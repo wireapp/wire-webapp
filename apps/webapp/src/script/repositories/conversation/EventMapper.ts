@@ -161,7 +161,7 @@ export class EventMapper {
    * @returns the updated message entity
    */
   updateMessageEvent(originalEntity: ContentMessage, event: LegacyEventRecord): ContentMessage {
-    const {id, data: eventData, edited_time: editedTime, qualified_conversation} = event;
+    const {id, data: eventData, edited_time: editedTime, qualified_conversation, thread_id} = event;
 
     // Handle quote for both regular text messages and multipart messages
     const quoteData = eventData.quote || eventData.text?.quote;
@@ -241,6 +241,7 @@ export class EventMapper {
     }
 
     originalEntity.id = id ?? '';
+    originalEntity.threadId = thread_id && thread_id.length ? thread_id : null;
 
     if (originalEntity.isContent() || (originalEntity as Message).isPing()) {
       originalEntity.status(event.status ?? StatusType.SENT);
@@ -451,6 +452,7 @@ export class EventMapper {
       from_client_id,
       ephemeral_expires,
       ephemeral_started,
+      thread_id,
     } = event as LegacyEventRecord;
 
     messageEntity.category = category;
@@ -459,6 +461,7 @@ export class EventMapper {
     messageEntity.fromDomain = qualified_from?.domain ?? '';
     messageEntity.fromClientId = from_client_id ?? '';
     messageEntity.id = id ?? '';
+    messageEntity.threadId = thread_id && thread_id.length ? thread_id : null;
     messageEntity.primary_key = primary_key;
     messageEntity.timestamp(new Date(time).getTime());
     messageEntity.type = type;

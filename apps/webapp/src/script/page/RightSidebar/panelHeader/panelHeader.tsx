@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect, useRef} from 'react';
+import {FC, ReactNode, useEffect, useRef} from 'react';
 
 import cx from 'classnames';
 
@@ -42,6 +42,9 @@ interface PanelHeaderProps {
   goBackUie?: string;
   titleDataUieName?: string;
   title?: string;
+  titleIcon?: ReactNode;
+  subtitle?: string;
+  subtitleDataUieName?: string;
   handleBlur?: () => void;
   onToggleMute?: () => void;
   shouldFocusFirstButton?: boolean;
@@ -57,6 +60,9 @@ const PanelHeader: FC<PanelHeaderProps> = ({
   goBackUie = 'back-button',
   goBackTitle = t('accessibility.rightPanel.GoBack'),
   title = '',
+  titleIcon,
+  subtitle = '',
+  subtitleDataUieName = '',
   titleDataUieName = '',
   closeUie = 'do-close',
   closeBtnTitle = t('accessibility.rightPanel.close'),
@@ -89,9 +95,17 @@ const PanelHeader: FC<PanelHeaderProps> = ({
       )}
 
       {title && (
-        <h2 className="panel__header__title" tabIndex={TabIndex.FOCUSABLE} data-uie-name={titleDataUieName}>
-          {title}
-        </h2>
+        <div className="panel__header__title-wrapper">
+          <h2 className="panel__header__title" tabIndex={TabIndex.FOCUSABLE} data-uie-name={titleDataUieName}>
+            {titleIcon}
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="panel__header__subtitle" data-uie-name={subtitleDataUieName}>
+              {subtitle}
+            </p>
+          )}
+        </div>
       )}
 
       <DraggableClickWrapper onClick={onClose}>

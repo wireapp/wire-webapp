@@ -432,6 +432,47 @@ export class StorageSchemata {
         schema: {},
         version: 21,
       },
+      {
+        schema: {
+          [StorageSchemata.OBJECT_STORE.AMPLIFY]: '',
+          [StorageSchemata.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
+          [StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS]:
+            ', category, conversation, time, type, thread_id, thread_root_message_id, is_thread_reply, [conversation+time], [conversation+category], [conversation+is_thread_reply+time], [conversation+thread_id], [conversation+thread_id+time]',
+          [StorageSchemata.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
+          [StorageSchemata.OBJECT_STORE.EVENTS]:
+            '++primary_key, id, category, conversation, time, type, thread_id, thread_root_message_id, is_thread_reply, [conversation+time], [conversation+category], [conversation+is_thread_reply+time], [conversation+thread_id], [conversation+thread_id+time]',
+          [StorageSchemata.OBJECT_STORE.KEYS]: '',
+          [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
+          [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
+          [StorageSchemata.OBJECT_STORE.USERS]: ', id',
+          [StorageSchemata.OBJECT_STORE.GROUP_IDS]: '',
+          [StorageSchemata.OBJECT_STORE.PENDING_PROPOSALS]: '',
+          [StorageSchemata.OBJECT_STORE.LAST_KEY_MATERIAL_UPDATE_DATES]: '',
+        },
+        upgrade: (transaction: Transaction) => {
+          const normalizeThreadId = (threadId?: string | null): string | null =>
+            typeof threadId === 'string' && threadId.length > 0 ? threadId : null;
+
+          const normalizeThreadData = (event: {
+            thread_id?: string | null;
+            thread_root_message_id?: string | null;
+            is_thread_reply?: boolean;
+          }) => {
+            const threadId = normalizeThreadId(event.thread_id);
+            const normalizedThreadRootMessageId = normalizeThreadId(event.thread_root_message_id);
+            event.thread_id = threadId;
+            event.thread_root_message_id = threadId ? normalizedThreadRootMessageId ?? threadId : null;
+            event.is_thread_reply = !!threadId;
+          };
+
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
+            .toCollection()
+            .modify(normalizeThreadData);
+          transaction.table(StorageSchemata.OBJECT_STORE.EVENTS).toCollection().modify(normalizeThreadData);
+        },
+        version: 22,
+      },
     ];
   }
 }

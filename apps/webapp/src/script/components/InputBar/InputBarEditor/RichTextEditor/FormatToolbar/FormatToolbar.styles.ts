@@ -25,7 +25,7 @@ export const wrapperStyles: CSSObject = {
   columnGap: '4px',
   overflowX: 'auto',
   scrollbarWidth: 'none',
-  '-ms-overflow-style': 'none',
+  msOverflowStyle: 'none',
 
   '&::-webkit-scrollbar': {
     width: 0,

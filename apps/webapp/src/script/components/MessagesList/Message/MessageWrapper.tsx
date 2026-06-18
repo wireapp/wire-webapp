@@ -79,12 +79,14 @@ export const MessageWrapper = ({
   onClickTimestamp,
   onClickParticipants,
   onClickDetails,
+  onClickThread,
   onClickResetSession,
   onClickCancelRequest,
   messageRepository,
   messageActions,
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
+  showThreadSummary = true,
 }: MessageParams) => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const findMessage = async (conversation: Conversation, messageId: string) => {
@@ -119,9 +121,16 @@ export const MessageWrapper = ({
         quoteEntity: quote,
         messageId,
         attachments: [],
+        threadId: message.threadId,
       });
     } else if (file !== undefined && firstAsset !== undefined) {
-      await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
+      await messageRepository.retryUploadFile(
+        conversation,
+        file,
+        firstAsset.isImage(),
+        message.id,
+        message.threadId,
+      );
     }
   };
   const {display_name: displayName, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
@@ -219,12 +228,17 @@ export const MessageWrapper = ({
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickDetails={onClickDetails}
+        onClickThread={onClickThread}
         onRetry={onRetry}
         isFocused={isFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}
         onClickReaction={handleReactionClick}
         is1to1={conversation.is1to1()}
         isFileShareRestricted={isFileShareRestricted}
+        showThreadSummary={showThreadSummary}
+        loadThreadRepliesCount={(conversationId, threadId) =>
+          messageRepository.countVisibleThreadReplies(conversationId, threadId)
+        }
       />
     );
   }

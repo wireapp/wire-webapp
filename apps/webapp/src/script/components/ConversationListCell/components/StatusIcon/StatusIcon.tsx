@@ -20,6 +20,12 @@
 import {useMemo} from 'react';
 
 import * as Icon from 'Components/icon';
+import {
+  getConversationHasUnreadThreadMentions,
+  getConversationUnreadThreadRepliesCount,
+  useThreadUnreadRepliesStore,
+} from 'Components/MessagesList/threading/threadUnreadRepliesStore';
+import {ThreadsIcon} from 'Components/ThreadIcons';
 import {generateCellState} from 'Repositories/conversation/ConversationCellState';
 import {ConversationStatusIcon} from 'Repositories/conversation/ConversationStatusIcon';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -31,17 +37,34 @@ interface Props {
 }
 
 export const StatusIcon = ({conversation}: Props) => {
-  const {unreadState, mutedState, isRequest} = useKoSubscribableChildren(conversation, [
-    'unreadState',
-    'mutedState',
-    'isRequest',
-  ]);
+  useKoSubscribableChildren(conversation, ['unreadState', 'mutedState', 'isRequest']);
 
-  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
+  const cellState = useMemo(() => generateCellState(conversation), [conversation]);
+  const unreadThreadRepliesCount = useThreadUnreadRepliesStore(state =>
+    getConversationUnreadThreadRepliesCount(conversation.id, state),
+  );
+  const hasUnreadThreadMentions = useThreadUnreadRepliesStore(state =>
+    getConversationHasUnreadThreadMentions(conversation.id, state),
+  );
+
+  const isMutedOrPendingIcon =
+    cellState.icon === ConversationStatusIcon.MUTED || cellState.icon === ConversationStatusIcon.PENDING_CONNECTION;
+
+  const showMentionIcon = cellState.icon === ConversationStatusIcon.UNREAD_MENTION || hasUnreadThreadMentions;
+  const effectiveCellIcon =
+    cellState.icon === ConversationStatusIcon.UNREAD_MENTION ? ConversationStatusIcon.NONE : cellState.icon;
+
+  const iconToRender = (() => {
+    if (unreadThreadRepliesCount > 0 && !isMutedOrPendingIcon) {
+      return ConversationStatusIcon.UNREAD_THREAD;
+    }
+
+    return effectiveCellIcon;
+  })();
 
   return (
     <>
-      {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (
+      {iconToRender === ConversationStatusIcon.PENDING_CONNECTION && (
         <span
           className="conversation-list-cell-badge cell-badge-light"
           data-uie-name="status-pending"
@@ -51,7 +74,7 @@ export const StatusIcon = ({conversation}: Props) => {
         </span>
       )}
 
-      {cellState.icon === ConversationStatusIcon.UNREAD_MENTION && (
+      {showMentionIcon && (
         <span
           className="conversation-list-cell-badge cell-badge-dark"
           data-uie-name="status-mention"
@@ -61,7 +84,18 @@ export const StatusIcon = ({conversation}: Props) => {
         </span>
       )}
 
-      {cellState.icon === ConversationStatusIcon.UNREAD_REPLY && (
+      {iconToRender === ConversationStatusIcon.UNREAD_THREAD && (
+        <span
+          className="conversation-list-cell-badge cell-badge-dark"
+          data-uie-name="status-thread-reply"
+          title={t('accessibility.conversationStatusUnreadReply')}
+          aria-label={t('accessibility.conversationStatusUnreadReply')}
+        >
+          <ThreadsIcon className="svg-icon" />
+        </span>
+      )}
+
+      {iconToRender === ConversationStatusIcon.UNREAD_REPLY && (
         <span
           className="conversation-list-cell-badge cell-badge-dark"
           data-uie-name="status-reply"
@@ -72,7 +106,7 @@ export const StatusIcon = ({conversation}: Props) => {
         </span>
       )}
 
-      {cellState.icon === ConversationStatusIcon.UNREAD_PING && (
+      {iconToRender === ConversationStatusIcon.UNREAD_PING && (
         <span
           className="conversation-list-cell-badge cell-badge-dark"
           data-uie-name="status-ping"
@@ -82,7 +116,7 @@ export const StatusIcon = ({conversation}: Props) => {
         </span>
       )}
 
-      {cellState.icon === ConversationStatusIcon.MISSED_CALL && (
+      {iconToRender === ConversationStatusIcon.MISSED_CALL && (
         <span
           className="conversation-list-cell-badge cell-badge-dark"
           data-uie-name="status-missed-call"
@@ -92,7 +126,7 @@ export const StatusIcon = ({conversation}: Props) => {
         </span>
       )}
 
-      {cellState.icon === ConversationStatusIcon.MUTED && (
+      {iconToRender === ConversationStatusIcon.MUTED && (
         <span
           className="conversation-list-cell-badge cell-badge-light conversation-muted"
           data-uie-name="status-silence"
@@ -103,15 +137,17 @@ export const StatusIcon = ({conversation}: Props) => {
         </span>
       )}
 
-      {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (
-        <span
-          className="conversation-list-cell-badge cell-badge-dark"
-          data-uie-name="status-unread"
-          title={t('accessibility.conversationStatusUnread')}
-        >
-          {unreadState.allMessages.length}
-        </span>
-      )}
+      {(iconToRender === ConversationStatusIcon.UNREAD_MESSAGES ||
+        (iconToRender === ConversationStatusIcon.UNREAD_THREAD && conversation.unreadState().allMessages.length > 0)) &&
+        conversation.unreadState().allMessages.length > 0 && (
+          <span
+            className="conversation-list-cell-badge cell-badge-dark"
+            data-uie-name="status-unread"
+            title={t('accessibility.conversationStatusUnread')}
+          >
+            {conversation.unreadState().allMessages.length}
+          </span>
+        )}
     </>
   );
 };

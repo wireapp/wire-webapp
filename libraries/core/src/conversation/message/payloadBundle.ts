@@ -36,6 +36,7 @@ export interface BasePayloadBundle {
   qualifiedFrom?: QualifiedId;
   fromClientId?: string;
   id: string;
+  threadId?: string | null;
   messageTimer?: number;
   source: NotificationSource;
   state: MessageSendingState;

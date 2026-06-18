@@ -48,6 +48,7 @@ type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
 type DBEvents = DexieCollection | EventRecord[];
 export type IdentifiedUpdatePayload = Partial<EventRecord> & Pick<EventRecord, 'primary_key'>;
+type EventLoadOptions = {includeThreadReplies?: boolean};
 
 const eventTimeToDate = (time: string) => {
   return new Date(time);
@@ -64,6 +65,33 @@ const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) => {
   return eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
 };
 const MAX_INDEXED_DB_LIMIT = 0xffffffff; // 4_294_967_295
+const normalizeThreadId = (threadId?: string | null): string | null =>
+  typeof threadId === 'string' && threadId.length > 0 ? threadId : null;
+const isThreadReply = (event: Partial<EventRecord>) => !!event.is_thread_reply;
+const hasThreadMetadata = (event: Partial<EventRecord>) =>
+  'thread_id' in event || 'thread_root_message_id' in event || 'is_thread_reply' in event;
+const isCompleteEventRecord = (event: Partial<EventRecord>) =>
+  'id' in event && 'conversation' in event && 'time' in event && 'type' in event;
+
+const withThreadDefaults = <T extends Partial<EventRecord>>(event: T): T => {
+  const threadId = normalizeThreadId(event.thread_id);
+  const hasThread = !!threadId;
+  const normalizedRootThreadId = normalizeThreadId(event.thread_root_message_id);
+
+  return {
+    ...event,
+    is_thread_reply: event.is_thread_reply ?? hasThread,
+    thread_id: threadId,
+    thread_root_message_id: hasThread ? normalizedRootThreadId ?? threadId : null,
+  };
+};
+
+const normalizeThreadMetadata = <T extends Partial<EventRecord>>(event: T): T => {
+  if (isCompleteEventRecord(event) || hasThreadMetadata(event)) {
+    return withThreadDefaults(event);
+  }
+  return event;
+};
 
 /** Handles all databases interactions related to events */
 export class EventService {
@@ -182,6 +210,7 @@ export class EventService {
     conversationId: string,
     categoryMin: MessageCategory,
     categoryMax = MessageCategory.LIKED,
+    {includeThreadReplies = false}: EventLoadOptions = {},
   ): Promise<DBEvents> {
     const filterExpired = (record: EventRecord) => {
       if (typeof record.ephemeral_expires !== 'undefined') {
@@ -196,6 +225,7 @@ export class EventService {
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('[conversation+category]')
         .between([conversationId, categoryMin], [conversationId, categoryMax], true, true)
+        .and(record => includeThreadReplies || !isThreadReply(record))
         .and(filterExpired)
         .sortBy('time');
       return events;
@@ -207,6 +237,7 @@ export class EventService {
         record =>
           record.conversation === conversationId && record.category >= categoryMin && record.category <= categoryMax,
       )
+      .filter(record => includeThreadReplies || !isThreadReply(record))
       .filter(filterExpired)
       .toSorted(compareEventsByTime);
   }
@@ -235,6 +266,71 @@ export class EventService {
       .toSorted(compareEventsByConversation);
   }
 
+  async loadThreadEvents(
+    conversationId: string,
+    threadId: string,
+    fromDate = new Date(0),
+    toDate = new Date(),
+    limit = Number.MAX_SAFE_INTEGER,
+  ): Promise<EventRecord[]> {
+    if (!conversationId || !threadId) {
+      this.logger.error(`Cannot get thread events for conversation '${conversationId}' and thread '${threadId}'`);
+      throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
+    }
+
+    const fromIsoDate = fromDate.toISOString();
+    const toIsoDate = toDate.toISOString();
+    if (this.storageService.db) {
+      return this.storageService.db
+        .table(StorageSchemata.OBJECT_STORE.EVENTS)
+        .where('[conversation+thread_id+time]')
+        .between([conversationId, threadId, fromIsoDate], [conversationId, threadId, toIsoDate], true, true)
+        .and(record => record.id !== threadId || !!record.is_thread_reply)
+        .sortBy('time')
+        .then(events => events.slice(0, limit));
+    }
+
+    const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
+    return records
+      .filter(record => {
+        return (
+          record.conversation === conversationId &&
+          record.thread_id === threadId &&
+          record.id !== threadId &&
+          record.time >= fromIsoDate &&
+          record.time <= toIsoDate
+        );
+      })
+      .sort(compareEventsByTime)
+      .slice(0, limit);
+  }
+
+  async countVisibleThreadReplies(conversationId: string, threadId: string): Promise<number> {
+    if (!conversationId || !threadId) {
+      this.logger.error(`Cannot count thread replies for conversation '${conversationId}' and thread '${threadId}'`);
+      throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
+    }
+
+    const isVisibleReply = (event: EventRecord) =>
+      (event.thread_id === threadId || event.thread_root_message_id === threadId) &&
+      event.id !== threadId &&
+      event.ephemeral_expires !== true;
+
+    if (this.storageService.db) {
+      return this.storageService.db
+        .table(StorageSchemata.OBJECT_STORE.EVENTS)
+        .where('[conversation+thread_id]')
+        .equals([conversationId, threadId])
+        .and(isVisibleReply)
+        .count();
+    }
+
+    const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
+    return records
+      .filter(record => record.conversation === conversationId && record.thread_id === threadId)
+      .filter(isVisibleReply).length;
+  }
+
   /**
    * Load events starting from the fromDate going back in history until either limit or toDate is reached.
    *
@@ -248,6 +344,7 @@ export class EventService {
     fromDate = new Date(0),
     toDate = new Date(),
     limit = MAX_INDEXED_DB_LIMIT,
+    {includeThreadReplies = false}: EventLoadOptions = {},
   ): Promise<DBEvents> {
     const includeParams = {
       includeFrom: true,
@@ -255,7 +352,9 @@ export class EventService {
     };
 
     try {
-      const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
+      const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams, {
+        includeThreadReplies,
+      });
       return this.storageService.db
         ? // Dexie.Collection.reverse() is a query API, not Array.prototype.reverse().
           // eslint-disable-next-line unicorn/no-array-reverse
@@ -281,6 +380,7 @@ export class EventService {
     fromDate: Date,
     limit = MAX_INDEXED_DB_LIMIT,
     includeFrom = true,
+    {includeThreadReplies = false}: EventLoadOptions = {},
   ): Promise<DBEvents> {
     const includeParams = {
       includeFrom,
@@ -292,7 +392,9 @@ export class EventService {
     }
     const toDate = new Date(Math.max(fromDate.getTime() + 1, Date.now()));
 
-    const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
+    const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams, {
+      includeThreadReplies,
+    });
     return this.storageService.db
       ? (events as DexieCollection).sortBy('time')
       : (events as EventRecord[]).toSorted(compareEventsByTime);
@@ -312,6 +414,7 @@ export class EventService {
     toDate: Date,
     limit: number,
     includes: Includes,
+    {includeThreadReplies = false}: EventLoadOptions = {},
   ): Promise<DBEvents> {
     const {includeFrom, includeTo} = includes;
     if (!(toDate instanceof Date) || !(fromDate instanceof Date)) {
@@ -325,7 +428,7 @@ export class EventService {
     }
 
     if (this.storageService.db) {
-      const events = await this.storageService.db
+      const collection = this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('[conversation+time]')
         .between(
@@ -334,7 +437,8 @@ export class EventService {
           includeFrom,
           includeTo,
         )
-        .limit(limit);
+        .and(record => includeThreadReplies || !isThreadReply(record));
+      const events = await collection.limit(limit);
       return events;
     }
 
@@ -344,6 +448,7 @@ export class EventService {
         const recordDate = eventTimeToDate(record.time).getTime();
         return (
           record.conversation === conversationId &&
+          (includeThreadReplies || !isThreadReply(record)) &&
           (includeFrom ? recordDate >= fromDate.getTime() : recordDate > fromDate.getTime()) &&
           (includeTo ? recordDate <= toDate.getTime() : recordDate < toDate.getTime())
         );
@@ -359,9 +464,10 @@ export class EventService {
    * @param event JSON event to be stored
    */
   async saveEvent(event: Omit<EventRecord, 'primary_key' | 'category'>): Promise<EventRecord> {
+    const normalizedEvent = withThreadDefaults(event);
     const categorizedEvent = {
-      ...event,
-      category: categoryFromEvent(event as EventRecord),
+      ...normalizedEvent,
+      category: categoryFromEvent(normalizedEvent as EventRecord),
     };
     const savedEvent: EventRecord = {
       ...categorizedEvent,
@@ -371,8 +477,9 @@ export class EventService {
   }
 
   async replaceEvent<T extends IdentifiedUpdatePayload>(event: T): Promise<T> {
-    await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
-    return event;
+    const normalizedEvent = normalizeThreadMetadata(event);
+    await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, normalizedEvent);
+    return normalizedEvent as T;
   }
 
   addEventUpdatedListener(callback: DatabaseListenerCallback): void {

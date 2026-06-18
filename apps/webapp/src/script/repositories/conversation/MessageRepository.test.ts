@@ -472,6 +472,36 @@ describe('MessageRepository', () => {
         userIds: expect.any(Object),
       });
     });
+
+    it('sends threaded text mode without changing payload content shape', async () => {
+      const [messageRepository, {eventRepository, core, propertiesRepository}] = await buildMessageRepository();
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      spyOn(eventRepository, 'injectEvent').and.returnValue(Promise.resolve());
+      const conversation = generateConversation();
+      await messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'threaded hello',
+        mentions: [],
+        threadId: 'root-123',
+      });
+
+      expect(core.service!.conversation.send).toHaveBeenCalledWith({
+        ...commonSendResponse,
+        conversationId: conversation.qualifiedId,
+        nativePush: true,
+        payload: expect.objectContaining({text: expect.objectContaining({content: 'threaded hello'})}),
+        targetMode: undefined,
+        userIds: expect.any(Object),
+      });
+    });
+  });
+
+  describe('thread id derivation', () => {
+    it('uses deterministic thread id based on root message id', async () => {
+      const [messageRepository] = await buildMessageRepository();
+      expect(messageRepository.getThreadIdFromRootMessage('root-message-id')).toBe('root-message-id');
+    });
   });
 
   describe('deleteMessageForEveryone', () => {

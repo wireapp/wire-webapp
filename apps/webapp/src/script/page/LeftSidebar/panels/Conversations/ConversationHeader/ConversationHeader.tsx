@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, KeyboardEvent, MutableRefObject, useEffect} from 'react';
+import {KeyboardEvent, MutableRefObject, useEffect} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -155,4 +155,4 @@ export const ConversationHeaderComponent = ({
   );
 };
 
-export const ConversationHeader = forwardRef(ConversationHeaderComponent);
+export const ConversationHeader = ConversationHeaderComponent;

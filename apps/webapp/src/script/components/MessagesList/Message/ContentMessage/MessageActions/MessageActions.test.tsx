@@ -32,6 +32,7 @@ const defaultProps: MessageActionsMenuProps = {
   isMessageFocused: true,
   handleActionMenuVisibility: jest.fn(),
   handleReactionClick: jest.fn(),
+  onThreadClick: jest.fn(),
   reactionsTotalCount: 0,
   isRemovedFromConversation: false,
 };

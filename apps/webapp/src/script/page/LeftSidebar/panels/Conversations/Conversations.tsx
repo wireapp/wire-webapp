@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {useShallow} from 'zustand/react/shallow';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
+import {CircleCloseIcon, Input, SearchIcon, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useConversationFocus} from 'Hooks/useConversationFocus';
@@ -32,6 +32,7 @@ import {createLabel} from 'Repositories/conversation/ConversationLabelRepository
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
@@ -52,10 +53,19 @@ import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {ConversationCallingView} from './ConversationCallingView/ConversationCallingView';
 import {ConversationHeader} from './ConversationHeader';
+import {
+  closeIconStyles as conversationsHeaderCloseIconStyles,
+  header as conversationsHeaderStyles,
+  label as conversationsHeaderLabelStyles,
+  searchIconStyles as conversationsHeaderSearchIconStyles,
+  searchInputStyles as conversationsHeaderSearchInputStyles,
+  searchInputWrapperStyles as conversationsHeaderSearchInputWrapperStyles,
+} from './ConversationHeader/ConversationHeader.styles';
 import {conversationsSpacerStyles} from './Conversations.styles';
 import {ConversationSidebar} from './ConversationSidebar/ConversationSidebar';
 import {ConversationsList} from './ConversationsList';
 import {EmptyConversationList} from './EmptyConversationList';
+import {ThreadsPanel} from './ThreadsPanel';
 import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
 import {getTabConversations, scrollToConversation} from './helpers';
 import {useDraftConversations} from './hooks/useDraftConversations';
@@ -63,11 +73,21 @@ import {useFolderStore} from './useFoldersStore';
 import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import {Config} from '../../../../Config';
+import {useThreadIndexStore} from '../../../../components/MessagesList/threading/threadIndexStore';
+import {useThreadUnreadRepliesStore} from '../../../../components/MessagesList/threading/threadUnreadRepliesStore';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {navigate} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../ListWrapper';
 import {StartUI} from '../StartUI';
+import {PanelState} from '../../../RightSidebar';
+
+type ThreadAuthorLabelLookup = {
+  displayName?: string;
+  handle?: string;
+  accentColor?: string;
+};
 
 type ConversationsProps = {
   callState?: CallState;
@@ -112,9 +132,10 @@ export const Conversations = ({
   } = useSidebarStore(useShallow(state => state));
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
+  const [threadsRootSearchValue, setThreadsRootSearchValue] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
-  const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
+  const {connectRequests, users} = useKoSubscribableChildren(userState, ['connectRequests', 'users']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
   const {isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['isTemporaryGuest']);
@@ -153,10 +174,33 @@ export const Conversations = ({
     }
     return conversationLabelRepository.getLabelConversations(favoriteLabel, conversations);
   }, [conversationLabelRepository, conversations, favoriteLabel]);
+  const conversationLabelsById = useMemo(() => {
+    return visibleConversations.reduce<Record<string, string>>((labels, conversation) => {
+      labels[conversation.id] = conversation.display_name();
+      return labels;
+    }, {});
+  }, [visibleConversations]);
+  const authorLabelsById = useMemo(() => {
+    return users.reduce<Record<string, ThreadAuthorLabelLookup>>((labels, user) => {
+      labels[user.id] = {
+        displayName: user.name(),
+        handle: user.handle,
+        accentColor: user.accent_color(),
+      };
+      return labels;
+    }, {});
+  }, [users]);
+  const conversationsById = useMemo(() => {
+    return visibleConversations.reduce<Record<string, Conversation>>((nextConversationsById, conversation) => {
+      nextConversationsById[conversation.id] = conversation;
+      return nextConversationsById;
+    }, {});
+  }, [visibleConversations]);
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
   const isCells = currentTab === SidebarTabs.CELLS;
   const isMeetings = currentTab === SidebarTabs.MEETINGS;
+  const isThreads = currentTab === SidebarTabs.THREADS;
 
   const showSearchInput = [
     SidebarTabs.RECENT,
@@ -174,9 +218,11 @@ export const Conversations = ({
   ].includes(currentTab);
 
   const {setCurrentView} = useAppMainState(useShallow(state => state.responsiveView));
+  const openRightSidebarPanel = useAppMainState(state => state.rightSidebar.goTo);
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore(
     useShallow(state => state),
   );
+  const {message: messageRepository} = listViewModel.contentViewModel.repositories;
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
   // false when screen is larger than 1000px
@@ -251,9 +297,59 @@ export const Conversations = ({
     );
   }, [isFoldersTabOpen, isSideBarOpen, setSidebarStatus, toggleFoldersTab]);
 
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
+  const openIndexedThread = useCallback(
+    async (thread: {conversationId: string; threadId: string}) => {
+      const conversation = conversationState.findConversation({id: thread.conversationId, domain: ''});
       if (!conversation) {
+        useThreadIndexStore.getState().removeThread(thread.conversationId, thread.threadId);
+        return;
+      }
+
+      setCurrentTab(SidebarTabs.THREADS);
+      navigate(generateConversationUrl(conversation.qualifiedId));
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+
+      let threadRootMessage: Message | undefined = conversation.getMessage(thread.threadId);
+      if (!threadRootMessage) {
+        try {
+          threadRootMessage = await messageRepository.getMessageInConversationById(conversation, thread.threadId);
+        } catch {
+          useThreadIndexStore.getState().removeThread(thread.conversationId, thread.threadId);
+          return;
+        }
+      }
+
+      if (!threadRootMessage) {
+        useThreadIndexStore.getState().removeThread(thread.conversationId, thread.threadId);
+        return;
+      }
+
+      try {
+        threadRootMessage = await messageRepository.ensureMessageSender(threadRootMessage);
+      } catch {
+        // Keep opening the thread even if sender hydration fails.
+      }
+
+      if (threadRootMessage.user().isMe) {
+        useThreadUnreadRepliesStore.getState().markThreadRootAuthoredBySelf(thread.conversationId, thread.threadId);
+        useThreadIndexStore.getState().markThreadRootMessageBySelf(thread.conversationId, thread.threadId);
+      }
+
+      const threadMessage = threadRootMessage;
+      window.requestAnimationFrame(() => {
+        openRightSidebarPanel(PanelState.MESSAGE_THREAD, {entity: threadMessage});
+      });
+    },
+    [conversationState, messageRepository, openRightSidebarPanel, setCurrentTab],
+  );
+
+  useEffect(() => {
+    const handleConversationShow = (conversation?: Conversation) => {
+      if (!conversation) {
+        return;
+      }
+
+      if (currentTab === SidebarTabs.THREADS) {
         return;
       }
 
@@ -262,8 +358,13 @@ export const Conversations = ({
       if (!includesConversation) {
         setCurrentTab(SidebarTabs.RECENT);
       }
-    });
-  }, [currentTabConversations, setCurrentTab]);
+    };
+
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, handleConversationShow);
+    return () => {
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.SHOW, handleConversationShow);
+    };
+  }, [currentTab, currentTabConversations, setCurrentTab]);
 
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
@@ -409,18 +510,47 @@ export const Conversations = ({
       <ListWrapper
         id="conversations"
         headerElement={
-          <ConversationHeader
-            currentFolder={currentFolder}
-            currentTab={currentTab}
-            selfUser={selfUser}
-            showSearchInput={(showSearchInput && hasVisibleConversations) || !!conversationsFilter}
-            searchValue={conversationsFilter}
-            setSearchValue={onSearch}
-            searchInputPlaceholder={searchInputPlaceholder}
-            onSearchEnterClick={handleEnterSearchClick}
-            jumpToRecentSearch={jumpToRecentSearch}
-            searchInputRef={searchInputRef}
-          />
+          isThreads ? (
+            <>
+              <div css={conversationsHeaderStyles}>
+                <h2 css={conversationsHeaderLabelStyles} data-uie-name="conversation-list-header-title">
+                  All threads
+                </h2>
+              </div>
+              <Input
+                className="label-1"
+                value={threadsRootSearchValue}
+                onChange={event => setThreadsRootSearchValue(event.currentTarget.value)}
+                startContent={<SearchIcon width={14} height={14} css={conversationsHeaderSearchIconStyles} />}
+                endContent={
+                  threadsRootSearchValue && (
+                    <CircleCloseIcon
+                      className="cursor-pointer"
+                      onClick={() => setThreadsRootSearchValue('')}
+                      css={conversationsHeaderCloseIconStyles}
+                    />
+                  )
+                }
+                inputCSS={conversationsHeaderSearchInputStyles}
+                wrapperCSS={conversationsHeaderSearchInputWrapperStyles}
+                placeholder="Search root messages"
+                data-uie-name="search-threads-root-message"
+              />
+            </>
+          ) : (
+            <ConversationHeader
+              currentFolder={currentFolder}
+              currentTab={currentTab}
+              selfUser={selfUser}
+              showSearchInput={(showSearchInput && hasVisibleConversations) || !!conversationsFilter}
+              searchValue={conversationsFilter}
+              setSearchValue={onSearch}
+              searchInputPlaceholder={searchInputPlaceholder}
+              onSearchEnterClick={handleEnterSearchClick}
+              jumpToRecentSearch={jumpToRecentSearch}
+              searchInputRef={searchInputRef}
+            />
+          )
         }
         conversationListRef={conversationListRef}
         setConversationListRef={setConversationListRef}
@@ -482,7 +612,7 @@ export const Conversations = ({
               />
             )}
 
-            {hasEmptyConversationsList && (
+            {!isThreads && hasEmptyConversationsList && (
               <EmptyConversationList
                 currentTab={currentTab}
                 onChangeTab={changeTab}
@@ -490,7 +620,17 @@ export const Conversations = ({
               />
             )}
 
-            {showSearchInput && (
+            {isThreads && (
+              <ThreadsPanel
+                onOpenThread={openIndexedThread}
+                conversationLabelsById={conversationLabelsById}
+                authorLabelsById={authorLabelsById}
+                conversationsById={conversationsById}
+                rootMessageSearchValue={threadsRootSearchValue}
+              />
+            )}
+
+            {!isThreads && showSearchInput && (
               <ConversationsList
                 conversationsFilter={conversationsFilter}
                 currentFolder={currentFolder}

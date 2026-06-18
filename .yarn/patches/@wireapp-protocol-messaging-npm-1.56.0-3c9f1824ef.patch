@@ -1,0 +1,392 @@
+diff --git a/proto/messages.proto b/proto/messages.proto
+index 433a05b5b81bc4da66123987fe5fea1741e19835..ef9587fdce74b1ef82486e43172fa2def1a881b3 100644
+--- a/proto/messages.proto
++++ b/proto/messages.proto
+@@ -76,6 +76,7 @@ message Composite {
+   repeated Item items = 1;
+   optional bool expects_read_confirmation = 2 [default = false];
+   optional LegalHoldStatus legal_hold_status = 3 [default = UNKNOWN];
++  optional string thread_id = 4;
+ 
+   message Item {
+       oneof content {
+@@ -130,6 +131,7 @@ message Text {
+   optional Quote quote = 5; // if this Text is part of a MessageEdit, this field is ignored
+   optional bool expects_read_confirmation = 6 [default = false]; // whether the sender is expecting to receive a read confirmation
+   optional LegalHoldStatus legal_hold_status = 7 [default = UNKNOWN]; // whether this message was sent to legal hold
++  optional string thread_id = 8;
+ }
+ 
+ message Knock {
+@@ -278,6 +280,7 @@ message Multipart {
+   // Standard flags for all message types
+   optional bool expects_read_confirmation = 3 [default = false];
+   optional LegalHoldStatus legal_hold_status = 4 [default = UNKNOWN];
++  optional string thread_id = 5;
+ }
+ 
+ // CellAsset represents a file uploaded to a conversation cell
+@@ -386,6 +389,7 @@ message Asset {
+   optional Preview preview = 5;
+   optional bool expects_read_confirmation = 6 [default = false]; // whether the sender is expecting to receive a read confirmation
+   optional LegalHoldStatus legal_hold_status = 7 [default = UNKNOWN]; // whether this message was sent to legal hold
++  optional string thread_id = 8;
+ }
+ 
+ // Actual message is encrypted with AES and sent as additional data
+diff --git a/web/messages.d.ts b/web/messages.d.ts
+index 6e5d207cc9efb6bc7940b91e425ae31d5f4d886a..abae3f55e1109f5b7e0af3281ff3afd59812e7ea 100644
+--- a/web/messages.d.ts
++++ b/web/messages.d.ts
+@@ -125,6 +125,7 @@ export interface IComposite {
+     items?: (Composite.IItem[]|null);
+     expectsReadConfirmation?: (boolean|null);
+     legalHoldStatus?: (LegalHoldStatus|null);
++    threadId?: (string|null);
+ }
+ 
+ export class Composite implements IComposite {
+@@ -132,6 +133,7 @@ export class Composite implements IComposite {
+     public items: Composite.IItem[];
+     public expectsReadConfirmation: boolean;
+     public legalHoldStatus: LegalHoldStatus;
++    public threadId: string;
+     public static create(properties?: IComposite): Composite;
+     public static encode(message: IComposite, writer?: $protobuf.Writer): $protobuf.Writer;
+     public static encodeDelimited(message: IComposite, writer?: $protobuf.Writer): $protobuf.Writer;
+@@ -298,6 +300,7 @@ export interface IText {
+     quote?: (IQuote|null);
+     expectsReadConfirmation?: (boolean|null);
+     legalHoldStatus?: (LegalHoldStatus|null);
++    threadId?: (string|null);
+ }
+ 
+ export class Text implements IText {
+@@ -308,6 +311,7 @@ export class Text implements IText {
+     public quote?: (IQuote|null);
+     public expectsReadConfirmation: boolean;
+     public legalHoldStatus: LegalHoldStatus;
++    public threadId: string;
+     public static create(properties?: IText): Text;
+     public static encode(message: IText, writer?: $protobuf.Writer): $protobuf.Writer;
+     public static encodeDelimited(message: IText, writer?: $protobuf.Writer): $protobuf.Writer;
+@@ -711,6 +715,7 @@ export interface IMultipart {
+     attachments?: (IAttachment[]|null);
+     expectsReadConfirmation?: (boolean|null);
+     legalHoldStatus?: (LegalHoldStatus|null);
++    threadId?: (string|null);
+ }
+ 
+ export class Multipart implements IMultipart {
+@@ -719,6 +724,7 @@ export class Multipart implements IMultipart {
+     public attachments: IAttachment[];
+     public expectsReadConfirmation: boolean;
+     public legalHoldStatus: LegalHoldStatus;
++    public threadId: string;
+     public static create(properties?: IMultipart): Multipart;
+     public static encode(message: IMultipart, writer?: $protobuf.Writer): $protobuf.Writer;
+     public static encodeDelimited(message: IMultipart, writer?: $protobuf.Writer): $protobuf.Writer;
+@@ -838,6 +844,7 @@ export interface IAsset {
+     preview?: (Asset.IPreview|null);
+     expectsReadConfirmation?: (boolean|null);
+     legalHoldStatus?: (LegalHoldStatus|null);
++    threadId?: (string|null);
+ }
+ 
+ export class Asset implements IAsset {
+@@ -848,6 +855,7 @@ export class Asset implements IAsset {
+     public preview?: (Asset.IPreview|null);
+     public expectsReadConfirmation: boolean;
+     public legalHoldStatus: LegalHoldStatus;
++    public threadId: string;
+     public status?: ("notUploaded"|"uploaded");
+     public static create(properties?: IAsset): Asset;
+     public static encode(message: IAsset, writer?: $protobuf.Writer): $protobuf.Writer;
+diff --git a/web/messages.js b/web/messages.js
+index bc34306c2f85beb17fea818cf91b3c6345523568..ddb4a208a7065a7bbf6ea35b0fff1f752b7b7032 100644
+--- a/web/messages.js
++++ b/web/messages.js
+@@ -1642,6 +1642,14 @@ $root.Composite = (function() {
+      */
+     Composite.prototype.legalHoldStatus = 0;
+ 
++    /**
++     * Composite threadId.
++     * @member {string} threadId
++     * @memberof Composite
++     * @instance
++     */
++    Composite.prototype.threadId = "";
++
+     /**
+      * Creates a new Composite instance using the specified properties.
+      * @function create
+@@ -1673,6 +1681,8 @@ $root.Composite = (function() {
+             writer.uint32(/* id 2, wireType 0 =*/16).bool(message.expectsReadConfirmation);
+         if (message.legalHoldStatus != null && Object.hasOwnProperty.call(message, "legalHoldStatus"))
+             writer.uint32(/* id 3, wireType 0 =*/24).int32(message.legalHoldStatus);
++        if (message.threadId != null && Object.hasOwnProperty.call(message, "threadId"))
++            writer.uint32(/* id 4, wireType 2 =*/34).string(message.threadId);
+         return writer;
+     };
+ 
+@@ -1721,6 +1731,10 @@ $root.Composite = (function() {
+                     message.legalHoldStatus = reader.int32();
+                     break;
+                 }
++            case 4: {
++                    message.threadId = reader.string();
++                    break;
++                }
+             default:
+                 reader.skipType(tag & 7);
+                 break;
+@@ -1777,6 +1791,9 @@ $root.Composite = (function() {
+             case 2:
+                 break;
+             }
++        if (message.threadId != null && message.hasOwnProperty("threadId"))
++            if (!$util.isString(message.threadId))
++                return "threadId: string expected";
+         return null;
+     };
+ 
+@@ -1824,6 +1841,8 @@ $root.Composite = (function() {
+             message.legalHoldStatus = 2;
+             break;
+         }
++        if (object.threadId != null)
++            message.threadId = String(object.threadId);
+         return message;
+     };
+ 
+@@ -1845,6 +1864,7 @@ $root.Composite = (function() {
+         if (options.defaults) {
+             object.expectsReadConfirmation = false;
+             object.legalHoldStatus = options.enums === String ? "UNKNOWN" : 0;
++            object.threadId = "";
+         }
+         if (message.items && message.items.length) {
+             object.items = [];
+@@ -1855,6 +1875,8 @@ $root.Composite = (function() {
+             object.expectsReadConfirmation = message.expectsReadConfirmation;
+         if (message.legalHoldStatus != null && message.hasOwnProperty("legalHoldStatus"))
+             object.legalHoldStatus = options.enums === String ? $root.LegalHoldStatus[message.legalHoldStatus] === undefined ? message.legalHoldStatus : $root.LegalHoldStatus[message.legalHoldStatus] : message.legalHoldStatus;
++        if (message.threadId != null && message.hasOwnProperty("threadId"))
++            object.threadId = message.threadId;
+         return object;
+     };
+ 
+@@ -3564,6 +3586,14 @@ $root.Text = (function() {
+      */
+     Text.prototype.legalHoldStatus = 0;
+ 
++    /**
++     * Text threadId.
++     * @member {string} threadId
++     * @memberof Text
++     * @instance
++     */
++    Text.prototype.threadId = "";
++
+     /**
+      * Creates a new Text instance using the specified properties.
+      * @function create
+@@ -3601,6 +3631,8 @@ $root.Text = (function() {
+             writer.uint32(/* id 6, wireType 0 =*/48).bool(message.expectsReadConfirmation);
+         if (message.legalHoldStatus != null && Object.hasOwnProperty.call(message, "legalHoldStatus"))
+             writer.uint32(/* id 7, wireType 0 =*/56).int32(message.legalHoldStatus);
++        if (message.threadId != null && Object.hasOwnProperty.call(message, "threadId"))
++            writer.uint32(/* id 8, wireType 2 =*/66).string(message.threadId);
+         return writer;
+     };
+ 
+@@ -3663,6 +3695,10 @@ $root.Text = (function() {
+                     message.legalHoldStatus = reader.int32();
+                     break;
+                 }
++            case 8: {
++                    message.threadId = reader.string();
++                    break;
++                }
+             default:
+                 reader.skipType(tag & 7);
+                 break;
+@@ -3737,6 +3773,9 @@ $root.Text = (function() {
+             case 2:
+                 break;
+             }
++        if (message.threadId != null && message.hasOwnProperty("threadId"))
++            if (!$util.isString(message.threadId))
++                return "threadId: string expected";
+         return null;
+     };
+ 
+@@ -3801,6 +3840,8 @@ $root.Text = (function() {
+             message.legalHoldStatus = 2;
+             break;
+         }
++        if (object.threadId != null)
++            message.threadId = String(object.threadId);
+         return message;
+     };
+ 
+@@ -3826,6 +3867,7 @@ $root.Text = (function() {
+             object.quote = null;
+             object.expectsReadConfirmation = false;
+             object.legalHoldStatus = options.enums === String ? "UNKNOWN" : 0;
++            object.threadId = "";
+         }
+         if (message.content != null && message.hasOwnProperty("content"))
+             object.content = message.content;
+@@ -3845,6 +3887,8 @@ $root.Text = (function() {
+             object.expectsReadConfirmation = message.expectsReadConfirmation;
+         if (message.legalHoldStatus != null && message.hasOwnProperty("legalHoldStatus"))
+             object.legalHoldStatus = options.enums === String ? $root.LegalHoldStatus[message.legalHoldStatus] === undefined ? message.legalHoldStatus : $root.LegalHoldStatus[message.legalHoldStatus] : message.legalHoldStatus;
++        if (message.threadId != null && message.hasOwnProperty("threadId"))
++            object.threadId = message.threadId;
+         return object;
+     };
+ 
+@@ -8357,6 +8401,14 @@ $root.Multipart = (function() {
+      */
+     Multipart.prototype.legalHoldStatus = 0;
+ 
++    /**
++     * Multipart threadId.
++     * @member {string} threadId
++     * @memberof Multipart
++     * @instance
++     */
++    Multipart.prototype.threadId = "";
++
+     /**
+      * Creates a new Multipart instance using the specified properties.
+      * @function create
+@@ -8390,6 +8442,8 @@ $root.Multipart = (function() {
+             writer.uint32(/* id 3, wireType 0 =*/24).bool(message.expectsReadConfirmation);
+         if (message.legalHoldStatus != null && Object.hasOwnProperty.call(message, "legalHoldStatus"))
+             writer.uint32(/* id 4, wireType 0 =*/32).int32(message.legalHoldStatus);
++        if (message.threadId != null && Object.hasOwnProperty.call(message, "threadId"))
++            writer.uint32(/* id 5, wireType 2 =*/42).string(message.threadId);
+         return writer;
+     };
+ 
+@@ -8442,6 +8496,10 @@ $root.Multipart = (function() {
+                     message.legalHoldStatus = reader.int32();
+                     break;
+                 }
++            case 5: {
++                    message.threadId = reader.string();
++                    break;
++                }
+             default:
+                 reader.skipType(tag & 7);
+                 break;
+@@ -8503,6 +8561,9 @@ $root.Multipart = (function() {
+             case 2:
+                 break;
+             }
++        if (message.threadId != null && message.hasOwnProperty("threadId"))
++            if (!$util.isString(message.threadId))
++                return "threadId: string expected";
+         return null;
+     };
+ 
+@@ -8555,6 +8616,8 @@ $root.Multipart = (function() {
+             message.legalHoldStatus = 2;
+             break;
+         }
++        if (object.threadId != null)
++            message.threadId = String(object.threadId);
+         return message;
+     };
+ 
+@@ -8577,6 +8640,7 @@ $root.Multipart = (function() {
+             object.text = null;
+             object.expectsReadConfirmation = false;
+             object.legalHoldStatus = options.enums === String ? "UNKNOWN" : 0;
++            object.threadId = "";
+         }
+         if (message.text != null && message.hasOwnProperty("text"))
+             object.text = $root.Text.toObject(message.text, options);
+@@ -8589,6 +8653,8 @@ $root.Multipart = (function() {
+             object.expectsReadConfirmation = message.expectsReadConfirmation;
+         if (message.legalHoldStatus != null && message.hasOwnProperty("legalHoldStatus"))
+             object.legalHoldStatus = options.enums === String ? $root.LegalHoldStatus[message.legalHoldStatus] === undefined ? message.legalHoldStatus : $root.LegalHoldStatus[message.legalHoldStatus] : message.legalHoldStatus;
++        if (message.threadId != null && message.hasOwnProperty("threadId"))
++            object.threadId = message.threadId;
+         return object;
+     };
+ 
+@@ -9844,6 +9910,14 @@ $root.Asset = (function() {
+      */
+     Asset.prototype.legalHoldStatus = 0;
+ 
++    /**
++     * Asset threadId.
++     * @member {string} threadId
++     * @memberof Asset
++     * @instance
++     */
++    Asset.prototype.threadId = "";
++
+     // OneOf field names bound to virtual getters and setters
+     var $oneOfFields;
+ 
+@@ -9894,6 +9968,8 @@ $root.Asset = (function() {
+             writer.uint32(/* id 6, wireType 0 =*/48).bool(message.expectsReadConfirmation);
+         if (message.legalHoldStatus != null && Object.hasOwnProperty.call(message, "legalHoldStatus"))
+             writer.uint32(/* id 7, wireType 0 =*/56).int32(message.legalHoldStatus);
++        if (message.threadId != null && Object.hasOwnProperty.call(message, "threadId"))
++            writer.uint32(/* id 8, wireType 2 =*/66).string(message.threadId);
+         return writer;
+     };
+ 
+@@ -9952,6 +10028,10 @@ $root.Asset = (function() {
+                     message.legalHoldStatus = reader.int32();
+                     break;
+                 }
++            case 8: {
++                    message.threadId = reader.string();
++                    break;
++                }
+             default:
+                 reader.skipType(tag & 7);
+                 break;
+@@ -10030,6 +10110,9 @@ $root.Asset = (function() {
+             case 2:
+                 break;
+             }
++        if (message.threadId != null && message.hasOwnProperty("threadId"))
++            if (!$util.isString(message.threadId))
++                return "threadId: string expected";
+         return null;
+     };
+ 
+@@ -10098,6 +10181,8 @@ $root.Asset = (function() {
+             message.legalHoldStatus = 2;
+             break;
+         }
++        if (object.threadId != null)
++            message.threadId = String(object.threadId);
+         return message;
+     };
+ 
+@@ -10119,6 +10204,7 @@ $root.Asset = (function() {
+             object.preview = null;
+             object.expectsReadConfirmation = false;
+             object.legalHoldStatus = options.enums === String ? "UNKNOWN" : 0;
++            object.threadId = "";
+         }
+         if (message.original != null && message.hasOwnProperty("original"))
+             object.original = $root.Asset.Original.toObject(message.original, options);
+@@ -10138,6 +10224,8 @@ $root.Asset = (function() {
+             object.expectsReadConfirmation = message.expectsReadConfirmation;
+         if (message.legalHoldStatus != null && message.hasOwnProperty("legalHoldStatus"))
+             object.legalHoldStatus = options.enums === String ? $root.LegalHoldStatus[message.legalHoldStatus] === undefined ? message.legalHoldStatus : $root.LegalHoldStatus[message.legalHoldStatus] : message.legalHoldStatus;
++        if (message.threadId != null && message.hasOwnProperty("threadId"))
++            object.threadId = message.threadId;
+         return object;
+     };
+ 

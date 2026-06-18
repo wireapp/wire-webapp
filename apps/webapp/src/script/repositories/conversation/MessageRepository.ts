@@ -50,6 +50,7 @@ import {partition} from 'underscore';
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {THREAD_REPLY_SENT} from 'Components/MessagesList/threading/threadingEvents';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -146,6 +147,7 @@ type TextMessagePayload = {
   message: string;
   messageId?: string;
   quote?: OutgoingQuote;
+  threadId?: string | null;
 };
 type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
 
@@ -215,6 +217,14 @@ export class MessageRepository {
     this.onClientMismatch = onClientMismatch;
   }
 
+  public getThreadIdFromRootMessage(rootMessageId: string): string {
+    return rootMessageId;
+  }
+
+  public async countVisibleThreadReplies(conversationId: string, threadId: string): Promise<number> {
+    return this.eventService.countVisibleThreadReplies(conversationId, threadId);
+  }
+
   /**
    * Triggers the handler for mismatch. Can be used if a mismatch is triggered from outside the MessageRepository
    *
@@ -266,7 +276,7 @@ export class MessageRepository {
    * @see https://docs.wire.com/understand/federation/index.html
    */
   private async sendText(
-    {conversation, message, mentions = [], linkPreview, quote, messageId}: TextMessagePayload,
+    {conversation, message, mentions = [], linkPreview, quote, messageId, threadId}: TextMessagePayload,
     options?: {syncTimestamp?: boolean},
   ) {
     const textMessage = MessageBuilder.buildTextMessage(
@@ -278,6 +288,7 @@ export class MessageRepository {
         {linkPreview, mentions, quote},
       ),
       messageId,
+      threadId,
     );
 
     return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
@@ -289,7 +300,16 @@ export class MessageRepository {
    * @see https://docs.wire.com/understand/federation/index.html
    */
   private async sendMultipartText(
-    {conversation, message, messageId, attachments, linkPreview, mentions = [], quote}: MultipartMessagePayload,
+    {
+      conversation,
+      message,
+      messageId,
+      attachments,
+      linkPreview,
+      mentions = [],
+      quote,
+      threadId,
+    }: MultipartMessagePayload,
     options?: {syncTimestamp?: boolean},
   ) {
     const text = this.decorateTextMessage(
@@ -299,7 +319,7 @@ export class MessageRepository {
       conversation,
       {linkPreview, mentions, quote},
     );
-    const textMessage = MessageBuilder.buildMultipartMessage(attachments, text, messageId);
+    const textMessage = MessageBuilder.buildMultipartMessage(attachments, text, messageId, threadId);
 
     return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
   }
@@ -399,6 +419,7 @@ export class MessageRepository {
     quoteEntity,
     messageId,
     attachments,
+    threadId,
   }: {
     conversation: Conversation;
     textMessage: string;
@@ -406,6 +427,7 @@ export class MessageRepository {
     quoteEntity?: OutgoingQuote;
     messageId?: string;
     attachments?: MultiPartContent['attachments'];
+    threadId?: string | null;
   }): Promise<void> {
     const textPayload = {
       conversation,
@@ -415,6 +437,7 @@ export class MessageRepository {
       // We set the id explicitely in order to be able to override the message if we generate a link preview
       // Similarly, we provide that same id when we retry to send a failed message in order to override the original
       messageId: messageId ?? createUuid(),
+      threadId,
     };
 
     let state;
@@ -422,6 +445,10 @@ export class MessageRepository {
       state = (await this.sendMultipartText({...textPayload, attachments})).state;
     } else {
       state = (await this.sendText(textPayload)).state;
+    }
+
+    if (threadId && state !== MessageSendingState.CANCELED) {
+      this.publishThreadReplySent(conversation.id, threadId);
     }
 
     if (state !== MessageSendingState.CANCELED) {
@@ -534,6 +561,7 @@ export class MessageRepository {
     url: string,
     tag: string | number | Record<string, string>,
     quoteEntity?: OutgoingQuote,
+    threadId?: string | null,
   ): Promise<void> {
     if (!tag) {
       tag = t('extensionsGiphyRandom');
@@ -541,8 +569,14 @@ export class MessageRepository {
 
     const blob = await loadUrlBlob(url);
     const textMessage = t('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
-    this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity});
-    return this.uploadImages(conversationEntity, [blob]);
+    void this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity, threadId})
+      .then(({state}) => {
+        if (threadId && state !== MessageSendingState.CANCELED) {
+          this.publishThreadReplySent(conversationEntity.id, threadId);
+        }
+      })
+      .catch(() => undefined);
+    return this.uploadImages(conversationEntity, [blob], threadId);
   }
 
   /**
@@ -550,8 +584,8 @@ export class MessageRepository {
    *
    * @param conversationEntity Conversation to post the images
    */
-  public uploadImages(conversationEntity: Conversation, images: Blob[]) {
-    this.uploadFiles(conversationEntity, images, true);
+  public uploadImages(conversationEntity: Conversation, images: Blob[], threadId?: string | null) {
+    this.uploadFiles(conversationEntity, images, true, threadId);
   }
 
   /**
@@ -561,9 +595,9 @@ export class MessageRepository {
    * @param files files
    * @param asImage whether or not the file should be treated as an image
    */
-  public uploadFiles(conversationEntity: Conversation, files: Blob[], asImage?: boolean) {
+  public uploadFiles(conversationEntity: Conversation, files: Blob[], asImage?: boolean, threadId?: string | null) {
     if (this.canUploadAssetsToConversation(conversationEntity)) {
-      Array.from(files).forEach(file => this.uploadFile(conversationEntity, file, asImage));
+      Array.from(files).forEach(file => this.uploadFile(conversationEntity, file, asImage, undefined, threadId));
     }
   }
 
@@ -590,6 +624,7 @@ export class MessageRepository {
     file: Blob,
     asImage: boolean = false,
     originalId?: string,
+    threadId?: string | null,
   ): Promise<EventRecord | void> {
     const uploadStarted = Date.now();
     const beforeUnload = (event: Event) => {
@@ -597,7 +632,7 @@ export class MessageRepository {
     };
 
     window.addEventListener('beforeunload', beforeUnload);
-    const assetMetadata = await this.createAssetMetadata(conversation, file, asImage, originalId);
+    const assetMetadata = await this.createAssetMetadata(conversation, file, asImage, originalId, threadId);
 
     if (!assetMetadata) {
       window.removeEventListener('beforeunload', beforeUnload);
@@ -608,9 +643,12 @@ export class MessageRepository {
     const {messageId} = message;
 
     try {
-      const {state} = await this.sendAssetRemotedata(conversation, file, messageId, asImage, metaData);
+      const {state} = await this.sendAssetRemotedata(conversation, file, messageId, asImage, metaData, threadId);
 
       if (state === SendAndInjectSendingState.FAILED) {
+        if (threadId) {
+          this.publishThreadReplySent(conversation.id, threadId);
+        }
         await this.storeFileInDb(conversation, messageId, file);
         return;
       }
@@ -618,6 +656,10 @@ export class MessageRepository {
       if (state === MessageSendingState.CANCELED) {
         // The user has canceled the upload, no need to do anything else
         return;
+      }
+
+      if (threadId) {
+        this.publishThreadReplySent(conversation.id, threadId);
       }
 
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
@@ -631,7 +673,15 @@ export class MessageRepository {
         error,
       );
       const messageEntity = await this.getMessageInConversationById(conversation, messageId);
-      await this.sendAssetUploadFailed(conversation, messageEntity.id);
+      await this.sendAssetUploadFailed(
+        conversation,
+        messageEntity.id,
+        Asset.NotUploaded.FAILED,
+        messageEntity.threadId,
+      );
+      if (threadId) {
+        this.publishThreadReplySent(conversation.id, threadId);
+      }
       return this.updateMessageAsUploadFailed(messageEntity);
     } finally {
       window.removeEventListener('beforeunload', beforeUnload);
@@ -652,8 +702,14 @@ export class MessageRepository {
     file: Blob,
     asImage: boolean = false,
     originalId: string,
+    threadId?: string | null,
   ): Promise<EventRecord | void> {
-    await this.uploadFile(conversation, file, asImage, originalId);
+    const resolvedThreadId =
+      threadId ??
+      (await this.getMessageInConversationById(conversation, originalId)
+        .then(message => message.threadId)
+        .catch(() => null));
+    await this.uploadFile(conversation, file, asImage, originalId, resolvedThreadId);
   }
 
   /**
@@ -735,6 +791,7 @@ export class MessageRepository {
     file: File | Blob,
     allowImageDetection?: boolean,
     originalId?: string,
+    threadId?: string | null,
   ) {
     try {
       const metadata = await buildMetadata(file);
@@ -747,7 +804,11 @@ export class MessageRepository {
         type: file.type,
       } as FileMetaDataContent;
 
-      const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
+      const message = MessageBuilder.buildFileMetaDataMessage(
+        {metaData: meta as FileMetaDataContent},
+        originalId,
+        threadId,
+      );
       this.assetRepository.addToProcessQueue(message, conversation.id);
       return {message, metaData: meta as FileMetaDataContent};
     } catch (error: unknown) {
@@ -766,6 +827,7 @@ export class MessageRepository {
     messageId: string,
     asImage: boolean,
     meta: FileMetaDataContent,
+    threadId?: string | null,
   ) {
     const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
 
@@ -805,6 +867,7 @@ export class MessageRepository {
             image: metadata,
           },
           messageId,
+          threadId,
         )
       : MessageBuilder.buildFileDataMessage(
           {
@@ -813,6 +876,7 @@ export class MessageRepository {
             file: {data: Buffer.from(await file.arrayBuffer())},
           },
           messageId,
+          threadId,
         );
 
     return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true});
@@ -826,8 +890,13 @@ export class MessageRepository {
    * @param reason Cause for the failed upload (optional)
    * @returns Resolves when the asset failure was sent
    */
-  private sendAssetUploadFailed(conversation: Conversation, messageId: string, reason = Asset.NotUploaded.FAILED) {
-    const payload = MessageBuilder.buildFileAbortMessage({reason}, messageId);
+  private sendAssetUploadFailed(
+    conversation: Conversation,
+    messageId: string,
+    reason = Asset.NotUploaded.FAILED,
+    threadId?: string | null,
+  ) {
+    const payload = MessageBuilder.buildFileAbortMessage({reason}, messageId, threadId);
 
     return this.sendAndInjectMessage(payload, conversation);
   }
@@ -1438,8 +1507,11 @@ export class MessageRepository {
         if (!isNaN(timestamp)) {
           changes.time = isoDate;
           messageEntity.timestamp(timestamp);
-          conversationEntity.updateTimestampServer(timestamp, true);
-          conversationEntity.updateTimestamps(messageEntity);
+          const isThreadMessage = !!messageEntity.threadId;
+          if (!isThreadMessage) {
+            conversationEntity.updateTimestampServer(timestamp, true);
+            conversationEntity.updateTimestamps(messageEntity);
+          }
         }
       }
       this.conversationRepositoryProvider().checkMessageTimer(messageEntity);
@@ -1481,6 +1553,10 @@ export class MessageRepository {
       userClients[user.domain][user.id] = user.devices().map(client => client.id);
       return userClients;
     }, {} as QualifiedUserClients);
+  }
+
+  private publishThreadReplySent(conversationId: string, threadId: string) {
+    amplify.publish(THREAD_REPLY_SENT, {conversationId, threadId});
   }
 
   private async generateRecipients(

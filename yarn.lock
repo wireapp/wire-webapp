@@ -11468,6 +11468,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wireapp/protocol-messaging@patch:@wireapp/protocol-messaging@npm%3A1.56.0#./.yarn/patches/@wireapp-protocol-messaging-npm-1.56.0-3c9f1824ef.patch::locator=wire-webapp%40workspace%3A.":
+  version: 1.56.0
+  resolution: "@wireapp/protocol-messaging@patch:@wireapp/protocol-messaging@npm%3A1.56.0#./.yarn/patches/@wireapp-protocol-messaging-npm-1.56.0-3c9f1824ef.patch::version=1.56.0&hash=96044e&locator=wire-webapp%40workspace%3A."
+  dependencies:
+    long: "npm:5.2.0"
+    protobufjs: "npm:7.2.5"
+    protobufjs-cli: "npm:1.1.2"
+    typescript: "npm:4.8.4"
+  checksum: 10/58c0f3fd4559db80baee3c00b322f598f9425ae4d204c7b71ae24907ccdd3bce04933c34286bc6d393474ad07da9cc89ab492330ba3a5e57df240c6daa757f59
+  languageName: node
+  linkType: hard
+
 "@wireapp/react-ui-kit@workspace:^, @wireapp/react-ui-kit@workspace:libraries/react-ui-kit":
   version: 0.0.0-use.local
   resolution: "@wireapp/react-ui-kit@workspace:libraries/react-ui-kit"

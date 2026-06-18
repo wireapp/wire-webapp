@@ -52,6 +52,12 @@ export interface BaseEvent {
   from: string;
   id: string;
   from_client_id?: string;
+  /** Thread context for threaded replies. Null/undefined means non-thread message. */
+  thread_id?: string | null;
+  /** Deterministic root message identifier for the thread. */
+  thread_root_message_id?: string | null;
+  /** Whether this event should be treated as a thread reply projection. */
+  is_thread_reply?: boolean;
   qualified_conversation?: QualifiedId;
   qualified_from?: QualifiedId;
   server_time?: string;

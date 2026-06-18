@@ -33,6 +33,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
+import {ThreadsOutlineIcon} from 'Components/ThreadIcons';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
@@ -255,6 +256,23 @@ export const ConversationTabs = ({
         className="conversations-sidebar-list"
       >
         <div className="conversations-sidebar-title" css={conversationsTitleWrapper}>
+          <span>Threads</span>
+        </div>
+
+        <ConversationTab
+          title="All threads"
+          label="All threads"
+          type={SidebarTabs.THREADS}
+          Icon={<ThreadsOutlineIcon />}
+          onChangeTab={onChangeTab}
+          conversationTabIndex={1}
+          dataUieName="go-threads-view"
+          isActive={currentTab === SidebarTabs.THREADS}
+        />
+
+        <div className="conversations-sidebar-divider" />
+
+        <div className="conversations-sidebar-title" css={conversationsTitleWrapper}>
           <span>{t('videoCallOverlayConversations')}</span>
           <TabAndFilterSettings />
         </div>
@@ -267,7 +285,7 @@ export const ConversationTabs = ({
                 unreadConversations={unreadConversations}
                 conversationRepository={conversationRepository}
                 key={conversationTab.type}
-                conversationTabIndex={index + 1}
+                conversationTabIndex={index + 2}
                 onChangeTab={onChangeTab}
                 isActive={conversationTab.type === currentTab}
               />
@@ -278,7 +296,7 @@ export const ConversationTabs = ({
             <ConversationTab
               {...conversationTab}
               key={conversationTab.type}
-              conversationTabIndex={index + 1}
+              conversationTabIndex={index + 2}
               onChangeTab={onChangeTab}
               isActive={conversationTab.type === currentTab}
             />

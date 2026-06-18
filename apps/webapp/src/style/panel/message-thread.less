@@ -1,0 +1,162 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.panel__page.panel__message-thread {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: hidden;
+
+  .panel__content {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  .panel__footer {
+    position: sticky;
+    z-index: 2;
+    bottom: 0;
+    flex: 0 0 auto;
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+    background: var(--input-bar-bg);
+  }
+
+  .conversation-input-bar {
+    min-height: 0;
+  }
+
+  .input-bar-container {
+    --input-bar-avatar-size: 0px;
+    --input-bar-avatar-spacing: 8px;
+
+    padding-left: 8px;
+  }
+
+  .input-bar-avatar {
+    display: none;
+  }
+
+  .input-bar-field {
+    padding-right: 4px;
+  }
+
+  // The root message has action controls positioned above the bubble.
+  // Reserve headroom so the controls are not clipped by the thread title bar.
+  .message-thread-root-highlight {
+    margin-top: 58px;
+  }
+}
+
+.message-thread-focus-overlay {
+  position: fixed;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--foreground-fade-40);
+  inset: 0;
+}
+
+.message-thread-focus-modal {
+  overflow: hidden;
+  width: min(1100px, calc(100vw - 40px));
+  height: min(880px, calc(100vh - 40px));
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--app-bg-secondary);
+  box-shadow: 0 20px 60px var(--box-shadow-color);
+
+  .panel__page.panel__message-thread.panel__message-thread--focus-mode {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    .panel__content {
+      width: 100%;
+    }
+  }
+}
+
+.message-thread-focus-toggle {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: var(--content-title-bar-height);
+  display: flex;
+  width: var(--content-title-bar-height);
+  height: var(--content-title-bar-height);
+  align-items: center;
+  justify-content: center;
+}
+
+.panel__header__title-wrapper {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.panel__header__subtitle {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text-input-placeholder);
+  font-size: var(--font-size-xsmall);
+  line-height: var(--line-height-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversation-threads-list-panel {
+  min-height: 0;
+  overflow: hidden;
+  background: var(--app-bg-secondary);
+
+  &.panel__page {
+    overflow-y: hidden;
+  }
+
+  .conversation-threads-list__content {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+}
+
+.message-thread-main {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+
+  .message-list {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  .message-thread-root-highlight {
+    margin-top: 0;
+  }
+}

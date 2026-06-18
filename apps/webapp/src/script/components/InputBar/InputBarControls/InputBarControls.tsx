@@ -33,6 +33,7 @@ import {MessageContent} from '../common/messageContent/messageContent';
 
 interface InputBarControlsProps {
   conversation: Conversation;
+  showPingButton: boolean;
   isFileSharingSendingEnabled: boolean;
   pingDisabled: boolean;
   messageContent: MessageContent;
@@ -62,6 +63,7 @@ interface InputBarControlsProps {
 
 export const InputBarControls = ({
   conversation,
+  showPingButton,
   isFileSharingSendingEnabled,
   pingDisabled,
   messageContent,
@@ -85,12 +87,16 @@ export const InputBarControls = ({
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.SHORTCUT.PING, onClickPing);
+    if (showPingButton) {
+      amplify.subscribe(WebAppEvents.SHORTCUT.PING, onClickPing);
 
-    return () => {
-      amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
-    };
-  }, [onClickPing]);
+      return () => {
+        amplify.unsubscribe(WebAppEvents.SHORTCUT.PING, onClickPing);
+      };
+    }
+
+    return undefined;
+  }, [onClickPing, showPingButton]);
 
   return (
     <div className="input-bar-buttons">
@@ -99,6 +105,7 @@ export const InputBarControls = ({
           conversation={conversation}
           disableFilesharing={!isFileSharingSendingEnabled}
           disablePing={pingDisabled}
+          showPingButton={showPingButton}
           input={messageContent.text}
           isCellsFeatureEnabled={isCellsFeatureEnabled}
           isEditing={isEditing}

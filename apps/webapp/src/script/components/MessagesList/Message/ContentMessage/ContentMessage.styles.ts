@@ -37,3 +37,58 @@ export const deliveredMessageIndicator: CSSObject = {
   paddingTop: '2px',
   width: 'var(--delivered-state-width)',
 };
+
+export const threadRepliesContainer: CSSObject = {
+  paddingLeft: 'var(--conversation-message-sender-width)',
+  paddingTop: '4px',
+};
+
+export const threadRepliesIcon: CSSObject = {
+  flexShrink: 0,
+  width: '14px',
+  height: '14px',
+};
+
+export const threadRepliesButton: CSSObject = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '6px',
+  backgroundColor: 'var(--accent-color-50)',
+  border: '1px solid var(--accent-color-100)',
+  borderRadius: '999px',
+  color: 'var(--accent-color)',
+  cursor: 'pointer',
+  fontSize: '12px',
+  fontWeight: 'var(--font-weight-semibold)',
+  lineHeight: '16px',
+  padding: '4px 10px',
+  textAlign: 'left',
+  'body.theme-dark &': {
+    backgroundColor: 'var(--accent-color-800)',
+    borderColor: 'var(--accent-color-700)',
+    color: 'var(--white)',
+  },
+};
+
+export const threadRepliesButtonUnread: CSSObject = {
+  backgroundColor: 'var(--accent-color-100)',
+  borderColor: 'var(--accent-color)',
+  color: 'var(--main-color)',
+  'body.theme-dark &': {
+    backgroundColor: 'var(--accent-color-700)',
+    borderColor: 'var(--accent-color-500)',
+    color: 'var(--white)',
+  },
+};
+
+export const threadRepliesButtonUnreadMentioned: CSSObject = {
+  backgroundColor: 'var(--accent-color)',
+  borderColor: 'var(--accent-color)',
+  color: 'var(--white)',
+  fontWeight: 600,
+  'body.theme-dark &': {
+    backgroundColor: 'var(--accent-color-500)',
+    borderColor: 'var(--accent-color-400)',
+    color: 'var(--white)',
+  },
+};

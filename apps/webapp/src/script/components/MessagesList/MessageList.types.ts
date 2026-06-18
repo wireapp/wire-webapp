@@ -49,6 +49,7 @@ export interface MessagesListParams {
   selfUser: User;
   showImageDetails: (message: ContentMessage, event: React.UIEvent) => void;
   showMessageDetails: (message: MessageEntity, showReactions?: boolean) => void;
+  showMessageThread: (message: MessageEntity) => void;
   showMessageReactions: (message: MessageEntity, showReactions?: boolean) => void;
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User | ServiceEntity) => void;

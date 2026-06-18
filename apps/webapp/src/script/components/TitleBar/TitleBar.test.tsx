@@ -31,10 +31,12 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ContentState} from 'src/script/page/useAppState';
+import {useAppMainState} from 'src/script/page/state';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
@@ -95,6 +97,11 @@ const getDefaultProps = (callingRepository: CallingRepository, conversation: Con
 });
 
 describe('TitleBar', () => {
+  beforeEach(() => {
+    useAppMainState.getState().rightSidebar.close();
+    useAppMainState.getState().conversationThread.close();
+  });
+
   it('subscribes to shortcut PEOPLE and add ADD_PEOPLE events on mount', async () => {
     spyOn(amplify, 'subscribe').and.returnValue(undefined);
     const conversation = new Conversation();
@@ -163,6 +170,88 @@ describe('TitleBar', () => {
 
     fireEvent.click(infoButton);
     expect(props.openRightSidebar).toHaveBeenCalledWith(PanelState.CONVERSATION_DETAILS, {entity: conversation});
+  });
+
+  it('always renders the conversation threads button', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+    const conversation = createConversationEntity();
+    const props = getDefaultProps(callingRepository, conversation);
+
+    const {getByLabelText} = render(withTheme(<TitleBar {...props} />));
+
+    expect(getByLabelText('Threads')).toBeDefined();
+  });
+
+  it('opens conversation threads list when thread button is clicked', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+    const conversation = createConversationEntity();
+    const props = getDefaultProps(callingRepository, conversation);
+
+    const {getByLabelText} = render(withTheme(<TitleBar {...props} />));
+
+    fireEvent.click(getByLabelText('Threads'));
+    expect(props.openRightSidebar).toHaveBeenCalledWith(
+      PanelState.CONVERSATION_THREADS_LIST,
+      {entity: conversation},
+      true,
+    );
+  });
+
+  it('shows breadcrumb navigation and closes thread when conversation name is clicked', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+    const displayName = 'Project Alpha';
+    const conversation = createConversationEntity({
+      display_name: ko.pureComputed(() => displayName),
+    });
+    const rootMessage = new Message('root-message-id');
+
+    useAppMainState.getState().conversationThread.open(rootMessage);
+
+    const {getByRole, getByText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
+
+    expect(getByText('Thread')).toBeDefined();
+
+    fireEvent.click(getByRole('button', {name: displayName}));
+    expect(useAppMainState.getState().conversationThread.rootMessage).toBeNull();
+  });
+
+  it('hides search button when main pane thread is open', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+    const selfUser = createUser(true);
+    const conversation = createConversationEntity();
+    const rootMessage = new Message('root-message-id');
+
+    useAppMainState.getState().conversationThread.open(rootMessage);
+
+    const {queryByText} = render(
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
+    );
+
+    expect(queryByText('tooltipConversationSearch')).toBeNull();
+  });
+
+  it('closes thread when back button is clicked', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+    const conversation = createConversationEntity();
+    const rootMessage = new Message('root-message-id');
+
+    useAppMainState.getState().conversationThread.open(rootMessage);
+
+    const {getByLabelText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
+
+    fireEvent.click(getByLabelText('Back to conversation'));
+    expect(useAppMainState.getState().conversationThread.rootMessage).toBeNull();
+  });
+
+  it('marks thread button active when conversation threads list is open', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+    const conversation = createConversationEntity();
+
+    useAppMainState.getState().rightSidebar.goTo(PanelState.CONVERSATION_THREADS_LIST, {entity: conversation});
+
+    const {getByLabelText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
+
+    expect(getByLabelText('Threads').className).toContain('active');
   });
 
   it('hide info button and search button on scaled down view', async () => {

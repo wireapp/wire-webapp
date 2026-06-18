@@ -139,7 +139,8 @@
     "dexie": "4.4.3",
     "dotenv": "16.6.1",
     "@types/react": "18.3.31",
-    "@types/react-dom": "18.3.7"
+    "@types/react-dom": "18.3.7",
+    "@wireapp/protocol-messaging@npm:1.56.0": "patch:@wireapp/protocol-messaging@npm%3A1.56.0#./.yarn/patches/@wireapp-protocol-messaging-npm-1.56.0-3c9f1824ef.patch"
   },
   "dependenciesMeta": {
     "canvas": {

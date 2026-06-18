@@ -28,4 +28,5 @@ export enum ConversationStatusIcon {
   UNREAD_MESSAGES = 'messages',
   UNREAD_PING = 'ping',
   UNREAD_REPLY = 'reply',
+  UNREAD_THREAD = 'thread',
 }

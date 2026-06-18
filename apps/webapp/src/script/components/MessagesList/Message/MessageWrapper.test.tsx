@@ -72,6 +72,7 @@ const createBaseProps = (conversation: Conversation, message: MemberMessageEntit
   onClickTimestamp: jest.fn(),
   onClickParticipants: jest.fn(),
   onClickDetails: jest.fn(),
+  onClickThread: jest.fn(),
   onClickResetSession: jest.fn(),
   onClickCancelRequest: jest.fn(),
   messageRepository: {

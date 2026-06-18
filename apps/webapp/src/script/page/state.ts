@@ -37,6 +37,11 @@ type RightSidebarParams = {
 };
 
 type AppMainState = {
+  conversationThread: {
+    rootMessage: Message | null;
+    open: (message: Message) => void;
+    close: () => void;
+  };
   responsiveView: {
     currentView: ViewType;
     setCurrentView: (view: ViewType) => void;
@@ -61,6 +66,19 @@ type AppMainState = {
 };
 
 const useAppMainState = create<AppMainState>((set, get) => ({
+  conversationThread: {
+    rootMessage: null,
+    open: (message: Message) =>
+      set(state => ({
+        ...state,
+        conversationThread: {...state.conversationThread, rootMessage: message},
+      })),
+    close: () =>
+      set(state => ({
+        ...state,
+        conversationThread: {...state.conversationThread, rootMessage: null},
+      })),
+  },
   responsiveView: {
     currentView: ViewType.MOBILE_LEFT_SIDEBAR,
     setCurrentView: (view: ViewType) =>

@@ -108,4 +108,7 @@ export type LegacyEventRecord<T = any> = {
   type: string;
   waiting_button_id?: string;
   senderClientId?: string;
+  thread_id?: string | null;
+  thread_root_message_id?: string | null;
+  is_thread_reply?: boolean;
 } & Partial<StoredEvent<{}>>;

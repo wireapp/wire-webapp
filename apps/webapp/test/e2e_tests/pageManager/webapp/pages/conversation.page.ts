@@ -33,6 +33,7 @@ export class ConversationPage {
   readonly backButton: Locator;
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
+  readonly sendThreadMessageButton: Locator;
   readonly searchButton: Locator;
   readonly conversationTitle: Locator;
   readonly verifiedBadge: Locator;
@@ -54,6 +55,12 @@ export class ConversationPage {
   /** Messages in conversation, only contains message items which have been sent successfully */
   readonly messages: Locator;
   readonly messageDetails: Locator;
+  readonly messageThreadPanel: Locator;
+  readonly messageThreadInput: Locator;
+  readonly conversationThreadsButton: Locator;
+  readonly conversationThreadsListPanel: Locator;
+  readonly threadBreadcrumbConversation: Locator;
+  readonly threadBreadcrumbThread: Locator;
   readonly messageItems: Locator;
   readonly filesTab: Locator;
   readonly typingIndicator: Locator;
@@ -80,6 +87,7 @@ export class ConversationPage {
     this.messageInput = page.getByTestId('input-message');
     this.watermark = page.getByTestId('no-conversation').locator('svg');
     this.sendMessageButton = page.getByTestId('do-send-message');
+    this.sendThreadMessageButton = page.locator('#message-thread-main').getByTestId('do-send-message');
     this.searchButton = page.getByRole('button', {name: 'Search'});
     this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
     this.verifiedBadge = page.getByTestId('do-participants').getByTestId('proteus-verified');
@@ -105,6 +113,12 @@ export class ConversationPage {
       `[data-uie-name="item-message"]:not([data-uie-send-status="1"]):not([data-uie-send-status="-1"]):not(.system-message)`,
     );
     this.messageDetails = page.locator('#message-details');
+    this.messageThreadPanel = page.locator('#message-thread-main');
+    this.messageThreadInput = page.getByTestId('input-thread-message');
+    this.conversationThreadsButton = page.getByTestId('do-open-conversation-threads');
+    this.conversationThreadsListPanel = page.getByTestId('conversation-threads-list-panel');
+    this.threadBreadcrumbConversation = page.getByTestId('thread-breadcrumb').getByRole('button');
+    this.threadBreadcrumbThread = page.getByTestId('thread-breadcrumb').getByText('Thread');
     this.filesTab = page.locator('#conversation-tab-files');
     this.typingIndicator = page.getByTestId('typing-indicator-title');
     this.itemPendingRequest = page.getByTestId('item-pending-requests');
@@ -174,6 +188,28 @@ export class ConversationPage {
       await message.hover();
       await message.getByRole('group').getByTestId('do-reply-message').click({timeout: 3_000});
     }).toPass();
+  }
+
+  async startThreadForMessage(message: Locator) {
+    await message.hover();
+    await message.getByRole('group').getByTestId('do-thread-message').click();
+  }
+
+  async openThreadFromRepliesBadge(message: Locator) {
+    await message.getByTestId('do-open-message-thread').click();
+  }
+
+  async openConversationThreadsList() {
+    await this.conversationThreadsButton.click();
+  }
+
+  async closeMainPaneThreadViaBreadcrumb() {
+    await this.threadBreadcrumbConversation.click();
+  }
+
+  async sendThreadMessage(message: string) {
+    await this.messageThreadInput.fill(message);
+    await this.sendThreadMessageButton.click();
   }
 
   async enableSelfDeletingMessages() {

@@ -50,11 +50,13 @@ export interface MessageActions {
   onClickMessage: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickDetails: (message: BaseMessage) => void;
+  onClickThread: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
   onClickTimestamp: (messageId: string) => void;
 }
 
 export interface MessageParams extends MessageActions {
+  className?: string;
   conversation: Conversation;
   hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;
@@ -80,10 +82,12 @@ export interface MessageParams extends MessageActions {
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
+  showThreadSummary?: boolean;
 }
 
 export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => {
   const {
+    className,
     message,
     isHighlighted,
     hideHeader,
@@ -163,7 +167,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
         'message-marked': isHighlighted,
         'content-message': message.isContent(),
         'system-message': !message.isContent(),
-      })}
+      }, className)}
       ref={messageElementRef}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}

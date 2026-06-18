@@ -29,12 +29,14 @@ import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {createUuid} from 'Util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
+import {useThreadUnreadRepliesStore} from 'Components/MessagesList/threading/threadUnreadRepliesStore';
 
 describe('message', () => {
   let defaultParams: ContentMessageProps;
   const textValue = 'hello';
 
   beforeEach(() => {
+    useThreadUnreadRepliesStore.setState({threadStateByKey: {}});
     const message = new ContentMessage();
     message.user(new User(createUuid()));
     const textAsset = new Text('', textValue);
@@ -59,11 +61,13 @@ describe('message', () => {
       onClickReaction: jest.fn(),
       onClickReactionDetails: jest.fn(),
       onClickDetails: jest.fn(),
+      onClickThread: jest.fn(),
       onClickTimestamp: jest.fn(),
       onRetry: jest.fn(),
       selfId: {domain: '', id: createUuid()},
       isMsgElementsFocusable: true,
       isFileShareRestricted: false,
+      loadThreadRepliesCount: jest.fn().mockResolvedValue(0),
     };
   });
 
@@ -78,6 +82,17 @@ describe('message', () => {
 
     const {getByText} = render(<ContentMessageComponent {...defaultParams} />);
     expect(getByText(linkPreview.title)).not.toBe(null);
+  });
+
+  it('renders thread reply pill labels with unread counts', async () => {
+    defaultParams.loadThreadRepliesCount = jest.fn().mockResolvedValue(3);
+
+    useThreadUnreadRepliesStore.getState().incrementUnreadForThread(defaultParams.conversation.id, defaultParams.message.id);
+    useThreadUnreadRepliesStore.getState().incrementUnreadForThread(defaultParams.conversation.id, defaultParams.message.id);
+
+    const {findByTestId} = render(<ContentMessageComponent {...defaultParams} showThreadSummary />);
+
+    expect(await findByTestId('do-open-message-thread')).toHaveTextContent('3 replies · 2 new');
   });
 
   it('displays a quoted message', async () => {

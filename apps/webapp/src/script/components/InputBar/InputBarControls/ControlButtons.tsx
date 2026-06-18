@@ -39,6 +39,7 @@ import {PingButton} from './PingButton/PingButton';
 interface ControlButtonsProps {
   input: string;
   conversation: Conversation;
+  showPingButton: boolean;
   disablePing?: boolean;
   disableFilesharing?: boolean;
   isCellsFeatureEnabled?: boolean;
@@ -61,6 +62,7 @@ interface ControlButtonsProps {
 
 const ControlButtons = ({
   conversation,
+  showPingButton,
   disablePing,
   disableFilesharing,
   input,
@@ -150,12 +152,16 @@ const ControlButtons = ({
             </li>
           </>
         )}
-        <li aria-hidden="true">
-          <FormatSeparator />
-        </li>
-        <li>
-          <PingButton isDisabled={disablePing === true} onClick={onClickPing} />
-        </li>
+        {showPingButton && (
+          <>
+            <li aria-hidden="true">
+              <FormatSeparator />
+            </li>
+            <li>
+              <PingButton isDisabled={disablePing === true} onClick={onClickPing} />
+            </li>
+          </>
+        )}
         {!isCellsConversation && (
           <li>
             <MessageTimerButton conversation={conversation} />

@@ -20,12 +20,21 @@
 import {useMemo, useState, useEffect, useRef} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {amplify} from 'amplify';
 import cx from 'classnames';
 import ko from 'knockout';
 
 import {OutlineCheck} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
+import {ThreadsOutlineIcon} from 'Components/ThreadIcons';
+import {THREAD_REPLY_SENT, ThreadReplySentPayload} from 'Components/MessagesList/threading/threadingEvents';
+import {
+  getThreadHasUnreadMentionForSelf,
+  getThreadUnreadRepliesCount,
+  useThreadUnreadRepliesStore,
+} from 'Components/MessagesList/threading/threadUnreadRepliesStore';
 import {useClickOutside} from 'Hooks/useClickOutside';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
@@ -38,7 +47,16 @@ import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {t} from 'Util/localizerUtil';
 
 import {ContentAsset} from './asset';
-import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './ContentMessage.styles';
+import {
+  deliveredMessageIndicator,
+  messageBodyWrapper,
+  messageEphemeralTimer,
+  threadRepliesButton,
+  threadRepliesButtonUnreadMentioned,
+  threadRepliesButtonUnread,
+  threadRepliesContainer,
+  threadRepliesIcon,
+} from './ContentMessage.styles';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
 import {useMessageActionsState} from './MessageActions/MessageActions.state';
 import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
@@ -72,6 +90,8 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   onClickReaction: (emoji: string) => void;
   is1to1?: boolean;
   isFileShareRestricted: boolean;
+  showThreadSummary?: boolean;
+  loadThreadRepliesCount: (conversationId: string, threadId: string) => Promise<number>;
 }
 
 export const ContentMessageComponent = ({
@@ -93,8 +113,11 @@ export const ContentMessageComponent = ({
   isMsgElementsFocusable,
   onClickReaction,
   onClickDetails,
+  onClickThread,
   is1to1,
   isFileShareRestricted,
+  showThreadSummary = true,
+  loadThreadRepliesCount,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
 
@@ -136,10 +159,65 @@ export const ContentMessageComponent = ({
   });
 
   const [isActionMenuVisible, setActionMenuVisibility] = useState(false);
+  const [threadRepliesCount, setThreadRepliesCount] = useState(0);
   const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
   useEffect(() => {
     setActionMenuVisibility(isFocused || msgFocusState);
   }, [msgFocusState, isFocused]);
+
+  const canShowThreadReplies = showThreadSummary && message.isReplyable() && !message.threadId;
+  const threadUnreadRepliesCount = useThreadUnreadRepliesStore(state =>
+    getThreadUnreadRepliesCount(conversation.id, message.id, state),
+  );
+  const hasUnreadThreadMentionForSelf = useThreadUnreadRepliesStore(state =>
+    getThreadHasUnreadMentionForSelf(conversation.id, message.id, state),
+  );
+
+  useEffect(() => {
+    if (!canShowThreadReplies) {
+      setThreadRepliesCount(0);
+      return;
+    }
+
+    let isSubscribed = true;
+    const threadId = message.id;
+
+    const loadRepliesCount = async () => {
+      try {
+        const count = await loadThreadRepliesCount(conversation.id, threadId);
+        if (isSubscribed) {
+          setThreadRepliesCount(count);
+        }
+      } catch {
+        if (isSubscribed) {
+          setThreadRepliesCount(0);
+        }
+      }
+    };
+
+    const handleThreadReplySent = (payload: ThreadReplySentPayload) => {
+      if (payload.conversationId === conversation.id && payload.threadId === threadId) {
+        void loadRepliesCount();
+      }
+    };
+
+    const handleBackendEvent = (event: {conversation?: string; thread_id?: string | null}) => {
+      if (event?.conversation === conversation.id && event.thread_id === threadId) {
+        void loadRepliesCount();
+      }
+    };
+
+    void loadRepliesCount();
+
+    amplify.subscribe(THREAD_REPLY_SENT, handleThreadReplySent);
+    amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, handleBackendEvent);
+
+    return () => {
+      isSubscribed = false;
+      amplify.unsubscribe(THREAD_REPLY_SENT, handleThreadReplySent);
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, handleBackendEvent);
+    };
+  }, [canShowThreadReplies, conversation.id, loadThreadRepliesCount, message.id]);
 
   const isConversationReadonly = conversation.readOnlyState() !== null;
 
@@ -266,6 +344,7 @@ export const ContentMessageComponent = ({
               contextMenu={contextMenu}
               isMessageFocused={msgFocusState}
               handleReactionClick={onClickReaction}
+              onThreadClick={() => onClickThread(message)}
               reactionsTotalCount={reactions.length}
               isRemovedFromConversation={conversation.isSelfUserRemoved()}
             />
@@ -286,6 +365,25 @@ export const ContentMessageComponent = ({
           </div>
         )}
       </div>
+
+      {canShowThreadReplies && threadRepliesCount > 0 && (
+        <div css={threadRepliesContainer}>
+          <button
+            type="button"
+            data-uie-name="do-open-message-thread"
+            css={[
+              threadRepliesButton,
+              threadUnreadRepliesCount > 0 && threadRepliesButtonUnread,
+              hasUnreadThreadMentionForSelf && threadRepliesButtonUnreadMentioned,
+            ]}
+            onClick={() => onClickThread(message)}
+          >
+            <ThreadsOutlineIcon css={threadRepliesIcon} />
+            {(threadRepliesCount === 1 ? '1 reply' : `${threadRepliesCount} replies`) +
+              (threadUnreadRepliesCount > 0 ? ` · ${threadUnreadRepliesCount} new` : '')}
+          </button>
+        </div>
+      )}
 
       {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
         <CompleteFailureToSendWarning

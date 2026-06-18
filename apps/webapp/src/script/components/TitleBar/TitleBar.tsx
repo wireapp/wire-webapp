@@ -17,19 +17,31 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {ReactNode, useCallback, useEffect, useMemo, useRef} from 'react';
 
+import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
+import {
+  Breadcrumbs,
+  CallIcon,
+  IconButton,
+  IconButtonVariant,
+  QUERY,
+  TabIndex,
+  useMatchMedia,
+} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
+import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
 import {ConversationVerificationBadges} from 'Components/Badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ThreadsOutlineIcon} from 'Components/ThreadIcons';
 import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {CallState} from 'Repositories/calling/CallState';
@@ -44,6 +56,7 @@ import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
@@ -84,6 +97,8 @@ export const TitleBar = ({
     isRequest,
     isActiveParticipant,
     isGroupOrChannel,
+    isGroup,
+    isChannel,
     hasExternal,
     hasDirectGuest,
     hasService,
@@ -97,6 +112,8 @@ export const TitleBar = ({
     'isRequest',
     'isActiveParticipant',
     'isGroupOrChannel',
+    'isGroup',
+    'isChannel',
     'hasExternal',
     'hasDirectGuest',
     'hasService',
@@ -108,6 +125,7 @@ export const TitleBar = ({
   ]);
 
   const guardCall = useNoInternetCallGuard();
+  const {isChannelsEnabled} = useChannelsFeatureFlag();
   const {isCallConnecting, isCallActive} = useConversationCall(conversation);
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
@@ -161,6 +179,12 @@ export const TitleBar = ({
   const smBreakpoint = useMatchMedia(QUERY.tabletSMDown);
 
   const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
+  const activeThreadRootMessage = useAppMainState(state => state.conversationThread.rootMessage);
+  const closeConversationThread = useAppMainState(state => state.conversationThread.close);
+  const activeRightSidebarPanel = useAppMainState(state => {
+    const {history} = state.rightSidebar;
+    return history[history.length - 1];
+  });
 
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
@@ -250,6 +274,65 @@ export const TitleBar = ({
   }, [activeCalls.length]);
 
   const {showStartedCallAlert} = useCallAlertState();
+  const isConversationThreadsListOpen = activeRightSidebarPanel === PanelState.CONVERSATION_THREADS_LIST;
+  const isInfoPanelActive = isRightSidebarOpen && !isConversationThreadsListOpen;
+  const isMainThreadOpen = !!activeThreadRootMessage;
+
+  const openConversationThreadsList = useCallback(() => {
+    openRightSidebar(PanelState.CONVERSATION_THREADS_LIST, {entity: conversation}, true);
+  }, [conversation, openRightSidebar]);
+
+  const conversationBreadcrumbIcon = useMemo((): ReactNode => {
+    if (isChannel && isChannelsEnabled) {
+      return (
+        <ChannelAvatar
+          conversationID={conversation.id}
+          isLocked={conversation.accessModes?.includes(CONVERSATION_ACCESS.LINK) !== true}
+          size="small"
+        />
+      );
+    }
+
+    if (isGroup) {
+      return <GroupAvatar conversationID={conversation.id} size="small" />;
+    }
+
+    if (firstUserEntity) {
+      return <Avatar participant={firstUserEntity} avatarSize={AVATAR_SIZE.SMALL} />;
+    }
+
+    return null;
+  }, [conversation.accessModes, conversation.id, firstUserEntity, isChannel, isChannelsEnabled, isGroup]);
+
+  const threadBreadcrumbItems = useMemo(
+    () => [
+      {name: displayName, icon: conversationBreadcrumbIcon},
+      {name: 'Thread', icon: <ThreadsOutlineIcon />},
+    ],
+    [conversationBreadcrumbIcon, displayName],
+  );
+
+  const onThreadBreadcrumbClick = useCallback(
+    (item: {name: string}) => {
+      if (item.name === displayName) {
+        closeConversationThread();
+      }
+    },
+    [closeConversationThread, displayName],
+  );
+
+  const threadButton = (
+    <button
+      type="button"
+      title="Threads"
+      aria-label="Threads"
+      onClick={openConversationThreadsList}
+      className={cx('conversation-title-bar-icon', {active: isConversationThreadsListOpen})}
+      data-uie-name="do-open-conversation-threads"
+    >
+      <ThreadsOutlineIcon />
+    </button>
+  );
 
   return (
     <ul
@@ -260,7 +343,18 @@ export const TitleBar = ({
       })}
     >
       <li className="conversation-title-bar-library">
-        {smBreakpoint && (
+        {isMainThreadOpen && (
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            className="conversation-title-bar-icon icon-back"
+            css={{marginBottom: 0}}
+            onClick={closeConversationThread}
+            aria-label="Back to conversation"
+            data-uie-name="do-close-message-thread"
+          />
+        )}
+
+        {!isMainThreadOpen && smBreakpoint && (
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
@@ -283,7 +377,7 @@ export const TitleBar = ({
           </button>
         )}
 
-        {isActivatedAccount && !mdBreakpoint && !isSharedDriveSearchViewOpen && (
+        {isActivatedAccount && !mdBreakpoint && !isSharedDriveSearchViewOpen && !isMainThreadOpen && (
           <button
             className="conversation-title-bar-icon icon-search"
             type="button"
@@ -298,42 +392,51 @@ export const TitleBar = ({
       </li>
 
       <li className="conversation-title-bar-name">
-        <div
-          id="show-participants"
-          onClick={onClickDetails}
-          title={conversationDetailsTooltip}
-          aria-label={conversationDetailsTooltip}
-          onKeyDown={event =>
-            handleKeyDown({
-              event,
-              callback: onClickDetails,
-              keys: [KEY.ENTER, KEY.SPACE],
-            })
-          }
-          data-placement="bottom"
-          role="button"
-          tabIndex={TabIndex.FOCUSABLE}
-          data-uie-name="do-participants"
-        >
-          <div className="conversation-title-bar-name-label--wrapper">
-            {hasLegalHold && (
-              <LegalHoldDot
-                dataUieName="status-legal-hold-conversation"
-                className="conversation-title-bar-legal-hold"
-                conversation={conversation}
-                isInteractive
-              />
-            )}
+        {isMainThreadOpen ? (
+          <nav aria-label="Thread navigation" data-uie-name="thread-breadcrumb">
+            <Breadcrumbs items={threadBreadcrumbItems} onItemClick={onThreadBreadcrumbClick} />
+          </nav>
+        ) : (
+          <div
+            id="show-participants"
+            onClick={onClickDetails}
+            title={conversationDetailsTooltip}
+            aria-label={conversationDetailsTooltip}
+            onKeyDown={event =>
+              handleKeyDown({
+                event,
+                callback: onClickDetails,
+                keys: [KEY.ENTER, KEY.SPACE],
+              })
+            }
+            data-placement="bottom"
+            role="button"
+            tabIndex={TabIndex.FOCUSABLE}
+            data-uie-name="do-participants"
+          >
+            <div className="conversation-title-bar-name-label--wrapper">
+              {hasLegalHold && (
+                <LegalHoldDot
+                  dataUieName="status-legal-hold-conversation"
+                  className="conversation-title-bar-legal-hold"
+                  conversation={conversation}
+                  isInteractive
+                />
+              )}
 
-            <span className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
-              {displayName}
-            </span>
+              <span
+                className="conversation-title-bar-name-label"
+                data-uie-name="status-conversation-title-bar-label"
+              >
+                {displayName}
+              </span>
 
-            <ConversationVerificationBadges conversation={conversation} />
+              <ConversationVerificationBadges conversation={conversation} />
+            </div>
+
+            {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
           </div>
-
-          {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
-        </div>
+        )}
       </li>
 
       <li className="conversation-title-bar-icons">
@@ -355,19 +458,20 @@ export const TitleBar = ({
                 <CallIcon />
               </button>
             )}
-
             {mdBreakpoint ? (
               <>
-                <IconButton
-                  className="icon-search"
-                  css={{marginBottom: 0}}
-                  title={t('tooltipConversationSearch')}
-                  aria-label={t('tooltipConversationSearch')}
-                  onClick={onClickCollectionButton}
-                  data-uie-name="do-collections"
-                >
-                  <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
-                </IconButton>
+                {!isMainThreadOpen && (
+                  <IconButton
+                    className="icon-search"
+                    css={{marginBottom: 0}}
+                    title={t('tooltipConversationSearch')}
+                    aria-label={t('tooltipConversationSearch')}
+                    onClick={onClickCollectionButton}
+                    data-uie-name="do-collections"
+                  >
+                    <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
+                  </IconButton>
+                )}
                 {showCallControls && (
                   <IconButton
                     title={t('tooltipConversationCall')}
@@ -380,18 +484,22 @@ export const TitleBar = ({
                     <CallIcon />
                   </IconButton>
                 )}
+                {threadButton}
               </>
             ) : (
-              <button
-                type="button"
-                title={t('tooltipConversationInfo')}
-                aria-label={t('tooltipConversationInfo')}
-                onClick={onClickDetails}
-                className={cx('conversation-title-bar-icon', {active: isRightSidebarOpen})}
-                data-uie-name="do-open-info"
-              >
-                <Icon.InfoIcon />
-              </button>
+              <>
+                {threadButton}
+                <button
+                  type="button"
+                  title={t('tooltipConversationInfo')}
+                  aria-label={t('tooltipConversationInfo')}
+                  onClick={onClickDetails}
+                  className={cx('conversation-title-bar-icon', {active: isInfoPanelActive})}
+                  data-uie-name="do-open-info"
+                >
+                  <Icon.InfoIcon />
+                </button>
+              </>
             )}
           </>
         )}

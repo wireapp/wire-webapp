@@ -128,6 +128,15 @@ export interface AssetData {
 }
 
 type EncryptedEvent = ConversationOtrMessageAddEvent | ConversationMLSMessageAddEvent | MessageAddEvent;
+type ThreadPayload = {threadId?: string | null; thread_id?: string | null};
+type ThreadEventMetadata = {
+  is_thread_reply?: boolean | null;
+  thread_id?: string | null;
+  thread_root_message_id?: string | null;
+  threadId?: string | null;
+};
+
+const normalizeThreadId = (threadId?: string | null): string | null => (threadId && threadId.length ? threadId : null);
 
 export class CryptographyMapper {
   private readonly logger: Logger;
@@ -297,14 +306,18 @@ export class CryptographyMapper {
     }
 
     const {conversation, qualified_conversation, from, qualified_from} = event;
+    const {isThreadReply, threadId, threadRootMessageId} = this._extractThreadMetadata(genericMessage, event);
     const genericContent = {
       conversation,
       from,
       from_client_id: event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data.sender : undefined,
       id: genericMessage.messageId,
+      is_thread_reply: isThreadReply,
       qualified_conversation,
       qualified_from,
       status: 'status' in event ? event.status : undefined,
+      thread_id: threadId,
+      thread_root_message_id: threadRootMessageId,
       time: event.time,
     };
 
@@ -675,6 +688,42 @@ export class CryptographyMapper {
         attachments,
       },
       type: ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD,
+    };
+  }
+
+  private _extractThreadId(genericMessage: GenericMessage): string | null {
+    const fromPayload = (payload: ThreadPayload | undefined | null) =>
+      normalizeThreadId(payload?.threadId ?? payload?.thread_id ?? null);
+
+    switch (genericMessage.content) {
+      case GenericMessageType.TEXT:
+        return fromPayload(genericMessage.text as Text & ThreadPayload);
+      case GenericMessageType.ASSET:
+        return fromPayload(genericMessage.asset as Asset & ThreadPayload);
+      case GenericMessageType.MULTIPART:
+        return fromPayload(genericMessage.multipart as MultiPartContent & ThreadPayload);
+      case GenericMessageType.COMPOSITE:
+        return fromPayload(genericMessage.composite as Composite & ThreadPayload);
+      default:
+        return null;
+    }
+  }
+
+  private _extractThreadMetadata(genericMessage: GenericMessage, event: EncryptedEvent) {
+    const payloadThreadId = this._extractThreadId(genericMessage);
+    const eventMetadata = event as EncryptedEvent & ThreadEventMetadata;
+    const eventThreadId = normalizeThreadId(
+      eventMetadata.thread_id ?? eventMetadata.threadId ?? eventMetadata.thread_root_message_id ?? null,
+    );
+    const threadId = payloadThreadId ?? eventThreadId;
+    const threadRootMessageId = threadId ? (eventMetadata.thread_root_message_id ?? threadId) : null;
+    const isThreadReply =
+      typeof eventMetadata.is_thread_reply === 'boolean' ? eventMetadata.is_thread_reply : !!threadId;
+
+    return {
+      isThreadReply,
+      threadId,
+      threadRootMessageId,
     };
   }
 

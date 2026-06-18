@@ -48,11 +48,13 @@ interface MessageActions {
   onClickMessage: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickDetails: (message: BaseMessage) => void;
+  onClickThread: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
   onClickTimestamp: (messageId: string) => void;
 }
 
 interface MessageParams extends MessageActions {
+  className?: string;
   conversation: Conversation;
   hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;
@@ -82,6 +84,7 @@ interface MessageParams extends MessageActions {
 
 export const Message = (props: MessageParams) => {
   const {
+    className,
     message,
     isHighlighted,
     hideHeader,
@@ -147,7 +150,7 @@ export const Message = (props: MessageParams) => {
         'message-marked': isHighlighted,
         'content-message': message.isContent(),
         'system-message': !message.isContent(),
-      })}
+      }, className)}
       ref={element => {
         messageElementRef.current = element;
         measureElement?.(element);

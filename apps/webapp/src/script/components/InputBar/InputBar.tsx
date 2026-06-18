@@ -66,6 +66,7 @@ import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/RootProvider';
+import {ComposerFocusScope} from '../MessagesList/utils/threadRootHighlightEvents';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -74,6 +75,10 @@ const CONFIG = {
 };
 
 interface InputBarProps {
+  threadId?: string | null;
+  disableRightPanelOffset?: boolean;
+  showPingButton?: boolean;
+  focusScope?: ComposerFocusScope;
   readonly conversation: Conversation;
   readonly conversationRepository: ConversationRepository;
   readonly cellsRepository: CellsRepository;
@@ -96,6 +101,10 @@ interface InputBarProps {
 }
 
 export const InputBar = ({
+  threadId,
+  disableRightPanelOffset = false,
+  showPingButton = true,
+  focusScope = 'main',
   conversation,
   conversationRepository,
   cellsRepository,
@@ -228,6 +237,7 @@ export const InputBar = ({
     isSending,
     isSendingDisabled,
   } = useMessageHandling({
+    threadId,
     messageContent,
     conversation,
     conversationRepository,
@@ -258,6 +268,7 @@ export const InputBar = ({
     generateQuote,
     messageRepository,
     conversation,
+    threadId,
     cancelMesssageEditing,
   });
 
@@ -273,7 +284,7 @@ export const InputBar = ({
 
   return (
     <div ref={wrapperRef}>
-      <InputBarContainer>
+      <InputBarContainer disableRightPanelOffset={disableRightPanelOffset} focusScope={focusScope}>
         {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
         {classifiedDomains && !isConnectionRequest && (
@@ -332,6 +343,7 @@ export const InputBar = ({
                   {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
                   <InputBarControls
                     conversation={conversation}
+                    showPingButton={showPingButton}
                     isCellsFeatureEnabled={isCellsEnabled}
                     isFileSharingSendingEnabled={isFileSharingSendingEnabled}
                     pingDisabled={ping.isPingDisabled}

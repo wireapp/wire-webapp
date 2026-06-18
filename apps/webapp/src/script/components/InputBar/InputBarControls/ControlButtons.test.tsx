@@ -28,6 +28,7 @@ type PropsType = React.ComponentProps<typeof ControlButtons>;
 const defaultParams: PropsType = {
   conversation: undefined as unknown as Conversation,
   input: '',
+  showPingButton: true,
   onCancelEditing: jest.fn(),
   onClickPing: jest.fn(),
   onGifClick: jest.fn(),
@@ -80,5 +81,12 @@ describe('ControlButtons', () => {
     allButtonTitles
       .filter(button => !buttonTitles.includes(button))
       .forEach(button => expect(queryByTitle(button)).toBe(null));
+  });
+
+  it('hides ping button when showPingButton is false', () => {
+    const params = {...defaultParams, showPingButton: false};
+    const {queryByTitle} = render(withTheme(<ControlButtons {...params} />));
+
+    expect(queryByTitle('tooltipConversationPing')).toBe(null);
   });
 });

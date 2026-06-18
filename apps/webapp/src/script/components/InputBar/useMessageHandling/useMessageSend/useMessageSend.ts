@@ -45,6 +45,7 @@ import {t} from 'Util/localizerUtil';
 import {useSendFiles} from './useSendFiles/useSendFiles';
 
 interface UseMessageSendProps {
+  threadId?: string | null;
   replyMessageEntity: ContentMessage | null;
   eventRepository: EventRepository;
   messageRepository: MessageRepository;
@@ -65,6 +66,7 @@ interface UseMessageSendProps {
 }
 
 export const useMessageSend = ({
+  threadId,
   replyMessageEntity,
   eventRepository,
   messageRepository,
@@ -175,11 +177,12 @@ export const useMessageSend = ({
           mentions: mentionEntities,
           quoteEntity,
           attachments: getCellAssets(),
+          threadId,
         });
         cancelMessageReply();
       });
     },
-    [cancelMessageReply, conversation, generateQuote, messageRepository, getCellAssets, cellsEnabled],
+    [cancelMessageReply, conversation, generateQuote, messageRepository, getCellAssets, cellsEnabled, threadId],
   );
 
   const isSendingDisabled = useMemo(() => {

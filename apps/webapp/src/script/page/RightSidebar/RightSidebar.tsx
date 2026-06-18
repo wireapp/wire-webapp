@@ -17,9 +17,11 @@
  *
  */
 
-import {cloneElement, FC, ReactNode, useCallback, useEffect, useState} from 'react';
+import {cloneElement, FC, ReactNode, useCallback, useEffect, useRef, useState} from 'react';
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
+import cx from 'classnames';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
@@ -39,14 +41,17 @@ import {AddParticipants} from './addParticipants';
 import {ConversationDetails} from './conversationDetails';
 import {ConversationHistory} from './conversationHistory/conversationHistory';
 import {ConversationParticipants} from './conversationParticipants';
+import {ConversationThreadsList} from './ConversationThreadsList';
 import {GroupParticipantService} from './groupParticipantService';
 import {GroupParticipantUser} from './groupParticipantUser';
 import {GuestServicesOptions} from './guestServicesOptions';
 import {MessageDetails} from './messageDetails';
+import {MessageThread} from './MessageThread/MessageThread';
 import {Notifications} from './notifications';
 import {ParticipantDevices} from './participantDevices';
 import {TimedMessages} from './timedMessages';
 
+import {Config} from '../../Config';
 import {isReadableMessage} from '../../guards/Message';
 import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
 import {isAppOrServiceEntity} from '../../guards/Service';
@@ -60,11 +65,15 @@ import {ContentState} from '../useAppState';
 export const OPEN_CONVERSATION_DETAILS = 'OPEN_CONVERSATION_DETAILS';
 export const rightPanelAnimationTimeout = 350; // ms
 
-const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
-  <CSSTransition classNames="right-to-left" timeout={rightPanelAnimationTimeout} {...rest}>
-    {children}
-  </CSSTransition>
-);
+const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => {
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+
+  return (
+    <CSSTransition nodeRef={nodeRef} classNames="right-to-left" timeout={rightPanelAnimationTimeout} {...rest}>
+      <div ref={nodeRef}>{children}</div>
+    </CSSTransition>
+  );
+};
 
 export enum PanelState {
   ADD_PARTICIPANTS = 'ADD_PARTICIPANTS',
@@ -74,6 +83,8 @@ export enum PanelState {
   GROUP_PARTICIPANT_USER = 'GROUP_PARTICIPANT_USER',
   GUEST_OPTIONS = 'GUEST_OPTIONS',
   MESSAGE_DETAILS = 'MESSAGE_DETAILS',
+  MESSAGE_THREAD = 'MESSAGE_THREAD',
+  CONVERSATION_THREADS_LIST = 'CONVERSATION_THREADS_LIST',
   NOTIFICATIONS = 'NOTIFICATIONS',
   PARTICIPANT_DEVICES = 'DEVICES',
   SERVICES_OPTIONS = 'SERVICES_OPTIONS',
@@ -117,6 +128,8 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const {conversationRoleRepository} = conversationRepository;
   const conversationState = container.resolve(ConversationState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  const isCellsEnabled =
+    Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
 
   const [animatePanelToLeft, setAnimatePanelToLeft] = useState<boolean>(true);
 
@@ -191,7 +204,10 @@ const RightSidebar: FC<RightSidebarProps> = ({
     <TransitionGroup
       id="right-column"
       component="aside"
-      className="right-column"
+      className={cx('right-column', {
+        'right-column--message-thread': currentState === PanelState.MESSAGE_THREAD,
+        'right-column--conversation-threads-list': currentState === PanelState.CONVERSATION_THREADS_LIST,
+      })}
       childFactory={child =>
         cloneElement(child, {
           classNames: animatePanelToLeft ? 'right-to-left' : 'left-to-right',
@@ -320,6 +336,37 @@ const RightSidebar: FC<RightSidebarProps> = ({
               userRepository={userRepository}
               onClose={closePanel}
               togglePanel={togglePanel}
+            />
+          )}
+
+          {currentState === PanelState.CONVERSATION_THREADS_LIST && (
+            <ConversationThreadsList
+              activeConversation={activeConversation}
+              messageRepository={repositories.message}
+              onClose={closePanel}
+              usersById={Object.fromEntries(
+                activeConversation.allUserEntities().map(userEntity => [userEntity.id, userEntity]),
+              )}
+            />
+          )}
+
+          {currentState === PanelState.MESSAGE_THREAD && messageEntity && (
+            <MessageThread
+              activeConversation={activeConversation}
+              rootMessage={messageEntity}
+              onClose={closePanel}
+              conversationRepository={repositories.conversation}
+              cellsRepository={repositories.cells}
+              messageRepository={repositories.message}
+              eventRepository={repositories.event}
+              giphyRepository={repositories.giphy}
+              propertiesRepository={repositories.properties}
+              searchRepository={repositories.search}
+              storageRepository={repositories.storage}
+              teamState={teamState}
+              isCellsEnabled={isCellsEnabled}
+              selfUser={selfUser}
+              actionsViewModel={actionsViewModel}
             />
           )}
 
