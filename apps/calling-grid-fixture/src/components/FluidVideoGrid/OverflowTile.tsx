@@ -1,5 +1,11 @@
 import {GridParticipant} from './FluidVideoGrid.types';
 
+const TILE_BG = '#34373D';
+
+function avatarGrad(hue: number): string {
+  return `linear-gradient(135deg, hsl(${hue} 55% 56%), hsl(${(hue + 28) % 360} 58% 40%))`;
+}
+
 interface OverflowTileProps {
   count: number;
   avatars: GridParticipant[];
@@ -7,11 +13,14 @@ interface OverflowTileProps {
 }
 
 export function OverflowTile({count, avatars, onViewAll}: OverflowTileProps) {
+  const shown = avatars.slice(0, 3);
+
   return (
     <button
       onClick={onViewAll}
       style={{
         all: 'unset',
+        boxSizing: 'border-box',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
@@ -19,27 +28,32 @@ export function OverflowTile({count, avatars, onViewAll}: OverflowTileProps) {
         justifyContent: 'center',
         width: '100%',
         height: '100%',
-        background: '#1e1e1e',
-        borderRadius: 6,
+        backgroundColor: TILE_BG,
+        borderRadius: 4,
         gap: 6,
-        position: 'relative',
-        overflow: 'hidden',
+        transition: 'background 0.15s ease',
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#3d4046';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLButtonElement).style.backgroundColor = TILE_BG;
       }}
     >
-      {/* Stacked avatars */}
-      <div style={{display: 'flex', position: 'relative', height: 32}}>
-        {avatars.slice(0, 3).map((p, i) => (
+      {/* Stacked overlapping avatars */}
+      <div style={{display: 'flex', position: 'relative', height: 30}}>
+        {shown.map((p, i) => (
           <div
             key={p.id}
             style={{
               position: 'absolute',
               left: i * 18,
-              width: 28,
-              height: 28,
+              width: 30,
+              height: 30,
               borderRadius: '50%',
-              background: '#555',
-              border: '2px solid #1e1e1e',
+              border: `2px solid ${TILE_BG}`,
               overflow: 'hidden',
+              background: avatarGrad(p.hue ?? (i * 47) % 360),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -49,14 +63,33 @@ export function OverflowTile({count, avatars, onViewAll}: OverflowTileProps) {
             }}
           >
             {p.avatarUrl ? (
-              <img src={p.avatarUrl} alt={p.name} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+              <img
+                src={p.avatarUrl}
+                alt={p.name}
+                style={{width: '100%', height: '100%', objectFit: 'cover', display: 'block'}}
+              />
             ) : (
-              p.name.slice(0, 2).toUpperCase()
+              p.name
+                .split(' ')
+                .map(w => w[0])
+                .join('')
+                .slice(0, 2)
+                .toUpperCase()
             )}
           </div>
         ))}
       </div>
-      <span style={{fontSize: 11, color: '#ccc', fontWeight: 600}}>+{count} more</span>
+
+      <span
+        style={{
+          color: '#fff',
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: 0.3,
+        }}
+      >
+        +{count} more
+      </span>
     </button>
   );
 }

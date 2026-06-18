@@ -6,16 +6,22 @@ export const MIN_TILE_HEIGHT = 120; // px
 export const MAX_TILE_HEIGHT = 600; // px
 export const MIN_ASPECT_RATIO = 0.67; // 4:3
 export const MAX_ASPECT_RATIO = 1.78; // 16:9
-export const MAX_SUBTILES_PER_TILE = 6; // passive participants per fractional tile
+export const MAX_SUB_ROWS = 2; // max sub-rows inside the fractional tile
+export const MAX_SUB_COLS = 3; // max sub-cols inside the fractional tile
 export const TILE_GAP = 4; // px
 export const TRANSITION_DURATION_MS = 250;
+
+// ── Speaker promotion / debounce ──────────────────────────────────────────────
+export const SPEAKING_DEBOUNCE_MS = 1500; // ms of continuous speech before promotion
+export const PRIME_HOLD_MS = 10_000; // ms a promoted speaker keeps their prime tile after stopping
 
 export const GRID_CONFIG: GridConfig = {
   minTileHeight: MIN_TILE_HEIGHT,
   maxTileHeight: MAX_TILE_HEIGHT,
   minAspectRatio: MIN_ASPECT_RATIO,
   maxAspectRatio: MAX_ASPECT_RATIO,
-  maxSubtilesPerTile: MAX_SUBTILES_PER_TILE,
+  maxSubRows: MAX_SUB_ROWS,
+  maxSubCols: MAX_SUB_COLS,
   tileGap: TILE_GAP,
 };
 

@@ -11,35 +11,41 @@ export interface GridParticipant {
   id: string;
   name: string;
   avatarUrl?: string;
-  /** Render prop for video content; absent means show avatar */
+  hue?: number;
   renderVideo?: () => ReactNode;
   tier: ParticipantTier;
   isMuted: boolean;
-  /** Accumulated speaking time in seconds; used for stable-slot eviction priority */
   speakingDuration: number;
 }
 
 // ── Layout types ────────────────────────────────────────────────────────────
 
-export interface SubtileEntry {
-  type: 'participant' | 'overflow';
-  participant?: GridParticipant;
-  overflowCount?: number;
-  overflowAvatars?: GridParticipant[];
+export type SubtileDescriptor =
+  | {type: 'participant'; participant: GridParticipant}
+  | {type: 'overflow'; count: number; avatars: GridParticipant[]};
+
+export type TileDescriptor =
+  | {type: 'full'; participant: GridParticipant}
+  | {type: 'fractional'; subRows: number; subCols: number; subtiles: SubtileDescriptor[]};
+
+export interface RowLayout {
+  tiles: TileDescriptor[];
 }
 
-export interface LayoutCell {
-  type: 'active' | 'fractional';
-  participant?: GridParticipant;
-  subtiles?: SubtileEntry[];
-}
-
-export interface LayoutResult {
-  cols: number;
-  rows: number;
+export interface GridLayout {
+  /** Maximum tiles per row given container width and minTileHeight × minAspectRatio */
+  maxRows: number;
+  maxCols: number;
+  /** Full tile pixel dimensions */
   tileWidth: number;
   tileHeight: number;
-  cells: LayoutCell[];
+  tileAspectRatio: number;
+  /** Subtile pixel dimensions — null when no fractional tile exists */
+  subtileWidth: number | null;
+  subtileHeight: number | null;
+  subtileAspectRatio: number | null;
+  /** Row-based layout: each row is a list of tile descriptors */
+  rows: RowLayout[];
 }
 
 // ── Reducer state & actions ──────────────────────────────────────────────────
@@ -49,7 +55,7 @@ export interface GridState {
   containerSize: {width: number; height: number};
   /** participantId → stable slot index (lower = rendered earlier) */
   slotMap: Record<string, number>;
-  layout: LayoutResult;
+  layout: GridLayout;
 }
 
 export type GridAction =
@@ -63,7 +69,11 @@ export interface GridConfig {
   maxTileHeight: number;
   minAspectRatio: number;
   maxAspectRatio: number;
-  maxSubtilesPerTile: number;
+  /** Maximum sub-rows inside the fractional tile */
+  maxSubRows: number;
+  /** Maximum sub-cols inside the fractional tile */
+  maxSubCols: number;
+  /** Gap in px between tiles and between subtiles */
   tileGap: number;
 }
 
