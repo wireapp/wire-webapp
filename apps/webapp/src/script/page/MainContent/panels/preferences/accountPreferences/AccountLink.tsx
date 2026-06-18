@@ -35,17 +35,23 @@ const AccountLink = ({label, value, ...rest}: AccountLinkProps) => {
       css={{
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
       }}
     >
       <div
         css={{
           marginBottom: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
         }}
       >
         <label
           className="label preferences-label"
           css={{
             alignItems: 'center',
+            justifyContent: 'center',
             color: 'inherit',
             display: 'flex',
             height: 32,
@@ -62,6 +68,8 @@ const AccountLink = ({label, value, ...rest}: AccountLinkProps) => {
       <div
         css={{
           marginTop: 8,
+          display: 'flex',
+          justifyContent: 'center',
         }}
       >
         <Button

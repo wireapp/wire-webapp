@@ -233,7 +233,7 @@ const AccountFormComponent = ({
           type="email"
           data-uie-name="enter-email"
         />
-
+{/* mibpiW-qyrsec-wemve9 */}
         <Input
           label={t('accountForm.passwordLabel')}
           name="password"

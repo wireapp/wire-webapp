@@ -1056,15 +1056,13 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   // TODO: replace with real API call when endpoint is ready
-  async getUserLinks(userid: string): Promise<AccountLink[]> {
-
+  async getUserLinks(handle: string): Promise<AccountLink[]> {
     // TODO Implement the API call but comment it out
-
 
     // process.stdout.write(JSON.stringify(userid));
     return [
-      {name: `${userid} Personal site`, url: 'https://johndoe.dev', verified: true},
-      {name: 'Blog', url: 'https://blog.johndoe.dev', verified: false},
+      {name: `${handle} Personal site`, url: 'https://johndoe.dev', verified: true},
+      {name: `${handle} Blog`, url: 'https://blog.johndoe.dev', verified: false},
     ];
   }
 }

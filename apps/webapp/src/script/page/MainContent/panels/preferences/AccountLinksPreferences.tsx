@@ -39,50 +39,47 @@ interface AccountLinksPreferencesProps {
 }
 
 const AccountLinksPreferences = ({selfUser, userRepository}: AccountLinksPreferencesProps) => {
-  const {username: handle} = useKoSubscribableChildren(selfUser, ['username']);
+  const {username} = useKoSubscribableChildren(selfUser, ['username']);
   const [links, setLinks] = useState<AccountLink[]>([]);
-
-  const {id, domain} = selfUser;
+  const handle = selfUser.isFederated ? `@${username}@${selfUser.domain}` : `@${username}`;
 
   useEffect(() => {
-    void userRepository.getUserLinks({id, domain}).then(setLinks);
-  }, [id, domain, userRepository]);
+    void userRepository.getUserLinks(handle).then(setLinks);
+  }, [handle, userRepository]);
 
   return (
     <PreferencesPage title={t('preferencesAccountLinks')}>
-      <PreferencesSection>
-        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '16px 0 24px'}}>
-          <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />
-          <div style={{textAlign: 'center'}}>
-            <div style={{fontWeight: 600, fontSize: 16}}>{handle}</div>
-            <div
-              style={{
-                marginTop: 6,
-                color: 'var(--foreground-fade-40)',
-                fontSize: 14,
-                maxWidth: 320,
-                lineHeight: 1.4,
-              }}
-            >
-              {MOCK_BIO}
-            </div>
-          </div>
+      <div className="preferences-wrapper">
+        <div className="preferences-account-name">
+          <h3 className="heading-h3 text-center">{handle}</h3>
         </div>
-      </PreferencesSection>
 
-      <PreferencesSection>
-        <ul style={{listStyle: 'none', padding: 0, margin: 0}}>
+        <div className="preferences-account-image">
+          <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />
+        </div>
+
+        <div css={{margin: '12px auto 0', maxWidth: 280, textAlign: 'center'}}>
+          <label className="label preferences-label">{t('preferencesAccountBio')}</label>
+          <p css={{color: 'var(--foreground-fade-40)', fontSize: 14, lineHeight: 1.4}}>{MOCK_BIO}</p>
+        </div>
+      </div>
+
+      <PreferencesSection hasSeparator title={t('preferencesAccountLinks')}>
+        <div
+          css={{
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           {links.map(link => (
-            <li key={link.url} style={{padding: '12px 0', borderBottom: '1px solid var(--foreground-fade-8)'}}>
-              <div style={{display: 'flex', alignItems: 'center', gap: 6}}>
-                <a href={link.url} target="_blank" rel="noreferrer" style={{color: 'var(--accent-color)'}}>
-                  {link.name}
-                </a>
-                {link.verified && <Icon.CheckIcon style={{width: 14, height: 14, color: 'var(--green-500)'}} />}
-              </div>
-            </li>
+            <div key={link.url} css={{display: 'flex', alignItems: 'center', gap: 6, padding: '8px'}}>
+              <a href={link.url} target="_blank" rel="noreferrer" css={{color: 'var(--accent-color)'}}>
+                {link.name}
+              </a>
+              {link.verified && <Icon.CheckIcon css={{width: 14, height: 14, color: 'var(--green-500)'}} />}
+            </div>
           ))}
-        </ul>
+        </div>
       </PreferencesSection>
     </PreferencesPage>
   );
