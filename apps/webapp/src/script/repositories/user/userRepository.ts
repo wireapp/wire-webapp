@@ -1055,14 +1055,20 @@ export class UserRepository extends TypedEventEmitter<Events> {
     }
   }
 
-  // TODO: replace with real API call when endpoint is ready
-  async getUserLinks(handle: string): Promise<AccountLink[]> {
-    // TODO Implement the API call but comment it out
+  async changeBio(bio: string, currentLinks: AccountLink[]): Promise<void> {
+    const self = this.userState.self();
+    await this.selfService.putSelf({bio, links: currentLinks.map(({name, url}) => ({name, url}))});
+    self.bio = bio;
+  }
 
-    // process.stdout.write(JSON.stringify(userid));
-    return [
-      {name: `${handle} Personal site`, url: 'https://johndoe.dev', verified: true},
-      {name: `${handle} Blog`, url: 'https://blog.johndoe.dev', verified: false},
-    ];
+  async changeLinks(links: AccountLink[]): Promise<void> {
+    const self = this.userState.self();
+    await this.selfService.putSelf({links: links.map(({name, url}) => ({name, url})), bio: self.bio});
+    self.links = links;
+  }
+
+  async getUserLinks(handle: string): Promise<AccountLink[]> {
+    const profile = await this.userService.getUserPublicProfile(handle.replace(/^@/, ''));
+    return profile.links ?? [];
   }
 }

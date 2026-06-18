@@ -95,6 +95,7 @@ export class UserAPI {
     RICH_INFO: 'rich-info',
     SEARCH: 'search',
     SEND: 'send',
+    PUBLIC: 'public',
     USERS: 'users',
     V2: 'v2',
     VERIFICATION: 'verification-code',
@@ -330,6 +331,16 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       method: 'get',
       url,
+    };
+
+    const response = await this.client.sendJSON<User>(config);
+    return response.data;
+  }
+
+  public async getUserPublicProfile(handle: string): Promise<User> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `/${UserAPI.URL.USERS}/${UserAPI.URL.PUBLIC}/${handle}`,
     };
 
     const response = await this.client.sendJSON<User>(config);

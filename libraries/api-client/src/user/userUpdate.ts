@@ -19,4 +19,8 @@
 
 import {User} from '../user/';
 
-export type UserUpdate = Partial<Pick<User, 'name'> & Pick<User, 'assets' | 'accent_id'>>;
+export type UserUpdate = Partial<Pick<User, 'name' | 'assets' | 'accent_id'> & {
+  bio: string;
+  links: Pick<import('./user').AccountLink, 'name' | 'url'>[];
+  text_status: string;
+}>;

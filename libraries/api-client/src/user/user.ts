@@ -43,6 +43,7 @@ export interface User {
   accent_id?: AccentColor.AccentColorID;
   app?: App;
   assets?: UserAsset[];
+  bio?: string;
   deleted?: boolean;
   email?: string;
   expires_at?: string;

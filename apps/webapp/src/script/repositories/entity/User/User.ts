@@ -103,6 +103,7 @@ export class User {
   /** The federated domain (when the user is on a federated server) */
   public domain: string;
   public type: UserType;
+  public bio?: string;
   public category?: string;
   public description?: string;
   public links?: AccountLink[];

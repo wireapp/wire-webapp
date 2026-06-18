@@ -173,6 +173,10 @@ export class UserService {
     return this.apiClient.api.user.getUser(userId);
   }
 
+  getUserPublicProfile(handle: string): Promise<APIClientUser> {
+    return this.apiClient.api.user.getUserPublicProfile(handle);
+  }
+
   /**
    * Get the list of user's supported protocols.
    */

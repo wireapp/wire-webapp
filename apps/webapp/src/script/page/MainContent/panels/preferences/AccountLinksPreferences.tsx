@@ -28,10 +28,9 @@ import type {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
+import {BioInput} from './accountPreferences/BioInput';
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
-
-const MOCK_BIO = 'Software engineer at Wire. Building secure communication tools for everyone.';
 
 interface AccountLinksPreferencesProps {
   selfUser: User;
@@ -41,6 +40,7 @@ interface AccountLinksPreferencesProps {
 const AccountLinksPreferences = ({selfUser, userRepository}: AccountLinksPreferencesProps) => {
   const {username} = useKoSubscribableChildren(selfUser, ['username']);
   const [links, setLinks] = useState<AccountLink[]>([]);
+  const [bio, setBio] = useState<string>(selfUser.bio ?? '');
   const handle = selfUser.isFederated ? `@${username}@${selfUser.domain}` : `@${username}`;
 
   useEffect(() => {
@@ -58,10 +58,7 @@ const AccountLinksPreferences = ({selfUser, userRepository}: AccountLinksPrefere
           <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />
         </div>
 
-        <div css={{margin: '12px auto 0', maxWidth: 280, textAlign: 'center'}}>
-          <label className="label preferences-label">{t('preferencesAccountBio')}</label>
-          <p css={{color: 'var(--foreground-fade-40)', fontSize: 14, lineHeight: 1.4}}>{MOCK_BIO}</p>
-        </div>
+        <BioInput bio={bio} currentLinks={links} onBioSaved={setBio} userRepository={userRepository} />
       </div>
 
       <PreferencesSection hasSeparator title={t('preferencesAccountLinks')}>
@@ -72,11 +69,14 @@ const AccountLinksPreferences = ({selfUser, userRepository}: AccountLinksPrefere
           }}
         >
           {links.map(link => (
-            <div key={link.url} css={{display: 'flex', alignItems: 'center', gap: 6, padding: '8px'}}>
-              <a href={link.url} target="_blank" rel="noreferrer" css={{color: 'var(--accent-color)'}}>
-                {link.name}
+            <div key={link.url} css={{display: 'flex', flexDirection: 'column', padding: '8px 8px 12px'}}>
+              <div css={{display: 'flex', alignItems: 'center', gap: 6}}>
+                <span className="label preferences-label">{link.name}</span>
+                {link.verified && <Icon.CheckIcon css={{width: 14, height: 14, color: 'var(--green-500)'}} />}
+              </div>
+              <a href={link.url} target="_blank" rel="noreferrer" css={{color: 'var(--accent-color)', fontSize: 14}}>
+                {link.url}
               </a>
-              {link.verified && <Icon.CheckIcon css={{width: 14, height: 14, color: 'var(--green-500)'}} />}
             </div>
           ))}
         </div>

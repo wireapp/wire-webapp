@@ -30,6 +30,7 @@ import {isEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
 
 interface AccountInputProps extends InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;
+  containerWidth?: number;
   'data-uie-name'?: string;
   forceLowerCase?: boolean;
   isDone?: boolean;
@@ -78,6 +79,7 @@ const AccountInput: FC<AccountInputProps> = ({
   forceLowerCase = false,
   maxLength,
   allowedChars,
+  containerWidth = 280,
   labelUie,
   valueUie,
   ...rest
@@ -128,7 +130,7 @@ const AccountInput: FC<AccountInputProps> = ({
         flexDirection: 'column',
         height: 100,
         padding: 8,
-        width: 280,
+        width: containerWidth,
       }}
     >
       {!isEditing && (
