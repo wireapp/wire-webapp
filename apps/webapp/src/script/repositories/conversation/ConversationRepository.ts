@@ -2930,12 +2930,20 @@ export class ConversationRepository {
   private readonly descriptionVersions = new Map<string, number>();
 
   /**
+   * Whether to use encrypted API path for description.
+   * Set to true when backend endpoint is available and MLS crypto is wired in.
+   */
+  private readonly useEncryptedDescriptions = false;
+
+  /**
    * Load conversation description.
    *
-   * TODO: When the backend endpoint is live, this will:
+   * Encrypted path (when useEncryptedDescriptions = true):
    *   1. GET /conversations/:domain/:id/description → { version, ciphertext }
-   *   2. Decrypt ciphertext with MLS epoch secret
-   *   3. Set plaintext on the entity
+   *   2. If ciphertext is null → empty description
+   *   3. Get MLS secret: core.service.mls.exportSecretKey(groupId, 32)
+   *   4. Decrypt: decryptDescription(ciphertext, secret)
+   *   5. On decrypt failure → log error, do NOT overwrite local description
    */
   public loadConversationDescription(conversationEntity: Conversation): void {
     const {version, description} = this.conversationService.getConversationDescription(conversationEntity.qualifiedId);
@@ -2946,11 +2954,13 @@ export class ConversationRepository {
   /**
    * Update conversation description.
    *
-   * TODO: When the backend endpoint is live, this will:
-   *   1. Encrypt plaintext with MLS epoch secret → ciphertext
-   *   2. PUT /conversations/:domain/:id/description { base_version, version, ciphertext }
-   *   3. Handle 409 conflict by re-fetching and retrying
-   *   4. Inject conversation.description-update event
+   * Encrypted path (when useEncryptedDescriptions = true):
+   *   1. Get MLS secret: core.service.mls.exportSecretKey(groupId, 32)
+   *   2. Encrypt: encryptDescription(description, secret) → base64 blob
+   *   3. PUT /conversations/:domain/:id/description
+   *      { base_version: current, version: current + 1, ciphertext: blob }
+   *   4. Handle 409 (stale-description-version): re-fetch, re-encrypt, retry
+   *   5. Inject conversation.description-update event
    *
    * @param conversationEntity Conversation to update
    * @param description New description plaintext

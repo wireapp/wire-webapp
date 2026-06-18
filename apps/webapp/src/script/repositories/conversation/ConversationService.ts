@@ -192,11 +192,14 @@ export class ConversationService {
   }
 
   /**
-   * Get the conversation description.
+   * Get the conversation description from local mock storage.
    *
-   * TODO: Replace localStorage mock with:
-   *   GET /conversations/:domain/:id/description
-   *   → { version, ciphertext } then decrypt ciphertext with MLS epoch secret
+   * To switch to encrypted API path:
+   *   1. Call GET /conversations/:domain/:id/description → { version, ciphertext }
+   *   2. If ciphertext is null, return { version: 0, description: '' }
+   *   3. Decode base64 ciphertext
+   *   4. Export MLS secret: mlsService.exportSecretKey(groupId, 32)
+   *   5. Decrypt with decryptDescription(ciphertext, secret)
    *
    * @param conversationId ID of the conversation
    * @returns The description plaintext and version
@@ -218,13 +221,15 @@ export class ConversationService {
   }
 
   /**
-   * Update the conversation description.
+   * Update the conversation description in local mock storage.
    *
-   * TODO: Replace localStorage mock with:
-   *   1. Encrypt plaintext with MLS epoch secret → ciphertext
-   *   2. PUT /conversations/:domain/:id/description
-   *      { base_version, version: base_version + 1, ciphertext }
-   *   3. Handle 409 (stale version) by re-fetching and retrying
+   * To switch to encrypted API path:
+   *   1. Export MLS secret: mlsService.exportSecretKey(groupId, 32)
+   *   2. Encrypt with encryptDescription(description, secret)
+   *   3. Base64-encode the [IV][ciphertext] blob
+   *   4. PUT /conversations/:domain/:id/description
+   *      { base_version: baseVersion, version: baseVersion + 1, ciphertext }
+   *   5. Handle 409 (stale-description-version) by re-fetching and retrying
    *
    * @param conversationId ID of the conversation
    * @param description new description plaintext
