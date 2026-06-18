@@ -43,7 +43,7 @@ function hueFromId(id: string): number {
 }
 
 function participantToGrid(p: Participant, isYou: boolean): GridParticipant {
-  const videoStream = p.processedVideoStream()?.stream ?? p.videoStream();
+  const videoStream = p.hasActiveVideo() ? (p.processedVideoStream()?.stream ?? p.videoStream()) : undefined;
   const id = isYou ? 'self' : `${p.user.qualifiedId.id}/${p.clientId}`;
 
   return {
