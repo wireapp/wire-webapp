@@ -172,10 +172,33 @@
 
     &-text {
       margin: 4px 0 0;
-      color: var(--foreground-fade-56);
+      color: var(--background);
       font-size: var(--font-size-small);
       line-height: var(--line-height-md);
       word-break: break-word;
+
+      .md-heading {
+        margin: 4px 0 8px;
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-bold);
+        line-height: var(--line-height-lg);
+
+        &--1 {
+          font-size: var(--font-size-xlarge);
+        }
+
+        &--2 {
+          font-size: var(--font-size-large);
+        }
+
+        &--3 {
+          font-size: var(--font-size-base);
+        }
+
+        & + br {
+          display: none;
+        }
+      }
     }
 
     &-placeholder {

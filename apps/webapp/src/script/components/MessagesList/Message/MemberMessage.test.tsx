@@ -99,25 +99,30 @@ describe('MemberMessage', () => {
       conversationDescription: 'A useful group description',
     };
 
-    const {getByText} = render(withTheme(<MemberMessage {...props} />));
+    const {getByTestId, getByText} = render(withTheme(<MemberMessage {...props} />));
     expect(getByText('Description:')).toBeInTheDocument();
     expect(getByText('A useful group description')).toBeInTheDocument();
+    expect(getByTestId('group-creation-description-label').nextElementSibling).toBe(
+      getByTestId('group-creation-description-text'),
+    );
   });
 
-  it('renders conversation description line breaks and links like chat messages', () => {
+  it('renders conversation description headings, line breaks, and links like chat messages', () => {
     const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
     const props = {
       ...baseProps,
       message,
-      conversationDescription: 'First line\nhttps://wire.com',
+      conversationDescription: '# First line\nhttps://wire.com',
     };
 
     const {getByRole, getByTestId} = render(withTheme(<MemberMessage {...props} />));
 
     const link = getByRole('link', {name: 'https://wire.com'});
+    const description = getByTestId('group-creation-description-text');
     expect(link).toHaveAttribute('href', 'https://wire.com');
     expect(link).toHaveAttribute('target', '_blank');
-    expect(getByTestId('group-creation-description-text').innerHTML).toContain('First line<br>');
+    expect(description.querySelector('.md-heading--1')).toHaveTextContent('First line');
+    expect(description.innerHTML).toContain('<br>');
   });
 
   it('escapes html in the conversation description shown in chat', () => {

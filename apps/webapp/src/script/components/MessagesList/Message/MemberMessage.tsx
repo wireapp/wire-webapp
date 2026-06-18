@@ -119,7 +119,7 @@ export const MemberMessage = ({
             <Icon.MessageIcon />
           </div>
           <div className="message-header-label message-header-label--description">
-            <strong>{t('conversationDescriptionLabel')}</strong>{' '}
+            <strong data-uie-name="group-creation-description-label">{t('conversationDescriptionLabel')}</strong>
             <span
               data-uie-name="group-creation-description-text"
               dangerouslySetInnerHTML={{__html: renderedConversationDescription}}
