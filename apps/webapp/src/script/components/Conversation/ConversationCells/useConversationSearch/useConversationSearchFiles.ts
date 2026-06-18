@@ -88,11 +88,37 @@ export const useConversationSearchFiles = ({
 
   const {id, domain} = conversationQualifiedId;
 
-  const isCurrentSearchRequest = useCallback((requestVersion: number): boolean => {
-    return (
-      (enabledRef.current || allowSearchWhenDisabledRef.current) && !requestVersionGate.current.isStale(requestVersion)
-    );
+  const canSearchOwnResults = useCallback((): boolean => {
+    return enabledRef.current === true || allowSearchWhenDisabledRef.current === true;
   }, []);
+
+  const isCurrentSearchRequest = useCallback(
+    (requestVersion: number): boolean => {
+      return canSearchOwnResults() === true && requestVersionGate.current.isStale(requestVersion) === false;
+    },
+    [canSearchOwnResults],
+  );
+
+  const shouldRefreshSearchResultsAfterClearingInput = useCallback(
+    ({
+      preserveFilters,
+      hasActiveParamsBeforeClear,
+    }: {
+      preserveFilters: boolean;
+      hasActiveParamsBeforeClear: boolean;
+    }): boolean => {
+      if (preserveFilters === false) {
+        return false;
+      }
+
+      if (enabledRef.current === true) {
+        return true;
+      }
+
+      return allowSearchWhenDisabledRef.current === true && hasActiveParamsBeforeClear === true;
+    },
+    [],
+  );
 
   const searchNodes = useCallback(
     async ({
@@ -251,10 +277,12 @@ export const useConversationSearchFiles = ({
     setSearchQuery('');
     shouldPerformSearch.current = false;
 
-    const shouldRefreshSearchResults =
-      preserveFilters && (enabledRef.current || (allowSearchWhenDisabledRef.current && hasActiveParams));
+    const shouldRefreshSearchResults = shouldRefreshSearchResultsAfterClearingInput({
+      preserveFilters,
+      hasActiveParamsBeforeClear: hasActiveParams,
+    });
 
-    if (shouldRefreshSearchResults) {
+    if (shouldRefreshSearchResults === true) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         await searchNodes({query: '', filters});
       });
@@ -312,8 +340,8 @@ export const useConversationSearchFiles = ({
   useEffect(() => {
     const hasNoSearchQuery = normalizeSearchQuery(searchValue).length === 0;
 
-    if (hadActiveSearchParamsRef.current && hasActiveParams === false && hasNoSearchQuery) {
-      if (enabledRef.current || allowSearchWhenDisabledRef.current) {
+    if (hadActiveSearchParamsRef.current === true && hasActiveParams === false && hasNoSearchQuery === true) {
+      if (canSearchOwnResults() === true) {
         fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
           await searchNodes({query: '', filters});
         });
@@ -322,7 +350,7 @@ export const useConversationSearchFiles = ({
       }
     }
     hadActiveSearchParamsRef.current = hasActiveParams;
-  }, [filters, fireAndForgetInvoker, hasActiveParams, onClear, searchNodes, searchValue]);
+  }, [canSearchOwnResults, filters, fireAndForgetInvoker, hasActiveParams, onClear, searchNodes, searchValue]);
 
   const loadMore = useCallback(
     async (offset: number): Promise<void> => {
