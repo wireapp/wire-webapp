@@ -20,12 +20,11 @@
 /** Response from GET /conversations/:domain/:id/description */
 export interface ConversationDescriptionResponse {
   version: number;
-  ciphertext: string | null;
+  ciphertext: string;
 }
 
 /** Request body for PUT /conversations/:domain/:id/description */
 export interface ConversationDescriptionUpdateData {
   base_version: number;
-  version: number;
   ciphertext: string;
 }

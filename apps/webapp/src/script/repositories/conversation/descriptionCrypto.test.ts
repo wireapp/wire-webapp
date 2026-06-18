@@ -75,14 +75,15 @@ describe('descriptionCrypto', () => {
     expect(decrypted).toBe(plaintext);
   });
 
-  it('produces base64 output with IV prepended to ciphertext', async () => {
+  it('produces base64 AES-CBC output with a random encrypted prefix block', async () => {
     const secret = await generateTestKey();
     const ciphertextBase64 = await encryptDescription('test', secret);
 
     // Should be valid base64
     const raw = Uint8Array.from(atob(ciphertextBase64), c => c.charCodeAt(0));
 
-    // AES-GCM IV is 12 bytes, so total must be > 12
-    expect(raw.length).toBeGreaterThan(12);
+    // AES-CBC ciphertext is block-aligned and includes one random prefix block
+    expect(raw.length).toBeGreaterThanOrEqual(32);
+    expect(raw.length % 16).toBe(0);
   });
 });

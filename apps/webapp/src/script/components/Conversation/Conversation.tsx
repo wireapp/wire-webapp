@@ -161,7 +161,7 @@ export const Conversation = ({
     }
 
     // TODO: Remove when description is part of the API Conversation payload
-    conversationRepository.loadConversationDescription(activeConversation);
+    void conversationRepository.loadConversationDescription(activeConversation);
   }, [activeConversation, conversationRepository]);
 
   const uploadImages = useCallback(

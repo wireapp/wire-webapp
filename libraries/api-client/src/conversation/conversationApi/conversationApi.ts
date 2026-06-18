@@ -61,6 +61,8 @@ import {
 } from '../conversationError';
 import {
   ConversationAccessUpdateData,
+  ConversationDescriptionResponse,
+  ConversationDescriptionUpdateData,
   ConversationJoinData,
   ConversationMemberUpdateData,
   ConversationMessageTimerUpdateData,
@@ -98,6 +100,7 @@ export class ConversationAPI {
     CODE: 'code',
     CODE_CHECK: 'code-check',
     CONVERSATIONS: 'conversations',
+    DESCRIPTION: 'description',
     SUBCONVERSATIONS: 'subconversations',
     GROUP_INFO: 'groupinfo',
     MLS: 'mls',
@@ -808,6 +811,40 @@ export class ConversationAPI {
 
     const response = await this.client.sendJSON<ConversationRenameEvent>(config);
     return response.data;
+  }
+
+  /**
+   * Get encrypted conversation description.
+   * @param conversationId The conversation ID
+   * @see https://nginz-https.bella.wire.link/v17/api/swagger-ui/#/default/get-conversation-description
+   */
+  public async getConversationDescription(conversationId: QualifiedId): Promise<ConversationDescriptionResponse> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.DESCRIPTION}`,
+    };
+
+    const response = await this.client.sendJSON<ConversationDescriptionResponse>(config);
+    return response.data;
+  }
+
+  /**
+   * Update encrypted conversation description.
+   * @param conversationId The conversation ID
+   * @param descriptionData The encrypted description update data
+   * @see https://nginz-https.bella.wire.link/v17/api/swagger-ui/#/default/update-conversation-description
+   */
+  public async putConversationDescription(
+    conversationId: QualifiedId,
+    descriptionData: ConversationDescriptionUpdateData,
+  ): Promise<void> {
+    const config: AxiosRequestConfig = {
+      data: descriptionData,
+      method: 'put',
+      url: `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.DESCRIPTION}`,
+    };
+
+    await this.client.sendJSON(config);
   }
 
   /**

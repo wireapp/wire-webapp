@@ -18,17 +18,22 @@
  */
 
 /**
- * AES-GCM encryption/decryption for conversation description metadata.
+ * AES-CBC encryption/decryption for conversation description metadata.
  *
- * Wire format (matching iOS zmEncryptPrefixingIV / zmDecryptPrefixedIV):
- *   [12-byte IV][ciphertext+tag bytes]
- * The combined blob is base64-encoded for transport.
+ * Wire format matches iOS `zmEncryptPrefixingIV` / `zmDecryptPrefixedIV`:
+ *   AES-256-CBC with PKCS#7 padding and a zero IV.
+ *   Plaintext is prefixed with one random AES block before encryption.
+ *   Decryption decrypts the full payload and drops the first plaintext block.
  *
- * Key: 32-byte secret derived from MLS epoch via exportSecretKey(conversationId, 32).
+ * Despite the iOS method name, the IV is not stored in the payload; randomization
+ * comes from encrypting the random first block in CBC mode.
+ *
+ * Key: 32-byte secret derived from MLS epoch via exportSecretKey(groupId, 32).
  */
 
-const IV_LENGTH = 12;
-const ALGORITHM = 'AES-GCM';
+const BLOCK_LENGTH = 16;
+const ALGORITHM = 'AES-CBC';
+const ZERO_IV = new Uint8Array(BLOCK_LENGTH);
 
 async function importKey(rawKey: Uint8Array): Promise<CryptoKey> {
   return crypto.subtle.importKey('raw', rawKey, ALGORITHM, false, ['encrypt', 'decrypt']);
@@ -39,38 +44,35 @@ async function importKey(rawKey: Uint8Array): Promise<CryptoKey> {
  *
  * @param plaintext - The description text
  * @param secret - 32-byte MLS-derived secret
- * @returns Base64-encoded blob: [IV][ciphertext]
+ * @returns Base64-encoded AES-CBC blob compatible with iOS zmEncryptPrefixingIV
  */
 export async function encryptDescription(plaintext: string, secret: Uint8Array): Promise<string> {
   const key = await importKey(secret);
-  const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
+  const randomPrefix = crypto.getRandomValues(new Uint8Array(BLOCK_LENGTH));
   const encoded = new TextEncoder().encode(plaintext);
 
-  const ciphertext = await crypto.subtle.encrypt({name: ALGORITHM, iv}, key, encoded);
+  const prefixedPlaintext = new Uint8Array(BLOCK_LENGTH + encoded.length);
+  prefixedPlaintext.set(randomPrefix, 0);
+  prefixedPlaintext.set(encoded, BLOCK_LENGTH);
 
-  // Prepend IV to ciphertext (matching iOS wire format)
-  const combined = new Uint8Array(IV_LENGTH + ciphertext.byteLength);
-  combined.set(iv, 0);
-  combined.set(new Uint8Array(ciphertext), IV_LENGTH);
+  const ciphertext = await crypto.subtle.encrypt({name: ALGORITHM, iv: ZERO_IV}, key, prefixedPlaintext);
 
-  return btoa(String.fromCharCode(...combined));
+  return btoa(String.fromCharCode(...new Uint8Array(ciphertext)));
 }
 
 /**
  * Decrypt a base64-encoded description blob.
  *
- * @param ciphertextBase64 - Base64-encoded blob: [IV][ciphertext]
+ * @param ciphertextBase64 - Base64-encoded AES-CBC blob
  * @param secret - 32-byte MLS-derived secret (same epoch as encryption)
  * @returns The decrypted plaintext string
  */
 export async function decryptDescription(ciphertextBase64: string, secret: Uint8Array): Promise<string> {
   const key = await importKey(secret);
-  const combined = Uint8Array.from(atob(ciphertextBase64), c => c.charCodeAt(0));
+  const ciphertext = Uint8Array.from(atob(ciphertextBase64), c => c.charCodeAt(0));
 
-  const iv = combined.slice(0, IV_LENGTH);
-  const ciphertext = combined.slice(IV_LENGTH);
+  const decrypted = await crypto.subtle.decrypt({name: ALGORITHM, iv: ZERO_IV}, key, ciphertext);
+  const plaintext = new Uint8Array(decrypted).slice(BLOCK_LENGTH);
 
-  const decrypted = await crypto.subtle.decrypt({name: ALGORITHM, iv}, key, ciphertext);
-
-  return new TextDecoder().decode(decrypted);
+  return new TextDecoder().decode(plaintext);
 }

@@ -29,6 +29,12 @@ import {MessageCategory} from '../../message/MessageCategory';
 import type {APIClient} from '../../service/apiClientSingleton';
 import type {Core} from '../../service/coreSingleton';
 import {ConversationService} from './ConversationService';
+import {decryptDescription, encryptDescription} from './descriptionCrypto';
+
+jest.mock('./descriptionCrypto', () => ({
+  decryptDescription: jest.fn(),
+  encryptDescription: jest.fn(),
+}));
 
 type EventServiceLike = Pick<EventService, 'loadEventsWithCategory'>;
 
@@ -98,6 +104,54 @@ describe('ConversationService', () => {
       );
       expect(await conversationService.searchInConversation('conversation-id', 'caption')).toEqual([compositeEvent]);
       expect(await conversationService.searchInConversation('conversation-id', 'unrelated')).toEqual([]);
+    });
+  });
+
+  describe('conversation description', () => {
+    const conversationId: QualifiedId = {id: 'conv-id', domain: 'wire.com'};
+    const groupId = 'group-id';
+    const secret = btoa('12345678901234567890123456789012');
+
+    const makeService = (conversationApi: Record<string, jest.Mock>) => {
+      const apiClient = {
+        api: {conversation: conversationApi},
+      } as unknown as APIClient;
+      const core = {
+        service: {mls: {exportSecretKey: jest.fn().mockResolvedValue(secret)}},
+      } as unknown as Core;
+
+      return {service: new ConversationService({} as EventService, {} as StorageService, apiClient, core), core};
+    };
+
+    it('fetches and decrypts the encrypted conversation description', async () => {
+      const getConversationDescription = jest.fn().mockResolvedValue({version: 7, ciphertext: 'ciphertext'});
+      const {service, core} = makeService({getConversationDescription});
+      jest.mocked(decryptDescription).mockResolvedValueOnce('decrypted description');
+
+      const result = await service.getConversationDescription(conversationId, groupId);
+
+      expect(result).toEqual({version: 7, description: 'decrypted description'});
+      expect(getConversationDescription).toHaveBeenCalledWith(conversationId);
+      expect(core.service?.mls?.exportSecretKey).toHaveBeenCalledWith(groupId, 32);
+      expect(decryptDescription).toHaveBeenCalledWith('ciphertext', expect.any(Uint8Array));
+    });
+
+    it('fetches current version before updating the encrypted conversation description', async () => {
+      const getConversationDescription = jest.fn().mockResolvedValue({version: 7, ciphertext: 'current-ciphertext'});
+      const putConversationDescription = jest.fn().mockResolvedValue(undefined);
+      const {service, core} = makeService({getConversationDescription, putConversationDescription});
+      jest.mocked(encryptDescription).mockResolvedValueOnce('new-ciphertext');
+
+      const result = await service.updateConversationDescription(conversationId, groupId, 'new description', 3);
+
+      expect(result).toEqual({version: 8});
+      expect(getConversationDescription).toHaveBeenCalledWith(conversationId);
+      expect(core.service?.mls?.exportSecretKey).toHaveBeenCalledWith(groupId, 32);
+      expect(encryptDescription).toHaveBeenCalledWith('new description', expect.any(Uint8Array));
+      expect(putConversationDescription).toHaveBeenCalledWith(conversationId, {
+        base_version: 7,
+        ciphertext: 'new-ciphertext',
+      });
     });
   });
 

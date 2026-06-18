@@ -2930,47 +2930,43 @@ export class ConversationRepository {
   private readonly descriptionVersions = new Map<string, number>();
 
   /**
-   * Whether to use encrypted API path for description.
-   * Set to true when backend endpoint is available and MLS crypto is wired in.
+   * Load encrypted conversation description from backend and decrypt it with the MLS group secret.
    */
-  private readonly useEncryptedDescriptions = false;
+  public async loadConversationDescription(conversationEntity: Conversation): Promise<void> {
+    if (!conversationEntity.groupId) {
+      logger.warn('Cannot load conversation description without MLS group ID', {conversationId: conversationEntity.id});
+      return;
+    }
 
-  /**
-   * Load conversation description.
-   *
-   * Encrypted path (when useEncryptedDescriptions = true):
-   *   1. GET /conversations/:domain/:id/description → { version, ciphertext }
-   *   2. If ciphertext is null → empty description
-   *   3. Get MLS secret: core.service.mls.exportSecretKey(groupId, 32)
-   *   4. Decrypt: decryptDescription(ciphertext, secret)
-   *   5. On decrypt failure → log error, do NOT overwrite local description
-   */
-  public loadConversationDescription(conversationEntity: Conversation): void {
-    const {version, description} = this.conversationService.getConversationDescription(conversationEntity.qualifiedId);
-    this.descriptionVersions.set(conversationEntity.id, version);
-    conversationEntity.description(description);
+    try {
+      const {version, description} = await this.conversationService.getConversationDescription(
+        conversationEntity.qualifiedId,
+        conversationEntity.groupId,
+      );
+      this.descriptionVersions.set(conversationEntity.id, version);
+      conversationEntity.description(description);
+    } catch (error) {
+      this.logger.warn('Failed to load conversation description', {conversationId: conversationEntity.id, error});
+    }
   }
 
   /**
-   * Update conversation description.
-   *
-   * Encrypted path (when useEncryptedDescriptions = true):
-   *   1. Get MLS secret: core.service.mls.exportSecretKey(groupId, 32)
-   *   2. Encrypt: encryptDescription(description, secret) → base64 blob
-   *   3. PUT /conversations/:domain/:id/description
-   *      { base_version: current, version: current + 1, ciphertext: blob }
-   *   4. Handle 409 (stale-description-version): re-fetch, re-encrypt, retry
-   *   5. Inject conversation.description-update event
+   * Encrypt and update conversation description through the backend API.
    *
    * @param conversationEntity Conversation to update
    * @param description New description plaintext
    */
   public async updateConversationDescription(conversationEntity: Conversation, description: string): Promise<void> {
+    if (!conversationEntity.groupId) {
+      throw new Error('Cannot update conversation description without MLS group ID');
+    }
+
     const baseVersion = this.descriptionVersions.get(conversationEntity.id) ?? 0;
     const previousDescription = conversationEntity.description();
     const action = previousDescription.length > 0 ? 'edit' : 'add';
     const {version} = await this.conversationService.updateConversationDescription(
       conversationEntity.qualifiedId,
+      conversationEntity.groupId,
       description,
       baseVersion,
     );

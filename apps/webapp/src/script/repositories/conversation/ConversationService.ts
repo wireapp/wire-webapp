@@ -58,6 +58,7 @@ import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {getLogger} from 'Util/logger';
 
 import {MLSCapableConversation} from './ConversationSelectors';
+import {decryptDescription, encryptDescription} from './descriptionCrypto';
 
 import {MessageCategory} from '../../message/MessageCategory';
 import {APIClient} from '../../service/apiClientSingleton';
@@ -191,60 +192,66 @@ export class ConversationService {
     });
   }
 
-  /**
-   * Get the conversation description from local mock storage.
-   *
-   * To switch to encrypted API path:
-   *   1. Call GET /conversations/:domain/:id/description → { version, ciphertext }
-   *   2. If ciphertext is null, return { version: 0, description: '' }
-   *   3. Decode base64 ciphertext
-   *   4. Export MLS secret: mlsService.exportSecretKey(groupId, 32)
-   *   5. Decrypt with decryptDescription(ciphertext, secret)
-   *
-   * @param conversationId ID of the conversation
-   * @returns The description plaintext and version
-   */
-  getConversationDescription(conversationId: QualifiedId): {version: number; description: string} {
-    const storageKey = `wire_conversation_description_${conversationId.id}`;
-    const raw = window.localStorage.getItem(storageKey);
+  private get mlsService() {
+    const mlsService = this.core.service?.mls;
 
-    if (!raw) {
-      return {version: 0, description: ''};
+    if (!mlsService) {
+      throw new Error('MLS service not available');
     }
 
-    try {
-      const parsed = JSON.parse(raw) as {version: number; description: string};
-      return parsed;
-    } catch {
-      return {version: 0, description: ''};
-    }
+    return mlsService;
+  }
+
+  private async getDescriptionSecret(groupId: string): Promise<Uint8Array> {
+    const secret = await this.mlsService.exportSecretKey(groupId, 32);
+    return Uint8Array.from(atob(secret), char => char.charCodeAt(0));
   }
 
   /**
-   * Update the conversation description in local mock storage.
-   *
-   * To switch to encrypted API path:
-   *   1. Export MLS secret: mlsService.exportSecretKey(groupId, 32)
-   *   2. Encrypt with encryptDescription(description, secret)
-   *   3. Base64-encode the [IV][ciphertext] blob
-   *   4. PUT /conversations/:domain/:id/description
-   *      { base_version: baseVersion, version: baseVersion + 1, ciphertext }
-   *   5. Handle 409 (stale-description-version) by re-fetching and retrying
+   * Get and decrypt the encrypted conversation description.
    *
    * @param conversationId ID of the conversation
+   * @param groupId MLS group ID used to derive the description encryption key
+   * @returns The description plaintext and version
+   */
+  async getConversationDescription(conversationId: QualifiedId, groupId: string): Promise<{version: number; description: string}> {
+    const {version, ciphertext} = await this.apiClient.api.conversation.getConversationDescription(conversationId);
+
+    if (!ciphertext) {
+      return {version, description: ''};
+    }
+
+    const secret = await this.getDescriptionSecret(groupId);
+    const description = await decryptDescription(ciphertext, secret);
+
+    return {version, description};
+  }
+
+  /**
+   * Encrypt and update the conversation description.
+   *
+   * @param conversationId ID of the conversation
+   * @param groupId MLS group ID used to derive the description encryption key
    * @param description new description plaintext
    * @param baseVersion current version for optimistic concurrency
    * @returns The new version number
    */
   async updateConversationDescription(
     conversationId: QualifiedId,
+    groupId: string,
     description: string,
     baseVersion: number,
   ): Promise<{version: number}> {
-    const storageKey = `wire_conversation_description_${conversationId.id}`;
-    const newVersion = baseVersion + 1;
-    window.localStorage.setItem(storageKey, JSON.stringify({version: newVersion, description}));
-    return {version: newVersion};
+    const currentDescription = await this.apiClient.api.conversation.getConversationDescription(conversationId);
+    const secret = await this.getDescriptionSecret(groupId);
+    const ciphertext = await encryptDescription(description, secret);
+
+    await this.apiClient.api.conversation.putConversationDescription(conversationId, {
+      base_version: currentDescription.version,
+      ciphertext,
+    });
+
+    return {version: currentDescription.version + 1};
   }
 
   /**

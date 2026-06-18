@@ -58,6 +58,41 @@ const conversationApi = new ConversationAPI(client, {
 const generateQualifiedId = () => ({domain, id: randomUUID()});
 
 describe('ConversationAPI', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('getConversationDescription', () => {
+    it('gets the encrypted conversation description', async () => {
+      const conversationId = generateQualifiedId();
+      const description = {version: 1, ciphertext: 'encrypted-description'};
+      jest.spyOn(client, 'sendJSON').mockResolvedValueOnce({data: description} as AxiosResponse);
+
+      const result = await conversationApi.getConversationDescription(conversationId);
+
+      expect(result).toBe(description);
+      expect(client.sendJSON).toHaveBeenCalledWith({
+        method: 'get',
+        url: `/conversations/${conversationId.domain}/${conversationId.id}/description`,
+      });
+    });
+  });
+
+  describe('putConversationDescription', () => {
+    it('updates the encrypted conversation description', async () => {
+      const conversationId = generateQualifiedId();
+      const descriptionUpdate = {base_version: 1, ciphertext: 'new-encrypted-description'};
+
+      await conversationApi.putConversationDescription(conversationId, descriptionUpdate);
+
+      expect(client.sendJSON).toHaveBeenCalledWith({
+        data: descriptionUpdate,
+        method: 'put',
+        url: `/conversations/${conversationId.domain}/${conversationId.id}/description`,
+      });
+    });
+  });
+
   describe('getConversationList', () => {
     it('returns a full list of conversations', async () => {
       const allIds = Array.from({length: 10}, generateQualifiedId);
