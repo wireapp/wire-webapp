@@ -2695,13 +2695,17 @@ export class CallingRepository {
     const call = this.findCall(this.parseQualifiedId(convId));
     const activeSpeakers: ActiveSpeakers = JSON.parse(rawJson);
     if (call && activeSpeakers) {
-      call.setActiveSpeakers(
+      const didUpdateGridPage = call.setActiveSpeakers(
         activeSpeakers.audio_levels.map(({userid, clientid, audio_level_now}) => ({
           clientId: clientid,
           levelNow: audio_level_now,
           userId: this.parseQualifiedId(userid),
         })),
       );
+
+      if (didUpdateGridPage && !this.callState.isSpeakersViewActive() && !this.callState.isMaximisedViewActive()) {
+        this.changeCallPage(call, call.currentPage());
+      }
     }
   };
 
