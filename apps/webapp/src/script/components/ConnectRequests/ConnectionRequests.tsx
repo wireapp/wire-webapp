@@ -17,19 +17,22 @@
  *
  */
 
-import {useContext, useEffect, useRef} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
+import {type AccountLink} from '@wireapp/api-client/lib/user';
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
+import * as Icon from 'Components/icon';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {UserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useAppMainState, ViewType} from 'src/script/page/state';
@@ -38,14 +41,49 @@ import {t} from 'Util/localizerUtil';
 
 import {RootContext} from '../../page/RootProvider';
 
+interface ConnectionRequestLinksProps {
+  user: User;
+  userRepository: UserRepository;
+}
+
+const ConnectionRequestLinks = ({user, userRepository}: ConnectionRequestLinksProps) => {
+  const [links, setLinks] = useState<AccountLink[]>([]);
+  const {username} = useKoSubscribableChildren(user, ['username']);
+
+  useEffect(() => {
+    if (username) {
+      void userRepository.getUserLinks(username).then(setLinks);
+    }
+  }, [username, userRepository]);
+
+  if (links.length === 0) {
+    return null;
+  }
+
+  return (
+    <div css={{display: 'flex', flexWrap: 'wrap', gap: '6px 16px', justifyContent: 'center', marginTop: 8}}>
+      {links.map(link => (
+        <div key={link.url} css={{display: 'flex', alignItems: 'center', gap: 4}}>
+          <a href={link.url} target="_blank" rel="noreferrer" css={{color: 'var(--accent-color)', fontSize: 13}}>
+            {link.url}
+          </a>
+          {link.verified === true && <Icon.CheckIcon css={{width: 12, height: 12, color: 'var(--green-500)'}} />}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 interface ConnectRequestsProps {
   readonly userState: UserState;
   readonly teamState: TeamState;
+  readonly userRepository: UserRepository;
 }
 
 export const ConnectRequests = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
+  userRepository,
 }: ConnectRequestsProps) => {
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
@@ -139,6 +177,8 @@ export const ConnectRequests = ({
               </div>
 
               <div className="connect-request-username label-username">{connectRequest.handle}</div>
+
+              <ConnectionRequestLinks user={connectRequest} userRepository={userRepository} />
 
               {classifiedDomains && (
                 <UserClassifiedBar users={[connectRequest]} classifiedDomains={classifiedDomains} />

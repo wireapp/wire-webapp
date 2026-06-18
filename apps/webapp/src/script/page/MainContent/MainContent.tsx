@@ -261,7 +261,7 @@ const MainContent = ({
             )}
 
             {contentState === ContentState.CONNECTION_REQUESTS && (
-              <ConnectRequests teamState={teamState} userState={userState} />
+              <ConnectRequests teamState={teamState} userState={userState} userRepository={repositories.user} />
             )}
 
             {contentState === ContentState.CONVERSATION && (

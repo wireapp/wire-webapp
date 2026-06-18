@@ -1691,6 +1691,7 @@ declare module 'I18n/en-US.json' {
     'preferencesAccountEmail': `Email`;
     'preferencesAccountEmailPlaceholder': `Your email address`;
     'preferencesAccountBio': `Bio`;
+    'preferencesAccountName': `Name`;
     'preferencesAccountInfo': `Info`;
     'preferencesAccountLeaveGuestRoom': `Leave the guest room`;
     'preferencesAccountLeaveGuestRoomDescription': `You will no longer be able to access the messages in this conversation.`;
