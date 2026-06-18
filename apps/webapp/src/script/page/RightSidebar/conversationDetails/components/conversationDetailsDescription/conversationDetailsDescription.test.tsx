@@ -116,6 +116,23 @@ describe('ConversationDetailsDescription', () => {
       expect(screen.getByTestId('description-text').innerHTML).toContain('First line<br>');
     });
 
+    it('renders markdown-like headings, lists, quotes, and links like chat messages', () => {
+      render(
+        <ConversationDetailsDescription
+          description={'# Title\n- First item\n> Important\n[Wire](https://wire.com)'}
+          onDescriptionChange={onDescriptionChange}
+        />,
+      );
+
+      const descriptionText = screen.getByTestId('description-text');
+      const link = screen.getByRole('link', {name: 'Wire'});
+
+      expect(descriptionText.querySelector('.md-heading--1')).not.toBeNull();
+      expect(descriptionText.querySelector('li')).toHaveTextContent('First item');
+      expect(descriptionText.querySelector('.md-blockquote')).toHaveTextContent('Important');
+      expect(link).toHaveAttribute('href', 'https://wire.com');
+    });
+
     it('escapes html when rendering the description', () => {
       render(
         <ConversationDetailsDescription

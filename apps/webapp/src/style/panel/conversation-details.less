@@ -177,6 +177,48 @@
       line-height: var(--line-height-md);
       word-break: break-word;
 
+      li {
+        display: list-item;
+        line-height: var(--line-height-lg);
+
+        &::after {
+          display: none;
+        }
+      }
+
+      li::marker {
+        color: currentColor;
+      }
+
+      && ul,
+      && ol {
+        padding-left: 24px;
+        margin-top: 0;
+        margin-bottom: 0;
+        line-height: 0.85;
+        list-style-position: outside;
+      }
+
+      && ul {
+        list-style-type: disc;
+      }
+
+      && ol {
+        list-style-type: decimal;
+      }
+
+      ol ol {
+        list-style: lower-alpha;
+      }
+
+      ol ol ol {
+        list-style: lower-roman;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
       .md-heading {
         margin: 4px 0 8px;
         font-size: var(--font-size-base);
@@ -197,6 +239,24 @@
 
         & + br {
           display: none;
+        }
+      }
+
+      .md-blockquote {
+        position: relative;
+        padding: 0 12px 0 16px;
+        margin: 0;
+
+        &::before {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 4px;
+          height: 100%;
+          border-radius: 2px;
+          margin-right: 12px;
+          background-color: var(--message-quote-bg);
+          content: '';
         }
       }
     }
