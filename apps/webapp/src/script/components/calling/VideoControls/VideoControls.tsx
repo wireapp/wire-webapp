@@ -969,7 +969,7 @@ export const VideoControls = ({
               </li>
             )}
 
-            {participants.length > 2 && onPresenterModeToggle && (
+            {onPresenterModeToggle && (
               <li className="video-controls__item">
                 <button
                   className={classNames('video-controls__button_primary', {active: presenterModeActive})}
