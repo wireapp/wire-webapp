@@ -195,6 +195,8 @@ export class UserMapper {
       userEntity.category = undefined;
     }
 
+    userEntity.links = userData.links ?? [];
+
     return userEntity;
   }
 }

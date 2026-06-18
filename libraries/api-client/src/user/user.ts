@@ -33,6 +33,12 @@ export enum UserType {
   BOT = 'bot',
 }
 
+export interface AccountLink {
+  name: string;
+  url: string;
+  verified: boolean;
+}
+
 export interface User {
   accent_id?: AccentColor.AccentColorID;
   app?: App;
@@ -42,6 +48,7 @@ export interface User {
   expires_at?: string;
   handle?: string;
   id: string;
+  links?: AccountLink[];
   name: string;
   picture?: Picture[];
   user_groups?: string[];

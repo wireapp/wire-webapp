@@ -166,6 +166,12 @@ const Preferences = ({
       label: t('preferencesAbout'),
       uieName: 'go-about',
     },
+    {
+      IconComponent: Icon.LinkIcon,
+      id: ContentState.PREFERENCES_ACCOUNT_LINKS,
+      label: t('preferencesAccountLinks'),
+      uieName: 'go-account-links',
+    },
   ];
 
   return (

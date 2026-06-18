@@ -1669,6 +1669,7 @@ declare module 'I18n/en-US.json' {
     'preferencesAboutVersion': `{brandName} for web version {version}`;
     'preferencesAboutWebsite': `{brandName} website`;
     'preferencesAccount': `Account`;
+    'preferencesAccountLinks': `Account links`;
     'preferencesAccountAccentColor': `Set a profile color`;
     'preferencesAccountAccentColorAMBER': `Amber`;
     'preferencesAccountAccentColorBLUE': `Blue`;

@@ -46,6 +46,7 @@ import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {Collection} from './panels/Collection';
 import {AboutPreferences} from './panels/preferences/AboutPreferences';
+import {AccountLinksPreferences} from './panels/preferences/AccountLinksPreferences';
 import {AccountPreferences} from './panels/preferences/AccountPreferences';
 import {AVPreferences} from './panels/preferences/AVPreferences';
 import {DevicesPreferences} from './panels/preferences/DevicesPreferences';
@@ -97,7 +98,7 @@ const MainContent = ({
       // Reset active conversation for all states that do not require a loaded conversation
       conversationState.activeConversation(undefined);
     }
-  }, [contentState, conversationState]);
+  }, [contentState, conversationState, isShowingConversation]);
 
   useEffect(() => {
     // Show legal hold on mount when legal hold is enabled for team
@@ -137,6 +138,7 @@ const MainContent = ({
     [ContentState.PREFERENCES_AV]: t('accessibility.headings.preferencesAV'),
     [ContentState.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
     [ContentState.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
+    [ContentState.PREFERENCES_ACCOUNT_LINKS]: t('preferencesAccountLinks'),
     [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
   };
 
@@ -171,6 +173,16 @@ const MainContent = ({
                 ref={removeAnimationsClass}
               >
                 <AboutPreferences selfUser={selfUser} teamState={teamState} />
+              </div>
+            )}
+
+            {contentState === ContentState.PREFERENCES_ACCOUNT_LINKS && (
+              <div
+                id="preferences-account-links"
+                className={cx('preferences-page preferences-account-links', incomingCssClass)}
+                ref={removeAnimationsClass}
+              >
+                <AccountLinksPreferences selfUser={selfUser} userRepository={repositories.user} />
               </div>
             )}
 

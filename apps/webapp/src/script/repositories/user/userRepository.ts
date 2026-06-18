@@ -29,7 +29,7 @@ import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {ConsentType} from '@wireapp/api-client/lib/self/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/lib/user';
+import type {AccountLink, QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {
   QualifiedId,
   UserAsset as APIClientUserAsset,
@@ -1053,5 +1053,18 @@ export class UserRepository extends TypedEventEmitter<Events> {
     } catch (error: unknown) {
       this.logger.warn(`Failed to retrieve marketing consent: ${toError(error).message}`, error);
     }
+  }
+
+  // TODO: replace with real API call when endpoint is ready
+  async getUserLinks(userid: string): Promise<AccountLink[]> {
+
+    // TODO Implement the API call but comment it out
+
+
+    // process.stdout.write(JSON.stringify(userid));
+    return [
+      {name: `${userid} Personal site`, url: 'https://johndoe.dev', verified: true},
+      {name: 'Blog', url: 'https://blog.johndoe.dev', verified: false},
+    ];
   }
 }

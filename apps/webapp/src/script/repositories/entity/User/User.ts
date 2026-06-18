@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
+import {type AccountLink, QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
@@ -105,6 +105,7 @@ export class User {
   public type: UserType;
   public category?: string;
   public description?: string;
+  public links?: AccountLink[];
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
   public readonly supportedProtocols: ko.Observable<null | CONVERSATION_PROTOCOL[]>;
 
