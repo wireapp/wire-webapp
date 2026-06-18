@@ -2967,7 +2967,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.17.8":
+"@babel/runtime@npm:^7.17.8, @babel/runtime@npm:^7.29.7":
   version: 7.29.7
   resolution: "@babel/runtime@npm:7.29.7"
   checksum: 10/9883b4951787779fd382b121f22f92966d85f19434841f65fb00b2dfec232107e139683f47c6f252891826ad8ee18317b46c3a0e4819116a9885f47b46d7126a
@@ -11969,7 +11969,7 @@ __metadata:
     webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.6"
     workbox-webpack-plugin: "npm:7.4.1"
-    worker-timers: "npm:8.0.31"
+    worker-timers: "npm:8.0.32"
     xstate: "npm:5.32.1"
     zustand: "npm:4.5.7"
   languageName: unknown
@@ -32311,15 +32311,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"worker-timers@npm:8.0.31":
-  version: 8.0.31
-  resolution: "worker-timers@npm:8.0.31"
+"worker-timers@npm:8.0.32":
+  version: 8.0.32
+  resolution: "worker-timers@npm:8.0.32"
   dependencies:
-    "@babel/runtime": "npm:^7.29.2"
+    "@babel/runtime": "npm:^7.29.7"
     tslib: "npm:^2.8.1"
     worker-timers-broker: "npm:^8.0.16"
     worker-timers-worker: "npm:^9.0.14"
-  checksum: 10/30edbadbd4bb0df3a838d4bd209a4cbb297a48a7439e22b7c4e2ae087e4546ff65b5cd8dbacce0424072a1775f42e2f417c1df5a813a6eccc25b4dfc339adeed
+  checksum: 10/c1415f9e214199027b40bd4890df4b83432640132f211679a3da20e249c99a825248bb4cc102a0fea90abfa4693d3e1da41d102bb83c713f10347516627b9c2f
   languageName: node
   linkType: hard
 
