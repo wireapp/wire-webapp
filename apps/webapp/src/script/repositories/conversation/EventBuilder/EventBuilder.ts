@@ -104,6 +104,11 @@ export type DeleteEvent = ConversationEvent<
   CONVERSATION.MESSAGE_DELETE,
   {deleted_time: number; message_id: string; time: string}
 >;
+export type DescriptionUpdateAction = 'add' | 'edit';
+export type DescriptionUpdateEvent = ConversationEvent<
+  CONVERSATION.DESCRIPTION_UPDATE,
+  {action: DescriptionUpdateAction; description: string}
+>;
 export type FederationStopEvent = ConversationEvent<CONVERSATION.FEDERATION_STOP, {domains: string[]}>;
 export type GroupCreationEventData = {
   allTeamMembers: boolean;
@@ -274,6 +279,7 @@ export type ClientConversationEvent =
   | ConfirmationEvent
   | FederationStopEvent
   | DeleteEvent
+  | DescriptionUpdateEvent
   | DeleteEverywhereEvent
   | DegradedMessageEvent
   | ButtonActionConfirmationEvent
@@ -382,6 +388,23 @@ export const EventBuilder = {
       id: createUuid(),
       time: conversationEntity.getNextIsoDate(),
       type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
+    };
+  },
+
+  buildDescriptionUpdate(
+    conversationEntity: Conversation,
+    description: string,
+    action: DescriptionUpdateAction,
+  ): DescriptionUpdateEvent {
+    const selfUser = getConversationSelfUser(conversationEntity);
+
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {action, description},
+      from: selfUser.id,
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.DESCRIPTION_UPDATE,
     };
   },
 

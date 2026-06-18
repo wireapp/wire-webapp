@@ -2967,6 +2967,8 @@ export class ConversationRepository {
    */
   public async updateConversationDescription(conversationEntity: Conversation, description: string): Promise<void> {
     const baseVersion = this.descriptionVersions.get(conversationEntity.id) ?? 0;
+    const previousDescription = conversationEntity.description();
+    const action = previousDescription.length > 0 ? 'edit' : 'add';
     const {version} = await this.conversationService.updateConversationDescription(
       conversationEntity.qualifiedId,
       description,
@@ -2974,6 +2976,11 @@ export class ConversationRepository {
     );
     this.descriptionVersions.set(conversationEntity.id, version);
     conversationEntity.description(description);
+
+    await this.eventRepository.injectEvent(
+      EventBuilder.buildDescriptionUpdate(conversationEntity, description, action),
+      EventRepository.SOURCE.INJECTED,
+    );
   }
 
   private readonly inject1to1MigratedToMLS = async (conversation: Conversation) => {
@@ -3770,6 +3777,7 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
+      case ClientEvent.CONVERSATION.DESCRIPTION_UPDATE:
       case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:

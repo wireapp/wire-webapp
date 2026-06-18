@@ -155,6 +155,15 @@ export const Conversation = ({
     }
   }, [activeConversation, isVirtualizedMessagesListEnabled]);
 
+  useEffect(() => {
+    if (!activeConversation) {
+      return;
+    }
+
+    // TODO: Remove when description is part of the API Conversation payload
+    conversationRepository.loadConversationDescription(activeConversation);
+  }, [activeConversation, conversationRepository]);
+
   const uploadImages = useCallback(
     (images: File[]) => {
       if (!activeConversation || isHittingUploadLimit(images, repositories.asset)) {

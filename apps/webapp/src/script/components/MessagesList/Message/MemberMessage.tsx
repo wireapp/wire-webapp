@@ -42,6 +42,7 @@ interface MemberMessageProps {
   onClickParticipants: (participants: User[]) => void;
   shouldShowInvitePeople: boolean;
   conversationName: string;
+  conversationDescription?: string;
   isCellsConversation: boolean;
 }
 
@@ -56,6 +57,7 @@ export const MemberMessage = ({
   onClickCancelRequest,
   classifiedDomains,
   conversationName,
+  conversationDescription,
   isCellsConversation,
 }: MemberMessageProps) => {
   const {otherUser, timestamp, user, htmlGroupCreationHeader, showNamedCreation, hasUsers} = useKoSubscribableChildren(
@@ -72,6 +74,8 @@ export const MemberMessage = ({
   const cellsConversationLabel = t('conversationCellsConversationEnabled');
   const receiptsEnabledLabel = t('conversationCreateReceiptsEnabled');
   const timedMessagesDisabledLabel = t('conversationDetailsActionTimedMessagesDisabled');
+  const hasConversationDescription = conversationDescription !== undefined && conversationDescription.length > 0;
+  const shouldShowDescription = isGroupCreation && hasConversationDescription;
 
   const isConnectedMessage = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST].includes(
     message.memberMessageType,
@@ -99,6 +103,22 @@ export const MemberMessage = ({
           <h2 className="message-group-creation-header-name" data-uie-name="conversation-name">
             {conversationName}
           </h2>
+        </div>
+      )}
+
+      {shouldShowDescription && (
+        <div
+          className="message-header"
+          data-uie-name="label-group-creation-description"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
+            <Icon.MessageIcon />
+          </div>
+          <p className="message-header-label message-header-label--description">
+            <strong>{t('conversationDescriptionLabel')}</strong> {conversationDescription}
+          </p>
         </div>
       )}
 

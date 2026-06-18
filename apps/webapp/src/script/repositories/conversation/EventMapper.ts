@@ -34,6 +34,7 @@ import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
 import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
+import {DescriptionUpdateMessage} from 'Repositories/entity/message/DescriptionUpdateMessage';
 import {E2EIVerificationMessage} from 'Repositories/entity/message/E2EIVerificationMessage';
 import {FailedToAddUsersMessage} from 'Repositories/entity/message/FailedToAddUsersMessage';
 import {FederationStopMessage} from 'Repositories/entity/message/FederationStopMessage';
@@ -296,6 +297,11 @@ export class EventMapper {
 
       case CONVERSATION_EVENT.PROTOCOL_UPDATE: {
         messageEntity = this._mapEventProtocolUpdate(event);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.DESCRIPTION_UPDATE: {
+        messageEntity = this._mapEventDescriptionUpdate(event);
         break;
       }
 
@@ -802,6 +808,13 @@ export class EventMapper {
    */
   private _mapEventRename({data: eventData, from, qualified_from}: LegacyEventRecord) {
     return new RenameMessage(eventData.name, from, qualified_from?.domain);
+  }
+
+  /**
+   * Maps JSON data of conversation.description-update message into message entity.
+   */
+  private _mapEventDescriptionUpdate({data: eventData}: LegacyEventRecord) {
+    return new DescriptionUpdateMessage(eventData.description, eventData.action);
   }
 
   /**

@@ -258,11 +258,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     }, [activeConversation, conversationRepository]);
 
     useEffect(() => {
-      // TODO: Remove when description is part of the API Conversation payload
-      conversationRepository.loadConversationDescription(activeConversation);
-    }, [activeConversation, conversationRepository]);
-
-    useEffect(() => {
       if (team.id && isSingleUserMode) {
         void teamRepository.updateTeamMembersByIds(team.id, [firstParticipant!.id], true);
       }

@@ -669,6 +669,7 @@ declare module 'I18n/en-US.json' {
     'conversationContextMenuReply': `Reply`;
     'conversationContextMenuUnlike': `Unlike`;
     'conversationCreateReceiptsEnabled': `Read receipts are on`;
+    'conversationDescriptionLabel': `Description:`;
     'conversationCreateTeam': `with [showmore]all team members[/showmore]`;
     'conversationCreateTeamGuest': `with [showmore]all team members and one guest[/showmore]`;
     'conversationCreateTeamGuests': `with [showmore]all team members and {count} guests[/showmore]`;
@@ -708,6 +709,8 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsGroupAdminInfo': `When this is on, the admin can add or remove people and apps, update group settings, and change a participant’s role.`;
     'conversationDetailsDescription': `Description (optional)`;
     'conversationDetailsDescriptionPlaceholder': `Enter a description (maximum 200 characters)`;
+    'conversationDescriptionAddedYou': ` added a group description`;
+    'conversationDescriptionEditedYou': ` edited the group description`;
     'conversationDetailsOff': `Off`;
     'conversationDetailsOn': `On`;
     'conversationDetailsOptions': `Options`;

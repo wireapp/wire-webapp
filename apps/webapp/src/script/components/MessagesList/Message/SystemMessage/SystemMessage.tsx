@@ -20,6 +20,7 @@
 import {MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
+import {DescriptionUpdateMessage} from 'Repositories/entity/message/DescriptionUpdateMessage';
 import {E2EIVerificationMessage} from 'Repositories/entity/message/E2EIVerificationMessage';
 import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/JoinedAfterMLSMigrationFinalisationMessage';
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
@@ -50,6 +51,10 @@ export const SystemMessage = ({message}: SystemMessageProps) => {
         </div>
       </>
     );
+  }
+
+  if (message instanceof DescriptionUpdateMessage) {
+    return <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.EditIcon />} />;
   }
 
   if (message instanceof MessageTimerUpdateMessage) {

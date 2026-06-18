@@ -124,10 +124,11 @@ export const MessageWrapper = ({
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
   };
-  const {display_name: displayName, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
-    'display_name',
-    'hasGlobalMessageTimer',
-  ]);
+  const {
+    display_name: displayName,
+    description: conversationDescription,
+    hasGlobalMessageTimer,
+  } = useKoSubscribableChildren(conversation, ['display_name', 'description', 'hasGlobalMessageTimer']);
   const isFileShareRestricted = !teamState.isFileSharingReceivingEnabled();
 
   const isCellsConversation =
@@ -263,6 +264,7 @@ export const MessageWrapper = ({
       <MemberMessage
         message={message}
         conversationName={displayName}
+        conversationDescription={conversationDescription}
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickCancelRequest={onClickCancelRequest}

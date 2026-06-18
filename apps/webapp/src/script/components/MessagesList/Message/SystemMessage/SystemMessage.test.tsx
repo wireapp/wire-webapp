@@ -19,9 +19,12 @@
 
 import {render, screen} from '@testing-library/react';
 
+import en from 'I18n/en-US.json';
+import {DescriptionUpdateMessage} from 'Repositories/entity/message/DescriptionUpdateMessage';
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
+import {setStrings} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
@@ -38,6 +41,8 @@ jest.mock('Components/icon', () => ({
   __esModule: true,
 }));
 
+setStrings({en});
+
 describe('SystemMessage', () => {
   it('shows edit icon for RenameMessage', async () => {
     const message = new RenameMessage('new name');
@@ -46,6 +51,26 @@ describe('SystemMessage', () => {
 
     expect(screen.queryByTestId('element-message-system')).not.toBeNull();
     expect(screen.queryByTestId('editicon')).not.toBeNull();
+  });
+
+  it('shows added description update without description body', async () => {
+    const message = new DescriptionUpdateMessage('Updated description', 'add');
+
+    render(<SystemMessage message={message} />);
+
+    expect(screen.queryByTestId('element-message-system')).not.toBeNull();
+    expect(screen.queryByTestId('editicon')).not.toBeNull();
+    expect(screen.queryByText('Updated description')).not.toBeInTheDocument();
+    expect(screen.getByText(/added a group description/)).toBeInTheDocument();
+  });
+
+  it('shows edited description update without description body', async () => {
+    const message = new DescriptionUpdateMessage('Updated description', 'edit');
+
+    render(<SystemMessage message={message} />);
+
+    expect(screen.queryByText('Updated description')).not.toBeInTheDocument();
+    expect(screen.getByText(/edited the group description/)).toBeInTheDocument();
   });
 
   it('shows timer icon for MessageTimerUpdateMessage', async () => {

@@ -32,6 +32,7 @@ export enum CONVERSATION {
   COMPOSITE_MESSAGE_ADD = 'conversation.composite-message-add',
   CONFIRMATION = 'conversation.confirmation',
   DELETE_EVERYWHERE = 'conversation.delete-everywhere',
+  DESCRIPTION_UPDATE = 'conversation.description-update',
   FILE_TYPE_RESTRICTED = 'conversation.file-type-restricted',
   GROUP_CREATION = 'conversation.group-creation',
   INCOMING_MESSAGE_TOO_BIG = 'conversation.incoming-message-too-big',

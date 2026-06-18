@@ -91,6 +91,31 @@ describe('MemberMessage', () => {
     expect(getByTestId('element-connected-message')).not.toBeNull();
   });
 
+  it('shows conversation description when group is created and description exists', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      conversationDescription: 'A useful group description',
+    };
+
+    const {getByText} = render(withTheme(<MemberMessage {...props} />));
+    expect(getByText('Description:')).toBeInTheDocument();
+    expect(getByText('A useful group description')).toBeInTheDocument();
+  });
+
+  it('does not show conversation description when group is created without description', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      conversationDescription: '',
+    };
+
+    const {queryByText} = render(withTheme(<MemberMessage {...props} />));
+    expect(queryByText('Description:')).not.toBeInTheDocument();
+  });
+
   it('shows self-deleting messages off banner when group is created and self-deleting messages are disabled', () => {
     const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
     const props = {
