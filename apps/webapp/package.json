@@ -94,7 +94,7 @@
     "underscore": "1.13.8",
     "use-debounce": "10.1.1",
     "webgl-utils.js": "1.1.0",
-    "webrtc-adapter": "9.0.5",
+    "webrtc-adapter": "9.0.6",
     "xstate": "5.32.1",
     "zustand": "4.5.7"
   },
