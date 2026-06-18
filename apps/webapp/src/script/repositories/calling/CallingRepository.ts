@@ -55,6 +55,7 @@ import {
 import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {GlobalAudioContext} from './AudioSpeakerFactory';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -440,6 +441,7 @@ export class CallingRepository {
     this.selfClientId = clientId;
     const callingInstance = await getAvsInstance();
 
+    await GlobalAudioContext.resume();
     this.wCall = this.configureCallingApi(callingInstance);
     this.wUser = this.createWUser(this.wCall, this.serializeQualifiedId(this.selfUser.qualifiedId), clientId);
 
@@ -2705,6 +2707,7 @@ export class CallingRepository {
     }
   };
 
+  static counter = 0;
   private readonly updateCallAudioStreams = (
     convId: SerializedConversationId,
     streamId: string,
@@ -2714,18 +2717,42 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+    CallingRepository.counter += 1;
 
     if (streams === null || streams.length === 0) {
-      call.removeAudio(streamId);
       return;
     }
+    const stream = streams[0];
 
-    const [stream] = streams;
-    if (stream.getAudioTracks().length > 0) {
-      call.addAudio(streamId, stream);
+    console.log('### UPDATE');
+    //console.log('### media devices', mediaDevicesStore.getState());
+    //console.log('### setting sink id', mediaDevicesStore.getState().audio.output.selectedId);
+
+    const context = GlobalAudioContext.get();
+    console.log('### context state', context.state);
+    console.log('### global context:', context);
+
+    const source = context.createMediaStreamSource(stream);
+    //const dest = context.createMediaStreamDestination();
+
+    if (CallingRepository.counter == 2) {
+      source.connect(context.destination);
     }
 
-    call.playAudioStreams();
+    /*
+    console.log('### context dest', context.destination);
+    console.log('### len audio tracks', stream.getAudioTracks().length);
+    console.log('### ready state of 1st audio track', stream.getAudioTracks()[0]?.readyState);
+
+    dest.stream.getAudioTracks().forEach(track => {
+      console.log('### track', track.enabled);
+      console.log('### track', track.readyState);
+      console.log('### track', track.muted);
+    });
+    */
+
+
+
   };
 
   private readonly updateParticipantVideoStream = (

@@ -18,10 +18,37 @@
  */
 
 import {getLogger, Logger} from 'Util/logger';
+import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+
+
+export class GlobalAudioContext {
+  private static context?: AudioContext;
+
+  static get(): AudioContext {
+    if (!this.context || this.context.state === 'closed') {
+      this.context = new AudioContext();
+    }
+
+    return this.context;
+  }
+
+  static async resume(): Promise<void> {
+    const context = this.get();
+    await context.setSinkId('a98fc8cb1a717976c4fea85b4455944d7667e9bc4b4e59cd7269eed3652043c4');
+
+    if (context.state !== 'running') {
+      console.log("### about to await context.resume");
+      await context.resume();
+      console.log("### done awaiting context.resume");
+    }
+  }
+}
+
 
 export class AudioSpeakerFactory {
   private static readonly logger: Logger = getLogger('AudioSpeakerFactory');
   private static baseElement: HTMLElement | null = document.getElementById('calling-audio-speaker-elements');
+  static counter = 0;
 
   public static createNewCallingAudioSpeaker(stream: MediaStream): HTMLAudioElement {
     AudioSpeakerFactory.initBaseElement();
@@ -31,15 +58,68 @@ export class AudioSpeakerFactory {
       throw new Error('Audio element could not be crated!');
     }
 
+
+    console.log('### media devices', mediaDevicesStore.getState());
+    console.log('### setting sink id', mediaDevicesStore.getState().audio.output.selectedId);
+    //context.setSinkId(mediaDevicesStore.getState().audio.output.selectedId);
+
+
+    console.log('### stream', stream, stream.id);
+    stream.getTracks().forEach(track => {
+      console.log('### src track', track.kind);
+    });
+
+    const context = GlobalAudioContext.get();
+    console.log('### context state', context.state);
+    console.log('### global context:', context);
+    const source = context.createMediaStreamSource(stream);
+    //const gainNode = context.createGain();
+    //gainNode.gain.value = 2.0;
+    const dest = context.createMediaStreamDestination();
+
+    const analyser = context.createAnalyser();
+    const data = new Float32Array(analyser.fftSize);
+
+    setInterval(() => {
+      const track = stream.getAudioTracks()[0];
+      console.log("###", {
+        id: track.id,
+        readyState: track.readyState,
+        muted: track.muted,
+        enabled: track.enabled,
+      });
+    }, 1000);
+
+    //source.connect(gainNode).connect(dest);
+    source.connect(context.destination);
+
+    console.log('### context dest', context.destination);
+    console.log('### len audio tracks', stream.getAudioTracks().length);
+    console.log('### ready state of 1st audio track', stream.getAudioTracks()[0]?.readyState);
+
+
+
+    dest.stream.getAudioTracks().forEach(track => {
+      console.log('### track', track.enabled);
+      console.log('### track', track.readyState);
+      console.log('### track', track.muted);
+    });
+
+
+
     AudioSpeakerFactory.logger.log('Add new audio speaker');
-    const audioElement = new Audio();
-    audioElement.srcObject = stream;
-    audioElement.play().catch((error: unknown) => {
+    // const audioElement = new Audio();
+    //audioElement.srcObject = dest.stream;
+    console.log(audioElement);
+    // audioElement.srcObject = stream;
+    /*
+     * audioElement.play().catch((error: unknown) => {
       AudioSpeakerFactory.logger.error('Audio play failed', error);
     });
     AudioSpeakerFactory.baseElement.appendChild(audioElement);
 
     return audioElement;
+    */
   }
 
   private static initBaseElement(): void {
