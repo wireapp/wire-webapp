@@ -131,6 +131,13 @@ export function withTheme(component: React.ReactNode): React.ReactElement {
   return <StyledApp themeId={THEME_ID.DEFAULT}>{rootProviderWrapper({children: component})}</StyledApp>;
 }
 
+export function withThemeAndRootContext(
+  component: React.ReactNode,
+  rootProviderWrapperForTest: ReturnType<typeof createRootProviderWrapperForTest>,
+): React.ReactElement {
+  return <StyledApp themeId={THEME_ID.DEFAULT}>{rootProviderWrapperForTest({children: component})}</StyledApp>;
+}
+
 const wrapComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,

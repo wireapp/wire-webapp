@@ -86,7 +86,7 @@ export const PeopleTab = ({
   onClickUser,
   onSearchResults,
 }: PeopleTabProps) => {
-  const {translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const logger = getLogger('PeopleSearch');
   const [topPeople, setTopPeople] = useState<User[]>([]);
   const teamSize = teamState.teamSize();
@@ -213,8 +213,10 @@ export const PeopleTab = ({
   }, SEARCH_DEBOUNCE_MILLISECONDS);
 
   useEffect(() => {
-    void debouncedSearch();
-  }, [debouncedSearch, searchQuery]);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await debouncedSearch();
+    });
+  }, [debouncedSearch, fireAndForgetInvoker, searchQuery]);
 
   useEffect(() => {
     // keep track of the most up to date value of the search query (in order to cancel outdated queries)

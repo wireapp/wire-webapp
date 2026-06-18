@@ -20,7 +20,12 @@
 import {render, screen, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/TestUtil';
+import {
+  createExecutingFireAndForgetInvokerForTest,
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {ConversationState} from 'src/script/repositories/conversation/ConversationState';
 import {User} from 'src/script/repositories/entity/User';
 import {SearchRepository} from 'src/script/repositories/search/searchRepository';
@@ -131,6 +136,13 @@ describe('PeopleTab', () => {
     const conversationRepositoryDouble = {} satisfies MinimalConversationRepository;
     const userRepositoryDouble = {} satisfies MinimalUserRepository;
     const onSearchResults = jest.fn<void, [SearchResultsData | undefined]>();
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const rootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        fireAndForgetInvoker,
+        translate: translateForTest,
+      }),
+    );
 
     const properties: PeopleTabProps = {
       canInviteTeamMembers: false,
@@ -150,7 +162,9 @@ describe('PeopleTab', () => {
       userState: new UserState(),
     };
 
-    const {rerender} = render(withTheme(<PeopleTab {...properties} searchQuery="" />));
+    const {rerender} = render(
+      withThemeAndRootContext(<PeopleTab {...properties} searchQuery="" />, rootProviderWrapper),
+    );
 
     expect(screen.getByText('Alice Example')).toBeInTheDocument();
     expect(screen.getByText('Bob Test')).toBeInTheDocument();
@@ -162,7 +176,7 @@ describe('PeopleTab', () => {
 
     onSearchResults.mockClear();
 
-    rerender(withTheme(<PeopleTab {...properties} searchQuery="test" />));
+    rerender(withThemeAndRootContext(<PeopleTab {...properties} searchQuery="test" />, rootProviderWrapper));
 
     await waitFor(() => {
       expect(screen.queryByText('Alice Example')).toBeNull();
