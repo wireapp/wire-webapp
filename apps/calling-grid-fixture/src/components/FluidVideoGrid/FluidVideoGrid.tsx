@@ -6,6 +6,7 @@ import { createGridReducer, createInitialState } from './gridReducer';
 import { FractionalTile } from './FractionalTile';
 import { GridTile } from './GridTile';
 import { OverflowTile } from './OverflowTile';
+import { useContainerSize } from './useContainerSize';
 
 export interface FluidVideoGridProps {
   participants: GridParticipant[];
@@ -30,16 +31,7 @@ export function FluidVideoGrid({ participants, config, onViewAllParticipantsSele
   const reducer = useMemo(() => createGridReducer(config), [config]);
   const [state, dispatch] = useReducer(reducer, createInitialState({ width: 0, height: 0 }));
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return undefined;
-    const ro = new ResizeObserver(entries => {
-      const { width, height } = entries[0].contentRect;
-      dispatch({ type: 'SET_CONTAINER_SIZE', width, height });
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+  useContainerSize(containerRef, (width, height) => dispatch({type: 'SET_CONTAINER_SIZE', width, height}));
 
   useEffect(() => {
     const currentIds = new Set(state.participants.map(p => p.id));
@@ -80,14 +72,18 @@ export function FluidVideoGrid({ participants, config, onViewAllParticipantsSele
 
     if (spotlight) {
       const narrowInnerWidth = Math.ceil(config.minTileHeight * config.minAspectRatio);
+      // Aspect-ratio bounds for a tile of this exact width
+      const minStripTileHeight = narrowInnerWidth / config.maxAspectRatio;
+      const maxStripTileHeight = narrowInnerWidth / config.minAspectRatio; // ≈ config.minTileHeight
       const gridParticipants = sorted.filter(p => p !== spotlight);
       const availH = containerSize.height - 2 * gap;
-      const maxTiles = Math.max(1, Math.floor((availH + gap) / (config.minTileHeight + gap)));
+      // How many tiles fit using the shortest valid tile height
+      const maxTiles = Math.max(1, Math.floor((availH + gap) / (minStripTileHeight + gap)));
       const hasOverflow = gridParticipants.length > maxTiles;
       const nVisible = hasOverflow ? maxTiles : gridParticipants.length;
-      const stripTileHeight = nVisible > 0
-        ? Math.min(config.maxTileHeight, (availH - gap * (nVisible - 1)) / nVisible)
-        : config.minTileHeight;
+      // Distribute height evenly, clamped to aspect-ratio bounds
+      const rawHeight = nVisible > 0 ? (availH - gap * (nVisible - 1)) / nVisible : maxStripTileHeight;
+      const stripTileHeight = Math.min(maxStripTileHeight, Math.max(minStripTileHeight, rawHeight));
       const visibleStripParticipants = gridParticipants.slice(0, hasOverflow ? maxTiles - 1 : nVisible);
       const overflowCount = hasOverflow ? gridParticipants.length - (maxTiles - 1) : 0;
       const overflowAvatars = hasOverflow ? gridParticipants.slice(maxTiles - 1) : [];
