@@ -32,7 +32,7 @@ import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
 
-import {wrapperStyles} from './ConfigToolbar.styles';
+import {messagePreprocessingSwitchStyles, wrapperStyles} from './ConfigToolbar.styles';
 
 export function createLocationUrl(pathname: string, search: string, hash: string): string {
   return `${pathname}${search}${hash}`;
@@ -73,6 +73,9 @@ export function ConfigToolbar() {
   const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(window.wire?.app?.debug?.isEnabledAvsRustSFT() ?? false);
   const [videoBackgroundEffectsFeatureEnabled, setVideoBackgroundEffectsFeatureEnabled] = useState(
     window.wire?.app?.debug?.isVideoBackgroundEffectsFeatureEnabled() ?? false,
+  );
+  const [isMessagePreprocessingDisabled, setIsMessagePreprocessingDisabled] = useState(
+    window.wire?.app?.debug?.isMessagePreprocessingDisabled() ?? false,
   );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
   const [notificationDumpFrom, setNotificationDumpFrom] = useState(() => toDateInputValue(getStartOfToday()));
@@ -288,6 +291,23 @@ export function ConfigToolbar() {
               window.wire?.app?.debug?.toggleGzipping(!previousIsGzipEnabled);
               return !previousIsGzipEnabled;
             });
+          }}
+        />
+      </div>
+    );
+  };
+
+  const renderMessagePreprocessingSwitch = () => {
+    return (
+      <div css={messagePreprocessingSwitchStyles}>
+        <label htmlFor="message-preprocessing-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          DISABLE MESSAGE PREPROCESSING
+        </label>
+        <Switch
+          id="message-preprocessing-checkbox"
+          checked={isMessagePreprocessingDisabled}
+          onToggle={isChecked => {
+            setIsMessagePreprocessingDisabled(window.wire?.app?.debug?.disableMessagePreprocessing(isChecked) === true);
           }}
         />
       </div>
@@ -518,6 +538,10 @@ export function ConfigToolbar() {
       <hr />
 
       <div>{renderGzipSwitch()}</div>
+
+      <hr />
+
+      <div>{renderMessagePreprocessingSwitch()}</div>
 
       <hr />
 

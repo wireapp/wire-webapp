@@ -54,11 +54,12 @@ import {ListItemTabIndentationPlugin} from './plugins/ListIndentationPlugin/List
 import {ListMaxIndentLevelPlugin} from './plugins/ListMaxIndentLevelPlugin/ListMaxIndentLevelPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {PastePlugin} from './plugins/PastePlugin/PastePlugin';
+import {PlainTextPastePlugin} from './plugins/PlainTextPastePlugin';
 import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin/ReplaceCarriageReturnPlugin';
 import {SendPlugin} from './plugins/SendPlugin/SendPlugin';
 import {markdownTransformers} from './utils/markdownTransformers';
 import {parseMentions} from './utils/parseMentions';
-import {transformMessage} from './utils/transformMessage';
+import {getRawMessageText, transformMessage} from './utils/transformMessage';
 import {useEditorDraftState} from './utils/useEditorDraftState';
 
 interface RichTextEditorProps {
@@ -69,6 +70,7 @@ interface RichTextEditorProps {
   hasLocalEphemeralTimer: boolean;
   showFormatToolbar: boolean;
   showMarkdownPreview: boolean;
+  disableMessagePreprocessing: boolean;
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editor: string, plainMessage: string, replyId?: string) => void;
   loadDraftState: () => Promise<DraftState>;
@@ -89,6 +91,7 @@ export const RichTextEditor = ({
   editedMessage,
   showFormatToolbar,
   showMarkdownPreview,
+  disableMessagePreprocessing,
   onUpdate,
   saveDraftState,
   loadDraftState,
@@ -108,6 +111,7 @@ export const RichTextEditor = ({
     editorRef,
     saveDraftState,
     replaceEmojis,
+    disableMessagePreprocessing,
   });
 
   const handleChange = (editorState: EditorState) => {
@@ -116,13 +120,14 @@ export const RichTextEditor = ({
         return;
       }
 
-      const markdown = $convertToMarkdownString(markdownTransformers, undefined, true);
-
-      const text = transformMessage({replaceEmojis, markdown});
+      const markdown = disableMessagePreprocessing
+        ? ''
+        : $convertToMarkdownString(markdownTransformers, undefined, true);
+      const text = disableMessagePreprocessing ? getRawMessageText() : transformMessage({replaceEmojis, markdown});
 
       onUpdate({
         text,
-        mentions: parseMentions(editorRef.current, markdown, getMentionCandidates()),
+        mentions: parseMentions(editorRef.current, text, getMentionCandidates()),
       });
 
       saveDraft();
@@ -145,11 +150,11 @@ export const RichTextEditor = ({
           />
           <DraftStatePlugin loadDraftState={loadDraftState} />
           <EditedMessagePlugin message={editedMessage} showMarkdownPreview={showMarkdownPreview} />
-          <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
+          {!disableMessagePreprocessing && <EmojiPickerPlugin openStateRef={emojiPickerOpen} />}
           <HistoryPlugin />
 
-          {replaceEmojis && <ReplaceEmojiPlugin />}
-          <ReplaceCarriageReturnPlugin />
+          {replaceEmojis && !disableMessagePreprocessing && <ReplaceEmojiPlugin />}
+          {!disableMessagePreprocessing && <ReplaceCarriageReturnPlugin />}
 
           {showMarkdownPreview && (
             <>
@@ -177,12 +182,16 @@ export const RichTextEditor = ({
           <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
           <SendPlugin
             onSend={() => {
-              if (!mentionsOpen.current && !emojiPickerOpen.current) {
+              if (!mentionsOpen.current && (disableMessagePreprocessing || !emojiPickerOpen.current)) {
                 onSend();
               }
             }}
           />
-          <PastePlugin getMentionCandidates={getMentionCandidates} isPreviewMode={showMarkdownPreview} />
+          {disableMessagePreprocessing ? (
+            <PlainTextPastePlugin />
+          ) : (
+            <PastePlugin getMentionCandidates={getMentionCandidates} isPreviewMode={showMarkdownPreview} />
+          )}
         </div>
       </div>
       {showFormatToolbar && showMarkdownPreview && (

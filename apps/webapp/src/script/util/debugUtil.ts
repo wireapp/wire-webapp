@@ -62,6 +62,7 @@ import {UserState} from 'Repositories/user/userState';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 
+import {isMessagePreprocessingDisabled, setMessagePreprocessingDisabled} from './debugMessagePreprocessingUtil';
 import {TIME_IN_MILLIS} from './timeUtil';
 import {downloadBlob} from './util';
 import {createUuid} from './uuid';
@@ -319,6 +320,14 @@ export class DebugUtil {
 
   enableVideoBackgroundEffectsFeature(flag: boolean) {
     return this.callingRepository.getBackgroundEffectsHandler().saveFeatureEnabledStateInStore(flag);
+  }
+
+  isMessagePreprocessingDisabled(): boolean {
+    return isMessagePreprocessingDisabled();
+  }
+
+  disableMessagePreprocessing(disable: boolean): boolean {
+    return setMessagePreprocessingDisabled(disable);
   }
 
   setupAvsDebugger() {
