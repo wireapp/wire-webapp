@@ -39,6 +39,8 @@ import {ContentState} from 'src/script/page/useAppState';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),
@@ -90,14 +92,14 @@ const getDefaultProps = (callingRepository: CallingRepository, conversation: Con
     } as CallingRepository,
   } as ViewModelRepositories,
   teamState: new TeamState(),
-  selfUser: new User(),
+  selfUser: new User('', '', translateForTest),
   withBottomDivider: true,
 });
 
 describe('TitleBar', () => {
   it('subscribes to shortcut PEOPLE and add ADD_PEOPLE events on mount', async () => {
     spyOn(amplify, 'subscribe').and.returnValue(undefined);
-    const conversation = new Conversation();
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     await render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
     await waitFor(() => {
@@ -108,7 +110,7 @@ describe('TitleBar', () => {
 
   it("doesn't show conversation search button for user with activated account", async () => {
     const selfUser = createUser(false);
-    const conversation = new Conversation();
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const {queryByText} = render(
       withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
@@ -119,7 +121,7 @@ describe('TitleBar', () => {
 
   it('opens search area after search button click', async () => {
     const selfUser = createUser(true);
-    const conversation = new Conversation();
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const {getByText} = render(
       withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
@@ -167,7 +169,7 @@ describe('TitleBar', () => {
 
   it('hide info button and search button on scaled down view', async () => {
     mockedUiKit.useMatchMedia.mockReturnValue(true);
-    const conversation = new Conversation();
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const {queryByLabelText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
 
@@ -233,7 +235,7 @@ describe('TitleBar', () => {
   });
 
   it('starts audio call on audio call button click', async () => {
-    const firstUser = new User();
+    const firstUser = new User('', '', translateForTest);
     const conversation = createConversationEntity({
       firstUserEntity: ko.pureComputed(() => firstUser),
       is1to1: ko.pureComputed(() => true),
@@ -251,7 +253,7 @@ describe('TitleBar', () => {
   });
 
   it("doesn't show video call button when video calling is not enabled", async () => {
-    const firstUser = new User();
+    const firstUser = new User('', '', translateForTest);
     const conversation = createConversationEntity({
       firstUserEntity: ko.pureComputed(() => firstUser),
       is1to1: ko.pureComputed(() => true),
@@ -302,7 +304,7 @@ describe('TitleBar', () => {
 });
 
 function createUser(activated: boolean = true) {
-  const user = new User();
+  const user = new User('', '', translateForTest);
   user.isTemporaryGuest(!activated);
   return user;
 }
@@ -313,6 +315,6 @@ function createTeamState(team?: Partial<TeamState>) {
 }
 
 function createConversationEntity(conversation?: Partial<Conversation>) {
-  const conversationEntity = new Conversation();
+  const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   return Object.assign(conversationEntity, conversation) as Conversation;
 }

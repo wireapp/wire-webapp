@@ -45,7 +45,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageContent} from './common/messageContent/messageContent';
@@ -116,7 +115,7 @@ export const InputBar = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: InputBarProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
@@ -163,7 +162,9 @@ export const InputBar = ({
     },
   });
 
-  const inputPlaceholder = messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
+  const inputPlaceholder = messageTimer
+    ? translate('tooltipConversationEphemeral')
+    : translate('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
@@ -206,6 +207,7 @@ export const InputBar = ({
     uploadDroppedFiles,
     uploadImages,
     isFileNameKept: isCellsEnabled,
+    translate,
   });
 
   const showMarkdownPreview = useUserPropertyValue<boolean>(
@@ -238,6 +240,7 @@ export const InputBar = ({
     editorRef,
     pastedFile: fileHandling.pastedFile,
     sendPastedFile: fileHandling.sendPastedFile,
+    translate,
   });
 
   if (fileHandling.pastedFile && !!isCellsEnabled) {
@@ -368,6 +371,7 @@ export const InputBar = ({
       </InputBarContainer>
       {emojiPicker.open ? (
         <EmojiPicker
+          translate={translate}
           posX={emojiPicker.position.x}
           posY={emojiPicker.position.y}
           onKeyPress={emojiPicker.handleClose}

@@ -47,11 +47,11 @@ import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {sharedDriveSearchAndFiltersFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext, useMainViewModel} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
 import {formatBytes} from 'Util/util';
@@ -78,7 +78,6 @@ import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
-import {useApplicationContext, useMainViewModel} from '../../page/RootProvider';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
@@ -103,7 +102,7 @@ export const Conversation = ({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {fireAndForgetInvoker, isFeatureToggleEnabled} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
@@ -157,7 +156,7 @@ export const Conversation = ({
 
   const uploadImages = useCallback(
     (images: File[]) => {
-      if (!activeConversation || isHittingUploadLimit(images, repositories.asset)) {
+      if (!activeConversation || isHittingUploadLimit(images, repositories.asset, translate)) {
         return;
       }
 
@@ -170,15 +169,16 @@ export const Conversation = ({
           const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / bytesMultiplier / bytesMultiplier;
 
           return showWarningModal(
-            t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
-            t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', {number: maxSize}),
+            translate(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
+            translate(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', {number: maxSize}),
+            translate,
           );
         }
       }
 
       repositories.message.uploadImages(activeConversation, images);
     },
-    [activeConversation, repositories.asset, repositories.message],
+    [activeConversation, repositories.asset, repositories.message, translate],
   );
 
   const uploadFiles = useCallback(
@@ -208,13 +208,17 @@ export const Conversation = ({
 
       const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
-      if (!isHittingUploadLimit(files, repositories.asset)) {
+      if (!isHittingUploadLimit(files, repositories.asset, translate)) {
         for (const file of fileArray) {
           const isFileTooLarge = file.size > uploadLimit;
 
           if (isFileTooLarge) {
             const fileSize = formatBytes(uploadLimit);
-            showWarningModal(t('modalAssetTooLargeHeadline'), t('modalAssetTooLargeMessage', {number: fileSize}));
+            showWarningModal(
+              translate('modalAssetTooLargeHeadline'),
+              translate('modalAssetTooLargeMessage', {number: fileSize}),
+              translate,
+            );
 
             return;
           }
@@ -231,6 +235,7 @@ export const Conversation = ({
       repositories.asset,
       repositories.message,
       selfUser,
+      translate,
     ],
   );
 
@@ -239,7 +244,7 @@ export const Conversation = ({
       const images: File[] = [];
       const files: File[] = [];
 
-      if (!isHittingUploadLimit(droppedFiles, repositories.asset)) {
+      if (!isHittingUploadLimit(droppedFiles, repositories.asset, translate)) {
         Array.from(droppedFiles).forEach(file => {
           const isSupportedImage = (CONFIG.ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(file.type);
 
@@ -254,7 +259,7 @@ export const Conversation = ({
         uploadFiles(files);
       }
     },
-    [repositories.asset, uploadFiles, uploadImages],
+    [repositories.asset, translate, uploadFiles, uploadImages],
   );
 
   const openGiphy = (text: string) => {
@@ -367,16 +372,21 @@ export const Conversation = ({
       );
       return false;
     }
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      primaryAction: {
-        action: () => safeWindowOpen(href),
-        text: t('modalOpenLinkAction'),
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        primaryAction: {
+          action: () => safeWindowOpen(href),
+          text: translate('modalOpenLinkAction'),
+        },
+        text: {
+          htmlMessage: translate('modalOpenLinkMessage', {link: href}, {}, true),
+          title: translate('modalOpenLinkTitle'),
+        },
       },
-      text: {
-        htmlMessage: t('modalOpenLinkMessage', {link: href}, {}, true),
-        title: t('modalOpenLinkTitle'),
-      },
-    });
+      undefined,
+      translate,
+    );
     event.preventDefault();
     return false;
   };
@@ -441,13 +451,14 @@ export const Conversation = ({
       fireAndForgetInvoker,
       messageRepository: repositories.message,
       selfUser,
+      translate,
     });
   };
 
   const onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
     const resetProgress = () => {
       setTimeout(() => {
-        PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {});
+        PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {}, undefined, translate);
       }, MotionDuration.LONG);
     };
 
@@ -571,6 +582,7 @@ export const Conversation = ({
       conversation: activeConversation,
       isCellsEnabled: isCellsEnabled,
       isDisabled: isFileTabActive,
+      translate,
     });
 
   return (
@@ -579,7 +591,7 @@ export const Conversation = ({
       isCellsEnabled={isCellsEnabled}
       isConversationLoaded={isConversationLoaded}
       activeConversationId={activeConversation?.id}
-      onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
+      onFileDropped={checkFileSharingPermission(uploadDroppedFiles, translate)}
       rootProps={getRootProps()}
       inputProps={getInputProps()}
     >
@@ -711,7 +723,7 @@ export const Conversation = ({
                   uploadDroppedFiles={uploadDroppedFiles}
                   uploadImages={uploadImages}
                   uploadFiles={uploadFiles}
-                  uploadPastedFiles={checkFileSharingPermission(handlePastedFile)}
+                  uploadPastedFiles={checkFileSharingPermission(handlePastedFile, translate)}
                   onCellImageUpload={openImageFilesView}
                   onCellAssetUpload={openAllFilesView}
                 />

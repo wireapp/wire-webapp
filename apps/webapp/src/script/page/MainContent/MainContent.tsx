@@ -17,9 +17,8 @@
  *
  */
 
-import {ReactNode, useContext, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 
-import is from '@sindresorhus/is';
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
@@ -38,9 +37,10 @@ import {User} from 'Repositories/entity/User';
 import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {TeamState} from 'Repositories/team/TeamState';
+import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {UserState} from 'Repositories/user/userState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
@@ -53,7 +53,6 @@ import {OptionPreferences} from './panels/preferences/OptionPreferences';
 
 import {RightSidebarParams} from '../AppMain';
 import {PanelState} from '../RightSidebar';
-import {RootContext} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
 export const ANIMATED_PAGE_TRANSITION_DURATION = 500;
@@ -65,6 +64,7 @@ const Animated = ({children, ...rest}: {children: ReactNode}) => (
 );
 
 interface MainContentProps {
+  appLockRepository: AppLockRepository;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
   selfUser: User;
@@ -73,6 +73,7 @@ interface MainContentProps {
 }
 
 const MainContent = ({
+  appLockRepository,
   openRightSidebar,
   isRightSidebarOpen = false,
   selfUser,
@@ -80,7 +81,7 @@ const MainContent = ({
   reloadApp,
 }: MainContentProps) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const rootContext = useContext(RootContext);
+  const {mainViewModel, translate} = useApplicationContext();
 
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
@@ -97,7 +98,7 @@ const MainContent = ({
       // Reset active conversation for all states that do not require a loaded conversation
       conversationState.activeConversation(undefined);
     }
-  }, [contentState, conversationState]);
+  }, [contentState, conversationState, isShowingConversation]);
 
   useEffect(() => {
     // Show legal hold on mount when legal hold is enabled for team
@@ -106,13 +107,9 @@ const MainContent = ({
     }
   }, [teamState, showRequestModal]);
 
-  if (is.null_(rootContext)) {
-    return null;
-  }
-  const contentViewModel = rootContext.mainViewModel.content;
+  const contentViewModel = mainViewModel.content;
   const {isFederated, repositories, switchContent} = contentViewModel;
 
-  /* eslint-disable react-hooks/rules-of-hooks */
   const {audioInputSupported, audioOutputSupported, videoInputSupported} = useMediaDevicesStore(state => ({
     audioInputSupported: state.audio.input.supported,
     audioOutputSupported: state.audio.output.supported,
@@ -124,20 +121,19 @@ const MainContent = ({
     [MediaDeviceType.VIDEO_INPUT]: videoInputSupported,
   };
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  /* eslint-enable react-hooks/rules-of-hooks */
 
   const statesTitle: Partial<Record<ContentState, string>> = {
-    [ContentState.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
-    [ContentState.CONVERSATION]: t('accessibility.headings.conversation'),
-    [ContentState.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
-    [ContentState.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
-    [ContentState.COLLECTION]: t('accessibility.headings.collection'),
-    [ContentState.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
-    [ContentState.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
-    [ContentState.PREFERENCES_AV]: t('accessibility.headings.preferencesAV'),
-    [ContentState.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
-    [ContentState.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
-    [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
+    [ContentState.CONNECTION_REQUESTS]: translate('accessibility.headings.connectionRequests'),
+    [ContentState.CONVERSATION]: translate('accessibility.headings.conversation'),
+    [ContentState.HISTORY_EXPORT]: translate('accessibility.headings.historyExport'),
+    [ContentState.HISTORY_IMPORT]: translate('accessibility.headings.historyImport'),
+    [ContentState.COLLECTION]: translate('accessibility.headings.collection'),
+    [ContentState.PREFERENCES_ABOUT]: translate('accessibility.headings.preferencesAbout'),
+    [ContentState.PREFERENCES_ACCOUNT]: translate('accessibility.headings.preferencesAccount'),
+    [ContentState.PREFERENCES_AV]: translate('accessibility.headings.preferencesAV'),
+    [ContentState.PREFERENCES_DEVICES]: translate('accessibility.headings.preferencesDevices'),
+    [ContentState.PREFERENCES_OPTIONS]: translate('accessibility.headings.preferencesOptions'),
+    [ContentState.WATERMARK]: translate('accessibility.headings.noConversation'),
   };
 
   const title = statesTitle[contentState];
@@ -170,7 +166,7 @@ const MainContent = ({
                 className={cx('preferences-page preferences-about', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <AboutPreferences selfUser={selfUser} teamState={teamState} />
+                <AboutPreferences selfUser={selfUser} />
               </div>
             )}
 
@@ -190,6 +186,7 @@ const MainContent = ({
                   userRepository={repositories.user}
                   selfUser={selfUser}
                   isActivatedAccount={isActivatedAccount}
+                  appLockRepository={appLockRepository}
                 />
               </div>
             )}

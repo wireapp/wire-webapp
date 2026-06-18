@@ -30,8 +30,8 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
 import {PreferencesSection} from '../components/PreferencesSection';
@@ -49,6 +49,7 @@ const AccountSecuritySection = ({
   appLockState = container.resolve(AppLockState),
   teamState = container.resolve(TeamState),
 }: AccountSecuritySectionProps) => {
+  const {translate} = useApplicationContext();
   const createTeamUrl = externalUrl.createTeam;
   const manageTeamUrl = getManageTeamUrl('client_settings');
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
@@ -62,14 +63,15 @@ const AccountSecuritySection = ({
       {
         primaryAction: {
           action: () => userRepository.deleteMe(),
-          text: t('modalAccountDeletionAction'),
+          text: translate('modalAccountDeletionAction'),
         },
         text: {
-          message: t('modalAccountDeletionMessage'),
-          title: t('modalAccountDeletionHeadline'),
+          message: translate('modalAccountDeletionMessage'),
+          title: translate('modalAccountDeletionHeadline'),
         },
       },
       undefined,
+      translate,
     );
 
   return (
@@ -83,13 +85,13 @@ const AccountSecuritySection = ({
           data-uie-name="do-manage-team"
           type="button"
         >
-          {t('preferencesAccountManageTeam')}
+          {translate('preferencesAccountManageTeam')}
         </Link>
       )}
 
       {createTeamUrl && !isMacOsWrapper && (
         <Link variant={LinkVariant.PRIMARY} targetBlank href={createTeamUrl} data-uie-name="do-create-team">
-          {t('preferencesAccountCreateTeam')}
+          {translate('preferencesAccountCreateTeam')}
         </Link>
       )}
       {isAppLockActivated && (
@@ -100,7 +102,7 @@ const AccountSecuritySection = ({
           data-uie-name="do-reset-app-lock"
           type="button"
         >
-          {t('preferencesAccountResetAppLockPassphrase')}
+          {translate('preferencesAccountResetAppLockPassphrase')}
         </Link>
       )}
       {!selfUser?.isNoPasswordSSO && (
@@ -109,11 +111,11 @@ const AccountSecuritySection = ({
           variant={LinkVariant.PRIMARY}
           href={externalUrl.passwordReset}
           targetBlank
-          title={t('tooltipPreferencesPassword')}
+          title={translate('tooltipPreferencesPassword')}
           data-uie-name="do-reset-password"
           type="button"
         >
-          {t('preferencesAccountResetPassword')}
+          {translate('preferencesAccountResetPassword')}
         </Link>
       )}
 
@@ -125,7 +127,7 @@ const AccountSecuritySection = ({
           data-uie-name="go-delete-account"
           type="button"
         >
-          {t('preferencesAccountDelete')}
+          {translate('preferencesAccountDelete')}
         </Link>
       )}
     </PreferencesSection>

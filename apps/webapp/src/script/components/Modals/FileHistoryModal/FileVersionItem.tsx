@@ -22,7 +22,6 @@ import {ReactElement} from 'react';
 import {Button, ButtonVariant, DownloadIcon, ReloadIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/RootProvider';
-import {t} from 'Util/localizerUtil';
 
 import {
   fileVersionItemWrapperCss,
@@ -55,7 +54,7 @@ interface FileVersionItemProps {
 }
 
 export const FileVersionItem = (properties: FileVersionItemProps): ReactElement => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {version, isCurrentVersion, showTimelineConnector, onDownload, onRestore} = properties;
   const versionDetailsTitle = `${version.ownerName} ${version.size}`.trim();
 
@@ -71,7 +70,7 @@ export const FileVersionItem = (properties: FileVersionItemProps): ReactElement 
       <div css={isCurrentVersion ? versionDotCurrentCss : versionDotOldCss} aria-hidden="true" />
       <div css={versionInfoContainerCss}>
         <p css={versionTimeTextCss}>
-          {version.time} {isCurrentVersion && t('cells.versionHistory.current')}
+          {version.time} {isCurrentVersion && translate('cells.versionHistory.current')}
         </p>
         <p css={versionMetaTextCss} title={versionDetailsTitle} data-version-meta-text="true">
           <span css={versionOwnerSpanCss}>{version.ownerName}</span>
@@ -83,18 +82,18 @@ export const FileVersionItem = (properties: FileVersionItemProps): ReactElement 
           variant={ButtonVariant.SECONDARY}
           css={versionButtonCss}
           onClick={handleDownloadClick}
-          aria-label={t('cells.versionHistory.downloadAriaLabel', {time: version.time})}
+          aria-label={translate('cells.versionHistory.downloadAriaLabel', {time: version.time})}
         >
-          <DownloadIcon css={iconMarginRightCss} /> {t('cells.versionHistory.download')}
+          <DownloadIcon css={iconMarginRightCss} /> {translate('cells.versionHistory.download')}
         </Button>
         {!isCurrentVersion && (
           <Button
             css={versionButtonCss}
             onClick={() => onRestore(version.versionId)}
             variant={ButtonVariant.SECONDARY}
-            aria-label={t('cells.versionHistory.restoreAriaLabel', {time: version.time})}
+            aria-label={translate('cells.versionHistory.restoreAriaLabel', {time: version.time})}
           >
-            <ReloadIcon css={restoreIconCss} /> {t('cells.versionHistory.restore')}
+            <ReloadIcon css={restoreIconCss} /> {translate('cells.versionHistory.restore')}
           </Button>
         )}
       </div>

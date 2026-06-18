@@ -19,15 +19,23 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {AssetUploadButton} from './AssetUploadButton';
 
 const pngFile = new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('AssetUploadButton', () => {
   it('Does call onSelectFiles with uploaded file', () => {
     const onSelectFiles = jest.fn();
 
-    const {container} = render(<AssetUploadButton onSelectFiles={onSelectFiles} />);
+    const {container} = render(<AssetUploadButton onSelectFiles={onSelectFiles} />, {wrapper: rootProviderWrapper});
     const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
 
     fireEvent.change(fileInput, {
@@ -40,7 +48,7 @@ describe('AssetUploadButton', () => {
   it('Does reset a form with input after upload', () => {
     const onSelectFiles = jest.fn();
 
-    const {container} = render(<AssetUploadButton onSelectFiles={onSelectFiles} />);
+    const {container} = render(<AssetUploadButton onSelectFiles={onSelectFiles} />, {wrapper: rootProviderWrapper});
 
     const form = container.querySelector('form');
     jest.spyOn(form!, 'reset');

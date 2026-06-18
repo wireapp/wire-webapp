@@ -24,7 +24,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {UserState} from 'Repositories/user/userState';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
@@ -39,6 +39,7 @@ interface SaveCallLogsProps {
 const OBFUSCATION_TRUNCATE_TO = 4;
 
 const SaveCallLogs = ({callingRepository, userState = container.resolve(UserState)}: SaveCallLogsProps) => {
+  const {translate} = useApplicationContext();
   const brandName = Config.getConfig().BRAND_NAME;
   const saveCallLogs = () => {
     const messageLog = callingRepository.getCallLog();
@@ -55,17 +56,22 @@ const SaveCallLogs = ({callingRepository, userState = container.resolve(UserStat
 
       downloadBlob(blob, filename);
     } else {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          closeBtnLabel: t('modalCallEmptyLogCloseBtn'),
-          message: t('modalCallEmptyLogMessage'),
-          title: t('modalCallEmptyLogHeadline'),
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            closeBtnLabel: translate('modalCallEmptyLogCloseBtn'),
+            message: translate('modalCallEmptyLogMessage'),
+            title: translate('modalCallEmptyLogHeadline'),
+          },
         },
-      });
+        undefined,
+        translate,
+      );
     }
   };
   return (
-    <PreferencesSection title={t('preferencesOptionsCallLogs')}>
+    <PreferencesSection title={translate('preferencesOptionsCallLogs')}>
       <div className="preferences-option">
         <Button
           variant={ButtonVariant.TERTIARY}
@@ -74,11 +80,11 @@ const SaveCallLogs = ({callingRepository, userState = container.resolve(UserStat
           aria-describedby="call-logs-description"
           type="button"
         >
-          {t('preferencesOptionsCallLogsGet')}
+          {translate('preferencesOptionsCallLogsGet')}
         </Button>
       </div>
       <p id="call-logs-description" className="preferences-detail">
-        {t('preferencesOptionsCallLogsDetail', {brandName})}
+        {translate('preferencesOptionsCallLogsDetail', {brandName})}
       </p>
     </PreferencesSection>
   );

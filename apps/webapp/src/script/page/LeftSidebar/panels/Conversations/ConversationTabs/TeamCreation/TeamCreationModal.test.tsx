@@ -21,12 +21,15 @@ import {act} from 'react';
 
 import {render, fireEvent, waitFor} from '@testing-library/react';
 
-import en from 'I18n/en-US.json';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {setStrings} from 'Util/localizerUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {TeamCreationModal} from './TeamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
+import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Repositories/team/TeamService');
 jest.mock('@wireapp/react-ui-kit', () => {
@@ -53,11 +56,17 @@ describe('TeamCreationModal', () => {
   const onCloseMock = jest.fn();
   const onSuccessMock = jest.fn();
   const userName = 'testUser';
-  setStrings({en});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   const renderTeamCreationModal = () => {
     useTeamCreationModal.setState({isModalOpen: true});
-    return render(withTheme(<TeamCreationModal onClose={onCloseMock} onSuccess={onSuccessMock} userName={userName} />));
+    return render(
+      withTheme(<TeamCreationModal onClose={onCloseMock} onSuccess={onSuccessMock} userName={userName} />),
+      {
+        wrapper: rootProviderWrapper,
+      },
+    );
   };
 
   beforeEach(() => {
@@ -65,11 +74,10 @@ describe('TeamCreationModal', () => {
     onSuccessMock.mockClear();
   });
 
-  const getStepString = (currentStep: number) => `Step ${currentStep} of 4`;
-
   it('renders the introduction step initially', () => {
     const {getByText} = renderTeamCreationModal();
-    expect(getByText(getStepString(1))).toBeTruthy();
+    expect(getByText('teamCreationStep')).toBeTruthy();
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
   });
 
   it('navigates to the form step when clicking continue', () => {
@@ -77,7 +85,7 @@ describe('TeamCreationModal', () => {
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
-    expect(getByText(getStepString(2))).toBeTruthy();
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
   });
 
   it('navigates back to the introduction step', () => {
@@ -86,23 +94,23 @@ describe('TeamCreationModal', () => {
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
-    expect(getByText(getStepString(2))).toBeTruthy();
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
 
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doGoBack));
     });
-    expect(getByText(getStepString(1))).toBeTruthy();
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
   });
 
   it('navigates to confirm page after providing team name', () => {
     const {getByTestId, getByText} = renderTeamCreationModal();
 
-    expect(getByText(getStepString(1))).toBeTruthy();
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
 
-    expect(getByText(getStepString(2))).toBeTruthy();
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
     act(() => {
       fireEvent.change(getByTestId(testIdentifiers.enterTeamName), {target: {value: 'New Team'}});
     });
@@ -110,18 +118,18 @@ describe('TeamCreationModal', () => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
 
-    expect(getByText(getStepString(3))).toBeTruthy();
+    expect(getByText('teamCreationConfirmTitle')).toBeTruthy();
   });
 
   it('calls onSuccess when closed from last page (success)', async () => {
     const {getByTestId, getByText} = renderTeamCreationModal();
 
-    expect(getByText(getStepString(1))).toBeTruthy();
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
 
-    expect(getByText(getStepString(2))).toBeTruthy();
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
     act(() => {
       fireEvent.change(getByTestId(testIdentifiers.enterTeamName), {target: {value: 'New Team'}});
     });
@@ -129,7 +137,7 @@ describe('TeamCreationModal', () => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
 
-    expect(getByText(getStepString(3))).toBeTruthy();
+    expect(getByText('teamCreationConfirmTitle')).toBeTruthy();
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doAcceptTerms));
     });
@@ -142,7 +150,7 @@ describe('TeamCreationModal', () => {
     });
 
     await waitFor(() => {
-      expect(getByText(getStepString(4))).toBeTruthy();
+      expect(getByText('teamCreationSuccessTitle')).toBeTruthy();
     });
 
     act(() => {

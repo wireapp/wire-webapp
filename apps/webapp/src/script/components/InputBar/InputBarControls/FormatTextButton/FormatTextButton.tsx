@@ -22,7 +22,7 @@ import type {MouseEvent} from 'react';
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface FormatTextButtonProps {
   isActive: boolean;
@@ -31,6 +31,8 @@ interface FormatTextButtonProps {
 }
 
 export const FormatTextButton = ({isActive, isEditing = false, onClick}: FormatTextButtonProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <button
       className={cx(`input-bar-control`, {
@@ -39,8 +41,10 @@ export const FormatTextButton = ({isActive, isEditing = false, onClick}: FormatT
       })}
       type="button"
       onClick={onClick}
-      title={isActive ? t('tooltipConversationHideFormatting') : t('tooltipConversationShowFormatting')}
-      aria-label={isActive ? t('tooltipConversationHideFormatting') : t('tooltipConversationShowFormatting')}
+      title={isActive ? translate('tooltipConversationHideFormatting') : translate('tooltipConversationShowFormatting')}
+      aria-label={
+        isActive ? translate('tooltipConversationHideFormatting') : translate('tooltipConversationShowFormatting')
+      }
       data-uie-name="format-text"
     >
       <Icon.MarkdownIcon width={14} height={14} />

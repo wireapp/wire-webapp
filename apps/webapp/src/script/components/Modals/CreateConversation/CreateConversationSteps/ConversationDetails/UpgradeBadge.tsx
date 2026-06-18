@@ -17,10 +17,12 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {upgradeBadgeCss} from './ConversationDetails.styles';
 
 export const UpgradeBadge = () => {
-  return <div css={upgradeBadgeCss}>{t('createConversationUpgradeBadge')}</div>;
+  const {translate} = useApplicationContext();
+
+  return <div css={upgradeBadgeCss}>{translate('createConversationUpgradeBadge')}</div>;
 };

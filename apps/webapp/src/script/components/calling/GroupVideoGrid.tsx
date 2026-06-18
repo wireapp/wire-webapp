@@ -30,8 +30,8 @@ import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {Call} from 'Repositories/calling/Call';
 import type {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
 import {Video} from './Video';
@@ -64,6 +64,7 @@ const COLUMNS = {
 };
 
 const PARTICIPANTS_DESKTOP_EDGE_CASE = 3;
+const MIN_PARTICIPANTS_FOR_MAXIMIZED_VIEW = 2;
 
 interface CalculateRowsAndColumsParams {
   totalCount: number;
@@ -133,6 +134,7 @@ const GroupVideoGrid = ({
   call,
   setMaximizedParticipant,
 }: GroupVideoGripProps) => {
+  const {translate} = useApplicationContext();
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
   const isTablet = useActiveWindowMatchMedia(QUERY.tablet);
   const isDesktop = useActiveWindowMatchMedia(QUERY.desktop);
@@ -164,7 +166,7 @@ const GroupVideoGrid = ({
       setMaximizedParticipant(null);
       return;
     }
-    if (grid.grid.length < 2) {
+    if (grid.grid.length < MIN_PARTICIPANTS_FOR_MAXIMIZED_VIEW) {
       return;
     }
 
@@ -256,7 +258,7 @@ const GroupVideoGrid = ({
               data-uie-name="no-active-speakers"
               css={{color: 'var(--main-color)', fontSize: 'var(--font-size-xsmall)', fontWeight: 500}}
             >
-              {t('noActiveSpeakers')}
+              {translate('noActiveSpeakers')}
             </div>
           </div>
         )}

@@ -18,18 +18,20 @@
  */
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface CellImageUploadButtonProps {
   onClick: () => void;
 }
 
 export const CellImageUploadButton = ({onClick}: CellImageUploadButtonProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <button
       type="button"
-      aria-label={t('tooltipConversationAddImage')}
-      title={t('tooltipConversationAddImage')}
+      aria-label={translate('tooltipConversationAddImage')}
+      title={translate('tooltipConversationAddImage')}
       className="input-bar-control file-button"
       onClick={onClick}
       data-uie-name="do-share-image"

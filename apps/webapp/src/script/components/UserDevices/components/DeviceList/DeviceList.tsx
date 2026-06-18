@@ -22,8 +22,8 @@ import cx from 'classnames';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/E2EIdentity';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../../../Config';
 import {DeviceCard} from '../DeviceCard';
@@ -37,13 +37,14 @@ interface DeviceListProps {
 }
 
 export const DeviceList = ({user, getDeviceIdentity, noPadding, clients, clickOnDevice}: DeviceListProps) => {
+  const {translate} = useApplicationContext();
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 
   return (
     <>
       <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
         <p className="participant-devices__text-block panel__info-text" data-uie-name="status-devices-headline">
-          {t('participantDevicesHeadline', {brandName: Config.getConfig().BRAND_NAME, user: userName})}
+          {translate('participantDevicesHeadline', {brandName: Config.getConfig().BRAND_NAME, user: userName})}
         </p>
 
         <a
@@ -52,7 +53,7 @@ export const DeviceList = ({user, getDeviceIdentity, noPadding, clients, clickOn
           rel="nofollow noopener noreferrer"
           target="_blank"
         >
-          {t('participantDevicesWhyVerify')}
+          {translate('participantDevicesWhyVerify')}
         </a>
       </div>
 

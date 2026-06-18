@@ -23,21 +23,25 @@ import * as Icon from 'Components/icon';
 import {generateCellState} from 'Repositories/conversation/ConversationCellState';
 import {ConversationStatusIcon} from 'Repositories/conversation/ConversationStatusIcon';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 interface Props {
   conversation: Conversation;
 }
 
 export const StatusIcon = ({conversation}: Props) => {
+  const {translate} = useApplicationContext();
   const {unreadState, mutedState, isRequest} = useKoSubscribableChildren(conversation, [
     'unreadState',
     'mutedState',
     'isRequest',
   ]);
 
-  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
+  const cellState = useMemo(
+    () => generateCellState(conversation, translate),
+    [conversation, isRequest, mutedState, translate, unreadState],
+  );
 
   return (
     <>
@@ -45,7 +49,7 @@ export const StatusIcon = ({conversation}: Props) => {
         <span
           className="conversation-list-cell-badge cell-badge-light"
           data-uie-name="status-pending"
-          title={t('accessibility.conversationStatusPending')}
+          title={translate('accessibility.conversationStatusPending')}
         >
           <Icon.PendingIcon className="svg-icon" />
         </span>
@@ -55,7 +59,7 @@ export const StatusIcon = ({conversation}: Props) => {
         <span
           className="conversation-list-cell-badge cell-badge-dark"
           data-uie-name="status-mention"
-          title={t('accessibility.conversationStatusUnreadMention')}
+          title={translate('accessibility.conversationStatusUnreadMention')}
         >
           <Icon.MentionIcon className="svg-icon" />
         </span>
@@ -65,8 +69,8 @@ export const StatusIcon = ({conversation}: Props) => {
         <span
           className="conversation-list-cell-badge cell-badge-dark"
           data-uie-name="status-reply"
-          title={t('accessibility.conversationStatusUnreadReply')}
-          aria-label={t('accessibility.conversationStatusUnreadReply')}
+          title={translate('accessibility.conversationStatusUnreadReply')}
+          aria-label={translate('accessibility.conversationStatusUnreadReply')}
         >
           <Icon.ReplyIcon className="svg-icon" />
         </span>
@@ -76,7 +80,7 @@ export const StatusIcon = ({conversation}: Props) => {
         <span
           className="conversation-list-cell-badge cell-badge-dark"
           data-uie-name="status-ping"
-          title={t('accessibility.conversationStatusUnreadPing')}
+          title={translate('accessibility.conversationStatusUnreadPing')}
         >
           <Icon.PingIcon className="svg-icon" />
         </span>
@@ -86,7 +90,7 @@ export const StatusIcon = ({conversation}: Props) => {
         <span
           className="conversation-list-cell-badge cell-badge-dark"
           data-uie-name="status-missed-call"
-          title={t('accessibility.callStatusMissed')}
+          title={translate('accessibility.callStatusMissed')}
         >
           <Icon.HangupIcon className="svg-icon" />
         </span>
@@ -96,7 +100,7 @@ export const StatusIcon = ({conversation}: Props) => {
         <span
           className="conversation-list-cell-badge cell-badge-light conversation-muted"
           data-uie-name="status-silence"
-          title={t('accessibility.conversationStatusMuted')}
+          title={translate('accessibility.conversationStatusMuted')}
           aria-hidden="true"
         >
           <Icon.MuteIcon className="svg-icon" />
@@ -107,7 +111,7 @@ export const StatusIcon = ({conversation}: Props) => {
         <span
           className="conversation-list-cell-badge cell-badge-dark"
           data-uie-name="status-unread"
-          title={t('accessibility.conversationStatusUnread')}
+          title={translate('accessibility.conversationStatusUnread')}
         >
           {unreadState.allMessages.length}
         </span>

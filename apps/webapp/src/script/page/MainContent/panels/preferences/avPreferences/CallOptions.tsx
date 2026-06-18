@@ -28,7 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/PreferencesSection';
@@ -39,6 +39,7 @@ interface CallOptionsProps {
 }
 
 const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProps) => {
+  const {translate} = useApplicationContext();
   const {current: isCbrEncodingEnforced} = useRef(Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE);
   const [vbrEncoding, setVbrEncoding] = useState(
     !isCbrEncodingEnforced && propertiesRepository.properties.settings.call.enable_vbr_encoding,
@@ -58,11 +59,13 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
     const updateProperties = ({settings}: WebappProperties) => {
       setVbrEncoding(!isCbrEncodingEnforced && settings.call.enable_vbr_encoding);
     };
+
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+
     return () => {
       amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
     };
-  }, []);
+  }, [isCbrEncodingEnforced]);
 
   const handleCbrEncodingChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -103,7 +106,7 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
   );
 
   return (
-    <PreferencesSection title={t('preferencesOptionsCall')}>
+    <PreferencesSection title={translate('preferencesOptionsCall')}>
       <div>
         <Checkbox
           onChange={handleCbrEncodingChange}
@@ -112,16 +115,22 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
           disabled={isCbrEncodingEnforced}
         >
           <CheckboxLabel htmlFor="status-preference-vbr-encoding">
-            {t('preferencesOptionsEnableVbrCheckbox')}
+            {translate('preferencesOptionsEnableVbrCheckbox')}
           </CheckboxLabel>
         </Checkbox>
-        <p className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableVbrDetails')}</p>
+        <p className="preferences-detail preferences-detail-intended">
+          {translate('preferencesOptionsEnableVbrDetails')}
+        </p>
       </div>
       <div className="checkbox-margin">
         <Checkbox onChange={handleAgcChange} checked={agcEnabled} data-uie-name="status-preference-agc">
-          <CheckboxLabel htmlFor="status-preference-agc">{t('preferencesOptionsEnableAgcCheckbox')}</CheckboxLabel>
+          <CheckboxLabel htmlFor="status-preference-agc">
+            {translate('preferencesOptionsEnableAgcCheckbox')}
+          </CheckboxLabel>
         </Checkbox>
-        <p className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableAgcDetails')}</p>
+        <p className="preferences-detail preferences-detail-intended">
+          {translate('preferencesOptionsEnableAgcDetails')}
+        </p>
       </div>
       <div className="checkbox-margin">
         <Checkbox
@@ -130,11 +139,11 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
           data-uie-name="status-preference-soundless-incoming-calls"
         >
           <CheckboxLabel htmlFor="status-preference-soundless-incoming-calls">
-            {t('preferencesOptionsEnableSoundlessIncomingCalls')}
+            {translate('preferencesOptionsEnableSoundlessIncomingCalls')}
           </CheckboxLabel>
         </Checkbox>
         <p className="preferences-detail preferences-detail-intended">
-          {t('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
+          {translate('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
         </p>
       </div>
       {isPressSpaceToUnmuteFlagEnabled && (
@@ -145,11 +154,11 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
             data-uie-name="status-preference-press-space-to-unmute"
           >
             <CheckboxLabel htmlFor="status-preference-press-space-to-unmute">
-              {t('preferencesOptionsEnablePressSpaceToUnmute')}
+              {translate('preferencesOptionsEnablePressSpaceToUnmute')}
             </CheckboxLabel>
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
-            {t('preferencesOptionsEnablePressSpaceToUnmuteDetails')}
+            {translate('preferencesOptionsEnablePressSpaceToUnmuteDetails')}
           </p>
         </div>
       )}

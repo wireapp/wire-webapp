@@ -20,8 +20,8 @@
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {copyText} from 'Util/clipboardUtil';
-import {t} from 'Util/localizerUtil';
 
 interface AccountLinkProps {
   'data-uie-name'?: string;
@@ -30,6 +30,8 @@ interface AccountLinkProps {
 }
 
 const AccountLink = ({label, value, ...rest}: AccountLinkProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div
       css={{
@@ -73,7 +75,7 @@ const AccountLink = ({label, value, ...rest}: AccountLinkProps) => {
           className="text-bold-small"
         >
           <Icon.CopyIcon width="16" height="16" css={{marginRight: '8px'}} />
-          {t('preferencesAccountCopyLink')}
+          {translate('preferencesAccountCopyLink')}
         </Button>
       </div>
     </div>

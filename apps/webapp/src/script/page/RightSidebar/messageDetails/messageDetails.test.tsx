@@ -27,26 +27,28 @@ import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './messageDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
 let searchRepository: SearchRepository;
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-beforeAll(() => {
-  testFactory.exposeConversationActors().then(factory => {
-    conversationRepository = factory;
-    return conversationRepository;
-  });
-
-  testFactory.exposeSearchActors().then(factory => {
-    searchRepository = factory;
-    return searchRepository;
-  });
+beforeAll(async () => {
+  conversationRepository = await testFactory.exposeConversationActors();
+  searchRepository = await testFactory.exposeSearchActors();
 });
 
 const getDefaultParams = (showReactions: boolean = false) => {
@@ -65,21 +67,21 @@ const getDefaultParams = (showReactions: boolean = false) => {
 
 describe('MessageDetails', () => {
   it('renders no reactions view', async () => {
-    const conversation = new Conversation();
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.teamId = 'mock-team-id';
 
     const timestamp = new Date('2022-01-21T15:08:14.225Z').getTime();
     const userName = 'Jan Kowalski';
 
-    const user = new User(createUuid());
+    const user = new User(createUuid(), '', translateForTest);
     user.name(userName);
 
-    const message = new ContentMessage(createUuid());
+    const message = new ContentMessage(createUuid(), translateForTest);
     message.timestamp(timestamp);
     message.user(user);
 
     const findUsersByIds = jest.fn((ids: QualifiedId[]) => {
-      return ids.map(id => new User(id.id, 'test-domain.mock'));
+      return ids.map(id => new User(id.id, 'test-domain.mock', translateForTest));
     });
 
     const userRepository = {
@@ -90,12 +92,13 @@ describe('MessageDetails', () => {
     const {getByText} = render(
       <MessageDetails
         {...defaultProps}
-        selfUser={new User()}
+        selfUser={new User('', '', translateForTest)}
         togglePanel={() => undefined}
         activeConversation={conversation}
         messageEntity={message}
         userRepository={userRepository}
       />,
+      {wrapper: rootProviderWrapper},
     );
 
     await waitFor(() => {

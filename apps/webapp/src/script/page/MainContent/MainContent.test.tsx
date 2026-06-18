@@ -20,8 +20,10 @@
 import {act, render, screen, waitFor} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
+import type {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {MainContent} from './MainContent';
 
@@ -68,8 +70,9 @@ describe('Preferences', () => {
   } as MainViewModel;
 
   const defaultParams = {
+    appLockRepository: {} as AppLockRepository,
     openRightSidebar: jest.fn(),
-    selfUser: new User('selfUser'),
+    selfUser: new User('selfUser', '', translateForTest),
     reloadApp: jest.fn(),
   };
   const wallClock = createDeterministicWallClock();
@@ -82,6 +85,7 @@ describe('Preferences', () => {
       withTheme(
         <RootProvider
           value={createRootContextValueForTest({
+            translate: translateForTest,
             isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
             mainViewModel,
             wallClock,

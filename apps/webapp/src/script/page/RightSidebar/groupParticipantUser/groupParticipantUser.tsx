@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect} from 'react';
+import {FC, useCallback, useEffect} from 'react';
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 import {amplify} from 'amplify';
@@ -38,9 +38,9 @@ import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../panelHeader';
@@ -75,6 +75,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   selfUser,
   isFederated = false,
 }) => {
+  const {translate} = useApplicationContext();
   const {isGroupOrChannel, roles} = useKoSubscribableChildren(activeConversation, ['isGroupOrChannel', 'roles']);
   const {isTemporaryGuest, isAvailable} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest', 'isAvailable']);
   const {classifiedDomains, team, isTeam} = useKoSubscribableChildren(teamState, [
@@ -107,25 +108,28 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     }
   };
 
-  const checkMemberLeave = ({type, data}: MemberLeaveEvent | TeamMemberLeaveEvent) => {
-    if (type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE && data.user_ids.includes(currentUser.id)) {
-      goToRoot();
-    }
-  };
+  const checkMemberLeave = useCallback(
+    ({type, data}: MemberLeaveEvent | TeamMemberLeaveEvent) => {
+      if (type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE && data.user_ids.includes(currentUser.id)) {
+        goToRoot();
+      }
+    },
+    [currentUser.id, goToRoot],
+  );
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, checkMemberLeave);
-  }, []);
+  }, [checkMemberLeave]);
 
   useEffect(() => {
     if (currentUser.isDeleted) {
       goToRoot();
     }
-  }, [currentUser]);
+  }, [currentUser, goToRoot]);
 
   useEffect(() => {
     if (team.id) {
-      teamRepository.updateTeamMembersByIds(team.id, [currentUser.id], true);
+      void teamRepository.updateTeamMembersByIds(team.id, [currentUser.id], true);
     }
   }, [currentUser, teamRepository, team]);
 
@@ -158,7 +162,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
             <button
               className="panel__action-item"
               onClick={() => showDevices(currentUser)}
-              aria-label={t('accessibility.conversationDetailsActionDevicesLabel')}
+              aria-label={translate('accessibility.conversationDetailsActionDevicesLabel')}
               data-uie-name="go-devices"
               type="button"
             >
@@ -166,7 +170,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
                 <Icon.DevicesIcon />
               </span>
 
-              <span className="panel__action-item__text">{t('conversationDetailsActionDevices')}</span>
+              <span className="panel__action-item__text">{translate('conversationDetailsActionDevices')}</span>
 
               <Icon.ChevronRight className="chevron-right-icon" />
             </button>
@@ -181,7 +185,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
                 role="button"
                 className="panel__action-item modal-style panel__action-button"
                 data-uie-name="toggle-admin"
-                aria-label={t('accessibility.conversationDetailsActionGroupAdminLabel')}
+                aria-label={translate('accessibility.conversationDetailsActionGroupAdminLabel')}
                 aria-pressed={isAdmin}
                 onClick={toggleAdmin}
                 onKeyDown={(event: React.KeyboardEvent<HTMLElement>) =>
@@ -199,7 +203,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
                 <BaseToggle
                   isChecked={isAdmin}
                   setIsChecked={toggleAdmin}
-                  toggleName={t('conversationDetailsGroupAdmin')}
+                  toggleName={translate('conversationDetailsGroupAdmin')}
                   toggleId="admin"
                   isDisabled={currentUser.isFederated}
                 />
@@ -207,7 +211,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
             </div>
 
             <p className="panel__info-text panel__item-offset" css={{padding: '16px'}} tabIndex={TabIndex.FOCUSABLE}>
-              {t('conversationDetailsGroupAdminInfo')}
+              {translate('conversationDetailsGroupAdminInfo')}
             </p>
           </>
         )}

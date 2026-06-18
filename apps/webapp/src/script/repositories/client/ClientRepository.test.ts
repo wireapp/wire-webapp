@@ -21,17 +21,21 @@ import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/'
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage/record/clientRecord';
 import {ClientError} from 'src/script/error/clientError';
+import {type Translate, translate} from 'Util/localizerUtil';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
 import {entities} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ClientRepository', () => {
+  const originalPrimaryModalShow = PrimaryModal.show;
   const testFactory = new TestFactory();
   const clientId = '5021d77752286cac';
   let userId: string = undefined;
@@ -39,7 +43,7 @@ describe('ClientRepository', () => {
   beforeAll(async () => {
     await testFactory.exposeClientActors();
 
-    const user = new User(entities.user.john_doe.id, null);
+    const user = new User(entities.user.john_doe.id, null, translateForTest);
     user.email(entities.user.john_doe.email);
     user.isMe = true;
     user.locale = entities.user.john_doe.locale;
@@ -50,6 +54,11 @@ describe('ClientRepository', () => {
   });
 
   beforeEach(() => testFactory.storage_repository.clearStores());
+
+  afterEach(() => {
+    PrimaryModal.show = originalPrimaryModalShow;
+    jest.clearAllMocks();
+  });
 
   describe('getClientsByUserIds', () => {
     it('maps client entities from client payloads by the backend', async () => {
@@ -250,7 +259,7 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity(false, null);
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient = clientEntity;
-      testFactory.client_repository.selfUser(new User(userId, null));
+      testFactory.client_repository.selfUser(new User(userId, null, translateForTest));
       const result = testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, clientId);
 
       expect(result).toBeTruthy();
@@ -292,6 +301,42 @@ describe('ClientRepository', () => {
       const functionCall = () => testFactory.client_repository['isCurrentClient'](undefined, clientId);
 
       expect(functionCall).toThrow(ClientError);
+    });
+  });
+
+  describe('logoutClient', () => {
+    it('uses the injected translate function for the logout modal copy', async () => {
+      const translate = jest.fn(
+        (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
+      ) as Translate;
+      const primaryModalShow = jest.fn();
+      const clientRepository = new ClientRepository(
+        {} as any,
+        {} as any,
+        translate,
+        {currentClient: {isTemporary: () => false}} as any,
+        {} as any,
+      );
+
+      PrimaryModal.show = primaryModalShow;
+
+      await clientRepository.logoutClient();
+
+      expect(translate).toHaveBeenCalledWith('modalAccountLogoutAction');
+      expect(translate).toHaveBeenCalledWith('modalAccountLogoutOption');
+      expect(translate).toHaveBeenCalledWith('modalAccountLogoutHeadline');
+      expect(primaryModalShow).toHaveBeenCalledWith(
+        PrimaryModal.type.OPTION,
+        expect.objectContaining({
+          primaryAction: expect.objectContaining({text: 'translated:modalAccountLogoutAction'}),
+          text: expect.objectContaining({
+            option: 'translated:modalAccountLogoutOption',
+            title: 'translated:modalAccountLogoutHeadline',
+          }),
+        }),
+        undefined,
+        translate,
+      );
     });
   });
 });

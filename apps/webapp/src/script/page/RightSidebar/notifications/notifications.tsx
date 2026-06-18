@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, FC} from 'react';
+import {useMemo, FC} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -25,8 +25,8 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {RadioGroup} from 'Components/Radio';
 import {NOTIFICATION_STATE, getNotificationText} from 'Repositories/conversation/NotificationSetting';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../panelHeader';
@@ -39,16 +39,19 @@ interface NotificationsProps {
 }
 
 const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, onClose, repositories}) => {
+  const {translate} = useApplicationContext();
   const {notificationState} = useKoSubscribableChildren(activeConversation, ['notificationState']);
   const saveOptionNotificationPreference = (value: number) => {
-    repositories.conversation.setNotificationState(activeConversation, value);
+    void repositories.conversation.setNotificationState(activeConversation, value);
   };
 
-  const [settings] = useState(
-    Object.values(NOTIFICATION_STATE).map(status => ({
-      label: getNotificationText(status),
-      value: status,
-    })),
+  const settings = useMemo(
+    () =>
+      Object.values(NOTIFICATION_STATE).map(status => ({
+        label: getNotificationText(status, translate),
+        value: status,
+      })),
+    [translate],
   );
 
   return (
@@ -57,15 +60,15 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
         onGoBack={onGoBack}
         onClose={onClose}
         goBackUie="go-back-notification-options"
-        goBackTitle={t('accessibility.conversation.goBack')}
-        title={t('notificationSettingsTitle')}
-        closeBtnTitle={t('accessibility.closeNotificationsLabel')}
+        goBackTitle={translate('accessibility.conversation.goBack')}
+        title={translate('notificationSettingsTitle')}
+        closeBtnTitle={translate('accessibility.closeNotificationsLabel')}
       />
 
       <FadingScrollbar className="panel__content">
         <fieldset className="notification-section">
           <RadioGroup
-            ariaLabelledBy={t('notificationSettingsTitle')}
+            ariaLabelledBy={translate('notificationSettingsTitle')}
             name="preferences-options-notifications"
             selectedValue={notificationState}
             onChange={saveOptionNotificationPreference}
@@ -74,7 +77,7 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
         </fieldset>
 
         <p className="panel__info-text notification-settings__disclaimer" tabIndex={TabIndex.FOCUSABLE}>
-          {t('notificationSettingsDisclaimer')}
+          {translate('notificationSettingsDisclaimer')}
         </p>
       </FadingScrollbar>
     </div>

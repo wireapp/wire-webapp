@@ -24,7 +24,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface ConversationDetailsParticipantsProps {
   activeConversation: Conversation;
@@ -49,6 +49,8 @@ export const ConversationDetailsParticipants = ({
   showUser,
   userParticipants,
 }: ConversationDetailsParticipantsProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div className="conversation-details__participants">
       {!!userParticipants.length && (
@@ -80,7 +82,7 @@ export const ConversationDetailsParticipants = ({
               </span>
 
               <span className="panel__action-item__text">
-                {t('conversationDetailsActionConversationParticipants', {number: allUsersCount})}
+                {translate('conversationDetailsActionConversationParticipants', {number: allUsersCount})}
               </span>
 
               <Icon.ChevronRight className="chevron-right-icon" />
@@ -92,7 +94,7 @@ export const ConversationDetailsParticipants = ({
       {!!serviceParticipants.length && (
         <div className="service-list-wrapper">
           <h3 className="conversation-details__list-head" data-uie-name="label-conversation-services">
-            {t('conversationDetailsServices')}
+            {translate('conversationDetailsServices')}
           </h3>
 
           <ServiceList services={serviceParticipants} onServiceClick={showService} dataUieName="list-services" />

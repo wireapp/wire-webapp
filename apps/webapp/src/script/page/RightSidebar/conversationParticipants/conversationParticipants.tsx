@@ -27,8 +27,8 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {isServiceEntity} from '../../../guards/Service';
@@ -56,6 +56,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   onBack,
   highlightedUsers,
 }) => {
+  const {translate} = useApplicationContext();
   const [searchInput, setSearchInput] = useState<string>('');
   const {
     participating_user_ets: participatingUserEts,
@@ -88,7 +89,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
         onGoBack={onBack}
         onClose={onClose}
         goBackUie="go-back-conversation-participants"
-        title={t('conversationParticipantsTitle')}
+        title={translate('conversationParticipantsTitle')}
         shouldFocusFirstButton={false}
       />
 
@@ -97,7 +98,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
           <SearchInput
             input={searchInput}
             setInput={setSearchInput}
-            placeholder={t('conversationParticipantsSearchPlaceholder')}
+            placeholder={translate('conversationParticipantsSearchPlaceholder')}
             forceDark
           />
         </div>

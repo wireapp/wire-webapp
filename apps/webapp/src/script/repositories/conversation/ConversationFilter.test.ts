@@ -25,16 +25,18 @@ import {
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
+import {translate} from 'Util/localizerUtil';
 
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ConversationFilter', () => {
   describe('showCallControls', () => {
     it('defines when to show audio/video call buttons in the UI', () => {
-      const conversationEntity = new Conversation();
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       const showCallControls = ConversationFilter.showCallControls(conversationEntity, false);
       expect(showCallControls).toBeFalsy();
     });
@@ -76,7 +78,7 @@ describe('ConversationFilter', () => {
         verification_state: ConversationVerificationState.UNVERIFIED,
         mlsVerificationState: ConversationVerificationState.UNVERIFIED,
       };
-      const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
+      const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, translate);
       expect(conversationEntity.is1to1()).toBeFalsy();
       expect(conversationEntity['isProteusTeam1to1']()).toBeFalsy();
       expect(conversationEntity.isGroup()).toBeFalsy();
@@ -131,7 +133,7 @@ describe('ConversationFilter', () => {
         verification_state: ConversationVerificationState.UNVERIFIED,
         mlsVerificationState: ConversationVerificationState.UNVERIFIED,
       };
-      const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
+      const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, translate);
       expect(conversationEntity.is1to1()).toBeTruthy();
       expect(conversationEntity['isProteusTeam1to1']()).toBeFalsy();
       expect(conversationEntity.isGroup()).toBeFalsy();

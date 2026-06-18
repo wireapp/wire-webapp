@@ -19,7 +19,7 @@
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {wrapperStyles, iconStyles, textStyles} from './VideoAssetError.styles';
 
@@ -30,7 +30,10 @@ interface VideoAssetErrorProps {
 }
 
 export const VideoAssetError = ({isFileShareRestricted}: VideoAssetErrorProps) => {
-  const message = isFileShareRestricted ? t('conversationVideoAssetRestricted') : t('conversationVideoAssetError');
+  const {translate} = useApplicationContext();
+  const message = isFileShareRestricted
+    ? translate('conversationVideoAssetRestricted')
+    : translate('conversationVideoAssetError');
 
   return (
     <VideoAssetPlaceholder>

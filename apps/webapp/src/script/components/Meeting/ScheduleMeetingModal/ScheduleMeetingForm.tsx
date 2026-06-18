@@ -33,7 +33,7 @@ import {
 import {MeetingParticipantsPicker} from 'Components/Meeting/MeetingParticipantsPicker';
 import type {User} from 'Repositories/entity/User';
 import {currentLanguage} from 'src/script/auth/localeConfig';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   scheduleMeetingFormColumnCss,
@@ -80,20 +80,21 @@ export const ScheduleMeetingForm = ({
   onParticipantsFilterChange,
   selfUser,
 }: ScheduleMeetingFormProps) => {
+  const {translate} = useApplicationContext();
   const {users} = useScheduleMeetingParticipants();
-  const recurrenceOptions = useMemo(() => getScheduleMeetingRecurrenceSelectOptions(), []);
+  const recurrenceOptions = useMemo(() => getScheduleMeetingRecurrenceSelectOptions(translate), [translate]);
   const selectedRecurrenceOption = recurrenceOptions.find(option => option.value === formState.recurrence);
   const portalContainer = getOverlayPortalContainer();
 
   const dateTimePickerLabels = useMemo(
     () => ({
-      dateAriaLabel: t('meetings.scheduleModal.openCalendarAriaLabel'),
-      timeAriaLabel: t('meetings.scheduleModal.timeSelectAriaLabel'),
-      openCalendarLabel: t('meetings.scheduleModal.openCalendarAriaLabel'),
-      previousMonthLabel: t('meetings.scheduleModal.previousMonthAriaLabel'),
-      nextMonthLabel: t('meetings.scheduleModal.nextMonthAriaLabel'),
+      dateAriaLabel: translate('meetings.scheduleModal.openCalendarAriaLabel'),
+      timeAriaLabel: translate('meetings.scheduleModal.timeSelectAriaLabel'),
+      openCalendarLabel: translate('meetings.scheduleModal.openCalendarAriaLabel'),
+      previousMonthLabel: translate('meetings.scheduleModal.previousMonthAriaLabel'),
+      nextMonthLabel: translate('meetings.scheduleModal.nextMonthAriaLabel'),
     }),
-    [],
+    [translate],
   );
 
   return (
@@ -102,8 +103,8 @@ export const ScheduleMeetingForm = ({
         <Input
           id="schedule-meeting-title"
           data-uie-name="schedule-meeting-title"
-          label={t('meetings.scheduleModal.titleLabel')}
-          placeholder={t('meetings.scheduleModal.titlePlaceholder')}
+          label={translate('meetings.scheduleModal.titleLabel')}
+          placeholder={translate('meetings.scheduleModal.titlePlaceholder')}
           value={formState.title}
           onChange={event => onTitleChange(event.currentTarget.value)}
           markInvalid={is.nonEmptyString(errors.title)}
@@ -119,7 +120,7 @@ export const ScheduleMeetingForm = ({
                 type="button"
                 onClick={() => onTitleChange('')}
                 css={scheduleMeetingTitleClearButtonStyles}
-                aria-label={t('accessibility.userProfileDeleteEntry')}
+                aria-label={translate('accessibility.userProfileDeleteEntry')}
               >
                 <CircleCloseIcon />
               </button>
@@ -137,8 +138,8 @@ export const ScheduleMeetingForm = ({
             filter={formState.participantsFilter}
             onFilterChange={onParticipantsFilterChange}
             selfUser={selfUser}
-            label={t('meetings.scheduleModal.participantsLabel')}
-            placeholder={t('meetings.scheduleModal.participantsPlaceholder')}
+            label={translate('meetings.scheduleModal.participantsLabel')}
+            placeholder={translate('meetings.scheduleModal.participantsPlaceholder')}
             popoverPortalContainer={portalContainer}
           />
         </div>
@@ -149,7 +150,7 @@ export const ScheduleMeetingForm = ({
       <div css={scheduleMeetingFormColumnCss}>
         <DateTimePickerField
           dataUieName="schedule-meeting-start"
-          label={t('meetings.scheduleModal.startsLabel')}
+          label={translate('meetings.scheduleModal.startsLabel')}
           value={formState.start}
           onChange={onStartChange}
           labels={dateTimePickerLabels}
@@ -160,7 +161,7 @@ export const ScheduleMeetingForm = ({
 
         <DateTimePickerField
           dataUieName="schedule-meeting-end"
-          label={t('meetings.scheduleModal.endsLabel')}
+          label={translate('meetings.scheduleModal.endsLabel')}
           value={formState.end}
           onChange={onEndChange}
           labels={dateTimePickerLabels}
@@ -174,11 +175,11 @@ export const ScheduleMeetingForm = ({
         <Select
           id="schedule-meeting-recurrence"
           dataUieName="schedule-meeting-recurrence"
-          label={t('meetings.scheduleModal.repeatsLabel')}
+          label={translate('meetings.scheduleModal.repeatsLabel')}
           options={recurrenceOptions}
           value={selectedRecurrenceOption}
           onChange={option => {
-            if (option) {
+            if (option !== null) {
               onRecurrenceChange(option.value as ScheduleMeetingRecurrenceOption);
             }
           }}

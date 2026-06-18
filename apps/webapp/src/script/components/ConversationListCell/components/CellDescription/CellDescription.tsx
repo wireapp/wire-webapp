@@ -26,6 +26,7 @@ import {DraftState, generateConversationInputStorageKey} from 'Components/InputB
 import {useLocalStorage} from 'Hooks/useLocalStorage';
 import {generateCellState} from 'Repositories/conversation/ConversationCellState';
 import {Conversation, UnreadState} from 'Repositories/entity/Conversation';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {iconStyle} from './CellDescription.style';
 
@@ -38,7 +39,12 @@ interface Props {
 }
 
 export const CellDescription = ({conversation, mutedState, isActive, isRequest, unreadState}: Props) => {
-  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
+  const {translate} = useApplicationContext();
+  void isRequest;
+  void mutedState;
+  void unreadState;
+
+  const cellState = useMemo(() => generateCellState(conversation, translate), [conversation, translate]);
 
   const storageKey = generateConversationInputStorageKey(conversation);
   // Hardcoded __amplify__ because of StorageUtil saving as __amplify__<storage_key>

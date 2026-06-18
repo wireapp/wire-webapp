@@ -23,8 +23,8 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {BackupFileUpload} from 'Components/HistoryImport/BackupFileUpload';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {ContentState} from 'src/script/page/useAppState';
-import {t} from 'Util/localizerUtil';
 
 import {PreferencesSection} from '../components/PreferencesSection';
 
@@ -39,6 +39,7 @@ const {
 } = Config.getConfig();
 
 const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importFile, switchContent}) => {
+  const {translate} = useApplicationContext();
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -48,9 +49,9 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
   return (
     <PreferencesSection
       hasSeparator
-      title={t('preferencesOptionsBackupHeader')}
+      title={translate('preferencesOptionsBackupHeader')}
       className="preferences-section-conversation-history"
-      aria-label={t('preferencesOptionsBackupExportHeadline')}
+      aria-label={translate('preferencesOptionsBackupExportHeadline')}
     >
       <Button
         variant={ButtonVariant.TERTIARY}
@@ -59,21 +60,21 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
         aria-describedby="preferences-history-describe-1"
         type="button"
       >
-        {t('preferencesOptionsBackupExportHeadline')}
+        {translate('preferencesOptionsBackupExportHeadline')}
       </Button>
       <p id="preferences-history-describe-1" className="preferences-detail">
-        {t('preferencesOptionsBackupExportSecondary', {brandName})}
+        {translate('preferencesOptionsBackupExportSecondary', {brandName})}
       </p>
       <BackupFileUpload
         onFileChange={handleFileChange}
-        backupImportHeadLine={t('preferencesOptionsBackupImportHeadline')}
+        backupImportHeadLine={translate('preferencesOptionsBackupImportHeadline')}
         variant={ButtonVariant.TERTIARY}
         cssClassName="preferences-history-restore-button"
       />
       <p id="preferences-history-describe-2" className="preferences-detail">
         {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT
-          ? t('preferencesOptionsBackupImportCrossPlatformSecondary')
-          : t('preferencesOptionsBackupImportSecondary')}
+          ? translate('preferencesOptionsBackupImportCrossPlatformSecondary')
+          : translate('preferencesOptionsBackupImportSecondary')}
       </p>
     </PreferencesSection>
   );

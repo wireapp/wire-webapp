@@ -22,39 +22,45 @@ import {Fragment} from 'react';
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {RootContextValue, useApplicationContext} from 'src/script/page/RootProvider';
 
 import {badgesWrapper, icon} from './UserStatusBadges.styles';
 
-const badgeToComponentMap = {
-  guest: () => (
-    <Tooltip css={icon} body={t('conversationGuestIndicator')}>
-      <Icon.GuestIcon data-uie-name="status-guest" />
-    </Tooltip>
-  ),
-  federated: () => (
-    <Tooltip css={icon} body={t('conversationFederationIndicator')}>
-      <Icon.FederationIcon data-uie-name="status-federated-user" />
-    </Tooltip>
-  ),
-  external: () => (
-    <Tooltip css={icon} body={t('rolePartner')}>
-      <Icon.ExternalIcon data-uie-name="status-external" />
-    </Tooltip>
-  ),
-  verified: () => (
-    <span css={icon}>
-      <Icon.VerifiedIcon data-uie-name="status-verified" />
-    </span>
-  ),
-} as const;
+function createBadgeToComponentMap(translate: RootContextValue['translate']) {
+  return {
+    guest: () => (
+      <Tooltip css={icon} body={translate('conversationGuestIndicator')}>
+        <Icon.GuestIcon data-uie-name="status-guest" />
+      </Tooltip>
+    ),
+    federated: () => (
+      <Tooltip css={icon} body={translate('conversationFederationIndicator')}>
+        <Icon.FederationIcon data-uie-name="status-federated-user" />
+      </Tooltip>
+    ),
+    external: () => (
+      <Tooltip css={icon} body={translate('rolePartner')}>
+        <Icon.ExternalIcon data-uie-name="status-external" />
+      </Tooltip>
+    ),
+    verified: () => (
+      <span css={icon}>
+        <Icon.VerifiedIcon data-uie-name="status-verified" />
+      </span>
+    ),
+  } as const;
+}
 
-type BadgeKey = keyof typeof badgeToComponentMap;
+type BadgeMap = ReturnType<typeof createBadgeToComponentMap>;
+
+type BadgeKey = keyof BadgeMap;
 interface UserStatusBadgesProps {
   config: {[key in BadgeKey]?: boolean};
 }
 
 export const UserStatusBadges = ({config}: UserStatusBadgesProps) => {
+  const {translate} = useApplicationContext();
+  const badgeToComponentMap = createBadgeToComponentMap(translate);
   const badges = Object.entries(config).filter(([_badge, shouldShow]) => shouldShow);
   const badgesCount = badges.length;
 

@@ -19,10 +19,18 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {PanelHeader} from './panelHeader';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const goBackUie = 'back-button';
 const closeUie = 'do-close';
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('PanelHeader', () => {
   it('calls the correct callbacks for back and close', () => {
@@ -31,7 +39,7 @@ describe('PanelHeader', () => {
       onGoBack: jest.fn(),
     };
 
-    const {getByTestId} = render(<PanelHeader {...props} />);
+    const {getByTestId} = render(<PanelHeader {...props} />, {wrapper: rootProviderWrapper});
 
     const backButton = getByTestId(goBackUie);
     fireEvent.click(backButton);

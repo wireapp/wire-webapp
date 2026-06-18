@@ -28,6 +28,10 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {entities} from 'test/api/payloads';
+import {TestFactory} from 'test/helper/TestFactory';
+import {generateAPIUser} from 'test/helper/UserGenerator';
+
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ClientRepository} from 'Repositories/client';
 import {ClientMapper} from 'Repositories/client/ClientMapper';
@@ -37,10 +41,10 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamState} from 'Repositories/team/TeamState';
-import {entities} from 'test/api/payloads';
-import {TestFactory} from 'test/helper/TestFactory';
-import {generateAPIUser} from 'test/helper/UserGenerator';
+import type {Translate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
+import {translateForTest} from 'Util/test/translateForTest';
+import {createUuid} from 'Util/uuid';
 
 import {ConsentValue} from './consentValue';
 import {UserRepository} from './userRepository';
@@ -50,14 +54,14 @@ import {UserState} from './userState';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 
 const testFactory = new TestFactory();
-async function buildUserRepository() {
+async function buildUserRepository(translate: Translate) {
   const storageRepo = await testFactory.exposeStorageActors();
 
   const userService = new UserService(storageRepo['storageService']);
   const assetRepository = new AssetRepository();
   const selfService = new SelfService();
-  const clientRepository = new ClientRepository({} as any, {} as any);
-  const propertyRepository = new PropertiesRepository({} as any, {} as any);
+  const clientRepository = new ClientRepository({} as any, {} as any, translate);
+  const propertyRepository = new PropertiesRepository({} as any, {} as any, translate);
   const userState = new UserState();
   const teamState = new TeamState();
 
@@ -68,6 +72,7 @@ async function buildUserRepository() {
     clientRepository,
     serverTimeHandler,
     propertyRepository,
+    translate,
     userState,
     teamState,
   );
@@ -98,7 +103,7 @@ describe('UserRepository', () => {
   describe('Account preferences', () => {
     describe('Data usage permissions', () => {
       it('syncs the "Send anonymous data" preference through WebSocket events', async () => {
-        const [, {propertyRepository}] = await buildUserRepository();
+        const [, {propertyRepository}] = await buildUserRepository(translateForTest);
         const setPropertyMock = jest.spyOn(propertyRepository, 'setProperty').mockReturnValue(undefined);
         const turnOnErrorReporting = {
           key: 'webapp',
@@ -138,7 +143,7 @@ describe('UserRepository', () => {
       });
 
       it('syncs the "Receive newsletter" preference through WebSocket events', async () => {
-        const [userRepository, {propertyRepository}] = await buildUserRepository();
+        const [userRepository, {propertyRepository}] = await buildUserRepository(translateForTest);
         const setPropertyMock = jest.spyOn(propertyRepository, 'setProperty').mockReturnValue(undefined);
 
         const deletePropertyMock = jest
@@ -169,7 +174,7 @@ describe('UserRepository', () => {
 
     describe('Privacy', () => {
       it('syncs the "Read receipts" preference through WebSocket events', async () => {
-        const [, {propertyRepository}] = await buildUserRepository();
+        const [, {propertyRepository}] = await buildUserRepository(translateForTest);
         const setPropertyMock = jest.spyOn(propertyRepository, 'setProperty').mockReturnValue(undefined);
 
         const deletePropertyMock = jest.spyOn(propertyRepository, 'deleteProperty').mockReturnValue(undefined);
@@ -202,8 +207,8 @@ describe('UserRepository', () => {
       let userRepository: UserRepository;
 
       beforeEach(async () => {
-        [userRepository] = await buildUserRepository();
-        user = new User(entities.user.john_doe.id);
+        [userRepository] = await buildUserRepository(translateForTest);
+        user = new User(entities.user.john_doe.id, '', translateForTest);
         return userRepository['saveUser'](user);
       });
 
@@ -218,12 +223,22 @@ describe('UserRepository', () => {
 
         expect(userEntity).toBe(undefined);
       });
+
+      it('uses the injected translate function for local-only deleted users', async () => {
+        const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+        const [translatedRepository] = await buildUserRepository(translate);
+
+        const deletedUser = await translatedRepository.getUserById({id: createUuid(), domain: ''}, {localOnly: true});
+
+        expect(deletedUser.name()).toBe('translated:deletedUser');
+        expect(translate).toHaveBeenCalledWith('deletedUser');
+      });
     });
 
     describe('saveUser', () => {
       it('saves a user', async () => {
-        const [userRepository, {userState}] = await buildUserRepository();
-        const user = new User(entities.user.jane_roe.id);
+        const [userRepository, {userState}] = await buildUserRepository(translateForTest);
+        const user = new User(entities.user.jane_roe.id, '', translateForTest);
 
         userRepository['saveUser'](user);
 
@@ -232,8 +247,8 @@ describe('UserRepository', () => {
       });
 
       it('saves self user', async () => {
-        const [userRepository, {userState}] = await buildUserRepository();
-        const user = new User(entities.user.jane_roe.id);
+        const [userRepository, {userState}] = await buildUserRepository(translateForTest);
+        const user = new User(entities.user.jane_roe.id, '', translateForTest);
 
         userRepository['saveUser'](user, true);
 
@@ -250,10 +265,10 @@ describe('UserRepository', () => {
       let userService: UserService;
 
       beforeEach(async () => {
-        [userRepository, {userState, userService}] = await buildUserRepository();
+        [userRepository, {userState, userService}] = await buildUserRepository(translateForTest);
         jest.resetAllMocks();
         jest.spyOn(userService, 'loadUsersFromDb').mockResolvedValue(localUsers);
-        const selfUser = new User('self');
+        const selfUser = new User('self', '', translateForTest);
         selfUser.isMe = true;
         userState.self(selfUser);
         userState.users([selfUser]);
@@ -265,7 +280,7 @@ describe('UserRepository', () => {
         const connections = createConnections(users);
         const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: users});
 
-        await userRepository.loadUsers(new User('self'), connections, [], []);
+        await userRepository.loadUsers(new User('self', '', translateForTest), connections, [], []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(users.map(user => user.qualified_id!));
@@ -277,7 +292,7 @@ describe('UserRepository', () => {
         const connections = createConnections(users);
         jest.spyOn(userService, 'getUsers').mockResolvedValue({found: users});
 
-        await userRepository.loadUsers(new User('self'), connections, [], []);
+        await userRepository.loadUsers(new User('self', '', translateForTest), connections, [], []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         users.forEach(user => {
@@ -305,7 +320,7 @@ describe('UserRepository', () => {
         jest.spyOn(userRepository['userService'], 'loadUsersFromDb').mockResolvedValue(partialUsers as any);
         const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: localUsers});
 
-        await userRepository.loadUsers(new User('self'), connections, [], []);
+        await userRepository.loadUsers(new User('self', '', translateForTest), connections, [], []);
 
         expect(userState.users()).toHaveLength(localUsers.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(userIds);
@@ -317,9 +332,9 @@ describe('UserRepository', () => {
 
     describe('assignAllClients', () => {
       it('assigns all available clients to the users', async () => {
-        const [userRepository, {clientRepository}] = await buildUserRepository();
-        const userJaneRoe = new User(entities.user.jane_roe.id);
-        const userJohnDoe = new User(entities.user.john_doe.id);
+        const [userRepository, {clientRepository}] = await buildUserRepository(translateForTest);
+        const userJaneRoe = new User(entities.user.jane_roe.id, '', translateForTest);
+        const userJohnDoe = new User(entities.user.john_doe.id, '', translateForTest);
 
         userRepository['saveUsers']([userJaneRoe, userJohnDoe]);
         const permanent_client = ClientMapper.mapClient(entities.clients.john_doe.permanent, false);
@@ -345,7 +360,7 @@ describe('UserRepository', () => {
 
     describe('verify_username', () => {
       it('resolves with username when username is not taken', async () => {
-        const [userRepository, {userService}] = await buildUserRepository();
+        const [userRepository, {userService}] = await buildUserRepository(translateForTest);
         const expectedUsername = 'john_doe';
         const notFoundError = new Error('not found') as any;
         notFoundError.response = {status: HTTP_STATUS.NOT_FOUND};
@@ -356,7 +371,7 @@ describe('UserRepository', () => {
       });
 
       it('rejects when username is taken', async () => {
-        const [userRepository, {userService}] = await buildUserRepository();
+        const [userRepository, {userService}] = await buildUserRepository(translateForTest);
         const username = 'john_doe';
         jest.spyOn(userService, 'checkUserHandle').mockResolvedValue(undefined);
 
@@ -370,9 +385,9 @@ describe('UserRepository', () => {
   });
   describe('updateUsers', () => {
     it('should update local users', async () => {
-      const [userRepository, {userService, userState}] = await buildUserRepository();
-      userState.self(new User());
-      const user = new User(entities.user.jane_roe.id);
+      const [userRepository, {userService, userState}] = await buildUserRepository(translateForTest);
+      userState.self(new User('', '', translateForTest));
+      const user = new User(entities.user.jane_roe.id, '', translateForTest);
       user.name('initial name');
       user.isMe = true;
       userRepository['saveUser'](user);
@@ -392,8 +407,8 @@ describe('UserRepository', () => {
     });
 
     it("should update user's supportedProtocols", async () => {
-      const [userRepository, {userState}] = await buildUserRepository();
-      const user = new User(generateUUID());
+      const [userRepository, {userState}] = await buildUserRepository(translateForTest);
+      const user = new User(generateUUID(), '', translateForTest);
       userState.users.push(user);
       userState.self(user);
       const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
@@ -415,9 +430,9 @@ describe('UserRepository', () => {
     });
 
     it("should emit supportedProtocolsUpdate event after user's supported protocols were updated", async () => {
-      const [userRepository, {userState}] = await buildUserRepository();
-      const user = new User(generateUUID());
-      const selfUser = new User(generateUUID());
+      const [userRepository, {userState}] = await buildUserRepository(translateForTest);
+      const user = new User(generateUUID(), '', translateForTest);
+      const selfUser = new User(generateUUID(), '', translateForTest);
 
       userState.users.push(user);
       userState.self(selfUser);
@@ -448,11 +463,11 @@ describe('UserRepository', () => {
     });
 
     it("should not emit supportedProtocolsUpdate event if user's supported protocols remain unchanged", async () => {
-      const [userRepository, {userState}] = await buildUserRepository();
-      const user = new User(generateUUID());
+      const [userRepository, {userState}] = await buildUserRepository(translateForTest);
+      const user = new User(generateUUID(), '', translateForTest);
       userState.users.push(user);
 
-      const selfUser = new User(generateUUID());
+      const selfUser = new User(generateUUID(), '', translateForTest);
       userState.self(selfUser);
 
       const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
@@ -478,11 +493,11 @@ describe('UserRepository', () => {
     });
 
     it('should not emit supportedProtocolsUpdate event if the event did not contain supported protocols', async () => {
-      const [userRepository, {userState}] = await buildUserRepository();
-      const user = new User(generateUUID());
+      const [userRepository, {userState}] = await buildUserRepository(translateForTest);
+      const user = new User(generateUUID(), '', translateForTest);
       userState.users.push(user);
 
-      const selfUser = new User(generateUUID());
+      const selfUser = new User(generateUUID(), '', translateForTest);
       userState.self(selfUser);
 
       const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];

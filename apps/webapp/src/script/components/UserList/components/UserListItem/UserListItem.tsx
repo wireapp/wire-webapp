@@ -28,8 +28,8 @@ import {listItem, listWrapper} from 'Components/ParticipantItemContent/Participa
 import {UserlistMode} from 'Components/UserList';
 import {useUserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
 interface UserListItemProps {
@@ -65,6 +65,7 @@ export const UserListItem = ({
   onClick,
   onKeyDown,
 }: UserListItemProps) => {
+  const {translate} = useApplicationContext();
   const checkboxId = useId();
 
   const {isDirectGuest, expirationText} = useKoSubscribableChildren(user, ['isDirectGuest', 'expirationText']);
@@ -76,7 +77,7 @@ export const UserListItem = ({
   const hasUsernameInfo = hideInfo !== true && (customInfo === undefined || customInfo === '') && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
-  const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
+  const selfString = `(${capitalizeFirstChar(translate('conversationYouNominative'))})`;
 
   const userName = useUserName(user);
 
@@ -134,7 +135,7 @@ export const UserListItem = ({
     <>
       {canSelect ? (
         <div
-          aria-label={t('accessibility.openConversation', {name: userName})}
+          aria-label={translate('accessibility.openConversation', {name: userName})}
           css={listWrapper({isHighlighted, noUnderline, noInteraction})}
         >
           <Checkbox
@@ -156,7 +157,7 @@ export const UserListItem = ({
         <div
           tabIndex={TabIndex.FOCUSABLE}
           role="button"
-          aria-label={t('accessibility.openConversation', {name: userName})}
+          aria-label={translate('accessibility.openConversation', {name: userName})}
           css={listWrapper({isHighlighted, noUnderline})}
           {...(!noInteraction && {
             onClick: event => onClick(user, event.nativeEvent),

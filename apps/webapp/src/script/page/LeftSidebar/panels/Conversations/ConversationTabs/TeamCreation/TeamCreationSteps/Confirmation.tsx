@@ -27,7 +27,7 @@ import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {TeamService} from 'Repositories/team/TeamService';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {StepProps} from './StepProps';
 import {
@@ -41,10 +41,11 @@ import {
 import {buttonCss} from '../TeamCreation.styles';
 
 export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstStep, onSuccess}: StepProps) => {
+  const {translate} = useApplicationContext();
   const confirmationList = [
-    t('teamCreationConfirmListItem1'),
-    t('teamCreationConfirmListItem2'),
-    t('teamCreationConfirmListItem3'),
+    translate('teamCreationConfirmListItem1'),
+    translate('teamCreationConfirmListItem2'),
+    translate('teamCreationConfirmListItem3'),
   ];
 
   const [isMigrationAccepted, setIsMigrationAccepted] = useState(false);
@@ -61,29 +62,39 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstSte
       onNextStep();
     } catch (error: any) {
       if (error.code === StatusCodes.FORBIDDEN) {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          primaryAction: {
-            action: onSuccess,
-            text: t('teamCreationAlreadyInTeamErrorActionText'),
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            primaryAction: {
+              action: onSuccess,
+              text: translate('teamCreationAlreadyInTeamErrorActionText'),
+            },
+            close: onSuccess,
+            text: {
+              message: translate('teamCreationAlreadyInTeamErrorMessage'),
+              title: translate('teamCreationAlreadyInTeamErrorTitle'),
+            },
           },
-          close: onSuccess,
-          text: {
-            message: t('teamCreationAlreadyInTeamErrorMessage'),
-            title: t('teamCreationAlreadyInTeamErrorTitle'),
-          },
-        });
+          undefined,
+          translate,
+        );
       } else {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          primaryAction: {
-            action: goToFirstStep,
-            text: t('teamCreationGeneralErrorActionText'),
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            primaryAction: {
+              action: goToFirstStep,
+              text: translate('teamCreationGeneralErrorActionText'),
+            },
+            close: goToFirstStep,
+            text: {
+              message: translate('teamCreationGeneralErrorMessage'),
+              title: translate('teamCreationGeneralErrorTitle'),
+            },
           },
-          close: goToFirstStep,
-          text: {
-            message: t('teamCreationGeneralErrorMessage'),
-            title: t('teamCreationGeneralErrorTitle'),
-          },
-        });
+          undefined,
+          translate,
+        );
       }
     } finally {
       setLoading(false);
@@ -93,7 +104,7 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstSte
   return (
     <>
       <h2 className="heading-h2" data-uie-name="team-creation-confirm-title">
-        {t('teamCreationConfirmTitle')}
+        {translate('teamCreationConfirmTitle')}
       </h2>
       <ul css={listCss} data-uie-name="team-creation-confirm-list">
         {confirmationList.map(item => (
@@ -112,7 +123,7 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstSte
           data-uie-name="do-accept-migration"
           wrapperCSS={termsCheckboxWrapperCss}
         >
-          <span css={termsCheckboxLabelCss}>{t('teamCreationConfirmMigrationTermsText')}</span>
+          <span css={termsCheckboxLabelCss}>{translate('teamCreationConfirmMigrationTermsText')}</span>
         </Checkbox>
         <Checkbox
           checked={isTermOfUseAccepted}
@@ -124,9 +135,9 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstSte
           wrapperCSS={termsCheckboxWrapperCss}
         >
           <span css={termsCheckboxLabelCss}>
-            {t('teamCreationConfirmTermsOfUseText')}{' '}
+            {translate('teamCreationConfirmTermsOfUseText')}{' '}
             <Link href={Config.getConfig().URL.TERMS_OF_USE_TEAMS} targetBlank>
-              <span css={termsOfUseLinkCss}>{t('teamCreationConfirmTermsOfUseLink')}</span>
+              <span css={termsOfUseLinkCss}>{translate('teamCreationConfirmTermsOfUseLink')}</span>
             </Link>
             .
           </span>
@@ -135,7 +146,7 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstSte
 
       <div className="modal__buttons" css={modalButtonsCss}>
         <Button data-uie-name="do-go-back" onClick={onPreviousStep} variant={ButtonVariant.SECONDARY} css={buttonCss}>
-          {t('teamCreationBack')}
+          {translate('teamCreationBack')}
         </Button>
         <Button
           data-uie-name="do-create-team"
@@ -144,7 +155,7 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstSte
           onClick={onSubmit}
           showLoading={loading}
         >
-          {t('teamCreationCreateTeam')}
+          {translate('teamCreationCreateTeam')}
         </Button>
       </div>
     </>

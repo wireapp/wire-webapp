@@ -21,7 +21,11 @@ import React from 'react';
 
 import {render, act, fireEvent, waitFor} from '@testing-library/react';
 
-import {t} from 'Util/localizerUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {MessageReactions, MessageReactionsProps} from './MessageReactions';
 
@@ -30,7 +34,11 @@ import {MessageActionsId} from '../MessageActions';
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';
 const wrapperRef = React.createRef<HTMLDivElement>();
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 const defaultProps: MessageReactionsProps = {
+  translate: translateForTest,
   handleReactionClick: jest.fn(),
   messageFocusedTabIndex: 0,
   currentMsgActionName: '',
@@ -57,9 +65,10 @@ describe('MessageReactions', () => {
     };
     const {getByLabelText, getByTestId, queryByTestId, rerender} = render(
       <MessageReactionsComponent {...defaultProps} />,
+      {wrapper: rootProviderWrapper},
     );
 
-    const emojiButton = getByLabelText(t('accessibility.messageActionsMenuEmoji'));
+    const emojiButton = getByLabelText(translateForTest('accessibility.messageActionsMenuEmoji'));
 
     act(() => {
       fireEvent.click(emojiButton);
@@ -80,10 +89,10 @@ describe('MessageReactions', () => {
   });
 
   test('should call handleReactionClick on reaction click', () => {
-    const {getByLabelText} = render(<MessageReactions {...defaultProps} />);
+    const {getByLabelText} = render(<MessageReactions {...defaultProps} />, {wrapper: rootProviderWrapper});
 
-    const thumbsUpButton = getByLabelText(t('accessibility.messageActionsMenuThumbsUp'));
-    const likeButton = getByLabelText(t('accessibility.messageActionsMenuLike'));
+    const thumbsUpButton = getByLabelText(translateForTest('accessibility.messageActionsMenuThumbsUp'));
+    const likeButton = getByLabelText(translateForTest('accessibility.messageActionsMenuLike'));
 
     fireEvent.click(thumbsUpButton);
     fireEvent.click(likeButton);

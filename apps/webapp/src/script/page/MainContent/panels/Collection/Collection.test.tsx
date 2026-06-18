@@ -31,9 +31,16 @@ import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {MessageCategory} from 'src/script/message/MessageCategory';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {Collection} from './Collection';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('./CollectionDetails', () => ({
   CollectionDetails: () => <div>CollectionDetails</div>,
@@ -45,7 +52,7 @@ jest.mock('./CollectionItem', () => ({
 }));
 
 const createImageMessage = (timestamp: number = Date.now()) => {
-  const message = new ContentMessage(createUuid());
+  const message = new ContentMessage(createUuid(), translateForTest);
   message.timestamp(timestamp);
   const image = new MediumImage(createUuid());
   message.assets.push(image);
@@ -54,7 +61,7 @@ const createImageMessage = (timestamp: number = Date.now()) => {
 };
 
 const createFileMessage = () => {
-  const message = new ContentMessage(createUuid());
+  const message = new ContentMessage(createUuid(), translateForTest);
   const file = new FileAsset(createUuid());
   message.assets.push(file);
   message.category = MessageCategory.FILE;
@@ -62,7 +69,7 @@ const createFileMessage = () => {
 };
 
 const createLinkMessage = () => {
-  const message = new ContentMessage(createUuid());
+  const message = new ContentMessage(createUuid(), translateForTest);
   const link = new Text(createUuid());
   link.previews.push(new LinkPreview({}));
   message.assets.push(link);
@@ -71,7 +78,7 @@ const createLinkMessage = () => {
 };
 
 const createAudioMessage = () => {
-  const message = new ContentMessage(createUuid());
+  const message = new ContentMessage(createUuid(), translateForTest);
   const audio = new FileAsset(createUuid());
   audio.isAudio = () => true;
   message.assets.push(audio);
@@ -80,7 +87,10 @@ const createAudioMessage = () => {
 };
 
 describe('Collection', () => {
-  const conversation = new Conversation();
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
+  const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const messages = [createImageMessage(), createLinkMessage(), createAudioMessage(), createFileMessage()];
   const mockConversationRepository = {
     getEventsForCategory: jest.fn().mockResolvedValue(messages),
@@ -88,7 +98,7 @@ describe('Collection', () => {
   };
   const mockAssetRepository = container.resolve(AssetRepository);
   const mockMessageRepository = {} as MessageRepository;
-  const mockSelfUser = new User(createUuid());
+  const mockSelfUser = new User(createUuid(), '', translateForTest);
 
   it('displays all image assets', async () => {
     const {getAllByText, getByText, queryByText} = render(
@@ -101,6 +111,7 @@ describe('Collection', () => {
           selfUser={mockSelfUser}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     await waitFor(() => getAllByText('CollectionItem'));
@@ -127,6 +138,7 @@ describe('Collection', () => {
           selfUser={mockSelfUser}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     await waitFor(() => getAllByText('CollectionItem'));
@@ -148,6 +160,7 @@ describe('Collection', () => {
           selfUser={mockSelfUser}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     await waitFor(() => getAllByText('CollectionItem'));

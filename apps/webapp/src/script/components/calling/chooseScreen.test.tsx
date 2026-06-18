@@ -21,15 +21,23 @@ import {render, fireEvent} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {CallState} from 'Repositories/calling/CallState';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
 
 import {ChooseScreen} from './ChooseScreen';
+import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Util/modalFocusUtil', () => ({
   captureModalFocusContext: jest.fn(),
 }));
 
 describe('ChooseScreen', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
   const screens = [
     {
       id: 'screen:first',
@@ -78,7 +86,7 @@ describe('ChooseScreen', () => {
     (captureModalFocusContext as jest.Mock).mockReturnValue(focusContext);
 
     const props = {choose: jest.fn()};
-    const renderedComponent = render(<ChooseScreen {...props} />);
+    const renderedComponent = render(<ChooseScreen {...props} />, {wrapper: rootProviderWrapper});
 
     return {props, focusContext, ...renderedComponent};
   };

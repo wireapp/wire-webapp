@@ -21,18 +21,22 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/localizerUtil';
 import {getFileExtension, trimFileExtension} from 'Util/util';
 
 interface UseCellsRenameFormProps {
   node: CellNode;
   cellsRepository: CellsRepository;
   onSuccess: () => void;
+  renameNodeCopy: {
+    readonly error: string;
+    readonly invalidCharacters: string;
+    readonly nameRequired: string;
+  };
 }
 
 const INVALID_CHARACTERS = ['/', '.'];
 
-export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsRenameFormProps) => {
+export const useCellsRenameForm = ({node, cellsRepository, onSuccess, renameNodeCopy}: UseCellsRenameFormProps) => {
   const [name, setName] = useState(trimFileExtension(node.name));
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,8 +55,8 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     try {
       await cellsRepository.renameNode({currentPath: node.path, newName: buildNewName(name)});
       onSuccess();
-    } catch (error: unknown) {
-      setError(t('cells.renameNodeModal.error'));
+    } catch {
+      setError(renameNodeCopy.error);
     }
   };
 
@@ -67,13 +71,13 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     setIsSubmitting(true);
 
     if (!normalizedName) {
-      setError(t('cells.renameNodeModal.nameRequired'));
+      setError(renameNodeCopy.nameRequired);
       setIsSubmitting(false);
       return;
     }
 
     if (hasInvalidCharacters) {
-      setError(t('cells.renameNodeModal.invalidCharacters'));
+      setError(renameNodeCopy.invalidCharacters);
       setIsSubmitting(false);
       return;
     }
@@ -87,7 +91,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.currentTarget.value);
-    if (error === t('cells.renameNodeModal.nameRequired') || error === t('cells.renameNodeModal.invalidCharacters')) {
+    if (error === renameNodeCopy.nameRequired || error === renameNodeCopy.invalidCharacters) {
       setError(null);
     }
   };

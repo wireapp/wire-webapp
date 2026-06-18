@@ -32,8 +32,8 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import type {Logger} from 'Util/logger';
 import {splitFingerprint} from 'Util/stringUtil';
 import {toError} from 'Util/toError';
@@ -67,6 +67,7 @@ export const DeviceDetails = ({
   logger,
   conversationState = container.resolve(ConversationState),
 }: DeviceDetailsProps) => {
+  const {translate} = useApplicationContext();
   const [fingerprintRemote, setFingerprintRemote] = useState<string>();
   const [isResettingSession, setIsResettingSession] = useState(false);
 
@@ -80,7 +81,7 @@ export const DeviceDetails = ({
     void cryptographyRepository
       .getRemoteFingerprint(user.qualifiedId, device.id)
       .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
-  }, [device]);
+  }, [cryptographyRepository, device, user.qualifiedId]);
 
   const clickToToggleDeviceVerification = () => {
     const toggleVerified = !isVerified;
@@ -115,12 +116,14 @@ export const DeviceDetails = ({
       )}
 
       <div className="device-proteus-details">
-        <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>
+        <h3 className="device-details-title paragraph-body-3">
+          {translate('participantDevicesProteusDeviceVerification')}
+        </h3>
 
         <p className="panel__info-text">
           <span
             dangerouslySetInnerHTML={{
-              __html: t('participantDevicesDetailHeadline', {user: userName}),
+              __html: translate('participantDevicesDetailHeadline', {user: userName}),
             }}
           />
 
@@ -130,14 +133,14 @@ export const DeviceDetails = ({
             rel="nofollow noopener noreferrer"
             target="_blank"
           >
-            {t('participantDevicesDetailHowTo')}
+            {translate('participantDevicesDetailHowTo')}
           </a>
         </p>
 
         {fingerprintRemote !== undefined && fingerprintRemote !== '' && (
           <>
             <p className="label-2 preferences-label preferences-devices-fingerprint-label">
-              {t('participantDevicesProteusKeyFingerprint')}
+              {translate('participantDevicesProteusKeyFingerprint')}
             </p>
 
             <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
@@ -147,7 +150,7 @@ export const DeviceDetails = ({
         )}
 
         <p className="label-2 preferences-label preferences-devices-fingerprint-label">
-          {t('preferencesDeviceDetailsVerificationStatus')}
+          {translate('preferencesDeviceDetailsVerificationStatus')}
         </p>
 
         <div className="participant-devices__verify">
@@ -163,13 +166,13 @@ export const DeviceDetails = ({
 
             <label className="button-label" htmlFor="toggle">
               <span className="button-label__switch" />
-              <span className="button-label__text paragraph-body-3">{t('participantDevicesDetailVerify')}</span>
+              <span className="button-label__text paragraph-body-3">{translate('participantDevicesDetailVerify')}</span>
             </label>
           </div>
         </div>
 
         <p className="device-details__reset-fingerprint paragraph-body-1">
-          {t('preferencesDeviceDetailsFingerprintNotMatch')}
+          {translate('preferencesDeviceDetailsFingerprintNotMatch')}
         </p>
 
         {isConversationMLS !== true && (
@@ -180,12 +183,12 @@ export const DeviceDetails = ({
             style={{display: isResettingSession ? 'none' : 'initial'}}
             data-uie-name={isResettingSession ? 'status-loading' : 'do-reset-session'}
           >
-            {t('participantDevicesDetailResetSession')}
+            {translate('participantDevicesDetailResetSession')}
           </Button>
         )}
 
         <Button variant={ButtonVariant.TERTIARY} onClick={clickToShowSelfFingerprint}>
-          {t('participantDevicesDetailShowMyDevice')}
+          {translate('participantDevicesDetailShowMyDevice')}
         </Button>
       </div>
     </div>

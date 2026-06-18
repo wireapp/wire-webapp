@@ -24,7 +24,7 @@ import cx from 'classnames';
 import * as Icon from 'Components/icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface LegalHoldDotProps {
   isInteractive?: boolean;
@@ -47,6 +47,7 @@ export const LegalHoldDot = ({
   className = '',
   dataUieName = 'legal-hold-dot-pending-icon',
 }: LegalHoldDotProps) => {
+  const {translate} = useApplicationContext();
   const {showRequestModal, showUsers} = useLegalHoldModalState(state => state);
 
   const onClick = (event: React.MouseEvent) => {
@@ -85,7 +86,7 @@ export const LegalHoldDot = ({
         {isPending === true && <Icon.PendingIcon className="pending-icon" />}
       </span>
 
-      {showText && <span className="visibility-hidden legal-hold-dot--text">{t('legalHoldHeadline')}</span>}
+      {showText && <span className="visibility-hidden legal-hold-dot--text">{translate('legalHoldHeadline')}</span>}
     </button>
   );
 };

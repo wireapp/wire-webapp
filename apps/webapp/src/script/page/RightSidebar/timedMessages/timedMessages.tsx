@@ -25,8 +25,8 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {RadioGroup} from 'Components/Radio';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {formatDuration} from 'Util/timeUtil';
 
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
@@ -54,6 +54,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
   repositories,
   teamState,
 }) => {
+  const {translate} = useApplicationContext();
   const [currentMessageTimer, setCurrentMessageTimer] = useState(0);
   const [messageTimes, setMessageTimes] = useState<MessageTime[]>([]);
 
@@ -71,32 +72,32 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
 
     const mappedTimes = EphemeralTimings.VALUES.map(time => ({
       isCustom: false,
-      text: formatDuration(time).text,
+      text: formatDuration(time, translate).text,
       value: time,
     }));
 
     if (!!messageTimer && !EphemeralTimings.VALUES.includes(messageTimer)) {
       mappedTimes.push({
         isCustom: true,
-        text: formatDuration(messageTimer).text,
+        text: formatDuration(messageTimer, translate).text,
         value: messageTimer,
       });
     }
 
     mappedTimes.unshift({
       isCustom: false,
-      text: t('ephemeralUnitsNone'),
+      text: translate('ephemeralUnitsNone'),
       value: 0,
     });
 
     setMessageTimes(mappedTimes);
-  }, [globalMessageTimer]);
+  }, [getEnforcedSelfDeletingMessagesTimeout, globalMessageTimer, isSelfDeletingMessagesEnforced, translate]);
 
   const timedMessageChange = (value: number): void => {
     const finalTimer = value === 0 ? null : value;
 
     activeConversation.globalMessageTimer(finalTimer);
-    repositories.conversation.updateConversationMessageTimer(activeConversation, finalTimer);
+    void repositories.conversation.updateConversationMessageTimer(activeConversation, finalTimer);
   };
 
   return (
@@ -104,14 +105,14 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
       <PanelHeader
         onGoBack={onGoBack}
         onClose={onClose}
-        title={t('timedMessagesTitle')}
+        title={translate('timedMessagesTitle')}
         goBackUie="go-back-timed-messages-options"
       />
 
       <FadingScrollbar className="panel__content">
         <div css={{margin: '16px'}}>
           <RadioGroup
-            ariaLabelledBy={t('timedMessagesTitle')}
+            ariaLabelledBy={translate('timedMessagesTitle')}
             name="timed-message-settings"
             selectedValue={currentMessageTimer}
             onChange={timedMessageChange}
@@ -124,7 +125,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
           />
         </div>
         <p className="panel__info-text timed-messages__disclaimer" tabIndex={TabIndex.FOCUSABLE}>
-          {t('timedMessageDisclaimer')}
+          {translate('timedMessageDisclaimer')}
         </p>
       </FadingScrollbar>
     </div>

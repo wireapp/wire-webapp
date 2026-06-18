@@ -19,7 +19,6 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
@@ -30,7 +29,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
 import {getForcedErrorReportingStatus} from 'Repositories/tracking/telemetry.helpers';
 import {ConsentValue} from 'Repositories/user/consentValue';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {PreferencesSection} from '../components/PreferencesSection';
 
@@ -41,7 +40,10 @@ interface DataUsageSectionProps {
   teamState?: TeamState;
 }
 
+type WebappProperties = PropertiesRepository['properties'];
+
 const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}: DataUsageSectionProps) => {
+  const {translate} = useApplicationContext();
   const [optionTelemetry, setOptionTelemetry] = useState(
     propertiesRepository.properties.settings.privacy.telemetry_data_sharing,
   );
@@ -67,7 +69,11 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
   const forceErrorReporting = getForcedErrorReportingStatus();
 
   return (
-    <PreferencesSection hasSeparator title={t('preferencesAccountData')} className="preferences-section-data-usage">
+    <PreferencesSection
+      hasSeparator
+      title={translate('preferencesAccountData')}
+      className="preferences-section-data-usage"
+    >
       {isTelemetryEnabledAtCurrentEnvironment && (
         <div className="checkbox-margin">
           <Checkbox
@@ -81,11 +87,11 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
             disabled={forceErrorReporting}
           >
             <CheckboxLabel htmlFor="status-preference-telemetry">
-              {t('preferencesAccountDataTelemetryCheckbox')}
+              {translate('preferencesAccountDataTelemetryCheckbox')}
             </CheckboxLabel>
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
-            {t('preferencesAccountDataTelemetry', {brandName})}
+            {translate('preferencesAccountDataTelemetry', {brandName})}
           </p>
         </div>
       )}
@@ -105,11 +111,11 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
             data-uie-name="status-preference-marketing"
           >
             <CheckboxLabel htmlFor="status-preference-marketing">
-              {t('preferencesAccountMarketingConsentCheckbox')}
+              {translate('preferencesAccountMarketingConsentCheckbox')}
             </CheckboxLabel>
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
-            {t('preferencesAccountMarketingConsentDetail', {brandName})}
+            {translate('preferencesAccountMarketingConsentDetail', {brandName})}
           </p>
         </div>
       )}

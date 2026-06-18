@@ -19,6 +19,11 @@
 
 import {render, screen} from '@testing-library/react';
 
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {ConnectionRequests} from './ConnectionRequests';
@@ -26,6 +31,9 @@ import {ConnectionRequests} from './ConnectionRequests';
 import {generateUser} from '../../../../../../../test/helper/UserGenerator';
 
 const mockOnConnectionRequestClick = jest.fn();
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('ConnectionRequests', () => {
   afterEach(() => {
@@ -35,7 +43,9 @@ describe('ConnectionRequests', () => {
   const user = generateUser({id: createUuid(), domain: 'test.wire.test'});
 
   it('should display the correct text for one connection request', () => {
-    render(<ConnectionRequests connectionRequests={[user]} onConnectionRequestClick={mockOnConnectionRequestClick} />);
+    render(<ConnectionRequests connectionRequests={[user]} onConnectionRequestClick={mockOnConnectionRequestClick} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(screen.getByText('conversationsConnectionRequestOne')).not.toBeNull();
   });
 
@@ -44,6 +54,7 @@ describe('ConnectionRequests', () => {
 
     render(
       <ConnectionRequests connectionRequests={[user, user2]} onConnectionRequestClick={mockOnConnectionRequestClick} />,
+      {wrapper: rootProviderWrapper},
     );
     expect(screen.getByText('conversationsConnectionRequestMany')).not.toBeNull();
   });

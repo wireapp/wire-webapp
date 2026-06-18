@@ -31,10 +31,10 @@ import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/r
 
 import {LogoFullIcon} from 'Components/icon';
 import {useSingleInstance} from 'Hooks/useSingleInstance';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {Core} from 'src/script/service/coreSingleton';
 import {isDataDogEnabled} from 'Util/dataDog';
 import {getWebEnvironment} from 'Util/environment';
-import {t} from 'Util/localizerUtil';
 
 import {Page} from './Page';
 
@@ -51,6 +51,7 @@ import {getPrefixedSSOCode} from '../util/urlUtil';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const navigate = useNavigate();
   const {hasOtherInstance} = useSingleInstance();
   const core = container.resolve(Core);
@@ -107,7 +108,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
           style={{fontSize: '2rem', fontWeight: 300, marginBottom: '48px'}}
           data-uie-name="welcome-text"
         >
-          {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
+          {translate('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
 
         {!getWebEnvironment().isProduction && isDataDogEnabled() && (
@@ -137,11 +138,11 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
             block
             data-uie-name="go-set-account-type"
           >
-            {t('index.createAccount')}
+            {translate('index.createAccount')}
           </Button>
         )}
         <Button type="button" onClick={() => navigate(ROUTE.LOGIN)} block data-uie-name="go-login">
-          {t('index.login')}
+          {translate('index.login')}
         </Button>
         {is.nonEmptyString(logoutReason) && (
           <ErrorMessage data-uie-name="status-logout-reason">
@@ -162,7 +163,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
             style={{marginTop: '120px'}}
             data-uie-name="go-sso-login"
           >
-            {t(features.ENABLE_DOMAIN_DISCOVERY ? 'index.enterprise' : 'index.ssoLogin')}
+            {translate(features.ENABLE_DOMAIN_DISCOVERY ? 'index.enterprise' : 'index.ssoLogin')}
           </Button>
         )}
       </ContainerXS>

@@ -28,7 +28,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {fixWebsocketString} from 'Util/stringUtil';
 import {TypedEventTarget} from 'Util/typedEventTarget';
@@ -87,6 +87,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     private readonly allConversations: ko.ObservableArray<Conversation>,
     private readonly conversations: ko.PureComputed<Conversation[]>,
     private readonly propertiesService: PropertiesService,
+    private readonly translate: Translate,
   ) {
     super();
     this.labels = ko.observableArray([]);
@@ -405,24 +406,29 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly addConversationToNewLabel = (conversation: Conversation) => {
     const {setCurrentTab} = useSidebarStore.getState();
-    PrimaryModal.show(PrimaryModal.type.INPUT, {
-      primaryAction: {
-        action: (name: string) => {
-          this.removeConversationFromAllLabels(conversation);
-          const newFolder = createLabel(name, [conversation]);
-          this.labels.push(newFolder);
-          amplify.publish(WebAppEvents.CONTENT.EXPAND_FOLDER, newFolder.id);
-          this.saveLabels();
-          setCurrentTab(SidebarTabs.FOLDER);
+    PrimaryModal.show(
+      PrimaryModal.type.INPUT,
+      {
+        primaryAction: {
+          action: (name: string) => {
+            this.removeConversationFromAllLabels(conversation);
+            const newFolder = createLabel(name, [conversation]);
+            this.labels.push(newFolder);
+            amplify.publish(WebAppEvents.CONTENT.EXPAND_FOLDER, newFolder.id);
+            this.saveLabels();
+            setCurrentTab(SidebarTabs.FOLDER);
+          },
+          text: this.translate('modalCreateFolderAction'),
         },
-        text: t('modalCreateFolderAction'),
+        text: {
+          closeBtnLabel: this.translate('modalNewFolderCloseBtn'),
+          input: this.translate('modalCreateFolderPlaceholder'),
+          message: this.translate('modalCreateFolderMessage'),
+          title: this.translate('modalCreateFolderHeadline'),
+        },
       },
-      text: {
-        closeBtnLabel: t('modalNewFolderCloseBtn'),
-        input: t('modalCreateFolderPlaceholder'),
-        message: t('modalCreateFolderMessage'),
-        title: t('modalCreateFolderHeadline'),
-      },
-    });
+      undefined,
+      this.translate,
+    );
   };
 }

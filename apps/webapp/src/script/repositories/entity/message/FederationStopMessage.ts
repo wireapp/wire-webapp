@@ -17,6 +17,8 @@
  *
  */
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {Message} from './Message';
 
 import {SuperType} from '../../../message/SuperType';
@@ -28,8 +30,9 @@ export class FederationStopMessage extends Message {
   constructor(
     public readonly domains: string[],
     timestamp: number,
+    translate: Translate,
   ) {
-    super();
+    super(undefined, undefined, translate);
     this.super_type = SuperType.FEDERATION_STOP;
     this.timestamp(timestamp);
   }

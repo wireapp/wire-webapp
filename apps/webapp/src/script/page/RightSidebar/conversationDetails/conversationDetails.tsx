@@ -41,8 +41,8 @@ import {IntegrationRepository} from 'Repositories/integration/IntegrationReposit
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 import {formatDuration} from 'Util/timeUtil';
 
@@ -91,6 +91,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     },
     ref,
   ) => {
+    const {translate} = useApplicationContext();
     const [selectedService, setSelectedService] = useState<ServiceEntity>();
 
     const roleRepository = conversationRepository.conversationRoleRepository;
@@ -152,24 +153,26 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const isTeamOnly = isConversationTeamOnly || isConversationServicesRoomOnly;
     const isServicesRoom = isConversationServicesRoomOnly || isGuestAndServicesRoom;
 
-    const guestOptionsText = isTeamOnly ? t('conversationDetailsOff') : t('conversationDetailsOn');
-    const servicesOptionsText = isServicesRoom ? t('conversationDetailsOn') : t('conversationDetailsOff');
+    const guestOptionsText = isTeamOnly ? translate('conversationDetailsOff') : translate('conversationDetailsOn');
+    const servicesOptionsText = isServicesRoom
+      ? translate('conversationDetailsOn')
+      : translate('conversationDetailsOff');
     const isChannelPublic = activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK);
 
     const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
 
-    const notificationStatusText = getNotificationText(notificationState);
+    const notificationStatusText = getNotificationText(notificationState, translate);
     function getTimedMessagesText(): string {
       if (isCellsConversation) {
-        return t('cells.selfDeletingMessage.info');
+        return translate('cells.selfDeletingMessage.info');
       }
       if (isSelfDeletingMessagesEnforced) {
-        return formatDuration(getEnforcedSelfDeletingMessagesTimeout).text;
+        return formatDuration(getEnforcedSelfDeletingMessagesTimeout, translate).text;
       }
       if (hasTimer && globalMessageTimer) {
-        return formatDuration(globalMessageTimer).text;
+        return formatDuration(globalMessageTimer, translate).text;
       }
-      return t('ephemeralUnitsNone');
+      return translate('ephemeralUnitsNone');
     }
 
     const timedMessagesText = getTimedMessagesText();
@@ -279,7 +282,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         ref={ref}
         tabIndex={TabIndex.FOCUSABLE}
       >
-        <h2 className="visually-hidden">{t('tooltipConversationInfo')}</h2>
+        <h2 className="visually-hidden">{translate('tooltipConversationInfo')}</h2>
 
         <PanelHeader
           isReverse
@@ -329,7 +332,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                   <button
                     className="panel__action-item"
                     type="button"
-                    title={t('tooltipConversationDetailsAddPeople', {
+                    title={translate('tooltipConversationDetailsAddPeople', {
                       shortcut: Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE),
                     })}
                     onClick={openAddParticipants}
@@ -339,7 +342,9 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                       <Icon.PlusIcon />
                     </span>
 
-                    <span className="panel__action-item__text">{t('conversationDetailsActionAddParticipants')}</span>
+                    <span className="panel__action-item__text">
+                      {translate('conversationDetailsActionAddParticipants')}
+                    </span>
 
                     <Icon.ChevronRight className="chevron-right-icon" />
                   </button>

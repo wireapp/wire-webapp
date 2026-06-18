@@ -33,9 +33,9 @@ import {IntegrationRepository} from 'Repositories/integration/IntegrationReposit
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {generatePermissionHelpers} from 'Repositories/user/userPermission';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../panelHeader';
@@ -69,6 +69,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   selfUser,
   isAddMode = false,
 }) => {
+  const {translate} = useApplicationContext();
   const {
     inTeam,
     isActiveParticipant,
@@ -88,33 +89,33 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   const showActions = isActiveParticipant && serviceUser !== undefined && inTeam;
 
   const onOpen = () => {
-    actionsViewModel.open1to1ConversationWithService(serviceEntity);
+    void actionsViewModel.open1to1ConversationWithService(serviceEntity);
   };
 
   const onRemove = (user: User) => {
-    actionsViewModel.removeFromConversation(activeConversation, user);
+    void actionsViewModel.removeFromConversation(activeConversation, user);
     onBack();
   };
 
   const onAdd = () => {
     if (serviceEntity.isService) {
-      integrationRepository.addServiceToExistingConversation(activeConversation, serviceEntity);
+      void integrationRepository.addServiceToExistingConversation(activeConversation, serviceEntity);
     } else if (serviceEntity.qualifiedId !== undefined) {
-      conversationRepository.addUsers(activeConversation, [{qualifiedId: serviceEntity.qualifiedId}]);
+      void conversationRepository.addUsers(activeConversation, [{qualifiedId: serviceEntity.qualifiedId}]);
     }
     goToRoot();
   };
 
   useEffect(() => {
-    integrationRepository.addProviderNameToParticipant(serviceEntity);
+    void integrationRepository.addProviderNameToParticipant(serviceEntity);
   }, [integrationRepository, serviceEntity]);
 
   useEffect(() => {
     // Set the author of the Service / App to the name of the team the user is in
     if (!is.nullOrUndefined(selfUser.teamId) && serviceEntity.author !== undefined) {
-      teamRepository.getTeamNameById(selfUser.teamId).then(name => serviceEntity.author?.(name));
+      void teamRepository.getTeamNameById(selfUser.teamId).then(name => serviceEntity.author?.(name));
     }
-  }, [teamRepository, selfUser.teamId]);
+  }, [serviceEntity, teamRepository, selfUser.teamId]);
 
   return (
     <div id="group-participant-service" className="panel__page group-participant">
@@ -146,7 +147,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
                   <Icon.MessageIcon />
                 </span>
 
-                <div className="panel__action-item__text">{t('groupParticipantActionOpenConversation')}</div>
+                <div className="panel__action-item__text">{translate('groupParticipantActionOpenConversation')}</div>
               </div>
             )}
 
@@ -177,7 +178,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
                   <Icon.MinusIcon />
                 </span>
 
-                <div className="panel__action-item__text">{t('groupParticipantActionRemove')}</div>
+                <div className="panel__action-item__text">{translate('groupParticipantActionRemove')}</div>
               </div>
             )}
           </>
@@ -190,7 +191,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
             data-uie-name="do-add-service"
             type="button"
           >
-            <span>{t('addParticipantsConfirmLabel')}</span>
+            <span>{translate('addParticipantsConfirmLabel')}</span>
           </button>
         )}
       </div>

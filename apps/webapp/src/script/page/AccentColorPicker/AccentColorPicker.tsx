@@ -23,9 +23,9 @@ import {CSSObject} from '@emotion/serialize';
 
 import {User} from 'Repositories/entity/User';
 import {ACCENT_ID} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {CSS_SQUARE} from 'Util/cssMixin';
-import {t} from 'Util/localizerUtil';
 
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;
@@ -39,14 +39,21 @@ const headerStyles: CSSObject = {
   textAlign: 'center',
 };
 
+const ACCENT_COLOR_INNER_CIRCLE_SIZE = 10;
+const ACCENT_COLOR_OUTER_CIRCLE_SIZE = 16;
+
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
+  const {translate} = useApplicationContext();
   const {accent_id: accentId} = useKoSubscribableChildren(user, ['accent_id']);
   return (
     <>
       <h3 className="label" css={headerStyles}>
-        {t('preferencesAccountAccentColor')}
+        {translate('preferencesAccountAccentColor')}
       </h3>
-      <fieldset css={{border: 'none', margin: 0, padding: 0}} aria-label={t('accessibility.chooseAccountColor')}>
+      <fieldset
+        css={{border: 'none', margin: 0, padding: 0}}
+        aria-label={translate('accessibility.chooseAccountColor')}
+      >
         <div
           className="preferences-account-accent-color"
           css={{
@@ -57,7 +64,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
         >
           {(Object.keys(ACCENT_ID) as (keyof typeof ACCENT_ID)[]).map(key => {
             const id = ACCENT_ID[key];
-            const name = t(`preferencesAccountAccentColor${key}`);
+            const name = translate(`preferencesAccountAccentColor${key}`);
             const color = User.ACCENT_COLOR[id];
             const isChecked = accentId === id;
 
@@ -79,12 +86,12 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                       position: 'relative',
                     },
                     '& + label > span:first-of-type::after': {
-                      ...CSS_SQUARE(10),
+                      ...CSS_SQUARE(ACCENT_COLOR_INNER_CIRCLE_SIZE),
                       background: 'currentColor',
                       transform: 'translate(-50%, -50%)',
                     },
                     '& + label > span:first-of-type::before': {
-                      ...CSS_SQUARE(16),
+                      ...CSS_SQUARE(ACCENT_COLOR_OUTER_CIRCLE_SIZE),
                       transform: 'translate(-50%, -50%)',
                     },
                     '& + label > span:first-of-type::before, & + label > span:first-of-type::after': {

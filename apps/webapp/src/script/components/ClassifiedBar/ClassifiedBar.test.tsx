@@ -21,20 +21,32 @@ import {render} from '@testing-library/react';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationClassifiedBar} from './ClassifiedBar';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('ClassifiedBar', () => {
-  const conversation = new Conversation();
+  const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const classifiedDomains = ['same.domain', 'classified.domain', 'other-classified.domain'];
-  const sameDomainUser = new User(createUuid(), 'same.domain');
-  const classifiedDomainUser = new User(createUuid(), 'classified.domain');
-  const otherDomainUser = new User(createUuid(), 'other.domain');
+  const sameDomainUser = new User(createUuid(), 'same.domain', translateForTest);
+  const classifiedDomainUser = new User(createUuid(), 'classified.domain', translateForTest);
+  const otherDomainUser = new User(createUuid(), 'other.domain', translateForTest);
 
   it.each([[[sameDomainUser]], [[sameDomainUser, otherDomainUser]]])('is empty if no domains are given', users => {
     conversation.participating_user_ets(users);
-    const {container} = render(<ConversationClassifiedBar conversation={conversation} conversationDomain="test" />);
+    const {container} = render(<ConversationClassifiedBar conversation={conversation} conversationDomain="test" />, {
+      wrapper: rootProviderWrapper,
+    });
 
     expect(container.querySelector('[data-uie-name=classified-label]')).toBe(null);
   });
@@ -49,6 +61,7 @@ describe('ClassifiedBar', () => {
           conversation={conversation}
           classifiedDomains={classifiedDomains}
         />,
+        {wrapper: rootProviderWrapper},
       );
 
       expect(getByText('conversationClassified')).not.toBe(null);
@@ -68,6 +81,7 @@ describe('ClassifiedBar', () => {
         conversation={conversation}
         classifiedDomains={classifiedDomains}
       />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(queryByText('conversationClassified')).toBe(null);

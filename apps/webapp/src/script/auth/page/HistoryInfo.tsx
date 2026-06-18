@@ -27,8 +27,8 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {Button, ContainerXS, Link, Paragraph, Text} from '@wireapp/react-ui-kit';
 
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {Page} from './Page';
 
@@ -48,6 +48,7 @@ const HistoryInfoComponent = ({
   isNewCurrentSelfClient,
   doGetAllClients,
 }: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const navigate = useNavigate();
   const shouldLoadClients = !hasLoadedClients && isNewCurrentSelfClient;
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
@@ -80,7 +81,7 @@ const HistoryInfoComponent = ({
     <Page withSideBar={isEnterpriseLoginV2Enabled}>
       <ContainerXS centerText verticalCenter style={{width: '100%', maxWidth: '20rem'}}>
         <Text fontSize="1.5rem" css={{fontWeight: '500'}} center>
-          {t('historyInfo.noHistoryHeadline', {brandName: Config.getConfig().BRAND_NAME})}
+          {translate('historyInfo.noHistoryHeadline', {brandName: Config.getConfig().BRAND_NAME})}
         </Text>
         <Paragraph center style={{marginBottom: '1rem'}}>
           <FormattedMessage
@@ -97,11 +98,11 @@ const HistoryInfoComponent = ({
           data-uie-name="do-history-confirm"
           onKeyDown={event => handleEnterDown(event, onContinue)}
         >
-          {t('historyInfo.ok')}
+          {translate('historyInfo.ok')}
         </Button>
         <Paragraph center style={{marginTop: '1rem'}}>
           <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
-            {t('historyInfo.learnMore')}
+            {translate('historyInfo.learnMore')}
           </Link>
         </Paragraph>
       </ContainerXS>

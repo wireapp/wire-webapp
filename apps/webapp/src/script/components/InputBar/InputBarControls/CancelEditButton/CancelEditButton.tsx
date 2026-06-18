@@ -20,7 +20,7 @@
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface CancelEditButtonProps {
   isEditing: boolean;
@@ -28,6 +28,8 @@ interface CancelEditButtonProps {
 }
 
 export const CancelEditButton = ({isEditing, onClick}: CancelEditButtonProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <button
       type="button"
@@ -36,7 +38,7 @@ export const CancelEditButton = ({isEditing, onClick}: CancelEditButtonProps) =>
       })}
       onClick={onClick}
       data-uie-name="do-cancel-edit"
-      aria-label={t('accessibility.cancelMsgEdit')}
+      aria-label={translate('accessibility.cancelMsgEdit')}
     >
       <Icon.CloseIcon width={14} height={14} />
     </button>

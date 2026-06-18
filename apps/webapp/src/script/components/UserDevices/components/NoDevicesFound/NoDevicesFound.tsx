@@ -20,8 +20,8 @@
 import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 interface NoDevicesFoundProps {
   noPadding: boolean;
@@ -29,12 +29,13 @@ interface NoDevicesFoundProps {
 }
 
 export const NoDevicesFound = ({user, noPadding}: NoDevicesFoundProps) => {
+  const {translate} = useApplicationContext();
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
       <p className="participant-devices__text-block panel__info-text" data-uie-name="status-devices-headline">
-        {t('participantDevicesNoClients', {
+        {translate('participantDevicesNoClients', {
           user: userName,
         })}
       </p>

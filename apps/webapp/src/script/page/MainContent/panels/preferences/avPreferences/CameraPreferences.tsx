@@ -25,7 +25,7 @@ import * as Icon from 'Components/icon';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getLogger} from 'Util/logger';
 
 import {DeviceSelect} from './DeviceSelect';
@@ -44,6 +44,7 @@ interface CameraPreferencesProps {
 const DEBOUNCE_TIMEOUT = 100;
 
 const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCameraStream}: CameraPreferencesProps) => {
+  const {translate} = useApplicationContext();
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
@@ -93,7 +94,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   };
 
   useEffect(() => {
-    debouncedRequestStream();
+    void debouncedRequestStream();
   }, [videoInputDeviceId, videoInputDevices.length, debouncedRequestStream]);
 
   useEffect(() => {
@@ -120,11 +121,11 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   );
 
   return (
-    <PreferencesSection title={t('preferencesAVCamera')}>
+    <PreferencesSection title={translate('preferencesAVCamera')}>
       {!stream && !isRequesting && (
         <div className="preferences-av-detail">
           <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
-            {t('preferencesAVPermissionDetail')}
+            {translate('preferencesAVPermissionDetail')}
           </a>
         </div>
       )}
@@ -132,11 +133,11 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
         uieName="enter-camera"
         devices={videoInputDevices}
         value={videoInputDeviceId}
-        defaultDeviceName={t('preferencesAVCamera')}
+        defaultDeviceName={translate('preferencesAVCamera')}
         icon={Icon.CameraIcon}
         isRequesting={isRequesting}
         onChange={deviceId => setVideoInputDeviceId(deviceId)}
-        title={t('preferencesAVCamera')}
+        title={translate('preferencesAVCamera')}
       />
 
       {isRequesting ? (
@@ -152,7 +153,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
               <div
                 className="preferences-av-video-disabled__info"
                 dangerouslySetInnerHTML={{
-                  __html: t(
+                  __html: translate(
                     'preferencesAVNoCamera',
                     {brandName},
                     {
@@ -171,7 +172,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
                 onClick={requestStream}
                 data-uie-name="do-try-again-preferences-av"
               >
-                {t('preferencesAVTryAgain')}
+                {translate('preferencesAVTryAgain')}
               </button>
             </div>
           )}

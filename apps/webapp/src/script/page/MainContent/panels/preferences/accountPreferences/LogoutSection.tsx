@@ -20,24 +20,28 @@
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import type {ClientRepository} from 'Repositories/client';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface LogoutSectionProps {
   clientRepository: ClientRepository;
 }
 
-const LogoutSection = ({clientRepository}: LogoutSectionProps) => (
-  <section className="preferences-section">
-    <Button
-      tabIndex={TabIndex.FOCUSABLE}
-      type="button"
-      onClick={() => clientRepository.logoutClient()}
-      data-uie-name="do-logout"
-      variant={ButtonVariant.TERTIARY}
-    >
-      {t('preferencesAccountLogOut')}
-    </Button>
-  </section>
-);
+const LogoutSection = ({clientRepository}: LogoutSectionProps) => {
+  const {translate} = useApplicationContext();
+
+  return (
+    <section className="preferences-section">
+      <Button
+        tabIndex={TabIndex.FOCUSABLE}
+        type="button"
+        onClick={() => clientRepository.logoutClient()}
+        data-uie-name="do-logout"
+        variant={ButtonVariant.TERTIARY}
+      >
+        {translate('preferencesAccountLogOut')}
+      </Button>
+    </section>
+  );
+};
 
 export {LogoutSection};

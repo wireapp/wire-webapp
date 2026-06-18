@@ -21,7 +21,7 @@ import {FunctionComponent} from 'react';
 
 import * as Icon from 'Components/icon';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {DeviceSelect} from './DeviceSelect';
 
@@ -36,6 +36,7 @@ const AudioOutPreferences: FunctionComponent<AudioOutPreferencesProps> = ({
   refreshCallOutputSpeaker,
   hasActiveCall,
 }: AudioOutPreferencesProps) => {
+  const {translate} = useApplicationContext();
   const {audioOutputDeviceId, setAudioOutputDeviceId, audioOutputDevices} = useMediaDevicesStore(state => ({
     audioOutputDeviceId: state.audio.output.selectedId,
     setAudioOutputDeviceId: state.setAudioOutputDeviceId,
@@ -52,15 +53,15 @@ const AudioOutPreferences: FunctionComponent<AudioOutPreferencesProps> = ({
   };
 
   return (
-    <PreferencesSection title={t('preferencesAVSpeakers')}>
+    <PreferencesSection title={translate('preferencesAVSpeakers')}>
       <DeviceSelect
         uieName="enter-speaker"
         onChange={handleChange}
         devices={audioOutputDevices}
         value={audioOutputDeviceId}
         icon={Icon.SpeakerIcon}
-        defaultDeviceName={t('preferencesAVSpeakers')}
-        title={t('preferencesAVSpeakers')}
+        defaultDeviceName={translate('preferencesAVSpeakers')}
+        title={translate('preferencesAVSpeakers')}
       />
     </PreferencesSection>
   );

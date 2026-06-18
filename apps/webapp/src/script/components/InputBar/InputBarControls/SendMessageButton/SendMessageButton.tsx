@@ -20,7 +20,7 @@
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface SendMessageButtonProps {
   onSend: () => void;
@@ -30,13 +30,15 @@ interface SendMessageButtonProps {
 }
 
 export const SendMessageButton = ({isDisabled, isLoading, onSend, className}: SendMessageButtonProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <button
       type="button"
       className={cx('controls-right-button controls-right-button--send', className)}
       disabled={isDisabled}
-      title={t('tooltipConversationSendMessage')}
-      aria-label={t('tooltipConversationSendMessage')}
+      title={translate('tooltipConversationSendMessage')}
+      aria-label={translate('tooltipConversationSendMessage')}
       data-uie-name="do-send-message"
       onClick={onSend}
     >

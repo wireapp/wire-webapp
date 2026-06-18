@@ -19,7 +19,7 @@
 
 import {SaveIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   iconStyles,
@@ -34,11 +34,13 @@ interface FileDropzoneOverlayProps {
 }
 
 export const FileDropzoneOverlay = ({isActive}: FileDropzoneOverlayProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div css={isActive ? overlayActiveStyles : overlayStyles} aria-hidden={!isActive}>
       <SaveIcon width={24} height={24} css={iconStyles} />
-      <p css={titleStyles}>{t('conversationFileUploadOverlayTitle')}</p>
-      <p css={descriptionStyles}>{t('conversationFileUploadOverlayDescription')}</p>
+      <p css={titleStyles}>{translate('conversationFileUploadOverlayTitle')}</p>
+      <p css={descriptionStyles}>{translate('conversationFileUploadOverlayDescription')}</p>
     </div>
   );
 };

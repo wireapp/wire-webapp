@@ -27,8 +27,8 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {CellsHeader} from './CellsHeader/CellsHeader';
 import {CellsLoader} from './CellsLoader/CellsLoader';
@@ -50,8 +50,6 @@ import {useConversationSearchFiles} from './useConversationSearch/useConversatio
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
-
-import {useApplicationContext} from '../../../page/RootProvider';
 
 interface ConversationCellsProps {
   cellsRepository: CellsRepository;
@@ -75,7 +73,7 @@ export const ConversationCells = memo(
     onOpenSearchView,
     onCloseSearchView,
   }: ConversationCellsProps) => {
-    const {fireAndForgetInvoker} = useApplicationContext();
+    const {fireAndForgetInvoker, translate} = useApplicationContext();
     const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
     const {getNodes, status: nodesStatus, getPagination, error: storeError, clearAll} = useCellsStore();
@@ -106,6 +104,7 @@ export const ConversationCells = memo(
     const {filters, filterState, clearAllFilters} = useConversationDriveFilters({
       cellsRepository,
       conversationRepository,
+      translate,
     });
 
     const {
@@ -224,27 +223,38 @@ export const ConversationCells = memo(
           />
         )}
         {isCellsStatePending && !isRefreshing && (
-          <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
+          <CellsStateInfo
+            heading={translate('cells.pending.heading')}
+            description={translate('cells.pending.description')}
+          />
         )}
         {isNoNodesVisible && (
-          <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
+          <CellsStateInfo
+            heading={translate('cells.noNodes.heading')}
+            description={translate('cells.noNodes.description')}
+          />
         )}
-        {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
+        {isEmptyRecycleBin && <CellsStateInfo description={translate('cells.emptyRecycleBin.description')} />}
         {(isLoadingVisible || isRefreshing || isFetchingMoreVisible) && <CellsLoader />}
-        {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
+        {isError && (
+          <CellsStateInfo
+            heading={translate('cells.error.heading')}
+            description={translate('cells.error.description')}
+          />
+        )}
         {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
         {isLoadMoreVisible && (
           <div css={loadMoreWrapperStyles}>
             <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
-              {t('cells.pagination.loadMoreResults')}
+              {translate('cells.pagination.loadMoreResults')}
             </Button>
           </div>
         )}
         {isLoadMoreErrorVisible && (
           <div css={loadMoreErrorWrapperStyles} role="alert">
-            <span css={loadMoreErrorMessageStyles}>{t('cells.pagination.loadMoreError.heading')}</span>
+            <span css={loadMoreErrorMessageStyles}>{translate('cells.pagination.loadMoreError.heading')}</span>
             <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
-              {t('cells.pagination.loadMoreError.retry')}
+              {translate('cells.pagination.loadMoreError.retry')}
             </Button>
           </div>
         )}

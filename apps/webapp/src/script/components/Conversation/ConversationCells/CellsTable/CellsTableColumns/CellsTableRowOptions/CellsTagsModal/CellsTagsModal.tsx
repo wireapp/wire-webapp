@@ -21,7 +21,7 @@ import {ComboboxSelect, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {contentStyles, descriptionStyles, menuListCSS, selectWrapperStyles} from './CellsTagsModal.styles';
 import {useTagsManagement} from './useTagsManagement/useTagsManagement';
@@ -43,6 +43,7 @@ export const CellsTagsModal = ({
   selectedTags: initialSelectedTags,
   onRefresh,
 }: CellsTagsModalProps) => {
+  const {translate} = useApplicationContext();
   const {
     allTags,
     selectedTags,
@@ -61,6 +62,7 @@ export const CellsTagsModal = ({
       onClose();
       onRefresh();
     },
+    commaValidationError: translate('cells.tagsModal.validationError.comma'),
   });
 
   const handleSave = async () => {
@@ -69,14 +71,14 @@ export const CellsTagsModal = ({
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>{t('cells.tagsModal.title')}</CellsModal.Header>
+      <CellsModal.Header>{translate('cells.tagsModal.title')}</CellsModal.Header>
       <div css={contentStyles}>
-        <p css={descriptionStyles}>{t('cells.tagsModal.description')}</p>
+        <p css={descriptionStyles}>{translate('cells.tagsModal.description')}</p>
         <div css={selectWrapperStyles}>
           <ComboboxSelect
             id="tags"
-            label={t('cells.tagsModal.label')}
-            placeholder={t('cells.tagsModal.placeholder')}
+            label={translate('cells.tagsModal.label')}
+            placeholder={translate('cells.tagsModal.placeholder')}
             menuPortalTarget={document.body}
             options={allTags}
             value={selectedTags}
@@ -84,18 +86,20 @@ export const CellsTagsModal = ({
             isLoading={isLoadingAllTags}
             onChange={handleChange}
             onCreateOption={handleCreateOption}
-            createOptionLabel={name => t('cells.tagsModal.createOptionLabel', {name})}
-            noOptionsMessage={t('cells.tagsModal.noTagsFound')}
-            loadingMessage={t('cells.tagsModal.loading')}
+            createOptionLabel={name => translate('cells.tagsModal.createOptionLabel', {name})}
+            noOptionsMessage={translate('cells.tagsModal.noTagsFound')}
+            loadingMessage={translate('cells.tagsModal.loading')}
           />
         </div>
-        {apiError !== null && <ErrorMessage>{t('cells.tagsModal.apiError')}</ErrorMessage>}
+        {apiError !== null && <ErrorMessage>{translate('cells.tagsModal.apiError')}</ErrorMessage>}
         {validationError !== null && <ErrorMessage>{validationError}</ErrorMessage>}
       </div>
       <CellsModal.Actions>
-        <CellsModal.SecondaryButton onClick={onClose}>{t('cells.tagsModal.cancelButton')}</CellsModal.SecondaryButton>
+        <CellsModal.SecondaryButton onClick={onClose}>
+          {translate('cells.tagsModal.cancelButton')}
+        </CellsModal.SecondaryButton>
         <CellsModal.PrimaryButton onClick={handleSave} isDisabled={isUpdatingTags}>
-          {t('cells.tagsModal.saveButton')}
+          {translate('cells.tagsModal.saveButton')}
         </CellsModal.PrimaryButton>
       </CellsModal.Actions>
     </CellsModal>

@@ -36,7 +36,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {CallMessage} from './CallMessage';
 import {CallTimeoutMessage} from './CallTimeoutMessage';
@@ -86,7 +85,7 @@ export const MessageWrapper = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const findMessage = async (conversation: Conversation, messageId: string) => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
     const event =
@@ -149,42 +148,42 @@ export const MessageWrapper = ({
     if (message.isDownloadable() && !isFileShareRestricted) {
       entries.push({
         click: () => message.download(container.resolve(AssetRepository)),
-        label: t('conversationContextMenuDownload'),
+        label: translate('conversationContextMenuDownload'),
       });
     }
 
     if (canEdit) {
       entries.push({
         click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message),
-        label: t('conversationContextMenuEdit'),
+        label: translate('conversationContextMenuEdit'),
       });
     }
 
     if (message.isCopyable() && !isFileShareRestricted) {
       entries.push({
         click: () => message.copy(),
-        label: t('conversationContextMenuCopy'),
+        label: translate('conversationContextMenuCopy'),
       });
     }
 
     if (hasDetails) {
       entries.push({
         click: () => onClickDetails(message),
-        label: t('conversationContextMenuDetails'),
+        label: translate('conversationContextMenuDetails'),
       });
     }
 
     if (message.isDeletable()) {
       entries.push({
         click: () => messageActions.deleteMessage(conversation, message),
-        label: t('conversationContextMenuDelete'),
+        label: translate('conversationContextMenuDelete'),
       });
     }
 
     if (canDelete) {
       entries.push({
         click: () => messageActions.deleteMessageEveryone(conversation, message),
-        label: t('conversationContextMenuDeleteEveryone'),
+        label: translate('conversationContextMenuDeleteEveryone'),
       });
     }
 

@@ -17,23 +17,27 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
 import {formatLocale, isToday, isYesterday} from 'Util/timeUtil';
+
+interface MessageGroupLabels {
+  today: string;
+  yesterday: string;
+}
 
 /**
  If today: “Today”
  If yesterday: “Yesterday”
  Any other day: <Week day>, <date> (e.g. “Monday, April 12” or “Friday, January 6 2023”)
  */
-export const getMessagesGroupLabel = (timestamp: number) => {
+export const getMessagesGroupLabel = (timestamp: number, messageGroupLabels: MessageGroupLabels) => {
   const date = new Date(timestamp);
 
   if (isToday(date)) {
-    return t('conversationToday');
+    return messageGroupLabels.today;
   }
 
   if (isYesterday(date)) {
-    return t('conversationYesterday');
+    return messageGroupLabels.yesterday;
   }
 
   const today = new Date();

@@ -20,8 +20,17 @@
 import {render} from '@testing-library/react';
 
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/FileTypeRestrictedMessage';
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const createFileTypeRestrictedMessage = (
   partialFileTypeRestrictedMessage: Partial<FileTypeRestrictedMessageEntity>,
@@ -41,7 +50,7 @@ describe('FileTypeRestrictedMessage', () => {
       isIncoming: true,
     });
 
-    const {getByTestId} = render(<FileTypeRestrictedMessage message={message} />);
+    const {getByTestId} = render(<FileTypeRestrictedMessage message={message} />, {wrapper: rootProviderWrapper});
 
     const filetypeRestrictedMessageText = getByTestId('filetype-restricted-message-text');
 
@@ -53,7 +62,7 @@ describe('FileTypeRestrictedMessage', () => {
       isIncoming: false,
     });
 
-    const {getByTestId} = render(<FileTypeRestrictedMessage message={message} />);
+    const {getByTestId} = render(<FileTypeRestrictedMessage message={message} />, {wrapper: rootProviderWrapper});
 
     const filetypeRestrictedMessageText = getByTestId('filetype-restricted-message-text');
 

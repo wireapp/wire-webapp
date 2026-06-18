@@ -21,13 +21,22 @@ import {render} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {MLSStatuses} from 'src/script/E2EIdentity';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {VerificationBadges} from './VerificationBadges';
+import {translateForTest} from 'Util/test/translateForTest';
+
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('VerificationBadges', () => {
   it('is mls verified', async () => {
     const {getByTestId} = render(
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.VALID} />),
+      {wrapper: rootProviderWrapper},
     );
 
     const E2EIdentityStatus = getByTestId('mls-conversation-status');
@@ -35,7 +44,9 @@ describe('VerificationBadges', () => {
   });
 
   it('is proteus verified', async () => {
-    const {getByTestId} = render(withTheme(<VerificationBadges context="conversation" isProteusVerified />));
+    const {getByTestId} = render(withTheme(<VerificationBadges context="conversation" isProteusVerified />), {
+      wrapper: rootProviderWrapper,
+    });
 
     const E2EIdentityStatus = getByTestId('proteus-verified');
     expect(E2EIdentityStatus).not.toBeNull();
@@ -44,6 +55,7 @@ describe('VerificationBadges', () => {
   it('is not downloaded', async () => {
     const {getByTestId} = render(
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.NOT_ACTIVATED} />),
+      {wrapper: rootProviderWrapper},
     );
 
     const E2EIdentityStatus = getByTestId('mls-conversation-status');
@@ -53,6 +65,7 @@ describe('VerificationBadges', () => {
   it('is expired', async () => {
     const {getByTestId} = render(
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.EXPIRED} />),
+      {wrapper: rootProviderWrapper},
     );
 
     const E2EIdentityStatus = getByTestId('mls-conversation-status');
@@ -62,6 +75,7 @@ describe('VerificationBadges', () => {
   it('is revoked', async () => {
     const {getByTestId} = render(
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.REVOKED} />),
+      {wrapper: rootProviderWrapper},
     );
 
     const E2EIdentityStatus = getByTestId('mls-conversation-status');
@@ -71,6 +85,7 @@ describe('VerificationBadges', () => {
   it('is expiring soon', async () => {
     const {getByTestId} = render(
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.EXPIRES_SOON} />),
+      {wrapper: rootProviderWrapper},
     );
 
     const E2EIdentityStatus = getByTestId('mls-conversation-status');

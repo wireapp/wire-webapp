@@ -24,7 +24,11 @@ import {Runtime} from '@wireapp/commons/lib/util/Runtime';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import en from 'I18n/en-US.json';
 import {TeamState} from 'Repositories/team/TeamState';
-import {setStrings} from 'Util/localizerUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from 'Util/localizerUtil';
 
 import {FeatureConfigChangeNotifier} from './FeatureConfigChangeNotifier';
 
@@ -32,6 +36,7 @@ setStrings({en});
 
 describe('FeatureConfigChangeNotifier', () => {
   const showModalSpy = jest.spyOn(PrimaryModal, 'show');
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translate}));
 
   beforeEach(() => {
     showModalSpy.mockClear();
@@ -88,7 +93,7 @@ describe('FeatureConfigChangeNotifier', () => {
     ],
   ] as const)('shows a modal when feature %s is turned on and off', async (feature, enabledString, disabledString) => {
     const teamState = new TeamState();
-    render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+    render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />, {wrapper: rootProviderWrapper});
     act(() => {
       teamState.teamFeatures(baseConfig);
     });
@@ -112,6 +117,8 @@ describe('FeatureConfigChangeNotifier', () => {
             htmlMessage: enabledString,
           }),
         }),
+        undefined,
+        translate,
       );
     });
 
@@ -137,6 +144,8 @@ describe('FeatureConfigChangeNotifier', () => {
               htmlMessage: disabledString,
             }),
           }),
+          undefined,
+          translate,
         );
       });
     }
@@ -146,13 +155,15 @@ describe('FeatureConfigChangeNotifier', () => {
     const teamState = new TeamState();
     teamState.teamFeatures(baseConfig);
 
-    const {unmount} = render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+    const {unmount} = render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     unmount();
     expect(showModalSpy).not.toHaveBeenCalled();
 
     teamState.teamFeatures({...baseConfig, [FEATURE_KEY.FILE_SHARING]: {status: FEATURE_STATUS.ENABLED}});
-    render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+    render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />, {wrapper: rootProviderWrapper});
     expect(showModalSpy).toHaveBeenCalledTimes(1);
   });
 
@@ -181,7 +192,9 @@ describe('FeatureConfigChangeNotifier', () => {
     'indicates the config change when self deleting messages have changed (%s) to (%s)',
     async (fromStatus, toStatus, expectedText) => {
       const teamState = new TeamState();
-      render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+      render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />, {
+        wrapper: rootProviderWrapper,
+      });
       act(() => {
         teamState.teamFeatures({
           ...baseConfig,
@@ -198,14 +211,19 @@ describe('FeatureConfigChangeNotifier', () => {
 
       await waitFor(() => {
         expect(showModalSpy).toHaveBeenCalledTimes(1);
-        expect(showModalSpy).toHaveBeenCalledWith(PrimaryModal.type.ACKNOWLEDGE, {
-          hideCloseBtn: false,
-          primaryAction: undefined,
-          preventClose: false,
-          text: expect.objectContaining({
-            htmlMessage: expectedText,
-          }),
-        });
+        expect(showModalSpy).toHaveBeenCalledWith(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            hideCloseBtn: false,
+            primaryAction: undefined,
+            preventClose: false,
+            text: expect.objectContaining({
+              htmlMessage: expectedText,
+            }),
+          },
+          undefined,
+          translate,
+        );
       });
     },
   );

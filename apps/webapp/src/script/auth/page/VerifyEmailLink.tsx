@@ -24,7 +24,7 @@ import {useNavigate} from 'react-router-dom';
 
 import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {Page} from './Page';
 
@@ -36,13 +36,14 @@ import {ROUTE} from '../route';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
+  const {translate} = useApplicationContext();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (hasSelfEmail) {
       navigate(ROUTE.SET_PASSWORD);
     }
-  }, [hasSelfEmail]);
+  }, [hasSelfEmail, navigate]);
 
   if (hasSelfEmail) {
     return null;
@@ -56,16 +57,16 @@ const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
       >
         <div>
           <H1 center data-uie-name="verify-email-headline">
-            {t('authPostedResendHeadline')}
+            {translate('authPostedResendHeadline')}
           </H1>
           <H3 center block data-uie-name="verify-email-subhead">
-            {t('authPostedResendDetail')}
+            {translate('authPostedResendDetail')}
           </H3>
           <Muted center block style={{marginTop: 64}} data-uie-name="verify-email-no-mail">
-            {t('authPostedResendAction')}
+            {translate('authPostedResendAction')}
           </Muted>
           <RouterLink to={ROUTE.SET_EMAIL} data-uie-name="go-set-email">
-            {t('setEmail.tryAgain')}
+            {translate('setEmail.tryAgain')}
           </RouterLink>
         </div>
       </ContainerXS>

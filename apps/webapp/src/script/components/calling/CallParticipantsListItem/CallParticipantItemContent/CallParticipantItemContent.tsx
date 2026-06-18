@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {
@@ -51,7 +51,8 @@ export const CallParticipantItemContent = ({
   showContextMenu,
   onDropdownClick,
 }: CallParticipantItemContentProps) => {
-  const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
+  const {translate} = useApplicationContext();
+  const selfString = `(${capitalizeFirstChar(translate('conversationYouNominative'))})`;
 
   return (
     <div css={wrapper}>

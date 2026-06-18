@@ -21,7 +21,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getLogger} from 'Util/logger';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
 
@@ -37,34 +37,46 @@ const logger = getLogger('EmailInput');
 
 const EmailInput = ({email, canEditProfile, userRepository}: EmailInputProps) => {
   const emailInputDone = useInputDone();
+  const {translate} = useApplicationContext();
 
   const changeEmail = async (enteredEmail: string): Promise<void> => {
     const showWarning = (title: string, message: string) => {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          message,
-          title,
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message,
+            title,
+          },
         },
-      });
+        undefined,
+        translate,
+      );
     };
     try {
       await userRepository.changeEmail(enteredEmail);
       emailInputDone.done();
-      showWarning(t('modalPreferencesAccountEmailHeadline'), t('authPostedResendDetail'));
+      showWarning(translate('modalPreferencesAccountEmailHeadline'), translate('authPostedResendDetail'));
     } catch (error: unknown) {
       logger.warn('Failed to send reset email request', error);
       if (isErrorWithCode(error) && error.code === HTTP_STATUS.BAD_REQUEST) {
-        showWarning(t('modalPreferencesAccountEmailErrorHeadline'), t('modalPreferencesAccountEmailInvalidMessage'));
+        showWarning(
+          translate('modalPreferencesAccountEmailErrorHeadline'),
+          translate('modalPreferencesAccountEmailInvalidMessage'),
+        );
       }
       if (isErrorWithCode(error) && error.code === HTTP_STATUS.CONFLICT) {
-        showWarning(t('modalPreferencesAccountEmailErrorHeadline'), t('modalPreferencesAccountEmailTakenMessage'));
+        showWarning(
+          translate('modalPreferencesAccountEmailErrorHeadline'),
+          translate('modalPreferencesAccountEmailTakenMessage'),
+        );
       }
     }
   };
 
   return (
     <AccountInput
-      label={t('preferencesAccountEmail')}
+      label={translate('preferencesAccountEmail')}
       value={email}
       readOnly={!canEditProfile}
       onValueChange={changeEmail}

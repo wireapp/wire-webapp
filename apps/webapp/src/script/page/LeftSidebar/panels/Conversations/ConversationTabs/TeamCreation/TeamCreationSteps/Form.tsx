@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, Input} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {StepProps} from './StepProps';
 import {modalButtonsCss} from './TeamCreationSteps.styles';
@@ -27,6 +27,7 @@ import {modalButtonsCss} from './TeamCreationSteps.styles';
 import {buttonCss} from '../TeamCreation.styles';
 
 export const Form = ({onNextStep, onPreviousStep, teamName, setTeamName}: StepProps) => {
+  const {translate} = useApplicationContext();
   const trimmedTeamName = teamName.trim();
   const isValidTeamName = trimmedTeamName.length > 0;
 
@@ -41,26 +42,26 @@ export const Form = ({onNextStep, onPreviousStep, teamName, setTeamName}: StepPr
 
   return (
     <>
-      <h2 className="heading-h2">{t('teamCreationFormTitle')}</h2>
+      <h2 className="heading-h2">{translate('teamCreationFormTitle')}</h2>
       <p css={{margin: '1.5rem 0'}} className="text-regular">
-        {t('teamCreationFormSubTitle')}
+        {translate('teamCreationFormSubTitle')}
       </p>
       <Input
         type="text"
         value={teamName}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTeamName(event.target.value)}
-        label={t('teamCreationFormNameLabel')}
+        label={translate('teamCreationFormNameLabel')}
         autoComplete="off"
-        placeholder={t('teamCreationFormNamePlaceholder')}
+        placeholder={translate('teamCreationFormNamePlaceholder')}
         css={{width: '100%'}}
         data-uie-name="enter-team-name"
       />
       <div className="modal__buttons" css={modalButtonsCss}>
         <Button data-uie-name="do-go-back" onClick={onPreviousStep} variant={ButtonVariant.SECONDARY} css={buttonCss}>
-          {t('teamCreationBack')}
+          {translate('teamCreationBack')}
         </Button>
         <Button data-uie-name="do-continue" disabled={!isValidTeamName} onClick={handleNextStep} css={buttonCss}>
-          {t('teamCreationContinue')}
+          {translate('teamCreationContinue')}
         </Button>
       </div>
     </>

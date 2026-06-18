@@ -19,7 +19,6 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
 import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
@@ -32,8 +31,8 @@ import {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
@@ -43,18 +42,36 @@ interface OptionPreferencesProps {
   selfUser: User;
 }
 
+type AudioPreferenceValue = PropertiesRepository['properties']['settings']['sound']['alerts'];
+type NotificationPreferenceValue = PropertiesRepository['properties']['settings']['notifications'];
+type WebappProperties = PropertiesRepository['properties'];
+
+const audioPreferenceValues = {
+  ALL: 'all' as AudioPreferenceValue,
+  NONE: 'none' as AudioPreferenceValue,
+  SOME: 'some' as AudioPreferenceValue,
+} as const satisfies Record<'ALL' | 'NONE' | 'SOME', AudioPreferenceValue>;
+
+const notificationPreferenceValues = {
+  NONE: 'none' as NotificationPreferenceValue,
+  OBFUSCATE: 'obfuscate' as NotificationPreferenceValue,
+  OBFUSCATE_MESSAGE: 'obfuscate-message' as NotificationPreferenceValue,
+  ON: 'on' as NotificationPreferenceValue,
+} as const satisfies Record<'NONE' | 'OBFUSCATE' | 'OBFUSCATE_MESSAGE' | 'ON', NotificationPreferenceValue>;
+
 const fontSizes = Object.values(RootFontSize);
 
 const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesProps) => {
+  const {translate} = useApplicationContext();
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {
     properties: {settings},
   } = propertiesRepository;
-  const [optionAudio, setOptionAudio] = useState<AudioPreference>(settings.sound.alerts);
+  const [optionAudio, setOptionAudio] = useState<AudioPreferenceValue>(settings.sound.alerts);
   const [optionReplaceInlineEmoji, setOptionReplaceInlineEmoji] = useState<boolean>(settings.emoji.replace_inline);
   const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === 'dark');
   const [optionSendPreviews, setOptionSendPreviews] = useState<boolean>(settings.previews.send);
-  const [optionNotifications, setOptionNotifications] = useState<NotificationPreference>(settings.notifications);
+  const [optionNotifications, setOptionNotifications] = useState<NotificationPreferenceValue>(settings.notifications);
   const [optionMarkdownPreview, setOptionMarkdownPreview] = useState<boolean>(settings.interface.markdown_preview);
   const [currentRootFontSize, setCurrentRootFontSize] = useRootFontSize();
   const [sliderValue, setSliderValue] = useState<number>(fontSizes.indexOf(currentRootFontSize));
@@ -80,7 +97,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
     };
   }, []);
 
-  const saveOptionAudioPreference = (audioPreference: AudioPreference) => {
+  const saveOptionAudioPreference = (audioPreference: AudioPreferenceValue) => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.SOUND_ALERTS, audioPreference);
     setOptionAudio(audioPreference);
   };
@@ -90,7 +107,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
     setOptionReplaceInlineEmoji(emojiPreference);
   };
 
-  const saveOptionNotificationsPreference = (notificationsPreference: NotificationPreference) => {
+  const saveOptionNotificationsPreference = (notificationsPreference: NotificationPreferenceValue) => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.NOTIFICATIONS, notificationsPreference);
     setOptionNotifications(notificationsPreference);
   };
@@ -125,41 +142,41 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
   };
 
   const fontSliderOptions = [
-    {value: 0, label: RootFontSize.XXS, heading: t('preferencesOptionsFontSizeSmall')},
+    {value: 0, label: RootFontSize.XXS, heading: translate('preferencesOptionsFontSizeSmall')},
     {value: 1, label: RootFontSize.XS},
     {value: 2, label: RootFontSize.S},
-    {value: 3, label: RootFontSize.M, heading: t('preferencesOptionsFontSizeDefault')},
+    {value: 3, label: RootFontSize.M, heading: translate('preferencesOptionsFontSizeDefault')},
     {value: 4, label: RootFontSize.L},
     {value: 5, label: RootFontSize.XL},
-    {value: 6, label: RootFontSize.XXL, heading: t('preferencesOptionsFontSizeLarge')},
+    {value: 6, label: RootFontSize.XXL, heading: translate('preferencesOptionsFontSizeLarge')},
   ];
 
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
   const isLinkPreviewsEnabled = Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS;
 
   return (
-    <PreferencesPage title={t('preferencesOptions')}>
-      <PreferencesSection title={t('preferencesOptionsAudio')}>
+    <PreferencesPage title={translate('preferencesOptions')}>
+      <PreferencesSection title={translate('preferencesOptionsAudio')}>
         <RadioGroup
-          ariaLabelledBy={t('preferencesOptionsAudio')}
+          ariaLabelledBy={translate('preferencesOptionsAudio')}
           name="preferences-options-audio"
           selectedValue={optionAudio}
           onChange={saveOptionAudioPreference}
           options={[
             {
-              detailLabel: t('preferencesOptionsAudioAllDetail'),
-              label: t('preferencesOptionsAudioAll'),
-              value: AudioPreference.ALL,
+              detailLabel: translate('preferencesOptionsAudioAllDetail'),
+              label: translate('preferencesOptionsAudioAll'),
+              value: audioPreferenceValues.ALL,
             },
             {
-              detailLabel: t('preferencesOptionsAudioSomeDetail'),
-              label: t('preferencesOptionsAudioSome'),
-              value: AudioPreference.SOME,
+              detailLabel: translate('preferencesOptionsAudioSomeDetail'),
+              label: translate('preferencesOptionsAudioSome'),
+              value: audioPreferenceValues.SOME,
             },
             {
-              detailLabel: t('preferencesOptionsAudioNoneDetail'),
-              label: t('preferencesOptionsAudioNone'),
-              value: AudioPreference.NONE,
+              detailLabel: translate('preferencesOptionsAudioNoneDetail'),
+              label: translate('preferencesOptionsAudioNone'),
+              value: audioPreferenceValues.NONE,
             },
           ]}
         />
@@ -169,28 +186,28 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
         <>
           <hr className="preferences-separator" />
 
-          <PreferencesSection title={t('preferencesOptionsNotifications')}>
+          <PreferencesSection title={translate('preferencesOptionsNotifications')}>
             <RadioGroup
-              ariaLabelledBy={t('preferencesOptionsNotifications')}
+              ariaLabelledBy={translate('preferencesOptionsNotifications')}
               name="preferences-options-notification"
               selectedValue={optionNotifications}
               onChange={saveOptionNotificationsPreference}
               options={[
                 {
-                  label: t('preferencesOptionsNotificationsOn'),
-                  value: NotificationPreference.ON,
+                  label: translate('preferencesOptionsNotificationsOn'),
+                  value: notificationPreferenceValues.ON,
                 },
                 {
-                  label: t('preferencesOptionsNotificationsObfuscateMessage'),
-                  value: NotificationPreference.OBFUSCATE_MESSAGE,
+                  label: translate('preferencesOptionsNotificationsObfuscateMessage'),
+                  value: notificationPreferenceValues.OBFUSCATE_MESSAGE,
                 },
                 {
-                  label: t('preferencesOptionsNotificationsObfuscate'),
-                  value: NotificationPreference.OBFUSCATE,
+                  label: translate('preferencesOptionsNotificationsObfuscate'),
+                  value: notificationPreferenceValues.OBFUSCATE,
                 },
                 {
-                  label: t('preferencesOptionsNotificationsNone'),
-                  value: NotificationPreference.NONE,
+                  label: translate('preferencesOptionsNotificationsNone'),
+                  value: notificationPreferenceValues.NONE,
                 },
               ]}
             />
@@ -199,11 +216,11 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
       )}
       <hr className="preferences-separator" />
 
-      <PreferencesSection title={t('preferencesOptionsAppearance')}>
+      <PreferencesSection title={translate('preferencesOptionsAppearance')}>
         <div css={{marginBottom: '1.5rem', width: '100%'}}>
           <IndicatorRangeInput
             value={sliderValue}
-            label={t('preferencesOptionsAppearanceTextSize')}
+            label={translate('preferencesOptionsAppearanceTextSize')}
             onChange={saveOptionFontSize}
             onOptionClick={handleOptionClick}
             dataListOptions={fontSliderOptions}
@@ -220,7 +237,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
               data-uie-name="status-preference-use-dark-mode"
             >
               <CheckboxLabel htmlFor="status-preference-use-dark-mode">
-                {t('preferencesOptionsUseDarkMode')}
+                {translate('preferencesOptionsUseDarkMode')}
               </CheckboxLabel>
             </Checkbox>
 
@@ -234,7 +251,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
                 data-uie-name="status-preference-emoji-replace"
               >
                 <CheckboxLabel htmlFor="status-preference-emoji-replace">
-                  {t('preferencesOptionsEmojiReplaceCheckbox')}
+                  {translate('preferencesOptionsEmojiReplaceCheckbox')}
                 </CheckboxLabel>
               </Checkbox>
 
@@ -242,7 +259,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
                 className="preferences-detail preferences-detail-intended"
                 aria-hidden="true"
                 dangerouslySetInnerHTML={{
-                  __html: t('preferencesOptionsEmojiReplaceDetail', undefined, {
+                  __html: translate('preferencesOptionsEmojiReplaceDetail', undefined, {
                     icon: "<span class='font-size-xs icon-emoji'></span>",
                   }),
                 }}
@@ -260,12 +277,12 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
                   data-uie-name="status-preference-markdown-preview"
                 >
                   <CheckboxLabel htmlFor="status-preference-markdown-preview">
-                    {t('preferencesOptionsMarkdownPreview')}
+                    {translate('preferencesOptionsMarkdownPreview')}
                   </CheckboxLabel>
                 </Checkbox>
 
                 <p className="preferences-detail preferences-detail-intended">
-                  {t('preferencesOptionsMarkdownPreviewDetails')}
+                  {translate('preferencesOptionsMarkdownPreviewDetails')}
                 </p>
               </div>
             )}
@@ -281,12 +298,12 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
                   data-uie-name="status-preference-previews-send"
                 >
                   <CheckboxLabel htmlFor="status-preference-previews-send">
-                    {t('preferencesOptionsPreviewsSendCheckbox')}
+                    {translate('preferencesOptionsPreviewsSendCheckbox')}
                   </CheckboxLabel>
                 </Checkbox>
 
                 <p className="preferences-detail preferences-detail-intended">
-                  {t('preferencesOptionsPreviewsSendDetail')}
+                  {translate('preferencesOptionsPreviewsSendDetail')}
                 </p>
               </div>
             )}

@@ -28,7 +28,7 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {Config} from '../../Config';
@@ -39,7 +39,7 @@ const windowTitleLogger = getLogger('WindowTitlesViewModel');
 const MIN_UNREAD_COUNT = 0;
 const MIN_CONNECTION_REQUEST_COUNT = 1;
 
-const useWindowTitle = () => {
+const useWindowTitle = (translate: Translate) => {
   const userState = container.resolve(UserState);
   const conversationState = container.resolve(ConversationState);
 
@@ -98,8 +98,8 @@ const useWindowTitle = () => {
         case ContentState.CONNECTION_REQUESTS: {
           const multipleRequests = connectionRequestsCount > MIN_CONNECTION_REQUEST_COUNT;
           const requestsString = multipleRequests
-            ? t('conversationsConnectionRequestMany', {number: connectionRequestsCount})
-            : t('conversationsConnectionRequestOne');
+            ? translate('conversationsConnectionRequestMany', {number: connectionRequestsCount})
+            : translate('conversationsConnectionRequestOne');
           specificTitle += requestsString;
           break;
         }
@@ -112,32 +112,32 @@ const useWindowTitle = () => {
         }
 
         case ContentState.PREFERENCES_ABOUT: {
-          specificTitle += t('preferencesAbout');
+          specificTitle += translate('preferencesAbout');
           break;
         }
 
         case ContentState.PREFERENCES_ACCOUNT: {
-          specificTitle += t('preferencesAccount');
+          specificTitle += translate('preferencesAccount');
           break;
         }
 
         case ContentState.PREFERENCES_AV: {
-          specificTitle += t('preferencesAV');
+          specificTitle += translate('preferencesAV');
           break;
         }
 
         case ContentState.PREFERENCES_DEVICE_DETAILS: {
-          specificTitle += t('preferencesDeviceDetails');
+          specificTitle += translate('preferencesDeviceDetails');
           break;
         }
 
         case ContentState.PREFERENCES_DEVICES: {
-          specificTitle += t('preferencesDevices');
+          specificTitle += translate('preferencesDevices');
           break;
         }
 
         case ContentState.PREFERENCES_OPTIONS: {
-          specificTitle += t('preferencesOptions');
+          specificTitle += translate('preferencesOptions');
           break;
         }
 
@@ -152,6 +152,7 @@ const useWindowTitle = () => {
     activeConversation,
     connectionRequests.length,
     contentState,
+    translate,
     unreadConversations.length,
     updateFavicon,
     updateWindowTitle,
@@ -163,8 +164,14 @@ const useWindowTitle = () => {
   }, [initiateTitleUpdates, updateNotificationState]);
 };
 
-export function WindowTitleUpdater(): null {
-  useWindowTitle();
+type WindowTitleUpdaterProps = {
+  readonly translate: Translate;
+};
+
+export function WindowTitleUpdater(properties: WindowTitleUpdaterProps): null {
+  const {translate} = properties;
+
+  useWindowTitle(translate);
 
   return null;
 }

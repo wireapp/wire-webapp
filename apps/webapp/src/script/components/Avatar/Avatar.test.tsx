@@ -21,20 +21,29 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {Avatar} from './Avatar';
+import {translateForTest} from 'Util/test/translateForTest';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('Avatar', () => {
   it('executes onClick with current participant', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
-      onAvatarClick: jasmine.createSpy(),
+      onAvatarClick: jest.fn(),
       participant,
     };
 
-    const {getByTestId} = render(<Avatar {...props} />);
+    const {getByTestId} = render(<Avatar {...props} />, {wrapper: rootProviderWrapper});
 
     const userAvatar = getByTestId('element-avatar-user');
     fireEvent.click(userAvatar);
@@ -43,11 +52,11 @@ describe('Avatar', () => {
   });
 
   it('renders temporary guest avatar', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
-    const {getByTestId} = render(<Avatar participant={participant} />);
+    const {getByTestId} = render(<Avatar participant={participant} />, {wrapper: rootProviderWrapper});
     expect(getByTestId('element-avatar-temporary-guest')).not.toBeNull();
   });
 
@@ -55,7 +64,7 @@ describe('Avatar', () => {
     const participant = new ServiceEntity({id: 'id'});
     participant.name('Anton Bertha');
 
-    const {getByTestId} = render(<Avatar participant={participant} />);
+    const {getByTestId} = render(<Avatar participant={participant} />, {wrapper: rootProviderWrapper});
     expect(getByTestId('element-avatar-service')).not.toBeNull();
   });
 
@@ -63,19 +72,19 @@ describe('Avatar', () => {
    * This behaviour exists in the message list for message avatars and in the conversation details in the services section.
    */
   it('renders service avatar with participant of type User but isService = true', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
     participant.isService = true;
 
-    const {getByTestId} = render(<Avatar participant={participant} />);
+    const {getByTestId} = render(<Avatar participant={participant} />, {wrapper: rootProviderWrapper});
     expect(getByTestId('element-avatar-service')).not.toBeNull();
   });
 
   it('renders user avatar', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
-    const {getByTestId} = render(<Avatar participant={participant} />);
+    const {getByTestId} = render(<Avatar participant={participant} />, {wrapper: rootProviderWrapper});
     expect(getByTestId('element-avatar-user')).not.toBeNull();
   });
 });

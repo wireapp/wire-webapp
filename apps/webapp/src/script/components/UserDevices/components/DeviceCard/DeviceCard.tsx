@@ -25,8 +25,8 @@ import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {type ClientEntity} from 'Repositories/client/ClientEntity';
 import {WireIdentity} from 'src/script/E2EIdentity';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
@@ -41,6 +41,7 @@ interface DeviceCardProps {
 }
 
 const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = false}: DeviceCardProps) => {
+  const {translate} = useApplicationContext();
   const messageFocusedTabIndex = useMessageFocusedTabIndex(!!click);
   const {class: deviceClass = '?', id = '', label = '?'} = clientEntity;
   const name = clientEntity.getName();
@@ -87,7 +88,7 @@ const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = 
 
         {deviceIdentity?.thumbprint !== undefined && deviceIdentity.thumbprint !== '' && (
           <p className="text-background device-card__id">
-            <span>{t('preferencesMLSThumbprint')}</span>
+            <span>{translate('preferencesMLSThumbprint')}</span>
 
             <span data-uie-name="device-id" className="formatted-id">
               <FormattedId idSlices={splitFingerprint(deviceIdentity.thumbprint)} smallPadding />
@@ -96,7 +97,7 @@ const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = 
         )}
 
         <p className="text-background device-card__id">
-          <span>{t('preferencesDevicesId')}</span>
+          <span>{translate('preferencesDevicesId')}</span>
 
           <span data-uie-name="device-id" className="formatted-id">
             <FormattedId idSlices={splitFingerprint(id)} smallPadding />

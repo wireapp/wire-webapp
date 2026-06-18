@@ -27,6 +27,7 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {type Translate} from 'Util/localizerUtil';
 
 import {CallingViewModel} from './CallingViewModel';
 
@@ -58,7 +59,7 @@ export function buildCall(conversation: Conversation, convType = CONV_TYPE.ONEON
   } as any);
 }
 
-export function buildCallingViewModel() {
+export function buildCallingViewModel(translate: Translate) {
   const mockCore = container.resolve(Core);
   const callingViewModel = new CallingViewModel(
     mockCallingRepository,
@@ -68,6 +69,7 @@ export function buildCallingViewModel() {
     {} as any,
     {} as any,
     {} as any,
+    translate,
     {} as any,
     callState,
     {} as any,

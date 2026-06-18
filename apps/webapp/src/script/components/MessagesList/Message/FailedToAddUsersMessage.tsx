@@ -25,13 +25,14 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {getUserName} from 'Components/UserName';
+import {getUserNameWithTranslate} from 'Components/UserName';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
+import type {TranslationKey} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styles';
@@ -72,9 +73,31 @@ interface MessageDetailsProps {
   failure: AddUsersFailure;
   isMessageFocused: boolean;
   allUsers: User[];
+  translate: (translationKey: TranslationKey, replacements?: Record<string, string>) => string;
 }
 
-const MessageDetails = ({failure, isMessageFocused, allUsers}: MessageDetailsProps) => {
+const singularDetailsTranslationKeyByReason = {
+  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'failedToAddParticipantsSingularDetailsNonFederatingBackends',
+  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'failedToAddParticipantsSingularDetailsOfflineBackend',
+  [AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG]: 'failedToAddParticipantsSingularDetailsOfflineForTooLong',
+  [AddUsersFailureReasons.NOT_MLS_CAPABLE]: 'failedToAddParticipantsSingularDetailsNotMlsCapable',
+} as const satisfies Record<AddUsersFailureReasons, TranslationKey>;
+
+const pluralDetailsTranslationKeyByReason = {
+  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'failedToAddParticipantsPluralDetailsNonFederatingBackends',
+  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'failedToAddParticipantsPluralDetailsOfflineBackend',
+  [AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG]: 'failedToAddParticipantsPluralDetailsOfflineForTooLong',
+  [AddUsersFailureReasons.NOT_MLS_CAPABLE]: 'failedToAddParticipantsPluralDetailsNotMlsCapable',
+} as const satisfies Record<AddUsersFailureReasons, TranslationKey>;
+
+const singularTranslationKeyByReason = {
+  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'failedToAddParticipantSingularNonFederatingBackends',
+  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'failedToAddParticipantSingularOfflineBackend',
+  [AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG]: 'failedToAddParticipantSingularOfflineForTooLong',
+  [AddUsersFailureReasons.NOT_MLS_CAPABLE]: 'failedToAddParticipantSingularNotMlsCapable',
+} as const satisfies Record<AddUsersFailureReasons, TranslationKey>;
+
+const MessageDetails = ({failure, isMessageFocused, allUsers, translate}: MessageDetailsProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   const {users: userIds, reason} = failure;
@@ -106,7 +129,7 @@ const MessageDetails = ({failure, isMessageFocused, allUsers}: MessageDetailsPro
         data-uie-name={link.name}
         css={backendErrorLink}
       >
-        {t('offlineBackendLearnMore')}
+        {translate('offlineBackendLearnMore')}
       </Link>
     </>
   );
@@ -114,34 +137,34 @@ const MessageDetails = ({failure, isMessageFocused, allUsers}: MessageDetailsPro
   const getText = (): string => {
     if (baseTranslationKey === 'failedToAddParticipantsSingularDetails') {
       if (translationLabel === 'OfflineBackend') {
-        return t(`failedToAddParticipantsSingularDetailsOfflineBackend`, {
-          name: getUserName(users[0]),
+        return translate(singularDetailsTranslationKeyByReason[reason], {
+          name: getUserNameWithTranslate(users[0], translate),
           domain: domainStr as string,
         });
       }
 
-      return t(`failedToAddParticipantsSingularDetails${translationLabel}`, {
-        name: getUserName(users[0]),
+      return translate(singularDetailsTranslationKeyByReason[reason], {
+        name: getUserNameWithTranslate(users[0], translate),
       });
     }
 
     if (baseTranslationKey === 'failedToAddParticipantsPluralDetails') {
       if (translationLabel === 'OfflineBackend') {
-        return t(`failedToAddParticipantsPluralDetailsOfflineBackend`, {
-          name: getUserName(users[0]),
+        return translate(pluralDetailsTranslationKeyByReason[reason], {
+          name: getUserNameWithTranslate(users[0], translate),
           names: users
             .slice(1)
-            .map(user => getUserName(user))
+            .map(user => getUserNameWithTranslate(user, translate))
             .join(', '),
           domain: domainStr as string,
         });
       }
 
-      return t(`failedToAddParticipantsPluralDetails${translationLabel}`, {
-        name: getUserName(users[0]),
+      return translate(pluralDetailsTranslationKeyByReason[reason], {
+        name: getUserNameWithTranslate(users[0], translate),
         names: users
           .slice(1)
-          .map(user => getUserName(user))
+          .map(user => getUserNameWithTranslate(user, translate))
           .join(', '),
       });
     }
@@ -171,6 +194,7 @@ const FailedToAddUsersMessage = ({
   message,
   userState = container.resolve(UserState),
 }: FailedToAddUsersMessageProps) => {
+  const {translate} = useApplicationContext();
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -188,7 +212,7 @@ const FailedToAddUsersMessage = ({
 
   // These will be used if we've only failed to add a single user
   const firstUser = allUsers.find(user => matchQualifiedIds(allUserIds[0], user.qualifiedId));
-  const {link, translationLabel} = reasonToMessageDataMap[failures[0].reason];
+  const {link} = reasonToMessageDataMap[failures[0].reason];
 
   const learnMore = (
     <>
@@ -201,7 +225,7 @@ const FailedToAddUsersMessage = ({
         data-uie-name={link.name}
         css={backendErrorLink}
       >
-        {t('offlineBackendLearnMore')}
+        {translate('offlineBackendLearnMore')}
       </Link>
     </>
   );
@@ -224,8 +248,8 @@ const FailedToAddUsersMessage = ({
               <span
                 css={warning}
                 dangerouslySetInnerHTML={{
-                  __html: t(`failedToAddParticipantSingular${translationLabel}`, {
-                    name: getUserName(firstUser),
+                  __html: translate(singularTranslationKeyByReason[failures[0].reason], {
+                    name: getUserNameWithTranslate(firstUser, translate),
                     domain: firstUser.domain,
                   }),
                 }}
@@ -237,7 +261,7 @@ const FailedToAddUsersMessage = ({
             <p
               css={warning}
               dangerouslySetInnerHTML={{
-                __html: t(`failedToAddParticipantsPlural`, {total: totalNumberOfUsers.toString()}),
+                __html: translate('failedToAddParticipantsPlural', {total: totalNumberOfUsers.toString()}),
               }}
             />
           )}
@@ -253,7 +277,13 @@ const FailedToAddUsersMessage = ({
       <div className="message-details">
         {isOpen &&
           failures.map((failure, index) => (
-            <MessageDetails allUsers={allUsers} isMessageFocused={isMessageFocused} key={index} failure={failure} />
+            <MessageDetails
+              allUsers={allUsers}
+              isMessageFocused={isMessageFocused}
+              key={index}
+              failure={failure}
+              translate={translate}
+            />
           ))}
 
         {totalNumberOfUsers > 1 && (
@@ -266,7 +296,7 @@ const FailedToAddUsersMessage = ({
               onClick={() => setIsOpen(state => !state)}
               style={{marginTop: 4}}
             >
-              {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
+              {isOpen ? translate('messageFailedToSendHideDetails') : translate('messageFailedToSendShowDetails')}
             </Button>
           </div>
         )}

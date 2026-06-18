@@ -25,11 +25,14 @@ import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {SuperType} from 'src/script/message/SuperType';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {EventBuilder} from './EventBuilder';
 
 import {EventMapper} from '../EventMapper';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('EventBuilder', () => {
   let event_mapper: EventMapper = undefined;
@@ -37,13 +40,13 @@ describe('EventBuilder', () => {
   let self_user_et: User = undefined;
 
   beforeEach(() => {
-    self_user_et = new User(createUuid(), null);
+    self_user_et = new User(createUuid(), null, translateForTest);
     self_user_et.isMe = true;
 
-    conversation_et = new Conversation(createUuid());
+    conversation_et = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation_et.selfUser(self_user_et);
 
-    event_mapper = new EventMapper();
+    event_mapper = new EventMapper(undefined, translate);
   });
 
   it('buildAllVerified', () => {

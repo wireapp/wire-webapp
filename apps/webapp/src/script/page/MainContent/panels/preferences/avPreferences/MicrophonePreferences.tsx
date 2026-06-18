@@ -26,7 +26,7 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getLogger} from 'Util/logger';
 
 import {DeviceSelect} from './DeviceSelect';
@@ -47,6 +47,7 @@ interface MicrophonePreferencesProps {
 const DEBOUNCE_TIMEOUT = 100;
 
 const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: MicrophonePreferencesProps) => {
+  const {translate} = useApplicationContext();
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
@@ -76,7 +77,7 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
   const debouncedRequestStream = useDebouncedCallback(requestStream, DEBOUNCE_TIMEOUT);
 
   useEffect(() => {
-    debouncedRequestStream();
+    void debouncedRequestStream();
   }, [audioInputDeviceId, audioInputDevices.length, debouncedRequestStream]);
 
   useEffect(
@@ -85,15 +86,15 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
         streamHandler.releaseTracksFromStream(stream);
       }
     },
-    [stream],
+    [hasActiveCall, stream, streamHandler],
   );
 
   return (
-    <PreferencesSection title={t('preferencesAVMicrophone')}>
+    <PreferencesSection title={translate('preferencesAVMicrophone')}>
       {!stream && !isRequesting && (
         <div className="preferences-av-detail">
           <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
-            {t('preferencesAVPermissionDetail')}
+            {translate('preferencesAVPermissionDetail')}
           </a>
         </div>
       )}
@@ -102,11 +103,11 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
         uieName="enter-microphone"
         devices={audioInputDevices}
         value={audioInputDeviceId}
-        defaultDeviceName={t('preferencesAVMicrophone')}
+        defaultDeviceName={translate('preferencesAVMicrophone')}
         icon={Icon.MicOnIcon}
         isRequesting={isRequesting}
         onChange={deviceId => setAudioInputDeviceId(deviceId)}
-        title={t('preferencesAVMicrophone')}
+        title={translate('preferencesAVMicrophone')}
       />
       {isRequesting ? (
         <div className="preferences-av-spinner">

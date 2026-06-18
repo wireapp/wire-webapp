@@ -24,9 +24,18 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {Participant} from 'Repositories/calling/Participant';
 import {User} from 'Repositories/entity/User';
 import {ROLE} from 'Repositories/user/userPermission';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';
+import {translateForTest} from 'Util/test/translateForTest';
+
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 const createMockParticipant = ({
   name,
@@ -45,7 +54,7 @@ const createMockParticipant = ({
   isExternal?: boolean;
   isAudioEstablished?: boolean;
 }) => {
-  const user = new User(createUuid());
+  const user = new User(createUuid(), '', translateForTest);
   user.name('user');
   user.isMe = isSelfUser;
   user.isGuest(isGuest);
@@ -75,6 +84,7 @@ describe('CallParticipantsListItem', () => {
     const participant = createMockParticipant({});
     const {getByTestId} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByTestId('element-avatar-user')).toBeDefined();
@@ -89,6 +99,7 @@ describe('CallParticipantsListItem', () => {
 
     const {getByText} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByText(participantName)).toBeDefined();
@@ -99,6 +110,7 @@ describe('CallParticipantsListItem', () => {
 
     const {getByText} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByText('(ConversationYouNominative)')).toBeDefined();
@@ -113,6 +125,7 @@ describe('CallParticipantsListItem', () => {
 
     const {getByTestId} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByTestId('status-guest')).toBeDefined();
@@ -124,6 +137,7 @@ describe('CallParticipantsListItem', () => {
     const onContextMenu = jest.fn();
     const {getByTestId} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     const userItem = getByTestId('item-user');
@@ -137,6 +151,7 @@ describe('CallParticipantsListItem', () => {
     const onContextMenu = jest.fn();
     const {getByTestId} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     const userItem = getByTestId('item-user');
@@ -150,8 +165,9 @@ describe('CallParticipantsListItem', () => {
     const onContextMenu = jest.fn();
     const {getByText} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
+      {wrapper: rootProviderWrapper},
     );
 
-    expect(getByText('videoCallParticipantConnecting')).toBeDefined();
+    expect(getByText(translate('videoCallParticipantConnecting'))).toBeDefined();
   });
 });

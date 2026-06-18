@@ -26,8 +26,8 @@ import {ClientRepository, ClientEntity} from 'Repositories/client';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {partition} from 'Util/arrayUtil';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
@@ -71,6 +71,7 @@ export const UserDevices = ({
   cryptographyRepository,
   groupId,
 }: UserDevicesProps) => {
+  const {translate} = useApplicationContext();
   const [selectedClient, setSelectedClient] = useState<ClientEntity>();
   const {getDeviceIdentity} = useUserIdentity(user.qualifiedId, groupId);
   const [deviceMode, setDeviceMode] = useState(FIND_MODE.REQUESTING);
@@ -78,7 +79,7 @@ export const UserDevices = ({
   const logger = useMemo(() => getLogger('UserDevicesComponent'), []);
 
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
         const qualifiedUsersMap = Object.values(await clientRepository.getClientsByUserIds([user], true));
         for (const qualifiedUsersMaps of qualifiedUsersMap) {
@@ -93,7 +94,7 @@ export const UserDevices = ({
         logger.error(`Unable to retrieve clients for user '${user.id}': ${(error as Error).message || error}`);
       }
     })();
-  }, [user]);
+  }, [clientRepository, logger, user]);
 
   const clickOnDevice = (clientEntity: ClientEntity) => {
     setSelectedClient(clientEntity);
@@ -104,7 +105,7 @@ export const UserDevices = ({
   };
 
   const clickToShowSelfFingerprint = () => {
-    goTo(UserDevicesState.SELF_FINGERPRINT, t('participantDevicesSelfFingerprint'));
+    goTo(UserDevicesState.SELF_FINGERPRINT, translate('participantDevicesSelfFingerprint'));
   };
 
   const showDeviceList = current.state === UserDevicesState.DEVICE_LIST;

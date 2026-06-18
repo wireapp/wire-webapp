@@ -21,7 +21,7 @@ import {useNavigate} from 'react-router-dom';
 
 import {FlexBox} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {styles} from './CreatePersonalAccount.styles';
 import {Page} from './Page';
@@ -34,6 +34,7 @@ import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';
 
 export const CreatePersonalAccount = () => {
+  const {translate} = useApplicationContext();
   const navigate = useNavigate();
   const onSubmit = () => {
     if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
@@ -52,12 +53,12 @@ export const CreatePersonalAccount = () => {
               <BackButton />
             </div>
             <p css={styles.header} role="heading" aria-level={1} data-page-title tabIndex={-1}>
-              {t('createPersonalAccount.headLine')}
+              {translate('createPersonalAccount.headLine')}
             </p>
             <AccountForm onSubmit={onSubmit} />
-            <p css={styles.footer}>{t('createPersonalAccount.subHeader')}</p>
+            <p css={styles.footer}>{translate('createPersonalAccount.subHeader')}</p>
             <a css={styles.teamCreateButton} href={EXTERNAL_ROUTE.WIRE_TEAMS_SIGNUP} target="_blank" rel="noreferrer">
-              {t('createPersonalAccount.createTeamButton')}
+              {translate('createPersonalAccount.createTeamButton')}
             </a>
           </FlexBox>
         </FlexBox>

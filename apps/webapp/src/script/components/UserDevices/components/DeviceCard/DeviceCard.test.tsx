@@ -28,6 +28,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {DeviceCard} from './DeviceCard';
+import {translateForTest} from 'Util/test/translateForTest';
 
 function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
   const device: Partial<ClientEntity> = {
@@ -41,7 +42,7 @@ function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
 }
 
 describe('DeviceCard', () => {
-  const rootContextValue = createRootContextValueForTest({});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   it('shows disclose icon when component is clickable', async () => {

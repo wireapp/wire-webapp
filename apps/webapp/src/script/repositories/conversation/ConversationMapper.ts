@@ -30,6 +30,7 @@ import {
   ADD_PERMISSION,
   CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {isObject} from 'underscore';
@@ -38,6 +39,7 @@ import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
+import {type Translate} from 'Util/localizerUtil';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
@@ -84,7 +86,11 @@ export type ConversationDatabaseData = ConversationRecord &
   };
 
 export class ConversationMapper {
-  static mapConversations(conversationsData: ConversationDatabaseData[], timestamp: number = 1): Conversation[] {
+  static mapConversations(
+    conversationsData: ConversationDatabaseData[],
+    timestamp: number = 1,
+    translate: Translate,
+  ): Conversation[] {
     if (conversationsData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
@@ -92,7 +98,7 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
     return conversationsData.map((conversationData: ConversationDatabaseData, index: number) => {
-      return ConversationMapper.createConversationEntity(conversationData, timestamp + index);
+      return ConversationMapper.createConversationEntity(conversationData, translate, timestamp + index);
     });
   }
 
@@ -237,6 +243,7 @@ export class ConversationMapper {
 
   private static createConversationEntity(
     conversationData: ConversationDatabaseData,
+    translate: Translate,
     initialTimestamp?: number,
   ): Conversation {
     if (conversationData === undefined) {
@@ -270,11 +277,10 @@ export class ConversationMapper {
       cells_state,
     } = conversationData;
 
-    let conversationEntity = new Conversation(
-      id,
-      conversationData.domain ?? conversationData.qualified_id?.domain,
-      protocol,
-    );
+    const conversationDomain = conversationData.domain ?? conversationData.qualified_id?.domain ?? '';
+    const conversationProtocol = protocol ?? CONVERSATION_PROTOCOL.PROTEUS;
+
+    let conversationEntity = new Conversation(id, conversationDomain, conversationProtocol, translate);
     conversationEntity.roles(this.computeRoles(conversationData));
 
     conversationEntity.creator = creator;

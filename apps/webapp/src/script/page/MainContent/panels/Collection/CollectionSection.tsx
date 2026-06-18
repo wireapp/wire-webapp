@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {CollectionItem} from './CollectionItem';
 
@@ -41,6 +41,8 @@ const CollectionSection = ({
   uieName: string;
   onImageClick?: (message: ContentMessage) => void;
 }) => {
+  const {translate} = useApplicationContext();
+
   if (messages.length === 0) {
     return null;
   }
@@ -54,7 +56,7 @@ const CollectionSection = ({
         <span className="label-bold-xs">{label}</span>
         {hasExtra && (
           <button className="collection-header-all accent-text" onClick={onSelect}>
-            <span data-uie-name="collection-show-all">{t('collectionShowAll', {number: messages.length})}</span>
+            <span data-uie-name="collection-show-all">{translate('collectionShowAll', {number: messages.length})}</span>
             &nbsp;<span className="icon-forward font-size-xxs"></span>
           </button>
         )}

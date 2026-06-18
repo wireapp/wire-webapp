@@ -23,7 +23,7 @@ import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 import type {MemberMessage} from 'Repositories/entity/message/MemberMessage';
 import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import type {Text} from 'Repositories/entity/message/Text';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
@@ -40,7 +40,17 @@ enum ACTIVITY_TYPE {
   REPLY = 'ConversationCellState.ACTIVITY_TYPE.REPLY',
 }
 
-const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionAndReply?: boolean): string => {
+type ConversationCellStateDefinition = {
+  description: (conversationEntity: Conversation, translate: Translate) => string;
+  icon: (conversationEntity: Conversation) => ConversationStatusIcon | void;
+  match: (conversationEntity: Conversation) => boolean;
+};
+
+const _accumulateSummary = (
+  conversationEntity: Conversation,
+  translate: Translate,
+  prioritizeMentionAndReply?: boolean,
+): string => {
   const {
     calls: unreadCalls,
     otherMessages: unreadOtherMessages,
@@ -75,12 +85,12 @@ const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionA
 
         if (hasSingleMention) {
           summary = conversationEntity.isGroupOrChannel()
-            ? t('conversationsSecondaryLineEphemeralMentionGroup')
-            : t('conversationsSecondaryLineEphemeralMention');
+            ? translate('conversationsSecondaryLineEphemeralMentionGroup')
+            : translate('conversationsSecondaryLineEphemeralMention');
         } else {
           summary = conversationEntity.isGroupOrChannel()
-            ? t('conversationsSecondaryLineEphemeralReplyGroup')
-            : t('conversationsSecondaryLineEphemeralReply');
+            ? translate('conversationsSecondaryLineEphemeralReplyGroup')
+            : translate('conversationsSecondaryLineEphemeralReply');
         }
 
         return summary;
@@ -92,10 +102,10 @@ const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionA
     }
   }
 
-  return _generateSummaryDescription(activities);
+  return _generateSummaryDescription(activities, translate);
 };
 
-const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>): string => {
+const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, translate: Translate): string => {
   return Object.entries(activities)
     .map(([activity, activityCount]): string | void => {
       if (activityCount) {
@@ -104,32 +114,32 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>):
         switch (activity) {
           case ACTIVITY_TYPE.CALL: {
             return activityCountIsOne
-              ? t('conversationsSecondaryLineSummaryMissedCall', {number: activityCount})
-              : t('conversationsSecondaryLineSummaryMissedCalls', {number: activityCount});
+              ? translate('conversationsSecondaryLineSummaryMissedCall', {number: activityCount})
+              : translate('conversationsSecondaryLineSummaryMissedCalls', {number: activityCount});
           }
 
           case ACTIVITY_TYPE.MENTION: {
             return activityCountIsOne
-              ? t('conversationsSecondaryLineSummaryMention', {number: activityCount})
-              : t('conversationsSecondaryLineSummaryMentions', {number: activityCount});
+              ? translate('conversationsSecondaryLineSummaryMention', {number: activityCount})
+              : translate('conversationsSecondaryLineSummaryMentions', {number: activityCount});
           }
 
           case ACTIVITY_TYPE.MESSAGE: {
             return activityCountIsOne
-              ? t('conversationsSecondaryLineSummaryMessage', {number: activityCount})
-              : t('conversationsSecondaryLineSummaryMessages', {number: activityCount});
+              ? translate('conversationsSecondaryLineSummaryMessage', {number: activityCount})
+              : translate('conversationsSecondaryLineSummaryMessages', {number: activityCount});
           }
 
           case ACTIVITY_TYPE.PING: {
             return activityCountIsOne
-              ? t('conversationsSecondaryLineSummaryPing', {number: activityCount})
-              : t('conversationsSecondaryLineSummaryPings', {number: activityCount});
+              ? translate('conversationsSecondaryLineSummaryPing', {number: activityCount})
+              : translate('conversationsSecondaryLineSummaryPings', {number: activityCount});
           }
 
           case ACTIVITY_TYPE.REPLY: {
             return activityCountIsOne
-              ? t('conversationsSecondaryLineSummaryReply', {number: activityCount})
-              : t('conversationsSecondaryLineSummaryReplies', {number: activityCount});
+              ? translate('conversationsSecondaryLineSummaryReply', {number: activityCount})
+              : translate('conversationsSecondaryLineSummaryReplies', {number: activityCount});
           }
 
           default:
@@ -143,8 +153,9 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>):
     .join(', ');
 };
 
-const _getStateAlert = {
-  description: (conversationEntity: Conversation) => _accumulateSummary(conversationEntity, true),
+const _getStateAlert: ConversationCellStateDefinition = {
+  description: (conversationEntity: Conversation, translate: Translate) =>
+    _accumulateSummary(conversationEntity, translate, true),
   icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
     const {
       calls: unreadCalls,
@@ -184,13 +195,14 @@ const _getStateAlert = {
   },
 };
 
-const _getStateDefault = {
+const _getStateDefault: ConversationCellStateDefinition = {
   description: () => '',
   icon: () => ConversationStatusIcon.NONE,
+  match: () => false,
 };
 
-const _getStateGroupActivity = {
-  description: (conversationEntity: Conversation): string => {
+const _getStateGroupActivity: ConversationCellStateDefinition = {
+  description: (conversationEntity: Conversation, translate: Translate): string => {
     const lastMessageEntity = conversationEntity.getNewestMessage();
     if (lastMessageEntity === undefined) {
       return '';
@@ -206,7 +218,7 @@ const _getStateGroupActivity = {
         if ((lastMessageEntity as MemberMessage).isMemberJoin()) {
           if (userCountIsOne) {
             if (!(lastMessageEntity as MemberMessage).remoteUserEntities().length) {
-              return t('conversationsSecondaryLinePersonAddedYou', {
+              return translate('conversationsSecondaryLinePersonAddedYou', {
                 user: (lastMessageEntity as MemberMessage).user().name(),
               });
             }
@@ -217,13 +229,13 @@ const _getStateGroupActivity = {
             }
             const userSelfJoined = lastMessageEntity.user().id === remoteUserEntity.id;
             const string = userSelfJoined
-              ? t('conversationsSecondaryLinePersonAddedSelf', {user: remoteUserEntity.name()})
-              : t('conversationsSecondaryLinePersonAdded', {user: remoteUserEntity.name()});
+              ? translate('conversationsSecondaryLinePersonAddedSelf', {user: remoteUserEntity.name()})
+              : translate('conversationsSecondaryLinePersonAdded', {user: remoteUserEntity.name()});
 
             return string;
           }
 
-          return t('conversationsSecondaryLinePeopleAdded', {user: userCount});
+          return translate('conversationsSecondaryLinePeopleAdded', {user: userCount});
         }
 
         if ((lastMessageEntity as MemberMessage).isMemberRemoval()) {
@@ -233,19 +245,19 @@ const _getStateGroupActivity = {
             if (remoteUserEntity !== undefined) {
               if ((lastMessageEntity as MemberMessage).isTeamMemberLeave()) {
                 const name = (lastMessageEntity as MemberMessage).name() ?? remoteUserEntity.name();
-                return t('conversationsSecondaryLinePersonRemovedTeam', {user: name});
+                return translate('conversationsSecondaryLinePersonRemovedTeam', {user: name});
               }
 
               const userSelfLeft = remoteUserEntity.id === lastMessageEntity.user().id;
               const string = userSelfLeft
-                ? t('conversationsSecondaryLinePersonLeft', {user: remoteUserEntity.name()})
-                : t('conversationsSecondaryLinePersonRemoved', {user: remoteUserEntity.name()});
+                ? translate('conversationsSecondaryLinePersonLeft', {user: remoteUserEntity.name()})
+                : translate('conversationsSecondaryLinePersonRemoved', {user: remoteUserEntity.name()});
 
               return string;
             }
           }
 
-          return t('conversationsSecondaryLinePeopleLeft', {number: userCount});
+          return translate('conversationsSecondaryLinePeopleLeft', {number: userCount});
         }
       }
     }
@@ -253,7 +265,7 @@ const _getStateGroupActivity = {
     const isConversationRename =
       lastMessageEntity.isSystem() && (lastMessageEntity as SystemMessage).isConversationRename();
     if (isConversationRename) {
-      return t('conversationsSecondaryLineRenamed', {user: lastMessageEntity.user().name()});
+      return translate('conversationsSecondaryLineRenamed', {user: lastMessageEntity.user().name()});
     }
 
     return '';
@@ -272,9 +284,9 @@ const _getStateGroupActivity = {
   },
 };
 
-const _getStateMuted = {
-  description: (conversationEntity: Conversation) => {
-    return _accumulateSummary(conversationEntity, conversationEntity.showNotificationsMentionsAndReplies());
+const _getStateMuted: ConversationCellStateDefinition = {
+  description: (conversationEntity: Conversation, translate: Translate) => {
+    return _accumulateSummary(conversationEntity, translate, conversationEntity.showNotificationsMentionsAndReplies());
   },
   icon: (conversationEntity: Conversation) => {
     const hasSelfMentions = conversationEntity.unreadState().selfMentions.length > 0;
@@ -295,8 +307,8 @@ const _getStateMuted = {
   match: (conversationEntity: Conversation) => !conversationEntity.showNotificationsEverything(),
 };
 
-const _getStateRemoved = {
-  description: (conversationEntity: Conversation) => {
+const _getStateRemoved: ConversationCellStateDefinition = {
+  description: (conversationEntity: Conversation, translate: Translate) => {
     const lastMessageEntity = conversationEntity.getNewestMessage();
     const selfUser = conversationEntity.selfUser();
     if (selfUser === undefined) {
@@ -311,7 +323,9 @@ const _getStateRemoved = {
       (lastMessageEntity as MemberMessage).userIds().some(userId => matchQualifiedIds(userId, selfUser));
     if (wasSelfRemoved) {
       const selfLeft = lastMessageEntity.user().id === selfUserId;
-      return selfLeft ? t('conversationsSecondaryLineYouLeft') : t('conversationsSecondaryLineYouWereRemoved');
+      return selfLeft
+        ? translate('conversationsSecondaryLineYouLeft')
+        : translate('conversationsSecondaryLineYouWereRemoved');
     }
 
     return '';
@@ -320,8 +334,8 @@ const _getStateRemoved = {
   match: (conversationEntity: Conversation) => conversationEntity.isSelfUserRemoved(),
 };
 
-const _getStateUnreadMessage = {
-  description: (conversationEntity: Conversation): string => {
+const _getStateUnreadMessage: ConversationCellStateDefinition = {
+  description: (conversationEntity: Conversation, translate: Translate): string => {
     const unreadState = conversationEntity.unreadState();
 
     const {allMessages, systemMessages} = unreadState;
@@ -332,7 +346,7 @@ const _getStateUnreadMessage = {
       let conversationPreviewText = '';
 
       if (messageEntity.isPing()) {
-        conversationPreviewText = t('notificationPing');
+        conversationPreviewText = translate('notificationPing');
       } else if (messageEntity.isContent() && messageEntity.hasAssetText()) {
         const assetEntity = messageEntity.getFirstAsset();
         if (assetEntity !== undefined) {
@@ -345,31 +359,31 @@ const _getStateUnreadMessage = {
 
         if (isUploaded && assetEntity !== undefined) {
           if (assetEntity.isAudio()) {
-            conversationPreviewText = t('notificationSharedAudio');
+            conversationPreviewText = translate('notificationSharedAudio');
           } else if (assetEntity.isVideo()) {
-            conversationPreviewText = t('notificationSharedVideo');
+            conversationPreviewText = translate('notificationSharedVideo');
           } else {
-            conversationPreviewText = t('notificationSharedFile');
+            conversationPreviewText = translate('notificationSharedFile');
           }
         }
       } else if (messageEntity.hasAssetLocation()) {
-        conversationPreviewText = t('notificationSharedLocation');
+        conversationPreviewText = translate('notificationSharedLocation');
       } else if (messageEntity.hasAssetImage()) {
-        conversationPreviewText = t('notificationAssetAdd');
+        conversationPreviewText = translate('notificationAssetAdd');
       } else if (messageEntity.isE2EIVerification()) {
         conversationPreviewText =
           messageEntity.messageType === E2EIVerificationMessageType.VERIFIED
-            ? t('conversation.AllE2EIDevicesVerifiedShort')
-            : t('conversation.E2EIVerificationDegraded');
+            ? translate('conversation.AllE2EIDevicesVerifiedShort')
+            : translate('conversation.E2EIVerificationDegraded');
       } else if (messageEntity.isVerification()) {
-        conversationPreviewText = t('conversation.AllDevicesVerified');
+        conversationPreviewText = translate('conversation.AllDevicesVerified');
       }
 
       if (conversationPreviewText.length > 0) {
         if (messageEntity.isEphemeral()) {
           return conversationEntity.isGroupOrChannel()
-            ? t('conversationsSecondaryLineEphemeralMessageGroup')
-            : t('conversationsSecondaryLineEphemeralMessage');
+            ? translate('conversationsSecondaryLineEphemeralMessageGroup')
+            : translate('conversationsSecondaryLineEphemeralMessage');
         }
 
         return conversationEntity.isGroupOrChannel() && !messageEntity.isE2EIVerification()
@@ -387,7 +401,7 @@ const _getStateUnreadMessage = {
   },
 };
 
-const _getStateUserName = {
+const _getStateUserName: ConversationCellStateDefinition = {
   description: (conversationEntity: Conversation): string => {
     const [userEntity] = conversationEntity.participating_user_ets();
     const hasHandle = userEntity !== undefined && userEntity.username() !== undefined;
@@ -412,6 +426,7 @@ const _getStateUserName = {
 
 export const generateCellState = (
   conversationEntity: Conversation,
+  translate: Translate,
 ): {description: string; icon: ConversationStatusIcon | void} => {
   const states = [
     _getStateRemoved,
@@ -420,12 +435,12 @@ export const generateCellState = (
     _getStateGroupActivity,
     _getStateUnreadMessage,
     _getStateUserName,
-  ];
+  ] satisfies ConversationCellStateDefinition[];
 
   const matchingState = states.find(state => state.match(conversationEntity)) || _getStateDefault;
 
   return {
-    description: matchingState.description(conversationEntity),
+    description: matchingState.description(conversationEntity, translate),
     icon: matchingState.icon(conversationEntity),
   };
 };

@@ -20,12 +20,13 @@
 import {FC} from 'react';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './MessageActions.styles';
 import {reactionImgSize} from './MessageReactions/EmojiChar.styles';
 
 interface ReplyButtonProps {
+  translate: Translate;
   actionId: string;
   currentMsgActionName: string;
   messageFocusedTabIndex: number;
@@ -34,6 +35,7 @@ interface ReplyButtonProps {
 }
 
 const ReplyButton: FC<ReplyButtonProps> = ({
+  translate,
   actionId,
   currentMsgActionName,
   messageFocusedTabIndex,
@@ -50,7 +52,7 @@ const ReplyButton: FC<ReplyButtonProps> = ({
       type="button"
       tabIndex={messageFocusedTabIndex}
       data-uie-name={actionId}
-      aria-label={t('conversationContextMenuReply')}
+      aria-label={translate('conversationContextMenuReply')}
       onClick={onReplyClick}
       onKeyDown={onKeyPress}
     >

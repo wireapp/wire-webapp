@@ -37,6 +37,8 @@ import {EventStorageMiddleware} from './EventStorageMiddleware';
 import {ClientEvent} from '../../Client';
 import {EventService} from '../../EventService';
 import {EventSource} from '../../EventSource';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildEventStorageMiddleware() {
   const eventService = {
@@ -48,7 +50,7 @@ function buildEventStorageMiddleware() {
   const conversationState = {
     findConversation: jest.fn(),
   } as unknown as jest.Mocked<ConversationState>;
-  const selfUser = new User(createUuid());
+  const selfUser = new User(createUuid(), '', translateForTest);
 
   return [
     new EventStorageMiddleware(eventService, selfUser, conversationState),
@@ -92,7 +94,7 @@ describe('EventStorageMiddleware', () => {
       const [eventStorageMiddleware, {conversationState}] = buildEventStorageMiddleware();
       const conversationId = createUuid();
       const userIds = [createUuid(), createUuid(), createUuid(), createUuid()];
-      const conversation = new Conversation(conversationId, '');
+      const conversation = new Conversation(conversationId, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       conversationState.findConversation.mockImplementation(() => conversation);
 
@@ -110,13 +112,13 @@ describe('EventStorageMiddleware', () => {
       const [eventStorageMiddleware, {conversationState}] = buildEventStorageMiddleware();
       const conversationId = createUuid();
       const userIds = [createUuid(), createUuid(), createUuid()];
-      const user1 = new User(userIds[0]);
-      const user2 = new User(userIds[1]);
-      const user3 = new User(userIds[2]);
+      const user1 = new User(userIds[0], '', translateForTest);
+      const user2 = new User(userIds[1], '', translateForTest);
+      const user3 = new User(userIds[2], '', translateForTest);
       user1.isDeleted = true;
       user2.isDeleted = true;
       user3.isDeleted = true;
-      const conversation = new Conversation(conversationId, '');
+      const conversation = new Conversation(conversationId, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.participating_user_ets([user1, user2, user3]);
 
       conversationState.findConversation.mockImplementation(() => conversation);
@@ -135,10 +137,10 @@ describe('EventStorageMiddleware', () => {
       const [eventStorageMiddleware, {conversationState}] = buildEventStorageMiddleware();
       const conversationId = createUuid();
       const userIds = [createUuid(), createUuid(), createUuid()];
-      const user1 = new User(userIds[0]);
-      const user2 = new User(userIds[1]);
-      const user3 = new User(userIds[2]);
-      const conversation = new Conversation(conversationId, '');
+      const user1 = new User(userIds[0], '', translateForTest);
+      const user2 = new User(userIds[1], '', translateForTest);
+      const user3 = new User(userIds[2], '', translateForTest);
+      const conversation = new Conversation(conversationId, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.participating_user_ets([user1, user2, user3]);
 
       conversationState.findConversation.mockImplementation(() => conversation);

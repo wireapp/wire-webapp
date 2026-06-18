@@ -23,7 +23,7 @@ import {WavesPattern} from '@wireapp/react-ui-kit/lib/Images/WavesPattern';
 
 import {CheckRoundIcon, COLOR_V2, FlexBox, Logo, Text} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   bodyCss,
@@ -38,23 +38,24 @@ import {
 } from './Layout.styles';
 
 export const AccountRegistrationLayout = ({children}: {children: ReactNode}) => {
+  const {translate} = useApplicationContext();
   const featureList = [
-    t('registrationLayout.listItem1'),
-    t('registrationLayout.listItem2'),
-    t('registrationLayout.listItem3'),
+    translate('registrationLayout.listItem1'),
+    translate('registrationLayout.listItem2'),
+    translate('registrationLayout.listItem3'),
   ];
 
   return (
     <FlexBox css={bodyCss}>
       <div css={leftSectionCss}>
-        <Logo color={COLOR_V2.WHITE} scale={1.9} ariaLabel={t('accessibility.logo.wire')} />
+        <Logo color={COLOR_V2.WHITE} scale={1.9} ariaLabel={translate('accessibility.logo.wire')} />
         <div css={registrationLayoutContainerCss}>
           <Text bold css={whiteFontCss} fontSize="1.5rem">
-            {t('registrationLayout.header')}
+            {translate('registrationLayout.header')}
           </Text>
           <br />
           <div css={registrationLayoutSubHeaderContainerCss}>
-            <Text css={registrationLayoutSubHeaderCss}>{t('registrationLayout.subhead')}</Text>
+            <Text css={registrationLayoutSubHeaderCss}>{translate('registrationLayout.subhead')}</Text>
           </div>
 
           {featureList.map(item => (
@@ -70,7 +71,7 @@ export const AccountRegistrationLayout = ({children}: {children: ReactNode}) => 
           ))}
 
           <div css={registrationLayoutSubHeaderContainerCss}>
-            <Text css={registrationLayoutSubHeaderCss}>{t('registrationLayout.footer')}</Text>
+            <Text css={registrationLayoutSubHeaderCss}>{translate('registrationLayout.footer')}</Text>
           </div>
         </div>
         <span aria-hidden="true">

@@ -28,6 +28,7 @@ import {CALL_TYPE, CONV_TYPE, QUALITY, REASON, STATE as CALL_STATE, VIDEO_STATE,
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CallingEvent} from 'Repositories/event/CallingEvent';
@@ -51,13 +52,14 @@ import {buildMediaDevicesHandler, createConversation, createSelfParticipant} fro
 import {Core} from '../../service/coreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository: CallingRepository;
   let wCall: Wcall;
   let wUser: number;
-  const selfUser = new User(createUuid());
+  const selfUser = new User(createUuid(), '', translateForTest);
   selfUser.isMe = true;
   const clientId = createUuid();
 
@@ -369,6 +371,41 @@ describe('CallingRepository', () => {
     });
   });
 
+  describe('showNoAudioInputModal', () => {
+    it('uses the injected translate function', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const isolatedCallingRepository = new CallingRepository(
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        translate,
+      );
+
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined as never);
+
+      isolatedCallingRepository['showNoAudioInputModal']();
+
+      expect(showModal).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          primaryAction: expect.objectContaining({text: 'translated:modalAcknowledgeAction'}),
+          secondaryAction: expect.objectContaining({text: 'translated:modalNoAudioInputAction'}),
+          text: expect.objectContaining({
+            closeBtnLabel: 'translated:modalNoAudioCloseBtn',
+            message: 'translated:modalNoAudioInputMessage',
+            title: 'translated:modalNoAudioInputTitle',
+          }),
+        }),
+        undefined,
+        translate,
+      );
+    });
+  });
+
   describe('joinedCall', () => {
     it('only exposes the current active call', () => {
       const selfParticipant = createSelfParticipant();
@@ -497,7 +534,7 @@ describe('CallingRepository', () => {
 
       const selfParticipant = createSelfParticipant();
 
-      const user = new User(userId);
+      const user = new User(userId, '', translateForTest);
 
       const remoteParticipant = new Participant(user, remoteClientId);
 
@@ -749,10 +786,10 @@ describe('CallingRepository ISO', () => {
     });
 
     it('creates and stores a new call when an incoming call arrives', async () => {
-      const selfUser = new User(createUuid());
+      const selfUser = new User(createUuid(), '', translateForTest);
       selfUser.isMe = true;
 
-      const conversation = new Conversation(createUuid());
+      const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       const callingRepo = new CallingRepository(
         {
@@ -768,6 +805,7 @@ describe('CallingRepository ISO', () => {
           toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
         } as any, // ServerTimeHandler
         {} as any, // BackgroundEffectsHandler
+        undefined,
         {} as any, // APIClient
         {
           findConversation: jest.fn().mockImplementation(() => conversation),
@@ -892,8 +930,9 @@ describe.skip('E2E audio call', () => {
     {} as any,
     {} as any,
     {} as any,
+    undefined,
   );
-  const user = new User('user-1');
+  const user = new User('user-1', '', translateForTest);
   let remoteWuser: number;
   let wCall: Wcall;
 
@@ -1035,8 +1074,9 @@ describe('NotificationHandlingState', () => {
     mediaDevicesHandler,
     {} as any,
     {} as any,
+    undefined,
   );
-  const user = new User('user-1');
+  const user = new User('user-1', '', translateForTest);
   let wCall: Wcall;
   let wUserNumber: number;
   //
@@ -1096,8 +1136,9 @@ describe('init AVS state', () => {
     mediaDevicesHandler,
     {} as any,
     {} as any,
+    undefined,
   );
-  const user = new User('user-1');
+  const user = new User('user-1', '', translateForTest);
   beforeEach(() => {
     jest.useFakeTimers();
     jest.spyOn(Date, 'now');

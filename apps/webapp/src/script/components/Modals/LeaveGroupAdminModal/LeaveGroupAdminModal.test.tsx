@@ -24,7 +24,11 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react';
 import {User} from 'Repositories/entity/User';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LeaveGroupAdminModal} from './LeaveGroupAdminModal';
 import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';
@@ -33,10 +37,16 @@ jest.mock('./AdminSearchInput', () => ({
   AdminSearchInput: () => <div data-uie-name="admin-search-input" />,
 }));
 
-const renderModal = () => render(withTheme(<LeaveGroupAdminModal />));
+const renderModal = () => render(withTheme(<LeaveGroupAdminModal translate={translateForTest} />));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
+
+const renderModalWithRootProvider = () =>
+  render(withTheme(<LeaveGroupAdminModal translate={translateForTest} />), {wrapper: rootProviderWrapper});
 
 const createEligibleUser = (id: string) => {
-  const user = new User(id, 'example.com');
+  const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   user.username(`user.${id}`);
   return user;
@@ -62,13 +72,13 @@ describe('LeaveGroupAdminModal', () => {
       });
     });
 
-    const {getByTestId, queryByTestId} = renderModal();
+    const {getByTestId, queryByTestId} = renderModalWithRootProvider();
 
     expect(getByTestId('leave-group-admin-modal-message')).toHaveTextContent(
-      t('leaveGroupAdminModalMessageNoEligibleFirstPart'),
+      'leaveGroupAdminModalMessageNoEligibleFirstPart',
     );
     expect(getByTestId('leave-group-admin-modal-message')).toHaveTextContent(
-      t('leaveGroupAdminModalMessageNoEligibleSecondPart'),
+      'leaveGroupAdminModalMessageNoEligibleSecondPart',
     );
     expect(queryByTestId('do-leave-group-and-promote-admin')).toBeNull();
     expect(getByTestId('do-delete-group-from-leave-modal')).toBeInTheDocument();
@@ -90,7 +100,7 @@ describe('LeaveGroupAdminModal', () => {
       useLeaveGroupAdminModalStore.getState().setSelectedUser(selectedUser);
     });
 
-    const {getByTestId} = renderModal();
+    const {getByTestId} = renderModalWithRootProvider();
     const leaveButton = getByTestId('do-leave-group-and-promote-admin') as HTMLButtonElement;
 
     expect(leaveButton).not.toBeDisabled();

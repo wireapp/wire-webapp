@@ -63,6 +63,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserService} from 'Repositories/user/userService';
 import {UserState} from 'Repositories/user/userState';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
+import {translate} from 'Util/localizerUtil';
 
 import {entities} from '../api/payloads';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
@@ -108,7 +109,12 @@ export class TestFactory {
     await this.exposeCryptographyActors();
 
     this.client_service = new ClientService(this.storage_service);
-    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository, new ClientState());
+    this.client_repository = new ClientRepository(
+      this.client_service,
+      this.cryptography_repository,
+      translate,
+      new ClientState(),
+    );
 
     const currentClient = new ClientEntity(false, null);
     currentClient.address = '62.96.148.44';
@@ -155,10 +161,10 @@ export class TestFactory {
 
     this.connection_service = new ConnectionService();
     this.user_service = new UserService(this.storage_service);
-    this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
+    this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService(), translate);
 
     const userState = new UserState();
-    const selfUser = new User('self-id');
+    const selfUser = new User('self-id', '', translate);
     selfUser.isMe = true;
     userState.self(selfUser);
     userState.users([selfUser]);
@@ -170,6 +176,7 @@ export class TestFactory {
       this.client_repository,
       serverTimeHandler,
       this.propertyRepository,
+      translate,
       userState,
     );
 
@@ -188,6 +195,7 @@ export class TestFactory {
       this.user_repository,
       this.self_service,
       this.team_service,
+      translate,
     );
 
     return this.connection_repository;
@@ -215,6 +223,7 @@ export class TestFactory {
       this.assetRepository,
       () => Promise.resolve(),
       this.team_service,
+      translate,
       this.user_repository['userState'],
       new TeamState(this.user_repository['userState']),
     );
@@ -253,7 +262,7 @@ export class TestFactory {
 
     this.conversation_service = new ConversationService(this.event_service);
 
-    this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
+    this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService(), translate);
 
     /** @type {ConversationRepository} */
     this.conversation_repository = null;
@@ -277,6 +286,7 @@ export class TestFactory {
       this.user_repository,
       this.assetRepository,
       new AudioRepository(),
+      translate,
       this.user_repository['userState'],
       clientState,
     );
@@ -292,6 +302,7 @@ export class TestFactory {
       this.propertyRepository,
       this.calling_repository,
       serverTimeHandler,
+      translate,
       this.user_repository['userState'],
       this.team_repository['teamState'],
       conversationState,
@@ -319,6 +330,7 @@ export class TestFactory {
       mediaDevicesHandler,
       serverTimeHandler,
       undefined,
+      translate,
       this.conversation_repository['conversationState'],
     );
 

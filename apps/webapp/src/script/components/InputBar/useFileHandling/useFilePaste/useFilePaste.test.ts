@@ -20,17 +20,13 @@
 import {act, renderHook} from '@testing-library/react';
 
 import * as checkFileSharingPermissionModule from 'Components/Conversation/utils/checkFileSharingPermission';
-import * as LocalizerUtil from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import * as TimeUtil from 'Util/timeUtil';
 
 import {useFilePaste} from './useFilePaste';
 
 jest.mock('Components/Conversation/utils/checkFileSharingPermission', () => ({
   checkFileSharingPermission: jest.fn(callback => callback),
-}));
-
-jest.mock('Util/localizerUtil', () => ({
-  t: jest.fn(),
 }));
 
 jest.mock('Util/timeUtil', () => ({
@@ -43,20 +39,25 @@ describe('useFilePaste', () => {
   const mockFormattedDate = '1 Jan 2024, 12:00';
   // After sanitization, commas and colons are replaced with hyphens
   const sanitizedFormattedDate = '1 Jan 2024-12-00';
+  const translate: Translate = (key, replacements) => {
+    if (key === 'conversationSendPastedFile' && replacements !== undefined && replacements.date) {
+      return `Pasted file from ${replacements.date}`;
+    }
+    return key;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (LocalizerUtil.t as jest.Mock).mockImplementation((key, params) => {
-      if (key === 'conversationSendPastedFile' && params?.date) {
-        return `Pasted file from ${params.date}`;
-      }
-      return key;
-    });
     (TimeUtil.formatLocale as jest.Mock).mockReturnValue(mockFormattedDate);
   });
 
   it('handles file paste event', () => {
-    renderHook(() => useFilePaste({onFilePasted: mockOnFilePasted}));
+    renderHook(() =>
+      useFilePaste({
+        onFilePasted: mockOnFilePasted,
+        translate,
+      }),
+    );
 
     const file = new File(['test content'], 'test.txt', {type: 'text/plain', lastModified: mockDate.getTime()});
     const clipboardEvent = new MockClipboardEvent([file]);
@@ -73,7 +74,12 @@ describe('useFilePaste', () => {
   });
 
   it('ignores paste events with text/plain content', () => {
-    renderHook(() => useFilePaste({onFilePasted: mockOnFilePasted}));
+    renderHook(() =>
+      useFilePaste({
+        onFilePasted: mockOnFilePasted,
+        translate,
+      }),
+    );
 
     const clipboardEvent = new MockClipboardEvent([], ['text/plain']);
 
@@ -86,7 +92,12 @@ describe('useFilePaste', () => {
   });
 
   it('does nothing when no files are pasted', () => {
-    renderHook(() => useFilePaste({onFilePasted: mockOnFilePasted}));
+    renderHook(() =>
+      useFilePaste({
+        onFilePasted: mockOnFilePasted,
+        translate,
+      }),
+    );
 
     const clipboardEvent = new MockClipboardEvent([]);
 

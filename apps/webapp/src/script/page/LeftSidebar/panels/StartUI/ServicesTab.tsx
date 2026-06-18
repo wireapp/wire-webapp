@@ -27,10 +27,12 @@ import * as Icon from 'Components/icon';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {getManageServicesUrl} from '../../../../externalRoute';
+
+const SEARCH_DEBOUNCE_MILLISECONDS = 300;
 
 export const ServicesTab = ({
   searchQuery,
@@ -43,6 +45,7 @@ export const ServicesTab = ({
   onClickService: (service: ServiceEntity) => void;
   searchQuery: string;
 }) => {
+  const {translate} = useApplicationContext();
   const isInitial = false;
   const [services, setServices] = useState<ServiceEntity[]>(integrationRepository.services());
   const manageServicesUrl = getManageServicesUrl('client_landing');
@@ -54,11 +57,11 @@ export const ServicesTab = ({
     if (results) {
       setServices(results);
     }
-  }, 300);
+  }, SEARCH_DEBOUNCE_MILLISECONDS);
 
   useEffect(() => {
-    debouncedSearch();
-  }, [searchQuery]);
+    void debouncedSearch();
+  }, [debouncedSearch]);
 
   return (
     <>
@@ -76,7 +79,7 @@ export const ServicesTab = ({
                   <span className="left-column-icon">
                     <Icon.ServiceIcon />
                   </span>
-                  <span className="column-center">{t('searchManageServices')}</span>
+                  <span className="column-center">{translate('searchManageServices')}</span>
                 </button>
               </li>
             </ul>
@@ -94,7 +97,7 @@ export const ServicesTab = ({
           {canManageServices && manageServicesUrl ? (
             <>
               <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
-                {t('searchNoServicesManager')}
+                {translate('searchNoServicesManager')}
               </div>
 
               <Button
@@ -104,12 +107,12 @@ export const ServicesTab = ({
                 data-uie-name="go-enable-services"
                 style={{marginTop: '1em'}}
               >
-                {t('searchManageServicesNoResults')}
+                {translate('searchManageServicesNoResults')}
               </Button>
             </>
           ) : (
             <div className="search__no-services__info" data-uie-name="label-no-services-enabled">
-              {t('searchNoServicesMember')}
+              {translate('searchNoServicesMember')}
             </div>
           )}
         </div>

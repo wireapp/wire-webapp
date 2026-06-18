@@ -19,9 +19,10 @@
 
 import {ReactNode} from 'react';
 
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 interface DownloadButtonProps {
+  translate: Translate;
   actionId: string;
   messageFocusedTabIndex: number;
   onDownloadClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -31,6 +32,7 @@ interface DownloadButtonProps {
 }
 
 const DownloadButton = ({
+  translate,
   actionId,
   messageFocusedTabIndex,
   onDownloadClick,
@@ -44,7 +46,7 @@ const DownloadButton = ({
       type="button"
       tabIndex={messageFocusedTabIndex}
       data-uie-name={actionId}
-      aria-label={t('conversationContextMenuDownload')}
+      aria-label={translate('conversationContextMenuDownload')}
       onClick={onDownloadClick}
       onKeyDown={onKeyPress}
     >

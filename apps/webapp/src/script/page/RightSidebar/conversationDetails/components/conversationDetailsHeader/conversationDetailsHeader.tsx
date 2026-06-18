@@ -25,9 +25,9 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {removeLineBreaks} from 'Util/stringUtil';
 
 import {GroupDetails} from '../groupDetails/groupDetails';
@@ -53,6 +53,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   isTeam = false,
   conversation,
 }) => {
+  const {translate} = useApplicationContext();
   const {isGroupOrChannel, display_name: displayName} = useKoSubscribableChildren(conversation, [
     'isGroupOrChannel',
     'display_name',
@@ -134,7 +135,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
               {canRenameGroup && (
                 <button
                   className="conversation-details__name__edit-icon"
-                  aria-label={t('tooltipConversationDetailsRename')}
+                  aria-label={translate('tooltipConversationDetailsRename')}
                 >
                   <Icon.EditIcon />
                 </button>

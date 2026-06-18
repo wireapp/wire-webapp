@@ -21,32 +21,46 @@ import {useCallback} from 'react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {styles} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard.styles';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 
-export const useNoInternetCallGuard = () => {
+interface NoInternetCallGuardCopy {
+  description: string;
+  descriptionPoints: [string, string, string];
+  title: string;
+  translate: Translate;
+}
+
+export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGuardCopy) => {
+  const {description, descriptionPoints, title, translate} = noInternetCallGuardCopy;
+  const [firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint] = descriptionPoints;
   const warnings = useWarningsState(state => state.warnings);
   const visibleWarning = warnings[warnings.length - 1];
 
   const showCallNotEstablishedMessage = useCallback(() => {
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {
-        message: (
-          <span>
-            {t('callNotEstablishedDescription')}
-            <ul css={styles}>
-              <li>{t('callNotEstablishedDescriptionPoint1')}</li>
-              <li>{t('callNotEstablishedDescriptionPoint2')}</li>
-              <li>{t('callNotEstablishedDescriptionPoint3')}</li>
-            </ul>
-          </span>
-        ),
-        title: t('callNotEstablishedTitle'),
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          message: (
+            <span>
+              {description}
+              <ul css={styles}>
+                <li>{firstDescriptionPoint}</li>
+                <li>{secondDescriptionPoint}</li>
+                <li>{thirdDescriptionPoint}</li>
+              </ul>
+            </span>
+          ),
+          title,
+        },
       },
-    });
-  }, []);
+      undefined,
+      translate,
+    );
+  }, [description, firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint, title, translate]);
 
   return useCallback(
     (startCall: () => void) => {

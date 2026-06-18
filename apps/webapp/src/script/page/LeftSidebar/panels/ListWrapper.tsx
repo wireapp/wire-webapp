@@ -25,7 +25,7 @@ import {throttle} from 'underscore';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/icon';
 import {useConnectionQuality} from 'src/script/hooks/useConnectionQuality';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scrollHelpers';
 
 const scrollStyle = css`
@@ -43,6 +43,8 @@ const style = css`
   overflow-y: overlay;
   position: relative;
 `;
+
+const BORDER_RECALCULATION_THROTTLE_MILLISECONDS = 100;
 
 interface LeftListWrapperProps {
   /** A react element that will be inserted after the header but before the list */
@@ -76,6 +78,7 @@ const ListWrapper = memo(
     conversationListRef,
     setConversationListRef,
   }: LeftListWrapperProps) => {
+    const {translate} = useApplicationContext();
     const calculateBorders = throttle((element: HTMLElement) => {
       window.requestAnimationFrame(() => {
         if (element.offsetHeight <= 0 || !isScrollable(element)) {
@@ -86,7 +89,7 @@ const ListWrapper = memo(
         element.classList.toggle('left-list-center-border-top', !isScrolledTop(element));
         element.classList.toggle('left-list-center-border-bottom', !isScrolledBottom(element));
       });
-    }, 100);
+    }, BORDER_RECALCULATION_THROTTLE_MILLISECONDS);
 
     function initBorderedScroll(element: HTMLElement | null) {
       if (!element) {
@@ -113,7 +116,7 @@ const ListWrapper = memo(
                 {isSlow && (
                   <p className="slow-connection-indicator">
                     <Icon.NetworkIcon />
-                    <span>{t('internetConnectionSlow')}</span>
+                    <span>{translate('internetConnectionSlow')}</span>
                   </p>
                 )}
                 <div className="left-list-header-title-wrapper">
@@ -128,7 +131,7 @@ const ListWrapper = memo(
                           type="button"
                           className="left-list-header-close-button button-icon-large"
                           onClick={onClose}
-                          title={t('tooltipSearchClose')}
+                          title={translate('tooltipSearchClose')}
                           data-uie-name={`do-close-${id}`}
                         >
                           <Icon.CloseIcon />
@@ -144,7 +147,7 @@ const ListWrapper = memo(
 
             <FadingScrollbar
               role="list"
-              aria-label={t('accessibility.conversation.sectionLabel')}
+              aria-label={translate('accessibility.conversation.sectionLabel')}
               css={scrollStyle}
               ref={initBorderedScroll}
             >

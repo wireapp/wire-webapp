@@ -18,11 +18,11 @@
  */
 
 import type {User} from 'Repositories/entity/User';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 const MAX_VISIBLE_NAMES = 2;
 
-export const formatSelectedSummary = (selectedUsers: User[]): string => {
+export function formatSelectedSummary(selectedUsers: User[], translate: Translate): string {
   if (selectedUsers.length === 0) {
     return '';
   }
@@ -34,7 +34,7 @@ export const formatSelectedSummary = (selectedUsers: User[]): string => {
   }
 
   if (names.length === MAX_VISIBLE_NAMES) {
-    return t('meetings.scheduleModal.participantsSelectedSummaryTwo', {
+    return translate('meetings.scheduleModal.participantsSelectedSummaryTwo', {
       name1: names[0],
       name2: names[1],
     });
@@ -43,10 +43,10 @@ export const formatSelectedSummary = (selectedUsers: User[]): string => {
   const remaining = names.length - MAX_VISIBLE_NAMES;
   const thirdInitial = names[MAX_VISIBLE_NAMES].charAt(0);
 
-  return t('meetings.scheduleModal.participantsSelectedSummaryOverflow', {
+  return translate('meetings.scheduleModal.participantsSelectedSummaryOverflow', {
     name1: names[0],
     name2: names[1],
     initial: thirdInitial,
     count: remaining,
   });
-};
+}

@@ -27,7 +27,7 @@ import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {Message} from 'Repositories/entity/message/Message';
 import {getSearchRegex} from 'Repositories/search/fullTextSearch';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isScrolledBottom} from 'Util/scrollHelpers';
 import {useEffectRef} from 'Util/useEffectRef';
 import {noop} from 'Util/util';
@@ -39,6 +39,7 @@ const PRE_MARKED_OFFSET = 20;
 const MAX_TEXT_LENGTH = 60;
 const MAX_OFFSET_INDEX = 30;
 const DEBOUNCE_TIME = 100;
+const MINIMUM_SEARCH_LENGTH = 2;
 
 export const fullSearchInputSubmitComboStyles: CSSObject = {
   padding: '0 16px',
@@ -67,6 +68,7 @@ interface FullSearchProps {
 }
 
 const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchProps) => {
+  const {translate} = useApplicationContext();
   const [searchValue, setSearchValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
@@ -77,7 +79,7 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
   const debouncedSearch = useDebouncedCallback(async () => {
     const trimmedInput = searchValue.trim();
     change(trimmedInput);
-    if (trimmedInput.length < 2) {
+    if (trimmedInput.length < MINIMUM_SEARCH_LENGTH) {
       setMessages([]);
       setMessageCount(0);
       setHasNoResults(false);
@@ -92,8 +94,8 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
   }, DEBOUNCE_TIME);
 
   useEffect(() => {
-    debouncedSearch();
-  }, [searchValue]);
+    void debouncedSearch();
+  }, [debouncedSearch, searchValue]);
 
   useEffect(() => {
     const parent = element?.closest('.collection-list') as HTMLDivElement;
@@ -129,10 +131,10 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
         firstPart = `…${firstPart.substring(splitOffset)}`;
       }
       const parts = matches.reduce(
-        (acc, match, i) => [
-          ...acc,
+        (accumulator, match, matchIndex) => [
+          ...accumulator,
           match[0],
-          text.substring((match.index ?? 0) + match[0].length, matches[i + 1]?.index ?? text.length),
+          text.substring((match.index ?? 0) + match[0].length, matches[matchIndex + 1]?.index ?? text.length),
         ],
         [firstPart],
       );
@@ -152,8 +154,8 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
             type="text"
             value={searchValue}
             ref={inputRef}
-            aria-label={t('fullsearchPlaceholder')}
-            placeholder={t('fullsearchPlaceholder')}
+            aria-label={translate('fullsearchPlaceholder')}
+            placeholder={translate('fullsearchPlaceholder')}
             onChange={event => setSearchValue(event.currentTarget.value)}
             data-uie-name="full-search-header-input"
           />
@@ -162,7 +164,7 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
             <CloseIcon
               css={{cursor: 'pointer'}}
               data-uie-name="full-search-dismiss"
-              aria-label={t('fullsearchCancelCloseBtn')}
+              aria-label={translate('fullsearchCancelCloseBtn')}
               onClick={() => setSearchValue('')}
             />
           )}
@@ -171,7 +173,7 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
 
       {hasNoResults && (
         <p className="full-search__no-result" data-uie-name="full-search-no-results">
-          {t('fullsearchNoResults')}
+          {translate('fullsearchNoResults')}
         </p>
       )}
 

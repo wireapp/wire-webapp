@@ -36,40 +36,42 @@ import {
   iconContainerStyle,
   iconStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {showContextMenu} from '../../../../../../ui/ContextMenu';
 
 export const MeetingAction = () => {
+  const {translate} = useApplicationContext();
+
   const handleActionButton = (event: MouseEvent<HTMLElement>) => {
     showContextMenu({
       event,
       entries: [
         {
           icon: () => <CallIcon />,
-          label: t('meetings.action.startMeeting'),
+          label: translate('meetings.action.startMeeting'),
         },
         {
           icon: () => <CirclePlusIcon />,
-          label: t('meetings.action.createConversation'),
+          label: translate('meetings.action.createConversation'),
         },
         {
           icon: () => <ShareLinkIcon />,
-          label: t('meetings.action.copyLink'),
+          label: translate('meetings.action.copyLink'),
         },
         {
           icon: () => <EditIcon />,
-          label: t('meetings.action.editMeeting'),
+          label: translate('meetings.action.editMeeting'),
         },
         {
           css: contextMenuDangerItemStyles,
           icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
-          label: t('meetings.action.deleteMeetingForMe'),
+          label: translate('meetings.action.deleteMeetingForMe'),
         },
         {
           css: contextMenuDangerItemStyles,
           icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
-          label: t('meetings.action.deleteMeetingForAll'),
+          label: translate('meetings.action.deleteMeetingForAll'),
         },
       ],
       identifier: 'message-options-menu',

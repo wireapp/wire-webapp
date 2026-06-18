@@ -25,9 +25,9 @@ import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/Image';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {AssetLoader} from '../common/AssetLoader/AssetLoader';
 import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
@@ -40,10 +40,11 @@ export interface ImageAssetProps {
 }
 
 export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
+  const {translate} = useApplicationContext();
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isUploading, uploadProgress, cancelUpload} = useAssetTransfer(message);
 
-  const imageAltText = t('accessibility.conversationAssetImageAlt', {
+  const imageAltText = translate('accessibility.conversationAssetImageAlt', {
     messageDate: `${message.displayTimestampShort()}`,
     username: `${message.user().name()}`,
   });

@@ -49,7 +49,7 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {truncate} from 'Util/stringUtil';
@@ -179,6 +179,7 @@ export class Conversation {
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
+  public readonly protocol: CONVERSATION_PROTOCOL;
   public status: ko.Observable<ConversationStatus>;
   public teamId: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
@@ -200,15 +201,17 @@ export class Conversation {
   }
 
   constructor(
-    conversation_id: string = '',
-    domain: string = '',
-    public readonly protocol = CONVERSATION_PROTOCOL.PROTEUS,
+    conversation_id: string,
+    domain: string,
+    protocol: CONVERSATION_PROTOCOL,
+    private readonly translate: Translate,
     teamState = container.resolve(TeamState),
   ) {
     this.teamState = teamState;
     this.id = conversation_id;
 
     this.domain = domain;
+    this.protocol = protocol;
 
     this.logger = getLogger(`Conversation (${this.id})`);
     this.initialProtocol = this.protocol;
@@ -587,7 +590,7 @@ export class Conversation {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName || t('unavailableUser');
+        return userName || this.translate('unavailableUser');
       }
 
       if (this.isGroupOrChannel()) {
@@ -609,7 +612,7 @@ export class Conversation {
 
         const hasUserIds = !!this.participating_user_ids().length;
         if (!hasUserIds) {
-          return t('conversationsEmptyConversation');
+          return this.translate('conversationsEmptyConversation');
         }
       }
 

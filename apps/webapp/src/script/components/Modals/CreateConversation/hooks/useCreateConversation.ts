@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useContext} from 'react';
+import {useState} from 'react';
 
 import {ADD_PERMISSION, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
@@ -38,19 +38,21 @@ import {
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {RootContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKeyboardEvent} from 'Util/keyboardUtil';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {replaceLink} from 'Util/localizerUtil';
 
 import {PrimaryModal} from '../../PrimaryModal';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationAccess, ConversationCreationStep, ConversationType} from '../types';
+import {NonFederatingParticipantsModalCopy} from '../utils';
 
-export const useCreateConversation = () => {
+export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFederatingParticipantsModalCopy) => {
   const [isLoading, setIsLoading] = useState(false);
+  const {mainViewModel, translate} = useApplicationContext();
   const {
     conversationName,
     hideModal,
@@ -68,9 +70,6 @@ export const useCreateConversation = () => {
   } = useCreateConversationModal();
   const sidebarStore = useSidebarStore();
   const setCurrentSidebarTab = sidebarStore.setCurrentTab;
-
-  const rootContext = useContext(RootContext);
-  const mainViewModel = rootContext!.mainViewModel;
   const contentViewModel = mainViewModel.content;
   const conversationRepository = contentViewModel.repositories.conversation;
   const teamState = container.resolve(TeamState);
@@ -105,28 +104,33 @@ export const useCreateConversation = () => {
     backendString: string,
     replaceBackends: Record<string, string>,
   ) => {
-    PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
-      preventClose: true,
-      primaryAction: {
-        text: t('groupCreationPreferencesNonFederatingEditList'),
-        action: () => {
-          setConversationName(conversationName);
-          showModal();
-          setIsLoading(false);
-          setConversationCreationStep(ConversationCreationStep.ParticipantsSelection);
+    PrimaryModal.show(
+      PrimaryModal.type.MULTI_ACTIONS,
+      {
+        preventClose: true,
+        primaryAction: {
+          text: nonFederatingParticipantsModalCopy.editParticipantsButtonText,
+          action: () => {
+            setConversationName(conversationName);
+            showModal();
+            setIsLoading(false);
+            setConversationCreationStep(ConversationCreationStep.ParticipantsSelection);
+          },
+        },
+        secondaryAction: {
+          text: nonFederatingParticipantsModalCopy.leaveButtonText,
+          action: () => {
+            setIsLoading(false);
+          },
+        },
+        text: {
+          htmlMessage: nonFederatingParticipantsModalCopy.getMessageHtml(backendString, replaceBackends),
+          title: nonFederatingParticipantsModalCopy.titleText,
         },
       },
-      secondaryAction: {
-        text: t('groupCreationPreferencesNonFederatingLeave'),
-        action: () => {
-          setIsLoading(false);
-        },
-      },
-      text: {
-        htmlMessage: t('groupCreationPreferencesNonFederatingMessage', {backends: backendString}, replaceBackends),
-        title: t('groupCreationPreferencesNonFederatingHeadline'),
-      },
-    });
+      undefined,
+      translate,
+    );
   };
 
   const handleException = (error: Error, conversationName: string) => {

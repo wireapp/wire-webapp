@@ -68,7 +68,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings} from 'Util/localizerUtil';
+import {setStrings, translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {mapLanguage} from '../../localeConfig';
@@ -109,7 +110,7 @@ const withRouter = (component: React.ReactNode) => (
   <Router future={{v7_relativeSplatPath: true, v7_startTransition: true}}>{component}</Router>
 );
 
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 const loadLanguage = (language: string) => {
@@ -143,7 +144,7 @@ export const mountComponent = (
 export function generateUsers(nbUsers: number, domain: string) {
   const users: User[] = [];
   for (let i = 0; i < nbUsers; i++) {
-    const user = new User(createUuid(), domain);
+    const user = new User(createUuid(), domain, translateForTest);
     user.name(`User ${i}`);
     users.push(user);
   }
@@ -174,8 +175,8 @@ export const createConversation = (
   conversationId: QualifiedId = {id: createUuid(), domain: ''},
   groupId = 'group-id',
 ) => {
-  const conversation = new Conversation(conversationId.id, conversationId.domain, protocol);
-  conversation.participating_user_ets.push(new User(createUuid()));
+  const conversation = new Conversation(conversationId.id, conversationId.domain, protocol, translateForTest);
+  conversation.participating_user_ets.push(new User(createUuid(), '', translateForTest));
   conversation.type(type);
   if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = groupId;
@@ -184,7 +185,7 @@ export const createConversation = (
 };
 
 export const createSelfParticipant = () => {
-  const selfUser = new User();
+  const selfUser = new User('', '', translateForTest);
   selfUser.isMe = true;
   return new Participant(selfUser, 'client1');
 };

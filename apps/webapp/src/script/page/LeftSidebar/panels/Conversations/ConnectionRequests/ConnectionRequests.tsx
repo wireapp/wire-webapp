@@ -23,8 +23,8 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {ContentState, useAppState} from '../../../../useAppState';
 
@@ -34,6 +34,7 @@ interface ConnectionRequestsProps {
 }
 
 export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick}: ConnectionRequestsProps) => {
+  const {translate} = useApplicationContext();
   const contentState = useAppState(state => state.contentState);
   const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
   const connectionRequestsCount = connectionRequests.length;
@@ -44,8 +45,8 @@ export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick
 
   const connectionText =
     connectionRequestsCount > 1
-      ? t('conversationsConnectionRequestMany', {number: connectionRequestsCount})
-      : t('conversationsConnectionRequestOne');
+      ? translate('conversationsConnectionRequestMany', {number: connectionRequestsCount})
+      : translate('conversationsConnectionRequestOne');
 
   return (
     <ul css={{margin: 0, paddingLeft: 0}} data-uie-name="connection-requests">

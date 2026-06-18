@@ -34,8 +34,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {replaceLink} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatDuration} from 'Util/timeUtil';
 
@@ -54,14 +55,18 @@ type Features =
 
 type Title = `featureConfigChangeModal${Features}Headline`;
 
+type Translate = ReturnType<typeof useApplicationContext>['translate'];
+
 type FeatureNotificationMessage = {
   htmlMessage: string;
   title: Title;
   primaryAction?: ButtonAction;
 };
 
-const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => FeatureNotificationMessage | undefined> =
-  {
+const createFeatureNotifications = (
+  translate: Translate,
+): Record<string, (oldConfig: any, newConfig: any) => FeatureNotificationMessage | undefined> => {
+  return {
     [FEATURE_KEY.FILE_SHARING]: (
       oldConfig: FeatureList[FEATURE_KEY.FILE_SHARING],
       newConfig: FeatureList[FEATURE_KEY.FILE_SHARING],
@@ -73,8 +78,8 @@ const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => F
       return {
         htmlMessage:
           status === FEATURE_STATUS.ENABLED
-            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
-            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled'),
+            ? translate('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
+            : translate('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled'),
         title: 'featureConfigChangeModalFileSharingHeadline',
       };
     },
@@ -89,8 +94,8 @@ const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => F
       return {
         htmlMessage:
           status === FEATURE_STATUS.ENABLED
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled'),
+            ? translate('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
+            : translate('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled'),
         title: 'featureConfigChangeModalAudioVideoHeadline',
       };
     },
@@ -104,7 +109,7 @@ const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => F
         return undefined;
       }
       return {
-        htmlMessage: t('featureConfigChangeModalApplock'),
+        htmlMessage: translate('featureConfigChangeModalApplock'),
         title: 'featureConfigChangeModalApplockHeadline',
       };
     },
@@ -127,13 +132,13 @@ const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => F
         let htmlMessage: string;
         switch (status) {
           case FEATURE_STATUS.ENABLED:
-            htmlMessage = t('featureConfigChangeModalDownloadPathEnabled');
+            htmlMessage = translate('featureConfigChangeModalDownloadPathEnabled');
             break;
           case FEATURE_STATUS.DISABLED:
-            htmlMessage = t('featureConfigChangeModalDownloadPathDisabled');
+            htmlMessage = translate('featureConfigChangeModalDownloadPathDisabled');
             break;
           default:
-            htmlMessage = t('featureConfigChangeModalDownloadPathChanged');
+            htmlMessage = translate('featureConfigChangeModalDownloadPathChanged');
         }
 
         return {
@@ -185,8 +190,8 @@ const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => F
       if (!oldConfig || !('config' in oldConfig) || !newConfig || !('config' in newConfig)) {
         return undefined;
       }
-      const previousTimeout = oldConfig?.config?.enforcedTimeoutSeconds * 1000;
-      const newTimeout = (newConfig?.config?.enforcedTimeoutSeconds ?? 0) * 1000;
+      const previousTimeout = oldConfig?.config?.enforcedTimeoutSeconds * millisecondsInSecond;
+      const newTimeout = (newConfig?.config?.enforcedTimeoutSeconds ?? 0) * millisecondsInSecond;
       const previousStatus = oldConfig?.status;
       const newStatus = newConfig?.status;
 
@@ -202,11 +207,11 @@ const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => F
       return {
         htmlMessage: isFeatureEnabled
           ? isEnforced
-            ? t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
-                timeout: formatDuration(newTimeout).text,
+            ? translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
+                timeout: formatDuration(newTimeout, translate).text,
               })
-            : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled')
-          : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled'),
+            : translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled')
+          : translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled'),
         title: 'featureConfigChangeModalSelfDeletingMessagesHeadline',
       };
     },
@@ -225,7 +230,7 @@ const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => F
       );
 
       return {
-        htmlMessage: t(
+        htmlMessage: translate(
           'featureConfigChangeModalConferenceCallingEnabled',
           {brandName: Config.getConfig().BRAND_NAME},
           replaceEnterprise,
@@ -244,12 +249,13 @@ const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => F
       return {
         htmlMessage:
           status === FEATURE_STATUS.ENABLED
-            ? t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled')
-            : t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled'),
+            ? translate('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled')
+            : translate('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled'),
         title: 'featureConfigChangeModalConversationGuestLinksHeadline',
       };
     },
   } as const;
+};
 
 function wasTurnedOnOrOff(
   oldConfig?: FeatureWithoutConfig,
@@ -262,14 +268,17 @@ function wasTurnedOnOrOff(
 }
 
 const logger = getLogger('FeatureConfigChangeNotifier');
+const millisecondsInSecond = 1000;
 type Props = {
   teamState: TeamState;
   selfUserId: string;
 };
 
 export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): null {
+  const {translate} = useApplicationContext();
   const {teamFeatures: config} = useKoSubscribableChildren(teamState, ['teamFeatures']);
   const previousConfig = useRef<FeatureList | undefined>(loadFeatureConfig(selfUserId));
+  const featureNotifications = createFeatureNotifications(translate);
 
   useEffect(() => {
     const previous = previousConfig.current;
@@ -299,26 +308,31 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
           previous?.[featureKey],
         )}" to "${JSON.stringify(config[featureKey])}"`,
       );
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: message.htmlMessage,
-          title: t(message.title, {
-            brandName: Config.getConfig().BRAND_NAME,
-          }),
-        },
-        primaryAction: message.primaryAction,
-        hideCloseBtn: isEnforceDownloadPath,
-        preventClose: isEnforceDownloadPath,
-        close: isEnforceDownloadPath
-          ? () => {
-              if (Runtime.isDesktopApp() && config[featureKey]?.status !== FEATURE_STATUS.DISABLED) {
-                amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            htmlMessage: message.htmlMessage,
+            title: translate(message.title, {
+              brandName: Config.getConfig().BRAND_NAME,
+            }),
+          },
+          primaryAction: message.primaryAction,
+          hideCloseBtn: isEnforceDownloadPath,
+          preventClose: isEnforceDownloadPath,
+          close: isEnforceDownloadPath
+            ? () => {
+                if (Runtime.isDesktopApp() && config[featureKey]?.status !== FEATURE_STATUS.DISABLED) {
+                  amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+                }
               }
-            }
-          : undefined,
-      });
+            : undefined,
+        },
+        undefined,
+        translate,
+      );
     }
-  }, [config, selfUserId]);
+  }, [config, featureNotifications, selfUserId, translate]);
 
   return null;
 }

@@ -38,7 +38,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 
@@ -88,6 +88,7 @@ const Separator = () => {
 };
 
 const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColumnProps) => {
+  const {translate} = useApplicationContext();
   return (
     <Container centerText verticalCenter style={{width: '100%', display: 'flex'}}>
       <Columns style={{justifyContent: 'center'}}>
@@ -102,18 +103,20 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
             }}
           >
             <>
-              <H2 center>{t('conversationJoin.existentAccountJoinInBrowser')}</H2>
-              <Muted style={{marginBottom: '1rem'}}>{t('conversationJoin.existentAccountUserName', {selfName})}</Muted>
+              <H2 center>{translate('conversationJoin.existentAccountJoinInBrowser')}</H2>
+              <Muted style={{marginBottom: '1rem'}}>
+                {translate('conversationJoin.existentAccountUserName', {selfName})}
+              </Muted>
 
               <Button
                 block
                 type="submit"
                 formNoValidate
                 onClick={() => handleSubmit()}
-                aria-label={t('conversationJoin.join')}
+                aria-label={translate('conversationJoin.join')}
                 data-uie-name="do-join-as-member"
               >
-                {t('conversationJoin.join')}
+                {translate('conversationJoin.join')}
               </Button>
               <Link
                 variant={LinkVariant.PRIMARY}
@@ -123,7 +126,7 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
                 style={{fontSize: '1rem'}}
                 data-uie-name="go-logout"
               >
-                {t('conversationJoin.joinWithOtherAccount')}
+                {translate('conversationJoin.joinWithOtherAccount')}
               </Link>
             </>
           </ContainerXS>
@@ -143,6 +146,7 @@ const GuestLoginColumn = ({
   conversationError,
   error,
 }: GuestLoginColumnProps) => {
+  const {translate} = useApplicationContext();
   const [isTermOfUseAccepted, setIsTermOfUseAccepted] = useState(false);
 
   return (
@@ -158,8 +162,8 @@ const GuestLoginColumn = ({
             }}
           >
             <>
-              <H2 center>{t('conversationJoin.noAccountHead')}</H2>
-              <Muted>{t('conversationJoin.subhead')}</Muted>
+              <H2 center>{translate('conversationJoin.noAccountHead')}</H2>
+              <Muted>{translate('conversationJoin.subhead')}</Muted>
               <Form style={{marginTop: 30}}>
                 <Input
                   id="enter-name"
@@ -168,7 +172,7 @@ const GuestLoginColumn = ({
                   value={enteredName}
                   ref={nameInput}
                   onChange={onNameChange}
-                  placeholder={t('conversationJoin.namePlaceholder')}
+                  placeholder={translate('conversationJoin.namePlaceholder')}
                   maxLength={64}
                   minLength={2}
                   pattern=".{2,64}"
@@ -189,7 +193,7 @@ const GuestLoginColumn = ({
                   }}
                 >
                   <span className="subline">
-                    {t('conversationJoin.termsAcceptanceText')}{' '}
+                    {translate('conversationJoin.termsAcceptanceText')}{' '}
                     <Link
                       href={Config.getConfig().URL.TERMS_OF_USE_TEAMS}
                       css={{
@@ -204,7 +208,7 @@ const GuestLoginColumn = ({
                           color: 'var(--accent-color)',
                         }}
                       >
-                        {t('conversationJoin.termsLink', {brandName: Config.getConfig().BRAND_NAME})}
+                        {translate('conversationJoin.termsLink', {brandName: Config.getConfig().BRAND_NAME})}
                       </span>
                     </Link>
                     .
@@ -220,10 +224,10 @@ const GuestLoginColumn = ({
                     disabled={!enteredName || !isValidName || isSubmitingName || !isTermOfUseAccepted}
                     formNoValidate
                     onClick={checkNameValidity}
-                    aria-label={t('conversationJoin.joinButton')}
+                    aria-label={translate('conversationJoin.joinButton')}
                     data-uie-name="do-join-as-guest"
                   >
-                    {t('conversationJoin.joinButton')}
+                    {translate('conversationJoin.joinButton')}
                   </Button>
                 )}
               </Form>

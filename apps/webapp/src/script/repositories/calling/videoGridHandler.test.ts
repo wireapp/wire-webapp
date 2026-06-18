@@ -24,14 +24,16 @@ import {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Participant} from 'Repositories/calling/Participant';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('videoGridHandler', () => {
   const createCall = () => {
-    const selfUser = new User(createUuid());
+    const selfUser = new User(createUuid(), '', translateForTest);
 
     return new Call(
       {domain: '', id: ''},
-      new Conversation('', ''),
+      new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
       CONV_TYPE.CONFERENCE,
       new Participant(selfUser, ''),
       CALL_TYPE.NORMAL,
@@ -40,7 +42,7 @@ describe('videoGridHandler', () => {
   };
 
   const createParticipant = (name: string) => {
-    const user = new User(createUuid());
+    const user = new User(createUuid(), '', translateForTest);
     user.name(name);
 
     return new Participant(user, `client-${name}`);

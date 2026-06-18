@@ -22,6 +22,7 @@ import {act, render, waitFor} from '@testing-library/react';
 import {User} from 'Repositories/entity/User';
 
 import {AppLoader} from '.';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('AppLoader', () => {
   it('triggers loading of the app once mounted', async () => {
@@ -30,7 +31,7 @@ describe('AppLoader', () => {
     let done: () => void = () => {};
     const init = jest.fn(async (onProgress: (m: string) => void) => {
       nextStep = (message: string) => onProgress(message);
-      return new Promise<User>(resolve => (done = () => resolve(new User())));
+      return new Promise<User>(resolve => (done = () => resolve(new User('', '', translateForTest))));
     });
 
     const {queryByText, getByText} = render(<AppLoader init={init}>{() => <div>LoadedApp</div>}</AppLoader>);
