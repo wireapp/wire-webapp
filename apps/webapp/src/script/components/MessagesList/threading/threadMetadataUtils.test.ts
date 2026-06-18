@@ -25,6 +25,8 @@ import {
   extractThreadPreviewFromEvent,
   extractThreadRootMetadataFromEvent,
   extractThreadRootMetadataFromMessage,
+  getThreadIdFromBackendEvent,
+  isThreadReplyMessageEvent,
 } from './threadMetadataUtils';
 
 describe('threadMetadataUtils', () => {
@@ -62,5 +64,18 @@ describe('threadMetadataUtils', () => {
       rootMessageAuthorId: 'user-a',
       rootMessageTimestamp: '2026-01-01T00:00:00.000Z',
     });
+  });
+
+  it('extracts thread id from backend thread events', () => {
+    expect(getThreadIdFromBackendEvent({thread_id: 'root-1'})).toBe('root-1');
+    expect(getThreadIdFromBackendEvent({thread_root_message_id: 'root-1'})).toBe('root-1');
+    expect(getThreadIdFromBackendEvent({data: {thread_id: 'root-1'}})).toBe('root-1');
+    expect(getThreadIdFromBackendEvent({thread_id: ''})).toBeNull();
+  });
+
+  it('identifies thread reply message event types', () => {
+    expect(isThreadReplyMessageEvent('conversation.message-add')).toBe(true);
+    expect(isThreadReplyMessageEvent('conversation.reaction')).toBe(false);
+    expect(isThreadReplyMessageEvent(undefined)).toBe(false);
   });
 });

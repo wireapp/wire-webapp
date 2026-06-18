@@ -17,9 +17,54 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {Message} from 'Repositories/entity/message/Message';
 import {Text} from 'Repositories/entity/message/Text';
+import {ClientEvent} from 'Repositories/event/Client';
+
+export type BackendThreadEvent = {
+  type?: string;
+  conversation?: string;
+  is_thread_reply?: boolean;
+  data?: {
+    thread_id?: string | null;
+    thread_root_message_id?: string | null;
+    threadId?: string | null;
+    message_id?: string;
+  };
+  thread_id?: string | null;
+  thread_root_message_id?: string | null;
+  threadId?: string | null;
+};
+
+export const normalizeThreadId = (threadId?: string | null): string | null =>
+  typeof threadId === 'string' && threadId.length > 0 ? threadId : null;
+
+export const getThreadIdFromBackendEvent = (event?: BackendThreadEvent): string | null =>
+  normalizeThreadId(
+    event?.thread_id ??
+      event?.threadId ??
+      event?.thread_root_message_id ??
+      event?.data?.thread_id ??
+      event?.data?.threadId ??
+      event?.data?.thread_root_message_id ??
+      null,
+  );
+
+export const isThreadReplyMessageEvent = (eventType?: string): boolean => {
+  if (eventType === undefined || eventType.length === 0) {
+    return false;
+  }
+
+  return (
+    eventType === ClientEvent.CONVERSATION.MESSAGE_ADD ||
+    eventType === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD ||
+    eventType === CONVERSATION_EVENT.OTR_MESSAGE_ADD ||
+    eventType === CONVERSATION_EVENT.MLS_MESSAGE_ADD
+  );
+};
 
 export type ThreadRootMetadata = {
   rootMessagePreview?: string;
@@ -60,9 +105,7 @@ export const extractThreadRootMetadataFromMessage = (message?: Message): ThreadR
   const authorId = message.user()?.id;
   const timestampMs = message.timestamp();
   const rootMessageTimestamp =
-    typeof timestampMs === 'number' && Number.isFinite(timestampMs)
-      ? new Date(timestampMs).toISOString()
-      : undefined;
+    typeof timestampMs === 'number' && Number.isFinite(timestampMs) ? new Date(timestampMs).toISOString() : undefined;
 
   if (message.hasAssetText()) {
     const textAsset = (message as ContentMessage).getFirstAsset() as Text | undefined;
