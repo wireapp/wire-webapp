@@ -31,6 +31,7 @@ import {chunk, getDifference, partition} from 'Util/arrayUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortUsersByPriority} from 'Util/stringUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {CallingEpochCache} from './CallingEpochCache';
 import {MuteState} from './CallState';
@@ -45,6 +46,16 @@ interface ActiveSpeaker {
   levelNow: number;
   userId: QualifiedId;
 }
+
+interface FlexibleFrontPageParticipant {
+  participant: Participant;
+  reservedUntil: number;
+}
+
+export const IS_TALKING_THRESHOLD = 2;
+export const RESERVE_FRONTPAGE_THRESHOLD = 15;
+const TALKING_THRESHOLD = IS_TALKING_THRESHOLD * TIME_IN_MILLIS.SECOND;
+const FRONTPAGE_RESERVATION = RESERVE_FRONTPAGE_THRESHOLD * TIME_IN_MILLIS.SECOND;
 
 export class Call {
   private readonly logger: Logger = getLogger('Call');
@@ -84,6 +95,8 @@ export class Call {
    */
   public analyticsMaximumParticipants: number = 0;
   public readonly canvasMixer: CanvasMediaStreamMixer;
+  private readonly activeSpeakerStartedAt: Record<string, number> = {};
+  private flexibleFrontPageParticipantQueue: FlexibleFrontPageParticipant[] = [];
 
   constructor(
     public readonly initiator: QualifiedId,
@@ -183,14 +196,149 @@ export class Call {
     });
   }
 
-  setActiveSpeakers(audioLevels: ActiveSpeaker[]): void {
-    // Make sure that every participant only has one entry in the list.
-    const uniqueAudioLevels = audioLevels.reduce((acc, curr) => {
+  private getActiveSpeakerKey(participant: Participant): string {
+    const {domain, id} = participant.user.qualifiedId;
+    return `${domain}/${id}/${participant.clientId}`;
+  }
+
+  private getUniqueAudioLevels(audioLevels: ActiveSpeaker[]): ActiveSpeaker[] {
+    return audioLevels.reduce((acc, curr) => {
       if (!acc.some(({clientId, userId}) => matchQualifiedIds(userId, curr.userId) && clientId === curr.clientId)) {
         acc.push(curr);
       }
       return acc;
     }, [] as ActiveSpeaker[]);
+  }
+
+  private getAvailableFlexibleTiles(): number {
+    const screensharingUserCount = this.getRemoteParticipants().filter(participant =>
+      participant.sharesScreen(),
+    ).length;
+    return Math.max(this.numberOfParticipantsInOnePage - 1 - screensharingUserCount, 0);
+  }
+
+  private isFlexibleFrontPageCandidate(participant: Participant): boolean {
+    return (
+      this.participants().includes(participant) &&
+      participant !== this.getSelfParticipant() &&
+      !participant.sharesScreen()
+    );
+  }
+
+  private removeUnavailableFlexibleFrontPageParticipants(): boolean {
+    const queueLength = this.flexibleFrontPageParticipantQueue.length;
+    this.flexibleFrontPageParticipantQueue = this.flexibleFrontPageParticipantQueue.filter(({participant}) => {
+      const shouldKeep = this.isFlexibleFrontPageCandidate(participant);
+
+      if (!shouldKeep) {
+        delete this.activeSpeakerStartedAt[this.getActiveSpeakerKey(participant)];
+      }
+
+      return shouldKeep;
+    });
+
+    return this.flexibleFrontPageParticipantQueue.length !== queueLength;
+  }
+
+  private getVisibleFlexibleFrontPageParticipants(): Participant[] {
+    const availableFlexibleTiles = this.getAvailableFlexibleTiles();
+
+    return this.flexibleFrontPageParticipantQueue
+      .slice(0, availableFlexibleTiles)
+      .map(({participant}) => participant);
+  }
+
+  private areSameParticipants(participantsA: Participant[], participantsB: Participant[]): boolean {
+    return (
+      participantsA.length === participantsB.length &&
+      participantsA.every((participant, index) => participant === participantsB[index])
+    );
+  }
+
+  private promoteFlexibleFrontPageParticipant(participant: Participant, now: number): void {
+    const availableFlexibleTiles = this.getAvailableFlexibleTiles();
+    const reservedUntil = now + FRONTPAGE_RESERVATION;
+
+    if (availableFlexibleTiles <= 0) {
+      return;
+    }
+
+    const existingIndex = this.flexibleFrontPageParticipantQueue.findIndex(entry => entry.participant === participant);
+    if (existingIndex >= 0) {
+      this.flexibleFrontPageParticipantQueue.splice(existingIndex, 1);
+      this.flexibleFrontPageParticipantQueue.push({participant, reservedUntil});
+      return;
+    }
+
+    if (this.flexibleFrontPageParticipantQueue.length < availableFlexibleTiles) {
+      this.flexibleFrontPageParticipantQueue.push({participant, reservedUntil});
+      return;
+    }
+
+    const replacementIndex = this.flexibleFrontPageParticipantQueue.findIndex(
+      ({reservedUntil}, index) => index < availableFlexibleTiles && reservedUntil <= now,
+    );
+
+    if (replacementIndex < 0) {
+      return;
+    }
+
+    this.flexibleFrontPageParticipantQueue.splice(replacementIndex, 1);
+    this.flexibleFrontPageParticipantQueue.push({participant, reservedUntil});
+  }
+
+  private updateActiveSpeakerPageParticipants(uniqueAudioLevels: ActiveSpeaker[], now = Date.now()): boolean {
+    this.removeUnavailableFlexibleFrontPageParticipants();
+    const previousVisibleFlexibleParticipants = this.getVisibleFlexibleFrontPageParticipants();
+    const currentlySpeakingKeys = new Set<string>();
+
+    uniqueAudioLevels.forEach(({userId, clientId, levelNow}) => {
+      const participant = this.getParticipant(userId, clientId);
+      if (!participant || !this.isFlexibleFrontPageCandidate(participant)) {
+        return;
+      }
+
+      const speakerKey = this.getActiveSpeakerKey(participant);
+      if (levelNow <= 0) {
+        delete this.activeSpeakerStartedAt[speakerKey];
+        return;
+      }
+
+      currentlySpeakingKeys.add(speakerKey);
+
+      const startedAt = this.activeSpeakerStartedAt[speakerKey] ?? now;
+      this.activeSpeakerStartedAt[speakerKey] = startedAt;
+
+      if (now - startedAt < TALKING_THRESHOLD) {
+        return;
+      }
+
+      this.promoteFlexibleFrontPageParticipant(participant, now);
+    });
+
+    Object.keys(this.activeSpeakerStartedAt).forEach(speakerKey => {
+      if (!currentlySpeakingKeys.has(speakerKey)) {
+        delete this.activeSpeakerStartedAt[speakerKey];
+      }
+    });
+
+    this.removeUnavailableFlexibleFrontPageParticipants();
+    const nextVisibleFlexibleParticipants = this.getVisibleFlexibleFrontPageParticipants();
+    const shouldUpdatePages = !this.areSameParticipants(
+      previousVisibleFlexibleParticipants,
+      nextVisibleFlexibleParticipants,
+    );
+
+    if (shouldUpdatePages) {
+      this.updatePages();
+    }
+
+    return shouldUpdatePages;
+  }
+
+  setActiveSpeakers(audioLevels: ActiveSpeaker[], now = Date.now()): boolean {
+    // Make sure that every participant only has one entry in the list.
+    const uniqueAudioLevels = this.getUniqueAudioLevels(audioLevels);
 
     // Update activeSpeaking status on the participants based on their `audio_level_now`.
     this.participants().forEach(participant => {
@@ -216,6 +364,8 @@ export class Call {
     if (!isSameSpeakers) {
       this.activeSpeakers(activeSpeakers);
     }
+
+    return this.updateActiveSpeakerPageParticipants(uniqueAudioLevels, now);
   }
 
   addParticipant(participant: Participant): void {
@@ -240,13 +390,20 @@ export class Call {
     const selfParticipant = this.getSelfParticipant();
     const remoteParticipants = this.getRemoteParticipants().toSorted((p1, p2) => sortUsersByPriority(p1.user, p2.user));
 
-    const [withVideoAndScreenShare, withoutVideo] = partition(remoteParticipants, participant =>
+    const [withScreenShare, withoutScreenShare] = partition(remoteParticipants, participant =>
+      participant.sharesScreen(),
+    );
+    this.removeUnavailableFlexibleFrontPageParticipants();
+    const visibleFlexibleFrontPageParticipants = this.getVisibleFlexibleFrontPageParticipants();
+    const withoutFlexibleFrontPage = withoutScreenShare.filter(
+      participant => !visibleFlexibleFrontPageParticipants.includes(participant),
+    );
+    const [withVideo, withoutVideo] = partition(withoutFlexibleFrontPage, participant =>
       participant.isSendingVideo(),
     );
-    const [withScreenShare, withVideo] = partition(withVideoAndScreenShare, participant => participant.sharesScreen());
 
     const newPages = chunk<Participant>(
-      [selfParticipant, ...withScreenShare, ...withVideo, ...withoutVideo],
+      [selfParticipant, ...withScreenShare, ...visibleFlexibleFrontPageParticipants, ...withVideo, ...withoutVideo],
       this.numberOfParticipantsInOnePage,
     );
 

@@ -26,7 +26,7 @@ import {User} from 'Repositories/entity/User';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 
-import {Call} from './Call';
+import {Call, IS_TALKING_THRESHOLD, RESERVE_FRONTPAGE_THRESHOLD} from './Call';
 import {CallingRepository} from './CallingRepository';
 import {Participant} from './Participant';
 
@@ -57,6 +57,16 @@ const buildMediaDevicesHandler = () => {
     setOnMediaDevicesRefreshHandler: jest.fn(),
   } as unknown as MediaDevicesHandler;
 };
+
+const TIME_IN_MILLIS_SECOND = 1000;
+const TALKING_THRESHOLD = IS_TALKING_THRESHOLD * TIME_IN_MILLIS_SECOND;
+const FRONTPAGE_RESERVATION = RESERVE_FRONTPAGE_THRESHOLD * TIME_IN_MILLIS_SECOND;
+
+const activeSpeakerLevel = (participant: Participant, levelNow = 1) => ({
+  clientId: participant.clientId,
+  levelNow,
+  userId: participant.user.qualifiedId,
+});
 
 describe('Call', () => {
   const testFactory = new TestFactory();
@@ -222,6 +232,138 @@ describe('Call', () => {
         thirdParticipant.user.name(),
         firstParticipant.user.name(),
         secondParticipant.user.name(),
+      ]);
+    });
+
+    it('does not prioritize an active speaker before the active speaker threshold is reached', async () => {
+      call.setNumberOfParticipantsInOnePage(3);
+
+      const didUpdateGridPage = call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], 0);
+
+      const firstPage = call.pages()[0];
+      expect(didUpdateGridPage).toBe(false);
+      expect(firstPage.map(p => p.user.name())).toEqual([
+        selfParticipant.user.name(),
+        firstParticipant.user.name(),
+        secondParticipant.user.name(),
+      ]);
+    });
+
+    it('prioritizes a participant who speaks for the active speaker threshold', async () => {
+      call.setNumberOfParticipantsInOnePage(3);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], 0);
+
+      const didUpdateGridPage = call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], TALKING_THRESHOLD);
+
+      const firstPage = call.pages()[0];
+      expect(didUpdateGridPage).toBe(true);
+      expect(firstPage.map(p => p.user.name())).toEqual([
+        selfParticipant.user.name(),
+        fifthParticipant.user.name(),
+        firstParticipant.user.name(),
+      ]);
+    });
+
+    it('keeps screen sharing participants before active speakers', async () => {
+      call.setNumberOfParticipantsInOnePage(3);
+      fourthParticipant.videoState(4);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], 0);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], TALKING_THRESHOLD);
+
+      const firstPage = call.pages()[0];
+      expect(firstPage.map(p => p.user.name())).toEqual([
+        selfParticipant.user.name(),
+        fourthParticipant.user.name(),
+        fifthParticipant.user.name(),
+      ]);
+    });
+
+    it('keeps a flexible front-page participant reserved when they stop speaking', async () => {
+      call.setNumberOfParticipantsInOnePage(3);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], 0);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], TALKING_THRESHOLD);
+
+      const didUpdateGridPage = call.setActiveSpeakers([], TALKING_THRESHOLD + 1);
+
+      const firstPage = call.pages()[0];
+      expect(didUpdateGridPage).toBe(false);
+      expect(firstPage.map(p => p.user.name())).toEqual([
+        selfParticipant.user.name(),
+        fifthParticipant.user.name(),
+        firstParticipant.user.name(),
+      ]);
+    });
+
+    it('does not replace a flexible participant whose front-page reservation has not expired', async () => {
+      call.setNumberOfParticipantsInOnePage(2);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], 0);
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], TALKING_THRESHOLD);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fourthParticipant)], TALKING_THRESHOLD + 1);
+      const didUpdateGridPage = call.setActiveSpeakers(
+        [activeSpeakerLevel(fourthParticipant)],
+        TALKING_THRESHOLD * 2 + 1,
+      );
+
+      const firstPage = call.pages()[0];
+      expect(didUpdateGridPage).toBe(false);
+      expect(firstPage.map(p => p.user.name())).toEqual([
+        selfParticipant.user.name(),
+        fifthParticipant.user.name(),
+      ]);
+    });
+
+    it('moves an existing flexible participant to the back of the queue when they qualify again', async () => {
+      call.setNumberOfParticipantsInOnePage(3);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fourthParticipant)], 0);
+      call.setActiveSpeakers([activeSpeakerLevel(fourthParticipant)], TALKING_THRESHOLD);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], TALKING_THRESHOLD + 1);
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], TALKING_THRESHOLD * 2 + 1);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fourthParticipant)], TALKING_THRESHOLD * 2 + 2);
+      const didUpdateGridPage = call.setActiveSpeakers(
+        [activeSpeakerLevel(fourthParticipant)],
+        TALKING_THRESHOLD * 3 + 2,
+      );
+
+      const firstPage = call.pages()[0];
+      expect(didUpdateGridPage).toBe(true);
+      expect(firstPage.map(p => p.user.name())).toEqual([
+        selfParticipant.user.name(),
+        fifthParticipant.user.name(),
+        fourthParticipant.user.name(),
+      ]);
+    });
+
+    it('replaces the oldest expired flexible participant when a new qualified speaker needs the tile', async () => {
+      call.setNumberOfParticipantsInOnePage(3);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fourthParticipant)], 0);
+      call.setActiveSpeakers([activeSpeakerLevel(fourthParticipant)], TALKING_THRESHOLD);
+
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], TALKING_THRESHOLD + 1);
+      call.setActiveSpeakers([activeSpeakerLevel(fifthParticipant)], TALKING_THRESHOLD * 2 + 1);
+
+      call.setActiveSpeakers([activeSpeakerLevel(thirdParticipant)], FRONTPAGE_RESERVATION + 1);
+      const didUpdateGridPage = call.setActiveSpeakers(
+        [activeSpeakerLevel(thirdParticipant)],
+        TALKING_THRESHOLD + FRONTPAGE_RESERVATION + 1,
+      );
+
+      const firstPage = call.pages()[0];
+      expect(didUpdateGridPage).toBe(true);
+      expect(firstPage.map(p => p.user.name())).toEqual([
+        selfParticipant.user.name(),
+        fifthParticipant.user.name(),
+        thirdParticipant.user.name(),
       ]);
     });
   });
