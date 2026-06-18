@@ -42,6 +42,7 @@ import {
 export type ThreadListItemProps = {
   thread: ThreadRowViewModel;
   conversation?: Conversation;
+  isActive?: boolean;
   onClick?: (thread: ThreadIndexEntry) => void;
 };
 
@@ -84,15 +85,15 @@ const ThreadContextIcon = ({conversation}: {conversation?: Conversation}) => {
 
 const getReplyCountLabel = (count: number) => (count === 1 ? '1 reply' : `${count} replies`);
 
-export const ThreadListItem = ({thread, conversation, onClick}: ThreadListItemProps) => {
+export const ThreadListItem = ({thread, conversation, isActive = false, onClick}: ThreadListItemProps) => {
   const unreadCount = thread.badges.unreadCount;
   const isUnread = unreadCount > 0;
   const replyCountLabel = getReplyCountLabel(thread.thread.replyCount);
 
   return (
-    <li css={listItem} data-uie-name="threads-list-item">
+    <li css={listItem(isActive)} data-uie-name="threads-list-item" data-uie-status={isActive ? 'active' : undefined}>
       {isUnread && (
-        <span css={unreadBadge} data-uie-name="threads-list-item-unread-badge">
+        <span css={unreadBadge(isActive)} data-uie-name="threads-list-item-unread-badge">
           {unreadCount}
         </span>
       )}
@@ -100,22 +101,23 @@ export const ThreadListItem = ({thread, conversation, onClick}: ThreadListItemPr
         css={openButton}
         type="button"
         data-uie-name="threads-list-open-button"
+        aria-current={isActive ? 'true' : undefined}
         aria-label={`${thread.title}, ${thread.conversationLabel}, ${replyCountLabel}${isUnread ? `, ${unreadCount} unread` : ''}`}
         onClick={() => onClick?.(thread.thread)}
       >
-        <span css={threadIconWrapper} data-uie-name="threads-list-item-thread-icon" aria-hidden="true">
+        <span css={threadIconWrapper(isActive)} data-uie-name="threads-list-item-thread-icon" aria-hidden="true">
           <ThreadsIcon css={threadIcon} />
         </span>
         <span css={content}>
-          <span css={primaryText(isUnread)} data-uie-name="threads-list-item-title">
+          <span css={primaryText(isUnread, isActive)} data-uie-name="threads-list-item-title">
             {thread.title}
           </span>
-          <span css={secondaryRow} data-uie-name="threads-list-item-meta">
+          <span css={secondaryRow(isActive)} data-uie-name="threads-list-item-meta">
             <ThreadContextIcon conversation={conversation} />
-            <span css={conversationName} data-uie-name="threads-list-item-conversation-label">
+            <span css={conversationName(isActive)} data-uie-name="threads-list-item-conversation-label">
               {thread.conversationLabel}
             </span>
-            <span css={replyCount} data-uie-name="threads-list-item-replies">
+            <span css={replyCount(isActive)} data-uie-name="threads-list-item-replies">
               {replyCountLabel}
             </span>
           </span>

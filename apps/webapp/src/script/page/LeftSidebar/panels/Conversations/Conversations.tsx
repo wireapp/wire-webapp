@@ -32,7 +32,6 @@ import {createLabel} from 'Repositories/conversation/ConversationLabelRepository
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
@@ -73,8 +72,7 @@ import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import {Config} from '../../../../Config';
 import {countScopedThreads, useThreadIndexStore} from '../../../../components/MessagesList/threading/threadIndexStore';
-import {useThreadUnreadRepliesStore} from '../../../../components/MessagesList/threading/threadUnreadRepliesStore';
-import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {generateConversationThreadUrl, generateConversationUrl} from '../../../../router/routeGenerator';
 import {navigate} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
@@ -222,12 +220,9 @@ export const Conversations = ({
   ].includes(currentTab);
 
   const {setCurrentView} = useAppMainState(useShallow(state => state.responsiveView));
-  const openConversationThread = useAppMainState(state => state.conversationThread.open);
-  const closeRightSidebar = useAppMainState(state => state.rightSidebar.close);
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore(
     useShallow(state => state),
   );
-  const {message: messageRepository} = listViewModel.contentViewModel.repositories;
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
   // false when screen is larger than 1000px
@@ -348,49 +343,16 @@ export const Conversations = ({
   }, [isFoldersTabOpen, isSideBarOpen, setSidebarStatus, toggleFoldersTab]);
 
   const openIndexedThread = useCallback(
-    async (thread: {conversationId: string; threadId: string}) => {
+    (thread: {conversationId: string; threadId: string}) => {
       const conversation = conversationState.findConversation({id: thread.conversationId, domain: ''});
       if (!conversation) {
         useThreadIndexStore.getState().removeThread(thread.conversationId, thread.threadId);
         return;
       }
 
-      navigate(generateConversationUrl(conversation.qualifiedId));
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
-
-      let threadRootMessage: Message | undefined = conversation.getMessage(thread.threadId);
-      if (!threadRootMessage) {
-        try {
-          threadRootMessage = await messageRepository.getMessageInConversationById(conversation, thread.threadId);
-        } catch {
-          useThreadIndexStore.getState().removeThread(thread.conversationId, thread.threadId);
-          return;
-        }
-      }
-
-      if (!threadRootMessage) {
-        useThreadIndexStore.getState().removeThread(thread.conversationId, thread.threadId);
-        return;
-      }
-
-      try {
-        threadRootMessage = await messageRepository.ensureMessageSender(threadRootMessage);
-      } catch {
-        // Keep opening the thread even if sender hydration fails.
-      }
-
-      if (threadRootMessage.user().isMe) {
-        useThreadUnreadRepliesStore.getState().markThreadRootAuthoredBySelf(thread.conversationId, thread.threadId);
-        useThreadIndexStore.getState().markThreadRootMessageBySelf(thread.conversationId, thread.threadId);
-      }
-
-      const threadMessage = threadRootMessage;
-      window.requestAnimationFrame(() => {
-        closeRightSidebar();
-        openConversationThread(threadMessage);
-      });
+      navigate(generateConversationThreadUrl(conversation.qualifiedId, thread.threadId));
     },
-    [closeRightSidebar, conversationState, messageRepository, openConversationThread],
+    [conversationState],
   );
 
   useEffect(() => {

@@ -22,18 +22,19 @@ import {FC, useCallback, useMemo} from 'react';
 import {Avatar} from 'Components/Avatar';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/icon';
+import {openConversationThreadById} from 'Components/MessagesList/threading/openConversationThreadById';
 import {
   buildConversationThreadRowViewModel,
   getThreadsForConversation,
   ThreadAuthorLabelData,
   useThreadIndexStore,
 } from 'Components/MessagesList/threading/threadIndexStore';
-import {useThreadUnreadRepliesStore} from 'Components/MessagesList/threading/threadUnreadRepliesStore';
 import {ThreadsOutlineIcon} from 'Components/ThreadIcons';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
+import {generateConversationThreadUrl} from 'src/script/router/routeGenerator';
+import {setHistoryParam} from 'src/script/router/Router';
 import {useAppMainState} from 'src/script/page/state';
 import {formatTimeShort} from 'src/script/util/TimeUtil';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -118,33 +119,16 @@ export const ConversationThreadsList: FC<ConversationThreadsListProps> = ({
 
   const openThread = useCallback(
     async (threadId: string) => {
-      let threadRootMessage: Message | undefined = activeConversation.getMessage(threadId);
-      if (!threadRootMessage) {
-        try {
-          threadRootMessage = await messageRepository.getMessageInConversationById(activeConversation, threadId);
-        } catch {
-          useThreadIndexStore.getState().removeThread(activeConversation.id, threadId);
-          return;
-        }
-      }
+      const opened = await openConversationThreadById({
+        conversation: activeConversation,
+        threadId,
+        messageRepository,
+        openConversationThread,
+      });
 
-      if (!threadRootMessage) {
-        useThreadIndexStore.getState().removeThread(activeConversation.id, threadId);
-        return;
+      if (opened) {
+        setHistoryParam(generateConversationThreadUrl(activeConversation.qualifiedId, threadId));
       }
-
-      try {
-        threadRootMessage = await messageRepository.ensureMessageSender(threadRootMessage);
-      } catch {
-        // Keep opening the thread even if sender hydration fails.
-      }
-
-      if (threadRootMessage.user().isMe) {
-        useThreadUnreadRepliesStore.getState().markThreadRootAuthoredBySelf(activeConversation.id, threadId);
-        useThreadIndexStore.getState().markThreadRootMessageBySelf(activeConversation.id, threadId);
-      }
-
-      openConversationThread(threadRootMessage);
     },
     [activeConversation, messageRepository, openConversationThread],
   );

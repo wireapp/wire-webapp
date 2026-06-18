@@ -62,6 +62,8 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
+import {generateConversationUrl} from '../../router/routeGenerator';
+import {navigate} from '../../router/Router';
 import {CallActions} from '../../view_model/CallingViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
@@ -354,10 +356,16 @@ export const TitleBar = ({
     (item: {name: string}) => {
       if (item.name === displayName) {
         closeConversationThread();
+        navigate(generateConversationUrl(conversation.qualifiedId));
       }
     },
-    [closeConversationThread, displayName],
+    [closeConversationThread, conversation.qualifiedId, displayName],
   );
+
+  const closeActiveThread = useCallback(() => {
+    closeConversationThread();
+    navigate(generateConversationUrl(conversation.qualifiedId));
+  }, [closeConversationThread, conversation.qualifiedId]);
 
   const threadButton = (
     <button
@@ -426,7 +434,7 @@ export const TitleBar = ({
               variant={IconButtonVariant.SECONDARY}
               className="conversation-title-bar-icon icon-back"
               css={{marginBottom: 0}}
-              onClick={closeConversationThread}
+              onClick={closeActiveThread}
               aria-label="Back to conversation"
               data-uie-name="do-close-message-thread"
             />

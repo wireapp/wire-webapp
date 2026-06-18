@@ -48,14 +48,16 @@ import '../page/MainContent';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
-import {generateConversationUrl} from '../router/routeGenerator';
+import {generateConversationThreadUrl, generateConversationUrl} from '../router/routeGenerator';
 import {navigate, setHistoryParam} from '../router/Router';
+import {openConversationThreadById} from '../components/MessagesList/threading/openConversationThreadById';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
   openFirstSelfMention?: boolean;
   openNotificationSettings?: boolean;
   filePath?: string;
+  threadId?: string;
 }
 
 interface ShowConversationOverload {
@@ -193,12 +195,16 @@ export class ContentViewModel {
     conversationEntity: Conversation,
     openNotificationSettings: boolean,
     filePath?: string,
+    threadId?: string,
   ): void {
     const {rightSidebar} = useAppMainState.getState();
     this.showContent(ContentState.CONVERSATION);
     this.previousConversation = this.conversationState.activeConversation();
+    const qualifiedId = {id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''};
     setHistoryParam(
-      generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? '', filePath}),
+      threadId
+        ? generateConversationThreadUrl(qualifiedId, threadId)
+        : generateConversationUrl({...qualifiedId, filePath}),
     );
 
     if (openNotificationSettings) {
@@ -290,7 +296,18 @@ export class ContentViewModel {
       void this.conversationRepository.refreshMLSConversationVerificationState(conversationEntity);
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.changeConversation(conversationEntity, messageEntity);
-      this.showAndNavigate(conversationEntity, openNotificationSettings, filePath);
+      this.showAndNavigate(conversationEntity, openNotificationSettings, filePath, options?.threadId);
+
+      if (options?.threadId) {
+        const {conversationThread, rightSidebar} = useAppMainState.getState();
+        rightSidebar.close();
+        await openConversationThreadById({
+          conversation: conversationEntity,
+          threadId: options.threadId,
+          messageRepository: this.messageRepository,
+          openConversationThread: conversationThread.open,
+        });
+      }
     } catch (error: unknown) {
       if (this.isConversationNotFoundError(error)) {
         const qualifiedId = isConversationEntity(conversation) ? conversation.qualifiedId : conversation;

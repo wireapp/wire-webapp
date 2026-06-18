@@ -32,3 +32,16 @@ export const generateConversationUrl = ({id, domain, filePath}: QualifiedId & {f
 
   return baseUrl;
 };
+
+export const generateConversationThreadUrl = (
+  {id, domain}: QualifiedId,
+  threadId: string,
+): string => {
+  const conversationUrl = generateConversationUrl({id, domain});
+  return `${conversationUrl}/thread/${threadId}`;
+};
+
+export const parseConversationThreadIdFromPath = (path: string): string | null => {
+  const match = path.match(/\/thread\/([^/?#]+)(?:[/?#]|$)/);
+  return match?.[1] ?? null;
+};

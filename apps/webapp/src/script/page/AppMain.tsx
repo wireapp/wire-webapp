@@ -237,7 +237,16 @@ export const AppMain = (properties: AppMainProps) => {
     }
 
     const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? '') => {
+      useAppMainState.getState().conversationThread.close();
       void mainView.content.showConversation({id: conversationId, domain});
+    };
+
+    const showConversationThread = (conversationId: string, domain: string, threadId: string) => {
+      void mainView.content.showConversation({id: conversationId, domain}, {threadId});
+    };
+
+    const showConversationThreadWithoutDomain = (conversationId: string, threadId: string) => {
+      showConversationThread(conversationId, apiContext.domain ?? '', threadId);
     };
 
     const showConversationFiles = async (
@@ -269,6 +278,8 @@ export const AppMain = (properties: AppMainProps) => {
 
     configureRoutes({
       '/': showMostRecentConversation,
+      '/conversation/:conversationId/:domain/thread/:threadId': showConversationThread,
+      '/conversation/:conversationId/thread/:threadId': showConversationThreadWithoutDomain,
       '/conversation/:conversationId/:domain': showConversationMessages,
       '/conversation/:conversationId': showConversationMessages,
       '/conversation/:conversationId/:domain/files': showConversationFiles,

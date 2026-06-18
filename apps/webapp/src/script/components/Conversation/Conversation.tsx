@@ -82,6 +82,9 @@ import {MessageThreadView} from '../../page/RightSidebar/MessageThread/MessageTh
 import {useAppMainState} from '../../page/state';
 import {useApplicationContext, useMainViewModel} from '../../page/RootProvider';
 import {useThreadUnreadRepliesStore} from '../MessagesList/threading/threadUnreadRepliesStore';
+import {parseConversationThreadIdFromPath} from '../../router/routeGenerator';
+import {generateConversationThreadUrl} from '../../router/routeGenerator';
+import {setHistoryParam} from '../../router/Router';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
@@ -154,7 +157,12 @@ export const Conversation = ({
   const closeConversationThread = useAppMainState(state => state.conversationThread.close);
 
   useEffect(() => {
-    closeConversationThread();
+    const currentPath = window.location.hash.replace('#', '') || '/';
+    const threadIdInRoute = parseConversationThreadIdFromPath(currentPath);
+
+    if (!threadIdInRoute) {
+      closeConversationThread();
+    }
   }, [activeConversation?.id, closeConversationThread]);
 
   useEffect(() => {
@@ -334,6 +342,7 @@ export const Conversation = ({
     }
 
     openConversationThread(message);
+    setHistoryParam(generateConversationThreadUrl(activeConversation.qualifiedId, threadId));
   };
 
   const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {

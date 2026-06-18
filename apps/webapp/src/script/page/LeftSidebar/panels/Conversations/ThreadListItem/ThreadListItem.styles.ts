@@ -24,19 +24,19 @@ import {DIAMETER, AVATAR_SIZE} from 'Components/Avatar';
 const THREAD_ICON_SIZE = 40;
 const CONTEXT_ICON_SIZE = DIAMETER[AVATAR_SIZE.XX_SMALL];
 
-export const listItem: CSSObject = {
+export const listItem = (isActive: boolean): CSSObject => ({
   position: 'relative',
   listStyle: 'none',
-  backgroundColor: 'var(--app-bg)',
+  backgroundColor: isActive ? 'var(--list-item-selected-bg)' : 'var(--app-bg)',
 
   ':not(:last-child)': {
     borderBottom: '1px solid var(--border-color)',
   },
 
   ':hover': {
-    backgroundColor: 'var(--background-fade-8)',
+    backgroundColor: isActive ? 'var(--list-item-selected-bg)' : 'var(--background-fade-8)',
   },
-};
+});
 
 export const openButton: CSSObject = {
   display: 'flex',
@@ -56,7 +56,7 @@ export const openButton: CSSObject = {
   },
 };
 
-export const threadIconWrapper: CSSObject = {
+export const threadIconWrapper = (isActive: boolean): CSSObject => ({
   display: 'flex',
   flexShrink: 0,
   alignItems: 'center',
@@ -64,14 +64,14 @@ export const threadIconWrapper: CSSObject = {
   width: `${THREAD_ICON_SIZE}px`,
   height: `${THREAD_ICON_SIZE}px`,
   borderRadius: '8px',
-  backgroundColor: '#e7f0fa',
-  color: '#0667c8',
+  backgroundColor: isActive ? 'rgba(255, 255, 255, 0.18)' : '#e7f0fa',
+  color: isActive ? 'var(--app-bg-secondary)' : '#0667c8',
 
   'body.theme-dark &': {
-    backgroundColor: 'rgba(6, 103, 200, 0.2)',
-    color: '#4d9ae8',
+    backgroundColor: isActive ? 'rgba(255, 255, 255, 0.18)' : 'rgba(6, 103, 200, 0.2)',
+    color: isActive ? 'var(--app-bg-secondary)' : '#4d9ae8',
   },
-};
+});
 
 export const threadIcon: CSSObject = {
   width: '18px',
@@ -87,9 +87,9 @@ export const content: CSSObject = {
   paddingRight: '28px',
 };
 
-export const primaryText = (isUnread: boolean): CSSObject => ({
+export const primaryText = (isUnread: boolean, isActive: boolean): CSSObject => ({
   overflow: 'hidden',
-  color: 'var(--foreground)',
+  color: isActive ? 'var(--app-bg-secondary)' : 'var(--foreground)',
   fontSize: 'var(--font-size-medium)',
   fontWeight: isUnread ? 'var(--font-weight-bold)' : 'var(--font-weight-semibold)',
   lineHeight: 'var(--line-height-md)',
@@ -97,14 +97,15 @@ export const primaryText = (isUnread: boolean): CSSObject => ({
   whiteSpace: 'nowrap',
 });
 
-export const secondaryRow: CSSObject = {
+export const secondaryRow = (isActive: boolean): CSSObject => ({
   display: 'flex',
   minWidth: 0,
   alignItems: 'center',
   gap: '6px',
   fontSize: 'var(--font-size-xsmall)',
   lineHeight: 'var(--line-height-xs)',
-};
+  color: isActive ? 'var(--app-bg-secondary)' : undefined,
+});
 
 export const contextIconWrapper: CSSObject = {
   display: 'flex',
@@ -123,23 +124,23 @@ export const contextIconPlaceholder: CSSObject = {
   backgroundColor: 'var(--background-fade-16)',
 };
 
-export const conversationName: CSSObject = {
+export const conversationName = (isActive: boolean): CSSObject => ({
   overflow: 'hidden',
-  color: 'var(--main-color)',
+  color: isActive ? 'var(--app-bg-secondary)' : 'var(--main-color)',
   fontWeight: 'var(--font-weight-regular)',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
   minWidth: 0,
-};
+});
 
-export const replyCount: CSSObject = {
+export const replyCount = (isActive: boolean): CSSObject => ({
   flexShrink: 0,
-  color: 'var(--text-input-placeholder)',
+  color: isActive ? 'rgba(255, 255, 255, 0.75)' : 'var(--text-input-placeholder)',
   fontWeight: 'var(--font-weight-regular)',
   whiteSpace: 'nowrap',
-};
+});
 
-export const unreadBadge: CSSObject = {
+export const unreadBadge = (isActive: boolean): CSSObject => ({
   position: 'absolute',
   top: '12px',
   right: '16px',
@@ -147,11 +148,11 @@ export const unreadBadge: CSSObject = {
   height: '18px',
   padding: '0 4px',
   borderRadius: '4px',
-  backgroundColor: 'var(--foreground)',
-  color: 'var(--app-bg-secondary)',
+  backgroundColor: isActive ? 'var(--app-bg-secondary)' : 'var(--foreground)',
+  color: isActive ? 'var(--list-item-selected-bg)' : 'var(--app-bg-secondary)',
   fontSize: 'var(--font-size-xsmall)',
   fontWeight: 'var(--font-weight-semibold)',
   lineHeight: '18px',
   textAlign: 'center',
   pointerEvents: 'none',
-};
+});

@@ -17,7 +17,7 @@
  *
  */
 
-import {generateConversationUrl} from './routeGenerator';
+import {generateConversationUrl, generateConversationThreadUrl} from './routeGenerator';
 
 describe('generateConversationUrl', () => {
   it('generates an URL that contains the given conversation ID', () => {
@@ -59,5 +59,13 @@ describe('generateConversationUrl', () => {
     expect(url).toContain('/conversation');
     expect(url).toContain(domain);
     expect(url).toContain(filePath);
+  });
+
+  it('generates a thread URL for a conversation', () => {
+    const conversationId = '16177651-5307-421a-acc6-69d4016195f7';
+    const threadId = 'thread-root-id';
+    const url = generateConversationThreadUrl({id: conversationId, domain: 'wire.example'}, threadId);
+
+    expect(url).toBe(`/conversation/${conversationId}/wire.example/thread/${threadId}`);
   });
 });

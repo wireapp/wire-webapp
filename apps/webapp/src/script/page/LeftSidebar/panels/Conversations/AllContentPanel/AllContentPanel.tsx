@@ -32,6 +32,7 @@ import {
   getScopedThreadRows,
   useThreadIndexStore,
 } from 'Components/MessagesList/threading/threadIndexStore';
+import {isActiveThreadRow} from 'Components/MessagesList/threading/threadRouteUtils';
 import {Call} from 'Repositories/calling/Call';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -92,6 +93,7 @@ export const AllContentPanel = ({
   conversationsById = {},
 }: AllContentPanelProps) => {
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const activeThreadRootMessage = useAppMainState(state => state.conversationThread.rootMessage);
   const threadsByKey = useThreadIndexStore(state => state.threadsByKey);
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
@@ -110,8 +112,14 @@ export const AllContentPanel = ({
   );
 
   const isActiveConversation = useCallback(
-    (conversation: Conversation) => conversationState.isActiveConversation(conversation),
-    [conversationState],
+    (conversation: Conversation) => {
+      if (activeThreadRootMessage) {
+        return false;
+      }
+
+      return conversationState.isActiveConversation(conversation);
+    },
+    [activeThreadRootMessage, conversationState],
   );
 
   const openContextMenu = useCallback(
@@ -182,6 +190,7 @@ export const AllContentPanel = ({
                 key={`thread:${item.thread.conversationId}:${item.thread.threadId}`}
                 thread={item.thread}
                 conversation={conversationsById[item.thread.conversationId]}
+                isActive={isActiveThreadRow(item.thread, activeThreadRootMessage)}
                 onClick={onOpenThread}
               />
             );

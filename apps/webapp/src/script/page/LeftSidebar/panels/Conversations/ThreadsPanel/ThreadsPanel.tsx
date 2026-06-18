@@ -25,7 +25,9 @@ import {
   getScopedThreadRows,
   useThreadIndexStore,
 } from 'Components/MessagesList/threading/threadIndexStore';
+import {isActiveThreadRow} from 'Components/MessagesList/threading/threadRouteUtils';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import {useAppMainState} from 'src/script/page/state';
 
 import {ThreadListItem} from '../ThreadListItem';
 
@@ -49,6 +51,7 @@ export const ThreadsPanel = ({
   searchValue = '',
 }: ThreadsPanelProps) => {
   const threadsByKey = useThreadIndexStore(state => state.threadsByKey);
+  const activeThreadRootMessage = useAppMainState(state => state.conversationThread.rootMessage);
   const scopedThreads = useMemo(
     () =>
       getScopedThreadRows(useThreadIndexStore.getState(), conversationIds, {
@@ -93,6 +96,7 @@ export const ThreadsPanel = ({
               key={`${thread.conversationId}:${thread.threadId}`}
               thread={thread}
               conversation={conversationsById[thread.conversationId]}
+              isActive={isActiveThreadRow(thread, activeThreadRootMessage)}
               onClick={onOpenThread}
             />
           ))}
