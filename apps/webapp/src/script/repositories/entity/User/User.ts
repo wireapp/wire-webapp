@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
+import {ContactStatus, QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
@@ -107,6 +107,9 @@ export class User {
   public description?: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
   public readonly supportedProtocols: ko.Observable<null | CONVERSATION_PROTOCOL[]>;
+  public readonly contactStatus: ko.Observable<ContactStatus | undefined>;
+  /** Whether the user can be contacted (e.g. sent a connection request). Defaults to true when the backend does not provide a contact status. */
+  public readonly isContactable: ko.PureComputed<boolean>;
 
   public static get ACCENT_COLOR() {
     return {
@@ -181,6 +184,9 @@ export class User {
     });
 
     this.connection = ko.observable<ConnectionEntity | null>(null);
+
+    this.contactStatus = ko.observable<ContactStatus | undefined>(undefined);
+    this.isContactable = ko.pureComputed(() => this.contactStatus() !== ContactStatus.NON_CONTACTABLE);
 
     this.isBlocked = ko.pureComputed(() => !!this.connection()?.isBlocked() || this.isBlockedLegalHold());
     this.isBlockedLegalHold = ko.pureComputed(() => !!this.connection()?.isMissingLegalHoldConsent());

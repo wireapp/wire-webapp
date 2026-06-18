@@ -28,6 +28,7 @@ interface MenuItem {
   Icon: React.FC<React.SVGProps<SVGSVGElement>>;
   identifier: string;
   label: string;
+  disabled?: boolean;
 }
 
 interface SingleActionProps {
@@ -56,7 +57,12 @@ const SingleAction = ({item, onCancel, oneButtonPerRow = false}: SingleActionPro
       >
         {t('modalConfirmSecondary')}
       </Button>
-      <Button onClick={item.click} data-uie-name={item.identifier} css={singleActionButtonStyle(oneButtonPerRow)}>
+      <Button
+        onClick={item.click}
+        data-uie-name={item.identifier}
+        disabled={item.disabled}
+        css={singleActionButtonStyle(oneButtonPerRow)}
+      >
         {item.label}
       </Button>
     </FlexBox>

@@ -41,10 +41,10 @@ export class UserService {
   }
 
   public async getUsers(userIds: QualifiedId[]): Promise<User[] | UsersResponse> {
-    if (!userIds.length) {
+    if (!userIds.length) {  
       return [];
     }
-    return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
+    return this.apiClient.api.user.postListUsers({qualified_ids: userIds}, true);
   }
 
   /**

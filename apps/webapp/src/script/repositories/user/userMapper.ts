@@ -103,6 +103,7 @@ export class UserMapper {
       availability,
       app,
       assets,
+      contact_status: contactStatus,
       deleted,
       email,
       expires_at: expirationDate,
@@ -139,6 +140,10 @@ export class UserMapper {
 
     if (supportedProtocols) {
       userEntity.supportedProtocols(supportedProtocols);
+    }
+
+    if (contactStatus !== undefined) {
+      userEntity.contactStatus(contactStatus);
     }
 
     if (expirationDate) {

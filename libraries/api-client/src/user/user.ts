@@ -33,6 +33,11 @@ export enum UserType {
   BOT = 'bot',
 }
 
+export enum ContactStatus {
+  CONTACTABLE = 'contactable',
+  NON_CONTACTABLE = 'non-contactable',
+}
+
 export interface User {
   accent_id?: AccentColor.AccentColorID;
   app?: App;
@@ -51,4 +56,5 @@ export interface User {
   searchable?: boolean;
   supported_protocols?: CONVERSATION_PROTOCOL[];
   type: UserType;
+  contact_status?: ContactStatus;
 }

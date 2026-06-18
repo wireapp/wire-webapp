@@ -128,6 +128,7 @@ const UserActions = ({
     isConnected,
     isOutgoingRequest,
     isIncomingRequest,
+    isContactable,
   } = useKoSubscribableChildren(user, [
     'isAvailable',
     'isTemporaryGuest',
@@ -138,6 +139,7 @@ const UserActions = ({
     'isCanceled',
     'isUnknown',
     'isConnected',
+    'isContactable',
   ]);
   const isTeamMember = teamState.isInTeam(user);
 
@@ -297,6 +299,7 @@ const UserActions = ({
           Icon: Icon.PlusIcon,
           identifier: ActionIdentifier[Actions.SEND_REQUEST],
           label: t('groupParticipantActionSendRequest'),
+          disabled: !isContactable,
         }
       : undefined;
 

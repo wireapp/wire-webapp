@@ -561,10 +561,12 @@ export class UserAPI {
    */
   public async postListUsers(
     users: {qualified_ids: QualifiedId[]} | {qualified_handles: QualifiedHandle[]},
+    includeContactStatus: boolean = false,
   ): Promise<UsersReponse> {
     const config: AxiosRequestConfig = {
       data: users,
       method: 'post',
+      params: includeContactStatus ? {'include-contact-status': includeContactStatus} : undefined,
       url: `/${UserAPI.URL.LIST_USERS}`,
     };
     try {
@@ -598,6 +600,7 @@ export class UserAPI {
         const {data: sameBackendUserData} = await this.client.sendJSON<User[]>({
           data: {qualified_ids: sameBackendUsers},
           method: 'post',
+          params: includeContactStatus ? {'include-contact-status': includeContactStatus} : undefined,
           url: `/${UserAPI.URL.LIST_USERS}`,
         });
         return {found: sameBackendUserData, failed: federatedUsers};

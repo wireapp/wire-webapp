@@ -161,7 +161,7 @@ export class UserService {
     if (userIds.length === 0) {
       return {found: []};
     }
-    return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
+    return this.apiClient.api.user.postListUsers({qualified_ids: userIds}, true);
   }
 
   /**
