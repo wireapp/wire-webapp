@@ -310,7 +310,9 @@ export const useConversationSearchFiles = ({
   // When the search params transition from "active" to "none" with no search query,
   // restore the default unfiltered file list.
   useEffect(() => {
-    if (hadActiveSearchParamsRef.current && !hasActiveParams && !searchValue) {
+    const hasNoSearchQuery = normalizeSearchQuery(searchValue).length === 0;
+
+    if (hadActiveSearchParamsRef.current && hasActiveParams === false && hasNoSearchQuery) {
       if (enabledRef.current || allowSearchWhenDisabledRef.current) {
         fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
           await searchNodes({query: '', filters});
