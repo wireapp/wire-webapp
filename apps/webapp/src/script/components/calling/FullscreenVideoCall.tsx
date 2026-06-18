@@ -46,7 +46,6 @@ import type {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
-import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {detectCapabilities} from 'Repositories/media/backgroundEffects';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
@@ -75,7 +74,7 @@ import {
   paginationWrapperStyles,
   videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
-import {GroupVideoGrid} from './GroupVideoGrid';
+import {WireFluidVideoGrid} from './WireFluidVideoGrid';
 import {Pagination} from './Pagination/Pagination';
 import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
@@ -111,7 +110,6 @@ export interface FullscreenVideoCallProps {
   toggleScreenshare: (call: Call) => void;
   sendEmoji: (emoji: string, call: Call) => void;
   sendHandRaised: (isHandUp: boolean, call: Call) => void;
-  videoGrid: Grid;
 }
 
 const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
@@ -127,7 +125,6 @@ const FullscreenVideoCall = ({
   mediaDevicesHandler,
   propertiesRepository,
   callingRepository,
-  videoGrid,
   maximizedParticipant,
   activeCallViewTab,
   switchCameraInput,
@@ -158,14 +155,12 @@ const FullscreenVideoCall = ({
   const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
 
   const {
-    activeSpeakers,
     currentPage,
     pages: callPages,
     startedAt,
     participants,
     handRaisedParticipants,
   } = useKoSubscribableChildren(call, [
-    'activeSpeakers',
     'currentPage',
     'pages',
     'startedAt',
@@ -400,19 +395,10 @@ const FullscreenVideoCall = ({
         </div>
 
         <div id="video-element-remote" className="video-element-remote">
-          <GroupVideoGrid
-            maximizedParticipant={maximizedParticipant}
+          <WireFluidVideoGrid
+            participants={participants}
             selfParticipant={selfParticipant}
-            grid={
-              activeCallViewTab === CallViewTab.SPEAKERS
-                ? {
-                    grid: activeSpeakers,
-                    thumbnail: null,
-                  }
-                : videoGrid
-            }
-            call={call}
-            setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
+            onViewAllParticipantsSelected={toggleParticipantsList}
           />
           {classifiedDomains && (
             <ConversationClassifiedBar

@@ -29,7 +29,7 @@ import {useAppNotification} from 'Components/AppNotification';
 import {callingContainer} from 'Components/calling/CallingCell/CallingCell.styles';
 import {CallingControls} from 'Components/calling/CallingCell/CallingControls';
 import {CallingHeader} from 'Components/calling/CallingCell/CallingHeader';
-import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
+import {WireFluidVideoGrid} from 'Components/calling/WireFluidVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/icon';
@@ -54,7 +54,7 @@ import {t} from 'Util/localizerUtil';
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 
 import {generateConversationUrl} from '../../../router/routeGenerator';
-import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
+import {CallActions} from '../../../view_model/CallingViewModel';
 
 interface VideoCallProps {
   hasAccessToCamera?: boolean;
@@ -92,15 +92,15 @@ export const CallingCell = ({
 }: CallingCellProps) => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const {conversation} = call;
-  const {reason, state, isCbrEnabled, startedAt, maximizedParticipant, muteState} = useKoSubscribableChildren(call, [
+  const {reason, state, isCbrEnabled, startedAt, muteState, participants} = useKoSubscribableChildren(call, [
     'reason',
     'state',
     'isCbrEnabled',
     'startedAt',
-    'maximizedParticipant',
     'pages',
     'currentPage',
     'muteState',
+    'participants',
   ]);
 
   const {
@@ -116,7 +116,7 @@ export const CallingCell = ({
     'selfUser',
     'display_name',
   ]);
-  const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
+  const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
 
   const guardCall = useNoInternetCallGuard();
   const {isCallConnecting} = useConversationCall(conversation);
@@ -131,7 +131,6 @@ export const CallingCell = ({
     ['sharesCamera', 'hasActiveVideo'],
   );
 
-  const {activeSpeakers} = useKoSubscribableChildren(call, ['activeSpeakers']);
 
   const isVideoCall = call.initialType === CALL_TYPE.VIDEO;
   const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
@@ -397,13 +396,9 @@ export const CallingCell = ({
                   tabIndex={TabIndex.FOCUSABLE}
                   aria-label={t('callMaximizeLabel')}
                 >
-                  <GroupVideoGrid
-                    grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
-                    minimized
-                    maximizedParticipant={maximizedParticipant}
+                  <WireFluidVideoGrid
+                    participants={participants}
                     selfParticipant={selfParticipant}
-                    call={call}
-                    setMaximizedParticipant={setMaximizedParticipant}
                   />
 
                   {isOngoing && (

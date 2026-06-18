@@ -167,7 +167,6 @@ const CallingContainer = ({
       {isFullScreenOrDetached && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
           key={conversation.id}
-          videoGrid={videoGrid}
           call={joinedCall}
           activeCallViewTab={activeCallViewTab}
           conversation={conversation}

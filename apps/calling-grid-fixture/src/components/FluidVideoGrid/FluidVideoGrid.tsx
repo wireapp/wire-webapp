@@ -1,10 +1,10 @@
-import {useEffect, useMemo, useReducer, useRef} from 'react';
-import {AnimatePresence, motion} from 'framer-motion';
+import { useEffect, useMemo, useReducer, useRef } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
-import {GridConfig, GridParticipant, TileDescriptor} from './FluidVideoGrid.types';
-import {createGridReducer, createInitialState} from './gridReducer';
-import {FractionalTile} from './FractionalTile';
-import {GridTile} from './GridTile';
+import { GridConfig, GridParticipant, TileDescriptor } from './FluidVideoGrid.types';
+import { createGridReducer, createInitialState } from './gridReducer';
+import { FractionalTile } from './FractionalTile';
+import { GridTile } from './GridTile';
 
 export interface FluidVideoGridProps {
   participants: GridParticipant[];
@@ -14,24 +14,24 @@ export interface FluidVideoGridProps {
 
 const TILE_MOTION = {
   layout: true,
-  initial: {opacity: 0, scale: 0.9},
-  animate: {opacity: 1, scale: 1},
-  exit: {opacity: 0, scale: 0.9},
-  transition: {duration: 0.25, ease: 'easeOut'},
+  initial: { opacity: 0, scale: 0.9 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.9 },
+  transition: { duration: 0.25, ease: 'easeOut' },
 } as const;
 
-export function FluidVideoGrid({participants, config, onViewAllParticipantsSelected}: FluidVideoGridProps) {
+export function FluidVideoGrid({ participants, config, onViewAllParticipantsSelected }: FluidVideoGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const reducer = useMemo(() => createGridReducer(config), [config]);
-  const [state, dispatch] = useReducer(reducer, createInitialState({width: 0, height: 0}));
+  const [state, dispatch] = useReducer(reducer, createInitialState({ width: 0, height: 0 }));
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return undefined;
     const ro = new ResizeObserver(entries => {
-      const {width, height} = entries[0].contentRect;
-      dispatch({type: 'SET_CONTAINER_SIZE', width, height});
+      const { width, height } = entries[0].contentRect;
+      dispatch({ type: 'SET_CONTAINER_SIZE', width, height });
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -43,21 +43,21 @@ export function FluidVideoGrid({participants, config, onViewAllParticipantsSelec
 
     for (const p of state.participants) {
       if (!incomingIds.has(p.id)) {
-        dispatch({type: 'REMOVE_PARTICIPANT', id: p.id});
+        dispatch({ type: 'REMOVE_PARTICIPANT', id: p.id });
       }
     }
 
     for (const p of participants) {
       if (!currentIds.has(p.id)) {
-        dispatch({type: 'ADD_PARTICIPANT', participant: p});
+        dispatch({ type: 'ADD_PARTICIPANT', participant: p });
       } else {
-        dispatch({type: 'UPDATE_PARTICIPANT', id: p.id, changes: p});
+        dispatch({ type: 'UPDATE_PARTICIPANT', id: p.id, changes: p });
       }
     }
   }, [participants]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const {layout} = state;
-  const {rows, tileWidth, tileHeight} = layout;
+  const { layout } = state;
+  const { rows, tileWidth, tileHeight } = layout;
   const gap = config.tileGap;
 
   const renderTile = (tile: TileDescriptor, key: string) => {
@@ -66,7 +66,7 @@ export function FluidVideoGrid({participants, config, onViewAllParticipantsSelec
         <motion.div
           key={key}
           {...TILE_MOTION}
-          style={{width: tileWidth, height: tileHeight, flexShrink: 0}}
+          style={{ width: tileWidth, height: tileHeight, flexShrink: 0 }}
         >
           <GridTile
             participant={tile.participant}
@@ -83,7 +83,7 @@ export function FluidVideoGrid({participants, config, onViewAllParticipantsSelec
         <motion.div
           key={key}
           {...TILE_MOTION}
-          style={{width: tileWidth, height: tileHeight, flexShrink: 0}}
+          style={{ width: tileWidth, height: tileHeight, flexShrink: 0 }}
         >
           <FractionalTile
             subRows={tile.subRows}
@@ -121,7 +121,7 @@ export function FluidVideoGrid({participants, config, onViewAllParticipantsSelec
           <motion.div
             key={rowIdx}
             layout
-            style={{display: 'flex', flexDirection: 'row', gap, flexShrink: 0}}
+            style={{ display: 'flex', flexDirection: 'row', gap, flexShrink: 0 }}
           >
             {row.tiles.map((tile, tileIdx) => {
               const key =

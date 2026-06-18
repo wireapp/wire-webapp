@@ -132,7 +132,7 @@ module.exports = {
     rules: [
       {
         exclude: /node_modules/,
-        include: srcScript,
+        include: [srcScript, path.resolve(ROOT_PATH, 'apps/calling-grid-fixture/src')],
         loader: 'babel-loader',
         options: {
           // Ensure we use the app-specific babel config for TS/JSX support
@@ -279,6 +279,7 @@ module.exports = {
       I18n: path.resolve(SRC_PATH, 'i18n'),
       Resource: path.resolve(__dirname, 'resource'),
       Util: path.resolve(srcScript, 'util'),
+      '@fluid-video-grid/components': path.resolve(ROOT_PATH, 'apps/calling-grid-fixture/src/components/FluidVideoGrid'),
       src: path.resolve(__dirname, 'src'),
       test: path.resolve(__dirname, 'test'),
     },

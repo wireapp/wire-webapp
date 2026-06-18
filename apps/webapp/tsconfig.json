@@ -22,7 +22,8 @@
       "Repositories/*": ["./src/script/repositories/*"],
       "Resource/*": ["./resource/*"],
       "Util/*": ["./src/script/util/*"],
-      "apps/*": ["apps/*"]
+      "apps/*": ["apps/*"],
+      "@fluid-video-grid/components": ["../calling-grid-fixture/src/components/FluidVideoGrid/index.ts"]
     },
     "rootDirs": ["src"],
     "target": "ESNext",

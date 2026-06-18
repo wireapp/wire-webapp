@@ -23,7 +23,6 @@ import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
-import {Grid} from 'Repositories/calling/videoGridHandler';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
@@ -65,7 +64,6 @@ describe('fullscreenVideoCall', () => {
       propertiesRepository: new PropertiesRepository({} as PropertiesService, {} as SelfService),
       mediaDevicesHandler: buildMediaDevicesHandler(),
       callingRepository: buildCallingRepository(),
-      videoGrid: {grid: [], thumbnail: null} as Grid,
     };
     return props as FullscreenVideoCallProps;
   };
