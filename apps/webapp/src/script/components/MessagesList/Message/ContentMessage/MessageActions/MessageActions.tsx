@@ -179,6 +179,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         {isMsgReactable && (
           <>
             <MessageReactions
+              translate={translate}
               messageFocusedTabIndex={messageFocusedTabIndex}
               currentMsgActionName={currentMsgActionName}
               handleCurrentMsgAction={setCurrentMsgAction}
@@ -190,6 +191,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
             />
             {message.isReplyable() && (
               <ReplyButton
+                translate={translate}
                 actionId={MessageActionsId.REPLY}
                 currentMsgActionName={currentMsgActionName}
                 messageFocusedTabIndex={messageFocusedTabIndex}

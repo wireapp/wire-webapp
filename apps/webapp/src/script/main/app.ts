@@ -86,7 +86,6 @@ import {StorageRepository, StorageService} from 'Repositories/storage';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamService} from 'Repositories/team/TeamService';
 import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserService} from 'Repositories/user/userService';
 import {initializeDataDog} from 'Util/dataDog';
@@ -219,7 +218,6 @@ export class App {
 
     container.registerInstance(MediaDevicesHandler, mediaDevicesHandler);
     container.registerInstance(MediaStreamHandler, mediaStreamHandler);
-    container.registerInstance(AppLockRepository, new AppLockRepository(this.translate));
 
     repositories.asset = container.resolve(AssetRepository);
 

@@ -35,14 +35,14 @@ import {formatDurationCaption, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface PrivacySectionProps {
-  appLockRepository?: AppLockRepository;
+  appLockRepository: AppLockRepository;
   appLockState?: AppLockState;
   propertiesRepository: PropertiesRepository;
 }
 
 const PrivacySection = ({
   propertiesRepository,
-  appLockRepository = container.resolve(AppLockRepository),
+  appLockRepository,
   appLockState = container.resolve(AppLockState),
 }: PrivacySectionProps) => {
   const {translate} = useApplicationContext();

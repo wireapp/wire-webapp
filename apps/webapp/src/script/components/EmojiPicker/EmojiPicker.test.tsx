@@ -22,6 +22,7 @@ import React from 'react';
 import {render, waitFor} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {EmojiPicker} from './EmojiPicker';
 
@@ -34,6 +35,7 @@ describe('EmojiPicker', () => {
       withTheme(
         <div ref={wrapperRef}>
           <EmojiPicker
+            translate={translateForTest}
             posX={100}
             posY={100}
             onKeyPress={() => {
@@ -65,6 +67,7 @@ describe('EmojiPicker', () => {
       withTheme(
         <div ref={wrapperRef}>
           <EmojiPicker
+            translate={translateForTest}
             posX={100}
             posY={100}
             onKeyPress={() => undefined}

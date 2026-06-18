@@ -27,9 +27,9 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
-import {translateForTest} from 'Util/test/translateForTest';
 
 const user1 = new User('', '', translateForTest);
 const user2 = new User('', '', translateForTest);
@@ -42,6 +42,7 @@ const reactions: ReactionMap = [
 ];
 
 const defaultProps: MessageReactionsListProps = {
+  translate: translateForTest,
   reactions: reactions,
   handleReactionClick: jest.fn(),
   onTooltipReactionCountClick: jest.fn(),

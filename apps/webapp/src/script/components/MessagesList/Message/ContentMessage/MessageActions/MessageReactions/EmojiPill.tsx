@@ -21,9 +21,9 @@ import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getEmojiTitleFromEmojiUnicode} from 'Util/emojiUtil';
 import {isTabKey} from 'Util/keyboardUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {EmojiChar} from './EmojiChar';
@@ -39,6 +39,7 @@ import {
 } from './MessageReactions.styles';
 
 interface EmojiPillProps {
+  translate: Translate;
   emoji: string;
   emojiUnicode: string;
   handleReactionClick: (emoji: string) => void;
@@ -55,6 +56,7 @@ interface EmojiPillProps {
 const MAX_USER_NAMES_TO_SHOW = 2;
 
 export const EmojiPill = ({
+  translate,
   emoji,
   emojiUnicode,
   handleReactionClick,
@@ -67,7 +69,6 @@ export const EmojiPill = ({
   hasUserReacted,
   reactingUsers,
 }: EmojiPillProps) => {
-  const {translate} = useApplicationContext();
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
   const isActive = hasUserReacted && !isRemovedFromConversation;

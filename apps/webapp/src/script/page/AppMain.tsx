@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useLayoutEffect, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -45,6 +45,7 @@ import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/c
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {showInitialModal} from 'Repositories/user/availabilityModal';
 import {UserState} from 'Repositories/user/userState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
@@ -148,6 +149,7 @@ export const AppMain = (properties: AppMainProps) => {
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
+  const appLockRepository = useMemo(() => new AppLockRepository(translate), [translate]);
 
   const isScreenshareActive =
     hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.MAIN_WINDOW;
@@ -375,6 +377,7 @@ export const AppMain = (properties: AppMainProps) => {
                   isRightSidebarOpen={!!currentState}
                   openRightSidebar={toggleRightSidebar}
                   reloadApp={app.refresh}
+                  appLockRepository={appLockRepository}
                 />
               )}
 
@@ -393,7 +396,7 @@ export const AppMain = (properties: AppMainProps) => {
             </div>
           )}
 
-          <AppLock clientRepository={repositories.client} />
+          <AppLock appLockRepository={appLockRepository} clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
 
           {!locked && (

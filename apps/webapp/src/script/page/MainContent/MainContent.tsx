@@ -37,6 +37,7 @@ import {User} from 'Repositories/entity/User';
 import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {TeamState} from 'Repositories/team/TeamState';
+import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -63,6 +64,7 @@ const Animated = ({children, ...rest}: {children: ReactNode}) => (
 );
 
 interface MainContentProps {
+  appLockRepository: AppLockRepository;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
   selfUser: User;
@@ -71,6 +73,7 @@ interface MainContentProps {
 }
 
 const MainContent = ({
+  appLockRepository,
   openRightSidebar,
   isRightSidebarOpen = false,
   selfUser,
@@ -183,6 +186,7 @@ const MainContent = ({
                   userRepository={repositories.user}
                   selfUser={selfUser}
                   isActivatedAccount={isActivatedAccount}
+                  appLockRepository={appLockRepository}
                 />
               </div>
             )}

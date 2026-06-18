@@ -20,8 +20,8 @@
 import {useState, RefObject, FC, useRef} from 'react';
 
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {EmojiChar} from './EmojiChar';
 import {reactionImgSize} from './EmojiChar.styles';
@@ -35,6 +35,7 @@ const likeEmoji = '❤️';
 const INITIAL_CLIENT_X_POS = 0;
 const INITIAL_CLIENT_Y_POS = 0;
 export interface MessageReactionsProps {
+  translate: Translate;
   messageFocusedTabIndex: number;
   currentMsgActionName: string;
   toggleActiveMenu: (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => void;
@@ -46,6 +47,7 @@ export interface MessageReactionsProps {
 }
 
 const MessageReactions: FC<MessageReactionsProps> = ({
+  translate,
   messageFocusedTabIndex,
   currentMsgActionName,
   handleCurrentMsgAction,
@@ -55,7 +57,6 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   wrapperRef,
   handleReactionClick,
 }) => {
-  const {translate} = useApplicationContext();
   const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
   const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
   const [showEmojis, setShowEmojis] = useState(false);
@@ -220,6 +221,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
       </button>
       {showEmojis ? (
         <EmojiPicker
+          translate={translate}
           posX={clientX}
           posY={clientY}
           onKeyPress={handleEmojiSelectionWithKeyboard}

@@ -19,9 +19,10 @@
 
 import {ReactNode} from 'react';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import type {Translate} from 'Util/localizerUtil';
 
 interface DownloadButtonProps {
+  translate: Translate;
   actionId: string;
   messageFocusedTabIndex: number;
   onDownloadClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -31,6 +32,7 @@ interface DownloadButtonProps {
 }
 
 const DownloadButton = ({
+  translate,
   actionId,
   messageFocusedTabIndex,
   onDownloadClick,
@@ -38,7 +40,6 @@ const DownloadButton = ({
   children,
   ...rest
 }: DownloadButtonProps) => {
-  const {translate} = useApplicationContext();
   return (
     <button
       {...rest}

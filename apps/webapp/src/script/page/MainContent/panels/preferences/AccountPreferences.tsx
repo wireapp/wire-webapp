@@ -32,6 +32,7 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
 import {useApplicationContext} from 'src/script/page/RootProvider';
@@ -59,6 +60,7 @@ import {Config} from '../../../../Config';
 import {AccentColorPicker} from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {
+  appLockRepository: AppLockRepository;
   importFile: (file: File) => void;
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
@@ -76,6 +78,7 @@ interface AccountPreferencesProps {
 const logger = getLogger('AccountPreferences');
 
 export const AccountPreferences = ({
+  appLockRepository,
   importFile,
   clientRepository,
   userRepository,
@@ -243,7 +246,7 @@ export const AccountPreferences = ({
         />
       )}
 
-      <PrivacySection propertiesRepository={propertiesRepository} />
+      <PrivacySection appLockRepository={appLockRepository} propertiesRepository={propertiesRepository} />
 
       {isActivatedAccount && (
         <>

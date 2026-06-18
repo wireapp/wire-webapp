@@ -313,6 +313,7 @@ export const ContentMessageComponent = ({
 
       {reactions.length > 0 && (
         <MessageReactionsList
+          translate={translate}
           reactions={reactions}
           selfUserId={selfId}
           handleReactionClick={onClickReaction}

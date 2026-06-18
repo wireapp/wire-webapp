@@ -20,12 +20,13 @@
 import {FC} from 'react';
 
 import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import type {Translate} from 'Util/localizerUtil';
 
 import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './MessageActions.styles';
 import {reactionImgSize} from './MessageReactions/EmojiChar.styles';
 
 interface ReplyButtonProps {
+  translate: Translate;
   actionId: string;
   currentMsgActionName: string;
   messageFocusedTabIndex: number;
@@ -34,13 +35,13 @@ interface ReplyButtonProps {
 }
 
 const ReplyButton: FC<ReplyButtonProps> = ({
+  translate,
   actionId,
   currentMsgActionName,
   messageFocusedTabIndex,
   onReplyClick,
   onKeyPress,
 }) => {
-  const {translate} = useApplicationContext();
   return (
     <button
       css={{

@@ -24,13 +24,14 @@ import {createPortal} from 'react-dom';
 
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {EmojiPickerAdapter, SkinTones} from './EmojiPickerAdapter';
 import type {EmojiPickerSelection} from './EmojiPickerAdapter';
 
 interface EmojiPickerProperties {
+  readonly translate: Translate;
   readonly posX: number;
   readonly posY: number;
   readonly onKeyPress: () => void;
@@ -40,8 +41,7 @@ interface EmojiPickerProperties {
 }
 
 export const EmojiPicker: FunctionComponent<EmojiPickerProperties> = properties => {
-  const {posX, posY, onKeyPress, resetActionMenuStates, wrapperRef, handleReactionClick} = properties;
-  const {translate} = useApplicationContext();
+  const {translate, posX, posY, onKeyPress, resetActionMenuStates, wrapperRef, handleReactionClick} = properties;
   const emojiRef = useRef<HTMLDivElement>(null);
   useClickOutside(emojiRef, resetActionMenuStates, wrapperRef);
   const [style, setStyle] = useState<object>({

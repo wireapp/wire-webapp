@@ -59,7 +59,7 @@ const passwordRegexSpecial = /(?=.*[!@#$%^&*(),.?":{}|<>])/;
 const passwordRegexUpper = /(?=.*[A-Z])/;
 
 interface AppLockProps {
-  appLockRepository?: AppLockRepository;
+  appLockRepository: AppLockRepository;
   appLockState?: AppLockState;
   clientRepository: ClientRepository;
   clientState?: ClientState;
@@ -69,7 +69,7 @@ const AppLock = ({
   clientRepository,
   clientState = container.resolve(ClientState),
   appLockState = container.resolve(AppLockState),
-  appLockRepository = container.resolve(AppLockRepository),
+  appLockRepository,
 }: AppLockProps) => {
   const {translate} = useApplicationContext();
   const [localAppLockState, setLocalAppLockState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);

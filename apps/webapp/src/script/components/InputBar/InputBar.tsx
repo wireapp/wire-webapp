@@ -371,6 +371,7 @@ export const InputBar = ({
       </InputBarContainer>
       {emojiPicker.open ? (
         <EmojiPicker
+          translate={translate}
           posX={emojiPicker.position.x}
           posY={emojiPicker.position.y}
           onKeyPress={emojiPicker.handleClose}

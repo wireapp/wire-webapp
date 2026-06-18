@@ -20,8 +20,10 @@
 import {act, render, screen, waitFor} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
+import type {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {MainContent} from './MainContent';
 
@@ -31,7 +33,6 @@ import {createDeterministicWallClock} from '../../clock/deterministicWallClock';
 import {createRootContextValueForTest} from '../testSupport/rootContextTestSupport';
 import {RootProvider} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
-import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('./panels/preferences/AccountPreferences', () => ({
   AccountPreferences: () => <span>AccountPreferences</span>,
@@ -69,6 +70,7 @@ describe('Preferences', () => {
   } as MainViewModel;
 
   const defaultParams = {
+    appLockRepository: {} as AppLockRepository,
     openRightSidebar: jest.fn(),
     selfUser: new User('selfUser', '', translateForTest),
     reloadApp: jest.fn(),
