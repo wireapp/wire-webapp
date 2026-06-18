@@ -313,7 +313,9 @@ describe('useConversationSearchFiles', () => {
     act(() => rerender({filters: emptyFilters}));
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(cellsRepository.searchNodes).toHaveBeenLastCalledWith(expect.objectContaining({query: '', recursive: false}));
+    expect(cellsRepository.searchNodes).toHaveBeenLastCalledWith(
+      expect.objectContaining({query: '', recursive: false}),
+    );
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('all-files.pdf');
     expect(onClear).not.toHaveBeenCalled();
   });
@@ -332,7 +334,9 @@ describe('useConversationSearchFiles', () => {
     act(() => result.current.handleSearch(''));
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(cellsRepository.searchNodes).toHaveBeenLastCalledWith(expect.objectContaining({query: '', recursive: false}));
+    expect(cellsRepository.searchNodes).toHaveBeenLastCalledWith(
+      expect.objectContaining({query: '', recursive: false}),
+    );
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('all-files.pdf');
     expect(onClear).not.toHaveBeenCalled();
   });
