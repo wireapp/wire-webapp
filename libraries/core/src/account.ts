@@ -788,7 +788,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.apiClient.connect(async abortController => {
       // this call back is called every single time the websocket connection is (re)established
       this.logger.info(
-        `Connection established with websocket, starting notification stream processing. useLegacy: ${useLegacy}, aborted: ${abortController.signal.aborted}`,
+        `WebSocket notification processing started. useLegacy: ${useLegacy}, aborted: ${abortController.signal.aborted}`,
       );
       /**
        * This is to avoid passing proposals too early to core crypto
@@ -808,33 +808,27 @@ export class Account extends TypedEventEmitter<Events> {
 
       if (useLegacy) {
         this.logger.info(
-          `Starting legacy notification stream processing after WebSocket open. aborted: ${abortController.signal.aborted}`,
+          `Legacy notification stream catch-up started after WebSocket open. aborted: ${abortController.signal.aborted}`,
         );
         try {
           await legacyProcessNotificationStream(abortController);
           this.logger.info(
-            `Completed legacy notification stream processing after WebSocket open. aborted: ${abortController.signal.aborted}, live: ${this.isConnectionLive()}`,
+            `Legacy notification stream catch-up completed after WebSocket open. aborted: ${abortController.signal.aborted}, live: ${this.isConnectionLive()}`,
           );
         } catch (error: unknown) {
           this.logger.error(
-            `Failed legacy notification stream processing after WebSocket open. aborted: ${abortController.signal.aborted}, live: ${this.isConnectionLive()}`,
+            `Legacy notification stream catch-up failed after WebSocket open. aborted: ${abortController.signal.aborted}, live: ${this.isConnectionLive()}`,
             error,
           );
 
           if (abortController.signal.aborted) {
-            this.logger.info('Ignoring failed legacy notification stream processing because WebSocket was aborted');
             return;
           }
 
           this.pauseAndFlushNotificationQueue();
           onConnectionStateChanged(ConnectionState.CLOSED);
         }
-        return;
       }
-
-      this.logger.info(
-        `Notification stream processing callback completed after WebSocket open. useLegacy: ${useLegacy}, aborted: ${abortController.signal.aborted}, live: ${this.isConnectionLive()}`,
-      );
     });
 
     return () => {

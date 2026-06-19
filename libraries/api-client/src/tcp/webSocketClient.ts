@@ -68,7 +68,7 @@ export type WebSocketClientOptions = {
 
 export class WebSocketClient extends EventEmitter {
   private clientId?: string;
-  private accessTokenRefreshPromise: Maybe<Promise<void>> = Maybe.nothing<Promise<void>>();
+  private accessTokenRefreshPromise?: Promise<void>;
   private readonly baseUrl: string;
   private readonly logger: logdown.Logger;
   private readonly socket: ReconnectingWebsocket;
@@ -201,16 +201,21 @@ export class WebSocketClient extends EventEmitter {
   }
 
   private async refreshAccessToken(): Promise<void> {
-    if (this.accessTokenRefreshPromise.isJust) {
-      return this.accessTokenRefreshPromise.value;
+    if (this.accessTokenRefreshPromise !== undefined) {
+      return this.accessTokenRefreshPromise;
     }
 
-    const accessTokenRefreshPromise = this.refreshAccessTokenOnce().finally(() => {
-      this.accessTokenRefreshPromise = Maybe.nothing<Promise<void>>();
-    });
-    this.accessTokenRefreshPromise = Maybe.just(accessTokenRefreshPromise);
+    this.accessTokenRefreshPromise = this.refreshAccessTokenWithCleanup();
 
-    return accessTokenRefreshPromise;
+    return this.accessTokenRefreshPromise;
+  }
+
+  private async refreshAccessTokenWithCleanup(): Promise<void> {
+    try {
+      await this.refreshAccessTokenOnce();
+    } finally {
+      this.accessTokenRefreshPromise = undefined;
+    }
   }
 
   private async refreshAccessTokenOnce(): Promise<void> {
