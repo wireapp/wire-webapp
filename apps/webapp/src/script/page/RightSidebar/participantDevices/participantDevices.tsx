@@ -20,7 +20,7 @@
 import {FC} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {UserDevices, UserDevicesState} from 'Components/UserDevices';
+import {UserDevices, UserDevicesState} from 'Components/userDevices';
 import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/RootProvider';

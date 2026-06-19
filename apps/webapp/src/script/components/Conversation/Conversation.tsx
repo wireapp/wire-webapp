@@ -34,7 +34,7 @@ import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal} from 'Components/Modals/UserModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {TitleBar} from 'Components/TitleBar';
+import {TitleBar} from 'Components/titleBar';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';

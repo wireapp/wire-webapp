@@ -26,7 +26,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import * as Icon from 'Components/icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {UserDevicesState, UserDevices} from 'Components/UserDevices';
+import {UserDevicesState, UserDevices} from 'Components/userDevices';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import {ClientRepository} from 'Repositories/client';

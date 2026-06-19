@@ -19,7 +19,7 @@
 
 import * as Icon from 'Components/icon';
 import {ServiceList} from 'Components/ServiceList';
-import {UserList} from 'Components/UserList';
+import {UserList} from 'Components/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';

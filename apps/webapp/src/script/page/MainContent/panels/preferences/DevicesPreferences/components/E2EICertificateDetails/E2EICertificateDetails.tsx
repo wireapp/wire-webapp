@@ -19,7 +19,7 @@
 
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {VerificationBadges} from 'Components/Badge';
+import {VerificationBadges} from 'Components/badge';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {useCertificateStatus} from 'src/script/hooks/useCertificateStatus';
 import {useApplicationContext} from 'src/script/page/RootProvider';

@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {UserVerificationBadges} from 'Components/Badge';
+import {UserVerificationBadges} from 'Components/badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/RootProvider';

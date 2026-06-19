@@ -33,7 +33,7 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {WIDTH} from '@wireapp/react-ui-kit';
 
-import {ConversationListCell} from 'Components/ConversationListCell';
+import {ConversationListCell} from 'Components/conversationListCell';
 import {Call} from 'Repositories/calling/Call';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';

@@ -17,7 +17,7 @@
  *
  */
 
-import {DeviceVerificationBadges} from 'Components/Badge';
+import {DeviceVerificationBadges} from 'Components/badge';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {E2EIHandler, WireIdentity} from 'src/script/E2EIdentity';
 

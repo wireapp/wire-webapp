@@ -25,7 +25,7 @@ import {partition} from 'underscore';
 import {useDebouncedCallback} from 'use-debounce';
 
 import * as Icon from 'Components/icon';
-import {UserList, UserlistMode} from 'Components/UserList';
+import {UserList, UserlistMode} from 'Components/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';

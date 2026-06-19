@@ -24,7 +24,7 @@ import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {UserList} from 'Components/UserList';
+import {UserList} from 'Components/userList';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
