@@ -112,7 +112,7 @@ export function FluidVideoGrid({ participants, config, onViewAllParticipantsSele
           </div>
 
           {/* Narrow strip — fixed single-column sidebar */}
-          <div style={{width: narrowInnerWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', gap}}>
+          <div style={{width: narrowInnerWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', gap, justifyContent: 'center'}}>
             {visibleStripParticipants.map(p => (
               <div key={p.id} style={{height: stripTileHeight, flexShrink: 0, overflow: 'hidden'}}>
                 <GridTile

@@ -239,8 +239,8 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
       {/* ── Right: panel (collapsible, independently scrollable) ── */}
       <aside
         style={{
-          flex: panelOpen ? '0 0 360px' : '0 0 0px',
-          width: panelOpen ? 360 : 0,
+          flex: panelOpen ? '0 0 400px' : '0 0 0px',
+          width: panelOpen ? 400 : 0,
           background: '#fff',
           borderLeft: panelOpen ? `1px solid ${PANEL_LINE}` : 'none',
           display: 'flex',
@@ -250,7 +250,7 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
         }}
       >
         {/* Panel header (sticky) */}
-        <div style={{padding: '18px 18px 12px', borderBottom: `1px solid ${PANEL_LINE}`, flexShrink: 0, position: 'relative', minWidth: 324}}>
+        <div style={{padding: '18px 18px 12px', borderBottom: `1px solid ${PANEL_LINE}`, flexShrink: 0, position: 'relative', minWidth: 364}}>
           <button
             onClick={() => setPanelOpen(false)}
             title="Hide controls"
@@ -282,7 +282,7 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
         </div>
 
         {/* Scrollable content (independent of grid) */}
-        <div style={{flex: '1 1 auto', overflowY: 'auto', padding: '14px 18px 28px', display: 'flex', flexDirection: 'column', gap: 20, minWidth: 324}}>
+        <div style={{flex: '1 1 auto', overflowY: 'auto', padding: '14px 18px 28px', display: 'flex', flexDirection: 'column', gap: 20, minWidth: 364}}>
 
           {/* ── Call group ── */}
           <div>
