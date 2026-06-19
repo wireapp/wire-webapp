@@ -31,6 +31,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {ChooseScreen} from 'Components/calling/ChooseScreen';
+import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {ConfigToolbar} from 'Components/ConfigToolbar/ConfigToolbar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
@@ -51,6 +52,7 @@ import {UserState} from 'Repositories/user/userState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
 import {AppLock} from './AppLock';
 import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/FeatureConfigChangeHandler/Features/useE2EIFeatureConfigUpdate';
@@ -405,6 +407,15 @@ export const AppMain = (properties: AppMainProps) => {
 
               {viewMode === CallingViewMode.FULL_SCREEN && (
                 <CallingContainer
+                  propertiesRepository={repositories.properties}
+                  callingRepository={repositories.calling}
+                  fireAndForgetInvoker={fireAndForgetInvoker}
+                  toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
+                />
+              )}
+
+              {isDetachedCallingFeatureEnabled() && (
+                <DetachedCallingCell
                   propertiesRepository={repositories.properties}
                   callingRepository={repositories.calling}
                   fireAndForgetInvoker={fireAndForgetInvoker}
