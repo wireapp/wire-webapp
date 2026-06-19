@@ -13,7 +13,7 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "@enormora/objectory": "0.0.7",
+    "@enormora/objectory": "0.0.9",
     "@faker-js/faker": "9.9.0",
     "@ls-lint/ls-lint": "2.3.1",
     "@nx/jest": "22.7.5",
