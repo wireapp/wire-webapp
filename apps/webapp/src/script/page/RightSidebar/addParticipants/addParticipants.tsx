@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useMemo, useState} from 'react';
+import {FC, useCallback, useMemo, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -181,10 +181,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
   const onAddPeople = () => setCurrentState(PARTICIPANTS_STATE.ADD_PEOPLE);
 
-  const searchServices = async (value: string) => {
-    await integrationRepository.searchForServices(value);
-    setIsInitialServiceSearch(false);
-  };
+  const searchServices = useCallback(
+    async (value: string): Promise<void> => {
+      await integrationRepository.searchForServices(value);
+      setIsInitialServiceSearch(false);
+    },
+    [integrationRepository],
+  );
 
   const onAddServices = async () => {
     setCurrentState(PARTICIPANTS_STATE.ADD_SERVICE);
@@ -211,13 +214,16 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     onBack();
   };
 
-  const onSearchInput = async (value: string) => {
-    setSearchInput(value);
+  const onSearchInput = useCallback(
+    async (value: string): Promise<void> => {
+      setSearchInput(value);
 
-    if (isAddServiceState && activeConversation.protocol === CONVERSATION_PROTOCOL.PROTEUS) {
-      await searchServices(value);
-    }
-  };
+      if (isAddServiceState && activeConversation.protocol === CONVERSATION_PROTOCOL.PROTEUS) {
+        await searchServices(value);
+      }
+    },
+    [activeConversation.protocol, isAddServiceState, searchServices],
+  );
 
   return (
     <div id="add-participants" className="add-participants panel__page">
