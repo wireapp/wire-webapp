@@ -20,6 +20,7 @@
 /* eslint-disable dot-notation */
 
 import {WebSocketClient} from './webSocketClient';
+import {noop} from 'noop-esm';
 
 import {InvalidTokenError} from '../auth/authenticationError';
 import {MINIMUM_API_VERSION} from '../config';
@@ -204,7 +205,7 @@ describe('WebSocketClient', () => {
 
   describe('onReconnect', () => {
     it('waits for the same in-flight access-token refresh before building reconnect URLs', async () => {
-      let resolveRefreshAccessToken: () => void = () => undefined;
+      let resolveRefreshAccessToken: () => void = noop;
       const refreshAccessTokenPromise = new Promise<void>(resolve => {
         resolveRefreshAccessToken = resolve;
       });
