@@ -23,12 +23,12 @@ import * as Icon from 'Components/icon';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
 import {Config} from 'src/script/Config';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {splitFingerprint} from 'Util/stringUtil';
 
 import {messageBodyWrapper} from './ContentMessage/ContentMessage.styles';
 
-import {FormattedId} from '../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
+import {FormattedId} from '../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 
 interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;

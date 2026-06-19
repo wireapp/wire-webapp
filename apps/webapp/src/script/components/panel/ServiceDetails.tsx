@@ -19,10 +19,10 @@
 
 import {useId} from 'react';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {authorLabel, description, header, panel} from 'Components/panel/ServiceDetails.styles';
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 interface ServiceDetailsProps {

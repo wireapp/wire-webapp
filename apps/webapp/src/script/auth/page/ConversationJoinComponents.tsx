@@ -38,7 +38,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 

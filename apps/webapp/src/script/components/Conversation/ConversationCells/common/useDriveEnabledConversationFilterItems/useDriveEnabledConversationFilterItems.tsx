@@ -20,8 +20,8 @@
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
-import {GroupAvatar} from 'Components/Avatar';
-import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
+import {GroupAvatar} from 'Components/avatar';
+import {ChannelAvatar} from 'Components/avatar';
 import type {FilterItem} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';

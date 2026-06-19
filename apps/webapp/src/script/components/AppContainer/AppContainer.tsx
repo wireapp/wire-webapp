@@ -45,7 +45,7 @@ import {Config, Configuration} from '../../Config';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
-import {AppMain} from '../../page/AppMain';
+import {AppMain} from '../../page/appMain';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import {MainViewModel} from '../../view_model/MainViewModel';

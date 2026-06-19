@@ -17,7 +17,7 @@
  *
  */
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {showUserModal} from 'Components/Modals/UserModal';
 import {User} from 'Repositories/entity/User';
 

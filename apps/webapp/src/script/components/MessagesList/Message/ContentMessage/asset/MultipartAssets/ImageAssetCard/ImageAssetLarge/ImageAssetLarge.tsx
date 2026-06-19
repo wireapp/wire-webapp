@@ -24,7 +24,7 @@ import {Maybe} from 'true-myth';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getBestPreviewSource} from 'Util/imageUtil';
 
 import {

@@ -20,7 +20,7 @@
 import {forwardRef, ReactNode, useState} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {contentWrapperStyles} from './VideoAssetCard.styles';
 

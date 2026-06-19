@@ -34,7 +34,7 @@ import {useDriveEnabledParticipantFilterItems} from 'Components/Conversation/Con
 import {useGetAllTags} from 'Components/Conversation/ConversationCells/common/useGetAllTags/useGetAllTags';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {RootContextValue} from 'src/script/page/RootProvider';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 
 export const useGlobalDriveFilters = ({
   cellsRepository,

@@ -23,7 +23,7 @@ import {FormattedMessage} from 'react-intl';
 
 import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Config} from '../../Config';
 

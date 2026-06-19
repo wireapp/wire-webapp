@@ -20,7 +20,7 @@
 import {Button, Container, H2, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonCss, containerCss, headerCss, linkCss} from './AccountAlreadyExistsModal.styles';
 

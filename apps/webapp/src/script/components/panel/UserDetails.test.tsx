@@ -22,7 +22,7 @@ import {ReactElement} from 'react';
 import {render} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
-import {RootProvider} from 'src/script/page/RootProvider';
+import {RootProvider} from 'src/script/page/rootProvider';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translate} from 'Util/localizerUtil';
@@ -30,7 +30,7 @@ import {createUuid} from 'Util/uuid';
 
 import {UserDetails} from './UserDetails';
 
-jest.mock('Components/Avatar', () => ({
+jest.mock('Components/avatar', () => ({
   Avatar: () => <div data-testid="mock-avatar" />,
   AVATAR_SIZE: {X_LARGE: 'x-large'},
 }));

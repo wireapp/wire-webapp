@@ -32,7 +32,7 @@ import {ClientState} from 'Repositories/client/ClientState';
 import {User} from 'Repositories/entity/User';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {getLogger} from 'Util/logger';
 import {getCurrentDate} from 'Util/timeUtil';

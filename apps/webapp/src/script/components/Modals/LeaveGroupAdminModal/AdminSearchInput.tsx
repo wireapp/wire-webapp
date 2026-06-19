@@ -22,7 +22,7 @@ import {FormatOptionLabelMeta} from 'react-select';
 
 import {Option, Select} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import type {User} from 'Repositories/entity/User';
 import type {Translate} from 'Util/localizerUtil';
 

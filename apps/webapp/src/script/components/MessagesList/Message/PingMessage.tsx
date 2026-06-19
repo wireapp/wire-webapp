@@ -23,7 +23,7 @@ import {OutlineCheck} from '@wireapp/react-ui-kit';
 
 import {Message} from 'Repositories/entity/message/Message';
 import {PingMessage as PingMessageEntity} from 'Repositories/entity/message/PingMessage';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';

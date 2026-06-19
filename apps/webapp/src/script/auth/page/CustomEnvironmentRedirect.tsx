@@ -26,7 +26,7 @@ import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {LogoIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {afterRender} from 'Util/util';
 
 import {Page} from './Page';

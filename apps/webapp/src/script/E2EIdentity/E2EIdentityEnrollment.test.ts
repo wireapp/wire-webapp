@@ -34,11 +34,11 @@ import * as util from 'Util/util';
 import {E2EIHandler} from './E2EIdentityEnrollment';
 import * as e2EIdentityVerification from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
-import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
+import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('./OIDCService', () => {
+jest.mock('./oidcService', () => {
   return {
     // Mock the OIDCService class
     OIDCService: jest.fn().mockImplementation(() => ({

@@ -47,7 +47,7 @@ import {TestFactory} from '../../../../test/helper/TestFactory';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('Components/Avatar', () => ({
+jest.mock('Components/avatar', () => ({
   AVATAR_SIZE: {X_LARGE: 'avatar-xl'},
   Avatar: () => <div data-uie-name="mock-avatar" />,
 }));

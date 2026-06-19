@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface ShowMoreButtonProps {
   active: boolean;

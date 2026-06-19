@@ -24,7 +24,7 @@ import {FormattedMessage} from 'react-intl';
 import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Config} from '../../Config';
 import {EXTERNAL_ROUTE} from '../externalRoute';

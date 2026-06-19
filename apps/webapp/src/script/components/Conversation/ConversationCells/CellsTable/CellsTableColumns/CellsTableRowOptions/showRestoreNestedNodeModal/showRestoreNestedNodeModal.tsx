@@ -18,7 +18,7 @@
  */
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {RootContextValue} from 'src/script/page/RootProvider';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNodeType, CellNode} from 'src/script/types/cellNode';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 

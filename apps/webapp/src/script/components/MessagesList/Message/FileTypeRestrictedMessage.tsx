@@ -18,7 +18,7 @@
  */
 
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/FileTypeRestrictedMessage';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface FileTypeRestrictedMessageProps {
   message: FileTypeRestrictedMessageEntity;

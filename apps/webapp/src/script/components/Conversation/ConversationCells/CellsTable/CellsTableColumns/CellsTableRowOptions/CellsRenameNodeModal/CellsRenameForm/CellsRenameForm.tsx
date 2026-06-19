@@ -22,7 +22,7 @@ import {ChangeEvent, FormEvent} from 'react';
 import {CircleCloseIcon, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
 
 import {useInputAutoFocus} from 'Components/Conversation/ConversationCells/common/useInputAutoFocus/useInputAutoFocus';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {closeIconStyles, formStyles} from './CellsRenameForm.styles';
 

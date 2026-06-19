@@ -23,7 +23,7 @@ import {WavesPattern} from '@wireapp/react-ui-kit/lib/Images/WavesPattern';
 
 import {Bold, COLOR_V2, FlexBox, Link, Logo, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './Layout.styles';
 

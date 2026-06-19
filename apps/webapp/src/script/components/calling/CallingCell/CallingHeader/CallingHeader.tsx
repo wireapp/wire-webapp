@@ -19,11 +19,11 @@
 
 import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/avatar';
 import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/icon';
 import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
 import {

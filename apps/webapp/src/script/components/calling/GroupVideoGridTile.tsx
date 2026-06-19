@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {VIDEO_STATE} from '@wireapp/avs';
 import {Loading, TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {
   groupVideoActiveSpeaker,
   groupVideoActiveSpeakerTile,
@@ -38,7 +38,7 @@ import {
 } from 'Components/calling/GroupVideoGridTile.styles';
 import * as Icon from 'Components/icon';
 import type {Participant} from 'Repositories/calling/Participant';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';
 

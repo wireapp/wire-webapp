@@ -39,7 +39,7 @@ import {ConversationError} from 'src/script/error/conversationError';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import type {RootContextValue} from 'src/script/page/RootProvider';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 import {isErrorWithType} from 'src/script/util/typePredicateUtil';
 
 import {useSendFiles} from './useSendFiles/useSendFiles';

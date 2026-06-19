@@ -19,7 +19,7 @@
 
 import {TextInput} from 'Components/TextInput';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';

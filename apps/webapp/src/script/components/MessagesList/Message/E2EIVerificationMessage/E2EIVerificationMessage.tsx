@@ -22,7 +22,7 @@ import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/E2EIVerificationMessage';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {replaceLink} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';

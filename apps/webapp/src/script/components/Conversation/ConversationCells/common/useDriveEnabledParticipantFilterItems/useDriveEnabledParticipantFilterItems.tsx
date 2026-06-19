@@ -19,7 +19,7 @@
 
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import type {FilterItem} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';

@@ -21,7 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsSearchInput} from 'Components/CellsSearchInput/CellsSearchInput';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   actionsStyles,

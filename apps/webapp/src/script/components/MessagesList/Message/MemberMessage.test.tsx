@@ -38,7 +38,7 @@ import {setStrings, translate} from 'Util/localizerUtil';
 import {MemberMessage} from './MemberMessage';
 import {CONFIG} from './MemberMessage/MessageContent';
 
-jest.mock('Components/Avatar', () => ({
+jest.mock('Components/avatar', () => ({
   AVATAR_SIZE: {
     X_LARGE: 'avatar-xl',
   },

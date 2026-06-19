@@ -21,7 +21,7 @@ import {useNavigate} from 'react-router-dom';
 
 import {FlexBox} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {styles} from './CreatePersonalAccount.styles';
 import {Page} from './Page';

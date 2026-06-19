@@ -18,7 +18,7 @@
  */
 
 import {Note} from 'Components/Note/Note';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const AppsDisabledNote = () => {
   const {translate} = useApplicationContext();

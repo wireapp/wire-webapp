@@ -28,7 +28,7 @@ import type {Translate} from 'Util/localizerUtil';
 import {WallClock, createWallClock} from '../../clock/wallClock';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../../view_model/MainViewModel';
-import {RootContextValue, RootProvider} from '../RootProvider';
+import {RootContextValue, RootProvider} from '../rootProvider';
 
 type CreateRootContextValueForTestParameters = {
   readonly doesApplicationNeedForceReload?: boolean;

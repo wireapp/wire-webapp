@@ -31,8 +31,8 @@ import type {MessageRepository} from 'Repositories/conversation/MessageRepositor
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/E2EIdentity';
-import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import type {Logger} from 'Util/logger';
 import {splitFingerprint} from 'Util/stringUtil';
@@ -40,7 +40,7 @@ import {toError} from 'Util/toError';
 
 import {Config} from '../../../../Config';
 import {MotionDuration} from '../../../../motion/MotionDuration';
-import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
+import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;

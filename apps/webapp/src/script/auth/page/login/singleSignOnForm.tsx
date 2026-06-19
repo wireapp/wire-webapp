@@ -31,7 +31,7 @@ import {container} from 'tsyringe';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {APIClient} from 'src/script/service/apiClientSingleton';
 import {isBackendError} from 'Util/typePredicateUtil';
 

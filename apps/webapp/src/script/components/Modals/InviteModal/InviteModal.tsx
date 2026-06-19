@@ -24,7 +24,7 @@ import {Runtime} from '@wireapp/commons';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';

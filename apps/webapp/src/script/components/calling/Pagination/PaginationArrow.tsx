@@ -19,7 +19,7 @@
 
 import {ChevronIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {chevronLeftStyles, chevronRightStyles, iconButtonStyles} from './Pagination.styles';

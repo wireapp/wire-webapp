@@ -42,10 +42,10 @@ import {
   MLSStatuses,
 } from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
-import {getEnrollmentTimer, getRemainingGracePeriodDelay, hasGracePeriodStartedForSelfClient} from './EnrollmentTimer';
-import {getModalOptions, ModalType} from './Modals';
-import {OIDCService} from './OIDCService';
-import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
+import {getEnrollmentTimer, getRemainingGracePeriodDelay, hasGracePeriodStartedForSelfClient} from './enrollmentTimer';
+import {getModalOptions, ModalType} from './modals';
+import {OIDCService} from './oidcService';
+import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
 interface E2EIHandlerParams {
   discoveryUrl: string;

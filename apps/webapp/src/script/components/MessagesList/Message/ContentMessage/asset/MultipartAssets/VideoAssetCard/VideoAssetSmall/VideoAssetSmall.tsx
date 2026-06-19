@@ -20,7 +20,7 @@
 import {useState} from 'react';
 
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {iconWrapperStyles, videoStyles} from './VideoAssetSmall.styles';
 

@@ -20,7 +20,7 @@
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 

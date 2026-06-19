@@ -14,7 +14,7 @@ import {TypeUtil} from '@wireapp/commons';
 import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {RootProvider} from 'src/script/page/RootProvider';
+import {RootProvider} from 'src/script/page/rootProvider';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;

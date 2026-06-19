@@ -25,7 +25,7 @@ import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {useApplicationContext, type RootContextValue} from 'src/script/page/RootProvider';
+import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
 import {Declension, joinNames, replaceLink} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';

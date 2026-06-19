@@ -26,7 +26,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, Muted, QUERY, Text, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Page} from './Page';
 

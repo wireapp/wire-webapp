@@ -19,7 +19,7 @@
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
+import {AVATAR_SIZE, Avatar} from 'Components/avatar';
 import {UserBlockedBadge} from 'Components/badge';
 import * as Icon from 'Components/icon';
 import {UserName} from 'Components/UserName';
@@ -27,7 +27,7 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './MessageHeader.styles';

@@ -21,7 +21,7 @@ import {REASON} from '@wireapp/avs';
 
 import * as Icon from 'Components/icon';
 import {CallingTimeoutMessage} from 'Repositories/entity/message/CallingTimeoutMessage';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {MessageTime} from './MessageTime';

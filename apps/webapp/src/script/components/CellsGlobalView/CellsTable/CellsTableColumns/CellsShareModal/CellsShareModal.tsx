@@ -27,7 +27,7 @@ import {useCellExpirationToggle} from 'Components/Cells/ShareModal/useCellExpira
 import {useCellPasswordToggle} from 'Components/Cells/ShareModal/useCellPasswordToggle';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {RootContextValue} from 'src/script/page/RootProvider';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 import {createUuid} from 'Util/uuid';
 
 import {

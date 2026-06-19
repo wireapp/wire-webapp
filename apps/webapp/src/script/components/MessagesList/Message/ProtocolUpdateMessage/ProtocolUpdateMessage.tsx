@@ -23,7 +23,7 @@ import * as Icon from 'Components/icon';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/ProtocolUpdateMessage';
 import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {type Translate, replaceLink} from 'Util/localizerUtil';
 
 import {SystemMessageBase} from '../SystemMessage/SystemMessageBase';

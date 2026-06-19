@@ -18,7 +18,7 @@
  */
 
 import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface CellAssetUploadButtonProps {
   onClick: () => void;

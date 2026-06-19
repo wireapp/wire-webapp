@@ -19,7 +19,7 @@
 
 import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {closeButtonStyles, headerStyles, headingStyles} from './CellsFilterModalHeader.styles';
 

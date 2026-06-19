@@ -30,7 +30,7 @@ import type {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {partition} from 'Util/arrayUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortByPriority} from 'Util/stringUtil';

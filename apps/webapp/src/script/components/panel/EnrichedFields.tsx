@@ -26,7 +26,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import type {User} from 'Repositories/entity/User';
 import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
-import {RootContextValue, useApplicationContext} from 'src/script/page/RootProvider';
+import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 import {availabilityStatus, availabilityTranslationKeys} from 'Util/availabilityStatus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {noop} from 'Util/util';

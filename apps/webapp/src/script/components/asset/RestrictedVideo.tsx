@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface RestrictedVideoProps {
   isSmall?: boolean;

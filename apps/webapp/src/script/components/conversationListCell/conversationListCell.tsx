@@ -24,8 +24,8 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
-import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
+import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/avatar';
+import {ChannelAvatar} from 'Components/avatar';
 import {UserBlockedBadge} from 'Components/badge';
 import {CellDescription} from 'Components/conversationListCell/components/cellDescription';
 import {UserInfo} from 'Components/UserInfo';
@@ -33,7 +33,7 @@ import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaType} from 'Repositories/media/MediaType';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/keyboardUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';

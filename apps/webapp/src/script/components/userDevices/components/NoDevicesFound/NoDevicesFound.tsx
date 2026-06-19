@@ -20,7 +20,7 @@
 import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 interface NoDevicesFoundProps {

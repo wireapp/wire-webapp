@@ -20,7 +20,7 @@
 import {ShieldIcon} from '@wireapp/react-ui-kit';
 
 import {CheckIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   conversationFeatureContainerCss,

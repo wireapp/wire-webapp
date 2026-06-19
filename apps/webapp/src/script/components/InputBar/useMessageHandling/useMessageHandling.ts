@@ -31,7 +31,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageRepository} from 'Repositories/storage';
-import type {RootContextValue} from 'src/script/page/RootProvider';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 
 import {useDraftState} from './useDraftState/useDraftState';
 import {useMessageEditing} from './useMessageEditing/useMessageEditing';

@@ -22,7 +22,7 @@ import {CSSProperties, useState} from 'react';
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
 import {FileCard} from 'Components/FileCard/FileCard';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   contentWrapperStyles,

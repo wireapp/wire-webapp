@@ -22,7 +22,7 @@ import cx from 'classnames';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/E2EIdentity';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {Config} from '../../../../Config';

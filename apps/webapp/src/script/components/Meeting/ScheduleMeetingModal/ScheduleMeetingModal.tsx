@@ -25,7 +25,7 @@ import {Button, ButtonVariant, CalendarIcon, CloseIcon} from '@wireapp/react-ui-
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
 import {ScheduleMeetingForm} from './ScheduleMeetingForm';
