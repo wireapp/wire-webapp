@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Modals';
+export * from './modals';

@@ -20,7 +20,7 @@
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {translate} from 'Util/localizerUtil';
 
-import {getModalOptions, ModalType} from './Modals';
+import {getModalOptions, ModalType} from './modals';
 
 describe('getModalOptions', () => {
   it('should return modal options with hidden secondary action when hideSecondary is true', () => {

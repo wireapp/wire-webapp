@@ -21,7 +21,7 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 
-import {getEnrollmentTimer, getRemainingGracePeriodDelay, messageRetentionTime} from './EnrollmentTimer';
+import {getEnrollmentTimer, getRemainingGracePeriodDelay, messageRetentionTime} from './enrollmentTimer';
 
 import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
 

@@ -100,7 +100,7 @@ import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config, Configuration} from '../Config';
 import {E2EIHandler} from '../E2EIdentity';
-import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
+import {getModalOptions, ModalType} from '../E2EIdentity/modals';
 import {AccessTokenError} from '../error/accessTokenError';
 import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';
