@@ -68,7 +68,7 @@ export type WebSocketClientOptions = {
 
 export class WebSocketClient extends EventEmitter {
   private clientId?: string;
-  private isRefreshingAccessToken: boolean;
+  private accessTokenRefreshPromise: Maybe<Promise<void>> = Maybe.nothing<Promise<void>>();
   private readonly baseUrl: string;
   private readonly logger: logdown.Logger;
   private readonly socket: ReconnectingWebsocket;
@@ -90,7 +90,6 @@ export class WebSocketClient extends EventEmitter {
     this.isSocketLocked = false;
     this.baseUrl = baseUrl;
     this.client = client;
-    this.isRefreshingAccessToken = false;
     this.socket = new ReconnectingWebsocket(this.onReconnect, {
       backFromSleepHandler: Maybe.nothing(),
       pingInterval: Maybe.nothing(),
@@ -135,7 +134,11 @@ export class WebSocketClient extends EventEmitter {
   private readonly onError = async (error: ErrorEvent) => {
     this.onStateChange(this.socket.getState());
     this.emit(WebSocketClient.TOPIC.ON_ERROR, error);
-    await this.refreshAccessToken();
+    try {
+      await this.refreshAccessToken();
+    } catch {
+      // Refresh failures are already emitted by refreshAccessToken().
+    }
   };
 
   private readonly onReconnect = async () => {
@@ -143,6 +146,11 @@ export class WebSocketClient extends EventEmitter {
       // before we try any connection, we first refresh the access token to make sure we will avoid concurrent accessToken refreshes
       await this.refreshAccessToken();
     }
+
+    if (!this.client.hasValidAccessToken()) {
+      throw new Error('Cannot reconnect WebSocket because access token is invalid after refresh');
+    }
+
     return this.buildWebSocketUrl();
   };
 
@@ -193,11 +201,19 @@ export class WebSocketClient extends EventEmitter {
   }
 
   private async refreshAccessToken(): Promise<void> {
-    if (this.isRefreshingAccessToken) {
-      return;
+    if (this.accessTokenRefreshPromise.isJust) {
+      return this.accessTokenRefreshPromise.value;
     }
-    this.isRefreshingAccessToken = true;
 
+    const accessTokenRefreshPromise = this.refreshAccessTokenOnce().finally(() => {
+      this.accessTokenRefreshPromise = Maybe.nothing<Promise<void>>();
+    });
+    this.accessTokenRefreshPromise = Maybe.just(accessTokenRefreshPromise);
+
+    return accessTokenRefreshPromise;
+  }
+
+  private async refreshAccessTokenOnce(): Promise<void> {
     try {
       await this.client.refreshAccessToken();
     } catch (error: unknown) {
@@ -217,8 +233,8 @@ export class WebSocketClient extends EventEmitter {
       } else {
         this.emit(WebSocketClient.TOPIC.ON_ERROR, error);
       }
-    } finally {
-      this.isRefreshingAccessToken = false;
+
+      throw error;
     }
   }
 
@@ -294,7 +310,13 @@ export class WebSocketClient extends EventEmitter {
       ? `${this.baseUrl}/await?${queryString}`
       : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
 
-    this.logger.info(`WebSocket URL: ${websocketAddress}`);
+    const redactedQueryParams = new URLSearchParams(queryParams);
+    redactedQueryParams.set('access_token', '[redacted]');
+    const redactedWebsocketAddress = this.useLegacySocket
+      ? `${this.baseUrl}/await?${redactedQueryParams.toString()}`
+      : `${this.baseUrl}${this.versionPrefix}/events?${redactedQueryParams.toString()}`;
+
+    this.logger.info(`WebSocket URL: ${redactedWebsocketAddress}`);
 
     return websocketAddress;
   }
