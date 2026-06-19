@@ -24,7 +24,7 @@ import {ErrorBoundary} from 'react-error-boundary';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserBlockedBadge, UserVerificationBadges} from 'Components/badge';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {ErrorFallback} from 'Components/ErrorFallback';

@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {User} from 'Repositories/entity/User';

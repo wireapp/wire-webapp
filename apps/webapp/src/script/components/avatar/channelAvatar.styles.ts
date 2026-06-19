@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 import {CSS_SQUARE} from 'Util/cssMixin';
 
-import {ChannelAvatarSize} from './ChannelAvatar';
+import {ChannelAvatarSize} from './channelAvatar';
 
 export const channelAvatarContainerCss = ({border, size}: {border: string; size: ChannelAvatarSize}): CSSObject => ({
   ...CSS_SQUARE(size === 'small' ? 16 : 28),

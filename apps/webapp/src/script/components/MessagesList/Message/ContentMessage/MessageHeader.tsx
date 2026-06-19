@@ -19,7 +19,7 @@
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
+import {AVATAR_SIZE, Avatar} from 'Components/avatar';
 import {UserBlockedBadge} from 'Components/badge';
 import * as Icon from 'Components/icon';
 import {UserName} from 'Components/UserName';

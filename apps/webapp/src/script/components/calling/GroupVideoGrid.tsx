@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {QUERY} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import * as Icon from 'Components/icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {Call} from 'Repositories/calling/Call';

@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserVerificationBadges} from 'Components/badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {User} from 'Repositories/entity/User';

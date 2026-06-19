@@ -37,7 +37,7 @@ import {buildMediaDevicesHandler} from '../../auth/util/test/TestUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('Components/Avatar', () => ({
+jest.mock('Components/avatar', () => ({
   AVATAR_SIZE: {MEDIUM: 'medium', LARGE: 'large'},
   Avatar: () => <div data-testid="mock-avatar" />,
 }));

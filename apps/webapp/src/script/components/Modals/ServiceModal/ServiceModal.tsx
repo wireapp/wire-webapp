@@ -17,7 +17,7 @@
  *
  */
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';

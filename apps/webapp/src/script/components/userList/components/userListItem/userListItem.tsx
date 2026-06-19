@@ -21,7 +21,7 @@ import React, {ChangeEvent, useId} from 'react';
 
 import {TabIndex, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserStatusBadges} from 'Components/badge';
 import {ParticipantItemContent} from 'Components/participantItemContent';
 import {listItem, listWrapper} from 'Components/participantItemContent/participantItem.styles';

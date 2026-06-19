@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 
-import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
+import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
 
 import {AVATAR_SIZE, STATE} from '.';
 import {translateForTest} from 'Util/test/translateForTest';

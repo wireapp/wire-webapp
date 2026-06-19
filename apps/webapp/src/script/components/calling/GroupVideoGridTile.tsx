@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {VIDEO_STATE} from '@wireapp/avs';
 import {Loading, TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {
   groupVideoActiveSpeaker,
   groupVideoActiveSpeakerTile,

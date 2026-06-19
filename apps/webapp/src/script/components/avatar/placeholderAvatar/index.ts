@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,4 @@
  *
  */
 
-import {render} from '@testing-library/react';
-
-import {GroupAvatar} from './GroupAvatar';
-
-describe('GroupAvatar', () => {
-  it('renders avatar', async () => {
-    const {getByTestId} = render(<GroupAvatar />);
-    const avatarWrapper = getByTestId('group-avatar-box-wrapper');
-
-    expect(avatarWrapper.children).toHaveLength(1);
-  });
-});
+export * from './placeholderAvatar';

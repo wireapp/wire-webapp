@@ -31,13 +31,13 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {AVATAR_SIZE, STATE} from '../Avatar';
-import {AvatarBackground} from '../AvatarBackground';
-import {AvatarBadge} from '../AvatarBadge';
-import {AvatarBorder} from '../AvatarBorder';
-import {AvatarImage} from '../AvatarImage';
-import {AvatarInitials} from '../AvatarInitials';
-import {AvatarWrapper} from '../AvatarWrapper';
+import {AVATAR_SIZE, STATE} from '../avatar';
+import {AvatarBackground} from '../avatarBackground';
+import {AvatarBadge} from '../avatarBadge';
+import {AvatarBorder} from '../avatarBorder';
+import {AvatarImage} from '../avatarImage';
+import {AvatarInitials} from '../avatarInitials';
+import {AvatarWrapper} from '../avatarWrapper';
 
 interface UserAvatarProps {
   avatarSize: AVATAR_SIZE;

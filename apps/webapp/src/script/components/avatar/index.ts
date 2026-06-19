@@ -17,4 +17,6 @@
  *
  */
 
-export * from './PlaceholderAvatar';
+export * from './avatar';
+export * from './channelAvatar';
+export * from './groupAvatar';

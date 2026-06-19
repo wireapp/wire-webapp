@@ -19,7 +19,7 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {Text} from 'Repositories/entity/message/Text';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
