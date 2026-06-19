@@ -34,7 +34,7 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
-import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
+import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/teamCreation/teamCreationAccountHeader';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {Core} from 'src/script/service/coreSingleton';

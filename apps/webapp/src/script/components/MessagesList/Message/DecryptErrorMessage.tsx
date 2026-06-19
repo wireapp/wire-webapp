@@ -28,7 +28,7 @@ import {splitFingerprint} from 'Util/stringUtil';
 
 import {messageBodyWrapper} from './ContentMessage/ContentMessage.styles';
 
-import {FormattedId} from '../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
+import {FormattedId} from '../../../page/MainContent/panels/preferences/devicesPreferences/components/formattedId';
 
 interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;

@@ -62,7 +62,7 @@ import {
   iconStyle,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
-import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
+import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 
 import {Config} from '../../../../../Config';
 import {ContentState} from '../../../../useAppState';

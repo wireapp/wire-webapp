@@ -20,7 +20,7 @@
 import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {useTeamCreationModal} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/useTeamCreationModal';
+import {useTeamCreationModal} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/teamCreation/useTeamCreationModal';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 

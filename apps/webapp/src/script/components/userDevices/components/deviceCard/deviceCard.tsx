@@ -29,7 +29,7 @@ import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
-import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
+import {FormattedId} from '../../../../page/MainContent/panels/preferences/devicesPreferences/components/formattedId';
 import * as Icon from '../../../icon';
 
 interface DeviceCardProps {

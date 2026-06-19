@@ -60,7 +60,7 @@ import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/Feat
 import {ForceReloadModal} from './components/ForceReloadModal/ForceReloadModal';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
-import {TeamCreationModalContainer} from './LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationModalContainer';
+import {TeamCreationModalContainer} from './LeftSidebar/panels/Conversations/ConversationTabs/teamCreation/teamCreationModalContainer';
 import {SidebarTabs, useSidebarStore} from './LeftSidebar/panels/Conversations/useSidebarStore';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
