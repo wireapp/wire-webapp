@@ -15,6 +15,7 @@
   "devDependencies": {
     "@enormora/objectory": "0.0.7",
     "@faker-js/faker": "9.9.0",
+    "@inquirer/prompts": "8.5.2",
     "@ls-lint/ls-lint": "2.3.1",
     "@nx/jest": "22.7.5",
     "@nx/node": "22.7.5",
@@ -118,6 +119,7 @@
     "release:version": "nx release version",
     "release:publish": "nx release publish",
     "start": "nx serve server",
+    "start:watch": "ts-node --project ./tsconfig.bin.json bin/start-watch.ts",
     "stylelint": "nx run webapp:stylelint",
     "e2e-test": "nx e2e webapp",
     "e2e-ui": "nx e2e webapp --ui",
