@@ -209,6 +209,32 @@ describe('useConversationSearchFiles', () => {
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
   });
 
+  it('shows loading when reloading search results', async () => {
+    const reloadSearch = createDeferred<RestNodeCollection>();
+    const cellsRepository = createFakeCellsRepository();
+    cellsRepository.searchNodes.mockResolvedValueOnce({Nodes: []});
+    cellsRepository.searchNodes.mockReturnValueOnce(reloadSearch.promise);
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+
+    const {result} = renderSearchHook({cellsRepository, fireAndForgetInvoker});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    act(() => {
+      useCellsStore.getState().setStatus('success');
+    });
+
+    act(() => {
+      void result.current.handleReload();
+    });
+
+    expect(useCellsStore.getState().status).toBe('loading');
+
+    act(() => {
+      reloadSearch.resolve({Nodes: []});
+    });
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+  });
+
   it('does not write to the store when disabled mid-flight', async () => {
     const search = createDeferred<RestNodeCollection>();
     const cellsRepository = {searchNodes: jest.fn().mockReturnValue(search.promise)} as FakeCellsRepository;
