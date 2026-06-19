@@ -27,7 +27,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalState';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import * as styles from './FileEditor.styles';

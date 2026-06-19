@@ -18,7 +18,7 @@
  */
 
 import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 interface VideoCallCancelButtonProps {

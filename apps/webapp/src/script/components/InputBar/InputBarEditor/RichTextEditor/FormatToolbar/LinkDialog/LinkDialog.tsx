@@ -25,7 +25,7 @@ import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit'
 
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {RootContextValue, useApplicationContext} from 'src/script/page/RootProvider';
+import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   buttonGroupStyles,

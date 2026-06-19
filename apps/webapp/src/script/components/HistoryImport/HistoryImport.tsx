@@ -33,7 +33,7 @@ import {
   InvalidPassword,
 } from 'Repositories/backup/error';
 import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {checkBackupEncryption} from 'Util/backupUtil';
 import {getLogger} from 'Util/logger';

@@ -21,7 +21,7 @@ import {useNavigate} from 'react-router';
 
 import {ArrowIcon, COLOR} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const BackButton = () => {
   const {translate} = useApplicationContext();

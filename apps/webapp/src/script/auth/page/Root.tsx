@@ -30,7 +30,7 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {createWallClock} from 'src/script/clock/wallClock';
-import {RootProvider} from 'src/script/page/RootProvider';
+import {RootProvider} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 
 import {ClientManager} from './ClientManager';

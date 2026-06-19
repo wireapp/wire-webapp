@@ -27,7 +27,7 @@ import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from
 import {UserList} from 'Components/userList';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {formatSelectedSummary} from './formatSelectedSummary';
 import {

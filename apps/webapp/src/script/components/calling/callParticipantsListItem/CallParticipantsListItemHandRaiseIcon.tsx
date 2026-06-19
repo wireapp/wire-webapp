@@ -23,7 +23,7 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {InviteIcon, Tooltip} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatDuration} from 'Util/timeUtil';
 
 import {toolTipStyles} from './CallParticipantsListItemHandRaiseIcon.styles';

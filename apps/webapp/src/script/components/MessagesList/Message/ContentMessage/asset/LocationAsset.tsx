@@ -18,7 +18,7 @@
  */
 
 import type {Location} from 'Repositories/entity/message/Location';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getMapsUrl} from 'Util/locationUtil';
 
 interface LocationAssetProps {

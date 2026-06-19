@@ -19,7 +19,7 @@
 
 import {actionsStyles, headingStyles, wrapperStyles} from 'Components/Meeting/MeetingHeader/MeetingHeader.styles';
 import {MeetNowMultiActionButton} from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const MeetingHeader = () => {
   const {translate} = useApplicationContext();

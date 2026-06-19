@@ -27,7 +27,7 @@ import {
   emptyListStyles,
 } from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const EmptyMeetingList = () => {
   const {translate} = useApplicationContext();

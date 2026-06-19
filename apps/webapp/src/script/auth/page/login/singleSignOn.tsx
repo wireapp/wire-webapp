@@ -47,7 +47,7 @@ import {
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {LogoFullIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {getLogger} from 'Util/logger';
 

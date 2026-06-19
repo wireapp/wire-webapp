@@ -19,7 +19,7 @@
 
 import {Button} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {FilePlaceholder} from '../common/FilePlaceholder/FilePlaceholder';

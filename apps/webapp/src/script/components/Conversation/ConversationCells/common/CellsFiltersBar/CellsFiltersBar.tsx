@@ -17,7 +17,7 @@
  *
  */
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {clearAllButtonStyles, filterGroupStyles, toggleFilterButtonStyles} from './CellsFiltersBar.styles';
 import type {FilterConfig} from './filterConfig';

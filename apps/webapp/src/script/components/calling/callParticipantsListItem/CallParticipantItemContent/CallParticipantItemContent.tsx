@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {

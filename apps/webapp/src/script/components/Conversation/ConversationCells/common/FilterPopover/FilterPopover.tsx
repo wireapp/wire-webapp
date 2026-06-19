@@ -23,7 +23,7 @@ import {Button, Dialog, DialogTrigger, Popover} from 'react-aria-components';
 
 import {Checkbox, CheckboxLabel, CircleCloseIcon, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   badgeStyles,

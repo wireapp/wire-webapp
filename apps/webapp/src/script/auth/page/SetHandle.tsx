@@ -29,7 +29,7 @@ import {Runtime} from '@wireapp/commons';
 import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
 
 import {StorageKey} from 'Repositories/storage';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {navigate} from 'src/script/router/Router';
 import {storeValue} from 'Util/storageUtil';
 import {isBackendError} from 'Util/typePredicateUtil';

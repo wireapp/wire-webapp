@@ -25,11 +25,11 @@ import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {type ClientEntity} from 'Repositories/client/ClientEntity';
 import {WireIdentity} from 'src/script/E2EIdentity';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
-import {FormattedId} from '../../../../page/MainContent/panels/preferences/devicesPreferences/components/formattedId';
+import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 import * as Icon from '../../../icon';
 
 interface DeviceCardProps {

@@ -26,7 +26,7 @@ import {DraftState, generateConversationInputStorageKey} from 'Components/InputB
 import {useLocalStorage} from 'Hooks/useLocalStorage';
 import {generateCellState} from 'Repositories/conversation/ConversationCellState';
 import {Conversation, UnreadState} from 'Repositories/entity/Conversation';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {iconStyle} from './cellDescription.style';
 

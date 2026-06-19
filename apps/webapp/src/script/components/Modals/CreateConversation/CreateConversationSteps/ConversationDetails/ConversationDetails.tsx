@@ -20,7 +20,7 @@
 import {container} from 'tsyringe';
 
 import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {ChannelSettings} from './ChannelSettings';
 import {groupsNotAllowedSectionCss} from './ConversationDetails.styles';

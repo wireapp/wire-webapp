@@ -22,7 +22,7 @@ import {useEffect} from 'react';
 import {FallbackProps} from 'react-error-boundary';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 
 const logger = getLogger('ErrorFallback');

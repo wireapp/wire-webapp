@@ -40,7 +40,7 @@ import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresigne
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
 import {sharedDriveSearchAndFiltersFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from '../../page/RootProvider';
+import {useApplicationContext} from '../../page/rootProvider';
 
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;

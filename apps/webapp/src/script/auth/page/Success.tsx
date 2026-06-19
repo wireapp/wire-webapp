@@ -25,7 +25,7 @@ import {ActionLinkButton, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Page} from './Page';
 import {styles} from './Success.styles.';

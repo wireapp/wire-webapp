@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {Runtime} from '@wireapp/commons';
 
 import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {afterRender} from 'Util/util';
 
 import {closeWarning, useWarningsState} from './WarningsState';

@@ -20,8 +20,8 @@
 import {FeatureList} from '@wireapp/api-client/lib/team';
 
 import {Config} from '../../Config';
-import {getE2EIConfig} from '../../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
-import {getMLSConfig} from '../../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/MLS';
+import {getE2EIConfig} from '../../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
+import {getMLSConfig} from '../../page/components/featureConfigChange/featureConfigChangeHandler/features/mls';
 
 export function getClientMLSConfig(teamFeatures: FeatureList) {
   const keyingMaterialUpdateThreshold = Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD;

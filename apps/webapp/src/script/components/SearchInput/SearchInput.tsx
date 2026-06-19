@@ -24,7 +24,7 @@ import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
 import {MAX_HANDLE_LENGTH} from 'Repositories/user/userHandleGenerator';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isEnterKey} from 'Util/keyboardUtil';
 
 import * as Icon from '../icon';

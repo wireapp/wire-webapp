@@ -26,7 +26,7 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 
 import {ConversationError} from '../error/conversationError';
-import {OPEN_CONVERSATION_DETAILS} from '../page/RightSidebar/RightSidebar';
+import {OPEN_CONVERSATION_DETAILS} from '../page/rightSidebar/rightSidebar';
 
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,

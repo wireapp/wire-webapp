@@ -23,7 +23,7 @@ import {AssetError} from 'Repositories/assets/assetError';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 
 import {AssetUrl} from '../useAssetTransfer/useAssetTransfer';

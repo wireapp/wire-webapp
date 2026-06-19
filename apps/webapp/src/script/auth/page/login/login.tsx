@@ -55,7 +55,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 import {isBackendError} from 'Util/typePredicateUtil';
 

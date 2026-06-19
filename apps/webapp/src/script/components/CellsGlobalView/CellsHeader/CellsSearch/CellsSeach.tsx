@@ -18,7 +18,7 @@
  */
 
 import {CellsSearchInput} from 'Components/CellsSearchInput/CellsSearchInput';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {wrapperStyles} from './CellsSearch.styles';
 

@@ -24,7 +24,7 @@ import {useNavigate} from 'react-router-dom';
 import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './CustomBackend.styles';
 import {Page} from './Page';

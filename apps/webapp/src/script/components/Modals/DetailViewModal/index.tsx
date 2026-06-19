@@ -44,7 +44,7 @@ import {DetailViewModalHeader} from './DetailViewModalHeader';
 
 import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/MessageCategory';
-import {isOfCategory} from '../../../page/MainContent/panels/Collection/utils';
+import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
 
 interface DetailViewModalProps {
   readonly assetRepository: AssetRepository;

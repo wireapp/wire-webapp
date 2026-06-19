@@ -28,7 +28,7 @@ import {Navigate} from 'react-router-dom';
 import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isBackendError} from 'Util/typePredicateUtil';
 import {noop} from 'Util/util';
 

@@ -22,7 +22,7 @@ import {Fragment} from 'react';
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {RootContextValue, useApplicationContext} from 'src/script/page/RootProvider';
+import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 
 import {badgesWrapper, icon} from './userStatusBadges.styles';
 

@@ -18,7 +18,7 @@
  */
 
 import {ZoomableImage} from 'Components/ZoomableImage/ZoomableImage';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {imageWrapperStyles, wrapperStyles} from './ImageFileView.styles';
 

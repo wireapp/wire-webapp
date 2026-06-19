@@ -1,0 +1,83 @@
+/*
+ * Wire
+ * Copyright (C) 2021 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {FC} from 'react';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
+import {BackupFileUpload} from 'Components/HistoryImport/BackupFileUpload';
+import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {ContentState} from 'src/script/page/useAppState';
+
+import {PreferencesSection} from '../components/preferencesSection';
+
+interface HistoryBackupSectionProps {
+  brandName: string;
+  importFile: (file: File) => void;
+  switchContent: (contentState: ContentState) => void;
+}
+
+const {
+  FEATURE: {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT},
+} = Config.getConfig();
+
+const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importFile, switchContent}) => {
+  const {translate} = useApplicationContext();
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      importFile(file);
+    }
+  };
+  return (
+    <PreferencesSection
+      hasSeparator
+      title={translate('preferencesOptionsBackupHeader')}
+      className="preferences-section-conversation-history"
+      aria-label={translate('preferencesOptionsBackupExportHeadline')}
+    >
+      <Button
+        variant={ButtonVariant.TERTIARY}
+        onClick={() => switchContent(ContentState.HISTORY_EXPORT)}
+        data-uie-name="do-backup-export"
+        aria-describedby="preferences-history-describe-1"
+        type="button"
+      >
+        {translate('preferencesOptionsBackupExportHeadline')}
+      </Button>
+      <p id="preferences-history-describe-1" className="preferences-detail">
+        {translate('preferencesOptionsBackupExportSecondary', {brandName})}
+      </p>
+      <BackupFileUpload
+        onFileChange={handleFileChange}
+        backupImportHeadLine={translate('preferencesOptionsBackupImportHeadline')}
+        variant={ButtonVariant.TERTIARY}
+        cssClassName="preferences-history-restore-button"
+      />
+      <p id="preferences-history-describe-2" className="preferences-detail">
+        {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT
+          ? translate('preferencesOptionsBackupImportCrossPlatformSecondary')
+          : translate('preferencesOptionsBackupImportSecondary')}
+      </p>
+    </PreferencesSection>
+  );
+};
+
+export {HistoryBackupSection};

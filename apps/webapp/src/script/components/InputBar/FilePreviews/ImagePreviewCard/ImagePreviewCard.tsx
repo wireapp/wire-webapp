@@ -17,7 +17,7 @@
  *
  */
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {imageStyles} from './ImagePreviewCard.styles';
 

@@ -43,7 +43,7 @@ import {
 import * as Icon from 'Components/icon';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {toError} from 'Util/toError';
 import {loadDataUrl} from 'Util/util';

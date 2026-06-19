@@ -26,7 +26,7 @@ import {
   dropdownIconStyles,
 } from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton.styles';
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {showContextMenu} from '../../../ui/ContextMenu';
 

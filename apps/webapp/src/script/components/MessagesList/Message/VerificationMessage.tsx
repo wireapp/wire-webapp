@@ -25,8 +25,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {VerificationIcon} from 'Components/VerificationIcon';
 import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/VerificationMessage';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Declension, joinNames} from 'Util/localizerUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';

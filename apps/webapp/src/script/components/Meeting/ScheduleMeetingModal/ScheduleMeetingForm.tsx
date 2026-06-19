@@ -33,7 +33,7 @@ import {
 import {MeetingParticipantsPicker} from 'Components/Meeting/MeetingParticipantsPicker';
 import type {User} from 'Repositories/entity/User';
 import {currentLanguage} from 'src/script/auth/localeConfig';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   scheduleMeetingFormColumnCss,

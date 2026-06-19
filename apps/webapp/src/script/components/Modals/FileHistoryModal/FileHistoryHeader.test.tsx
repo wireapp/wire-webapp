@@ -21,7 +21,7 @@ import {ReactElement} from 'react';
 
 import {render, screen, fireEvent} from '@testing-library/react';
 
-import {RootProvider} from 'src/script/page/RootProvider';
+import {RootProvider} from 'src/script/page/rootProvider';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 

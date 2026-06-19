@@ -21,7 +21,7 @@ import {ReactNode} from 'react';
 
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   errorIconStyles,

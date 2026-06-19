@@ -22,7 +22,7 @@ import {Navigate, useNavigate} from 'react-router-dom';
 import {Runtime} from '@wireapp/commons';
 import {Button, ButtonVariant, CheckRoundIcon, FlexBox} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Page} from './Page';
 import {styles} from './SetAccountType.styles';

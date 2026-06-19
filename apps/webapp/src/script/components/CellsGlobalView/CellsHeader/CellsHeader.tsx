@@ -20,7 +20,7 @@
 import {CellsFiltersBar} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/CellsFiltersBar';
 import type {FilterConfig} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CellsFilters} from './CellsFilters/CellsFilters';
 import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './CellsHeader.styles';

@@ -19,7 +19,7 @@
 
 import {IconButton, IconButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles} from './CellsRefresh.styles';
 

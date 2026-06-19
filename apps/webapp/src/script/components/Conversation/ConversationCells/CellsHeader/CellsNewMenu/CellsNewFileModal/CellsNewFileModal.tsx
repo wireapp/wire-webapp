@@ -26,7 +26,7 @@ import {
   useCellsNewFileForm,
 } from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewFileForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {descriptionStyles} from './CellsNewFileModal.styles';
 
