@@ -19,7 +19,7 @@
 
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
-import {ConversationVerificationBadges} from 'Components/Badge';
+import {ConversationVerificationBadges} from 'Components/badge';
 import * as Icon from 'Components/icon';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';

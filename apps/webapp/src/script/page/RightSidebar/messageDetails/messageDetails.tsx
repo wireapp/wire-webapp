@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/icon';
-import {UserList} from 'Components/UserList';
+import {UserList} from 'Components/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';

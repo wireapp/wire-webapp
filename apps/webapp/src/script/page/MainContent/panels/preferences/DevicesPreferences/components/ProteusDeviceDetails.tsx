@@ -19,7 +19,7 @@
 
 import {useId} from 'react';
 
-import {VerificationBadges} from 'Components/Badge';
+import {VerificationBadges} from 'Components/badge';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {splitFingerprint} from 'Util/stringUtil';
 import {formatTimestamp} from 'Util/timeUtil';

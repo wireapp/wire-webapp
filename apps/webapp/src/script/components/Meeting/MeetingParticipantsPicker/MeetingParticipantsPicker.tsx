@@ -24,7 +24,7 @@ import {Button, Popover} from 'react-aria-components';
 
 import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {UserList} from 'Components/UserList';
+import {UserList} from 'Components/userList';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/RootProvider';

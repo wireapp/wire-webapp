@@ -21,7 +21,7 @@ import {MouseEvent, KeyboardEvent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {DeviceVerificationBadges} from 'Components/Badge';
+import {DeviceVerificationBadges} from 'Components/badge';
 import * as Icon from 'Components/icon';
 import {ClientEntity} from 'Repositories/client';
 import {WireIdentity} from 'src/script/E2EIdentity';
