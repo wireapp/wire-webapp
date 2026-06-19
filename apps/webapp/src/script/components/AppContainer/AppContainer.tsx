@@ -27,7 +27,6 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
@@ -36,7 +35,6 @@ import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import type {Translate} from 'Util/localizerUtil';
 
 import {useAccentColor} from './hooks/useAccentColor';
@@ -141,15 +139,6 @@ export const AppContainer = (properties: AppProps) => {
         <LeaveGroupAdminModal translate={translate} />
         <QualityFeedbackModal callingRepository={app.repository.calling} translate={translate} />
       </StyledApp>
-
-      {isDetachedCallingFeatureEnabled() && (
-        <DetachedCallingCell
-          propertiesRepository={app.repository.properties}
-          callingRepository={app.repository.calling}
-          fireAndForgetInvoker={fireAndForgetInvoker}
-          toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
-        />
-      )}
 
       {/* Wrapper which will hold the audio elements for playing e.g. the ringtone. The elements are created within AudioRepository.ts */}
       <div id="audio-elements" />
