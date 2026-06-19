@@ -118,7 +118,7 @@ CI runs the Nx/Jest test targets with `--configuration=ci`, which generates cove
 
 Other useful tasks:
 
-- Lint: `./bin/yarn nx run-many -t lint --all`
+- Lint: `./bin/yarn lint`
 - Type-check: `./bin/yarn nx run-many -t type-check --all`
 - E2E (Playwright): `./bin/yarn nx e2e webapp`
 
