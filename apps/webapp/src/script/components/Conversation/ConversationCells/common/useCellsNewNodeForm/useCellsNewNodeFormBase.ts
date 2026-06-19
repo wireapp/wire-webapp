@@ -19,9 +19,8 @@
 
 import {ChangeEvent, FormEvent, MouseEvent, useEffect, useState} from 'react';
 
-import {t} from 'Util/localizerUtil';
-
 import {
+  CellsNewNodeFormValidationCopy,
   ITEM_ALREADY_EXISTS_ERROR,
   getClientSideNodeNameError,
   getErrorStatus,
@@ -30,6 +29,7 @@ import {
 
 interface UseCellsNewNodeFormBaseProps {
   createNode: (name: string) => Promise<void>;
+  validationCopy: CellsNewNodeFormValidationCopy;
   normalizeNameForCreation?: (rawName: string) => string;
   isOpen?: boolean;
 }
@@ -38,6 +38,7 @@ const defaultNameNormalizer = (value: string) => value;
 
 export const useCellsNewNodeFormBase = ({
   createNode,
+  validationCopy,
   normalizeNameForCreation = defaultNameNormalizer,
   isOpen = true,
 }: UseCellsNewNodeFormBaseProps) => {
@@ -63,7 +64,7 @@ export const useCellsNewNodeFormBase = ({
     }
 
     const trimmedName = name.trim();
-    const validationError = getClientSideNodeNameError(trimmedName).unwrapOr(null);
+    const validationError = getClientSideNodeNameError(trimmedName, validationCopy).unwrapOr(null);
     if (validationError !== null) {
       setError(validationError);
       return;
@@ -80,9 +81,9 @@ export const useCellsNewNodeFormBase = ({
         .unwrapOr(false);
 
       if (isAlreadyExistsError) {
-        setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
+        setError(validationCopy.alreadyExistsError);
       } else {
-        setError(t('cells.newItemMenuModalForm.genericError'));
+        setError(validationCopy.genericError);
       }
     } finally {
       setIsSubmitting(false);
@@ -91,7 +92,7 @@ export const useCellsNewNodeFormBase = ({
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.currentTarget.value);
-    if (isClientSideNodeNameError(error).unwrapOr(false)) {
+    if (isClientSideNodeNameError(error, validationCopy).unwrapOr(false)) {
       setError(null);
     }
   };

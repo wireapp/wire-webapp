@@ -27,7 +27,7 @@ import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './TeamCreation.styles';
 import {Confirmation} from './TeamCreationSteps/Confirmation';
@@ -50,13 +50,6 @@ const stepMap = {
   [Step.Success]: Success,
 } as const;
 
-const stepCloseButtonLabelMap = {
-  [Step.Introduction]: t('teamCreationIntroCloseLabel'),
-  [Step.Form]: t('teamCreationCreateTeamCloseLabel'),
-  [Step.Confirmation]: t('teamCreationConfirmCloseLabel'),
-  [Step.Success]: t('teamCreationSuccessCloseLabel'),
-} as const;
-
 const segmentationModalStepMap = {
   [Step.Introduction]: Segmentation.TEAM_CREATION_STEP.MODAL_DISCLAIMERS,
   [Step.Form]: Segmentation.TEAM_CREATION_STEP.MODAL_TEAM_NAME,
@@ -70,10 +63,17 @@ interface Props {
 }
 
 export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
+  const {translate} = useApplicationContext();
   const stepsSequence = Object.values(Step);
   const [currentStep, setCurrentStep] = useState<Step>(Step.Introduction);
   const [teamName, setTeamName] = useState('');
   const {isModalOpen} = useTeamCreationModal();
+  const stepCloseButtonLabelMap = {
+    [Step.Introduction]: translate('teamCreationIntroCloseLabel'),
+    [Step.Form]: translate('teamCreationCreateTeamCloseLabel'),
+    [Step.Confirmation]: translate('teamCreationConfirmCloseLabel'),
+    [Step.Success]: translate('teamCreationSuccessCloseLabel'),
+  } as const;
 
   const nextStepHandler = () => {
     const currentStepIndex = stepsSequence.indexOf(currentStep);
@@ -129,13 +129,13 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
     >
       <div className="modal__header" data-uie-name="team-creation-modal-header">
         <span className="subline" data-uie-name="team-creation-modal-subline">
-          {t('teamCreationStep', {
+          {translate('teamCreationStep', {
             currentStep: (stepsSequence.indexOf(currentStep) + 1).toString(),
             totalSteps: stepsSequence.length.toString(),
           })}
         </span>
         <h2 className="modal__header__title" data-uie-name="team-creation-modal-title">
-          {t('teamCreationTitle')}
+          {translate('teamCreationTitle')}
         </h2>
 
         <button

@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {StepProps} from './StepProps';
@@ -34,6 +34,7 @@ import {listCss, modalButtonsCss, successStepSubHeaderCss} from './TeamCreationS
 import {buttonCss} from '../TeamCreation.styles';
 
 export const Success = ({onSuccess, teamName, userName}: StepProps) => {
+  const {translate} = useApplicationContext();
   const handleOpenTeamsClick = () => {
     safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_COMPLETED, {
@@ -52,29 +53,29 @@ export const Success = ({onSuccess, teamName, userName}: StepProps) => {
   return (
     <>
       <h2 className="heading-h2" data-uie-name="team-creation-success-title">
-        {t('teamCreationSuccessTitle', {name: userName})}
+        {translate('teamCreationSuccessTitle', {name: userName})}
       </h2>
       <p className="text-regular" data-uie-name="team-creation-success-sub-title" css={successStepSubHeaderCss}>
-        {t('teamCreationSuccessSubTitle', {teamName})}
+        {translate('teamCreationSuccessSubTitle', {teamName})}
       </p>
       <p className="text-regular" data-uie-name="team-creation-list-header">
-        {t('teamCreationSuccessListTitle')}
+        {translate('teamCreationSuccessListTitle')}
       </p>
       <ul css={listCss}>
         <li>
-          <p className="text-regular">{t('teamCreationSuccessListItem1')}</p>
+          <p className="text-regular">{translate('teamCreationSuccessListItem1')}</p>
         </li>
         <li>
-          <p className="text-regular">{t('teamCreationSuccessListItem2')}</p>
+          <p className="text-regular">{translate('teamCreationSuccessListItem2')}</p>
         </li>
       </ul>
 
       <div className="modal__buttons" css={modalButtonsCss}>
         <Button variant={ButtonVariant.SECONDARY} css={buttonCss} onClick={successHandler}>
-          {t('teamCreationBackToWire')}
+          {translate('teamCreationBackToWire')}
         </Button>
         <Button data-uie-name="do-open-team-management" onClick={handleOpenTeamsClick} css={buttonCss}>
-          {t('teamCreationOpenTeamManagement')}
+          {translate('teamCreationOpenTeamManagement')}
         </Button>
       </div>
     </>

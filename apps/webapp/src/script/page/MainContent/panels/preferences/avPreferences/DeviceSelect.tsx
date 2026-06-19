@@ -23,6 +23,8 @@ import cx from 'classnames';
 
 import {Select} from '@wireapp/react-ui-kit';
 
+import {containerStyles, selectWrapperStyles} from './DeviceSelect.styles';
+
 interface DeviceSelectProps {
   defaultDeviceName?: string;
   devices: MediaDeviceInfo[];
@@ -57,13 +59,13 @@ const DeviceSelect = ({
       className={cx('preferences-option', {
         'preferences-av-select-disabled': disabled,
       })}
-      css={{width: '100%'}}
+      css={containerStyles}
     >
       <div className="preferences-option-icon preferences-av-select-icon">
         <DeviceIcon />
       </div>
 
-      <div css={{width: '100%'}}>
+      <div css={selectWrapperStyles}>
         <Select
           id={uieName}
           onChange={option => {
@@ -76,7 +78,6 @@ const DeviceSelect = ({
           dataUieName={uieName}
           options={devicesList}
           value={currentValue}
-          label={title}
           isDisabled={disabled}
         />
       </div>

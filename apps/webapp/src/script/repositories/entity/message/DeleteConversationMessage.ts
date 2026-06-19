@@ -19,7 +19,7 @@
 
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/teamEvent';
 
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
@@ -27,14 +27,14 @@ import {SystemMessageType} from '../../../message/SystemMessageType';
 import type {Conversation} from '../Conversation';
 
 export class DeleteConversationMessage extends SystemMessage {
-  constructor(conversationEntity: Conversation) {
-    super();
+  constructor(conversationEntity: Conversation, translate: Translate) {
+    super(translate);
 
     this.type = TEAM_EVENT.DELETE;
     this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
 
     this.caption = conversationEntity
-      ? t('notificationConversationDeletedNamed', {name: conversationEntity.name()})
-      : t('notificationConversationDeleted');
+      ? this.translate('notificationConversationDeletedNamed', {name: conversationEntity.name()})
+      : this.translate('notificationConversationDeleted');
   }
 }

@@ -18,13 +18,15 @@
  */
 
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/FileTypeRestrictedMessage';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface FileTypeRestrictedMessageProps {
   message: FileTypeRestrictedMessageEntity;
 }
 
 const FileTypeRestrictedMessage = ({message}: FileTypeRestrictedMessageProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div className="message-header" data-uie-name="filetype-restricted-message">
       <div className="message-header-icon">
@@ -33,14 +35,14 @@ const FileTypeRestrictedMessage = ({message}: FileTypeRestrictedMessageProps) =>
       {message.isIncoming ? (
         <p
           className="message-header-label"
-          dangerouslySetInnerHTML={{__html: t('fileTypeRestrictedIncoming', {name: message.name})}}
+          dangerouslySetInnerHTML={{__html: translate('fileTypeRestrictedIncoming', {name: message.name})}}
           data-uie-name="filetype-restricted-message-text"
           data-uie-value="incoming"
         />
       ) : (
         <p
           className="message-header-label"
-          dangerouslySetInnerHTML={{__html: t('fileTypeRestrictedOutgoing', {fileExt: message.fileExt})}}
+          dangerouslySetInnerHTML={{__html: translate('fileTypeRestrictedOutgoing', {fileExt: message.fileExt})}}
           data-uie-name="filetype-restricted-message-text"
           data-uie-value="outgoing"
         />

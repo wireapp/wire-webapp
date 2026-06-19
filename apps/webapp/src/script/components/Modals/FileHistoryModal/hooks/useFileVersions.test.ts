@@ -26,6 +26,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {useFileVersions} from './useFileVersions';
+import {translateForTest} from 'Util/test/translateForTest';
 
 // Mock the dependencies
 const mockGetNode = jest.fn();
@@ -43,10 +44,6 @@ jest.mock('tsyringe', () => ({
   },
   singleton: () => () => {},
   injectable: () => () => {},
-}));
-
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
 }));
 
 jest.mock('Util/util', () => ({
@@ -72,7 +69,7 @@ jest.mock('../utils/fileVersionUtils', () => ({
 
 describe('useFileVersions', () => {
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker});
+  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker, translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   const mockNode = {

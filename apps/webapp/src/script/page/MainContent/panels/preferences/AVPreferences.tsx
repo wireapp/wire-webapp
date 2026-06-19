@@ -28,7 +28,7 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';
 import {CallOptions} from './avPreferences/CallOptions';
@@ -48,6 +48,7 @@ interface AVPreferencesProps {
 }
 
 const AVPreferencesComponent = ({propertiesRepository, callingRepository, deviceSupport}: AVPreferencesProps) => {
+  const {translate} = useApplicationContext();
   const devicesHandler = container.resolve(MediaDevicesHandler);
   const constraintsHandler = container.resolve(MediaConstraintsHandler);
   const streamHandler = container.resolve(MediaStreamHandler);
@@ -55,7 +56,7 @@ const AVPreferencesComponent = ({propertiesRepository, callingRepository, device
   const {areMediaDevicesInitialized} = useInitializeMediaDevices(devicesHandler, streamHandler);
 
   return (
-    <PreferencesPage title={t('preferencesAV')}>
+    <PreferencesPage title={translate('preferencesAV')}>
       {!areMediaDevicesInitialized && (
         <div className="preferences-av-spinner-select">
           <div className="icon-spinner spin accent-text"></div>

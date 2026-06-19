@@ -26,10 +26,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useClickOutside} from 'Hooks/useClickOutside';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey, isTabKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 import {useMessageActionsState} from './MessageActions.state';
@@ -75,6 +75,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   reactionsTotalCount,
   isRemovedFromConversation,
 }) => {
+  const {translate} = useApplicationContext();
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
@@ -114,7 +115,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         setCurrentMsgAction('');
       }
     },
-    [handleActionMenuVisibility, menuEntries, reactionsTotalCount],
+    [handleActionMenuVisibility, handleMenuOpen, menuEntries, reactionsTotalCount],
   );
 
   const handleContextMenuClick = useCallback(
@@ -135,7 +136,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         });
       }
     },
-    [currentMsgActionName, handleMenuOpen, menuEntries],
+    [currentMsgActionName, handleMenuOpen, menuEntries, resetActionMenuStates],
   );
 
   const toggleActiveMenu = useCallback(
@@ -172,12 +173,13 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
       <div
         css={messageActionsGroup}
         role="group"
-        aria-label={t('accessibility.messageActionsMenuLabel')}
+        aria-label={translate('accessibility.messageActionsMenuLabel')}
         data-uie-name="message-actions"
       >
         {isMsgReactable && (
           <>
             <MessageReactions
+              translate={translate}
               messageFocusedTabIndex={messageFocusedTabIndex}
               currentMsgActionName={currentMsgActionName}
               handleCurrentMsgAction={setCurrentMsgAction}
@@ -189,6 +191,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
             />
             {message.isReplyable() && (
               <ReplyButton
+                translate={translate}
                 actionId={MessageActionsId.REPLY}
                 currentMsgActionName={currentMsgActionName}
                 messageFocusedTabIndex={messageFocusedTabIndex}
@@ -209,7 +212,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
             }}
             className="icon-more font-size-xs"
             data-uie-name={MessageActionsId.OPTIONS}
-            aria-label={t('accessibility.conversationContextMenuOpenLabel')}
+            aria-label={translate('accessibility.conversationContextMenuOpenLabel')}
             onClick={event => {
               handleContextMenuClick(event);
             }}

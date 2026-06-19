@@ -23,16 +23,31 @@ import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
 import {FileInfo, FileVersion} from '../types';
 import {groupVersionsByDate} from '../utils/fileVersionUtils';
 
+type FileHistoryCopy = {
+  readonly failedToLoadVersions: string;
+  readonly failedToRestore: string;
+  readonly invalidNodeData: string;
+};
+
 /**
  * Hook to fetch and manage file versions for a given node UUID.
  */
-export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onRestore?: () => void) => {
+export const useFileVersions = (
+  nodeUuid?: string,
+  onClose?: () => void,
+  onRestore?: () => void,
+  fileHistoryCopy?: FileHistoryCopy,
+) => {
+  const {translate} = useApplicationContext();
+  const failedToLoadVersions = fileHistoryCopy?.failedToLoadVersions ?? 'fileHistoryModal.failedToLoadVersions';
+  const failedToRestore = fileHistoryCopy?.failedToRestore ?? 'fileHistoryModal.failedToRestore';
+  const invalidNodeData = fileHistoryCopy?.invalidNodeData ?? 'fileHistoryModal.invalidNodeData';
   const [fileInfo, setFileInfo] = useState<FileInfo>();
   const [fileVersions, setFileVersions] = useState<Record<string, FileVersion[]>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -61,7 +76,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
 
         // Validate node data
         if (!node?.Path) {
-          throw new Error(t('fileHistoryModal.invalidNodeData'));
+          throw new Error(invalidNodeData);
         }
 
         // Extract file info from the node
@@ -72,10 +87,10 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
 
         setFileInfo(info);
 
-        const groupedVersions = groupVersionsByDate(versions ?? []);
+        const groupedVersions = groupVersionsByDate(versions ?? [], translate);
         setFileVersions(groupedVersions);
       } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : t('fileHistoryModal.failedToLoadVersions');
+        const errorMessage = err instanceof Error ? err.message : failedToLoadVersions;
         setError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -83,7 +98,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
     };
 
     void loadFileVersions();
-  }, [hasValidNodeUuid, nodeUuid]);
+  }, [failedToLoadVersions, hasValidNodeUuid, invalidNodeData, nodeUuid, translate]);
 
   const reset = useCallback(() => {
     setFileInfo(undefined);
@@ -125,12 +140,12 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
         versionId: toBeRestoredVersionId,
       });
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : t('fileHistoryModal.failedToRestore');
+      const errorMessage = err instanceof Error ? err.message : failedToRestore;
       setError(errorMessage);
     } finally {
       reset();
     }
-  }, [toBeRestoredVersionId, hasValidNodeUuid, nodeUuid, reset]);
+  }, [failedToRestore, hasValidNodeUuid, nodeUuid, reset, toBeRestoredVersionId]);
 
   return {
     fileInfo,

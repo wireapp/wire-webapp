@@ -17,13 +17,15 @@
  *
  */
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {Message} from './Message';
 
 import {SuperType} from '../../../message/SuperType';
 
 export class MissedMessage extends Message {
-  constructor() {
-    super();
+  constructor(translate: Translate) {
+    super(undefined, undefined, translate);
     this.super_type = SuperType.MISSED;
     this.affect_order(false);
   }

@@ -17,15 +17,17 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 const MissedMessage = () => {
+  const {translate} = useApplicationContext();
+
   return (
     <div className="message-header">
       <div className="message-header-icon">
         <span className="icon-sysmsg-error text-red" />
       </div>
-      <p className="message-header-label">{t('conversationMissedMessages')}</p>
+      <p className="message-header-label">{translate('conversationMissedMessages')}</p>
     </div>
   );
 };

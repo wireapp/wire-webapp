@@ -22,8 +22,8 @@ import {Fragment} from 'react';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {formatLocale, isThisYear, isToday} from 'Util/timeUtil';
 import {noop} from 'Util/util';
 
@@ -38,17 +38,20 @@ interface CollectionDetailsProps {
 
 type GroupedCollection = [string, ContentMessage[]][];
 
-const getTitleForHeader = (timestamp: number) => {
+const getTitleForHeader = (timestamp: number, translate: ReturnType<typeof useApplicationContext>['translate']) => {
   if (isToday(timestamp)) {
-    return t('conversationToday');
+    return translate('conversationToday');
   }
   return isThisYear(timestamp) ? formatLocale(timestamp, 'MMMM') : formatLocale(timestamp, 'MMMM y');
 };
 
-const groupByDate = (messages: ContentMessage[]): GroupedCollection => {
+const groupByDate = (
+  messages: ContentMessage[],
+  translate: ReturnType<typeof useApplicationContext>['translate'],
+): GroupedCollection => {
   return Object.entries(
     messages.reduce<{[group: string]: ContentMessage[]}>((groups, message) => {
-      const group = getTitleForHeader(message.timestamp());
+      const group = getTitleForHeader(message.timestamp(), translate);
       groups[group] = groups[group] || [];
       groups[group].unshift(message);
       return groups;
@@ -57,6 +60,7 @@ const groupByDate = (messages: ContentMessage[]): GroupedCollection => {
 };
 
 const CollectionDetails = ({conversation, messages, onClose = noop, onImageClick}: CollectionDetailsProps) => {
+  const {translate} = useApplicationContext();
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
 
   return (
@@ -77,7 +81,7 @@ const CollectionDetails = ({conversation, messages, onClose = noop, onImageClick
       <div className="content-list-wrapper">
         <FadingScrollbar className="content-list collection-list">
           <div className="collection-images">
-            {groupByDate(messages).map(([groupName, groupMessages]) => {
+            {groupByDate(messages, translate).map(([groupName, groupMessages]) => {
               return (
                 <Fragment key={groupName}>
                   <header className="collection-date-separator">{groupName}</header>

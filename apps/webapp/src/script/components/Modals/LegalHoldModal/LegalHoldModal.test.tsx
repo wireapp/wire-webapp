@@ -31,14 +31,23 @@ import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();
 let callRepository: CallingRepository;
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 beforeAll(() => {
   testFactory.exposeCallingActors().then(injectedCallingRepository => {
@@ -58,12 +67,12 @@ const defaultProps = () => ({
   } as MessageRepository,
   searchRepository: new SearchRepository(userRepository),
   teamRepository: {} as TeamRepository,
-  selfUser: new User('mocked-id'),
+  selfUser: new User('mocked-id', '', translateForTest),
 });
 
 describe('LegalHoldModal', () => {
   it('is showRequestModal', () => {
-    render(<LegalHoldModal {...defaultProps()} />);
+    render(<LegalHoldModal {...defaultProps()} />, {wrapper: rootProviderWrapper});
     act(() => {
       useLegalHoldModalState.getState().showRequestModal();
     });
@@ -73,8 +82,8 @@ describe('LegalHoldModal', () => {
 
   it('is showUser', async () => {
     const props = defaultProps();
-    await render(<LegalHoldModal {...props} />);
-    const selfConversation = new Conversation(props.selfUser.id);
+    await render(<LegalHoldModal {...props} />, {wrapper: rootProviderWrapper});
+    const selfConversation = new Conversation(props.selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     await act(() => {
       useLegalHoldModalState.getState().showUsers(false, selfConversation);

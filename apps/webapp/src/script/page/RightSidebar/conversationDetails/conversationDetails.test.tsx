@@ -19,6 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
@@ -34,6 +35,11 @@ import {TeamEntity} from 'Repositories/team/TeamEntity';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translate} from 'Util/localizerUtil';
 import 'src/script/util/test/mock/localStorageMock';
 import {createUuid} from 'Util/uuid';
 
@@ -42,6 +48,7 @@ import {ConversationDetails} from './conversationDetails';
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
+import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Components/panel/EnrichedFields', () => ({
   useEnrichedFields: (): never[] => [],
@@ -56,17 +63,12 @@ jest.mock('Components/panel/UserDetails', () => ({
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
 let searchRepository: SearchRepository;
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-beforeAll(() => {
-  testFactory.exposeConversationActors().then(factory => {
-    conversationRepository = factory;
-    return conversationRepository;
-  });
-
-  testFactory.exposeSearchActors().then(factory => {
-    searchRepository = factory;
-    return searchRepository;
-  });
+beforeAll(async () => {
+  conversationRepository = await testFactory.exposeConversationActors();
+  searchRepository = await testFactory.exposeSearchActors();
 });
 
 const getDefaultParams = () => {
@@ -81,7 +83,7 @@ const getDefaultParams = () => {
     isUserGroupAdmin: () => true,
   };
 
-  const selfUserMock = new User(createUuid());
+  const selfUserMock = new User(createUuid(), '', translateForTest);
 
   return {
     actionsViewModel: new ActionsViewModel(
@@ -92,11 +94,14 @@ const getDefaultParams = () => {
       {} as IntegrationRepository,
       {} as MessageRepository,
       {} as UserState,
+      {} as TeamState,
       {} as MainViewModel,
+      translate,
     ),
     conversationRepository: {
       expectReadReceipt: () => true,
-      getNextConversation: () => Promise.resolve(new Conversation()),
+      getNextConversation: () =>
+        Promise.resolve(new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest)),
       refreshUnavailableParticipants: () => Promise.resolve(),
       loadConversationDescription: () => {},
       updateConversationDescription: () => Promise.resolve(),
@@ -146,15 +151,20 @@ describe('ConversationDetails', () => {
   });
 
   it("returns the right actions depending on the conversation's type for non group creators", () => {
-    const conversation = new Conversation();
-    const otherUser = new User('other-user');
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const otherUser = new User('other-user', '', translateForTest);
     jest.spyOn(otherUser as any, 'isConnected').mockReturnValue(true);
     jest.spyOn(conversation as any, 'isClearable').mockReturnValue(true);
     conversation.participating_user_ets([otherUser]);
 
     const defaultProps = getDefaultParams();
 
-    const {rerender, getByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+    const {rerender, getByTestId} = render(
+      <ConversationDetails {...defaultProps} activeConversation={conversation} />,
+      {
+        wrapper: rootProviderWrapper,
+      },
+    );
 
     const tests = [
       {

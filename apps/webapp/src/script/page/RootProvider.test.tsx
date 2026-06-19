@@ -27,6 +27,7 @@ import {applockRefactoredFeatureToggleName} from '../featureToggles/startupFeatu
 import {MainViewModel} from '../view_model/MainViewModel';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from './testSupport/rootContextTestSupport';
 import {RootContext, RootContextValue, RootProvider, useApplicationContext, useMainViewModel} from './RootProvider';
+import {translateForTest} from 'Util/test/translateForTest';
 
 interface WrapperProperties {
   children: ReactNode;
@@ -53,6 +54,7 @@ function createRootProviderWrapper(
 
   const isFeatureToggleEnabled = jest.fn(isFeatureToggleEnabledForTest);
   const rootContextValue = createRootContextValueForTest({
+    translate: translateForTest,
     doesApplicationNeedForceReload,
     isFeatureToggleEnabled,
     mainViewModel,
@@ -116,5 +118,19 @@ describe('RootProvider', () => {
 
     expect(result.current.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
     expect(isFeatureToggleEnabled).toHaveBeenCalledWith(applockRefactoredFeatureToggleName);
+  });
+
+  it('provides the injected translate function through useApplicationContext()', () => {
+    const translate = jest.fn((identifier: Parameters<RootContextValue['translate']>[0]) => {
+      return identifier;
+    }) as RootContextValue['translate'];
+    const rootContextValue = createRootContextValueForTest({mainViewModel, translate});
+    const wrapper = createRootProviderWrapperForTest(rootContextValue);
+
+    const {result} = renderHook(useApplicationContext, {wrapper});
+
+    expect(result.current.translate).toBe(translate);
+    expect(result.current.translate('conversationYouNominative')).toBe('conversationYouNominative');
+    expect(translate).toHaveBeenCalledWith('conversationYouNominative');
   });
 });

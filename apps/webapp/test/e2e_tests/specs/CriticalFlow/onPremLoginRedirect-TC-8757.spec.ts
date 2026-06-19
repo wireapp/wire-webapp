@@ -21,18 +21,28 @@ import {expect, test} from '../../test.fixtures';
 import {PageManager} from '../../pageManager';
 import {faker} from '@faker-js/faker';
 
-const ON_PREM_WEBAPP_URL = 'https://webapp.anta.wire.link';
-
 test.describe('On Prem Login Redirect Flow', () => {
   let domain: string;
   let email: string;
+  let webappUrl: string;
+  let backendUrl: string;
 
   test.beforeEach(async ({api}) => {
+    if (!process.env.FEDERATION_WEBAPP_URL) {
+      throw new Error('Environment variable FEDERATION_WEBAPP_URL is required but not defined.');
+    }
+
+    if (!process.env.FEDERATION_BACKEND_URL) {
+      throw new Error('Environment variable FEDERATION_BACKEND_URL is required but not defined.');
+    }
+
     domain = faker.internet.domainName();
     email = `redirect-user@${domain}`;
+    webappUrl = process.env.FEDERATION_WEBAPP_URL;
+    backendUrl = process.env.FEDERATION_BACKEND_URL;
 
     await test.step('Claim domain and configure on-prem redirect', async () => {
-      await api.brig.claimDomain(domain);
+      await api.brig.claimDomain(domain, {webappUrl, backendUrl});
     });
   });
 
@@ -48,12 +58,12 @@ test.describe('On Prem Login Redirect Flow', () => {
 
     await test.step('Verify connect-to-organization backend dialog is shown', async () => {
       await expect(page.getByText("Connect to your organization's backend?")).toBeVisible();
-      await expect(page.getByText(ON_PREM_WEBAPP_URL)).toBeVisible();
+      await expect(page.getByText(webappUrl)).toBeVisible();
     });
 
     await test.step('Click connect and verify redirect to on-prem webapp', async () => {
       await page.getByRole('button', {name: 'Connect'}).click();
-      await expect(page).toHaveURL(new RegExp(String.raw`${ON_PREM_WEBAPP_URL}`), {timeout: 20_000});
+      await expect(page).toHaveURL(new RegExp(String.raw`${webappUrl}`), {timeout: 20_000});
     });
   });
 

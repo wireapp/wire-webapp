@@ -24,9 +24,12 @@ import {DescriptionUpdateMessage} from 'Repositories/entity/message/DescriptionU
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
-import {setStrings} from 'Util/localizerUtil';
+import {setStrings, translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {SystemMessage} from './SystemMessage';
+
+setStrings({en});
 
 jest.mock('Components/icon', () => ({
   EditIcon: () => {
@@ -41,11 +44,10 @@ jest.mock('Components/icon', () => ({
   __esModule: true,
 }));
 
-setStrings({en});
 
 describe('SystemMessage', () => {
   it('shows edit icon for RenameMessage', async () => {
-    const message = new RenameMessage('new name');
+    const message = new RenameMessage('new name', undefined, undefined, translateForTest);
 
     render(<SystemMessage message={message} />);
 
@@ -74,7 +76,7 @@ describe('SystemMessage', () => {
   });
 
   it('shows timer icon for MessageTimerUpdateMessage', async () => {
-    const message = new MessageTimerUpdateMessage(0);
+    const message = new MessageTimerUpdateMessage(0, translateForTest);
 
     render(<SystemMessage message={message} />);
 
@@ -83,7 +85,7 @@ describe('SystemMessage', () => {
   });
 
   it('shows read icon for ReceiptModeUpdateMessage', async () => {
-    const message = new ReceiptModeUpdateMessage(true);
+    const message = new ReceiptModeUpdateMessage(true, translateForTest);
 
     render(<SystemMessage message={message} />);
 

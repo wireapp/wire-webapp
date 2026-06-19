@@ -23,8 +23,8 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
@@ -38,12 +38,13 @@ interface ServiceModalProps {
 }
 
 const ServiceModal = ({service, avatarSize = AVATAR_SIZE.LARGE, actionsViewModel, onClose}: ServiceModalProps) => {
+  const {translate} = useApplicationContext();
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
   const onOpenService = () => {
     onClose?.();
     setCurrentSidebarTab(SidebarTabs.RECENT);
-    actionsViewModel.open1to1ConversationWithService(service);
+    void actionsViewModel.open1to1ConversationWithService(service);
   };
 
   const {providerName, name} = useKoSubscribableChildren(service, ['name', 'providerName']);
@@ -84,7 +85,7 @@ const ServiceModal = ({service, avatarSize = AVATAR_SIZE.LARGE, actionsViewModel
               onClick={onOpenService}
               data-uie-name="do-service-confirm"
             >
-              {t('searchServiceConfirmButton')}
+              {translate('searchServiceConfirmButton')}
             </button>
           </div>
         </>

@@ -17,6 +17,8 @@
  *
  */
 
+import {useMemo} from 'react';
+
 import {container} from 'tsyringe';
 
 import {
@@ -36,9 +38,9 @@ import {EditIcon} from 'Components/icon';
 import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/FileAssetCard/common/FileAssetOptions/FileAssetOptions.styles';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
-import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {
@@ -82,7 +84,15 @@ export const FileHeader = ({
   onEditModeChange,
   onFileContentRefresh,
 }: FileHeaderProps) => {
-  const timeAgo = useRelativeTimestamp(timestamp);
+  const {translate} = useApplicationContext();
+  const relativeTimestampFormatter = useMemo(() => {
+    return createRelativeTimestampFormatter({
+      justNow: translate('conversationJustNow'),
+      today: translate('conversationToday'),
+      yesterday: translate('conversationYesterday'),
+    });
+  }, [translate]);
+  const timeAgo = useRelativeTimestamp(timestamp, false, relativeTimestampFormatter);
   const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
   const isRecycleBin = isInRecycleBin();
   const cellsRepository = container.resolve(CellsRepository);
@@ -102,7 +112,7 @@ export const FileHeader = ({
         <button
           type="button"
           css={closeButtonStyles}
-          aria-label={t('cells.imageFullScreenModal.closeButton')}
+          aria-label={translate('cells.imageFullScreenModal.closeButton')}
           onClick={onClose}
         >
           <CloseIcon />
@@ -148,7 +158,7 @@ export const FileHeader = ({
             css={downloadButtonStyles}
             onClick={handleFileDownload}
             disabled={fileUrl === undefined || fileUrl.length === 0}
-            aria-label={t('cells.imageFullScreenModal.downloadButton')}
+            aria-label={translate('cells.imageFullScreenModal.downloadButton')}
           >
             <DownloadIcon />
           </Button>
@@ -156,13 +166,17 @@ export const FileHeader = ({
         {!isRecycleBin && isEditable === true && (
           <DropdownMenu>
             <DropdownMenu.Trigger asChild>
-              <Button variant={ButtonVariant.TERTIARY} css={downloadButtonStyles} aria-label={t('cells.options.label')}>
+              <Button
+                variant={ButtonVariant.TERTIARY}
+                css={downloadButtonStyles}
+                aria-label={translate('cells.options.label')}
+              >
                 <MoreIcon css={iconStyles} />
               </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
               <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
-                {t('cells.options.versionHistory')}
+                {translate('cells.options.versionHistory')}
               </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu>

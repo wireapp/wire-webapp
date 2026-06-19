@@ -26,7 +26,7 @@ import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   buttonCss,
@@ -42,6 +42,8 @@ interface Props {
 }
 
 export const ConfirmLeaveModal = ({isShown, onClose, onLeave}: Props) => {
+  const {translate} = useApplicationContext();
+
   const closeHandler = () => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_CANCELLED, {
       step: Segmentation.TEAM_CREATION_STEP.MODAL_CONTINUE_CLICKED,
@@ -65,14 +67,14 @@ export const ConfirmLeaveModal = ({isShown, onClose, onLeave}: Props) => {
     >
       <div className="modal__header">
         <h2 className="modal__header__title" data-uie-name="confirm-leave-modal-title">
-          {t('teamCreationLeaveModalTitle')}
+          {translate('teamCreationLeaveModalTitle')}
         </h2>
         <button
           type="button"
           className="modal__header__button"
           onClick={closeHandler}
           data-uie-name="do-close"
-          aria-label={t('teamCreationLeaveModalCloseLabel')}
+          aria-label={translate('teamCreationLeaveModalCloseLabel')}
         >
           <Icon.CloseIcon />
         </button>
@@ -80,15 +82,15 @@ export const ConfirmLeaveModal = ({isShown, onClose, onLeave}: Props) => {
 
       <div className="modal__body" css={confirmLeaveModalBodyCss}>
         <p className="text-regular" data-uie-name="confirm-leave-modal-sub-title">
-          {t('teamCreationLeaveModalSubTitle')}
+          {translate('teamCreationLeaveModalSubTitle')}
         </p>
 
         <div className="modal__buttons" css={confirmLeaveModalButtonsCss}>
           <Button onClick={closeHandler} css={buttonCss} data-uie-name="do-continue-team-creation">
-            {t('teamCreationLeaveModalSuccessBtn')}
+            {translate('teamCreationLeaveModalSuccessBtn')}
           </Button>
           <Button css={buttonCss} variant={ButtonVariant.SECONDARY} onClick={leaveHandler} data-uie-name="do-leave">
-            {t('teamCreationLeaveModalLeaveBtn')}
+            {translate('teamCreationLeaveModalLeaveBtn')}
           </Button>
         </div>
       </div>

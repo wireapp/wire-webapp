@@ -18,7 +18,7 @@
  */
 
 import {UserRepository} from 'Repositories/user/userRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getLogger} from 'Util/logger';
 
 import {AccountInput, useInputDone} from './AccountInput';
@@ -32,6 +32,7 @@ const logger = getLogger('NameInput');
 
 const NameInput = ({name, userRepository, canEditProfile}: NameInputProps) => {
   const nameInputDone = useInputDone();
+  const {translate} = useApplicationContext();
 
   const changeName = async (newName: string): Promise<void> => {
     if (newName === name) {
@@ -52,7 +53,7 @@ const NameInput = ({name, userRepository, canEditProfile}: NameInputProps) => {
     <AccountInput
       isDone={nameInputDone.isDone}
       onValueChange={changeName}
-      label={t('preferencesAccountDisplayname')}
+      label={translate('preferencesAccountDisplayname')}
       value={name}
       readOnly={!canEditProfile}
       fieldName="displayname"

@@ -17,7 +17,17 @@
  *
  */
 
-import {ChangeEvent, FormEvent, HTMLProps, useEffect, useRef, useState, MouseEvent, KeyboardEvent} from 'react';
+import {
+  ChangeEvent,
+  FormEvent,
+  HTMLProps,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  MouseEvent,
+  KeyboardEvent,
+} from 'react';
 
 import is from '@sindresorhus/is';
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
@@ -37,8 +47,8 @@ import {
   TrashIcon,
 } from '@wireapp/react-ui-kit';
 
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
@@ -55,19 +65,51 @@ interface Props extends HTMLProps<HTMLDivElement> {
 }
 
 const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, requirePassword}: Props) => {
+  const {translate} = useApplicationContext();
   const passwordInput = useRef<HTMLInputElement>(null);
 
-  const CONFIG = {
-    animationSteps: 8,
-  };
+  const animationSteps = 8;
+  const cardLeftSpacingPixels = 32;
+  const cardHorizontalSpacingPixels = 16;
+  const cardVerticalSpacingPixels = 12;
+  const cardExpandedLeftSpacingPixels = 48;
+  const cardIconSpacingPixels = 8;
+  const cardDividerSpacingPixels = 4;
+  const deviceIconBaseOffsetPixels = 18;
+  const halfPixelDivisor = 2;
+  const inputContainerHeightPixels = 104;
 
-  const [animationStep, setAnimationStep] = useState(selected ? CONFIG.animationSteps : 0);
+  const [animationStep, setAnimationStep] = useState(selected ? animationSteps : 0);
   const [isSelected, setIsSelected] = useState(selected);
   const [isAnimating, setIsAnimating] = useState(false);
   const [password, setPassword] = useState('');
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const [isOpen, setIsOpen] = useState(requirePassword && (isSelected || isAnimating));
+
+  const formatId = (id = '?') => splitFingerprint(id).join(' ');
+
+  const executeAnimateIn = useCallback((): void => {
+    setAnimationStep(step => {
+      if (step < animationSteps) {
+        window.requestAnimationFrame(executeAnimateIn);
+        return step + 1;
+      }
+      setIsAnimating(false);
+      return step;
+    });
+  }, [animationSteps]);
+
+  const executeAnimateOut = useCallback((): void => {
+    setAnimationStep(step => {
+      if (step > 0) {
+        window.requestAnimationFrame(executeAnimateOut);
+        return step - 1;
+      }
+      setIsAnimating(false);
+      return step;
+    });
+  }, []);
 
   useEffect(() => {
     if (!selected && isSelected) {
@@ -86,31 +128,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       setAnimationStep(0);
       setIsOpen(false);
     }
-  }, [selected]);
-
-  const formatId = (id = '?') => splitFingerprint(id).join(' ');
-
-  const executeAnimateIn = (): void => {
-    setAnimationStep(step => {
-      if (step < CONFIG.animationSteps) {
-        window.requestAnimationFrame(executeAnimateIn);
-        return step + 1;
-      }
-      setIsAnimating(false);
-      return step;
-    });
-  };
-
-  const executeAnimateOut = (): void => {
-    setAnimationStep(step => {
-      if (step > 0) {
-        window.requestAnimationFrame(executeAnimateOut);
-        return step - 1;
-      }
-      setIsAnimating(false);
-      return step;
-    });
-  };
+  }, [executeAnimateIn, executeAnimateOut, isSelected, selected]);
 
   const formatDate = (dateString: string): string =>
     dateString
@@ -137,7 +155,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     );
 
   const resetState = () => {
-    setAnimationStep(selected ? CONFIG.animationSteps : 0);
+    setAnimationStep(selected ? animationSteps : 0);
     setIsAnimating(false);
   };
 
@@ -210,20 +228,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     setIsValidPassword(true);
   };
 
-  const animatedCardSpacing = {
-    l: 32,
-    m: 16,
-    s: 12,
-    xl: 48,
-    xs: 8,
-    xxs: 4,
-  };
-
-  const inputContainerHeight = 104;
-
-  const animationPosition = animationStep / CONFIG.animationSteps;
-  const smoothHeight = animationPosition * inputContainerHeight;
-  const smoothMarginTop = animationPosition * animatedCardSpacing.m;
+  const animationPosition = animationStep / animationSteps;
+  const smoothHeight = animationPosition * inputContainerHeightPixels;
+  const smoothMarginTop = animationPosition * cardHorizontalSpacingPixels;
 
   return (
     <ContainerXS>
@@ -247,7 +254,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
             },
             cursor: requirePassword ? 'pointer' : 'auto',
             margin: `${smoothMarginTop}px 0 0 0`,
-            padding: `0 ${animatedCardSpacing.m}px`,
+            padding: `0 ${cardHorizontalSpacingPixels}px`,
           }}
           data-uie-name="go-remove-device"
           tabIndex={TabIndex.FOCUSABLE}
@@ -255,8 +262,8 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           <FlexBox>
             <div
               style={{
-                flexBasis: animatedCardSpacing.l,
-                margin: isOpen ? `${18 - smoothMarginTop / 2}px 0 0 0` : 'auto',
+                flexBasis: cardLeftSpacingPixels,
+                margin: isOpen ? `${deviceIconBaseOffsetPixels - smoothMarginTop / halfPixelDivisor}px 0 0 0` : 'auto',
               }}
             >
               <DeviceIcon color="#323639" />
@@ -272,7 +279,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
             </div>
             {!requirePassword && (
               <IconButton
-                aria-label={t('modalAccountRemoveDeviceAction')}
+                aria-label={translate('modalAccountRemoveDeviceAction')}
                 data-uie-name="do-remove-device"
                 formNoValidate
                 onClick={handlePasswordlessClientDeletion}
@@ -287,7 +294,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
             color="rgba(51, 55, 58, .04)"
             style={{
               backgroundColor: 'transparent',
-              margin: `${animatedCardSpacing.xxs}px 0 0 ${animatedCardSpacing.l}px`,
+              margin: `${cardDividerSpacingPixels}px 0 0 ${cardLeftSpacingPixels}px`,
             }}
           />
         </ContainerXS>
@@ -297,11 +304,11 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
               <FlexBox
                 css={{
                   alignItems: 'center',
-                  margin: `${animatedCardSpacing.s}px ${animatedCardSpacing.m}px 0px ${animatedCardSpacing.xl}px`,
+                  margin: `${cardVerticalSpacingPixels}px ${cardHorizontalSpacingPixels}px 0px ${cardExpandedLeftSpacingPixels}px`,
                   maxHeight: smoothHeight,
                 }}
               >
-                <FlexBox css={{flexGrow: 1, marginRight: `${animatedCardSpacing.s}px`}}>
+                <FlexBox css={{flexGrow: 1, marginRight: `${cardVerticalSpacingPixels}px`}}>
                   {/* eslint jsx-a11y/no-autofocus : "off" */}
                   <Input
                     autoFocus
@@ -310,23 +317,23 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                     data-uie-name="remove-device-password"
                     ref={passwordInput}
                     name="password"
-                    label={t('modalAccountRemoveDevicePlaceholder')}
+                    label={translate('modalAccountRemoveDevicePlaceholder')}
                     onChange={onPasswordChange}
                     pattern=".{1,1024}"
-                    placeholder={t('clientItem.passwordPlaceholder')}
+                    placeholder={translate('clientItem.passwordPlaceholder')}
                     required
                     type="password"
-                    showTogglePasswordLabel={t('showTogglePasswordLabel')}
-                    hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
+                    showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+                    hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
                     value={password}
                   />
                 </FlexBox>
                 <IconButton
-                  aria-label={t('modalAccountRemoveDeviceAction')}
+                  aria-label={translate('modalAccountRemoveDeviceAction')}
                   data-uie-name="do-remove-device"
                   disabled={!is.nonEmptyString(password) || isValidPassword !== true}
                   formNoValidate
-                  css={{margin: `0 ${animatedCardSpacing.xs}px`}}
+                  css={{margin: `0 ${cardIconSpacingPixels}px`}}
                   onClick={handleSubmit}
                   type="submit"
                 >
@@ -338,9 +345,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         )}
       </ContainerXS>
       {validationError && selected ? (
-        <div style={{margin: `${animatedCardSpacing.m}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
+        <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
       ) : clientError && selected ? (
-        <div style={{margin: `${animatedCardSpacing.m}px 0 0 0`}} data-uie-name="error-message">
+        <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}} data-uie-name="error-message">
           {parseError(clientError)}
         </div>
       ) : null}

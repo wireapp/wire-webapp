@@ -28,8 +28,8 @@ import {AnyAction, Dispatch} from 'redux';
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, Form, Input, Text} from '@wireapp/react-ui-kit';
 
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {styles} from './AccountForm.styles';
@@ -66,6 +66,7 @@ const AccountFormComponent = ({
   pushAccountRegistrationData,
   beforeSubmit,
 }: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const [registrationData, setRegistrationData] = useState({
     accent_id: AccentColor.STRONG_BLUE.id,
     email: account.email ?? '',
@@ -194,7 +195,7 @@ const AccountFormComponent = ({
     <Form onSubmit={handleSubmit} css={styles.form}>
       <div css={styles.formBody}>
         <Input
-          label={t('accountForm.nameLabel')}
+          label={translate('accountForm.nameLabel')}
           name="name"
           id="name"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -206,7 +207,7 @@ const AccountFormComponent = ({
           markInvalid={!validInputs.name}
           value={registrationData.name}
           autoComplete="section-create-team username"
-          placeholder={t('accountForm.namePlaceholder')}
+          placeholder={translate('accountForm.namePlaceholder')}
           onKeyDown={event => handleEnterDown(event, () => inputs.email.current?.focus())}
           maxLength={64}
           minLength={2}
@@ -215,7 +216,7 @@ const AccountFormComponent = ({
         />
 
         <Input
-          label={t('accountForm.emailLabel')}
+          label={translate('accountForm.emailLabel')}
           name="email"
           id="email"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -227,7 +228,7 @@ const AccountFormComponent = ({
           markInvalid={!validInputs.email}
           value={registrationData.email}
           autoComplete="section-create-team email"
-          placeholder={t('accountForm.emailPersonalPlaceholder')}
+          placeholder={translate('accountForm.emailPersonalPlaceholder')}
           onKeyDown={event => handleEnterDown(event, () => inputs.password.current?.focus())}
           maxLength={128}
           type="email"
@@ -235,7 +236,7 @@ const AccountFormComponent = ({
         />
 
         <Input
-          label={t('accountForm.passwordLabel')}
+          label={translate('accountForm.passwordLabel')}
           name="password"
           id="password"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -248,18 +249,20 @@ const AccountFormComponent = ({
           value={registrationData.password}
           autoComplete="section-create-team new-password"
           type="password"
-          placeholder={t('accountForm.passwordPlaceholder')}
+          placeholder={translate('accountForm.passwordPlaceholder')}
           pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
           data-uie-name="enter-password"
-          showTogglePasswordLabel={t('showTogglePasswordLabel')}
-          hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
+          showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+          hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
         />
         <Text muted css={styles.passwordInfo(!!validationErrors.length)} data-uie-name="element-password-help">
-          {t('accountForm.passwordHelp', {minPasswordLength: String(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)})}
+          {translate('accountForm.passwordHelp', {
+            minPasswordLength: String(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
+          })}
         </Text>
 
         <Input
-          label={t('accountForm.passwordLabel')}
+          label={translate('accountForm.passwordLabel')}
           name="confirmPassword"
           id="confirmPassword"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -271,11 +274,11 @@ const AccountFormComponent = ({
           markInvalid={!validInputs.confirmPassword}
           value={registrationData.confirmPassword}
           type="password"
-          placeholder={t('accountForm.confirmPasswordPlaceholder')}
+          placeholder={translate('accountForm.confirmPasswordPlaceholder')}
           pattern={`^${registrationData.password?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`}
           data-uie-name="enter-confirm-password"
-          showTogglePasswordLabel={t('showTogglePasswordLabel')}
-          hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
+          showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+          hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
         />
 
         <Exception errors={[authError, ...validationErrors]} />
@@ -307,7 +310,7 @@ const AccountFormComponent = ({
                   href={Config.getConfig().URL.TERMS_OF_USE_PERSONAL}
                   css={styles.checkboxLink}
                 >
-                  {t('accountForm.termsAndConditionsLink')}
+                  {translate('accountForm.termsAndConditionsLink')}
                 </a>
               ),
             }}
@@ -342,7 +345,7 @@ const AccountFormComponent = ({
                     href={Config.getConfig().URL.PRIVACY_POLICY}
                     css={styles.checkboxLink}
                   >
-                    {t('accountForm.privacyPolicyLink')}
+                    {translate('accountForm.privacyPolicyLink')}
                   </a>
                 ),
               }}
@@ -358,7 +361,7 @@ const AccountFormComponent = ({
         css={styles.submitButton}
         data-uie-name="do-next"
       >
-        {t('accountForm.continueButtonText')}
+        {translate('accountForm.continueButtonText')}
       </Button>
     </Form>
   );

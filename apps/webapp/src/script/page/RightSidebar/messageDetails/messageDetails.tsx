@@ -23,14 +23,14 @@ import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/icon';
-import {UserList} from 'Components/UserList';
+import {UserList} from 'Components/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {User} from 'Repositories/entity/User';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {formatLocale} from 'Util/timeUtil';
 
 import {UsersReactions} from './userReactions';
@@ -75,6 +75,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   onClose,
   togglePanel,
 }) => {
+  const {translate} = useApplicationContext();
   const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(!showReactions);
 
   const {
@@ -121,10 +122,10 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
   const sentFooter = timestamp ? formatTime(timestamp) : '';
 
-  const receiptsTitle = t('messageDetailsTitleReceipts', {
+  const receiptsTitle = translate('messageDetailsTitleReceipts', {
     count: messageEntity?.expectsReadConfirmation ? formatUserCount(receiptUsers) : '',
   });
-  const reactionsTitle = t('messageDetailsTitleReactions', {
+  const reactionsTitle = translate('messageDetailsTitleReactions', {
     count: totalNbReactions > 0 ? ` (${totalNbReactions})` : '',
   });
 
@@ -137,8 +138,8 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       return receiptsTitle;
     }
 
-    return t('messageDetailsTitle');
-  }, [supportsReceipts, supportsReactions, reactionsTitle, receiptsTitle]);
+    return translate('messageDetailsTitle');
+  }, [supportsReceipts, supportsReactions, reactionsTitle, receiptsTitle, translate]);
 
   const showTabs = supportsReceipts && supportsReactions;
 
@@ -205,33 +206,33 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         {messageState === MESSAGE_STATES.NO_RECEIPTS && (
           <div className="panel__message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
             <Icon.ReadIcon className="panel__message-details__empty__icon" />
-            <p className="panel__message-details__empty__text">{t('messageDetailsNoReceipts')}</p>
+            <p className="panel__message-details__empty__text">{translate('messageDetailsNoReceipts')}</p>
           </div>
         )}
 
         {messageState === MESSAGE_STATES.NO_REACTIONS && (
           <div className="panel__message-details__empty" data-uie-name="message-details-no-reactions-placeholder">
             <Icon.LikeIcon className="panel__message-details__empty__icon" />
-            <p className="panel__message-details__empty__text">{t('messageDetailsNoReactions')}</p>
+            <p className="panel__message-details__empty__text">{translate('messageDetailsNoReactions')}</p>
           </div>
         )}
 
         {messageState === MESSAGE_STATES.RECEIPTS_OFF && (
           <div className="message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
             <Icon.ReadIcon className="panel__message-details__empty__icon" />
-            <p className="panel__message-details__empty__text">{t('messageDetailsReceiptsOff')}</p>
+            <p className="panel__message-details__empty__text">{translate('messageDetailsReceiptsOff')}</p>
           </div>
         )}
       </FadingScrollbar>
 
       <div className="panel__footer">
         <p className="panel__footer__info" data-uie-name="status-message-details-sent">
-          {t('messageDetailsSent', {sent: sentFooter})}
+          {translate('messageDetailsSent', {sent: sentFooter})}
         </p>
 
         {editedFooter && (
           <p className="panel__footer__info" data-uie-name="status-message-details-edited">
-            {t('messageDetailsEdited', {edited: editedFooter})}
+            {translate('messageDetailsEdited', {edited: editedFooter})}
           </p>
         )}
       </div>

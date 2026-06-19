@@ -23,7 +23,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {ClientEvent} from 'Repositories/event/Client';
-import {Declension, getUserName, t} from 'Util/localizerUtil';
+import {type Translate, Declension, getUserName} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
@@ -51,8 +51,8 @@ export class MemberMessage extends SystemMessage {
   /** this can be used to check uniqueness of the message. It's computed using the timestamp + users involved in the event */
   public readonly hash: ko.PureComputed<string>;
 
-  constructor() {
-    super();
+  constructor(translate: Translate) {
+    super(translate);
 
     this.super_type = SuperType.MEMBER;
     this.memberMessageType = SystemMessageType.NORMAL;
@@ -87,7 +87,7 @@ export class MemberMessage extends SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave ? this.name() : getUserName(this.user(), Declension.NOMINATIVE, true);
+      return isTeamMemberLeave ? this.name() : getUserName(this.user(), this.translate, Declension.NOMINATIVE, true);
     });
 
     this.showNamedCreation = ko.pureComputed(() => {
@@ -95,18 +95,18 @@ export class MemberMessage extends SystemMessage {
     });
 
     this.otherUser = ko.pureComputed(() => {
-      return this.hasUsers() ? this.userEntities()[0] : new User('', '');
+      return this.hasUsers() ? this.userEntities()[0] : new User('', '', this.translate);
     });
 
     this.htmlGroupCreationHeader = ko.pureComputed(() => {
       if (this.showNamedCreation()) {
         if (this.user().isTemporaryGuest()) {
-          return t('conversationCreateTemporary');
+          return this.translate('conversationCreateTemporary');
         }
 
         const groupCreationString = this.user().isMe
-          ? t('conversationCreatedNameYou')
-          : t('conversationCreatedName', {name: this.senderName()});
+          ? this.translate('conversationCreatedNameYou')
+          : this.translate('conversationCreatedName', {name: this.senderName()});
         return capitalizeFirstChar(groupCreationString);
       }
       return '';

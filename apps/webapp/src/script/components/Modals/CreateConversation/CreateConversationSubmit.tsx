@@ -19,14 +19,17 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {useCreateConversation} from './hooks/useCreateConversation';
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
+import {getNonFederatingParticipantsModalCopy} from './utils';
 
 export const CreateConversationSubmit = () => {
+  const {translate} = useApplicationContext();
   const {error, conversationName} = useCreateConversationModal();
-  const {onSubmit, isLoading} = useCreateConversation();
+  const nonFederatingParticipantsModalCopy = getNonFederatingParticipantsModalCopy(translate);
+  const {onSubmit, isLoading} = useCreateConversation(nonFederatingParticipantsModalCopy);
 
   return (
     <Button
@@ -39,7 +42,7 @@ export const CreateConversationSubmit = () => {
       showLoading={isLoading}
       variant={ButtonVariant.TERTIARY}
     >
-      {t('createConversationModalHeaderDone')}
+      {translate('createConversationModalHeaderDone')}
     </Button>
   );
 };

@@ -105,7 +105,6 @@ jobs:
       - name: Verify generated i18n artifacts are committed
         run: |
           ./bin/yarn nx run webapp:translate-merge
-          ./bin/yarn nx run webapp:translate-generate-types
 
           if ! test -z "$(git status --porcelain)"; then
             echo "Repository is not clean after generation. Run generation locally and commit the changes."
@@ -122,18 +121,15 @@ jobs:
       - name: Lint file names
         run: ./bin/yarn lint:fileNames
 
-      - name: Lint formatting
-        run: ./bin/yarn lint:other
-
       - name: Lint (PR)
         if: ${{ github.event_name == 'pull_request' }}
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: ./bin/yarn nx affected -t lint --base="origin/${BASE_REF}"
+        run: ./bin/yarn lint:affected
 
       - name: Lint (non-PR)
         if: ${{ github.event_name != 'pull_request' }}
-        run: ./bin/yarn nx run-many -t lint --all
+        run: ./bin/yarn lint
 
       - name: Test
         run: ./bin/run-with-network-isolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false

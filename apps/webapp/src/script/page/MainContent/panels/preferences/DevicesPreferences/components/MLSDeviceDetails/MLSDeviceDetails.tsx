@@ -19,7 +19,7 @@
 
 import {isKnownSignature, MLSPublicKeys} from 'Repositories/client';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {splitFingerprint} from 'Util/stringUtil';
 
 import {styles} from './MLSDeviceDetails.styles';
@@ -40,6 +40,7 @@ export const MLSDeviceDetails = ({
   identity,
   isSelfUser = false,
 }: MLSDeviceDetailsProps) => {
+  const {translate} = useApplicationContext();
   if (!isCurrentDevice && !identity) {
     return null;
   }
@@ -56,12 +57,14 @@ export const MLSDeviceDetails = ({
   return (
     <div css={styles.wrapper}>
       {isKnownSignature(cipherSuite) && (
-        <h4 className="paragraph-body-3">{t('mlsSignature', {signature: MLSPublicKeys[cipherSuite]})}</h4>
+        <h4 className="paragraph-body-3">{translate('mlsSignature', {signature: MLSPublicKeys[cipherSuite]})}</h4>
       )}
 
       {identity?.thumbprint && (
         <>
-          <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
+          <p className="label-2 preferences-label preferences-devices-fingerprint-label">
+            {translate('mlsThumbprint')}
+          </p>
 
           <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
             <FormattedId idSlices={splitFingerprint(identity.thumbprint)} />

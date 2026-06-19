@@ -27,21 +27,22 @@ import {
   emptyListStyles,
 } from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 export const EmptyMeetingList = () => {
+  const {translate} = useApplicationContext();
   const {handleMeetNow, handleScheduleMeeting} = useMeetingActions();
 
   return (
     <div css={emptyListStyles} data-uie-name="empty-meetings-list">
-      <p css={emptyListHeadingStyles}>{t('meetings.noMeetingsText')}</p>
-      <p css={emptyListBodyStyles}>{t('meetings.startMeetingHelp')}</p>
+      <p css={emptyListHeadingStyles}>{translate('meetings.noMeetingsText')}</p>
+      <p css={emptyListBodyStyles}>{translate('meetings.startMeetingHelp')}</p>
       <div css={emptyListActionButtonContainerStyles}>
         <Button variant={ButtonVariant.TERTIARY} onClick={handleMeetNow} data-uie-name="meet-now">
-          <CallIcon css={emptyListActionButtonsStyles} /> {t('meetings.action.meetNow')}
+          <CallIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.meetNow')}
         </Button>
         <Button variant={ButtonVariant.TERTIARY} onClick={handleScheduleMeeting} data-uie-name="schedule-meeting">
-          <CalendarIcon css={emptyListActionButtonsStyles} /> {t('meetings.action.scheduleMeeting')}
+          <CalendarIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.scheduleMeeting')}
         </Button>
       </div>
     </div>

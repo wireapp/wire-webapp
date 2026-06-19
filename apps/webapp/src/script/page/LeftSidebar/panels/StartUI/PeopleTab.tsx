@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -25,7 +25,7 @@ import {partition} from 'underscore';
 import {useDebouncedCallback} from 'use-debounce';
 
 import * as Icon from 'Components/icon';
-import {UserList, UserlistMode} from 'Components/UserList';
+import {UserList, UserlistMode} from 'Components/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
@@ -34,7 +34,7 @@ import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getLogger} from 'Util/logger';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {sortByPriority} from 'Util/stringUtil';
@@ -46,7 +46,10 @@ import {getManageTeamUrl} from '../../../../externalRoute';
 
 export type SearchResultsData = {contacts: User[]; others: User[]};
 
-interface PeopleTabProps {
+const TOP_PEOPLE_LIMIT = 6;
+const SEARCH_DEBOUNCE_MILLISECONDS = 300;
+
+export interface PeopleTabProps {
   canInviteTeamMembers: boolean;
   canSearchUnconnectedUsers: boolean;
   conversationRepository: ConversationRepository;
@@ -83,6 +86,7 @@ export const PeopleTab = ({
   onClickUser,
   onSearchResults,
 }: PeopleTabProps) => {
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const logger = getLogger('PeopleSearch');
   const [topPeople, setTopPeople] = useState<User[]>([]);
   const teamSize = teamState.teamSize();
@@ -137,24 +141,24 @@ export const PeopleTab = ({
     };
   };
 
-  const getTopPeople = () => {
+  const getTopPeople = useCallback(() => {
     return conversationRepository
       .getMostActiveConversations()
       .then(conversationEntities => {
         return conversationEntities
           .filter(conversation => conversation.is1to1())
-          .slice(0, 6)
+          .slice(0, TOP_PEOPLE_LIMIT)
           .map(conversation => conversation.participating_user_ids()[0]);
       })
       .then(userIds => userRepository.getUsersById(userIds))
       .then(userEntities => userEntities.filter(user => !user.isBlocked()));
-  };
+  }, [conversationRepository, userRepository]);
 
   useEffect(() => {
     if (!isTeam) {
-      getTopPeople().then(setTopPeople);
+      void getTopPeople().then(setTopPeople);
     }
-  }, []);
+  }, [getTopPeople, isTeam]);
 
   const debouncedSearch = useDebouncedCallback(async () => {
     setHasFederationError(false);
@@ -206,11 +210,13 @@ export const PeopleTab = ({
         logger.error(`Error searching for contacts: ${(error as any).message}`, error);
       }
     }
-  }, 300);
+  }, SEARCH_DEBOUNCE_MILLISECONDS);
 
   useEffect(() => {
-    debouncedSearch();
-  }, [searchQuery]);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await debouncedSearch();
+    });
+  }, [debouncedSearch, fireAndForgetInvoker, searchQuery]);
 
   useEffect(() => {
     // keep track of the most up to date value of the search query (in order to cancel outdated queries)
@@ -219,16 +225,18 @@ export const PeopleTab = ({
       currentSearchQuery.current = '';
       onSearchResults(undefined);
     };
-  }, [searchQuery]);
+  }, [onSearchResults, searchQuery]);
 
   return (
     <>
       {hasFederationError && (
         <div className="start-ui-fed-domain-unavailable">
-          <div className="start-ui-fed-domain-unavailable__head">{t('searchConnectWithOtherDomain')}</div>
-          <span className="start-ui-fed-domain-unavailable__text">{t('searchFederatedDomainNotAvailable')}</span>
+          <div className="start-ui-fed-domain-unavailable__head">{translate('searchConnectWithOtherDomain')}</div>
+          <span className="start-ui-fed-domain-unavailable__text">
+            {translate('searchFederatedDomainNotAvailable')}
+          </span>
           {/*@todo: re-enable when federation article is available
-                <a className="start-ui-fed-domain-unavailable__link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: t('searchFederatedDomainNotAvailableLearnMore')"></a>
+                <a className="start-ui-fed-domain-unavailable__link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: translate('searchFederatedDomainNotAvailableLearnMore')}"></a>
             */}
         </div>
       )}
@@ -245,14 +253,14 @@ export const PeopleTab = ({
                   data-uie-name="do-invite-member"
                 >
                   <span className="left-column-icon icon-envelope"></span>
-                  <span className="column-center">{t('searchMemberInvite')}</span>
+                  <span className="column-center">{translate('searchMemberInvite')}</span>
                 </button>
               </li>
             )}
           </ul>
           {topPeople.length > 0 && (
             <div className="start-ui-list-top-people" data-uie-name="status-top-people">
-              <h3 className="start-ui-list-header start-ui-list-header-top-people">{t('searchTopPeople')}</h3>
+              <h3 className="start-ui-list-header start-ui-list-header-top-people">{translate('searchTopPeople')}</h3>
               <div className="search-list-theme-black">
                 <div className="top-people">
                   <TopPeople users={topPeople} clickOnUser={onClickContact} />
@@ -270,7 +278,7 @@ export const PeopleTab = ({
                 <Icon.MessageIcon />
               </span>
               <p className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
-                {t('searchNoMatchesPartner')}
+                {translate('searchNoMatchesPartner')}
               </p>
             </div>
           ) : isFederated ? (
@@ -278,17 +286,17 @@ export const PeopleTab = ({
               <span className="start-ui-fed-wrapper__icon">
                 <Icon.ProfileIcon />
               </span>
-              <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
+              <div className="start-ui-fed-wrapper__text">{translate('searchTrySearchFederation')}</div>
               <div className="start-ui-fed-wrapper__button">
                 {/*@todo: re-enable when federation article is available
                 <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
-                  {t('searchTrySearchLearnMore')}
+                  {translate('searchTrySearchLearnMore')}
                 </button>
           */}
               </div>
             </div>
           ) : (
-            <p className="start-ui-no-search-results">{t('searchTrySearch')}</p>
+            <p className="start-ui-no-search-results">{translate('searchTrySearch')}</p>
           )}
         </>
       )}
@@ -296,9 +304,11 @@ export const PeopleTab = ({
         {results.contacts.length > 0 && (
           <div className="contacts">
             {isTeam ? (
-              <h3 className="start-ui-list-header start-ui-list-header-contacts">{t('searchContacts')}</h3>
+              <h3 className="start-ui-list-header start-ui-list-header-contacts">{translate('searchContacts')}</h3>
             ) : (
-              <h3 className="start-ui-list-header start-ui-list-header-connections">{t('searchConnections')}</h3>
+              <h3 className="start-ui-list-header start-ui-list-header-connections">
+                {translate('searchConnections')}
+              </h3>
             )}
             <div className="search-list-theme-black">
               <UserList
@@ -316,8 +326,8 @@ export const PeopleTab = ({
           <div className="others">
             <h3 className="start-ui-list-header">
               {searchOnFederatedDomain()
-                ? t('searchOthersFederation', {domainName: searchOnFederatedDomain()})
-                : t('searchOthers')}
+                ? translate('searchOthersFederation', {domainName: searchOnFederatedDomain()})
+                : translate('searchOthers')}
             </h3>
             <div className="search-list-theme-black">
               <UserList

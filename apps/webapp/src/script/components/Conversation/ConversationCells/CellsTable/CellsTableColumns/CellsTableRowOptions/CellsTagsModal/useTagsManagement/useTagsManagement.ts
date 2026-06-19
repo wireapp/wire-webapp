@@ -23,7 +23,6 @@ import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/RootProvider';
-import {t} from 'Util/localizerUtil';
 
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
 
@@ -34,6 +33,7 @@ interface UseTagsManagementProps {
   fetchTagsEnabled: boolean;
   initialSelectedTags: string[];
   onSuccess?: () => void;
+  commaValidationError: string;
 }
 
 export const useTagsManagement = ({
@@ -41,6 +41,7 @@ export const useTagsManagement = ({
   fetchTagsEnabled,
   initialSelectedTags,
   onSuccess,
+  commaValidationError,
 }: UseTagsManagementProps) => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const tagNames = useAllCellsTagsStore(state => state.tags);
@@ -78,7 +79,7 @@ export const useTagsManagement = ({
     }
 
     if (inputValue.includes(',')) {
-      setValidationError(t('cells.tagsModal.validationError.comma'));
+      setValidationError(commaValidationError);
       return;
     }
 

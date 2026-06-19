@@ -28,23 +28,24 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
-import {formatDurationCaption} from 'Util/timeUtil';
+import {formatDurationCaption, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface PrivacySectionProps {
-  appLockRepository?: AppLockRepository;
+  appLockRepository: AppLockRepository;
   appLockState?: AppLockState;
   propertiesRepository: PropertiesRepository;
 }
 
 const PrivacySection = ({
   propertiesRepository,
-  appLockRepository = container.resolve(AppLockRepository),
+  appLockRepository,
   appLockState = container.resolve(AppLockState),
 }: PrivacySectionProps) => {
+  const {translate} = useApplicationContext();
   const {isAppLockEnabled, isAppLockAvailable, isAppLockEnforced, appLockInactivityTimeoutSecs} =
     useKoSubscribableChildren(appLockState, [
       'isAppLockEnabled',
@@ -61,7 +62,7 @@ const PrivacySection = ({
   const changeReceiptMode = (event: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
 
-    propertiesRepository.updateProperty(
+    void propertiesRepository.updateProperty(
       PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
       isChecked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
     );
@@ -70,14 +71,18 @@ const PrivacySection = ({
   const handleTypingModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
 
-    propertiesRepository.updateProperty(
+    void propertiesRepository.updateProperty(
       PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.key,
       isChecked ? CONVERSATION_TYPING_INDICATOR_MODE.ON : CONVERSATION_TYPING_INDICATOR_MODE.OFF,
     );
   };
 
   return (
-    <PreferencesSection hasSeparator className="preferences-section-privacy" title={t('preferencesAccountPrivacy')}>
+    <PreferencesSection
+      hasSeparator
+      className="preferences-section-privacy"
+      title={translate('preferencesAccountPrivacy')}
+    >
       <>
         <Checkbox
           onChange={changeReceiptMode}
@@ -85,10 +90,12 @@ const PrivacySection = ({
           data-uie-name="status-preference-read-receipts"
         >
           <CheckboxLabel htmlFor="status-preference-read-receipts">
-            {t('preferencesAccountReadReceiptsCheckbox')}
+            {translate('preferencesAccountReadReceiptsCheckbox')}
           </CheckboxLabel>
         </Checkbox>
-        <p className="preferences-detail preferences-detail-intended">{t('preferencesAccountReadReceiptsDetail')}</p>
+        <p className="preferences-detail preferences-detail-intended">
+          {translate('preferencesAccountReadReceiptsDetail')}
+        </p>
       </>
 
       <div className="checkbox-margin">
@@ -98,11 +105,11 @@ const PrivacySection = ({
           data-uie-name="status-preference-typing-indicator"
         >
           <CheckboxLabel htmlFor="status-preference-typing-indicator">
-            {t('preferencesAccountTypingIndicatorCheckbox')}
+            {translate('preferencesAccountTypingIndicatorCheckbox')}
           </CheckboxLabel>
         </Checkbox>
         <p className="preferences-detail preferences-detail-intended">
-          {t('preferencesAccountTypingIndicatorsDetail')}
+          {translate('preferencesAccountTypingIndicatorsDetail')}
         </p>
       </div>
 
@@ -116,11 +123,13 @@ const PrivacySection = ({
             disabled={isAppLockEnforced}
             data-uie-name="status-preference-applock"
           >
-            <CheckboxLabel htmlFor="status-preference-applock">{t('preferencesAccountAppLockCheckbox')}</CheckboxLabel>
+            <CheckboxLabel htmlFor="status-preference-applock">
+              {translate('preferencesAccountAppLockCheckbox')}
+            </CheckboxLabel>
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
-            {t('preferencesAccountAppLockDetail', {
-              locktime: formatDurationCaption(appLockInactivityTimeoutSecs * 1000),
+            {translate('preferencesAccountAppLockDetail', {
+              locktime: formatDurationCaption(appLockInactivityTimeoutSecs * TIME_IN_MILLIS.SECOND, translate),
             })}
           </p>
         </div>

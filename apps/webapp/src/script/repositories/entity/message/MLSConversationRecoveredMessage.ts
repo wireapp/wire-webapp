@@ -18,14 +18,14 @@
  */
 
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
 export class MLSConversationRecoveredMessage extends SystemMessage {
-  constructor() {
-    super();
+  constructor(translate: Translate) {
+    super(translate);
     this.system_message_type = SystemMessageType.MLS_CONVERSATION_RECOVERED;
-    this.caption = t('mlsConversationRecovered');
+    this.caption = this.translate('mlsConversationRecovered');
   }
 }

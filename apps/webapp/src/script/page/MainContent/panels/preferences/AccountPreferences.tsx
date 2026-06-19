@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {UserVerificationBadges} from 'Components/Badge';
+import {UserVerificationBadges} from 'Components/badge';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
@@ -32,12 +32,13 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {Core} from 'src/script/service/coreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {AccountInput} from './accountPreferences/AccountInput';
@@ -59,6 +60,7 @@ import {Config} from '../../../../Config';
 import {AccentColorPicker} from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {
+  appLockRepository: AppLockRepository;
   importFile: (file: File) => void;
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
@@ -76,6 +78,7 @@ interface AccountPreferencesProps {
 const logger = getLogger('AccountPreferences');
 
 export const AccountPreferences = ({
+  appLockRepository,
   importFile,
   clientRepository,
   userRepository,
@@ -89,6 +92,7 @@ export const AccountPreferences = ({
   conversationState = container.resolve(ConversationState),
 }: AccountPreferencesProps) => {
   const core = container.resolve(Core);
+  const {translate} = useApplicationContext();
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
   const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
     'name',
@@ -107,7 +111,7 @@ export const AccountPreferences = ({
     Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
     core.backendFeatures.version >= Config.getConfig().MIN_TEAM_CREATION_SUPPORTED_API_VERSION;
 
-  const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false});
+  const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false}, translate);
   const domain = selfUser.domain;
 
   const clickOnLeaveGuestRoom = (): void => {
@@ -124,19 +128,20 @@ export const AccountPreferences = ({
               logger.warn('Error while leaving room', error);
             }
           },
-          text: t('modalAccountLeaveGuestRoomAction'),
+          text: translate('modalAccountLeaveGuestRoomAction'),
         },
         text: {
-          message: t('modalAccountLeaveGuestRoomMessage'),
-          title: t('modalAccountLeaveGuestRoomHeadline'),
+          message: translate('modalAccountLeaveGuestRoomMessage'),
+          title: translate('modalAccountLeaveGuestRoomHeadline'),
         },
       },
       undefined,
+      translate,
     );
   };
 
   return (
-    <PreferencesPage title={t('preferencesAccount')}>
+    <PreferencesPage title={translate('preferencesAccount')}>
       <div className="preferences-wrapper">
         {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationAccountHeader />}
         <div className="preferences-account-name">
@@ -168,7 +173,7 @@ export const AccountPreferences = ({
       </div>
 
       {isActivatedAccount ? (
-        <PreferencesSection hasSeparator title={t('preferencesAccountInfo')}>
+        <PreferencesSection hasSeparator title={translate('preferencesAccountInfo')}>
           <div
             css={{
               display: 'flex',
@@ -191,7 +196,12 @@ export const AccountPreferences = ({
             )}
 
             {isTeam && (
-              <AccountInput label={t('preferencesAccountTeam')} value={teamName} readOnly fieldName="status-team" />
+              <AccountInput
+                label={translate('preferencesAccountTeam')}
+                value={teamName}
+                readOnly
+                fieldName="status-team"
+              />
             )}
 
             {richFields.map(({type, value}) => (
@@ -208,7 +218,7 @@ export const AccountPreferences = ({
           </div>
 
           <AccountLink
-            label={t('preferencesAccountLink')}
+            label={translate('preferencesAccountLink')}
             value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}@${selfUser.domain}`}
             data-uie-name="element-profile-link"
           />
@@ -221,10 +231,10 @@ export const AccountPreferences = ({
             data-uie-name="do-leave-guest-room"
             type="button"
           >
-            {t('preferencesAccountLeaveGuestRoom')}
+            {translate('preferencesAccountLeaveGuestRoom')}
           </button>
 
-          <div className="preferences-leave-disclaimer">{t('preferencesAccountLeaveGuestRoomDescription')}</div>
+          <div className="preferences-leave-disclaimer">{translate('preferencesAccountLeaveGuestRoomDescription')}</div>
         </PreferencesSection>
       )}
 
@@ -236,7 +246,7 @@ export const AccountPreferences = ({
         />
       )}
 
-      <PrivacySection propertiesRepository={propertiesRepository} />
+      <PrivacySection appLockRepository={appLockRepository} propertiesRepository={propertiesRepository} />
 
       {isActivatedAccount && (
         <>

@@ -30,8 +30,8 @@ import {RadioGroup} from 'Components/Radio';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {conversationAccessContainerCss, conversationAccessContentCss} from './access.styles';
@@ -53,6 +53,7 @@ export const Access = ({
   conversationRepository,
   conversationRoleRepository,
 }: AccessProps) => {
+  const {translate} = useApplicationContext();
   const {conversationModerator} = useKoSubscribableChildren(activeConversation, ['conversationModerator']);
   const [access, setAccess] = useState<ConversationAccess>(
     activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK)
@@ -75,35 +76,35 @@ export const Access = ({
         onGoBack={onGoBack}
         onClose={onClose}
         goBackUie="go-back-access-options"
-        title={t('conversationAccessTitle')}
+        title={translate('conversationAccessTitle')}
       />
 
       <FadingScrollbar className="panel__content" css={conversationAccessContainerCss}>
         <p className="panel__info-text" tabIndex={TabIndex.FOCUSABLE}>
-          {t('createConversationAccessText')}
+          {translate('createConversationAccessText')}
         </p>
 
         <p className="panel__info-text" tabIndex={TabIndex.FOCUSABLE} css={conversationAccessContentCss}>
-          {t('conversationAccessDisclaimer')}
+          {translate('conversationAccessDisclaimer')}
         </p>
 
         <RadioGroup<ConversationAccess>
           onChange={setAccess}
           selectedValue={access}
-          options={getConversationAccessOptions(isPublicChannelsEnabled)}
+          options={getConversationAccessOptions(translate, isPublicChannelsEnabled)}
           ariaLabelledBy="conversation-access"
           name="conversation-access"
         />
 
         <p className="panel__info-text" tabIndex={TabIndex.FOCUSABLE} css={conversationAccessContentCss}>
-          {t('createConversationManagerText')}
+          {translate('createConversationManagerText')}
         </p>
 
         <RadioGroup<ADD_PERMISSION>
           disabled={access === ConversationAccess.Public || !canUpdateAddPermission}
           onChange={updateAddPermission}
           selectedValue={conversationModerator}
-          options={getConversationManagerOptions()}
+          options={getConversationManagerOptions(translate)}
           ariaLabelledBy="conversation-manager"
           name="conversation-manager"
         />

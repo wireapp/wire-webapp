@@ -21,6 +21,7 @@ import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {User} from 'Repositories/entity/User';
 
 import {extractClientDiff, findDeletedClients} from './ClientMismatchUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ClientMismatchUtil', () => {
   describe('findDeletedClients', () => {
@@ -95,10 +96,10 @@ describe('ClientMismatchUtil', () => {
           },
         },
       };
-      const userWithoutClients = new User('user3');
+      const userWithoutClients = new User('user3', '', translateForTest);
       userWithoutClients.devices([new ClientEntity(false, '', 'client1'), new ClientEntity(false, '', 'client2')]);
 
-      const userWithClientsLeft = new User('user4');
+      const userWithClientsLeft = new User('user4', '', translateForTest);
       userWithClientsLeft.devices([new ClientEntity(false, '', 'client1'), new ClientEntity(false, '', 'client2')]);
 
       const {missingClients, deletedClients, missingUserIds, emptyUsers} = extractClientDiff(mismatch, [
@@ -130,10 +131,10 @@ describe('ClientMismatchUtil', () => {
           },
         },
       };
-      const user1 = new User('user1');
+      const user1 = new User('user1', '', translateForTest);
       user1.devices([new ClientEntity(false, '', 'client1'), new ClientEntity(false, '', 'client2')]);
 
-      const user2 = new User('user2');
+      const user2 = new User('user2', '', translateForTest);
       user2.devices([new ClientEntity(false, '', 'client1')]);
 
       const {missingClients} = extractClientDiff(mismatch, [user1, user2]);

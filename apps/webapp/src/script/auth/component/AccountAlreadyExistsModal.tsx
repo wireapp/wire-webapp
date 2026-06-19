@@ -20,7 +20,7 @@
 import {Button, Container, H2, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {buttonCss, containerCss, headerCss, linkCss} from './AccountAlreadyExistsModal.styles';
 
@@ -29,30 +29,31 @@ interface AccountAlreadyExistsModalProps {
 }
 
 export const AccountAlreadyExistsModal = ({onClose}: AccountAlreadyExistsModalProps) => {
+  const {translate} = useApplicationContext();
   const {CHANGE_EMAIL_ADDRESS: changeEmailAddressUrl, DELETE_PERSONAL_ACCOUNT: deletePersonalAccountUrl} =
     Config.getConfig().URL.SUPPORT;
 
   return (
     <Modal onClose={onClose}>
       <Container css={containerCss}>
-        <H2 css={headerCss}>{t('accountAlreadyExistsModal.header')}</H2>
+        <H2 css={headerCss}>{translate('accountAlreadyExistsModal.header')}</H2>
         <Text block fontSize="var(--font-size-base)" style={{marginBottom: 24}}>
-          {t('accountAlreadyExistsModal.content')}
+          {translate('accountAlreadyExistsModal.content')}
         </Text>
         <Text block>
           👉{' '}
           <Link href={changeEmailAddressUrl} target="_blank" css={linkCss}>
-            {t('accountAlreadyExistsModal.changeEmailLink')}
+            {translate('accountAlreadyExistsModal.changeEmailLink')}
           </Link>
         </Text>
         <Text block>
           👉{' '}
           <Link href={deletePersonalAccountUrl} target="_blank" css={linkCss}>
-            {t('accountAlreadyExistsModal.deletePersonalAccount')}
+            {translate('accountAlreadyExistsModal.deletePersonalAccount')}
           </Link>
         </Text>
         <Button css={buttonCss} block type="button" onClick={onClose} data-uie-name="guest-link-join-submit-button">
-          {t('authHistoryButton')}
+          {translate('authHistoryButton')}
         </Button>
       </Container>
     </Modal>

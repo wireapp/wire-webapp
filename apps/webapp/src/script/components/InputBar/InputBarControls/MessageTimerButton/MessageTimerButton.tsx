@@ -26,10 +26,10 @@ import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {DurationUnit, formatDuration} from 'Util/timeUtil';
 import {setContextMenuPosition} from 'Util/util';
 
@@ -39,6 +39,7 @@ interface MessageTimerButtonProps {
 }
 
 const MessageTimerButton = ({conversation, teamState = container.resolve(TeamState)}: MessageTimerButtonProps) => {
+  const {translate} = useApplicationContext();
   const {messageTimer, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
     'messageTimer',
     'hasGlobalMessageTimer',
@@ -49,17 +50,17 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
   ]);
   const hasMessageTimer = !!messageTimer;
   const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer;
-  const duration = hasMessageTimer ? formatDuration(messageTimer) : ({} as DurationUnit);
+  const duration = hasMessageTimer ? formatDuration(messageTimer, translate) : ({} as DurationUnit);
 
   const setEntries = () =>
     [
       {
         click: () => conversation.localMessageTimer(0),
-        label: t('ephemeralUnitsNone'),
+        label: translate('ephemeralUnitsNone'),
       },
     ].concat(
       EphemeralTimings.VALUES.map(milliseconds => {
-        const {text} = formatDuration(milliseconds);
+        const {text} = formatDuration(milliseconds, translate);
 
         return {
           click: () => conversation.localMessageTimer(milliseconds),
@@ -92,7 +93,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
       className="input-bar-control conversation-input-bar-message-timer"
       onClick={isTimerDisabled ? undefined : onClick}
       onKeyDown={handleContextKeyDown}
-      title={t('tooltipConversationEphemeral')}
+      title={translate('tooltipConversationEphemeral')}
       disabled={isTimerDisabled}
       data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
       data-uie-name="do-set-ephemeral-timer"

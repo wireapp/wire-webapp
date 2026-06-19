@@ -17,10 +17,14 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {FilePlaceholder} from '../../common/FilePlaceholder/FilePlaceholder';
 
 export const PdfError = () => {
-  return <FilePlaceholder title={t('pdfViewerErrorTitle')} description={t('pdfViewerErrorDescription')} />;
+  const {translate} = useApplicationContext();
+
+  return (
+    <FilePlaceholder title={translate('pdfViewerErrorTitle')} description={translate('pdfViewerErrorDescription')} />
+  );
 };

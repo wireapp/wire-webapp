@@ -23,6 +23,7 @@ import {container} from 'tsyringe';
 
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ConversationFeature} from './ConversationFeature';
@@ -34,6 +35,7 @@ import {ConversationCreationStep, ConversationType} from '../types';
 import {getConversationTypeOptions} from '../utils';
 
 export const ConversationTypeContainer = () => {
+  const {translate} = useApplicationContext();
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
   const {self} = useKoSubscribableChildren(userState, ['self']);
@@ -74,7 +76,7 @@ export const ConversationTypeContainer = () => {
 
   return (
     <div css={conversationTypeContainerCss}>
-      {getConversationTypeOptions().map(option => (
+      {getConversationTypeOptions(translate).map(option => (
         <>
           <ConversationOption
             key={option.conversationType}

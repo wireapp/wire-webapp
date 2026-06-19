@@ -62,7 +62,7 @@ import {Text} from 'Repositories/entity/message/Text';
 import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {userReactionMapToReactionMap} from 'Util/reactionUtil';
 import {toError} from 'Util/toError';
@@ -100,7 +100,10 @@ export class EventMapper {
   /**
    * Construct a new Event Mapper.
    */
-  constructor(private readonly apiClient = container.resolve(APIClient)) {
+  constructor(
+    private readonly apiClient = container.resolve(APIClient),
+    private readonly translate: Translate,
+  ) {
     this.logger = getLogger('EventMapper');
   }
 
@@ -517,7 +520,7 @@ export class EventMapper {
    */
   private _mapEvent1to1Creation({data: eventData}: LegacyEventRecord) {
     const {has_service: hasService, userIds} = eventData;
-    const messageEntity = new MemberMessage();
+    const messageEntity = new MemberMessage(this.translate);
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
 
@@ -535,7 +538,7 @@ export class EventMapper {
    * @returns Content message entity
    */
   private _mapEventAssetAdd(event: LegacyEventRecord) {
-    const messageEntity = new ContentMessage();
+    const messageEntity = new ContentMessage(undefined, this.translate);
 
     const assetEntity = this._mapAsset(event);
     if (assetEntity === undefined) {
@@ -553,7 +556,7 @@ export class EventMapper {
    * @returns Delete message entity
    */
   private _mapEventDeleteEverywhere({data: eventData}: LegacyEventRecord) {
-    const messageEntity = new DeleteMessage();
+    const messageEntity = new DeleteMessage(this.translate);
     messageEntity.deleted_timestamp = new Date(eventData.deleted_time).getTime();
     return messageEntity;
   }
@@ -565,7 +568,7 @@ export class EventMapper {
    * @returns Member message entity
    */
   private _mapEventGroupCreation({data: eventData}: LegacyEventRecord) {
-    const messageEntity = new MemberMessage();
+    const messageEntity = new MemberMessage(this.translate);
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name ?? '');
     messageEntity.userIds(eventData.userIds);
@@ -574,19 +577,19 @@ export class EventMapper {
   }
 
   _mapEventCallingTimeout({data, time}: LegacyEventRecord) {
-    return new CallingTimeoutMessage(data.reason, parseInt(time, 10));
+    return new CallingTimeoutMessage(data.reason, parseInt(time, 10), this.translate);
   }
 
   _mapEventFailedToAddUsers({data, time}: FailedToAddUsersMessageEvent) {
-    return new FailedToAddUsersMessage(data, parseInt(time, 10));
+    return new FailedToAddUsersMessage(data, parseInt(time, 10), this.translate);
   }
 
   _mapEventFederationStop({data, time}: FederationStopEvent) {
-    return new FederationStopMessage(data.domains, parseInt(time, 10));
+    return new FederationStopMessage(data.domains, parseInt(time, 10), this.translate);
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord) {
-    return new LegalHoldMessage(data.legal_hold_status, timestamp ?? 0);
+    return new LegalHoldMessage(data.legal_hold_status, timestamp ?? 0, this.translate);
   }
 
   /**
@@ -597,7 +600,7 @@ export class EventMapper {
    */
   private _mapEventLocation({data: eventData}: LegacyEventRecord) {
     const location = eventData.location;
-    const messageEntity = new ContentMessage();
+    const messageEntity = new ContentMessage(undefined, this.translate);
     const assetEntity = new Location();
 
     assetEntity.longitude = location.longitude;
@@ -626,7 +629,7 @@ export class EventMapper {
     const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: '', id}));
     let messageUserIds = userIds;
 
-    const messageEntity = new MemberMessage();
+    const messageEntity = new MemberMessage(this.translate);
 
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
     messageEntity.visible(!isSingleModeConversation);
@@ -658,7 +661,7 @@ export class EventMapper {
    * @returns Member message entity
    */
   private _mapEventMemberLeave({data: eventData}: MemberLeaveEvent | TeamMemberLeaveEvent) {
-    const messageEntity = new MemberMessage();
+    const messageEntity = new MemberMessage(this.translate);
     const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: '', id}));
     messageEntity.userIds(userIds);
     messageEntity.reason = eventData.reason;
@@ -673,7 +676,7 @@ export class EventMapper {
    */
   private _mapEventMessageAdd(event: MessageAddEvent) {
     const {data: eventData, edited_time: editedTime} = event;
-    const messageEntity = new ContentMessage();
+    const messageEntity = new ContentMessage(undefined, this.translate);
 
     const assets = this._mapAssetText(eventData);
     messageEntity.assets.push(assets);
@@ -698,7 +701,7 @@ export class EventMapper {
    */
   private _mapEventMultipartAdd(event: MultipartMessageAddEvent) {
     const {data: eventData, edited_time: editedTime} = event;
-    const messageEntity = new ContentMessage();
+    const messageEntity = new ContentMessage(undefined, this.translate);
 
     const assets = this._mapAssetMultipart(eventData);
     messageEntity.assets.push(assets);
@@ -744,7 +747,7 @@ export class EventMapper {
 
   private _mapEventCompositeMessageAdd(event: CompositeMessageAddEvent) {
     const {data: eventData} = event;
-    const messageEntity = new CompositeMessage();
+    const messageEntity = new CompositeMessage(undefined, this.translate);
     const assets = this._mapAssetComposite(eventData);
     messageEntity.assets.push(...assets);
     messageEntity.replacing_message_id = eventData.replacing_message_id;
@@ -755,49 +758,49 @@ export class EventMapper {
    * Maps JSON data of local missed message event to message entity.
    */
   private _mapEventMissedMessages(): MissedMessage {
-    return new MissedMessage();
+    return new MissedMessage(this.translate);
   }
 
   /**
    * Maps JSON data of local missed message event to message entity.
    */
   private _mapEventJoinedAfterMLSMigrationFinalisation(): JoinedAfterMLSMigrationFinalisationMessage {
-    return new JoinedAfterMLSMigrationFinalisationMessage();
+    return new JoinedAfterMLSMigrationFinalisationMessage(this.translate);
   }
 
   /**
    * Maps JSON data of local missed message event to message entity.
    */
   private _mapEventMLSMigrationFinalisationOngoingCall(): MLSMigrationFinalisationOngoingCallMessage {
-    return new MLSMigrationFinalisationOngoingCallMessage();
+    return new MLSMigrationFinalisationOngoingCallMessage(this.translate);
   }
 
   /**
    * Maps JSON data of local MLS conversation recovered event to message entity.
    */
   private _mapEventMLSConversationRecovered(): MLSConversationRecoveredMessage {
-    return new MLSConversationRecoveredMessage();
+    return new MLSConversationRecoveredMessage(this.translate);
   }
 
   /**
    * Maps 1:1 conversation migrated to mls event to message entity.
    */
   private _mapEventOneToOneMigratedToMls(): OneToOneMigratedToMlsMessage {
-    return new OneToOneMigratedToMlsMessage();
+    return new OneToOneMigratedToMlsMessage(this.translate);
   }
 
   /**
    * Maps JSON data of `conversation.knock` message into message entity.
    */
   private _mapEventPing(): PingMessage {
-    return new PingMessage();
+    return new PingMessage(this.translate);
   }
 
   /**
    * Maps JSON data of `conversation.protocol-update` message into message entity.
    */
   private _mapEventProtocolUpdate(event: ConversationProtocolUpdateEvent): ProtocolUpdateMessage {
-    return new ProtocolUpdateMessage(event.data.protocol);
+    return new ProtocolUpdateMessage(event.data.protocol, this.translate);
   }
 
   /**
@@ -807,7 +810,7 @@ export class EventMapper {
    * @returns Rename message entity
    */
   private _mapEventRename({data: eventData, from, qualified_from}: LegacyEventRecord) {
-    return new RenameMessage(eventData.name, from, qualified_from?.domain);
+    return new RenameMessage(eventData.name, from, qualified_from?.domain, this.translate);
   }
 
   /**
@@ -824,7 +827,7 @@ export class EventMapper {
    * @returns receipt mode update message entity
    */
   private _mapEventReceiptModeUpdate({data: eventData}: LegacyEventRecord) {
-    return new ReceiptModeUpdateMessage(!!eventData.receipt_mode);
+    return new ReceiptModeUpdateMessage(!!eventData.receipt_mode, this.translate);
   }
 
   /**
@@ -834,7 +837,7 @@ export class EventMapper {
    * @returns message timer update message entity
    */
   private _mapEventMessageTimerUpdate({data: eventData}: LegacyEventRecord) {
-    return new MessageTimerUpdateMessage(eventData.message_timer);
+    return new MessageTimerUpdateMessage(eventData.message_timer, this.translate);
   }
 
   /**
@@ -846,7 +849,7 @@ export class EventMapper {
   private _mapEventTeamMemberLeave(event: TeamMemberLeaveEvent) {
     const messageEntity = this._mapEventMemberLeave(event);
     const eventData = event.data;
-    messageEntity.name(eventData.name || t('conversationSomeone'));
+    messageEntity.name(eventData.name || this.translate('conversationSomeone'));
     return messageEntity;
   }
 
@@ -859,7 +862,7 @@ export class EventMapper {
   private _mapEventUnableToDecrypt({error_code: errorCode, error}: ErrorEvent) {
     const code = typeof errorCode === 'string' ? parseInt(errorCode.split(' ')[0], 10) : errorCode;
     const clientId = error.replace(/\n/g, '').replace(/^.*\(([\w\d]+)\)$/g, '$1');
-    return new DecryptErrorMessage(clientId, code);
+    return new DecryptErrorMessage(clientId, code, this.translate);
   }
 
   /**
@@ -869,7 +872,7 @@ export class EventMapper {
    * @returns Verification message entity
    */
   private _mapEventVerification({data: eventData}: LegacyEventRecord) {
-    const messageEntity = new VerificationMessage();
+    const messageEntity = new VerificationMessage(this.translate);
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
     messageEntity.verificationMessageType(eventData.type);
@@ -881,7 +884,7 @@ export class EventMapper {
    * Maps JSON data of E2E Identity verification message event to message entity.
    */
   private _mapEventE2EIVerificationMessage({data: eventData}: E2EIVerificationEvent): MissedMessage {
-    return new E2EIVerificationMessage(eventData.type, eventData.userIds);
+    return new E2EIVerificationMessage(eventData.type, eventData.userIds, this.translate);
   }
 
   /**
@@ -889,7 +892,7 @@ export class EventMapper {
    * @returns Call message entity
    */
   private _mapEventVoiceChannelActivate() {
-    const messageEntity = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED);
+    const messageEntity = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0, this.translate);
     messageEntity.visible(false);
     return messageEntity;
   }
@@ -901,7 +904,12 @@ export class EventMapper {
    * @returns Call message entity
    */
   private _mapEventVoiceChannelDeactivate({data: eventData}: LegacyEventRecord) {
-    const messageEntity = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, eventData.reason, eventData.duration);
+    const messageEntity = new CallMessage(
+      CALL_MESSAGE_TYPE.DEACTIVATED,
+      eventData.reason,
+      eventData.duration,
+      this.translate,
+    );
 
     if (typeof eventData.duration !== 'undefined') {
       // new message format, including duration
@@ -1166,7 +1174,7 @@ export class EventMapper {
       data: {isIncoming, name, fileExt},
       time,
     } = event;
-    return new FileTypeRestrictedMessage(isIncoming, name, fileExt, +time);
+    return new FileTypeRestrictedMessage(isIncoming, name, fileExt, +time, this.translate);
   }
 }
 

@@ -31,15 +31,16 @@ import {CallingRepository} from './CallingRepository';
 import {Participant} from './Participant';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const createSelfParticipant = () => {
-  const selfUser = new User();
+  const selfUser = new User('', '', translateForTest);
   selfUser.isMe = true;
   return new Participant(selfUser, 'client1');
 };
 
 const createParticipant = (name: string) => {
-  const user = new User();
+  const user = new User('', '', translateForTest);
   user.name(name);
   return new Participant(user, `client-${name}`);
 };

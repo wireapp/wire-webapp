@@ -35,6 +35,8 @@ import {E2EIHandler} from './E2EIdentityEnrollment';
 import * as e2EIdentityVerification from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('./OIDCService', () => {
   return {
@@ -87,7 +89,7 @@ const modalMock = jest.spyOn(PrimaryModal, 'show');
 
 describe('E2EIHandler', () => {
   const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
-  const user = new User('userId', 'domain');
+  const user = new User('userId', 'domain', translateForTest);
   user.name('John Doe');
   user.username('johndoe');
   user.teamId = 'team';
@@ -157,6 +159,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.settingsChanged.headline.alt'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -167,6 +171,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.done.headline'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -192,6 +198,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.LOADING,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.inProgress.headline'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -199,6 +207,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.done.headline'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -220,6 +230,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.settingsChanged.headline.alt'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -230,6 +242,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.done.headline'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -260,10 +274,14 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.error.headline'})}),
+        undefined,
+        expect.any(Function),
       );
       expect(modalMock).not.toHaveBeenCalledWith(
         PrimaryModalType.CONFIRM,
         expect.objectContaining({secondaryAction: expect.objectContaining({text: 'acme.error.button.secondary'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -298,6 +316,8 @@ describe('E2EIHandler', () => {
           text: expect.objectContaining({title: 'acme.error.headline'}),
           secondaryAction: expect.objectContaining({text: 'acme.error.button.secondary'}),
         }),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -310,7 +330,9 @@ describe('E2EIHandler', () => {
 
   it('registers a renew timer when device is enrolled', async () => {
     const conversationState = container.resolve(ConversationState);
-    jest.spyOn(conversationState, 'getSelfMLSConversation').mockReturnValue(new Conversation() as any);
+    jest
+      .spyOn(conversationState, 'getSelfMLSConversation')
+      .mockReturnValue(new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest) as any);
 
     const enrollmentStore = getEnrollmentStore({id: 'userId', domain: 'domain'}, 'clientId');
     enrollmentStore.store.e2eiActivatedAt(Date.now());

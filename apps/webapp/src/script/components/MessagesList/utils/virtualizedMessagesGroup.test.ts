@@ -23,14 +23,17 @@ import {EventMapper} from 'Repositories/conversation/EventMapper';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/Message';
 import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
+import {translate} from 'Util/localizerUtil';
 import {getRandomNumber} from 'Util/numberUtil';
 import {createUuid} from 'Util/uuid';
 
 import {GroupedMessage, groupMessagesBySenderAndTime, isMarker} from './virtualizedMessagesGroup';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('MessagesGroup', () => {
-  const eventMapper = new EventMapper();
-  const conversation = new Conversation(createUuid(), 'domain');
+  const eventMapper = new EventMapper(undefined, translate);
+  const conversation = new Conversation(createUuid(), 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
   it('should group messages by sender', () => {
     const sender = 'user1';

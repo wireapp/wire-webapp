@@ -21,7 +21,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
 import {UserState} from 'Repositories/user/userState';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {SystemMessage} from './SystemMessage';
@@ -33,8 +33,8 @@ export class RenameMessage extends SystemMessage {
   public readonly name: string;
   private readonly userState = container.resolve(UserState);
 
-  constructor(name: string, userId?: string, userDomain?: string) {
-    super();
+  constructor(name: string, userId: string | undefined, userDomain: string | undefined, translate: Translate) {
+    super(translate);
 
     this.type = CONVERSATION_EVENT.RENAME;
     this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
@@ -43,7 +43,7 @@ export class RenameMessage extends SystemMessage {
     if (userId) {
       this.from = userId;
       this.fromDomain = userDomain;
-      this.user(new User(userId, userDomain));
+      this.user(new User(userId, userDomain ?? '', this.translate));
     }
 
     this.caption = this.generateCaption();
@@ -51,11 +51,11 @@ export class RenameMessage extends SystemMessage {
 
   private generateCaption(): string {
     if (!this.user()) {
-      return t('conversationRename');
+      return this.translate('conversationRename');
     }
 
     return matchQualifiedIds(this.user().qualifiedId, this.userState.self()?.qualifiedId)
-      ? t('conversationRenameYou')
-      : t('conversationRename');
+      ? this.translate('conversationRenameYou')
+      : this.translate('conversationRename');
   }
 }

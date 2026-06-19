@@ -25,7 +25,7 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {toError} from 'Util/toError';
 
 import {Page} from './Page';
@@ -45,6 +45,7 @@ const SetEmailComponent = ({
   doSetEmail,
   isFetching,
 }: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const emailInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<Error | null>(null);
   const [isValidEmail, setIsValidEmail] = useState(true);
@@ -88,10 +89,10 @@ const SetEmailComponent = ({
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <Form onSubmit={onSetEmail}>
-          <H1 center>{t('setEmail.headline')}</H1>
+          <H1 center>{translate('setEmail.headline')}</H1>
           <Input
             name="email"
-            placeholder={t('setEmail.emailPlaceholder')}
+            placeholder={translate('setEmail.emailPlaceholder')}
             type="email"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               if (emailInput.current !== null) {
@@ -119,7 +120,7 @@ const SetEmailComponent = ({
             type="submit"
             data-uie-name="do-verify-email"
           >
-            {t('setEmail.button')}
+            {translate('setEmail.button')}
           </Button>
         </Form>
       </ContainerXS>

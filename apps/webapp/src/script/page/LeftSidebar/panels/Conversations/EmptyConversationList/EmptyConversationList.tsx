@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './EmptyConversationList.styles';
 
@@ -36,15 +36,19 @@ interface EmptyConversationListProps {
 }
 
 export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''}: EmptyConversationListProps) => {
+  const {translate} = useApplicationContext();
+
   if (currentTab === SidebarTabs.RECENT || currentTab === SidebarTabs.FOLDER) {
     return (
       <div css={wrapper} className="empty-conversations-list">
         <div>
-          <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationAllWelcomeMessage')}</p>
+          <p css={paragraph}>
+            {searchValue ? translate('searchConversationsNoResult') : translate('conversationAllWelcomeMessage')}
+          </p>
 
           <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
 
-          <span css={seperator}>{t('conversationButtonSeparator')}</span>
+          <span css={seperator}>{translate('conversationButtonSeparator')}</span>
 
           <Button
             variant={ButtonVariant.TERTIARY}
@@ -52,7 +56,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
             data-uie-name="go-create-group"
             css={button}
           >
-            {t('conversationStartNewConversation')}
+            {translate('conversationStartNewConversation')}
           </Button>
         </div>
       </div>
@@ -64,7 +68,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
       <div css={wrapper} className="empty-conversations-list">
         <div>
           <p css={paragraph}>
-            {searchValue ? t('searchConversationsNoResult') : t('conversationFavoritesTabEmptyMessage')}
+            {searchValue ? translate('searchConversationsNoResult') : translate('conversationFavoritesTabEmptyMessage')}
           </p>
 
           <Link
@@ -73,7 +77,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
             target="_blank"
             data-uie-name="how-to-label-conversation-as-favorites"
           >
-            {t('conversationFavoritesTabEmptyLinkText')}
+            {translate('conversationFavoritesTabEmptyLinkText')}
           </Link>
         </div>
       </div>
@@ -84,11 +88,13 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
     return (
       <div css={wrapper} className="empty-conversations-list">
         <div>
-          <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationGroupEmptyMessage')}</p>
+          <p css={paragraph}>
+            {searchValue ? translate('searchConversationsNoResult') : translate('conversationGroupEmptyMessage')}
+          </p>
 
           <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
 
-          <span css={seperator}>{t('conversationButtonSeparator')}</span>
+          <span css={seperator}>{translate('conversationButtonSeparator')}</span>
 
           <Button
             variant={ButtonVariant.TERTIARY}
@@ -96,7 +102,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
             data-uie-name="go-create-group"
             css={button}
           >
-            {t('conversationStartNewConversation')}
+            {translate('conversationStartNewConversation')}
           </Button>
         </div>
       </div>
@@ -107,14 +113,14 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
     return (
       <div css={wrapper} className="empty-conversations-list">
         <div>
-          <p css={paragraph}>{t('searchChannelsNoResult')}</p>
+          <p css={paragraph}>{translate('searchChannelsNoResult')}</p>
           <Link
             variant={LinkVariant.PRIMARY}
             href={Config.getConfig().URL.WEBSITE_BASE}
             target="_blank"
             data-uie-name="learn-more-about-channels"
           >
-            {t('conversationLearnMoreChannels')}
+            {translate('conversationLearnMoreChannels')}
           </Link>
         </div>
       </div>
@@ -127,8 +133,8 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
         <div>
           <p css={paragraph}>
             {searchValue
-              ? t('searchConversationsNoResult')
-              : t('conversationDirectEmptyMessage', {brandName: Config.getConfig().BRAND_NAME})}
+              ? translate('searchConversationsNoResult')
+              : translate('conversationDirectEmptyMessage', {brandName: Config.getConfig().BRAND_NAME})}
           </p>
 
           <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
@@ -141,12 +147,12 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
     return (
       <div css={wrapper} className="empty-conversations-list">
         <div>
-          {searchValue && <p css={paragraph}>{t('searchConversationsNoResult')}</p>}
+          {searchValue && <p css={paragraph}>{translate('searchConversationsNoResult')}</p>}
 
           {!searchValue && (
             <div>
-              <p css={paragraphBold}>{t('conversationsNothingArchived')}</p>
-              <p css={paragraphGray}>{t('conversationsNothingArchivedTip')}</p>
+              <p css={paragraphBold}>{translate('conversationsNothingArchived')}</p>
+              <p css={paragraphGray}>{translate('conversationsNothingArchivedTip')}</p>
             </div>
           )}
         </div>
@@ -161,8 +167,12 @@ type ConnectWithNewUsersButtonProps = {
   onClick: () => void;
 };
 
-const ConnectWithNewUsersButton = ({onClick}: ConnectWithNewUsersButtonProps) => (
-  <Button variant={ButtonVariant.TERTIARY} onClick={onClick} data-uie-name="connect-with-new-users" css={button}>
-    {t('conversationConnectWithNewUsers')}
-  </Button>
-);
+const ConnectWithNewUsersButton = ({onClick}: ConnectWithNewUsersButtonProps) => {
+  const {translate} = useApplicationContext();
+
+  return (
+    <Button variant={ButtonVariant.TERTIARY} onClick={onClick} data-uie-name="connect-with-new-users" css={button}>
+      {translate('conversationConnectWithNewUsers')}
+    </Button>
+  );
+};

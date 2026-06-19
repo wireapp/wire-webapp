@@ -32,9 +32,9 @@ import {
   SidebarTabs,
   useSidebarStore,
 } from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 interface ConversationFolderTabProps {
   title: string;
@@ -49,6 +49,8 @@ interface ConversationFolderTabProps {
   isActive?: boolean;
 }
 
+const CONTEXT_MENU_OFFSET_PIXELS = 4;
+
 export const ConversationFolderTab = ({
   title,
   label,
@@ -60,6 +62,7 @@ export const ConversationFolderTab = ({
   unreadConversations = [],
   dataUieName,
 }: ConversationFolderTabProps) => {
+  const {translate} = useApplicationContext();
   const {status: sidebarStatus} = useSidebarStore();
   const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderStore();
   const {conversationLabelRepository} = conversationRepository;
@@ -80,13 +83,13 @@ export const ConversationFolderTab = ({
   const placeholder = useMemo(
     () => (
       <div className="conversations-sidebar-folders--empty">
-        {t('conversationFoldersEmptyText')}
+        {translate('conversationFoldersEmptyText')}
         <a href={Config.getConfig().URL.SUPPORT.FOLDERS} target="_blank" rel="noreferrer">
-          {t('conversationFoldersEmptyTextLearnMore')}
+          {translate('conversationFoldersEmptyTextLearnMore')}
         </a>
       </div>
     ),
-    [],
+    [translate],
   );
 
   function openFoldersContextMenu(event: React.MouseEvent<HTMLButtonElement>) {
@@ -101,7 +104,7 @@ export const ConversationFolderTab = ({
 
     const boundingRect = event.currentTarget.getBoundingClientRect();
 
-    event.clientX = boundingRect.right + 4;
+    event.clientX = boundingRect.right + CONTEXT_MENU_OFFSET_PIXELS;
     event.clientY = boundingRect.top;
 
     showContextMenu({event, entries, identifier: 'navigation-folders-menu', placeholder});

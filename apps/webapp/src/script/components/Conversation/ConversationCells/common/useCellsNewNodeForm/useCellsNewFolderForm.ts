@@ -21,6 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
+import {CellsNewNodeFormValidationCopy} from './cellsNodeFormUtils';
 import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
@@ -31,6 +32,7 @@ interface UseCellsNewFolderFormProps {
   onSuccess: () => void;
   currentPath: string;
   isOpen: boolean;
+  validationCopy: CellsNewNodeFormValidationCopy;
 }
 
 export const useCellsNewFolderForm = ({
@@ -39,6 +41,7 @@ export const useCellsNewFolderForm = ({
   onSuccess,
   currentPath,
   isOpen,
+  validationCopy,
 }: UseCellsNewFolderFormProps) => {
   const createFolder = async (name: string) => {
     const path = getCellsApiPath({conversationQualifiedId, currentPath});
@@ -46,5 +49,5 @@ export const useCellsNewFolderForm = ({
     onSuccess();
   };
 
-  return useCellsNewNodeFormBase({createNode: createFolder, isOpen});
+  return useCellsNewNodeFormBase({createNode: createFolder, isOpen, validationCopy});
 };

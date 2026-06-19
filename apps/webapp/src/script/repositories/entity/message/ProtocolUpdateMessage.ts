@@ -20,12 +20,16 @@
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import type {Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
 export class ProtocolUpdateMessage extends SystemMessage {
-  constructor(public protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS) {
-    super();
+  constructor(
+    public protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS,
+    translate: Translate,
+  ) {
+    super(translate);
     this.system_message_type = SystemMessageType.CONVERSATION_PROTOCOL_UPDATE;
   }
 }

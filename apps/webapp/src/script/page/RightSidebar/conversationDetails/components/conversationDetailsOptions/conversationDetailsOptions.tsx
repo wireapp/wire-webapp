@@ -33,8 +33,8 @@ import {isGroupMLSConversation} from 'Repositories/conversation/ConversationSele
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
@@ -76,6 +76,7 @@ const ConversationDetailsOptions = ({
   updateConversationReceiptMode,
   isChannelPublic,
 }: ConversationDetailsOptionsProps) => {
+  const {translate} = useApplicationContext();
   const {
     isMutable,
     receiptMode,
@@ -118,6 +119,7 @@ const ConversationDetailsOptions = ({
     isServiceMode,
     isTeam,
     isParticipantBlocked,
+    translate,
   });
 
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
@@ -155,7 +157,9 @@ const ConversationDetailsOptions = ({
 
   return (
     <div className="conversation-details__options">
-      {isGroupOrChannel && <h3 className="conversation-details__list-head">{t('conversationDetailsOptions')}</h3>}
+      {isGroupOrChannel && (
+        <h3 className="conversation-details__list-head">{translate('conversationDetailsOptions')}</h3>
+      )}
 
       <ul>
         {showChannelOptions && (
@@ -165,10 +169,12 @@ const ConversationDetailsOptions = ({
               onClick={openAccessPanel}
               dataUieName="go-access"
               icon={isChannelPublic ? <UnlockedIcon /> : <LockClosedIcon width={14} height={14} />}
-              title={t('conversationAccessTitle')}
+              title={translate('conversationAccessTitle')}
               statusUieName="status-access"
               statusText={
-                isChannelPublic ? t('createConversationAccessOptionPublic') : t('createConversationAccessOptionPrivate')
+                isChannelPublic
+                  ? translate('createConversationAccessOptionPublic')
+                  : translate('createConversationAccessOptionPrivate')
               }
             />
 
@@ -178,9 +184,9 @@ const ConversationDetailsOptions = ({
                 onClick={openConversationHistoryPanel}
                 dataUieName="go-conversation-history"
                 icon={<HistoryIcon />}
-                title={t('conversationHistoryTitle')}
+                title={translate('conversationHistoryTitle')}
                 statusUieName="status-conversation-history"
-                statusText={t('conversationHistoryOptionDay')}
+                statusText={translate('conversationHistoryOptionDay')}
               />
             )}
           </>
@@ -192,7 +198,7 @@ const ConversationDetailsOptions = ({
             onClick={openNotificationsPanel}
             dataUieName="go-notifications"
             icon={<Icon.NotificationIcon />}
-            title={t('conversationDetailsActionNotifications')}
+            title={translate('conversationDetailsActionNotifications')}
             statusUieName="status-notifications"
             statusText={notificationStatusText}
           />
@@ -203,9 +209,9 @@ const ConversationDetailsOptions = ({
             className="conversation-details__cells-info"
             dataUieName="cells-info"
             icon={<CollectionIcon />}
-            title={t('conversationDetailsActionCellsTitle')}
+            title={translate('conversationDetailsActionCellsTitle')}
             statusUieName="status-cells-info"
-            statusText={t('conversationDetailsActionCellsOption')}
+            statusText={translate('conversationDetailsActionCellsOption')}
             disabled
           />
         )}
@@ -218,8 +224,8 @@ const ConversationDetailsOptions = ({
             icon={<Icon.TimerIcon />}
             title={
               isCellsConversation
-                ? t('conversationDetailsActionTimedMessagesDisabled')
-                : t('conversationDetailsActionTimedMessages')
+                ? translate('conversationDetailsActionTimedMessagesDisabled')
+                : translate('conversationDetailsActionTimedMessages')
             }
             statusUieName="status-timed-messages"
             statusText={timedMessagesText}
@@ -233,7 +239,7 @@ const ConversationDetailsOptions = ({
             onClick={canEditGuests ? openGuestPanel : undefined}
             dataUieName="go-guest-options"
             icon={<Icon.GuestIcon />}
-            title={t('conversationDetailsActionGuestOptions')}
+            title={translate('conversationDetailsActionGuestOptions')}
             statusUieName="status-allow-guests"
             statusText={guestOptionsText}
             disabled={!canEditGuests}
@@ -246,7 +252,7 @@ const ConversationDetailsOptions = ({
             onClick={canEditGuests ? openServicePanel : undefined}
             dataUieName="go-services-options"
             icon={<Icon.ServiceIcon className="service-icon" />}
-            title={t('conversationDetailsActionServicesOptions')}
+            title={translate('conversationDetailsActionServicesOptions')}
             statusUieName="status-allow-services"
             statusText={servicesOptionsText}
             disabled={!canEditGuests}
@@ -286,12 +292,12 @@ const ConversationDetailsOptions = ({
                 <span>
                   <p className="panel__action-item__status-title">
                     {hasReceiptsEnabled
-                      ? t('conversationDetails1to1ReceiptsHeadEnabled')
-                      : t('conversationDetails1to1ReceiptsHeadDisabled')}
+                      ? translate('conversationDetails1to1ReceiptsHeadEnabled')
+                      : translate('conversationDetails1to1ReceiptsHeadDisabled')}
                   </p>
-                  <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsFirst')}</p>
+                  <p className="panel__action-item__status">{translate('conversationDetails1to1ReceiptsFirst')}</p>
                   <p className="panel__action-item__status">
-                    {replaceReactComponents(t('conversationDetails1to1ReceiptsSecond'), [
+                    {replaceReactComponents(translate('conversationDetails1to1ReceiptsSecond'), [
                       {
                         start: '[button]',
                         end: '[/button]',

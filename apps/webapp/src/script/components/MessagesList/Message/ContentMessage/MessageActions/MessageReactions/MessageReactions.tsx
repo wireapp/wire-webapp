@@ -21,7 +21,7 @@ import {useState, RefObject, FC, useRef} from 'react';
 
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {EmojiChar} from './EmojiChar';
 import {reactionImgSize} from './EmojiChar.styles';
@@ -35,6 +35,7 @@ const likeEmoji = '❤️';
 const INITIAL_CLIENT_X_POS = 0;
 const INITIAL_CLIENT_Y_POS = 0;
 export interface MessageReactionsProps {
+  translate: Translate;
   messageFocusedTabIndex: number;
   currentMsgActionName: string;
   toggleActiveMenu: (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => void;
@@ -46,6 +47,7 @@ export interface MessageReactionsProps {
 }
 
 const MessageReactions: FC<MessageReactionsProps> = ({
+  translate,
   messageFocusedTabIndex,
   currentMsgActionName,
   handleCurrentMsgAction,
@@ -160,7 +162,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...getIconCSS,
           ...getActionsMenuCSS(isThumbUpAction),
         }}
-        aria-label={t('accessibility.messageActionsMenuThumbsUp')}
+        aria-label={translate('accessibility.messageActionsMenuThumbsUp')}
         data-uie-name={MessageActionsId.THUMBSUP}
         aria-pressed={isThumbUpAction}
         type="button"
@@ -176,7 +178,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...getIconCSS,
           ...getActionsMenuCSS(isLikeAction),
         }}
-        aria-label={t('accessibility.messageActionsMenuLike')}
+        aria-label={translate('accessibility.messageActionsMenuLike')}
         data-uie-name={MessageActionsId.HEART}
         aria-pressed={isLikeAction}
         type="button"
@@ -192,7 +194,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...getIconCSS,
           ...getActionsMenuCSS(currentMsgActionName === MessageActionsId.EMOJI),
         }}
-        aria-label={t('accessibility.messageActionsMenuEmoji')}
+        aria-label={translate('accessibility.messageActionsMenuEmoji')}
         data-uie-name={MessageActionsId.EMOJI}
         type="button"
         tabIndex={messageFocusedTabIndex}
@@ -219,6 +221,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
       </button>
       {showEmojis ? (
         <EmojiPicker
+          translate={translate}
           posX={clientX}
           posY={clientY}
           onKeyPress={handleEmojiSelectionWithKeyboard}

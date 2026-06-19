@@ -23,7 +23,8 @@ import * as Icon from 'Components/icon';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/ProtocolUpdateMessage';
 import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import {Config} from 'src/script/Config';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
+import {type Translate, replaceLink} from 'Util/localizerUtil';
 
 import {SystemMessageBase} from '../SystemMessage/SystemMessageBase';
 
@@ -31,23 +32,24 @@ interface ProtocolUpdateMessageProps {
   message: ProtocolUpdateMessageEntity;
 }
 
-const createSystemMessage = (caption: string) => {
-  const message = new SystemMessage();
+const createSystemMessage = (caption: string, translate: Translate) => {
+  const message = new SystemMessage(translate);
   message.caption = caption;
   return message;
 };
 
 export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => {
+  const {translate} = useApplicationContext();
   if (message.protocol === CONVERSATION_PROTOCOL.MIXED) {
     const captions = [
-      t(
+      translate(
         'conversationProtocolUpdatedToMixedPart1',
         undefined,
         replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
       ),
-      t('conversationProtocolUpdatedToMixedPart2'),
+      translate('conversationProtocolUpdatedToMixedPart2'),
     ];
-    const messages = captions.map(createSystemMessage);
+    const messages = captions.map(caption => createSystemMessage(caption, translate));
     return (
       <>
         {messages.map(message => (
@@ -58,7 +60,12 @@ export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => 
   }
 
   const migratedToMLSMessage = createSystemMessage(
-    t('conversationProtocolUpdatedToMLS', undefined, replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE)),
+    translate(
+      'conversationProtocolUpdatedToMLS',
+      undefined,
+      replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
+    ),
+    translate,
   );
   return <SystemMessageBase message={migratedToMLSMessage} icon={<Icon.InfoIcon />} />;
 };

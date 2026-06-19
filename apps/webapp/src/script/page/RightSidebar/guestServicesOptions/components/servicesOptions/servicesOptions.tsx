@@ -23,9 +23,9 @@ import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {ACCESS_TYPES} from 'Repositories/conversation/ConversationAccessPermission';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
-import {t} from 'Util/localizerUtil';
 
 import {serviceOptionContainer} from './serviceOptions.styles';
 
@@ -42,6 +42,7 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
   isToggleDisabled = false,
   teamState,
 }) => {
+  const {translate} = useApplicationContext();
   const {hasService, isServicesRoom, isGuestAndServicesRoom} = useKoSubscribableChildren(activeConversation, [
     'hasService',
     'isServicesRoom',
@@ -60,7 +61,7 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
   const displayAppsToggle = isAppsFeatureEnabled || isServicesEnabled;
 
   const toggleServicesAccessState = () => {
-    toggleAccessState(ACCESS_TYPES.SERVICE, t('modalConversationRemoveServicesMessage'), hasService);
+    toggleAccessState(ACCESS_TYPES.SERVICE, translate('modalConversationRemoveServicesMessage'), hasService);
   };
 
   return (
@@ -70,14 +71,14 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
           isChecked={isServicesEnabled}
           setIsChecked={toggleServicesAccessState}
           isDisabled={isToggleDisabled}
-          infoText={t('servicesRoomToggleInfo')}
-          toggleName={t('servicesOptionsTitle')}
+          infoText={translate('servicesRoomToggleInfo')}
+          toggleName={translate('servicesOptionsTitle')}
           toggleId="services"
         />
       ) : (
         <>
-          <h4>{t('servicesNotEnabledNoteTitle')}</h4>
-          <p>{t('servicesNotEnabledBody')}</p>
+          <h4>{translate('servicesNotEnabledNoteTitle')}</h4>
+          <p>{translate('servicesNotEnabledBody')}</p>
         </>
       )}
     </div>

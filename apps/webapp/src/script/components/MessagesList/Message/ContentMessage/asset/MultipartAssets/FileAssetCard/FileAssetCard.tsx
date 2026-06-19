@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {FileAssetSmall} from './FileAssetSmall/FileAssetSmall';
 import {FileAssetWithPreview} from './FileAssetWithPreview/FileAssetWithPreview';
@@ -51,7 +51,8 @@ export const FileAssetCard = ({
   timestamp,
   id,
 }: FileAssetCardProps) => {
-  const formattedName = isError ? t('cells.unavailableFile') : name;
+  const {translate} = useApplicationContext();
+  const formattedName = isError ? translate('cells.unavailableFile') : name;
 
   if (variant === 'large') {
     return (

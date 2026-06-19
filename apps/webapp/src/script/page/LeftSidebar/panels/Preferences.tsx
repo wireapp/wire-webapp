@@ -33,7 +33,7 @@ import {
   PreferenceNotificationRepository,
 } from 'Repositories/notification/PreferenceNotificationRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {ListWrapper} from './ListWrapper';
 
@@ -54,7 +54,11 @@ interface PreferencesItemProps {
   uieName: string;
 }
 
-const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
+const showNotification = (
+  type: string,
+  aggregatedNotifications: Notification[],
+  translate: ReturnType<typeof useApplicationContext>['translate'],
+) => {
   switch (type) {
     case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
       PrimaryModal.show(
@@ -69,6 +73,7 @@ const showNotification = (type: string, aggregatedNotifications: Notification[])
           },
         },
         undefined,
+        translate,
       );
       break;
     }
@@ -81,6 +86,7 @@ const showNotification = (type: string, aggregatedNotifications: Notification[])
           preventClose: true,
         },
         undefined,
+        translate,
       );
       break;
     }
@@ -117,20 +123,21 @@ const Preferences = ({
   onPreferenceItemClick,
   onClose,
 }: PreferencesProps) => {
+  const {translate} = useApplicationContext();
   const contentState = useAppState(state => state.contentState);
 
   useEffect(() => {
     // Update local team
-    teamRepository.getTeam();
+    void teamRepository.getTeam();
   }, [teamRepository]);
 
   useEffect(() => {
     if (NEW_DEVICE_NOTIFICATION_STATES.includes(contentState)) {
-      preferenceNotificationRepository
+      void preferenceNotificationRepository
         .getNotifications()
-        .forEach(({type, notification}) => showNotification(type, notification));
+        .forEach(({type, notification}) => showNotification(type, notification, translate));
     }
-  }, [contentState, preferenceNotificationRepository]);
+  }, [contentState, preferenceNotificationRepository, translate]);
 
   const supportsCalling = Runtime.isSupportingLegacyCalling();
 
@@ -138,32 +145,32 @@ const Preferences = ({
     {
       IconComponent: Icon.ProfileIcon,
       id: ContentState.PREFERENCES_ACCOUNT,
-      label: t('preferencesAccount'),
+      label: translate('preferencesAccount'),
       uieName: 'go-account',
     },
     {
       IconComponent: Icon.DevicesIcon,
       id: ContentState.PREFERENCES_DEVICES,
-      label: t('preferencesDevices'),
+      label: translate('preferencesDevices'),
       uieName: 'go-devices',
     },
     {
       IconComponent: Icon.OptionsIcon,
       id: ContentState.PREFERENCES_OPTIONS,
-      label: t('preferencesOptions'),
+      label: translate('preferencesOptions'),
       uieName: 'go-options',
     },
     {
       IconComponent: Icon.AvIcon,
       hidden: !supportsCalling,
       id: ContentState.PREFERENCES_AV,
-      label: t('preferencesAV'),
+      label: translate('preferencesAV'),
       uieName: 'go-audio-video',
     },
     {
       IconComponent: Icon.AboutIcon,
       id: ContentState.PREFERENCES_ABOUT,
-      label: t('preferencesAbout'),
+      label: translate('preferencesAbout'),
       uieName: 'go-about',
     },
   ];
@@ -171,13 +178,13 @@ const Preferences = ({
   return (
     <ListWrapper
       id="preferences"
-      header={t('preferencesHeadline')}
+      header={translate('preferencesHeadline')}
       headerUieName="preferences-header-title"
       onClose={onClose}
     >
       <ul
         role="tablist"
-        aria-label={t('tooltipPreferencesTabs')}
+        aria-label={translate('tooltipPreferencesTabs')}
         className="left-list-items no-scroll preferences-list-items"
       >
         {preferencesItems

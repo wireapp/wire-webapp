@@ -20,10 +20,10 @@
 import {FC} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {UserDevices, UserDevicesState} from 'Components/UserDevices';
+import {UserDevices, UserDevicesState} from 'Components/userDevices';
 import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import type {User} from 'Repositories/entity/User';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../panelHeader';
@@ -37,11 +37,12 @@ interface ParticipantDevicesProps {
 }
 
 const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose, onGoBack, groupId, user}) => {
+  const {translate} = useApplicationContext();
   const history = useUserDevicesHistory();
 
   return (
     <div id="participant-devices" className="panel__page participant-devices">
-      <h2 className="visually-hidden">{t('conversationDetailsActionDevices')}</h2>
+      <h2 className="visually-hidden">{translate('conversationDetailsActionDevices')}</h2>
 
       <PanelHeader
         onGoBack={() => {
@@ -53,7 +54,7 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
         }}
         onClose={onClose}
         title={history.current.headline}
-        goBackTitle={t('groupParticipantActionDevicesGoBack')}
+        goBackTitle={translate('groupParticipantActionDevicesGoBack')}
         goBackUie="go-back-participant-devices"
       />
 

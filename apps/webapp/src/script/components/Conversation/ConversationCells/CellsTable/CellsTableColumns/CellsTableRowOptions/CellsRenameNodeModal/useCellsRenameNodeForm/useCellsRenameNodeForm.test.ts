@@ -25,11 +25,12 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellsRenameForm} from './useCellsRenameNodeForm';
 
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
-
 describe('useCellsRenameForm', () => {
+  const renameNodeCopy = {
+    error: 'cells.renameNodeModal.error',
+    invalidCharacters: 'cells.renameNodeModal.invalidCharacters',
+    nameRequired: 'cells.renameNodeModal.nameRequired',
+  };
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
 
@@ -61,7 +62,9 @@ describe('useCellsRenameForm', () => {
 
   it('trims the base name and avoids trailing dots for folders', async () => {
     const node = createNode();
-    const {result} = renderHook(() => useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess}));
+    const {result} = renderHook(() =>
+      useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy}),
+    );
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: 'New Folder '}} as ChangeEvent<HTMLInputElement>);
@@ -80,7 +83,9 @@ describe('useCellsRenameForm', () => {
 
   it('keeps the original extension when renaming files', async () => {
     const node = createNode({name: 'Report.txt', path: '/Report.txt', type: CellNodeType.FILE, extension: 'txt'});
-    const {result} = renderHook(() => useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess}));
+    const {result} = renderHook(() =>
+      useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy}),
+    );
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: 'Final Report '}} as ChangeEvent<HTMLInputElement>);
@@ -98,7 +103,9 @@ describe('useCellsRenameForm', () => {
 
   it('disables saving when the trimmed name matches the original', () => {
     const node = createNode({name: 'Folder'});
-    const {result} = renderHook(() => useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess}));
+    const {result} = renderHook(() =>
+      useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy}),
+    );
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: 'Folder '}} as ChangeEvent<HTMLInputElement>);
@@ -109,7 +116,9 @@ describe('useCellsRenameForm', () => {
 
   it('shows error when name contains invalid character "/"', async () => {
     const node = createNode();
-    const {result} = renderHook(() => useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess}));
+    const {result} = renderHook(() =>
+      useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy}),
+    );
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: 'New/Folder'}} as ChangeEvent<HTMLInputElement>);
@@ -119,14 +128,16 @@ describe('useCellsRenameForm', () => {
       await result.current.handleRename(createEvent());
     });
 
-    expect(result.current.error).toBe('cells.renameNodeModal.invalidCharacters');
+    expect(result.current.error).toBe(renameNodeCopy.invalidCharacters);
     expect(mockCellsRepository.renameNode).not.toHaveBeenCalled();
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
   it('shows error when name contains invalid character "."', async () => {
     const node = createNode();
-    const {result} = renderHook(() => useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess}));
+    const {result} = renderHook(() =>
+      useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy}),
+    );
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: 'New.Folder'}} as ChangeEvent<HTMLInputElement>);
@@ -136,14 +147,16 @@ describe('useCellsRenameForm', () => {
       await result.current.handleRename(createEvent());
     });
 
-    expect(result.current.error).toBe('cells.renameNodeModal.invalidCharacters');
+    expect(result.current.error).toBe(renameNodeCopy.invalidCharacters);
     expect(mockCellsRepository.renameNode).not.toHaveBeenCalled();
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
   it('does not call rename when name is empty after trimming', async () => {
     const node = createNode();
-    const {result} = renderHook(() => useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess}));
+    const {result} = renderHook(() =>
+      useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy}),
+    );
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: '   '}} as ChangeEvent<HTMLInputElement>);
@@ -162,7 +175,9 @@ describe('useCellsRenameForm', () => {
   it('shows error when renameNode fails', async () => {
     mockCellsRepository.renameNode.mockRejectedValueOnce(new Error('Network error'));
     const node = createNode();
-    const {result} = renderHook(() => useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess}));
+    const {result} = renderHook(() =>
+      useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy}),
+    );
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: 'New Folder'}} as ChangeEvent<HTMLInputElement>);
@@ -172,14 +187,16 @@ describe('useCellsRenameForm', () => {
       await result.current.handleRename(createEvent());
     });
 
-    expect(result.current.error).toBe('cells.renameNodeModal.error');
+    expect(result.current.error).toBe(renameNodeCopy.error);
     expect(mockCellsRepository.renameNode).toHaveBeenCalled();
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
   it('clears name and error when handleClearName is called', () => {
     const node = createNode();
-    const {result} = renderHook(() => useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess}));
+    const {result} = renderHook(() =>
+      useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy}),
+    );
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: 'New Folder'}} as ChangeEvent<HTMLInputElement>);
@@ -197,7 +214,9 @@ describe('useCellsRenameForm', () => {
 
   it('does not attempt rename when form is disabled', async () => {
     const node = createNode();
-    const {result} = renderHook(() => useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess}));
+    const {result} = renderHook(() =>
+      useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy}),
+    );
 
     await act(async () => {
       await result.current.handleRename(createEvent());
@@ -209,7 +228,9 @@ describe('useCellsRenameForm', () => {
 
   it('disables form when name is empty', () => {
     const node = createNode();
-    const {result} = renderHook(() => useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess}));
+    const {result} = renderHook(() =>
+      useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy}),
+    );
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: ''}} as ChangeEvent<HTMLInputElement>);

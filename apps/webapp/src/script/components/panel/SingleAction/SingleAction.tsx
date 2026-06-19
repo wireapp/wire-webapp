@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {singleActionButtonStyle} from './SingleAction.styles';
 
@@ -37,6 +37,7 @@ interface SingleActionProps {
 }
 
 const SingleAction = ({item, onCancel, oneButtonPerRow = false}: SingleActionProps) => {
+  const {translate} = useApplicationContext();
   return (
     <FlexBox
       css={{
@@ -54,7 +55,7 @@ const SingleAction = ({item, onCancel, oneButtonPerRow = false}: SingleActionPro
         data-uie-name="do-close"
         css={singleActionButtonStyle(oneButtonPerRow)}
       >
-        {t('modalConfirmSecondary')}
+        {translate('modalConfirmSecondary')}
       </Button>
       <Button onClick={item.click} data-uie-name={item.identifier} css={singleActionButtonStyle(oneButtonPerRow)}>
         {item.label}

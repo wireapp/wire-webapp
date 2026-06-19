@@ -43,7 +43,7 @@ import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClip
 import * as Icon from 'Components/icon';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {type RootContextValue} from 'src/script/page/RootProvider';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 
@@ -106,6 +106,7 @@ interface CellsShareModalContentLabels {
 }
 
 interface CellsShareModalContentProps {
+  translate: RootContextValue['translate'];
   publicLinkDescription: string;
   labels?: Partial<CellsShareModalContentLabels>;
   publicLink: {
@@ -149,33 +150,34 @@ const DEFAULT_SWITCH_COLORS: SwitchColorProps = {
   disabledColorDark: COLOR_V2.GRAY_60,
 };
 
-const getDefaultLabels = (): CellsShareModalContentLabels => ({
-  enablePublicLink: t('cells.shareModal.enablePublicLink'),
-  password: t('cells.shareModal.password'),
-  passwordDescription: t('cells.shareModal.password.description'),
-  changePassword: t('cells.shareModal.changePassword'),
-  expiration: t('cells.shareModal.expiration'),
-  expirationDescription: t('cells.shareModal.expiration.description'),
-  expirationExpiresLabel: t('cells.shareModal.expiration.expiresLabel'),
-  expirationDateAriaLabel: t('cells.shareModal.expiration.dateAriaLabel'),
-  expirationTimeAriaLabel: t('cells.shareModal.expiration.timeAriaLabel'),
-  expirationOpenCalendarLabel: t('cells.shareModal.expiration.openCalendarLabel'),
-  expirationPreviousMonthLabel: t('cells.shareModal.expiration.previousMonthLabel'),
-  expirationNextMonthLabel: t('cells.shareModal.expiration.nextMonthLabel'),
-  expirationPastDateError: t('cells.shareModal.expiration.error.pastDate'),
-  generatedPublicLink: t('cells.shareModal.generatedPublicLink'),
-  copyLink: t('cells.shareModal.copyLink'),
-  linkCopied: t('cells.shareModal.linkCopied'),
-  errorLoadingLink: t('cells.shareModal.error.loadingLink'),
-  passwordInputLabel: t('modalGuestLinkJoinLabel'),
-  passwordInputPlaceholder: t('modalGuestLinkJoinPlaceholder'),
-  passwordCopy: t('conversationContextMenuCopy'),
-  passwordCopied: t('guestOptionsPasswordCopyToClipboardSuccess'),
-  showTogglePasswordLabel: t('showTogglePasswordLabel'),
-  hideTogglePasswordLabel: t('hideTogglePasswordLabel'),
+const getDefaultLabels = (translate: RootContextValue['translate']): CellsShareModalContentLabels => ({
+  enablePublicLink: translate('cells.shareModal.enablePublicLink'),
+  password: translate('cells.shareModal.password'),
+  passwordDescription: translate('cells.shareModal.password.description'),
+  changePassword: translate('cells.shareModal.changePassword'),
+  expiration: translate('cells.shareModal.expiration'),
+  expirationDescription: translate('cells.shareModal.expiration.description'),
+  expirationExpiresLabel: translate('cells.shareModal.expiration.expiresLabel'),
+  expirationDateAriaLabel: translate('cells.shareModal.expiration.dateAriaLabel'),
+  expirationTimeAriaLabel: translate('cells.shareModal.expiration.timeAriaLabel'),
+  expirationOpenCalendarLabel: translate('cells.shareModal.expiration.openCalendarLabel'),
+  expirationPreviousMonthLabel: translate('cells.shareModal.expiration.previousMonthLabel'),
+  expirationNextMonthLabel: translate('cells.shareModal.expiration.nextMonthLabel'),
+  expirationPastDateError: translate('cells.shareModal.expiration.error.pastDate'),
+  generatedPublicLink: translate('cells.shareModal.generatedPublicLink'),
+  copyLink: translate('cells.shareModal.copyLink'),
+  linkCopied: translate('cells.shareModal.linkCopied'),
+  errorLoadingLink: translate('cells.shareModal.error.loadingLink'),
+  passwordInputLabel: translate('modalGuestLinkJoinLabel'),
+  passwordInputPlaceholder: translate('modalGuestLinkJoinPlaceholder'),
+  passwordCopy: translate('conversationContextMenuCopy'),
+  passwordCopied: translate('guestOptionsPasswordCopyToClipboardSuccess'),
+  showTogglePasswordLabel: translate('showTogglePasswordLabel'),
+  hideTogglePasswordLabel: translate('hideTogglePasswordLabel'),
 });
 
 export const CellsShareModalContent = ({
+  translate,
   publicLinkDescription,
   labels,
   publicLink,
@@ -185,7 +187,7 @@ export const CellsShareModalContent = ({
   styles,
   switchColors,
 }: CellsShareModalContentProps) => {
-  const resolvedLabels = {...getDefaultLabels(), ...labels};
+  const resolvedLabels = {...getDefaultLabels(translate), ...labels};
   const hasPublicLink = is.nonEmptyString(publicLink.link);
   const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && hasPublicLink;
   const areDependentTogglesDisabled = publicLink.isEnabled !== true;

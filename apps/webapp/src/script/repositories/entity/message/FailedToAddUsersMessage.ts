@@ -19,6 +19,8 @@
 
 import {AddUsersFailure} from '@wireapp/core/lib/conversation';
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {Message} from './Message';
 
 import {SuperType} from '../../../message/SuperType';
@@ -27,8 +29,9 @@ export class FailedToAddUsersMessage extends Message {
   constructor(
     public readonly failures: AddUsersFailure[],
     time: number,
+    translate: Translate,
   ) {
-    super();
+    super(undefined, undefined, translate);
     this.super_type = SuperType.FAILED_TO_ADD_USERS;
     this.timestamp(time);
   }

@@ -19,6 +19,8 @@
 
 import {REASON as AVS_REASON} from '@wireapp/avs';
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {Message} from './Message';
 
 import {SuperType} from '../../../message/SuperType';
@@ -27,8 +29,9 @@ export class CallingTimeoutMessage extends Message {
   constructor(
     public reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT,
     time: number,
+    translate: Translate,
   ) {
-    super();
+    super(undefined, undefined, translate);
     this.super_type = SuperType.CALL_TIME_OUT;
     this.timestamp(time);
   }

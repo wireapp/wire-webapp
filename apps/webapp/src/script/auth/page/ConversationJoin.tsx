@@ -28,7 +28,7 @@ import {Navigate} from 'react-router-dom';
 import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isBackendError} from 'Util/typePredicateUtil';
 import {noop} from 'Util/util';
 
@@ -73,6 +73,7 @@ const ConversationJoinComponent = ({
   generalError,
   doGetAllClients,
 }: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const nameInput = useRef<HTMLInputElement>(null);
 
   const conversationHasPassword = conversationInfo?.has_password;
@@ -104,7 +105,7 @@ const ConversationJoinComponent = ({
     setConversationKey(localConversationKey);
     setExpiresIn(localExpiresIn);
     setIsValidLink(true);
-    doInit({isImmediateLogin: false, shouldValidateLocalClient: true})
+    void doInit({isImmediateLogin: false, shouldValidateLocalClient: true})
       .catch(noop)
       .then(async () => {
         if (localConversationCode && localConversationKey) {
@@ -119,7 +120,7 @@ const ConversationJoinComponent = ({
         }
         setIsValidLink(false);
       });
-  }, []);
+  }, [doCheckConversationCode, doGetAllClients, doGetConversationInfoByCode, doInit]);
 
   const routeToApp = (conversation: string = '', domain: string = '') => {
     const conversationPath = is.nonEmptyString(conversation)
@@ -272,11 +273,11 @@ const ConversationJoinComponent = ({
         <AppAlreadyOpen />
         <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', marginBottom: '2rem'}}>
           <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
-            {t('conversationJoin.mainHeadline')}
+            {translate('conversationJoin.mainHeadline')}
           </H1>
           {!isWirePublicInstance && (
             <Muted data-uie-name="status-join-subhead">
-              {t('conversationJoin.headline', {domain: window.location.hostname})}
+              {translate('conversationJoin.headline', {domain: window.location.hostname})}
             </Muted>
           )}
         </div>

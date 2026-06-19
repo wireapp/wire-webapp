@@ -23,7 +23,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {UserState} from 'Repositories/user/userState';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {createConversationHeaderContainerCss} from './CreateConversation.styles';
 import {CreateConversationSubmit} from './CreateConversationSubmit';
@@ -31,6 +31,7 @@ import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {ConversationType, ConversationCreationStep} from './types';
 
 export const CreateConversationHeader = () => {
+  const {translate} = useApplicationContext();
   const {
     error,
     gotoNextStep,
@@ -83,14 +84,14 @@ export const CreateConversationHeader = () => {
         className="button-reset-default"
         type="button"
         onClick={onModalClose}
-        aria-label={t('accessibility.groupCreationActionCloseModal')}
+        aria-label={translate('accessibility.groupCreationActionCloseModal')}
         data-uie-name="do-close"
       >
         <Icon.CloseIcon aria-hidden="true" className="modal__header__button" />
       </button>
 
       <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
-        {t('createConversationModalHeader')}
+        {translate('createConversationModalHeader')}
       </h2>
 
       <div css={{display: 'flex', gap: '8px'}}>
@@ -104,7 +105,7 @@ export const CreateConversationHeader = () => {
             data-uie-name="go-to-previous-step"
             variant={ButtonVariant.TERTIARY}
           >
-            {t('createConversationModalHeaderBack')}
+            {translate('createConversationModalHeaderBack')}
           </Button>
         )}
 
@@ -117,11 +118,11 @@ export const CreateConversationHeader = () => {
             disabled={isNextButtonDisabled}
             type="button"
             onClick={onNextClick}
-            aria-label={t('groupCreationPreferencesAction')}
+            aria-label={translate('groupCreationPreferencesAction')}
             data-uie-name="go-next"
             variant={ButtonVariant.TERTIARY}
           >
-            {t('createConversationModalHeaderNext')}
+            {translate('createConversationModalHeaderNext')}
           </Button>
         )}
       </div>

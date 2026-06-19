@@ -28,6 +28,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {useGetMultipartAsset} from './useGetMultipartAsset';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const mockNode: RestNode = {
   Path: '/path/to/test.pdf',
@@ -56,7 +57,7 @@ const mockRecycledNode: RestNode = {
 describe('useGetMultipartAsset', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker});
+  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker, translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   beforeEach(() => {

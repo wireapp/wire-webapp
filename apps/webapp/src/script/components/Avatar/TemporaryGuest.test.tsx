@@ -24,10 +24,11 @@ import {User} from 'Repositories/entity/User';
 import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
 
 import {AVATAR_SIZE, STATE} from '.';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('TemporaryGuestAvatar', () => {
   it('shows expiration circle', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
@@ -43,7 +44,7 @@ describe('TemporaryGuestAvatar', () => {
   });
 
   it('shows participant initials', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
@@ -59,7 +60,7 @@ describe('TemporaryGuestAvatar', () => {
   });
 
   it('does not show avatar badge in default state', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
@@ -75,7 +76,7 @@ describe('TemporaryGuestAvatar', () => {
   });
 
   it('shows avatar badge for blocked user', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 

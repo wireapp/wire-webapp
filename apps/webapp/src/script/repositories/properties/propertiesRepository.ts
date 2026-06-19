@@ -36,7 +36,7 @@ import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndica
 import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/environment';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {type Translate, replaceLink} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {loadValue} from 'Util/storageUtil';
 
@@ -71,7 +71,11 @@ export class PropertiesRepository {
   private readonly selfUser: ko.Observable<User | undefined>;
   public properties: WebappProperties;
 
-  constructor(propertiesService: PropertiesService, selfService: SelfService) {
+  constructor(
+    propertiesService: PropertiesService,
+    selfService: SelfService,
+    private readonly translate: Translate,
+  ) {
     this.propertiesService = propertiesService;
     this.selfService = selfService;
     this.logger = getLogger('PropertiesRepository');
@@ -154,23 +158,32 @@ export class PropertiesRepository {
       this.publishProperties();
     };
 
-    PrimaryModal.show(PrimaryModalType.CONFIRM, {
-      text: {
-        title: t('dataSharingModalTitle'),
-        htmlMessage: t('dataSharingModalDescription', undefined, replaceLink(Config.getConfig().URL.PRIVACY_POLICY)),
-        closeBtnLabel: t('dataSharingModalCloseBtnTitle'),
+    PrimaryModal.show(
+      PrimaryModalType.CONFIRM,
+      {
+        text: {
+          title: this.translate('dataSharingModalTitle'),
+          htmlMessage: this.translate(
+            'dataSharingModalDescription',
+            undefined,
+            replaceLink(Config.getConfig().URL.PRIVACY_POLICY),
+          ),
+          closeBtnLabel: this.translate('dataSharingModalCloseBtnTitle'),
+        },
+        primaryAction: {
+          text: this.translate('dataSharingModalAgree'),
+          action: () => toggleTelemetrySharing(true),
+          runActionOnEnterClick: true,
+        },
+        secondaryAction: {
+          text: this.translate('dataSharingModalDecline'),
+          action: () => toggleTelemetrySharing(false),
+        },
+        closeOnSecondaryAction: true,
       },
-      primaryAction: {
-        text: t('dataSharingModalAgree'),
-        action: () => toggleTelemetrySharing(true),
-        runActionOnEnterClick: true,
-      },
-      secondaryAction: {
-        text: t('dataSharingModalDecline'),
-        action: () => toggleTelemetrySharing(false),
-      },
-      closeOnSecondaryAction: true,
-    });
+      undefined,
+      this.translate,
+    );
   }
 
   getPreference(propertiesType: string): any {

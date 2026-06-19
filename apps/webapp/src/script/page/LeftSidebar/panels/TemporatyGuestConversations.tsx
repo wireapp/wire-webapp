@@ -21,8 +21,8 @@ import {CallingCell} from 'Components/calling/CallingCell';
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../../Config';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
@@ -35,6 +35,7 @@ type TemporaryGuestConversations = {
 };
 
 const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}: TemporaryGuestConversations) => {
+  const {translate} = useApplicationContext();
   const {expirationIsUrgent, expirationRemainingText} = useKoSubscribableChildren(selfUser, [
     'expirationIsUrgent',
     'expirationRemainingText',
@@ -43,21 +44,26 @@ const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}
   const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   const openPreferences = () => {
-    listViewModel.openPreferencesAccount();
+    void listViewModel.openPreferencesAccount();
   };
 
   const createAccount = (): void => {
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      preventClose: true,
-      primaryAction: {
-        action: () => window.location.replace(`/auth/${location.search}`),
-        text: t('modalAccountCreateAction'),
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        preventClose: true,
+        primaryAction: {
+          action: () => window.location.replace(`/auth/${location.search}`),
+          text: translate('modalAccountCreateAction'),
+        },
+        text: {
+          message: translate('modalAccountCreateMessage'),
+          title: translate('modalAccountCreateHeadline'),
+        },
       },
-      text: {
-        message: t('modalAccountCreateMessage'),
-        title: t('modalAccountCreateHeadline'),
-      },
-    });
+      undefined,
+      translate,
+    );
   };
 
   return (
@@ -82,7 +88,7 @@ const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}
       })}
       <div className="temporary-guest__content">
         <Icon.LogoFullIcon />
-        <div className="temporary-guest__description">{t('temporaryGuestDescription')}</div>
+        <div className="temporary-guest__description">{translate('temporaryGuestDescription')}</div>
         {isAccountCreationEnabled && (
           <button
             type="button"
@@ -90,7 +96,7 @@ const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}
             onClick={createAccount}
             data-uie-name="do-create-account"
           >
-            {t('temporaryGuestCta')}
+            {translate('temporaryGuestCta')}
           </button>
         )}
       </div>
@@ -104,11 +110,11 @@ const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}
           >
             {expirationRemainingText}
           </span>
-          <span>{t('temporaryGuestTimeRemaining')}</span>
+          <span>{translate('temporaryGuestTimeRemaining')}</span>
         </span>
         <button
           type="button"
-          title={t('tooltipConversationsPreferences')}
+          title={translate('tooltipConversationsPreferences')}
           className="temporary-guest__footer__preferences"
           data-uie-name="go-preferences"
           onClick={openPreferences}

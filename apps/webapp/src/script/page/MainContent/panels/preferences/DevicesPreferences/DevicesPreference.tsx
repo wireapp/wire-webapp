@@ -29,8 +29,8 @@ import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {DetailedDevice} from './components/DetailedDevice';
 import {Device} from './components/Device';
@@ -57,6 +57,7 @@ export const DevicesPreferences = ({
   verifyDevice,
   resetSession,
 }: DevicesPreferencesProps) => {
+  const {translate} = useApplicationContext();
   const [selectedDevice, setSelectedDevice] = useState<ClientEntity | undefined>();
   const [localFingerprint, setLocalFingerprint] = useState('');
 
@@ -96,9 +97,9 @@ export const DevicesPreferences = ({
   }
 
   return (
-    <PreferencesPage title={t('preferencesDevices')}>
+    <PreferencesPage title={translate('preferencesDevices')}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
-        <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
+        <legend className="preferences-header">{translate('preferencesDevicesCurrent')}</legend>
         {currentClient && (
           <DetailedDevice
             isCurrentDevice
@@ -113,7 +114,7 @@ export const DevicesPreferences = ({
 
       {devices.length > 0 && (
         <fieldset className="preferences-section">
-          <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
+          <legend className="preferences-header">{translate('preferencesDevicesActive')}</legend>
           {devices.map((device, index) => (
             <Device
               device={device}
@@ -125,7 +126,7 @@ export const DevicesPreferences = ({
               getDeviceIdentity={getDeviceIdentity}
             />
           ))}
-          <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>
+          <p className="preferences-detail">{translate('preferencesDevicesActiveDetail')}</p>
         </fieldset>
       )}
     </PreferencesPage>

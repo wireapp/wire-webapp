@@ -20,7 +20,7 @@
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   bannerHeaderContainerCss,
@@ -31,6 +31,7 @@ import {
 import {useTeamCreationModal} from './useTeamCreationModal';
 
 export const TeamCreationAccountHeader = () => {
+  const {translate} = useApplicationContext();
   const {showModal} = useTeamCreationModal();
 
   return (
@@ -39,13 +40,13 @@ export const TeamCreationAccountHeader = () => {
         <div css={bannerHeaderContainerCss}>
           <Icon.InfoIcon />
           <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
-            {t('teamUpgradeBannerHeader')}
+            {translate('teamUpgradeBannerHeader')}
           </span>
         </div>
-        <div className="subline">{t('teamUpgradeBannerContent')}</div>
+        <div className="subline">{translate('teamUpgradeBannerContent')}</div>
       </div>
       <Button css={teamUpgradeBannerButtonCss} variant={ButtonVariant.SECONDARY} onClick={showModal}>
-        {t('teamUpgradeBannerButtonText')}
+        {translate('teamUpgradeBannerButtonText')}
       </Button>
     </div>
   );

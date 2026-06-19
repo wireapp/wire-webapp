@@ -50,9 +50,6 @@ jest.mock('./FileHistoryContent', () => ({
 jest.mock('Components/FileFullscreenModal/FileLoader/FileLoader', () => ({
   FileLoader: () => <div data-uie-name="file-loader">Loading...</div>,
 }));
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
 
 const mockedUseFileHistoryModal = jest.mocked(useFileHistoryModal);
 const mockedUseFileVersions = jest.mocked(useFileVersions);

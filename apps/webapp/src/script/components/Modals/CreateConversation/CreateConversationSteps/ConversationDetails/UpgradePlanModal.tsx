@@ -21,8 +21,8 @@ import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {
@@ -37,6 +37,7 @@ import {
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 
 export const UpgradePlanModal = () => {
+  const {translate} = useApplicationContext();
   const {isUpgradeTeamModalOpen, setIsUpgradeTeamModalOpen} = useCreateConversationModal();
 
   const onCancel = () => {
@@ -60,10 +61,10 @@ export const UpgradePlanModal = () => {
       <div css={salesModalBodyCss}>
         <div css={salesModalBodyWrapperCss}>
           <p css={salesModalBodyHeaderCss} className="paragraph-body-3">
-            {t('createConversationUpgradePlanModalHeader')}
+            {translate('createConversationUpgradePlanModalHeader')}
           </p>
           <Text block css={salesModalBodyTextCss}>
-            {t('createConversationUpgradePlanModalText')}
+            {translate('createConversationUpgradePlanModalText')}
           </Text>
         </div>
         <Button
@@ -73,7 +74,7 @@ export const UpgradePlanModal = () => {
           data-uie-name="do-submit"
           onKeyDown={event => handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]})}
         >
-          {t('createConversationUpgradePlanModalButton')}
+          {translate('createConversationUpgradePlanModalButton')}
         </Button>
       </div>
     </ModalComponent>

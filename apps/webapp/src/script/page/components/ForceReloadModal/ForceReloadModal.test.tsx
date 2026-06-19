@@ -25,12 +25,13 @@ import {render} from '@testing-library/react';
 import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {createDeterministicWallClock, DeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {RootProvider} from '../../RootProvider';
+import {RootProvider} from 'src/script/page/RootProvider';
 import {createRootContextValueForTest} from '../../testSupport/rootContextTestSupport';
 import {ForceReloadModal} from './ForceReloadModal';
+import {translateForTest} from 'Util/test/translateForTest';
 
 interface ForceReloadModalTestContextValue {
   readonly doesApplicationNeedForceReload: boolean;
@@ -76,6 +77,7 @@ function createForceReloadModalTestElement(contextValue: ForceReloadModalTestCon
   return (
     <RootProvider
       value={createRootContextValueForTest({
+        translate: translateForTest,
         doesApplicationNeedForceReload,
         isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
         mainViewModel: createMainViewModelForTest(),
@@ -199,9 +201,9 @@ describe('ForceReloadModal', () => {
     const currentModalIdentifierBeforeBackgroundClick = currentModalId;
 
     expect(currentModalContent.hideCloseBtn).toBe(true);
-    expect(currentModalContent.messageHtml).toBe(t('forceReloadModalMessage'));
-    expect(currentModalContent.primaryAction?.text).toBe(t('forceReloadModalAction'));
-    expect(currentModalContent.titleText).toBe(t('forceReloadModalTitle'));
+    expect(currentModalContent.messageHtml).toBe(translate('forceReloadModalMessage'));
+    expect(currentModalContent.primaryAction?.text).toBe(translate('forceReloadModalAction'));
+    expect(currentModalContent.titleText).toBe(translate('forceReloadModalTitle'));
 
     currentModalContent.onBgClick();
     expect(usePrimaryModalState.getState().currentModalId).toBe(currentModalIdentifierBeforeBackgroundClick);

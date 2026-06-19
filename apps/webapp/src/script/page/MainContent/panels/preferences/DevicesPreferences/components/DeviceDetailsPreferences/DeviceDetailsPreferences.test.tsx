@@ -28,9 +28,10 @@ import {
 import {createUuid} from 'Util/uuid';
 
 import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('DeviceDetailsPreferences', () => {
-  const rootContextValue = createRootContextValueForTest({});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
   const device = new ClientEntity(true, '', createUuid());
   device.model = 'test';

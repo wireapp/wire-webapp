@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface RestrictedVideoProps {
   isSmall?: boolean;
@@ -28,6 +28,8 @@ interface RestrictedVideoProps {
 }
 
 const RestrictedVideo = ({showMessage = true, isSmall = false, className}: RestrictedVideoProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div
       className={cx('video-asset__restricted', className, {
@@ -38,7 +40,9 @@ const RestrictedVideo = ({showMessage = true, isSmall = false, className}: Restr
         <div className="flex-center" data-uie-name="file-icon">
           <div className="video-asset__restricted__play-button icon-play" />
         </div>
-        {showMessage && <div className="video-asset__restricted--message">{t('conversationVideoAssetRestricted')}</div>}
+        {showMessage && (
+          <div className="video-asset__restricted--message">{translate('conversationVideoAssetRestricted')}</div>
+        )}
       </div>
     </div>
   );

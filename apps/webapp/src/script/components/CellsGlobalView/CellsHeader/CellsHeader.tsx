@@ -20,7 +20,7 @@
 import {CellsFiltersBar} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/CellsFiltersBar';
 import type {FilterConfig} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {CellsFilters} from './CellsFilters/CellsFilters';
 import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './CellsHeader.styles';
@@ -50,10 +50,12 @@ export const CellsHeader = ({
   cellsRepository,
   isSharedDriveSearchAndFiltersEnabled,
 }: CellsHeaderProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <header css={wrapperStyles}>
       <div css={titleRowStyles}>
-        <h2 css={headingStyles}>{t('cells.heading')}</h2>
+        <h2 css={headingStyles}>{translate('cells.heading')}</h2>
         <CellsRefresh onRefresh={onRefresh} />
       </div>
       <div css={contentStyles}>
@@ -64,7 +66,7 @@ export const CellsHeader = ({
           <CellsFilters cellsRepository={cellsRepository} />
         )}
         {searchStatus === 'loading' && <CellsTableLoader />}
-        {searchStatus === 'error' && <p>{t('cells.search.failed')}</p>}
+        {searchStatus === 'error' && <p>{translate('cells.search.failed')}</p>}
       </div>
     </header>
   );

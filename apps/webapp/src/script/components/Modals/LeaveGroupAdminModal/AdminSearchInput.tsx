@@ -24,7 +24,7 @@ import {Option, Select} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import type {User} from 'Repositories/entity/User';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {
   checkboxStyles,
@@ -42,6 +42,7 @@ import {
 } from './styles';
 
 interface AdminSearchInputProps {
+  readonly translate: Translate;
   clearContent: boolean;
   eligibleUsers: User[];
   selectedUser: User | null;
@@ -50,6 +51,7 @@ interface AdminSearchInputProps {
 }
 
 export const AdminSearchInput = ({
+  translate,
   clearContent,
   eligibleUsers,
   selectedUser,
@@ -90,7 +92,7 @@ export const AdminSearchInput = ({
   return (
     <div style={searchSectionStyles}>
       <label style={newAdminLabelStyles} data-uie-name="leave-group-admin-new-admin-label">
-        {t('leaveGroupAdminModalNewAdminLabel')}
+        {translate('leaveGroupAdminModalNewAdminLabel')}
       </label>
 
       <Select
@@ -101,7 +103,7 @@ export const AdminSearchInput = ({
         onChange={option => handleChange(option)}
         formatOptionLabel={formatOptionLabel}
         isSearchable
-        placeholder={t('leaveGroupAdminModalSearchPlaceholder')}
+        placeholder={translate('leaveGroupAdminModalSearchPlaceholder')}
         wrapperCSS={selectWrapperStyles}
         menuPortalTarget={document.body}
         menuPosition="fixed"
@@ -120,7 +122,7 @@ export const AdminSearchInput = ({
             data-uie-name="input-leave-group-clear-content"
           />
           <label htmlFor="leave-group-admin-clear-content-checkbox" style={clearContentLabelStyles}>
-            {t('leaveGroupAdminModalClearContent')}
+            {translate('leaveGroupAdminModalClearContent')}
           </label>
         </div>
       )}

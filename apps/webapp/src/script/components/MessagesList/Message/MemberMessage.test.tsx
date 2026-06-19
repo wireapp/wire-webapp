@@ -22,13 +22,18 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
 import {randomInt} from 'crypto';
 
+import {generateUser} from 'test/helper/UserGenerator';
+
 import en from 'I18n/en-US.json';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {generateUser} from 'test/helper/UserGenerator';
-import {setStrings} from 'Util/localizerUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from 'Util/localizerUtil';
 
 import {MemberMessage} from './MemberMessage';
 import {CONFIG} from './MemberMessage/MessageContent';
@@ -42,12 +47,14 @@ jest.mock('Components/Avatar', () => ({
 
 setStrings({en});
 
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
+
 function createMemberMessage({systemType, type}: {systemType?: SystemMessageType; type?: string}, users?: User[]) {
-  const message = new MemberMessageEntity();
-  if (systemType) {
+  const message = new MemberMessageEntity(translate);
+  if (systemType !== undefined) {
     message.memberMessageType = systemType;
   }
-  if (type) {
+  if (type !== undefined) {
     message.type = type;
   }
   const actor = generateUser();
@@ -84,10 +91,12 @@ describe('MemberMessage', () => {
   it('shows connected message', async () => {
     const props = {
       ...baseProps,
-      message: createMemberMessage({systemType: SystemMessageType.CONNECTION_ACCEPTED}, [new User('id')]),
+      message: createMemberMessage({systemType: SystemMessageType.CONNECTION_ACCEPTED}, [
+        new User('id', '', translate),
+      ]),
     };
 
-    const {getByTestId} = render(withTheme(<MemberMessage {...props} />));
+    const {getByTestId} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
     expect(getByTestId('element-connected-message')).not.toBeNull();
   });
 
@@ -159,7 +168,7 @@ describe('MemberMessage', () => {
       isSelfDeletingMessagesOff: true,
     };
 
-    const {getByText} = render(withTheme(<MemberMessage {...props} />));
+    const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
     expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
   });
 
@@ -171,7 +180,7 @@ describe('MemberMessage', () => {
       isSelfDeletingMessagesOff: false,
     };
 
-    const {queryByText} = render(withTheme(<MemberMessage {...props} />));
+    const {queryByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
     expect(queryByText('Self-deleting messages are off')).not.toBeInTheDocument();
   });
 
@@ -184,7 +193,7 @@ describe('MemberMessage', () => {
       isCellsConversation: true,
     };
 
-    const {getByText} = render(withTheme(<MemberMessage {...props} />));
+    const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
     expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
   });
 
@@ -197,7 +206,7 @@ describe('MemberMessage', () => {
       isCellsConversation: true,
     };
 
-    const {getByText} = render(withTheme(<MemberMessage {...props} />));
+    const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
     // Both banners should be visible
     expect(getByText('Shared Drive is on')).toBeInTheDocument();
     expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
@@ -213,7 +222,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText} = render(withTheme(<MemberMessage {...props} />));
+      const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
       users.forEach(user => {
         expect(getByText(user.name())).not.toBeNull();
       });
@@ -230,9 +239,8 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText, container} = render(withTheme(<MemberMessage {...props} />));
+      const {getByText, container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
 
-      // We expect to see the first 15 users + the user that created the conversation
       expect(container.querySelectorAll('strong')).toHaveLength(CONFIG.REDUCED_USERS_COUNT + 1);
       const showMoreButton = getByText(`${nbUsers - CONFIG.REDUCED_USERS_COUNT} more`);
       showMoreButton.click();
@@ -252,8 +260,8 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText} = render(withTheme(<MemberMessage {...props} />));
-      const showMoreButton = getByText(`all team members`);
+      const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      const showMoreButton = getByText('all team members');
       showMoreButton.click();
 
       expect(props.onClickParticipants).toHaveBeenCalledTimes(1);
@@ -273,8 +281,8 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText} = render(withTheme(<MemberMessage {...props} />));
-      expect(getByText(`all team members and one guest`)).not.toBeNull();
+      const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(getByText('all team members and one guest')).not.toBeNull();
     });
 
     it('displays all team members and multiple guests message', () => {
@@ -297,7 +305,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText} = render(withTheme(<MemberMessage {...props} />));
+      const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
       expect(getByText(`all team members and ${nbGuests} guests`)).not.toBeNull();
     });
 
@@ -312,8 +320,8 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(withTheme(<MemberMessage {...props} />));
-      expect(container.textContent).toContain(`Creator started a conversation with`);
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain('Creator started a conversation with');
     });
 
     it('displays that self user created a conversation', () => {
@@ -327,8 +335,8 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(withTheme(<MemberMessage {...props} />));
-      expect(container.textContent).toContain(`You started a conversation with`);
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain('You started a conversation with');
     });
   });
 
@@ -343,8 +351,8 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(withTheme(<MemberMessage {...props} />));
-      expect(container.textContent).toContain(`You added `);
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain('You added ');
     });
 
     it('displays that a new members were added by someone', () => {
@@ -356,7 +364,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(withTheme(<MemberMessage {...props} />));
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
       expect(container.textContent).toContain(`${message.user().name()} added `);
     });
 
@@ -367,7 +375,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(withTheme(<MemberMessage {...props} />));
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
       expect(container.textContent).toContain(`${message.user().name()} joined`);
     });
   });
@@ -381,8 +389,8 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(withTheme(<MemberMessage {...props} />));
-      expect(container.textContent).toContain(`You left`);
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain('You left');
     });
 
     it('displays that a member left the conversation', () => {
@@ -392,7 +400,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(withTheme(<MemberMessage {...props} />));
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
       expect(container.textContent).toContain(`${message.user().name()} left`);
     });
 
@@ -404,7 +412,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(withTheme(<MemberMessage {...props} />));
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
       expect(container.textContent).toContain(`${message.user().name()} removed ${removedUser.name()}`);
     });
 
@@ -418,8 +426,8 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(withTheme(<MemberMessage {...props} />));
-      expect(container.textContent).toContain(`were removed`);
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain('were removed');
     });
   });
 });

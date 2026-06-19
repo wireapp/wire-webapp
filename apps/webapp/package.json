@@ -17,12 +17,11 @@
     "lint:fix": "nx lint webapp --fix",
     "check:circular-dependencies": "nx check-circular webapp",
     "translate:extract": "nx translate-extract webapp",
-    "translate:merge": "nx translate-merge webapp",
-    "translate:generate-types": "nx translate-generate-types webapp"
+    "translate:merge": "nx translate-merge webapp"
   },
   "dependencies": {
-    "@datadog/browser-logs": "7.2.0",
-    "@datadog/browser-rum": "7.2.0",
+    "@datadog/browser-logs": "7.3.0",
+    "@datadog/browser-rum": "7.3.0",
     "@emotion/react": "11.14.0",
     "@formkit/auto-animate": "0.9.0",
     "@lexical/code": "0.27.2",
@@ -34,7 +33,7 @@
     "@mediapipe/tasks-vision": "0.10.35",
     "@sindresorhus/is": "4.6.0",
     "@tanstack/react-table": "8.21.3",
-    "@tanstack/react-virtual": "3.14.2",
+    "@tanstack/react-virtual": "3.14.3",
     "@wireapp/avs": "10.4.5",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/commons": "workspace:^",
@@ -95,7 +94,7 @@
     "underscore": "1.13.8",
     "use-debounce": "10.1.1",
     "webgl-utils.js": "1.1.0",
-    "webrtc-adapter": "9.0.5",
+    "webrtc-adapter": "9.0.6",
     "xstate": "5.32.1",
     "zustand": "4.5.7"
   },
@@ -108,7 +107,7 @@
     "@emotion/eslint-plugin": "11.12.0",
     "@formatjs/cli": "6.16.11",
     "@nx/webpack": "22.7.5",
-    "@playwright/test": "1.60.0",
+    "@playwright/test": "1.61.0",
     "@roamhq/wrtc": "0.10.0",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
@@ -172,6 +171,6 @@
     "webpack-dev-middleware": "7.4.5",
     "webpack-hot-middleware": "2.26.1",
     "workbox-webpack-plugin": "7.4.1",
-    "worker-timers": "8.0.31"
+    "worker-timers": "8.0.32"
   }
 }

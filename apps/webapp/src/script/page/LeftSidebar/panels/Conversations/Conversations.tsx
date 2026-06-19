@@ -44,6 +44,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -100,6 +101,7 @@ export const Conversations = ({
   userState = container.resolve(UserState),
   selfUser,
 }: ConversationsProps) => {
+  const {translate} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -207,6 +209,19 @@ export const Conversations = ({
     isChannelsEnabled,
     channelAndGroupConversations,
     draftConversations,
+    searchInputPlaceholders: {
+      searchConversations: translate('searchConversations'),
+      searchGroupConversations: translate('searchGroupConversations'),
+      searchChannelConversations: translate('searchChannelConversations'),
+      searchDirectConversations: translate('searchDirectConversations'),
+      searchFavoriteConversations: translate('searchFavoriteConversations'),
+      searchArchivedConversations: translate('searchArchivedConversations'),
+      searchUnreadConversations: translate('searchUnreadConversations'),
+      searchMentionsConversations: translate('searchMentionsConversations'),
+      searchRepliesConversations: translate('searchRepliesConversations'),
+      searchDraftsConversations: translate('searchDraftsConversations'),
+      searchPingsConversations: translate('searchPingsConversations'),
+    },
   });
 
   const currentFolder = labels

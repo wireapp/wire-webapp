@@ -23,7 +23,7 @@ import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/LegalHoldMessage';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface LegalHoldMessageProps {
   conversationState?: ConversationState;
@@ -34,6 +34,7 @@ const LegalHoldMessage = ({
   message,
   conversationState = container.resolve(ConversationState),
 }: LegalHoldMessageProps) => {
+  const {translate} = useApplicationContext();
   const {showUsers} = useLegalHoldModalState(state => state);
   const showLegalHold = () => showUsers(false, conversationState.activeConversation());
 
@@ -46,19 +47,19 @@ const LegalHoldMessage = ({
       <div className="message-header-label">
         {message.isActivationMessage ? (
           <>
-            <p data-uie-name="status-legalhold-activated">{t('legalHoldActivated')}</p>
+            <p data-uie-name="status-legalhold-activated">{translate('legalHoldActivated')}</p>
 
             <button
               type="button"
               className="button-reset-default message-header-label__learn-more"
               onClick={showLegalHold}
             >
-              {t('legalHoldActivatedLearnMore')}
+              {translate('legalHoldActivatedLearnMore')}
             </button>
           </>
         ) : (
           <p className="message-header-label" data-uie-name="status-legalhold-deactivated">
-            {t('legalHoldDeactivated')}
+            {translate('legalHoldDeactivated')}
           </p>
         )}
       </div>

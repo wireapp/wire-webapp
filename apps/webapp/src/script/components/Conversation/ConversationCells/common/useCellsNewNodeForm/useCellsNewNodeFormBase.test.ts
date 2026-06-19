@@ -19,7 +19,6 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
-import {t} from 'Util/localizerUtil';
 
 import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
 
@@ -32,6 +31,13 @@ interface SetupOptions {
 }
 
 describe('useCellsNewNodeFormBase', () => {
+  const validationCopy = {
+    genericError: 'cells.newItemMenuModalForm.genericError',
+    alreadyExistsError: 'cells.newItemMenuModalForm.alreadyExistsError',
+    invalidCharactersError: 'cells.newItemMenuModalForm.invalidCharactersError',
+    maxLengthError: 'cells.newItemMenuModalForm.maxLengthError',
+    nameRequired: 'cells.newItemMenuModalForm.nameRequired',
+  };
   const createEvent = () => ({preventDefault: jest.fn()}) as unknown as FormEvent<HTMLFormElement>;
   const createNodeMock = () => jest.fn().mockResolvedValue(undefined) as CreateNodeMock;
 
@@ -40,6 +46,7 @@ describe('useCellsNewNodeFormBase', () => {
       ({modalIsOpen}: {modalIsOpen: boolean}) =>
         useCellsNewNodeFormBase({
           createNode,
+          validationCopy,
           normalizeNameForCreation,
           isOpen: modalIsOpen,
         }),
@@ -60,7 +67,7 @@ describe('useCellsNewNodeFormBase', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.nameRequired'));
+    expect(result.current.error).toBe(validationCopy.nameRequired);
     expect(createNode).not.toHaveBeenCalled();
   });
 
@@ -75,7 +82,7 @@ describe('useCellsNewNodeFormBase', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
+    expect(result.current.error).toBe(validationCopy.invalidCharactersError);
     expect(createNode).not.toHaveBeenCalled();
   });
 
@@ -106,7 +113,7 @@ describe('useCellsNewNodeFormBase', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.alreadyExistsError'));
+    expect(result.current.error).toBe(validationCopy.alreadyExistsError);
   });
 
   it('maps non-409 failures to generic error', async () => {
@@ -120,7 +127,7 @@ describe('useCellsNewNodeFormBase', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.genericError'));
+    expect(result.current.error).toBe(validationCopy.genericError);
   });
 
   it('clears name and error when handleClear is called', async () => {
@@ -135,7 +142,7 @@ describe('useCellsNewNodeFormBase', () => {
     });
 
     expect(result.current.name).toBe('invalid/name');
-    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
+    expect(result.current.error).toBe(validationCopy.invalidCharactersError);
 
     act(() => {
       result.current.handleClear();
@@ -157,7 +164,7 @@ describe('useCellsNewNodeFormBase', () => {
     });
 
     expect(result.current.name).toBe('invalid/name');
-    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
+    expect(result.current.error).toBe(validationCopy.invalidCharactersError);
 
     act(() => {
       rerender({modalIsOpen: false});

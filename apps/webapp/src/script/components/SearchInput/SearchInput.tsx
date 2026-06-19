@@ -24,8 +24,8 @@ import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
 import {MAX_HANDLE_LENGTH} from 'Repositories/user/userHandleGenerator';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import * as Icon from '../icon';
 
@@ -47,6 +47,7 @@ export const SearchInput = ({
   setInput,
   forceDark,
 }: SearchInputProps) => {
+  const {translate} = useApplicationContext();
   const innerElement = useRef<HTMLDivElement>(null);
   const inputElement = useRef<HTMLInputElement>(null);
 
@@ -62,7 +63,7 @@ export const SearchInput = ({
 
   useEffect(() => {
     setInput('');
-  }, [selectedUsers.length]);
+  }, [selectedUsers.length, setInput]);
 
   const placeHolderText = emptyInput && noSelectedUsers ? placeholder : '';
 
@@ -101,7 +102,7 @@ export const SearchInput = ({
             <button
               className="search-input-cancel"
               onClick={() => setInput('')}
-              aria-label={t('accessibility.searchInput.cancel')}
+              aria-label={translate('accessibility.searchInput.cancel')}
             >
               <Icon.CloseIcon css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
             </button>

@@ -17,13 +17,14 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {UserList} from 'Components/UserList';
+import {UserList} from 'Components/userList';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
@@ -31,7 +32,6 @@ import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {partition} from 'Util/arrayUtil';
-import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortByPriority} from 'Util/stringUtil';
 
@@ -56,6 +56,8 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   filterRemoteTeamUsers?: boolean;
 };
 
+const SEARCH_MEMBERS_DEBOUNCE_MILLISECONDS = 300;
+
 export const UserSearchableList = ({
   onUpdateSelectedUsers,
   filterRemoteTeamUsers = false,
@@ -69,12 +71,19 @@ export const UserSearchableList = ({
   teamState = container.resolve(TeamState),
   ...props
 }: UserListProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {searchRepository, teamRepository, selfFirst, ...userListProps} = props;
   const {conversationState = container.resolve(ConversationState)} = props;
 
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [remoteTeamMembers, setRemoteTeamMembers] = useState<User[]>([]);
+  const currentFilter = useRef(filter);
+  const remoteTeamMembersFilter = useRef(filter);
+  currentFilter.current = filter;
+
+  useEffect(() => {
+    setRemoteTeamMembers([]);
+  }, [filter]);
 
   const filteredSelectedUsers = selectedUsers ? searchRepository.searchUserInSet(filter, selectedUsers) : undefined;
 
@@ -93,10 +102,15 @@ export const UserSearchableList = ({
 
     // We shouldn't show any members that have the 'external' role and are not already locally known.
     const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
-    setRemoteTeamMembers(
-      filterRemoteTeamUsers ? await teamRepository.filterRemoteDomainUsers(nonExternalMembers) : nonExternalMembers,
-    );
-  }, 300);
+    const nextRemoteTeamMembers = filterRemoteTeamUsers
+      ? await teamRepository.filterRemoteDomainUsers(nonExternalMembers)
+      : nonExternalMembers;
+
+    if (currentFilter.current === query) {
+      remoteTeamMembersFilter.current = query;
+      setRemoteTeamMembers(nextRemoteTeamMembers);
+    }
+  }, SEARCH_MEMBERS_DEBOUNCE_MILLISECONDS);
 
   // Filter all list items if a filter is provided
 
@@ -116,7 +130,7 @@ export const UserSearchableList = ({
           user.username() === normalizedQuery,
       );
 
-    if (normalizedQuery !== '' && selfInTeam && allowRemoteSearch === true) {
+    if (is.nonEmptyString(normalizedQuery) && selfInTeam && allowRemoteSearch === true) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         await fetchMembersFromBackend(filter, results);
       });
@@ -136,10 +150,22 @@ export const UserSearchableList = ({
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await setUsers(concatUsers);
     });
-  }, [filter, fireAndForgetInvoker, users.length]);
+  }, [
+    allowRemoteSearch,
+    conversationState,
+    fetchMembersFromBackend,
+    filter,
+    filterRemoteTeamUsers,
+    fireAndForgetInvoker,
+    searchRepository,
+    selfFirst,
+    selfInTeam,
+    teamRepository,
+    users,
+  ]);
 
   const foundUserEntities = () => {
-    if (!remoteTeamMembers.length) {
+    if (remoteTeamMembersFilter.current !== filter || is.emptyArray(remoteTeamMembers)) {
       return filteredUsers;
     }
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
@@ -164,7 +190,7 @@ export const UserSearchableList = ({
       user.type === UserType.REGULAR,
   );
   const isEmptyUserList = userList.length === 0;
-  const isSearching = filter.length > 0;
+  const isSearching = is.nonEmptyString(filter);
   const noResultsDataUieName = !isSearching ? 'status-all-added' : 'status-no-matches';
   const noResultsTranslationText = !isSearching ? 'searchListEveryoneParticipates' : 'searchListNoMatches';
 
@@ -172,7 +198,7 @@ export const UserSearchableList = ({
     <div className="user-list-wrapper" data-uie-name={dataUieName} role="list">
       {isEmptyUserList ? (
         <p className="user-list__no-results" data-uie-name={noResultsDataUieName}>
-          {t(noResultsTranslationText)}
+          {translate(noResultsTranslationText)}
         </p>
       ) : (
         <UserList

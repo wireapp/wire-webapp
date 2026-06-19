@@ -17,14 +17,52 @@
  *
  */
 
-import express, {type Response} from 'express';
+import is from '@sindresorhus/is';
+import express, {type Request, type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Maybe, maybe} from 'true-myth';
 
 import type {ServerConfig} from '@wireapp/config';
 
 import * as BrowserUtil from '../util/browserUtil';
 
 const router = express.Router();
+
+type JoinRedirectQuery = {
+  readonly key?: unknown;
+  readonly code?: unknown;
+};
+
+export function createJoinConversationRedirectUrl(query: JoinRedirectQuery): Maybe<string> {
+  const {key, code} = query;
+
+  if (!is.nonEmptyString(key) || !is.nonEmptyString(code)) {
+    return Maybe.nothing();
+  }
+
+  const queryParameters = new URLSearchParams({
+    join_key: key,
+    join_code: code,
+  });
+
+  return Maybe.just(`/auth/?${queryParameters.toString()}#/join-conversation`);
+}
+
+export function redirectToJoinConversation(request: Request, response: Response): void {
+  const redirectUrl = createJoinConversationRedirectUrl(request.query);
+
+  maybe.match(
+    {
+      Just: url => {
+        response.redirect(HTTP_STATUS.MOVED_TEMPORARILY, url);
+      },
+      Nothing: () => {
+        response.sendStatus(HTTP_STATUS.BAD_REQUEST);
+      },
+    },
+    redirectUrl,
+  );
+}
 
 export function setNonCacheHeaders(response: Response): Response {
   response.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -42,11 +80,7 @@ export const RedirectRoutes = (config: ServerConfig) => [
       : config.ROBOTS.DISALLOW;
     return res.contentType('text/plain; charset=UTF-8').send(robotsContent);
   }),
-  router.get('/join/?', (req, res) => {
-    const key = req.query.key;
-    const code = req.query.code;
-    res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `/auth/?join_key=${key}&join_code=${code}#/join-conversation`);
-  }),
+  router.get('/join/?', redirectToJoinConversation),
   router.get('/browser/?', (req, res, next) => {
     if (config.DEVELOPMENT) {
       return next();

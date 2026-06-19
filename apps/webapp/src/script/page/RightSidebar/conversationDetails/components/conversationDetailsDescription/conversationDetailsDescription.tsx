@@ -21,7 +21,7 @@ import {FC, KeyboardEvent, MouseEvent, useEffect, useRef, useState} from 'react'
 
 import * as Icon from 'Components/icon';
 import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {renderMessage} from 'Util/messageRenderer';
 
 const MAX_DESCRIPTION_LENGTH = 200;
@@ -110,7 +110,7 @@ const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = 
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="conversation-details__description-label">
-        <h3 className="conversation-details__description-heading">{t('conversationDetailsDescription')}</h3>
+        <h3 className="conversation-details__description-heading">{translate('conversationDetailsDescription')}</h3>
         {canEdit && isHovered && !isEditing && hasDescription && (
           <button
             type="button"
@@ -151,7 +151,7 @@ const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = 
             />
           ) : (
             <p className="conversation-details__description-placeholder">
-              {t('conversationDetailsDescriptionPlaceholder')}
+              {translate('conversationDetailsDescriptionPlaceholder')}
             </p>
           )}
         </div>

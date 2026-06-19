@@ -20,16 +20,25 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {AccountLink} from './AccountLink';
 
 import * as utils from '../../../../../util/clipboardUtil';
 
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
+
 test('copies correct text', async () => {
   const mockCopy: any = jest.spyOn(utils, 'copyText');
   mockCopy.mockImplementation((text: string) => text);
 
-  render(withTheme(<AccountLink label="test" value="test-value" />));
+  render(withTheme(<AccountLink label="test" value="test-value" />), {wrapper: rootProviderWrapper});
 
   const button = await screen.findByRole('button');
   fireEvent.click(button);
@@ -39,7 +48,7 @@ test('copies correct text', async () => {
 });
 
 test('renders elements correctly', () => {
-  render(withTheme(<AccountLink label="test" value="test-value" />));
+  render(withTheme(<AccountLink label="test" value="test-value" />), {wrapper: rootProviderWrapper});
   const label = screen.getByTestId('label-profile-link');
   const value = screen.getByTestId('profile-link');
   const button = screen.getByTestId('do-copy-profile-link');

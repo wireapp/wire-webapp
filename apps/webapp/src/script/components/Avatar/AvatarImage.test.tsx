@@ -26,6 +26,7 @@ import {User} from 'Repositories/entity/User';
 import {viewportObserver} from 'Util/DOM/viewportObserver';
 
 import {AvatarImage} from './AvatarImage';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('AvatarImage', () => {
   let originalTrackElement: typeof viewportObserver.trackElement;
@@ -48,7 +49,7 @@ describe('AvatarImage', () => {
       getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
     const assetRepo = assetRepoSpy as unknown as AssetRepository;
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     const resource = {
       downloadProgress: 0,
     } as AssetRemoteData;
@@ -73,7 +74,7 @@ describe('AvatarImage', () => {
       getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
     const assetRepo = assetRepoSpy as unknown as AssetRepository;
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     const resource = {
       downloadProgress: 0,
     } as AssetRemoteData;
@@ -98,7 +99,7 @@ describe('AvatarImage', () => {
       getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
     const assetRepo = assetRepoSpy as unknown as AssetRepository;
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.previewPictureResource({
       downloadProgress: 0,
     } as AssetRemoteData);
@@ -122,7 +123,7 @@ describe('AvatarImage', () => {
       getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
     const assetRepo = assetRepoSpy as unknown as AssetRepository;
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
 
     const props = {
       assetRepository: assetRepo,

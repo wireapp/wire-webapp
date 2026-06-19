@@ -22,7 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {useCellsNewFolderForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {descriptionStyles} from './CellsNewFolderModal.styles';
 
@@ -45,21 +45,29 @@ export const CellsNewFolderModal = ({
   onSuccess,
   currentPath,
 }: CellsNewFolderModalProps) => {
+  const {translate} = useApplicationContext();
   const {name, error, isSubmitting, handleSubmit, handleChange, handleClear} = useCellsNewFolderForm({
     cellsRepository,
     conversationQualifiedId,
     onSuccess,
     currentPath,
     isOpen,
+    validationCopy: {
+      genericError: translate('cells.newItemMenuModalForm.genericError'),
+      alreadyExistsError: translate('cells.newItemMenuModalForm.alreadyExistsError'),
+      invalidCharactersError: translate('cells.newItemMenuModalForm.invalidCharactersError'),
+      maxLengthError: translate('cells.newItemMenuModalForm.maxLengthError'),
+      nameRequired: translate('cells.newItemMenuModalForm.nameRequired'),
+    },
   });
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>{t('cells.newItemMenuModal.headlineFolder')}</CellsModal.Header>
-      <p css={descriptionStyles}>{t('cells.newItemMenuModal.descriptionFolder')}</p>
+      <CellsModal.Header>{translate('cells.newItemMenuModal.headlineFolder')}</CellsModal.Header>
+      <p css={descriptionStyles}>{translate('cells.newItemMenuModal.descriptionFolder')}</p>
       <CellsNewNodeForm
-        label={t('cells.newItemMenuModal.labelFolder')}
-        placeholder={t('cells.newItemMenuModal.placeholderFolder')}
+        label={translate('cells.newItemMenuModal.labelFolder')}
+        placeholder={translate('cells.newItemMenuModal.placeholderFolder')}
         onSubmit={handleSubmit}
         inputValue={name}
         onChange={handleChange}
@@ -69,10 +77,10 @@ export const CellsNewFolderModal = ({
       />
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
-          {t('cells.newItemMenuModal.secondaryAction')}
+          {translate('cells.newItemMenuModal.secondaryAction')}
         </CellsModal.SecondaryButton>
         <CellsModal.PrimaryButton onClick={handleSubmit} isDisabled={isSubmitting || !name}>
-          {t('cells.newItemMenuModal.primaryAction')}
+          {translate('cells.newItemMenuModal.primaryAction')}
         </CellsModal.PrimaryButton>
       </CellsModal.Actions>
     </CellsModal>

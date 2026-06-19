@@ -20,7 +20,7 @@
 import {useState} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {hollowWrapperButtonStyles} from '../../MultipartAssets.styles';
 import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';
@@ -53,6 +53,7 @@ export const FileAssetSmall = ({
   isError,
   id,
 }: FileAssetSmallProps) => {
+  const {translate} = useApplicationContext();
   const [isOpen, setIsOpen] = useState(false);
   const [isInEditMode, setIsInEditMode] = useState(false);
 
@@ -71,7 +72,7 @@ export const FileAssetSmall = ({
       <button
         onClick={() => showModal()}
         css={hollowWrapperButtonStyles}
-        aria-label={t('cells.filePreviewButton.ariaLabel', {name})}
+        aria-label={translate('cells.filePreviewButton.ariaLabel', {name})}
       />
       <FileCard.Header>
         <FileCard.Icon type={isError ? 'unavailable' : 'file'} />

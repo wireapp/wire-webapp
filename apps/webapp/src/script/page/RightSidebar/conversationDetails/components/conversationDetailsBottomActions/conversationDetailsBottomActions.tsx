@@ -18,7 +18,7 @@
  */
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface ConversationDetailsBottomActionsProps {
   isDeviceActionEnabled: boolean;
@@ -35,6 +35,7 @@ const ConversationDetailsBottomActions = ({
   showOptionNotifications1To1 = false,
   notificationStatusText = '',
 }: ConversationDetailsBottomActionsProps) => {
+  const {translate} = useApplicationContext();
   const renderConversationDetailsActions = showOptionNotifications1To1 || isDeviceActionEnabled;
 
   if (!renderConversationDetailsActions) {
@@ -50,7 +51,7 @@ const ConversationDetailsBottomActions = ({
               <Icon.DevicesIcon />
             </span>
 
-            <span className="panel__action-item__text">{t('conversationDetailsActionDevices')}</span>
+            <span className="panel__action-item__text">{translate('conversationDetailsActionDevices')}</span>
 
             <Icon.ChevronRight className="chevron-right-icon" />
           </button>
@@ -70,7 +71,7 @@ const ConversationDetailsBottomActions = ({
             </span>
 
             <span className="panel__action-item__summary">
-              <span className="panel__action-item__text">{t('conversationDetailsActionNotifications')}</span>
+              <span className="panel__action-item__text">{translate('conversationDetailsActionNotifications')}</span>
               <span className="panel__action-item__status" data-uie-name="status-notifications">
                 {notificationStatusText}
               </span>

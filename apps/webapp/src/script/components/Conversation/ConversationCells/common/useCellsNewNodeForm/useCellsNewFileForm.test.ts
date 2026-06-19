@@ -21,12 +21,18 @@ import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
 
 import {useCellsNewFileForm} from './useCellsNewFileForm';
 import type {CellsFileType} from './useCellsNewFileForm';
 
 describe('useCellsNewFileForm', () => {
+  const validationCopy = {
+    genericError: 'cells.newItemMenuModalForm.genericError',
+    alreadyExistsError: 'cells.newItemMenuModalForm.alreadyExistsError',
+    invalidCharactersError: 'cells.newItemMenuModalForm.invalidCharactersError',
+    maxLengthError: 'cells.newItemMenuModalForm.maxLengthError',
+    nameRequired: 'cells.newItemMenuModalForm.nameRequired',
+  };
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
 
@@ -50,6 +56,7 @@ describe('useCellsNewFileForm', () => {
         onSuccess,
         currentPath: '/wire-cells-web/path',
         isOpen: true,
+        validationCopy,
       }),
     );
 
@@ -110,7 +117,7 @@ describe('useCellsNewFileForm', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.alreadyExistsError'));
+    expect(result.current.error).toBe(validationCopy.alreadyExistsError);
     expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
     expect(onSuccess).not.toHaveBeenCalled();
   });

@@ -27,7 +27,6 @@ import {useInView} from 'Hooks/useInView/useInView';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isPreviewableImage} from 'Util/imageUtil';
-import {t} from 'Util/localizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {MediaFilePreviewCard} from './common/MediaFilePreviewCard/MediaFilePreviewCard';
@@ -95,7 +94,7 @@ const MultipartAsset = ({
   senderName,
   timestamp,
 }: MultipartAssetProps): JSX.Element => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const extension = getFileExtension(initialName!);
   const size = formatBytes(Number(initialSize));
 
@@ -146,7 +145,7 @@ const MultipartAsset = ({
   if (isRecycled === true) {
     return (
       <li ref={elementRef} css={fileCardStyles}>
-        <MediaFilePreviewCard isLoading={false} isError label={t('cells.unavailableFile')} />
+        <MediaFilePreviewCard isLoading={false} isError label={translate('cells.unavailableFile')} />
       </li>
     );
   }

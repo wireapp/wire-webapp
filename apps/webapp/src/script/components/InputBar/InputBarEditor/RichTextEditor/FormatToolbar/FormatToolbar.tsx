@@ -34,7 +34,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {FormatButton} from './FormatButton/FormatButton';
 import {wrapperStyles} from './FormatToolbar.styles';
@@ -52,6 +52,7 @@ interface FormatToolbarProps {
 
 export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
   const [editor] = useLexicalComposerContext();
+  const {translate} = useApplicationContext();
 
   const {activeFormats} = useToolbarState();
 
@@ -72,28 +73,28 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
   return (
     <div css={wrapperStyles}>
       <FormatButton
-        label={t('richTextFormatHeading')}
+        label={translate('richTextFormatHeading')}
         icon={HeadingIcon}
         active={activeFormats.includes('heading')}
         onClick={formatHeading}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextFormatBold')}
+        label={translate('richTextFormatBold')}
         icon={BoldIcon}
         active={activeFormats.includes('bold')}
         onClick={() => formatText('bold')}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextFormatItalic')}
+        label={translate('richTextFormatItalic')}
         icon={ItalicIcon}
         active={activeFormats.includes('italic')}
         onClick={() => formatText('italic')}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextFormatStrikethrough')}
+        label={translate('richTextFormatStrikethrough')}
         icon={StrikethroughIcon}
         active={activeFormats.includes('strikethrough')}
         onClick={() => formatText('strikethrough')}
@@ -101,21 +102,21 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
       />
       <FormatSeparator isEditing={isEditing} />
       <FormatButton
-        label={t('richTextFormatOrderedList')}
+        label={translate('richTextFormatOrderedList')}
         icon={NumberedListIcon}
         active={activeFormats.includes('orderedList')}
         onClick={() => formatList('ordered')}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextFormatUnorderedList')}
+        label={translate('richTextFormatUnorderedList')}
         icon={BulletListIcon}
         active={activeFormats.includes('unorderedList')}
         onClick={() => formatList('unordered')}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextFormatBlockquote')}
+        label={translate('richTextFormatBlockquote')}
         icon={BlockquoteIcon}
         active={activeFormats.includes('blockquote')}
         onClick={formatBlockquote}
@@ -123,21 +124,21 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
       />
       <FormatSeparator isEditing={isEditing} />
       <FormatButton
-        label={t('richTextFormatLink')}
+        label={translate('richTextFormatLink')}
         icon={LinkIcon}
         active={activeFormats.includes('link')}
         onClick={formatLink}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextFormatCodeBlock')}
+        label={translate('richTextFormatCodeBlock')}
         icon={CodeBlockIcon}
         active={activeFormats.includes('codeBlock')}
         onClick={formatCodeBlock}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextFormatCodeInline')}
+        label={translate('richTextFormatCodeInline')}
         icon={CodeInlineIcon}
         active={activeFormats.includes('code')}
         onClick={() => formatText('code')}

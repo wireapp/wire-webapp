@@ -21,6 +21,7 @@ import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table'
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 
 import {CellsFilePreviewModal} from './CellsFilePreviewModal/CellsFilePreviewModal';
@@ -52,12 +53,22 @@ export const CellsTable = ({
   onRefresh,
   onCloseSearchView,
 }: CellsTableProps) => {
+  const {translate} = useApplicationContext();
   const table = useReactTable({
     data: nodes,
     columns: getCellsTableColumns({
       cellsRepository,
       conversationQualifiedId,
       conversationName,
+      labels: {
+        actions: translate('cells.tableRow.actions'),
+        created: translate('cells.tableRow.created'),
+        name: translate('cells.tableRow.name'),
+        owner: translate('cells.tableRow.owner'),
+        publicLink: translate('cells.tableRow.publicLink'),
+        size: translate('cells.tableRow.size'),
+        tags: translate('cells.tableRow.tags'),
+      },
       onRefresh,
       onCloseSearchView,
     }),

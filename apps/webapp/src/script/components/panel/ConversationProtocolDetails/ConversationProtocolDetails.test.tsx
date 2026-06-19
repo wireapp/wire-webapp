@@ -22,7 +22,17 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {ConversationProtocolDetails} from './ConversationProtocolDetails';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('ConversationProtocolDetails', () => {
   it('renders the correct infos for the conversation with mls protocol', () => {
@@ -31,7 +41,7 @@ describe('ConversationProtocolDetails', () => {
       protocol: CONVERSATION_PROTOCOL.MLS,
     };
 
-    const {queryByText} = render(<ConversationProtocolDetails {...props} />);
+    const {queryByText} = render(<ConversationProtocolDetails {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByText('MLS')).not.toBeNull();
     expect(queryByText('MLS_128_DHKEMP256_AES128GCM_SHA256_P256')).not.toBeNull();
@@ -42,7 +52,7 @@ describe('ConversationProtocolDetails', () => {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
     };
 
-    const {queryByText} = render(<ConversationProtocolDetails {...props} />);
+    const {queryByText} = render(<ConversationProtocolDetails {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByText('PROTEUS')).not.toBeNull();
   });

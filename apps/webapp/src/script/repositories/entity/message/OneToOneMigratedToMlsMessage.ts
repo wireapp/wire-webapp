@@ -19,15 +19,15 @@
 
 import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {type Translate, replaceLink} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
 export class OneToOneMigratedToMlsMessage extends SystemMessage {
-  constructor() {
-    super();
+  constructor(translate: Translate) {
+    super(translate);
     this.system_message_type = SystemMessageType.ONE2ONE_MIGRATED_TO_MLS;
-    this.caption = t(
+    this.caption = this.translate(
       'conversationProtocolUpdatedToMLS',
       undefined,
       replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),

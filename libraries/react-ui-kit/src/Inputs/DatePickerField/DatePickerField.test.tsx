@@ -19,12 +19,14 @@
 
 /* eslint-disable jest/expect-expect */
 
-import {CalendarDate, getLocalTimeZone, today} from '@internationalized/date';
+import {parseDate} from '@internationalized/date';
 
 import {DatePickerField} from './DatePickerField';
 
 import {matchComponent} from '../../utils/testUtil';
 import React from 'react';
+
+const fixedDate = parseDate('2026-06-16');
 
 const defaultLabels = {
   openCalendarLabel: 'Open calendar',
@@ -37,7 +39,7 @@ const defaultProps: React.ComponentProps<typeof DatePickerField> = {
   id: 'date-picker-test',
   labels: defaultLabels,
   ariaLabel: 'Select date',
-  value: new CalendarDate(2026, 6, 16),
+  value: fixedDate,
   onChange: () => undefined,
 };
 

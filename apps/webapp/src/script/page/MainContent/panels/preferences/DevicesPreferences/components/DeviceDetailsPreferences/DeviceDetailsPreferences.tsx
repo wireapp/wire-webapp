@@ -23,8 +23,8 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {WireIdentity} from 'src/script/E2EIdentity';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../../../../../../Config';
 import {MotionDuration} from '../../../../../../../motion/MotionDuration';
@@ -47,6 +47,8 @@ enum SessionResetState {
   RESET = 'reset',
 }
 
+const RESET_CONFIRMATION_TIMEOUT_MILLISECONDS = 5000;
+
 export const DeviceDetailsPreferences = ({
   device,
   getFingerprint,
@@ -56,6 +58,7 @@ export const DeviceDetailsPreferences = ({
   onClose,
   onResetSession,
 }: DevicesPreferencesProps) => {
+  const {translate} = useApplicationContext();
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const [resetState, setResetState] = useState<SessionResetState>(SessionResetState.RESET);
   const [fingerprint, setFingerprint] = useState<string | undefined>();
@@ -65,7 +68,7 @@ export const DeviceDetailsPreferences = ({
     setResetState(SessionResetState.ONGOING);
     await onResetSession(device);
     setTimeout(() => setResetState(SessionResetState.CONFIRMATION), MotionDuration.LONG);
-    setTimeout(() => setResetState(SessionResetState.RESET), 5000);
+    setTimeout(() => setResetState(SessionResetState.RESET), RESET_CONFIRMATION_TIMEOUT_MILLISECONDS);
   };
 
   useEffect(() => {
@@ -78,7 +81,7 @@ export const DeviceDetailsPreferences = ({
       className="preferences-page preferences-device-details"
       data-uie-name="preferences-devices-details"
     >
-      <h2 className="preferences-titlebar">{t('preferencesDeviceDetails')}</h2>
+      <h2 className="preferences-titlebar">{translate('preferencesDeviceDetails')}</h2>
 
       <div className="preferences-content" css={contentStyle}>
         <fieldset className="preferences-section">
@@ -88,14 +91,14 @@ export const DeviceDetailsPreferences = ({
               className="preferences-devices-icon icon-back"
               onClick={onClose}
               data-uie-name="go-back"
-              aria-label={t('accessibility.preferencesDeviceDetails.goBack')}
+              aria-label={translate('accessibility.preferencesDeviceDetails.goBack')}
             />
           </legend>
 
           <DetailedDevice getDeviceIdentity={getDeviceIdentity} device={device} fingerprint={fingerprint || ''} />
 
           <h3 className="label preferences-label preferences-devices-fingerprint-label">
-            {t('preferencesDeviceDetailsVerificationStatus')}
+            {translate('preferencesDeviceDetailsVerificationStatus')}
           </h3>
 
           <div className="participant-devices__verify slider">
@@ -110,16 +113,16 @@ export const DeviceDetailsPreferences = ({
 
             <label className="button-label" htmlFor="preferences_device_verification" data-uie-name="do-verify">
               <span className="button-label__switch" />
-              <span className="button-label__text paragraph-body-3">{t('preferencesDevicesVerification')}</span>
+              <span className="button-label__text paragraph-body-3">{translate('preferencesDevicesVerification')}</span>
             </label>
           </div>
 
-          <p className="paragraph-body-1">{t('preferencesDevicesFingerprintDetail', {brandName})}</p>
+          <p className="paragraph-body-1">{translate('preferencesDevicesFingerprintDetail', {brandName})}</p>
         </fieldset>
 
         <section className="preferences-section">
           <p className="preferences-info preferences-reset-session paragraph-body-1">
-            {t('preferencesDevicesSessionDetail')}
+            {translate('preferencesDevicesSessionDetail')}
           </p>
 
           <div data-uie-name="preferences-device-details-session">
@@ -131,17 +134,17 @@ export const DeviceDetailsPreferences = ({
                 onClick={resetSession}
                 data-uie-name="do-session-reset"
               >
-                {t('preferencesDevicesSessionReset')}
+                {translate('preferencesDevicesSessionReset')}
               </Button>
             )}
 
             {resetState === SessionResetState.ONGOING && (
-              <p className="preferences-devices-session-reset">{t('preferencesDevicesSessionOngoing')}</p>
+              <p className="preferences-devices-session-reset">{translate('preferencesDevicesSessionOngoing')}</p>
             )}
 
             {resetState === SessionResetState.CONFIRMATION && (
               <p className="preferences-devices-session-confirmation accent-text">
-                {t('preferencesDevicesSessionConfirmation')}
+                {translate('preferencesDevicesSessionConfirmation')}
               </p>
             )}
           </div>
@@ -151,7 +154,7 @@ export const DeviceDetailsPreferences = ({
 
         {!device.isLegalHold() && (
           <section className="preferences-section">
-            <p className="preferences-info paragraph-body-1">{t('preferencesDevicesRemoveDetail')}</p>
+            <p className="preferences-info paragraph-body-1">{translate('preferencesDevicesRemoveDetail')}</p>
 
             <Button
               variant={ButtonVariant.TERTIARY}
@@ -160,7 +163,7 @@ export const DeviceDetailsPreferences = ({
               onClick={() => onRemove(device)}
               data-uie-name="go-remove-device"
             >
-              {t('preferencesDevicesRemove')}
+              {translate('preferencesDevicesRemove')}
             </Button>
           </section>
         )}

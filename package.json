@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "axios": "1.17.0",
+    "axios": "1.18.0",
     "dotenv": "16.6.1",
     "dotenv-extended": "2.9.0",
     "fs-extra": "11.3.5",
@@ -30,8 +30,8 @@
     "@types/jsdom": "28.0.3",
     "@types/node": "24.13.1",
     "@types/tough-cookie": "4.0.5",
-    "@typescript-eslint/eslint-plugin": "8.61.0",
-    "@typescript-eslint/parser": "8.61.0",
+    "@typescript-eslint/eslint-plugin": "8.61.1",
+    "@typescript-eslint/parser": "8.61.1",
     "@wireapp/copy-config": "workspace:^",
     "@wireapp/eslint-config": "workspace:^",
     "@wireapp/prettier-config": "workspace:^",
@@ -62,7 +62,7 @@
     "jsdom": "29.1.1",
     "nock": "14.0.15",
     "nx": "22.7.5",
-    "playwright": "1.60.0",
+    "playwright": "1.61.0",
     "prettier": "3.8.4",
     "rimraf": "6.1.3",
     "simple-git": "3.36.0",
@@ -102,7 +102,9 @@
     "dev:packages": "nx run-many -t watch --projects=tag:type:lib",
     "docker": "nx run workspace-tools:docker",
     "fix": "nx format:write && nx run-many -t lint --all --fix",
-    "lint": "nx run-many -t lint --all",
+    "lint": "yarn lint:projects && yarn lint:other",
+    "lint:affected": "nx affected -t lint --base=\"origin/${BASE_REF}\" && yarn lint:other",
+    "lint:projects": "nx run-many -t lint --all",
     "lint:fileNames": "ls-lint",
     "lint:fix": "nx run-many -t lint --all --fix",
     "lint:other": "nx format:check --base=dev --head=HEAD && nx run webapp:stylelint",
@@ -135,7 +137,7 @@
     "@jest/environment": "30.4.1",
     "jest-mock": "30.4.1",
     "dexie-encrypted@2.0.0": "patch:dexie-encrypted@npm%3A2.0.0#./.yarn/patches/dexie-encrypted-npm-2.0.0-eb61eb5975.patch",
-    "axios": "1.17.0",
+    "axios": "1.18.0",
     "dexie": "4.4.3",
     "dotenv": "16.6.1",
     "@types/react": "18.3.31",
@@ -147,5 +149,5 @@
     }
   },
   "version": "0.27.0",
-  "packageManager": "yarn@4.16.0"
+  "packageManager": "yarn@4.17.0"
 }

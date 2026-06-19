@@ -24,9 +24,9 @@ import cx from 'classnames';
 import {Image} from 'Components/Image';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {Text} from 'Repositories/entity/message/Text';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {cleanURL, prependProtocol} from 'Util/urlUtil';
 import {isTweetUrl} from 'Util/validationUtil';
@@ -42,14 +42,17 @@ interface LinkPreviewAssetProps {
   isFocusable?: boolean;
 }
 
+const maximumTweetAuthorLength = 20;
+
 const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPreviewAssetProps) => {
+  const {translate} = useApplicationContext();
   const {
     previews: [preview],
   } = useKoSubscribableChildren(message.getFirstAsset() as Text, ['previews']);
 
   const isTypeTweet = !!preview?.tweet;
   const isTweet = isTypeTweet && isTweetUrl(preview?.url);
-  const author = isTweet ? preview.tweet?.author?.substring(0, 20) : '';
+  const author = isTweet ? preview.tweet?.author?.substring(0, maximumTweetAuthorLength) : '';
   const previewImage = preview?.image;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
@@ -123,7 +126,7 @@ const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPre
                 data-uie-name="link-preview-tweet-author"
               >
                 <p className="font-weight-bold link-preview-info-title-singleline">{author}</p>
-                <p>{t('conversationTweetAuthor')}</p>
+                <p>{translate('conversationTweetAuthor')}</p>
               </div>
             ) : (
               <a

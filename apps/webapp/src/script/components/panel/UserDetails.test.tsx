@@ -17,10 +17,15 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import {render} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
-import {t} from 'Util/localizerUtil';
+import {RootProvider} from 'src/script/page/RootProvider';
+import {translateForTest} from 'Util/test/translateForTest';
+import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {UserDetails} from './UserDetails';
@@ -30,11 +35,17 @@ jest.mock('Components/Avatar', () => ({
   AVATAR_SIZE: {X_LARGE: 'x-large'},
 }));
 
+function renderWithRootProvider(element: ReactElement) {
+  return render(
+    <RootProvider value={createRootContextValueForTest({translate: translateForTest})}>{element}</RootProvider>,
+  );
+}
+
 describe('UserDetails', () => {
   it('renders the correct infos for a user', () => {
     const name = 'test-name';
     const userName = 'test-user-name';
-    const participant = new User(createUuid());
+    const participant = new User(createUuid(), '', translateForTest);
     participant.name(name);
     participant.username(userName);
 
@@ -45,7 +56,7 @@ describe('UserDetails', () => {
       participant,
     };
 
-    const {getByText, queryByTestId} = render(<UserDetails {...props} />);
+    const {getByText, queryByTestId} = renderWithRootProvider(<UserDetails {...props} />);
 
     getByText(name);
     getByText(`@${userName}`);
@@ -59,7 +70,7 @@ describe('UserDetails', () => {
 
   it('renders the badge for a user', () => {
     const badge = 'badgeText';
-    const participant = new User(createUuid());
+    const participant = new User(createUuid(), '', translateForTest);
 
     const props = {
       badge,
@@ -69,14 +80,14 @@ describe('UserDetails', () => {
       participant,
     };
 
-    const {getByText} = render(<UserDetails {...props} />);
+    const {getByText} = renderWithRootProvider(<UserDetails {...props} />);
 
     expect(getByText(badge)).not.toBeNull();
   });
 
   it('renders the badge for a guest', () => {
     const expirationText = '1h remaining';
-    const participant = new User(createUuid());
+    const participant = new User(createUuid(), '', translateForTest);
     participant.isGuest(true);
     participant.name("I'm a guest");
     participant.isTemporaryGuest(true);
@@ -89,14 +100,14 @@ describe('UserDetails', () => {
       participant,
     };
 
-    const {getByTestId, getByText} = render(<UserDetails {...props} />);
+    const {getByTestId, getByText} = renderWithRootProvider(<UserDetails {...props} />);
 
     expect(getByTestId('status-guest')).not.toBeNull();
     expect(getByText(expirationText)).not.toBeNull();
   });
 
   it('renders the placeholder avatar for a user that could not be loaded', () => {
-    const participant = new User(createUuid());
+    const participant = new User(createUuid(), '', translateForTest);
     participant.name('');
 
     const props = {
@@ -106,8 +117,8 @@ describe('UserDetails', () => {
       participant,
     };
 
-    const {getByTestId} = render(<UserDetails {...props} />);
+    const {getByTestId} = renderWithRootProvider(<UserDetails {...props} />);
 
-    expect(getByTestId('status-name').textContent).toBe(t('unavailableUser'));
+    expect(getByTestId('status-name').textContent).toBe(translate('unavailableUser'));
   });
 });

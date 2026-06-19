@@ -18,7 +18,6 @@
  */
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/localizerUtil';
 import {replaceAccents} from 'Util/stringUtil';
 
 import {SidebarTabs} from './useSidebarStore';
@@ -44,12 +43,27 @@ interface GetTabConversationsProps {
   conversationsFilter: string;
   isChannelsEnabled: boolean;
   draftConversations: Conversation[];
+  searchInputPlaceholders: SearchInputPlaceholders;
 }
 
 type GetTabConversations = {
   conversations: Conversation[];
   searchInputPlaceholder: string;
 };
+
+interface SearchInputPlaceholders {
+  searchConversations: string;
+  searchGroupConversations: string;
+  searchChannelConversations: string;
+  searchDirectConversations: string;
+  searchFavoriteConversations: string;
+  searchArchivedConversations: string;
+  searchUnreadConversations: string;
+  searchMentionsConversations: string;
+  searchRepliesConversations: string;
+  searchDraftsConversations: string;
+  searchPingsConversations: string;
+}
 
 export function getTabConversations({
   currentTab,
@@ -63,6 +77,7 @@ export function getTabConversations({
   isChannelsEnabled,
   channelAndGroupConversations,
   draftConversations,
+  searchInputPlaceholders,
 }: GetTabConversationsProps): GetTabConversations {
   const conversationSearchFilter = (conversation: Conversation) => {
     const filterWord = replaceAccents(conversationsFilter.toLowerCase());
@@ -77,7 +92,7 @@ export function getTabConversations({
     if (!conversationsFilter) {
       return {
         conversations: conversations,
-        searchInputPlaceholder: t('searchConversations'),
+        searchInputPlaceholder: searchInputPlaceholders.searchConversations,
       };
     }
 
@@ -94,7 +109,7 @@ export function getTabConversations({
 
     return {
       conversations: combinedConversations,
-      searchInputPlaceholder: t('searchConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchConversations,
     };
   }
 
@@ -104,7 +119,7 @@ export function getTabConversations({
 
     return {
       conversations: filteredConversations,
-      searchInputPlaceholder: t('searchGroupConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchGroupConversations,
     };
   }
 
@@ -115,7 +130,7 @@ export function getTabConversations({
 
     return {
       conversations: filteredConversations,
-      searchInputPlaceholder: t('searchChannelConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchChannelConversations,
     };
   }
 
@@ -126,7 +141,7 @@ export function getTabConversations({
 
     return {
       conversations: filteredConversations,
-      searchInputPlaceholder: t('searchDirectConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchDirectConversations,
     };
   }
 
@@ -135,7 +150,7 @@ export function getTabConversations({
 
     return {
       conversations: filteredConversations,
-      searchInputPlaceholder: t('searchFavoriteConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchFavoriteConversations,
     };
   }
 
@@ -144,7 +159,7 @@ export function getTabConversations({
 
     return {
       conversations: filteredConversations,
-      searchInputPlaceholder: t('searchArchivedConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchArchivedConversations,
     };
   }
 
@@ -156,7 +171,7 @@ export function getTabConversations({
 
     return {
       conversations: filteredConversations,
-      searchInputPlaceholder: t('searchUnreadConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchUnreadConversations,
     };
   }
 
@@ -168,7 +183,7 @@ export function getTabConversations({
 
     return {
       conversations: filteredConversations,
-      searchInputPlaceholder: t('searchMentionsConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchMentionsConversations,
     };
   }
 
@@ -180,7 +195,7 @@ export function getTabConversations({
 
     return {
       conversations: filteredConversations,
-      searchInputPlaceholder: t('searchRepliesConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchRepliesConversations,
     };
   }
 
@@ -191,7 +206,7 @@ export function getTabConversations({
 
     return {
       conversations: filteredConversations,
-      searchInputPlaceholder: t('searchDraftsConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchDraftsConversations,
     };
   }
 
@@ -203,7 +218,7 @@ export function getTabConversations({
 
     return {
       conversations: filteredConversations,
-      searchInputPlaceholder: t('searchPingsConversations'),
+      searchInputPlaceholder: searchInputPlaceholders.searchPingsConversations,
     };
   }
 

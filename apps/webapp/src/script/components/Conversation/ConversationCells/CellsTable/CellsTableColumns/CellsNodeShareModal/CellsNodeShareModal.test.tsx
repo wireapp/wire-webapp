@@ -77,6 +77,9 @@ describe('CellShareModalContent', () => {
             cellsRepository={createCellsRepository()}
             fireAndForgetInvoker={createFireAndForgetInvokerForTest()}
             modalId="modal-id"
+            translate={key => {
+              return key;
+            }}
           />,
         ),
       ),

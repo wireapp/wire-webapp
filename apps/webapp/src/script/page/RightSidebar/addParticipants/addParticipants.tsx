@@ -41,10 +41,10 @@ import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {UserState} from 'Repositories/user/userState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {compareTransliteration, sortByPriority, sortUsersByPriority} from 'Util/stringUtil';
 
@@ -86,6 +86,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   userState,
   selfUser,
 }) => {
+  const {translate} = useApplicationContext();
   const {
     firstUserEntity,
     inTeam,
@@ -148,8 +149,8 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
   const headerText = selectedContacts.length
-    ? t('addParticipantsHeaderWithCounter', {number: selectedContacts.length})
-    : t('addParticipantsHeader');
+    ? translate('addParticipantsHeaderWithCounter', {number: selectedContacts.length})
+    : translate('addParticipantsHeader');
 
   const showIntegrations = useMemo(() => {
     const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
@@ -235,7 +236,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           input={searchInput}
           setInput={onSearchInput}
           selectedUsers={selectedContacts}
-          placeholder={t('addParticipantsSearchPlaceholder')}
+          placeholder={translate('addParticipantsSearchPlaceholder')}
         />
 
         {showIntegrations && (
@@ -254,7 +255,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               }
               data-uie-name="do-add-people"
             >
-              {t('addParticipantsTabsPeople')}
+              {translate('addParticipantsTabsPeople')}
             </div>
 
             <div
@@ -271,7 +272,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               }
               data-uie-name="do-add-services"
             >
-              {t('addParticipantsTabsServices')}
+              {translate('addParticipantsTabsServices')}
             </div>
           </div>
         )}
@@ -318,7 +319,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                           <Icon.ServiceIcon />
                         </div>
 
-                        <div className="column-center">{t('addParticipantsManageServices')}</div>
+                        <div className="column-center">{translate('addParticipantsManageServices')}</div>
                       </li>
                     </ul>
                   )}
@@ -334,7 +335,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                   {canManageServices() && !!manageServicesUrl && (
                     <>
                       <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
-                        {t('addParticipantsNoServicesManager')}
+                        {translate('addParticipantsNoServicesManager')}
                       </div>
 
                       <Button
@@ -352,14 +353,14 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         data-uie-name="go-enable-services"
                         style={{marginTop: '1em'}}
                       >
-                        {t('addParticipantsManageServicesNoResults')}
+                        {translate('addParticipantsManageServicesNoResults')}
                       </Button>
                     </>
                   )}
 
                   {!canManageServices() && (
                     <div className="search__no-services__info" data-uie-name="label-no-services-enabled">
-                      {t('addParticipantsNoServicesMember')}
+                      {translate('addParticipantsNoServicesMember')}
                     </div>
                   )}
                 </div>
@@ -371,7 +372,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
         {isAddPeopleState && (
           <div className="add-participants__footer">
             <Button type="button" disabled={!enabledAddAction} onClick={onAddParticipants} data-uie-name="do-create">
-              {t('addParticipantsConfirmLabel')}
+              {translate('addParticipantsConfirmLabel')}
             </Button>
           </div>
         )}

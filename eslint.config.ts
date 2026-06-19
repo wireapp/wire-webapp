@@ -54,7 +54,6 @@ const ignores = [
   '**/storybook-static/',
   '**/.storybook/',
   '*.js',
-  'apps/webapp/src/types/i18n.d.ts',
   'apps/webapp/playwright-report/',
   'libraries/core/lib/',
   'libraries/api-client/lib/',
@@ -298,6 +297,52 @@ const config: Linter.Config[] = [
     files: ['apps/webapp/src/script/components/**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': 'error',
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/Modals/PrimaryModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/LeaveGroupAdminModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/QualityFeedbackModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/DetailViewModal/**/*.{ts,tsx}',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'src/script/page/RootProvider',
+              importNames: ['useApplicationContext'],
+              message: 'This modal is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/page/components/WindowTitleUpdater.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'src/script/page/RootProvider',
+              importNames: ['useApplicationContext'],
+              message:
+                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+            {
+              name: '../RootProvider',
+              importNames: ['useApplicationContext'],
+              message:
+                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+          ],
+        },
+      ],
     },
   },
   {

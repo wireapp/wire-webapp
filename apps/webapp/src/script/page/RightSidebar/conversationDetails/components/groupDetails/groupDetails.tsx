@@ -22,7 +22,7 @@ import {FC} from 'react';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface GroupDetailsProps {
   userParticipants: User[];
@@ -39,15 +39,16 @@ const GroupDetails: FC<GroupDetailsProps> = ({
   isTeam = false,
   isChannel = false,
 }) => {
+  const {translate} = useApplicationContext();
   const hasMultipleUserParticipants = userParticipants.length > 1;
   const participantsUserText = hasMultipleUserParticipants
-    ? t('conversationDetailsParticipantsUsersMany')
-    : t('conversationDetailsParticipantsUsersOne');
+    ? translate('conversationDetailsParticipantsUsersMany')
+    : translate('conversationDetailsParticipantsUsersOne');
 
   const hasMultipleServiceParticipants = serviceParticipants.length > 1;
   const participantsServiceText = hasMultipleServiceParticipants
-    ? t('conversationDetailsParticipantsServicesMany')
-    : t('conversationDetailsParticipantsServicesOne');
+    ? translate('conversationDetailsParticipantsServicesMany')
+    : translate('conversationDetailsParticipantsServicesOne');
 
   return (
     <>
@@ -78,7 +79,7 @@ const GroupDetails: FC<GroupDetailsProps> = ({
           className="panel__info-text conversation-details__group-size-info"
           data-uie-name="status-group-size-info-conversation-details"
         >
-          {t(isChannel ? 'channelSizeInfo' : 'groupSizeInfo', {
+          {translate(isChannel ? 'channelSizeInfo' : 'groupSizeInfo', {
             count: isChannel
               ? ConversationRepository.CONFIG.CHANNEL.MAX_SIZE
               : ConversationRepository.CONFIG.GROUP.MAX_SIZE,

@@ -20,7 +20,7 @@
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   fileHistoryCloseButtonCss,
@@ -33,12 +33,13 @@ import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {FileInfo} from './types';
 
 export const FileHistoryHeader = ({file}: {file?: FileInfo}) => {
+  const {translate} = useApplicationContext();
   const {hideModal} = useFileHistoryModal();
 
   return (
     <div css={fileHistoryHeaderContainerCss}>
       <div css={fileHeaderInfoWrapperCss}>
-        <h2 css={fileHistoryHeaderTitleCss}>{t('cells.versionHistory.title')}</h2>
+        <h2 css={fileHistoryHeaderTitleCss}>{translate('cells.versionHistory.title')}</h2>
 
         <div css={fileHeaderFileInfoCss}>
           {file ? (
@@ -54,7 +55,7 @@ export const FileHistoryHeader = ({file}: {file?: FileInfo}) => {
       <button
         css={fileHistoryCloseButtonCss}
         onClick={hideModal}
-        aria-label={t('cells.versionHistory.closeAriaLabel')}
+        aria-label={translate('cells.versionHistory.closeAriaLabel')}
         data-uie-name="do-close-file-history"
       >
         <Icon.CloseIcon width={14} height={14} />

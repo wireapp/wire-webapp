@@ -26,7 +26,7 @@ import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {LogoIcon} from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {afterRender} from 'Util/util';
 
 import {Page} from './Page';
@@ -37,7 +37,9 @@ import {QUERY_KEY} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 const REDIRECT_DELAY = 5000;
+const REDIRECTION_CIRCLE_CIRCUMFERENCE = 377;
 const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
+  const {translate} = useApplicationContext();
   const [destinationUrl, setDestinationUrl] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
@@ -62,7 +64,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
     return () => {
       window.clearTimeout(redirectTimeoutId);
     };
-  }, [destinationUrl]);
+  }, [destinationUrl, doNavigate, doSendNavigationEvent]);
 
   return (
     <Page withSideBar={isEnterpriseLoginV2Enabled}>
@@ -93,7 +95,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
             >
               <circle
                 style={{
-                  strokeDashoffset: isAnimating ? 0 : 377,
+                  strokeDashoffset: isAnimating ? 0 : REDIRECTION_CIRCLE_CIRCUMFERENCE,
                   transition: `stroke-dashoffset ${REDIRECT_DELAY}ms linear`,
                 }}
                 cx="62"
@@ -102,7 +104,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
                 strokeWidth="4"
                 stroke={COLOR.BLUE}
                 strokeLinecap="round"
-                strokeDasharray={377}
+                strokeDasharray={REDIRECTION_CIRCLE_CIRCUMFERENCE}
                 transform="rotate(-90)"
                 // eslint-disable-next-line react/no-unknown-property
                 transform-origin="center"
@@ -112,13 +114,13 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
         </FlexBox>
         <ContainerXS centerText style={{marginTop: 48}}>
           <Text block bold fontSize={'24px'} center style={{marginBottom: 16, marginTop: 0}}>
-            {t('customEnvRedirect.redirectHeadline')}
+            {translate('customEnvRedirect.redirectHeadline')}
           </Text>
           <Text block center>
-            {t('customEnvRedirect.redirectTo')}
+            {translate('customEnvRedirect.redirectTo')}
           </Text>
           <Text block center fontSize="16px" bold style={{marginTop: '16px'}} data-uie-name="credentials-info">
-            {t('customEnvRedirect.credentialsInfo')}
+            {translate('customEnvRedirect.credentialsInfo')}
           </Text>
         </ContainerXS>
       </FlexBox>

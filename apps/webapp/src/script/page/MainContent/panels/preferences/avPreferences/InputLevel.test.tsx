@@ -19,7 +19,20 @@
 
 import {render} from '@testing-library/react';
 
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {InputLevel, MAX_AUDIO_BULLETS} from './InputLevel';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({
+    translate: key => {
+      return key;
+    },
+  }),
+);
 
 describe('InputLevel', () => {
   let originalAudioContext: any;
@@ -56,7 +69,7 @@ describe('InputLevel', () => {
       mediaStream,
     };
 
-    const {container} = render(<InputLevel {...props} />);
+    const {container} = render(<InputLevel {...props} />, {wrapper: rootProviderWrapper});
 
     const activeAudioLevelBullets = container.querySelectorAll('.input-level__bullet--active');
     expect(activeAudioLevelBullets).toHaveLength(expectedAudioLevel);

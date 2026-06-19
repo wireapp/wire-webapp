@@ -18,7 +18,7 @@
  */
 
 import {ClientEvent} from 'Repositories/event/Client';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
@@ -37,6 +37,6 @@ export class DescriptionUpdateMessage extends SystemMessage {
     this.system_message_type = SystemMessageType.CONVERSATION_DESCRIPTION_UPDATE;
     this.description = description;
     this.action = action;
-    this.caption = t(action === 'add' ? 'conversationDescriptionAddedYou' : 'conversationDescriptionEditedYou');
+    this.caption = translate(action === 'add' ? 'conversationDescriptionAddedYou' : 'conversationDescriptionEditedYou');
   }
 }

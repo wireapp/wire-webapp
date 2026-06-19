@@ -18,39 +18,40 @@
  */
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {translate} from 'Util/localizerUtil';
 
 import {getModalOptions, ModalType} from './Modals';
 
 describe('getModalOptions', () => {
   it('should return modal options with hidden secondary action when hideSecondary is true', () => {
-    const options = getModalOptions({type: ModalType.ENROLL, hideSecondary: true});
+    const options = getModalOptions({type: ModalType.ENROLL, hideSecondary: true}, translate);
 
     expect(options.modalOptions.secondaryAction).toBeUndefined();
     expect(options.modalType).toEqual(PrimaryModal.type.ACKNOWLEDGE);
   });
 
   it('should return modal options with hidden secondary action when secondaryActionFn is not provided', () => {
-    const options = getModalOptions({type: ModalType.ENROLL, secondaryActionFn: undefined});
+    const options = getModalOptions({type: ModalType.ENROLL, secondaryActionFn: undefined}, translate);
 
     expect(options.modalOptions.secondaryAction).toBeUndefined();
     expect(options.modalType).toEqual(PrimaryModal.type.ACKNOWLEDGE);
   });
 
   it('should return modal options with hidden primary action when hidePrimary is true', () => {
-    const options = getModalOptions({type: ModalType.ENROLL, hidePrimary: true});
+    const options = getModalOptions({type: ModalType.ENROLL, hidePrimary: true}, translate);
 
     expect(options.modalOptions.primaryAction).toBeUndefined();
   });
 
   it('should return modal options with hidden close button when hideClose is true', () => {
-    const options = getModalOptions({type: ModalType.ENROLL, hideClose: true});
+    const options = getModalOptions({type: ModalType.ENROLL, hideClose: true}, translate);
 
     expect(options.modalOptions.hideCloseBtn).toBeTruthy();
     expect(options.modalOptions.preventClose).toBeTruthy();
   });
 
   it('should return modal options with hidden secondary and primary actions when both hideSecondary and hidePrimary are true', () => {
-    const options = getModalOptions({type: ModalType.ENROLL, hideSecondary: true, hidePrimary: true});
+    const options = getModalOptions({type: ModalType.ENROLL, hideSecondary: true, hidePrimary: true}, translate);
 
     expect(options.modalOptions.secondaryAction).toBeUndefined();
     expect(options.modalOptions.primaryAction).toBeUndefined();

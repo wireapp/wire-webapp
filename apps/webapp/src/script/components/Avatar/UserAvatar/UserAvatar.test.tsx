@@ -23,14 +23,23 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {UserAvatar} from './UserAvatar';
 
 import {AVATAR_SIZE, STATE} from '../Avatar';
+import {translateForTest} from 'Util/test/translateForTest';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -39,13 +48,13 @@ describe('UserAvatar', () => {
       state: STATE.NONE,
     };
 
-    const {getByText} = render(<UserAvatar {...props} />);
+    const {getByText} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getByText('AB')).not.toBeNull();
   });
 
   it('shows single initial character when avatar size is extra small', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -54,13 +63,13 @@ describe('UserAvatar', () => {
       state: STATE.NONE,
     };
 
-    const {getByText} = render(<UserAvatar {...props} />);
+    const {getByText} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getByText('A')).not.toBeNull();
   });
 
   it('does not show avatar badge in default state', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -69,12 +78,12 @@ describe('UserAvatar', () => {
       state: STATE.NONE,
     };
 
-    const {queryByTestId} = render(<UserAvatar {...props} />);
+    const {queryByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
     expect(queryByTestId('element-avatar-user-badge-icon')).toBeNull();
   });
 
   it('shows avatar badge for blocked user', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -83,14 +92,14 @@ describe('UserAvatar', () => {
       state: STATE.BLOCKED,
     };
 
-    const {getByTestId} = render(<UserAvatar {...props} />);
+    const {getByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
     const badgeIcon = getByTestId('element-avatar-user-badge-icon');
 
     expect(badgeIcon.getAttribute('data-uie-value')).toEqual(STATE.BLOCKED);
   });
 
   it('shows avatar badge for connection request', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -99,13 +108,13 @@ describe('UserAvatar', () => {
       state: STATE.PENDING,
     };
 
-    const {getByTestId} = render(<UserAvatar {...props} />);
+    const {getByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
     const badgeIcon = getByTestId('element-avatar-user-badge-icon');
 
     expect(badgeIcon.getAttribute('data-uie-value')).toEqual(STATE.PENDING);
   });
   it('renders available icon', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
@@ -115,14 +124,14 @@ describe('UserAvatar', () => {
     };
 
     participant.availability(Availability.Type.AVAILABLE);
-    const {getByTestId} = render(<UserAvatar {...props} />);
+    const {getByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('available');
   });
 
   it('renders away icon', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
@@ -133,14 +142,14 @@ describe('UserAvatar', () => {
 
     participant.availability(Availability.Type.AWAY);
 
-    const {getByTestId} = render(<UserAvatar {...props} />);
+    const {getByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('away');
   });
 
   it('renders busy icon', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
@@ -151,14 +160,14 @@ describe('UserAvatar', () => {
 
     participant.availability(Availability.Type.BUSY);
 
-    const {getByTestId} = render(<UserAvatar {...props} />);
+    const {getByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('busy');
   });
 
   it('does not render the profile picture image when hideProfilePicture is true', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -168,12 +177,12 @@ describe('UserAvatar', () => {
       hideProfilePicture: true,
     };
 
-    const {queryByRole} = render(<UserAvatar {...props} />);
+    const {queryByRole} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
     expect(queryByRole('img')).toBeNull();
   });
 
   it('renders the profile picture image when hideProfilePicture is false', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -183,12 +192,12 @@ describe('UserAvatar', () => {
       hideProfilePicture: false,
     };
 
-    const {getByRole} = render(<UserAvatar {...props} />);
+    const {getByRole} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
     expect(getByRole('img')).not.toBeNull();
   });
 
   it('does not show availability icon if param is false', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
@@ -198,7 +207,9 @@ describe('UserAvatar', () => {
     };
 
     participant.availability(Availability.Type.AVAILABLE);
-    const {queryByTestId} = render(<UserAvatar {...props} hideAvailabilityStatus={true} />);
+    const {queryByTestId} = render(<UserAvatar {...props} hideAvailabilityStatus={true} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     const statusAvailabilityIcon = queryByTestId('status-availability-icon');
     expect(statusAvailabilityIcon).toBeNull();

@@ -23,8 +23,8 @@ import * as Icon from 'Components/icon';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
 import {User} from 'Repositories/entity/User';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {renderMessage} from 'Util/messageRenderer';
 
 import {E2eEncryptionMessage} from './E2eEncryptionMessage/E2eEncryptionMessage';
@@ -67,6 +67,7 @@ export const MemberMessage = ({
   conversationDescription,
   isCellsConversation,
 }: MemberMessageProps) => {
+  const {translate} = useApplicationContext();
   const {otherUser, timestamp, user, htmlGroupCreationHeader, showNamedCreation, hasUsers} = useKoSubscribableChildren(
     message,
     ['otherUser', 'timestamp', 'user', 'htmlGroupCreationHeader', 'showNamedCreation', 'hasUsers'],
@@ -78,9 +79,9 @@ export const MemberMessage = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const cellsConversationLabel = t('conversationCellsConversationEnabled');
-  const receiptsEnabledLabel = t('conversationCreateReceiptsEnabled');
-  const timedMessagesDisabledLabel = t('conversationDetailsActionTimedMessagesDisabled');
+  const cellsConversationLabel = translate('conversationCellsConversationEnabled');
+  const receiptsEnabledLabel = translate('conversationCreateReceiptsEnabled');
+  const timedMessagesDisabledLabel = translate('conversationDetailsActionTimedMessagesDisabled');
   const hasConversationDescription = conversationDescription !== undefined && conversationDescription.length > 0;
   const shouldShowDescription = isGroupCreation && hasConversationDescription;
   const renderedConversationDescription = renderMessage(conversationDescription ?? '');
@@ -128,7 +129,9 @@ export const MemberMessage = ({
             <PinIcon />
           </div>
           <div className="message-header-label message-header-label--description">
-            <strong data-uie-name="group-creation-description-label">{t('conversationDescriptionLabel')}</strong>
+            <strong data-uie-name="group-creation-description-label">
+              {translate('conversationDescriptionLabel')}
+            </strong>
             <span
               data-uie-name="group-creation-description-text"
               dangerouslySetInnerHTML={{__html: renderedConversationDescription}}
@@ -161,13 +164,13 @@ export const MemberMessage = ({
 
       {hasUsers && message.showServicesWarning && (
         <p className="message-services-warning" data-uie-name="label-services-warning">
-          {t('conversationServicesWarning')}
+          {translate('conversationServicesWarning')}
         </p>
       )}
 
       {isGroupCreation && shouldShowInvitePeople && (
         <div className="message-member-footer">
-          <p>{t('guestRoomConversationHead')}</p>
+          <p>{translate('guestRoomConversationHead')}</p>
 
           <Button
             variant={ButtonVariant.TERTIARY}
@@ -176,15 +179,15 @@ export const MemberMessage = ({
             data-uie-name="do-invite-people"
             style={{marginTop: '1em'}}
           >
-            {t('guestRoomConversationButton')}
+            {translate('guestRoomConversationButton')}
           </Button>
         </div>
       )}
 
       {isGroupCreation && isSelfTemporaryGuest && (
         <div className="message-member-footer">
-          <p className="message-member-footer-message">{t('temporaryGuestJoinMessage')}</p>
-          <p className="message-member-footer-description">{t('temporaryGuestJoinDescription')}</p>
+          <p className="message-member-footer-message">{translate('temporaryGuestJoinMessage')}</p>
+          <p className="message-member-footer-description">{translate('temporaryGuestJoinDescription')}</p>
         </div>
       )}
 
@@ -234,7 +237,7 @@ export const MemberMessage = ({
 
       {isMemberLeave && user.isMe && isSelfTemporaryGuest && (
         <div className="message-member-footer">
-          <p className="message-member-footer-description">{t('temporaryGuestLeaveDescription')}</p>
+          <p className="message-member-footer-description">{translate('temporaryGuestLeaveDescription')}</p>
         </div>
       )}
 

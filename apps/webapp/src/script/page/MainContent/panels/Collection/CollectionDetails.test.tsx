@@ -26,9 +26,16 @@ import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {Text} from 'Repositories/entity/message/Text';
 import {MessageCategory} from 'src/script/message/MessageCategory';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {CollectionDetails} from './CollectionDetails';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('Components/Image', () => ({
   AssetImage: () => <div>Image</div>,
@@ -48,7 +55,7 @@ jest.mock('Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAsset
 }));
 
 const createImageMessage = (timestamp: number = Date.now()) => {
-  const message = new ContentMessage(createUuid());
+  const message = new ContentMessage(createUuid(), translateForTest);
   message.timestamp(timestamp);
   const image = new MediumImage(createUuid());
   image.resource({} as any);
@@ -58,7 +65,7 @@ const createImageMessage = (timestamp: number = Date.now()) => {
 };
 
 const createFileMessage = () => {
-  const message = new ContentMessage(createUuid());
+  const message = new ContentMessage(createUuid(), translateForTest);
   const file = new FileAsset(createUuid());
   message.assets.push(file);
   message.category = MessageCategory.FILE;
@@ -66,7 +73,7 @@ const createFileMessage = () => {
 };
 
 const createLinkMessage = () => {
-  const message = new ContentMessage(createUuid());
+  const message = new ContentMessage(createUuid(), translateForTest);
   const link = new Text(createUuid());
   link.previews.push(new LinkPreview({}));
   message.assets.push(link);
@@ -75,7 +82,7 @@ const createLinkMessage = () => {
 };
 
 const createAudioMessage = () => {
-  const message = new ContentMessage(createUuid());
+  const message = new ContentMessage(createUuid(), translateForTest);
   const audio = new FileAsset(createUuid());
   spyOn(audio, 'isAudio').and.returnValue(true);
   message.assets.push(audio);
@@ -84,28 +91,39 @@ const createAudioMessage = () => {
 };
 
 describe('CollectionDetails', () => {
-  const conversation = new Conversation();
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
+  const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   it('displays all image assets', async () => {
     const messages = [createImageMessage(), createImageMessage()];
-    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(getAllByText('Image')).toHaveLength(messages.length);
   });
 
   it('displays all file assets', async () => {
     const messages = [createFileMessage(), createFileMessage()];
-    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(getAllByText('File')).toHaveLength(messages.length);
   });
 
   it('displays all link preview assets', async () => {
     const messages = [createLinkMessage(), createLinkMessage()];
-    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(getAllByText('Link Preview')).toHaveLength(messages.length);
   });
 
   it('displays all audio assets', async () => {
     const messages = [createAudioMessage(), createAudioMessage()];
-    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(getAllByText('Audio')).toHaveLength(messages.length);
   });
 
@@ -122,7 +140,9 @@ describe('CollectionDetails', () => {
       createImageMessage(now - ONE_MONTH),
       createImageMessage(now - ONE_YEAR),
     ];
-    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(getAllByText('Image')).toHaveLength(messages.length);
     expect(getAllByText('conversationToday')).toHaveLength(1);
     expect(getAllByText('March')).toHaveLength(1);

@@ -23,7 +23,7 @@ import {Select} from '@wireapp/react-ui-kit';
 
 import {selectGroupStyles} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect.styles';
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   videoOptionInlineMenuStyles,
@@ -99,6 +99,7 @@ export const VideoControlsSelect = ({
   onClose,
   isOptionSelected,
 }: VideoControlsSelectProps) => {
+  const {translate} = useApplicationContext();
   const isInlineMenu = overlayMenu === false;
   const menuCssWithInlineMenu = isInlineMenu
     ? {
@@ -111,9 +112,14 @@ export const VideoControlsSelect = ({
     <>
       {showHeader === true && (
         <div css={videoOptionsSheetHeaderStyles}>
-          <span css={videoOptionsSheetTitleStyles}>{t('videoCallMenuMoreVideoSettings')}</span>
+          <span css={videoOptionsSheetTitleStyles}>{translate('videoCallMenuMoreVideoSettings')}</span>
           {onClose && (
-            <button className="icon-button" type="button" aria-label={t('cells.modal.closeButton')} onClick={onClose}>
+            <button
+              className="icon-button"
+              type="button"
+              aria-label={translate('cells.modal.closeButton')}
+              onClick={onClose}
+            >
               <Icon.CloseIcon width={12} height={12} />
             </button>
           )}

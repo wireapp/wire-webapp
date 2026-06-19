@@ -20,7 +20,7 @@
 import {Link, LinkVariant, ShieldIcon} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   e2eMessageContainerCss,
@@ -37,6 +37,8 @@ interface E2eEncryptionMessageProps {
 }
 
 export const E2eEncryptionMessage = ({isCellsConversation}: E2eEncryptionMessageProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div css={e2eMessageContainerCss}>
       <div css={e2eMessageIconContainerCss}>
@@ -44,9 +46,11 @@ export const E2eEncryptionMessage = ({isCellsConversation}: E2eEncryptionMessage
       </div>
       <div css={e2eMessageContentContainerCss}>
         <p css={e2eMessageContentParagraphCss}>
-          {isCellsConversation ? t('conversationNewCellsConversation') : t('conversationNewConversation')}
+          {isCellsConversation
+            ? translate('conversationNewCellsConversation')
+            : translate('conversationNewConversation')}
         </p>
-        <p css={e2eMessageContentParagraphWithMarginCss}>{t('conversationUnverifiedUserWarning')}</p>
+        <p css={e2eMessageContentParagraphWithMarginCss}>{translate('conversationUnverifiedUserWarning')}</p>
         <Link
           css={e2eMessageContentLinkCss}
           variant={LinkVariant.PRIMARY}
@@ -54,7 +58,7 @@ export const E2eEncryptionMessage = ({isCellsConversation}: E2eEncryptionMessage
           target="_blank"
           data-uie-name="how-to-label-conversation-as-favorites"
         >
-          {t('systemMessageLearnMore')}
+          {translate('systemMessageLearnMore')}
         </Link>
       </div>
     </div>

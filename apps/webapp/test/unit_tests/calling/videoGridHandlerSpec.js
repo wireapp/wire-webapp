@@ -24,6 +24,8 @@ import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
 import {getGrid} from 'Repositories/calling/videoGridHandler';
 import {User} from 'Repositories/entity/User';
+import {translate} from 'Util/localizerUtil';
+
 describe('videoGridHandler', () => {
   let participants;
 
@@ -67,7 +69,7 @@ describe('videoGridHandler', () => {
         ];
 
         const participantsObs = ko.observable([]);
-        const selfUser = new User('self_id');
+        const selfUser = new User('self_id', '', translate);
         selfUser.isMe = true;
         const selfParticipant = new Participant(selfUser, 'selfdevice');
         selfParticipant.videoState(VIDEO_STATE.STARTED);
@@ -161,7 +163,7 @@ describe('videoGridHandler', () => {
   });
 
   function generateVideoParticipant(id, isMe = false) {
-    const user = new User(id);
+    const user = new User(id, '', translate);
     user.isMe = isMe;
     const participant = new Participant(user, 'deviceid');
     participant.hasActiveVideo = () => true;

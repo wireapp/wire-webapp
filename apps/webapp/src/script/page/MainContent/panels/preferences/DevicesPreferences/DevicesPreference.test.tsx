@@ -39,6 +39,7 @@ import {Core} from 'src/script/service/coreSingleton';
 import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreference';
+import {translateForTest} from 'Util/test/translateForTest';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createUuid());
@@ -48,7 +49,7 @@ function createDevice(): ClientEntity {
 }
 
 function createConversation(protocol?: CONVERSATION_PROTOCOL, type?: CONVERSATION_TYPE) {
-  const conversation = new Conversation(randomUUID(), '', protocol);
+  const conversation = new Conversation(randomUUID(), '', protocol, translateForTest);
   if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = `groupid-${randomUUID()}`;
     conversation.epoch = 0;
@@ -60,7 +61,7 @@ function createConversation(protocol?: CONVERSATION_PROTOCOL, type?: CONVERSATIO
 }
 
 describe('DevicesPreferences', () => {
-  const rootContextValue = createRootContextValueForTest({});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
   const selfProteusConversation = createConversation(CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_TYPE.SELF);
   const selfMLSConversation = createConversation(CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.SELF);
@@ -69,7 +70,7 @@ describe('DevicesPreferences', () => {
   const coreMock = container.resolve(Core);
   coreMock.isMLSActiveForClient = jest.fn().mockReturnValue(true);
 
-  const selfUser = new User(createUuid());
+  const selfUser = new User(createUuid(), '', translateForTest);
   selfUser.devices([createDevice(), createDevice()]);
 
   const clientState = new ClientState();

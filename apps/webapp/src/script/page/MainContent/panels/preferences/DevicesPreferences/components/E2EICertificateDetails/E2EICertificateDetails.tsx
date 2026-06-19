@@ -19,10 +19,10 @@
 
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {VerificationBadges} from 'Components/Badge';
+import {VerificationBadges} from 'Components/badge';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {useCertificateStatus} from 'src/script/hooks/useCertificateStatus';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getLogger} from 'Util/logger';
 
 import {styles} from './E2EICertificateDetails.styles';
@@ -36,6 +36,7 @@ interface E2EICertificateDetailsProps {
 }
 
 export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
+  const {translate} = useApplicationContext();
   const [certificate, status] = useCertificateStatus(identity, isCurrentDevice);
 
   const isActivated = status !== MLSStatuses.NOT_ACTIVATED;
@@ -52,12 +53,12 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
 
   return (
     <div css={styles.container}>
-      <h5 css={styles.title}>{t('E2EI.certificateTitle')}</h5>
+      <h5 css={styles.title}>{translate('E2EI.certificateTitle')}</h5>
 
       <div data-uie-name="e2ei-identity-status" data-uie-value={status} css={styles.e2eiStatusContainer}>
         <p className="label-1">
-          <span>{t('E2EI.status')}</span>
-          <strong css={styles.e2eiStatus(status)}>{t(`E2EI.${status}`)}</strong>
+          <span>{translate('E2EI.status')}</span>
+          <strong css={styles.e2eiStatus(status)}>{translate(`E2EI.${status}`)}</strong>
         </p>
 
         <VerificationBadges MLSStatus={status} context="device" />
@@ -69,10 +70,10 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
             variant={ButtonVariant.TERTIARY}
             onClick={showModal}
             data-uie-name="show-certificate-details"
-            aria-label={t('E2EI.showCertificateDetails')}
+            aria-label={translate('E2EI.showCertificateDetails')}
             tabIndex={TabIndex.FOCUSABLE}
           >
-            {t('E2EI.showCertificateDetails')}
+            {translate('E2EI.showCertificateDetails')}
           </Button>
         )}
 
@@ -83,10 +84,10 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
                 variant={ButtonVariant.TERTIARY}
                 onClick={getCertificate}
                 data-uie-name="get-certificate"
-                aria-label={t('E2EI.getCertificate')}
+                aria-label={translate('E2EI.getCertificate')}
                 tabIndex={TabIndex.FOCUSABLE}
               >
-                {t('E2EI.getCertificate')}
+                {translate('E2EI.getCertificate')}
               </Button>
             )}
 
@@ -95,10 +96,10 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
                 variant={ButtonVariant.TERTIARY}
                 onClick={getCertificate}
                 data-uie-name="update-certificate"
-                aria-label={t('E2EI.updateCertificate')}
+                aria-label={translate('E2EI.updateCertificate')}
                 tabIndex={TabIndex.FOCUSABLE}
               >
-                {t('E2EI.updateCertificate')}
+                {translate('E2EI.updateCertificate')}
               </Button>
             )}
           </>

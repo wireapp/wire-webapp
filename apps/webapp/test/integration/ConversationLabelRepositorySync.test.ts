@@ -21,6 +21,7 @@ import ko from 'knockout';
 import {ConversationLabelRepository, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 // Simple integration test to verify the synchronization fix
@@ -64,6 +65,7 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
       allConversations,
       ko.pureComputed(() => conversations()),
       propertiesService,
+      translate,
     );
   });
 

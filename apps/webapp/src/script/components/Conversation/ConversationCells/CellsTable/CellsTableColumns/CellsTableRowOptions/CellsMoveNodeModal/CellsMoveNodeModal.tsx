@@ -28,7 +28,6 @@ import {useCellsNewFolderForm} from 'Components/Conversation/ConversationCells/c
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/localizerUtil';
 
 import {CellsFoldersListModalContent} from './CellsFoldersListModalContent/CellsFoldersListModalContent';
 import {useGetCellsFolders} from './useGetCellsFolders/useGetCellsFolders';
@@ -51,7 +50,7 @@ export const CellsMoveNodeModal = ({
   conversationQualifiedId,
   conversationName,
 }: CellsMoveNodeModalProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [currentPath, setCurrentPath] = useState(() => getCellsFilesPath());
   const [activeModalContent, setActiveModalContent] = useState<'move' | 'create'>('move');
 
@@ -92,6 +91,13 @@ export const CellsMoveNodeModal = ({
     },
     currentPath,
     isOpen,
+    validationCopy: {
+      genericError: translate('cells.newItemMenuModalForm.genericError'),
+      alreadyExistsError: translate('cells.newItemMenuModalForm.alreadyExistsError'),
+      invalidCharactersError: translate('cells.newItemMenuModalForm.invalidCharactersError'),
+      maxLengthError: translate('cells.newItemMenuModalForm.maxLengthError'),
+      nameRequired: translate('cells.newItemMenuModalForm.nameRequired'),
+    },
   });
 
   useEffect(() => {
@@ -105,7 +111,9 @@ export const CellsMoveNodeModal = ({
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
       <CellsModal.Header>
-        {activeModalContent === 'move' ? t('cells.moveNodeModal.moveTitle') : t('cells.moveNodeModal.createTitle')}
+        {activeModalContent === 'move'
+          ? translate('cells.moveNodeModal.moveTitle')
+          : translate('cells.moveNodeModal.createTitle')}
       </CellsModal.Header>
       {activeModalContent === 'move' ? (
         <>
@@ -120,22 +128,22 @@ export const CellsMoveNodeModal = ({
           />
           <CellsModal.Actions>
             <CellsModal.SecondaryButton onClick={onClose}>
-              {t('cells.moveNodeModal.cancelButton')}
+              {translate('cells.moveNodeModal.cancelButton')}
             </CellsModal.SecondaryButton>
             <CellsModal.PrimaryButton
               onClick={handleMove}
               isDisabled={movingDisabled || shouldShowLoadingSpinner || isMoveLoading}
               isLoading={isMoveLoading}
             >
-              {t('cells.moveNodeModal.moveButton')}
+              {translate('cells.moveNodeModal.moveButton')}
             </CellsModal.PrimaryButton>
           </CellsModal.Actions>
         </>
       ) : (
         <>
           <CellsNewNodeForm
-            label={t('cells.newItemMenuModal.labelFolder')}
-            placeholder={t('cells.newItemMenuModal.placeholderFolder')}
+            label={translate('cells.newItemMenuModal.labelFolder')}
+            placeholder={translate('cells.newItemMenuModal.placeholderFolder')}
             onSubmit={handleCreateNewFolder}
             inputValue={name}
             onChange={handleChange}
@@ -145,10 +153,10 @@ export const CellsMoveNodeModal = ({
           />
           <CellsModal.Actions>
             <CellsModal.SecondaryButton onClick={() => setActiveModalContent('move')}>
-              {t('cells.newItemMenuModal.secondaryAction')}
+              {translate('cells.newItemMenuModal.secondaryAction')}
             </CellsModal.SecondaryButton>
             <CellsModal.PrimaryButton onClick={handleCreateNewFolder} isDisabled={isSubmitting}>
-              {t('cells.newItemMenuModal.primaryAction')}
+              {translate('cells.newItemMenuModal.primaryAction')}
             </CellsModal.PrimaryButton>
           </CellsModal.Actions>
         </>
