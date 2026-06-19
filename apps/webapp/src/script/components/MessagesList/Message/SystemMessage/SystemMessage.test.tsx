@@ -56,7 +56,7 @@ describe('SystemMessage', () => {
   });
 
   it('shows added description update without description body', async () => {
-    const message = new DescriptionUpdateMessage('Updated description', 'add');
+    const message = new DescriptionUpdateMessage('Updated description', 'add', translate);
 
     render(<SystemMessage message={message} />);
 
@@ -67,7 +67,7 @@ describe('SystemMessage', () => {
   });
 
   it('shows edited description update without description body', async () => {
-    const message = new DescriptionUpdateMessage('Updated description', 'edit');
+    const message = new DescriptionUpdateMessage('Updated description', 'edit', translate);
 
     render(<SystemMessage message={message} />);
 

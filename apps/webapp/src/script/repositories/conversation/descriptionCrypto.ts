@@ -36,7 +36,8 @@ const ALGORITHM = 'AES-CBC';
 const ZERO_IV = new Uint8Array(BLOCK_LENGTH);
 
 async function importKey(rawKey: Uint8Array): Promise<CryptoKey> {
-  return crypto.subtle.importKey('raw', rawKey, ALGORITHM, false, ['encrypt', 'decrypt']);
+  const keyData = new Uint8Array(rawKey).buffer as ArrayBuffer;
+  return crypto.subtle.importKey('raw', keyData, ALGORITHM, false, ['encrypt', 'decrypt']);
 }
 
 /**

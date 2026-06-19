@@ -150,6 +150,7 @@ import {
   ButtonActionEvent,
   ClientConversationEvent,
   DeleteEvent,
+  DescriptionUpdateEvent,
   EventBuilder,
   GroupCreationEvent,
   MemberLeaveEvent,
@@ -2955,7 +2956,9 @@ export class ConversationRepository {
    */
   public async loadConversationDescription(conversationEntity: Conversation): Promise<void> {
     if (!conversationEntity.groupId) {
-      logger.warn('Cannot load conversation description without MLS group ID', {conversationId: conversationEntity.id});
+      this.logger.warn('Cannot load conversation description without MLS group ID', {
+        conversationId: conversationEntity.id,
+      });
       return;
     }
 
@@ -3028,10 +3031,19 @@ export class ConversationRepository {
     }
     conversationEntity.description(description);
 
-    return this.addEventToConversation(conversationEntity, {
-      ...eventJson,
+    const descriptionUpdateEvent: DescriptionUpdateEvent = {
+      conversation: eventJson.conversation,
       data: {action, description},
-    });
+      from: eventJson.from,
+      id: ('id' in eventJson && eventJson.id) || createUuid(),
+      qualified_conversation: eventJson.qualified_conversation,
+      qualified_from: eventJson.qualified_from,
+      server_time: eventJson.server_time,
+      time: eventJson.time,
+      type: ClientEvent.CONVERSATION.DESCRIPTION_UPDATE,
+    };
+
+    return this.addEventToConversation(conversationEntity, descriptionUpdateEvent);
   }
 
   private readonly inject1to1MigratedToMLS = async (conversation: Conversation) => {

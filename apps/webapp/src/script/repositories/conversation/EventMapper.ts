@@ -817,7 +817,7 @@ export class EventMapper {
    * Maps JSON data of conversation.description-update message into message entity.
    */
   private _mapEventDescriptionUpdate({data: eventData}: LegacyEventRecord) {
-    return new DescriptionUpdateMessage(eventData.description, eventData.action);
+    return new DescriptionUpdateMessage(eventData.description, eventData.action, this.translate);
   }
 
   /**

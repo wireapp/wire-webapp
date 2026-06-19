@@ -18,7 +18,7 @@
  */
 
 import {ClientEvent} from 'Repositories/event/Client';
-import {translate} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
@@ -30,8 +30,8 @@ export class DescriptionUpdateMessage extends SystemMessage {
   public readonly description: string;
   public readonly action: DescriptionUpdateAction;
 
-  constructor(description: string, action: DescriptionUpdateAction = 'edit') {
-    super();
+  constructor(description: string, action: DescriptionUpdateAction = 'edit', translate: Translate) {
+    super(translate);
 
     this.type = ClientEvent.CONVERSATION.DESCRIPTION_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_DESCRIPTION_UPDATE;
