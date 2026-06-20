@@ -100,6 +100,19 @@ describe('Collection', () => {
   const mockMessageRepository = {} as MessageRepository;
   const mockSelfUser = new User(createUuid(), '', translateForTest);
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockConversationRepository.getEventsForCategory.mockResolvedValue(messages);
+    mockConversationRepository.searchInConversation.mockResolvedValue({
+      messageEntities: [createLinkMessage()],
+      query: 'term',
+    });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('displays all image assets', async () => {
     const {getAllByText, getByText, queryByText} = render(
       withTheme(
@@ -167,10 +180,64 @@ describe('Collection', () => {
     await act(async () => {
       const input = getByTestId('full-search-header-input');
       fireEvent.change(input, {target: {value: 'term'}});
-      jest.advanceTimersByTime(500);
+      jest.advanceTimersByTime(499);
     });
-    await waitFor(() => expect(mockConversationRepository.searchInConversation).toHaveBeenCalled());
+    expect(mockConversationRepository.searchInConversation).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(mockConversationRepository.searchInConversation).toHaveBeenCalled();
 
     expect(queryByText('CollectionTime')).toBeNull();
+  });
+
+  it('runs only the latest pending search while another search is in progress', async () => {
+    jest.useFakeTimers();
+    let resolveFirstSearch: (value: {messageEntities: ContentMessage[]; query: string}) => void = () => {};
+    mockConversationRepository.searchInConversation.mockImplementation((_conversation: Conversation, query: string) => {
+      if (query === 'term') {
+        return new Promise(resolve => {
+          resolveFirstSearch = resolve;
+        });
+      }
+
+      return Promise.resolve({messageEntities: [], query});
+    });
+
+    const {getAllByText, getByTestId} = render(
+      withTheme(
+        <Collection
+          assetRepository={mockAssetRepository}
+          messageRepository={mockMessageRepository}
+          conversation={conversation}
+          conversationRepository={mockConversationRepository as any}
+          selfUser={mockSelfUser}
+        />,
+      ),
+      {wrapper: rootProviderWrapper},
+    );
+
+    await waitFor(() => getAllByText('CollectionItem'));
+    const input = getByTestId('full-search-header-input');
+
+    await act(async () => {
+      fireEvent.change(input, {target: {value: 'term'}});
+      jest.advanceTimersByTime(500);
+    });
+    expect(mockConversationRepository.searchInConversation).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      fireEvent.change(input, {target: {value: 'terms'}});
+      jest.advanceTimersByTime(500);
+    });
+    expect(mockConversationRepository.searchInConversation).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolveFirstSearch({messageEntities: [], query: 'term'});
+    });
+
+    await waitFor(() => expect(mockConversationRepository.searchInConversation).toHaveBeenCalledTimes(2));
+    expect(mockConversationRepository.searchInConversation).toHaveBeenLastCalledWith(conversation, 'terms');
   });
 });

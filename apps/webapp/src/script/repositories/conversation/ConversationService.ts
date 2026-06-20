@@ -64,6 +64,7 @@ import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 
 const logger = getLogger('ConversationService');
+const SEARCH_BATCH_SIZE = 500;
 
 type CompositeMessageItem = {
   text?: {content?: string; message?: string};
@@ -77,8 +78,10 @@ type ConversationEventData = {
   items?: CompositeMessageItem[];
 };
 
-type SearchableConversationEvent = {type?: string; data?: ConversationEventData};
+type SearchableConversationEvent = {type?: string; data?: ConversationEventData; ephemeral_expires?: boolean};
 type ConversationSearchEventLoader = Pick<EventService, 'loadEventsWithCategory'>;
+
+const waitForNextSearchBatch = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
 const TextExtractors: Partial<Record<string, (event: SearchableConversationEvent) => string>> = {
   [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => event.data?.content || event.data?.message || '',
@@ -488,13 +491,30 @@ export class ConversationService {
     const category_min = MessageCategory.TEXT;
     const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
 
-    const events = await this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max);
-    return events
-      .filter(record => record.ephemeral_expires !== true)
-      .filter(event => {
-        const searchableText = this.getEventSearchableText(event);
-        return searchableText ? fullTextSearch(searchableText, query) : false;
-      });
+    const events = (await this.eventService.loadEventsWithCategory(
+      conversation_id,
+      category_min,
+      category_max,
+    )) as SearchableConversationEvent[];
+    const matchingEvents: SearchableConversationEvent[] = [];
+
+    for (let index = 0; index < events.length; index += 1) {
+      if (index > 0 && index % SEARCH_BATCH_SIZE === 0) {
+        await waitForNextSearchBatch();
+      }
+
+      const event = events[index];
+      if (event.ephemeral_expires === true) {
+        continue;
+      }
+
+      const searchableText = this.getEventSearchableText(event);
+      if (searchableText && fullTextSearch(searchableText, query)) {
+        matchingEvents.push(event);
+      }
+    }
+
+    return matchingEvents;
   }
 
   private getEventSearchableText(event: SearchableConversationEvent): string {

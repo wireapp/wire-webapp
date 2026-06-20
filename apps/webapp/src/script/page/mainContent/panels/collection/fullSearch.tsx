@@ -38,7 +38,7 @@ const MAX_VISIBLE_MESSAGES = 30;
 const PRE_MARKED_OFFSET = 20;
 const MAX_TEXT_LENGTH = 60;
 const MAX_OFFSET_INDEX = 30;
-const DEBOUNCE_TIME = 100;
+const DEBOUNCE_TIME = 500;
 const MINIMUM_SEARCH_LENGTH = 2;
 
 export const fullSearchInputSubmitComboStyles: CSSObject = {
@@ -71,30 +71,60 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
   const {translate} = useApplicationContext();
   const [searchValue, setSearchValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const latestSearchValueRef = useRef(searchValue);
+  const isSearchingRef = useRef(false);
+  const pendingSearchValueRef = useRef<string | undefined>();
   const [messages, setMessages] = useState<ContentMessage[]>([]);
   const [messageCount, setMessageCount] = useState(0);
   const [hasNoResults, setHasNoResults] = useState(false);
   const [element, setElement] = useEffectRef<HTMLDivElement>();
 
-  const debouncedSearch = useDebouncedCallback(async () => {
-    const trimmedInput = searchValue.trim();
-    change(trimmedInput);
-    if (trimmedInput.length < MINIMUM_SEARCH_LENGTH) {
-      setMessages([]);
-      setMessageCount(0);
-      setHasNoResults(false);
+  const search = async (value: string) => {
+    if (isSearchingRef.current) {
+      pendingSearchValueRef.current = value;
       return;
     }
-    const {messageEntities, query} = await searchProvider(trimmedInput);
-    if (query === trimmedInput) {
-      setHasNoResults(messageEntities.length === 0);
-      setMessages(messageEntities as ContentMessage[]);
-      setMessageCount(MAX_VISIBLE_MESSAGES);
+
+    try {
+      isSearchingRef.current = true;
+      let nextSearchValue = value;
+
+      while (true) {
+        const trimmedInput = nextSearchValue.trim();
+        pendingSearchValueRef.current = undefined;
+        change(trimmedInput);
+
+        if (trimmedInput.length < MINIMUM_SEARCH_LENGTH) {
+          if (latestSearchValueRef.current.trim() === trimmedInput) {
+            setMessages([]);
+            setMessageCount(0);
+            setHasNoResults(false);
+          }
+        } else {
+          const {messageEntities, query} = await searchProvider(trimmedInput);
+          if (query === trimmedInput && latestSearchValueRef.current.trim() === trimmedInput) {
+            setHasNoResults(messageEntities.length === 0);
+            setMessages(messageEntities as ContentMessage[]);
+            setMessageCount(MAX_VISIBLE_MESSAGES);
+          }
+        }
+
+        const pendingSearchValue = pendingSearchValueRef.current as string | undefined;
+        if (pendingSearchValue === undefined || pendingSearchValue.trim() === trimmedInput) {
+          break;
+        }
+        nextSearchValue = pendingSearchValue;
+      }
+    } finally {
+      isSearchingRef.current = false;
     }
-  }, DEBOUNCE_TIME);
+  };
+
+  const debouncedSearch = useDebouncedCallback(search, DEBOUNCE_TIME);
 
   useEffect(() => {
-    void debouncedSearch();
+    latestSearchValueRef.current = searchValue;
+    debouncedSearch(searchValue);
   }, [debouncedSearch, searchValue]);
 
   useEffect(() => {
