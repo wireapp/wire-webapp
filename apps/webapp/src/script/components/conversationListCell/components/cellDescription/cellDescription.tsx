@@ -17,8 +17,6 @@
  *
  */
 
-import {useMemo} from 'react';
-
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
@@ -38,13 +36,10 @@ interface Props {
   unreadState: UnreadState;
 }
 
-export const CellDescription = ({conversation, mutedState, isActive, isRequest, unreadState}: Props) => {
+export const CellDescription = ({conversation, isActive}: Props) => {
   const {translate} = useApplicationContext();
-  void isRequest;
-  void mutedState;
-  void unreadState;
 
-  const cellState = useMemo(() => generateCellState(conversation, translate), [conversation, translate]);
+  const cellState = generateCellState(conversation, translate);
 
   const storageKey = generateConversationInputStorageKey(conversation);
   // Hardcoded __amplify__ because of StorageUtil saving as __amplify__<storage_key>
