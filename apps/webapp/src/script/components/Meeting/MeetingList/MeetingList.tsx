@@ -93,7 +93,7 @@ export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) =
     );
   }
 
-  if (errorKey !== undefined && is.nonEmptyArray(meetings)) {
+  if (!is.nullOrUndefined(errorKey) && is.nonEmptyArray(meetings)) {
     return (
       <div css={meetingListContainerStyles} data-uie-name="meetings-list-error">
         {translate(errorKey)}
