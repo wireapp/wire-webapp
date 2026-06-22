@@ -56,6 +56,7 @@ export const GuestLinkPasswordForm = ({
   return (
     <>
       <PasswordGeneratorButton
+        translate={translate}
         passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
         onGeneratePassword={onGeneratePassword}
       />
