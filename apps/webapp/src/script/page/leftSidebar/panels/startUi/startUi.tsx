@@ -142,7 +142,7 @@ const StartUI = ({
     });
   };
 
-  const openInviteModal = () => showInviteModal({selfUser});
+  const openInviteModal = () => showInviteModal({translate, selfUser});
 
   const before = (
     <div id="start-ui-header" className={cx('start-ui-header', {'start-ui-header-integrations': isTeam})}>

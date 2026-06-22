@@ -24,20 +24,20 @@ import {Runtime} from '@wireapp/commons';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';
 
 interface InviteModalProps {
+  translate: Translate;
   readonly selfUser: User;
   onClose?: () => void;
 }
 
 const {BRAND_NAME: brandName} = Config.getConfig();
 
-const InviteModal = ({selfUser, onClose}: InviteModalProps) => {
-  const {translate} = useApplicationContext();
+const InviteModal = ({translate, selfUser, onClose}: InviteModalProps) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const userName = selfUser.username();
   const inviteMessage = userName
