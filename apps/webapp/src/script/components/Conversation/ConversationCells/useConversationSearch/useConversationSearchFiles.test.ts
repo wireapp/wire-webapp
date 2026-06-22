@@ -190,11 +190,13 @@ describe('useConversationSearchFiles', () => {
     const cellsRepository = {searchNodes: jest.fn().mockReturnValue(search.promise)} as FakeCellsRepository;
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
-    useCellsStore.getState().setNodes({
-      conversationId: CONV_ID,
-      nodes: [staleFolderNode],
+    act(() => {
+      useCellsStore.getState().setNodes({
+        conversationId: CONV_ID,
+        nodes: [staleFolderNode],
+      });
+      useCellsStore.getState().setStatus('success');
     });
-    useCellsStore.getState().setStatus('success');
 
     renderSearchHook({cellsRepository, fireAndForgetInvoker});
 
@@ -203,6 +205,32 @@ describe('useConversationSearchFiles', () => {
 
     act(() => {
       search.resolve({Nodes: []});
+    });
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+  });
+
+  it('shows loading when reloading search results', async () => {
+    const reloadSearch = createDeferred<RestNodeCollection>();
+    const cellsRepository = createFakeCellsRepository();
+    cellsRepository.searchNodes.mockResolvedValueOnce({Nodes: []});
+    cellsRepository.searchNodes.mockReturnValueOnce(reloadSearch.promise);
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+
+    const {result} = renderSearchHook({cellsRepository, fireAndForgetInvoker});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    act(() => {
+      useCellsStore.getState().setStatus('success');
+    });
+
+    act(() => {
+      void result.current.handleReload();
+    });
+
+    expect(useCellsStore.getState().status).toBe('loading');
+
+    act(() => {
+      reloadSearch.resolve({Nodes: []});
     });
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
   });
@@ -279,18 +307,72 @@ describe('useConversationSearchFiles', () => {
     );
   });
 
-  it('calls onClear when the search input is emptied', async () => {
+  it('reloads the unfiltered search list when all filters are cleared with no query', async () => {
     const onClear = jest.fn();
-    const {result, fireAndForgetInvoker} = renderSearchHook({onClear});
+    const cellsRepository = createFakeCellsRepository({
+      Nodes: [createRestNode('all-files.pdf')],
+    });
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const {rerender} = renderHook(
+      ({filters}: {filters: ConversationDriveFiltersState}) =>
+        useConversationSearchFiles({
+          cellsRepository: cellsRepository as unknown as CellsRepository,
+          userRepository: createFakeUserRepository() as unknown as UserRepository,
+          conversationQualifiedId: QUALIFIED_ID,
+          enabled: true,
+          fireAndForgetInvoker,
+          filters,
+          onClear,
+        }),
+      {
+        initialProps: {
+          filters: {
+            ...emptyFilters,
+            selectedFileTypeIds: ['pictures'],
+          },
+        },
+      },
+    );
+
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    const searchCallCountBeforeClearingFilters = cellsRepository.searchNodes.mock.calls.length;
+
+    act(() => rerender({filters: emptyFilters}));
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(searchCallCountBeforeClearingFilters + 1);
+    expect(cellsRepository.searchNodes).toHaveBeenNthCalledWith(
+      searchCallCountBeforeClearingFilters + 1,
+      expect.objectContaining({query: '', recursive: false}),
+    );
+    expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('all-files.pdf');
+    expect(onClear).not.toHaveBeenCalled();
+  });
+
+  it('reloads the unfiltered search list when the search input is emptied while search is open', async () => {
+    const onClear = jest.fn();
+    const cellsRepository = createFakeCellsRepository({
+      Nodes: [createRestNode('all-files.pdf')],
+    });
+    const {result, fireAndForgetInvoker} = renderSearchHook({cellsRepository, onClear});
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
     act(() => result.current.handleSearch('test'));
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
+    const searchCallCountBeforeClearingInput = cellsRepository.searchNodes.mock.calls.length;
+
     act(() => result.current.handleSearch(''));
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(onClear).toHaveBeenCalled();
+    expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(searchCallCountBeforeClearingInput + 1);
+    expect(cellsRepository.searchNodes).toHaveBeenNthCalledWith(
+      searchCallCountBeforeClearingInput + 1,
+      expect.objectContaining({query: '', recursive: false}),
+    );
+    expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('all-files.pdf');
+    expect(onClear).not.toHaveBeenCalled();
   });
 
   it('clears search-owned rows before handing control back to browse mode', async () => {
@@ -298,13 +380,15 @@ describe('useConversationSearchFiles', () => {
     const {result, fireAndForgetInvoker} = renderSearchHook({onClear});
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    useCellsStore.getState().setNodes({
-      conversationId: CONV_ID,
-      nodes: [staleFolderNode],
+    act(() => {
+      useCellsStore.getState().setNodes({
+        conversationId: CONV_ID,
+        nodes: [staleFolderNode],
+      });
+      useCellsStore.getState().setStatus('success');
     });
-    useCellsStore.getState().setStatus('success');
 
-    act(() => result.current.handleSearch(''));
+    act(() => result.current.handleClearSearch({preserveFilters: false}));
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toEqual([]);
     expect(useCellsStore.getState().getPagination({conversationId: CONV_ID})).toBeNull();
