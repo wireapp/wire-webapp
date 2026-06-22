@@ -26,14 +26,14 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {Message} from './Message';
 
-import {SuperType} from '../../../message/SuperType';
-import {VerificationMessageType} from '../../../message/VerificationMessageType';
+import {SuperType} from '../../../message/superType';
+import {VerificationMessageType} from '../../../message/verificationMessageType';
 import type {User} from '../User';
 
 export class VerificationMessage extends Message {
   public readonly userEntities: ko.ObservableArray<User>;
   public userIds: ko.ObservableArray<QualifiedUserId>;
-  public verificationMessageType: ko.Observable<VerificationMessageType | undefined>;
+  public VerificationMessageType: ko.Observable<VerificationMessageType | undefined>;
   public readonly isSelfClient: ko.PureComputed<boolean>;
 
   constructor(translate: Translate) {
@@ -42,7 +42,7 @@ export class VerificationMessage extends Message {
     this.super_type = SuperType.VERIFICATION;
     this.affect_order(false);
 
-    this.verificationMessageType = ko.observable();
+    this.VerificationMessageType = ko.observable();
     this.userIds = ko.observableArray<QualifiedUserId>();
 
     this.userEntities = ko.observableArray();

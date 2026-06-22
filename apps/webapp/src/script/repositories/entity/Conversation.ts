@@ -63,7 +63,7 @@ import type {User} from './User';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
 
 export interface UnreadState {

@@ -17,8 +17,8 @@
  *
  */
 
-import '../message/MessageCategorization';
-import '../message/MessageCategory';
+import '../message/messageCategorization';
+import '../message/messageCategory';
 import '../repositories/event/Client';
 import '../repositories/storage/storageSchemata';
 import '../service/backendEnvironment';

@@ -48,7 +48,7 @@ import {VideoAsset} from './asset/VideoAsset/VideoAsset';
 
 import {MessageActions} from '..';
 import {ConversationError} from '../../../../error/conversationError';
-import {QuoteEntity} from '../../../../message/QuoteEntity';
+import {QuoteEntity} from '../../../../message/quoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
 
 function createPlaceholderMessage(translate: Translate) {

@@ -25,7 +25,7 @@ import {AssetType} from 'Repositories/assets/assetType';
 import {EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {MentionEntity} from 'src/script/message/MentionEntity';
+import {MentionEntity} from 'src/script/message/mentionEntity';
 import {translate} from 'Util/localizerUtil';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';

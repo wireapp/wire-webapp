@@ -57,7 +57,7 @@ import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
 import {ConversationVerificationState} from './ConversationVerificationState';
 
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {ServerTimeHandler, serverTimeHandler} from '../../time/serverTimeHandler';
 
 const selfUser = new User('selfid', '', translateForTest);

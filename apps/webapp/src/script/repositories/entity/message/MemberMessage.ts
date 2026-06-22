@@ -29,8 +29,8 @@ import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-import {SuperType} from '../../../message/SuperType';
-import {SystemMessageType} from '../../../message/SystemMessageType';
+import {SuperType} from '../../../message/superType';
+import {SystemMessageType} from '../../../message/systemMessageType';
 import {User} from '../User';
 
 export class MemberMessage extends SystemMessage {

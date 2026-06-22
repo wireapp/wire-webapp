@@ -33,8 +33,8 @@ import type {MediumImage} from './MediumImage';
 import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 
-import type {QuoteEntity} from '../../../message/QuoteEntity';
-import {SuperType} from '../../../message/SuperType';
+import type {QuoteEntity} from '../../../message/quoteEntity';
+import {SuperType} from '../../../message/superType';
 
 export class ContentMessage extends Message {
   public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage> = ko.observableArray();
@@ -97,8 +97,8 @@ export class ContentMessage extends Message {
    * @returns `true` if the message quotes the user, `false` otherwise.
    */
   isUserQuoted(userId: string): boolean {
-    const quoteEntity = this.quote();
-    return quoteEntity !== undefined ? quoteEntity.isQuoteFromUser(userId) : false;
+    const QuoteEntity = this.quote();
+    return QuoteEntity !== undefined ? QuoteEntity.isQuoteFromUser(userId) : false;
   }
 
   /**

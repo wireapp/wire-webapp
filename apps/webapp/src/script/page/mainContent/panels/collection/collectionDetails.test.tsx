@@ -25,7 +25,7 @@ import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {Text} from 'Repositories/entity/message/Text';
-import {MessageCategory} from 'src/script/message/MessageCategory';
+import {MessageCategory} from 'src/script/message/messageCategory';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

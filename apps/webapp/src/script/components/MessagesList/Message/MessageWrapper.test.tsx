@@ -25,7 +25,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

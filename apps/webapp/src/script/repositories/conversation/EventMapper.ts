@@ -84,12 +84,12 @@ import {
 
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage} from '../../guards/Message';
-import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
-import {MentionEntity} from '../../message/MentionEntity';
-import {MessageCategory} from '../../message/MessageCategory';
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {StatusType} from '../../message/StatusType';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {CALL_MESSAGE_TYPE} from '../../message/callMessageType';
+import {MentionEntity} from '../../message/mentionEntity';
+import {MessageCategory} from '../../message/messageCategory';
+import {QuoteEntity} from '../../message/quoteEntity';
+import {StatusType} from '../../message/statusType';
+import {SystemMessageType} from '../../message/systemMessageType';
 import {APIClient} from '../../service/apiClientSingleton';
 
 // Event Mapper to convert all server side JSON events into core entities.
@@ -862,7 +862,7 @@ export class EventMapper {
     const messageEntity = new VerificationMessage(this.translate);
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
-    messageEntity.verificationMessageType(eventData.type);
+    messageEntity.VerificationMessageType(eventData.type);
 
     return messageEntity;
   }
@@ -1121,10 +1121,10 @@ export class EventMapper {
           protoMention.qualifiedUserId?.domain ?? undefined,
         );
       })
-      .filter((mentionEntity, _, allMentions): boolean | void => {
-        if (mentionEntity !== undefined) {
+      .filter((MentionEntity, _, allMentions): boolean | void => {
+        if (MentionEntity !== undefined) {
           try {
-            return mentionEntity.validate(messageText, allMentions);
+            return MentionEntity.validate(messageText, allMentions);
           } catch (error: unknown) {
             this.logger.warn(`Removed invalid mention when mapping message: ${toError(error).message}`);
             return false;

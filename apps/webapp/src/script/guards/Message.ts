@@ -21,7 +21,7 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
 import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
 
-import {SuperType} from '../message/SuperType';
+import {SuperType} from '../message/superType';
 
 export const isReadableMessage = (message: any): message is ContentMessage =>
   message &&

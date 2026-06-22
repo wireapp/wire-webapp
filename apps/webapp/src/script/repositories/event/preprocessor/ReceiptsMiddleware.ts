@@ -25,7 +25,7 @@ import {User} from 'Repositories/entity/User';
 import type {EventRecord} from 'Repositories/storage/record/eventRecord';
 import {getLogger, Logger} from 'Util/logger';
 
-import {StatusType} from '../../../message/StatusType';
+import {StatusType} from '../../../message/statusType';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';

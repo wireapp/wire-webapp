@@ -25,7 +25,7 @@ import {formatDuration} from 'Util/timeUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-import {SystemMessageType} from '../../../message/SystemMessageType';
+import {SystemMessageType} from '../../../message/systemMessageType';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;

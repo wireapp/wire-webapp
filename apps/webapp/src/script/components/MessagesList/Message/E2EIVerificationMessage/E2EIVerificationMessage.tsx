@@ -32,7 +32,7 @@ import {MessageIcon, IconInfo, Link as LinkStyles} from './E2EIVerificationMessa
 
 import {Config} from '../../../../Config';
 import {E2EIHandler} from '../../../../E2EIdentity';
-import {E2EIVerificationMessageType} from '../../../../message/E2EIVerificationMessageType';
+import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';
 
 const logger = getLogger('E2EIVerificationMessage');
 

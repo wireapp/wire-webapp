@@ -22,8 +22,8 @@ import {type Translate} from 'Util/localizerUtil';
 import {Message} from './Message';
 import {RenameMessage} from './RenameMessage';
 
-import {SuperType} from '../../../message/SuperType';
-import {SystemMessageType} from '../../../message/SystemMessageType';
+import {SuperType} from '../../../message/superType';
+import {SystemMessageType} from '../../../message/systemMessageType';
 
 export class SystemMessage extends Message {
   public caption?: string;

@@ -25,7 +25,7 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

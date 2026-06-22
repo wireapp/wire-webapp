@@ -23,7 +23,7 @@ import type {Translate} from 'Util/localizerUtil';
 
 import {Message} from './Message';
 
-import {SuperType} from '../../../message/SuperType';
+import {SuperType} from '../../../message/superType';
 
 /**
  * Legal hold system message

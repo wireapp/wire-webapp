@@ -19,7 +19,7 @@
 
 import {renderMessage, getRenderedTextContent} from './messageRenderer';
 
-import {MentionEntity} from '../message/MentionEntity';
+import {MentionEntity} from '../message/mentionEntity';
 
 const escapeLink = (link: string) => link.replace(/&/g, '&amp;');
 
@@ -409,8 +409,8 @@ describe('renderMessage', () => {
 
     tests.forEach(({expected, mentions, testCase, text}) => {
       const mentionEntities = mentions.map(mention => {
-        const mentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
-        return mentionEntity;
+        const MentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
+        return MentionEntity;
       });
 
       // eslint-disable-next-line jest/valid-title
@@ -426,8 +426,8 @@ describe('renderMessage', () => {
         'hey <span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>user</span>';
       const mentions = [{length: 5, startIndex: 4, userId: 'pain-id'}];
       const mentionEntities = mentions.map(mention => {
-        const mentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
-        return mentionEntity;
+        const MentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
+        return MentionEntity;
       });
       const result = renderMessage('hey @user', undefined, mentionEntities);
 

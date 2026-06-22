@@ -42,9 +42,9 @@ import {createUuid} from 'Util/uuid';
 
 import {BuildMessageAddParams} from './EventBuilder.types';
 
-import {E2EIVerificationMessageType} from '../../../message/E2EIVerificationMessageType';
-import {StatusType} from '../../../message/StatusType';
-import {VerificationMessageType} from '../../../message/VerificationMessageType';
+import {E2EIVerificationMessageType} from '../../../message/e2eiVerificationMessageType';
+import {StatusType} from '../../../message/statusType';
+import {VerificationMessageType} from '../../../message/verificationMessageType';
 
 export interface BaseEvent {
   conversation: string;

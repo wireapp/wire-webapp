@@ -31,7 +31,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Declension, joinNames} from 'Util/localizerUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
-import {VerificationMessageType} from '../../../message/VerificationMessageType';
+import {VerificationMessageType} from '../../../message/verificationMessageType';
 
 interface VerificationMessageProps {
   message: VerificationMessageEntity;
@@ -39,10 +39,19 @@ interface VerificationMessageProps {
 
 const VerificationMessage = ({message}: VerificationMessageProps) => {
   const {translate} = useApplicationContext();
-  const {userIds, userEntities, unsafeSenderName, verificationMessageType, isSelfClient} = useKoSubscribableChildren(
-    message,
-    ['userIds', 'userEntities', 'unsafeSenderName', 'verificationMessageType', 'isSelfClient'],
-  );
+  const {
+    userIds,
+    userEntities,
+    unsafeSenderName,
+    VerificationMessageType: verificationMessageType,
+    isSelfClient,
+  } = useKoSubscribableChildren(message, [
+    'userIds',
+    'userEntities',
+    'unsafeSenderName',
+    'VerificationMessageType',
+    'isSelfClient',
+  ]);
 
   const nameList = useMemo(() => {
     const namesString = joinNames(userEntities, translate, Declension.NOMINATIVE);

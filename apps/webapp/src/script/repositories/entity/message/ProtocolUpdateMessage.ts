@@ -19,7 +19,7 @@
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
 import type {Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';

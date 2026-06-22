@@ -49,7 +49,7 @@ import type {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 
 import {Config} from '../../Config';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessageType} from '../../message/systemMessageType';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;

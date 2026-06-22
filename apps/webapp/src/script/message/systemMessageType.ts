@@ -18,7 +18,7 @@
  */
 
 /**
- * @todo Refactor to use member-join and member-leave instead of normal. It duplicates "SuperType".
+ * @todo Refactor to use member-join and member-leave instead of normal. It duplicates "superType".
  */
 export enum SystemMessageType {
   CONNECTION_ACCEPTED = 'created-one-to-one',

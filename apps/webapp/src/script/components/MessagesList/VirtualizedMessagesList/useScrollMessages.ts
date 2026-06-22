@@ -21,7 +21,7 @@ import {useLayoutEffect, useRef} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {StatusType} from '../../../message/StatusType';
+import {StatusType} from '../../../message/statusType';
 import {GroupedMessage, isMarker, Marker} from '../utils/virtualizedMessagesGroup';
 
 interface Props {

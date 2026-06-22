@@ -23,7 +23,7 @@ import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-import {SystemMessageType} from '../../../message/SystemMessageType';
+import {SystemMessageType} from '../../../message/systemMessageType';
 import type {Conversation} from '../Conversation';
 
 export class DeleteConversationMessage extends SystemMessage {

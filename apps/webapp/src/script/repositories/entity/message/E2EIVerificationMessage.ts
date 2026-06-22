@@ -23,8 +23,8 @@ import type {Translate} from 'Util/localizerUtil';
 
 import {Message} from './Message';
 
-import {E2EIVerificationMessageType} from '../../../message/E2EIVerificationMessageType';
-import {SuperType} from '../../../message/SuperType';
+import {E2EIVerificationMessageType} from '../../../message/e2eiVerificationMessageType';
+import {SuperType} from '../../../message/superType';
 
 export class E2EIVerificationMessage extends Message {
   public messageType: E2EIVerificationMessageType;

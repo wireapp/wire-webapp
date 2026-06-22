@@ -109,9 +109,9 @@ import {getLinkPreviewFromString} from './linkPreviews';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
-import {MentionEntity} from '../../message/MentionEntity';
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {StatusType} from '../../message/StatusType';
+import {MentionEntity} from '../../message/mentionEntity';
+import {QuoteEntity} from '../../message/quoteEntity';
+import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 
@@ -390,21 +390,21 @@ export class MessageRepository {
    * @param conversation Conversation that should receive the message
    * @param textMessage Plain text message
    * @param mentions Mentions part of the message
-   * @param quoteEntity Quoted message
+   * @param QuoteEntity Quoted message
    * @returns Resolves after sending the message
    */
   public async sendTextWithLinkPreview({
     conversation,
     textMessage,
     mentions,
-    quoteEntity,
+    QuoteEntity,
     messageId,
     attachments,
   }: {
     conversation: Conversation;
     textMessage: string;
     mentions: MentionEntity[];
-    quoteEntity?: OutgoingQuote;
+    QuoteEntity?: OutgoingQuote;
     messageId?: string;
     attachments?: MultiPartContent['attachments'];
   }): Promise<void> {
@@ -412,7 +412,7 @@ export class MessageRepository {
       conversation,
       mentions,
       message: textMessage,
-      quote: quoteEntity,
+      quote: QuoteEntity,
       // We set the id explicitely in order to be able to override the message if we generate a link preview
       // Similarly, we provide that same id when we retry to send a failed message in order to override the original
       messageId: messageId ?? createUuid(),
@@ -527,14 +527,14 @@ export class MessageRepository {
    * @param conversationEntity Conversation to send message in
    * @param url URL of giphy image
    * @param tag tag tag used for gif search
-   * @param quoteEntity Quote as part of the message
+   * @param QuoteEntity Quote as part of the message
    * @returns Resolves when the gif was posted
    */
   public async sendGif(
     conversationEntity: Conversation,
     url: string,
     tag: string | number | Record<string, string>,
-    quoteEntity?: OutgoingQuote,
+    QuoteEntity?: OutgoingQuote,
   ): Promise<void> {
     if (!tag) {
       tag = this.translate('extensionsGiphyRandom');
@@ -542,7 +542,7 @@ export class MessageRepository {
 
     const blob = await loadUrlBlob(url);
     const textMessage = this.translate('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
-    this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity});
+    this.sendText({conversation: conversationEntity, message: textMessage, quote: QuoteEntity});
     return this.uploadImages(conversationEntity, [blob]);
   }
 

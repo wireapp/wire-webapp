@@ -44,7 +44,7 @@ import {CollectionSection} from './collectionSection';
 import {FullSearch} from './fullSearch';
 import {Category, isOfCategory} from './utils';
 
-import {MessageCategory} from '../../../../message/MessageCategory';
+import {MessageCategory} from '../../../../message/messageCategory';
 
 interface CollectionDetailsProps {
   conversation: Conversation;

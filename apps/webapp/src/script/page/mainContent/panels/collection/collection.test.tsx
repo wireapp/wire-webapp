@@ -30,7 +30,7 @@ import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {MessageCategory} from 'src/script/message/MessageCategory';
+import {MessageCategory} from 'src/script/message/messageCategory';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

@@ -167,8 +167,8 @@ import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';
 import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
 import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
-import {MessageCategory} from '../../message/MessageCategory';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {MessageCategory} from '../../message/messageCategory';
+import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
@@ -2561,7 +2561,7 @@ export class ConversationRepository {
   private onConversationVerificationStateChange: OnConversationVerificationStateChange = async ({
     conversationEntity,
     conversationVerificationState,
-    verificationMessageType,
+    VerificationMessageType,
     userIds = [],
   }) => {
     switch (conversationVerificationState) {
@@ -2570,11 +2570,11 @@ export class ConversationRepository {
         await this.eventRepository.injectEvent(allVerifiedEvent);
         break;
       case ConversationVerificationState.DEGRADED:
-        if (verificationMessageType) {
-          const event = EventBuilder.buildDegraded(conversationEntity, userIds, verificationMessageType);
+        if (VerificationMessageType) {
+          const event = EventBuilder.buildDegraded(conversationEntity, userIds, VerificationMessageType);
           await this.eventRepository.injectEvent(event);
         } else {
-          this.logger.error('onConversationVerificationStateChange: Missing verificationMessageType while degrading');
+          this.logger.error('onConversationVerificationStateChange: Missing VerificationMessageType while degrading');
         }
         break;
       default:

@@ -30,7 +30,7 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 
 import {ConversationError} from '../../error/conversationError';
-import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
+import {E2EIVerificationMessageType} from '../../message/e2eiVerificationMessageType';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',

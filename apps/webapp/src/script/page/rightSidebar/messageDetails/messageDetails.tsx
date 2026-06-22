@@ -35,7 +35,7 @@ import {formatLocale} from 'Util/timeUtil';
 
 import {UsersReactions} from './userReactions';
 
-import {SuperType} from '../../../message/SuperType';
+import {SuperType} from '../../../message/superType';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

@@ -38,8 +38,8 @@ import {arrayToBase64, noop} from 'Util/util';
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 import {ConversationMapper} from './ConversationMapper';
 
-import {EphemeralStatusType} from '../../message/EphemeralStatusType';
-import {StatusType} from '../../message/StatusType';
+import {EphemeralStatusType} from '../../message/ephemeralStatusType';
+import {StatusType} from '../../message/statusType';
 
 export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   eventListeners: Record<string, (...args: any[]) => void>;

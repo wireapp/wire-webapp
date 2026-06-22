@@ -43,7 +43,7 @@ import {DetailViewModalFooter} from './DetailViewModalFooter';
 import {DetailViewModalHeader} from './DetailViewModalHeader';
 
 import {isContentMessage} from '../../../guards/Message';
-import {MessageCategory} from '../../../message/MessageCategory';
+import {MessageCategory} from '../../../message/messageCategory';
 import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
 
 interface DetailViewModalProps {

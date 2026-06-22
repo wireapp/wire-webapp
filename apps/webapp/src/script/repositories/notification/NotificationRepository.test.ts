@@ -56,10 +56,10 @@ import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermission
 import {UserMapper} from 'Repositories/user/userMapper';
 import {UserState} from 'Repositories/user/userState';
 import 'src/script/localization/Localizer';
-import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
-import {MentionEntity} from 'src/script/message/MentionEntity';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {CALL_MESSAGE_TYPE} from 'src/script/message/callMessageType';
+import {MentionEntity} from 'src/script/message/mentionEntity';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
 import {entities, payload} from 'test/api/payloads';
 import type {Translate} from 'Util/localizerUtil';
@@ -784,8 +784,8 @@ describe('NotificationRepository', () => {
       const mentionId = selfMentioned ? userId.id : createUuid();
 
       const textEntity = new Text(createUuid(), '@Gregor can you take a look?');
-      const mentionEntity = new MentionEntity(0, 7, mentionId, userId.domain);
-      textEntity.mentions([mentionEntity]);
+      const MentionEntity = new MentionEntity(0, 7, mentionId, userId.domain);
+      textEntity.mentions([MentionEntity]);
 
       return textEntity;
     }
@@ -837,8 +837,8 @@ describe('NotificationRepository', () => {
     it('returns the correct value for self replies', () => {
       messageEntity.addAsset(generateTextAsset());
 
-      const quoteEntity = new QuoteEntity({messageId: createUuid(), userId: userId.id});
-      messageEntity.quote(quoteEntity);
+      const QuoteEntity = new QuoteEntity({messageId: createUuid(), userId: userId.id});
+      messageEntity.quote(QuoteEntity);
 
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
@@ -849,11 +849,11 @@ describe('NotificationRepository', () => {
     it('returns the correct value for non-self replies', () => {
       messageEntity.addAsset(generateTextAsset());
 
-      const quoteEntity = new QuoteEntity({
+      const QuoteEntity = new QuoteEntity({
         messageId: createUuid(),
         userId: createUuid(),
       });
-      messageEntity.quote(quoteEntity);
+      messageEntity.quote(QuoteEntity);
 
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);

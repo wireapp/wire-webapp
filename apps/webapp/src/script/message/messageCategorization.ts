@@ -22,7 +22,7 @@ import {isObject} from 'underscore';
 import {ClientEvent} from 'Repositories/event/Client';
 import {EventRecord} from 'Repositories/storage/record/eventRecord';
 
-import {MessageCategory} from './MessageCategory';
+import {MessageCategory} from './messageCategory';
 
 const _checkAsset = (event: any): MessageCategory | void => {
   const {data: eventData, type: eventType} = event;

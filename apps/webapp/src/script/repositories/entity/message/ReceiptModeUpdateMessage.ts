@@ -23,7 +23,7 @@ import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-import {SystemMessageType} from '../../../message/SystemMessageType';
+import {SystemMessageType} from '../../../message/systemMessageType';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
   constructor(isReceiptEnabled: boolean, translate: Translate) {

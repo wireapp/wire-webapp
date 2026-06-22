@@ -30,7 +30,7 @@ import type {Location} from 'Repositories/entity/message/Location';
 import type {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {Multipart} from 'Repositories/entity/message/Multipart';
 import {Text} from 'Repositories/entity/message/Text';
-import {StatusType} from 'src/script/message/StatusType';
+import {StatusType} from 'src/script/message/statusType';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
 

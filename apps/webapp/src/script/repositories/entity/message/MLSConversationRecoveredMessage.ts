@@ -17,7 +17,7 @@
  *
  */
 
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';

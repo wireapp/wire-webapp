@@ -29,7 +29,7 @@ import {Multipart} from './Multipart';
 import {PingMessage} from './PingMessage';
 import {Text} from './Text';
 
-import {SuperType} from '../../../message/SuperType';
+import {SuperType} from '../../../message/superType';
 
 describe('Message', () => {
   describe('translation injection', () => {

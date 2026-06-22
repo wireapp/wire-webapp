@@ -24,7 +24,7 @@ import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/
 import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {Config} from 'src/script/Config';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
 import {Declension, joinNames, replaceLink} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';

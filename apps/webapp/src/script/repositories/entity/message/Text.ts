@@ -28,7 +28,7 @@ import {renderMessage} from 'Util/messageRenderer';
 import {Asset} from './Asset';
 import type {LinkPreview} from './LinkPreview';
 
-import type {MentionEntity} from '../../../message/MentionEntity';
+import type {MentionEntity} from '../../../message/mentionEntity';
 
 export class Text extends Asset {
   public readonly mentions: ko.ObservableArray<MentionEntity>;
@@ -59,6 +59,6 @@ export class Text extends Asset {
   }
 
   isUserMentioned(userId: QualifiedId): boolean {
-    return this.mentions().some(mentionEntity => mentionEntity.targetsUser(userId));
+    return this.mentions().some(MentionEntity => MentionEntity.targetsUser(userId));
   }
 }

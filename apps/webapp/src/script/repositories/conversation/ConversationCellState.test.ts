@@ -34,7 +34,7 @@ import {generateCellState} from './ConversationCellState';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
-import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
+import {CALL_MESSAGE_TYPE} from '../../message/callMessageType';
 
 describe('ConversationCellState', () => {
   describe('Notification state icon', () => {
