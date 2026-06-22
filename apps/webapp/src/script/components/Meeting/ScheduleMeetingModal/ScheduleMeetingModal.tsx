@@ -44,7 +44,7 @@ import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useSchedu
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 
 export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?: () => Promise<void>}) => {
-  const {translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {
     isOpen,
     mode,
@@ -77,16 +77,18 @@ export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?:
     reset();
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const validationErrors = validate();
     if (hasScheduleMeetingFormErrors(validationErrors)) {
       return;
     }
 
-    const didSchedule = await submit(formState);
-    if (didSchedule) {
-      handleClose();
-    }
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      const didSchedule = await submit(formState);
+      if (didSchedule) {
+        handleClose();
+      }
+    });
   };
 
   const modalTitle =
