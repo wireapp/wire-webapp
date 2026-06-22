@@ -24,8 +24,8 @@ import type {ReactElement} from 'react';
 
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Text} from 'Repositories/entity/message/Text';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
 import {
   createRootContextValueForTest,
