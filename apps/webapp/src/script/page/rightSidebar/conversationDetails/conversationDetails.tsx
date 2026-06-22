@@ -51,8 +51,8 @@ import {ConversationDetailsOptions} from './components/conversationDetailsOption
 import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
 
 import {isServiceEntity} from '../../../guards/Service';
-import {Shortcut} from '../../../ui/Shortcut';
-import {ShortcutType} from '../../../ui/ShortcutType';
+import {Shortcut} from '../../../ui/shortcut';
+import {ShortcutType} from '../../../ui/shortcutType';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';

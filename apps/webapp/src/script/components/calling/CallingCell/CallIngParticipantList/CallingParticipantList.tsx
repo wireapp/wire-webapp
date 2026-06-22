@@ -39,7 +39,7 @@ import {
   participantListWrapperStyles,
 } from './CallingParticipantList.styles';
 
-import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
+import {ContextMenuEntry, showContextMenu} from '../../../../ui/contextMenu';
 
 interface CallingParticipantListProps {
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;

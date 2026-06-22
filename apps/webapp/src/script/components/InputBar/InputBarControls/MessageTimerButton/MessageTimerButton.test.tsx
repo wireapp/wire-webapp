@@ -27,7 +27,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import * as Context from 'src/script/ui/ContextMenu';
+import * as Context from 'src/script/ui/contextMenu';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageTimerButton} from './MessageTimerButton';

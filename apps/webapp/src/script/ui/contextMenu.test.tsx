@@ -20,7 +20,7 @@
 import '@testing-library/jest-dom';
 import {act, waitFor} from '@testing-library/react';
 
-import {showContextMenu} from './ContextMenu';
+import {showContextMenu} from './contextMenu';
 
 import * as ActiveWindowMod from '../hooks/useActiveWindow';
 

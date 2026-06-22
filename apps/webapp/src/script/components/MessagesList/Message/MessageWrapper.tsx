@@ -52,7 +52,7 @@ import {PingMessage} from './PingMessage';
 import {SystemMessage} from './SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
-import {ContextMenuEntry} from '../../../ui/ContextMenu';
+import {ContextMenuEntry} from '../../../ui/contextMenu';
 
 import {MessageParams} from './index';
 

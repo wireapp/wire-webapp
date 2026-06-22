@@ -21,7 +21,7 @@ import {PlusIcon} from 'Components/icon';
 import type {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 
-import {ContextMenuEntry, showContextMenu} from './ContextMenu';
+import {ContextMenuEntry, showContextMenu} from './contextMenu';
 
 type LabelContextMenuCopy = {
   readonly newFolder: string;

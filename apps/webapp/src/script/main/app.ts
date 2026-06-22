@@ -118,7 +118,7 @@ import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsVal
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
-import {WindowHandler} from '../ui/WindowHandler';
+import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 

@@ -48,7 +48,7 @@ import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warni
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
-import {ContextMenuEntry} from '../../../../ui/ContextMenu';
+import {ContextMenuEntry} from '../../../../ui/contextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
 import {useMessageFocusedTabIndex} from '../util';

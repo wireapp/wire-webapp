@@ -27,7 +27,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {showContextMenu} from 'src/script/ui/ContextMenu';
+import {showContextMenu} from 'src/script/ui/contextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {DurationUnit, formatDuration} from 'Util/timeUtil';

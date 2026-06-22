@@ -32,7 +32,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import * as styles from './userDetails.styles';
 
-import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
+import {AvailabilityContextMenu} from '../../../ui/availabilityContextMenu';
 
 interface AvailabilityStateButtonWrapperProps {
   children: React.ReactElement;
