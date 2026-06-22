@@ -19,6 +19,8 @@
 
 import {useEffect, useMemo, useState} from 'react';
 
+import is from '@sindresorhus/is';
+
 import {Loading} from '@wireapp/react-ui-kit';
 
 import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
@@ -79,11 +81,11 @@ export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) =
   const groupedMeetingsTomorrow = groupByStartHour(meetingsTomorrow);
   const groupedMeetingsPast = groupByStartHour(meetingsPast);
 
-  const hasMeetingsToday = meetingsToday.length > 0;
-  const hasMeetingsTomorrow = meetingsTomorrow.length > 0;
-  const hasMeetingsPast = meetingsPast.length > 0;
+  const hasMeetingsToday = is.nonEmptyArray(meetingsToday);
+  const hasMeetingsTomorrow = is.nonEmptyArray(meetingsTomorrow);
+  const hasMeetingsPast = is.nonEmptyArray(meetingsPast);
 
-  if (isLoading && meetings.length === 0) {
+  if (isLoading && is.nonEmptyArray(meetings)) {
     return (
       <div css={emptyListContainerStyles} data-uie-name="meetings-list-loading">
         <Loading data-uie-name="status-loading" />
@@ -91,7 +93,7 @@ export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) =
     );
   }
 
-  if (errorKey !== undefined && meetings.length === 0) {
+  if (errorKey !== undefined && is.nonEmptyArray(meetings)) {
     return (
       <div css={meetingListContainerStyles} data-uie-name="meetings-list-error">
         {translate(errorKey)}
