@@ -30,7 +30,14 @@ export class ScheduleMeetingService {
     private readonly notifier: ScheduleMeetingNotifier,
   ) {}
 
-  async scheduleMeeting(formState: ScheduleMeetingFormState): Promise<boolean> {
+  /**
+   * Tries to schedule a meeting with the given form state.
+   * If the meeting cannot be scheduled because of a missing participant email, it will show an error notification and return false.
+   * If the meeting cannot be scheduled because of an error, it will show an error notification and return false.
+   * @param formState - The form state to schedule the meeting with.
+   * @returns True if the meeting was scheduled successfully, false otherwise.
+   */
+  async tryScheduleMeeting(formState: ScheduleMeetingFormState): Promise<boolean> {
     const mapping = mapScheduleFormToCreateMeeting(formState);
 
     if (mapping.error === 'participantMissingEmail') {

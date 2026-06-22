@@ -67,7 +67,7 @@ describe('ScheduleMeetingService', () => {
   it('creates a meeting and refreshes the list', async () => {
     const {service, createMeeting, fetchMeetings} = createService();
 
-    await expect(service.scheduleMeeting(formState)).resolves.toBe(true);
+    await expect(service.tryScheduleMeeting(formState)).resolves.toBe(true);
 
     expect(createMeeting).toHaveBeenCalledWith({
       title: 'Weekly sync',
@@ -83,7 +83,7 @@ describe('ScheduleMeetingService', () => {
     const {service, createMeeting, showParticipantMissingEmailError} = createService();
 
     await expect(
-      service.scheduleMeeting({
+      service.tryScheduleMeeting({
         ...formState,
         selectedUsers: [user],
       }),
@@ -98,7 +98,7 @@ describe('ScheduleMeetingService', () => {
       createMeeting: jest.fn().mockRejectedValue(new Error('network')),
     });
 
-    await expect(service.scheduleMeeting(formState)).resolves.toBe(false);
+    await expect(service.tryScheduleMeeting(formState)).resolves.toBe(false);
 
     expect(showCreateError).toHaveBeenCalled();
     expect(fetchMeetings).not.toHaveBeenCalled();

@@ -43,7 +43,7 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
       setIsSubmitting(true);
 
       try {
-        return await scheduleMeetingService.scheduleMeeting(formState);
+        return await scheduleMeetingService.tryScheduleMeeting(formState);
       } finally {
         setIsSubmitting(false);
       }
