@@ -52,6 +52,11 @@ enum TOPIC {
   ON_STATE_CHANGE = 'WebSocketClient.TOPIC.ON_STATE_CHANGE',
 }
 
+const accessTokenRefreshRetryInitialDelayInMilliseconds = 1_000;
+const accessTokenRefreshRetryMaximumDelayInMilliseconds = 10_000;
+const accessTokenRefreshRetryBackoffFactor = 2;
+const firstRetryAttemptOffset = 1;
+
 export interface WebSocketClient {
   on(event: TOPIC.ON_ERROR, listener: (error: Error | ErrorEvent) => void): this;
   on(event: TOPIC.ON_INVALID_TOKEN, listener: (error: InvalidTokenError | MissingCookieError) => void): this;
@@ -72,6 +77,7 @@ export class WebSocketClient extends EventEmitter {
   private readonly baseUrl: string;
   private readonly logger: logdown.Logger;
   private readonly socket: ReconnectingWebsocket;
+  private readonly wallClock: ReconnectingWebsocketWallClock;
   private websocketState: WEBSOCKET_STATE;
   public client: HttpClient;
   private isSocketLocked: boolean;
@@ -90,6 +96,7 @@ export class WebSocketClient extends EventEmitter {
     this.isSocketLocked = false;
     this.baseUrl = baseUrl;
     this.client = client;
+    this.wallClock = options.wallClock;
     this.socket = new ReconnectingWebsocket(this.onReconnect, {
       backFromSleepHandler: Maybe.nothing(),
       pingInterval: Maybe.nothing(),
@@ -142,14 +149,7 @@ export class WebSocketClient extends EventEmitter {
   };
 
   private readonly onReconnect = async () => {
-    if (!this.client.hasValidAccessToken()) {
-      // before we try any connection, we first refresh the access token to make sure we will avoid concurrent accessToken refreshes
-      await this.refreshAccessToken();
-    }
-
-    if (!this.client.hasValidAccessToken()) {
-      throw new Error('Cannot reconnect WebSocket because access token is invalid after refresh');
-    }
+    await this.waitForValidAccessTokenBeforeReconnect();
 
     return this.buildWebSocketUrl();
   };
@@ -208,6 +208,69 @@ export class WebSocketClient extends EventEmitter {
     this.accessTokenRefreshPromise = this.refreshAccessTokenWithCleanup();
 
     return this.accessTokenRefreshPromise;
+  }
+
+  private async waitForValidAccessTokenBeforeReconnect(): Promise<void> {
+    let retryCount = 0;
+
+    while (!this.client.hasValidAccessToken()) {
+      this.logger.info(`WebSocket reconnect waiting for access-token refresh. retry count: ${retryCount}`);
+
+      try {
+        await this.refreshAccessToken();
+      } catch (error: unknown) {
+        if (this.isInvalidSessionError(error)) {
+          this.logger.warn(
+            'WebSocket reconnect stopped because access-token refresh failed with an invalid session. Logout handling should take over.',
+            error,
+          );
+          throw error;
+        }
+
+        retryCount += 1;
+        const nextRetryDelayInMilliseconds = this.getAccessTokenRefreshRetryDelayInMilliseconds(retryCount);
+        this.logger.warn(
+          `WebSocket reconnect access-token refresh failed transiently. retry count: ${retryCount}, next retry delay: ${nextRetryDelayInMilliseconds}ms`,
+          error,
+        );
+        await this.waitForNextAccessTokenRefreshRetry(nextRetryDelayInMilliseconds);
+        continue;
+      }
+
+      if (this.client.hasValidAccessToken()) {
+        this.logger.info('WebSocket reconnect access-token refresh succeeded; building WebSocket URL');
+        return;
+      }
+
+      retryCount += 1;
+      const nextRetryDelayInMilliseconds = this.getAccessTokenRefreshRetryDelayInMilliseconds(retryCount);
+      this.logger.warn(
+        `WebSocket reconnect access-token refresh completed but token is still invalid. retry count: ${retryCount}, next retry delay: ${nextRetryDelayInMilliseconds}ms`,
+      );
+      await this.waitForNextAccessTokenRefreshRetry(nextRetryDelayInMilliseconds);
+    }
+  }
+
+  private isInvalidSessionError(error: unknown): boolean {
+    return (
+      error instanceof InvalidTokenError ||
+      error instanceof MissingCookieError ||
+      error instanceof MissingCookieAndTokenError
+    );
+  }
+
+  private getAccessTokenRefreshRetryDelayInMilliseconds(retryCount: number): number {
+    const delayInMilliseconds =
+      accessTokenRefreshRetryInitialDelayInMilliseconds *
+      accessTokenRefreshRetryBackoffFactor ** (retryCount - firstRetryAttemptOffset);
+
+    return Math.min(delayInMilliseconds, accessTokenRefreshRetryMaximumDelayInMilliseconds);
+  }
+
+  private waitForNextAccessTokenRefreshRetry(delayInMilliseconds: number): Promise<void> {
+    return new Promise(resolve => {
+      this.wallClock.setTimeout(resolve, delayInMilliseconds);
+    });
   }
 
   private async refreshAccessTokenWithCleanup(): Promise<void> {
