@@ -19,7 +19,7 @@
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
 

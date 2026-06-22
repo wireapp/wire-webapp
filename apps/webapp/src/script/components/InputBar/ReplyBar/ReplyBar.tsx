@@ -24,7 +24,7 @@ import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/Image';
 import {MultipartAssetPreview} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssetPreview';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {renderMessage} from 'Util/messageRenderer';

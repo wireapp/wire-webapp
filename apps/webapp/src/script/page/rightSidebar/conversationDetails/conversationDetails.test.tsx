@@ -50,12 +50,12 @@ import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 
-jest.mock('Components/panel/EnrichedFields', () => ({
+jest.mock('Components/panel/enrichedFields', () => ({
   useEnrichedFields: (): never[] => [],
   EnrichedFields: () => <div />,
   __esModule: true,
 }));
-jest.mock('Components/panel/UserDetails', () => ({
+jest.mock('Components/panel/userDetails', () => ({
   UserDetails: () => <div />,
   __esModule: true,
 }));

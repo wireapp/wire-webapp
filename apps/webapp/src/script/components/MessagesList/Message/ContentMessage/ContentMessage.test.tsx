@@ -21,11 +21,11 @@ import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
-import {Text} from 'Repositories/entity/message/Text';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {LinkPreview} from 'Repositories/entity/message/linkPreview';
+import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

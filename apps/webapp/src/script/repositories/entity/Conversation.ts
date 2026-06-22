@@ -54,16 +54,16 @@ import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {truncate} from 'Util/stringUtil';
 
-import {CallMessage} from './message/CallMessage';
-import type {ContentMessage} from './message/ContentMessage';
-import type {Message} from './message/Message';
-import {PingMessage} from './message/PingMessage';
+import {CallMessage} from './message/callMessage';
+import type {ContentMessage} from './message/contentMessage';
+import type {Message} from './message/message';
+import {PingMessage} from './message/pingMessage';
 import type {User} from './User';
 
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
 
 export interface UnreadState {

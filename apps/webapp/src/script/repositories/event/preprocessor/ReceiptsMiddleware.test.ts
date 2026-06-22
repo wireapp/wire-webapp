@@ -19,7 +19,7 @@
 
 import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';
-import {StatusType} from 'src/script/message/StatusType';
+import {StatusType} from 'src/script/message/statusType';
 import {createUuid} from 'Util/uuid';
 
 import {ReceiptsMiddleware} from './ReceiptsMiddleware';

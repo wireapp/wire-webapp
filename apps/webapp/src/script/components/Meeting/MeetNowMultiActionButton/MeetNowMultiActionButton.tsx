@@ -28,7 +28,7 @@ import {
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {showContextMenu} from '../../../ui/ContextMenu';
+import {showContextMenu} from '../../../ui/contextMenu';
 
 export const MeetNowMultiActionButton = () => {
   const {translate} = useApplicationContext();

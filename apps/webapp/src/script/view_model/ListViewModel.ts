@@ -49,10 +49,10 @@ import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversat
 import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
-import {showContextMenu} from '../ui/ContextMenu';
-import {showLabelContextMenu} from '../ui/LabelContextMenu';
-import {Shortcut} from '../ui/Shortcut';
-import {ShortcutType} from '../ui/ShortcutType';
+import {showContextMenu} from '../ui/contextMenu';
+import {showLabelContextMenu} from '../ui/labelContextMenu';
+import {Shortcut} from '../ui/shortcut';
+import {ShortcutType} from '../ui/shortcutType';
 
 export class ListViewModel {
   private readonly userState: UserState;

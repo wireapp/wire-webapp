@@ -36,7 +36,7 @@ import {MessageReactions} from 'Components/MessagesList/Message/ContentMessage/M
 import {ReplyButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/ReplyButton';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isTabKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';

@@ -17,7 +17,7 @@
  *
  */
 
-import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/DeleteMessage';
+import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/deleteMessage';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';

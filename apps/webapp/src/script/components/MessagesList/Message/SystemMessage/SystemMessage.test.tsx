@@ -19,9 +19,9 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
-import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
+import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
+import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
+import {RenameMessage} from 'Repositories/entity/message/renameMessage';
 import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 

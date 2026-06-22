@@ -17,7 +17,7 @@
  *
  */
 
-import {Message} from 'Repositories/entity/message/Message';
+import {Message} from 'Repositories/entity/message/message';
 
 export const verticallyCenterMessage = (messages: Message[]): boolean => {
   const filteredMessagesLength = messages.length;

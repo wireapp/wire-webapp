@@ -66,7 +66,7 @@ import {base64ToArray, arrayToBase64} from 'Util/util';
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
 import {CryptographyError} from '../../error/cryptographyError';
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 
 export interface MappedText {

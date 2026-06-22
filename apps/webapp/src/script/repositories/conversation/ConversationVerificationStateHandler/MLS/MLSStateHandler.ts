@@ -32,7 +32,7 @@ import {
   MLSStatuses,
   WireIdentity,
 } from 'src/script/E2EIdentity';
-import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
+import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
 import {Core} from 'src/script/service/coreSingleton';
 import {Logger, getLogger} from 'Util/logger';
 import {waitFor} from 'Util/waitFor';
@@ -93,7 +93,7 @@ export class MLSConversationVerificationStateHandler {
     this.onConversationVerificationStateChange({
       conversationEntity: conversation,
       conversationVerificationState: state,
-      verificationMessageType: E2EIVerificationMessageType.NO_LONGER_VERIFIED,
+      VerificationMessageType: E2EIVerificationMessageType.NO_LONGER_VERIFIED,
       userIds: degradedUsers,
     });
   }

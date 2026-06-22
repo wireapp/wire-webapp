@@ -37,7 +37,7 @@ import type {ConversationRepository} from 'Repositories/conversation/Conversatio
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/Message';
+import type {Message} from 'Repositories/entity/message/message';
 import type {User} from 'Repositories/entity/User';
 import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';

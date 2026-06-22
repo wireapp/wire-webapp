@@ -19,7 +19,7 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

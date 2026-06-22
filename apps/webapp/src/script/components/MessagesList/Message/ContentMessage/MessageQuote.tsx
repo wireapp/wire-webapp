@@ -28,9 +28,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/Image';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Multipart} from 'Repositories/entity/message/Multipart';
-import {Text} from 'Repositories/entity/message/Text';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Multipart} from 'Repositories/entity/message/multipart';
+import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -48,7 +48,7 @@ import {VideoAsset} from './asset/VideoAsset/VideoAsset';
 
 import {MessageActions} from '..';
 import {ConversationError} from '../../../../error/conversationError';
-import {QuoteEntity} from '../../../../message/QuoteEntity';
+import {QuoteEntity} from '../../../../message/quoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
 
 function createPlaceholderMessage(translate: Translate) {

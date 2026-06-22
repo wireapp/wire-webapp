@@ -33,11 +33,11 @@ import {ClientState} from 'Repositories/client/ClientState';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {Button} from 'Repositories/entity/message/Button';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Message} from 'Repositories/entity/message/Message';
-import {Text} from 'Repositories/entity/message/Text';
+import {Button} from 'Repositories/entity/message/button';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Message} from 'Repositories/entity/message/message';
+import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
@@ -57,7 +57,7 @@ import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
 import {ConversationVerificationState} from './ConversationVerificationState';
 
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {ServerTimeHandler, serverTimeHandler} from '../../time/serverTimeHandler';
 
 const selfUser = new User('selfid', '', translateForTest);
@@ -224,7 +224,7 @@ describe('MessageRepository', () => {
     });
 
     it('sends an edit multipart message if original message has multipart asset', async () => {
-      const {Multipart} = await import('Repositories/entity/message/Multipart');
+      const {Multipart} = await import('Repositories/entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
@@ -259,7 +259,7 @@ describe('MessageRepository', () => {
     });
 
     it('preserves attachments when editing multipart message', async () => {
-      const {Multipart} = await import('Repositories/entity/message/Multipart');
+      const {Multipart} = await import('Repositories/entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
@@ -297,7 +297,7 @@ describe('MessageRepository', () => {
     });
 
     it('handles empty attachments array when editing multipart message', async () => {
-      const {Multipart} = await import('Repositories/entity/message/Multipart');
+      const {Multipart} = await import('Repositories/entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
@@ -330,7 +330,7 @@ describe('MessageRepository', () => {
     });
 
     it('filters out falsy attachments when editing multipart message', async () => {
-      const {Multipart} = await import('Repositories/entity/message/Multipart');
+      const {Multipart} = await import('Repositories/entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);

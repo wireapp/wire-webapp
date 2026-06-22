@@ -20,9 +20,9 @@
 import {render} from '@testing-library/react';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/E2EIVerificationMessage';
+import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {User} from 'Repositories/entity/User';
-import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
+import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
 
 import {E2EIVerificationMessage} from './E2EIVerificationMessage';
 

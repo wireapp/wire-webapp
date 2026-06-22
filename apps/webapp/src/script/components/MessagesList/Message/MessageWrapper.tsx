@@ -29,11 +29,11 @@ import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerif
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Text} from 'Repositories/entity/message/Text';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Text} from 'Repositories/entity/message/text';
 import {TeamState} from 'Repositories/team/TeamState';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -52,12 +52,12 @@ import {PingMessage} from './PingMessage';
 import {SystemMessage} from './SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
-import {ContextMenuEntry} from '../../../ui/ContextMenu';
+import {ContextMenuEntry} from '../../../ui/contextMenu';
 
 import {MessageParams} from './index';
 
-const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote => {
-  return quoteEntity.hash !== undefined;
+const isOutgoingQuote = (QuoteEntity: QuoteEntity): QuoteEntity is OutgoingQuote => {
+  return QuoteEntity.hash !== undefined;
 };
 
 export const MessageWrapper = ({
@@ -115,7 +115,7 @@ export const MessageWrapper = ({
         conversation,
         textMessage: messageText,
         mentions,
-        quoteEntity: quote,
+        QuoteEntity: quote,
         messageId,
         attachments: [],
       });

@@ -73,11 +73,11 @@ import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConnectionState} from 'Repositories/connection/connectionState';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {DeleteConversationMessage} from 'Repositories/entity/message/DeleteConversationMessage';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import {Message} from 'Repositories/entity/message/Message';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {DeleteConversationMessage} from 'Repositories/entity/message/deleteConversationMessage';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import {Message} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from 'Repositories/event/Client';
 import {EventRepository} from 'Repositories/event/EventRepository';
@@ -167,8 +167,8 @@ import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';
 import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
 import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
-import {MessageCategory} from '../../message/MessageCategory';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {MessageCategory} from '../../message/messageCategory';
+import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
@@ -2561,7 +2561,7 @@ export class ConversationRepository {
   private onConversationVerificationStateChange: OnConversationVerificationStateChange = async ({
     conversationEntity,
     conversationVerificationState,
-    verificationMessageType,
+    VerificationMessageType,
     userIds = [],
   }) => {
     switch (conversationVerificationState) {
@@ -2570,11 +2570,11 @@ export class ConversationRepository {
         await this.eventRepository.injectEvent(allVerifiedEvent);
         break;
       case ConversationVerificationState.DEGRADED:
-        if (verificationMessageType) {
-          const event = EventBuilder.buildDegraded(conversationEntity, userIds, verificationMessageType);
+        if (VerificationMessageType) {
+          const event = EventBuilder.buildDegraded(conversationEntity, userIds, VerificationMessageType);
           await this.eventRepository.injectEvent(event);
         } else {
-          this.logger.error('onConversationVerificationStateChange: Missing verificationMessageType while degrading');
+          this.logger.error('onConversationVerificationStateChange: Missing VerificationMessageType while degrading');
         }
         break;
       default:

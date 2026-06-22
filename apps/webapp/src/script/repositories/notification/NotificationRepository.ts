@@ -38,14 +38,14 @@ import {ConversationEphemeralHandler} from 'Repositories/conversation/Conversati
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {CallMessage} from 'Repositories/entity/message/CallMessage';
-import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {DeleteConversationMessage} from 'Repositories/entity/message/DeleteConversationMessage';
-import type {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import type {Message} from 'Repositories/entity/message/Message';
-import type {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
-import type {RenameMessage} from 'Repositories/entity/message/RenameMessage';
-import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
+import type {CallMessage} from 'Repositories/entity/message/callMessage';
+import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {DeleteConversationMessage} from 'Repositories/entity/message/deleteConversationMessage';
+import type {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import type {Message} from 'Repositories/entity/message/message';
+import type {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
+import type {RenameMessage} from 'Repositories/entity/message/renameMessage';
+import type {SystemMessage} from 'Repositories/entity/message/systemMessage';
 import type {User} from 'Repositories/entity/User';
 import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {getPermissionState, setPermissionState} from 'Repositories/permission/permissionHandlers';
@@ -61,8 +61,8 @@ import {ValidationUtilError} from 'Util/validationUtil';
 
 import {AppPermissionState} from './AppPermissionState';
 
-import {SuperType} from '../../message/SuperType';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {SuperType} from '../../message/superType';
+import {SystemMessageType} from '../../message/systemMessageType';
 import {ContentState, useAppState} from '../../page/useAppState';
 import {Warnings} from '../../view_model/WarningsContainer';
 

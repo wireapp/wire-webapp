@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {Message} from 'Repositories/entity/message/Message';
+import {Message} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import * as TimeUtil from 'Util/timeUtil';

@@ -21,7 +21,7 @@ import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/E2EIVerificationMessage';
+import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {replaceLink} from 'Util/localizerUtil';
@@ -32,7 +32,7 @@ import {MessageIcon, IconInfo, Link as LinkStyles} from './E2EIVerificationMessa
 
 import {Config} from '../../../../Config';
 import {E2EIHandler} from '../../../../E2EIdentity';
-import {E2EIVerificationMessageType} from '../../../../message/E2EIVerificationMessageType';
+import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';
 
 const logger = getLogger('E2EIVerificationMessage');
 

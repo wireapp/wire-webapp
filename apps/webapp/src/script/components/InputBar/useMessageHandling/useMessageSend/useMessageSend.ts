@@ -32,13 +32,13 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {Config} from 'src/script/Config';
 import {ConversationError} from 'src/script/error/conversationError';
-import {MentionEntity} from 'src/script/message/MentionEntity';
-import {MessageHasher} from 'src/script/message/MessageHasher';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {MentionEntity} from 'src/script/message/mentionEntity';
+import {MessageHasher} from 'src/script/message/messageHasher';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {isErrorWithType} from 'src/script/util/typePredicateUtil';
 
@@ -176,12 +176,12 @@ export const useMessageSend = ({
 
       const mentionEntities = mentions.slice(0);
 
-      void generateQuote().then(quoteEntity => {
+      void generateQuote().then(QuoteEntity => {
         void messageRepository.sendTextWithLinkPreview({
           conversation,
           textMessage: messageText,
           mentions: mentionEntities,
-          quoteEntity,
+          QuoteEntity,
           attachments: getCellAssets(),
         });
         cancelMessageReply();

@@ -118,7 +118,7 @@ import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsVal
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
-import {WindowHandler} from '../ui/WindowHandler';
+import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
@@ -869,7 +869,7 @@ export class App {
   private readonly updateConversationE2EIVerificationState: OnConversationE2EIVerificationStateChange = async ({
     conversationEntity,
     conversationVerificationState,
-    verificationMessageType,
+    VerificationMessageType,
     userIds,
   }) => {
     switch (conversationVerificationState) {
@@ -878,11 +878,11 @@ export class App {
         await this.repository.event.injectEvent(allVerifiedEvent);
         break;
       case ConversationVerificationState.DEGRADED:
-        if (verificationMessageType) {
-          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, verificationMessageType, userIds);
+        if (VerificationMessageType) {
+          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, VerificationMessageType, userIds);
           await this.repository.event.injectEvent(degradedEvent);
         } else {
-          this.logger.error('updateConversationE2EIVerificationState: Missing verificationMessageType while degrading');
+          this.logger.error('updateConversationE2EIVerificationState: Missing VerificationMessageType while degrading');
         }
         break;
       default:

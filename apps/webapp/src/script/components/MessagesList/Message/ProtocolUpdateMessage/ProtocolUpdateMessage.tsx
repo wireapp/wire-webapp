@@ -20,8 +20,8 @@
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import * as Icon from 'Components/icon';
-import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/ProtocolUpdateMessage';
-import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
+import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/protocolUpdateMessage';
+import {SystemMessage} from 'Repositories/entity/message/systemMessage';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {type Translate, replaceLink} from 'Util/localizerUtil';

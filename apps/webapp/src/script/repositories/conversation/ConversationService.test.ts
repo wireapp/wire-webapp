@@ -23,9 +23,9 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventService} from 'Repositories/event/EventService';
 import type {EventRecord, StorageService} from 'Repositories/storage';
-import {StatusType} from 'src/script/message/StatusType';
+import {StatusType} from 'src/script/message/statusType';
 
-import {MessageCategory} from '../../message/MessageCategory';
+import {MessageCategory} from '../../message/messageCategory';
 import type {APIClient} from '../../service/apiClientSingleton';
 import type {Core} from '../../service/coreSingleton';
 import {ConversationService} from './ConversationService';

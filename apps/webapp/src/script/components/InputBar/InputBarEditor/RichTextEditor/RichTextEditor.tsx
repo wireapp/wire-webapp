@@ -33,7 +33,7 @@ import {LexicalEditor, EditorState} from 'lexical';
 
 import {DraftState} from 'Components/InputBar/common/draftState/draftState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {User} from 'Repositories/entity/User';
 
 import {editorConfig} from './editorConfig';

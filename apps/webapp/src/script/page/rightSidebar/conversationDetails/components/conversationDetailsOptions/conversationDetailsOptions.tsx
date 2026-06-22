@@ -25,7 +25,7 @@ import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} fro
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
-import {PanelActions} from 'Components/panel/PanelActions';
+import {PanelActions} from 'Components/panel/panelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';

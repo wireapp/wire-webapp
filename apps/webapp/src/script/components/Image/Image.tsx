@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {InViewport} from 'Components/InViewport';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

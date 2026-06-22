@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
-import {MenuItem} from 'Components/panel/PanelActions';
+import {MenuItem} from 'Components/panel/panelActions';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import * as UserPermission from 'Repositories/user/userPermission';

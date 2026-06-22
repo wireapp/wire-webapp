@@ -21,7 +21,7 @@ import {Fragment} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {formatLocale, isThisYear, isToday} from 'Util/timeUtil';

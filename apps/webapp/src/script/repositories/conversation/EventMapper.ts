@@ -27,38 +27,38 @@ import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import {AssetData} from 'Repositories/cryptography/CryptographyMapper';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {Button} from 'Repositories/entity/message/Button';
-import {CallingTimeoutMessage} from 'Repositories/entity/message/CallingTimeoutMessage';
-import {CallMessage} from 'Repositories/entity/message/CallMessage';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
-import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
-import {E2EIVerificationMessage} from 'Repositories/entity/message/E2EIVerificationMessage';
-import {FailedToAddUsersMessage} from 'Repositories/entity/message/FailedToAddUsersMessage';
-import {FederationStopMessage} from 'Repositories/entity/message/FederationStopMessage';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {FileTypeRestrictedMessage} from 'Repositories/entity/message/FileTypeRestrictedMessage';
-import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/JoinedAfterMLSMigrationFinalisationMessage';
-import {LegalHoldMessage} from 'Repositories/entity/message/LegalHoldMessage';
-import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from 'Repositories/entity/message/LinkPreview';
-import {Location} from 'Repositories/entity/message/Location';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
-import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import type {Message} from 'Repositories/entity/message/Message';
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
-import {MissedMessage} from 'Repositories/entity/message/MissedMessage';
-import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/MLSConversationRecoveredMessage';
-import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/MLSMigrationFinalisationOngoingCallMessage';
-import {Multipart} from 'Repositories/entity/message/Multipart';
-import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/OneToOneMigratedToMlsMessage';
-import {PingMessage} from 'Repositories/entity/message/PingMessage';
-import {ProtocolUpdateMessage} from 'Repositories/entity/message/ProtocolUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
-import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
-import type {Text as TextAsset} from 'Repositories/entity/message/Text';
-import {Text} from 'Repositories/entity/message/Text';
-import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
+import {Button} from 'Repositories/entity/message/button';
+import {CallingTimeoutMessage} from 'Repositories/entity/message/callingTimeoutMessage';
+import {CallMessage} from 'Repositories/entity/message/callMessage';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
+import {DeleteMessage} from 'Repositories/entity/message/deleteMessage';
+import {E2EIVerificationMessage} from 'Repositories/entity/message/e2eiVerificationMessage';
+import {FailedToAddUsersMessage} from 'Repositories/entity/message/failedToAddUsersMessage';
+import {FederationStopMessage} from 'Repositories/entity/message/federationStopMessage';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {FileTypeRestrictedMessage} from 'Repositories/entity/message/fileTypeRestrictedMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
+import {LegalHoldMessage} from 'Repositories/entity/message/legalHoldMessage';
+import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from 'Repositories/entity/message/linkPreview';
+import {Location} from 'Repositories/entity/message/location';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import type {Message} from 'Repositories/entity/message/message';
+import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
+import {MissedMessage} from 'Repositories/entity/message/missedMessage';
+import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/mlsConversationRecoveredMessage';
+import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/mlsMigrationFinalisationOngoingCallMessage';
+import {Multipart} from 'Repositories/entity/message/multipart';
+import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/oneToOneMigratedToMlsMessage';
+import {PingMessage} from 'Repositories/entity/message/pingMessage';
+import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateMessage';
+import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
+import {RenameMessage} from 'Repositories/entity/message/renameMessage';
+import type {Text as TextAsset} from 'Repositories/entity/message/text';
+import {Text} from 'Repositories/entity/message/text';
+import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
 import {type Translate} from 'Util/localizerUtil';
@@ -84,12 +84,12 @@ import {
 
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage} from '../../guards/Message';
-import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
-import {MentionEntity} from '../../message/MentionEntity';
-import {MessageCategory} from '../../message/MessageCategory';
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {StatusType} from '../../message/StatusType';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {CALL_MESSAGE_TYPE} from '../../message/callMessageType';
+import {MentionEntity} from '../../message/mentionEntity';
+import {MessageCategory} from '../../message/messageCategory';
+import {QuoteEntity} from '../../message/quoteEntity';
+import {StatusType} from '../../message/statusType';
+import {SystemMessageType} from '../../message/systemMessageType';
 import {APIClient} from '../../service/apiClientSingleton';
 
 // Event Mapper to convert all server side JSON events into core entities.
@@ -862,7 +862,7 @@ export class EventMapper {
     const messageEntity = new VerificationMessage(this.translate);
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
-    messageEntity.verificationMessageType(eventData.type);
+    messageEntity.VerificationMessageType(eventData.type);
 
     return messageEntity;
   }
@@ -1121,10 +1121,10 @@ export class EventMapper {
           protoMention.qualifiedUserId?.domain ?? undefined,
         );
       })
-      .filter((mentionEntity, _, allMentions): boolean | void => {
-        if (mentionEntity !== undefined) {
+      .filter((MentionEntity, _, allMentions): boolean | void => {
+        if (MentionEntity !== undefined) {
           try {
-            return mentionEntity.validate(messageText, allMentions);
+            return MentionEntity.validate(messageText, allMentions);
           } catch (error: unknown) {
             this.logger.warn(`Removed invalid mention when mapping message: ${toError(error).message}`);
             return false;

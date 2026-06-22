@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {PingMessage as PingMessageEntity} from 'Repositories/entity/message/PingMessage';
+import {PingMessage as PingMessageEntity} from 'Repositories/entity/message/pingMessage';
 import {ReadReceipt} from 'Repositories/storage';
 import {translateForTest} from 'Util/test/translateForTest';
 import {

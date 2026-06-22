@@ -28,10 +28,10 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/icon';
-import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
-import {EnrichedFields} from 'Components/panel/EnrichedFields';
-import {ServiceDetails} from 'Components/panel/ServiceDetails';
-import {UserDetails} from 'Components/panel/UserDetails';
+import {ConversationProtocolDetails} from 'Components/panel/conversationProtocolDetails/conversationProtocolDetails';
+import {EnrichedFields} from 'Components/panel/enrichedFields';
+import {ServiceDetails} from 'Components/panel/serviceDetails';
+import {UserDetails} from 'Components/panel/userDetails';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {getNotificationText} from 'Repositories/conversation/NotificationSetting';
@@ -51,8 +51,8 @@ import {ConversationDetailsOptions} from './components/conversationDetailsOption
 import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
 
 import {isServiceEntity} from '../../../guards/Service';
-import {Shortcut} from '../../../ui/Shortcut';
-import {ShortcutType} from '../../../ui/ShortcutType';
+import {Shortcut} from '../../../ui/shortcut';
+import {ShortcutType} from '../../../ui/shortcutType';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';

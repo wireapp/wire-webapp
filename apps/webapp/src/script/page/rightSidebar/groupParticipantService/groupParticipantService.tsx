@@ -25,7 +25,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/icon';
-import {ServiceDetails} from 'Components/panel/ServiceDetails';
+import {ServiceDetails} from 'Components/panel/serviceDetails';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';

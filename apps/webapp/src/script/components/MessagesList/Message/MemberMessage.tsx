@@ -20,9 +20,9 @@
 import {Button, ButtonVariant, CollectionIcon} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/User';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

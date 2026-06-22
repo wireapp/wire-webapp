@@ -28,16 +28,16 @@ import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
 import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import 'src/script/localization/Localizer';
-import {StatusType} from 'src/script/message/StatusType';
+import {StatusType} from 'src/script/message/statusType';
 import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {Conversation} from './Conversation';
-import {ContentMessage} from './message/ContentMessage';
-import {Message} from './message/Message';
-import {PingMessage} from './message/PingMessage';
-import {Text} from './message/Text';
+import {ContentMessage} from './message/contentMessage';
+import {Message} from './message/message';
+import {PingMessage} from './message/pingMessage';
+import {Text} from './message/text';
 import {User} from './User';
 
 import {entities} from '../../../../test/api/payloads';

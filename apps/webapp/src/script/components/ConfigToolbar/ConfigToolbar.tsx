@@ -122,7 +122,7 @@ export function ConfigToolbar() {
           conversation: activeConversation,
           textMessage: `${prefix} ${messageCountRef.current}`,
           mentions: [],
-          quoteEntity: undefined,
+          QuoteEntity: undefined,
         });
         messageCountRef.current++;
       } catch (error: unknown) {

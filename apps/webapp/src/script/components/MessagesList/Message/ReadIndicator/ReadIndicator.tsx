@@ -18,7 +18,7 @@
  */
 
 import * as Icon from 'Components/icon';
-import {Message} from 'Repositories/entity/message/Message';
+import {Message} from 'Repositories/entity/message/message';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {formatTimeShort} from 'Util/timeUtil';
 
