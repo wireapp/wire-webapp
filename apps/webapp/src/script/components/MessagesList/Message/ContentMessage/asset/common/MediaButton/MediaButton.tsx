@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {FileAsset} from 'Repositories/entity/message/FileAsset';
+import type {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {noop} from 'Util/util';

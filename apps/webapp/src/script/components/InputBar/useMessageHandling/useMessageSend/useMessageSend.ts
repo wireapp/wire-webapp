@@ -32,7 +32,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {Config} from 'src/script/Config';
 import {ConversationError} from 'src/script/error/conversationError';

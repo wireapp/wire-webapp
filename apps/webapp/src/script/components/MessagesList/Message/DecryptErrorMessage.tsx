@@ -20,7 +20,7 @@
 import {useState} from 'react';
 
 import * as Icon from 'Components/icon';
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
 import {Config} from 'src/script/Config';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {useApplicationContext} from 'src/script/page/rootProvider';

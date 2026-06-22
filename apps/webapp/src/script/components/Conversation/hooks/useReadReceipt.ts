@@ -23,7 +23,7 @@ import {groupBy} from 'underscore';
 
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/Message';
+import {Message} from 'Repositories/entity/message/message';
 
 type ReadMessageBuffer = {conversation: Conversation; message: Message};
 

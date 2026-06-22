@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CollectionItem} from './collectionItem';

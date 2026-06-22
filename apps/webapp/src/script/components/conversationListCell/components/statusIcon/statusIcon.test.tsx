@@ -21,7 +21,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {act, render, screen} from '@testing-library/react';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {User} from 'Repositories/entity/User';
 import {
   createRootContextValueForTest,

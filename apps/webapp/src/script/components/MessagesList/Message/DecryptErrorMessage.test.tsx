@@ -21,7 +21,7 @@ import {act} from 'react';
 import {render, fireEvent} from '@testing-library/react';
 import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {

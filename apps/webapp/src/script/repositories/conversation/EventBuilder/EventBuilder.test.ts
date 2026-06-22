@@ -20,7 +20,7 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
+import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {SuperType} from 'src/script/message/superType';

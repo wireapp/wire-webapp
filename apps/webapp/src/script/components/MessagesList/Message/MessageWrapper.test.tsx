@@ -22,7 +22,7 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/systemMessageType';

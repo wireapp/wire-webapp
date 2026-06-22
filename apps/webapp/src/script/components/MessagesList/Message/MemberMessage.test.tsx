@@ -25,7 +25,7 @@ import {randomInt} from 'crypto';
 import {generateUser} from 'test/helper/UserGenerator';
 
 import en from 'I18n/en-US.json';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/systemMessageType';

@@ -26,7 +26,7 @@ import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {getUserNameWithTranslate} from 'Components/UserName';
-import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
+import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';

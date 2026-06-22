@@ -17,8 +17,8 @@
  *
  */
 
-import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {Text as TextAsset} from 'Repositories/entity/message/Text';
+import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {Text as TextAsset} from 'Repositories/entity/message/text';
 
 import type {MentionEntity} from '../message/mentionEntity';
 

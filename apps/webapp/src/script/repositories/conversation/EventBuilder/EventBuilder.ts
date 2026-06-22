@@ -34,7 +34,7 @@ import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/Message';
+import type {Message} from 'Repositories/entity/message/message';
 import type {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {ReactionMap, ReadReceipt, UserReactionMap} from 'Repositories/storage';

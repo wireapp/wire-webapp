@@ -29,7 +29,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
 import type {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import type {EventSource} from 'Repositories/event/EventSource';

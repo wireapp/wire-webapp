@@ -39,17 +39,17 @@ import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {CallMessage} from 'Repositories/entity/message/CallMessage';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Location} from 'Repositories/entity/message/Location';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
-import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import {Message} from 'Repositories/entity/message/Message';
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
-import {PingMessage} from 'Repositories/entity/message/PingMessage';
-import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
-import {Text} from 'Repositories/entity/message/Text';
+import {CallMessage} from 'Repositories/entity/message/callMessage';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Location} from 'Repositories/entity/message/location';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import {Message} from 'Repositories/entity/message/message';
+import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
+import {PingMessage} from 'Repositories/entity/message/pingMessage';
+import {RenameMessage} from 'Repositories/entity/message/renameMessage';
+import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
@@ -784,8 +784,8 @@ describe('NotificationRepository', () => {
       const mentionId = selfMentioned ? userId.id : createUuid();
 
       const textEntity = new Text(createUuid(), '@Gregor can you take a look?');
-      const MentionEntity = new MentionEntity(0, 7, mentionId, userId.domain);
-      textEntity.mentions([MentionEntity]);
+      const mentionEntity = new MentionEntity(0, 7, mentionId, userId.domain);
+      textEntity.mentions([mentionEntity]);
 
       return textEntity;
     }
@@ -837,8 +837,8 @@ describe('NotificationRepository', () => {
     it('returns the correct value for self replies', () => {
       messageEntity.addAsset(generateTextAsset());
 
-      const QuoteEntity = new QuoteEntity({messageId: createUuid(), userId: userId.id});
-      messageEntity.quote(QuoteEntity);
+      const quoteEntity = new QuoteEntity({messageId: createUuid(), userId: userId.id});
+      messageEntity.quote(quoteEntity);
 
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
@@ -849,11 +849,11 @@ describe('NotificationRepository', () => {
     it('returns the correct value for non-self replies', () => {
       messageEntity.addAsset(generateTextAsset());
 
-      const QuoteEntity = new QuoteEntity({
+      const quoteEntity = new QuoteEntity({
         messageId: createUuid(),
         userId: createUuid(),
       });
-      messageEntity.quote(QuoteEntity);
+      messageEntity.quote(quoteEntity);
 
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);

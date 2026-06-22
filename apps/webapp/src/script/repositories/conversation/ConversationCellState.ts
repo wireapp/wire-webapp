@@ -19,10 +19,10 @@
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {FileAsset} from 'Repositories/entity/message/FileAsset';
-import type {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
-import type {Text} from 'Repositories/entity/message/Text';
+import type {FileAsset} from 'Repositories/entity/message/fileAsset';
+import type {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import type {SystemMessage} from 'Repositories/entity/message/systemMessage';
+import type {Text} from 'Repositories/entity/message/text';
 import {type Translate} from 'Util/localizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {matchQualifiedIds} from 'Util/qualifiedId';

@@ -19,7 +19,7 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import type {Message} from 'Repositories/entity/message/Message';
+import type {Message} from 'Repositories/entity/message/message';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

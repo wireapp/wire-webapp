@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {VerificationIcon} from 'Components/VerificationIcon';
-import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/VerificationMessage';
+import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationMessage';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

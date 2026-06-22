@@ -23,10 +23,10 @@ import ko from 'knockout';
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
-import type {Message} from 'Repositories/entity/message/Message';
-import {Text} from 'Repositories/entity/message/Text';
+import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
+import type {Message} from 'Repositories/entity/message/message';
+import {Text} from 'Repositories/entity/message/text';
 import type {EventService} from 'Repositories/event/EventService';
 import type {EventRecord} from 'Repositories/storage';
 import {getLogger, Logger} from 'Util/logger';

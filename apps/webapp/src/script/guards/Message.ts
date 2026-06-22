@@ -17,9 +17,9 @@
  *
  */
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
-import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {DeleteMessage} from 'Repositories/entity/message/deleteMessage';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
 
 import {SuperType} from '../message/superType';
 

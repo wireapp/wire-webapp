@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 
 export const useMessageEditing = () => {
   const [editedMessage, setEditedMessage] = useState<ContentMessage | undefined>();

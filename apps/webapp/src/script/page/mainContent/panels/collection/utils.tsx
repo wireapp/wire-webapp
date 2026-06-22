@@ -17,7 +17,7 @@
  *
  */
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 
 import {MessageCategory} from '../../../../message/messageCategory';
 

@@ -23,7 +23,7 @@ import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/convers
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import en from 'I18n/en-US.json';
-import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
+import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';

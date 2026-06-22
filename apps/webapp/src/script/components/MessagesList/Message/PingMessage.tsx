@@ -21,8 +21,8 @@ import cx from 'classnames';
 
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
-import {Message} from 'Repositories/entity/message/Message';
-import {PingMessage as PingMessageEntity} from 'Repositories/entity/message/PingMessage';
+import {Message} from 'Repositories/entity/message/message';
+import {PingMessage as PingMessageEntity} from 'Repositories/entity/message/pingMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

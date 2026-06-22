@@ -20,7 +20,7 @@
 import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

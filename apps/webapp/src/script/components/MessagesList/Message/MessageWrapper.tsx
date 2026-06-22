@@ -29,9 +29,9 @@ import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerif
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Text} from 'Repositories/entity/message/Text';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Text} from 'Repositories/entity/message/text';
 import {TeamState} from 'Repositories/team/TeamState';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
