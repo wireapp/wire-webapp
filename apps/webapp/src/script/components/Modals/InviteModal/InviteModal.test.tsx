@@ -21,16 +21,8 @@ import {render, screen, waitFor} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
-import {
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {InviteModal} from './InviteModal';
-
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
 
 test('proper render invite modal text', async () => {
   const userName = 'janek';
@@ -38,7 +30,7 @@ test('proper render invite modal text', async () => {
 
   user.username(userName);
 
-  render(<InviteModal selfUser={user} />, {wrapper: rootProviderWrapper});
+  render(<InviteModal translate={translateForTest} selfUser={user} />);
 
   const textarea = await screen.getByTestId('invite-modal-message');
   await waitFor(() => expect((textarea as HTMLTextAreaElement).value).toBe('inviteMessage'));
