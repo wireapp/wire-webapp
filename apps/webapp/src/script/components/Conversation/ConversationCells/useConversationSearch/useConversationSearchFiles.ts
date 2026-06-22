@@ -54,6 +54,11 @@ interface UseConversationSearchFilesProps {
   onClear?: () => void;
 }
 
+type ClearSearchRefreshOptions = {
+  preserveFilters: boolean;
+  hasActiveParamsBeforeClear: boolean;
+};
+
 const DEBOUNCE_TIME = 300;
 
 const normalizeSearchQuery = (query: string): string => (is.nonEmptyStringAndNotWhitespace(query) ? query.trim() : '');
@@ -92,7 +97,7 @@ export const useConversationSearchFiles = ({
     return enabledRef.current === true || allowSearchWhenDisabledRef.current === true;
   }, []);
 
-  const isCurrentSearchRequest = useCallback(
+  const isValidSearchRequest = useCallback(
     (requestVersion: number): boolean => {
       return canSearchOwnResults() === true && requestVersionGate.current.isStale(requestVersion) === false;
     },
@@ -100,13 +105,7 @@ export const useConversationSearchFiles = ({
   );
 
   const shouldRefreshSearchResultsAfterClearingInput = useCallback(
-    ({
-      preserveFilters,
-      hasActiveParamsBeforeClear,
-    }: {
-      preserveFilters: boolean;
-      hasActiveParamsBeforeClear: boolean;
-    }): boolean => {
+    ({preserveFilters, hasActiveParamsBeforeClear}: ClearSearchRefreshOptions): boolean => {
       if (preserveFilters === false) {
         return false;
       }
@@ -165,7 +164,7 @@ export const useConversationSearchFiles = ({
           ...searchParams,
         });
 
-        if (!isCurrentSearchRequest(requestVersion)) {
+        if (!isValidSearchRequest(requestVersion)) {
           return;
         }
 
@@ -180,7 +179,7 @@ export const useConversationSearchFiles = ({
 
         const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
-        if (!isCurrentSearchRequest(requestVersion)) {
+        if (!isValidSearchRequest(requestVersion)) {
           return;
         }
 
@@ -198,7 +197,7 @@ export const useConversationSearchFiles = ({
         setPagination({conversationId: id, pagination});
         setStatus('success');
       } catch (error) {
-        if (!isCurrentSearchRequest(requestVersion)) {
+        if (!isValidSearchRequest(requestVersion)) {
           return;
         }
 
@@ -218,7 +217,7 @@ export const useConversationSearchFiles = ({
     },
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain, isCurrentSearchRequest],
+    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain, isValidSearchRequest],
   );
 
   useLayoutEffect(() => {
