@@ -37,4 +37,8 @@ export type {
   ScheduleMeetingFormErrorKey,
   ScheduleMeetingMode,
 } from './scheduleMeetingTypes';
-export {getScheduleMeetingRecurrenceSelectOptions, mapMeetingRecurrenceToOption} from './scheduleMeetingRecurrence';
+export {
+  SCHEDULE_MEETING_RECURRENCE_OPTIONS,
+  SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
+  mapMeetingRecurrenceToOption,
+} from './scheduleMeetingRecurrence';

@@ -17,22 +17,15 @@
  *
  */
 
-import {contentStyles} from 'Components/Meeting/Meeting.styles';
-import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
-import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
-import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useMeetingsList} from 'Components/Meeting/useMeetingsList';
+import type {Meeting as ApiMeeting} from '@wireapp/api-client/lib/meetings/meeting';
 
-export const Meetings = () => {
-  const meetingsList = useMeetingsList();
+import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import {mapMeetingRecurrenceToOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 
-  return (
-    <>
-      <MeetingHeader />
-      <div css={contentStyles}>
-        <MeetingList {...meetingsList} />
-      </div>
-      <ScheduleMeetingModal onMeetingScheduled={meetingsList.fetchMeetings} />
-    </>
-  );
-};
+export const mapApiMeetingToListMeeting = (apiMeeting: ApiMeeting): Meeting => ({
+  start_date: apiMeeting.start_time,
+  end_date: apiMeeting.end_time,
+  conversation_id: apiMeeting.qualified_conversation.id,
+  title: apiMeeting.title,
+  recurrence: mapMeetingRecurrenceToOption(apiMeeting.recurrence),
+});

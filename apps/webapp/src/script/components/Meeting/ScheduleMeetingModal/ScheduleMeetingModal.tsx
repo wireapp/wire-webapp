@@ -41,9 +41,10 @@ import {
   wrapperStyles,
 } from './ScheduleMeetingModal.styles';
 import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
+import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 
-export const ScheduleMeetingModal = () => {
-  const {translate} = useApplicationContext();
+export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?: () => Promise<void>}) => {
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {
     isOpen,
     mode,
@@ -60,6 +61,7 @@ export const ScheduleMeetingModal = () => {
     validate,
   } = useScheduleMeetingModal();
 
+  const {isSubmitting, submit} = useScheduleMeetingSubmit(onMeetingScheduled);
   const selfUser = container.resolve(UserState).self();
 
   const displayErrors = useMemo(
@@ -81,8 +83,12 @@ export const ScheduleMeetingModal = () => {
       return;
     }
 
-    // TODO: submit scheduled meeting via API
-    handleClose();
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      const didSchedule = await submit(formState);
+      if (didSchedule) {
+        handleClose();
+      }
+    });
   };
 
   const modalTitle =
@@ -137,6 +143,7 @@ export const ScheduleMeetingModal = () => {
             variant={ButtonVariant.PRIMARY}
             css={submitButtonStyles}
             onClick={handleSubmit}
+            disabled={isSubmitting}
             data-uie-name="schedule-meeting-modal-submit"
           >
             <CalendarIcon aria-hidden="true" css={submitButtonIconStyles} />

@@ -57,6 +57,7 @@ export class MeetingsAPI {
 
   /**
    * List all meetings for the authenticated user.
+   * @see https://staging-nginz-https.zinfra.io/v16/api/swagger-ui/#/default/get_meetings_list
    */
   public async getMeetingsList(): Promise<Meeting[]> {
     const config: AxiosRequestConfig = {

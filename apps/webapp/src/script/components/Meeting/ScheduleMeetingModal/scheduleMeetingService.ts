@@ -1,0 +1,59 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {mapScheduleFormToCreateMeeting} from 'Components/Meeting/mapScheduleFormToCreateMeeting';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+
+import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+
+export type ScheduleMeetingResult =
+  | {status: 'success'}
+  | {status: 'participantMissingEmail'}
+  | {status: 'createFailed'};
+
+export type TryScheduleMeetingDependencies = {
+  meetingsRepository: MeetingsRepository;
+  fetchMeetings: () => Promise<void>;
+};
+
+/**
+ * Tries to schedule a meeting with the given form state.
+ * @param formState - The form state to schedule the meeting with.
+ * @param deps - Repository and list refresh dependencies.
+ * @returns A semantic result indicating success or the failure reason.
+ */
+export async function tryScheduleMeeting(
+  formState: ScheduleMeetingFormState,
+  dependencies: TryScheduleMeetingDependencies,
+): Promise<ScheduleMeetingResult> {
+  const mapping = mapScheduleFormToCreateMeeting(formState);
+
+  if (mapping.error === 'participantMissingEmail') {
+    return {status: 'participantMissingEmail'};
+  }
+
+  try {
+    const {meetingsRepository, fetchMeetings} = dependencies;
+    await meetingsRepository.createMeeting(mapping.payload);
+    await fetchMeetings();
+    return {status: 'success'};
+  } catch {
+    return {status: 'createFailed'};
+  }
+}

@@ -46,7 +46,10 @@ import {
   scheduleMeetingTitleClearButtonStyles,
   scheduleMeetingTitleInputWrapperStyles,
 } from './ScheduleMeetingForm.styles';
-import {getScheduleMeetingRecurrenceSelectOptions} from './scheduleMeetingRecurrence';
+import {
+  SCHEDULE_MEETING_RECURRENCE_OPTIONS,
+  SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
+} from './scheduleMeetingRecurrence';
 import type {
   ScheduleMeetingFormDisplayErrors,
   ScheduleMeetingFormState,
@@ -82,9 +85,21 @@ export const ScheduleMeetingForm = ({
 }: ScheduleMeetingFormProps) => {
   const {translate} = useApplicationContext();
   const {users} = useScheduleMeetingParticipants();
-  const recurrenceOptions = useMemo(() => getScheduleMeetingRecurrenceSelectOptions(translate), [translate]);
-  const selectedRecurrenceOption = recurrenceOptions.find(option => option.value === formState.recurrence);
   const portalContainer = getOverlayPortalContainer();
+
+  const recurrenceSelectOptions = useMemo(
+    () =>
+      SCHEDULE_MEETING_RECURRENCE_OPTIONS.map(value => ({
+        value,
+        label: translate(SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS[value]),
+      })),
+    [translate],
+  );
+
+  const selectedRecurrenceOption = useMemo(
+    () => recurrenceSelectOptions.find(option => option.value === formState.recurrence),
+    [formState.recurrence, recurrenceSelectOptions],
+  );
 
   const dateTimePickerLabels = useMemo(
     () => ({
@@ -176,7 +191,7 @@ export const ScheduleMeetingForm = ({
           id="schedule-meeting-recurrence"
           dataUieName="schedule-meeting-recurrence"
           label={translate('meetings.scheduleModal.repeatsLabel')}
-          options={recurrenceOptions}
+          options={recurrenceSelectOptions}
           value={selectedRecurrenceOption}
           onChange={option => {
             if (option !== null) {

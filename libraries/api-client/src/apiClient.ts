@@ -48,6 +48,7 @@ import {Backend} from './env/backend';
 import {GenericAPI} from './generic/genericApi';
 import {GiphyAPI} from './giphy/giphyApi';
 import {BackendError, HttpClient} from './http/';
+import {MeetingsAPI} from './meetings/meetingsApi';
 import {NotificationAPI} from './notification/';
 import {OAuthAPI} from './oauth/oAuthApi';
 import {ObfuscationUtil} from './obfuscation';
@@ -121,6 +122,7 @@ type Apis = {
   connection: ConnectionAPI;
   conversation: ConversationAPI;
   giphy: GiphyAPI;
+  meetings: MeetingsAPI;
   notification: NotificationAPI;
   oauth: OAuthAPI;
   self: SelfAPI;
@@ -252,6 +254,7 @@ export class APIClient extends EventEmitter {
       connection: new ConnectionAPI(this.transport.http),
       conversation: new ConversationAPI(this.transport.http, backendFeatures),
       giphy: new GiphyAPI(this.transport.http),
+      meetings: new MeetingsAPI(this.transport.http),
       notification: new NotificationAPI(this.transport.http),
       oauth: new OAuthAPI(this.transport.http),
       self: new SelfAPI(this.transport.http),

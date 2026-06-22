@@ -17,22 +17,19 @@
  *
  */
 
-import {contentStyles} from 'Components/Meeting/Meeting.styles';
-import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
-import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
-import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useMeetingsList} from 'Components/Meeting/useMeetingsList';
+import type {TranslationKey} from 'Util/localizerUtil';
 
-export const Meetings = () => {
-  const meetingsList = useMeetingsList();
+import type {ScheduleMeetingResult} from './scheduleMeetingService';
 
-  return (
-    <>
-      <MeetingHeader />
-      <div css={contentStyles}>
-        <MeetingList {...meetingsList} />
-      </div>
-      <ScheduleMeetingModal onMeetingScheduled={meetingsList.fetchMeetings} />
-    </>
-  );
-};
+type ScheduleMeetingErrorStatus = Exclude<ScheduleMeetingResult['status'], 'success'>;
+
+export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
+  participantMissingEmail: {
+    titleKey: 'meetings.scheduleModal.error.createFailedTitle',
+    messageKey: 'meetings.scheduleModal.error.participantMissingEmail',
+  },
+  createFailed: {
+    titleKey: 'meetings.scheduleModal.error.createFailedTitle',
+    messageKey: 'meetings.scheduleModal.error.createFailed',
+  },
+} as const satisfies Record<ScheduleMeetingErrorStatus, {titleKey: TranslationKey; messageKey: TranslationKey}>;

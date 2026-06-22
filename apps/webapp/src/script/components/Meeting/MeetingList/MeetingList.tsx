@@ -17,17 +17,23 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
+
+import is from '@sindresorhus/is';
+
+import {Loading} from '@wireapp/react-ui-kit';
 
 import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
 import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeetingList';
+import type {MeetingsListErrorKey} from 'Components/Meeting/loadMeetingsList';
 import {meetingListContainerStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
 import {
   MeetingGroupBy,
   MeetingListItemGroup,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
 import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOngoingSection/TodayAndOngoingSection';
-import {MEETINGS_PAST, MEETINGS_TODAY, MEETINGS_TOMORROW} from 'Components/Meeting/mocks/MeetingMocks';
+import {partitionMeetingsByDay} from 'Components/Meeting/partitionMeetingsByDay';
+import type {ScheduleMeetingRecurrenceOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
@@ -35,7 +41,7 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 export interface Meeting {
   start_date: string;
   end_date: string;
-  schedule: string;
+  recurrence: ScheduleMeetingRecurrenceOption;
   conversation_id: string;
   title: string;
   // TODO: Ask iOS and Android about how to identify this status
@@ -48,7 +54,13 @@ export interface TodayAndOngoingSectionProps {
   nowMs: number;
 }
 
-export const MeetingList = () => {
+export interface MeetingListProps {
+  meetings: Meeting[];
+  isLoading: boolean;
+  errorKey?: MeetingsListErrorKey;
+}
+
+export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) => {
   const {translate, wallClock} = useApplicationContext();
   const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
 
@@ -61,12 +73,34 @@ export const MeetingList = () => {
   const headerForToday = `${translate('meetings.list.today')} (${today})`;
   const headerForTomorrow = `${translate('meetings.list.tomorrow')} (${tomorrow})`;
 
-  const groupedMeetingsTomorrow = groupByStartHour(MEETINGS_TOMORROW);
-  const groupedMeetingsPast = groupByStartHour(MEETINGS_PAST);
+  const {
+    today: meetingsToday,
+    tomorrow: meetingsTomorrow,
+    past: meetingsPast,
+  } = useMemo(() => partitionMeetingsByDay(meetings, wallClock), [meetings, wallClock]);
 
-  const hasMeetingsToday = MEETINGS_TODAY.length > 0;
-  const hasMeetingsTomorrow = MEETINGS_TOMORROW.length > 0;
-  const hasMeetingsPast = MEETINGS_PAST.length > 0;
+  const groupedMeetingsTomorrow = groupByStartHour(meetingsTomorrow);
+  const groupedMeetingsPast = groupByStartHour(meetingsPast);
+
+  const hasMeetingsToday = is.nonEmptyArray(meetingsToday);
+  const hasMeetingsTomorrow = is.nonEmptyArray(meetingsTomorrow);
+  const hasMeetingsPast = is.nonEmptyArray(meetingsPast);
+
+  if (isLoading && is.nonEmptyArray(meetings)) {
+    return (
+      <div css={emptyListContainerStyles} data-uie-name="meetings-list-loading">
+        <Loading data-uie-name="status-loading" />
+      </div>
+    );
+  }
+
+  if (!is.nullOrUndefined(errorKey) && is.nonEmptyArray(meetings)) {
+    return (
+      <div css={meetingListContainerStyles} data-uie-name="meetings-list-error">
+        {translate(errorKey)}
+      </div>
+    );
+  }
 
   if (!hasMeetingsToday && !hasMeetingsTomorrow && !hasMeetingsPast) {
     return (
@@ -80,7 +114,7 @@ export const MeetingList = () => {
     <div css={meetingListContainerStyles}>
       <>
         {hasMeetingsToday && (
-          <TodayAndOngoingSection meetingsToday={MEETINGS_TODAY} headerForToday={headerForToday} nowMs={nowMs} />
+          <TodayAndOngoingSection meetingsToday={meetingsToday} headerForToday={headerForToday} nowMs={nowMs} />
         )}
 
         {hasMeetingsTomorrow && (

@@ -74,6 +74,8 @@ import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHand
 import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MeetingsApiDataSource} from 'Repositories/meetings/meetingsApiDataSource';
+import {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import {initializePermissions} from 'Repositories/permission/permissionHandlers';
@@ -319,6 +321,8 @@ export class App {
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     repositories.cells = container.resolve(CellsRepository);
+
+    repositories.meetings = new MeetingsRepository(new MeetingsApiDataSource(this.apiClient.api.meetings));
 
     // Initialize LifeCycleRepository with all required dependencies
     repositories.lifeCycle = new LifeCycleRepository({
