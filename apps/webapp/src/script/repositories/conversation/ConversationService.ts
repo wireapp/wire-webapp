@@ -51,7 +51,7 @@ import {container} from 'tsyringe';
 import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventService} from 'Repositories/event/EventService';
-import {search as fullTextSearch} from 'Repositories/search/fullTextSearch';
+import {getSearchRegex} from 'Repositories/search/fullTextSearch';
 import {StorageService} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
@@ -488,6 +488,11 @@ export class ConversationService {
    * @returns Resolves with the matching events
    */
   async searchInConversation(conversation_id: string, query: string): Promise<any> {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery.length) {
+      return [];
+    }
+
     const category_min = MessageCategory.TEXT;
     const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
 
@@ -497,6 +502,7 @@ export class ConversationService {
       category_max,
     )) as SearchableConversationEvent[];
     const matchingEvents: SearchableConversationEvent[] = [];
+    const searchRegex = getSearchRegex(trimmedQuery);
 
     for (let index = 0; index < events.length; index += 1) {
       if (index > 0 && index % SEARCH_BATCH_SIZE === 0) {
@@ -509,7 +515,8 @@ export class ConversationService {
       }
 
       const searchableText = this.getEventSearchableText(event);
-      if (searchableText && fullTextSearch(searchableText, query)) {
+      searchRegex.lastIndex = 0;
+      if (searchableText && searchRegex.test(searchableText)) {
         matchingEvents.push(event);
       }
     }

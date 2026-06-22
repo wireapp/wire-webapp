@@ -99,6 +99,50 @@ describe('ConversationService', () => {
       expect(await conversationService.searchInConversation('conversation-id', 'caption')).toEqual([compositeEvent]);
       expect(await conversationService.searchInConversation('conversation-id', 'unrelated')).toEqual([]);
     });
+
+    it('reuses the search regex without skipping consecutive matches', async () => {
+      const matchingEvents: EventRecord[] = [
+        {
+          primary_key: 'primary-key-1',
+          category: MessageCategory.TEXT,
+          conversation: 'conversation-id',
+          from: 'user-id',
+          time: new Date(0).toISOString(),
+          id: 'event-id-1',
+          type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+          data: {content: 'term'},
+          ephemeral_expires: false,
+        },
+        {
+          primary_key: 'primary-key-2',
+          category: MessageCategory.TEXT,
+          conversation: 'conversation-id',
+          from: 'user-id',
+          time: new Date(1).toISOString(),
+          id: 'event-id-2',
+          type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+          data: {content: 'term'},
+          ephemeral_expires: false,
+        },
+      ];
+
+      const loadEventsWithCategory = jest
+        .fn<
+          ReturnType<EventServiceLike['loadEventsWithCategory']>,
+          Parameters<EventServiceLike['loadEventsWithCategory']>
+        >()
+        .mockResolvedValue(matchingEvents);
+      const eventService: EventServiceLike = {loadEventsWithCategory};
+
+      const conversationService = new ConversationService(
+        eventService,
+        {} as unknown as StorageService,
+        {} as unknown as APIClient,
+        {} as unknown as Core,
+      );
+
+      expect(await conversationService.searchInConversation('conversation-id', 'term')).toEqual(matchingEvents);
+    });
   });
 
   describe('getSafeConversationById', () => {
