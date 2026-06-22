@@ -24,7 +24,7 @@ import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useMeetingsList = () => {
-  const {mainViewModel} = useApplicationContext();
+  const {fireAndForgetInvoker, mainViewModel} = useApplicationContext();
   const meetingsRepository = mainViewModel.content.repositories.meetings;
 
   const [meetings, setMeetings] = useState<Meeting[]>([]);
@@ -43,8 +43,8 @@ export const useMeetingsList = () => {
   }, [meetingsRepository]);
 
   useEffect(() => {
-    void fetchMeetings();
-  }, [fetchMeetings]);
+    fireAndForgetInvoker.fireAndForget(fetchMeetings);
+  }, [fetchMeetings, fireAndForgetInvoker]);
 
   return {meetings, isLoading, errorKey, fetchMeetings};
 };
