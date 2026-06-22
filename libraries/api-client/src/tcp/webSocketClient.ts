@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import logdown from 'logdown';
 import {ErrorEvent} from 'reconnecting-websocket';
 import {Maybe} from 'true-myth';
@@ -201,7 +202,7 @@ export class WebSocketClient extends EventEmitter {
   }
 
   private async refreshAccessToken(): Promise<void> {
-    if (this.accessTokenRefreshPromise !== undefined) {
+    if (is.promise(this.accessTokenRefreshPromise)) {
       return this.accessTokenRefreshPromise;
     }
 
