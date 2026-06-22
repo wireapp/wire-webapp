@@ -18,7 +18,7 @@
  */
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 
 import type {ScheduleMeetingNotifier} from './scheduleMeetingService.types';
 
@@ -26,8 +26,8 @@ export class ScheduleMeetingNotifierImpl implements ScheduleMeetingNotifier {
   showCreateError(): void {
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {
-        title: t('meetings.scheduleModal.error.createFailedTitle'),
-        message: t('meetings.scheduleModal.error.createFailed'),
+        title: translate('meetings.scheduleModal.error.createFailedTitle'),
+        message: translate('meetings.scheduleModal.error.createFailed'),
       },
     });
   }
@@ -35,8 +35,8 @@ export class ScheduleMeetingNotifierImpl implements ScheduleMeetingNotifier {
   showParticipantMissingEmailError(): void {
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {
-        title: t('meetings.scheduleModal.error.createFailedTitle'),
-        message: t('meetings.scheduleModal.error.participantMissingEmail'),
+        title: translate('meetings.scheduleModal.error.createFailedTitle'),
+        message: translate('meetings.scheduleModal.error.participantMissingEmail'),
       },
     });
   }
