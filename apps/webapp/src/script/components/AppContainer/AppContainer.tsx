@@ -17,10 +17,11 @@
  *
  */
 
-import {useEffect, useMemo} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
+import ky from 'ky';
 import {container} from 'tsyringe';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
@@ -40,14 +41,18 @@ import type {Translate} from 'Util/localizerUtil';
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
+import {runClientVersionCheck} from '../../application-periodic-checks/runClientVersionCheck';
+import {startApplicationPeriodicChecks} from '../../application-periodic-checks/startApplicationPeriodicChecks';
 import {WallClock} from '../../clock/wallClock';
 import {Config, Configuration} from '../../Config';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import {AppMain} from '../../page/appMain';
+import {RootProvider} from '../../page/rootProvider';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {AppLoader} from '../AppLoader';
 
@@ -70,7 +75,7 @@ export const AppContainer = (properties: AppProps) => {
 
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
-  const mainView = new MainViewModel(app.repository, translate);
+  const mainView = useMemo(() => new MainViewModel(app.repository, translate), [app.repository, translate]);
   useTheme(() => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
   useAccentColor();
   const themePreference = useUserPropertyValue(
@@ -104,6 +109,44 @@ export const AppContainer = (properties: AppProps) => {
   const {repository: repositories} = app;
 
   const {softLockEnabled} = useAppSoftLock(repositories.calling, repositories.notification);
+  const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
+  const clientVersion = Config.getConfig().VERSION;
+  const runApplicationPeriodicCheck: () => void = useCallback(() => {
+    void runClientVersionCheck({ky, clientVersion, setDoesApplicationNeedForceReload});
+  }, [clientVersion]);
+
+  useEffect(() => {
+    return startApplicationPeriodicChecks({
+      wallClock,
+      periodicChecksIntervalDelayInMilliseconds: TIME_IN_MILLIS.FIVE_MINUTES,
+      runPeriodicCheck: runApplicationPeriodicCheck,
+    });
+  }, [wallClock, runApplicationPeriodicCheck]);
+
+  const rootContextValue = useMemo(() => {
+    return {
+      fireAndForgetInvoker,
+      mainViewModel: mainView,
+      wallClock,
+      doesApplicationNeedForceReload,
+      isFeatureToggleEnabled,
+      translate,
+      applicationNavigation: {
+        get currentPathname(): string {
+          return window.location.pathname;
+        },
+        get currentSearch(): string {
+          return window.location.search;
+        },
+        get currentHash(): string {
+          return window.location.hash;
+        },
+        navigateTo(url: string) {
+          window.location.assign(url);
+        },
+      },
+    };
+  }, [doesApplicationNeedForceReload, fireAndForgetInvoker, isFeatureToggleEnabled, mainView, translate, wallClock]);
 
   if (hasOtherInstance) {
     // Automatically sign out the user if the user has multiple tabs open
@@ -117,7 +160,7 @@ export const AppContainer = (properties: AppProps) => {
   }
 
   return (
-    <>
+    <RootProvider value={rootContextValue}>
       <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
         {selfUser => {
           return (
@@ -144,6 +187,6 @@ export const AppContainer = (properties: AppProps) => {
       <div id="audio-elements" />
       {/* Wrapper which will hold the audio elements for the calling speaker */}
       <div id="calling-audio-speaker-elements" />
-    </>
+    </RootProvider>
   );
 };
