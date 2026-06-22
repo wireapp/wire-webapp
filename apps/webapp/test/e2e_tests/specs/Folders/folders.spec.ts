@@ -322,7 +322,7 @@ test.describe('Folders', () => {
       await test.step('User A removes 1:1 and group conversation with User B from Favorites', async () => {
         const contextMenuDirectConversation = await userAPages
           .conversationList()
-          .getConversation(userB.fullName)
+          .getConversation(userB.fullName, {protocol: 'mls'})
           .openContextMenu();
         await contextMenuDirectConversation.getByRole('button', {name: 'Remove from favorites'}).click();
 
