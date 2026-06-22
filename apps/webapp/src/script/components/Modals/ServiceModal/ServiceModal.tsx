@@ -23,13 +23,14 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 interface ServiceModalProps {
+  translate: Translate;
   readonly service: ServiceEntity;
   readonly integrationRepository: IntegrationRepository;
   readonly actionsViewModel: ActionsViewModel;
@@ -37,8 +38,13 @@ interface ServiceModalProps {
   readonly avatarSize?: AVATAR_SIZE;
 }
 
-const ServiceModal = ({service, avatarSize = AVATAR_SIZE.LARGE, actionsViewModel, onClose}: ServiceModalProps) => {
-  const {translate} = useApplicationContext();
+const ServiceModal = ({
+  translate,
+  service,
+  avatarSize = AVATAR_SIZE.LARGE,
+  actionsViewModel,
+  onClose,
+}: ServiceModalProps) => {
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
   const onOpenService = () => {

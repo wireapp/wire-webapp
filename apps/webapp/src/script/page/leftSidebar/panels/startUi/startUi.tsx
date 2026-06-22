@@ -135,6 +135,7 @@ const StartUI = ({
 
   const openService = (service: ServiceEntity) => {
     showServiceModal({
+      translate,
       actionsViewModel: mainViewModel.actions,
       integrationRepository: integrationRepository,
       service: service,
