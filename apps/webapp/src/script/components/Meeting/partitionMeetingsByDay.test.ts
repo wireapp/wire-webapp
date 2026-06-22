@@ -62,10 +62,7 @@ describe('partitionMeetingsByDay', () => {
   });
 
   it('puts ended meetings from today into past', () => {
-    const result = partitionMeetingsByDay(
-      [createRelativeMeeting(0, 8, 9, 'ended-today')],
-      wallClock,
-    );
+    const result = partitionMeetingsByDay([createRelativeMeeting(0, 8, 9, 'ended-today')], wallClock);
 
     expect(result.past.map(meeting => meeting.title)).toEqual(['ended-today']);
     expect(result.today).toHaveLength(0);
