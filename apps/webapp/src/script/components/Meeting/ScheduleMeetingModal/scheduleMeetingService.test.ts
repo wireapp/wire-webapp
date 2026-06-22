@@ -17,12 +17,11 @@
  *
  */
 
+import {MeetingsRepository} from 'Repositories/meetings';
 import {User} from 'Repositories/entity/User';
 
-import {ScheduleMeetingService} from './scheduleMeetingService';
-import type {MeetingsListRefresher, ScheduleMeetingNotifier} from './scheduleMeetingService.types';
+import {tryScheduleMeeting} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
-import {MeetingsRepository} from 'Repositories/meetings';
 
 const formState: ScheduleMeetingFormState = {
   title: 'Weekly sync',
@@ -33,41 +32,30 @@ const formState: ScheduleMeetingFormState = {
   participantsFilter: '',
 };
 
-describe('ScheduleMeetingService', () => {
-  const createService = ({
+describe('tryScheduleMeeting', () => {
+  const createDeps = ({
     createMeeting = jest.fn().mockResolvedValue({}),
     fetchMeetings = jest.fn().mockResolvedValue(undefined),
-    showCreateError = jest.fn(),
-    showParticipantMissingEmailError = jest.fn(),
   }: {
     createMeeting?: jest.Mock;
     fetchMeetings?: jest.Mock;
-    showCreateError?: jest.Mock;
-    showParticipantMissingEmailError?: jest.Mock;
   } = {}) => {
     const meetingsRepository = {
       createMeeting,
       getMeetingsList: jest.fn(),
     } as unknown as MeetingsRepository;
-    const meetingsListRefresher: MeetingsListRefresher = {fetchMeetings};
-    const notifier: ScheduleMeetingNotifier = {
-      showCreateError,
-      showParticipantMissingEmailError,
-    };
 
     return {
-      service: new ScheduleMeetingService(meetingsRepository, meetingsListRefresher, notifier),
+      deps: {meetingsRepository, fetchMeetings},
       createMeeting,
       fetchMeetings,
-      showCreateError,
-      showParticipantMissingEmailError,
     };
   };
 
   it('creates a meeting and refreshes the list', async () => {
-    const {service, createMeeting, fetchMeetings} = createService();
+    const {deps, createMeeting, fetchMeetings} = createDeps();
 
-    await expect(service.tryScheduleMeeting(formState)).resolves.toBe(true);
+    await expect(tryScheduleMeeting(formState, deps)).resolves.toEqual({status: 'success'});
 
     expect(createMeeting).toHaveBeenCalledWith({
       title: 'Weekly sync',
@@ -77,30 +65,31 @@ describe('ScheduleMeetingService', () => {
     expect(fetchMeetings).toHaveBeenCalled();
   });
 
-  it('shows participant missing email error and does not call API', async () => {
+  it('returns participantMissingEmail and does not call API', async () => {
     const user = new User('1', 'example.com');
     user.name('Alice');
-    const {service, createMeeting, showParticipantMissingEmailError} = createService();
+    const {deps, createMeeting} = createDeps();
 
     await expect(
-      service.tryScheduleMeeting({
-        ...formState,
-        selectedUsers: [user],
-      }),
-    ).resolves.toBe(false);
+      tryScheduleMeeting(
+        {
+          ...formState,
+          selectedUsers: [user],
+        },
+        deps,
+      ),
+    ).resolves.toEqual({status: 'participantMissingEmail'});
 
-    expect(showParticipantMissingEmailError).toHaveBeenCalled();
     expect(createMeeting).not.toHaveBeenCalled();
   });
 
-  it('shows create error when API fails', async () => {
-    const {service, showCreateError, fetchMeetings} = createService({
+  it('returns createFailed when API fails', async () => {
+    const {deps, fetchMeetings} = createDeps({
       createMeeting: jest.fn().mockRejectedValue(new Error('network')),
     });
 
-    await expect(service.tryScheduleMeeting(formState)).resolves.toBe(false);
+    await expect(tryScheduleMeeting(formState, deps)).resolves.toEqual({status: 'createFailed'});
 
-    expect(showCreateError).toHaveBeenCalled();
     expect(fetchMeetings).not.toHaveBeenCalled();
   });
 });

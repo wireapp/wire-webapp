@@ -20,22 +20,12 @@
 import type {Meeting as ApiMeeting} from '@wireapp/api-client/lib/meetings/meeting';
 
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import {
-  mapMeetingRecurrenceToOption,
-  SCHEDULE_MEETING_RECURRENCE_OPTIONS,
-} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
-
-const getRecurrenceScheduleLabel = (apiMeeting: ApiMeeting): string => {
-  const option = mapMeetingRecurrenceToOption(apiMeeting.recurrence);
-
-  const selectOption = SCHEDULE_MEETING_RECURRENCE_OPTIONS[option];
-  return selectOption.label;
-};
+import {mapMeetingRecurrenceToOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 
 export const mapApiMeetingToListMeeting = (apiMeeting: ApiMeeting): Meeting => ({
   start_date: apiMeeting.start_time,
   end_date: apiMeeting.end_time,
   conversation_id: apiMeeting.qualified_conversation.id,
   title: apiMeeting.title,
-  schedule: getRecurrenceScheduleLabel(apiMeeting),
+  recurrence: mapMeetingRecurrenceToOption(apiMeeting.recurrence),
 });

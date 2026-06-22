@@ -19,17 +19,25 @@
 
 import {MeetingRecurrence, MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
 
-import {translate} from 'Util/localizerUtil';
+import type {TranslationKey} from 'Util/localizerUtil';
 
 import type {ScheduleMeetingRecurrenceOption} from './scheduleMeetingTypes';
 
-export const SCHEDULE_MEETING_RECURRENCE_OPTIONS = {
-  doesNotRepeat: {value: 'doesNotRepeat', label: translate('meetings.scheduleModal.recurrence.doesNotRepeat')},
-  daily: {value: 'daily', label: translate('meetings.scheduleModal.recurrence.daily')},
-  weekly: {value: 'weekly', label: translate('meetings.scheduleModal.recurrence.weekly')},
-  everyTwoWeeks: {value: 'everyTwoWeeks', label: translate('meetings.scheduleModal.recurrence.everyTwoWeeks')},
-  monthly: {value: 'monthly', label: translate('meetings.scheduleModal.recurrence.monthly')},
-};
+export const SCHEDULE_MEETING_RECURRENCE_OPTIONS = [
+  'doesNotRepeat',
+  'daily',
+  'weekly',
+  'everyTwoWeeks',
+  'monthly',
+] as const satisfies readonly ScheduleMeetingRecurrenceOption[];
+
+export const SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS = {
+  doesNotRepeat: 'meetings.scheduleModal.recurrence.doesNotRepeat',
+  daily: 'meetings.scheduleModal.recurrence.daily',
+  weekly: 'meetings.scheduleModal.recurrence.weekly',
+  everyTwoWeeks: 'meetings.scheduleModal.recurrence.everyTwoWeeks',
+  monthly: 'meetings.scheduleModal.recurrence.monthly',
+} as const satisfies Record<ScheduleMeetingRecurrenceOption, TranslationKey>;
 
 export const mapRecurrenceOptionToMeetingRecurrence = (
   option: ScheduleMeetingRecurrenceOption,

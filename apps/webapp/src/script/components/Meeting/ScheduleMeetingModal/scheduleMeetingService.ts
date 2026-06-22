@@ -20,38 +20,40 @@
 import {mapScheduleFormToCreateMeeting} from 'Components/Meeting/mapScheduleFormToCreateMeeting';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 
-import type {MeetingsListRefresher, ScheduleMeetingNotifier} from './scheduleMeetingService.types';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
-export class ScheduleMeetingService {
-  constructor(
-    private readonly meetingsRepository: MeetingsRepository,
-    private readonly meetingsListRefresher: MeetingsListRefresher,
-    private readonly notifier: ScheduleMeetingNotifier,
-  ) {}
+export type ScheduleMeetingResult =
+  | {status: 'success'}
+  | {status: 'participantMissingEmail'}
+  | {status: 'createFailed'};
 
-  /**
-   * Tries to schedule a meeting with the given form state.
-   * If the meeting cannot be scheduled because of a missing participant email, it will show an error notification and return false.
-   * If the meeting cannot be scheduled because of an error, it will show an error notification and return false.
-   * @param formState - The form state to schedule the meeting with.
-   * @returns True if the meeting was scheduled successfully, false otherwise.
-   */
-  async tryScheduleMeeting(formState: ScheduleMeetingFormState): Promise<boolean> {
-    const mapping = mapScheduleFormToCreateMeeting(formState);
+export type TryScheduleMeetingDependencies = {
+  meetingsRepository: MeetingsRepository;
+  fetchMeetings: () => Promise<void>;
+};
 
-    if (mapping.error === 'participantMissingEmail') {
-      this.notifier.showParticipantMissingEmailError();
-      return false;
-    }
+/**
+ * Tries to schedule a meeting with the given form state.
+ * @param formState - The form state to schedule the meeting with.
+ * @param deps - Repository and list refresh dependencies.
+ * @returns A semantic result indicating success or the failure reason.
+ */
+export async function tryScheduleMeeting(
+  formState: ScheduleMeetingFormState,
+  dependencies: TryScheduleMeetingDependencies,
+): Promise<ScheduleMeetingResult> {
+  const mapping = mapScheduleFormToCreateMeeting(formState);
 
-    try {
-      await this.meetingsRepository.createMeeting(mapping.payload);
-      await this.meetingsListRefresher.fetchMeetings();
-      return true;
-    } catch {
-      this.notifier.showCreateError();
-      return false;
-    }
+  if (mapping.error === 'participantMissingEmail') {
+    return {status: 'participantMissingEmail'};
+  }
+
+  try {
+    const {meetingsRepository, fetchMeetings} = dependencies;
+    await meetingsRepository.createMeeting(mapping.payload);
+    await fetchMeetings();
+    return {status: 'success'};
+  } catch {
+    return {status: 'createFailed'};
   }
 }

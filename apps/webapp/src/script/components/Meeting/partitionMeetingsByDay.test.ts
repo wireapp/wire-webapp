@@ -25,7 +25,7 @@ import {partitionMeetingsByDay} from './partitionMeetingsByDay';
 const createMeeting = (start: string, end: string, title: string): Meeting => ({
   start_date: start,
   end_date: end,
-  schedule: 'Single',
+  recurrence: 'doesNotRepeat',
   conversation_id: title,
   title,
 });

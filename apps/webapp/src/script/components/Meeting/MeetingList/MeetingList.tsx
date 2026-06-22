@@ -33,6 +33,7 @@ import {
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
 import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOngoingSection/TodayAndOngoingSection';
 import {partitionMeetingsByDay} from 'Components/Meeting/partitionMeetingsByDay';
+import type {ScheduleMeetingRecurrenceOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
@@ -40,7 +41,7 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 export interface Meeting {
   start_date: string;
   end_date: string;
-  schedule: string;
+  recurrence: ScheduleMeetingRecurrenceOption;
   conversation_id: string;
   title: string;
   // TODO: Ask iOS and Android about how to identify this status

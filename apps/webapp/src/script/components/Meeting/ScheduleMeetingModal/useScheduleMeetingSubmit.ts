@@ -17,38 +17,47 @@
  *
  */
 
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useState} from 'react';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {ScheduleMeetingNotifierImpl} from './scheduleMeetingNotifier';
-import {ScheduleMeetingService} from './scheduleMeetingService';
+import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
+import {tryScheduleMeeting} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void>) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {mainViewModel} = useApplicationContext();
+  const {mainViewModel, translate} = useApplicationContext();
   const meetingsRepository = mainViewModel.content.repositories.meetings;
-
-  const scheduleMeetingService = useMemo(() => {
-    return new ScheduleMeetingService(
-      meetingsRepository,
-      {fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve()},
-      new ScheduleMeetingNotifierImpl(),
-    );
-  }, [meetingsRepository, onMeetingScheduled]);
 
   const submit = useCallback(
     async (formState: ScheduleMeetingFormState): Promise<boolean> => {
       setIsSubmitting(true);
 
       try {
-        return await scheduleMeetingService.tryScheduleMeeting(formState);
+        const result = await tryScheduleMeeting(formState, {
+          meetingsRepository,
+          fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve(),
+        });
+
+        if (result.status !== 'success') {
+          const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[result.status];
+          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+            text: {
+              title: translate(titleKey),
+              message: translate(messageKey),
+            },
+          });
+          return false;
+        }
+
+        return true;
       } finally {
         setIsSubmitting(false);
       }
     },
-    [scheduleMeetingService],
+    [meetingsRepository, onMeetingScheduled, translate],
   );
 
   return {isSubmitting, submit};

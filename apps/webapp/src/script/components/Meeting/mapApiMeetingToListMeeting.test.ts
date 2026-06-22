@@ -19,12 +19,7 @@
 
 import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
 
-import en from 'I18n/en-US.json';
-import {setStrings} from 'Util/localizerUtil';
-
 import {mapApiMeetingToListMeeting} from './mapApiMeetingToListMeeting';
-
-setStrings({en});
 
 describe('mapApiMeetingToListMeeting', () => {
   it('maps API meeting fields to list meeting shape', () => {
@@ -47,11 +42,11 @@ describe('mapApiMeetingToListMeeting', () => {
       end_date: '2026-06-15T11:00:00.000Z',
       conversation_id: 'conv-id',
       title: 'Weekly sync',
-      schedule: 'meetings.scheduleModal.recurrence.weekly',
+      recurrence: 'weekly',
     });
   });
 
-  it('uses Single when meeting does not repeat', () => {
+  it('uses doesNotRepeat when meeting does not repeat', () => {
     const result = mapApiMeetingToListMeeting({
       created_at: '2026-06-15T09:00:00.000Z',
       updated_at: '2026-06-15T09:00:00.000Z',
@@ -65,6 +60,6 @@ describe('mapApiMeetingToListMeeting', () => {
       trial: false,
     });
 
-    expect(result.schedule).toBe('meetings.scheduleModal.recurrence.doesNotRepeat');
+    expect(result.recurrence).toBe('doesNotRepeat');
   });
 });

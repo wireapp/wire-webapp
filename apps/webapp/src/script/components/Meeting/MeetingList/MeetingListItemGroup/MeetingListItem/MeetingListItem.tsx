@@ -34,6 +34,7 @@ import {
   titleStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem.styles';
 import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
+import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
@@ -42,7 +43,14 @@ interface MeetingListItemProps extends Meeting {
   nowMs?: number;
 }
 
-const MeetingListItemComponent = ({title, start_date, end_date, schedule, attending, nowMs}: MeetingListItemProps) => {
+const MeetingListItemComponent = ({
+  title,
+  start_date,
+  end_date,
+  recurrence,
+  attending,
+  nowMs,
+}: MeetingListItemProps) => {
   const {translate} = useApplicationContext();
   const timestamp = nowMs ?? Date.now();
 
@@ -101,9 +109,9 @@ const MeetingListItemComponent = ({title, start_date, end_date, schedule, attend
           <div css={metaStyles}>
             {showCalendarIcon && <CalendarIcon css={{marginRight: '4px'}} height={12} />}
             {time}
-            {schedule && (
+            {recurrence && (
               <div css={badgeWrapperStyles}>
-                <span>{schedule}</span>
+                <span>{translate(SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS[recurrence])}</span>
               </div>
             )}
           </div>
