@@ -31,7 +31,7 @@ import {
 import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {FileAsset as FileAssetComponent} from './fileAsset';
+import {FileAsset as FileAssetComponent} from './FileAsset';
 
 describe('FileAssetComponent', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
