@@ -43,7 +43,7 @@ import {
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {noop} from 'Util/util';
 
-import {ActionIdentifier, Actions, UserActions} from './UserActions';
+import {ActionIdentifier, Actions, UserActions} from './userActions';
 
 const actionsViewModel = {
   open1to1Conversation: jest.fn(),

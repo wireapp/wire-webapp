@@ -29,7 +29,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
-import {EnrichedFields} from './EnrichedFields';
+import {EnrichedFields} from './enrichedFields';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

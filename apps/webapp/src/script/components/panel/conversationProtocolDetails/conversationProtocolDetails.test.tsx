@@ -18,32 +18,42 @@
  */
 
 import {render} from '@testing-library/react';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {Ciphersuite} from '@wireapp/core';
+
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
-import {ServiceDetails} from './ServiceDetails';
+import {ConversationProtocolDetails} from './conversationProtocolDetails';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-describe('ServiceDetails', () => {
-  it('renders the correct infos for the service', () => {
-    const serviceName = 'serviceName';
-    const serviceProvider = 'serviceProvider';
-    const serviceDescription = 'serviceDescription';
-    const service = new ServiceEntity({description: serviceDescription, name: serviceName});
-    service.providerName(serviceProvider);
+describe('ConversationProtocolDetails', () => {
+  it('renders the correct infos for the conversation with mls protocol', () => {
+    const props = {
+      cipherSuite: Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256,
+      protocol: CONVERSATION_PROTOCOL.MLS,
+    };
 
-    const {getByText} = render(<ServiceDetails service={service} />, {wrapper: rootProviderWrapper});
+    const {queryByText} = render(<ConversationProtocolDetails {...props} />, {wrapper: rootProviderWrapper});
 
-    getByText(serviceName);
-    getByText(serviceProvider);
-    getByText(serviceDescription);
+    expect(queryByText('MLS')).not.toBeNull();
+    expect(queryByText('MLS_128_DHKEMP256_AES128GCM_SHA256_P256')).not.toBeNull();
+  });
+
+  it('renders the correct infos for the conversation with proteus protocol', () => {
+    const props = {
+      protocol: CONVERSATION_PROTOCOL.PROTEUS,
+    };
+
+    const {queryByText} = render(<ConversationProtocolDetails {...props} />, {wrapper: rootProviderWrapper});
+
+    expect(queryByText('PROTEUS')).not.toBeNull();
   });
 });

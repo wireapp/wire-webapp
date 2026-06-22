@@ -28,7 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {listCSS} from 'Components/panel/PanelActions/PanelActions.styles';
+import {listCSS} from 'Components/panel/panelActions/panelActions.styles';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import type {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -40,9 +40,9 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import type {MenuItem} from './PanelActions';
-import {PanelActions} from './PanelActions';
-import {SingleAction} from './SingleAction/SingleAction';
+import type {MenuItem} from './panelActions';
+import {PanelActions} from './panelActions';
+import {SingleAction} from './singleAction/singleAction';
 
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 

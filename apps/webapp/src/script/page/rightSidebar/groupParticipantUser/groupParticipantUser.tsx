@@ -27,9 +27,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/icon';
-import {EnrichedFields} from 'Components/panel/EnrichedFields';
-import {UserActions, Actions} from 'Components/panel/UserActions';
-import {UserDetails} from 'Components/panel/UserDetails';
+import {EnrichedFields} from 'Components/panel/enrichedFields';
+import {UserActions, Actions} from 'Components/panel/userActions';
+import {UserDetails} from 'Components/panel/userDetails';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {MemberLeaveEvent, TeamMemberLeaveEvent} from 'Repositories/conversation/EventBuilder';

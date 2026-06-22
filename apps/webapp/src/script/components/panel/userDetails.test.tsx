@@ -28,7 +28,7 @@ import {createRootContextValueForTest} from 'src/script/page/testSupport/rootCon
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
-import {UserDetails} from './UserDetails';
+import {UserDetails} from './userDetails';
 
 jest.mock('Components/avatar', () => ({
   Avatar: () => <div data-testid="mock-avatar" />,
