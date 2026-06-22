@@ -19,6 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -34,9 +35,9 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import type {MenuItem} from './PanelActions';
@@ -86,7 +87,11 @@ interface UserActionsProps {
   conversationState?: ConversationState;
 }
 
-function createPlaceholder1to1Conversation(user: User, selfUser: User) {
+function createPlaceholder1to1Conversation(
+  user: User,
+  selfUser: User,
+  translate: ReturnType<typeof useApplicationContext>['translate'],
+) {
   const userConnection = user.connection();
 
   if (!userConnection) {
@@ -94,7 +99,7 @@ function createPlaceholder1to1Conversation(user: User, selfUser: User) {
   }
 
   const {id, domain} = userConnection.conversationId;
-  const conversation = new Conversation(id, domain);
+  const conversation = new Conversation(id, domain, CONVERSATION_PROTOCOL.PROTEUS, translate);
   conversation.name(user.name());
   conversation.selfUser(selfUser);
   conversation.type(CONVERSATION_TYPE.CONNECT);
@@ -118,6 +123,7 @@ const UserActions = ({
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
 }: UserActionsProps) => {
+  const {translate} = useApplicationContext();
   const {
     isAvailable,
     isBlocked,
@@ -151,7 +157,7 @@ const UserActions = ({
     const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
     if (showConversation) {
       setCurrentSidebarTab(SidebarTabs.RECENT);
-      actionsViewModel.open1to1Conversation(conversationEntity);
+      void actionsViewModel.open1to1Conversation(conversationEntity);
     }
   };
 
@@ -163,7 +169,7 @@ const UserActions = ({
         },
         Icon: Icon.ProfileIcon,
         identifier: ActionIdentifier[Actions.OPEN_PROFILE],
-        label: t('groupParticipantActionSelfProfile'),
+        label: translate('groupParticipantActionSelfProfile'),
       }
     : undefined;
 
@@ -180,7 +186,9 @@ const UserActions = ({
           },
           Icon: Icon.LeaveIcon,
           identifier: ActionIdentifier[Actions.LEAVE],
-          label: conversation.isChannel() ? t('channelParticipantActionLeave') : t('groupParticipantActionLeave'),
+          label: conversation.isChannel()
+            ? translate('channelParticipantActionLeave')
+            : translate('groupParticipantActionLeave'),
         }
       : undefined;
 
@@ -193,7 +201,7 @@ const UserActions = ({
           },
           Icon: Icon.MessageIcon,
           identifier: ActionIdentifier[Actions.OPEN_CONVERSATION],
-          label: t('groupParticipantActionOpenConversation'),
+          label: translate('groupParticipantActionOpenConversation'),
         }
       : undefined;
 
@@ -206,19 +214,26 @@ const UserActions = ({
               onAction(Actions.START_CONVERSATION);
             } catch (error: unknown) {
               if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
-                return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-                  text: {
-                    title: t('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
-                    htmlMessage: t('modal1To1ConversationCreateErrorNoKeyPackagesMessage', {name: user.name()}),
+                return PrimaryModal.show(
+                  PrimaryModal.type.ACKNOWLEDGE,
+                  {
+                    text: {
+                      title: translate('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
+                      htmlMessage: translate('modal1To1ConversationCreateErrorNoKeyPackagesMessage', {
+                        name: user.name(),
+                      }),
+                    },
                   },
-                });
+                  undefined,
+                  translate,
+                );
               }
               throw error;
             }
           },
           Icon: Icon.MessageIcon,
           identifier: ActionIdentifier[Actions.START_CONVERSATION],
-          label: t('groupParticipantActionStartConversation'),
+          label: translate('groupParticipantActionStartConversation'),
         }
       : undefined;
 
@@ -232,7 +247,7 @@ const UserActions = ({
           },
           Icon: Icon.CheckIcon,
           identifier: ActionIdentifier[Actions.ACCEPT_REQUEST],
-          label: t('groupParticipantActionIncomingRequest'),
+          label: translate('groupParticipantActionIncomingRequest'),
         }
       : undefined;
 
@@ -245,7 +260,7 @@ const UserActions = ({
           },
           Icon: Icon.CloseIcon,
           identifier: ActionIdentifier[Actions.IGNORE_REQUEST],
-          label: t('groupParticipantActionIgnoreRequest'),
+          label: translate('groupParticipantActionIgnoreRequest'),
         }
       : undefined;
 
@@ -259,7 +274,7 @@ const UserActions = ({
           },
           Icon: Icon.UndoIcon,
           identifier: ActionIdentifier[Actions.CANCEL_REQUEST],
-          label: t('groupParticipantActionCancelRequest'),
+          label: translate('groupParticipantActionCancelRequest'),
         }
       : undefined;
 
@@ -283,7 +298,7 @@ const UserActions = ({
             // before the other user has accepted the request.
             const connectionConversation =
               connectionStatus === ConnectionStatus.SENT
-                ? createPlaceholder1to1Conversation(user, selfUser)
+                ? createPlaceholder1to1Conversation(user, selfUser, translate)
                 : await actionsViewModel.getConversationById(conversationId);
 
             const savedConversation = await actionsViewModel.saveConversation(connectionConversation);
@@ -296,7 +311,7 @@ const UserActions = ({
           },
           Icon: Icon.PlusIcon,
           identifier: ActionIdentifier[Actions.SEND_REQUEST],
-          label: t('groupParticipantActionSendRequest'),
+          label: translate('groupParticipantActionSendRequest'),
         }
       : undefined;
 
@@ -310,7 +325,7 @@ const UserActions = ({
           },
           Icon: Icon.BlockIcon,
           identifier: ActionIdentifier[Actions.BLOCK],
-          label: t('groupParticipantActionBlock'),
+          label: translate('groupParticipantActionBlock'),
         }
       : undefined;
 
@@ -324,7 +339,7 @@ const UserActions = ({
           },
           Icon: Icon.BlockIcon,
           identifier: ActionIdentifier[Actions.UNBLOCK],
-          label: t('groupParticipantActionUnblock'),
+          label: translate('groupParticipantActionUnblock'),
         }
       : undefined;
 
@@ -341,7 +356,7 @@ const UserActions = ({
           },
           Icon: Icon.MinusIcon,
           identifier: 'do-remove',
-          label: t('groupParticipantActionRemove'),
+          label: translate('groupParticipantActionRemove'),
         }
       : undefined;
 

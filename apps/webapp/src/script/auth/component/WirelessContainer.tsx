@@ -24,7 +24,7 @@ import {FormattedMessage} from 'react-intl';
 import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Config} from '../../Config';
 import {EXTERNAL_ROUTE} from '../externalRoute';
@@ -36,6 +36,7 @@ interface WirelessContainerProps {
 }
 
 const WirelessContainer = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}: WirelessContainerProps) => {
+  const {translate} = useApplicationContext();
   return (
     <div
       style={{
@@ -98,7 +99,7 @@ const WirelessContainer = ({showCookiePolicyBanner, onCookiePolicyBannerClose, c
         <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
         <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
           <Link href={EXTERNAL_ROUTE.WIRE_WEBSITE}>{Config.getConfig().WEBSITE_LABEL}</Link>
-          <Small> &middot; {t('footer.copy')}</Small>
+          <Small> &middot; {translate('footer.copy')}</Small>
         </Footer>
       </Content>
     </div>

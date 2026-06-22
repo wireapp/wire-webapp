@@ -18,9 +18,10 @@
  */
 
 import {User} from 'Repositories/entity/User';
-import {Declension, LocalizerUtil, t, getSelfName, getUserName} from 'Util/localizerUtil';
+import {Declension, translate, getSelfName, getUserName} from 'Util/localizerUtil';
 
 import {escapeRegex, safeWindowOpen} from './sanitizationUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('sanitizationUtil', () => {
   describe('escapeRegex', () => {
@@ -33,41 +34,41 @@ describe('sanitizationUtil', () => {
 
   describe('getUserName', () => {
     it('will return the name of the given user', () => {
-      const userEntity = new User();
+      const userEntity = new User('', '', translateForTest);
       userEntity.name(`<script>alert('Unsanitzed');</script>`);
-      const escapedFirstName = getUserName(userEntity);
+      const escapedFirstName = getUserName(userEntity, translate);
 
       expect(escapedFirstName).toEqual('&lt;script&gt;alert(&#x27;Unsanitzed&#x27;);&lt;/script&gt;');
-      const unescapedFirstName = getUserName(userEntity, undefined, true);
+      const unescapedFirstName = getUserName(userEntity, translate, undefined, true);
 
       expect(unescapedFirstName).toEqual(`<script>alert('Unsanitzed');</script>`);
       userEntity.isMe = true;
-      const escapedSelfName = getUserName(userEntity);
+      const escapedSelfName = getUserName(userEntity, translate);
 
-      expect(escapedSelfName).toEqual(t('conversationYouNominative'));
+      expect(escapedSelfName).toEqual(translate('conversationYouNominative'));
     });
   });
 
   describe('getSelfName', () => {
     it('will return the self name in the given declension', () => {
-      const escapedNominativeName = getSelfName(Declension.NOMINATIVE);
+      const escapedNominativeName = getSelfName(translate, Declension.NOMINATIVE);
 
-      expect(escapedNominativeName).toEqual(t('conversationYouNominative'));
+      expect(escapedNominativeName).toEqual(translate('conversationYouNominative'));
 
-      const unescapedNominativeName = getSelfName(Declension.NOMINATIVE, true);
+      const unescapedNominativeName = getSelfName(translate, Declension.NOMINATIVE, true);
 
-      expect(unescapedNominativeName).toEqual(t('conversationYouNominative'));
+      expect(unescapedNominativeName).toEqual(translate('conversationYouNominative'));
 
-      const escapedDativeName = getSelfName(Declension.DATIVE);
+      const escapedDativeName = getSelfName(translate, Declension.DATIVE);
 
-      expect(escapedDativeName).toEqual(t('conversationYouDative'));
+      expect(escapedDativeName).toEqual(translate('conversationYouDative'));
 
-      spyOn(LocalizerUtil, 'translate').and.returnValue('<script>you</script>');
-      const escapedAccusativeName = getSelfName(Declension.DATIVE);
+      const translateUnsafeSelfName = () => '<script>you</script>';
+      const escapedAccusativeName = getSelfName(translateUnsafeSelfName, Declension.DATIVE, false);
 
       expect(escapedAccusativeName).toEqual('&lt;script&gt;you&lt;/script&gt;');
 
-      const unescapedAccusativeName = getSelfName(Declension.DATIVE, true);
+      const unescapedAccusativeName = getSelfName(translateUnsafeSelfName, Declension.DATIVE, true);
 
       expect(unescapedAccusativeName).toEqual('<script>you</script>');
     });

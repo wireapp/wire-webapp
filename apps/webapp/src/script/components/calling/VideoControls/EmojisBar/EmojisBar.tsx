@@ -17,12 +17,12 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import EmojiPicker, {EmojiClickData, EmojiStyle} from 'emoji-picker-react';
 
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {styles} from './EmojisBar.styles';
 
@@ -37,8 +37,10 @@ const DEFAULT_EMOJI_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '�
 type EmojiPickerLocalStorageItem = {unified: string; original: string; count: number}[];
 
 const EMOJI_PICKER_LOCAL_STORAGE_KEY = 'epr_suggested';
+const MAX_RECENT_TOP_EMOJIS = 8;
 
 export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: EmojisBarProps) => {
+  const {translate} = useApplicationContext();
   const emojisBarRef = useRef<HTMLDivElement>(null);
 
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
@@ -59,18 +61,21 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
     onPickerEmojiClick();
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (emojisBarRef.current && !emojisBarRef.current.contains(event.target as Node)) {
-      onPickerEmojiClick();
-    }
-  };
+  const handleClickOutside = useCallback(
+    (event: MouseEvent) => {
+      if (emojisBarRef.current && !emojisBarRef.current.contains(event.target as Node)) {
+        onPickerEmojiClick();
+      }
+    },
+    [onPickerEmojiClick],
+  );
 
   useEffect(() => {
     targetWindow.document.addEventListener('mousedown', handleClickOutside);
     return () => {
       targetWindow.document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [targetWindow, onPickerEmojiClick]);
+  }, [handleClickOutside, targetWindow]);
 
   const recentEmojis: EmojiPickerLocalStorageItem = JSON.parse(
     localStorage.getItem(EMOJI_PICKER_LOCAL_STORAGE_KEY) ?? '[]',
@@ -80,7 +85,7 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
     .toSorted((emojiA, emojiB) => emojiB.count - emojiA.count)
     .map(emoji => String.fromCodePoint(parseInt(emoji.unified, 16)))
     .concat(DEFAULT_EMOJI_LIST)
-    .slice(0, 8);
+    .slice(0, MAX_RECENT_TOP_EMOJIS);
 
   return (
     <div ref={emojisBarRef}>
@@ -88,7 +93,7 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
         <div
           role="dialog"
           data-uie-name="video-controls-emojis-picker"
-          aria-label={t('callReactionEmojiPickerAriaLabel')}
+          aria-label={translate('callReactionEmojiPickerAriaLabel')}
           css={styles.picker}
         >
           <EmojiPicker emojiStyle={EmojiStyle.NATIVE} onEmojiClick={handlePickerEmojiClick} />
@@ -97,14 +102,14 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
         <div
           role="toolbar"
           data-uie-name="video-controls-emojis-bar"
-          aria-label={t('callReactionButtonsAriaLabel')}
+          aria-label={translate('callReactionButtonsAriaLabel')}
           css={styles.emojisBar}
         >
           {recentTopEmojis.map(emoji => {
             const isDisabled = disabledEmojis.includes(emoji);
             return (
               <button
-                aria-label={t('callReactionButtonAriaLabel', {emoji})}
+                aria-label={translate('callReactionButtonAriaLabel', {emoji})}
                 data-uie-name="video-controls-emoji"
                 data-uie-value={emoji}
                 key={emoji}
@@ -117,7 +122,7 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
             );
           })}
           <button
-            aria-label={t('callReactionEmojiPickerButtonAriaLabel')}
+            aria-label={translate('callReactionEmojiPickerButtonAriaLabel')}
             data-uie-name="call-reaction-emoji-picker-button"
             data-uie-value="open-emoji-picker"
             className="icon-more font-size-sm"

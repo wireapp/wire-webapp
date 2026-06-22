@@ -54,6 +54,11 @@ interface UseConversationSearchFilesProps {
   onClear?: () => void;
 }
 
+type ClearSearchRefreshOptions = {
+  preserveFilters: boolean;
+  hasActiveParamsBeforeClear: boolean;
+};
+
 const DEBOUNCE_TIME = 300;
 
 const normalizeSearchQuery = (query: string): string => (is.nonEmptyStringAndNotWhitespace(query) ? query.trim() : '');
@@ -88,11 +93,31 @@ export const useConversationSearchFiles = ({
 
   const {id, domain} = conversationQualifiedId;
 
-  const isCurrentSearchRequest = useCallback((requestVersion: number): boolean => {
-    return (
-      (enabledRef.current || allowSearchWhenDisabledRef.current) && !requestVersionGate.current.isStale(requestVersion)
-    );
+  const canSearchOwnResults = useCallback((): boolean => {
+    return enabledRef.current === true || allowSearchWhenDisabledRef.current === true;
   }, []);
+
+  const isValidSearchRequest = useCallback(
+    (requestVersion: number): boolean => {
+      return canSearchOwnResults() === true && requestVersionGate.current.isStale(requestVersion) === false;
+    },
+    [canSearchOwnResults],
+  );
+
+  const shouldRefreshSearchResultsAfterClearingInput = useCallback(
+    ({preserveFilters, hasActiveParamsBeforeClear}: ClearSearchRefreshOptions): boolean => {
+      if (preserveFilters === false) {
+        return false;
+      }
+
+      if (enabledRef.current === true) {
+        return true;
+      }
+
+      return allowSearchWhenDisabledRef.current === true && hasActiveParamsBeforeClear === true;
+    },
+    [],
+  );
 
   const searchNodes = useCallback(
     async ({
@@ -139,7 +164,7 @@ export const useConversationSearchFiles = ({
           ...searchParams,
         });
 
-        if (!isCurrentSearchRequest(requestVersion)) {
+        if (!isValidSearchRequest(requestVersion)) {
           return;
         }
 
@@ -154,7 +179,7 @@ export const useConversationSearchFiles = ({
 
         const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
-        if (!isCurrentSearchRequest(requestVersion)) {
+        if (!isValidSearchRequest(requestVersion)) {
           return;
         }
 
@@ -172,7 +197,7 @@ export const useConversationSearchFiles = ({
         setPagination({conversationId: id, pagination});
         setStatus('success');
       } catch (error) {
-        if (!isCurrentSearchRequest(requestVersion)) {
+        if (!isValidSearchRequest(requestVersion)) {
           return;
         }
 
@@ -192,7 +217,7 @@ export const useConversationSearchFiles = ({
     },
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain, isCurrentSearchRequest],
+    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain, isValidSearchRequest],
   );
 
   useLayoutEffect(() => {
@@ -251,9 +276,12 @@ export const useConversationSearchFiles = ({
     setSearchQuery('');
     shouldPerformSearch.current = false;
 
-    const shouldRefreshSearchResults = preserveFilters && hasActiveParams;
+    const shouldRefreshSearchResults = shouldRefreshSearchResultsAfterClearingInput({
+      preserveFilters,
+      hasActiveParamsBeforeClear: hasActiveParams,
+    });
 
-    if (shouldRefreshSearchResults) {
+    if (shouldRefreshSearchResults === true) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         await searchNodes({query: '', filters});
       });
@@ -267,10 +295,9 @@ export const useConversationSearchFiles = ({
   };
 
   const handleReload = useCallback(async (): Promise<void> => {
-    setStatus('loading');
     clearAll({conversationId: id});
     await searchNodes({query: normalizeSearchQuery(searchQuery), filters});
-  }, [clearAll, filters, id, searchNodes, searchQuery, setStatus]);
+  }, [clearAll, filters, id, searchNodes, searchQuery]);
 
   useEffect(() => {
     if (!enabled) {
@@ -309,11 +336,19 @@ export const useConversationSearchFiles = ({
   // When the search params transition from "active" to "none" with no search query,
   // restore the default unfiltered file list.
   useEffect(() => {
-    if (hadActiveSearchParamsRef.current && !hasActiveParams && !searchValue) {
-      onClear?.();
+    const hasNoSearchQuery = normalizeSearchQuery(searchValue).length === 0;
+
+    if (hadActiveSearchParamsRef.current === true && hasActiveParams === false && hasNoSearchQuery === true) {
+      if (canSearchOwnResults() === true) {
+        fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+          await searchNodes({query: '', filters});
+        });
+      } else {
+        onClear?.();
+      }
     }
     hadActiveSearchParamsRef.current = hasActiveParams;
-  }, [hasActiveParams, searchValue, onClear]);
+  }, [canSearchOwnResults, filters, fireAndForgetInvoker, hasActiveParams, onClear, searchNodes, searchValue]);
 
   const loadMore = useCallback(
     async (offset: number): Promise<void> => {

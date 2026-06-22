@@ -34,14 +34,16 @@ import {useDriveEnabledParticipantFilterItems} from 'Components/Conversation/Con
 import {useGetAllTags} from 'Components/Conversation/ConversationCells/common/useGetAllTags/useGetAllTags';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {t} from 'Util/localizerUtil';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 
 export const useGlobalDriveFilters = ({
   cellsRepository,
   conversationRepository,
+  translate,
 }: {
   cellsRepository: CellsRepository;
   conversationRepository: ConversationRepository;
+  translate: RootContextValue['translate'];
 }): {filters: FilterConfig[]; filterState: GlobalDriveFiltersState} => {
   const {tags: allTags} = useGetAllTags({cellsRepository});
   const creatorItems = useDriveEnabledParticipantFilterItems({conversationRepository});
@@ -72,10 +74,10 @@ export const useGlobalDriveFilters = ({
     () =>
       FILE_TYPE_CATALOG.map(({id, labelKey, Icon}) => ({
         id,
-        label: t(labelKey),
+        label: translate(labelKey),
         startContent: <Icon />,
       })),
-    [],
+    [translate],
   );
 
   const filters = useMemo<FilterConfig[]>(
@@ -83,7 +85,7 @@ export const useGlobalDriveFilters = ({
       {
         type: 'popover',
         id: 'tags',
-        label: t('cells.filter.tags'),
+        label: translate('cells.filter.tags'),
         items: tagItems,
         selectedIds: selectedTagIds,
         onSelectionChange: setSelectedTagIds,
@@ -93,7 +95,7 @@ export const useGlobalDriveFilters = ({
       {
         type: 'popover',
         id: 'fileType',
-        label: t('cells.filter.fileType'),
+        label: translate('cells.filter.fileType'),
         items: fileTypes,
         selectedIds: selectedFileTypeIds,
         onSelectionChange: setSelectedFileTypeIds,
@@ -103,7 +105,7 @@ export const useGlobalDriveFilters = ({
       {
         type: 'popover',
         id: 'conversation',
-        label: t('cells.filter.conversation'),
+        label: translate('cells.filter.conversation'),
         items: conversationItems,
         selectedIds: selectedConversationIds,
         onSelectionChange: setSelectedConversationIds,
@@ -113,7 +115,7 @@ export const useGlobalDriveFilters = ({
       {
         type: 'popover',
         id: 'createdBy',
-        label: t('cells.filter.createdBy'),
+        label: translate('cells.filter.createdBy'),
         items: creatorItems,
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
@@ -123,7 +125,7 @@ export const useGlobalDriveFilters = ({
       {
         type: 'toggle',
         id: 'sharedViaLink',
-        label: t('cells.filter.sharedViaLink'),
+        label: translate('cells.filter.sharedViaLink'),
         isActive: isSharedViaLink,
         onToggle: toggleSharedViaLink,
         disabled: isFilterTypeDisabled('sharedViaLink', activeFilterType),
@@ -141,6 +143,7 @@ export const useGlobalDriveFilters = ({
       selectedCreatorIds,
       isSharedViaLink,
       toggleSharedViaLink,
+      translate,
     ],
   );
 

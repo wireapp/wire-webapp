@@ -18,9 +18,11 @@
  */
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const RestrictedAudio = () => {
+  const {translate} = useApplicationContext();
+
   return (
     <div className="audio-restricted">
       <div className="audio-restricted__icon">
@@ -28,9 +30,9 @@ const RestrictedAudio = () => {
       </div>
       <div className="audio-restricted__description">
         <div className="audio-restricted__description__headline">
-          {t('conversationAssetRestrictedAudioMessageHeadline')}
+          {translate('conversationAssetRestrictedAudioMessageHeadline')}
         </div>
-        <div className="audio-restricted__description__message">{t('conversationAudioAssetRestricted')}</div>
+        <div className="audio-restricted__description__message">{translate('conversationAudioAssetRestricted')}</div>
       </div>
     </div>
   );

@@ -24,7 +24,7 @@ import {useNavigate} from 'react-router-dom';
 import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './CustomBackend.styles';
 import {Page} from './Page';
@@ -34,6 +34,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 import {getSearchParams, navigateTo} from '../util/urlUtil';
 
 export const CustomBackend = () => {
+  const {translate} = useApplicationContext();
   const navigate = useNavigate();
   const {customBackendURL: url} = useSelector(AuthSelector.getAccount);
 
@@ -57,21 +58,21 @@ export const CustomBackend = () => {
       <Container centerText verticalCenter css={containerCss}>
         <LogoFullIcon aria-hidden="true" width={102} height={33} css={logoCss} data-uie-name="ui-wire-logo" />
         <Text block center css={headerCss}>
-          {t('redirectHeader')}
+          {translate('redirectHeader')}
         </Text>
         <Text block center>
-          {t('redirectParagraph1', {url})}
+          {translate('redirectParagraph1', {url})}
         </Text>
         <Text block center css={paragraphCss}>
-          {t('redirectParagraph2')}
+          {translate('redirectParagraph2')}
         </Text>
 
         <div css={buttonContainerCss}>
           <Button css={{flex: '1'}} onClick={navigateToIndex} variant={ButtonVariant.SECONDARY}>
-            {t('redirectCancel')}
+            {translate('redirectCancel')}
           </Button>
           <Button css={{flex: '1'}} onClick={onConnect}>
-            {t('redirectConnect')}
+            {translate('redirectConnect')}
           </Button>
         </div>
       </Container>

@@ -17,8 +17,6 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
-
 import {
   getClientSideNodeNameError,
   getErrorStatus,
@@ -27,64 +25,72 @@ import {
 } from './cellsNodeFormUtils';
 
 describe('cellsNodeFormUtils', () => {
+  const validationCopy = {
+    genericError: 'cells.newItemMenuModalForm.genericError',
+    alreadyExistsError: 'cells.newItemMenuModalForm.alreadyExistsError',
+    invalidCharactersError: 'cells.newItemMenuModalForm.invalidCharactersError',
+    maxLengthError: 'cells.newItemMenuModalForm.maxLengthError',
+    nameRequired: 'cells.newItemMenuModalForm.nameRequired',
+  };
+
   describe('getClientSideNodeNameError', () => {
     it('returns required error for empty name', () => {
-      expect(getClientSideNodeNameError('').unwrapOr(null)).toBe(t('cells.newItemMenuModalForm.nameRequired'));
+      expect(getClientSideNodeNameError('', validationCopy).unwrapOr(null)).toBe(validationCopy.nameRequired);
     });
 
     it('returns max length error for names longer than the maximum', () => {
-      expect(getClientSideNodeNameError('a'.repeat(NODE_NAME_MAX_LENGTH + 1)).unwrapOr(null)).toBe(
-        t('cells.newItemMenuModalForm.maxLengthError'),
+      expect(getClientSideNodeNameError('a'.repeat(NODE_NAME_MAX_LENGTH + 1), validationCopy).unwrapOr(null)).toBe(
+        validationCopy.maxLengthError,
       );
     });
 
     it('returns max length error before invalid character error', () => {
       const tooLongNameWithInvalidCharacter = `${'a'.repeat(NODE_NAME_MAX_LENGTH)}/`;
-      expect(getClientSideNodeNameError(tooLongNameWithInvalidCharacter).unwrapOr(null)).toBe(
-        t('cells.newItemMenuModalForm.maxLengthError'),
+      expect(getClientSideNodeNameError(tooLongNameWithInvalidCharacter, validationCopy).unwrapOr(null)).toBe(
+        validationCopy.maxLengthError,
       );
     });
 
     it('returns invalid character error for names starting with "."', () => {
-      expect(getClientSideNodeNameError('.hidden').unwrapOr(null)).toBe(
-        t('cells.newItemMenuModalForm.invalidCharactersError'),
+      expect(getClientSideNodeNameError('.hidden', validationCopy).unwrapOr(null)).toBe(
+        validationCopy.invalidCharactersError,
       );
-      expect(getClientSideNodeNameError('.').unwrapOr(null)).toBe(
-        t('cells.newItemMenuModalForm.invalidCharactersError'),
+      expect(getClientSideNodeNameError('.', validationCopy).unwrapOr(null)).toBe(
+        validationCopy.invalidCharactersError,
       );
     });
 
     it('returns invalid character error for forbidden characters', () => {
-      expect(getClientSideNodeNameError('report/name').unwrapOr(null)).toBe(
-        t('cells.newItemMenuModalForm.invalidCharactersError'),
+      expect(getClientSideNodeNameError('report/name', validationCopy).unwrapOr(null)).toBe(
+        validationCopy.invalidCharactersError,
       );
-      expect(getClientSideNodeNameError('report\\name').unwrapOr(null)).toBe(
-        t('cells.newItemMenuModalForm.invalidCharactersError'),
+      expect(getClientSideNodeNameError('report\\name', validationCopy).unwrapOr(null)).toBe(
+        validationCopy.invalidCharactersError,
       );
-      expect(getClientSideNodeNameError('report"name').unwrapOr(null)).toBe(
-        t('cells.newItemMenuModalForm.invalidCharactersError'),
+      expect(getClientSideNodeNameError('report"name', validationCopy).unwrapOr(null)).toBe(
+        validationCopy.invalidCharactersError,
       );
     });
 
     it('accepts names containing dots when dot is not at the beginning', () => {
-      expect(getClientSideNodeNameError('file.txt').isNothing).toBe(true);
-      expect(getClientSideNodeNameError('my.folder').isNothing).toBe(true);
-      expect(getClientSideNodeNameError('v1.2.report').isNothing).toBe(true);
+      expect(getClientSideNodeNameError('file.txt', validationCopy).isNothing).toBe(true);
+      expect(getClientSideNodeNameError('my.folder', validationCopy).isNothing).toBe(true);
+      expect(getClientSideNodeNameError('v1.2.report', validationCopy).isNothing).toBe(true);
     });
   });
 
   describe('isClientSideNodeNameError', () => {
     it('returns true for node name validation errors', () => {
-      expect(isClientSideNodeNameError(t('cells.newItemMenuModalForm.nameRequired')).unwrapOr(false)).toBe(true);
-      expect(isClientSideNodeNameError(t('cells.newItemMenuModalForm.maxLengthError')).unwrapOr(false)).toBe(true);
-      expect(isClientSideNodeNameError(t('cells.newItemMenuModalForm.invalidCharactersError')).unwrapOr(false)).toBe(
+      expect(isClientSideNodeNameError(validationCopy.nameRequired, validationCopy).unwrapOr(false)).toBe(true);
+      expect(isClientSideNodeNameError(validationCopy.maxLengthError, validationCopy).unwrapOr(false)).toBe(true);
+      expect(isClientSideNodeNameError(validationCopy.invalidCharactersError, validationCopy).unwrapOr(false)).toBe(
         true,
       );
     });
 
     it('returns false for non-validation errors', () => {
-      expect(isClientSideNodeNameError(null).isNothing).toBe(true);
-      expect(isClientSideNodeNameError(t('cells.newItemMenuModalForm.genericError')).unwrapOr(false)).toBe(false);
+      expect(isClientSideNodeNameError(null, validationCopy).isNothing).toBe(true);
+      expect(isClientSideNodeNameError(validationCopy.genericError, validationCopy).unwrapOr(false)).toBe(false);
     });
   });
 

@@ -23,7 +23,7 @@ import {FormattedMessage} from 'react-intl';
 
 import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Config} from '../../Config';
 
@@ -33,14 +33,15 @@ interface Props {
 }
 
 const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
+  const {translate} = useApplicationContext();
   return (
     <Modal>
       <Container style={{maxWidth: '400px'}} data-uie-name="modal-marketing-consent">
         <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="modal-marketing-consent-title">
-          {t('acceptNewsModal.headline', {brandName: Config.getConfig().BRAND_NAME})}
+          {translate('acceptNewsModal.headline', {brandName: Config.getConfig().BRAND_NAME})}
         </H3>
         <div data-uie-name="modal-marketing-consent-description">
-          <Text block>{t('acceptNewsModal.unsubscribeDescription')}</Text>
+          <Text block>{translate('acceptNewsModal.unsubscribeDescription')}</Text>
           <Link href={Config.getConfig().URL.PRIVACY_POLICY} target="_blank" data-uie-name="go-privacy">
             <Text block>
               <FormattedMessage
@@ -60,12 +61,12 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
               backgroundColor={COLOR.GRAY}
               data-uie-name="do-decline-marketing-consent"
             >
-              {t('acceptNewsModal.declineButton')}
+              {translate('acceptNewsModal.declineButton')}
             </Button>
           </Column>
           <Column style={{textAlign: 'center'}}>
             <Button type="button" onClick={onConfirm} data-uie-name="do-confirm-marketing-consent">
-              {t('acceptNewsModal.confirmButton')}
+              {translate('acceptNewsModal.confirmButton')}
             </Button>
           </Column>
         </Columns>

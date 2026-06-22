@@ -22,7 +22,7 @@ import {CSSProperties, useState} from 'react';
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
 import {FileCard} from 'Components/FileCard/FileCard';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   contentWrapperStyles,
@@ -64,6 +64,7 @@ export const FileAssetWithPreview = ({
   senderName,
   timestamp,
 }: FileAssetWithPreviewProps) => {
+  const {translate} = useApplicationContext();
   const [isOpen, setIsOpen] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isInEditMode, setIsInEditMode] = useState(false);
@@ -93,7 +94,7 @@ export const FileAssetWithPreview = ({
         <button
           css={contentWrapperStyles}
           onClick={() => showModal()}
-          aria-label={t('cells.options.open')}
+          aria-label={translate('cells.options.open')}
           aria-controls={id}
           aria-haspopup="dialog"
           aria-expanded={isOpen}
@@ -114,7 +115,7 @@ export const FileAssetWithPreview = ({
                 <>
                   <AlertIcon css={errorIconStyles} width={14} height={14} />
                   <p css={errorTextStyles}>
-                    {isError ? t('cells.unavailableFile') : t('cells.unavailableFilePreview')}
+                    {isError ? translate('cells.unavailableFile') : translate('cells.unavailableFilePreview')}
                   </p>
                 </>
               )}

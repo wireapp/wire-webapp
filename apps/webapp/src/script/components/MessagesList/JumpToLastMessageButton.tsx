@@ -28,19 +28,22 @@ import {
   jumpToLastMessageChevronStyles,
 } from 'Components/MessagesList/MessageList.styles';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface JumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;
   conversation: Conversation;
 }
 
+const LAST_MESSAGE_VISIBILITY_DEBOUNCE_MILLISECONDS = 200;
+
 export const JumpToLastMessageButton = ({onGoToLastMessage, conversation}: JumpToLastMessageButtonProps) => {
+  const {translate} = useApplicationContext();
   const [isLastMessageVisible, setIsLastMessageVisible] = useState(conversation.isLastMessageVisible());
 
   const debouncedSetVisibility = useDebouncedCallback((value: boolean) => {
     setIsLastMessageVisible(value);
-  }, 200);
+  }, LAST_MESSAGE_VISIBILITY_DEBOUNCE_MILLISECONDS);
 
   useEffect(() => {
     const subscription = conversation.isLastMessageVisible.subscribe(debouncedSetVisibility);
@@ -55,7 +58,7 @@ export const JumpToLastMessageButton = ({onGoToLastMessage, conversation}: JumpT
 
   return (
     <IconButton
-      aria-label={t('jumpToLastMessage')}
+      aria-label={translate('jumpToLastMessage')}
       data-uie-name="jump-to-last-message-button"
       onClick={onGoToLastMessage}
       css={jumpToLastMessageButtonStyles}

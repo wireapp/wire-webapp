@@ -17,26 +17,23 @@
  *
  */
 
-import {useContext, useEffect, useRef} from 'react';
+import {useEffect, useRef} from 'react';
 
-import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {UserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
-
-import {RootContext} from '../../page/RootProvider';
 
 interface ConnectRequestsProps {
   readonly userState: UserState;
@@ -49,8 +46,7 @@ export const ConnectRequests = ({
 }: ConnectRequestsProps) => {
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
-
-  const rootContext = useContext(RootContext);
+  const {mainViewModel, translate} = useApplicationContext();
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests: unsortedConnectionRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const connectionRequests = unsortedConnectionRequests.toSorted((user1, user2) => {
@@ -89,14 +85,10 @@ export const ConnectRequests = ({
     scrollToBottom();
   }, []);
 
-  if (is.null_(rootContext)) {
-    return null;
-  }
-
-  const actionsViewModel = rootContext.mainViewModel.actions;
+  const actionsViewModel = mainViewModel.actions;
 
   const onIgnoreClick = (userEntity: User): void => {
-    actionsViewModel.ignoreConnectionRequest(userEntity);
+    void actionsViewModel.ignoreConnectionRequest(userEntity);
   };
 
   const onAcceptClick = async (userEntity: User) => {
@@ -162,18 +154,18 @@ export const ConnectRequests = ({
                 <Button
                   variant={ButtonVariant.SECONDARY}
                   data-uie-name="do-ignore"
-                  aria-label={t('connectionRequestIgnore')}
+                  aria-label={translate('connectionRequestIgnore')}
                   onClick={() => onIgnoreClick(connectRequest)}
                 >
-                  {t('connectionRequestIgnore')}
+                  {translate('connectionRequestIgnore')}
                 </Button>
 
                 <Button
-                  onClick={() => onAcceptClick(connectRequest)}
+                  onClick={() => void onAcceptClick(connectRequest)}
                   data-uie-name="do-accept"
-                  aria-label={t('connectionRequestConnect')}
+                  aria-label={translate('connectionRequestConnect')}
                 >
-                  {t('connectionRequestConnect')}
+                  {translate('connectionRequestConnect')}
                 </Button>
               </div>
             </div>

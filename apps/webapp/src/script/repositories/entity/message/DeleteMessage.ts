@@ -17,6 +17,8 @@
  *
  */
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {Message} from './Message';
 
 import {SuperType} from '../../../message/SuperType';
@@ -24,8 +26,8 @@ import {SuperType} from '../../../message/SuperType';
 export class DeleteMessage extends Message {
   public deleted_timestamp: null | number;
 
-  constructor() {
-    super();
+  constructor(translate: Translate) {
+    super(undefined, undefined, translate);
 
     this.super_type = SuperType.DELETE;
     this.deleted_timestamp = null;

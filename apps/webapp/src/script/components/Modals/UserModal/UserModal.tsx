@@ -17,9 +17,8 @@
  *
  */
 
-import {ReactNode, useContext, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 
-import is from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -34,9 +33,10 @@ import {UserDetails} from 'Components/panel/UserDetails';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {replaceLink} from 'Util/localizerUtil';
 
 import {useUserModalState} from './UserModal.state';
 import {
@@ -51,7 +51,6 @@ import {
 } from './UserModal.styles';
 
 import {Config} from '../../../Config';
-import {RootContext} from '../../../page/RootProvider';
 import {Core} from '../../../service/coreSingleton';
 
 export interface UserModalProps {
@@ -68,36 +67,33 @@ interface UserModalUserActionsSectionProps {
   onAction: () => void;
   isSelfActivated: boolean;
   selfUser: User;
+  blockedForLegalHoldMessageHtml: string;
 }
 
-const UserModalUserActionsSection = ({user, onAction, isSelfActivated, selfUser}: UserModalUserActionsSectionProps) => {
+const UserModalUserActionsSection = ({
+  user,
+  onAction,
+  isSelfActivated,
+  selfUser,
+  blockedForLegalHoldMessageHtml,
+}: UserModalUserActionsSectionProps) => {
   const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
-  const rootContext = useContext(RootContext);
+  const {mainViewModel} = useApplicationContext();
 
   if (isBlockedLegalHold) {
-    const replaceLinkLegalHold = replaceLink(
-      Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-      '',
-      'read-more-legal-hold',
-    );
-
     return (
       <div
         className="modal__message"
         data-uie-name="status-blocked-legal-hold"
-        dangerouslySetInnerHTML={{__html: t('modalUserBlockedForLegalHold', undefined, replaceLinkLegalHold)}}
+        dangerouslySetInnerHTML={{__html: blockedForLegalHoldMessageHtml}}
       />
     );
-  }
-
-  if (is.null_(rootContext)) {
-    return null;
   }
 
   return (
     <UserActions
       user={user}
-      actionsViewModel={rootContext.mainViewModel.actions}
+      actionsViewModel={mainViewModel.actions}
       onAction={onAction}
       isSelfActivated={isSelfActivated}
       selfUser={selfUser}
@@ -141,15 +137,16 @@ const UserModalWarningMessage = ({
 };
 
 export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
+  const {translate} = useApplicationContext();
   const learnMoreHref = Config.getConfig().URL.SUPPORT.PRIVACY_UNVERIFIED_USERS;
 
   if (user !== undefined) {
     return (
       <div css={unverifiedUserWarningStyle}>
         <UserModalWarningMessage
-          content={t('userNotVerified', {user: user.name()})}
+          content={translate('userNotVerified', {user: user.name()})}
           href={learnMoreHref}
-          linkText={t('modalUserLearnMore')}
+          linkText={translate('modalUserLearnMore')}
           showIcon
         />
       </div>
@@ -159,15 +156,15 @@ export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
   return (
     <div css={unverifiedUserWarningStyle}>
       <UserModalWarningMessage
-        content={t('conversationConnectionVerificationWarning')}
+        content={translate('conversationConnectionVerificationWarning')}
         href={learnMoreHref}
-        linkText={t('modalUserLearnMore')}
+        linkText={translate('modalUserLearnMore')}
         textAlignCenter
       />
       <UserModalWarningMessage
-        content={t('conversationConnectionSupportWarning')}
+        content={translate('conversationConnectionSupportWarning')}
         href={learnMoreHref}
-        linkText={t('conversationConnectionReportMisuse')}
+        linkText={translate('conversationConnectionReportMisuse')}
         textAlignCenter
       />
     </div>
@@ -180,6 +177,7 @@ const UserModal = ({
   core = container.resolve(Core),
   teamState = container.resolve(TeamState),
 }: UserModalProps) => {
+  const {translate} = useApplicationContext();
   const onClose = useUserModalState(state => state.onClose);
   const userId = useUserModalState(state => state.userId);
   const resetState = useUserModalState(state => state.resetState);
@@ -232,6 +230,9 @@ const UserModal = ({
     };
   }, [userId, userRepository]);
 
+  const replaceLinkLegalHold = replaceLink(Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK, '', 'read-more-legal-hold');
+  const blockedForLegalHoldMessageHtml = translate('modalUserBlockedForLegalHold', undefined, replaceLinkLegalHold);
+
   return (
     <ModalComponent
       isShown={isShown}
@@ -245,7 +246,7 @@ const UserModal = ({
       <div className="modal__header">
         {userNotFound && (
           <h2 className="modal__header__title" data-uie-name="status-modal-title">
-            {t('userNotFoundTitle', {brandName})}
+            {translate('userNotFoundTitle', {brandName})}
           </h2>
         )}
 
@@ -284,6 +285,7 @@ const UserModal = ({
               onAction={hide}
               isSelfActivated={isActivatedAccount}
               selfUser={selfUser}
+              blockedForLegalHoldMessageHtml={blockedForLegalHoldMessageHtml}
             />
           </>
         )}
@@ -296,12 +298,12 @@ const UserModal = ({
         {userNotFound && (
           <>
             <div className="modal__message" data-uie-name="status-modal-text">
-              {t('userNotFoundMessage', {brandName})}
+              {translate('userNotFoundMessage', {brandName})}
             </div>
 
             <div className="modal__buttons">
               <button className="modal__button modal__button--confirm" data-uie-name="do-ok" onClick={hide}>
-                {t('modalAcknowledgeAction')}
+                {translate('modalAcknowledgeAction')}
               </button>
             </div>
           </>

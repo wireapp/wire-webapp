@@ -28,7 +28,7 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {ActionLinkButton, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 
 import {Page} from './Page';
@@ -52,6 +52,7 @@ const VerifyEmailCodeComponent = ({
   doRegisterPersonal,
   doSendActivationCode,
 }: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const navigate = useNavigate();
 
   const logger = getLogger('VerifyEmailCode');
@@ -92,7 +93,7 @@ const VerifyEmailCodeComponent = ({
         <FlexBox css={styles.container}>
           <FlexBox css={styles.header}>
             <BackButton />
-            <p css={styles.headline}>{t('verify.headline')}</p>
+            <p css={styles.headline}>{translate('verify.headline')}</p>
           </FlexBox>
           <Text block data-uie-name="label-with-email" css={styles.subhead}>
             <FormattedMessage
@@ -107,12 +108,12 @@ const VerifyEmailCodeComponent = ({
             style={styles.codeInput}
             onCodeComplete={createAccount}
             data-uie-name="enter-code"
-            codeInputLabel={t('verify.codeLabel')}
-            codePlaceholder={t('verify.codePlaceholder')}
+            codeInputLabel={translate('verify.codeLabel')}
+            codePlaceholder={translate('verify.codePlaceholder')}
           />
           {parseError(authError)}
           <ActionLinkButton onClick={resendCode} data-uie-name="do-resend-code" css={styles.resendLink}>
-            {t('verify.resendCode')}
+            {translate('verify.resendCode')}
           </ActionLinkButton>
         </FlexBox>
       </AccountRegistrationLayout>

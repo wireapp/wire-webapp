@@ -29,8 +29,8 @@ import {Runtime} from '@wireapp/commons';
 import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
 
 import {StorageKey} from 'Repositories/storage';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {navigate} from 'src/script/router/Router';
-import {t} from 'Util/localizerUtil';
 import {storeValue} from 'Util/storageUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
@@ -61,6 +61,7 @@ const SetHandleComponent = ({
   name,
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const [error, setError] = useState<unknown>(null);
   const [handle, setHandle] = useState('');
   const {state} = useLocation();
@@ -134,10 +135,10 @@ const SetHandleComponent = ({
       <AccountRegistrationLayout>
         <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', padding: '16px'}}>
           <Text fontSize="24px" css={{fontWeight: '500', marginBottom: '8px'}} center>
-            {t('chooseHandle.headline')}
+            {translate('chooseHandle.headline')}
           </Text>
           <Text block center>
-            {t('chooseHandle.subhead')}
+            {translate('chooseHandle.subhead')}
           </Text>
           <Form style={{marginTop: 24}} onSubmit={onSetHandle}>
             <InputBlock>
@@ -148,7 +149,7 @@ const SetHandleComponent = ({
                 <Input
                   id="handle"
                   name="handle"
-                  placeholder={t('chooseHandle.handlePlaceholder')}
+                  placeholder={translate('chooseHandle.handlePlaceholder')}
                   type="text"
                   onChange={onHandleChange}
                   value={handle}
@@ -162,7 +163,7 @@ const SetHandleComponent = ({
               data-uie-name="do-send-handle"
               block
             >
-              {t('chooseHandle.submitButton')}
+              {translate('chooseHandle.submitButton')}
             </Button>
           </Form>
           {error !== null ? parseError(error) : null}

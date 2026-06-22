@@ -87,7 +87,7 @@ import type {UserRepository} from 'Repositories/user/userRepository';
 import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
 import {roundLogarithmic} from 'Util/numberUtil';
@@ -153,6 +153,19 @@ type SubconversationData = {
   members: SubconversationEpochInfoMember[];
 };
 
+export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, openerWindow: Window): (() => void) => {
+  const handleClick = (event: MouseEvent) => {
+    const anchor = (event.target as HTMLElement).closest('a');
+    if (anchor?.target === '_blank' && anchor.href) {
+      event.preventDefault();
+      openerWindow.open(anchor.href);
+    }
+  };
+
+  detachedWindow.document.addEventListener('click', handleClick, true);
+  return () => detachedWindow.document.removeEventListener('click', handleClick, true);
+};
+
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
@@ -195,6 +208,7 @@ export class CallingRepository {
     private readonly mediaDevicesHandler: MediaDevicesHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly backgroundEffectsHandler: BackgroundEffectsHandler,
+    private readonly translate: Translate,
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
@@ -246,17 +260,22 @@ export class CallingRepository {
 
         const modalOptions = {
           primaryAction: {
-            text: t('conversation.E2EIOk'),
+            text: this.translate('conversation.E2EIOk'),
           },
           text: {
-            message: t('conversation.E2EIGroupCallDisconnected'),
-            title: t('conversation.E2EIConversationNoLongerVerified'),
+            message: this.translate('conversation.E2EIGroupCallDisconnected'),
+            title: this.translate('conversation.E2EIConversationNoLongerVerified'),
           },
           close: restoreFocusCallback(),
           container,
         };
 
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, `degraded-${activeConversation.id}`);
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          modalOptions,
+          `degraded-${activeConversation.id}`,
+          this.translate,
+        );
       }
     });
 
@@ -814,16 +833,17 @@ export class CallingRepository {
           PrimaryModal.type.ACKNOWLEDGE,
           {
             primaryAction: {
-              text: t('callDegradationAction'),
+              text: this.translate('callDegradationAction'),
             },
             text: {
-              message: t('callDegradationDescription', {username: participant.user.name()}),
-              title: t('callDegradationTitle'),
+              message: this.translate('callDegradationDescription', {username: participant.user.name()}),
+              title: this.translate('callDegradationTitle'),
             },
             close: restoreFocusCallback(),
             container,
           },
           `degraded-${conversation.qualifiedId}`,
+          this.translate,
         );
       }
     }
@@ -851,12 +871,13 @@ export class CallingRepository {
       {
         close: restoreFocusCallback(() => this.acceptVersionWarning(conversationId)),
         text: {
-          message: t('modalCallUpdateClientMessage', {brandName}),
-          title: t('modalCallUpdateClientHeadline', {brandName}),
+          message: this.translate('modalCallUpdateClientMessage', {brandName}),
+          title: this.translate('modalCallUpdateClientHeadline', {brandName}),
         },
         container,
       },
       'update-client-warning',
+      this.translate,
     );
   }
 
@@ -948,7 +969,7 @@ export class CallingRepository {
         window.dispatchEvent(
           new CustomEvent(WebAppEvents.CALL.REMOTE_MUTED, {
             detail: {
-              notificationMessage: t('muteStateRemoteMute'),
+              notificationMessage: this.translate('muteStateRemoteMute'),
             },
           }),
         );
@@ -981,7 +1002,7 @@ export class CallingRepository {
             id: `${Date.now()}-${id}`,
             emoji,
             left: Math.random() * 500,
-            from: isSelf ? t('conversationYouAccusative') : (senderParticipant?.user.name() ?? ''),
+            from: isSelf ? this.translate('conversationYouAccusative') : (senderParticipant?.user.name() ?? ''),
           };
         });
 
@@ -1028,8 +1049,8 @@ export class CallingRepository {
 
         const name = participant.user.name();
         const handUpMessage = isSelf
-          ? t('videoCallParticipantRaisedSelfHandUp')
-          : t('videoCallParticipantRaisedTheirHandUp', {name});
+          ? this.translate('videoCallParticipantRaisedSelfHandUp')
+          : this.translate('videoCallParticipantRaisedTheirHandUp', {name});
 
         window.dispatchEvent(
           new CustomEvent(WebAppEvents.CALL.HAND_RAISED, {
@@ -1492,11 +1513,15 @@ export class CallingRepository {
     // New window is not opened on the same domain (it's about:blank), so we cannot use any of the dom loaded events to copy the styles.
     setTimeout(() => copyStyles(window.document, detachedWindow.document), 0);
 
-    detachedWindow.document.title = t('callingPopOutWindowTitle', {brandName: Config.getConfig().BRAND_NAME});
+    detachedWindow.document.title = this.translate('callingPopOutWindowTitle', {
+      brandName: Config.getConfig().BRAND_NAME,
+    });
 
     detachedWindow.addEventListener('beforeunload', this.closeDetachedWindow);
     detachedWindow.addEventListener('pagehide', this.closeDetachedWindow);
     window.addEventListener('pagehide', this.onPageHide);
+
+    setupDetachedWindowExternalLinksClick(detachedWindow, window);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
 
@@ -1525,25 +1550,30 @@ export class CallingRepository {
         const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
         userConsentWithDegradation = await new Promise(resolve =>
-          PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-            primaryAction: {
-              action: () => {
-                conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-                resolve(true);
+          PrimaryModal.show(
+            PrimaryModal.type.CONFIRM,
+            {
+              primaryAction: {
+                action: () => {
+                  conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+                  resolve(true);
+                },
+                text: this.translate('conversation.E2EIJoinAnyway'),
               },
-              text: t('conversation.E2EIJoinAnyway'),
+              secondaryAction: {
+                action: () => resolve(false),
+                text: this.translate('conversation.E2EICancel'),
+              },
+              text: {
+                message: this.translate('conversation.E2EIDegradedJoinCall'),
+                title: this.translate('conversation.E2EIConversationNoLongerVerified'),
+              },
+              close: restoreFocusCallback(),
+              container,
             },
-            secondaryAction: {
-              action: () => resolve(false),
-              text: t('conversation.E2EICancel'),
-            },
-            text: {
-              message: t('conversation.E2EIDegradedJoinCall'),
-              title: t('conversation.E2EIConversationNoLongerVerified'),
-            },
-            close: restoreFocusCallback(),
-            container,
-          }),
+            undefined,
+            this.translate,
+          ),
         );
       }
       const shouldContinueCall = userConsentWithDegradation && (await this.pushClients(call, true));
@@ -2880,21 +2910,21 @@ export class CallingRepository {
 
     const modalOptions = {
       primaryAction: {
-        text: t('modalAcknowledgeAction'),
+        text: this.translate('modalAcknowledgeAction'),
       },
       secondaryAction: {
         action: () => amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV),
-        text: t('modalNoAudioInputAction'),
+        text: this.translate('modalNoAudioInputAction'),
       },
       text: {
-        closeBtnLabel: t('modalNoAudioCloseBtn'),
-        message: t('modalNoAudioInputMessage'),
-        title: t('modalNoAudioInputTitle'),
+        closeBtnLabel: this.translate('modalNoAudioCloseBtn'),
+        message: this.translate('modalNoAudioInputMessage'),
+        title: this.translate('modalNoAudioInputTitle'),
       },
       close: restoreFocusCallback(),
       container,
     };
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions, undefined, this.translate);
   }
 
   private showNoCameraModal(): void {
@@ -2902,8 +2932,8 @@ export class CallingRepository {
 
     const modalOptions = {
       text: {
-        closeBtnLabel: t('modalNoCameraCloseBtn'),
-        htmlMessage: t(
+        closeBtnLabel: this.translate('modalNoCameraCloseBtn'),
+        htmlMessage: this.translate(
           'modalNoCameraMessage',
           {brandName: Config.getConfig().BRAND_NAME},
           {
@@ -2914,12 +2944,12 @@ export class CallingRepository {
             }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
           },
         ),
-        title: t('modalNoCameraTitle'),
+        title: this.translate('modalNoCameraTitle'),
       },
       close: restoreFocusCallback(),
       container,
     };
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, this.translate);
   }
 
   /**

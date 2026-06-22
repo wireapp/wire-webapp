@@ -26,9 +26,9 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import type {User} from 'Repositories/entity/User';
 import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
+import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 import {availabilityStatus, availabilityTranslationKeys} from 'Util/availabilityStatus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {noop} from 'Util/util';
 
 interface EnrichedFieldsProps {
@@ -42,6 +42,7 @@ interface EnrichedFieldsProps {
 export const useEnrichedFields = (
   user: User,
   {addEmail, addDomain}: {addDomain: boolean; addEmail: boolean},
+  translate: RootContextValue['translate'],
   richProfileRepository: RichProfileRepository = container.resolve(RichProfileRepository),
   onFieldsLoaded: (richFields: RichInfoField[]) => void = noop,
 ) => {
@@ -50,11 +51,11 @@ export const useEnrichedFields = (
   useEffect(() => {
     let cancel = false;
     const returnFields: RichInfoField[] =
-      addEmail && email != null && email !== '' ? [{type: t('userProfileEmail'), value: email}] : [];
+      addEmail && email != null && email !== '' ? [{type: translate('userProfileEmail'), value: email}] : [];
 
     if (addDomain && user.domain) {
       returnFields.push({
-        type: t('userProfileDomain'),
+        type: translate('userProfileDomain'),
         value: user.domain,
       });
     }
@@ -73,11 +74,11 @@ export const useEnrichedFields = (
       }
     };
 
-    loadRichFields();
+    void loadRichFields();
     return () => {
       cancel = true;
     };
-  }, [user, addEmail, email]);
+  }, [addDomain, addEmail, email, onFieldsLoaded, richProfileRepository, translate, user]);
   return fields;
 };
 
@@ -88,9 +89,11 @@ const EnrichedFields = ({
   user,
   showAvailability = false,
 }: EnrichedFieldsProps) => {
+  const {translate} = useApplicationContext();
   const fields = useEnrichedFields(
     user,
     {addDomain: showDomain, addEmail: true},
+    translate,
     richProfileRepository,
     onFieldsLoaded,
   );
@@ -110,7 +113,7 @@ const EnrichedFields = ({
       {shouldShowAvailability && (
         <div className="enriched-fields__entry">
           <p className="enriched-fields__entry__key" data-uie-name="item-enriched-key">
-            {t('availability.status')}
+            {translate('availability.status')}
           </p>
           <p
             className="enriched-fields__entry__value availability-status"
@@ -118,7 +121,7 @@ const EnrichedFields = ({
             data-uie-value={availability}
           >
             {availabilityStatus[availability]}
-            <span>{t(availabilityTranslationKeys[availability])}</span>
+            <span>{translate(availabilityTranslationKeys[availability])}</span>
           </p>
         </div>
       )}

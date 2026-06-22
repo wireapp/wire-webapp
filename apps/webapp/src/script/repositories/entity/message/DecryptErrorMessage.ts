@@ -19,6 +19,8 @@
 
 import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {Message} from './Message';
 
 import {SuperType} from '../../../message/SuperType';
@@ -27,8 +29,9 @@ export class DecryptErrorMessage extends Message {
   constructor(
     public readonly clientId: string,
     public readonly code: number,
+    translate: Translate,
   ) {
-    super();
+    super(undefined, undefined, translate);
     this.super_type = SuperType.UNABLE_TO_DECRYPT;
   }
 

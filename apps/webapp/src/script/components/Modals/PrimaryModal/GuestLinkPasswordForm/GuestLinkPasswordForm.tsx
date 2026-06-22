@@ -24,11 +24,12 @@ import {Form, Input, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {errorMessageStyles} from './GuestLinkPasswordForm.styles';
 
 interface GuestLinkPasswordFormProps {
+  readonly translate: Translate;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onGeneratePassword: (password: string) => void;
   passwordValue: string;
@@ -41,6 +42,7 @@ interface GuestLinkPasswordFormProps {
 }
 
 export const GuestLinkPasswordForm = ({
+  translate,
   onSubmit,
   onGeneratePassword,
   passwordValue,
@@ -54,6 +56,7 @@ export const GuestLinkPasswordForm = ({
   return (
     <>
       <PasswordGeneratorButton
+        translate={translate}
         passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
         onGeneratePassword={onGeneratePassword}
       />
@@ -67,34 +70,34 @@ export const GuestLinkPasswordForm = ({
           name="guest-link-password"
           data-uie-name="guest-link-password"
           required
-          placeholder={t('modalGuestLinkJoinPlaceholder')}
-          label={t('modalGuestLinkJoinLabel')}
-          helperText={t('modalGuestLinkJoinHelperText', {
+          placeholder={translate('modalGuestLinkJoinPlaceholder')}
+          label={translate('modalGuestLinkJoinLabel')}
+          helperText={translate('modalGuestLinkJoinHelperText', {
             minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
           })}
           id="modal_pswd"
           className="modal__input"
           type="password"
-          showTogglePasswordLabel={t('showTogglePasswordLabel')}
-          hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
+          showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+          hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
           autoComplete="off"
           value={passwordValue}
           ref={passwordValueRef}
           onChange={event => onPasswordValueChange(event.currentTarget.value)}
           pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
           markInvalid={isPasswordInputMarkInvalid}
-          error={isPasswordInputMarkInvalid ? <GuestLinkPasswordModalErrorMessage /> : undefined}
+          error={isPasswordInputMarkInvalid ? <GuestLinkPasswordModalErrorMessage translate={translate} /> : undefined}
         />
         <Input
           name="guest-link-password-confirm"
           data-uie-name="guest-link-password-confirm"
           required
-          placeholder={t('modalGuestLinkJoinConfirmPlaceholder')}
-          label={t('modalGuestLinkJoinConfirmLabel')}
+          placeholder={translate('modalGuestLinkJoinConfirmPlaceholder')}
+          label={translate('modalGuestLinkJoinConfirmLabel')}
           className="modal__input"
           type="password"
-          showTogglePasswordLabel={t('showTogglePasswordLabel')}
-          hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
+          showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+          hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
           id="modal_pswd_confirmation"
           autoComplete="off"
           value={passwordConfirmationValue}
@@ -106,10 +109,14 @@ export const GuestLinkPasswordForm = ({
   );
 };
 
-const GuestLinkPasswordModalErrorMessage = () => {
+interface GuestLinkPasswordModalErrorMessageProps {
+  readonly translate: Translate;
+}
+
+const GuestLinkPasswordModalErrorMessage = ({translate}: GuestLinkPasswordModalErrorMessageProps) => {
   return (
     <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessageStyles}>
-      {t('modalGuestLinkJoinHelperText', {
+      {translate('modalGuestLinkJoinHelperText', {
         minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
       })}
     </ErrorMessage>

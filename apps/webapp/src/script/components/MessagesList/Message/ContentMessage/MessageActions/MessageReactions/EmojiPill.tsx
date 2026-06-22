@@ -23,7 +23,7 @@ import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {User} from 'Repositories/entity/User';
 import {getEmojiTitleFromEmojiUnicode} from 'Util/emojiUtil';
 import {isTabKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {EmojiChar} from './EmojiChar';
@@ -39,6 +39,7 @@ import {
 } from './MessageReactions.styles';
 
 interface EmojiPillProps {
+  translate: Translate;
   emoji: string;
   emojiUnicode: string;
   handleReactionClick: (emoji: string) => void;
@@ -55,6 +56,7 @@ interface EmojiPillProps {
 const MAX_USER_NAMES_TO_SHOW = 2;
 
 export const EmojiPill = ({
+  translate,
   emoji,
   emojiUnicode,
   handleReactionClick,
@@ -77,7 +79,7 @@ export const EmojiPill = ({
 
   const conversationReactionCaption = () => {
     if (emojiCount > MAX_USER_NAMES_TO_SHOW) {
-      return t(
+      return translate(
         'conversationLikesCaptionPluralMoreThan2',
         {
           number: (emojiCount - MAX_USER_NAMES_TO_SHOW).toString(),
@@ -89,7 +91,7 @@ export const EmojiPill = ({
     }
 
     if (emojiCount === MAX_USER_NAMES_TO_SHOW) {
-      return t(
+      return translate(
         'conversationLikesCaptionPlural',
         {
           firstUser: reactingUserNames[0],
@@ -100,7 +102,7 @@ export const EmojiPill = ({
       );
     }
 
-    return t('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] || ''}, {}, true);
+    return translate('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] || ''}, {}, true);
   };
 
   const caption = conversationReactionCaption();
@@ -135,8 +137,8 @@ export const EmojiPill = ({
             <p css={messageReactionButtonTooltipText}>
               {content}{' '}
               {emojiCount > 1
-                ? t('conversationLikesCaptionReactedPlural', {emojiName})
-                : t('conversationLikesCaptionReactedSingular', {emojiName})}
+                ? translate('conversationLikesCaptionReactedPlural', {emojiName})
+                : translate('conversationLikesCaptionReactedSingular', {emojiName})}
             </p>
           </div>
         }
@@ -145,8 +147,14 @@ export const EmojiPill = ({
           css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
           aria-label={
             emojiCount > 1
-              ? t('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
-              : t('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName})
+              ? translate('accessibility.messageReactionDetailsPlural', {
+                  emojiCount: emojiCount.toString(),
+                  emojiName,
+                })
+              : translate('accessibility.messageReactionDetailsSingular', {
+                  emojiCount: emojiCount.toString(),
+                  emojiName,
+                })
           }
           title={emojiName}
           aria-pressed={isActive}

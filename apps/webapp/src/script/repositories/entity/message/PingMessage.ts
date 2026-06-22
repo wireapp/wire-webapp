@@ -20,7 +20,7 @@
 import ko from 'knockout';
 
 import {ReactionMap} from 'Repositories/storage';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import {Message} from './Message';
 
@@ -31,11 +31,13 @@ export class PingMessage extends Message {
   public readonly iconClasses: ko.PureComputed<string>;
   readonly reactions = ko.observable<ReactionMap>([]);
 
-  constructor() {
-    super();
+  constructor(translate: Translate) {
+    super(undefined, undefined, translate);
     this.super_type = SuperType.PING;
 
-    this.caption = ko.pureComputed(() => (this.user().isMe ? t('conversationPingYou') : t('conversationPing')));
+    this.caption = ko.pureComputed(() =>
+      this.user().isMe ? this.translate('conversationPingYou') : this.translate('conversationPing'),
+    );
 
     this.iconClasses = ko.pureComputed(() => {
       const showPingAnimation = Date.now() - this.timestamp() < 2000;

@@ -32,8 +32,7 @@ import {
 import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOngoingSection/TodayAndOngoingSection';
 import {partitionMeetingsByDay} from 'Components/Meeting/partitionMeetingsByDay';
 import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
-import {useApplicationContext} from 'src/script/page/RootProvider';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 export interface Meeting {
@@ -59,7 +58,7 @@ export interface MeetingListProps {
 }
 
 export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) => {
-  const {wallClock} = useApplicationContext();
+  const {translate, wallClock} = useApplicationContext();
   const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
 
   useEffect(() => {
@@ -68,8 +67,8 @@ export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) =
   }, [wallClock]);
 
   const {today, tomorrow} = getTodayTomorrowLabels();
-  const headerForToday = `${t('meetings.list.today')} (${today})`;
-  const headerForTomorrow = `${t('meetings.list.tomorrow')} (${tomorrow})`;
+  const headerForToday = `${translate('meetings.list.today')} (${today})`;
+  const headerForTomorrow = `${translate('meetings.list.tomorrow')} (${tomorrow})`;
 
   const {
     today: meetingsToday,
@@ -95,7 +94,7 @@ export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) =
   if (errorKey !== undefined && meetings.length === 0) {
     return (
       <div css={meetingListContainerStyles} data-uie-name="meetings-list-error">
-        {t(errorKey)}
+        {translate(errorKey)}
       </div>
     );
   }

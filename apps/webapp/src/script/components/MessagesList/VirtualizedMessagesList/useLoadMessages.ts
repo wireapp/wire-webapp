@@ -23,7 +23,7 @@ import {Virtualizer} from '@tanstack/react-virtual';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 
 type UseLoadMessagesProps = {

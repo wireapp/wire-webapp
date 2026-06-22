@@ -27,7 +27,7 @@ import {useCellExpirationToggle} from 'Components/Cells/ShareModal/useCellExpira
 import {useCellPasswordToggle} from 'Components/Cells/ShareModal/useCellPasswordToggle';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 import {createUuid} from 'Util/uuid';
 
 import {
@@ -61,9 +61,11 @@ interface ShareModalParams {
   conversationId: string;
   cellsRepository: CellsRepository;
   fireAndForgetInvoker: FireAndForgetInvoker;
+  translate: RootContextValue['translate'];
 }
 
 const submitHandlers = new Map<string, () => Promise<void> | void>();
+const ACCESS_END_TIMESTAMP_MULTIPLIER = 1000;
 
 export const showShareModal = ({
   type,
@@ -71,6 +73,7 @@ export const showShareModal = ({
   conversationId,
   cellsRepository,
   fireAndForgetInvoker,
+  translate,
 }: ShareModalParams) => {
   const modalId = createUuid();
   PrimaryModal.show(
@@ -87,7 +90,7 @@ export const showShareModal = ({
             });
           }
         },
-        text: t('cells.shareModal.primaryAction'),
+        text: translate('cells.shareModal.primaryAction'),
       },
       text: {
         message: (
@@ -98,12 +101,14 @@ export const showShareModal = ({
             cellsRepository={cellsRepository}
             fireAndForgetInvoker={fireAndForgetInvoker}
             modalId={modalId}
+            translate={translate}
           />
         ),
-        title: t('cells.shareModal.heading'),
+        title: translate('cells.shareModal.heading'),
       },
     },
     modalId,
+    translate,
   );
 };
 
@@ -114,6 +119,7 @@ export const CellShareModalContent = ({
   cellsRepository,
   fireAndForgetInvoker,
   modalId,
+  translate,
 }: ShareModalParams & {modalId: string}) => {
   const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellConversationPublicLink({
     uuid,
@@ -175,7 +181,7 @@ export const CellShareModalContent = ({
 
       if (linkData.AccessEnd !== undefined && linkData.AccessEnd.length > 0) {
         setIsExpirationEnabled(true);
-        const expirationDate = new Date(parseInt(linkData.AccessEnd) * 1000);
+        const expirationDate = new Date(parseInt(linkData.AccessEnd) * ACCESS_END_TIMESTAMP_MULTIPLIER);
         setExpirationDateTime(expirationDate);
       } else {
         setIsExpirationEnabled(false);
@@ -270,7 +276,8 @@ export const CellShareModalContent = ({
 
   return (
     <CellsShareModalContent
-      publicLinkDescription={t(
+      translate={translate}
+      publicLinkDescription={translate(
         type === 'file'
           ? 'cells.shareModal.enablePublicLink.file.description'
           : 'cells.shareModal.enablePublicLink.folder.description',

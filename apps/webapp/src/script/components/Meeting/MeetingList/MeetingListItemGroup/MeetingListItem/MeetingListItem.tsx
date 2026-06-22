@@ -35,7 +35,7 @@ import {
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem.styles';
 import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
 import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
 
 interface MeetingListItemProps extends Meeting {
@@ -43,6 +43,7 @@ interface MeetingListItemProps extends Meeting {
 }
 
 const MeetingListItemComponent = ({title, start_date, end_date, schedule, attending, nowMs}: MeetingListItemProps) => {
+  const {translate} = useApplicationContext();
   const timestamp = nowMs ?? Date.now();
 
   const {time, showCalendarIcon} = useMemo(() => {
@@ -59,7 +60,7 @@ const MeetingListItemComponent = ({title, start_date, end_date, schedule, attend
       const day = formatLocale(start, 'd');
       const time = formatLocale(start, 'h:mm a');
       return {
-        time: `${dayOfWeek}, ${month} ${day} • ${t('meetings.meetingStatus.startedAt', {time})}`,
+        time: `${dayOfWeek}, ${month} ${day} • ${translate('meetings.meetingStatus.startedAt', {time})}`,
         showCalendarIcon: false,
       };
     }
@@ -67,7 +68,7 @@ const MeetingListItemComponent = ({title, start_date, end_date, schedule, attend
     if (isOngoing) {
       const time = formatLocale(start, 'h:mm a');
       return {
-        time: t('meetings.meetingStatus.startedAt', {time}),
+        time: translate('meetings.meetingStatus.startedAt', {time}),
         showCalendarIcon: false,
       };
     }
@@ -80,7 +81,7 @@ const MeetingListItemComponent = ({title, start_date, end_date, schedule, attend
       time: timeRange,
       showCalendarIcon: true,
     };
-  }, [start_date, end_date, timestamp]);
+  }, [end_date, start_date, timestamp, translate]);
 
   const meetingStatus = useMemo(
     () => getMeetingStatusAt(timestamp, start_date, end_date, attending),

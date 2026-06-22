@@ -25,8 +25,8 @@ import {Button, ButtonVariant, CalendarIcon, CloseIcon} from '@wireapp/react-ui-
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {UserState} from 'Repositories/user/userState';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {ScheduleMeetingForm} from './ScheduleMeetingForm';
 import {
@@ -44,6 +44,7 @@ import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useSchedu
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 
 export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?: () => Promise<void>}) => {
+  const {translate} = useApplicationContext();
   const {
     isOpen,
     mode,
@@ -65,10 +66,10 @@ export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?:
 
   const displayErrors = useMemo(
     () => ({
-      title: errors.title ? t(errors.title) : undefined,
-      endBeforeStart: errors.endBeforeStart ? t(errors.endBeforeStart) : undefined,
+      title: errors.title ? translate(errors.title) : undefined,
+      endBeforeStart: errors.endBeforeStart ? translate(errors.endBeforeStart) : undefined,
     }),
-    [errors],
+    [errors, translate],
   );
 
   const handleClose = () => {
@@ -89,10 +90,10 @@ export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?:
   };
 
   const modalTitle =
-    mode === 'edit' ? t('meetings.scheduleModal.editTitle') : t('meetings.scheduleModal.scheduleTitle');
+    mode === 'edit' ? translate('meetings.scheduleModal.editTitle') : translate('meetings.scheduleModal.scheduleTitle');
 
   const submitLabel =
-    mode === 'edit' ? t('meetings.scheduleModal.confirmChanges') : t('meetings.action.scheduleMeeting');
+    mode === 'edit' ? translate('meetings.scheduleModal.confirmChanges') : translate('meetings.action.scheduleMeeting');
 
   return (
     <ModalComponent
@@ -110,7 +111,7 @@ export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?:
             type="button"
             css={closeButtonStyles}
             onClick={handleClose}
-            aria-label={t('meetings.scheduleModal.closeAriaLabel')}
+            aria-label={translate('meetings.scheduleModal.closeAriaLabel')}
             data-uie-name="schedule-meeting-modal-close"
           >
             <CloseIcon aria-hidden="true" />

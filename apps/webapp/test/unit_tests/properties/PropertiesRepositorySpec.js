@@ -20,6 +20,8 @@
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {translate} from 'Util/localizerUtil';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
@@ -27,7 +29,7 @@ describe('PropertiesRepository', () => {
   beforeEach(() => {
     const propertiesService = new PropertiesService();
     const selfService = new SelfService();
-    propertiesRepository = new PropertiesRepository(propertiesService, selfService);
+    propertiesRepository = new PropertiesRepository(propertiesService, selfService, translate);
   });
 
   describe('deleteProperty', () => {
@@ -50,6 +52,32 @@ describe('PropertiesRepository', () => {
       expect(() => {
         propertiesRepository.deleteProperty(key);
       }).not.toThrow();
+    });
+  });
+
+  describe('checkTelemetrySharingPermission', () => {
+    it('uses the injected translate function for modal copy', () => {
+      const propertiesService = new PropertiesService();
+      const selfService = new SelfService();
+      const translate = jest.fn(translationKey => `translated:${translationKey}`);
+
+      propertiesRepository = new PropertiesRepository(propertiesService, selfService, translate);
+
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => {});
+
+      propertiesRepository.checkTelemetrySharingPermission();
+
+      expect(showModal).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          primaryAction: expect.objectContaining({text: 'translated:dataSharingModalAgree'}),
+          secondaryAction: expect.objectContaining({text: 'translated:dataSharingModalDecline'}),
+          text: expect.objectContaining({
+            closeBtnLabel: 'translated:dataSharingModalCloseBtnTitle',
+            title: 'translated:dataSharingModalTitle',
+          }),
+        }),
+      );
     });
   });
 });

@@ -31,6 +31,22 @@
         "cwd": "{projectRoot}"
       }
     },
+    "build-libs": {
+      "dependsOn": ["^build"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'All libraries built'",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "watch-deps-dynamic": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "[ -n \"$WATCH_LIBS\" ] && nx run-many -t watch --projects=$WATCH_LIBS || tail -f /dev/null",
+        "cwd": "{projectRoot}"
+      }
+    },
     "serve": {
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
@@ -105,13 +121,6 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "translate-generate-types": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ./bin/transalations_generate_types.js",
         "cwd": "{projectRoot}"
       }
     },

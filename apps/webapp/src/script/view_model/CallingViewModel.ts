@@ -48,7 +48,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {ROLE} from 'Repositories/user/userPermission';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {type Translate, replaceLink} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
@@ -92,6 +92,7 @@ export class CallingViewModel {
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
     private readonly selfUser: ko.Observable<User>,
+    private readonly translate: Translate,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
@@ -150,9 +151,9 @@ export class CallingViewModel {
 
     const startCall = async (conversation: Conversation): Promise<void> => {
       const canStart = await this.canInitiateCall(conversation.qualifiedId, {
-        action: t('modalCallSecondOutgoingAction'),
-        message: t('modalCallSecondOutgoingMessage'),
-        title: t('modalCallSecondOutgoingHeadline'),
+        action: this.translate('modalCallSecondOutgoingAction'),
+        message: this.translate('modalCallSecondOutgoingMessage'),
+        title: this.translate('modalCallSecondOutgoingHeadline'),
       });
 
       if (!canStart) {
@@ -169,9 +170,9 @@ export class CallingViewModel {
 
     const answerCall = async (call: Call) => {
       const canAnswer = await this.canInitiateCall(call.conversation.qualifiedId, {
-        action: t('modalCallSecondIncomingAction'),
-        message: t('modalCallSecondIncomingMessage'),
-        title: t('modalCallSecondIncomingHeadline'),
+        action: this.translate('modalCallSecondIncomingAction'),
+        message: this.translate('modalCallSecondIncomingMessage'),
+        title: this.translate('modalCallSecondIncomingHeadline'),
       });
       if (!canAnswer) {
         return;
@@ -198,49 +199,59 @@ export class CallingViewModel {
     const showE2EICallModal = (conversationEntity: Conversation) => {
       const memberCount = conversationEntity.participating_user_ets().length;
 
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: async () => {
-            conversationEntity.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: async () => {
+              conversationEntity.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
 
-            if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
-              showMaxUsersToCallModalWithoutConfirm(conversationEntity);
-            } else {
-              await startCall(conversationEntity);
-            }
+              if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+                showMaxUsersToCallModalWithoutConfirm(conversationEntity);
+              } else {
+                await startCall(conversationEntity);
+              }
+            },
+            text: this.translate('conversation.E2EICallAnyway'),
           },
-          text: t('conversation.E2EICallAnyway'),
+          secondaryAction: {
+            action: () => {},
+            text: this.translate('conversation.E2EICancel'),
+          },
+          text: {
+            message: this.translate('conversation.E2EIDegradedInitiateCall'),
+            title: this.translate('conversation.E2EIConversationNoLongerVerified'),
+          },
         },
-        secondaryAction: {
-          action: () => {},
-          text: t('conversation.E2EICancel'),
-        },
-        text: {
-          message: t('conversation.E2EIDegradedInitiateCall'),
-          title: t('conversation.E2EIConversationNoLongerVerified'),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     };
 
     const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation) => {
       const memberCount = conversationEntity.participating_user_ets().length;
 
-      PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
-        preventClose: true,
-        primaryAction: {
-          action: async () => await startCall(conversationEntity),
-          text: t('groupCallModalPrimaryBtnName'),
-        },
-        secondaryAction: {
-          text: t('modalConfirmSecondary'),
-        },
-        text: {
-          htmlMessage: `<div class="modal-description">
-            ${t('groupCallConfirmationModalTitle', {memberCount})}
+      PrimaryModal.show(
+        PrimaryModal.type.WITHOUT_TITLE,
+        {
+          preventClose: true,
+          primaryAction: {
+            action: async () => await startCall(conversationEntity),
+            text: this.translate('groupCallModalPrimaryBtnName'),
+          },
+          secondaryAction: {
+            text: this.translate('modalConfirmSecondary'),
+          },
+          text: {
+            htmlMessage: `<div class="modal-description">
+            ${this.translate('groupCallConfirmationModalTitle', {memberCount})}
           </div>`,
-          closeBtnLabel: t('groupCallModalCloseBtnLabel'),
+            closeBtnLabel: this.translate('groupCallModalCloseBtnLabel'),
+          },
         },
-      });
+        undefined,
+        this.translate,
+      );
     };
 
     const handleCallAction = async (conversationEntity: Conversation): Promise<void> => {
@@ -259,19 +270,24 @@ export class CallingViewModel {
     this.callActions = {
       answer: async (call: Call) => {
         if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
-          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-            primaryAction: {
-              action: () => {
-                this.callingRepository.rejectCall(call.conversation.qualifiedId);
+          PrimaryModal.show(
+            PrimaryModal.type.ACKNOWLEDGE,
+            {
+              primaryAction: {
+                action: () => {
+                  this.callingRepository.rejectCall(call.conversation.qualifiedId);
+                },
+              },
+              text: {
+                message: `${this.translate('modalConferenceCallNotSupportedMessage')} ${this.translate(
+                  'modalConferenceCallNotSupportedJoinMessage',
+                )}`,
+                title: this.translate('modalConferenceCallNotSupportedHeadline'),
               },
             },
-            text: {
-              message: `${t('modalConferenceCallNotSupportedMessage')} ${t(
-                'modalConferenceCallNotSupportedJoinMessage',
-              )}`,
-              title: t('modalConferenceCallNotSupportedHeadline'),
-            },
-          });
+            undefined,
+            this.translate,
+          );
         } else {
           return answerCall(call);
         }
@@ -382,22 +398,27 @@ export class CallingViewModel {
     }
 
     return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: async () => {
-            await this.gracefullyTeardownCall(otherActiveCall);
-            resolve(true);
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: async () => {
+              await this.gracefullyTeardownCall(otherActiveCall);
+              resolve(true);
+            },
+            text: warningStrings.action,
           },
-          text: warningStrings.action,
+          secondaryAction: {
+            action: () => resolve(false),
+          },
+          text: {
+            message: warningStrings.message,
+            title: warningStrings.title,
+          },
         },
-        secondaryAction: {
-          action: () => resolve(false),
-        },
-        text: {
-          message: warningStrings.message,
-          title: warningStrings.title,
-        },
-      });
+        undefined,
+        this.translate,
+      );
     });
   }
 
@@ -409,39 +430,54 @@ export class CallingViewModel {
           'modal__text__read-more',
           'read-more-pricing',
         );
-        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-          primaryAction: {
-            action: () => {
-              safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
+        PrimaryModal.show(
+          PrimaryModal.type.CONFIRM,
+          {
+            primaryAction: {
+              action: () => {
+                safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
+              },
+              text: this.translate('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
             },
-            text: t('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
+            text: {
+              htmlMessage: this.translate(
+                'callingRestrictedConferenceCallOwnerModalDescription',
+                {brandName: Config.getConfig().BRAND_NAME},
+                replaceEnterprise,
+              ),
+              title: this.translate('callingRestrictedConferenceCallOwnerModalTitle'),
+            },
           },
-          text: {
-            htmlMessage: t(
-              'callingRestrictedConferenceCallOwnerModalDescription',
-              {brandName: Config.getConfig().BRAND_NAME},
-              replaceEnterprise,
-            ),
-            title: t('callingRestrictedConferenceCallOwnerModalTitle'),
-          },
-        });
+          undefined,
+          this.translate,
+        );
       } else {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          text: {
-            message: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
-            title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            text: {
+              message: this.translate('callingRestrictedConferenceCallTeamMemberModalDescription'),
+              title: this.translate('callingRestrictedConferenceCallTeamMemberModalTitle'),
+            },
           },
-        });
+          undefined,
+          this.translate,
+        );
       }
     } else {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: t('callingRestrictedConferenceCallPersonalModalDescription', {
-            brandName: Config.getConfig().BRAND_NAME,
-          }),
-          title: t('callingRestrictedConferenceCallPersonalModalTitle'),
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            htmlMessage: this.translate('callingRestrictedConferenceCallPersonalModalDescription', {
+              brandName: Config.getConfig().BRAND_NAME,
+            }),
+            title: this.translate('callingRestrictedConferenceCallPersonalModalTitle'),
+          },
         },
-      });
+        undefined,
+        this.translate,
+      );
     }
   }
 

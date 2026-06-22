@@ -17,19 +17,20 @@
  *
  */
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
+import {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 interface ServiceModalProps {
+  translate: Translate;
   readonly service: ServiceEntity;
   readonly integrationRepository: IntegrationRepository;
   readonly actionsViewModel: ActionsViewModel;
@@ -37,13 +38,19 @@ interface ServiceModalProps {
   readonly avatarSize?: AVATAR_SIZE;
 }
 
-const ServiceModal = ({service, avatarSize = AVATAR_SIZE.LARGE, actionsViewModel, onClose}: ServiceModalProps) => {
+const ServiceModal = ({
+  translate,
+  service,
+  avatarSize = AVATAR_SIZE.LARGE,
+  actionsViewModel,
+  onClose,
+}: ServiceModalProps) => {
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
   const onOpenService = () => {
     onClose?.();
     setCurrentSidebarTab(SidebarTabs.RECENT);
-    actionsViewModel.open1to1ConversationWithService(service);
+    void actionsViewModel.open1to1ConversationWithService(service);
   };
 
   const {providerName, name} = useKoSubscribableChildren(service, ['name', 'providerName']);
@@ -84,7 +91,7 @@ const ServiceModal = ({service, avatarSize = AVATAR_SIZE.LARGE, actionsViewModel
               onClick={onOpenService}
               data-uie-name="do-service-confirm"
             >
-              {t('searchServiceConfirmButton')}
+              {translate('searchServiceConfirmButton')}
             </button>
           </div>
         </>

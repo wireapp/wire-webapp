@@ -28,11 +28,6 @@ import * as trackingUtil from '../util/trackingUtil';
 import * as urlUtil from '../util/urlUtil';
 import * as browserLocationModule from '../../navigation/browserLocation';
 
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-  setStrings: jest.fn(),
-}));
-
 jest.mock('@wireapp/react-ui-kit/lib/Images/SuccessShield', () => ({
   SuccessShield: () => <div data-uie-name="success-shield" />,
 }));
@@ -65,10 +60,10 @@ describe('Success', () => {
   it('renders all expected elements', () => {
     const {getByTestId, getByText} = renderComponent(<Success />);
     expect(getByTestId('success-shield')).toBeInTheDocument();
-    expect(getByText('success.header')).toBeInTheDocument();
-    expect(getByText('success.subheader')).toBeInTheDocument();
-    expect(getByText('success.downloadButton')).toBeInTheDocument();
-    expect(getByText('success.openWebAppText')).toBeInTheDocument();
+    expect(getByText('Great, your personal account is set up. Now you can connect with people.')).toBeInTheDocument();
+    expect(getByText('What do you want to do next?')).toBeInTheDocument();
+    expect(getByText('Download Wire')).toBeInTheDocument();
+    expect(getByText('Open Wire for web')).toBeInTheDocument();
   });
 
   it('calls telemetry tracking and reset on mount', () => {
@@ -79,14 +74,14 @@ describe('Success', () => {
 
   it('navigates to download url when download button is clicked', () => {
     const {getAllByText} = renderComponent(<Success />);
-    const downloadButton = getAllByText('success.downloadButton')[0];
+    const downloadButton = getAllByText('Download Wire')[0];
     fireEvent.click(downloadButton);
     expect(replaceLocationMock).toHaveBeenCalledWith('https://wire.com/app-download');
   });
 
   it('navigates to webapp url when open webapp button is clicked', () => {
     const {getAllByText} = renderComponent(<Success />);
-    const openWebAppButton = getAllByText('success.openWebAppText')[0];
+    const openWebAppButton = getAllByText('Open Wire for web')[0];
     fireEvent.click(openWebAppButton);
     expect(replaceLocationMock).toHaveBeenCalledWith(urlUtil.pathWithParams(expect.anything()));
   });

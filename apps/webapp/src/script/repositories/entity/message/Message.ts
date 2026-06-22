@@ -25,7 +25,7 @@ import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {AssetType} from 'Repositories/assets/assetType';
 import type {ReadReceipt} from 'Repositories/storage/record/eventRecord';
-import {t, getUserName} from 'Util/localizerUtil';
+import {type Translate, getUserName} from 'Util/localizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {CallingTimeoutMessage} from './CallingTimeoutMessage';
@@ -54,6 +54,7 @@ import {SuperType} from '../../../message/SuperType';
 import {User} from '../User';
 
 export class Message {
+  protected readonly translate: Translate;
   private messageTimerStarted: boolean;
   protected readonly affect_order: ko.Observable<boolean>;
   public category?: MessageCategory;
@@ -85,12 +86,15 @@ export class Message {
   public type: string;
   public version: number;
 
-  constructor(id: string = '0', super_type?: SuperType) {
-    this.id = id;
+  constructor(id: string | undefined, super_type: SuperType | undefined, translate: Translate) {
+    this.id = id ?? '0';
+    this.translate = translate;
     this.super_type = super_type ?? SuperType.SYSTEM;
     this.ephemeralCaption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
-      return remainingTime > 0 ? `${formatDurationCaption(remainingTime)} ${t('ephemeralRemaining')}` : '';
+      return remainingTime > 0
+        ? `${formatDurationCaption(remainingTime, this.translate)} ${this.translate('ephemeralRemaining')}`
+        : '';
     });
     this.ephemeral_remaining = ko.observable(0);
     this.ephemeral_expires = ko.observable(false);
@@ -130,7 +134,7 @@ export class Message {
     this.primary_key = undefined;
     this.status = ko.observable(StatusType.UNSPECIFIED);
     this.type = '';
-    this.user = ko.observable(new User('', ''));
+    this.user = ko.observable(new User('', '', this.translate));
     this.version = 1;
     this.visible = ko.observable(true);
 
@@ -141,7 +145,7 @@ export class Message {
     // MessageCategory
     this.category = undefined;
 
-    this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), undefined, true));
+    this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), this.translate, undefined, true));
     this.senderName = ko.pureComputed(() => {
       return this.user().name();
     });

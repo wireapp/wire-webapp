@@ -17,9 +17,8 @@
  *
  */
 
-import {useContext, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
-import is from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -33,14 +32,13 @@ import {ClientState} from 'Repositories/client/ClientState';
 import {User} from 'Repositories/entity/User';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
 import {Config} from '../../Config';
-import {RootContext} from '../../page/RootProvider';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',
@@ -48,6 +46,9 @@ enum ExportState {
   EXPORTING = 'ExportState.STATE.EXPORTING',
   PREPARING = 'ExportState.STATE.PREPARING',
 }
+
+const MILLISECONDS_PER_SECOND = 1000;
+const PERCENTAGE_MULTIPLIER = 100;
 
 export const CONFIG = {
   LEGACY_FILE_EXTENSION: 'desktop_wbu',
@@ -62,6 +63,7 @@ interface HistoryExportProps {
 
 const HistoryExport = ({switchContent, user, clientState = container.resolve(ClientState)}: HistoryExportProps) => {
   const logger = getLogger('HistoryExport');
+  const {mainViewModel, translate} = useApplicationContext();
 
   const [historyState, setHistoryState] = useState<ExportState>(ExportState.PREPARING);
   const [hasError, setHasError] = useState<boolean>(false);
@@ -71,20 +73,10 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
 
   const [archiveBlob, setArchiveBlob] = useState<Blob | null>(null);
 
-  const rootContext = useContext(RootContext);
-
-  useEffect(() => {
-    showBackupModal();
-  }, []);
-
-  if (is.null_(rootContext)) {
-    return null;
-  }
-
-  const contentViewModel = rootContext.mainViewModel.content;
+  const contentViewModel = mainViewModel.content;
   const backupRepository = contentViewModel.repositories.backup;
 
-  const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * 100);
+  const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * PERCENTAGE_MULTIPLIER);
 
   const isPreparing = !hasError && historyState === ExportState.PREPARING;
   const isExporting = !hasError && [ExportState.EXPORTING, ExportState.COMPRESSING].includes(historyState);
@@ -97,39 +89,42 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
   };
 
   const historyMessages: Partial<Record<ExportState, string>> = {
-    [ExportState.PREPARING]: t('backupExportProgressHeadline'),
-    [ExportState.EXPORTING]: t('backupExportProgressSecondary', replacements),
-    [ExportState.COMPRESSING]: t('backupExportProgressCompressing'),
+    [ExportState.PREPARING]: translate('backupExportProgressHeadline'),
+    [ExportState.EXPORTING]: translate('backupExportProgressSecondary', replacements),
+    [ExportState.COMPRESSING]: translate('backupExportProgressCompressing'),
   };
 
   const loadingMessage = historyMessages[historyState] ?? '';
 
-  const dismissExport = () => {
+  const dismissExport = useCallback(() => {
     switchContent(ContentState.PREFERENCES_ACCOUNT);
-  };
+  }, [switchContent]);
 
-  const onProgress = (processedNumber: number) => {
+  const onProgress = useCallback((processedNumber: number) => {
     setHistoryState(ExportState.EXPORTING);
     setNumberOfProcessedRecords(prevState => prevState + processedNumber);
-  };
+  }, []);
 
-  const onSuccess = (archiveBlob: Blob) => {
+  const onSuccess = useCallback((archiveBlob: Blob) => {
     setHistoryState(ExportState.DONE);
     setHasError(false);
     setArchiveBlob(archiveBlob);
-  };
+  }, []);
 
-  const onError = (error: Error) => {
-    if (error instanceof CancelError) {
-      logger.log('History export was cancelled');
-      dismissExport();
+  const onError = useCallback(
+    (error: Error) => {
+      if (error instanceof CancelError) {
+        logger.log('History export was cancelled');
+        dismissExport();
 
-      return;
-    }
+        return;
+      }
 
-    setHasError(true);
-    logger.error(`Failed to export history: ${error.message}`, error);
-  };
+      setHasError(true);
+      logger.error(`Failed to export history: ${error.message}`, error);
+    },
+    [dismissExport, logger],
+  );
 
   const downloadArchiveFile = () => {
     const {
@@ -156,74 +151,88 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
     backupRepository.cancelAction();
   };
 
-  const onClose = () => {
+  const onClose = useCallback(() => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CANCELLED, {
       [Segmentation.GENERAL.STEP]: Segmentation.BACKUP_CREATION.CANCELLATION_STEP.BEFORE_BACKUP,
     });
     dismissExport();
-  };
+  }, [dismissExport]);
 
-  const showBackupModal = () => {
-    PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
-      preventClose: true,
-      primaryAction: {
-        action: async (password: string, hasMultipleAttempts: boolean) => {
-          exportHistory(password, hasMultipleAttempts);
-        },
-        text: t('backupEncryptionModalAction'),
-      },
-      secondaryAction: [
-        {
-          action: () => onClose(),
-          text: t('backupEncryptionModalCloseBtn'),
-        },
-      ],
-      passwordOptional: true,
-      text: {
-        closeBtnLabel: t('backupEncryptionModalCloseBtn'),
-        input: t('backupEncryptionModalPlaceholder'),
-        message: t('backupEncryptionModalMessage'),
-        title: t('backupEncryptionModalTitle'),
-      },
-    });
-  };
+  const exportHistory = useCallback(
+    async (password: string, hasMultipleAttempts: boolean) => {
+      setHistoryState(ExportState.PREPARING);
+      setHasError(false);
 
-  const exportHistory = async (password: string, hasMultipleAttempts: boolean) => {
-    setHistoryState(ExportState.PREPARING);
-    setHasError(false);
+      try {
+        const startTime = Date.now();
+        const numberOfRecords = await backupRepository.getBackupInitData();
+        logger.log(`Exporting '${numberOfRecords}' records from history`);
 
-    try {
-      const startTime = Date.now();
-      const numberOfRecords = await backupRepository.getBackupInitData();
-      logger.log(`Exporting '${numberOfRecords}' records from history`);
+        setNumberOfRecords(numberOfRecords);
+        setNumberOfProcessedRecords(0);
 
-      setNumberOfRecords(numberOfRecords);
-      setNumberOfProcessedRecords(0);
-
-      if (clientState.currentClient) {
-        const archiveBlob = await backupRepository.generateHistory(
-          user,
-          clientState.currentClient.id,
-          onProgress,
-          password,
-        );
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CREATED, {
-          // converting to seconds
-          [Segmentation.BACKUP_CREATION.CREATION_DURATION]: Math.ceil((Date.now() - startTime) / 1000),
-          [Segmentation.BACKUP_CREATION.PASSWORD]: password ? Segmentation.GENERAL.YES : Segmentation.GENERAL.NO,
-          [Segmentation.BACKUP_CREATION.PASSWORD_MULTIPLE_ATTEMPTS]: hasMultipleAttempts
-            ? Segmentation.GENERAL.YES
-            : Segmentation.GENERAL.NO,
-        });
-        onSuccess(archiveBlob);
-        logger.log(`Completed export of '${numberOfRecords}' records from history`);
-      } else {
-        throw new Error('No local client found');
+        if (clientState.currentClient) {
+          const archiveBlob = await backupRepository.generateHistory(
+            user,
+            clientState.currentClient.id,
+            onProgress,
+            password,
+          );
+          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CREATED, {
+            // converting to seconds
+            [Segmentation.BACKUP_CREATION.CREATION_DURATION]: Math.ceil(
+              (Date.now() - startTime) / MILLISECONDS_PER_SECOND,
+            ),
+            [Segmentation.BACKUP_CREATION.PASSWORD]: password ? Segmentation.GENERAL.YES : Segmentation.GENERAL.NO,
+            [Segmentation.BACKUP_CREATION.PASSWORD_MULTIPLE_ATTEMPTS]: hasMultipleAttempts
+              ? Segmentation.GENERAL.YES
+              : Segmentation.GENERAL.NO,
+          });
+          onSuccess(archiveBlob);
+          logger.log(`Completed export of '${numberOfRecords}' records from history`);
+        } else {
+          throw new Error('No local client found');
+        }
+      } catch (error: unknown) {
+        onError(error as Error);
       }
-    } catch (error: unknown) {
-      onError(error as Error);
-    }
-  };
+    },
+    [backupRepository, clientState.currentClient, logger, onError, onProgress, onSuccess, user],
+  );
+
+  const showBackupModal = useCallback(() => {
+    PrimaryModal.show(
+      PrimaryModal.type.PASSWORD_ADVANCED_SECURITY,
+      {
+        preventClose: true,
+        primaryAction: {
+          action: async (password: string, hasMultipleAttempts: boolean) => {
+            await exportHistory(password, hasMultipleAttempts);
+          },
+          text: translate('backupEncryptionModalAction'),
+        },
+        secondaryAction: [
+          {
+            action: () => onClose(),
+            text: translate('backupEncryptionModalCloseBtn'),
+          },
+        ],
+        passwordOptional: true,
+        text: {
+          closeBtnLabel: translate('backupEncryptionModalCloseBtn'),
+          input: translate('backupEncryptionModalPlaceholder'),
+          message: translate('backupEncryptionModalMessage'),
+          title: translate('backupEncryptionModalTitle'),
+        },
+      },
+      undefined,
+      translate,
+    );
+  }, [exportHistory, onClose, translate]);
+
+  useEffect(() => {
+    showBackupModal();
+  }, [showBackupModal]);
 
   return (
     <div id="history-export">
@@ -234,7 +243,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
           <ProgressBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
 
           <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-cancel-history-export">
-            {t('backupCancel')}
+            {translate('backupCancel')}
           </Button>
         </>
       )}
@@ -243,11 +252,11 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
         <>
           <div className="history-message">
             <h2 className="history-message__headline" data-uie-name="status-history-export-success-headline">
-              {t('backupExportSuccessHeadline')}
+              {translate('backupExportSuccessHeadline')}
             </h2>
 
             <p className="history-message__info" data-uie-name="status-history-export-success-info">
-              {t('backupExportSuccessSecondary')}
+              {translate('backupExportSuccessSecondary')}
             </p>
             <FlexBox className="history-message__buttons" justify="center">
               <Button
@@ -255,11 +264,11 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
                 onClick={dismissExport}
                 data-uie-name="do-cancel-history-export"
               >
-                {t('backupCancel')}
+                {translate('backupCancel')}
               </Button>
 
               <Button onClick={downloadArchiveFile} data-uie-name="do-save-history-export">
-                {t('backupExportSaveFileAction')}
+                {translate('backupExportSaveFileAction')}
               </Button>
             </FlexBox>
           </div>
@@ -269,11 +278,11 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
       {hasError && (
         <div className="history-message" data-uie-name="status-history-export-error">
           <h2 className="history-message__headline" data-uie-name="status-history-export-error-headline">
-            {t('backupExportGenericErrorHeadline')}
+            {translate('backupExportGenericErrorHeadline')}
           </h2>
 
           <p className="history-message__info" data-uie-name="status-history-export-error-info">
-            {t('backupExportGenericErrorSecondary')}
+            {translate('backupExportGenericErrorSecondary')}
           </p>
           <FlexBox justify="center" className="history-message__buttons">
             <Button
@@ -281,11 +290,11 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
               data-uie-name="do-dismiss-history-export-error"
               onClick={dismissExport}
             >
-              {t('backupCancel')}
+              {translate('backupCancel')}
             </Button>
 
             <Button onClick={showBackupModal} data-uie-name="do-try-again-history-export-error">
-              {t('backupTryAgain')}
+              {translate('backupTryAgain')}
             </Button>
           </FlexBox>
         </div>

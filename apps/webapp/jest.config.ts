@@ -23,6 +23,7 @@ import {dirname} from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const isContinuousIntegrationEnvironment = process.env.CI === 'true';
 
 process.env.TZ = 'UTC';
 
@@ -50,7 +51,8 @@ const config: Config = {
     '^react(.*)$': '<rootDir>/../../node_modules/react$1',
     '.*\\.glsl': 'jest-transform-stub',
   },
-  reporters: ['default'],
+  coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
+  reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {

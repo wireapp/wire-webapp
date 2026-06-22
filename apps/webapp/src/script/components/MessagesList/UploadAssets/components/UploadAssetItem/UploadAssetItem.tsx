@@ -23,7 +23,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {ProgressBar} from 'Components/ProgressBar';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {uploadingProgressText} from './UploadAssetItem.styles';
 
@@ -34,6 +34,7 @@ interface Props {
 }
 
 export const UploadAssetItem = ({assetRepository, message, scrollToEnd}: Props) => {
+  const {translate} = useApplicationContext();
   const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
@@ -46,16 +47,16 @@ export const UploadAssetItem = ({assetRepository, message, scrollToEnd}: Props) 
     return () => {
       subscription.dispose();
     };
-  }, [assetRepository, message]);
+  }, [assetRepository, message, scrollToEnd]);
 
   const cancelUpload = async () => {
-    assetRepository.cancelUpload(message.messageId);
+    await assetRepository.cancelUpload(message.messageId);
   };
 
   return (
     <div data-uie-name="upload-asset-item" data-uie-value={message.messageId}>
       <span css={uploadingProgressText}>
-        {t('conversationAssetUploading')} {message.asset?.original?.name ?? ''} - {Math.trunc(uploadProgress)}%
+        {translate('conversationAssetUploading')} {message.asset?.original?.name ?? ''} - {Math.trunc(uploadProgress)}%
       </span>
 
       <ProgressBar className="uploading-asset" progress={uploadProgress} centerText={false} />
@@ -65,7 +66,7 @@ export const UploadAssetItem = ({assetRepository, message, scrollToEnd}: Props) 
         className="uploading-asset button-reset-default accent-text"
         onClick={cancelUpload}
       >
-        {t('conversationAssetUploadCancel')}
+        {translate('conversationAssetUploadCancel')}
       </button>
     </div>
   );

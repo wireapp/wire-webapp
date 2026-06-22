@@ -30,6 +30,11 @@ import {useFileVersions} from './hooks/useFileVersions';
 
 export const FileHistoryModal = () => {
   const {isOpen, hideModal, nodeUuid, onRestore} = useFileHistoryModal();
+  const fileHistoryCopy = {
+    failedToLoadVersions: 'fileHistoryModal.failedToLoadVersions',
+    failedToRestore: 'fileHistoryModal.failedToRestore',
+    invalidNodeData: 'fileHistoryModal.invalidNodeData',
+  };
   const {
     fileVersions,
     isLoading,
@@ -38,7 +43,7 @@ export const FileHistoryModal = () => {
     toBeRestoredVersionId,
     setToBeRestoredVersionId,
     handleRestore,
-  } = useFileVersions(nodeUuid, hideModal, onRestore);
+  } = useFileVersions(nodeUuid, hideModal, onRestore, fileHistoryCopy);
   const isRestoreFlowOpen = toBeRestoredVersionId !== undefined;
 
   return (

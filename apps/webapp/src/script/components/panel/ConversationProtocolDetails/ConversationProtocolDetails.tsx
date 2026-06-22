@@ -24,7 +24,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface ConversationProtocolDetailsProps {
   protocol: CONVERSATION_PROTOCOL;
@@ -51,12 +51,13 @@ const wrapperStyles: CSSObject = {
 };
 
 export const ConversationProtocolDetails = ({protocol, cipherSuite}: ConversationProtocolDetailsProps) => {
+  const {translate} = useApplicationContext();
   const protocolLabelId = useId();
   const cipherSuiteLabelId = useId();
 
   return (
     <div>
-      <h3 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h3>
+      <h3 className="conversation-details__list-head">{translate('conversationDetailsProtocolDetails')}</h3>
 
       <div css={wrapperStyles}>
         <div id={protocolLabelId} css={titleStyles}>

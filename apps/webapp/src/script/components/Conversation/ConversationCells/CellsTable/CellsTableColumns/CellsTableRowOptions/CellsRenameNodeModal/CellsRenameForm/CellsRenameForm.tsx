@@ -22,7 +22,7 @@ import {ChangeEvent, FormEvent} from 'react';
 import {CircleCloseIcon, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
 
 import {useInputAutoFocus} from 'Components/Conversation/ConversationCells/common/useInputAutoFocus/useInputAutoFocus';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {closeIconStyles, formStyles} from './CellsRenameForm.styles';
 
@@ -36,16 +36,17 @@ interface CellsRenameFormProps {
 }
 
 export const CellsRenameForm = ({isOpen, onSubmit, name, onChangeName, onClearName, error}: CellsRenameFormProps) => {
+  const {translate} = useApplicationContext();
   const {inputRef} = useInputAutoFocus({enabled: isOpen});
 
   return (
     <form onSubmit={onSubmit} css={formStyles}>
-      <Label htmlFor="cells-new-item-name">{t('cells.renameNodeModal.label')}</Label>
+      <Label htmlFor="cells-new-item-name">{translate('cells.renameNodeModal.label')}</Label>
       <Input
         id="cells-new-item-name"
         value={name}
         ref={inputRef}
-        placeholder={t('cells.renameNodeModal.placeholder')}
+        placeholder={translate('cells.renameNodeModal.placeholder')}
         onChange={onChangeName}
         error={error !== null ? <ErrorMessage>{error}</ErrorMessage> : undefined}
         endContent={

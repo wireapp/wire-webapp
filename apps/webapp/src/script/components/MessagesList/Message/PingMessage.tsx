@@ -23,8 +23,8 @@ import {OutlineCheck} from '@wireapp/react-ui-kit';
 
 import {Message} from 'Repositories/entity/message/Message';
 import {PingMessage as PingMessageEntity} from 'Repositories/entity/message/PingMessage';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
 
@@ -41,6 +41,7 @@ export const PingMessage = ({
   isLastDeliveredMessage,
   onClickDetails,
 }: PingMessageProps) => {
+  const {translate} = useApplicationContext();
   const {unsafeSenderName, caption, ephemeralCaption, isObfuscated, iconClasses} = useKoSubscribableChildren(message, [
     'unsafeSenderName',
     'caption',
@@ -78,7 +79,7 @@ export const PingMessage = ({
         {message.expectsReadConfirmation && is1to1Conversation && isLastDeliveredMessage && (
           <div
             data-uie-name="status-message-read-receipt-delivered"
-            title={t('conversationMessageDelivered')}
+            title={translate('conversationMessageDelivered')}
             className="delivered-message-icon"
           >
             <OutlineCheck />

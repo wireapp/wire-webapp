@@ -32,11 +32,12 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamRepository} from './TeamRepository';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
+import {translateForTest} from 'Util/test/translateForTest';
 
 function buildConnectionRepository() {
   const team = new TeamEntity(randomUUID());
   const userState = new UserState();
-  const selfUser = new User('self-id', 'self-domain');
+  const selfUser = new User('self-id', 'self-domain', translateForTest);
   selfUser.teamId = team.id;
   selfUser.isMe = true;
   selfUser.teamRole(ROLE.NONE);
@@ -48,9 +49,10 @@ function buildConnectionRepository() {
   const assetRepository = {} as AssetRepository;
   const teamService = new TeamService({} as any);
   const onMemberDeleted = jest.fn();
+  const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
   return [
-    new TeamRepository(userRepository, assetRepository, onMemberDeleted, teamService, userState, teamState),
-    {userState, teamState, userRepository, assetRepository, teamService},
+    new TeamRepository(userRepository, assetRepository, onMemberDeleted, teamService, translate, userState, teamState),
+    {userState, teamState, userRepository, assetRepository, teamService, translate},
   ] as const;
 }
 
@@ -209,6 +211,18 @@ describe('TeamRepository', () => {
       const protocols = teamRepo.getTeamSupportedProtocols();
 
       expect(protocols).toEqual([CONVERSATION_PROTOCOL.PROTEUS]);
+    });
+  });
+
+  describe('getRoleBadge', () => {
+    it('uses the injected translate function', () => {
+      const [teamRepo, {teamState, translate}] = buildConnectionRepository();
+
+      teamState.memberRoles({'external-user': ROLE.PARTNER});
+      teamState.memberInviters({});
+
+      expect(teamRepo.getRoleBadge('external-user')).toBe('translated:rolePartner');
+      expect(translate).toHaveBeenCalledWith('rolePartner');
     });
   });
 });

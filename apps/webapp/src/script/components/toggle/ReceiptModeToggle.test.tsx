@@ -20,7 +20,17 @@
 import {render} from '@testing-library/react';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {ReceiptModeToggle} from './ReceiptModeToggle';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('ReceiptModeToggle', () => {
   it('checks the checkbox when receipts are turned on', () => {
@@ -29,7 +39,7 @@ describe('ReceiptModeToggle', () => {
       receiptMode: RECEIPT_MODE.OFF,
     };
 
-    const {getByTestId} = render(<ReceiptModeToggle {...props} />);
+    const {getByTestId} = render(<ReceiptModeToggle {...props} />, {wrapper: rootProviderWrapper});
 
     const checkbox = getByTestId('toggle-receipt-mode-checkbox');
     expect(checkbox.getAttribute('checked')).toBe(null);
@@ -41,7 +51,7 @@ describe('ReceiptModeToggle', () => {
       receiptMode: RECEIPT_MODE.ON,
     };
 
-    const {getByTestId} = render(<ReceiptModeToggle {...props} />);
+    const {getByTestId} = render(<ReceiptModeToggle {...props} />, {wrapper: rootProviderWrapper});
 
     const checkbox = getByTestId('toggle-receipt-mode-checkbox');
     expect(checkbox.getAttribute('checked')).toBe('');

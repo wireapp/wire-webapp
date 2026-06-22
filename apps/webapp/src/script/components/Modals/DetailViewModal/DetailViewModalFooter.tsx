@@ -39,7 +39,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isTabKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 interface DetailViewModalFooterProps {
   messageEntity: ContentMessage;
@@ -49,6 +49,7 @@ interface DetailViewModalFooterProps {
   messageRepository: MessageRepository;
   selfId: QualifiedId;
   fireAndForgetInvoker: FireAndForgetInvoker;
+  translate: Translate;
 }
 
 const MESSAGE_REPLY_ID = 'do-reply-fullscreen-picture';
@@ -62,6 +63,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   messageRepository,
   selfId,
   fireAndForgetInvoker,
+  translate,
 }) => {
   const {isSelfUserRemoved} = useKoSubscribableChildren(conversationEntity, ['isSelfUserRemoved']);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
@@ -122,6 +124,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
       {isMsgReactable && !isSelfUserRemoved && (
         <div ref={wrapperRef} style={{display: 'flex'}}>
           <MessageReactions
+            translate={translate}
             messageFocusedTabIndex={TabIndex.FOCUSABLE}
             currentMsgActionName={currentMsgActionName}
             handleCurrentMsgAction={setCurrentMsgAction}
@@ -133,6 +136,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
           />
           {messageEntity.isReplyable() && !isSelfUserRemoved && (
             <ReplyButton
+              translate={translate}
               actionId={MESSAGE_REPLY_ID}
               currentMsgActionName={currentMsgActionName}
               messageFocusedTabIndex={TabIndex.FOCUSABLE}
@@ -142,6 +146,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
           )}
           {messageEntity.isDownloadable() && (
             <DownloadButton
+              translate={translate}
               actionId={MESSAGE_DOWNLOAD_ID}
               messageFocusedTabIndex={TabIndex.FOCUSABLE}
               onDownloadClick={handleAssetDownload}
@@ -159,6 +164,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
       )}
       {messageEntity.isDownloadable() && !isMsgReactable && (
         <DownloadButton
+          translate={translate}
           actionId={MESSAGE_DOWNLOAD_ID}
           messageFocusedTabIndex={TabIndex.FOCUSABLE}
           onDownloadClick={handleAssetDownload}
@@ -166,7 +172,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
           className="detail-view-action-button"
         >
           <span className="icon-download" />
-          <span>{t('conversationContextMenuDownload')}</span>
+          <span>{translate('conversationContextMenuDownload')}</span>
         </DownloadButton>
       )}
     </footer>

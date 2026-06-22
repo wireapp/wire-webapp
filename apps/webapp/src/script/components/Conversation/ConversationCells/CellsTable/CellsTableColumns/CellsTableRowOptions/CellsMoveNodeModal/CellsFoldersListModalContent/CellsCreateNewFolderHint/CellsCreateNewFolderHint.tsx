@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles, iconStyles, textStyles, wrapperStyles} from './CellsCreateNewFolderHint.styles';
 
@@ -28,12 +28,14 @@ interface CellsCreateNewFolderHintProps {
 }
 
 export const CellsCreateNewFolderHint = ({onCreate}: CellsCreateNewFolderHintProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div css={wrapperStyles}>
-      <p css={textStyles}>{t('cells.moveNodeModal.createFolder.hintText')}</p>
+      <p css={textStyles}>{translate('cells.moveNodeModal.createFolder.hintText')}</p>
       <Button variant={ButtonVariant.TERTIARY} type="submit" css={buttonStyles} onClick={onCreate}>
         <PlusIcon css={iconStyles} />
-        {t('cells.moveNodeModal.createFolder.hintButton')}
+        {translate('cells.moveNodeModal.createFolder.hintButton')}
       </Button>
     </div>
   );

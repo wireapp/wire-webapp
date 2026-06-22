@@ -25,7 +25,7 @@ import {ActionLinkButton, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Page} from './Page';
 import {styles} from './Success.styles.';
@@ -36,6 +36,7 @@ import {PageView, resetTelemetrySession, trackTelemetryPageView} from '../util/t
 import {pathWithParams} from '../util/urlUtil';
 
 export const Success = () => {
+  const {translate} = useApplicationContext();
   const secureOpen = (url: string) => {
     replaceBrowserLocation(url);
   };
@@ -51,10 +52,10 @@ export const Success = () => {
         <FlexBox css={styles.container}>
           <SuccessShield />
           <Text block center css={styles.heading}>
-            {t('success.header')}
+            {translate('success.header')}
           </Text>
           <Text block center css={styles.subHeading}>
-            {t('success.subheader')}
+            {translate('success.subheader')}
           </Text>
 
           <ActionLinkButton
@@ -62,7 +63,7 @@ export const Success = () => {
             onClick={() => secureOpen(pathWithParams(Config.getConfig().GET_WIRE_URL))}
             css={styles.link}
           >
-            {t('success.downloadButton')}
+            {translate('success.downloadButton')}
           </ActionLinkButton>
 
           <ActionLinkButton
@@ -70,7 +71,7 @@ export const Success = () => {
             onClick={() => secureOpen(pathWithParams(EXTERNAL_ROUTE.WEBAPP))}
             css={styles.link}
           >
-            {t('success.openWebAppText')}
+            {translate('success.openWebAppText')}
           </ActionLinkButton>
         </FlexBox>
       </AccountRegistrationLayout>

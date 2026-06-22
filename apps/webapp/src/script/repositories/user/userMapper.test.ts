@@ -25,12 +25,14 @@ import {User} from 'Repositories/entity/User';
 import {ACCENT_ID} from 'src/script/Config';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from 'test/api/payloads';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {UserMapper} from './userMapper';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('User Mapper', () => {
-  const mapper = new UserMapper(serverTimeHandler);
+  const mapper = new UserMapper(serverTimeHandler, translate);
 
   let self_user_payload: any = null;
 
@@ -145,7 +147,7 @@ describe('User Mapper', () => {
 
   describe('updateUserFromObject', () => {
     it('can update the accent color', () => {
-      const user_et = new User();
+      const user_et = new User('', '', translateForTest);
       user_et.id = entities.user.john_doe.id;
       const data = {accent_id: 1, id: entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
@@ -154,7 +156,7 @@ describe('User Mapper', () => {
     });
 
     it('can update the user name', () => {
-      const user_et = new User();
+      const user_et = new User('', '', translateForTest);
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.john_doe.id, name: entities.user.jane_roe.name};
       const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
@@ -163,7 +165,7 @@ describe('User Mapper', () => {
     });
 
     it('can update the user handle', () => {
-      const user_et = new User();
+      const user_et = new User('', '', translateForTest);
       user_et.id = entities.user.john_doe.id;
       const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
@@ -172,7 +174,7 @@ describe('User Mapper', () => {
     });
 
     it("converts user's expiration date to local timestamp", () => {
-      const userEntity = new User();
+      const userEntity = new User('', '', translateForTest);
       userEntity.id = entities.user.john_doe.id;
       const expirationDate = new Date('2018-10-16T09:16:41.294Z');
       const adjustedExpirationDate = new Date('2018-10-16T09:16:59.294Z');
@@ -192,7 +194,7 @@ describe('User Mapper', () => {
     });
 
     it('cannot update the user name of a wrong user', () => {
-      const user_et = new User();
+      const user_et = new User('', '', translateForTest);
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
       const functionCall = () => mapper.updateUserFromObject(user_et, data, '');
@@ -204,14 +206,14 @@ describe('User Mapper', () => {
       [Availability.Type.AVAILABLE, Availability.Type.NONE],
       [Availability.Type.NONE, Availability.Type.AVAILABLE],
     ])('updates the availability (from %s to %s)', (from, to) => {
-      const user = new User();
+      const user = new User('', '', translateForTest);
       user.availability(from);
       mapper.updateUserFromObject(user, {availability: to}, '');
       expect(user.availability()).toBe(to);
     });
 
     it('can update user with assets', () => {
-      const user_et = new User();
+      const user_et = new User('', '', translateForTest);
       user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [

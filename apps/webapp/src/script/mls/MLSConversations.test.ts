@@ -35,6 +35,7 @@ import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {
   classifyLocal,
@@ -47,7 +48,7 @@ import {
 } from './MLSConversations';
 
 function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversation {
-  const conversation = new Conversation(randomUUID(), '', CONVERSATION_PROTOCOL.MLS);
+  const conversation = new Conversation(randomUUID(), '', CONVERSATION_PROTOCOL.MLS, translateForTest);
   conversation.groupId = `groupid-${randomUUID()}`;
   conversation.epoch = epoch;
   if (type !== undefined) {
@@ -152,7 +153,13 @@ describe('MLSConversations', () => {
 
       const conversationRepository = await testFactory.exposeConversationActors();
 
-      await initialiseSelfAndTeamConversations(conversations, conversationRepository, new User(), 'client-1', core);
+      await initialiseSelfAndTeamConversations(
+        conversations,
+        conversationRepository,
+        new User('', '', translateForTest),
+        'client-1',
+        core,
+      );
 
       expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(2);
     });
@@ -177,7 +184,13 @@ describe('MLSConversations', () => {
       jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(true);
       mockSafeEpoch(core);
 
-      await initialiseSelfAndTeamConversations(conversations, conversationRepository, new User(), 'clientId', core);
+      await initialiseSelfAndTeamConversations(
+        conversations,
+        conversationRepository,
+        new User('', '', translateForTest),
+        'clientId',
+        core,
+      );
 
       expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
     });
@@ -214,7 +227,7 @@ describe('MLSConversations', () => {
       await initialiseSelfAndTeamConversations(
         conversations,
         conversationRepository,
-        new User(),
+        new User('', '', translateForTest),
         'clientId',
         repositoryCore,
       );
@@ -243,7 +256,13 @@ describe('MLSConversations', () => {
       const conversationRepository = await testFactory.exposeConversationActors();
       mockSafeEpoch(core);
 
-      await initialiseSelfAndTeamConversations(conversations, conversationRepository, new User(), 'clientId', core);
+      await initialiseSelfAndTeamConversations(
+        conversations,
+        conversationRepository,
+        new User('', '', translateForTest),
+        'clientId',
+        core,
+      );
 
       expect(core.service!.mls!.registerConversation).not.toHaveBeenCalled();
       expect(core.service!.conversation!.joinByExternalCommit).not.toHaveBeenCalled();

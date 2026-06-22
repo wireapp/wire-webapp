@@ -31,6 +31,8 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 
 import {initializeDataDog} from 'Util/dataDog';
+import {translate} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {enableLogging} from 'Util/loggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
@@ -71,14 +73,14 @@ const store = configureStore({
   localStorage,
 });
 
-const render = (Component: FC): void => {
+const render = (Component: FC<{translate: Translate}>): void => {
   const container = document.getElementById(mainId);
   if (!container) {
     throw new Error(`No container '${mainId}' found to render application`);
   }
   createRoot(container).render(
     <Provider store={store}>
-      <Component />
+      <Component translate={translate} />
     </Provider>,
   );
 };

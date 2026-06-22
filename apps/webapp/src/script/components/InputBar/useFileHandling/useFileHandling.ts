@@ -23,15 +23,23 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {useFilePaste} from './useFilePaste/useFilePaste';
 
 interface UseFileHandlingProps {
   uploadDroppedFiles: (files: File[]) => void;
   uploadImages: (images: File[]) => void;
   isFileNameKept?: boolean;
+  translate: Translate;
 }
 
-export const useFileHandling = ({uploadDroppedFiles, uploadImages, isFileNameKept}: UseFileHandlingProps) => {
+export const useFileHandling = ({
+  uploadDroppedFiles,
+  uploadImages,
+  isFileNameKept,
+  translate,
+}: UseFileHandlingProps) => {
   const [pastedFile, setPastedFile] = useState<File | null>(null);
 
   useFilePaste({
@@ -39,6 +47,7 @@ export const useFileHandling = ({uploadDroppedFiles, uploadImages, isFileNameKep
       setPastedFile(file);
     },
     isFileNameKept,
+    translate,
   });
 
   const clearPastedFile = () => setPastedFile(null);

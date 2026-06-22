@@ -25,9 +25,9 @@ import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {useMessageFocusedTabIndex} from '../../../util';
@@ -42,6 +42,8 @@ interface FileAssetProps {
   isFocusable?: boolean;
 }
 
+const uploadProgressCompletePercentage = 100;
+
 const FileAsset = ({
   message,
   hasHeader = false,
@@ -49,6 +51,7 @@ const FileAsset = ({
   isFocusable = true,
 }: FileAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
+  const {translate} = useApplicationContext();
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
@@ -64,7 +67,10 @@ const FileAsset = ({
   // uploaded completely we have to check if there is upload progress to
   // transition into the `AssetTransferState.UPLOADING` state.
   const assetStatus =
-    uploadProgress && (uploadProgress > 0 && uploadProgress < 100 ? AssetTransferState.UPLOADING : transferState);
+    uploadProgress &&
+    (uploadProgress > 0 && uploadProgress < uploadProgressCompletePercentage
+      ? AssetTransferState.UPLOADING
+      : transferState);
 
   const isPendingUpload = assetStatus === AssetTransferState.UPLOAD_PENDING;
   const isFailedUpload = assetStatus === AssetTransferState.UPLOAD_FAILED;
@@ -98,7 +104,7 @@ const FileAsset = ({
           data-uie-value={asset.file_name}
           role="button"
           tabIndex={messageFocusedTabIndex}
-          aria-label={`${t('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
+          aria-label={`${translate('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
           onClick={onDownloadAsset}
           onKeyDown={event => handleKeyDown({event, callback: onDownloadAsset, keys: [KEY.ENTER, KEY.SPACE]})}
         >
@@ -133,18 +139,18 @@ const FileAsset = ({
 
                   {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
 
-                  {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
+                  {isUploading && <li data-uie-name="file-status">{translate('conversationAssetUploading')}</li>}
 
-                  {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
+                  {isFailedUpload && <li data-uie-name="file-status">{translate('conversationAssetUploadFailed')}</li>}
 
-                  {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
+                  {isDownloading && <li data-uie-name="file-status">{translate('conversationAssetDownloading')}</li>}
 
                   {isFailedDownloadingDecrypt && (
-                    <li data-uie-name="file-status">{t('conversationAssetFailedDecryptDownloading')}</li>
+                    <li data-uie-name="file-status">{translate('conversationAssetFailedDecryptDownloading')}</li>
                   )}
 
                   {isFailedDownloadingHash && (
-                    <li data-uie-name="file-status">{t('conversationAssetFailedHashDownloading')}</li>
+                    <li data-uie-name="file-status">{translate('conversationAssetFailedHashDownloading')}</li>
                   )}
                 </ul>
               </div>

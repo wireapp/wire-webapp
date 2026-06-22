@@ -24,15 +24,15 @@ import {ErrorBoundary} from 'react-error-boundary';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {UserBlockedBadge, UserVerificationBadges} from 'Components/Badge';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {UserBlockedBadge, UserVerificationBadges} from 'Components/badge';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import * as Icon from 'Components/icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 interface UserDetailsProps {
   badge?: string;
@@ -59,6 +59,7 @@ const UserDetailsComponent = ({
     'isAvailable',
     'isBlocked',
   ]);
+  const {translate} = useApplicationContext();
 
   useEffect(() => {
     // This will trigger a user refresh
@@ -106,14 +107,14 @@ const UserDetailsComponent = ({
       {participant.isFederated && (
         <div className="panel-participant__label" data-uie-name="status-federated-user">
           <Icon.FederationIcon />
-          <span>{t('conversationFederationIndicator')}</span>
+          <span>{translate('conversationFederationIndicator')}</span>
         </div>
       )}
 
       {user.isDirectGuest && user.isAvailable && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.GuestIcon />
-          <span>{t('conversationGuestIndicator')}</span>
+          <span>{translate('conversationGuestIndicator')}</span>
         </div>
       )}
 
@@ -126,7 +127,7 @@ const UserDetailsComponent = ({
       {isGroupAdmin === true && (
         <div className="panel-participant__label" data-uie-name="status-admin">
           <Icon.GroupAdminIcon />
-          <span>{t('conversationDetailsGroupAdmin')}</span>
+          <span>{translate('conversationDetailsGroupAdmin')}</span>
         </div>
       )}
     </div>

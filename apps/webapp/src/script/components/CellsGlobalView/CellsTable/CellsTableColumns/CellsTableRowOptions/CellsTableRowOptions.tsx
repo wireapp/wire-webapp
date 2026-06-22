@@ -25,13 +25,12 @@ import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
-import {useApplicationContext} from '../../../../../page/RootProvider';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareModal} from '../CellsShareModal/CellsShareModal';
 
@@ -42,7 +41,7 @@ interface CellsTableRowOptionsProps {
 
 export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): ReactElement => {
   const {node, cellsRepository} = properties;
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {handleOpenFile} = useCellsFilePreviewModal();
 
   const url = node.url;
@@ -51,21 +50,23 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
-        <button css={buttonStyles} aria-label={t('cells.options.label')}>
+        <button css={buttonStyles} aria-label={translate('cells.options.label')}>
           <MoreIcon css={iconStyles} />
-          <span css={textStyles}>{t('cells.options.label')}</span>
+          <span css={textStyles}>{translate('cells.options.label')}</span>
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <DropdownMenu.Item
           onClick={() => (node.type === CellNodeType.FOLDER ? openFolder({path: node.path}) : handleOpenFile(node))}
         >
-          {t('cells.options.open')}
+          {translate('cells.options.open')}
         </DropdownMenu.Item>
         <DropdownMenu.Item
-          onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker})}
+          onClick={() =>
+            showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker, translate})
+          }
         >
-          {t('cells.options.share')}
+          {translate('cells.options.share')}
         </DropdownMenu.Item>
         {is.nonEmptyString(url) && (
           <DropdownMenu.Item
@@ -76,7 +77,7 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
               })
             }
           >
-            {t('cells.options.download')}
+            {translate('cells.options.download')}
           </DropdownMenu.Item>
         )}
       </DropdownMenu.Content>

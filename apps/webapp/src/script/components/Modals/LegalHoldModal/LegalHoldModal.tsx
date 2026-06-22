@@ -26,7 +26,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import * as Icon from 'Components/icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {UserDevicesState, UserDevices} from 'Components/UserDevices';
+import {UserDevicesState, UserDevices} from 'Components/userDevices';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import {ClientRepository} from 'Repositories/client';
@@ -36,8 +36,8 @@ import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepo
 import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
 
@@ -69,6 +69,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   cryptographyRepository,
   messageRepository,
 }) => {
+  const {translate} = useApplicationContext();
   const skipShowUsersRef = useRef(false);
 
   const {
@@ -110,13 +111,13 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setUserDevices(undefined);
     setPasswordValue('');
     setRequestError('');
-  }, []);
+  }, [closeModal]);
 
   const onBgClick = useCallback(() => {
     if (!isRequest) {
       onClose();
     }
-  }, [isRequest]);
+  }, [isRequest, onClose]);
 
   const onBackClick = () => {
     if (!showDeviceList) {
@@ -161,11 +162,11 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     } catch (error: unknown) {
       switch (isErrorWithCode(error) ? error.code : undefined) {
         case HTTP_STATUS.BAD_REQUEST: {
-          setRequestError(t('BackendError.LABEL.BAD_REQUEST'));
+          setRequestError(translate('BackendError.LABEL.BAD_REQUEST'));
           break;
         }
         case HTTP_STATUS.FORBIDDEN: {
-          setRequestError(t('BackendError.LABEL.ACCESS_DENIED'));
+          setRequestError(translate('BackendError.LABEL.ACCESS_DENIED'));
           break;
         }
         default: {
@@ -226,6 +227,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setFingerprint,
     setIsLoading,
     setIsModalOpen,
+    setType,
     teamRepository.teamService,
   ]);
 
@@ -241,17 +243,17 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       setIsPending(isPendingStatus);
       setIsModalOpen(true);
     }
-  }, [selfUser.id, selfUser.teamId, teamRepository.teamService]);
+  }, [selfUser.id, selfUser.teamId, setIsModalOpen, teamRepository.teamService]);
 
   useEffect(() => {
     if (type !== null) {
-      checkLegalHoldState();
+      void checkLegalHoldState();
     }
   }, [type, checkLegalHoldState]);
 
   useEffect(() => {
     if (isPending && isOpen && isRequest) {
-      showRequestModal();
+      void showRequestModal();
     }
   }, [isPending, showRequestModal, isOpen, isRequest]);
 
@@ -283,11 +285,20 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
 
     setIsLoading(false);
     setIsModalOpen(true);
-  }, [conversationRepository, currentConversation, messageRepository, selfUser]);
+  }, [
+    closeModal,
+    conversationRepository,
+    currentConversation,
+    messageRepository,
+    selfUser,
+    setIsLoading,
+    setIsModalOpen,
+    setUsers,
+  ]);
 
   useEffect(() => {
     if (isOpen && isUsers) {
-      getLegalHoldUsers();
+      void getLegalHoldUsers();
     }
   }, [getLegalHoldUsers, isOpen, isUsers]);
 
@@ -315,7 +326,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
 
         {isRequest ? (
           <h2 className="modal__header__title" data-uie-name="status-modal-title">
-            {t('legalHoldModalTitle')}
+            {translate('legalHoldModalTitle')}
           </h2>
         ) : (
           <button className="button-reset-default modal__header__button" data-uie-name="do-close" onClick={onBgClick}>
@@ -330,14 +341,14 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
             <div className="modal__text" data-uie-name="status-modal-text">
               <p
                 dangerouslySetInnerHTML={{
-                  __html: t('legalHoldModalText', undefined, {
+                  __html: translate('legalHoldModalText', undefined, {
                     br: '<br>',
                     fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${fingerprint}</span>`,
                   }),
                 }}
               />
 
-              {requiresPassword && <div>{t('legalHoldModalTextPassword')}</div>}
+              {requiresPassword && <div>{translate('legalHoldModalTextPassword')}</div>}
             </div>
 
             {requiresPassword && (
@@ -345,7 +356,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                 className="modal__input"
                 type="password"
                 value={passwordValue}
-                placeholder={t('login.passwordPlaceholder')}
+                placeholder={translate('login.passwordPlaceholder')}
                 onChange={ev => setPasswordValue(ev.target.value)}
                 onKeyDown={ev => handleEnterDown(ev, acceptRequest)}
               />
@@ -364,7 +375,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                 data-uie-name="do-secondary"
                 onClick={closeRequest}
               >
-                {t('legalHoldModalSecondaryAction')}
+                {translate('legalHoldModalSecondaryAction')}
               </button>
 
               {!isSendingApprove ? (
@@ -374,7 +385,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                   data-uie-name="do-action"
                   onClick={acceptRequest}
                 >
-                  {t('legalHoldModalPrimaryAction')}
+                  {translate('legalHoldModalPrimaryAction')}
                 </button>
               ) : (
                 <div className="modal__button modal__button--primary legal-hold-modal__loading-button">
@@ -394,18 +405,20 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                 </div>
 
                 <div className="legal-hold-modal__headline" data-uie-name="status-modal-title">
-                  {t('legalHoldHeadline')}
+                  {translate('legalHoldHeadline')}
                 </div>
 
                 <p
                   className="legal-hold-modal__info"
                   data-uie-name="status-modal-text"
                   dangerouslySetInnerHTML={{
-                    __html: isSelfInfo ? t('legalHoldDescriptionSelf') : t('legalHoldDescriptionOthers'),
+                    __html: isSelfInfo
+                      ? translate('legalHoldDescriptionSelf')
+                      : translate('legalHoldDescriptionOthers'),
                   }}
                 />
 
-                <div className="legal-hold-modal__subjects">{t('legalHoldSubjects')}</div>
+                <div className="legal-hold-modal__subjects">{translate('legalHoldSubjects')}</div>
 
                 <UserSearchableList
                   users={users}

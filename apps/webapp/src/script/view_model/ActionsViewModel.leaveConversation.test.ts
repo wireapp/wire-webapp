@@ -34,6 +34,8 @@ import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
+import type {Translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {ActionsViewModel} from './ActionsViewModel';
@@ -44,7 +46,7 @@ import {UserType} from '@wireapp/api-client/lib/user';
 
 /** Create a User that passes every eligibility criterion in leaveConversation. */
 function makeEligibleUser(id = createUuid()): User {
-  const user = new User(id, 'example.com');
+  const user = new User(id, 'example.com', translateForTest);
   user.name('Test User ' + id);
   user.username('testuser.' + id);
   user.isFederated = false;
@@ -59,16 +61,18 @@ const featureWithPreventAdminLessGroups = {
 } as any;
 
 function buildActionsViewModel({
-  selfUser = new User('self-id', 'example.com'),
+  selfUser = new User('self-id', 'example.com', translateForTest),
   teamFeatures = undefined as any,
   setMemberConversationRole = jest.fn().mockResolvedValue(undefined),
   leaveConversationMock = jest.fn().mockResolvedValue(undefined),
+  translate,
 }: {
   selfUser?: User;
   teamFeatures?: any;
   setMemberConversationRole?: jest.Mock;
   leaveConversationMock?: jest.Mock;
-} = {}) {
+  translate: Translate;
+}) {
   const mockUserState = {self: ko.observable(selfUser)} as unknown as UserState;
   const mockTeamState = {teamFeatures: ko.observable(teamFeatures)} as unknown as TeamState;
 
@@ -88,6 +92,7 @@ function buildActionsViewModel({
     mockUserState,
     mockTeamState,
     {} as MainViewModel,
+    translate,
   );
 
   return {vm, setMemberConversationRole, leaveConversationMock};
@@ -106,24 +111,57 @@ describe('ActionsViewModel.leaveConversation', () => {
 
   afterEach(() => jest.restoreAllMocks());
 
+  it('uses the injected translate function for modal copy', () => {
+    const selfUser = new User('self-id', 'example.com', translateForTest);
+    const userToBlock = makeEligibleUser('blocked-user');
+    const translate = jest.fn(
+      (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
+    ) as Translate;
+
+    const {vm} = buildActionsViewModel({selfUser, translate});
+
+    void vm.blockUser(userToBlock);
+
+    expect(translate).toHaveBeenCalledWith('modalUserBlockAction');
+    expect(translate).toHaveBeenCalledWith('modalUserBlockMessage', {user: userToBlock.name()});
+    expect(translate).toHaveBeenCalledWith('modalUserBlockHeadline', {user: userToBlock.name()});
+    expect(PrimaryModal.show).toHaveBeenCalledWith(
+      PrimaryModal.type.CONFIRM,
+      expect.objectContaining({
+        primaryAction: expect.objectContaining({text: 'translated:modalUserBlockAction'}),
+        text: expect.objectContaining({
+          message: 'translated:modalUserBlockMessage',
+          title: 'translated:modalUserBlockHeadline',
+        }),
+      }),
+      undefined,
+      translate,
+    );
+  });
+
   describe('feature flag off', () => {
     it('shows the standard PrimaryModal leave flow when PREVENT_ADMIN_LESS_GROUPS is disabled', () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       const conversation = generateConversation({users: [makeEligibleUser()]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({selfUser, teamFeatures: undefined});
+      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: undefined});
 
       void vm.leaveConversation(conversation);
 
-      expect(PrimaryModal.show).toHaveBeenCalledWith(PrimaryModal.type.OPTION, expect.any(Object));
+      expect(PrimaryModal.show).toHaveBeenCalledWith(
+        PrimaryModal.type.OPTION,
+        expect.any(Object),
+        undefined,
+        translateForTest,
+      );
       expect(mockShow).not.toHaveBeenCalled();
     });
   });
 
   describe('feature flag on', () => {
     it('shows the standard PrimaryModal leave flow when the self user is not the last admin', () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       const otherAdmin = makeEligibleUser('other-admin');
       const conversation = generateConversation({users: [otherAdmin]});
       // Both users are admins → self is NOT the last admin
@@ -132,20 +170,33 @@ describe('ActionsViewModel.leaveConversation', () => {
         [otherAdmin.id]: DefaultConversationRoleName.WIRE_ADMIN,
       });
 
-      const {vm} = buildActionsViewModel({selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
 
       void vm.leaveConversation(conversation);
 
-      expect(PrimaryModal.show).toHaveBeenCalledWith(PrimaryModal.type.OPTION, expect.any(Object));
+      expect(PrimaryModal.show).toHaveBeenCalledWith(
+        PrimaryModal.type.OPTION,
+        expect.any(Object),
+        undefined,
+        translateForTest,
+      );
       expect(mockShow).not.toHaveBeenCalled();
     });
 
     it('opens the LeaveGroupAdminModal when the self user is the last admin and eligible users exist', async () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       const conversation = generateConversation({users: [makeEligibleUser()]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
 
       await vm.leaveConversation(conversation);
 
@@ -154,13 +205,17 @@ describe('ActionsViewModel.leaveConversation', () => {
     });
 
     it('excludes the self user from the eligible users list passed to the modal', async () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       // participating_user_ets never includes self, but add an eligible other user
       const otherUser = makeEligibleUser('other-id');
       const conversation = generateConversation({users: [otherUser]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
 
       await vm.leaveConversation(conversation);
 
@@ -169,16 +224,20 @@ describe('ActionsViewModel.leaveConversation', () => {
     });
 
     it('passes an empty eligibleUsers list to the modal when no participant meets eligibility criteria', async () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       // Federated users are ineligible
-      const federatedUser = new User('fed-id', 'external.com');
+      const federatedUser = new User('fed-id', 'external.com', translateForTest);
       federatedUser.isFederated = true;
       federatedUser.name('Fed User');
       federatedUser.username('fed.user');
       const conversation = generateConversation({users: [federatedUser]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
 
       await vm.leaveConversation(conversation);
 
@@ -187,7 +246,7 @@ describe('ActionsViewModel.leaveConversation', () => {
     });
 
     it('assigns the admin role to the selected user before calling leaveConversation', async () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       const newAdmin = makeEligibleUser('new-admin-id');
       const conversation = generateConversation({users: [newAdmin]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
@@ -201,6 +260,7 @@ describe('ActionsViewModel.leaveConversation', () => {
         teamFeatures: featureWithPreventAdminLessGroups,
         setMemberConversationRole,
         leaveConversationMock,
+        translate: translateForTest,
       });
 
       await vm.leaveConversation(conversation);
@@ -217,7 +277,7 @@ describe('ActionsViewModel.leaveConversation', () => {
     });
 
     it('does not call leaveConversation when role assignment fails', async () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       const newAdmin = makeEligibleUser('new-admin-id');
       const conversation = generateConversation({users: [newAdmin]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
@@ -230,6 +290,7 @@ describe('ActionsViewModel.leaveConversation', () => {
         teamFeatures: featureWithPreventAdminLessGroups,
         setMemberConversationRole,
         leaveConversationMock,
+        translate: translateForTest,
       });
 
       await vm.leaveConversation(conversation);

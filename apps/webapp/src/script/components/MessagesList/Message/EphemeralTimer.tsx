@@ -20,8 +20,8 @@
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import type {Message} from 'Repositories/entity/message/Message';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {ephemeralTimerBackgroundStyle, ephemeralTimerDialStyle} from './EphemeralTimer.styles';
 
@@ -30,6 +30,7 @@ interface EphemeralTimerProps {
 }
 
 const EphemeralTimer = ({message}: EphemeralTimerProps) => {
+  const {translate} = useApplicationContext();
   const {
     ephemeral_remaining: remaining,
     ephemeral_started: started,
@@ -40,7 +41,7 @@ const EphemeralTimer = ({message}: EphemeralTimerProps) => {
 
   return (
     <svg
-      aria-label={t('accessibility.selfDeletingMessage.timer')}
+      aria-label={translate('accessibility.selfDeletingMessage.timer')}
       className="ephemeral-timer"
       tabIndex={TabIndex.FOCUSABLE}
       viewBox="0 0 8 8"

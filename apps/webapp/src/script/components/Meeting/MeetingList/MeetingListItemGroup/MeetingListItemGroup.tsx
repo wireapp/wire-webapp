@@ -28,7 +28,7 @@ import {
   sectionHeaderStyles,
   sectionStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup.styles';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface MeetingListItemGroupProps {
   header?: string;
@@ -48,6 +48,7 @@ const MeetingListItemGroupComponent = ({
   groupBy = MeetingGroupBy.HOUR,
   nowMs,
 }: MeetingListItemGroupProps) => {
+  const {translate} = useApplicationContext();
   const formatHourLabel = (date: string) =>
     set(new Date(date), {minutes: 0, seconds: 0, milliseconds: 0}).toLocaleTimeString([], {
       hour: '2-digit',
@@ -63,7 +64,7 @@ const MeetingListItemGroupComponent = ({
     return (
       <section css={sectionStyles}>
         {header !== undefined && header !== '' && <div css={sectionHeaderStyles}>{header}</div>}
-        <span className="subline">{t('meetings.noScheduledMeetings')}</span>
+        <span className="subline">{translate('meetings.noScheduledMeetings')}</span>
       </section>
     );
   }

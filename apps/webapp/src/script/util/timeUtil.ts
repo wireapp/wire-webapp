@@ -57,7 +57,7 @@ import {
   uk,
 } from 'date-fns/locale';
 
-import {t} from './localizerUtil';
+import type {Translate} from './localizerUtil';
 import {zeroPadding} from './util';
 
 export type FnDate = number | Date;
@@ -77,6 +77,7 @@ export interface DurationUnit {
 export enum TIME_IN_MILLIS {
   SECOND = 1000,
   MINUTE = SECOND * 60,
+  FIVE_MINUTES = MINUTE * 5,
   HOUR = MINUTE * 60,
   DAY = HOUR * 24,
   WEEK = DAY * 7,
@@ -117,40 +118,40 @@ export const formatDayMonthNumeral = (date: FnDate | string | number) =>
     .replace(/[0-9]{4}/g, '')
     .replace(locale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');
 
-const durationUnits = () => [
+const durationUnits = (translate: Translate) => [
   {
-    plural: t('ephemeralUnitsYears'),
-    singular: t('ephemeralUnitsYear'),
+    plural: translate('ephemeralUnitsYears'),
+    singular: translate('ephemeralUnitsYear'),
     symbol: 'y',
     value: TIME_IN_MILLIS.YEAR,
   },
   {
-    plural: t('ephemeralUnitsWeeks'),
-    singular: t('ephemeralUnitsWeek'),
+    plural: translate('ephemeralUnitsWeeks'),
+    singular: translate('ephemeralUnitsWeek'),
     symbol: 'w',
     value: TIME_IN_MILLIS.WEEK,
   },
   {
-    plural: t('ephemeralUnitsDays'),
-    singular: t('ephemeralUnitsDay'),
+    plural: translate('ephemeralUnitsDays'),
+    singular: translate('ephemeralUnitsDay'),
     symbol: 'd',
     value: TIME_IN_MILLIS.DAY,
   },
   {
-    plural: t('ephemeralUnitsHours'),
-    singular: t('ephemeralUnitsHour'),
+    plural: translate('ephemeralUnitsHours'),
+    singular: translate('ephemeralUnitsHour'),
     symbol: 'h',
     value: TIME_IN_MILLIS.HOUR,
   },
   {
-    plural: t('ephemeralUnitsMinutes'),
-    singular: t('ephemeralUnitsMinute'),
+    plural: translate('ephemeralUnitsMinutes'),
+    singular: translate('ephemeralUnitsMinute'),
     symbol: 'm',
     value: TIME_IN_MILLIS.MINUTE,
   },
   {
-    plural: t('ephemeralUnitsSeconds'),
-    singular: t('ephemeralUnitsSecond'),
+    plural: translate('ephemeralUnitsSeconds'),
+    singular: translate('ephemeralUnitsSecond'),
     symbol: 's',
     value: TIME_IN_MILLIS.SECOND,
   },
@@ -163,8 +164,8 @@ const durationUnits = () => [
  * @param rounded should the units be rounded as opposed to floored
  * @returns calculated time units
  */
-const mapUnits = (duration: number, rounded: boolean): DiscreteTimeUnit[] => {
-  const mappedUnits = durationUnits().map((unit, index, units) => {
+const mapUnits = (duration: number, rounded: boolean, translate: Translate): DiscreteTimeUnit[] => {
+  const mappedUnits = durationUnits(translate).map((unit, index, units) => {
     let value = duration;
     if (index > 0) {
       value %= units[index - 1].value;
@@ -186,12 +187,12 @@ const mapUnits = (duration: number, rounded: boolean): DiscreteTimeUnit[] => {
  * @param duration Duration to format in milliseconds
  * @returns Unit, value and localized string
  */
-export const formatDuration = (duration: number): DurationUnit => {
-  const mappedUnits = mapUnits(duration, true);
+export const formatDuration = (duration: number, translate: Translate): DurationUnit => {
+  const mappedUnits = mapUnits(duration, true, translate);
   const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
 
   if (!firstNonZeroUnit) {
-    const seconds = durationUnits().pop();
+    const seconds = durationUnits(translate).pop();
 
     return {
       symbol: seconds?.symbol ?? 's',
@@ -212,8 +213,8 @@ export const formatDuration = (duration: number): DurationUnit => {
  * @param duration the remaining time in milliseconds
  * @returns readable representation of the remaining time
  */
-export const formatDurationCaption = (duration: number): string => {
-  const mappedUnits = mapUnits(duration, false);
+export const formatDurationCaption = (duration: number, translate: Translate): string => {
+  const mappedUnits = mapUnits(duration, false, translate);
   const hours = mappedUnits.find(unit => unit.symbol === 'h');
   const minutes = mappedUnits.find(unit => unit.symbol === 'm');
   const hasHours = (hours?.value ?? 0) > 0;
@@ -235,7 +236,7 @@ export const formatDurationCaption = (duration: number): string => {
       break;
     }
   }
-  const joiner = ` ${t('and')} `;
+  const joiner = ` ${translate('and')} `;
   return validUnitStrings.join(joiner);
 };
 
@@ -308,23 +309,23 @@ export const weeksPassedSinceDate = (date: Date): number => {
   return Math.max(1, Math.ceil(diffInWeeks));
 };
 
-export const formatDelayTime = (delayTimeInMS: number): string => {
+export const formatDelayTime = (delayTimeInMS: number, translate: Translate): string => {
   if (delayTimeInMS >= TIME_IN_MILLIS.WEEK) {
     const weeks = Math.floor(delayTimeInMS / TIME_IN_MILLIS.WEEK);
-    return `${weeks} ${t(`ephemeralUnitsWeek${weeks === 1 ? '' : 's'}`)}`;
+    return `${weeks} ${translate(`ephemeralUnitsWeek${weeks === 1 ? '' : 's'}`)}`;
   } else if (delayTimeInMS >= TIME_IN_MILLIS.DAY) {
     const days = Math.floor(delayTimeInMS / TIME_IN_MILLIS.DAY);
-    return `${days} ${t(`ephemeralUnitsDay${days === 1 ? '' : 's'}`)}`;
+    return `${days} ${translate(`ephemeralUnitsDay${days === 1 ? '' : 's'}`)}`;
   } else if (delayTimeInMS >= TIME_IN_MILLIS.HOUR) {
     const hours = Math.floor(delayTimeInMS / TIME_IN_MILLIS.HOUR);
-    return `${hours} ${t(`ephemeralUnitsHour${hours === 1 ? '' : 's'}`)}`;
+    return `${hours} ${translate(`ephemeralUnitsHour${hours === 1 ? '' : 's'}`)}`;
   } else if (delayTimeInMS >= TIME_IN_MILLIS.MINUTE) {
     const minutes = Math.floor(delayTimeInMS / TIME_IN_MILLIS.MINUTE);
-    return `${minutes} ${t(`ephemeralUnitsMinute${minutes === 1 ? '' : 's'}`)}`;
+    return `${minutes} ${translate(`ephemeralUnitsMinute${minutes === 1 ? '' : 's'}`)}`;
   }
 
   const seconds = Math.floor(delayTimeInMS / TIME_IN_MILLIS.SECOND);
-  return `${seconds} ${t(`ephemeralUnitsSecond${seconds === 1 ? '' : 's'}`)}`;
+  return `${seconds} ${translate(`ephemeralUnitsSecond${seconds === 1 ? '' : 's'}`)}`;
 };
 
 /**
@@ -340,19 +341,19 @@ export const formatDelayTime = (delayTimeInMS: number): string => {
  * @param duration - Duration in milliseconds
  * @returns Localized string of the coarsest applicable unit
  */
-export const formatCoarseDuration = (duration: number) => {
+export const formatCoarseDuration = (duration: number, translate: Translate) => {
   if (duration >= TIME_IN_MILLIS.DAY) {
     const days = Math.floor(duration / TIME_IN_MILLIS.DAY);
-    return t(`initProgressDays${days === 1 ? 'Singular' : 'Plural'}`, {time: days});
+    return translate(`initProgressDays${days === 1 ? 'Singular' : 'Plural'}`, {time: days});
   }
 
   if (duration >= TIME_IN_MILLIS.HOUR) {
     const hours = Math.floor(duration / TIME_IN_MILLIS.HOUR);
-    return t(`initProgressHours${hours === 1 ? 'Singular' : 'Plural'}`, {time: hours});
+    return translate(`initProgressHours${hours === 1 ? 'Singular' : 'Plural'}`, {time: hours});
   }
 
   const minutes = Math.max(1, Math.floor(duration / TIME_IN_MILLIS.MINUTE));
-  return t(`initProgressMinutes${minutes === 1 ? 'Singular' : 'Plural'}`, {time: minutes});
+  return translate(`initProgressMinutes${minutes === 1 ? 'Singular' : 'Plural'}`, {time: minutes});
 };
 
 /**
@@ -362,7 +363,7 @@ export const formatCoarseDuration = (duration: number) => {
  * ```ts
  * const startedAt = "2025-06-01T00:00:00Z";
  * const elapsed = durationFrom(startedAt); // e.g. 2592000000 (30 days in ms)
- * formatDuration(elapsed);                // e.g. "1 month"
+ * formatDuration(elapsed, translate);     // e.g. "1 month"
  * ```
  *
  * @param date - The past date to compare (Date or timestamp).
@@ -382,12 +383,12 @@ export const calculateDaysDifference = (date1: Date, date2: Date): number => {
 /**
  * Get the day prefix for a version based on days difference
  */
-export const getDayPrefix = (daysDiff: number, timestamp: number): string => {
+export const getDayPrefix = (daysDiff: number, timestamp: number, translate: Translate): string => {
   if (daysDiff === 0) {
-    return t('fileHistoryModal.today');
+    return translate('fileHistoryModal.today');
   }
   if (daysDiff === 1) {
-    return t('fileHistoryModal.yesterday');
+    return translate('fileHistoryModal.yesterday');
   }
   return new Intl.DateTimeFormat(navigator.language, {
     weekday: 'long',

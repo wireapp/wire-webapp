@@ -29,11 +29,13 @@ import {
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {BaseError} from 'src/script/error/baseError';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
@@ -43,6 +45,7 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {
@@ -52,7 +55,7 @@ describe('ConversationMapper', () => {
 
       expect(functionCallUndefinedParam).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      const functionCallEmtpyArray = () => ConversationMapper.mapConversations([]);
+      const functionCallEmtpyArray = () => ConversationMapper.mapConversations([], 1, translate);
 
       expect(functionCallEmtpyArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
@@ -61,7 +64,7 @@ describe('ConversationMapper', () => {
 
       expect(functionCallWrongType).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      const functionCallUndefinedInArray = () => ConversationMapper.mapConversations([undefined]);
+      const functionCallUndefinedInArray = () => ConversationMapper.mapConversations([undefined], 1, translate);
 
       expect(functionCallUndefinedInArray).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
@@ -74,7 +77,7 @@ describe('ConversationMapper', () => {
     it('maps a single conversation', () => {
       const conversation = entities.conversation;
       const initialTimestamp = Date.now();
-      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp);
+      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp, translate);
 
       const expectedParticipantIds: QualifiedId[] = [
         conversation.members.others[0].id,
@@ -119,7 +122,7 @@ describe('ConversationMapper', () => {
       };
 
       const initialTimestamp = Date.now();
-      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp);
+      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp, translate);
 
       expect(conversationEntity.roles()).toEqual({
         [conversation.members.self.id]: DefaultConversationRoleName.WIRE_ADMIN,
@@ -130,7 +133,7 @@ describe('ConversationMapper', () => {
 
     it('maps multiple conversations', () => {
       const conversations = payload.conversations.get.conversations;
-      const conversationEntities = ConversationMapper.mapConversations(conversations);
+      const conversationEntities = ConversationMapper.mapConversations(conversations, 1, translate);
 
       expect(conversationEntities.length).toBe(conversations.length);
 
@@ -173,7 +176,11 @@ describe('ConversationMapper', () => {
         type: 0,
       };
 
-      const [conversationEntity] = ConversationMapper.mapConversations([payload] as ConversationDatabaseData[]);
+      const [conversationEntity] = ConversationMapper.mapConversations(
+        [payload] as ConversationDatabaseData[],
+        1,
+        translate,
+      );
 
       expect(conversationEntity.name()).toBe(payload.name);
       expect(conversationEntity.teamId).toBe(payload.team);
@@ -184,7 +191,7 @@ describe('ConversationMapper', () => {
     it('can update the properties of a conversation', () => {
       const creatorId = createUuid();
       const conversationsData = [payload.conversations.get.conversations[0]];
-      const [conversationEntity] = ConversationMapper.mapConversations(conversationsData);
+      const [conversationEntity] = ConversationMapper.mapConversations(conversationsData, 1, translate);
       const data: Partial<Record<keyof Conversation, string>> = {
         creator: creatorId,
         id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
@@ -199,7 +206,7 @@ describe('ConversationMapper', () => {
 
     it('only updates existing properties', () => {
       const updatedName = 'Christmas 2017';
-      const conversationEntity = new Conversation(createUuid());
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.name('Christmas 2016');
 
       expect(conversationEntity.name()).toBeDefined();
@@ -222,7 +229,7 @@ describe('ConversationMapper', () => {
 
     beforeEach(() => {
       const conversationsData = [payload.conversations.get.conversations[0]];
-      [conversationEntity] = ConversationMapper.mapConversations(conversationsData);
+      [conversationEntity] = ConversationMapper.mapConversations(conversationsData, 1, translate);
     });
 
     it('returns without updating if conversation entity does not exist', () => {
@@ -737,7 +744,12 @@ describe('ConversationMapper', () => {
         CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
       ];
 
-      const conversationEntity = new Conversation('conversation-id', 'domain');
+      const conversationEntity = new Conversation(
+        'conversation-id',
+        'domain',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
       conversationEntity.teamId = 'team_id';
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
@@ -756,7 +768,7 @@ describe('ConversationMapper', () => {
 
       const accessRoleV2: undefined = undefined;
 
-      const conversationEntity = new Conversation();
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.teamId = 'team_id';
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
@@ -820,7 +832,7 @@ describe('ConversationMapper', () => {
       ];
 
       it.each(mockRightsLegacy)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
-        const conversationEntity = new Conversation();
+        const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
         conversationEntity.teamId = 'team_id';
 
         ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
@@ -860,7 +872,7 @@ describe('ConversationMapper', () => {
       const mockAccessRights = Object.entries(mockRightsV3);
 
       it.each(mockAccessRights)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
-        const conversationEntity = new Conversation();
+        const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
         conversationEntity.teamId = 'team_id';
 
         ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
@@ -869,7 +881,7 @@ describe('ConversationMapper', () => {
     });
 
     it('maps roles properly for self conversation', () => {
-      const conversationEntity = new Conversation();
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.type(CONVERSATION_TYPE.SELF);
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);
@@ -877,7 +889,7 @@ describe('ConversationMapper', () => {
     });
 
     it('maps roles properly for personal group conversation', () => {
-      const conversationEntity = new Conversation();
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(ko.pureComputed(() => true));
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);
@@ -885,7 +897,7 @@ describe('ConversationMapper', () => {
     });
 
     it('maps roles properly for personal one2one conversation', () => {
-      const conversationEntity = new Conversation();
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(ko.pureComputed(() => false));
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);

@@ -32,7 +32,7 @@
     },
     "serve": {
       "continuous": true,
-      "dependsOn": ["webapp:watch-deps"],
+      "dependsOn": ["webapp:build-libs", "webapp:watch-deps-dynamic"],
       "executor": "@nx/js:node",
       "options": {
         "buildTarget": "server:build-dev",

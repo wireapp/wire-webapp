@@ -21,7 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
-import {ITEM_ALREADY_EXISTS_ERROR} from './cellsNodeFormUtils';
+import {CellsNewNodeFormValidationCopy, ITEM_ALREADY_EXISTS_ERROR} from './cellsNodeFormUtils';
 import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
@@ -62,6 +62,7 @@ interface UseCellsNewFileFormProps {
   onSuccess: () => void;
   currentPath: string;
   isOpen: boolean;
+  validationCopy: CellsNewNodeFormValidationCopy;
 }
 
 export const useCellsNewFileForm = ({
@@ -71,6 +72,7 @@ export const useCellsNewFileForm = ({
   onSuccess,
   currentPath,
   isOpen,
+  validationCopy,
 }: UseCellsNewFileFormProps) => {
   const normalizeNameForCreation = (rawName: string): string => {
     const extension = getFileExtensionByType(fileType);
@@ -89,5 +91,5 @@ export const useCellsNewFileForm = ({
     onSuccess();
   };
 
-  return useCellsNewNodeFormBase({createNode: createFile, normalizeNameForCreation, isOpen});
+  return useCellsNewNodeFormBase({createNode: createFile, normalizeNameForCreation, isOpen, validationCopy});
 };

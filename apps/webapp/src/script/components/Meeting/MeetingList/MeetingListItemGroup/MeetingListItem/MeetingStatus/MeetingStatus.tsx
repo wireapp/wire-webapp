@@ -30,7 +30,7 @@ import {
   startingSoonStatusStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus.styles';
 import {getCountdownSeconds, getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatSeconds} from 'Util/timeUtil';
 
 export interface MeetingStatusProps {
@@ -41,6 +41,7 @@ export interface MeetingStatusProps {
 }
 
 const MeetingStatusComponent = ({start_date, end_date, attending, nowMs}: MeetingStatusProps) => {
+  const {translate} = useApplicationContext();
   const timestamp = nowMs ?? Date.now();
 
   const meetingStatus = useMemo(
@@ -51,7 +52,7 @@ const MeetingStatusComponent = ({start_date, end_date, attending, nowMs}: Meetin
   if (meetingStatus === MeetingStatuses.PARTICIPATING) {
     return (
       <div css={participatingStatusStyles}>
-        <CallIcon css={participatingStatusIconStyles} /> {t('meetings.meetingStatus.participating')}
+        <CallIcon css={participatingStatusIconStyles} /> {translate('meetings.meetingStatus.participating')}
       </div>
     );
   }
@@ -60,7 +61,7 @@ const MeetingStatusComponent = ({start_date, end_date, attending, nowMs}: Meetin
     return (
       <div css={joinButtonContainerStyles}>
         <Button css={joinButtonStyles} variant={ButtonVariant.PRIMARY}>
-          <CallIcon css={joinButtonIconStyles} /> {t('callJoin')}
+          <CallIcon css={joinButtonIconStyles} /> {translate('callJoin')}
         </Button>
       </div>
     );
@@ -72,7 +73,7 @@ const MeetingStatusComponent = ({start_date, end_date, attending, nowMs}: Meetin
       const seconds = getCountdownSeconds(timestamp, start_date);
       return formatSeconds(seconds);
     }, [timestamp, start_date]);
-    return <div css={startingSoonStatusStyles}>{t('meetings.meetingStatus.startingIn', {countdown})}</div>;
+    return <div css={startingSoonStatusStyles}>{translate('meetings.meetingStatus.startingIn', {countdown})}</div>;
   }
 
   return null;

@@ -21,8 +21,8 @@ import {REASON} from '@wireapp/avs';
 
 import * as Icon from 'Components/icon';
 import {CallingTimeoutMessage} from 'Repositories/entity/message/CallingTimeoutMessage';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {MessageTime} from './MessageTime';
 
@@ -31,9 +31,10 @@ interface CallTimeoutMessageProps {
 }
 
 const CallTimeoutMessage = ({message}: CallTimeoutMessageProps) => {
+  const {translate} = useApplicationContext();
   const reason = message.reason;
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
-  const text = `${t('callWasEndedBecause')} `;
+  const text = `${translate('callWasEndedBecause')} `;
 
   return (
     <div className="message-header">
@@ -49,7 +50,7 @@ const CallTimeoutMessage = ({message}: CallTimeoutMessageProps) => {
       >
         <p>
           {text}
-          <b>{reason === REASON.NOONE_JOINED ? t('callNoOneJoined') : t('callEveryOneLeft')}</b>
+          <b>{reason === REASON.NOONE_JOINED ? translate('callNoOneJoined') : translate('callEveryOneLeft')}</b>
         </p>
       </div>
       <p className="message-body-actions">

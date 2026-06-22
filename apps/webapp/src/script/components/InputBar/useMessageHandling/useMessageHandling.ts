@@ -31,6 +31,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageRepository} from 'Repositories/storage';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 
 import {useDraftState} from './useDraftState/useDraftState';
 import {useMessageEditing} from './useMessageEditing/useMessageEditing';
@@ -51,6 +52,7 @@ interface UseMessageHandlingProps {
   editorRef: React.RefObject<LexicalEditor>;
   pastedFile: File | null;
   sendPastedFile: () => void;
+  translate: RootContextValue['translate'];
 }
 
 export const useMessageHandling = ({
@@ -64,6 +66,7 @@ export const useMessageHandling = ({
   editorRef,
   pastedFile,
   sendPastedFile,
+  translate,
 }: UseMessageHandlingProps) => {
   const {isEditing, editedMessage, editMessage: editMessageCallback, cancelMessageEditing} = useMessageEditing();
 
@@ -132,6 +135,7 @@ export const useMessageHandling = ({
     pastedFile,
     sendPastedFile,
     messageContent,
+    translate,
   });
 
   const editMessage = useCallback(

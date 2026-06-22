@@ -23,12 +23,12 @@ import * as Icon from 'Components/icon';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
 import {Config} from 'src/script/Config';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {splitFingerprint} from 'Util/stringUtil';
 
 import {messageBodyWrapper} from './ContentMessage/ContentMessage.styles';
 
-import {FormattedId} from '../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
+import {FormattedId} from '../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 
 interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;
@@ -37,10 +37,11 @@ interface DecryptErrorMessageProps {
 
 const DecryptErrorMessage = ({message, onClickResetSession}: DecryptErrorMessageProps) => {
   const [isResettingSession, setIsResettingSession] = useState(false);
+  const {translate} = useApplicationContext();
 
   const link = Config.getConfig().URL.SUPPORT.DECRYPT_ERROR;
   const caption = message.isIdentityChanged
-    ? t(
+    ? translate(
         'conversationUnableToDecrypt2',
         {user: message.user().name()},
         {
@@ -48,7 +49,7 @@ const DecryptErrorMessage = ({message, onClickResetSession}: DecryptErrorMessage
           highlight: '<span class="label-bold-xs">',
         },
       )
-    : t(
+    : translate(
         'conversationUnableToDecrypt1',
         {user: message.user().name()},
         {
@@ -75,7 +76,7 @@ const DecryptErrorMessage = ({message, onClickResetSession}: DecryptErrorMessage
               target="_blank"
               data-uie-name="go-decrypt-error-link"
             >
-              {t('conversationUnableToDecryptLink')}
+              {translate('conversationUnableToDecryptLink')}
             </a>
           </p>
         </div>
@@ -86,7 +87,7 @@ const DecryptErrorMessage = ({message, onClickResetSession}: DecryptErrorMessage
           <p className="message-header-decrypt-error-label" data-uie-name="status-decrypt-error">
             {message.code && (
               <>
-                {`${t('conversationUnableToDecryptErrorMessage')} `}
+                {`${translate('conversationUnableToDecryptErrorMessage')} `}
                 <span className="label-bold-xs">{message.code}</span>{' '}
               </>
             )}
@@ -113,7 +114,7 @@ const DecryptErrorMessage = ({message, onClickResetSession}: DecryptErrorMessage
                   }}
                   data-uie-name="do-reset-encryption-session"
                 >
-                  {t('conversationUnableToDecryptResetSession')}
+                  {translate('conversationUnableToDecryptResetSession')}
                 </button>
               )}
             </div>

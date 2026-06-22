@@ -22,9 +22,10 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 
 import {getDriveEnabledParticipants} from './useDriveEnabledParticipantFilterItems';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const createUser = ({id, domain = 'example.com', name}: {id: string; domain?: string; name: string}): User => {
-  const user = new User(id, domain);
+  const user = new User(id, domain, translateForTest);
   user.name(name);
   return user;
 };
@@ -58,7 +59,7 @@ describe('getDriveEnabledParticipants', () => {
 
   it('skips unavailable users and services', () => {
     const availableUser = createUser({id: 'available-user', name: 'Available User'});
-    const unavailableUser = new User('unavailable-user', 'example.com');
+    const unavailableUser = new User('unavailable-user', 'example.com', translateForTest);
     const serviceUser = createUser({id: 'service-user', name: 'Service User'});
     serviceUser.isService = true;
 

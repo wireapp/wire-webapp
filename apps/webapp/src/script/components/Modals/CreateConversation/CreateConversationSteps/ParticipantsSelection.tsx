@@ -17,7 +17,7 @@
  *
  */
 
-import {useContext, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -26,27 +26,27 @@ import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {RootContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {participantsSelectionListCss, participantsSelectionSearchCss} from './CreateConversationSteps.styles';
 
 import {useCreateConversation} from '../hooks/useCreateConversation';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
+import {getNonFederatingParticipantsModalCopy} from '../utils';
 
 export const ParticipantsSelection = () => {
-  const rootContext = useContext(RootContext);
+  const {mainViewModel, translate} = useApplicationContext();
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
   const [participantsInput, setParticipantsInput] = useState<string>('');
   const {isGuestsEnabled, selectedContacts, setSelectedContacts} = useCreateConversationModal();
-  const {onSubmit} = useCreateConversation();
+  const nonFederatingParticipantsModalCopy = getNonFederatingParticipantsModalCopy(translate);
+  const {onSubmit} = useCreateConversation(nonFederatingParticipantsModalCopy);
 
   const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
 
-  const mainViewModel = rootContext!.mainViewModel;
   const contentViewModel = mainViewModel.content;
   const conversationRepository = contentViewModel.repositories.conversation;
   const searchRepository = contentViewModel.repositories.search;
@@ -75,7 +75,7 @@ export const ParticipantsSelection = () => {
           input={participantsInput}
           setInput={setParticipantsInput}
           selectedUsers={selectedContacts}
-          placeholder={t('groupCreationParticipantsPlaceholder')}
+          placeholder={translate('groupCreationParticipantsPlaceholder')}
           onEnter={onSubmit}
         />
       </div>

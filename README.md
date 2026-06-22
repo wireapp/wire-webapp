@@ -55,6 +55,8 @@ Prerequisites:
    - `127.0.0.1 local.imai.wire.link` (to connect with the imai backend)
 1. Run `./bin/yarn nx build webapp --configuration=development` to build static assets
 1. Run `./bin/yarn start` (runs `nx serve server`); the app will be available at https://local.zinfra.io:8081/auth/
+1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
+   `FEATURE_CHECK_CONSENT="false"` to the env file
 
 #### Install Self-Signed Certificate
 
@@ -116,7 +118,7 @@ CI runs the Nx/Jest test targets with `--configuration=ci`, which generates cove
 
 Other useful tasks:
 
-- Lint: `./bin/yarn nx run-many -t lint --all`
+- Lint: `./bin/yarn lint`
 - Type-check: `./bin/yarn nx run-many -t type-check --all`
 - E2E (Playwright): `./bin/yarn nx e2e webapp`
 

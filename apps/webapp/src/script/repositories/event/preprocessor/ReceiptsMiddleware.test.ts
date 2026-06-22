@@ -25,9 +25,10 @@ import {createUuid} from 'Util/uuid';
 import {ReceiptsMiddleware} from './ReceiptsMiddleware';
 
 import {ClientEvent} from '../Client';
+import {translateForTest} from 'Util/test/translateForTest';
 
 function buildReadReceiptMiddleware() {
-  const selfUser = new User(createUuid());
+  const selfUser = new User(createUuid(), '', translateForTest);
   const eventService = {loadEvents: jest.fn((): never[] => []), replaceEvent: jest.fn()} as any;
 
   return [new ReceiptsMiddleware(eventService, {} as any, selfUser), {eventService, selfUser}] as const;

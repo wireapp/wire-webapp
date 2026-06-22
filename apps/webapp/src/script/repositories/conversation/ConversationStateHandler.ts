@@ -24,7 +24,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
@@ -41,8 +41,9 @@ import {ConversationEvent} from './EventBuilder';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
+  private readonly translate: Translate;
 
-  constructor(conversationService: ConversationService) {
+  constructor(conversationService: ConversationService, translate: Translate) {
     super();
     const eventHandlingConfig: EventHandlingConfig = {
       [CONVERSATION_EVENT.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),
@@ -51,6 +52,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     };
     this.setEventHandlingConfig(eventHandlingConfig);
     this.conversationService = conversationService;
+    this.translate = translate;
   }
 
   async changeAccessState(conversationEntity: Conversation, accessState: ACCESS_STATE): Promise<void> {
@@ -75,14 +77,18 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             await this.conversationService.putConversationAccess(conversationId, accessModes, accessRole);
 
             conversationEntity.accessState(accessState);
-          } catch (e: unknown) {
+          } catch {
             let messageString: string;
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
 
             if (featureInfo.isAvailable) {
-              messageString = t(`modalConversationOptionsAllow${featureName as 'Guest' | 'Service'}Message`);
+              messageString = this.translate(
+                `modalConversationOptionsAllow${featureName as 'Guest' | 'Service'}Message`,
+              );
             } else {
-              messageString = t(`modalConversationOptionsDisable${featureName as 'Guest' | 'Service'}Message`);
+              messageString = this.translate(
+                `modalConversationOptionsDisable${featureName as 'Guest' | 'Service'}Message`,
+              );
             }
             this._showModal(messageString);
           }
@@ -91,7 +97,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       }
     }
     const {featureName} = featureFromStateChange(prevAccessState, accessState);
-    this._showModal(t(`modalConversationOptionsToggle${featureName as 'Service' | 'Guest'}Message`));
+    this._showModal(this.translate(`modalConversationOptionsToggle${featureName as 'Service' | 'Guest'}Message`));
   }
 
   async getAccessCode(conversationEntity: Conversation): Promise<void> {
@@ -101,7 +107,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     } catch (error: unknown) {
       const isNotFound = isErrorWithCode(error) && error.code === HTTP_STATUS.NOT_FOUND;
       if (!isNotFound) {
-        this._showModal(t('modalConversationGuestOptionsGetCodeMessage'));
+        this._showModal(this.translate('modalConversationGuestOptionsGetCodeMessage'));
       }
     }
   }
@@ -113,8 +119,8 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       if (accessCode !== undefined) {
         ConversationMapper.mapAccessCode(conversationEntity, accessCode);
       }
-    } catch (e: unknown) {
-      return this._showModal(t('modalConversationGuestOptionsRequestCodeMessage'));
+    } catch {
+      return this._showModal(this.translate('modalConversationGuestOptionsRequestCodeMessage'));
     }
   }
 
@@ -122,8 +128,8 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     try {
       await this.conversationService.deleteConversationCode(conversationEntity.id);
       conversationEntity.accessCode('');
-    } catch (e: unknown) {
-      return this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage'));
+    } catch {
+      return this._showModal(this.translate('modalConversationGuestOptionsRevokeCodeMessage'));
     }
   }
 
@@ -152,6 +158,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _showModal(message: string): void {
     const modalOptions = {text: {message}};
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, this.translate);
   }
 }

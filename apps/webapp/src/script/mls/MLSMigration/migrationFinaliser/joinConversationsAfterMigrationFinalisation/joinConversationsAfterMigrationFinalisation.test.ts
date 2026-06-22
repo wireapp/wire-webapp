@@ -26,9 +26,11 @@ import {ConversationDatabaseData, ConversationMapper} from 'Repositories/convers
 import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/coreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {joinConversationsAfterMigrationFinalisation} from '.';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const createMockedDBConversationEntry = (
   id: string,
@@ -104,7 +106,7 @@ const createConversation = (
 ) => {
   const conversationRecord = createMockedDBConversationEntry(id, domain, initialProtocol, protocol, type);
 
-  const [conversation] = ConversationMapper.mapConversations([conversationRecord]);
+  const [conversation] = ConversationMapper.mapConversations([conversationRecord], 1, translate);
   conversation.type(type);
 
   if (protocol === CONVERSATION_PROTOCOL.MLS) {
@@ -138,7 +140,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
     const conversationGroupId = 'groupId1';
-    const selfUser = new User(createUuid());
+    const selfUser = new User(createUuid(), '', translateForTest);
 
     const mockedConversation = createConversation(
       conversationId,
@@ -184,7 +186,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
     const conversationGroupId = 'groupId1';
-    const selfUser = new User(createUuid());
+    const selfUser = new User(createUuid(), '', translateForTest);
 
     const mockedConversations = createConversation(
       conversationId,
@@ -221,7 +223,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
     const conversationGroupId = 'groupId1';
-    const selfUser = new User(createUuid());
+    const selfUser = new User(createUuid(), '', translateForTest);
 
     const mockedConversation = createConversation(
       conversationId,
@@ -258,7 +260,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
     const conversationGroupId = 'groupId1';
-    const selfUser = new User(createUuid());
+    const selfUser = new User(createUuid(), '', translateForTest);
 
     const mockedConversation = createConversation(
       conversationId,

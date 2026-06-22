@@ -93,7 +93,7 @@ import {UserService} from 'Repositories/user/userService';
 import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
@@ -102,7 +102,7 @@ import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config, Configuration} from '../Config';
 import {E2EIHandler} from '../E2EIdentity';
-import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
+import {getModalOptions, ModalType} from '../E2EIdentity/modals';
 import {AccessTokenError} from '../error/accessTokenError';
 import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';
@@ -112,8 +112,8 @@ import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
-import {configureDownloadPath} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/downloadPath';
-import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
+import {configureDownloadPath} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/downloadPath';
+import {configureE2EI} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -173,6 +173,7 @@ export class App {
     private readonly core: Core,
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
+    private readonly translate: Translate,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -223,12 +224,12 @@ export class App {
     repositories.asset = container.resolve(AssetRepository);
 
     repositories.giphy = new GiphyRepository(new GiphyService());
-    repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
+    repositories.properties = new PropertiesRepository(new PropertiesService(), selfService, this.translate);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository();
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, this.translate);
     repositories.audio = new AudioRepository();
 
     repositories.user = new UserRepository(
@@ -238,12 +239,14 @@ export class App {
       repositories.client,
       serverTimeHandler,
       repositories.properties,
+      this.translate,
     );
     repositories.connection = new ConnectionRepository(
       new ConnectionService(),
       repositories.user,
       selfService,
       teamService,
+      this.translate,
     );
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(repositories.user);
@@ -253,6 +256,7 @@ export class App {
       repositories.asset,
       () => this.repository.lifeCycle.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
       teamService,
+      this.translate,
     );
 
     repositories.message = new MessageRepository(
@@ -269,6 +273,7 @@ export class App {
       repositories.user,
       repositories.asset,
       repositories.audio,
+      this.translate,
     );
 
     repositories.calling = new CallingRepository(
@@ -279,6 +284,7 @@ export class App {
       mediaDevicesHandler,
       serverTimeHandler,
       backgroundEffectsHandler,
+      this.translate,
     );
 
     repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
@@ -294,6 +300,7 @@ export class App {
       repositories.properties,
       repositories.calling,
       serverTimeHandler,
+      this.translate,
     );
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message, this.apiClient);
@@ -309,6 +316,7 @@ export class App {
       repositories.conversation,
       repositories.audio,
       repositories.calling,
+      this.translate,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
@@ -444,7 +452,7 @@ export class App {
       const eventLogger = new InitializationEventLogger(selfUser.id);
       eventLogger.log(AppInitializationStep.AppInitialize);
 
-      onProgress(t('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
+      onProgress(this.translate('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
 
       try {
         await this.core.init(clientType);
@@ -490,7 +498,7 @@ export class App {
       }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
-      configureDownloadPath(teamFeatures);
+      configureDownloadPath(teamFeatures, this.translate);
 
       this.core.configureCoreCallbacks({
         groupIdFromConversationId: async conversationId => {
@@ -521,7 +529,7 @@ export class App {
       const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
       callingRepository.initAvs(selfUser, clientEntity.id);
 
-      onProgress(t('initValidatedClient'));
+      onProgress(this.translate('initValidatedClient'));
 
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type ?? clientType);
@@ -550,7 +558,7 @@ export class App {
         );
       }
 
-      onProgress(t('initReceivedUserData'));
+      onProgress(this.translate('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents(selfUser);
       this._subscribeToBeforeUnload();
@@ -575,7 +583,7 @@ export class App {
            * even when app is already loaded and in the main screen view
            */
           const message = this.config.FEATURE.SHOW_LOADING_INFORMATION
-            ? formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))
+            ? formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp), this.translate)
             : '';
 
           totalNotifications++;
@@ -633,7 +641,7 @@ export class App {
       eventLogger.log(AppInitializationStep.SetupMLS);
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
-      onProgress(t('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
+      onProgress(this.translate('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
 
@@ -887,12 +895,15 @@ export class App {
   };
 
   private readonly showClientCertificateRevokedWarning = async () => {
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.SELF_CERTIFICATE_REVOKED,
-      primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
-    });
+    const {modalOptions, modalType} = getModalOptions(
+      {
+        type: ModalType.SELF_CERTIFICATE_REVOKED,
+        primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
+      },
+      this.translate,
+    );
 
-    PrimaryModal.show(modalType, modalOptions);
+    PrimaryModal.show(modalType, modalOptions, undefined, this.translate);
   };
 
   // Todo: Move this to a separate hook or service
@@ -902,20 +913,25 @@ export class App {
     const e2eiHandler = E2EIHandler.getInstance();
     e2eiHandler.emit('deviceStatusUpdated', {status: 'locked'});
 
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      hideCloseBtn: true,
-      preventClose: true,
-      hideSecondary: true,
-      primaryAction: {
-        action: async () => {
-          await this.repository.lifeCycle.logout(reason, false);
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        hideCloseBtn: true,
+        preventClose: true,
+        hideSecondary: true,
+        primaryAction: {
+          action: async () => {
+            await this.repository.lifeCycle.logout(reason, false);
+          },
+          text: this.translate('modalAccountLogoutAction'),
         },
-        text: t('modalAccountLogoutAction'),
+        text: {
+          title: this.translate('unknownApplicationErrorTitle'),
+          message: this.translate('modalUnableToReceiveMessages'),
+        },
       },
-      text: {
-        title: t('unknownApplicationErrorTitle'),
-        message: t('modalUnableToReceiveMessages'),
-      },
-    });
+      undefined,
+      this.translate,
+    );
   };
 }

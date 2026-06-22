@@ -22,8 +22,8 @@ import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/FederationStopMessage';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {MessageTime} from './MessageTime';
 import {useMessageFocusedTabIndex} from './util';
@@ -36,6 +36,7 @@ interface FederationStopMessageProps {
 const config = Config.getConfig();
 
 const FederationStopMessage = ({message, isMessageFocused}: FederationStopMessageProps) => {
+  const {translate} = useApplicationContext();
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
   const {id, domains} = message;
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -56,8 +57,8 @@ const FederationStopMessage = ({message, isMessageFocused}: FederationStopMessag
           dangerouslySetInnerHTML={{
             __html:
               domains.length === 1
-                ? t('federationDelete', {backendUrl: domains[0]})
-                : t('federationConnectionRemove', {backendUrlOne: domains[0], backendUrlTwo: domains[1]}),
+                ? translate('federationDelete', {backendUrl: domains[0]})
+                : translate('federationConnectionRemove', {backendUrlOne: domains[0], backendUrlTwo: domains[1]}),
           }}
         />
         <Link
@@ -68,7 +69,7 @@ const FederationStopMessage = ({message, isMessageFocused}: FederationStopMessag
           href={config.URL.SUPPORT.FEDERATION_STOP}
           data-uie-name="go-stop-federation"
         >
-          {t('offlineBackendLearnMore')}
+          {translate('offlineBackendLearnMore')}
         </Link>
       </div>
       <p className="message-body-actions">

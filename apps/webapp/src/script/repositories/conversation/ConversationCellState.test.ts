@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CallMessage} from 'Repositories/entity/message/CallMessage';
@@ -25,7 +26,8 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {PingMessage} from 'Repositories/entity/message/PingMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {generateCellState} from './ConversationCellState';
@@ -36,9 +38,9 @@ import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 
 describe('ConversationCellState', () => {
   describe('Notification state icon', () => {
-    const conversationEntity = new Conversation(createUuid());
+    const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
-    const selfUserEntity = new User(createUuid());
+    const selfUserEntity = new User(createUuid(), '', translateForTest);
     selfUserEntity.isMe = true;
     selfUserEntity.teamId = createUuid();
     conversationEntity.selfUser(selfUserEntity);
@@ -46,51 +48,51 @@ describe('ConversationCellState', () => {
     it('returns empty state if notifications are set to everything', () => {
       conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
-      expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'none'});
+      expect(generateCellState(conversationEntity, translate)).toEqual({description: '', icon: 'none'});
     });
 
     it('returns the muted icon if state is set to mentions and replies', () => {
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
 
-      expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'muted'});
+      expect(generateCellState(conversationEntity, translate)).toEqual({description: '', icon: 'muted'});
     });
 
     it('returns the muted icon if no notifications are allowed', () => {
       conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
 
-      expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'muted'});
+      expect(generateCellState(conversationEntity, translate)).toEqual({description: '', icon: 'muted'});
     });
   });
 
   describe('Second line description for conversations', () => {
-    const conversationEntity = new Conversation(createUuid());
+    const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
-    const selfUserEntity = new User(createUuid());
+    const selfUserEntity = new User(createUuid(), '', translateForTest);
     selfUserEntity.isMe = true;
     selfUserEntity.teamId = createUuid();
     conversationEntity.selfUser(selfUserEntity);
 
     conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
-    const sender = new User();
+    const sender = new User('', '', translateForTest);
     sender.name('Felix');
-    const contentMessage = new ContentMessage();
+    const contentMessage = new ContentMessage(undefined, translateForTest);
     const text = new Text('id', 'Hello there');
     contentMessage.user(sender);
     contentMessage.assets([text]);
 
-    const pingMessage = new PingMessage();
+    const pingMessage = new PingMessage(translateForTest);
 
-    const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0);
+    const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0, translateForTest);
 
-    const mention = new ContentMessage();
+    const mention = new ContentMessage(undefined, translateForTest);
     jest.spyOn(mention, 'isUserMentioned').mockReturnValue(true);
 
     const tests = [
       {
         description: 'returns the number of missed calls',
         expected: {
-          description: t('conversationsSecondaryLineSummaryMissedCalls', {number: 2}),
+          description: translate('conversationsSecondaryLineSummaryMissedCalls', {number: 2}),
           icon: ConversationStatusIcon.MISSED_CALL,
         },
         messages: [callMessage, callMessage],
@@ -106,7 +108,7 @@ describe('ConversationCellState', () => {
       {
         description: 'returns the number of pings',
         expected: {
-          description: t('conversationsSecondaryLineSummaryPings', {number: 2}),
+          description: translate('conversationsSecondaryLineSummaryPings', {number: 2}),
           icon: ConversationStatusIcon.UNREAD_PING,
         },
         messages: [pingMessage, pingMessage],
@@ -114,7 +116,7 @@ describe('ConversationCellState', () => {
       {
         description: 'returns the number of mentions',
         expected: {
-          description: t('conversationsSecondaryLineSummaryMentions', {number: 2}),
+          description: translate('conversationsSecondaryLineSummaryMentions', {number: 2}),
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
         messages: [mention, mention],
@@ -122,10 +124,10 @@ describe('ConversationCellState', () => {
       {
         description: 'prioritizes mentions, calls, pings and messages',
         expected: {
-          description: `${t('conversationsSecondaryLineSummaryMentions', {number: 2})}, ${t(
+          description: `${translate('conversationsSecondaryLineSummaryMentions', {number: 2})}, ${translate(
             'conversationsSecondaryLineSummaryMissedCalls',
             {number: 2},
-          )}, ${t('conversationsSecondaryLineSummaryPings', {number: 2})}, ${t('conversationsSecondaryLineSummaryMessages', {number: 2})}`,
+          )}, ${translate('conversationsSecondaryLineSummaryPings', {number: 2})}, ${translate('conversationsSecondaryLineSummaryMessages', {number: 2})}`,
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
         messages: [
@@ -146,7 +148,7 @@ describe('ConversationCellState', () => {
     tests.forEach(({description, expected, messages}) => {
       const expectedOne2One = expected.one2one || expected;
       conversationEntity.messages_unordered(messages);
-      const state = generateCellState(conversationEntity);
+      const state = generateCellState(conversationEntity, translate);
 
       it(`${description} (1:1)`, () => {
         expect(state).toEqual(expectedOne2One);
@@ -157,11 +159,27 @@ describe('ConversationCellState', () => {
     tests.forEach(({description, expected, messages}) => {
       const expectedGroup = expected.group || expected;
       conversationEntity.messages_unordered(messages);
-      const state = generateCellState(conversationEntity);
+      const state = generateCellState(conversationEntity, translate);
 
       it(`${description} (group)`, () => {
         expect(state).toEqual(expectedGroup);
       });
+    });
+
+    it('uses the injected translate function for generated summary copy', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+
+      conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
+      conversationEntity.messages_unordered([callMessage, callMessage]);
+
+      const actualState = generateCellState(conversationEntity, translate);
+      const expectedState = {
+        description: 'translated:conversationsSecondaryLineSummaryMissedCalls',
+        icon: ConversationStatusIcon.MISSED_CALL,
+      };
+
+      expect(actualState).toEqual(expectedState);
+      expect(translate).toHaveBeenCalledWith('conversationsSecondaryLineSummaryMissedCalls', {number: 2});
     });
   });
 });

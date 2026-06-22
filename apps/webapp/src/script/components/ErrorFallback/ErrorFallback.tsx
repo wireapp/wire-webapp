@@ -22,32 +22,39 @@ import {useEffect} from 'react';
 import {FallbackProps} from 'react-error-boundary';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 
 const logger = getLogger('ErrorFallback');
 
 export const ErrorFallback = ({error, resetErrorBoundary}: FallbackProps) => {
+  const {translate} = useApplicationContext();
+
   useEffect(() => {
     const customError = new Error();
     logger.error({originalError: error, originalStack: error?.stack, fallbackInvocationStack: customError.stack});
 
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      preventClose: true,
-      secondaryAction: {
-        action: resetErrorBoundary,
-        text: t('unknownApplicationErrorTryAgain'),
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        preventClose: true,
+        secondaryAction: {
+          action: resetErrorBoundary,
+          text: translate('unknownApplicationErrorTryAgain'),
+        },
+        primaryAction: {
+          action: () => window.location.reload(),
+          text: translate('unknownApplicationErrorReload'),
+        },
+        text: {
+          message: translate('unknownApplicationErrorDescription'),
+          title: translate('unknownApplicationErrorTitle'),
+        },
       },
-      primaryAction: {
-        action: () => window.location.reload(),
-        text: t('unknownApplicationErrorReload'),
-      },
-      text: {
-        message: t('unknownApplicationErrorDescription'),
-        title: t('unknownApplicationErrorTitle'),
-      },
-    });
-  }, [error, resetErrorBoundary]);
+      undefined,
+      translate,
+    );
+  }, [error, resetErrorBoundary, translate]);
 
   return <></>;
 };

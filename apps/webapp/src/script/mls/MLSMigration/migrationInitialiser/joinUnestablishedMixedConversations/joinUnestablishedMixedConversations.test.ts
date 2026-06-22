@@ -29,9 +29,10 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {joinUnestablishedMixedConversations} from '.';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const createMixedConversation = (mockGroupId: string, epoch = 5): MixedConversation => {
-  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MIXED);
+  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MIXED, translateForTest);
   conversation.groupId = mockGroupId;
   conversation.type(CONVERSATION_TYPE.REGULAR);
   conversation.epoch = epoch;
@@ -51,7 +52,7 @@ describe('joinUnestablishedMixedConversations', () => {
     const mixedConversation3 = createMixedConversation('unestablishedGroup3');
     const mixedConversation4 = createMixedConversation('unestablishedGroup4');
 
-    const selfUser = new User(createUuid(), 'domain');
+    const selfUser = new User(createUuid(), 'domain', translateForTest);
     const mockedConversationRepository = await testFactory.exposeConversationActors();
 
     // Use the exact same core instance the repository was constructed with to avoid mismatched spies
@@ -95,7 +96,7 @@ describe('joinUnestablishedMixedConversations', () => {
     const mixedConversation3 = createMixedConversation('unestablishedGroup3', 0);
     const mixedConversation4 = createMixedConversation('unestablishedGroup4', 0);
 
-    const selfUser = new User(createUuid(), 'domain');
+    const selfUser = new User(createUuid(), 'domain', translateForTest);
     const mockedConversationRepository = await testFactory.exposeConversationActors();
     const repositoryCore = (mockedConversationRepository as any).core as Core;
     jest.spyOn(repositoryCore.service!.conversation!, 'mlsGroupExistsLocally').mockImplementation(groupId => {

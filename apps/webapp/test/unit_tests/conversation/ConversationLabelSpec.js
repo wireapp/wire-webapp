@@ -19,6 +19,7 @@
 
 import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 describe('ConversationLabelRepository', () => {
@@ -36,7 +37,7 @@ describe('ConversationLabelRepository', () => {
     createConversation(true),
   ];
 
-  const conversationLabelRepository = new ConversationLabelRepository(conversations, conversations);
+  const conversationLabelRepository = new ConversationLabelRepository(conversations, conversations, {}, translate);
 
   describe('getGroupsWithoutLabel', () => {
     it('returns the right amount of unlabelled group conversations', () => {

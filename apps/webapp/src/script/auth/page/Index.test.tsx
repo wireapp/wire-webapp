@@ -79,7 +79,7 @@ describe('when visiting the index page', () => {
     const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const welcomeText = getByTestId('welcome-text');
-    expect(welcomeText.innerHTML).toContain(Config.getConfig().BACKEND_NAME);
+    expect(welcomeText.textContent).toBe('Welcome to mybrand!');
   });
 
   it('shows the welcome text with custom backend name', () => {
@@ -96,11 +96,11 @@ describe('when visiting the index page', () => {
 
     const welcomeText = getByTestId('welcome-text');
 
-    expect(welcomeText.innerHTML).toContain(customBackendName);
+    expect(welcomeText.textContent).toBe('Welcome to Test!');
   });
 
   it('navigates to login page when clicking login button', async () => {
-    const historyPushSpy = spyOn(history, 'pushState');
+    const historyPushSpy = jest.spyOn(history, 'pushState');
 
     const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
@@ -123,7 +123,7 @@ describe('when visiting the index page', () => {
       },
     });
 
-    const historyPushSpy = spyOn(history, 'pushState');
+    const historyPushSpy = jest.spyOn(history, 'pushState');
 
     const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
@@ -166,7 +166,7 @@ describe('when visiting the index page', () => {
     });
 
     it('show create account button and navigates to account type selection on click', async () => {
-      const historyPushSpy = spyOn(history, 'pushState');
+      const historyPushSpy = jest.spyOn(history, 'pushState');
 
       const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 

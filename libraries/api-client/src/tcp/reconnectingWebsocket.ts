@@ -52,6 +52,8 @@ export type LongRunningRetryDetails = {
   readonly retryDurationInMilliseconds: number;
 };
 
+type IntervalIdentifier = ReturnType<typeof globalThis.setInterval>;
+
 const longRunningRetryThresholdInMilliseconds = TimeUtil.TimeInMillis.MINUTE;
 
 type BackFromSleepHandler = typeof onBackFromSleep;
@@ -61,7 +63,6 @@ type ReconnectingWebsocketWrapper = Pick<
   'binaryType' | 'close' | 'onclose' | 'onerror' | 'onmessage' | 'onopen' | 'readyState' | 'reconnect' | 'send'
 >;
 
-type IntervalIdentifier = ReturnType<typeof globalThis.setInterval>;
 type TimeoutIdentifier = ReturnType<typeof globalThis.setTimeout>;
 
 export type ReconnectingWebsocketWallClock = {

@@ -21,7 +21,7 @@ import {ReactNode} from 'react';
 
 import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {headerStyles, headingStyles, closeButtonStyles} from './CellsModalHeader.styles';
 
@@ -33,6 +33,7 @@ interface CellsModalHeaderProps {
 
 export const CellsModalHeader = ({children}: CellsModalHeaderProps) => {
   const {onClose} = useCellsModal();
+  const {translate} = useApplicationContext();
 
   return (
     <header css={headerStyles}>
@@ -43,7 +44,7 @@ export const CellsModalHeader = ({children}: CellsModalHeaderProps) => {
         type="button"
         css={closeButtonStyles}
         onClick={onClose}
-        aria-label={t('cells.modal.closeButton')}
+        aria-label={translate('cells.modal.closeButton')}
       >
         <CloseIcon />
       </IconButton>

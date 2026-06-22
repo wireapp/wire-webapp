@@ -27,7 +27,7 @@ import {Bold, Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {backendErrorLink, button, warning, wrapper} from '../Warnings.styles';
@@ -98,12 +98,13 @@ function joinWith(elements: React.ReactNode[], separator: string) {
 }
 
 export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, knownUsers}: Props) => {
+  const {translate} = useApplicationContext();
   const [isOpen, setIsOpen] = useState(false);
   const {queued = {}, failed = []} = failedToSend;
 
   const userCount = Array.isArray(queued)
     ? queued.length
-    : Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0) + failed.length;
+    : Object.entries(queued).reduce((count, [, users]) => count + Object.keys(users).length, 0) + failed.length;
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   const showToggle = userCount > 1;
@@ -114,14 +115,14 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
 
   const message = {head: '', rest: ''};
   if (showToggle) {
-    message.head = t('messageFailedToSendParticipants', {count: userCount.toString()});
-    message.rest = t('messageFailedToSendPlural');
+    message.head = translate('messageFailedToSendParticipants', {count: userCount.toString()});
+    message.rest = translate('messageFailedToSendPlural');
   } else if (namedUsers.length === 1) {
     message.head = namedUsers[0].name();
-    message.rest = t('messageFailedToSendWillReceiveSingular');
+    message.rest = translate('messageFailedToSendWillReceiveSingular');
   } else if (unreachableUsers.length === 1) {
-    message.head = t('messageFailedToSendParticipantsFromDomainSingular', {domain: unreachableUsers[0].domain});
-    message.rest = t('messageFailedToSendWillNotReceiveSingular');
+    message.head = translate('messageFailedToSendParticipantsFromDomainSingular', {domain: unreachableUsers[0].domain});
+    message.rest = translate('messageFailedToSendWillNotReceiveSingular');
   }
 
   return (
@@ -150,7 +151,7 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
                     )),
                     ', ',
                   )}
-                  {` ${t('messageFailedToSendWillReceivePlural')}`}
+                  {` ${translate('messageFailedToSendWillReceivePlural')}`}
                 </p>
               )}
 
@@ -162,11 +163,11 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
                     unreachableUsers.map(user => (
                       <Bold css={warning} data-uie-name="unreachable-domain" key={user.domain + user.count.toString()}>
                         {user.count > 1
-                          ? t('messageFailedToSendParticipantsFromDomainPlural', {
+                          ? translate('messageFailedToSendParticipantsFromDomainPlural', {
                               count: user.count.toString(),
                               domain: user.domain,
                             })
-                          : t('messageFailedToSendParticipantsFromDomainSingular', {
+                          : translate('messageFailedToSendParticipantsFromDomainSingular', {
                               domain: user.domain,
                             })}
                       </Bold>
@@ -174,8 +175,8 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
                     ', ',
                   )}
                   {unreachableUsers.length === 1
-                    ? ` ${t('messageFailedToSendWillNotReceiveSingular')}`
-                    : ` ${t('messageFailedToSendWillNotReceivePlural')}`}{' '}
+                    ? ` ${translate('messageFailedToSendWillNotReceiveSingular')}`
+                    : ` ${translate('messageFailedToSendWillNotReceivePlural')}`}{' '}
                   <Link
                     tabIndex={messageFocusedTabIndex}
                     targetBlank
@@ -184,7 +185,7 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
                     data-uie-name="go-offline-backend"
                     css={backendErrorLink}
                   >
-                    {t('offlineBackendLearnMore')}
+                    {translate('offlineBackendLearnMore')}
                   </Link>
                 </p>
               )}
@@ -197,7 +198,7 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
             variant={ButtonVariant.TERTIARY}
             onClick={() => setIsOpen(state => !state)}
           >
-            {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
+            {isOpen ? translate('messageFailedToSendHideDetails') : translate('messageFailedToSendShowDetails')}
           </Button>
         </>
       )}

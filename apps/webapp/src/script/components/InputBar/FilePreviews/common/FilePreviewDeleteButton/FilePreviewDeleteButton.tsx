@@ -18,7 +18,7 @@
  */
 
 import {CloseIcon} from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles, iconStyles} from './FilePreviewDeleteButton.styles';
 
@@ -27,7 +27,8 @@ interface FilePreviewDeleteButtonProps {
 }
 
 export const FilePreviewDeleteButton = ({onDelete}: FilePreviewDeleteButtonProps) => {
-  const label = t('conversationFilePreviewDeleteButtonLabel');
+  const {translate} = useApplicationContext();
+  const label = translate('conversationFilePreviewDeleteButtonLabel');
   return (
     <button type="button" onClick={onDelete} css={buttonStyles} aria-label={label} title={label}>
       <CloseIcon width={12} height={12} css={iconStyles} />

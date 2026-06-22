@@ -31,9 +31,9 @@ import {
 } from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/fileTypeUtil';
-import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
 import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';
@@ -48,7 +48,6 @@ import {useDeleteNode} from './useDeleteNode/useDeleteNode';
 import {useRestoreNestedNode} from './useRestoreNestedNode/useRestoreNestedNode';
 import {useRestoreParentNode} from './useRestoreParentNode/useRestoreParentNode';
 
-import {useApplicationContext} from '../../../../../../page/RootProvider';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareModal} from '../CellsNodeShareModal/CellsNodeShareModal';
 
@@ -69,12 +68,14 @@ export const CellsTableRowOptions = ({
   onRefresh,
   onCloseSearchView,
 }: CellsTableRowOptionsProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
-        <button css={buttonStyles} aria-label={t('cells.options.label')}>
+        <button css={buttonStyles} aria-label={translate('cells.options.label')}>
           <MoreIcon css={iconStyles} />
-          <span css={textStyles}>{t('cells.options.label')}</span>
+          <span css={textStyles}>{translate('cells.options.label')}</span>
         </button>
       </DropdownMenu.Trigger>
       <CellsTableRowOptionsContent
@@ -97,7 +98,7 @@ const CellsTableRowOptionsContent = ({
   onRefresh,
   onCloseSearchView,
 }: CellsTableRowOptionsProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {handleOpenFile} = useCellsFilePreviewModal();
   const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
@@ -108,7 +109,7 @@ const CellsTableRowOptionsContent = ({
   const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
 
   const restoreNodeFailedNotification = useAppNotification({
-    message: t('cells.restore.error'),
+    message: translate('cells.restore.error'),
   });
 
   const {restoreNestedNode} = useRestoreNestedNode({
@@ -128,6 +129,7 @@ const CellsTableRowOptionsContent = ({
   const {deleteNode} = useDeleteNode({
     conversationQualifiedId,
     cellsRepository,
+    deleteNodeFailedMessage: translate('cells.deleteModal.error'),
   });
 
   const isRootRecycleBin = isRootRecycleBinPath();
@@ -149,25 +151,28 @@ const CellsTableRowOptionsContent = ({
               ? showRestoreRootNodeModal({
                   node,
                   onRestoreNode: restoreNestedNode,
+                  translate,
                 })
               : showRestoreNestedNodeModal({
                   node,
                   onRestoreNode: restoreParentNode,
                   parentNodeName: rootParentName,
+                  translate,
                 })
           }
         >
-          {t('cells.options.restore')}
+          {translate('cells.options.restore')}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showDeletePermanentlyModal({
               node,
               onDeletePermanently: () => deleteNode({uuid: node.id, permanently: true}),
+              translate,
             })
           }
         >
-          {t('cells.options.deletePermanently')}
+          {translate('cells.options.deletePermanently')}
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     );
@@ -183,7 +188,7 @@ const CellsTableRowOptionsContent = ({
               : handleOpenFile(node)
           }
         >
-          {t('cells.options.open')}
+          {translate('cells.options.open')}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
@@ -193,27 +198,34 @@ const CellsTableRowOptionsContent = ({
               conversationId: conversationQualifiedId.id,
               cellsRepository,
               fireAndForgetInvoker,
+              translate,
             })
           }
         >
-          {t('cells.options.share')}
+          {translate('cells.options.share')}
         </DropdownMenu.Item>
 
         {url !== undefined && url.length > 0 && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
-            {t('cells.options.download')}
+            {translate('cells.options.download')}
           </DropdownMenu.Item>
         )}
         <DropdownMenu.Item onClick={() => setIsRenameNodeModalOpen(true)}>
-          {t('cells.options.rename')}
+          {translate('cells.options.rename')}
         </DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>{t('cells.options.move')}</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>
+          {translate('cells.options.move')}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>
+          {translate('cells.options.tags')}
+        </DropdownMenu.Item>
         {isEditable && (
           <>
-            <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+            <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>
+              {translate('cells.options.edit')}
+            </DropdownMenu.Item>
             <DropdownMenu.Item onClick={() => showModal(node.id, onConfirmRestore)}>
-              {t('cells.options.versionHistory')}
+              {translate('cells.options.versionHistory')}
             </DropdownMenu.Item>
           </>
         )}
@@ -222,10 +234,11 @@ const CellsTableRowOptionsContent = ({
             showMoveToRecycleBinModal({
               node,
               onMoveToRecycleBin: () => deleteNode({uuid: node.id, permanently: false}),
+              translate,
             })
           }
         >
-          {t('cells.options.delete')}
+          {translate('cells.options.delete')}
         </DropdownMenu.Item>
       </DropdownMenu.Content>
       <CellsMoveNodeModal

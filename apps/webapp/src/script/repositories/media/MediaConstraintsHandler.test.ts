@@ -23,6 +23,7 @@ import {UserState} from 'Repositories/user/userState';
 import {createUuid} from 'Util/uuid';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
+import {translateForTest} from 'Util/test/translateForTest';
 
 interface SelectedDeviceId {
   exact?: string;
@@ -75,7 +76,7 @@ describe('MediaConstraintsHandler', () => {
 
   const createConstraintsHandler = (selfUserId = createUuid()) => {
     const userState = {
-      self: () => new User(selfUserId, ''),
+      self: () => new User(selfUserId, '', translateForTest),
     };
     return new MediaConstraintsHandler(userState as UserState);
   };

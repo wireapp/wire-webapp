@@ -23,7 +23,7 @@ import {FormattedMessage} from 'react-intl';
 
 import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Config} from '../../Config';
 import {WirelessContainer} from '../component/WirelessContainer';
@@ -31,6 +31,7 @@ import {WirelessContainer} from '../component/WirelessContainer';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const ConversationJoinInvalid = ({}: Props) => {
+  const {translate} = useApplicationContext();
   return (
     <WirelessContainer>
       <ContainerXS style={{margin: 'auto'}}>
@@ -43,7 +44,7 @@ const ConversationJoinInvalid = ({}: Props) => {
           />
         </H2>
         <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-invalid-text">
-          {t('conversationJoin.invalidSubhead')}
+          {translate('conversationJoin.invalidSubhead')}
         </Text>
       </ContainerXS>
     </WirelessContainer>
@@ -51,6 +52,7 @@ const ConversationJoinInvalid = ({}: Props) => {
 };
 
 const ConversationJoinFull = ({}: Props) => {
+  const {translate} = useApplicationContext();
   return (
     <WirelessContainer>
       <ContainerXS style={{margin: 'auto 0'}}>
@@ -58,7 +60,7 @@ const ConversationJoinFull = ({}: Props) => {
           <FormattedMessage id="conversationJoin.fullConversationHeadline" />
         </H2>
         <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-full-text">
-          {t('conversationJoin.fullConversationSubhead')}
+          {translate('conversationJoin.fullConversationSubhead')}
         </Text>
       </ContainerXS>
     </WirelessContainer>

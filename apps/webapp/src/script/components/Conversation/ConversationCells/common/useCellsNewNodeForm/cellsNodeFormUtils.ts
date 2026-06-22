@@ -19,7 +19,6 @@
 
 import {Maybe} from 'true-myth';
 
-import {t} from 'Util/localizerUtil';
 import {isAxiosError} from 'Util/typePredicateUtil';
 
 export const ITEM_ALREADY_EXISTS_ERROR = 409;
@@ -27,36 +26,50 @@ export const NODE_NAME_MAX_LENGTH = 64;
 
 const INVALID_NODE_NAME_PATTERN = /[\\/"]/u;
 
-export const getNameValidationError = (name: string): Maybe<string> => {
+export type CellsNewNodeFormValidationCopy = {
+  readonly genericError: string;
+  readonly alreadyExistsError: string;
+  readonly invalidCharactersError: string;
+  readonly maxLengthError: string;
+  readonly nameRequired: string;
+};
+
+export const getNameValidationError = (name: string, validationCopy: CellsNewNodeFormValidationCopy): Maybe<string> => {
   if (!name) {
-    return Maybe.just(t('cells.newItemMenuModalForm.nameRequired'));
+    return Maybe.just(validationCopy.nameRequired);
   }
 
   return Maybe.nothing();
 };
 
-export const getClientSideNodeNameError = (name: string): Maybe<string> => {
-  const requiredNameError = getNameValidationError(name);
+export const getClientSideNodeNameError = (
+  name: string,
+  validationCopy: CellsNewNodeFormValidationCopy,
+): Maybe<string> => {
+  const requiredNameError = getNameValidationError(name, validationCopy);
   if (requiredNameError.isJust) {
     return requiredNameError;
   }
 
   if (name.length > NODE_NAME_MAX_LENGTH) {
-    return Maybe.just(t('cells.newItemMenuModalForm.maxLengthError'));
+    return Maybe.just(validationCopy.maxLengthError);
   }
 
   if (name.startsWith('.') || INVALID_NODE_NAME_PATTERN.test(name)) {
-    return Maybe.just(t('cells.newItemMenuModalForm.invalidCharactersError'));
+    return Maybe.just(validationCopy.invalidCharactersError);
   }
 
   return Maybe.nothing();
 };
 
-export const isClientSideNodeNameError = (error: string | null): Maybe<boolean> => {
+export const isClientSideNodeNameError = (
+  error: string | null,
+  validationCopy: CellsNewNodeFormValidationCopy,
+): Maybe<boolean> => {
   const clientSideNameErrors = new Set([
-    t('cells.newItemMenuModalForm.nameRequired'),
-    t('cells.newItemMenuModalForm.maxLengthError'),
-    t('cells.newItemMenuModalForm.invalidCharactersError'),
+    validationCopy.nameRequired,
+    validationCopy.maxLengthError,
+    validationCopy.invalidCharactersError,
   ]);
 
   return Maybe.of(error).map(errorMessage => clientSideNameErrors.has(errorMessage));

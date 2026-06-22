@@ -272,7 +272,7 @@ test.describe('Group Conversation', () => {
   );
 
   test(
-    'As a group member I should not see group admin toggle while viewing Admin`s profile in Conversation details',
+    "As a group member I should not see group admin toggle while viewing Admin's profile in Conversation details",
     {tag: ['@TC-1483', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([

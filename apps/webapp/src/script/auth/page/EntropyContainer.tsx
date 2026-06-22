@@ -21,8 +21,8 @@ import React, {useEffect, useState} from 'react';
 
 import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
 
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {styles} from './EntropyContainer.styles';
 
@@ -39,13 +39,14 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 }
 
 const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
+  const {translate} = useApplicationContext();
   const [entropy, setEntropy] = useState<EntropyData>(new EntropyData());
   const [pause, setPause] = useState<boolean | undefined>(undefined);
   const [percent, setPercent] = useState(0);
   const [progressAnnouncement, setProgressAnnouncement] = useState('');
   const [lastAnnouncedMilestone, setLastAnnouncedMilestone] = useState(0);
 
-  const entropyInstruction = t('setEntropy.a11yInstruction');
+  const entropyInstruction = translate('setEntropy.a11yInstruction');
 
   useEffect(() => {
     const clampedPercent = Math.min(PROGRESS_COMPLETE_PERCENT, Math.max(0, percent));
@@ -56,8 +57,8 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
     }
 
     setLastAnnouncedMilestone(milestone);
-    setProgressAnnouncement(t('setEntropy.progressAnnouncement', {percent: milestone}));
-  }, [lastAnnouncedMilestone, percent]);
+    setProgressAnnouncement(translate('setEntropy.progressAnnouncement', {percent: milestone}));
+  }, [lastAnnouncedMilestone, percent, translate]);
 
   const onProgress = (entropyData: EntropyData, percentage: number, pause: boolean) => {
     setEntropy(entropyData);
@@ -74,13 +75,13 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
   return (
     <ContainerSM centerText verticalCenter style={styles.container}>
       <H1 center css={styles.headline}>
-        {t('setEntropy.headline')}
+        {translate('setEntropy.headline')}
       </H1>
       {percent >= PROGRESS_COMPLETE_PERCENT ? (
         <>
           <CheckRoundIcon width={64} height={64} css={styles.successIcon} />
           <Muted center style={styles.successText}>
-            {t('setEntropy.success')}
+            {translate('setEntropy.success')}
           </Muted>
           <Button
             css={styles.continueButton}
@@ -88,13 +89,13 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
             data-uie-name="do-entropy-confirm"
             onKeyDown={event => handleEnterDown(event, () => forwardEntropy(entropy.entropyData))}
           >
-            {t('setEntropy.continue')}
+            {translate('setEntropy.continue')}
           </Button>
         </>
       ) : (
         <>
           <Muted center css={styles.subheadline}>
-            {t('setEntropy.subheadline')}
+            {translate('setEntropy.subheadline')}
           </Muted>
           <EntropyCanvas
             css={styles.entropyCanvas(pause === true)}
@@ -110,7 +111,7 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
             error={pause === true}
             width={containerSize}
             percent={percent}
-            ariaLabel={t('setEntropy.progressAriaLabel')}
+            ariaLabel={translate('setEntropy.progressAriaLabel')}
           />
           <div aria-live="polite" aria-atomic="true" style={styles.screenReaderOnly}>
             {progressAnnouncement}

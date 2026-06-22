@@ -20,6 +20,7 @@
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 
 import {CellsFilePreviewModal} from './CellsFilePreviewModal/CellsFilePreviewModal';
@@ -40,9 +41,11 @@ interface CellsTableProps {
 }
 
 export const CellsTable = ({nodes, cellsRepository}: CellsTableProps) => {
+  const {translate} = useApplicationContext();
+
   const table = useReactTable({
     data: nodes,
-    columns: getCellsTableColumns({cellsRepository}),
+    columns: getCellsTableColumns({cellsRepository, translate}),
     getCoreRowModel: getCoreRowModel(),
   });
 

@@ -19,17 +19,18 @@
 
 import {useId} from 'react';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {authorLabel, description, header, panel} from 'Components/panel/ServiceDetails.styles';
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 interface ServiceDetailsProps {
   service: ServiceEntity;
 }
 
 const ServiceDetails = ({service}: ServiceDetailsProps) => {
+  const {translate} = useApplicationContext();
   const {providerName, name, author} = useKoSubscribableChildren(service, ['providerName', 'name', 'author']);
 
   const descriptionId = useId();
@@ -54,11 +55,11 @@ const ServiceDetails = ({service}: ServiceDetailsProps) => {
         </div>
       </div>
 
-      <p css={authorLabel}>{t('serviceDetailsAuthor', {author: author ?? ''})}</p>
+      <p css={authorLabel}>{translate('serviceDetailsAuthor', {author: author ?? ''})}</p>
 
       <div css={description}>
         <div id={descriptionId} css={description.headline}>
-          {t('serviceDetailsDescription')}
+          {translate('serviceDetailsDescription')}
         </div>
         <p aria-labelledby={descriptionId} data-uie-name="status-service-description">
           {service.description}

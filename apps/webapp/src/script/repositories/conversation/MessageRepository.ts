@@ -85,7 +85,7 @@ import {
   clearLinkPreviewSendingState,
   shouldSendLinkPreviewForMessage,
 } from 'Util/linkPreviewSender';
-import {Declension, joinNames, t} from 'Util/localizerUtil';
+import {type Translate, Declension, joinNames} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {isMarkdownText} from 'Util/markdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
@@ -181,6 +181,7 @@ export class MessageRepository {
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -190,7 +191,7 @@ export class MessageRepository {
     this.logger = getLogger('MessageRepository');
 
     this.eventService = eventRepository.eventService;
-    this.event_mapper = new EventMapper();
+    this.event_mapper = new EventMapper(undefined, this.translate);
 
     this.isBlockingNotificationHandling = true;
 
@@ -536,11 +537,11 @@ export class MessageRepository {
     quoteEntity?: OutgoingQuote,
   ): Promise<void> {
     if (!tag) {
-      tag = t('extensionsGiphyRandom');
+      tag = this.translate('extensionsGiphyRandom');
     }
 
     const blob = await loadUrlBlob(url);
-    const textMessage = t('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
+    const textMessage = this.translate('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
     this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity});
     return this.uploadImages(conversationEntity, [blob]);
   }
@@ -845,7 +846,7 @@ export class MessageRepository {
   ): Promise<boolean> {
     const conversationDegraded = conversation.verification_state() === ConversationVerificationState.DEGRADED;
     if (showLegalHoldWarning) {
-      return showLegalHoldWarningModal(conversation, conversationDegraded)
+      return showLegalHoldWarningModal(conversation, conversationDegraded, this.translate)
         .then(() => true)
         .catch(() => false);
     }
@@ -854,27 +855,30 @@ export class MessageRepository {
     }
 
     const users = conversation.getUsersWithUnverifiedClients();
-    const userNames = joinNames(users, Declension.NOMINATIVE);
+    const userNames = joinNames(users, this.translate, Declension.NOMINATIVE);
     const titleSubstitutions = capitalizeFirstChar(userNames);
 
     const [actionString, messageString] = {
       [CONSENT_TYPE.INCOMING_CALL]: [
-        t('modalConversationNewDeviceIncomingCallAction'),
-        t('modalConversationNewDeviceIncomingCallMessage'),
+        this.translate('modalConversationNewDeviceIncomingCallAction'),
+        this.translate('modalConversationNewDeviceIncomingCallMessage'),
       ],
       [CONSENT_TYPE.OUTGOING_CALL]: [
-        t('modalConversationNewDeviceOutgoingCallAction'),
-        t('modalConversationNewDeviceOutgoingCallMessage'),
+        this.translate('modalConversationNewDeviceOutgoingCallAction'),
+        this.translate('modalConversationNewDeviceOutgoingCallMessage'),
       ],
-      [CONSENT_TYPE.MESSAGE]: [t('modalConversationNewDeviceAction'), t('modalConversationNewDeviceMessage')],
+      [CONSENT_TYPE.MESSAGE]: [
+        this.translate('modalConversationNewDeviceAction'),
+        this.translate('modalConversationNewDeviceMessage'),
+      ],
     }[consentType];
 
     const baseTitle =
       users.length > 1
-        ? t('modalConversationNewDeviceHeadlineMany', {users: titleSubstitutions})
-        : t('modalConversationNewDeviceHeadlineOne', {user: titleSubstitutions});
+        ? this.translate('modalConversationNewDeviceHeadlineMany', {users: titleSubstitutions})
+        : this.translate('modalConversationNewDeviceHeadlineOne', {user: titleSubstitutions});
     const titleString = users[0].isMe
-      ? t('modalConversationNewDeviceHeadlineYou', {user: titleSubstitutions})
+      ? this.translate('modalConversationNewDeviceHeadlineYou', {user: titleSubstitutions})
       : baseTitle;
 
     return new Promise(resolve => {
@@ -893,7 +897,7 @@ export class MessageRepository {
         },
       };
 
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, options, `degraded-${conversation.id}`);
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, options, `degraded-${conversation.id}`, this.translate);
     });
   }
 
@@ -1330,7 +1334,7 @@ export class MessageRepository {
       .some(user => matchQualifiedIds(senderId, user.qualifiedId));
 
     if (!senderInConversation) {
-      message.setButtonError(buttonId, t('buttonActionError'));
+      message.setButtonError(buttonId, this.translate('buttonActionError'));
       message.waitingButtonId(undefined);
       return;
     }
@@ -1348,7 +1352,7 @@ export class MessageRepository {
       await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
     } catch (error: unknown) {
       message.waitingButtonId(undefined);
-      return message.setButtonError(buttonId, t('buttonActionError'));
+      return message.setButtonError(buttonId, this.translate('buttonActionError'));
     }
   }
 
