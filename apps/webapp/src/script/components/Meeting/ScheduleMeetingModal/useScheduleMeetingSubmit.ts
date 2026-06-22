@@ -43,12 +43,17 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
 
         if (result.status !== 'success') {
           const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[result.status];
-          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-            text: {
-              title: translate(titleKey),
-              message: translate(messageKey),
+          PrimaryModal.show(
+            PrimaryModal.type.ACKNOWLEDGE,
+            {
+              text: {
+                title: translate(titleKey),
+                message: translate(messageKey),
+              },
             },
-          });
+            undefined,
+            translate,
+          );
           return false;
         }
 
