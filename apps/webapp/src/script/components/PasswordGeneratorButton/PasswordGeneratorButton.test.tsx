@@ -21,25 +21,17 @@ import {act} from 'react';
 import {render} from '@testing-library/react';
 
 import {translateForTest} from 'Util/test/translateForTest';
-import {
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {PasswordGeneratorButton} from './PasswordGeneratorButton';
 
 import {withTheme} from '../../auth/util/test/TestUtil';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
-
 describe('PasswordGeneratorButton', () => {
   it('calls onGeneratePassword prop with a random password when clicked', () => {
     const onGeneratePasswordMock = jest.fn();
-    const {getByTestId} = render(withTheme(<PasswordGeneratorButton onGeneratePassword={onGeneratePasswordMock} />), {
-      wrapper: rootProviderWrapper,
-    });
+    const {getByTestId} = render(
+      withTheme(<PasswordGeneratorButton translate={translateForTest} onGeneratePassword={onGeneratePasswordMock} />),
+    );
     const generatePasswordButton = getByTestId('do-generate-password');
 
     act(() => {
@@ -53,8 +45,13 @@ describe('PasswordGeneratorButton', () => {
   it('calls onGeneratePassword prop with a random password with 15 charachters when clicked', () => {
     const onGeneratePasswordMock = jest.fn();
     const {getByTestId} = render(
-      withTheme(<PasswordGeneratorButton passwordLength={15} onGeneratePassword={onGeneratePasswordMock} />),
-      {wrapper: rootProviderWrapper},
+      withTheme(
+        <PasswordGeneratorButton
+          translate={translateForTest}
+          passwordLength={15}
+          onGeneratePassword={onGeneratePasswordMock}
+        />,
+      ),
     );
     const generatePasswordButton = getByTestId('do-generate-password');
 
@@ -67,18 +64,18 @@ describe('PasswordGeneratorButton', () => {
   });
 
   it('displays a shield icon next to the button label', () => {
-    const {getByTestId} = render(withTheme(<PasswordGeneratorButton onGeneratePassword={jest.fn()} />), {
-      wrapper: rootProviderWrapper,
-    });
+    const {getByTestId} = render(
+      withTheme(<PasswordGeneratorButton translate={translateForTest} onGeneratePassword={jest.fn()} />),
+    );
     const shieldIcon = getByTestId('generate-password-icon');
     expect(shieldIcon).toBeTruthy();
   });
 
   it('uses the onGeneratePassword prop to generate a new password each time the button is clicked', () => {
     const onGeneratePasswordMock = jest.fn();
-    const {getByTestId} = render(withTheme(<PasswordGeneratorButton onGeneratePassword={onGeneratePasswordMock} />), {
-      wrapper: rootProviderWrapper,
-    });
+    const {getByTestId} = render(
+      withTheme(<PasswordGeneratorButton translate={translateForTest} onGeneratePassword={onGeneratePasswordMock} />),
+    );
     const generatePasswordButton = getByTestId('do-generate-password');
 
     act(() => {

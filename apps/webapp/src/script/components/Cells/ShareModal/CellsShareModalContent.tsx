@@ -257,6 +257,7 @@ export const CellsShareModalContent = ({
           <div css={styles.passwordContentStyles}>
             <div css={styles.passwordActionButtonStyles}>
               <PasswordGeneratorButton
+                translate={translate}
                 passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
                 onGeneratePassword={password.onGeneratePassword}
               />
