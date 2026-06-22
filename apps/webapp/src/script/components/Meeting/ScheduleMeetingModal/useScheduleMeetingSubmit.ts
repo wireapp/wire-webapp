@@ -17,9 +17,9 @@
  *
  */
 
-import {useCallback, useContext, useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
-import {RootContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {ScheduleMeetingNotifierImpl} from './scheduleMeetingNotifier';
 import {ScheduleMeetingService} from './scheduleMeetingService';
@@ -27,13 +27,10 @@ import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void>) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const rootContext = useContext(RootContext);
-  const meetingsRepository = rootContext?.mainViewModel.content.repositories.meetings;
+  const {mainViewModel} = useApplicationContext();
+  const meetingsRepository = mainViewModel.content.repositories.meetings;
 
   const scheduleMeetingService = useMemo(() => {
-    if (!meetingsRepository) {
-      throw new Error('Meetings repository not found');
-    }
     return new ScheduleMeetingService(
       meetingsRepository,
       {fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve()},

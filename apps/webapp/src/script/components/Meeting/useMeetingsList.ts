@@ -17,15 +17,15 @@
  *
  */
 
-import {useCallback, useContext, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {loadMeetingsList, type MeetingsListErrorKey} from 'Components/Meeting/loadMeetingsList';
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import {RootContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useMeetingsList = () => {
-  const rootContext = useContext(RootContext);
-  const meetingsRepository = rootContext?.mainViewModel.content.repositories.meetings;
+  const {mainViewModel} = useApplicationContext();
+  const meetingsRepository = mainViewModel.content.repositories.meetings;
 
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,12 +34,6 @@ export const useMeetingsList = () => {
   const fetchMeetings = useCallback(async () => {
     setIsLoading(true);
     setErrorKey(undefined);
-
-    if (!meetingsRepository) {
-      setErrorKey('meetings.list.loadError');
-      setIsLoading(false);
-      return;
-    }
 
     const result = await loadMeetingsList(meetingsRepository);
 
