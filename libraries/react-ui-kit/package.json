@@ -21,7 +21,7 @@
     "@types/color": "3.0.7",
     "color": "4.2.3",
     "emotion-normalize": "11.0.1",
-    "react-aria-components": "1.18.0",
+    "react-aria-components": "1.19.0",
     "react-select": "5.10.2",
     "react-transition-group": "4.4.5"
   },
