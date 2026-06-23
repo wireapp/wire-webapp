@@ -50,7 +50,7 @@ export const getCellsTableColumns = ({
   columnHelper.accessor('name', {
     header: () => (
       <CellsTableSortableHeader
-        label={t('cells.tableRow.name')}
+        label={translate('cells.tableRow.name')}
         direction={getDirectionFor('name_ci')}
         onClick={() => onToggleSort('name_ci')}
       />
@@ -75,7 +75,7 @@ export const getCellsTableColumns = ({
   columnHelper.accessor('sizeMb', {
     header: () => (
       <CellsTableSortableHeader
-        label={t('cells.tableRow.size')}
+        label={translate('cells.tableRow.size')}
         direction={getDirectionFor('size')}
         onClick={() => onToggleSort('size')}
       />
@@ -86,7 +86,7 @@ export const getCellsTableColumns = ({
   columnHelper.accessor('uploadedAtTimestamp', {
     header: () => (
       <CellsTableSortableHeader
-        label={t('cells.tableRow.created')}
+        label={translate('cells.tableRow.created')}
         direction={getDirectionFor('mtime')}
         onClick={() => onToggleSort('mtime')}
       />
