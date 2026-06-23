@@ -87,6 +87,22 @@ describe('tryScheduleMeeting', () => {
     expect(createMeeting).not.toHaveBeenCalled();
   });
 
+  it('returns missingTimes and does not call API', async () => {
+    const {deps, createMeeting} = createDeps();
+
+    await expect(
+      tryScheduleMeeting(
+        {
+          ...formState,
+          start: maybe.nothing(),
+        },
+        deps,
+      ),
+    ).resolves.toEqual({status: 'missingTimes'});
+
+    expect(createMeeting).not.toHaveBeenCalled();
+  });
+
   it('returns createFailed when API fails', async () => {
     const {deps, fetchMeetings} = createDeps({
       createMeeting: jest.fn().mockRejectedValue(new Error('network')),
@@ -174,6 +190,24 @@ describe('tryUpdateMeeting', () => {
         deps,
       ),
     ).resolves.toEqual({status: 'participantMissingEmail'});
+
+    expect(updateMeeting).not.toHaveBeenCalled();
+  });
+
+  it('returns missingTimes and does not call API', async () => {
+    const {deps, updateMeeting} = createDeps();
+
+    await expect(
+      tryUpdateMeeting(
+        meetingId,
+        {
+          ...formState,
+          end: maybe.nothing(),
+        },
+        [],
+        deps,
+      ),
+    ).resolves.toEqual({status: 'missingTimes'});
 
     expect(updateMeeting).not.toHaveBeenCalled();
   });

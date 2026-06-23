@@ -25,12 +25,11 @@ import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository'
 
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
-export type ScheduleMeetingResult =
-  | {status: 'success'}
-  | {status: 'participantMissingEmail'}
-  | {status: 'createFailed'};
+import type {ScheduleFormErrors} from '../ScheduleFormErrors';
 
-export type UpdateMeetingResult = {status: 'success'} | {status: 'participantMissingEmail'} | {status: 'updateFailed'};
+export type ScheduleMeetingResult = {status: 'success'} | {status: ScheduleFormErrors} | {status: 'createFailed'};
+
+export type UpdateMeetingResult = {status: 'success'} | {status: ScheduleFormErrors} | {status: 'updateFailed'};
 
 export type TryScheduleMeetingDependencies = {
   meetingsRepository: MeetingsRepository;
@@ -49,15 +48,15 @@ export async function tryScheduleMeeting(
   formState: ScheduleMeetingFormState,
   dependencies: TryScheduleMeetingDependencies,
 ): Promise<ScheduleMeetingResult> {
-  const mapping = mapScheduleFormToCreateMeeting(formState);
+  const mappingResult = mapScheduleFormToCreateMeeting(formState);
 
-  if (mapping.error === 'participantMissingEmail') {
-    return {status: 'participantMissingEmail'};
+  if (mappingResult.isErr) {
+    return {status: mappingResult.error};
   }
 
   try {
     const {meetingsRepository, fetchMeetings} = dependencies;
-    await meetingsRepository.createMeeting(mapping.payload);
+    await meetingsRepository.createMeeting(mappingResult.value);
     await fetchMeetings();
     return {status: 'success'};
   } catch {
@@ -74,25 +73,26 @@ export async function tryUpdateMeeting(
   originalInvitedEmails: string[],
   dependencies: TryUpdateMeetingDependencies,
 ): Promise<UpdateMeetingResult> {
-  const mapping = mapScheduleFormToUpdateMeeting(formState, originalInvitedEmails);
+  const mappingResult = mapScheduleFormToUpdateMeeting(formState, originalInvitedEmails);
 
-  if (mapping.error === 'participantMissingEmail') {
-    return {status: 'participantMissingEmail'};
+  if (mappingResult.isErr) {
+    return {status: mappingResult.error};
   }
 
+  const {payload, addedEmails, removedEmails} = mappingResult.value;
   const {meetingsRepository, fetchMeetings} = dependencies;
   let didUpdateMeeting = false;
 
   try {
-    await meetingsRepository.updateMeeting(meetingId, mapping.payload);
+    await meetingsRepository.updateMeeting(meetingId, payload);
     didUpdateMeeting = true;
 
-    if (mapping.removedEmails.length > 0) {
-      await meetingsRepository.removeMeetingInvitation(meetingId, mapping.removedEmails);
+    if (removedEmails.length > 0) {
+      await meetingsRepository.removeMeetingInvitation(meetingId, removedEmails);
     }
 
-    if (mapping.addedEmails.length > 0) {
-      await meetingsRepository.addMeetingInvitation(meetingId, mapping.addedEmails);
+    if (addedEmails.length > 0) {
+      await meetingsRepository.addMeetingInvitation(meetingId, addedEmails);
     }
 
     await fetchMeetings();

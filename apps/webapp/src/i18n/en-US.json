@@ -1290,6 +1290,7 @@
   "meetings.scheduleModal.error.createFailed": "Something went wrong while scheduling the meeting. Please try again.",
   "meetings.scheduleModal.error.createFailedTitle": "Could not schedule meeting",
   "meetings.scheduleModal.error.endBeforeStart": "End time must be after start time",
+  "meetings.scheduleModal.error.missingTimes": "Start and end times are required.",
   "meetings.scheduleModal.error.participantMissingEmail": "One or more selected participants do not have an email address and cannot be invited.",
   "meetings.scheduleModal.error.titleRequired": "Title is required",
   "meetings.scheduleModal.error.updateFailed": "Something went wrong while updating the meeting. Please try again.",

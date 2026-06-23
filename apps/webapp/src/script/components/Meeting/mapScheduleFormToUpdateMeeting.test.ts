@@ -19,6 +19,7 @@
 
 import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
 import {maybe} from 'true-myth';
+import {unwrap, unwrapErr} from 'true-myth/test-support';
 
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
@@ -63,15 +64,15 @@ describe('mapScheduleFormToUpdateMeeting', () => {
       ['alice@wire.com', 'bob@wire.com'],
     );
 
-    expect(result.error).toBeUndefined();
-    expect(result.payload).toEqual({
+    expect(result.isOk).toBe(true);
+    expect(unwrap(result).payload).toEqual({
       title: 'Weekly sync',
       start_time: '2026-06-15T10:00:00.000Z',
       end_time: '2026-06-15T11:00:00.000Z',
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
     });
-    expect(result.addedEmails).toEqual(['charlie@wire.com']);
-    expect(result.removedEmails).toEqual(['bob@wire.com']);
+    expect(unwrap(result).addedEmails).toEqual(['charlie@wire.com']);
+    expect(unwrap(result).removedEmails).toEqual(['bob@wire.com']);
   });
 
   it('returns participantMissingEmail when a selected user has no email', () => {
@@ -83,7 +84,20 @@ describe('mapScheduleFormToUpdateMeeting', () => {
       ['alice@wire.com'],
     );
 
-    expect(result.error).toBe('participantMissingEmail');
-    expect(result.payload).toBeUndefined();
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe('participantMissingEmail');
+  });
+
+  it('returns missingTimes when start or end is missing', () => {
+    const result = mapScheduleFormToUpdateMeeting(
+      {
+        ...baseFormState(),
+        end: maybe.nothing(),
+      },
+      ['alice@wire.com'],
+    );
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe('missingTimes');
   });
 });

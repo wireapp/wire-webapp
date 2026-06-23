@@ -26,6 +26,10 @@ type UpdateMeetingErrorStatus = Exclude<UpdateMeetingResult['status'], 'success'
 type MeetingSubmitErrorStatus = ScheduleMeetingErrorStatus | UpdateMeetingErrorStatus;
 
 export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
+  missingTimes: {
+    titleKey: 'meetings.scheduleModal.error.createFailedTitle',
+    messageKey: 'meetings.scheduleModal.error.missingTimes',
+  },
   participantMissingEmail: {
     titleKey: 'meetings.scheduleModal.error.createFailedTitle',
     messageKey: 'meetings.scheduleModal.error.participantMissingEmail',

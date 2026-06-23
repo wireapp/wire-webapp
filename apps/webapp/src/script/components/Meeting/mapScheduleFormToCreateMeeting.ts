@@ -18,38 +18,39 @@
  */
 
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
+import {result, Result} from 'true-myth';
 
 import {getInvitedEmailsFromSelectedUsers} from 'Components/Meeting/getInvitedEmailsFromSelectedUsers';
 import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 
-export type MapScheduleFormToCreateMeetingError = 'participantMissingEmail';
-
-export type MapScheduleFormToCreateMeetingResult =
-  | {payload: CreateMeeting; error?: undefined}
-  | {payload?: undefined; error: MapScheduleFormToCreateMeetingError};
+import {ScheduleFormErrors, scheduleFormErrors} from './ScheduleFormErrors';
 
 export const mapScheduleFormToCreateMeeting = (
   formState: ScheduleMeetingFormState,
-): MapScheduleFormToCreateMeetingResult => {
-  const {start, end} = requireScheduleMeetingTimes(formState);
+): Result<CreateMeeting, ScheduleFormErrors> => {
+  const timesResult = requireScheduleMeetingTimes(formState);
+
+  if (timesResult.isErr) {
+    return result.err(timesResult.error);
+  }
+
+  const {start, end} = timesResult.value;
 
   const invitedEmails = getInvitedEmailsFromSelectedUsers(formState.selectedUsers);
 
   if (invitedEmails.isNothing) {
-    return {error: 'participantMissingEmail'};
+    return result.err(scheduleFormErrors.participantMissingEmail);
   }
 
   const recurrence = mapRecurrenceOptionToMeetingRecurrence(formState.recurrence);
 
-  return {
-    payload: {
-      title: formState.title.trim(),
-      start_time: start.toISOString(),
-      end_time: end.toISOString(),
-      ...(invitedEmails.value.length > 0 && {invited_emails: invitedEmails.value}),
-      ...(recurrence !== undefined && {recurrence}),
-    },
-  };
+  return result.ok({
+    title: formState.title.trim(),
+    start_time: start.toISOString(),
+    end_time: end.toISOString(),
+    ...(invitedEmails.value.length > 0 && {invited_emails: invitedEmails.value}),
+    ...(recurrence !== undefined && {recurrence}),
+  });
 };
