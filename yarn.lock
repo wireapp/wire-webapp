@@ -29778,6 +29778,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tagged-tag@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "tagged-tag@npm:1.0.0"
+  checksum: 10/e37653df3e495daa7ea7790cb161b810b00075bba2e4d6c93fb06a709e747e3ae9da11a120d0489833203926511b39e038a2affbd9d279cfb7a2f3fcccd30b5d
+  languageName: node
+  linkType: hard
+
 "tapable@npm:^2.0.0, tapable@npm:^2.2.0, tapable@npm:^2.2.1, tapable@npm:^2.3.0":
   version: 2.3.0
   resolution: "tapable@npm:2.3.0"
@@ -30555,6 +30562,15 @@ __metadata:
   version: 4.1.0
   resolution: "type-detect@npm:4.1.0"
   checksum: 10/e363bf0352427a79301f26a7795a27718624c49c576965076624eb5495d87515030b207217845f7018093adcbe169b2d119bb9b7f1a31a92bfbb1ab9639ca8dd
+  languageName: node
+  linkType: hard
+
+"type-fest@npm:5.7.0":
+  version: 5.7.0
+  resolution: "type-fest@npm:5.7.0"
+  dependencies:
+    tagged-tag: "npm:^1.0.0"
+  checksum: 10/4867626aa489968df98e09ecdefbc45dfbb191ae5fb8924b3bd45da9cd940879b387086226366dce028570983a3fbe80adc53ad105a169bbbd27621c496bd6f0
   languageName: node
   linkType: hard
 
@@ -32338,6 +32354,7 @@ __metadata:
     ts-pattern: "npm:5.9.0"
     tsc-watch: "npm:7.2.0"
     tslib: "npm:2.8.1"
+    type-fest: "npm:5.7.0"
     typescript: "npm:6.0.3"
     uuid: "npm:14.0.0"
     zod: "npm:3.25.76"

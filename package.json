@@ -71,6 +71,7 @@
     "stylelint-config-idiomatic-order": "10.0.0",
     "ts-node": "10.9.2",
     "tsc-watch": "7.2.0",
+    "type-fest": "5.7.0",
     "typescript": "6.0.3"
   },
   "engines": {
