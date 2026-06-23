@@ -144,6 +144,7 @@ export class Conversation {
   public readonly isCreatedBySelf: ko.PureComputed<boolean>;
   public readonly isGroup: ko.PureComputed<boolean>;
   public readonly isChannel: ko.PureComputed<boolean>;
+  public readonly isMeeting: ko.PureComputed<boolean>;
   public readonly isGroupOrChannel: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isGuestRoom: ko.PureComputed<boolean>;
@@ -294,6 +295,10 @@ export class Conversation {
 
     this.isChannel = ko.pureComputed(() => {
       return this.groupConversationType() === GROUP_CONVERSATION_TYPE.CHANNEL;
+    });
+
+    this.isMeeting = ko.pureComputed(() => {
+      return this.groupConversationType() === GROUP_CONVERSATION_TYPE.MEETING;
     });
 
     this.isGroupOrChannel = ko.pureComputed(() => {
