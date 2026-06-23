@@ -247,6 +247,10 @@ export type FileTypeRestrictedEvent = ConversationEvent<
   CONVERSATION.FILE_TYPE_RESTRICTED,
   {fileExt: string; isIncoming: boolean; name: string}
 >;
+export type MemberRoleUpdateEvent = ConversationEvent<
+  CONVERSATION.MEMBER_ROLE_UPDATE,
+  {conversation_role: string; user_id: QualifiedId}
+>;
 export type CallingTimeoutEvent = ConversationEvent<
   CONVERSATION.CALL_TIME_OUT,
   {reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}
@@ -292,6 +296,7 @@ export type ClientConversationEvent =
   | OneToOneMigratedToMlsEvent
   | VoiceChannelDeactivateEvent
   | FileTypeRestrictedEvent
+  | MemberRoleUpdateEvent
   | CallingTimeoutEvent
   | FailedToAddUsersMessageEvent
   | UnableToDecryptEvent
@@ -490,6 +495,25 @@ export const EventBuilder = {
       id,
       time: conversation.getNextIsoDate(),
       type: ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED,
+    };
+  },
+
+  buildMemberRoleUpdate(
+    conversation: Conversation,
+    conversationRole: string,
+    userId: QualifiedId,
+    fromUserId: string,
+  ): MemberRoleUpdateEvent {
+    return {
+      ...buildQualifiedId(conversation),
+      data: {
+        conversation_role: conversationRole,
+        user_id: userId,
+      },
+      from: fromUserId,
+      id: createUuid(),
+      time: conversation.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.MEMBER_ROLE_UPDATE,
     };
   },
 

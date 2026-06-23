@@ -45,6 +45,7 @@ import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from 'Repositories/en
 import {Location} from 'Repositories/entity/message/location';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
 import type {Message} from 'Repositories/entity/message/message';
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
 import {MissedMessage} from 'Repositories/entity/message/missedMessage';
@@ -299,6 +300,11 @@ export class EventMapper {
 
       case CONVERSATION_EVENT.PROTOCOL_UPDATE: {
         messageEntity = this._mapEventProtocolUpdate(event);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.MEMBER_ROLE_UPDATE: {
+        messageEntity = this._mapEventMemberRoleUpdate();
         break;
       }
 
@@ -805,6 +811,15 @@ export class EventMapper {
    */
   private _mapEventRename({data: eventData, from, qualified_from}: LegacyEventRecord) {
     return new RenameMessage(eventData.name, from, qualified_from?.domain, this.translate);
+  }
+
+  /**
+   * Maps JSON data of conversation.member-role-update message into message entity.
+   *
+   * @returns Member role update message entity
+   */
+  private _mapEventMemberRoleUpdate() {
+    return new MemberRoleUpdateMessage(this.translate);
   }
 
   /**

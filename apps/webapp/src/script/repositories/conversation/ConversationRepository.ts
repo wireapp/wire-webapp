@@ -3755,6 +3755,7 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
+      case ClientEvent.CONVERSATION.MEMBER_ROLE_UPDATE:
       case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
@@ -4187,18 +4188,8 @@ export class ConversationRepository {
     const {conversation, data: eventData, from} = eventJson;
     const conversationId = {domain: '', id: conversation ?? '' /* TODO(federation) add domain on the sender side */};
 
-    const isConversationRoleUpdate = eventData.conversation_role !== undefined;
-    if (isConversationRoleUpdate) {
-      const {target, qualified_target, conversation_role} = eventData;
-      const userId = qualified_target ?? {domain: '', id: target};
-      const conversation = this.conversationState
-        .conversations()
-        .find(conversation => matchQualifiedIds(conversation, conversationId));
-      if (conversation !== undefined && userId.id !== undefined && conversation_role !== undefined) {
-        const roles = conversation.roles();
-        roles[userId.id] = conversation_role;
-        conversation.roles(roles);
-      }
+    if (eventData.conversation_role) {
+      await this.onConversationMemberRoleUpdated(conversationId, eventData, from);
       return;
     }
 
@@ -4235,6 +4226,44 @@ export class ConversationRepository {
 
     if (isActiveConversation && conversationEntity.is_archived()) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
+    }
+  }
+
+  /**
+   * A member's conversation role was updated.
+   *
+   * @param conversationId Qualified id of the conversation the role update happened in
+   * @param eventData Data of the 'conversation.member-update' event
+   * @param from Id of the user who triggered the role update
+   */
+  private async onConversationMemberRoleUpdated(
+    conversationId: QualifiedId,
+    eventData: ConversationMemberUpdateEvent['data'],
+    from: string,
+  ) {
+    const {target, qualified_target, conversation_role} = eventData;
+    const userId = qualified_target ?? (target ? {domain: '', id: target} : undefined);
+    const conversation = this.conversationState
+      .conversations()
+      .find(conversation => matchQualifiedIds(conversation, conversationId));
+
+    if (is.nullOrUndefined(conversation) || is.nullOrUndefined(userId) || is.nullOrUndefined(conversation_role)) {
+      return;
+    }
+
+    let roles = conversation.roles();
+    const previousRole = roles[userId.id];
+    roles = {...roles, [userId.id]: conversation_role};
+    conversation.roles(roles);
+
+    // Show a system message to the user who just got promoted to group admin.
+    // Only the promoted user receives this message (by design).
+    const selfUser = this.userState.self();
+    const isSelfTarget = selfUser && matchQualifiedIds(userId, selfUser.qualifiedId);
+    const isPromotedToAdmin = conversation_role === DefaultRole.WIRE_ADMIN && previousRole !== DefaultRole.WIRE_ADMIN;
+    if (isSelfTarget && isPromotedToAdmin) {
+      const roleUpdateEvent = EventBuilder.buildMemberRoleUpdate(conversation, conversation_role, userId, from);
+      await this.eventRepository.injectEvent(roleUpdateEvent, EventRepository.SOURCE.INJECTED);
     }
   }
 

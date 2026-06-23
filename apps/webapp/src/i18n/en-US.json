@@ -889,6 +889,7 @@
   "conversationYouAccusative": "you",
   "conversationYouDative": "you",
   "conversationYouNominative": "you",
+  "conversationYouPromotedToAdmin": "[bold]You[/bold] were promoted to group admin",
   "conversationYouRemovedMissingLegalHoldConsent": "[bold]You[/bold] were removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
   "conversationsAllArchived": "Everything archived",
   "conversationsConnectionRequestMany": "{number} people waiting",

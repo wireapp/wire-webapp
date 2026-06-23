@@ -19,13 +19,14 @@
 
 import {render, screen} from '@testing-library/react';
 
+import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/renameMessage';
-import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {SystemMessage} from './SystemMessage';
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 jest.mock('Components/icon', () => ({
   EditIcon: () => {
@@ -57,6 +58,14 @@ describe('SystemMessage', () => {
 
     expect(screen.queryByTestId('element-message-system')).not.toBeNull();
     expect(screen.queryByTestId('timericon')).not.toBeNull();
+  });
+
+  it('shows info icon and promotion caption for MemberRoleUpdateMessage', async () => {
+    const message = new MemberRoleUpdateMessage(translateForTest);
+
+    render(withTheme(<SystemMessage message={message} />));
+
+    expect(screen.queryByTestId('element-message-system')).not.toBeNull();
   });
 
   it('shows read icon for ReceiptModeUpdateMessage', async () => {

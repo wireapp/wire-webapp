@@ -35,6 +35,7 @@ export enum SystemMessageType {
   CONVERSATION_RESUME = 'resume',
   MEMBER_JOIN = 'join',
   MEMBER_LEAVE = 'leave',
+  MEMBER_ROLE_UPDATE = 'member-role-update',
   NORMAL = 'normal',
   MLS_CONVERSATION_RECOVERED = 'mls-conversation-recovered',
   ONE2ONE_MIGRATED_TO_MLS = 'one2one-migrated-to-mls',

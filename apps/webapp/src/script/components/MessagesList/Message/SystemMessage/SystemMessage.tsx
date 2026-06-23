@@ -17,11 +17,12 @@
  *
  */
 
-import {MLSVerified} from '@wireapp/react-ui-kit';
+import {ConversationSettingsIcon, MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {E2EIVerificationMessage} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
+import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
 import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/mlsConversationRecoveredMessage';
 import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/mlsMigrationFinalisationOngoingCallMessage';
@@ -50,6 +51,10 @@ export const SystemMessage = ({message}: SystemMessageProps) => {
         </div>
       </>
     );
+  }
+
+  if (message instanceof MemberRoleUpdateMessage) {
+    return <SystemMessageBase message={message} icon={<ConversationSettingsIcon />} />;
   }
 
   if (message instanceof MessageTimerUpdateMessage) {
