@@ -1,13 +1,16 @@
 ---
-name: precommit-crit-flows
+name: Precommit E2E Tests
 
 on:
   workflow_dispatch:
     inputs:
       reason:
-        description: Why this critical flow run was started
+        description: Why this test run was started
         required: false
         type: string
+      grep:
+        type: string
+        description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
   pull_request:
     types: [labeled, opened, synchronize, reopened]
   schedule:
@@ -86,7 +89,7 @@ jobs:
     with:
       env_name: ${{ needs.build.outputs.env_name }}
       backendUrl: https://staging-nginz-https.zinfra.io/
-      grep: '@crit-flow-web'
+      grep: ''
       notify_deployoholics_on_failure: ${{ github.event_name == 'schedule' }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
@@ -132,18 +135,16 @@ jobs:
           BACKEND_URL: https://staging-nginz-https.zinfra.io/
           DEPLOY_AND_RUN_E2E_RESULT: ${{ needs.deploy_and_run_e2e.result }}
           ENV_NAME: ${{ needs.build.outputs.env_name }}
-          GREP: '@crit-flow-web'
           PRECOMMIT_URL: ${{ needs.deploy_and_run_e2e.outputs.precommit_url }}
           REPORT_URL: ${{ needs.deploy_and_run_e2e.outputs.reportUrl }}
           WORKFLOW_DISPATCH_REASON: ${{ inputs.reason }}
         run: |
           {
-            echo "## Playwright Critical Flow"
+            echo "## Playwright E2E Test Summary"
             echo ""
             echo "- Environment: \`$ENV_NAME\`"
             echo "- Webapp URL: $PRECOMMIT_URL"
             echo "- Backend URL: $BACKEND_URL"
-            echo "- Grep: \`$GREP\`"
             echo "- Result: \`$DEPLOY_AND_RUN_E2E_RESULT\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
