@@ -22,6 +22,7 @@ import type {ScheduleFormErrors} from './ScheduleFormErrors';
 export const meetingSubmitErrors = {
   createFailed: 'createFailed',
   updateFailed: 'updateFailed',
+  editMeetingIdMissing: 'editMeetingIdMissing',
   addInvitationFailed: 'addInvitationFailed',
   removeInvitationFailed: 'removeInvitationFailed',
 } as const;

@@ -25,7 +25,7 @@ import {unwrapErr} from 'Util/test/resultTestSupport';
 
 import {meetingSubmitErrors} from '../MeetingSubmitErrors';
 
-import {tryScheduleMeeting, tryUpdateMeeting} from './scheduleMeetingService';
+import {tryScheduleMeeting, tryUpdateMeeting, performMeetingSubmit} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 const formState: ScheduleMeetingFormState = {
@@ -268,5 +268,79 @@ describe('tryUpdateMeeting', () => {
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.addInvitationFailed);
     expect(fetchMeetings).toHaveBeenCalled();
+  });
+});
+
+describe('performMeetingSubmit', () => {
+  const createDeps = ({
+    createMeeting = jest.fn().mockReturnValue(task.resolve({})),
+    updateMeeting = jest.fn().mockReturnValue(task.resolve({})),
+    fetchMeetings = jest.fn().mockResolvedValue(undefined),
+  }: {
+    createMeeting?: jest.Mock;
+    updateMeeting?: jest.Mock;
+    fetchMeetings?: jest.Mock;
+  } = {}) => {
+    const meetingsRepository = {
+      createMeeting,
+      updateMeeting,
+      getMeetingsList: jest.fn(),
+    } as unknown as MeetingsRepository;
+
+    return {
+      dependencies: {meetingsRepository, fetchMeetings},
+      createMeeting,
+      updateMeeting,
+      fetchMeetings,
+    };
+  };
+
+  it('creates a meeting in create mode', async () => {
+    const {dependencies, createMeeting, updateMeeting} = createDeps();
+
+    const result = await performMeetingSubmit({
+      mode: 'create',
+      editingMeetingId: maybe.nothing(),
+      formState,
+      originalInvitedEmails: [],
+      dependencies,
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(createMeeting).toHaveBeenCalled();
+    expect(updateMeeting).not.toHaveBeenCalled();
+  });
+
+  it('updates a meeting in edit mode when the meeting id is present', async () => {
+    const {dependencies, createMeeting, updateMeeting} = createDeps();
+
+    const result = await performMeetingSubmit({
+      mode: 'edit',
+      editingMeetingId: maybe.just(meetingId),
+      formState,
+      originalInvitedEmails: [],
+      dependencies,
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(updateMeeting).toHaveBeenCalledWith(meetingId, expect.any(Object));
+    expect(createMeeting).not.toHaveBeenCalled();
+  });
+
+  it('returns editMeetingIdMissing in edit mode when the meeting id is missing', async () => {
+    const {dependencies, createMeeting, updateMeeting} = createDeps();
+
+    const result = await performMeetingSubmit({
+      mode: 'edit',
+      editingMeetingId: maybe.nothing(),
+      formState,
+      originalInvitedEmails: [],
+      dependencies,
+    });
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.editMeetingIdMissing);
+    expect(createMeeting).not.toHaveBeenCalled();
+    expect(updateMeeting).not.toHaveBeenCalled();
   });
 });

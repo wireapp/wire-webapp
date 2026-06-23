@@ -37,6 +37,10 @@ export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
     titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
     messageKey: 'meetings.scheduleModal.error.updateFailed',
   },
+  editMeetingIdMissing: {
+    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
+    messageKey: 'meetings.scheduleModal.error.editMeetingIdMissing',
+  },
   addInvitationFailed: {
     titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
     messageKey: 'meetings.scheduleModal.error.addInvitationFailed',

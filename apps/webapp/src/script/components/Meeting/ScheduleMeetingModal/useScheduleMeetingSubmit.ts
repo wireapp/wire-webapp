@@ -19,16 +19,13 @@
 
 import {useCallback, useState} from 'react';
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {Maybe, Result} from 'true-myth';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
-import {tryScheduleMeeting, tryUpdateMeeting, type TryScheduleMeetingDependencies} from './scheduleMeetingService';
-import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
+import {performMeetingSubmit} from './scheduleMeetingService';
+import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
 import type {MeetingSubmitErrors} from '../MeetingSubmitErrors';
@@ -48,25 +45,6 @@ const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors
   );
 };
 
-const performMeetingSubmit = async (
-  mode: ScheduleMeetingMode,
-  editingMeetingId: Maybe<QualifiedId>,
-  formState: ScheduleMeetingFormState,
-  originalInvitedEmails: string[],
-  dependencies: TryScheduleMeetingDependencies,
-): Promise<Result<void, MeetingSubmitErrors>> => {
-  if (mode === 'edit' && editingMeetingId.isJust) {
-    return await tryUpdateMeeting({
-      meetingId: editingMeetingId.value,
-      formState,
-      originalInvitedEmails,
-      dependencies,
-    });
-  }
-
-  return await tryScheduleMeeting(formState, dependencies);
-};
-
 export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void>) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {mainViewModel, translate} = useApplicationContext();
@@ -80,9 +58,15 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
       setIsSubmitting(true);
 
       try {
-        const result = await performMeetingSubmit(mode, editingMeetingId, formState, originalInvitedEmails, {
-          meetingsRepository,
-          fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve(),
+        const result = await performMeetingSubmit({
+          mode,
+          editingMeetingId,
+          formState,
+          originalInvitedEmails,
+          dependencies: {
+            meetingsRepository,
+            fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve(),
+          },
         });
 
         if (result.isErr) {

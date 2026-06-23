@@ -19,18 +19,19 @@
 
 import is from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {Result, result, Task, task} from 'true-myth';
+import {Maybe, Result, result, Task, task} from 'true-myth';
 
 import {mapScheduleFormToCreateMeeting} from 'Components/Meeting/mapScheduleFormToCreateMeeting';
 import {mapScheduleFormToUpdateMeeting} from 'Components/Meeting/mapScheduleFormToUpdateMeeting';
 import {
   meetingSubmitErrors,
+  type MeetingSubmitErrors,
   type ScheduleMeetingErrors,
   type UpdateMeetingErrors,
 } from 'Components/Meeting/MeetingSubmitErrors';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 
-import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
 
 export type {ScheduleMeetingErrors, UpdateMeetingErrors} from 'Components/Meeting/MeetingSubmitErrors';
 
@@ -47,6 +48,37 @@ export type TryUpdateMeetingParams = {
   originalInvitedEmails: string[];
   dependencies: TryUpdateMeetingDependencies;
 };
+
+export type PerformMeetingSubmitParams = {
+  mode: ScheduleMeetingMode;
+  editingMeetingId: Maybe<QualifiedId>;
+  formState: ScheduleMeetingFormState;
+  originalInvitedEmails: string[];
+  dependencies: TryScheduleMeetingDependencies;
+};
+
+export async function performMeetingSubmit({
+  mode,
+  editingMeetingId,
+  formState,
+  originalInvitedEmails,
+  dependencies,
+}: PerformMeetingSubmitParams): Promise<Result<void, MeetingSubmitErrors>> {
+  if (mode === 'edit') {
+    if (editingMeetingId.isNothing) {
+      return result.err(meetingSubmitErrors.editMeetingIdMissing);
+    }
+
+    return await tryUpdateMeeting({
+      meetingId: editingMeetingId.value,
+      formState,
+      originalInvitedEmails,
+      dependencies,
+    });
+  }
+
+  return await tryScheduleMeeting(formState, dependencies);
+}
 
 const resultToTask = <T, E>(run: () => Promise<Result<T, E>>): Task<T, E> =>
   task.fromPromise(run()).andThen(value => task.fromResult(value)) as Task<T, E>;
