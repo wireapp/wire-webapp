@@ -30,6 +30,7 @@ import {
   iconStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
 import {useEditMeeting} from 'Components/Meeting/useEditMeeting';
+import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -37,15 +38,16 @@ import {showContextMenu} from '../../../../../../ui/contextMenu';
 
 interface MeetingActionProps {
   meeting: Meeting;
-  nowMs: number;
 }
 
-export const MeetingAction = ({meeting, nowMs}: MeetingActionProps) => {
-  const {translate} = useApplicationContext();
+export const MeetingAction = ({meeting}: MeetingActionProps) => {
+  const {translate, wallClock} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const selfUser = container.resolve(UserState).self();
 
   const handleActionButton = (event: MouseEvent<HTMLElement>) => {
+    const nowMs = wallClock.currentTimestampInMilliseconds;
+
     showContextMenu({
       event,
       entries: getMeetingActionEntries({
@@ -53,7 +55,11 @@ export const MeetingAction = ({meeting, nowMs}: MeetingActionProps) => {
         selfUser,
         nowMs,
         translate,
-        onEdit: () => editMeeting(meeting),
+        onEdit: () => {
+          if (canEditMeeting(meeting, selfUser, wallClock.currentTimestampInMilliseconds)) {
+            editMeeting(meeting);
+          }
+        },
       }),
       identifier: 'message-options-menu',
     });

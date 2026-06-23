@@ -113,7 +113,7 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
       </div>
       <div css={rightStyles}>
         <MeetingStatus start_date={start_date} end_date={end_date} attending={attending} nowMs={timestamp} />
-        <MeetingAction meeting={meeting} nowMs={timestamp} />
+        <MeetingAction meeting={meeting} />
       </div>
     </div>
   );
