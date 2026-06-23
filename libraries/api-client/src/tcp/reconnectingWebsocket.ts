@@ -160,12 +160,12 @@ export class ReconnectingWebsocket {
             ? `${this.options.wallClock.currentTimestampInMilliseconds - this.lastMessageTimestamp}ms`
             : 'unavailable';
         this.logger.info(
-          `Back from sleep detected, WebSocket state: ${WEBSOCKET_STATE[state]} (${state}), last non-pong message: ${timeSinceLastNonPongMessageInMilliseconds}, unanswered ping: ${this.hasUnansweredPing}, forcing reconnect`,
+          `Back from sleep detected, WebSocket state: ${WEBSOCKET_STATE[state]} (${state}), last non-pong message: ${timeSinceLastNonPongMessageInMilliseconds}, unanswered ping: ${this.hasUnansweredPing}, creating fresh WebSocket wrapper`,
         );
 
         this.stopPinging();
         this.hasUnansweredPing = false;
-        this.reconnectInPlace(socket);
+        this.replaceSocketWrapperAfterWake(socket);
       },
       Nothing: () => {
         this.logger.debug('Back from sleep detected, WebSocket instance does not exist, skipping reconnect');
@@ -274,6 +274,16 @@ export class ReconnectingWebsocket {
     } catch (error) {
       this.logger.warn('Failed to reconnect WebSocket in place', error);
     }
+  }
+
+  private replaceSocketWrapperAfterWake(socket: ReconnectingWebsocketWrapper): void {
+    try {
+      socket.close(CloseEventCode.NORMAL_CLOSURE, 'Back from sleep');
+    } catch (error) {
+      this.logger.warn('Failed to close stale WebSocket wrapper after wake', error);
+    }
+
+    this.createAndBindSocketWrapper();
   }
 
   public connect(): void {
