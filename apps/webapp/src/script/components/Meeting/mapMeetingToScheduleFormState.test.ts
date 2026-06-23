@@ -50,8 +50,10 @@ describe('mapMeetingToScheduleFormState', () => {
     const result = mapMeetingToScheduleFormState(createMeeting(), availableUsers);
 
     expect(result.title).toBe('Weekly sync');
-    expect(result.start).toEqual(new Date('2026-06-15T10:00:00.000Z'));
-    expect(result.end).toEqual(new Date('2026-06-15T11:00:00.000Z'));
+    expect(result.start.isJust).toBe(true);
+    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    expect(result.end.isJust).toBe(true);
+    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T11:00:00.000Z'));
     expect(result.recurrence).toBe('weekly');
     expect(result.participantsFilter).toBe('');
   });

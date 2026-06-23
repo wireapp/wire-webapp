@@ -20,6 +20,7 @@
 import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
 
 import {getInvitedEmailsFromSelectedUsers} from 'Components/Meeting/getInvitedEmailsFromSelectedUsers';
+import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 
@@ -58,9 +59,7 @@ export const mapScheduleFormToUpdateMeeting = (
   formState: ScheduleMeetingFormState,
   originalInvitedEmails: string[],
 ): MapScheduleFormToUpdateMeetingResult => {
-  if (formState.start === null || formState.end === null) {
-    throw new Error('Schedule meeting form is missing start or end time');
-  }
+  const {start, end} = requireScheduleMeetingTimes(formState);
 
   const invitedEmails = getInvitedEmailsFromSelectedUsers(formState.selectedUsers);
 
@@ -74,8 +73,8 @@ export const mapScheduleFormToUpdateMeeting = (
   return {
     payload: {
       title: formState.title.trim(),
-      start_time: formState.start.toISOString(),
-      end_time: formState.end.toISOString(),
+      start_time: start.toISOString(),
+      end_time: end.toISOString(),
       ...(recurrence !== undefined && {recurrence}),
     },
     addedEmails,

@@ -17,11 +17,13 @@
  *
  */
 
+import {maybe} from 'true-myth';
+
 import {hasScheduleMeetingFormErrors, validateScheduleMeetingForm} from './scheduleMeetingValidation';
 
 describe('scheduleMeetingValidation', () => {
-  const start = new Date('2026-06-15T10:00:00');
-  const end = new Date('2026-06-15T11:00:00');
+  const start = maybe.just(new Date('2026-06-15T10:00:00'));
+  const end = maybe.just(new Date('2026-06-15T11:00:00'));
 
   it('returns titleRequired when title is empty', () => {
     const errors = validateScheduleMeetingForm({title: '   ', start, end});
@@ -34,7 +36,7 @@ describe('scheduleMeetingValidation', () => {
     const errors = validateScheduleMeetingForm({
       title: 'Weekly sync',
       start,
-      end: new Date('2026-06-15T10:00:00'),
+      end: maybe.just(new Date('2026-06-15T10:00:00')),
     });
 
     expect(errors.endBeforeStart).toBe('meetings.scheduleModal.error.endBeforeStart');
@@ -47,7 +49,7 @@ describe('scheduleMeetingValidation', () => {
   });
 
   it('skips end validation when start or end is missing', () => {
-    const errors = validateScheduleMeetingForm({title: 'Weekly sync', start: null, end});
+    const errors = validateScheduleMeetingForm({title: 'Weekly sync', start: maybe.nothing(), end});
 
     expect(errors.endBeforeStart).toBeUndefined();
   });

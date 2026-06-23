@@ -17,6 +17,8 @@
  *
  */
 
+import type {Maybe} from 'true-myth';
+
 import type {User} from 'Repositories/entity/User';
 
 export type ScheduleMeetingMode = 'create' | 'edit';
@@ -25,8 +27,8 @@ export type ScheduleMeetingRecurrenceOption = 'doesNotRepeat' | 'daily' | 'weekl
 
 export interface ScheduleMeetingFormState {
   title: string;
-  start: Date | null;
-  end: Date | null;
+  start: Maybe<Date>;
+  end: Maybe<Date>;
   recurrence: ScheduleMeetingRecurrenceOption;
   selectedUsers: User[];
   participantsFilter: string;

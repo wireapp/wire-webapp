@@ -20,14 +20,15 @@
 import {MeetingsRepository} from 'Repositories/meetings';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
+import {maybe} from 'true-myth';
 
 import {tryScheduleMeeting, tryUpdateMeeting} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 const formState: ScheduleMeetingFormState = {
   title: 'Weekly sync',
-  start: new Date('2026-06-15T10:00:00.000Z'),
-  end: new Date('2026-06-15T11:00:00.000Z'),
+  start: maybe.just(new Date('2026-06-15T10:00:00.000Z')),
+  end: maybe.just(new Date('2026-06-15T11:00:00.000Z')),
   recurrence: 'doesNotRepeat',
   selectedUsers: [],
   participantsFilter: '',

@@ -18,6 +18,7 @@
  */
 
 import is from '@sindresorhus/is';
+import {maybe} from 'true-myth';
 
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
@@ -43,8 +44,8 @@ const resolveInvitedEmailsToUsers = (invitedEmails: string[], availableUsers: Us
 
 export const mapMeetingToScheduleFormState = (meeting: Meeting, availableUsers: User[]): ScheduleMeetingFormState => ({
   title: meeting.title,
-  start: new Date(meeting.start_date),
-  end: new Date(meeting.end_date),
+  start: maybe.just(new Date(meeting.start_date)),
+  end: maybe.just(new Date(meeting.end_date)),
   recurrence: meeting.recurrence,
   selectedUsers: resolveInvitedEmailsToUsers(meeting.invited_emails, availableUsers),
   participantsFilter: '',

@@ -18,6 +18,7 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Maybe, maybe} from 'true-myth';
 import {create} from 'zustand';
 
 import {getNextHourDateTime} from '@wireapp/react-ui-kit';
@@ -54,8 +55,8 @@ export const getDefaultScheduleMeetingFormState = (): ScheduleMeetingFormState =
   const start = getNextHourDateTime();
   return {
     title: '',
-    start,
-    end: getDefaultEndDateTime(start),
+    start: maybe.just(start),
+    end: maybe.just(getDefaultEndDateTime(start)),
     recurrence: 'doesNotRepeat',
     selectedUsers: [],
     participantsFilter: '',
@@ -67,15 +68,15 @@ type ScheduleMeetingModalState = {
   mode: ScheduleMeetingMode;
   formState: ScheduleMeetingFormState;
   errors: ScheduleMeetingFormErrors;
-  editingMeetingId: QualifiedId | null;
+  editingMeetingId: Maybe<QualifiedId>;
   originalInvitedEmails: string[];
   openCreate: () => void;
   openEdit: (meeting: Meeting, formState: ScheduleMeetingFormState) => void;
   close: () => void;
   reset: () => void;
   setTitle: (title: string) => void;
-  setStart: (start: Date | null) => void;
-  setEnd: (end: Date | null) => void;
+  setStart: (start: Maybe<Date>) => void;
+  setEnd: (end: Maybe<Date>) => void;
   setRecurrence: (recurrence: ScheduleMeetingRecurrenceOption) => void;
   setSelectedUsers: (selectedUsers: User[]) => void;
   setParticipantsFilter: (participantsFilter: string) => void;
@@ -88,7 +89,7 @@ const initialState = {
   mode: 'create' as ScheduleMeetingMode,
   formState: getDefaultScheduleMeetingFormState(),
   errors: {} as ScheduleMeetingFormErrors,
-  editingMeetingId: null as QualifiedId | null,
+  editingMeetingId: Maybe.nothing<QualifiedId>(),
   originalInvitedEmails: [] as string[],
 };
 
@@ -100,7 +101,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       mode: 'create',
       formState: getDefaultScheduleMeetingFormState(),
       errors: {},
-      editingMeetingId: null,
+      editingMeetingId: Maybe.nothing(),
       originalInvitedEmails: [],
     }),
   openEdit: (meeting: Meeting, formState: ScheduleMeetingFormState) =>
@@ -109,7 +110,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       mode: 'edit',
       formState,
       errors: {},
-      editingMeetingId: meeting.qualified_id,
+      editingMeetingId: maybe.just(meeting.qualified_id),
       originalInvitedEmails: meeting.invited_emails,
     }),
   close: () => set({isOpen: false}),

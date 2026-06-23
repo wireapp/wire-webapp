@@ -17,12 +17,14 @@
  *
  */
 
+import type {Maybe} from 'true-myth';
+
 import type {ScheduleMeetingFormErrors} from './scheduleMeetingTypes';
 
 export interface ScheduleMeetingValidationInput {
   title: string;
-  start: Date | null;
-  end: Date | null;
+  start: Maybe<Date>;
+  end: Maybe<Date>;
 }
 
 export const validateScheduleMeetingForm = ({
@@ -36,7 +38,7 @@ export const validateScheduleMeetingForm = ({
     errors.title = 'meetings.scheduleModal.error.titleRequired';
   }
 
-  if (start && end && end.getTime() <= start.getTime()) {
+  if (start.isJust && end.isJust && end.value.getTime() <= start.value.getTime()) {
     errors.endBeforeStart = 'meetings.scheduleModal.error.endBeforeStart';
   }
 

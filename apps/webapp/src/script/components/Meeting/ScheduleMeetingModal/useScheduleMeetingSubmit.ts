@@ -20,6 +20,7 @@
 import {useCallback, useState} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {Maybe} from 'true-myth';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -56,13 +57,13 @@ const showMeetingSubmitError = (translate: Translate, status: MeetingSubmitError
 
 const performMeetingSubmit = async (
   mode: ScheduleMeetingMode,
-  editingMeetingId: QualifiedId | null,
+  editingMeetingId: Maybe<QualifiedId>,
   formState: ScheduleMeetingFormState,
   originalInvitedEmails: string[],
   dependencies: TryScheduleMeetingDependencies,
 ): Promise<MeetingSubmitResult> => {
-  if (mode === 'edit' && editingMeetingId !== null) {
-    return tryUpdateMeeting(editingMeetingId, formState, originalInvitedEmails, dependencies);
+  if (mode === 'edit' && editingMeetingId.isJust) {
+    return tryUpdateMeeting(editingMeetingId.value, formState, originalInvitedEmails, dependencies);
   }
 
   return tryScheduleMeeting(formState, dependencies);

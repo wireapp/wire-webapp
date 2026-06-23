@@ -20,6 +20,8 @@
 import {useMemo} from 'react';
 
 import is from '@sindresorhus/is';
+import type {Maybe} from 'true-myth';
+import {maybe} from 'true-myth';
 
 import {
   CircleCloseIcon,
@@ -58,13 +60,18 @@ import type {
 } from './scheduleMeetingTypes';
 import {useScheduleMeetingParticipants} from './useScheduleMeetingParticipants';
 
+const toDateTimePickerValue = (value: Maybe<Date>): Date | null => value.unwrapOr(null);
+
+const fromDateTimePickerValue = (value: Date | null): Maybe<Date> =>
+  value === null ? maybe.nothing() : maybe.just(value);
+
 export interface ScheduleMeetingFormProps {
   mode: ScheduleMeetingMode;
   formState: ScheduleMeetingFormState;
   errors: ScheduleMeetingFormDisplayErrors;
   onTitleChange: (title: string) => void;
-  onStartChange: (start: Date | null) => void;
-  onEndChange: (end: Date | null) => void;
+  onStartChange: (start: Maybe<Date>) => void;
+  onEndChange: (end: Maybe<Date>) => void;
   onRecurrenceChange: (recurrence: ScheduleMeetingRecurrenceOption) => void;
   onSelectedUsersChange: (users: User[]) => void;
   onParticipantsFilterChange: (filter: string) => void;
@@ -166,8 +173,8 @@ export const ScheduleMeetingForm = ({
         <DateTimePickerField
           dataUieName="schedule-meeting-start"
           label={translate('meetings.scheduleModal.startsLabel')}
-          value={formState.start}
-          onChange={onStartChange}
+          value={toDateTimePickerValue(formState.start)}
+          onChange={date => onStartChange(fromDateTimePickerValue(date))}
           labels={dateTimePickerLabels}
           locale={currentLanguage()}
           menuPortalTarget={portalContainer}
@@ -177,8 +184,8 @@ export const ScheduleMeetingForm = ({
         <DateTimePickerField
           dataUieName="schedule-meeting-end"
           label={translate('meetings.scheduleModal.endsLabel')}
-          value={formState.end}
-          onChange={onEndChange}
+          value={toDateTimePickerValue(formState.end)}
+          onChange={date => onEndChange(fromDateTimePickerValue(date))}
           labels={dateTimePickerLabels}
           locale={currentLanguage()}
           markInvalid={Boolean(errors.endBeforeStart)}
@@ -194,7 +201,7 @@ export const ScheduleMeetingForm = ({
           options={recurrenceSelectOptions}
           value={selectedRecurrenceOption}
           onChange={option => {
-            if (option !== null) {
+            if (option) {
               onRecurrenceChange(option.value as ScheduleMeetingRecurrenceOption);
             }
           }}
