@@ -14,8 +14,10 @@ on:
     - cron: '17 8,20 * * *'
       timezone: Europe/Berlin
 
+# Concurrency is limited per event per branch as each event uses a different environment and we want to cancel runs if the same branch receives new commits.
+# The reused workflow precommit-slot-run.yml already enforces concurrency limits per environment so e.g. two PRs can't run on the same env at the same time.
 concurrency:
-  group: precommit-crit-flows-${{ github.event_name }}
+  group: precommit-crit-flows-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
