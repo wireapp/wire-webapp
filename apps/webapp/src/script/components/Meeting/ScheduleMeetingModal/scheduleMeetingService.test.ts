@@ -20,7 +20,7 @@
 import {MeetingsRepository} from 'Repositories/meetings';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
-import {maybe} from 'true-myth';
+import {maybe, task} from 'true-myth';
 
 import {tryScheduleMeeting, tryUpdateMeeting} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
@@ -38,7 +38,7 @@ const meetingId = {id: 'meeting-id', domain: 'example.com'};
 
 describe('tryScheduleMeeting', () => {
   const createDeps = ({
-    createMeeting = jest.fn().mockResolvedValue({}),
+    createMeeting = jest.fn().mockReturnValue(task.resolve({})),
     fetchMeetings = jest.fn().mockResolvedValue(undefined),
   }: {
     createMeeting?: jest.Mock;
@@ -105,7 +105,7 @@ describe('tryScheduleMeeting', () => {
 
   it('returns createFailed when API fails', async () => {
     const {deps, fetchMeetings} = createDeps({
-      createMeeting: jest.fn().mockRejectedValue(new Error('network')),
+      createMeeting: jest.fn().mockReturnValue(task.reject(new Error('network'))),
     });
 
     await expect(tryScheduleMeeting(formState, deps)).resolves.toEqual({status: 'createFailed'});
@@ -123,9 +123,9 @@ describe('tryUpdateMeeting', () => {
   };
 
   const createDeps = ({
-    updateMeeting = jest.fn().mockResolvedValue({}),
-    addMeetingInvitation = jest.fn().mockResolvedValue(undefined),
-    removeMeetingInvitation = jest.fn().mockResolvedValue(undefined),
+    updateMeeting = jest.fn().mockReturnValue(task.resolve({})),
+    addMeetingInvitation = jest.fn().mockReturnValue(task.resolve(undefined)),
+    removeMeetingInvitation = jest.fn().mockReturnValue(task.resolve(undefined)),
     fetchMeetings = jest.fn().mockResolvedValue(undefined),
   }: {
     updateMeeting?: jest.Mock;
@@ -214,7 +214,7 @@ describe('tryUpdateMeeting', () => {
 
   it('returns updateFailed when updateMeeting fails', async () => {
     const {deps, fetchMeetings} = createDeps({
-      updateMeeting: jest.fn().mockRejectedValue(new Error('network')),
+      updateMeeting: jest.fn().mockReturnValue(task.reject(new Error('network'))),
     });
 
     await expect(
@@ -226,7 +226,7 @@ describe('tryUpdateMeeting', () => {
 
   it('refreshes the list when invitation changes fail after updateMeeting succeeds', async () => {
     const {deps, fetchMeetings} = createDeps({
-      addMeetingInvitation: jest.fn().mockRejectedValue(new Error('invitation failed')),
+      addMeetingInvitation: jest.fn().mockReturnValue(task.reject(new Error('invitation failed'))),
     });
 
     await expect(

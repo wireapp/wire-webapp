@@ -62,14 +62,15 @@ export async function tryScheduleMeeting(
     return {status: mappingResult.error};
   }
 
-  try {
-    const {meetingsRepository, fetchMeetings} = dependencies;
-    await meetingsRepository.createMeeting(mappingResult.value);
-    await fetchMeetings();
-    return {status: 'success'};
-  } catch {
+  const {meetingsRepository, fetchMeetings} = dependencies;
+  const createResult = await meetingsRepository.createMeeting(mappingResult.value);
+
+  if (createResult.isErr) {
     return {status: 'createFailed'};
   }
+
+  await fetchMeetings();
+  return {status: 'success'};
 }
 
 /**
@@ -89,27 +90,31 @@ export async function tryUpdateMeeting({
 
   const {payload, addedEmails, removedEmails} = mappingResult.value;
   const {meetingsRepository, fetchMeetings} = dependencies;
-  let didUpdateMeeting = false;
 
-  try {
-    await meetingsRepository.updateMeeting(meetingId, payload);
-    didUpdateMeeting = true;
+  const updateResult = await meetingsRepository.updateMeeting(meetingId, payload);
 
-    if (is.nonEmptyArray(removedEmails)) {
-      await meetingsRepository.removeMeetingInvitation(meetingId, removedEmails);
-    }
-
-    if (is.nonEmptyArray(addedEmails)) {
-      await meetingsRepository.addMeetingInvitation(meetingId, addedEmails);
-    }
-
-    await fetchMeetings();
-    return {status: 'success'};
-  } catch {
-    if (didUpdateMeeting) {
-      await fetchMeetings();
-    }
-
+  if (updateResult.isErr) {
     return {status: 'updateFailed'};
   }
+
+  if (is.nonEmptyArray(removedEmails)) {
+    const removeResult = await meetingsRepository.removeMeetingInvitation(meetingId, removedEmails);
+
+    if (removeResult.isErr) {
+      await fetchMeetings();
+      return {status: 'updateFailed'};
+    }
+  }
+
+  if (is.nonEmptyArray(addedEmails)) {
+    const addResult = await meetingsRepository.addMeetingInvitation(meetingId, addedEmails);
+
+    if (addResult.isErr) {
+      await fetchMeetings();
+      return {status: 'updateFailed'};
+    }
+  }
+
+  await fetchMeetings();
+  return {status: 'success'};
 }
