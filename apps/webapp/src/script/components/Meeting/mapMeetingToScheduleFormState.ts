@@ -34,7 +34,7 @@ const createPlaceholderUserForEmail = (email: string): User => {
 
 const resolveInvitedEmailsToUsers = (invitedEmails: string[], availableUsers: User[]): User[] =>
   invitedEmails.map(email => {
-    const normalizedEmail = email.toLowerCase();
+    const normalizedEmail = email.trim().toLowerCase();
     const matchedUser = availableUsers.find(
       user => is.nonEmptyString(user.email()) && user.email()!.toLowerCase() === normalizedEmail,
     );
