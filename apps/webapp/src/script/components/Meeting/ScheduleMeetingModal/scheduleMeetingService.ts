@@ -39,6 +39,13 @@ export type TryScheduleMeetingDependencies = {
 
 export type TryUpdateMeetingDependencies = TryScheduleMeetingDependencies;
 
+export type TryUpdateMeetingParams = {
+  meetingId: QualifiedId;
+  formState: ScheduleMeetingFormState;
+  originalInvitedEmails: string[];
+  dependencies: TryUpdateMeetingDependencies;
+};
+
 /**
  * Tries to schedule a meeting with the given form state.
  * @param formState - The form state to schedule the meeting with.
@@ -68,12 +75,12 @@ export async function tryScheduleMeeting(
 /**
  * Tries to update a meeting with the given form state and invitation diff.
  */
-export async function tryUpdateMeeting(
-  meetingId: QualifiedId,
-  formState: ScheduleMeetingFormState,
-  originalInvitedEmails: string[],
-  dependencies: TryUpdateMeetingDependencies,
-): Promise<UpdateMeetingResult> {
+export async function tryUpdateMeeting({
+  meetingId,
+  formState,
+  originalInvitedEmails,
+  dependencies,
+}: TryUpdateMeetingParams): Promise<UpdateMeetingResult> {
   const mappingResult = mapScheduleFormToUpdateMeeting(formState, originalInvitedEmails);
 
   if (mappingResult.isErr) {

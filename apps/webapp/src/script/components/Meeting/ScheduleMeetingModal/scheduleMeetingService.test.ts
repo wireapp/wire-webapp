@@ -153,15 +153,15 @@ describe('tryUpdateMeeting', () => {
     const {deps, updateMeeting, addMeetingInvitation, removeMeetingInvitation, fetchMeetings} = createDeps();
 
     await expect(
-      tryUpdateMeeting(
+      tryUpdateMeeting({
         meetingId,
-        {
+        formState: {
           ...formState,
           selectedUsers: [createUser('1', 'alice@wire.com'), createUser('3', 'charlie@wire.com')],
         },
-        ['alice@wire.com', 'bob@wire.com'],
-        deps,
-      ),
+        originalInvitedEmails: ['alice@wire.com', 'bob@wire.com'],
+        dependencies: deps,
+      }),
     ).resolves.toEqual({status: 'success'});
 
     expect(updateMeeting).toHaveBeenCalledWith(meetingId, {
@@ -180,15 +180,15 @@ describe('tryUpdateMeeting', () => {
     const {deps, updateMeeting} = createDeps();
 
     await expect(
-      tryUpdateMeeting(
+      tryUpdateMeeting({
         meetingId,
-        {
+        formState: {
           ...formState,
           selectedUsers: [user],
         },
-        [],
-        deps,
-      ),
+        originalInvitedEmails: [],
+        dependencies: deps,
+      }),
     ).resolves.toEqual({status: 'participantMissingEmail'});
 
     expect(updateMeeting).not.toHaveBeenCalled();
@@ -198,15 +198,15 @@ describe('tryUpdateMeeting', () => {
     const {deps, updateMeeting} = createDeps();
 
     await expect(
-      tryUpdateMeeting(
+      tryUpdateMeeting({
         meetingId,
-        {
+        formState: {
           ...formState,
           end: maybe.nothing(),
         },
-        [],
-        deps,
-      ),
+        originalInvitedEmails: [],
+        dependencies: deps,
+      }),
     ).resolves.toEqual({status: 'missingTimes'});
 
     expect(updateMeeting).not.toHaveBeenCalled();
@@ -217,7 +217,9 @@ describe('tryUpdateMeeting', () => {
       updateMeeting: jest.fn().mockRejectedValue(new Error('network')),
     });
 
-    await expect(tryUpdateMeeting(meetingId, formState, [], deps)).resolves.toEqual({status: 'updateFailed'});
+    await expect(
+      tryUpdateMeeting({meetingId, formState, originalInvitedEmails: [], dependencies: deps}),
+    ).resolves.toEqual({status: 'updateFailed'});
 
     expect(fetchMeetings).not.toHaveBeenCalled();
   });
@@ -228,15 +230,15 @@ describe('tryUpdateMeeting', () => {
     });
 
     await expect(
-      tryUpdateMeeting(
+      tryUpdateMeeting({
         meetingId,
-        {
+        formState: {
           ...formState,
           selectedUsers: [createUser('1', 'alice@wire.com')],
         },
-        [],
-        deps,
-      ),
+        originalInvitedEmails: [],
+        dependencies: deps,
+      }),
     ).resolves.toEqual({status: 'updateFailed'});
 
     expect(fetchMeetings).toHaveBeenCalled();

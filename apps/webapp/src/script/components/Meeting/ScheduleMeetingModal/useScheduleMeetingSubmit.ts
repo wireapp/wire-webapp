@@ -63,7 +63,12 @@ const performMeetingSubmit = async (
   dependencies: TryScheduleMeetingDependencies,
 ): Promise<MeetingSubmitResult> => {
   if (mode === 'edit' && editingMeetingId.isJust) {
-    return tryUpdateMeeting(editingMeetingId.value, formState, originalInvitedEmails, dependencies);
+    return tryUpdateMeeting({
+      meetingId: editingMeetingId.value,
+      formState,
+      originalInvitedEmails,
+      dependencies,
+    });
   }
 
   return tryScheduleMeeting(formState, dependencies);
