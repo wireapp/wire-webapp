@@ -173,6 +173,7 @@ describe('tryUpdateMeeting', () => {
       title: 'Weekly sync',
       start_time: '2026-06-15T10:00:00.000Z',
       end_time: '2026-06-15T11:00:00.000Z',
+      recurrence: null,
     });
     expect(removeMeetingInvitation).toHaveBeenCalledWith(meetingId, ['bob@wire.com']);
     expect(addMeetingInvitation).toHaveBeenCalledWith(meetingId, ['charlie@wire.com']);

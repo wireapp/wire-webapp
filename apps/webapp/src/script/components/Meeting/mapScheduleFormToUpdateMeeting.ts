@@ -72,7 +72,7 @@ export const mapScheduleFormToUpdateMeeting = (
       title: formState.title.trim(),
       start_time: start.toISOString(),
       end_time: end.toISOString(),
-      ...(recurrence !== undefined && {recurrence}),
+      recurrence: recurrence ?? null,
     },
     addedEmails,
     removedEmails,
