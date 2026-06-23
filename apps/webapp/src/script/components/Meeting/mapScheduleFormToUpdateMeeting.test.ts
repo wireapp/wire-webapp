@@ -46,9 +46,7 @@ const baseFormState = (): ScheduleMeetingFormState => ({
 
 describe('computeInvitationDiff', () => {
   it('computes added and removed emails case-insensitively', () => {
-    expect(
-      computeInvitationDiff(['alice@wire.com', 'bob@wire.com'], ['Alice@wire.com', 'charlie@wire.com']),
-    ).toEqual({
+    expect(computeInvitationDiff(['alice@wire.com', 'bob@wire.com'], ['Alice@wire.com', 'charlie@wire.com'])).toEqual({
       addedEmails: ['charlie@wire.com'],
       removedEmails: ['bob@wire.com'],
     });
