@@ -74,6 +74,8 @@ const HTTP_METHOD_NAMES: Record<HttpMethod, string> = {
   [HttpMethod.Head]: 'HEAD',
 };
 
+const CERTIFICATE_PEM_PATTERN = /-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g;
+
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   private readonly logger = LogFactory.getLogger('@wireapp/core/E2EIdentityServiceExternal');
@@ -414,10 +416,58 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return !client || !this.mlsService.isInitializedMLSClient(client);
   }
 
+  private splitCertificatePemBundle(certificatePemBundle: string): string[] {
+    return certificatePemBundle.match(CERTIFICATE_PEM_PATTERN) ?? [certificatePemBundle];
+  }
+
+  private async tryAddTrustAnchor(pkiEnvironment: PkiEnvironment, certificate: string): Promise<boolean> {
+    try {
+      await pkiEnvironment.addTrustAnchor(certificate);
+      return true;
+    } catch (error) {
+      this.logger.debug('Certificate from ACME roots bundle was not accepted as trust anchor', {error});
+      return false;
+    }
+  }
+
+  private async tryAddIntermediateCertificate(
+    pkiEnvironment: PkiEnvironment,
+    certificate: string,
+    source: string,
+  ): Promise<void> {
+    try {
+      await pkiEnvironment.addIntermediateCert(certificate);
+    } catch (error) {
+      this.logger.warn(`Failed to register ${source} E2EI intermediate certificate`, {error});
+    }
+  }
+
   private async registerLocalCertificateRoot(acmeService: AcmeService): Promise<string> {
     const localCertificateRoot = await acmeService.getLocalCertificateRoot();
     const pkiEnvironment = await this.getOrCreatePkiEnvironment();
-    await pkiEnvironment.addTrustAnchor(localCertificateRoot);
+    const localCertificates = this.splitCertificatePemBundle(localCertificateRoot);
+
+    let trustAnchor: string | undefined;
+    const intermediateCandidates: string[] = [];
+
+    for (const certificate of localCertificates) {
+      if (trustAnchor === undefined && (await this.tryAddTrustAnchor(pkiEnvironment, certificate))) {
+        trustAnchor = certificate;
+        continue;
+      }
+
+      intermediateCandidates.push(certificate);
+    }
+
+    if (trustAnchor === undefined) {
+      throw new Error('Failed to register ACME trust anchor from roots.pem');
+    }
+
+    await Promise.all(
+      intermediateCandidates.map(certificate =>
+        this.tryAddIntermediateCertificate(pkiEnvironment, certificate, 'local ACME roots bundle'),
+      ),
+    );
 
     return localCertificateRoot;
   }
@@ -448,9 +498,15 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   private async registerCrossSignedCertificates(acmeService: AcmeService): Promise<void> {
-    const certificates = await acmeService.getFederationCrossSignedCertificates();
+    const certificates = (await acmeService.getFederationCrossSignedCertificates()).flatMap(certificate =>
+      this.splitCertificatePemBundle(certificate),
+    );
     const pkiEnvironment = await this.getOrCreatePkiEnvironment();
-    await Promise.all(certificates.map(certificate => pkiEnvironment.addIntermediateCert(certificate)));
+    await Promise.all(
+      certificates.map(certificate =>
+        this.tryAddIntermediateCertificate(pkiEnvironment, certificate, 'federation cross-signed'),
+      ),
+    );
   }
 
   /**
