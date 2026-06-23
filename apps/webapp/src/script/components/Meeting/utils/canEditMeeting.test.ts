@@ -23,6 +23,10 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {canEditMeeting} from './canEditMeeting';
 
+const FUTURE_MEETING_TIMESTAMP = Date.parse('2026-06-15T13:00:00.000Z');
+const ONGOING_MEETING_TIMESTAMP = Date.parse('2026-06-15T14:30:00.000Z');
+const PAST_MEETING_TIMESTAMP = Date.parse('2026-06-15T16:00:00.000Z');
+
 const createMeeting = (overrides: Partial<Meeting> = {}): Meeting => ({
   start_date: '2026-06-15T14:00:00.000Z',
   end_date: '2026-06-15T15:00:00.000Z',
@@ -46,27 +50,27 @@ describe('canEditMeeting', () => {
     const meeting = createMeeting();
     const selfUser = createSelfUser();
 
-    expect(canEditMeeting(meeting, selfUser, new Date('2026-06-15T13:00:00.000Z').getTime())).toBe(true);
+    expect(canEditMeeting(meeting, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(true);
   });
 
   it('returns false for a non-host', () => {
     const meeting = createMeeting();
     const selfUser = createSelfUser('other-user');
 
-    expect(canEditMeeting(meeting, selfUser, new Date('2026-06-15T13:00:00.000Z').getTime())).toBe(false);
+    expect(canEditMeeting(meeting, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(false);
   });
 
   it('returns false for an ongoing meeting', () => {
     const meeting = createMeeting();
     const selfUser = createSelfUser();
 
-    expect(canEditMeeting(meeting, selfUser, new Date('2026-06-15T14:30:00.000Z').getTime())).toBe(false);
+    expect(canEditMeeting(meeting, selfUser, ONGOING_MEETING_TIMESTAMP)).toBe(false);
   });
 
   it('returns false for a past meeting', () => {
     const meeting = createMeeting();
     const selfUser = createSelfUser();
 
-    expect(canEditMeeting(meeting, selfUser, new Date('2026-06-15T16:00:00.000Z').getTime())).toBe(false);
+    expect(canEditMeeting(meeting, selfUser, PAST_MEETING_TIMESTAMP)).toBe(false);
   });
 });
