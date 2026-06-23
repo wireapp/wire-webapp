@@ -165,3 +165,4 @@ export * from './ChevronDownIcon';
 export * from './ChevronUpIcon';
 export * from './ZoomInIcon';
 export * from './ZoomOutIcon';
+export * from './ConversationSettingsIcon';

@@ -17,7 +17,7 @@
  *
  */
 
-import {MLSVerified} from '@wireapp/react-ui-kit';
+import {ConversationSettingsIcon, MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {E2EIVerificationMessage} from 'Repositories/entity/message/e2eiVerificationMessage';
@@ -35,6 +35,7 @@ import {SystemMessageBase} from './SystemMessageBase';
 
 import {messageBodyWrapper} from '../ContentMessage/ContentMessage.styles';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
+import { MemberRoleUpdateMessage } from 'Repositories/entity/message/memberRoleUpdateMessage';
 
 interface SystemMessageProps {
   message: SystemMessageEntity;
@@ -50,6 +51,10 @@ export const SystemMessage = ({message}: SystemMessageProps) => {
         </div>
       </>
     );
+  }
+
+  if (message instanceof MemberRoleUpdateMessage) {
+    return <SystemMessageBase message={message} icon={<ConversationSettingsIcon />} />;
   }
 
   if (message instanceof MessageTimerUpdateMessage) {
