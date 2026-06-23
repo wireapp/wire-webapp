@@ -17,13 +17,8 @@
  *
  */
 
+import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {TranslationKey} from 'Util/localizerUtil';
-
-import type {ScheduleMeetingResult, UpdateMeetingResult} from './scheduleMeetingService';
-
-type ScheduleMeetingErrorStatus = Exclude<ScheduleMeetingResult['status'], 'success'>;
-type UpdateMeetingErrorStatus = Exclude<UpdateMeetingResult['status'], 'success'>;
-type MeetingSubmitErrorStatus = ScheduleMeetingErrorStatus | UpdateMeetingErrorStatus;
 
 export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
   missingTimes: {
@@ -42,4 +37,12 @@ export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
     titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
     messageKey: 'meetings.scheduleModal.error.updateFailed',
   },
-} as const satisfies Record<MeetingSubmitErrorStatus, {titleKey: TranslationKey; messageKey: TranslationKey}>;
+  addInvitationFailed: {
+    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
+    messageKey: 'meetings.scheduleModal.error.addInvitationFailed',
+  },
+  removeInvitationFailed: {
+    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
+    messageKey: 'meetings.scheduleModal.error.removeInvitationFailed',
+  },
+} as const satisfies Record<MeetingSubmitErrors, {titleKey: TranslationKey; messageKey: TranslationKey}>;

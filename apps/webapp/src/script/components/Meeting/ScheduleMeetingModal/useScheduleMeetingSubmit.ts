@@ -20,28 +20,21 @@
 import {useCallback, useState} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {Maybe} from 'true-myth';
+import type {Maybe, Result} from 'true-myth';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
-import {
-  tryScheduleMeeting,
-  tryUpdateMeeting,
-  type ScheduleMeetingResult,
-  type TryScheduleMeetingDependencies,
-  type UpdateMeetingResult,
-} from './scheduleMeetingService';
+import {tryScheduleMeeting, tryUpdateMeeting, type TryScheduleMeetingDependencies} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
-type MeetingSubmitResult = ScheduleMeetingResult | UpdateMeetingResult;
-type MeetingSubmitErrorStatus = Exclude<MeetingSubmitResult['status'], 'success'>;
+import type {MeetingSubmitErrors} from '../MeetingSubmitErrors';
 
-const showMeetingSubmitError = (translate: Translate, status: MeetingSubmitErrorStatus): void => {
-  const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[status];
+const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {
+  const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[error];
   PrimaryModal.show(
     PrimaryModal.type.ACKNOWLEDGE,
     {
@@ -61,9 +54,9 @@ const performMeetingSubmit = async (
   formState: ScheduleMeetingFormState,
   originalInvitedEmails: string[],
   dependencies: TryScheduleMeetingDependencies,
-): Promise<MeetingSubmitResult> => {
+): Promise<Result<void, MeetingSubmitErrors>> => {
   if (mode === 'edit' && editingMeetingId.isJust) {
-    return tryUpdateMeeting({
+    return await tryUpdateMeeting({
       meetingId: editingMeetingId.value,
       formState,
       originalInvitedEmails,
@@ -71,7 +64,7 @@ const performMeetingSubmit = async (
     });
   }
 
-  return tryScheduleMeeting(formState, dependencies);
+  return await tryScheduleMeeting(formState, dependencies);
 };
 
 export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void>) => {
@@ -92,8 +85,8 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
           fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve(),
         });
 
-        if (result.status !== 'success') {
-          showMeetingSubmitError(translate, result.status);
+        if (result.isErr) {
+          showMeetingSubmitError(translate, result.error);
           return false;
         }
 

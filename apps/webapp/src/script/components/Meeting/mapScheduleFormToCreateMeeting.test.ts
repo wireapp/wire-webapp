@@ -19,7 +19,7 @@
 
 import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
 import {maybe} from 'true-myth';
-import {unwrap, unwrapErr} from 'true-myth/test-support';
+import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
