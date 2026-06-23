@@ -22,6 +22,7 @@ import {ConversationSettingsIcon, MLSVerified} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 import {E2EIVerificationMessage} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
+import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
 import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/mlsConversationRecoveredMessage';
 import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/mlsMigrationFinalisationOngoingCallMessage';
@@ -35,7 +36,6 @@ import {SystemMessageBase} from './SystemMessageBase';
 
 import {messageBodyWrapper} from '../ContentMessage/ContentMessage.styles';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
-import { MemberRoleUpdateMessage } from 'Repositories/entity/message/memberRoleUpdateMessage';
 
 interface SystemMessageProps {
   message: SystemMessageEntity;

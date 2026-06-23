@@ -45,6 +45,7 @@ import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from 'Repositories/en
 import {Location} from 'Repositories/entity/message/location';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
 import type {Message} from 'Repositories/entity/message/message';
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
 import {MissedMessage} from 'Repositories/entity/message/missedMessage';
@@ -91,7 +92,6 @@ import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {APIClient} from '../../service/apiClientSingleton';
-import { MemberRoleUpdateMessage } from 'Repositories/entity/message/memberRoleUpdateMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
