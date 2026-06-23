@@ -61,7 +61,7 @@ export class Core extends Account {
       systemCrypto: window.systemCrypto ? wrapSystemCrypto(window.systemCrypto) : undefined,
       coreCryptoConfig: {
         enabled: enableCoreCrypto,
-        wasmFilePath: `/min/`,
+        wasmFilePath: `/min/index_bg.wasm`,
       },
       nbPrekeys: 100,
     });
