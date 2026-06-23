@@ -18,11 +18,12 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
-import {TypedEventEmitter} from '@wireapp/commons';
+import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {
   CoreCrypto,
   Database,
@@ -36,11 +37,14 @@ import {
   PkiEnvironment,
   PkiEnvironmentHooks,
   HttpMethod,
+  X509CredentialAcquisition,
+  X509CredentialAcquisitionConfiguration,
 } from '@wireapp/core-crypto/browser';
 
 import {AcmeService} from './connection';
-import {getTokenCallback} from './e2eiServiceInternal';
+import {getAllConversationsCallback, getTokenCallback} from './e2eiServiceInternal';
 import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
+import {User} from './e2eiService.types';
 
 import {ClientService} from '../../../client';
 import {CoreDatabase} from '../../../storage/coreDb';
@@ -72,9 +76,11 @@ const HTTP_METHOD_NAMES: Record<HttpMethod, string> = {
 
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal extends TypedEventEmitter<Events> {
+  private readonly logger = LogFactory.getLogger('@wireapp/core/E2EIdentityServiceExternal');
   private _acmeService?: AcmeService;
   private pkiEnvironment?: PkiEnvironment;
   private getOAuthToken?: getTokenCallback;
+  private isResumingCredentialAcquisition = false;
   private readonly enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
 
   public constructor(
@@ -118,12 +124,21 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
           body: new Uint8Array(await response.arrayBuffer()),
         };
       },
-      authenticate: async (idp, keyAuth, acmeAud) => {
+      authenticate: async (idp, keyAuth, acmeAud, acquisitionSnapshot) => {
         if (this.getOAuthToken === undefined) {
           throw new Error('Cannot authenticate E2EI X509 acquisition: OAuth token callback is not configured');
         }
 
-        const idToken = await this.getOAuthToken({keyAuth, challenge: {target: idp, url: acmeAud}});
+        const snapshot = new Uint8Array(acquisitionSnapshot.length);
+        snapshot.set(acquisitionSnapshot);
+        await this.enrollmentStorage.savePendingEnrollmentData({
+          type: 'x509-credential-acquisition',
+          acquisitionSnapshot: snapshot,
+        });
+
+        const idToken = this.isResumingCredentialAcquisition
+          ? await this.getOAuthToken()
+          : await this.getOAuthToken({keyAuth, challenge: {target: idp, url: acmeAud}});
         if (idToken === undefined || idToken.length === 0) {
           throw new Error('Cannot authenticate E2EI X509 acquisition: no ID token received');
         }
@@ -156,7 +171,13 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     throw new Error('Cannot resolve current client id for E2EI PKI environment');
   }
 
-  private async getOrCreatePkiEnvironment(): Promise<PkiEnvironment> {
+  private isX509CredentialAcquisitionEnrollmentData(
+    data: Awaited<ReturnType<typeof this.enrollmentStorage.getPendingEnrollmentData>>,
+  ): data is {type: 'x509-credential-acquisition'; acquisitionSnapshot: Uint8Array<ArrayBuffer>} {
+    return data !== undefined && 'type' in data && data.type === 'x509-credential-acquisition';
+  }
+
+  public async getOrCreatePkiEnvironment(): Promise<PkiEnvironment> {
     const existingPkiEnvironment = this.pkiEnvironment ?? (await this.coreCryptoClient.getPkiEnvironment());
     if (existingPkiEnvironment !== undefined) {
       this.pkiEnvironment = existingPkiEnvironment;
@@ -167,6 +188,81 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     await this.coreCryptoClient.setPkiEnvironment(pkiEnvironment);
     this.pkiEnvironment = pkiEnvironment;
     return pkiEnvironment;
+  }
+
+  public async enroll({
+    certificateTtl,
+    client,
+    discoveryUrl,
+    getAllConversations,
+    getOAuthToken,
+    nbKeyPackages,
+    user,
+  }: {
+    certificateTtl: number;
+    client: RegisteredClient;
+    discoveryUrl: string;
+    getAllConversations: getAllConversationsCallback;
+    getOAuthToken: getTokenCallback;
+    nbKeyPackages: number;
+    user: User;
+  }): Promise<void> {
+    this._acmeService = new AcmeService(discoveryUrl);
+    this.setAuthenticationCallback(getOAuthToken);
+
+    const pkiEnvironment = await this.getOrCreatePkiEnvironment();
+    const clientId = createCoreCryptoClientId(user.id, client.id, user.domain);
+    const config = X509CredentialAcquisitionConfiguration.new({
+      acmeDirectoryUrl: discoveryUrl,
+      cipherSuite: this.mlsService.config.defaultCiphersuite,
+      displayName: user.displayName,
+      clientId,
+      handle: user.handle,
+      domain: user.domain,
+      team: user.teamId,
+      validityPeriodSecs: BigInt(certificateTtl),
+    });
+
+    const pendingEnrollmentData = await this.enrollmentStorage.getPendingEnrollmentData();
+    const isResumingCredentialAcquisition = this.isX509CredentialAcquisitionEnrollmentData(pendingEnrollmentData);
+    const baseCredentialRef = await this.mlsService.getCurrentCredentialRef();
+    const acquisition = isResumingCredentialAcquisition
+      ? X509CredentialAcquisition.fromBytes(pkiEnvironment, pendingEnrollmentData.acquisitionSnapshot)
+      : await X509CredentialAcquisition.newFromCredentialRef(
+          pkiEnvironment,
+          config,
+          baseCredentialRef,
+          this.coreCryptoDatabase,
+        );
+
+    this.isResumingCredentialAcquisition = isResumingCredentialAcquisition;
+    try {
+      const credential = await acquisition.finalize();
+      const credentialRef = await this.coreCryptoClient.transaction(cx => cx.addCredential(credential));
+
+      const conversations = await getAllConversations();
+      for (const conversation of conversations) {
+        if (conversation.group_id?.length) {
+          try {
+            await this.mlsService.setConversationCredential(conversation.group_id, credentialRef);
+          } catch (error) {
+            this.logger.warn('Failed to set X509 credential for conversation', {groupId: conversation.group_id, error});
+          }
+        } else {
+          this.logger.error('No group id found in conversation');
+        }
+      }
+
+      const keyPackages = await this.mlsService.generateKeyPackagesForCredential(credentialRef, nbKeyPackages);
+      if (!this.mlsService.isInitializedMLSClient(client)) {
+        await this.mlsService.uploadMLSPublicKeys(client);
+      }
+      await this.mlsService.replaceKeyPackages(client.id, keyPackages);
+      await this.mlsService.verifyRemoteMLSKeyPackagesAmount(client.id);
+      await this.enrollmentStorage.deletePendingEnrollmentData();
+    } finally {
+      this.isResumingCredentialAcquisition = false;
+    }
   }
 
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)

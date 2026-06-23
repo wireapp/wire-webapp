@@ -37,7 +37,7 @@ const AcmeChallengeSchema = z.object({
   url: z.string(),
   target: z.string(),
 });
-export const EnrollmentFlowDataSchema = z.object({
+export const LegacyEnrollmentFlowDataSchema = z.object({
   handle: z.instanceof(Uint8Array),
   orderUrl: z.string().url(),
   authorization: z.object({
@@ -47,5 +47,15 @@ export const EnrollmentFlowDataSchema = z.object({
   }),
   nonce: z.string(),
 });
+export const X509CredentialAcquisitionEnrollmentDataSchema = z.object({
+  type: z.literal('x509-credential-acquisition'),
+  acquisitionSnapshot: z.instanceof(Uint8Array),
+});
+export const EnrollmentFlowDataSchema = z.union([
+  LegacyEnrollmentFlowDataSchema,
+  X509CredentialAcquisitionEnrollmentDataSchema,
+]);
+export type LegacyEnrollmentFlowData = z.infer<typeof LegacyEnrollmentFlowDataSchema>;
+export type X509CredentialAcquisitionEnrollmentData = z.infer<typeof X509CredentialAcquisitionEnrollmentDataSchema>;
 export type EnrollmentFlowData = z.infer<typeof EnrollmentFlowDataSchema>;
-export type UnidentifiedEnrollmentFlowData = Omit<EnrollmentFlowData, 'handle'>;
+export type UnidentifiedEnrollmentFlowData = Omit<LegacyEnrollmentFlowData, 'handle'>;

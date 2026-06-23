@@ -32,7 +32,7 @@ import {getCertificate} from './steps/certificate';
 import {doWireDpopChallenge} from './steps/dpopChallenge/dpopChallenge';
 import {doWireOidcChallenge} from './steps/oidcChallenge';
 import {createNewOrder, finalizeOrder} from './steps/order';
-import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './storage/e2eiStorage.schema';
+import {LegacyEnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './storage/e2eiStorage.schema';
 
 import {CoreDatabase} from '../../../storage/coreDb';
 import {Ciphersuite} from '../ciphersuite';
@@ -72,7 +72,7 @@ export class E2EIServiceInternal {
     getAllConversations: getAllConversationsCallback,
     ciphersuite: Ciphersuite,
   ) {
-    throw new Error('E2EI certificate generation must be migrated to CoreCrypto 10 X509CredentialAcquisition before use');
+    throw new Error('Deprecated CC9 E2EI certificate generation flow is disabled; use E2EIServiceExternal.enroll');
     /*
     const stashedEnrollmentData = await this.enrollmentStorage.getPendingEnrollmentData();
 
@@ -111,7 +111,7 @@ export class E2EIServiceInternal {
 
   public async continueCertificateGeneration(
     oAuthToken: string,
-    enrollmentData: EnrollmentFlowData,
+    enrollmentData: LegacyEnrollmentFlowData,
     getAllConversations: getAllConversationsCallback,
     cipherSuite: Ciphersuite,
   ) {

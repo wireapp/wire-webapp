@@ -319,17 +319,15 @@ export class Account extends TypedEventEmitter<Events> {
       id: this.userId,
     };
 
-    this.service.e2eIdentity.setAuthenticationCallback(getOAuthToken);
-
-    return this.service.mls.enrollE2EI(
-      discoveryUrl,
-      user,
-      this.currentClient,
-      this.options.nbPrekeys,
+    return this.service.e2eIdentity.enroll({
       certificateTtl,
-      getOAuthToken,
+      client: this.currentClient,
+      discoveryUrl,
       getAllConversations,
-    );
+      getOAuthToken,
+      nbKeyPackages: this.options.nbPrekeys,
+      user,
+    });
   };
 
   get clientId(): string {

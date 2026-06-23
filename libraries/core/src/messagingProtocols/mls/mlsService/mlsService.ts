@@ -65,11 +65,6 @@ import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUt
 import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {TaskScheduler} from '../../../util/taskScheduler';
-import {User} from '../e2eIdentityService';
-import {
-  getAllConversationsCallback,
-  getTokenCallback,
-} from '../e2eIdentityService/e2eiServiceInternal';
 import {
   getMLSDeviceStatus,
   getSignatureAlgorithmForCiphersuite,
@@ -315,9 +310,23 @@ export class MLSService extends TypedEventEmitter<Events> {
     return this.coreCryptoClient.transaction(cx => this.getCredentialRef(cx));
   }
 
+  public async getCurrentCredentialRef(): Promise<CredentialRef> {
+    return this.getCredentialRef();
+  }
+
   private async generateKeyPackages(context: CoreCryptoContext, amount: number): Promise<KeyPackage[]> {
     const credentialRef = await this.getCredentialRef(context);
     return Promise.all(Array.from({length: amount}, () => context.generateKeyPackage(credentialRef)));
+  }
+
+  public async generateKeyPackagesForCredential(
+    credentialRef: CredentialRef,
+    amount: number,
+  ): Promise<Uint8Array[]> {
+    const keyPackages = await this.coreCryptoClient.transaction(cx =>
+      Promise.all(Array.from({length: amount}, () => cx.generateKeyPackage(credentialRef))),
+    );
+    return keyPackages.map(keyPackage => keyPackage.serialize());
   }
 
   private readonly _uploadCommitBundle = async ({
@@ -990,7 +999,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
-  private async verifyRemoteMLSKeyPackagesAmount(clientId: string) {
+  public async verifyRemoteMLSKeyPackagesAmount(clientId: string) {
     const backendKeyPackagesCount = await this.getRemoteMLSKeyPackageCount(clientId);
 
     // If we have enough keys uploaded on backend, there's no need to upload more.
@@ -1021,7 +1030,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param mlsClient Intance of the coreCrypto that represents the mls client
    * @param client Backend client data
    */
-  private async uploadMLSPublicKeys(client: RegisteredClient) {
+  public async uploadMLSPublicKeys(client: RegisteredClient) {
     // If we've already updated a client with its public key, there's no need to do it again.
     try {
       const clientSignature = await this.getCCClientSignatureString();
@@ -1042,6 +1051,16 @@ export class MLSService extends TypedEventEmitter<Events> {
       keyPackages.map(bytesToBase64),
       numberToHex(this.config.defaultCiphersuite),
     );
+  }
+
+  public async setConversationCredential(groupId: string, credentialRef: CredentialRef): Promise<void> {
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
+    const conversationId = new ConversationId(groupIdBytes);
+    const conversationExists = await this.coreCryptoClient.conversationExists(conversationId);
+
+    if (conversationExists) {
+      await this.coreCryptoClient.transaction(cx => cx.setConversationCredential(conversationId, credentialRef));
+    }
   }
 
   private async uploadMLSKeyPackages(clientId: string, keyPackages: Uint8Array[]) {
@@ -1243,53 +1262,4 @@ export class MLSService extends TypedEventEmitter<Events> {
     return handleMLSWelcomeMessage({event, mlsService: this});
   }
 
-  /**
-   *
-   * @param discoveryUrl URL of the acme server
-   * @param user User object
-   * @param clientId The client id of the current device
-   * @param nbPrekeys Amount of prekeys to generate
-   * @param oAuthIdToken The OAuth id token if the user is already authenticated
-   * @returns AcmeChallenge if the user is not authenticated, true if the user is authenticated
-   */
-  public async enrollE2EI(
-    discoveryUrl: string,
-    user: User,
-    client: RegisteredClient,
-    nbPrekeys: number,
-    certificateTtl: number,
-    getOAuthToken: getTokenCallback,
-    getAllConversations: getAllConversationsCallback,
-  ): Promise<void> {
-    throw new Error('E2EI enrollment must be migrated to CoreCrypto 10 X509CredentialAcquisition before use');
-    /*
-    const isCertificateRenewal = await this.coreCryptoClient.e2eiIsEnabled(this.config.defaultCiphersuite);
-    const e2eiServiceInternal = new E2EIServiceInternal(
-      this.coreDatabase,
-      this.coreCryptoClient,
-      this.apiClient,
-      certificateTtl,
-      nbPrekeys,
-      {user, clientId: client.id, discoveryUrl},
-    );
-
-    const {keyPackages, newCrlDistributionPoints} = await e2eiServiceInternal.generateCertificate(
-      getOAuthToken,
-      isCertificateRenewal,
-      getAllConversations,
-      this.config.defaultCiphersuite,
-    );
-
-    this.dispatchNewCrlDistributionPoints(newCrlDistributionPoints);
-    // upload the clients public keys
-    if (!this.isInitializedMLSClient(client)) {
-      // we only upload public keys for the initial certification process if the device is not already a registered MLS device.
-      await this.uploadMLSPublicKeys(client);
-    }
-    // replace old key packages with new key packages with x509 certificate
-    await this.replaceKeyPackages(client.id, keyPackages);
-    // Verify that we have enough key packages
-    await this.verifyRemoteMLSKeyPackagesAmount(client.id);
-    */
-  }
 }

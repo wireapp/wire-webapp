@@ -21,7 +21,7 @@ import {toBufferSource} from '../../../../util/bufferUtils';
 import {AcmeService} from '../connection';
 import {E2eiEnrollment, NewAcmeAuthz, Nonce} from '../e2eiService.types';
 import {jsonToByteArray} from '../helper';
-import {EnrollmentFlowData} from '../storage/e2eiStorage.schema';
+import {LegacyEnrollmentFlowData} from '../storage/e2eiStorage.schema';
 
 interface GetAuthorizationParams {
   nonce: Nonce;
@@ -35,7 +35,7 @@ export const getAuthorizationChallenges = async ({
   nonce,
   identity,
   connection,
-}: GetAuthorizationParams): Promise<Pick<EnrollmentFlowData, 'authorization' | 'nonce'>> => {
+}: GetAuthorizationParams): Promise<Pick<LegacyEnrollmentFlowData, 'authorization' | 'nonce'>> => {
   const challenges: {type: string; challenge: NewAcmeAuthz}[] = [];
 
   for (const authzUrl of authzUrls) {
