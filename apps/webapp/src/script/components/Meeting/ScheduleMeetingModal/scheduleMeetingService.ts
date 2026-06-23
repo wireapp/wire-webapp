@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {mapScheduleFormToCreateMeeting} from 'Components/Meeting/mapScheduleFormToCreateMeeting';
@@ -87,11 +88,11 @@ export async function tryUpdateMeeting(
     await meetingsRepository.updateMeeting(meetingId, payload);
     didUpdateMeeting = true;
 
-    if (removedEmails.length > 0) {
+    if (is.nonEmptyArray(removedEmails)) {
       await meetingsRepository.removeMeetingInvitation(meetingId, removedEmails);
     }
 
-    if (addedEmails.length > 0) {
+    if (is.nonEmptyArray(addedEmails)) {
       await meetingsRepository.addMeetingInvitation(meetingId, addedEmails);
     }
 
