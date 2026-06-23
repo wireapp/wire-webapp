@@ -36,7 +36,7 @@ import {
   isProteus1to1ConversationWithUser,
   isSelfConversation,
   isReadableConversation,
-  isMeetingConversation,
+  isConversationForScheduledMeeting,
 } from './ConversationSelectors';
 
 @singleton()
@@ -79,7 +79,7 @@ export class ConversationState {
   ) {
     this.sortedConversations = ko.pureComputed(() =>
       this.filteredConversations()
-        .filter(conversation => !isMeetingConversation(conversation))
+        .filter(conversation => !isConversationForScheduledMeeting(conversation))
         .toSorted(sortGroupsByLastEvent),
     );
     this.selfProteusConversation = ko.pureComputed(() =>

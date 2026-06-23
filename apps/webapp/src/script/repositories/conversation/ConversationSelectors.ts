@@ -143,7 +143,7 @@ export const isProteus1to1ConversationWithUser = (userId: QualifiedId) =>
 export const isMLS1to1ConversationWithUser = (userId: QualifiedId) =>
   is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.MLS);
 
-export const isMeetingConversation = (conversation: Conversation): boolean => {
+export const isConversationForScheduledMeeting = (conversation: Conversation): boolean => {
   return conversation.groupConversationType() === GROUP_CONVERSATION_TYPE.MEETING;
 };
 
