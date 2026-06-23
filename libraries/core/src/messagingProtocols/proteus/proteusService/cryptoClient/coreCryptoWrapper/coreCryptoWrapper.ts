@@ -166,7 +166,11 @@ export async function buildClient(
         setLogger(coreCryptoLogger);
         setMaxLogLevel(CoreCryptoLogLevel.Info);
 
-        return new CoreCryptoWrapper(coreCryptoInstance, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
+        return new CoreCryptoWrapper(coreCryptoInstance, coreCryptoDatabase, {
+          nbPrekeys,
+          onNewPrekeys,
+          onWipe: key.deleteKey,
+        });
       })
       // if the coreCrypto initialization fails, can not use the crypto client and throw an error
       .catch(async (error: unknown) => {
@@ -184,6 +188,7 @@ export class CoreCryptoWrapper implements CryptoClient {
 
   constructor(
     private readonly coreCrypto: CoreCrypto,
+    private readonly coreCryptoDatabase: Database,
     config: ClientConfig,
   ) {
     this.version = CCVersion();
@@ -192,6 +197,10 @@ export class CoreCryptoWrapper implements CryptoClient {
 
   getNativeClient() {
     return this.coreCrypto;
+  }
+
+  getDatabase() {
+    return this.coreCryptoDatabase;
   }
 
   encrypt(sessions: string[], plainText: Uint8Array) {

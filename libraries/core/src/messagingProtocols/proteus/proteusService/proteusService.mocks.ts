@@ -42,7 +42,7 @@ export const buildProteusService = async (): Promise<
     clientId: getUUID(),
   };
 
-  const cryptoClient = new CoreCryptoWrapper({} as any, {} as any);
+  const cryptoClient = new CoreCryptoWrapper({} as any, {} as any, {} as any);
 
   const storeEngine = await createMemoryEngine('proteus-service-test');
 

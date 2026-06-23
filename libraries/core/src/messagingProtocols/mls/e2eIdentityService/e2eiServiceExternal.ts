@@ -21,9 +21,11 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Decoder} from 'bazinga64';
 
+import {APIClient} from '@wireapp/api-client';
 import {TypedEventEmitter} from '@wireapp/commons';
 import {
   CoreCrypto,
+  Database,
   E2eiConversationState,
   WireIdentity,
   DeviceStatus,
@@ -31,9 +33,13 @@ import {
   ConversationId,
   ClientId,
   Uuid,
+  PkiEnvironment,
+  PkiEnvironmentHooks,
+  HttpMethod,
 } from '@wireapp/core-crypto/browser';
 
 import {AcmeService} from './connection';
+import {getTokenCallback} from './e2eiServiceInternal';
 import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 
 import {ClientService} from '../../../client';
@@ -55,13 +61,26 @@ type Events = {
   crlChanged: {domain: string};
 };
 
+const HTTP_METHOD_NAMES: Record<HttpMethod, string> = {
+  [HttpMethod.Get]: 'GET',
+  [HttpMethod.Post]: 'POST',
+  [HttpMethod.Put]: 'PUT',
+  [HttpMethod.Delete]: 'DELETE',
+  [HttpMethod.Patch]: 'PATCH',
+  [HttpMethod.Head]: 'HEAD',
+};
+
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   private _acmeService?: AcmeService;
+  private pkiEnvironment?: PkiEnvironment;
+  private getOAuthToken?: getTokenCallback;
   private readonly enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
 
   public constructor(
     private readonly coreCryptoClient: CoreCrypto,
+    private readonly coreCryptoDatabase: Database,
+    private readonly apiClient: APIClient,
     private readonly coreDatabase: CoreDatabase,
     private readonly recurringTaskScheduler: RecurringTaskScheduler,
     private readonly clientService: ClientService,
@@ -69,6 +88,85 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   ) {
     super();
     this.enrollmentStorage = createE2EIEnrollmentStorage(coreDatabase);
+  }
+
+  public setAuthenticationCallback(getOAuthToken: getTokenCallback): void {
+    this.getOAuthToken = getOAuthToken;
+  }
+
+  private createPkiEnvironmentHooks(): PkiEnvironmentHooks {
+    return {
+      httpRequest: async (method, url, headers, body, asyncOpts) => {
+        const requestHeaders = new Headers();
+        headers.forEach(({name, value}) => requestHeaders.append(name, value));
+        const requestBody = new ArrayBuffer(body.length);
+        new Uint8Array(requestBody).set(body);
+
+        const response = await fetch(url, {
+          method: HTTP_METHOD_NAMES[method],
+          headers: requestHeaders,
+          body: method === HttpMethod.Get || method === HttpMethod.Head || body.length === 0 ? undefined : requestBody,
+          signal: asyncOpts?.signal,
+        });
+
+        const responseHeaders: Array<{name: string; value: string}> = [];
+        response.headers.forEach((value, name) => responseHeaders.push({name, value}));
+
+        return {
+          status: response.status,
+          headers: responseHeaders,
+          body: new Uint8Array(await response.arrayBuffer()),
+        };
+      },
+      authenticate: async (idp, keyAuth, acmeAud) => {
+        if (this.getOAuthToken === undefined) {
+          throw new Error('Cannot authenticate E2EI X509 acquisition: OAuth token callback is not configured');
+        }
+
+        const idToken = await this.getOAuthToken({keyAuth, challenge: {target: idp, url: acmeAud}});
+        if (idToken === undefined || idToken.length === 0) {
+          throw new Error('Cannot authenticate E2EI X509 acquisition: no ID token received');
+        }
+
+        return idToken;
+      },
+      getBackendNonce: async () => {
+        const clientId = await this.getCurrentClientId();
+        return this.apiClient.api.client.getNonce(clientId);
+      },
+      fetchBackendAccessToken: async dpop => {
+        const clientId = await this.getCurrentClientId();
+        const {token} = await this.apiClient.api.client.getAccessToken(clientId, new TextEncoder().encode(dpop));
+        return token;
+      },
+    };
+  }
+
+  private async getCurrentClientId(): Promise<string> {
+    const contextClientId = this.apiClient.context?.clientId;
+    if (contextClientId !== undefined && contextClientId.length > 0) {
+      return contextClientId;
+    }
+
+    const client = await this.clientService.loadClient();
+    if (client !== undefined) {
+      return client.id;
+    }
+
+    throw new Error('Cannot resolve current client id for E2EI PKI environment');
+  }
+
+  private async getOrCreatePkiEnvironment(): Promise<PkiEnvironment> {
+    const existingPkiEnvironment = this.pkiEnvironment ?? (await this.coreCryptoClient.getPkiEnvironment());
+    if (existingPkiEnvironment !== undefined) {
+      this.pkiEnvironment = existingPkiEnvironment;
+      return existingPkiEnvironment;
+    }
+
+    const pkiEnvironment = await PkiEnvironment.create(this.createPkiEnvironmentHooks(), this.coreCryptoDatabase);
+    await this.coreCryptoClient.setPkiEnvironment(pkiEnvironment);
+    this.pkiEnvironment = pkiEnvironment;
+    return pkiEnvironment;
   }
 
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
@@ -222,6 +320,8 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
 
   private async registerLocalCertificateRoot(acmeService: AcmeService): Promise<string> {
     const localCertificateRoot = await acmeService.getLocalCertificateRoot();
+    const pkiEnvironment = await this.getOrCreatePkiEnvironment();
+    await pkiEnvironment.addTrustAnchor(localCertificateRoot);
 
     return localCertificateRoot;
   }
@@ -234,6 +334,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
    */
   public async initialize(discoveryUrl: string): Promise<void> {
     this._acmeService = new AcmeService(discoveryUrl);
+    await this.getOrCreatePkiEnvironment();
 
     this.mlsService.on(MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS, distributionPoints =>
       this.handleNewCrlDistributionPoints(distributionPoints),
@@ -251,7 +352,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   private async registerCrossSignedCertificates(acmeService: AcmeService): Promise<void> {
-    await acmeService.getFederationCrossSignedCertificates();
+    const certificates = await acmeService.getFederationCrossSignedCertificates();
+    const pkiEnvironment = await this.getOrCreatePkiEnvironment();
+    await Promise.all(certificates.map(certificate => pkiEnvironment.addIntermediateCert(certificate)));
   }
 
   /**
@@ -268,12 +371,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
    * Both must be registered before the first enrollment.
    */
   private async registerServerCertificates(): Promise<void> {
-    const isRootRegistered = await this.coreCryptoClient.e2eiIsPkiEnvSetup();
-
-    // Register root certificate if not already registered
-    if (!isRootRegistered) {
-      await this.registerLocalCertificateRoot(this.acmeService);
-    }
+    await this.registerLocalCertificateRoot(this.acmeService);
 
     // Register intermediate certificate and update it every 24 hours
 

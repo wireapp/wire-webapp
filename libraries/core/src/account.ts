@@ -319,6 +319,8 @@ export class Account extends TypedEventEmitter<Events> {
       id: this.userId,
     };
 
+    this.service.e2eIdentity.setAuthenticationCallback(getOAuthToken);
+
     return this.service.mls.enrollE2EI(
       discoveryUrl,
       user,
@@ -528,6 +530,8 @@ export class Account extends TypedEventEmitter<Events> {
 
       e2eServiceExternal = new E2EIServiceExternal(
         cryptoClient.getNativeClient(),
+        cryptoClient.getDatabase(),
+        this.apiClient,
         this.db,
         this.recurringTaskScheduler,
         clientService,
