@@ -31,7 +31,6 @@ export type ProcessVideoTrackOptions = {
 
   // Virtual background options.
   mode?: EffectMode; /** Effect mode ('blur', 'virtual', or 'passthrough'). Default: 'blur'. */
-  blurStrength: number;
   enabled: boolean;
   backgroundSource: BackgroundSource | null;
 
@@ -86,7 +85,6 @@ export const defaultOpts = {
 
   // Virtual background options.
   mode: 'blur',
-  blurStrength: 0,
   enabled: true,
   backgroundSource: null,
 
