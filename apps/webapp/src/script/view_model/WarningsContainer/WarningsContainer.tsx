@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect} from 'react';
+import {Fragment, useEffect} from 'react';
 
 import cx from 'classnames';
 
@@ -29,14 +29,16 @@ import {afterRender} from 'Util/util';
 
 import {closeWarning, useWarningsState} from './WarningsState';
 import {CONFIG, TYPE} from './WarningsTypes';
+import {copyWebSocketConnectivityDiagnostics} from './webSocketConnectivityDiagnostics';
 
 import {Config} from '../../Config';
 
 interface WarningProps {
-  onRefresh: () => void;
+  readonly onRefresh: () => void;
+  readonly isWebSocketConnectivityDiagnosticsEnabled?: boolean;
 }
 
-const WarningsContainer = ({onRefresh}: WarningProps) => {
+const WarningsContainer = ({onRefresh, isWebSocketConnectivityDiagnosticsEnabled = false}: WarningProps) => {
   const {translate} = useApplicationContext();
   const name = useWarningsState(state => state.name);
   const warnings = useWarningsState(state => state.warnings);
@@ -281,6 +283,19 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
         <div data-uie-name="connectivity-reconnect" className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
             <span>{translate('warningConnectivityConnectionLost', {brandName})}</span>
+            {isWebSocketConnectivityDiagnosticsEnabled && (
+              <Fragment>
+                &nbsp;
+                <button
+                  type="button"
+                  className="warning-bar-link button-reset-default"
+                  data-uie-name="do-copy-websocket-connectivity-diagnostics"
+                  onClick={() => void copyWebSocketConnectivityDiagnostics()}
+                >
+                  Copy diagnostics
+                </button>
+              </Fragment>
+            )}
             <Icon.LoadingIcon className="warning-bar-spinner" data-uie-name="status-loading" />
           </div>
         </div>

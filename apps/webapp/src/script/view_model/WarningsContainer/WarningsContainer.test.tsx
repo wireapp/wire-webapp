@@ -17,7 +17,7 @@
  *
  */
 
-import {act, fireEvent, render} from '@testing-library/react';
+import {act, cleanup, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {translateForTest} from 'Util/test/translateForTest';
 import {
@@ -26,6 +26,11 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {WarningsContainer} from './WarningsContainer';
+import {
+  collectWebSocketConnectivityDiagnostics,
+  WebSocketConnectivityDiagnosticsDependencies,
+} from './webSocketConnectivityDiagnostics';
+import {useWarningsState} from './WarningsState';
 
 import {Warnings} from '.';
 
@@ -34,6 +39,24 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 describe('WarningsContainer', () => {
+  const originalClipboard = navigator.clipboard;
+
+  beforeEach(() => {
+    useWarningsState.setState({name: '', warnings: []});
+  });
+
+  afterEach(() => {
+    cleanup();
+    act(() => {
+      useWarningsState.setState({name: '', warnings: []});
+    });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: originalClipboard,
+    });
+    jest.restoreAllMocks();
+  });
+
   it('does not render when no warning is in the queue', async () => {
     const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
 
@@ -146,6 +169,161 @@ describe('WarningsContainer', () => {
     });
     const WarningElement = getByTestId('connectivity-reconnect');
     expect(WarningElement).toBeTruthy();
+  });
+
+  it('does not render websocket connectivity diagnostics button by default', () => {
+    const {queryByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
+    act(() => {
+      Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+    });
+
+    expect(queryByTestId('do-copy-websocket-connectivity-diagnostics')).toBeNull();
+  });
+
+  it('does not render websocket connectivity diagnostics button when disabled', () => {
+    const {queryByTestId} = render(
+      <WarningsContainer onRefresh={jest.fn()} isWebSocketConnectivityDiagnosticsEnabled={false} />,
+      {wrapper: rootProviderWrapper},
+    );
+    act(() => {
+      Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+    });
+
+    expect(queryByTestId('do-copy-websocket-connectivity-diagnostics')).toBeNull();
+  });
+
+  it('renders websocket connectivity diagnostics button for connectivity_reconnect when enabled', () => {
+    const {getByTestId} = render(
+      <WarningsContainer onRefresh={jest.fn()} isWebSocketConnectivityDiagnosticsEnabled />,
+      {wrapper: rootProviderWrapper},
+    );
+    act(() => {
+      Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+    });
+
+    expect(getByTestId('do-copy-websocket-connectivity-diagnostics')).toBeTruthy();
+  });
+
+  it('does not render websocket connectivity diagnostics button for no_internet when enabled', () => {
+    const {queryByTestId} = render(
+      <WarningsContainer onRefresh={jest.fn()} isWebSocketConnectivityDiagnosticsEnabled />,
+      {wrapper: rootProviderWrapper},
+    );
+    act(() => {
+      Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
+    });
+
+    expect(queryByTestId('do-copy-websocket-connectivity-diagnostics')).toBeNull();
+  });
+
+  it('copies websocket connectivity diagnostics JSON to the clipboard', async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    jest.spyOn(console, 'info').mockImplementation(jest.fn());
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {writeText},
+    });
+
+    const {getByTestId} = render(
+      <WarningsContainer onRefresh={jest.fn()} isWebSocketConnectivityDiagnosticsEnabled />,
+      {wrapper: rootProviderWrapper},
+    );
+    act(() => {
+      Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+    });
+
+    fireEvent.click(getByTestId('do-copy-websocket-connectivity-diagnostics'));
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    const [serializedDiagnostics] = writeText.mock.calls[0];
+    expect(() => JSON.parse(serializedDiagnostics)).not.toThrow();
+    expect(serializedDiagnostics).not.toContain('access_token');
+  });
+
+  it('does not include raw token values in websocket connectivity diagnostics', () => {
+    const diagnosticsDependencies: WebSocketConnectivityDiagnosticsDependencies = {
+      apiClient: {
+        transport: {
+          http: {
+            accessTokenStore: {
+              accessTokenData: {
+                access_token: 'secret-access-token',
+              },
+              markerToken: 'secret-marker-token',
+              tokenExpirationDate: 1_234,
+            },
+            hasValidAccessToken: () => true,
+          },
+          ws: {
+            accessTokenRefreshPromise: Promise.resolve(),
+            bufferedMessages: ['buffered-message'],
+            isLocked: () => true,
+            socket: {
+              getState: () => 1,
+              hasUnansweredPing: true,
+              lastMessageTimestamp: 1_000,
+              pendingHealthChecks: new Set([jest.fn()]),
+              reconnectAttemptCount: 2,
+              reconnectSequenceRetryCount: 1,
+              socket: {
+                _closeCalled: false,
+                _connectLock: true,
+                _shouldReconnect: true,
+                readyState: 3,
+                retryCount: 4,
+                url: 'wss://example.invalid/events?access_token=secret-access-token',
+              },
+              stopBackFromSleepHandler: {isJust: true},
+            },
+            useLegacySocket: false,
+            websocketState: 0,
+          },
+        },
+      },
+      browserDocument: {
+        hasFocus: () => true,
+        visibilityState: 'visible',
+      },
+      browserNavigator: {
+        onLine: true,
+      },
+      browserWindow: {
+        wire: {
+          app: {
+            repository: {
+              event: {
+                notificationHandlingState: () => 'WEB_SOCKET',
+              },
+            },
+          },
+        },
+      } as Window,
+      currentTimestampMilliseconds: () => 2_000,
+    };
+
+    const diagnostics = collectWebSocketConnectivityDiagnostics(diagnosticsDependencies);
+    const serializedDiagnostics = JSON.stringify(diagnostics);
+
+    expect(diagnostics.webSocketClientState.websocketStateName).toBe('CONNECTING');
+    expect(diagnostics.wireReconnectingWebsocketWrapperState.rawWebSocketStateName).toBe('OPEN');
+    expect(diagnostics.underlyingReconnectingWebSocketState.rwsReadyStateName).toBe('CLOSED');
+    expect(serializedDiagnostics).not.toContain('secret-access-token');
+    expect(serializedDiagnostics).not.toContain('secret-marker-token');
+    expect(serializedDiagnostics).not.toContain('access_token');
+    expect(serializedDiagnostics).not.toContain('wss://example.invalid');
+  });
+
+  it('collects websocket connectivity diagnostics when window.wire is missing', () => {
+    const diagnostics = collectWebSocketConnectivityDiagnostics({
+      browserDocument: document,
+      browserNavigator: navigator,
+      browserWindow: window,
+      currentTimestampMilliseconds: () => 2_000,
+    });
+
+    expect(diagnostics.appState.notificationHandlingState).toBeUndefined();
+    expect(diagnostics.wireReconnectingWebsocketWrapperState.hasWrapper).toBe(false);
+    expect(diagnostics.underlyingReconnectingWebSocketState.hasUnderlyingSocket).toBe(false);
   });
 
   it('correctly renders warning of type call_quality_poor', () => {
