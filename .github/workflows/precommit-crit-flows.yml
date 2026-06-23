@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   build:
-    if: ${{ github.repository == 'wireapp/wire-webapp' && (github.event_name != "pull_request" || contains(github.event.pull_request.labels.*.name, "run-e2e")) }}
+    if: ${{ github.repository == 'wireapp/wire-webapp' && (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-e2e')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
 
@@ -113,7 +113,7 @@ jobs:
   e2e-report:
     name: Generate test summary
     needs: [build, deploy_and_run_e2e]
-    if: ${{ always() && github.repository == 'wireapp/wire-webapp' && (github.event_name == "workflow_dispatch" || github.event_name == "schedule") }}
+    if: ${{ always() && github.repository == 'wireapp/wire-webapp' && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
