@@ -17,23 +17,15 @@
  *
  */
 
-import {useMemo} from 'react';
-
-import {container} from 'tsyringe';
-
-import {getScheduleMeetingParticipantPool} from 'Components/Meeting/getScheduleMeetingParticipantPool';
 import type {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import type {TeamState} from 'Repositories/team/TeamState';
+import type {UserState} from 'Repositories/user/userState';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
-export const useScheduleMeetingParticipants = (): {users: User[]} => {
-  const userState = container.resolve(UserState);
-  const teamState = container.resolve(TeamState);
+export const getScheduleMeetingParticipantPool = (userState: UserState, teamState: TeamState): User[] => {
+  const contacts = teamState.isTeam()
+    ? teamState.teamMembers().toSorted(sortUsersByPriority)
+    : userState.connectedUsers();
 
-  const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
-
-  const users = useMemo(() => getScheduleMeetingParticipantPool(userState, teamState), [isTeam, teamState, userState]);
-
-  return {users};
+  return contacts.filter(user => user.isAvailable());
 };

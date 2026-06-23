@@ -17,15 +17,21 @@
  *
  */
 
-import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
-import type {Meeting} from '@wireapp/api-client/lib/meetings/meeting';
-import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import is from '@sindresorhus/is';
+import {Maybe, maybe} from 'true-myth';
 
-export interface MeetingsDataSource {
-  createMeeting(payload: CreateMeeting): Promise<Meeting>;
-  getMeetingsList(): Promise<Meeting[]>;
-  updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Promise<Meeting>;
-  addMeetingInvitation(meetingId: QualifiedId, emails: string[]): Promise<void>;
-  removeMeetingInvitation(meetingId: QualifiedId, emails: string[]): Promise<void>;
-}
+import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+
+export const getInvitedEmailsFromSelectedUsers = (
+  selectedUsers: ScheduleMeetingFormState['selectedUsers'],
+): Maybe<string[]> => {
+  const emails = selectedUsers.map(user => user.email()).filter((email): email is string => is.nonEmptyString(email));
+
+  const hasMissingEmail = selectedUsers.some(user => !is.nonEmptyString(user.email()));
+
+  if (hasMissingEmail) {
+    return maybe.nothing();
+  }
+
+  return maybe.just(emails);
+};

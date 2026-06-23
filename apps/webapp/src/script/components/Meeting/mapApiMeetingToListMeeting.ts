@@ -28,4 +28,7 @@ export const mapApiMeetingToListMeeting = (apiMeeting: ApiMeeting): Meeting => (
   conversation_id: apiMeeting.qualified_conversation.id,
   title: apiMeeting.title,
   recurrence: mapMeetingRecurrenceToOption(apiMeeting.recurrence),
+  qualified_id: apiMeeting.qualified_id,
+  qualified_creator: apiMeeting.qualified_creator,
+  invited_emails: apiMeeting.invited_emails,
 });

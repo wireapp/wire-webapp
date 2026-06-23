@@ -17,23 +17,13 @@
  *
  */
 
-import {useMemo} from 'react';
-
-import {container} from 'tsyringe';
-
-import {getScheduleMeetingParticipantPool} from 'Components/Meeting/getScheduleMeetingParticipantPool';
+import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import type {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
-export const useScheduleMeetingParticipants = (): {users: User[]} => {
-  const userState = container.resolve(UserState);
-  const teamState = container.resolve(TeamState);
+export const canEditMeeting = (meeting: Meeting, selfUser: User, nowMs: number): boolean => {
+  const isHost = matchQualifiedIds(meeting.qualified_creator, selfUser.qualifiedId);
+  const hasNotStarted = nowMs < new Date(meeting.start_date).getTime();
 
-  const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
-
-  const users = useMemo(() => getScheduleMeetingParticipantPool(userState, teamState), [isTeam, teamState, userState]);
-
-  return {users};
+  return isHost && hasNotStarted;
 };

@@ -17,7 +17,10 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import {mapScheduleFormToCreateMeeting} from 'Components/Meeting/mapScheduleFormToCreateMeeting';
+import {mapScheduleFormToUpdateMeeting} from 'Components/Meeting/mapScheduleFormToUpdateMeeting';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
@@ -27,10 +30,14 @@ export type ScheduleMeetingResult =
   | {status: 'participantMissingEmail'}
   | {status: 'createFailed'};
 
+export type UpdateMeetingResult = {status: 'success'} | {status: 'participantMissingEmail'} | {status: 'updateFailed'};
+
 export type TryScheduleMeetingDependencies = {
   meetingsRepository: MeetingsRepository;
   fetchMeetings: () => Promise<void>;
 };
+
+export type TryUpdateMeetingDependencies = TryScheduleMeetingDependencies;
 
 /**
  * Tries to schedule a meeting with the given form state.
@@ -55,5 +62,46 @@ export async function tryScheduleMeeting(
     return {status: 'success'};
   } catch {
     return {status: 'createFailed'};
+  }
+}
+
+/**
+ * Tries to update a meeting with the given form state and invitation diff.
+ */
+export async function tryUpdateMeeting(
+  meetingId: QualifiedId,
+  formState: ScheduleMeetingFormState,
+  originalInvitedEmails: string[],
+  dependencies: TryUpdateMeetingDependencies,
+): Promise<UpdateMeetingResult> {
+  const mapping = mapScheduleFormToUpdateMeeting(formState, originalInvitedEmails);
+
+  if (mapping.error === 'participantMissingEmail') {
+    return {status: 'participantMissingEmail'};
+  }
+
+  const {meetingsRepository, fetchMeetings} = dependencies;
+  let didUpdateMeeting = false;
+
+  try {
+    await meetingsRepository.updateMeeting(meetingId, mapping.payload);
+    didUpdateMeeting = true;
+
+    if (mapping.removedEmails.length > 0) {
+      await meetingsRepository.removeMeetingInvitation(meetingId, mapping.removedEmails);
+    }
+
+    if (mapping.addedEmails.length > 0) {
+      await meetingsRepository.addMeetingInvitation(meetingId, mapping.addedEmails);
+    }
+
+    await fetchMeetings();
+    return {status: 'success'};
+  } catch {
+    if (didUpdateMeeting) {
+      await fetchMeetings();
+    }
+
+    return {status: 'updateFailed'};
   }
 }

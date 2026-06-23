@@ -1,0 +1,78 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {CallIcon, CirclePlusIcon, CloseIcon, EditIcon, ShareLinkIcon, TrashIcon} from '@wireapp/react-ui-kit';
+
+import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import {
+  contextMenuDangerItemIconStyles,
+  contextMenuDangerItemStyles,
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
+import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
+import type {User} from 'Repositories/entity/User';
+import type {ContextMenuEntry} from 'src/script/ui/contextMenu';
+import type {Translate} from 'Util/localizerUtil';
+
+type GetMeetingActionEntriesParams = {
+  meeting: Meeting;
+  selfUser: User;
+  nowMs: number;
+  translate: Translate;
+  onEdit: () => void;
+};
+
+export const getMeetingActionEntries = ({
+  meeting,
+  selfUser,
+  nowMs,
+  translate,
+  onEdit,
+}: GetMeetingActionEntriesParams): ContextMenuEntry[] => {
+  const editEntry: ContextMenuEntry = {
+    icon: () => <EditIcon />,
+    label: translate('meetings.action.editMeeting'),
+    click: onEdit,
+  };
+
+  return [
+    {
+      icon: () => <CallIcon />,
+      label: translate('meetings.action.startMeeting'),
+    },
+    {
+      icon: () => <CirclePlusIcon />,
+      label: translate('meetings.action.createConversation'),
+    },
+    {
+      icon: () => <ShareLinkIcon />,
+      label: translate('meetings.action.copyLink'),
+    },
+    ...(canEditMeeting(meeting, selfUser, nowMs) ? [editEntry] : []),
+    {
+      css: contextMenuDangerItemStyles,
+      icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
+      label: translate('meetings.action.deleteMeetingForMe'),
+    },
+    {
+      css: contextMenuDangerItemStyles,
+      icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
+      label: translate('meetings.action.deleteMeetingForAll'),
+    },
+  ];
+};

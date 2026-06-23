@@ -19,41 +19,75 @@
 
 import {useCallback, useState} from 'react';
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {Translate} from 'Util/localizerUtil';
 
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
-import {tryScheduleMeeting} from './scheduleMeetingService';
-import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+import {
+  tryScheduleMeeting,
+  tryUpdateMeeting,
+  type ScheduleMeetingResult,
+  type TryScheduleMeetingDependencies,
+  type UpdateMeetingResult,
+} from './scheduleMeetingService';
+import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
+import {useScheduleMeetingModal} from './useScheduleMeetingModal';
+
+type MeetingSubmitResult = ScheduleMeetingResult | UpdateMeetingResult;
+type MeetingSubmitErrorStatus = Exclude<MeetingSubmitResult['status'], 'success'>;
+
+const showMeetingSubmitError = (translate: Translate, status: MeetingSubmitErrorStatus): void => {
+  const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[status];
+  PrimaryModal.show(
+    PrimaryModal.type.ACKNOWLEDGE,
+    {
+      text: {
+        title: translate(titleKey),
+        message: translate(messageKey),
+      },
+    },
+    undefined,
+    translate,
+  );
+};
+
+const performMeetingSubmit = async (
+  mode: ScheduleMeetingMode,
+  editingMeetingId: QualifiedId | null,
+  formState: ScheduleMeetingFormState,
+  originalInvitedEmails: string[],
+  dependencies: TryScheduleMeetingDependencies,
+): Promise<MeetingSubmitResult> => {
+  if (mode === 'edit' && editingMeetingId !== null) {
+    return tryUpdateMeeting(editingMeetingId, formState, originalInvitedEmails, dependencies);
+  }
+
+  return tryScheduleMeeting(formState, dependencies);
+};
 
 export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void>) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {mainViewModel, translate} = useApplicationContext();
   const meetingsRepository = mainViewModel.content.repositories.meetings;
+  const mode = useScheduleMeetingModal(state => state.mode);
+  const editingMeetingId = useScheduleMeetingModal(state => state.editingMeetingId);
+  const originalInvitedEmails = useScheduleMeetingModal(state => state.originalInvitedEmails);
 
   const submit = useCallback(
     async (formState: ScheduleMeetingFormState): Promise<boolean> => {
       setIsSubmitting(true);
 
       try {
-        const result = await tryScheduleMeeting(formState, {
+        const result = await performMeetingSubmit(mode, editingMeetingId, formState, originalInvitedEmails, {
           meetingsRepository,
           fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve(),
         });
 
         if (result.status !== 'success') {
-          const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[result.status];
-          PrimaryModal.show(
-            PrimaryModal.type.ACKNOWLEDGE,
-            {
-              text: {
-                title: translate(titleKey),
-                message: translate(messageKey),
-              },
-            },
-            undefined,
-            translate,
-          );
+          showMeetingSubmitError(translate, result.status);
           return false;
         }
 
@@ -62,7 +96,7 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
         setIsSubmitting(false);
       }
     },
-    [meetingsRepository, onMeetingScheduled, translate],
+    [editingMeetingId, meetingsRepository, mode, onMeetingScheduled, originalInvitedEmails, translate],
   );
 
   return {isSubmitting, submit};

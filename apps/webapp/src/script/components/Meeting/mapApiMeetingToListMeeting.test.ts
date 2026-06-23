@@ -43,6 +43,9 @@ describe('mapApiMeetingToListMeeting', () => {
       conversation_id: 'conv-id',
       title: 'Weekly sync',
       recurrence: 'weekly',
+      qualified_id: {id: 'meeting-id', domain: 'example.com'},
+      qualified_creator: {id: 'creator-id', domain: 'example.com'},
+      invited_emails: ['alice@wire.com'],
     });
   });
 

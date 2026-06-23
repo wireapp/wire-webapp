@@ -19,9 +19,11 @@
 
 import type {TranslationKey} from 'Util/localizerUtil';
 
-import type {ScheduleMeetingResult} from './scheduleMeetingService';
+import type {ScheduleMeetingResult, UpdateMeetingResult} from './scheduleMeetingService';
 
 type ScheduleMeetingErrorStatus = Exclude<ScheduleMeetingResult['status'], 'success'>;
+type UpdateMeetingErrorStatus = Exclude<UpdateMeetingResult['status'], 'success'>;
+type MeetingSubmitErrorStatus = ScheduleMeetingErrorStatus | UpdateMeetingErrorStatus;
 
 export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
   participantMissingEmail: {
@@ -32,4 +34,8 @@ export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
     titleKey: 'meetings.scheduleModal.error.createFailedTitle',
     messageKey: 'meetings.scheduleModal.error.createFailed',
   },
-} as const satisfies Record<ScheduleMeetingErrorStatus, {titleKey: TranslationKey; messageKey: TranslationKey}>;
+  updateFailed: {
+    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
+    messageKey: 'meetings.scheduleModal.error.updateFailed',
+  },
+} as const satisfies Record<MeetingSubmitErrorStatus, {titleKey: TranslationKey; messageKey: TranslationKey}>;

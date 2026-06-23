@@ -17,6 +17,7 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
 
 import {getNextHourDateTime} from '@wireapp/react-ui-kit';
@@ -66,8 +67,10 @@ type ScheduleMeetingModalState = {
   mode: ScheduleMeetingMode;
   formState: ScheduleMeetingFormState;
   errors: ScheduleMeetingFormErrors;
+  editingMeetingId: QualifiedId | null;
+  originalInvitedEmails: string[];
   openCreate: () => void;
-  openEdit: (meeting?: Meeting) => void;
+  openEdit: (meeting: Meeting, formState: ScheduleMeetingFormState) => void;
   close: () => void;
   reset: () => void;
   setTitle: (title: string) => void;
@@ -85,6 +88,8 @@ const initialState = {
   mode: 'create' as ScheduleMeetingMode,
   formState: getDefaultScheduleMeetingFormState(),
   errors: {} as ScheduleMeetingFormErrors,
+  editingMeetingId: null as QualifiedId | null,
+  originalInvitedEmails: [] as string[],
 };
 
 export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, get) => ({
@@ -95,17 +100,18 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       mode: 'create',
       formState: getDefaultScheduleMeetingFormState(),
       errors: {},
+      editingMeetingId: null,
+      originalInvitedEmails: [],
     }),
-  openEdit: (meeting?: Meeting) => {
-    // TODO: map meeting fields when edit flow is implemented
-    void meeting;
+  openEdit: (meeting: Meeting, formState: ScheduleMeetingFormState) =>
     set({
       isOpen: true,
       mode: 'edit',
-      formState: getDefaultScheduleMeetingFormState(),
+      formState,
       errors: {},
-    });
-  },
+      editingMeetingId: meeting.qualified_id,
+      originalInvitedEmails: meeting.invited_emails,
+    }),
   close: () => set({isOpen: false}),
   reset: () => set({...initialState, formState: getDefaultScheduleMeetingFormState()}),
   setTitle: title =>

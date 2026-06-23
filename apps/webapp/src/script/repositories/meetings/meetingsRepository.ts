@@ -19,6 +19,8 @@
 
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 import type {Meeting} from '@wireapp/api-client/lib/meetings/meeting';
+import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import type {MeetingsDataSource} from './meetingsDataSource';
 
@@ -31,5 +33,17 @@ export class MeetingsRepository {
 
   getMeetingsList(): Promise<Meeting[]> {
     return this.dataSource.getMeetingsList();
+  }
+
+  updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Promise<Meeting> {
+    return this.dataSource.updateMeeting(meetingId, payload);
+  }
+
+  addMeetingInvitation(meetingId: QualifiedId, emails: string[]): Promise<void> {
+    return this.dataSource.addMeetingInvitation(meetingId, emails);
+  }
+
+  removeMeetingInvitation(meetingId: QualifiedId, emails: string[]): Promise<void> {
+    return this.dataSource.removeMeetingInvitation(meetingId, emails);
   }
 }
