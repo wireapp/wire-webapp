@@ -31,6 +31,7 @@ import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/ValidationError';
 import {ConversationState} from '../../module/reducer/conversationReducer';
 import {QUERY_KEY, ROUTE} from '../../route';
+import {Config} from 'src/script/Config';
 
 export const requiresPasswordModal = (
   isOpen: boolean,
@@ -122,7 +123,9 @@ export const handleEnterpriseLogin = async ({
       res => {
         dispatch(
           ROOT_ACTIONS.authAction.pushAccountRegistrationData({
-            accountCreationEnabled: res.domain_redirect !== DomainRedirect.NO_REGISTRATION,
+            accountCreationEnabled:
+              res.domain_redirect !== DomainRedirect.NO_REGISTRATION &&
+              Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION,
             shouldDisplayWarning: res.domain_redirect === DomainRedirect.NO_REGISTRATION && res.due_to_existing_account,
           }) as unknown as UnknownAction,
         );
