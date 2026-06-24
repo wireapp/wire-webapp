@@ -19,30 +19,35 @@
 
 import type {Maybe} from 'true-myth';
 
+import type {WallClock} from 'src/script/clock/wallClock';
+
 import type {ScheduleMeetingFormErrors} from './scheduleMeetingTypes';
 
 export interface ScheduleMeetingValidationInput {
   title: string;
   start: Maybe<Date>;
   end: Maybe<Date>;
+  wallClock: WallClock;
 }
 
 export const validateScheduleMeetingForm = ({
   title,
   start,
   end,
+  wallClock,
 }: ScheduleMeetingValidationInput): ScheduleMeetingFormErrors => {
   const errors: ScheduleMeetingFormErrors = {};
+  const currentTimestampInMilliseconds = wallClock.currentTimestampInMilliseconds;
 
   if (!title.trim()) {
     errors.title = 'meetings.scheduleModal.error.titleRequired';
   }
 
-  if (start.isJust && start.value.getTime() <= Date.now()) {
+  if (start.isJust && start.value.getTime() <= currentTimestampInMilliseconds) {
     errors.startInPast = 'meetings.schedule.errors.startInPast';
   }
 
-  if (end.isJust && end.value.getTime() <= Date.now()) {
+  if (end.isJust && end.value.getTime() <= currentTimestampInMilliseconds) {
     errors.endInPast = 'meetings.schedule.errors.endInPast';
   }
 

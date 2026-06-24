@@ -19,7 +19,6 @@
 
 import {useMemo} from 'react';
 
-import {getLocalTimeZone, today} from '@internationalized/date';
 import is from '@sindresorhus/is';
 import type {Maybe} from 'true-myth';
 import {maybe} from 'true-myth';
@@ -95,7 +94,7 @@ export const ScheduleMeetingForm = ({
   onParticipantsFilterChange,
   selfUser,
 }: ScheduleMeetingFormProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, wallClock} = useApplicationContext();
   const {users} = useScheduleMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
 
@@ -124,7 +123,7 @@ export const ScheduleMeetingForm = ({
     [translate],
   );
 
-  const todayValue = useMemo(() => today(getLocalTimeZone()), []);
+  const todayValue = dateValueFromDate(wallClock.currentDate);
 
   const endDateMinValue = useMemo(() => {
     if (formState.start.isNothing) {
@@ -133,7 +132,7 @@ export const ScheduleMeetingForm = ({
 
     const startDate = dateValueFromDate(formState.start.value);
     return startDate.compare(todayValue) > 0 ? startDate : todayValue;
-  }, [formState.start, todayValue]);
+  }, [formState.start, wallClock]);
 
   const startErrorText = firstNonEmptyError(errors.startInPast);
   const endErrorText = firstNonEmptyError(errors.endInPast, errors.endBeforeStart);

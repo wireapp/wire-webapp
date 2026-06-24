@@ -19,6 +19,7 @@
 
 import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
 import {maybe} from 'true-myth';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
 import {User} from 'Repositories/entity/User';
@@ -26,6 +27,14 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {mapScheduleFormToCreateMeeting} from './mapScheduleFormToCreateMeeting';
 import type {ScheduleMeetingFormState} from './ScheduleMeetingModal/scheduleMeetingTypes';
+
+const fixedNow = new Date('2026-06-23T14:30:00.000Z');
+const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
+const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
+const futureStartIso = futureStartDate.toISOString();
+const futureEndIso = futureEndDate.toISOString();
+
+const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
 
 const createUser = (id: string, email?: string) => {
   const user = new User(id, 'example.com', translateForTest);
@@ -38,8 +47,8 @@ const createUser = (id: string, email?: string) => {
 
 const baseFormState = (): ScheduleMeetingFormState => ({
   title: 'Weekly sync',
-  start: maybe.just(new Date('2026-07-15T10:00:00.000Z')),
-  end: maybe.just(new Date('2026-07-15T11:00:00.000Z')),
+  start: maybe.just(futureStartDate),
+  end: maybe.just(futureEndDate),
   recurrence: 'weekly',
   selectedUsers: [],
   participantsFilter: '',
@@ -47,43 +56,52 @@ const baseFormState = (): ScheduleMeetingFormState => ({
 
 describe('mapScheduleFormToCreateMeeting', () => {
   it('maps title, times, recurrence, and invited emails', () => {
-    const result = mapScheduleFormToCreateMeeting({
-      ...baseFormState(),
-      selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2', 'bob@wire.com')],
-    });
+    const result = mapScheduleFormToCreateMeeting(
+      {
+        ...baseFormState(),
+        selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2', 'bob@wire.com')],
+      },
+      wallClock,
+    );
 
     expect(result.isOk).toBe(true);
     expect(unwrap(result)).toEqual({
       title: 'Weekly sync',
-      start_time: '2026-07-15T10:00:00.000Z',
-      end_time: '2026-07-15T11:00:00.000Z',
+      start_time: futureStartIso,
+      end_time: futureEndIso,
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
       invited_emails: ['alice@wire.com', 'bob@wire.com'],
     });
   });
 
   it('omits invited_emails when no participants are selected', () => {
-    const result = mapScheduleFormToCreateMeeting(baseFormState());
+    const result = mapScheduleFormToCreateMeeting(baseFormState(), wallClock);
 
     expect(result.isOk).toBe(true);
     expect(unwrap(result).invited_emails).toBeUndefined();
   });
 
   it('returns participantMissingEmail when a selected user has no email', () => {
-    const result = mapScheduleFormToCreateMeeting({
-      ...baseFormState(),
-      selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2')],
-    });
+    const result = mapScheduleFormToCreateMeeting(
+      {
+        ...baseFormState(),
+        selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2')],
+      },
+      wallClock,
+    );
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe('participantMissingEmail');
   });
 
   it('returns missingTimes when start or end is missing', () => {
-    const result = mapScheduleFormToCreateMeeting({
-      ...baseFormState(),
-      start: maybe.nothing(),
-    });
+    const result = mapScheduleFormToCreateMeeting(
+      {
+        ...baseFormState(),
+        start: maybe.nothing(),
+      },
+      wallClock,
+    );
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe('missingTimes');

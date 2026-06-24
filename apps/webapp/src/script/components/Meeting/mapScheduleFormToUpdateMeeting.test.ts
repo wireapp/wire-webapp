@@ -19,6 +19,7 @@
 
 import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
 import {maybe} from 'true-myth';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
 import {User} from 'Repositories/entity/User';
@@ -26,6 +27,14 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {computeInvitationDiff, mapScheduleFormToUpdateMeeting} from './mapScheduleFormToUpdateMeeting';
 import type {ScheduleMeetingFormState} from './ScheduleMeetingModal/scheduleMeetingTypes';
+
+const fixedNow = new Date('2026-06-23T14:30:00.000Z');
+const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
+const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
+const futureStartIso = futureStartDate.toISOString();
+const futureEndIso = futureEndDate.toISOString();
+
+const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
 
 const createUser = (id: string, email?: string) => {
   const user = new User(id, 'example.com', translateForTest);
@@ -38,8 +47,8 @@ const createUser = (id: string, email?: string) => {
 
 const baseFormState = (): ScheduleMeetingFormState => ({
   title: 'Weekly sync',
-  start: maybe.just(new Date('2026-07-15T10:00:00.000Z')),
-  end: maybe.just(new Date('2026-07-15T11:00:00.000Z')),
+  start: maybe.just(futureStartDate),
+  end: maybe.just(futureEndDate),
   recurrence: 'weekly',
   selectedUsers: [],
   participantsFilter: '',
@@ -62,13 +71,14 @@ describe('mapScheduleFormToUpdateMeeting', () => {
         selectedUsers: [createUser('1', 'alice@wire.com'), createUser('3', 'charlie@wire.com')],
       },
       ['alice@wire.com', 'bob@wire.com'],
+      wallClock,
     );
 
     expect(result.isOk).toBe(true);
     expect(unwrap(result).payload).toEqual({
       title: 'Weekly sync',
-      start_time: '2026-07-15T10:00:00.000Z',
-      end_time: '2026-07-15T11:00:00.000Z',
+      start_time: futureStartIso,
+      end_time: futureEndIso,
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
     });
     expect(unwrap(result).addedEmails).toEqual(['charlie@wire.com']);
@@ -82,6 +92,7 @@ describe('mapScheduleFormToUpdateMeeting', () => {
         selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2')],
       },
       ['alice@wire.com'],
+      wallClock,
     );
 
     expect(result.isErr).toBe(true);
@@ -95,6 +106,7 @@ describe('mapScheduleFormToUpdateMeeting', () => {
         end: maybe.nothing(),
       },
       ['alice@wire.com'],
+      wallClock,
     );
 
     expect(result.isErr).toBe(true);
@@ -108,13 +120,14 @@ describe('mapScheduleFormToUpdateMeeting', () => {
         recurrence: 'doesNotRepeat',
       },
       [],
+      wallClock,
     );
 
     expect(result.isOk).toBe(true);
     expect(unwrap(result).payload).toEqual({
       title: 'Weekly sync',
-      start_time: '2026-07-15T10:00:00.000Z',
-      end_time: '2026-07-15T11:00:00.000Z',
+      start_time: futureStartIso,
+      end_time: futureEndIso,
       recurrence: null,
     });
   });

@@ -25,6 +25,7 @@ import {getNextHourDateTime} from '@wireapp/react-ui-kit';
 
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import type {User} from 'Repositories/entity/User';
+import type {WallClock} from 'src/script/clock/wallClock';
 
 import type {
   ScheduleMeetingFormErrors,
@@ -80,7 +81,7 @@ type ScheduleMeetingModalState = {
   setRecurrence: (recurrence: ScheduleMeetingRecurrenceOption) => void;
   setSelectedUsers: (selectedUsers: User[]) => void;
   setParticipantsFilter: (participantsFilter: string) => void;
-  validate: () => ScheduleMeetingFormErrors;
+  validate: (wallClock: WallClock) => ScheduleMeetingFormErrors;
   clearErrors: () => void;
 };
 
@@ -133,9 +134,9 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
   setRecurrence: recurrence => set(state => ({formState: {...state.formState, recurrence}})),
   setSelectedUsers: selectedUsers => set(state => ({formState: {...state.formState, selectedUsers}})),
   setParticipantsFilter: participantsFilter => set(state => ({formState: {...state.formState, participantsFilter}})),
-  validate: () => {
+  validate: wallClock => {
     const {title, start, end} = get().formState;
-    const errors = validateScheduleMeetingForm({title, start, end});
+    const errors = validateScheduleMeetingForm({title, start, end, wallClock});
     set({errors});
     return errors;
   },

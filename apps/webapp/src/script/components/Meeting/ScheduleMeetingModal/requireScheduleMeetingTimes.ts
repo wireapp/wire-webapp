@@ -19,12 +19,15 @@
 
 import {result, Result} from 'true-myth';
 
+import type {WallClock} from 'src/script/clock/wallClock';
+
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 import {ScheduleFormErrors, scheduleFormErrors} from '../ScheduleFormErrors';
 
 export const requireScheduleMeetingTimes = (
   formState: ScheduleMeetingFormState,
+  wallClock: WallClock,
 ): Result<{start: Date; end: Date}, ScheduleFormErrors> => {
   if (formState.start.isNothing || formState.end.isNothing) {
     return result.err(scheduleFormErrors.missingTimes);
@@ -32,12 +35,13 @@ export const requireScheduleMeetingTimes = (
 
   const start = formState.start.value;
   const end = formState.end.value;
+  const currentTimestampInMilliseconds = wallClock.currentTimestampInMilliseconds;
 
-  if (start.getTime() <= Date.now()) {
+  if (start.getTime() <= currentTimestampInMilliseconds) {
     return result.err(scheduleFormErrors.startInPast);
   }
 
-  if (end.getTime() <= Date.now()) {
+  if (end.getTime() <= currentTimestampInMilliseconds) {
     return result.err(scheduleFormErrors.endInPast);
   }
 

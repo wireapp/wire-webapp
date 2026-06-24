@@ -24,6 +24,7 @@ import {getInvitedEmailsFromSelectedUsers} from 'Components/Meeting/getInvitedEm
 import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {WallClock} from 'src/script/clock/wallClock';
 
 import {scheduleFormErrors, ScheduleFormErrors} from './ScheduleFormErrors';
 
@@ -51,8 +52,9 @@ export const computeInvitationDiff = (
 export const mapScheduleFormToUpdateMeeting = (
   formState: ScheduleMeetingFormState,
   originalInvitedEmails: string[],
+  wallClock: WallClock,
 ): Result<MapScheduleFormToUpdateMeetingResult, ScheduleFormErrors> => {
-  const timesResult = requireScheduleMeetingTimes(formState);
+  const timesResult = requireScheduleMeetingTimes(formState, wallClock);
   if (timesResult.isErr) {
     return result.err(timesResult.error);
   }

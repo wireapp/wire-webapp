@@ -21,6 +21,7 @@ import {MeetingsRepository} from 'Repositories/meetings';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {maybe, task} from 'true-myth';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
 import {meetingSubmitErrors} from '../MeetingSubmitErrors';
@@ -28,10 +29,18 @@ import {meetingSubmitErrors} from '../MeetingSubmitErrors';
 import {tryScheduleMeeting, tryUpdateMeeting, performMeetingSubmit} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
+const fixedNow = new Date('2026-06-23T14:30:00.000Z');
+const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
+const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
+const futureStartIso = futureStartDate.toISOString();
+const futureEndIso = futureEndDate.toISOString();
+
+const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+
 const formState: ScheduleMeetingFormState = {
   title: 'Weekly sync',
-  start: maybe.just(new Date('2026-07-15T10:00:00.000Z')),
-  end: maybe.just(new Date('2026-07-15T11:00:00.000Z')),
+  start: maybe.just(futureStartDate),
+  end: maybe.just(futureEndDate),
   recurrence: 'doesNotRepeat',
   selectedUsers: [],
   participantsFilter: '',
@@ -53,7 +62,7 @@ describe('tryScheduleMeeting', () => {
     } as unknown as MeetingsRepository;
 
     return {
-      deps: {meetingsRepository, fetchMeetings},
+      deps: {meetingsRepository, fetchMeetings, wallClock},
       createMeeting,
       fetchMeetings,
     };
@@ -67,8 +76,8 @@ describe('tryScheduleMeeting', () => {
     expect(result.isOk).toBe(true);
     expect(createMeeting).toHaveBeenCalledWith({
       title: 'Weekly sync',
-      start_time: '2026-07-15T10:00:00.000Z',
-      end_time: '2026-07-15T11:00:00.000Z',
+      start_time: futureStartIso,
+      end_time: futureEndIso,
     });
     expect(fetchMeetings).toHaveBeenCalled();
   });
@@ -147,7 +156,7 @@ describe('tryUpdateMeeting', () => {
     } as unknown as MeetingsRepository;
 
     return {
-      deps: {meetingsRepository, fetchMeetings},
+      deps: {meetingsRepository, fetchMeetings, wallClock},
       updateMeeting,
       addMeetingInvitation,
       removeMeetingInvitation,
@@ -171,8 +180,8 @@ describe('tryUpdateMeeting', () => {
     expect(result.isOk).toBe(true);
     expect(updateMeeting).toHaveBeenCalledWith(meetingId, {
       title: 'Weekly sync',
-      start_time: '2026-07-15T10:00:00.000Z',
-      end_time: '2026-07-15T11:00:00.000Z',
+      start_time: futureStartIso,
+      end_time: futureEndIso,
       recurrence: null,
     });
     expect(removeMeetingInvitation).toHaveBeenCalledWith(meetingId, ['bob@wire.com']);
@@ -288,7 +297,7 @@ describe('performMeetingSubmit', () => {
     } as unknown as MeetingsRepository;
 
     return {
-      dependencies: {meetingsRepository, fetchMeetings},
+      dependencies: {meetingsRepository, fetchMeetings, wallClock},
       createMeeting,
       updateMeeting,
       fetchMeetings,
