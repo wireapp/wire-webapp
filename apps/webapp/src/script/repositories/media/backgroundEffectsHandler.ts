@@ -27,6 +27,7 @@ import {
   SELFIE_MULTICLASS_MODEL_PATH,
   SELFIE_SEGMENTER_MODEL_PATH,
 } from 'Repositories/media/backgroundEffects/pipe/options';
+import {assertBgeResourcesAvailable} from 'Repositories/media/backgroundEffects/pipe/segmenter';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -358,6 +359,21 @@ export class BackgroundEffectsHandler {
     const model = modelPath.split('/').pop();
     backgroundEffectsStore.getState().setModel(model);
   };
+
+  public async preloadResources(): Promise<void> {
+    if (backgroundEffectsStore.getState().isFeatureEnabled) {
+      const {wasmLoaderPath, wasmBinaryPath, modelPath} = defaultOpts;
+      // preload media pipe resources
+      await assertBgeResourcesAvailable({wasmLoaderPath, wasmBinaryPath, modelPath});
+      // preload default bg image
+      await loadBackgroundSource(DEFAULT_BUILTIN_BACKGROUND_ID);
+
+      const {preferredEffect} = backgroundEffectsStore.getState();
+      if (preferredEffect.type === 'virtual') {
+        await loadBackgroundSource(preferredEffect.backgroundId);
+      }
+    }
+  }
 }
 
 export class ReleasableMediaStream {

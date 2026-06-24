@@ -161,8 +161,7 @@ export class BackgroundEffectsController {
 
         if (name === 'error' && this.qualityController !== null) {
           const {reason, message} = data as {reason: string; message: string};
-          this.logger.info(`error received, reason: ${reason}, message: ${message}`);
-          outputTrack.stop();
+          this.logger.error(`error received, reason: ${reason}, message: ${message}`);
         }
       };
 

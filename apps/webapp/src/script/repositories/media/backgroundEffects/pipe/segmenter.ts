@@ -57,7 +57,11 @@ async function createSegmenter(canvas: OffscreenCanvas) {
     throw new Error('Model path must be provided');
   }
 
-  await assertBgeResourcesAvailable({wasmLoaderPath, wasmBinaryPath, modelPath});
+  try {
+    await assertBgeResourcesAvailable({wasmLoaderPath, wasmBinaryPath, modelPath});
+  } catch (error) {
+    logger.warn('segmenter could not pre load BGE resources are not available.', error);
+  }
 
   const segmenter = await ImageSegmenter.createFromOptions(fileset, {
     baseOptions: {
@@ -328,24 +332,22 @@ export async function runSegmenter(
   });
 }
 
-async function assertResourceAvailable(url: string | undefined, name: string): Promise<void> {
+export async function assertResourceAvailable(url: string | undefined, name: string): Promise<void> {
   if (!url) {
-    throw new Error(`[BGE] Missing ${name}`);
+    throw new Error(`[virtual-background] Missing ${name}`);
   }
 
-  const res = await fetch(url, {
-    method: 'GET',
-    cache: 'no-store',
-  });
+  // preload resources in the cache
+  const res = await fetch(url, {method: 'GET', cache: 'force-cache'});
 
   if (!res.ok) {
-    throw new Error(`[BGE] ${name} not available: ${res.status} ${res.statusText} (${url})`);
+    throw new Error(`[virtual-background] ${name} not available: ${res.status} ${res.statusText} (${url})`);
   }
 
   const contentType = res.headers.get('content-type') ?? '';
 
   if (contentType.includes('text/html')) {
-    throw new Error(`[BGE] ${name} returned HTML instead of resource (${url})`);
+    throw new Error(`[virtual-background] ${name} returned HTML instead of resource (${url})`);
   }
 }
 
