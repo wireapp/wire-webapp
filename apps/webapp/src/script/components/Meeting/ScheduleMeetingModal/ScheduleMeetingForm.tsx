@@ -68,7 +68,7 @@ const fromDateTimePickerValue = (value: Date | null): Maybe<Date> =>
   value === null ? maybe.nothing() : maybe.just(value);
 
 const firstNonEmptyError = (...errorMessages: Array<string | undefined>): string | undefined =>
-  errorMessages.find(is.nonEmptyString);
+  errorMessages.find(message => is.nonEmptyString(message));
 
 export interface ScheduleMeetingFormProps {
   mode: ScheduleMeetingMode;
