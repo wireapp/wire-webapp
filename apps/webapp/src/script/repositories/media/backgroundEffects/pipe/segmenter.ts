@@ -57,12 +57,6 @@ async function createSegmenter(canvas: OffscreenCanvas) {
     throw new Error('Model path must be provided');
   }
 
-  try {
-    await assertBgeResourcesAvailable({wasmLoaderPath, wasmBinaryPath, modelPath});
-  } catch (error) {
-    logger.warn('segmenter could not pre load BGE resources are not available.', error);
-  }
-
   const segmenter = await ImageSegmenter.createFromOptions(fileset, {
     baseOptions: {
       modelAssetPath: modelPath,
@@ -330,33 +324,4 @@ export async function runSegmenter(
   readable.pipeTo(writer).catch((err: unknown) => {
     logger.error(`[virtual-background] video error: ${(err as Error).message}`);
   });
-}
-
-export async function assertResourceAvailable(url: string | undefined, name: string): Promise<void> {
-  if (!url) {
-    throw new Error(`[virtual-background] Missing ${name}`);
-  }
-
-  // preload resources in the cache
-  const res = await fetch(url, {method: 'GET', cache: 'force-cache'});
-
-  if (!res.ok) {
-    throw new Error(`[virtual-background] ${name} not available: ${res.status} ${res.statusText} (${url})`);
-  }
-
-  const contentType = res.headers.get('content-type') ?? '';
-
-  if (contentType.includes('text/html')) {
-    throw new Error(`[virtual-background] ${name} returned HTML instead of resource (${url})`);
-  }
-}
-
-export async function assertBgeResourcesAvailable(options: {
-  wasmLoaderPath: string;
-  wasmBinaryPath: string;
-  modelPath: string;
-}): Promise<void> {
-  await assertResourceAvailable(options.wasmLoaderPath, 'WASM loader');
-  await assertResourceAvailable(options.wasmBinaryPath, 'WASM binary');
-  await assertResourceAvailable(options.modelPath, 'model');
 }

@@ -605,7 +605,7 @@ export class App {
       try {
         await bgEffectsHandler.preloadResources();
       } catch (error) {
-        this.logger.warn('[BGE] preload failed, starting without resources', error);
+        this.logger.warn('[virtual-background] preload failed, starting without resources', error);
       }
 
       if (this.core.hasMLSDevice) {

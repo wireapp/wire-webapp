@@ -41,7 +41,7 @@ import {
   WorkerProcessVideoTrackOptions,
 } from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
-import {assertBgeResourcesAvailable, runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
+import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
 
 // Blur strength (0–1) maps to Gaussian sigma in pixel units for the shader.
 // The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives
@@ -87,15 +87,6 @@ export class BackgroundEffectsController {
   public async start(inputTrack: MediaStreamTrack, options: ProcessVideoTrackOptions): Promise<MediaStreamTrack> {
     this.refcount++;
     const resolved = await resolveOptions(options);
-
-    try {
-      await assertBgeResourcesAvailable(resolved);
-    } catch (error) {
-      this.refcount--;
-      this.logger.error('BGE resources are not available. Falling back to original track.', error);
-      // Disable BGE and return original track
-      return inputTrack;
-    }
 
     this.options = withoutBitmap(resolved);
     this.onMetrics = options.onMetrics;
