@@ -24,13 +24,13 @@ import {ButtonGroup, ButtonVariant, CallIcon, TriangleIcon} from '@wireapp/react
 import {
   callingButtonGroupStyles,
   dropdownIconStyles,
-} from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton.styles';
+} from 'Components/Meeting/MeetingMultiActionButton/MeetingMultiActionButton.styles';
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {showContextMenu} from '../../../ui/contextMenu';
 
-export const MeetNowMultiActionButton = () => {
+export const MeetingMultiActionButton = () => {
   const {translate} = useApplicationContext();
   const [invertIcon, setInvertIcon] = useState(false);
   const {handleMeetNow, handleScheduleMeeting} = useMeetingActions();
@@ -51,14 +51,6 @@ export const MeetNowMultiActionButton = () => {
             resetIconInversion();
           },
         },
-        {
-          title: translate('meetings.action.scheduleMeeting'),
-          label: translate('meetings.action.scheduleMeeting'),
-          click: () => {
-            handleScheduleMeeting();
-            resetIconInversion();
-          },
-        },
       ],
       identifier: 'message-options-menu',
       resetMenuStates: resetIconInversion,
@@ -73,7 +65,7 @@ export const MeetNowMultiActionButton = () => {
         variant={ButtonVariant.TERTIARY}
         css={callingButtonGroupStyles}
         icon={<CallIcon />}
-        onClick={handleMeetNow}
+        onClick={handleScheduleMeeting}
       >
         {translate('meetings.action.createMeeting')}
       </ButtonGroup.Button>
