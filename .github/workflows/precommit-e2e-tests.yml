@@ -99,7 +99,7 @@ jobs:
 
   run_e2e_tests:
     name: Playwright Critical Flow
-    if: ${{ always() && github.repository == 'wireapp/wire-webapp' }}
+    if: ${{ always() && github.repository == 'wireapp/wire-webapp' && (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-e2e')) }}
     needs: [deploy_and_run_e2e]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
