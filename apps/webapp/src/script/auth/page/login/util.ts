@@ -25,13 +25,13 @@ import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {Dispatch, UnknownAction} from 'redux';
 import {match, P} from 'ts-pattern';
 
+import {Config} from 'src/script/Config';
 import {APIClient} from 'src/script/service/apiClientSingleton';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/ValidationError';
 import {ConversationState} from '../../module/reducer/conversationReducer';
 import {QUERY_KEY, ROUTE} from '../../route';
-import {Config} from 'src/script/Config';
 
 export const requiresPasswordModal = (
   isOpen: boolean,
