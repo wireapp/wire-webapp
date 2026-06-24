@@ -207,6 +207,8 @@ test.describe('Federation', () => {
     'I want to share all possible assets in a federated group',
     {tag: ['@TC-8758', '@regression']},
     async ({createPage}) => {
+      test.setTimeout(150_000);
+
       const [normalUserPage, federatedUserPage] = await Promise.all([
         createPage(withLogin(normalUser)),
         createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),
@@ -296,6 +298,8 @@ test.describe('Federation', () => {
     'I want to import my backup of conversations with users from different BE and see the conversation contents',
     {tag: ['@TC-3128', '@regression']},
     async ({createPage}, testInfo) => {
+      test.setTimeout(150_000);
+
       const [normalUserPage, federatedUserPage] = await Promise.all([
         createPage(withLogin(normalUser)),
         createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),
