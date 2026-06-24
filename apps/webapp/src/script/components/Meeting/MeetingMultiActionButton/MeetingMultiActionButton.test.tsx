@@ -20,35 +20,38 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 
 import {translateForTest} from 'Util/test/translateForTest';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/TestUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import * as Context from 'src/script/ui/contextMenu';
 
-import {MeetingMultiActionButton} from './MeetingMultiActionButton';
+import {MeetingMultiActionButton, MeetingMultiActionButtonProps} from './MeetingMultiActionButton';
 
-const handleMeetNow = jest.fn();
-const handleScheduleMeeting = jest.fn();
+const createTestProps = () => {
+  const handleMeetNow = jest.fn();
+  const handleScheduleMeeting = jest.fn();
+  const triggerContextMenu = jest.fn();
 
-jest.mock('Components/Meeting/useMeetingActions', () => ({
-  useMeetingActions: () => ({
-    handleMeetNow,
-    handleScheduleMeeting,
-  }),
-}));
+  const props: MeetingMultiActionButtonProps = {
+    useMeetingActionsHook: () => ({
+      handleMeetNow,
+      handleScheduleMeeting,
+    }),
+    triggerContextMenu,
+  };
+
+  return {props, handleMeetNow, handleScheduleMeeting, triggerContextMenu};
+};
 
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('MeetingMultiActionButton', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(Context, 'showContextMenu').mockImplementation(() => undefined);
-  });
-
   it('opens the schedule meeting modal when clicking Create meeting', () => {
-    render(<MeetingMultiActionButton />, {wrapper: rootProviderWrapper});
+    const {props, handleMeetNow, handleScheduleMeeting} = createTestProps();
+
+    render(withThemeAndRootContext(<MeetingMultiActionButton {...props} />, rootProviderWrapper));
 
     fireEvent.click(screen.getByRole('button', {name: translateForTest('meetings.action.createMeeting')}));
 
@@ -57,12 +60,14 @@ describe('MeetingMultiActionButton', () => {
   });
 
   it('shows only Meet Now in the dropdown menu', () => {
-    render(<MeetingMultiActionButton />, {wrapper: rootProviderWrapper});
+    const {props, triggerContextMenu} = createTestProps();
+
+    render(withThemeAndRootContext(<MeetingMultiActionButton {...props} />, rootProviderWrapper));
 
     const buttons = screen.getAllByRole('button');
     fireEvent.click(buttons[1]);
 
-    expect(Context.showContextMenu).toHaveBeenCalledWith(
+    expect(triggerContextMenu).toHaveBeenCalledWith(
       expect.objectContaining({
         entries: [
           expect.objectContaining({
@@ -73,7 +78,7 @@ describe('MeetingMultiActionButton', () => {
       }),
     );
 
-    const {entries} = (Context.showContextMenu as jest.Mock).mock.calls[0][0];
+    const {entries} = triggerContextMenu.mock.calls[0][0];
     expect(entries).toHaveLength(1);
     expect(entries[0].title).not.toBe(translateForTest('meetings.action.scheduleMeeting'));
   });

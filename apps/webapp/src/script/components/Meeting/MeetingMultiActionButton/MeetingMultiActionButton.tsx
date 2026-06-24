@@ -30,14 +30,22 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {showContextMenu} from '../../../ui/contextMenu';
 
-export const MeetingMultiActionButton = () => {
+export interface MeetingMultiActionButtonProps {
+  useMeetingActionsHook?: typeof useMeetingActions;
+  triggerContextMenu?: typeof showContextMenu;
+}
+
+export const MeetingMultiActionButton = ({
+  triggerContextMenu = showContextMenu,
+  useMeetingActionsHook = useMeetingActions,
+}: MeetingMultiActionButtonProps) => {
   const {translate} = useApplicationContext();
   const [invertIcon, setInvertIcon] = useState(false);
-  const {handleMeetNow, handleScheduleMeeting} = useMeetingActions();
+  const {handleMeetNow, handleScheduleMeeting} = useMeetingActionsHook();
 
   const handleMeetingOptionButton = (event: MouseEvent<HTMLElement>) => {
     setInvertIcon(val => !val);
-    showContextMenu({
+    triggerContextMenu({
       event,
       anchor: event.target as HTMLElement,
       placement: 'bottom-end',
