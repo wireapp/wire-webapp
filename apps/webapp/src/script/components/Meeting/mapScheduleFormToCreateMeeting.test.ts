@@ -25,6 +25,7 @@ import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
+import {createParticipantMissingEmailError} from './ScheduleFormErrors';
 import {mapScheduleFormToCreateMeeting} from './mapScheduleFormToCreateMeeting';
 import type {ScheduleMeetingFormState} from './ScheduleMeetingModal/scheduleMeetingTypes';
 
@@ -81,7 +82,7 @@ describe('mapScheduleFormToCreateMeeting', () => {
     expect(unwrap(result).invited_emails).toBeUndefined();
   });
 
-  it('returns participantMissingEmail when a selected user has no email', () => {
+  it('returns participantMissingEmail with user names when a selected user has no email', () => {
     const result = mapScheduleFormToCreateMeeting(
       {
         ...baseFormState(),
@@ -91,7 +92,20 @@ describe('mapScheduleFormToCreateMeeting', () => {
     );
 
     expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe('participantMissingEmail');
+    expect(unwrapErr(result)).toEqual(createParticipantMissingEmailError(['User 2']));
+  });
+
+  it('returns participantMissingEmail with all affected user names', () => {
+    const result = mapScheduleFormToCreateMeeting(
+      {
+        ...baseFormState(),
+        selectedUsers: [createUser('1'), createUser('2')],
+      },
+      wallClock,
+    );
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toEqual(createParticipantMissingEmailError(['User 1', 'User 2']));
   });
 
   it('returns missingTimes when start or end is missing', () => {

@@ -23,25 +23,23 @@ import {maybe} from 'true-myth';
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import {User} from 'Repositories/entity/User';
-import {translate} from 'Util/localizerUtil';
 
-const createPlaceholderUserForEmail = (email: string): User => {
-  const user = new User(`email:${email}`, 'local', translate);
-  user.name(email);
-  user.email(email);
-  return user;
-};
+import {getInvitedEmailsFromSelectedUsers} from './getInvitedEmailsFromSelectedUsers';
 
-const resolveInvitedEmailsToUsers = (invitedEmails: string[], availableUsers: User[]): User[] =>
-  invitedEmails.map(email => {
-    const normalizedEmail = email.trim().toLowerCase();
-    const matchedUser = availableUsers.find(user => {
-      const userEmail = user.email();
-      return is.nonEmptyString(userEmail) && userEmail.toLowerCase() === normalizedEmail;
-    });
+export const resolveInvitedEmailsToUsers = (invitedEmails: string[], availableUsers: User[]): User[] =>
+  invitedEmails
+    .map(email => {
+      const normalizedEmail = email.trim().toLowerCase();
+      return availableUsers.find(user => {
+        const userEmail = user.email();
+        return is.nonEmptyString(userEmail) && userEmail.toLowerCase() === normalizedEmail;
+      });
+    })
+    .filter((user): user is User => user !== undefined);
 
-    return matchedUser ?? createPlaceholderUserForEmail(email);
-  });
+/** Emails from backend invited_emails that resolve to known Wire contacts in the participant pool. */
+export const getResolvedInvitedParticipantEmails = (meeting: Meeting, availableUsers: User[]): string[] =>
+  getInvitedEmailsFromSelectedUsers(resolveInvitedEmailsToUsers(meeting.invited_emails, availableUsers)).emails;
 
 export const mapMeetingToScheduleFormState = (meeting: Meeting, availableUsers: User[]): ScheduleMeetingFormState => ({
   title: meeting.title,

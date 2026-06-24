@@ -18,20 +18,20 @@
  */
 
 import is from '@sindresorhus/is';
-import {Maybe, maybe} from 'true-myth';
 
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {User} from 'Repositories/entity/User';
+
+export type InvitedEmailsFromSelectedUsers = {
+  emails: string[];
+  usersWithoutEmail: User[];
+};
 
 export const getInvitedEmailsFromSelectedUsers = (
   selectedUsers: ScheduleMeetingFormState['selectedUsers'],
-): Maybe<string[]> => {
+): InvitedEmailsFromSelectedUsers => {
+  const usersWithoutEmail = selectedUsers.filter(user => !is.nonEmptyString(user.email()));
   const emails = selectedUsers.map(user => user.email()).filter((email): email is string => is.nonEmptyString(email));
 
-  const hasMissingEmail = selectedUsers.some(user => !is.nonEmptyString(user.email()));
-
-  if (hasMissingEmail) {
-    return maybe.nothing();
-  }
-
-  return maybe.just(emails);
+  return {emails, usersWithoutEmail};
 };

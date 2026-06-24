@@ -21,7 +21,7 @@ import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {mapMeetingToScheduleFormState} from './mapMeetingToScheduleFormState';
+import {mapMeetingToScheduleFormState, getResolvedInvitedParticipantEmails} from './mapMeetingToScheduleFormState';
 
 const createUser = (id: string, email?: string) => {
   const user = new User(id, 'example.com', translateForTest);
@@ -65,15 +65,31 @@ describe('mapMeetingToScheduleFormState', () => {
 
     const result = mapMeetingToScheduleFormState(createMeeting(), availableUsers);
 
+    expect(result.selectedUsers).toHaveLength(2);
     expect(result.selectedUsers[0]).toBe(alice);
     expect(result.selectedUsers[1]).toBe(bob);
   });
 
-  it('creates placeholder users for unmatched invited emails', () => {
-    const result = mapMeetingToScheduleFormState(createMeeting(), []);
+  it('omits unmatched invited emails from selectedUsers', () => {
+    const alice = createUser('1', 'alice@wire.com');
+    const result = mapMeetingToScheduleFormState(createMeeting(), [alice]);
 
-    expect(result.selectedUsers).toHaveLength(3);
-    expect(result.selectedUsers[2]?.email()).toBe('unknown@example.com');
-    expect(result.selectedUsers[2]?.name()).toBe('unknown@example.com');
+    expect(result.selectedUsers).toHaveLength(1);
+    expect(result.selectedUsers[0]).toBe(alice);
+  });
+
+  it('returns only resolved emails for invitation diff baseline', () => {
+    const availableUsers = [createUser('1', 'alice@wire.com'), createUser('2', 'bob@wire.com')];
+
+    expect(getResolvedInvitedParticipantEmails(createMeeting(), availableUsers)).toEqual([
+      'alice@wire.com',
+      'bob@wire.com',
+    ]);
+  });
+
+  it('excludes unmatched backend emails from resolved invitation baseline', () => {
+    const availableUsers = [createUser('1', 'alice@wire.com')];
+
+    expect(getResolvedInvitedParticipantEmails(createMeeting(), availableUsers)).toEqual(['alice@wire.com']);
   });
 });

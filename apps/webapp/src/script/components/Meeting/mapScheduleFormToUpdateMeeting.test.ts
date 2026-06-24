@@ -25,6 +25,7 @@ import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
+import {createParticipantMissingEmailError} from './ScheduleFormErrors';
 import {computeInvitationDiff, mapScheduleFormToUpdateMeeting} from './mapScheduleFormToUpdateMeeting';
 import type {ScheduleMeetingFormState} from './ScheduleMeetingModal/scheduleMeetingTypes';
 
@@ -57,8 +58,8 @@ const baseFormState = (): ScheduleMeetingFormState => ({
 describe('computeInvitationDiff', () => {
   it('computes added and removed emails case-insensitively', () => {
     expect(computeInvitationDiff(['alice@wire.com', 'bob@wire.com'], ['Alice@wire.com', 'charlie@wire.com'])).toEqual({
-      addedEmails: ['charlie@wire.com'],
-      removedEmails: ['bob@wire.com'],
+      addedParticipantEmails: ['charlie@wire.com'],
+      removedParticipantEmails: ['bob@wire.com'],
     });
   });
 });
@@ -81,11 +82,11 @@ describe('mapScheduleFormToUpdateMeeting', () => {
       end_time: futureEndIso,
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
     });
-    expect(unwrap(result).addedEmails).toEqual(['charlie@wire.com']);
-    expect(unwrap(result).removedEmails).toEqual(['bob@wire.com']);
+    expect(unwrap(result).addedParticipantEmails).toEqual(['charlie@wire.com']);
+    expect(unwrap(result).removedParticipantEmails).toEqual(['bob@wire.com']);
   });
 
-  it('returns participantMissingEmail when a selected user has no email', () => {
+  it('returns participantMissingEmail with user names when a selected user has no email', () => {
     const result = mapScheduleFormToUpdateMeeting(
       {
         ...baseFormState(),
@@ -96,7 +97,7 @@ describe('mapScheduleFormToUpdateMeeting', () => {
     );
 
     expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe('participantMissingEmail');
+    expect(unwrapErr(result)).toEqual(createParticipantMissingEmailError(['User 2']));
   });
 
   it('returns missingTimes when start or end is missing', () => {

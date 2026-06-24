@@ -47,7 +47,8 @@ export type TryUpdateMeetingDependencies = TryScheduleMeetingDependencies;
 export type TryUpdateMeetingParams = {
   meetingId: QualifiedId;
   formState: ScheduleMeetingFormState;
-  originalInvitedEmails: string[];
+  /** Backend `invited_emails` snapshot from Wire contacts when edit opened. */
+  originalInvitedParticipantEmails: string[];
   dependencies: TryUpdateMeetingDependencies;
 };
 
@@ -55,7 +56,7 @@ export type PerformMeetingSubmitParams = {
   mode: ScheduleMeetingMode;
   editingMeetingId: Maybe<QualifiedId>;
   formState: ScheduleMeetingFormState;
-  originalInvitedEmails: string[];
+  originalInvitedParticipantEmails: string[];
   dependencies: TryScheduleMeetingDependencies;
 };
 
@@ -63,7 +64,7 @@ export async function performMeetingSubmit({
   mode,
   editingMeetingId,
   formState,
-  originalInvitedEmails,
+  originalInvitedParticipantEmails,
   dependencies,
 }: PerformMeetingSubmitParams): Promise<Result<void, MeetingSubmitErrors>> {
   if (mode === 'edit') {
@@ -74,7 +75,7 @@ export async function performMeetingSubmit({
     return await tryUpdateMeeting({
       meetingId: editingMeetingId.value,
       formState,
-      originalInvitedEmails,
+      originalInvitedParticipantEmails,
       dependencies,
     });
   }
@@ -120,17 +121,21 @@ export function tryScheduleMeeting(
 export function tryUpdateMeeting({
   meetingId,
   formState,
-  originalInvitedEmails,
+  originalInvitedParticipantEmails,
   dependencies,
 }: TryUpdateMeetingParams): Task<void, UpdateMeetingErrors> {
   return resultToTask(async () => {
-    const mappingResult = mapScheduleFormToUpdateMeeting(formState, originalInvitedEmails, dependencies.wallClock);
+    const mappingResult = mapScheduleFormToUpdateMeeting(
+      formState,
+      originalInvitedParticipantEmails,
+      dependencies.wallClock,
+    );
 
     if (mappingResult.isErr) {
       return result.err(mappingResult.error);
     }
 
-    const {payload, addedEmails, removedEmails} = mappingResult.value;
+    const {payload, addedParticipantEmails, removedParticipantEmails} = mappingResult.value;
     const {meetingsRepository, fetchMeetings} = dependencies;
 
     const updateResult = await meetingsRepository.updateMeeting(meetingId, payload);
@@ -139,8 +144,8 @@ export function tryUpdateMeeting({
       return result.err(meetingSubmitErrors.updateFailed);
     }
 
-    if (is.nonEmptyArray(removedEmails)) {
-      const removeResult = await meetingsRepository.removeMeetingInvitation(meetingId, removedEmails);
+    if (is.nonEmptyArray(removedParticipantEmails)) {
+      const removeResult = await meetingsRepository.removeMeetingInvitation(meetingId, removedParticipantEmails);
 
       if (removeResult.isErr) {
         await fetchMeetings();
@@ -148,8 +153,8 @@ export function tryUpdateMeeting({
       }
     }
 
-    if (is.nonEmptyArray(addedEmails)) {
-      const addResult = await meetingsRepository.addMeetingInvitation(meetingId, addedEmails);
+    if (is.nonEmptyArray(addedParticipantEmails)) {
+      const addResult = await meetingsRepository.addMeetingInvitation(meetingId, addedParticipantEmails);
 
       if (addResult.isErr) {
         await fetchMeetings();

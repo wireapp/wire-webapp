@@ -19,6 +19,7 @@
 
 import {useCallback, useState} from 'react';
 
+import {isStringMeetingSubmitError, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
@@ -28,16 +29,50 @@ import {performMeetingSubmit} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
-import type {MeetingSubmitErrors} from '../MeetingSubmitErrors';
+const PAIR_OF_NAMES = 2;
+
+const formatParticipantNames = (names: string[], translate: Translate): string => {
+  if (names.length === PAIR_OF_NAMES) {
+    return `${names[0]} ${translate('and')} ${names[1]}`;
+  }
+
+  const lastName = names[names.length - 1];
+  const otherNames = names.slice(0, -1).join(', ');
+
+  return `${otherNames}${translate('enumerationAnd')}${lastName}`;
+};
 
 const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {
-  const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[error];
+  if (isStringMeetingSubmitError(error)) {
+    const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[error];
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          title: translate(titleKey),
+          message: translate(messageKey),
+        },
+      },
+      undefined,
+      translate,
+    );
+    return;
+  }
+
+  const messageKey =
+    error.userNames.length === 1
+      ? 'meetings.scheduleModal.error.participantMissingEmailSingular'
+      : 'meetings.scheduleModal.error.participantMissingEmailPlural';
+
   PrimaryModal.show(
     PrimaryModal.type.ACKNOWLEDGE,
     {
       text: {
-        title: translate(titleKey),
-        message: translate(messageKey),
+        title: translate('meetings.scheduleModal.error.createFailedTitle'),
+        message:
+          error.userNames.length === 1
+            ? translate(messageKey, {name: error.userNames[0]})
+            : translate(messageKey, {names: formatParticipantNames(error.userNames, translate)}),
       },
     },
     undefined,
@@ -51,7 +86,7 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
   const meetingsRepository = mainViewModel.content.repositories.meetings;
   const mode = useScheduleMeetingModal(state => state.mode);
   const editingMeetingId = useScheduleMeetingModal(state => state.editingMeetingId);
-  const originalInvitedEmails = useScheduleMeetingModal(state => state.originalInvitedEmails);
+  const originalInvitedParticipantEmails = useScheduleMeetingModal(state => state.originalInvitedParticipantEmails);
 
   const submit = useCallback(
     async (formState: ScheduleMeetingFormState): Promise<boolean> => {
@@ -62,7 +97,7 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
           mode,
           editingMeetingId,
           formState,
-          originalInvitedEmails,
+          originalInvitedParticipantEmails,
           dependencies: {
             meetingsRepository,
             fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve(),
@@ -80,7 +115,15 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
         setIsSubmitting(false);
       }
     },
-    [editingMeetingId, meetingsRepository, mode, onMeetingScheduled, originalInvitedEmails, translate, wallClock],
+    [
+      editingMeetingId,
+      meetingsRepository,
+      mode,
+      onMeetingScheduled,
+      originalInvitedParticipantEmails,
+      translate,
+      wallClock,
+    ],
   );
 
   return {isSubmitting, submit};

@@ -24,6 +24,7 @@ import {maybe, task} from 'true-myth';
 import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
+import {createParticipantMissingEmailError} from '../ScheduleFormErrors';
 import {meetingSubmitErrors} from '../MeetingSubmitErrors';
 
 import {tryScheduleMeeting, tryUpdateMeeting, performMeetingSubmit} from './scheduleMeetingService';
@@ -96,7 +97,7 @@ describe('tryScheduleMeeting', () => {
     );
 
     expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe('participantMissingEmail');
+    expect(unwrapErr(result)).toEqual(createParticipantMissingEmailError(['Alice']));
     expect(createMeeting).not.toHaveBeenCalled();
   });
 
@@ -173,7 +174,7 @@ describe('tryUpdateMeeting', () => {
         ...formState,
         selectedUsers: [createUser('1', 'alice@wire.com'), createUser('3', 'charlie@wire.com')],
       },
-      originalInvitedEmails: ['alice@wire.com', 'bob@wire.com'],
+      originalInvitedParticipantEmails: ['alice@wire.com', 'bob@wire.com'],
       dependencies: deps,
     });
 
@@ -189,6 +190,28 @@ describe('tryUpdateMeeting', () => {
     expect(fetchMeetings).toHaveBeenCalled();
   });
 
+  it('does not remove unmatched backend invites when saving without participant changes', async () => {
+    const alice = createUser('1', 'alice@wire.com');
+    const bob = createUser('2', 'bob@wire.com');
+    const {deps, updateMeeting, addMeetingInvitation, removeMeetingInvitation} = createDeps();
+
+    const result = await tryUpdateMeeting({
+      meetingId,
+      formState: {
+        ...formState,
+        selectedUsers: [alice, bob],
+      },
+      // Baseline matches resolved form participants only — excludes unknown@example.com from backend.
+      originalInvitedParticipantEmails: ['alice@wire.com', 'bob@wire.com'],
+      dependencies: deps,
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(updateMeeting).toHaveBeenCalled();
+    expect(removeMeetingInvitation).not.toHaveBeenCalled();
+    expect(addMeetingInvitation).not.toHaveBeenCalled();
+  });
+
   it('returns participantMissingEmail and does not call API', async () => {
     const user = new User('1', 'example.com', translateForTest);
     user.name('Alice');
@@ -200,12 +223,12 @@ describe('tryUpdateMeeting', () => {
         ...formState,
         selectedUsers: [user],
       },
-      originalInvitedEmails: [],
+      originalInvitedParticipantEmails: [],
       dependencies: deps,
     });
 
     expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe('participantMissingEmail');
+    expect(unwrapErr(result)).toEqual(createParticipantMissingEmailError(['Alice']));
     expect(updateMeeting).not.toHaveBeenCalled();
   });
 
@@ -218,7 +241,7 @@ describe('tryUpdateMeeting', () => {
         ...formState,
         end: maybe.nothing(),
       },
-      originalInvitedEmails: [],
+      originalInvitedParticipantEmails: [],
       dependencies: deps,
     });
 
@@ -232,7 +255,7 @@ describe('tryUpdateMeeting', () => {
       updateMeeting: jest.fn().mockReturnValue(task.reject(new Error('network'))),
     });
 
-    const result = await tryUpdateMeeting({meetingId, formState, originalInvitedEmails: [], dependencies: deps});
+    const result = await tryUpdateMeeting({meetingId, formState, originalInvitedParticipantEmails: [], dependencies: deps});
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.updateFailed);
@@ -250,7 +273,7 @@ describe('tryUpdateMeeting', () => {
         ...formState,
         selectedUsers: [createUser('1', 'alice@wire.com')],
       },
-      originalInvitedEmails: ['alice@wire.com', 'bob@wire.com'],
+      originalInvitedParticipantEmails: ['alice@wire.com', 'bob@wire.com'],
       dependencies: deps,
     });
 
@@ -270,7 +293,7 @@ describe('tryUpdateMeeting', () => {
         ...formState,
         selectedUsers: [createUser('1', 'alice@wire.com')],
       },
-      originalInvitedEmails: [],
+      originalInvitedParticipantEmails: [],
       dependencies: deps,
     });
 
@@ -311,7 +334,7 @@ describe('performMeetingSubmit', () => {
       mode: 'create',
       editingMeetingId: maybe.nothing(),
       formState,
-      originalInvitedEmails: [],
+      originalInvitedParticipantEmails: [],
       dependencies,
     });
 
@@ -327,7 +350,7 @@ describe('performMeetingSubmit', () => {
       mode: 'edit',
       editingMeetingId: maybe.just(meetingId),
       formState,
-      originalInvitedEmails: [],
+      originalInvitedParticipantEmails: [],
       dependencies,
     });
 
@@ -343,7 +366,7 @@ describe('performMeetingSubmit', () => {
       mode: 'edit',
       editingMeetingId: maybe.nothing(),
       formState,
-      originalInvitedEmails: [],
+      originalInvitedParticipantEmails: [],
       dependencies,
     });
 

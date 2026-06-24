@@ -26,7 +26,7 @@ import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/Schedul
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import type {WallClock} from 'src/script/clock/wallClock';
 
-import {ScheduleFormErrors, scheduleFormErrors} from './ScheduleFormErrors';
+import {createParticipantMissingEmailError, ScheduleFormErrors} from './ScheduleFormErrors';
 
 export const mapScheduleFormToCreateMeeting = (
   formState: ScheduleMeetingFormState,
@@ -40,10 +40,10 @@ export const mapScheduleFormToCreateMeeting = (
 
   const {start, end} = timesResult.value;
 
-  const invitedEmails = getInvitedEmailsFromSelectedUsers(formState.selectedUsers);
+  const {emails: invitedEmails, usersWithoutEmail} = getInvitedEmailsFromSelectedUsers(formState.selectedUsers);
 
-  if (invitedEmails.isNothing) {
-    return result.err(scheduleFormErrors.participantMissingEmail);
+  if (usersWithoutEmail.length > 0) {
+    return result.err(createParticipantMissingEmailError(usersWithoutEmail.map(user => user.name())));
   }
 
   const recurrence = mapRecurrenceOptionToMeetingRecurrence(formState.recurrence);
@@ -52,7 +52,7 @@ export const mapScheduleFormToCreateMeeting = (
     title: formState.title.trim(),
     start_time: start.toISOString(),
     end_time: end.toISOString(),
-    ...(invitedEmails.value.length > 0 && {invited_emails: invitedEmails.value}),
+    ...(invitedEmails.length > 0 && {invited_emails: invitedEmails}),
     ...(recurrence !== undefined && {recurrence}),
   });
 };
