@@ -12136,6 +12136,7 @@ __metadata:
     css-loader: "npm:7.1.4"
     cssnano: "npm:7.1.9"
     date-fns: "npm:4.4.0"
+    debounce-fn: "npm:4.0.0"
     dexie: "npm:4.4.3"
     dexie-batch: "npm:0.4.3"
     dexie-encrypted: "npm:2.0.0"
@@ -15488,6 +15489,15 @@ __metadata:
   version: 1.0.2
   resolution: "de-indent@npm:1.0.2"
   checksum: 10/30bf43744dca005f9252dbb34ed95dcb3c30dfe52bfed84973b89c29eccff04e27769f222a34c61a93354acf47457785e9032e6184be390ed1d324fb9ab3f427
+  languageName: node
+  linkType: hard
+
+"debounce-fn@npm:4.0.0":
+  version: 4.0.0
+  resolution: "debounce-fn@npm:4.0.0"
+  dependencies:
+    mimic-fn: "npm:^3.0.0"
+  checksum: 10/1f0641c4dbfa38c2893943cd02cf94547840ac8fa21bed95489910bb7d312dd63dbad2d9cfcf0cf0ca47599090f41ebb4c356253aa9993a22461fa1f1d805ead
   languageName: node
   linkType: hard
 

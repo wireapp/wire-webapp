@@ -51,6 +51,7 @@
     "copy-webpack-plugin": "13.0.1",
     "core-js": "3.49.0",
     "date-fns": "4.4.0",
+    "debounce-fn": "4.0.0",
     "dexie-batch": "0.4.3",
     "dexie-encrypted": "2.0.0",
     "dotenv-extended": "2.9.0",

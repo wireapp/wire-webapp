@@ -34,6 +34,25 @@ type EventServiceLike = Pick<EventService, 'loadEventsWithCategory'>;
 
 describe('ConversationService', () => {
   describe('searchInConversation', () => {
+    function createMessageEvent(id: string, content: string, overrides: Partial<EventRecord> = {}): EventRecord {
+      return {
+        primary_key: `primary-key-${id}`,
+        category: MessageCategory.TEXT,
+        conversation: 'conversation-id',
+        from: 'user-id',
+        time: new Date(0).toISOString(),
+        id,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+        data: {content},
+        ephemeral_expires: false,
+        ...overrides,
+      };
+    }
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it('matches multipart message text content', async () => {
       const multipartEvent: EventRecord = {
         primary_key: 'primary-key',
@@ -98,6 +117,122 @@ describe('ConversationService', () => {
       );
       expect(await conversationService.searchInConversation('conversation-id', 'caption')).toEqual([compositeEvent]);
       expect(await conversationService.searchInConversation('conversation-id', 'unrelated')).toEqual([]);
+    });
+
+    it('reuses the search regex without skipping consecutive matches', async () => {
+      const matchingEvents: EventRecord[] = [
+        {
+          primary_key: 'primary-key-1',
+          category: MessageCategory.TEXT,
+          conversation: 'conversation-id',
+          from: 'user-id',
+          time: new Date(0).toISOString(),
+          id: 'event-id-1',
+          type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+          data: {content: 'term'},
+          ephemeral_expires: false,
+        },
+        {
+          primary_key: 'primary-key-2',
+          category: MessageCategory.TEXT,
+          conversation: 'conversation-id',
+          from: 'user-id',
+          time: new Date(1).toISOString(),
+          id: 'event-id-2',
+          type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+          data: {content: 'term'},
+          ephemeral_expires: false,
+        },
+      ];
+
+      const loadEventsWithCategory = jest
+        .fn<
+          ReturnType<EventServiceLike['loadEventsWithCategory']>,
+          Parameters<EventServiceLike['loadEventsWithCategory']>
+        >()
+        .mockResolvedValue(matchingEvents);
+      const eventService: EventServiceLike = {loadEventsWithCategory};
+
+      const conversationService = new ConversationService(
+        eventService,
+        {} as unknown as StorageService,
+        {} as unknown as APIClient,
+        {} as unknown as Core,
+      );
+
+      expect(await conversationService.searchInConversation('conversation-id', 'term')).toEqual(matchingEvents);
+    });
+
+    it('skips expired ephemeral events', async () => {
+      const expiredEvent = createMessageEvent('expired-event-id', 'term', {ephemeral_expires: true});
+      const matchingEvent = createMessageEvent('matching-event-id', 'term');
+
+      const loadEventsWithCategory = jest
+        .fn<
+          ReturnType<EventServiceLike['loadEventsWithCategory']>,
+          Parameters<EventServiceLike['loadEventsWithCategory']>
+        >()
+        .mockResolvedValue([expiredEvent, matchingEvent]);
+      const eventService: EventServiceLike = {loadEventsWithCategory};
+
+      const conversationService = new ConversationService(
+        eventService,
+        {} as unknown as StorageService,
+        {} as unknown as APIClient,
+        {} as unknown as Core,
+      );
+
+      expect(await conversationService.searchInConversation('conversation-id', 'term')).toEqual([matchingEvent]);
+    });
+
+    it('returns no results for whitespace-only queries without loading events', async () => {
+      const loadEventsWithCategory = jest
+        .fn<
+          ReturnType<EventServiceLike['loadEventsWithCategory']>,
+          Parameters<EventServiceLike['loadEventsWithCategory']>
+        >()
+        .mockResolvedValue([createMessageEvent('matching-event-id', 'term')]);
+      const eventService: EventServiceLike = {loadEventsWithCategory};
+
+      const conversationService = new ConversationService(
+        eventService,
+        {} as unknown as StorageService,
+        {} as unknown as APIClient,
+        {} as unknown as Core,
+      );
+
+      expect(await conversationService.searchInConversation('conversation-id', '   ')).toEqual([]);
+      expect(loadEventsWithCategory).not.toHaveBeenCalled();
+    });
+
+    it('stops aborted searches at a batch boundary', async () => {
+      jest.useFakeTimers();
+      const events = new Array(501).fill(null).map((_, index) => {
+        return createMessageEvent(`event-id-${index}`, 'term');
+      });
+      const loadEventsWithCategory = jest
+        .fn<
+          ReturnType<EventServiceLike['loadEventsWithCategory']>,
+          Parameters<EventServiceLike['loadEventsWithCategory']>
+        >()
+        .mockResolvedValue(events);
+      const eventService: EventServiceLike = {loadEventsWithCategory};
+      const abortController = new AbortController();
+
+      const conversationService = new ConversationService(
+        eventService,
+        {} as unknown as StorageService,
+        {} as unknown as APIClient,
+        {} as unknown as Core,
+      );
+
+      const searchPromise = conversationService.searchInConversation('conversation-id', 'term', abortController.signal);
+      await Promise.resolve();
+
+      abortController.abort();
+      jest.advanceTimersByTime(0);
+
+      await expect(searchPromise).rejects.toMatchObject({name: 'AbortError'});
     });
   });
 

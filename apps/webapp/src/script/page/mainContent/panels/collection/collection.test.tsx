@@ -40,6 +40,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {Collection} from './collection';
+import {FullSearch} from './fullSearch';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('./collectionDetails', () => ({
@@ -70,12 +71,19 @@ const createFileMessage = () => {
 
 const createLinkMessage = () => {
   const message = new ContentMessage(createUuid(), translateForTest);
-  const link = new Text(createUuid());
+  const link = new Text(createUuid(), 'term');
   link.previews.push(new LinkPreview({}));
   message.assets.push(link);
   message.category = MessageCategory.LINK_PREVIEW;
   return message;
 };
+
+function createTextMessage(text: string) {
+  const message = new ContentMessage(createUuid(), translateForTest);
+  message.assets.push(new Text(createUuid(), text));
+  message.category = MessageCategory.TEXT;
+  return message;
+}
 
 const createAudioMessage = () => {
   const message = new ContentMessage(createUuid(), translateForTest);
@@ -99,6 +107,19 @@ describe('Collection', () => {
   const mockAssetRepository = container.resolve(AssetRepository);
   const mockMessageRepository = {} as MessageRepository;
   const mockSelfUser = new User(createUuid(), '', translateForTest);
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockConversationRepository.getEventsForCategory.mockResolvedValue(messages);
+    mockConversationRepository.searchInConversation.mockResolvedValue({
+      messageEntities: [createLinkMessage()],
+      query: 'term',
+    });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
 
   it('displays all image assets', async () => {
     const {getAllByText, getByText, queryByText} = render(
@@ -167,10 +188,158 @@ describe('Collection', () => {
     await act(async () => {
       const input = getByTestId('full-search-header-input');
       fireEvent.change(input, {target: {value: 'term'}});
-      jest.advanceTimersByTime(500);
+      jest.advanceTimersByTime(499);
     });
-    await waitFor(() => expect(mockConversationRepository.searchInConversation).toHaveBeenCalled());
+    expect(mockConversationRepository.searchInConversation).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(mockConversationRepository.searchInConversation).toHaveBeenCalledWith(
+      conversation,
+      'term',
+      expect.any(AbortSignal),
+    );
 
     expect(queryByText('CollectionTime')).toBeNull();
+  });
+
+  it('hides collection content immediately when the parent search term changes', async () => {
+    jest.useFakeTimers();
+
+    const {getAllByText, getByTestId, queryByText} = render(
+      withTheme(
+        <Collection
+          assetRepository={mockAssetRepository}
+          messageRepository={mockMessageRepository}
+          conversation={conversation}
+          conversationRepository={mockConversationRepository as any}
+          selfUser={mockSelfUser}
+        />,
+      ),
+      {wrapper: rootProviderWrapper},
+    );
+
+    await waitFor(() => getAllByText('CollectionItem'));
+    const input = getByTestId('full-search-header-input');
+
+    await act(async () => {
+      fireEvent.change(input, {target: {value: 'term'}});
+    });
+
+    expect(queryByText('collectionSectionImages')).toBeNull();
+    expect(mockConversationRepository.searchInConversation).not.toHaveBeenCalled();
+  });
+});
+
+describe('FullSearch', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('calls change immediately with the normalized query and debounces the search provider', async () => {
+    jest.useFakeTimers();
+    const change = jest.fn();
+    const searchProvider = jest.fn().mockResolvedValue({
+      messageEntities: [createTextMessage('term result')],
+      query: 'term',
+    });
+
+    const {getByTestId} = render(withTheme(<FullSearch change={change} searchProvider={searchProvider} />), {
+      wrapper: rootProviderWrapper,
+    });
+
+    await act(async () => {
+      fireEvent.change(getByTestId('full-search-header-input'), {target: {value: ' term '}});
+      jest.advanceTimersByTime(499);
+    });
+
+    expect(change).toHaveBeenCalledWith('term');
+    expect(searchProvider).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(1);
+    });
+
+    await waitFor(() => expect(searchProvider).toHaveBeenCalledWith('term', expect.any(AbortSignal)));
+  });
+
+  it('clears no-results state immediately when the input is cleared', async () => {
+    jest.useFakeTimers();
+    const searchProvider = jest.fn().mockResolvedValue({messageEntities: [], query: 'term'});
+
+    const {getByTestId, getByText, queryByText} = render(withTheme(<FullSearch searchProvider={searchProvider} />), {
+      wrapper: rootProviderWrapper,
+    });
+
+    await act(async () => {
+      fireEvent.change(getByTestId('full-search-header-input'), {target: {value: 'term'}});
+      jest.advanceTimersByTime(500);
+    });
+
+    await waitFor(() => getByText('fullsearchNoResults'));
+
+    await act(async () => {
+      fireEvent.change(getByTestId('full-search-header-input'), {target: {value: ''}});
+    });
+
+    expect(queryByText('fullsearchNoResults')).toBeNull();
+  });
+
+  it('ignores slow stale search results so the latest query wins', async () => {
+    jest.useFakeTimers();
+    let resolveFirstSearch: (value: {messageEntities: ContentMessage[]; query: string}) => void = () => {};
+    let resolveSecondSearch: (value: {messageEntities: ContentMessage[]; query: string}) => void = () => {};
+    const searchProvider = jest.fn((query: string) => {
+      if (query === 'term') {
+        return new Promise<{messageEntities: ContentMessage[]; query: string}>(resolve => {
+          resolveFirstSearch = resolve;
+        });
+      }
+
+      return new Promise<{messageEntities: ContentMessage[]; query: string}>(resolve => {
+        resolveSecondSearch = resolve;
+      });
+    });
+
+    const {container: renderedContainer, getByTestId} = render(
+      withTheme(<FullSearch searchProvider={searchProvider} />),
+      {wrapper: rootProviderWrapper},
+    );
+    const input = getByTestId('full-search-header-input');
+
+    await act(async () => {
+      fireEvent.change(input, {target: {value: 'term'}});
+      jest.advanceTimersByTime(500);
+    });
+    await waitFor(() => expect(searchProvider).toHaveBeenCalledTimes(1));
+
+    await act(async () => {
+      fireEvent.change(input, {target: {value: 'terms'}});
+      jest.advanceTimersByTime(500);
+    });
+    await waitFor(() => expect(searchProvider).toHaveBeenCalledTimes(2));
+    expect(searchProvider).toHaveBeenLastCalledWith('terms', expect.any(AbortSignal));
+
+    await act(async () => {
+      resolveSecondSearch({messageEntities: [createTextMessage('latest terms result')], query: 'terms'});
+    });
+    await waitFor(() => {
+      expect(renderedContainer.querySelector('[data-uie-name="full-search-item-text"]')?.textContent).toBe(
+        'latest terms result',
+      );
+    });
+
+    await act(async () => {
+      resolveFirstSearch({messageEntities: [createTextMessage('stale term result')], query: 'term'});
+    });
+
+    expect(renderedContainer.querySelector('[data-uie-name="full-search-item-text"]')?.textContent).toBe(
+      'latest terms result',
+    );
   });
 });

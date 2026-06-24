@@ -17,14 +17,12 @@
  *
  */
 
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {useDebouncedCallback} from 'use-debounce';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import type {Message} from 'Repositories/entity/message/message';
 import {getSearchRegex} from 'Repositories/search/fullTextSearch';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -33,12 +31,14 @@ import {useEffectRef} from 'Util/useEffectRef';
 import {noop} from 'Util/util';
 
 import {FullSearchItem} from './fullSearch/fullSearchItem';
+import type {FullSearchProvider} from './fullSearch/useFullSearch';
+import {useFullSearch} from './fullSearch/useFullSearch';
 
 const MAX_VISIBLE_MESSAGES = 30;
 const PRE_MARKED_OFFSET = 20;
 const MAX_TEXT_LENGTH = 60;
 const MAX_OFFSET_INDEX = 30;
-const DEBOUNCE_TIME = 100;
+const DEBOUNCE_TIME = 500;
 const MINIMUM_SEARCH_LENGTH = 2;
 
 export const fullSearchInputSubmitComboStyles: CSSObject = {
@@ -61,55 +61,40 @@ export const fullSearchInputWrapperStyles: CSSObject = {
   },
 };
 
-interface FullSearchProps {
+type FullSearchProps = {
   change?: (query: string) => void;
   click?: (messageEntity: Message) => void;
-  searchProvider: (query: string) => Promise<{messageEntities: Message[]; query: string}>;
-}
+  searchProvider: FullSearchProvider;
+};
 
-const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchProps) => {
+function FullSearch(props: FullSearchProps) {
+  const {searchProvider, click = noop, change = noop} = props;
   const {translate} = useApplicationContext();
-  const [searchValue, setSearchValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const [messages, setMessages] = useState<ContentMessage[]>([]);
-  const [messageCount, setMessageCount] = useState(0);
-  const [hasNoResults, setHasNoResults] = useState(false);
   const [element, setElement] = useEffectRef<HTMLDivElement>();
-
-  const debouncedSearch = useDebouncedCallback(async () => {
-    const trimmedInput = searchValue.trim();
-    change(trimmedInput);
-    if (trimmedInput.length < MINIMUM_SEARCH_LENGTH) {
-      setMessages([]);
-      setMessageCount(0);
-      setHasNoResults(false);
-      return;
-    }
-    const {messageEntities, query} = await searchProvider(trimmedInput);
-    if (query === trimmedInput) {
-      setHasNoResults(messageEntities.length === 0);
-      setMessages(messageEntities as ContentMessage[]);
-      setMessageCount(MAX_VISIBLE_MESSAGES);
-    }
-  }, DEBOUNCE_TIME);
-
-  useEffect(() => {
-    void debouncedSearch();
-  }, [debouncedSearch, searchValue]);
+  const {hasNoResults, messageCount, messages, searchValue, setMessageCount, updateSearchValue} = useFullSearch({
+    change,
+    debounceMilliseconds: DEBOUNCE_TIME,
+    initialMessageCount: MAX_VISIBLE_MESSAGES,
+    minimumSearchLength: MINIMUM_SEARCH_LENGTH,
+    searchProvider,
+  });
 
   useEffect(() => {
     const parent = element?.closest('.collection-list') as HTMLDivElement;
     const onScroll = () => {
       const showAdditionalMessages = isScrolledBottom(parent) && messages.length;
       if (showAdditionalMessages) {
-        setMessageCount(currentCount => currentCount + MAX_VISIBLE_MESSAGES);
+        setMessageCount(currentCount => {
+          return currentCount + MAX_VISIBLE_MESSAGES;
+        });
       }
     };
     parent?.addEventListener('scroll', onScroll);
     return () => {
       parent?.removeEventListener('scroll', onScroll);
     };
-  }, [element, messages]);
+  }, [element, messages, setMessageCount]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -121,6 +106,7 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
     const regex = getSearchRegex(searchValue);
 
     return (text: string) => {
+      regex.lastIndex = 0;
       const matches = [...text.matchAll(regex)];
       const firstIndex = matches[0]?.index;
       let firstPart = text.substring(0, firstIndex ?? text.length);
@@ -156,7 +142,9 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
             ref={inputRef}
             aria-label={translate('fullsearchPlaceholder')}
             placeholder={translate('fullsearchPlaceholder')}
-            onChange={event => setSearchValue(event.currentTarget.value)}
+            onChange={event => {
+              updateSearchValue(event.currentTarget.value);
+            }}
             data-uie-name="full-search-header-input"
           />
 
@@ -165,7 +153,9 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
               css={{cursor: 'pointer'}}
               data-uie-name="full-search-dismiss"
               aria-label={translate('fullsearchCancelCloseBtn')}
-              onClick={() => setSearchValue('')}
+              onClick={() => {
+                updateSearchValue('');
+              }}
             />
           )}
         </InputSubmitCombo>
@@ -189,6 +179,6 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
       </div>
     </div>
   );
-};
+}
 
 export {FullSearch};
