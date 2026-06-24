@@ -64,15 +64,19 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
-          fetch-depth: 0
-          # Uses the head commit (not merge commit) for PRs
+          fetch-depth: 1
+          # Uses the head commit, not the merge commit.
+          # Keep this shallow. Nx gets the base branch explicitly in the next step.
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Fetch base branch for Nx format checks
+      - name: Fetch base branch for Nx checks
         if: ${{ github.event_name == 'pull_request' }}
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: git fetch origin "${BASE_REF}:${BASE_REF}"
+        run: |
+          git fetch --no-tags --depth=1 origin \
+            "${BASE_REF}:refs/remotes/origin/${BASE_REF}" \
+            "${BASE_REF}:${BASE_REF}"
 
       - name: Checkout (non-PR)
         if: ${{ github.event_name != 'pull_request' }}
