@@ -19,6 +19,7 @@
 
 import {useMemo} from 'react';
 
+import {getLocalTimeZone, today} from '@internationalized/date';
 import is from '@sindresorhus/is';
 import type {Maybe} from 'true-myth';
 import {maybe} from 'true-myth';
@@ -26,6 +27,7 @@ import {maybe} from 'true-myth';
 import {
   CircleCloseIcon,
   DateTimePickerField,
+  dateValueFromDate,
   ErrorMessage,
   getOverlayPortalContainer,
   Input,
@@ -64,6 +66,9 @@ const toDateTimePickerValue = (value: Maybe<Date>): Date | null => value.unwrapO
 
 const fromDateTimePickerValue = (value: Date | null): Maybe<Date> =>
   value === null ? maybe.nothing() : maybe.just(value);
+
+const firstNonEmptyError = (...errorMessages: Array<string | undefined>): string | undefined =>
+  errorMessages.find(is.nonEmptyString);
 
 export interface ScheduleMeetingFormProps {
   mode: ScheduleMeetingMode;
@@ -118,6 +123,20 @@ export const ScheduleMeetingForm = ({
     }),
     [translate],
   );
+
+  const todayValue = useMemo(() => today(getLocalTimeZone()), []);
+
+  const endDateMinValue = useMemo(() => {
+    if (formState.start.isNothing) {
+      return todayValue;
+    }
+
+    const startDate = dateValueFromDate(formState.start.value);
+    return startDate.compare(todayValue) > 0 ? startDate : todayValue;
+  }, [formState.start, todayValue]);
+
+  const startErrorText = firstNonEmptyError(errors.startInPast);
+  const endErrorText = firstNonEmptyError(errors.endInPast, errors.endBeforeStart);
 
   return (
     <div css={scheduleMeetingFormLayoutCss} data-uie-name="schedule-meeting-form" data-uie-mode={mode}>
@@ -177,6 +196,9 @@ export const ScheduleMeetingForm = ({
           onChange={date => onStartChange(fromDateTimePickerValue(date))}
           labels={dateTimePickerLabels}
           locale={currentLanguage()}
+          markInvalid={is.nonEmptyString(startErrorText)}
+          errorText={startErrorText}
+          minValue={todayValue}
           menuPortalTarget={portalContainer}
           popoverPortalContainer={portalContainer}
         />
@@ -188,8 +210,9 @@ export const ScheduleMeetingForm = ({
           onChange={date => onEndChange(fromDateTimePickerValue(date))}
           labels={dateTimePickerLabels}
           locale={currentLanguage()}
-          markInvalid={Boolean(errors.endBeforeStart)}
-          errorText={errors.endBeforeStart}
+          markInvalid={is.nonEmptyString(endErrorText)}
+          errorText={endErrorText}
+          minValue={endDateMinValue}
           menuPortalTarget={portalContainer}
           popoverPortalContainer={portalContainer}
         />

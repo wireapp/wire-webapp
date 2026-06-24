@@ -38,7 +38,15 @@ export const validateScheduleMeetingForm = ({
     errors.title = 'meetings.scheduleModal.error.titleRequired';
   }
 
-  if (start.isJust && end.isJust && end.value.getTime() <= start.value.getTime()) {
+  if (start.isJust && start.value.getTime() <= Date.now()) {
+    errors.startInPast = 'meetings.schedule.errors.startInPast';
+  }
+
+  if (end.isJust && end.value.getTime() <= Date.now()) {
+    errors.endInPast = 'meetings.schedule.errors.endInPast';
+  }
+
+  if (start.isJust && end.isJust && !errors.endInPast && end.value.getTime() <= start.value.getTime()) {
     errors.endBeforeStart = 'meetings.scheduleModal.error.endBeforeStart';
   }
 
@@ -46,4 +54,4 @@ export const validateScheduleMeetingForm = ({
 };
 
 export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors): boolean =>
-  Boolean(errors.title || errors.endBeforeStart);
+  Boolean(errors.title || errors.startInPast || errors.endInPast || errors.endBeforeStart);

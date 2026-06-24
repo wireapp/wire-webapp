@@ -30,5 +30,16 @@ export const requireScheduleMeetingTimes = (
     return result.err(scheduleFormErrors.missingTimes);
   }
 
-  return result.ok({start: formState.start.value, end: formState.end.value});
+  const start = formState.start.value;
+  const end = formState.end.value;
+
+  if (start.getTime() <= Date.now()) {
+    return result.err(scheduleFormErrors.startInPast);
+  }
+
+  if (end.getTime() <= Date.now()) {
+    return result.err(scheduleFormErrors.endInPast);
+  }
+
+  return result.ok({start, end});
 };

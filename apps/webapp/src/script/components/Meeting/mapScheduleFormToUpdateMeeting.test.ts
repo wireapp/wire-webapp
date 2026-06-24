@@ -38,8 +38,8 @@ const createUser = (id: string, email?: string) => {
 
 const baseFormState = (): ScheduleMeetingFormState => ({
   title: 'Weekly sync',
-  start: maybe.just(new Date('2026-06-15T10:00:00.000Z')),
-  end: maybe.just(new Date('2026-06-15T11:00:00.000Z')),
+  start: maybe.just(new Date('2026-07-15T10:00:00.000Z')),
+  end: maybe.just(new Date('2026-07-15T11:00:00.000Z')),
   recurrence: 'weekly',
   selectedUsers: [],
   participantsFilter: '',
@@ -67,8 +67,8 @@ describe('mapScheduleFormToUpdateMeeting', () => {
     expect(result.isOk).toBe(true);
     expect(unwrap(result).payload).toEqual({
       title: 'Weekly sync',
-      start_time: '2026-06-15T10:00:00.000Z',
-      end_time: '2026-06-15T11:00:00.000Z',
+      start_time: '2026-07-15T10:00:00.000Z',
+      end_time: '2026-07-15T11:00:00.000Z',
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
     });
     expect(unwrap(result).addedEmails).toEqual(['charlie@wire.com']);

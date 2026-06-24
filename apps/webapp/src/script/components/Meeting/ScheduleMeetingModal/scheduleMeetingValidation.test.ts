@@ -22,34 +22,79 @@ import {maybe} from 'true-myth';
 import {hasScheduleMeetingFormErrors, validateScheduleMeetingForm} from './scheduleMeetingValidation';
 
 describe('scheduleMeetingValidation', () => {
-  const start = maybe.just(new Date('2026-06-15T10:00:00'));
-  const end = maybe.just(new Date('2026-06-15T11:00:00'));
+  const fixedNow = new Date('2026-06-23T14:30:00.000Z');
+  const futureStart = maybe.just(new Date('2026-06-23T16:00:00.000Z'));
+  const futureEnd = maybe.just(new Date('2026-06-23T17:00:00.000Z'));
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(fixedNow);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
 
   it('returns titleRequired when title is empty', () => {
-    const errors = validateScheduleMeetingForm({title: '   ', start, end});
+    const errors = validateScheduleMeetingForm({title: '   ', start: futureStart, end: futureEnd});
 
     expect(errors.title).toBe('meetings.scheduleModal.error.titleRequired');
+    expect(errors.startInPast).toBeUndefined();
     expect(errors.endBeforeStart).toBeUndefined();
+  });
+
+  it('returns startInPast when start is not in the future', () => {
+    const errors = validateScheduleMeetingForm({
+      title: 'Weekly sync',
+      start: maybe.just(new Date('2026-06-23T10:00:00.000Z')),
+      end: futureEnd,
+    });
+
+    expect(errors.startInPast).toBe('meetings.schedule.errors.startInPast');
+  });
+
+  it('returns endInPast when end is not in the future', () => {
+    const errors = validateScheduleMeetingForm({
+      title: 'Weekly sync',
+      start: futureStart,
+      end: maybe.just(new Date('2026-06-23T10:00:00.000Z')),
+    });
+
+    expect(errors.endInPast).toBe('meetings.schedule.errors.endInPast');
+    expect(errors.endBeforeStart).toBeUndefined();
+  });
+
+  it('returns startInPast for a past time on today while allowing today as a date', () => {
+    const pastTimeToday = new Date(fixedNow);
+    pastTimeToday.setHours(pastTimeToday.getHours() - 1);
+
+    const errors = validateScheduleMeetingForm({
+      title: 'Weekly sync',
+      start: maybe.just(pastTimeToday),
+      end: futureEnd,
+    });
+
+    expect(errors.startInPast).toBe('meetings.schedule.errors.startInPast');
   });
 
   it('returns endBeforeStart when end is not after start', () => {
     const errors = validateScheduleMeetingForm({
       title: 'Weekly sync',
-      start,
-      end: maybe.just(new Date('2026-06-15T10:00:00')),
+      start: futureStart,
+      end: maybe.just(new Date('2026-06-23T16:00:00.000Z')),
     });
 
     expect(errors.endBeforeStart).toBe('meetings.scheduleModal.error.endBeforeStart');
   });
 
   it('returns no errors for valid input', () => {
-    const errors = validateScheduleMeetingForm({title: 'Weekly sync', start, end});
+    const errors = validateScheduleMeetingForm({title: 'Weekly sync', start: futureStart, end: futureEnd});
 
     expect(hasScheduleMeetingFormErrors(errors)).toBe(false);
   });
 
   it('skips end validation when start or end is missing', () => {
-    const errors = validateScheduleMeetingForm({title: 'Weekly sync', start: maybe.nothing(), end});
+    const errors = validateScheduleMeetingForm({title: 'Weekly sync', start: maybe.nothing(), end: futureEnd});
 
     expect(errors.endBeforeStart).toBeUndefined();
   });

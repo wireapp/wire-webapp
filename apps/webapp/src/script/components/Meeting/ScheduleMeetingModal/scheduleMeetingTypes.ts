@@ -36,14 +36,20 @@ export interface ScheduleMeetingFormState {
 
 export type ScheduleMeetingFormErrorKey =
   | 'meetings.scheduleModal.error.titleRequired'
-  | 'meetings.scheduleModal.error.endBeforeStart';
+  | 'meetings.scheduleModal.error.endBeforeStart'
+  | 'meetings.schedule.errors.startInPast'
+  | 'meetings.schedule.errors.endInPast';
 
 export interface ScheduleMeetingFormErrors {
   title?: ScheduleMeetingFormErrorKey;
+  startInPast?: ScheduleMeetingFormErrorKey;
+  endInPast?: ScheduleMeetingFormErrorKey;
   endBeforeStart?: ScheduleMeetingFormErrorKey;
 }
 
 export interface ScheduleMeetingFormDisplayErrors {
   title?: string;
+  startInPast?: string;
+  endInPast?: string;
   endBeforeStart?: string;
 }

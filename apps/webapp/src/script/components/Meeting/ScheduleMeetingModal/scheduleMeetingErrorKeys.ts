@@ -25,6 +25,14 @@ export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
     titleKey: 'meetings.scheduleModal.error.createFailedTitle',
     messageKey: 'meetings.scheduleModal.error.missingTimes',
   },
+  startInPast: {
+    titleKey: 'meetings.scheduleModal.error.createFailedTitle',
+    messageKey: 'meetings.schedule.errors.startInPast',
+  },
+  endInPast: {
+    titleKey: 'meetings.scheduleModal.error.createFailedTitle',
+    messageKey: 'meetings.schedule.errors.endInPast',
+  },
   participantMissingEmail: {
     titleKey: 'meetings.scheduleModal.error.createFailedTitle',
     messageKey: 'meetings.scheduleModal.error.participantMissingEmail',

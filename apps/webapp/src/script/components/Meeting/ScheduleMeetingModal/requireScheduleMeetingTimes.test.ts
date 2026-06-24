@@ -67,4 +67,28 @@ describe('requireScheduleMeetingTimes', () => {
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(scheduleFormErrors.missingTimes);
   });
+
+  it('returns startInPast when start is not in the future', () => {
+    const pastStart = new Date(Date.now() - 60_000);
+    const result = requireScheduleMeetingTimes({
+      ...baseFormState(),
+      start: maybe.just(pastStart),
+    });
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(scheduleFormErrors.startInPast);
+  });
+
+  it('returns endInPast when end is not in the future', () => {
+    const futureStart = new Date(Date.now() + 3_600_000);
+    const pastEnd = new Date(Date.now() - 60_000);
+    const result = requireScheduleMeetingTimes({
+      ...baseFormState(),
+      start: maybe.just(futureStart),
+      end: maybe.just(pastEnd),
+    });
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(scheduleFormErrors.endInPast);
+  });
 });

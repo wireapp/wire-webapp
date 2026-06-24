@@ -1281,6 +1281,8 @@
   "meetings.noMeetingsText": "No meetings yet.",
   "meetings.noScheduledMeetings": "No meetings scheduled.",
   "meetings.noUpcomingMeetingsText": "No upcoming meetings yet.",
+  "meetings.schedule.errors.startInPast": "Start time must be in the future",
+  "meetings.schedule.errors.endInPast": "End time must be in the future",
   "meetings.scheduleModal.closeAriaLabel": "Close",
   "meetings.scheduleModal.confirmChanges": "Confirm changes",
   "meetings.scheduleModal.editTitle": "Edit Meeting",

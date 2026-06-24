@@ -123,12 +123,12 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
   setStart: start =>
     set(state => ({
       formState: {...state.formState, start},
-      errors: {...state.errors, endBeforeStart: undefined},
+      errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined},
     })),
   setEnd: end =>
     set(state => ({
       formState: {...state.formState, end},
-      errors: {...state.errors, endBeforeStart: undefined},
+      errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined},
     })),
   setRecurrence: recurrence => set(state => ({formState: {...state.formState, recurrence}})),
   setSelectedUsers: selectedUsers => set(state => ({formState: {...state.formState, selectedUsers}})),
