@@ -17,12 +17,20 @@
  *
  */
 
-import {MeetingRecurrence} from './meetingRecurrence';
+import type {Result} from 'true-myth';
 
-export interface UpdateMeeting {
-  end_time?: string;
-  /** Omit to leave unchanged; null clears recurrence. */
-  recurrence?: MeetingRecurrence | null;
-  start_time?: string;
-  title?: string;
+export function unwrap<T, E>(result: Result<T, E>): T {
+  if (result.isErr) {
+    throw new Error(`Expected Ok, got Err: ${String(result.error)}`);
+  }
+
+  return result.value;
+}
+
+export function unwrapErr<E>(result: Result<unknown, E>): E {
+  if (!result.isErr) {
+    throw new Error('Expected Err, got Ok');
+  }
+
+  return result.error;
 }

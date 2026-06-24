@@ -19,61 +19,48 @@
 
 import {MouseEvent} from 'react';
 
-import {
-  CallIcon,
-  CirclePlusIcon,
-  CloseIcon,
-  EditIcon,
-  IconButton,
-  MoreIcon,
-  ShareLinkIcon,
-  TrashIcon,
-} from '@wireapp/react-ui-kit';
+import {container} from 'tsyringe';
 
+import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
+
+import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/getMeetingActionEntries';
 import {
-  contextMenuDangerItemIconStyles,
-  contextMenuDangerItemStyles,
   iconContainerStyle,
   iconStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
+import {useEditMeeting} from 'Components/Meeting/useEditMeeting';
+import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
+import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {showContextMenu} from '../../../../../../ui/contextMenu';
 
-export const MeetingAction = () => {
-  const {translate} = useApplicationContext();
+interface MeetingActionProps {
+  meeting: Meeting;
+}
+
+export const MeetingAction = ({meeting}: MeetingActionProps) => {
+  const {translate, wallClock} = useApplicationContext();
+  const {editMeeting} = useEditMeeting();
+  const selfUser = container.resolve(UserState).self();
 
   const handleActionButton = (event: MouseEvent<HTMLElement>) => {
+    const nowMs = wallClock.currentTimestampInMilliseconds;
+
     showContextMenu({
       event,
-      entries: [
-        {
-          icon: () => <CallIcon />,
-          label: translate('meetings.action.startMeeting'),
+      entries: getMeetingActionEntries({
+        meeting,
+        selfUser,
+        nowMs,
+        translate,
+        onEdit: () => {
+          if (canEditMeeting(meeting, selfUser, wallClock.currentTimestampInMilliseconds)) {
+            editMeeting(meeting);
+          }
         },
-        {
-          icon: () => <CirclePlusIcon />,
-          label: translate('meetings.action.createConversation'),
-        },
-        {
-          icon: () => <ShareLinkIcon />,
-          label: translate('meetings.action.copyLink'),
-        },
-        {
-          icon: () => <EditIcon />,
-          label: translate('meetings.action.editMeeting'),
-        },
-        {
-          css: contextMenuDangerItemStyles,
-          icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
-          label: translate('meetings.action.deleteMeetingForMe'),
-        },
-        {
-          css: contextMenuDangerItemStyles,
-          icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
-          label: translate('meetings.action.deleteMeetingForAll'),
-        },
-      ],
+      }),
       identifier: 'message-options-menu',
     });
   };

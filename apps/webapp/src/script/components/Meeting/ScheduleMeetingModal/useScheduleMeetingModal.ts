@@ -17,6 +17,8 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Maybe, maybe} from 'true-myth';
 import {create} from 'zustand';
 
 import {getNextHourDateTime} from '@wireapp/react-ui-kit';
@@ -53,8 +55,8 @@ export const getDefaultScheduleMeetingFormState = (): ScheduleMeetingFormState =
   const start = getNextHourDateTime();
   return {
     title: '',
-    start,
-    end: getDefaultEndDateTime(start),
+    start: maybe.just(start),
+    end: maybe.just(getDefaultEndDateTime(start)),
     recurrence: 'doesNotRepeat',
     selectedUsers: [],
     participantsFilter: '',
@@ -66,13 +68,15 @@ type ScheduleMeetingModalState = {
   mode: ScheduleMeetingMode;
   formState: ScheduleMeetingFormState;
   errors: ScheduleMeetingFormErrors;
+  editingMeetingId: Maybe<QualifiedId>;
+  originalInvitedEmails: string[];
   openCreate: () => void;
-  openEdit: (meeting?: Meeting) => void;
+  openEdit: (meeting: Meeting, formState: ScheduleMeetingFormState) => void;
   close: () => void;
   reset: () => void;
   setTitle: (title: string) => void;
-  setStart: (start: Date | null) => void;
-  setEnd: (end: Date | null) => void;
+  setStart: (start: Maybe<Date>) => void;
+  setEnd: (end: Maybe<Date>) => void;
   setRecurrence: (recurrence: ScheduleMeetingRecurrenceOption) => void;
   setSelectedUsers: (selectedUsers: User[]) => void;
   setParticipantsFilter: (participantsFilter: string) => void;
@@ -85,6 +89,8 @@ const initialState = {
   mode: 'create' as ScheduleMeetingMode,
   formState: getDefaultScheduleMeetingFormState(),
   errors: {} as ScheduleMeetingFormErrors,
+  editingMeetingId: Maybe.nothing<QualifiedId>(),
+  originalInvitedEmails: [] as string[],
 };
 
 export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, get) => ({
@@ -95,17 +101,18 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       mode: 'create',
       formState: getDefaultScheduleMeetingFormState(),
       errors: {},
+      editingMeetingId: Maybe.nothing(),
+      originalInvitedEmails: [],
     }),
-  openEdit: (meeting?: Meeting) => {
-    // TODO: map meeting fields when edit flow is implemented
-    void meeting;
+  openEdit: (meeting: Meeting, formState: ScheduleMeetingFormState) =>
     set({
       isOpen: true,
       mode: 'edit',
-      formState: getDefaultScheduleMeetingFormState(),
+      formState,
       errors: {},
-    });
-  },
+      editingMeetingId: maybe.just(meeting.qualified_id),
+      originalInvitedEmails: meeting.invited_emails,
+    }),
   close: () => set({isOpen: false}),
   reset: () => set({...initialState, formState: getDefaultScheduleMeetingFormState()}),
   setTitle: title =>

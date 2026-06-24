@@ -31,11 +31,12 @@ export type LoadMeetingsListResult =
 const logger = getLogger('loadMeetingsList');
 
 export const loadMeetingsList = async (meetingsRepository: MeetingsRepository): Promise<LoadMeetingsListResult> => {
-  try {
-    const apiMeetings = await meetingsRepository.getMeetingsList();
-    return {meetings: apiMeetings.map(mapApiMeetingToListMeeting)};
-  } catch (error) {
-    logger.warn('Failed to load meetings list', error);
+  const listResult = await meetingsRepository.getMeetingsList();
+
+  if (listResult.isErr) {
+    logger.warn('Failed to load meetings list', listResult.error);
     return {meetings: [], errorKey: 'meetings.list.loadError'};
   }
+
+  return {meetings: listResult.value.map(mapApiMeetingToListMeeting)};
 };

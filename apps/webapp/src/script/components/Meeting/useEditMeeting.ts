@@ -17,23 +17,32 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useCallback} from 'react';
 
 import {container} from 'tsyringe';
 
 import {getScheduleMeetingParticipantPool} from 'Components/Meeting/getScheduleMeetingParticipantPool';
-import type {User} from 'Repositories/entity/User';
+import {mapMeetingToScheduleFormState} from 'Components/Meeting/mapMeetingToScheduleFormState';
+import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-export const useScheduleMeetingParticipants = (): {users: User[]} => {
-  const userState = container.resolve(UserState);
-  const teamState = container.resolve(TeamState);
+import {useScheduleMeetingModal} from './ScheduleMeetingModal/useScheduleMeetingModal';
 
-  const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
+export const useEditMeeting = () => {
+  const openEdit = useScheduleMeetingModal(state => state.openEdit);
 
-  const users = useMemo(() => getScheduleMeetingParticipantPool(userState, teamState), [isTeam, teamState, userState]);
+  const editMeeting = useCallback(
+    (meeting: Meeting) => {
+      const userState = container.resolve(UserState);
+      const teamState = container.resolve(TeamState);
+      const availableUsers = getScheduleMeetingParticipantPool(userState, teamState);
+      const formState = mapMeetingToScheduleFormState(meeting, availableUsers);
 
-  return {users};
+      openEdit(meeting, formState);
+    },
+    [openEdit],
+  );
+
+  return {editMeeting};
 };

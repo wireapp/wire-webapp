@@ -28,6 +28,9 @@ const createMeeting = (start: string, end: string, title: string): Meeting => ({
   recurrence: 'doesNotRepeat',
   conversation_id: title,
   title,
+  qualified_id: {id: `meeting-${title}`, domain: 'example.com'},
+  qualified_creator: {id: 'creator-id', domain: 'example.com'},
+  invited_emails: [],
 });
 
 describe('partitionMeetingsByDay', () => {

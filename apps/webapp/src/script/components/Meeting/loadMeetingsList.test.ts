@@ -17,6 +17,8 @@
  *
  */
 
+import {task} from 'true-myth';
+
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 
 import {loadMeetingsList} from './loadMeetingsList';
@@ -38,7 +40,7 @@ describe('loadMeetingsList', () => {
   const createRepository = (getMeetingsList: jest.Mock) => ({getMeetingsList}) as unknown as MeetingsRepository;
 
   it('returns an empty list after a successful response with no meetings', async () => {
-    const getMeetingsList = jest.fn().mockResolvedValue([]);
+    const getMeetingsList = jest.fn().mockReturnValue(task.resolve([]));
     const result = await loadMeetingsList(createRepository(getMeetingsList));
 
     expect(getMeetingsList).toHaveBeenCalledTimes(1);
@@ -46,7 +48,7 @@ describe('loadMeetingsList', () => {
   });
 
   it('maps successful API meetings to list meetings', async () => {
-    const getMeetingsList = jest.fn().mockResolvedValue([apiMeeting]);
+    const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
     const result = await loadMeetingsList(createRepository(getMeetingsList));
 
     expect(result.meetings).toHaveLength(1);

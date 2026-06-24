@@ -19,17 +19,47 @@
 
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 import type {Meeting} from '@wireapp/api-client/lib/meetings/meeting';
+import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Task, task} from 'true-myth';
 
 import type {MeetingsDataSource} from './meetingsDataSource';
 
 export class MeetingsRepository {
   constructor(private readonly dataSource: MeetingsDataSource) {}
 
-  createMeeting(payload: CreateMeeting): Promise<Meeting> {
-    return this.dataSource.createMeeting(payload);
+  createMeeting(payload: CreateMeeting): Task<Meeting, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.dataSource.createMeeting(payload),
+    );
   }
 
-  getMeetingsList(): Promise<Meeting[]> {
-    return this.dataSource.getMeetingsList();
+  getMeetingsList(): Task<Meeting[], unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.dataSource.getMeetingsList(),
+    );
+  }
+
+  updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Task<Meeting, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.dataSource.updateMeeting(meetingId, payload),
+    );
+  }
+
+  addMeetingInvitation(meetingId: QualifiedId, emails: string[]): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.dataSource.addMeetingInvitation(meetingId, emails),
+    );
+  }
+
+  removeMeetingInvitation(meetingId: QualifiedId, emails: string[]): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.dataSource.removeMeetingInvitation(meetingId, emails),
+    );
   }
 }

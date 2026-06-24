@@ -17,12 +17,18 @@
  *
  */
 
-import {MeetingRecurrence} from './meetingRecurrence';
+import {result, Result} from 'true-myth';
 
-export interface UpdateMeeting {
-  end_time?: string;
-  /** Omit to leave unchanged; null clears recurrence. */
-  recurrence?: MeetingRecurrence | null;
-  start_time?: string;
-  title?: string;
-}
+import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+
+import {ScheduleFormErrors, scheduleFormErrors} from '../ScheduleFormErrors';
+
+export const requireScheduleMeetingTimes = (
+  formState: ScheduleMeetingFormState,
+): Result<{start: Date; end: Date}, ScheduleFormErrors> => {
+  if (formState.start.isNothing || formState.end.isNothing) {
+    return result.err(scheduleFormErrors.missingTimes);
+  }
+
+  return result.ok({start: formState.start.value, end: formState.end.value});
+};

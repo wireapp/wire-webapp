@@ -42,7 +42,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 const createUser = (id: string, name: string, handle: string) => {
-  const user = new User(id, 'example.com');
+  const user = new User(id, 'example.com', translateForTest);
   user.name(name);
   user.username(handle);
   return user;

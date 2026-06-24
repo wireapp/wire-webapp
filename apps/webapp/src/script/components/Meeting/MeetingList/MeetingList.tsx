@@ -20,6 +20,7 @@
 import {useEffect, useMemo, useState} from 'react';
 
 import is from '@sindresorhus/is';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Loading} from '@wireapp/react-ui-kit';
 
@@ -44,6 +45,9 @@ export interface Meeting {
   recurrence: ScheduleMeetingRecurrenceOption;
   conversation_id: string;
   title: string;
+  qualified_id: QualifiedId;
+  qualified_creator: QualifiedId;
+  invited_emails: string[];
   // TODO: Ask iOS and Android about how to identify this status
   attending?: boolean;
 }

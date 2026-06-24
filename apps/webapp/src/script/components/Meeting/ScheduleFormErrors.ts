@@ -17,12 +17,9 @@
  *
  */
 
-import {MeetingRecurrence} from './meetingRecurrence';
+export const scheduleFormErrors = {
+  missingTimes: 'missingTimes',
+  participantMissingEmail: 'participantMissingEmail',
+} as const;
 
-export interface UpdateMeeting {
-  end_time?: string;
-  /** Omit to leave unchanged; null clears recurrence. */
-  recurrence?: MeetingRecurrence | null;
-  start_time?: string;
-  title?: string;
-}
+export type ScheduleFormErrors = (typeof scheduleFormErrors)[keyof typeof scheduleFormErrors];

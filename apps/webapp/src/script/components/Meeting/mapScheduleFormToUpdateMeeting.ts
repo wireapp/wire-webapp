@@ -17,25 +17,45 @@
  *
  */
 
-import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
-import {result, Result} from 'true-myth';
+import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
+import {Result, result} from 'true-myth';
 
 import {getInvitedEmailsFromSelectedUsers} from 'Components/Meeting/getInvitedEmailsFromSelectedUsers';
 import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 
-import {ScheduleFormErrors, scheduleFormErrors} from './ScheduleFormErrors';
+import {scheduleFormErrors, ScheduleFormErrors} from './ScheduleFormErrors';
 
-export const mapScheduleFormToCreateMeeting = (
+export type MapScheduleFormToUpdateMeetingResult = {
+  payload: UpdateMeeting;
+  addedEmails: string[];
+  removedEmails: string[];
+};
+
+const normalizeEmail = (email: string): string => email.toLowerCase();
+
+export const computeInvitationDiff = (
+  originalInvitedEmails: string[],
+  newInvitedEmails: string[],
+): {addedEmails: string[]; removedEmails: string[]} => {
+  const originalSet = new Set(originalInvitedEmails.map(normalizeEmail));
+  const newSet = new Set(newInvitedEmails.map(normalizeEmail));
+
+  const addedEmails = newInvitedEmails.filter(email => !originalSet.has(normalizeEmail(email)));
+  const removedEmails = originalInvitedEmails.filter(email => !newSet.has(normalizeEmail(email)));
+
+  return {addedEmails, removedEmails};
+};
+
+export const mapScheduleFormToUpdateMeeting = (
   formState: ScheduleMeetingFormState,
-): Result<CreateMeeting, ScheduleFormErrors> => {
+  originalInvitedEmails: string[],
+): Result<MapScheduleFormToUpdateMeetingResult, ScheduleFormErrors> => {
   const timesResult = requireScheduleMeetingTimes(formState);
-
   if (timesResult.isErr) {
     return result.err(timesResult.error);
   }
-
   const {start, end} = timesResult.value;
 
   const invitedEmails = getInvitedEmailsFromSelectedUsers(formState.selectedUsers);
@@ -45,12 +65,16 @@ export const mapScheduleFormToCreateMeeting = (
   }
 
   const recurrence = mapRecurrenceOptionToMeetingRecurrence(formState.recurrence);
+  const {addedEmails, removedEmails} = computeInvitationDiff(originalInvitedEmails, invitedEmails.value);
 
   return result.ok({
-    title: formState.title.trim(),
-    start_time: start.toISOString(),
-    end_time: end.toISOString(),
-    ...(invitedEmails.value.length > 0 && {invited_emails: invitedEmails.value}),
-    ...(recurrence !== undefined && {recurrence}),
+    payload: {
+      title: formState.title.trim(),
+      start_time: start.toISOString(),
+      end_time: end.toISOString(),
+      recurrence: recurrence ?? null,
+    },
+    addedEmails,
+    removedEmails,
   });
 };

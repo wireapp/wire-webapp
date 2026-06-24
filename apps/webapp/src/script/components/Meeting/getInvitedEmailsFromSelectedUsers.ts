@@ -17,12 +17,21 @@
  *
  */
 
-import {MeetingRecurrence} from './meetingRecurrence';
+import is from '@sindresorhus/is';
+import {Maybe, maybe} from 'true-myth';
 
-export interface UpdateMeeting {
-  end_time?: string;
-  /** Omit to leave unchanged; null clears recurrence. */
-  recurrence?: MeetingRecurrence | null;
-  start_time?: string;
-  title?: string;
-}
+import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+
+export const getInvitedEmailsFromSelectedUsers = (
+  selectedUsers: ScheduleMeetingFormState['selectedUsers'],
+): Maybe<string[]> => {
+  const emails = selectedUsers.map(user => user.email()).filter((email): email is string => is.nonEmptyString(email));
+
+  const hasMissingEmail = selectedUsers.some(user => !is.nonEmptyString(user.email()));
+
+  if (hasMissingEmail) {
+    return maybe.nothing();
+  }
+
+  return maybe.just(emails);
+};

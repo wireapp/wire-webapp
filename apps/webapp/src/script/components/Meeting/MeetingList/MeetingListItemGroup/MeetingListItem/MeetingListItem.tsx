@@ -43,14 +43,8 @@ interface MeetingListItemProps extends Meeting {
   nowMs?: number;
 }
 
-const MeetingListItemComponent = ({
-  title,
-  start_date,
-  end_date,
-  recurrence,
-  attending,
-  nowMs,
-}: MeetingListItemProps) => {
+const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => {
+  const {title, start_date, end_date, recurrence, attending} = meeting;
   const {translate} = useApplicationContext();
   const timestamp = nowMs ?? Date.now();
 
@@ -119,7 +113,7 @@ const MeetingListItemComponent = ({
       </div>
       <div css={rightStyles}>
         <MeetingStatus start_date={start_date} end_date={end_date} attending={attending} nowMs={timestamp} />
-        <MeetingAction />
+        <MeetingAction meeting={meeting} />
       </div>
     </div>
   );

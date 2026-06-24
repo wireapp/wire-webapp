@@ -24,7 +24,7 @@ import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {mapScheduleFormToCreateMeeting} from './mapScheduleFormToCreateMeeting';
+import {computeInvitationDiff, mapScheduleFormToUpdateMeeting} from './mapScheduleFormToUpdateMeeting';
 import type {ScheduleMeetingFormState} from './ScheduleMeetingModal/scheduleMeetingTypes';
 
 const createUser = (id: string, email?: string) => {
@@ -45,47 +45,77 @@ const baseFormState = (): ScheduleMeetingFormState => ({
   participantsFilter: '',
 });
 
-describe('mapScheduleFormToCreateMeeting', () => {
-  it('maps title, times, recurrence, and invited emails', () => {
-    const result = mapScheduleFormToCreateMeeting({
-      ...baseFormState(),
-      selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2', 'bob@wire.com')],
+describe('computeInvitationDiff', () => {
+  it('computes added and removed emails case-insensitively', () => {
+    expect(computeInvitationDiff(['alice@wire.com', 'bob@wire.com'], ['Alice@wire.com', 'charlie@wire.com'])).toEqual({
+      addedEmails: ['charlie@wire.com'],
+      removedEmails: ['bob@wire.com'],
     });
+  });
+});
+
+describe('mapScheduleFormToUpdateMeeting', () => {
+  it('maps title, times, recurrence, and invitation diff', () => {
+    const result = mapScheduleFormToUpdateMeeting(
+      {
+        ...baseFormState(),
+        selectedUsers: [createUser('1', 'alice@wire.com'), createUser('3', 'charlie@wire.com')],
+      },
+      ['alice@wire.com', 'bob@wire.com'],
+    );
 
     expect(result.isOk).toBe(true);
-    expect(unwrap(result)).toEqual({
+    expect(unwrap(result).payload).toEqual({
       title: 'Weekly sync',
       start_time: '2026-06-15T10:00:00.000Z',
       end_time: '2026-06-15T11:00:00.000Z',
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
-      invited_emails: ['alice@wire.com', 'bob@wire.com'],
     });
-  });
-
-  it('omits invited_emails when no participants are selected', () => {
-    const result = mapScheduleFormToCreateMeeting(baseFormState());
-
-    expect(result.isOk).toBe(true);
-    expect(unwrap(result).invited_emails).toBeUndefined();
+    expect(unwrap(result).addedEmails).toEqual(['charlie@wire.com']);
+    expect(unwrap(result).removedEmails).toEqual(['bob@wire.com']);
   });
 
   it('returns participantMissingEmail when a selected user has no email', () => {
-    const result = mapScheduleFormToCreateMeeting({
-      ...baseFormState(),
-      selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2')],
-    });
+    const result = mapScheduleFormToUpdateMeeting(
+      {
+        ...baseFormState(),
+        selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2')],
+      },
+      ['alice@wire.com'],
+    );
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe('participantMissingEmail');
   });
 
   it('returns missingTimes when start or end is missing', () => {
-    const result = mapScheduleFormToCreateMeeting({
-      ...baseFormState(),
-      start: maybe.nothing(),
-    });
+    const result = mapScheduleFormToUpdateMeeting(
+      {
+        ...baseFormState(),
+        end: maybe.nothing(),
+      },
+      ['alice@wire.com'],
+    );
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe('missingTimes');
+  });
+
+  it('clears recurrence when changed to doesNotRepeat', () => {
+    const result = mapScheduleFormToUpdateMeeting(
+      {
+        ...baseFormState(),
+        recurrence: 'doesNotRepeat',
+      },
+      [],
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(unwrap(result).payload).toEqual({
+      title: 'Weekly sync',
+      start_time: '2026-06-15T10:00:00.000Z',
+      end_time: '2026-06-15T11:00:00.000Z',
+      recurrence: null,
+    });
   });
 });
