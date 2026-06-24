@@ -18,6 +18,7 @@
  */
 
 import {maybe} from 'true-myth';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
 import {scheduleFormErrors} from '../ScheduleFormErrors';
@@ -25,10 +26,17 @@ import {scheduleFormErrors} from '../ScheduleFormErrors';
 import {requireScheduleMeetingTimes} from './requireScheduleMeetingTimes';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
+const fixedNow = new Date('2026-06-23T14:30:00.000Z');
+const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
+const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
+const pastStartDate = new Date('2026-06-23T10:00:00.000Z');
+
+const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+
 const baseFormState = (): ScheduleMeetingFormState => ({
   title: 'Weekly sync',
-  start: maybe.just(new Date('2026-06-15T10:00:00.000Z')),
-  end: maybe.just(new Date('2026-06-15T11:00:00.000Z')),
+  start: maybe.just(futureStartDate),
+  end: maybe.just(futureEndDate),
   recurrence: 'weekly',
   selectedUsers: [],
   participantsFilter: '',
@@ -36,35 +44,69 @@ const baseFormState = (): ScheduleMeetingFormState => ({
 
 describe('requireScheduleMeetingTimes', () => {
   it('returns start and end when both are present', () => {
-    const start = new Date('2026-06-15T10:00:00.000Z');
-    const end = new Date('2026-06-15T11:00:00.000Z');
-    const result = requireScheduleMeetingTimes({
-      ...baseFormState(),
-      start: maybe.just(start),
-      end: maybe.just(end),
-    });
+    const result = requireScheduleMeetingTimes(
+      {
+        ...baseFormState(),
+        start: maybe.just(futureStartDate),
+        end: maybe.just(futureEndDate),
+      },
+      wallClock,
+    );
 
     expect(result.isOk).toBe(true);
-    expect(unwrap(result)).toEqual({start, end});
+    expect(unwrap(result)).toEqual({start: futureStartDate, end: futureEndDate});
   });
 
   it('returns missingTimes when start is missing', () => {
-    const result = requireScheduleMeetingTimes({
-      ...baseFormState(),
-      start: maybe.nothing(),
-    });
+    const result = requireScheduleMeetingTimes(
+      {
+        ...baseFormState(),
+        start: maybe.nothing(),
+      },
+      wallClock,
+    );
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(scheduleFormErrors.missingTimes);
   });
 
   it('returns missingTimes when end is missing', () => {
-    const result = requireScheduleMeetingTimes({
-      ...baseFormState(),
-      end: maybe.nothing(),
-    });
+    const result = requireScheduleMeetingTimes(
+      {
+        ...baseFormState(),
+        end: maybe.nothing(),
+      },
+      wallClock,
+    );
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(scheduleFormErrors.missingTimes);
+  });
+
+  it('returns startInPast when start is not in the future', () => {
+    const result = requireScheduleMeetingTimes(
+      {
+        ...baseFormState(),
+        start: maybe.just(pastStartDate),
+      },
+      wallClock,
+    );
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(scheduleFormErrors.startInPast);
+  });
+
+  it('returns endInPast when end is not in the future', () => {
+    const result = requireScheduleMeetingTimes(
+      {
+        ...baseFormState(),
+        start: maybe.just(futureStartDate),
+        end: maybe.just(pastStartDate),
+      },
+      wallClock,
+    );
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(scheduleFormErrors.endInPast);
   });
 });

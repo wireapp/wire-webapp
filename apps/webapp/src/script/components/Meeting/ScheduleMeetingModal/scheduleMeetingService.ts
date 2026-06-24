@@ -30,6 +30,7 @@ import {
   type UpdateMeetingErrors,
 } from 'Components/Meeting/MeetingSubmitErrors';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+import type {WallClock} from 'src/script/clock/wallClock';
 
 import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
 
@@ -38,6 +39,7 @@ export type {ScheduleMeetingErrors, UpdateMeetingErrors} from 'Components/Meetin
 export type TryScheduleMeetingDependencies = {
   meetingsRepository: MeetingsRepository;
   fetchMeetings: () => Promise<void>;
+  wallClock: WallClock;
 };
 
 export type TryUpdateMeetingDependencies = TryScheduleMeetingDependencies;
@@ -94,7 +96,7 @@ export function tryScheduleMeeting(
   dependencies: TryScheduleMeetingDependencies,
 ): Task<void, ScheduleMeetingErrors> {
   return resultToTask(async () => {
-    const mappingResult = mapScheduleFormToCreateMeeting(formState);
+    const mappingResult = mapScheduleFormToCreateMeeting(formState, dependencies.wallClock);
 
     if (mappingResult.isErr) {
       return result.err(mappingResult.error);
@@ -122,7 +124,7 @@ export function tryUpdateMeeting({
   dependencies,
 }: TryUpdateMeetingParams): Task<void, UpdateMeetingErrors> {
   return resultToTask(async () => {
-    const mappingResult = mapScheduleFormToUpdateMeeting(formState, originalInvitedEmails);
+    const mappingResult = mapScheduleFormToUpdateMeeting(formState, originalInvitedEmails, dependencies.wallClock);
 
     if (mappingResult.isErr) {
       return result.err(mappingResult.error);

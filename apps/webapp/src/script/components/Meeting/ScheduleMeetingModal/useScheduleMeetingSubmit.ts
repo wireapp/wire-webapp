@@ -47,7 +47,7 @@ const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors
 
 export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void>) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {mainViewModel, translate} = useApplicationContext();
+  const {mainViewModel, translate, wallClock} = useApplicationContext();
   const meetingsRepository = mainViewModel.content.repositories.meetings;
   const mode = useScheduleMeetingModal(state => state.mode);
   const editingMeetingId = useScheduleMeetingModal(state => state.editingMeetingId);
@@ -66,6 +66,7 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
           dependencies: {
             meetingsRepository,
             fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve(),
+            wallClock,
           },
         });
 
@@ -79,7 +80,7 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
         setIsSubmitting(false);
       }
     },
-    [editingMeetingId, meetingsRepository, mode, onMeetingScheduled, originalInvitedEmails, translate],
+    [editingMeetingId, meetingsRepository, mode, onMeetingScheduled, originalInvitedEmails, translate, wallClock],
   );
 
   return {isSubmitting, submit};

@@ -19,6 +19,8 @@
 
 export const scheduleFormErrors = {
   missingTimes: 'missingTimes',
+  startInPast: 'startInPast',
+  endInPast: 'endInPast',
   participantMissingEmail: 'participantMissingEmail',
 } as const;
 
