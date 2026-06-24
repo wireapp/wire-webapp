@@ -28,10 +28,7 @@ import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/Empt
 import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeetingList';
 import type {MeetingsListErrorKey} from 'Components/Meeting/loadMeetingsList';
 import {meetingListContainerStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
-import {
-  MeetingGroupBy,
-  MeetingListItemGroup,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
+import {MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
 import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOngoingSection/TodayAndOngoingSection';
 import {partitionMeetingsByDay} from 'Components/Meeting/partitionMeetingsByDay';
 import type {ScheduleMeetingRecurrenceOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
@@ -77,18 +74,15 @@ export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) =
   const headerForToday = `${translate('meetings.list.today')} (${today})`;
   const headerForTomorrow = `${translate('meetings.list.tomorrow')} (${tomorrow})`;
 
-  const {
-    today: meetingsToday,
-    tomorrow: meetingsTomorrow,
-    past: meetingsPast,
-  } = useMemo(() => partitionMeetingsByDay(meetings, wallClock), [meetings, wallClock]);
+  const {today: meetingsToday, tomorrow: meetingsTomorrow} = useMemo(
+    () => partitionMeetingsByDay(meetings, wallClock),
+    [meetings, wallClock],
+  );
 
   const groupedMeetingsTomorrow = groupByStartHour(meetingsTomorrow);
-  const groupedMeetingsPast = groupByStartHour(meetingsPast);
 
   const hasMeetingsToday = is.nonEmptyArray(meetingsToday);
   const hasMeetingsTomorrow = is.nonEmptyArray(meetingsTomorrow);
-  const hasMeetingsPast = is.nonEmptyArray(meetingsPast);
 
   if (isLoading && is.nonEmptyArray(meetings)) {
     return (
@@ -106,7 +100,7 @@ export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) =
     );
   }
 
-  if (!hasMeetingsToday && !hasMeetingsTomorrow && !hasMeetingsPast) {
+  if (!hasMeetingsToday && !hasMeetingsTomorrow) {
     return (
       <div css={emptyListContainerStyles}>
         <EmptyMeetingList />
@@ -123,10 +117,6 @@ export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) =
 
         {hasMeetingsTomorrow && (
           <MeetingListItemGroup header={headerForTomorrow} groupedMeetings={groupedMeetingsTomorrow} />
-        )}
-
-        {hasMeetingsPast && (
-          <MeetingListItemGroup groupedMeetings={groupedMeetingsPast} groupBy={MeetingGroupBy.NONE} nowMs={nowMs} />
         )}
       </>
     </div>

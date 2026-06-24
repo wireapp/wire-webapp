@@ -23,7 +23,6 @@ import type {WallClock} from 'src/script/clock/wallClock';
 export interface PartitionedMeetings {
   today: Meeting[];
   tomorrow: Meeting[];
-  past: Meeting[];
 }
 
 const isSameCalendarDay = (left: Date, right: Date): boolean =>
@@ -44,7 +43,6 @@ export const partitionMeetingsByDay = (meetings: Meeting[], wallClock: WallClock
   const partitioned: PartitionedMeetings = {
     today: [],
     tomorrow: [],
-    past: [],
   };
 
   for (const meeting of meetings) {
@@ -52,7 +50,6 @@ export const partitionMeetingsByDay = (meetings: Meeting[], wallClock: WallClock
     const endDate = new Date(meeting.end_date);
 
     if (endDate.getTime() < now.getTime()) {
-      partitioned.past.push(meeting);
       continue;
     }
 
@@ -71,7 +68,6 @@ export const partitionMeetingsByDay = (meetings: Meeting[], wallClock: WallClock
 
   partitioned.today.sort(sortByStart);
   partitioned.tomorrow.sort(sortByStart);
-  partitioned.past.sort((left, right) => sortByStart(right, left));
 
   return partitioned;
 };

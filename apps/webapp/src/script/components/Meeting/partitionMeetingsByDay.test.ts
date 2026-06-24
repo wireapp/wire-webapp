@@ -49,7 +49,7 @@ describe('partitionMeetingsByDay', () => {
     return createMeeting(start.toISOString(), end.toISOString(), title);
   };
 
-  it('groups meetings into today, tomorrow, and past buckets', () => {
+  it('groups meetings into today and tomorrow buckets', () => {
     const result = partitionMeetingsByDay(
       [
         createRelativeMeeting(0, 14, 15, 'today'),
@@ -61,13 +61,15 @@ describe('partitionMeetingsByDay', () => {
 
     expect(result.today.map(meeting => meeting.title)).toEqual(['today']);
     expect(result.tomorrow.map(meeting => meeting.title)).toEqual(['tomorrow']);
-    expect(result.past.map(meeting => meeting.title)).toEqual(['past']);
   });
 
-  it('puts ended meetings from today into past', () => {
-    const result = partitionMeetingsByDay([createRelativeMeeting(0, 8, 9, 'ended-today')], wallClock);
+  it('excludes ended meetings from all buckets', () => {
+    const result = partitionMeetingsByDay(
+      [createRelativeMeeting(0, 8, 9, 'ended-today'), createRelativeMeeting(-1, 9, 10, 'past')],
+      wallClock,
+    );
 
-    expect(result.past.map(meeting => meeting.title)).toEqual(['ended-today']);
     expect(result.today).toHaveLength(0);
+    expect(result.tomorrow).toHaveLength(0);
   });
 });
