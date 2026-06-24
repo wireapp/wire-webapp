@@ -41,6 +41,10 @@ on:
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+      testinyRunName:
+        type: string
+        required: false
+        description: Define Testiny Run name to upload results to
       keep_traces:
         type: boolean
         description: 'Keep Playwright traces'
@@ -49,6 +53,8 @@ on:
       OP_SERVICE_ACCOUNT_TOKEN:
         required: true
       WIRE_E2E_TEST_BOT_WEBHOOK_URL:
+        required: false
+      TESTINY_API_KEY:
         required: false
     outputs:
       reportArtifactId:
@@ -261,6 +267,11 @@ jobs:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
           TESTINY_RUN_NAME: ${{ inputs.testinyRunName }}
         run: |
+          if [ -z "$TESTINY_API_KEY" ]; then
+            echo "::error::TESTINY_API_KEY secret is required when testinyRunName is provided."
+            exit 1
+          fi
+
           node apps/webapp/test/e2e_tests/scripts/send-playwright-results-to-testiny.ts \
             --report apps/webapp/playwright-report/report.json \
             --run-name "$TESTINY_RUN_NAME"
