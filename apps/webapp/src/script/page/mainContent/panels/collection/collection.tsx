@@ -46,13 +46,13 @@ import {Category, isOfCategory} from './utils';
 
 import {MessageCategory} from '../../../../message/messageCategory';
 
-interface CollectionDetailsProps {
+type CollectionProps = {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   assetRepository: AssetRepository;
   messageRepository: MessageRepository;
   selfUser: User;
-}
+};
 
 type Categories = Record<Category, ContentMessage[]>;
 
@@ -83,13 +83,8 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
   );
 }
 
-const Collection = ({
-  conversation,
-  conversationRepository,
-  assetRepository,
-  messageRepository,
-  selfUser,
-}: CollectionDetailsProps) => {
+function Collection(props: CollectionProps) {
+  const {conversation, conversationRepository, assetRepository, messageRepository, selfUser} = props;
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [searchTerm, setSearchTerm] = useState('');
   const {display_name, cellsState} = useKoSubscribableChildren(conversation, ['display_name', 'cellsState']);
@@ -222,9 +217,13 @@ const Collection = ({
       <div className="content-list-wrapper">
         <div className="content-list collection-list">
           <FullSearch
-            searchProvider={query => conversationRepository.searchInConversation(conversation, query)}
+            searchProvider={(query, abortSignal) => {
+              return conversationRepository.searchInConversation(conversation, query, abortSignal);
+            }}
             change={setSearchTerm}
-            click={message => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {exposeMessage: message})}
+            click={message => {
+              amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {exposeMessage: message});
+            }}
           />
           {isCellsEnabled && (
             <SecondaryButton onClick={createNavigate(filesUrl)} fullWidth={true} uieName="shared-drive-id">
@@ -242,6 +241,6 @@ const Collection = ({
       </div>
     </div>
   );
-};
+}
 
 export {Collection};

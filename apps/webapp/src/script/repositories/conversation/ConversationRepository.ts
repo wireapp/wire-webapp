@@ -1099,12 +1099,13 @@ export class ConversationRepository {
   public async searchInConversation(
     conversationEntity: Conversation,
     query: string,
+    abortSignal?: AbortSignal,
   ): Promise<{messageEntities: Message[]; query: string}> {
     if (!conversationEntity || !query.length) {
       return {messageEntities: [], query};
     }
 
-    const events = await this.conversationService.searchInConversation(conversationEntity.id, query);
+    const events = await this.conversationService.searchInConversation(conversationEntity.id, query, abortSignal);
     const mappedMessages = this.event_mapper.mapJsonEvents(events, conversationEntity);
     const messageEntities = await this.updateMessagesUserEntities(mappedMessages);
     return {messageEntities, query};

@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import type {
   CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
@@ -52,6 +53,7 @@ import type {Conversation as ConversationEntity} from 'Repositories/entity/Conve
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventService} from 'Repositories/event/EventService';
 import {getSearchRegex} from 'Repositories/search/fullTextSearch';
+import type {EventRecord} from 'Repositories/storage';
 import {StorageService} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
@@ -78,16 +80,34 @@ type ConversationEventData = {
   items?: CompositeMessageItem[];
 };
 
-type SearchableConversationEvent = {type?: string; data?: ConversationEventData; ephemeral_expires?: boolean};
+type SearchableConversationEvent = EventRecord & {
+  data?: ConversationEventData;
+  ephemeral_expires?: boolean | number | string;
+  type?: string;
+};
 type ConversationSearchEventLoader = Pick<EventService, 'loadEventsWithCategory'>;
 
-const waitForNextSearchBatch = () => new Promise<void>(resolve => setTimeout(resolve, 0));
+function waitForNextSearchBatch() {
+  return new Promise<void>(resolve => setTimeout(resolve, 0));
+}
+
+function createSearchAbortError() {
+  const error = new Error('Conversation search aborted');
+  error.name = 'AbortError';
+  return error;
+}
+
+function throwIfSearchAborted(abortSignal?: AbortSignal) {
+  if (abortSignal?.aborted) {
+    throw createSearchAbortError();
+  }
+}
 
 const TextExtractors: Partial<Record<string, (event: SearchableConversationEvent) => string>> = {
   [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => event.data?.content || event.data?.message || '',
   [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => event.data?.text?.content || '',
   [ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD]: event => {
-    const items = Array.isArray(event.data?.items) ? event.data.items : [];
+    const items: CompositeMessageItem[] = is.array(event.data?.items) ? event.data.items : [];
     return items
       .flatMap(item => {
         if (item?.text) {
@@ -102,6 +122,42 @@ const TextExtractors: Partial<Record<string, (event: SearchableConversationEvent
       .join(' ');
   },
 };
+
+type FindMatchingConversationEventsParameters = {
+  abortSignal?: AbortSignal;
+  events: SearchableConversationEvent[];
+  getSearchableText: (event: SearchableConversationEvent) => string;
+  searchRegex: RegExp;
+};
+
+async function findMatchingConversationEvents(
+  options: FindMatchingConversationEventsParameters,
+): Promise<SearchableConversationEvent[]> {
+  const {abortSignal, events, getSearchableText, searchRegex} = options;
+  const matchingEvents: SearchableConversationEvent[] = [];
+
+  throwIfSearchAborted(abortSignal);
+
+  for (let index = 0; index < events.length; index += 1) {
+    if (index > 0 && index % SEARCH_BATCH_SIZE === 0) {
+      await waitForNextSearchBatch();
+      throwIfSearchAborted(abortSignal);
+    }
+
+    const event = events[index];
+    if (event.ephemeral_expires === true) {
+      continue;
+    }
+
+    const searchableText = getSearchableText(event);
+    searchRegex.lastIndex = 0;
+    if (searchableText && searchRegex.test(searchableText)) {
+      matchingEvents.push(event);
+    }
+  }
+
+  return matchingEvents;
+}
 
 export class ConversationService {
   private readonly eventService: ConversationSearchEventLoader;
@@ -145,7 +201,8 @@ export class ConversationService {
    * fetch failure, leaking errors out of the caller's data model. Prefer the `Task`-returning
    * variant so failures become a first-class case the type-checker can enforce handling for.
    */
-  getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
+  getConversationById(qualifiedId: QualifiedId): Promise<BackendConversation> {
+    const {id, domain} = qualifiedId;
     return this.apiClient.api.conversation.getConversation({domain, id});
   }
 
@@ -487,7 +544,11 @@ export class ConversationService {
    * @param query will be checked in against all text messages
    * @returns Resolves with the matching events
    */
-  async searchInConversation(conversation_id: string, query: string): Promise<any> {
+  async searchInConversation(
+    conversation_id: string,
+    query: string,
+    abortSignal?: AbortSignal,
+  ): Promise<SearchableConversationEvent[]> {
     const trimmedQuery = query.trim();
     if (!trimmedQuery.length) {
       return [];
@@ -501,27 +562,16 @@ export class ConversationService {
       category_min,
       category_max,
     )) as SearchableConversationEvent[];
-    const matchingEvents: SearchableConversationEvent[] = [];
     const searchRegex = getSearchRegex(trimmedQuery);
 
-    for (let index = 0; index < events.length; index += 1) {
-      if (index > 0 && index % SEARCH_BATCH_SIZE === 0) {
-        await waitForNextSearchBatch();
-      }
-
-      const event = events[index];
-      if (event.ephemeral_expires === true) {
-        continue;
-      }
-
-      const searchableText = this.getEventSearchableText(event);
-      searchRegex.lastIndex = 0;
-      if (searchableText && searchRegex.test(searchableText)) {
-        matchingEvents.push(event);
-      }
-    }
-
-    return matchingEvents;
+    return findMatchingConversationEvents({
+      abortSignal,
+      events,
+      getSearchableText: event => {
+        return this.getEventSearchableText(event);
+      },
+      searchRegex,
+    });
   }
 
   private getEventSearchableText(event: SearchableConversationEvent): string {
