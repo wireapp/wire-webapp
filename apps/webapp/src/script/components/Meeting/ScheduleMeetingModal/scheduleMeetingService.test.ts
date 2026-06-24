@@ -30,8 +30,8 @@ import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 const formState: ScheduleMeetingFormState = {
   title: 'Weekly sync',
-  start: maybe.just(new Date('2026-06-15T10:00:00.000Z')),
-  end: maybe.just(new Date('2026-06-15T11:00:00.000Z')),
+  start: maybe.just(new Date('2026-07-15T10:00:00.000Z')),
+  end: maybe.just(new Date('2026-07-15T11:00:00.000Z')),
   recurrence: 'doesNotRepeat',
   selectedUsers: [],
   participantsFilter: '',
@@ -67,8 +67,8 @@ describe('tryScheduleMeeting', () => {
     expect(result.isOk).toBe(true);
     expect(createMeeting).toHaveBeenCalledWith({
       title: 'Weekly sync',
-      start_time: '2026-06-15T10:00:00.000Z',
-      end_time: '2026-06-15T11:00:00.000Z',
+      start_time: '2026-07-15T10:00:00.000Z',
+      end_time: '2026-07-15T11:00:00.000Z',
     });
     expect(fetchMeetings).toHaveBeenCalled();
   });
@@ -171,8 +171,8 @@ describe('tryUpdateMeeting', () => {
     expect(result.isOk).toBe(true);
     expect(updateMeeting).toHaveBeenCalledWith(meetingId, {
       title: 'Weekly sync',
-      start_time: '2026-06-15T10:00:00.000Z',
-      end_time: '2026-06-15T11:00:00.000Z',
+      start_time: '2026-07-15T10:00:00.000Z',
+      end_time: '2026-07-15T11:00:00.000Z',
       recurrence: null,
     });
     expect(removeMeetingInvitation).toHaveBeenCalledWith(meetingId, ['bob@wire.com']);

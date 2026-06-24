@@ -27,8 +27,8 @@ import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 const baseFormState = (): ScheduleMeetingFormState => ({
   title: 'Weekly sync',
-  start: maybe.just(new Date('2026-06-15T10:00:00.000Z')),
-  end: maybe.just(new Date('2026-06-15T11:00:00.000Z')),
+  start: maybe.just(new Date('2026-07-15T10:00:00.000Z')),
+  end: maybe.just(new Date('2026-07-15T11:00:00.000Z')),
   recurrence: 'weekly',
   selectedUsers: [],
   participantsFilter: '',
@@ -36,8 +36,8 @@ const baseFormState = (): ScheduleMeetingFormState => ({
 
 describe('requireScheduleMeetingTimes', () => {
   it('returns start and end when both are present', () => {
-    const start = new Date('2026-06-15T10:00:00.000Z');
-    const end = new Date('2026-06-15T11:00:00.000Z');
+    const start = new Date('2026-07-15T10:00:00.000Z');
+    const end = new Date('2026-07-15T11:00:00.000Z');
     const result = requireScheduleMeetingTimes({
       ...baseFormState(),
       start: maybe.just(start),
