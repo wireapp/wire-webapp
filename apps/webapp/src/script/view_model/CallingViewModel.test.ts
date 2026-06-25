@@ -19,7 +19,7 @@
 
 import {STATE} from '@wireapp/avs';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {type Translate, translate} from 'Util/localizerUtil';

@@ -26,8 +26,8 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import 'Components/calling/ChooseScreen';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import 'Components/calling/chooseScreen';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {AudioRepository} from 'Repositories/audio/audioRepository';
 import {AudioType} from 'Repositories/audio/audioType';
 import type {Call} from 'Repositories/calling/Call';

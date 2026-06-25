@@ -25,7 +25,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserVerificationBadges} from 'Components/badge';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {LegalHoldDot} from 'Components/legalHoldDot';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

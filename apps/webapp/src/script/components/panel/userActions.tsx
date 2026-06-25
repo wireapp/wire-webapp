@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {listCSS} from 'Components/panel/panelActions/panelActions.styles';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import type {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';

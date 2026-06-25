@@ -27,7 +27,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
 
-import {ChooseScreen} from './ChooseScreen';
+import {ChooseScreen} from './chooseScreen';
 import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Util/modalFocusUtil', () => ({

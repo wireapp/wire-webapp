@@ -22,7 +22,7 @@ import {create} from 'zustand';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';

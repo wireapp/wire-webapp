@@ -26,7 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {PanelActions} from 'Components/panel/panelActions';
-import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
+import {ReceiptModeToggle} from 'Components/toggle/receiptModeToggle';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {isGroupMLSConversation} from 'Repositories/conversation/ConversationSelectors';

@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 import {TypedEventEmitter} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, removeCurrentModal} from 'Components/modals/primaryModal';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {translate} from 'Util/localizerUtil';

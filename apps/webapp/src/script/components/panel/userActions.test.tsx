@@ -25,7 +25,7 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
+import {PrimaryModalComponent} from 'Components/modals/primaryModal/primaryModal';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';

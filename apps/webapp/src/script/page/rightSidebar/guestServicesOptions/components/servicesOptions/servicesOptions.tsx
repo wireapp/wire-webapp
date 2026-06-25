@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {BaseToggle} from 'Components/toggle/baseToggle';
 import {ACCESS_TYPES} from 'Repositories/conversation/ConversationAccessPermission';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';

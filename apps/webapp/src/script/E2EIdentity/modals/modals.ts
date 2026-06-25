@@ -21,8 +21,8 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ModalOptions, PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {ModalOptions, PrimaryModalType} from 'Components/modals/primaryModal/primaryModalTypes';
 import {Config} from 'src/script/Config';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 import {replaceLink} from 'Util/localizerUtil';

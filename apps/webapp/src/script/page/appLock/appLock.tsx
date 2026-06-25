@@ -28,7 +28,7 @@ import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {ClientRepository} from 'Repositories/client';
 import {ClientState} from 'Repositories/client/ClientState';
 import {AppLockRepository} from 'Repositories/user/appLockRepository';

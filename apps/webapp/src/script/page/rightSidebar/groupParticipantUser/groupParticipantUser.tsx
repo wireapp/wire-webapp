@@ -25,12 +25,12 @@ import {amplify} from 'amplify';
 import {TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {EnrichedFields} from 'Components/panel/enrichedFields';
 import {UserActions, Actions} from 'Components/panel/userActions';
 import {UserDetails} from 'Components/panel/userDetails';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {BaseToggle} from 'Components/toggle/baseToggle';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {MemberLeaveEvent, TeamMemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'Repositories/entity/Conversation';

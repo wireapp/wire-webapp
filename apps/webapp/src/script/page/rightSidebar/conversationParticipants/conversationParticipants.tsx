@@ -19,9 +19,9 @@
 
 import {FC, useMemo, useState} from 'react';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {SearchInput} from 'Components/SearchInput';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {SearchInput} from 'Components/searchInput';
+import {UserSearchableList} from 'Components/userSearchableList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';

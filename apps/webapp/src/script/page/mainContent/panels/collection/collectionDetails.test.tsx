@@ -37,19 +37,19 @@ import {createUuid} from 'Util/uuid';
 import {CollectionDetails} from './collectionDetails';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('Components/Image', () => ({
+jest.mock('Components/image', () => ({
   AssetImage: () => <div>Image</div>,
   __esModule: true,
 }));
-jest.mock('Components/MessagesList/Message/ContentMessage/asset/AudioAsset/AudioAsset', () => ({
+jest.mock('Components/messagesList/message/contentMessage/asset/audioAsset/audioAsset', () => ({
   AudioAsset: () => <div>Audio</div>,
   __esModule: true,
 }));
-jest.mock('Components/MessagesList/Message/ContentMessage/asset/FileAsset/FileAsset', () => ({
+jest.mock('Components/messagesList/message/contentMessage/asset/fileAsset/fileAsset', () => ({
   FileAsset: () => <div>File</div>,
   __esModule: true,
 }));
-jest.mock('Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent', () => ({
+jest.mock('Components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent', () => ({
   LinkPreviewAsset: () => <div>Link Preview</div>,
   __esModule: true,
 }));

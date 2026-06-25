@@ -29,7 +29,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {createFireAndForgetInvoker} from '@wireapp/core';
 
-import {AppContainer} from 'Components/AppContainer/AppContainer';
+import {AppContainer} from 'Components/appContainer/appContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
 import {translate} from 'Util/localizerUtil';

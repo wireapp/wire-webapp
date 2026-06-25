@@ -22,7 +22,7 @@ import {FC, InputHTMLAttributes, useEffect, useRef, useState} from 'react';
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {TextInput} from 'Components/TextInput';
+import {TextInput} from 'Components/textInput';
 import {useIsMounted} from 'Util/useIsMounted';
 
 import {MotionDuration} from '../../../../../motion/MotionDuration';

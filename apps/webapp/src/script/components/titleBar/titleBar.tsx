@@ -29,7 +29,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ConversationVerificationBadges} from 'Components/badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/icon';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {LegalHoldDot} from 'Components/legalHoldDot';
 import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {CallState} from 'Repositories/calling/CallState';

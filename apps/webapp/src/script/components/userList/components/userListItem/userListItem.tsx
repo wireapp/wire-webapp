@@ -26,7 +26,7 @@ import {UserStatusBadges} from 'Components/badge';
 import {ParticipantItemContent} from 'Components/participantItemContent';
 import {listItem, listWrapper} from 'Components/participantItemContent/participantItem.styles';
 import {UserlistMode} from 'Components/userList';
-import {useUserName} from 'Components/UserName';
+import {useUserName} from 'Components/userName';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

@@ -22,7 +22,7 @@ import {ReactElement} from 'react';
 
 import {render} from '@testing-library/react';
 
-import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {usePrimaryModalState} from 'Components/modals/primaryModal';
 import {createDeterministicWallClock, DeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {translate} from 'Util/localizerUtil';

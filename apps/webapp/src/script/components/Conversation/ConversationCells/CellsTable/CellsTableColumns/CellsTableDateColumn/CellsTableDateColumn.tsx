@@ -19,7 +19,7 @@
 
 import {useMemo} from 'react';
 
-import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
+import {MessageTime} from 'Components/messagesList/message/messageTime';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

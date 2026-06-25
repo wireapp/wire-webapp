@@ -38,7 +38,7 @@ import {Cancelable, debounce} from 'underscore';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
 import {ClientRepository} from 'Repositories/client';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';

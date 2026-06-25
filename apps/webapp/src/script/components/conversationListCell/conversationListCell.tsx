@@ -28,7 +28,7 @@ import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/avatar';
 import {ChannelAvatar} from 'Components/avatar';
 import {UserBlockedBadge} from 'Components/badge';
 import {CellDescription} from 'Components/conversationListCell/components/cellDescription';
-import {UserInfo} from 'Components/UserInfo';
+import {UserInfo} from 'Components/userInfo';
 import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Conversation} from 'Repositories/entity/Conversation';

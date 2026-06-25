@@ -32,9 +32,9 @@ import {getLogger} from 'Util/logger';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {DeviceDetails} from './components/deviceDetails';
-import {DeviceList} from './components/DeviceList';
-import {NoDevicesFound} from './components/NoDevicesFound';
-import {SelfFingerprint} from './components/SelfFingerprint';
+import {DeviceList} from './components/deviceList';
+import {NoDevicesFound} from './components/noDevicesFound';
+import {SelfFingerprint} from './components/selfFingerprint';
 import {FIND_MODE, UserDevicesState} from './userDevices.types';
 
 export interface UserDevicesHistoryEntry {

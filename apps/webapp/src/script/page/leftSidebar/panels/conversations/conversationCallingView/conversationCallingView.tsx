@@ -17,7 +17,7 @@
  *
  */
 
-import {CallingCell} from 'Components/calling/CallingCell';
+import {CallingCell} from 'Components/calling/callingCell';
 import {Call} from 'Repositories/calling/Call';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';

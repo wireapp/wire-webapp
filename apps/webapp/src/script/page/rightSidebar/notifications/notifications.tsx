@@ -21,8 +21,8 @@ import {useMemo, FC} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {RadioGroup} from 'Components/Radio';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {RadioGroup} from 'Components/radio';
 import {NOTIFICATION_STATE, getNotificationText} from 'Repositories/conversation/NotificationSetting';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';

@@ -37,7 +37,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translate} from 'Util/localizerUtil';
 
-import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
+import {FullscreenVideoCall, FullscreenVideoCallProps} from './fullscreenVideoCall';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {KEY} from 'Util/keyboardUtil';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';

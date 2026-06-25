@@ -25,8 +25,8 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {PrimaryModalType} from 'Components/modals/primaryModal/primaryModalTypes';
 import type {User} from 'Repositories/entity/User';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {StorageKey} from 'Repositories/storage';

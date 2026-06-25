@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {RatingListLabel} from 'Components/modals/qualityFeedbackModal/typings';
 import {Call} from 'Repositories/calling/Call';
 import {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';

@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, usePrimaryModalState} from 'Components/modals/primaryModal';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';

@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MemberMessage} from 'Repositories/entity/message/memberMessage';
 import type {User} from 'Repositories/entity/User';

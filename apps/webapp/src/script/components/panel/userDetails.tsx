@@ -26,10 +26,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserBlockedBadge, UserVerificationBadges} from 'Components/badge';
-import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
-import {ErrorFallback} from 'Components/ErrorFallback';
+import {UserClassifiedBar} from 'Components/classifiedBar/classifiedBar';
+import {ErrorFallback} from 'Components/errorFallback';
 import * as Icon from 'Components/icon';
-import {UserInfo} from 'Components/UserInfo';
+import {UserInfo} from 'Components/userInfo';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

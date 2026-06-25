@@ -24,8 +24,8 @@ import {amplify} from 'amplify';
 import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Theme} from 'Components/AppContainer/hooks/useTheme';
-import {RadioGroup} from 'Components/Radio';
+import {Theme} from 'Components/appContainer/hooks/useTheme';
+import {RadioGroup} from 'Components/radio';
 import {RootFontSize, useRootFontSize} from 'Hooks/useRootFontSize';
 import {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';

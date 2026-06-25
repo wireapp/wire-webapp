@@ -22,7 +22,7 @@ import {ConversationAccessUpdateData} from '@wireapp/api-client/lib/conversation
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {type Translate} from 'Util/localizerUtil';
 import {isErrorWithCode} from 'Util/typePredicateUtil';

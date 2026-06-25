@@ -17,7 +17,7 @@
  *
  */
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {translate} from 'Util/localizerUtil';
 
 import {getModalOptions, ModalType} from './modals';

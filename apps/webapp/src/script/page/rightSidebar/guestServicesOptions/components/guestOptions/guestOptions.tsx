@@ -25,10 +25,10 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {RadioGroup} from 'Components/Radio';
-import {SelectText} from 'Components/SelectText';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {RadioGroup} from 'Components/radio';
+import {SelectText} from 'Components/selectText';
+import {BaseToggle} from 'Components/toggle/baseToggle';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import {teamPermissionsForAccessState} from 'Repositories/conversation/ConversationAccessPermission';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

@@ -17,9 +17,9 @@
  *
  */
 
-import {CallingCell} from 'Components/calling/CallingCell';
+import {CallingCell} from 'Components/calling/callingCell';
 import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

@@ -23,11 +23,11 @@ import {container} from 'tsyringe';
 
 import {FlexBox, Input, Select} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {customHistorySharingInputCss} from 'Components/Modals/CreateConversation/CreateConversationSteps/CreateConversationSteps.styles';
-import {ChatHistory, HistorySharingUnit} from 'Components/Modals/CreateConversation/types';
-import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/Modals/CreateConversation/utils';
-import {RadioGroup} from 'Components/Radio';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {customHistorySharingInputCss} from 'Components/modals/createConversation/createConversationSteps/createConversationSteps.styles';
+import {ChatHistory, HistorySharingUnit} from 'Components/modals/createConversation/types';
+import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/modals/createConversation/utils';
+import {RadioGroup} from 'Components/radio';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

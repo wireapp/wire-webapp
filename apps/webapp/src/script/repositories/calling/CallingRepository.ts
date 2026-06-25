@@ -57,9 +57,9 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/modals/qualityFeedbackModal/constants';
+import {RatingListLabel} from 'Components/modals/qualityFeedbackModal/typings';
 import {NetworkQualityInfo, NetworkQualityInfoSchema} from 'Repositories/calling/calling.schema';
 import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';

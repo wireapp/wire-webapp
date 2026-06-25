@@ -21,8 +21,8 @@ import {FC, useEffect, useState} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {RadioGroup} from 'Components/Radio';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {RadioGroup} from 'Components/radio';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';

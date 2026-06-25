@@ -23,10 +23,10 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {showInviteModal} from 'Components/Modals/InviteModal';
-import {showServiceModal} from 'Components/Modals/ServiceModal';
-import {showUserModal} from 'Components/Modals/UserModal';
-import {SearchInput} from 'Components/SearchInput';
+import {showInviteModal} from 'Components/modals/inviteModal';
+import {showServiceModal} from 'Components/modals/serviceModal';
+import {showUserModal} from 'Components/modals/userModal';
+import {SearchInput} from 'Components/searchInput';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';

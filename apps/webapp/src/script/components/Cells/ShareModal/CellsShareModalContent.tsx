@@ -38,10 +38,10 @@ import {
   CellsShareExpirationFields,
   type CellsShareExpirationSelection,
 } from 'Components/cells/shareModal/cellsShareExpirationFields';
-import {CellsTableLoader} from 'Components/Conversation/ConversationCells/common/CellsTableLoader/CellsTableLoader';
-import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
+import {CellsTableLoader} from 'Components/conversation/conversationCells/common/cellsTableLoader/cellsTableLoader';
+import {CopyToClipboardButton} from 'Components/copyToClipboardButton/copyToClipboardButton';
 import * as Icon from 'Components/icon';
-import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
+import {PasswordGeneratorButton} from 'Components/passwordGeneratorButton';
 import {Config} from 'src/script/Config';
 import {type RootContextValue} from 'src/script/page/rootProvider';
 

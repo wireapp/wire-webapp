@@ -20,7 +20,7 @@
 import sodium, {ready} from 'libsodium-wrappers-sumo';
 import {container, singleton} from 'tsyringe';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {Translate} from 'Util/localizerUtil';
 
 import {AppLockState} from './appLockState';

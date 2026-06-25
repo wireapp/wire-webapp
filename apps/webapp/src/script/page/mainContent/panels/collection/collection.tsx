@@ -26,7 +26,7 @@ import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
-import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
+import {showDetailViewModal} from 'Components/modals/detailViewModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';

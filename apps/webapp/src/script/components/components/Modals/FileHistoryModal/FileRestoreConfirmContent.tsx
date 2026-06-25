@@ -29,7 +29,7 @@ import {
   restoreModalContainerCss,
   restoreModalDescriptionCss,
   restoreModalTitleCss,
-} from './FileHistoryModal.styles';
+} from './fileHistoryModal.styles';
 
 interface FileRestoreConfirmModalProps {
   isLoading: boolean;

@@ -19,8 +19,8 @@
 
 import {amplify} from 'amplify';
 
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
