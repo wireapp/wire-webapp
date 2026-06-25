@@ -17,8 +17,14 @@
  *
  */
 
-import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 
+import {CellsSortDirection} from 'Components/Conversation/ConversationCells/common/CellsSortIcon/CellsSortIcon';
+import {
+  CellsSortField,
+  SORTABLE_COLUMN_FIELD,
+  toAriaSort,
+} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -32,20 +38,54 @@ import {
   tableStyles,
   wrapperStyles,
 } from './CellsTable.styles';
-import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
+import {getCellsTableColumns, getCellsTableDataCellLabels} from './CellsTableColumns/CellsTableColumns';
 import {FilePreviewProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 interface CellsTableProps {
   nodes: CellNode[];
   cellsRepository: CellsRepository;
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  isSortingEnabled: boolean;
+  onToggleSort: (field: CellsSortField) => void;
 }
 
-export const CellsTable = ({nodes, cellsRepository}: CellsTableProps) => {
+interface CellsTableHeaderCellProps {
+  header: Header<CellNode, unknown>;
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  isSortingEnabled: boolean;
+}
+
+const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
+  const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
+  const ariaSort = isSortingEnabled && sortField ? toAriaSort(getDirectionFor(sortField)) : undefined;
+
+  return (
+    <th
+      css={headerCellStyles}
+      colSpan={header.colSpan}
+      aria-sort={ariaSort}
+      style={{
+        width: header.id === 'name' ? undefined : header.getSize(),
+      }}
+    >
+      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+    </th>
+  );
+};
+
+export const CellsTable = ({
+  nodes,
+  cellsRepository,
+  getDirectionFor,
+  isSortingEnabled,
+  onToggleSort,
+}: CellsTableProps) => {
   const {translate} = useApplicationContext();
+  const cellLabels = getCellsTableDataCellLabels(translate);
 
   const table = useReactTable({
     data: nodes,
-    columns: getCellsTableColumns({cellsRepository, translate}),
+    columns: getCellsTableColumns({cellsRepository, getDirectionFor, isSortingEnabled, onToggleSort, translate}),
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -59,16 +99,12 @@ export const CellsTable = ({nodes, cellsRepository}: CellsTableProps) => {
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
-                  <th
+                  <CellsTableHeaderCell
                     key={header.id}
-                    css={headerCellStyles}
-                    colSpan={header.colSpan}
-                    style={{
-                      width: header.id == 'name' ? undefined : header.getSize(),
-                    }}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
+                    header={header}
+                    getDirectionFor={getDirectionFor}
+                    isSortingEnabled={isSortingEnabled}
+                  />
                 ))}
               </tr>
             ))}
@@ -81,7 +117,7 @@ export const CellsTable = ({nodes, cellsRepository}: CellsTableProps) => {
                     <td
                       key={cell.id}
                       css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+                      data-cell={cellLabels[cell.column.id]}
                       style={{
                         width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
                       }}

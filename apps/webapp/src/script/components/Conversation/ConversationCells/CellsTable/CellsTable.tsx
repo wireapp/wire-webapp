@@ -17,7 +17,7 @@
  *
  */
 
-import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -33,8 +33,11 @@ import {
   tableStyles,
   wrapperStyles,
 } from './CellsTable.styles';
-import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
+import {getCellsTableColumns, getCellsTableDataCellLabels} from './CellsTableColumns/CellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
+
+import {CellsSortDirection} from '../common/CellsSortIcon/CellsSortIcon';
+import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
 
 interface CellsTableProps {
   nodes: Array<CellNode>;
@@ -43,7 +46,33 @@ interface CellsTableProps {
   conversationName: string;
   onRefresh: () => void;
   onCloseSearchView?: () => void;
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  isSortingEnabled: boolean;
+  onToggleSort: (field: CellsSortField) => void;
 }
+
+interface CellsTableHeaderCellProps {
+  header: Header<CellNode, unknown>;
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  isSortingEnabled: boolean;
+}
+
+const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
+  const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
+  const ariaSort = isSortingEnabled && sortField ? toAriaSort(getDirectionFor(sortField)) : undefined;
+
+  return (
+    <th
+      css={headerCellStyles}
+      aria-sort={ariaSort}
+      style={{
+        width: header.id === 'name' ? undefined : header.getSize(),
+      }}
+    >
+      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+    </th>
+  );
+};
 
 export const CellsTable = ({
   nodes,
@@ -52,25 +81,34 @@ export const CellsTable = ({
   conversationName,
   onRefresh,
   onCloseSearchView,
+  getDirectionFor,
+  isSortingEnabled,
+  onToggleSort,
 }: CellsTableProps) => {
   const {translate} = useApplicationContext();
+  const labels = {
+    actions: translate('cells.tableRow.actions'),
+    created: translate('cells.tableRow.created'),
+    name: translate('cells.tableRow.name'),
+    owner: translate('cells.tableRow.owner'),
+    publicLink: translate('cells.tableRow.publicLink'),
+    size: translate('cells.tableRow.size'),
+    tags: translate('cells.tableRow.tags'),
+  };
+  const cellLabels = getCellsTableDataCellLabels(labels);
+
   const table = useReactTable({
     data: nodes,
     columns: getCellsTableColumns({
       cellsRepository,
       conversationQualifiedId,
       conversationName,
-      labels: {
-        actions: translate('cells.tableRow.actions'),
-        created: translate('cells.tableRow.created'),
-        name: translate('cells.tableRow.name'),
-        owner: translate('cells.tableRow.owner'),
-        publicLink: translate('cells.tableRow.publicLink'),
-        size: translate('cells.tableRow.size'),
-        tags: translate('cells.tableRow.tags'),
-      },
+      labels,
       onRefresh,
       onCloseSearchView,
+      getDirectionFor,
+      isSortingEnabled,
+      onToggleSort,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -84,19 +122,14 @@ export const CellsTable = ({
           <thead>
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  return (
-                    <th
-                      key={header.id}
-                      css={headerCellStyles}
-                      style={{
-                        width: header.id == 'name' ? undefined : header.getSize(),
-                      }}
-                    >
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  );
-                })}
+                {headerGroup.headers.map(header => (
+                  <CellsTableHeaderCell
+                    key={header.id}
+                    header={header}
+                    getDirectionFor={getDirectionFor}
+                    isSortingEnabled={isSortingEnabled}
+                  />
+                ))}
               </tr>
             ))}
           </thead>
@@ -108,7 +141,7 @@ export const CellsTable = ({
                     <td
                       key={cell.id}
                       css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+                      data-cell={cellLabels[cell.column.id]}
                       style={{
                         width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
                       }}

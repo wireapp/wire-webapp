@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import type {GlobalDriveFiltersState} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
+import {useCellsSorting} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -60,6 +61,8 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
   const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
 
   const {filters, filterState} = useGlobalDriveFilters({cellsRepository, conversationRepository, translate});
+
+  const {getDirectionFor, toggleSort} = useCellsSorting();
   const legacyFilterState = useMemo<GlobalDriveFiltersState>(
     () => ({
       selectedTagIds: legacyFilters.tags,
@@ -122,7 +125,15 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
           description={translate('cells.emptySearchResults.description')}
         />
       )}
-      {showTable && <CellsTable nodes={nodes} cellsRepository={cellsRepository} />}
+      {showTable && (
+        <CellsTable
+          nodes={nodes}
+          cellsRepository={cellsRepository}
+          getDirectionFor={getDirectionFor}
+          isSortingEnabled={isSharedDriveSearchAndFiltersEnabled}
+          onToggleSort={toggleSort}
+        />
+      )}
       {showNoFiles && (
         <CellsStateInfo
           heading={translate('cells.noNodes.global.heading')}
