@@ -17,7 +17,7 @@
  *
  */
 
-import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -49,6 +49,27 @@ interface CellsTableProps {
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   onToggleSort: (field: CellsSortField) => void;
 }
+
+interface CellsTableHeaderCellProps {
+  header: Header<CellNode, unknown>;
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+}
+
+const CellsTableHeaderCell = ({header, getDirectionFor}: CellsTableHeaderCellProps) => {
+  const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
+
+  return (
+    <th
+      css={headerCellStyles}
+      aria-sort={sortField ? toAriaSort(getDirectionFor(sortField)) : undefined}
+      style={{
+        width: header.id === 'name' ? undefined : header.getSize(),
+      }}
+    >
+      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+    </th>
+  );
+};
 
 export const CellsTable = ({
   nodes,
@@ -93,21 +114,9 @@ export const CellsTable = ({
           <thead>
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
-                  return (
-                    <th
-                      key={header.id}
-                      css={headerCellStyles}
-                      aria-sort={sortField ? toAriaSort(getDirectionFor(sortField)) : undefined}
-                      style={{
-                        width: header.id == 'name' ? undefined : header.getSize(),
-                      }}
-                    >
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  );
-                })}
+                {headerGroup.headers.map(header => (
+                  <CellsTableHeaderCell key={header.id} header={header} getDirectionFor={getDirectionFor} />
+                ))}
               </tr>
             ))}
           </thead>
