@@ -130,6 +130,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
           nodes={nodes}
           cellsRepository={cellsRepository}
           getDirectionFor={getDirectionFor}
+          isSortingEnabled={isSharedDriveSearchAndFiltersEnabled}
           onToggleSort={toggleSort}
         />
       )}

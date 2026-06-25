@@ -224,6 +224,7 @@ export const ConversationCells = memo(
             // with that folder (and breadcrumbs)
             onCloseSearchView={handleSearchViewClosure}
             getDirectionFor={getDirectionFor}
+            isSortingEnabled={isSharedDriveSearchAndFiltersEnabled}
             onToggleSort={toggleSort}
           />
         )}

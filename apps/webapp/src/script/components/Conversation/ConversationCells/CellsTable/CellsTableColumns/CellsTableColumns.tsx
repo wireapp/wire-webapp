@@ -63,6 +63,7 @@ export const getCellsTableColumns = ({
   onRefresh,
   onCloseSearchView,
   getDirectionFor,
+  isSortingEnabled,
   onToggleSort,
 }: {
   cellsRepository: CellsRepository;
@@ -72,16 +73,19 @@ export const getCellsTableColumns = ({
   onRefresh: () => void;
   onCloseSearchView?: () => void;
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
 }) => [
   columnHelper.accessor('name', {
-    header: () => (
-      <CellsTableSortableHeader
-        label={labels.name}
-        direction={getDirectionFor('name_ci')}
-        onClick={() => onToggleSort('name_ci')}
-      />
-    ),
+    header: isSortingEnabled
+      ? () => (
+          <CellsTableSortableHeader
+            label={labels.name}
+            direction={getDirectionFor('name_ci')}
+            onClick={() => onToggleSort('name_ci')}
+          />
+        )
+      : labels.name,
     cell: info => <CellsTableNameColumn node={info.row.original} onCloseSearchView={onCloseSearchView} />,
   }),
   columnHelper.accessor('owner', {
@@ -90,13 +94,15 @@ export const getCellsTableColumns = ({
     size: 170,
   }),
   columnHelper.accessor('sizeMb', {
-    header: () => (
-      <CellsTableSortableHeader
-        label={labels.size}
-        direction={getDirectionFor('size')}
-        onClick={() => onToggleSort('size')}
-      />
-    ),
+    header: isSortingEnabled
+      ? () => (
+          <CellsTableSortableHeader
+            label={labels.size}
+            direction={getDirectionFor('size')}
+            onClick={() => onToggleSort('size')}
+          />
+        )
+      : labels.size,
     cell: info => info.getValue(),
     size: 100,
   }),
@@ -106,13 +112,15 @@ export const getCellsTableColumns = ({
     size: 120,
   }),
   columnHelper.accessor('uploadedAtTimestamp', {
-    header: () => (
-      <CellsTableSortableHeader
-        label={labels.created}
-        direction={getDirectionFor('mtime')}
-        onClick={() => onToggleSort('mtime')}
-      />
-    ),
+    header: isSortingEnabled
+      ? () => (
+          <CellsTableSortableHeader
+            label={labels.created}
+            direction={getDirectionFor('mtime')}
+            onClick={() => onToggleSort('mtime')}
+          />
+        )
+      : labels.created,
     cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
     size: 125,
   }),

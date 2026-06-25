@@ -45,22 +45,25 @@ interface CellsTableProps {
   nodes: CellNode[];
   cellsRepository: CellsRepository;
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
 }
 
 interface CellsTableHeaderCellProps {
   header: Header<CellNode, unknown>;
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  isSortingEnabled: boolean;
 }
 
-const CellsTableHeaderCell = ({header, getDirectionFor}: CellsTableHeaderCellProps) => {
+const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
+  const ariaSort = isSortingEnabled && sortField ? toAriaSort(getDirectionFor(sortField)) : undefined;
 
   return (
     <th
       css={headerCellStyles}
       colSpan={header.colSpan}
-      aria-sort={sortField ? toAriaSort(getDirectionFor(sortField)) : undefined}
+      aria-sort={ariaSort}
       style={{
         width: header.id === 'name' ? undefined : header.getSize(),
       }}
@@ -70,13 +73,19 @@ const CellsTableHeaderCell = ({header, getDirectionFor}: CellsTableHeaderCellPro
   );
 };
 
-export const CellsTable = ({nodes, cellsRepository, getDirectionFor, onToggleSort}: CellsTableProps) => {
+export const CellsTable = ({
+  nodes,
+  cellsRepository,
+  getDirectionFor,
+  isSortingEnabled,
+  onToggleSort,
+}: CellsTableProps) => {
   const {translate} = useApplicationContext();
   const cellLabels = getCellsTableDataCellLabels(translate);
 
   const table = useReactTable({
     data: nodes,
-    columns: getCellsTableColumns({cellsRepository, getDirectionFor, onToggleSort, translate}),
+    columns: getCellsTableColumns({cellsRepository, getDirectionFor, isSortingEnabled, onToggleSort, translate}),
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -90,7 +99,12 @@ export const CellsTable = ({nodes, cellsRepository, getDirectionFor, onToggleSor
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
-                  <CellsTableHeaderCell key={header.id} header={header} getDirectionFor={getDirectionFor} />
+                  <CellsTableHeaderCell
+                    key={header.id}
+                    header={header}
+                    getDirectionFor={getDirectionFor}
+                    isSortingEnabled={isSortingEnabled}
+                  />
                 ))}
               </tr>
             ))}
