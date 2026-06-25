@@ -17,8 +17,9 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import type {WallClock} from 'src/script/clock/wallClock';
 
 export interface PartitionedMeetings {
   today: Meeting[];

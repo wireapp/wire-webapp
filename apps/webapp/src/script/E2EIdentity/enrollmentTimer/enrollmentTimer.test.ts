@@ -19,7 +19,7 @@
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
 import {getEnrollmentTimer, getRemainingGracePeriodDelay, messageRetentionTime} from './enrollmentTimer';
 

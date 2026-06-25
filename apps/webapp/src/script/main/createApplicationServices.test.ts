@@ -19,7 +19,7 @@
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {createDeterministicWallClock} from '../clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {createApplicationServices} from './createApplicationServices';
 
 describe('createApplicationServices', () => {

@@ -21,7 +21,7 @@ import {MeetingsRepository} from 'Repositories/meetings';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {maybe, task} from 'true-myth';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
 import {meetingSubmitErrors} from '../MeetingSubmitErrors';

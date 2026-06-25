@@ -41,7 +41,9 @@ import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
 import {Root} from './page/Root';
 
-import {createWallClock} from '../clock/wallClock';
+// eslint-disable-next-line import/order
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+
 import {Config} from '../Config';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';

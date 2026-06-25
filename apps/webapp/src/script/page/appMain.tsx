@@ -19,6 +19,7 @@
 
 import {useEffect, useLayoutEffect, useMemo} from 'react';
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
@@ -66,7 +67,6 @@ import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
-import {WallClock} from '../clock/wallClock';
 import {
   meetingsFeatureToggleName,
   websocketConnectivityDiagnosticsFeatureToggleName,

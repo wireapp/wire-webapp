@@ -19,11 +19,12 @@
 
 import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react';
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+
 import {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {Translate} from 'Util/localizerUtil';
 
-import {WallClock} from '../clock/wallClock';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../view_model/MainViewModel';
 

@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
 import ky from 'ky';
@@ -43,7 +44,6 @@ import {useTheme} from './hooks/useTheme';
 
 import {runClientVersionCheck} from '../../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../application-periodic-checks/startApplicationPeriodicChecks';
-import {WallClock} from '../../clock/wallClock';
 import {Config, Configuration} from '../../Config';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';

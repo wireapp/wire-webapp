@@ -41,7 +41,10 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import {createApplicationServices} from './createApplicationServices';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {createWallClock} from '../clock/wallClock';
+
+// eslint-disable-next-line import/order
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';

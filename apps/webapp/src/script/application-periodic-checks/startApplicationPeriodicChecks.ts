@@ -17,7 +17,7 @@
  *
  */
 
-import {WallClock} from '../clock/wallClock';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 
 interface StartApplicationPeriodicChecksOptions {
   readonly wallClock: WallClock;

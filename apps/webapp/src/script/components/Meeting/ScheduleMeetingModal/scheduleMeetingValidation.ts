@@ -17,9 +17,8 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Maybe} from 'true-myth';
-
-import type {WallClock} from 'src/script/clock/wallClock';
 
 import type {ScheduleMeetingFormErrors} from './scheduleMeetingTypes';
 

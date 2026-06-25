@@ -18,7 +18,7 @@
  */
 
 import {maybe} from 'true-myth';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
 import {scheduleFormErrors} from '../ScheduleFormErrors';

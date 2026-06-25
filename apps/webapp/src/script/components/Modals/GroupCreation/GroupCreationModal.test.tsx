@@ -11,7 +11,7 @@ import {mountComponent} from '../../../auth/util/test/TestUtil';
 import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';
 import {TypeUtil} from '@wireapp/commons';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {RootProvider} from 'src/script/page/rootProvider';
