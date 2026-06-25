@@ -18,7 +18,7 @@
  */
 
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
 import {partitionMeetingsByDay} from './partitionMeetingsByDay';
 

@@ -17,6 +17,7 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, maybe} from 'true-myth';
 import {create} from 'zustand';
@@ -25,7 +26,6 @@ import {getNextHourDateTime} from '@wireapp/react-ui-kit';
 
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import type {User} from 'Repositories/entity/User';
-import type {WallClock} from 'src/script/clock/wallClock';
 
 import type {
   ScheduleMeetingFormErrors,

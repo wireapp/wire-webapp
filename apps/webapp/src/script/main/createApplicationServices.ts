@@ -17,9 +17,9 @@
  *
  */
 
-import {FireAndForgetInvoker} from '@wireapp/core';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 
-import {WallClock} from '../clock/wallClock';
+import {FireAndForgetInvoker} from '@wireapp/core';
 
 export type ApplicationServices = {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;

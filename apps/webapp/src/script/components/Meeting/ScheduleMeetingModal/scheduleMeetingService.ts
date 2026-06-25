@@ -17,6 +17,7 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import is from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, Result, result, Task, task} from 'true-myth';
@@ -30,7 +31,6 @@ import {
   type UpdateMeetingErrors,
 } from 'Components/Meeting/MeetingSubmitErrors';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-import type {WallClock} from 'src/script/clock/wallClock';
 
 import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
 

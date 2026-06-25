@@ -23,6 +23,7 @@
     "@datadog/browser-logs": "7.3.0",
     "@datadog/browser-rum": "7.3.0",
     "@emotion/react": "11.14.0",
+    "@enormora/wall-clock": "0.0.1",
     "@formkit/auto-animate": "0.9.0",
     "@lexical/code": "0.27.2",
     "@lexical/history": "0.27.2",

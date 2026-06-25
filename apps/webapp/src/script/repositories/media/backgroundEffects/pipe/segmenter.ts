@@ -17,6 +17,7 @@
  *
  */
 
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
 
 import type {Metrics, Mode} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
@@ -32,8 +33,6 @@ import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/sam
 import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
-
-import {createWallClock} from '../../../../clock/wallClock';
 
 let segmenterOptions: WorkerProcessVideoTrackOptions = {} as WorkerProcessVideoTrackOptions;
 

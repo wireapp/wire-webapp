@@ -19,13 +19,14 @@
 
 import {ReactNode} from 'react';
 
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {noop} from 'noop-esm';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {Translate} from 'Util/localizerUtil';
 
-import {WallClock, createWallClock} from '../../clock/wallClock';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {RootContextValue, RootProvider} from '../rootProvider';

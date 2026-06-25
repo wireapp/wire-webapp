@@ -17,12 +17,12 @@
  *
  */
 
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import is from '@sindresorhus/is';
 import {randomInt} from '@wireapp/commons/lib/util/RandomUtil';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-
-import {WallClock, createWallClock} from 'src/script/clock/wallClock';
 
 import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
 

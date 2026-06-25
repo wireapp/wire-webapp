@@ -29,7 +29,7 @@ import {MainContent} from './mainContent';
 
 import {withTheme} from '../../auth/util/test/TestUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
-import {createDeterministicWallClock} from '../../clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {createRootContextValueForTest} from '../testSupport/rootContextTestSupport';
 import {RootProvider} from '../rootProvider';
 import {ContentState, useAppState} from '../useAppState';

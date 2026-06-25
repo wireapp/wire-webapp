@@ -17,11 +17,12 @@
  *
  */
 
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {singleton} from 'tsyringe';
 
 import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 
-import {WallClock, createWallClock} from '../clock/wallClock';
 import {Config} from '../Config';
 
 const wireClientHeaderName = 'Wire-Client';

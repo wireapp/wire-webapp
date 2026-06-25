@@ -19,6 +19,7 @@
 
 import {FC, ReactNode, useEffect, useMemo} from 'react';
 
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import is from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
@@ -29,7 +30,6 @@ import {AnyAction, Dispatch} from 'redux';
 import {FireAndForgetInvoker} from '@wireapp/core';
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {createWallClock} from 'src/script/clock/wallClock';
 import {RootProvider} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 
