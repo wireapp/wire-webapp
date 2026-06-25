@@ -107,8 +107,12 @@ function normalizeMessageEventForPartysocket(event: Event): Event {
 }
 
 function createPartysocketCompatibleWebSocketConstructor(
-  WebSocketConstructor: WebSocketConstructor,
-): WebSocketConstructor {
+  WebSocketConstructor: WebSocketConstructor | undefined,
+): WebSocketConstructor | undefined {
+  if (is.undefined(WebSocketConstructor) || globalThis.WebSocket === WebSocketConstructor) {
+    return WebSocketConstructor;
+  }
+
   return function PartysocketCompatibleWebSocket(url: string, protocols?: string | string[]) {
     const socket = (
       is.undefined(protocols) ? new WebSocketConstructor(url) : new WebSocketConstructor(url, protocols)
