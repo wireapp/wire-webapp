@@ -106,7 +106,7 @@ function normalizeMessageEventForPartysocket(event: Event): Event {
   } as unknown as MessageEvent;
 }
 
-function createPartysocketCompatibleWebSocketConstructor(
+export function createPartysocketCompatibleWebSocketConstructor(
   WebSocketConstructor: WebSocketConstructor | undefined,
 ): WebSocketConstructor | undefined {
   if (is.undefined(WebSocketConstructor) || globalThis.WebSocket === WebSocketConstructor) {
