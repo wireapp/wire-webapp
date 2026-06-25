@@ -55,6 +55,7 @@ export type LongRunningRetryDetails = {
 type IntervalIdentifier = ReturnType<typeof globalThis.setInterval>;
 
 const longRunningRetryThresholdInMilliseconds = TimeUtil.TimeInMillis.MINUTE;
+const connectingTimeoutInMilliseconds = TimeUtil.TimeInMillis.SECOND * 20;
 
 type BackFromSleepHandler = typeof onBackFromSleep;
 
@@ -94,6 +95,7 @@ export class ReconnectingWebsocket {
   private readonly logger: logdown.Logger;
   private socket?: ReconnectingWebsocketWrapper;
   private pingerId?: IntervalIdentifier;
+  private connectingTimeoutId?: TimeoutIdentifier;
   private readonly PING_INTERVAL = TimeUtil.TimeInMillis.SECOND * 20;
   private hasUnansweredPing: boolean;
   private onOpen?: (event: Event) => void;
@@ -165,7 +167,7 @@ export class ReconnectingWebsocket {
 
         this.stopPinging();
         this.hasUnansweredPing = false;
-        this.replaceSocketWrapperAfterWake(socket);
+        this.replaceSocketWrapper(socket, 'Back from sleep');
       },
       Nothing: () => {
         this.logger.debug('Back from sleep detected, WebSocket instance does not exist, skipping reconnect');
@@ -198,6 +200,7 @@ export class ReconnectingWebsocket {
 
   private readonly internalOnOpen = (event: Event) => {
     this.logger.info(`WebSocket opened (reconnect attempt #${this.reconnectAttemptCount})`);
+    this.stopConnectingWatchdog();
     this.resetLongRunningRetrySequence();
     if (this.socket) {
       this.socket.binaryType = 'arraybuffer';
@@ -224,6 +227,7 @@ export class ReconnectingWebsocket {
     this.logger.info(
       `WebSocket closed — code: ${event?.code}, reason: "${event?.reason || 'none'}", wasClean: ${event?.wasClean ?? 'unknown'}`,
     );
+    this.stopConnectingWatchdog();
     this.stopPinging();
     this.resolvePendingHealthChecks(false);
     if (this.onClose) {
@@ -276,11 +280,48 @@ export class ReconnectingWebsocket {
     }
   }
 
-  private replaceSocketWrapperAfterWake(socket: ReconnectingWebsocketWrapper): void {
+  private startConnectingWatchdog(socket: ReconnectingWebsocketWrapper): void {
+    this.stopConnectingWatchdog();
+
+    this.connectingTimeoutId = this.options.wallClock.setTimeout(() => {
+      if (this.socket !== socket) {
+        return;
+      }
+
+      this.connectingTimeoutId = undefined;
+
+      if (socket.readyState !== WEBSOCKET_STATE.CONNECTING) {
+        return;
+      }
+
+      this.logger.warn(
+        `WebSocket wrapper stayed CONNECTING for ${connectingTimeoutInMilliseconds}ms, replacing wrapper`,
+      );
+
+      this.replaceSocketWrapper(socket, 'Connecting timeout');
+    }, connectingTimeoutInMilliseconds);
+  }
+
+  private stopConnectingWatchdog(): void {
+    if (is.undefined(this.connectingTimeoutId) === false) {
+      this.options.wallClock.clearTimeout(this.connectingTimeoutId);
+      this.connectingTimeoutId = undefined;
+    }
+  }
+
+  private replaceSocketWrapper(socket: ReconnectingWebsocketWrapper, reason: string): void {
+    if (this.socket !== socket) {
+      return;
+    }
+
+    this.stopPinging();
+    this.hasUnansweredPing = false;
+    this.stopConnectingWatchdog();
+
     try {
-      socket.close(CloseEventCode.NORMAL_CLOSURE, 'Back from sleep');
+      socket.close(CloseEventCode.NORMAL_CLOSURE, reason);
     } catch (error) {
-      this.logger.warn('Failed to close stale WebSocket wrapper after wake', error);
+      this.logger.warn(`Failed to close stale WebSocket wrapper during ${reason}`, error);
     }
 
     this.createAndBindSocketWrapper();
@@ -317,6 +358,7 @@ export class ReconnectingWebsocket {
     const nextSocket = this.getReconnectingWebsocket();
     this.socket = nextSocket;
     this.bindSocketHandlers(nextSocket);
+    this.startConnectingWatchdog(nextSocket);
   }
 
   private bindSocketHandlers(socket: ReconnectingWebsocketWrapper): void {
@@ -425,6 +467,7 @@ export class ReconnectingWebsocket {
    */
   private cleanup(): void {
     this.stopPinging();
+    this.stopConnectingWatchdog();
     if (this.stopBackFromSleepHandler.isJust) {
       this.stopBackFromSleepHandler.value();
     }
