@@ -38,7 +38,7 @@ import {
   tableStyles,
   wrapperStyles,
 } from './CellsTable.styles';
-import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
+import {getCellsTableColumns, getCellsTableDataCellLabels} from './CellsTableColumns/CellsTableColumns';
 import {FilePreviewProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 interface CellsTableProps {
@@ -72,6 +72,7 @@ const CellsTableHeaderCell = ({header, getDirectionFor}: CellsTableHeaderCellPro
 
 export const CellsTable = ({nodes, cellsRepository, getDirectionFor, onToggleSort}: CellsTableProps) => {
   const {translate} = useApplicationContext();
+  const cellLabels = getCellsTableDataCellLabels(translate);
 
   const table = useReactTable({
     data: nodes,
@@ -102,9 +103,7 @@ export const CellsTable = ({nodes, cellsRepository, getDirectionFor, onToggleSor
                     <td
                       key={cell.id}
                       css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={
-                        typeof cell.column.columnDef.header === 'string' ? cell.column.columnDef.header : undefined
-                      }
+                      data-cell={cellLabels[cell.column.id]}
                       style={{
                         width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
                       }}

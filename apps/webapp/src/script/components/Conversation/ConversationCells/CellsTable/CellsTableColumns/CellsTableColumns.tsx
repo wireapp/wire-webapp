@@ -36,6 +36,25 @@ import {CellsSortField} from '../../common/useCellsSorting/useCellsSorting';
 
 const columnHelper = createColumnHelper<CellNode>();
 
+interface CellsTableLabels {
+  actions: string;
+  created: string;
+  name: string;
+  owner: string;
+  publicLink: string;
+  size: string;
+  tags: string;
+}
+
+export const getCellsTableDataCellLabels = (labels: CellsTableLabels): Record<string, string | undefined> => ({
+  name: labels.name,
+  owner: labels.owner,
+  publicLink: labels.publicLink,
+  sizeMb: labels.size,
+  tags: labels.tags,
+  uploadedAtTimestamp: labels.created,
+});
+
 export const getCellsTableColumns = ({
   cellsRepository,
   conversationQualifiedId,
@@ -49,15 +68,7 @@ export const getCellsTableColumns = ({
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
-  labels: {
-    actions: string;
-    created: string;
-    name: string;
-    owner: string;
-    publicLink: string;
-    size: string;
-    tags: string;
-  };
+  labels: CellsTableLabels;
   onRefresh: () => void;
   onCloseSearchView?: () => void;
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;

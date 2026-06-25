@@ -33,7 +33,7 @@ import {
   tableStyles,
   wrapperStyles,
 } from './CellsTable.styles';
-import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
+import {getCellsTableColumns, getCellsTableDataCellLabels} from './CellsTableColumns/CellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 import {CellsSortDirection} from '../common/CellsSortIcon/CellsSortIcon';
@@ -82,21 +82,24 @@ export const CellsTable = ({
   onToggleSort,
 }: CellsTableProps) => {
   const {translate} = useApplicationContext();
+  const labels = {
+    actions: translate('cells.tableRow.actions'),
+    created: translate('cells.tableRow.created'),
+    name: translate('cells.tableRow.name'),
+    owner: translate('cells.tableRow.owner'),
+    publicLink: translate('cells.tableRow.publicLink'),
+    size: translate('cells.tableRow.size'),
+    tags: translate('cells.tableRow.tags'),
+  };
+  const cellLabels = getCellsTableDataCellLabels(labels);
+
   const table = useReactTable({
     data: nodes,
     columns: getCellsTableColumns({
       cellsRepository,
       conversationQualifiedId,
       conversationName,
-      labels: {
-        actions: translate('cells.tableRow.actions'),
-        created: translate('cells.tableRow.created'),
-        name: translate('cells.tableRow.name'),
-        owner: translate('cells.tableRow.owner'),
-        publicLink: translate('cells.tableRow.publicLink'),
-        size: translate('cells.tableRow.size'),
-        tags: translate('cells.tableRow.tags'),
-      },
+      labels,
       onRefresh,
       onCloseSearchView,
       getDirectionFor,
@@ -128,9 +131,7 @@ export const CellsTable = ({
                     <td
                       key={cell.id}
                       css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={
-                        typeof cell.column.columnDef.header === 'string' ? cell.column.columnDef.header : undefined
-                      }
+                      data-cell={cellLabels[cell.column.id]}
                       style={{
                         width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
                       }}
