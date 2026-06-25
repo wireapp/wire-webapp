@@ -65,18 +65,18 @@ export const useCellsSorting = () => {
       if (current?.field !== field) {
         return {field, direction: DEFAULT_DIRECTION[field]};
       }
-      // Re-selecting the active column flips the direction. There is no click path
-      // back to the unsorted state — that only returns when the view is left/re-entered.
+      // Re-selecting the active column flips the direction. The unsorted state is only
+      // reached when entering a new sorting scope, not by clicking the active column.
       return {field, direction: current.direction === 'asc' ? 'desc' : 'asc'};
     });
   }, []);
-
-  const resetSort = useCallback(() => setSort(null), []);
 
   const getDirectionFor = useCallback(
     (field: CellsSortField): CellsSortDirection | undefined => (sort?.field === field ? sort.direction : undefined),
     [sort],
   );
+
+  const resetSort = () => setSort(null);
 
   return {sort, toggleSort, resetSort, getDirectionFor};
 };
