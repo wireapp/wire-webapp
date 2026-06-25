@@ -22,18 +22,18 @@ import {useCallback, useMemo, useState} from 'react';
 import type {
   FilterConfig,
   FilterItem,
-} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
+} from 'Components/conversation/conversationcells/common/cellsfiltersbar/filterconfig';
 import {
   type GlobalDriveFiltersState,
   getActiveGlobalDriveFilterType,
   isFilterTypeDisabled,
-} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
-import {FILE_TYPE_CATALOG} from 'Components/conversation/conversationCells/common/driveFilters/fileTypeCatalog';
-import {useDriveEnabledConversationFilterItems} from 'Components/conversation/conversationCells/common/useDriveEnabledConversationFilterItems/useDriveEnabledConversationFilterItems';
-import {useDriveEnabledParticipantFilterItems} from 'Components/conversation/conversationCells/common/useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
-import {useGetAllTags} from 'Components/conversation/conversationCells/common/useGetAllTags/useGetAllTags';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+} from 'Components/conversation/conversationcells/common/drivefilters/drivefilters';
+import {FILE_TYPE_CATALOG} from 'Components/conversation/conversationcells/common/drivefilters/filetypecatalog';
+import {useDriveEnabledConversationFilterItems} from 'Components/conversation/conversationcells/common/usedriveenabledconversationfilteritems/usedriveenabledconversationfilteritems';
+import {useDriveEnabledParticipantFilterItems} from 'Components/conversation/conversationcells/common/usedriveenabledparticipantfilteritems/usedriveenabledparticipantfilteritems';
+import {useGetAllTags} from 'Components/conversation/conversationcells/common/usegetalltags/usegetalltags';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
 export const useGlobalDriveFilters = ({

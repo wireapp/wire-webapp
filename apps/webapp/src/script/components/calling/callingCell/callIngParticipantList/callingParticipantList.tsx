@@ -23,12 +23,12 @@ import cx from 'classnames';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {CallParticipantsListItem} from 'Components/calling/callParticipantsListItem';
-import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {CallParticipantsListItem} from 'Components/calling/callparticipantslistitem';
+import {FadingScrollbar} from 'Components/fadingscrollbar';
 import * as Icon from 'Components/icon';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {CallingRepository} from 'Repositories/calling/callingrepository';
+import {Participant} from 'Repositories/calling/participant';
+import {Conversation} from 'Repositories/entity/conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
@@ -37,7 +37,7 @@ import {
   labelStyles,
   labelWithIconStyles,
   participantListWrapperStyles,
-} from './callingParticipantList.styles';
+} from './callingparticipantlist.styles';
 
 import {ContextMenuEntry, showContextMenu} from '../../../../ui/contextMenu';
 

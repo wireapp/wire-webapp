@@ -19,12 +19,12 @@
 
 import {renderHook} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {Message} from 'Repositories/entity/message/message';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {createUuid} from 'Util/uuid';
 
-import {useReadReceiptSender} from './useReadReceipt';
+import {useReadReceiptSender} from './usereadreceipt';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('useReadReceipt', () => {

@@ -1,0 +1,87 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {RestVersion} from 'cells-sdk-ts';
+
+import type {Translate} from 'Util/localizerUtil';
+import {calculateDaysDifference, formatDateKey, formatTime, getDayPrefix, TIME_IN_MILLIS} from 'Util/timeUtil';
+import {formatBytes} from 'Util/util';
+
+import {FileVersion} from '../types';
+
+type RestVersionWithOptionalFields = Partial<RestVersion>;
+type ResolveOwnerName = (version: RestVersionWithOptionalFields) => string | undefined;
+
+/**
+ * Transform a RestVersion to FileVersion
+ */
+export const transformRestVersionToFileVersion = (
+  version: RestVersionWithOptionalFields,
+  timestamp: number,
+  resolveOwnerName?: ResolveOwnerName,
+): FileVersion => {
+  return {
+    versionId: version.VersionId ?? '',
+    time: formatTime(timestamp),
+    ownerName: resolveOwnerName?.(version) ?? version.OwnerName ?? '',
+    size: formatBytes(Number(version.Size) ?? 0),
+    downloadUrl: version.PreSignedGET?.Url ?? '',
+  };
+};
+
+/**
+ * Group file versions by date
+ */
+export const groupVersionsByDate = (
+  versions: RestVersionWithOptionalFields[],
+  translate: Translate,
+  resolveOwnerName?: ResolveOwnerName,
+): Record<string, FileVersion[]> => {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  return versions.reduce(
+    (acc, version) => {
+      // Skip versions with missing critical data
+      if (
+        version.VersionId === undefined ||
+        version.VersionId === '' ||
+        version.MTime === undefined ||
+        version.MTime === ''
+      ) {
+        return acc;
+      }
+
+      const timestamp = Number(version.MTime) * TIME_IN_MILLIS.SECOND;
+      const versionDate = new Date(timestamp);
+
+      const daysDiff = calculateDaysDifference(today, versionDate);
+      const dayPrefix = getDayPrefix(daysDiff, timestamp, translate);
+      const dateKey = formatDateKey(timestamp, dayPrefix);
+
+      if (acc[dateKey] === undefined) {
+        acc[dateKey] = [];
+      }
+
+      acc[dateKey].push(transformRestVersionToFileVersion(version, timestamp, resolveOwnerName));
+      return acc;
+    },
+    {} as Record<string, FileVersion[]>,
+  );
+};

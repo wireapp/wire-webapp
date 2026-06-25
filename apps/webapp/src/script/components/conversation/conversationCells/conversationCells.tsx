@@ -23,33 +23,33 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {UserRepository} from 'Repositories/user/userrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {CellsHeader} from './cellsHeader/cellsHeader';
-import {CellsLoader} from './cellsLoader/cellsLoader';
-import {CellsPagination} from './cellsPagination/cellsPagination';
-import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
-import {CellsTable} from './cellsTable/cellsTable';
-import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
-import {isInRecycleBin} from './common/recycleBin/recycleBin';
-import {useCellsStore} from './common/useCellsStore/useCellsStore';
-import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
+import {CellsHeader} from './cellsheader/cellsheader';
+import {CellsLoader} from './cellsloader/cellsloader';
+import {CellsPagination} from './cellspagination/cellspagination';
+import {CellsStateInfo} from './cellsstateinfo/cellsstateinfo';
+import {CellsTable} from './cellstable/cellstable';
+import {getLoadMoreOffset} from './common/loadmorepagination/loadmorepagination';
+import {isInRecycleBin} from './common/recyclebin/recyclebin';
+import {useCellsStore} from './common/usecellsstore/usecellsstore';
+import {useConversationDriveFilters} from './common/useconversationdrivefilters/useconversationdrivefilters';
 import {
   loadMoreErrorMessageStyles,
   loadMoreErrorWrapperStyles,
   loadMoreWrapperStyles,
   wrapperStyles,
-} from './conversationCells.styles';
-import {useCellsPagination} from './useCellsPagination/useCellsPagination';
-import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
-import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
-import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
-import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
+} from './conversationcells.styles';
+import {useCellsPagination} from './usecellspagination/usecellspagination';
+import {useConversationSearchFiles} from './useconversationsearch/useconversationsearchfiles';
+import {useGetAllCellsNodes} from './usegetallcellsnodes/usegetallcellsnodes';
+import {useOnPresignedUrlExpired} from './useonpresignedurlexpired/useonpresignedurlexpired';
+import {useRefreshCellsState} from './userefreshcellsstate/userefreshcellsstate';
 
 interface ConversationCellsProps {
   cellsRepository: CellsRepository;

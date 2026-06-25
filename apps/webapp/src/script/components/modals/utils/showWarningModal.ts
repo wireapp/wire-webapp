@@ -19,7 +19,7 @@
 
 import type {Translate} from 'Util/localizerUtil';
 
-import {PrimaryModal} from '../primaryModal';
+import {PrimaryModal} from '../primarymodal';
 
 export const showWarningModal = (title: string, message: string, translate: Translate): void => {
   // Timeout needed for display warning modal - we need to update modal

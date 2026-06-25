@@ -21,9 +21,9 @@ import {ReactNode} from 'react';
 
 import {DropzoneRootProps, DropzoneInputProps} from 'react-dropzone';
 
-import {wrapperStyles} from './fileDropzone.styles';
-import {FileDropzoneOverlay} from './fileDropzoneOverlay/fileDropzoneOverlay';
-import {useIsDragging} from './useIsDragging/useIsDragging';
+import {wrapperStyles} from './filedropzone.styles';
+import {FileDropzoneOverlay} from './filedropzoneoverlay/filedropzoneoverlay';
+import {useIsDragging} from './useisdragging/useisdragging';
 
 interface FileDropzoneProps {
   isDragAccept: boolean;

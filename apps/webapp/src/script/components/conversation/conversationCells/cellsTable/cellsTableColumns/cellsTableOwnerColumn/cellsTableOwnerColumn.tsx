@@ -18,10 +18,10 @@
  */
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {showUserModal} from 'Components/modals/userModal';
-import {User} from 'Repositories/entity/User';
+import {showUserModal} from 'Components/modals/usermodal';
+import {User} from 'Repositories/entity/user';
 
-import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsTableOwnerColumn.styles';
+import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellstableownercolumn.styles';
 
 interface CellsTableOwnerColumnProps {
   owner: string;

@@ -19,10 +19,10 @@
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {videoStyles, iconWrapperStyles} from './videoPreviewCard.styles';
+import {videoStyles, iconWrapperStyles} from './videopreviewcard.styles';
 
-import {FilePreviewPlayButton} from '../common/filePreviewPlayButton/filePreviewPlayButton';
-import {MediaFilePreviewCard} from '../common/mediaFilePreviewCard/mediaFilePreviewCard';
+import {FilePreviewPlayButton} from '../common/filepreviewplaybutton/filepreviewplaybutton';
+import {MediaFilePreviewCard} from '../common/mediafilepreviewcard/mediafilepreviewcard';
 
 interface VideoPreviewCardProps {
   src: string;

@@ -38,34 +38,34 @@ import {
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
-import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
-import {useUserPropertyValue} from 'Hooks/useUserProperty';
-import {Call} from 'Repositories/calling/Call';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import {useActiveWindowMatchMedia} from 'Hooks/useactivewindowmatchmedia';
+import {useUserPropertyValue} from 'Hooks/useuserproperty';
+import {Call} from 'Repositories/calling/call';
+import {CallingViewMode, CallState} from 'Repositories/calling/callstate';
+import {Participant} from 'Repositories/calling/participant';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/mediadeviceshandler';
+import {useBackgroundEffectsStore} from 'Repositories/media/usebackgroundeffectsstore';
+import {useMediaDevicesStore} from 'Repositories/media/usemediadevicesstore';
 import {
   BackgroundEffectSelection,
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
-} from 'Repositories/media/VideoBackgroundEffects';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {TeamState} from 'Repositories/team/TeamState';
-import {Config} from 'src/script/Config';
-import {isCallViewOption} from 'src/script/guards/CallView';
-import {isMediaDevice} from 'src/script/guards/MediaDevice';
+} from 'Repositories/media/videobackgroundeffects';
+import {PropertiesRepository} from 'Repositories/properties/propertiesrepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiestype';
+import {TeamState} from 'Repositories/team/teamstate';
+import {Config} from 'src/script/config';
+import {isCallViewOption} from 'src/script/guards/callView';
+import {isMediaDevice} from 'src/script/guards/mediaDevice';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
-import {CallViewTab} from 'src/script/view_model/CallingViewModel';
+import {CallViewTab} from 'src/script/viewModel/callingviewmodel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from 'Util/keyboardUtil';
 
-import {EmojisBar} from './emojisBar/emojisBar';
-import {VideoCallCancelButton} from './videoCallCancelButton/videoCallCancelButton';
+import {EmojisBar} from './emojisbar/emojisbar';
+import {VideoCallCancelButton} from './videocallcancelbutton/videocallcancelbutton';
 import {
   moreControlsWrapperStyles,
   videoControlActiveStyles,
@@ -76,8 +76,8 @@ import {
   videoOptionsMenuStyles,
   videoOptionsRowIconStyles,
   videoOptionsSheetStyles,
-} from './videoControls.styles';
-import {VideoControlsSelect} from './videoControlsSelect/videoControlsSelect';
+} from './videocontrols.styles';
+import {VideoControlsSelect} from './videocontrolsselect/videocontrolsselect';
 
 type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
 

@@ -17,10 +17,10 @@
  *
  */
 
-import {addNewModalToQueue, showNextModalInQueue} from './primaryModalState';
-import {PrimaryModalType} from './primaryModalTypes';
+import {addNewModalToQueue, showNextModalInQueue} from './primarymodalstate';
+import {PrimaryModalType} from './primarymodaltypes';
 
-export {removeCurrentModal, usePrimaryModalState} from './primaryModalState';
+export {removeCurrentModal, usePrimaryModalState} from './primarymodalstate';
 export {PrimaryModal};
 
 const PrimaryModal = {

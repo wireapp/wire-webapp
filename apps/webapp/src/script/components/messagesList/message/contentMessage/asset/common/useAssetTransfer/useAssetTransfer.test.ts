@@ -20,16 +20,16 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {AssetRemoteData} from 'Repositories/assets/assetremotedata';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
+import {AssetTransferState} from 'Repositories/assets/assettransferstate';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {FileAsset} from 'Repositories/entity/message/fileasset';
 import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {createUuid} from 'Util/uuid';
 
-import {useAssetTransfer} from './useAssetTransfer';
+import {useAssetTransfer} from './useassettransfer';
 
 const assetRepository = {
   getUploadProgress: jest.fn().mockReturnValue(ko.pureComputed(() => 0)),

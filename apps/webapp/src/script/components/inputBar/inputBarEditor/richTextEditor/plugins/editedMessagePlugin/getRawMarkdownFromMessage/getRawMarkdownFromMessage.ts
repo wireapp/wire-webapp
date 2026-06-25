@@ -19,11 +19,11 @@
 
 import {$createParagraphNode, $createTextNode} from 'lexical';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
 import {Text} from 'Repositories/entity/message/text';
 
-import {$createMentionNode} from '../../../nodes/mentionNode';
-import {createNodes} from '../../../utils/generateNodes';
+import {$createMentionNode} from '../../../nodes/mentionnode';
+import {createNodes} from '../../../utils/generatenodes';
 
 export const getRawMarkdownNodesWithMentions = (message: ContentMessage) => {
   const firstAsset = message.getFirstAsset() as Text;

@@ -24,21 +24,21 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingscrollbar';
 import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/modals/modalComponent';
-import {EnrichedFields} from 'Components/panel/enrichedFields';
-import {UserActions} from 'Components/panel/userActions';
-import {UserDetails} from 'Components/panel/userDetails';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {ModalComponent} from 'Components/modals/modalcomponent';
+import {EnrichedFields} from 'Components/panel/enrichedfields';
+import {UserActions} from 'Components/panel/useractions';
+import {UserDetails} from 'Components/panel/userdetails';
+import {User} from 'Repositories/entity/user';
+import {TeamState} from 'Repositories/team/teamstate';
+import {UserRepository} from 'Repositories/user/userrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {replaceLink} from 'Util/localizerUtil';
 
-import {useUserModalState} from './userModal.state';
+import {useUserModalState} from './usermodal.state';
 import {
   unverifiedUserWarningIconStyle,
   unverifiedUserWarningLinkStyle,
@@ -48,9 +48,9 @@ import {
   unverifiedUserWarningStyle,
   userModalStyle,
   userModalWrapperStyle,
-} from './userModal.styles';
+} from './usermodal.styles';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {Core} from '../../../service/coreSingleton';
 
 export interface UserModalProps {

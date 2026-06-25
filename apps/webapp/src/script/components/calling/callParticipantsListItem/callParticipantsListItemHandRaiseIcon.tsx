@@ -26,7 +26,7 @@ import {InviteIcon, Tooltip} from '@wireapp/react-ui-kit';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatDuration} from 'Util/timeUtil';
 
-import {toolTipStyles} from './callParticipantsListItemHandRaiseIcon.styles';
+import {toolTipStyles} from './callparticipantslistitemhandraiseicon.styles';
 
 interface CallParticipantsListItemHandRaiseIconProps {
   handRaisedAt: number;

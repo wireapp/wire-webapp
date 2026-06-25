@@ -24,22 +24,22 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 
-import {RestrictedVideo} from 'Components/asset/restrictedVideo';
-import {AssetError} from 'Repositories/assets/assetError';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
+import {RestrictedVideo} from 'Components/asset/restrictedvideo';
+import {AssetError} from 'Repositories/assets/asseterror';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
+import {AssetTransferState} from 'Repositories/assets/assettransferstate';
+import type {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileasset';
+import {TeamState} from 'Repositories/team/teamstate';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {formatSeconds} from 'Util/timeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {MediaButton} from '../common/mediaButton/mediaButton';
-import {SeekBar} from '../common/seekBar/seekBar';
-import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
-import {FileAsset} from '../fileAsset/fileAsset';
+import {MediaButton} from '../common/mediabutton/mediabutton';
+import {SeekBar} from '../common/seekbar/seekbar';
+import {AssetUrl, useAssetTransfer} from '../common/useassettransfer/useassettransfer';
+import {FileAsset} from '../fileasset/fileasset';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;

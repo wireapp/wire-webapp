@@ -17,4 +17,4 @@
  *
  */
 
-export * from './messageButton';
+export * from './messagebutton';

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './serviceModal';
+export * from './servicemodal';

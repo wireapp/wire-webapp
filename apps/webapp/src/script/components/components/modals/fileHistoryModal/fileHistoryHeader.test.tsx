@@ -19,16 +19,16 @@
 
 import {render, screen, fireEvent} from '@testing-library/react';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {FileHistoryHeader} from './fileHistoryHeader';
-import {useFileHistoryModal} from './hooks/useFileHistoryModal';
+import {FileHistoryHeader} from './filehistoryheader';
+import {useFileHistoryModal} from './hooks/usefilehistorymodal';
 
-jest.mock('./hooks/useFileHistoryModal');
+jest.mock('./hooks/usefilehistorymodal');
 
 const mockedUseFileHistoryModal = jest.mocked(useFileHistoryModal);
 const rootProviderWrapper = createRootProviderWrapperForTest(

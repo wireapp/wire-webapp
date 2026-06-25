@@ -23,17 +23,17 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {UserRepository} from 'Repositories/user/userrepository';
 
-import {getUsersFromNodes} from './getUsersFromNodes';
-import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
+import {getUsersFromNodes} from './getusersfromnodes';
+import {transformDataToCellsNodes, transformToCellPagination} from './transformdatatocellsnodes';
 
-import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
-import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
-import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
-import {useCellsStore} from '../common/useCellsStore/useCellsStore';
-import {createRequestVersionGate} from '../useConversationSearch/requestVersionGate';
+import {getCellsApiPath} from '../common/getcellsapipath/getcellsapipath';
+import {getCellsFilesPath} from '../common/getcellsfilespath/getcellsfilespath';
+import {RECYCLE_BIN_PATH} from '../common/recyclebin/recyclebin';
+import {useCellsStore} from '../common/usecellsstore/usecellsstore';
+import {createRequestVersionGate} from '../useconversationsearch/requestversiongate';
 
 interface UseGetAllCellsNodesProps {
   cellsRepository: CellsRepository;

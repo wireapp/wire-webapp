@@ -23,10 +23,10 @@ import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {useFileVersions} from './useFileVersions';
-import {translateForTest} from 'Util/test/translateForTest';
+import {useFileVersions} from './usefileversions';
+import {translateForTest} from 'Util/test/translatefortest';
 
 // Mock the dependencies
 const mockGetNode = jest.fn();
@@ -58,7 +58,7 @@ jest.mock('Util/util', () => ({
   },
 }));
 
-jest.mock('../utils/fileVersionUtils', () => ({
+jest.mock('../utils/fileversionutils', () => ({
   groupVersionsByDate: (versions: any[]) => {
     if (!versions || versions.length === 0) {
       return {};

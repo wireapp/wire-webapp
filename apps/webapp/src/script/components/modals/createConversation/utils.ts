@@ -20,7 +20,7 @@
 import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamstate';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
 import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';

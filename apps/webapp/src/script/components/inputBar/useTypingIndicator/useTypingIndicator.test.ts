@@ -19,9 +19,9 @@
 
 import {fireEvent, renderHook} from '@testing-library/react';
 
-import {useTypingIndicator} from './useTypingIndicator';
+import {useTypingIndicator} from './usetypingindicator';
 
-import {TYPING_TIMEOUT} from '../typingIndicator';
+import {TYPING_TIMEOUT} from '../typingindicator';
 
 describe('useTypingIndicator', () => {
   beforeAll(() => {

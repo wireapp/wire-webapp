@@ -20,7 +20,7 @@
 import is from '@sindresorhus/is';
 import {Maybe, maybe} from 'true-myth';
 
-import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
+import type {ScheduleMeetingFormState} from 'Components/meeting/schedulemeetingmodal/schedulemeetingtypes';
 
 export const getInvitedEmailsFromSelectedUsers = (
   selectedUsers: ScheduleMeetingFormState['selectedUsers'],

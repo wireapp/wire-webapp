@@ -19,7 +19,7 @@
 
 import {ElementNode, TextNode} from 'lexical';
 
-import {isListNode} from './isListNode';
+import {isListNode} from './islistnode';
 
 const createMockElementNode = (type: string, tag: string, parent: ElementNode | null = null): ElementNode => {
   return {

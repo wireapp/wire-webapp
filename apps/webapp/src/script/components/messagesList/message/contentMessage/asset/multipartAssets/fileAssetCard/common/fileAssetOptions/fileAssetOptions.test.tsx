@@ -21,14 +21,14 @@ import type {ComponentProps} from 'react';
 
 import {render, screen} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {isFileEditable} from 'Util/fileTypeUtil';
 
-import {FileAssetOptions} from './fileAssetOptions';
+import {FileAssetOptions} from './fileassetoptions';
 
 jest.mock('Util/util', () => ({
   forcedDownloadFile: jest.fn(),

@@ -17,6 +17,6 @@
  *
  */
 
-export * from './meetingParticipantsPicker';
-export * from './formatSelectedSummary';
-export * from './participantPickerUtils';
+export * from './meetingparticipantspicker';
+export * from './formatselectedsummary';
+export * from './participantpickerutils';

@@ -24,7 +24,7 @@ import is from '@sindresorhus/is';
 import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/modals/modalComponent';
+import {ModalComponent} from 'Components/modals/modalcomponent';
 import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -34,7 +34,7 @@ import {
   formStyles,
   headerStyles,
   titleStyles,
-} from './linkDialog.styles';
+} from './linkdialog.styles';
 
 import {validateUrl} from '../../utils/url';
 

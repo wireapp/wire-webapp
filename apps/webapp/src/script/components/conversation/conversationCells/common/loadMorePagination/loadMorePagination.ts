@@ -19,7 +19,7 @@
 
 import {Maybe} from 'true-myth';
 
-import {CellPagination} from '../cellPagination/cellPagination';
+import {CellPagination} from '../cellpagination/cellpagination';
 
 export const LOAD_MORE_INITIAL_SIZE = 30;
 export const LOAD_MORE_INCREMENT = 20;

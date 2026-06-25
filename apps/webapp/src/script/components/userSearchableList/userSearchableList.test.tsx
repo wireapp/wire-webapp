@@ -19,20 +19,20 @@
 
 import {render, screen, waitFor} from '@testing-library/react';
 
-import {withThemeAndRootContext} from 'src/script/auth/util/test/TestUtil';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testutil';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {ConversationState} from 'src/script/repositories/conversation/ConversationState';
-import {User} from 'src/script/repositories/entity/User';
-import {SearchRepository} from 'src/script/repositories/search/searchRepository';
-import {TeamRepository} from 'src/script/repositories/team/TeamRepository';
-import {TeamState} from 'src/script/repositories/team/TeamState';
-import {translateForTest} from 'Util/test/translateForTest';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
+import {ConversationState} from 'src/script/repositories/conversation/conversationstate';
+import {User} from 'src/script/repositories/entity/user';
+import {SearchRepository} from 'src/script/repositories/search/searchrepository';
+import {TeamRepository} from 'src/script/repositories/team/teamrepository';
+import {TeamState} from 'src/script/repositories/team/teamstate';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {UserSearchableList, UserListProps} from './userSearchableList';
+import {UserSearchableList, UserListProps} from './usersearchablelist';
 
 type UserDefinition = {
   id: string;

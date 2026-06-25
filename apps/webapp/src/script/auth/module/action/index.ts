@@ -17,16 +17,16 @@
  *
  */
 
-import {AuthAction, authAction} from './AuthAction';
-import {ClientAction, clientAction} from './ClientAction';
-import {ConversationAction, conversationAction} from './ConversationAction';
-import {InvitationAction, invitationAction} from './InvitationAction';
-import {LocalStorageAction, localStorageAction} from './LocalStorageAction';
-import {NavigationAction, navigationAction} from './NavigationAction';
-import {NotificationAction, notificationAction} from './NotificationAction';
-import {SelfAction, selfAction} from './SelfAction';
-import {UserAction, userAction} from './UserAction';
-import {WrapperEventAction, wrapperEventAction} from './WrapperEventAction';
+import {AuthAction, authAction} from './authaction';
+import {ClientAction, clientAction} from './clientaction';
+import {ConversationAction, conversationAction} from './conversationaction';
+import {InvitationAction, invitationAction} from './invitationaction';
+import {LocalStorageAction, localStorageAction} from './localstorageaction';
+import {NavigationAction, navigationAction} from './navigationaction';
+import {NotificationAction, notificationAction} from './notificationaction';
+import {SelfAction, selfAction} from './selfaction';
+import {UserAction, userAction} from './useraction';
+import {WrapperEventAction, wrapperEventAction} from './wrappereventaction';
 
 export interface ActionRoot {
   authAction: AuthAction;

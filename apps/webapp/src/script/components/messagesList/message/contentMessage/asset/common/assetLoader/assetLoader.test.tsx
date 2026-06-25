@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {AssetLoader} from './assetLoader';
+import {AssetLoader} from './assetloader';
 
 describe('AssetLoader', () => {
   const defaultProps = {large: false, loadProgress: 10, onCancel: jest.fn()};

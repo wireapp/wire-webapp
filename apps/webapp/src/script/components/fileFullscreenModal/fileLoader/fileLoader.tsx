@@ -17,7 +17,7 @@
  *
  */
 
-import {loaderIconStyles, wrapperStyles} from './fileLoader.styles';
+import {loaderIconStyles, wrapperStyles} from './fileloader.styles';
 
 export const FileLoader = () => {
   return (

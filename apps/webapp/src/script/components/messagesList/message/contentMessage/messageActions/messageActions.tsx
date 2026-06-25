@@ -24,15 +24,15 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useClickOutside} from 'Hooks/useClickOutside';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {useClickOutside} from 'Hooks/useclickoutside';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey, isTabKey} from 'Util/keyboardUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import {useMessageActionsState} from './messageActions.state';
+import {useMessageActionsState} from './messageactions.state';
 import {
   messageActionsGroup,
   messageBodyActions,
@@ -40,9 +40,9 @@ import {
   getActionsMenuCSS,
   getIconCSS,
   messageWithHeaderTop,
-} from './messageActions.styles';
-import {MessageReactions} from './messageReactions/messageReactions';
-import {ReplyButton} from './replyButton';
+} from './messageactions.styles';
+import {MessageReactions} from './messagereactions/messagereactions';
+import {ReplyButton} from './replybutton';
 
 import {useMessageFocusedTabIndex} from '../../util';
 

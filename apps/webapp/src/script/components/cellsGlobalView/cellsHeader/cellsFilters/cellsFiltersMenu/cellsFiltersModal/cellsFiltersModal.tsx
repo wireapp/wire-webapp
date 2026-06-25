@@ -19,15 +19,15 @@
 
 import {Accordion} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/modals/modalComponent';
+import {ModalComponent} from 'Components/modals/modalcomponent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
-import {CellsFilterModalHeader} from './cellsFilterModalHeader/cellsFilterModalHeader';
-import {contentStyles, modalStyles, wrapperStyles} from './cellsFiltersModal.styles';
-import {CellsFiltersModalActions} from './cellsFiltersModalActions/cellsFiltersModalActions';
-import {CellsTagsFilter} from './cellsTagsFilter/cellsTagsFilter';
-import {useModalFilters} from './useModalFilters/useModalFilters';
+import {CellsFilterModalHeader} from './cellsfiltermodalheader/cellsfiltermodalheader';
+import {contentStyles, modalStyles, wrapperStyles} from './cellsfiltersmodal.styles';
+import {CellsFiltersModalActions} from './cellsfiltersmodalactions/cellsfiltersmodalactions';
+import {CellsTagsFilter} from './cellstagsfilter/cellstagsfilter';
+import {useModalFilters} from './usemodalfilters/usemodalfilters';
 
 interface CellsFiltersModalProps {
   isOpen: boolean;

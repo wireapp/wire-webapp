@@ -21,16 +21,16 @@ import {useEffect} from 'react';
 
 import {container} from 'tsyringe';
 
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {TeamState} from 'Repositories/team/teamstate';
+import {UserState} from 'Repositories/user/userstate';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {ConversationFeature} from './conversationFeature';
-import {ConversationOption} from './conversationOption';
-import {conversationTypeContainerCss} from './conversationType.styles';
+import {ConversationFeature} from './conversationfeature';
+import {ConversationOption} from './conversationoption';
+import {conversationTypeContainerCss} from './conversationtype.styles';
 
-import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
+import {useCreateConversationModal} from '../hooks/usecreateconversationmodal';
 import {ConversationCreationStep, ConversationType} from '../types';
 import {getConversationTypeOptions} from '../utils';
 

@@ -17,14 +17,14 @@
  *
  */
 
-import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/deleteMessage';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/deletemessage';
+import {User} from 'Repositories/entity/user';
+import {ServiceEntity} from 'Repositories/integration/serviceentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {MessageHeader} from './contentMessage/messageHeader';
-import {MessageTime} from './messageTime';
+import {MessageHeader} from './contentmessage/messageheader';
+import {MessageTime} from './messagetime';
 
 interface DeleteMessageProps {
   message: DeleteMessageEntity;

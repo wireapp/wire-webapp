@@ -22,8 +22,8 @@ import {useState, useEffect} from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {paginationContainerStyles, paginationDotsContainerStyles} from './pagination.styles';
-import {PaginationArrow} from './paginationArrow';
-import {PaginationDot} from './paginationDot';
+import {PaginationArrow} from './paginationarrow';
+import {PaginationDot} from './paginationdot';
 
 interface PaginationProps {
   currentPage: number;

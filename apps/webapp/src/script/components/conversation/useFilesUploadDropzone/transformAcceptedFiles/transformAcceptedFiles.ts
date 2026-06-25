@@ -17,7 +17,7 @@
  *
  */
 
-import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
+import {FileWithPreview} from 'Components/conversation/usefilesuploadstate/usefilesuploadstate';
 import {createUuid} from 'Util/uuid';
 
 export const transformAcceptedFiles = (files: File[]): FileWithPreview[] => {

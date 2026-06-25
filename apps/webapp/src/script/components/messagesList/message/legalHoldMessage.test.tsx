@@ -19,14 +19,14 @@
 
 import {render} from '@testing-library/react';
 
-import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/legalHoldMessage';
-import {translateForTest} from 'Util/test/translateForTest';
+import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/legalholdmessage';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {LegalHoldMessage} from './legalHoldMessage';
+import {LegalHoldMessage} from './legalholdmessage';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

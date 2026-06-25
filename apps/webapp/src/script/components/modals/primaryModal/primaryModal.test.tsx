@@ -19,17 +19,17 @@
 
 import {render, fireEvent, act} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {PrimaryModalComponent} from './primaryModal';
-import {PrimaryModalType} from './primaryModalTypes';
+import {PrimaryModalComponent} from './primarymodal';
+import {PrimaryModalType} from './primarymodaltypes';
 
-import {PrimaryModal, removeCurrentModal} from '.';
-import {translateForTest} from 'Util/test/translateForTest';
+import {PrimaryModal, removeCurrentModal} from './';
+import {translateForTest} from 'Util/test/translatefortest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

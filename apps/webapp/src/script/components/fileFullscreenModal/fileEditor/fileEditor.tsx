@@ -23,17 +23,17 @@ import {Node} from '@wireapp/api-client/lib/cells';
 import {Maybe, result} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {PrimaryModal} from 'Components/modals/primaryModal';
-import {removeCurrentModal} from 'Components/modals/primaryModal/primaryModalState';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {Config} from 'src/script/Config';
+import {PrimaryModal} from 'Components/modals/primarymodal';
+import {removeCurrentModal} from 'Components/modals/primarymodal/primarymodalstate';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import * as styles from './fileEditor.styles';
-import {validateCollaboraUrl} from './validateCollaboraUrl';
+import * as styles from './fileeditor.styles';
+import {validateCollaboraUrl} from './validatecollaboraurl';
 
-import {FileLoader} from '../fileLoader/fileLoader';
+import {FileLoader} from '../fileloader/fileloader';
 
 const REFRESH_BUFFER_SECONDS = 10; // Refresh 10 seconds before expiry for safety
 

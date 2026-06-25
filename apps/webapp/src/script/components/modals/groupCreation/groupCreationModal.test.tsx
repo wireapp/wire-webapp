@@ -1,19 +1,19 @@
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamstate';
 import ko from 'knockout';
-import {GroupCreationModal} from 'Components/modals/groupCreation/groupCreationModal';
+import {GroupCreationModal} from 'Components/modals/groupcreation/groupcreationmodal';
 import {act, getByRole} from '@testing-library/react';
-import {UserState} from 'Repositories/user/userState';
-import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/userstate';
+import {User} from 'Repositories/entity/user';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {mountComponent} from '../../../auth/util/test/TestUtil';
-import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
+import {mountComponent} from '../../../auth/util/test/testutil';
+import {mockStoreFactory} from '../../../auth/util/test/mockstorefactory';
 import {initialRootState} from '../../../auth/module/reducer';
 import {TypeUtil} from '@wireapp/commons';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicwallclock';
+import {translateForTest} from 'Util/test/translatefortest';
+import {createRootContextValueForTest} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {RootProvider} from 'src/script/page/rootProvider';
 
 type TeamStateDateSet = {

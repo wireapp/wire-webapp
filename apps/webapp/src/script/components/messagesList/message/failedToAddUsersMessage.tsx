@@ -26,17 +26,17 @@ import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {getUserNameWithTranslate} from 'Components/userName';
-import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
+import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedtoaddusersmessage';
+import {User} from 'Repositories/entity/user';
+import {UserState} from 'Repositories/user/userstate';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import type {TranslationKey} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {backendErrorLink, warning} from './contentMessage/warnings/warnings.styles';
-import {MessageTime} from './messageTime';
+import {backendErrorLink, warning} from './contentmessage/warnings/warnings.styles';
+import {MessageTime} from './messagetime';
 import {useMessageFocusedTabIndex} from './util';
 
 interface FailedToAddUsersMessageProps {

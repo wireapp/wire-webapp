@@ -23,13 +23,13 @@ import {render, fireEvent} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {CellsShareModalContent} from './cellsShareModalContent';
+import {CellsShareModalContent} from './cellssharemodalcontent';
 
 jest.mock('@wireapp/react-ui-kit', () => {
   const actualModule = jest.requireActual('@wireapp/react-ui-kit');
@@ -42,7 +42,7 @@ jest.mock('@wireapp/react-ui-kit', () => {
   };
 });
 
-jest.mock('src/script/Config', () => ({
+jest.mock('src/script/config', () => ({
   Config: {
     getConfig: () => ({
       MINIMUM_PASSWORD_LENGTH: 8,
@@ -57,21 +57,21 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 // Mock child components that have complex dependencies
-jest.mock('Components/cells/shareModal/cellsShareExpirationFields', () => ({
+jest.mock('Components/cells/sharemodal/cellsshareexpirationfields', () => ({
   CellsShareExpirationFields: () => <div data-uie-name="expiration-fields">Expiration Fields Mock</div>,
 }));
 
-jest.mock('Components/conversation/conversationCells/common/cellsTableLoader/cellsTableLoader', () => ({
+jest.mock('Components/conversation/conversationcells/common/cellstableloader/cellstableloader', () => ({
   CellsTableLoader: () => <div data-uie-name="cells-table-loader">Loading...</div>,
 }));
 
-jest.mock('Components/copyToClipboardButton/copyToClipboardButton', () => ({
+jest.mock('Components/copytoclipboardbutton/copytoclipboardbutton', () => ({
   CopyToClipboardButton: ({textToCopy, displayText}: {textToCopy: string; displayText: string}) => (
     <button data-uie-name="copy-to-clipboard-button">{displayText}</button>
   ),
 }));
 
-jest.mock('Components/passwordGeneratorButton', () => ({
+jest.mock('Components/passwordgeneratorbutton', () => ({
   PasswordGeneratorButton: ({onGeneratePassword}: {onGeneratePassword: (password: string) => void}) => (
     <button data-uie-name="do-generate-password" onClick={() => onGeneratePassword('generated-password')}>
       Generate Password

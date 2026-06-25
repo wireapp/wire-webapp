@@ -17,7 +17,7 @@
  *
  */
 
-import type {ScheduleFormErrors} from './scheduleFormErrors';
+import type {ScheduleFormErrors} from './scheduleformerrors';
 
 export const meetingSubmitErrors = {
   createFailed: 'createFailed',

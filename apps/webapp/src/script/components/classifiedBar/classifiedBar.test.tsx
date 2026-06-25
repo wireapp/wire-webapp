@@ -19,16 +19,16 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {createUuid} from 'Util/uuid';
 
-import {ConversationClassifiedBar} from './classifiedBar';
+import {ConversationClassifiedBar} from './classifiedbar';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(

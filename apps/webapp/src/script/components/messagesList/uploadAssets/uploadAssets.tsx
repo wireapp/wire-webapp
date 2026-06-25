@@ -17,11 +17,11 @@
  *
  */
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {UploadAssetItem} from './components/uploadAssetItem';
-import {uploadAssetsContainer} from './uploadAssets.styles';
+import {UploadAssetItem} from './components/uploadassetitem';
+import {uploadAssetsContainer} from './uploadassets.styles';
 
 interface Props {
   assetRepository: AssetRepository;

@@ -25,8 +25,8 @@ import {
   emptyListBodyStyles,
   emptyListHeadingStyles,
   emptyListStyles,
-} from 'Components/meeting/emptyMeetingList/emptyListStyles';
-import {useMeetingActions} from 'Components/meeting/useMeetingActions';
+} from 'Components/meeting/emptymeetinglist/emptyliststyles';
+import {useMeetingActions} from 'Components/meeting/usemeetingactions';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const EmptyMeetingList = () => {

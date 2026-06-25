@@ -18,7 +18,7 @@
  */
 
 import * as Icon from 'Components/icon';
-import {Participant} from 'Repositories/calling/Participant';
+import {Participant} from 'Repositories/calling/participant';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {
@@ -27,9 +27,9 @@ import {
   micOffIcon,
   micOffWrapper,
   screenShareIcon,
-} from './callParticipantsListItem.styles';
+} from './callparticipantslistitem.styles';
 
-import {ParticipantMicOnIcon} from '../participantMicOnIcon';
+import {ParticipantMicOnIcon} from '../participantmiconicon';
 
 interface CallParticipantStatusIconsProps {
   callParticipant: Participant;

@@ -28,32 +28,32 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {LeaveGroupAdminModal} from 'Components/modals/leaveGroupAdminModal/leaveGroupAdminModal';
-import {PrimaryModalComponent} from 'Components/modals/primaryModal/primaryModal';
-import {QualityFeedbackModal} from 'Components/modals/qualityFeedbackModal';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
+import {LeaveGroupAdminModal} from 'Components/modals/leavegroupadminmodal/leavegroupadminmodal';
+import {PrimaryModalComponent} from 'Components/modals/primarymodal/primarymodal';
+import {QualityFeedbackModal} from 'Components/modals/qualityfeedbackmodal';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiestype';
+import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
-import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
-import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
+import {useSingleInstance} from 'src/script/hooks/usesingleinstance';
+import {useUserPropertyValue} from 'src/script/hooks/useuserproperty';
 import type {Translate} from 'Util/localizerUtil';
 
-import {useAccentColor} from './hooks/useAccentColor';
-import {useTheme} from './hooks/useTheme';
+import {useAccentColor} from './hooks/useaccentcolor';
+import {useTheme} from './hooks/usetheme';
 
-import {runClientVersionCheck} from '../../application-periodic-checks/runClientVersionCheck';
-import {startApplicationPeriodicChecks} from '../../application-periodic-checks/startApplicationPeriodicChecks';
+import {runClientVersionCheck} from '../../applicationperiodicchecks/runclientversioncheck';
+import {startApplicationPeriodicChecks} from '../../applicationperiodicchecks/startapplicationperiodicchecks';
 import {WallClock} from '../../clock/wallClock';
-import {Config, Configuration} from '../../Config';
-import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
-import {setAppLocale} from '../../localization/Localizer';
+import {Config, Configuration} from '../../config';
+import {StartupFeatureToggleName} from '../../featureToggles/startupfeaturetoggles';
+import {setAppLocale} from '../../localization/localizer';
 import {App} from '../../main/app';
 import {AppMain} from '../../page/appMain';
 import {RootProvider} from '../../page/rootProvider';
-import {APIClient} from '../../service/apiClientSingleton';
+import {APIClient} from '../../service/apiclientsingleton';
 import {Core} from '../../service/coreSingleton';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
-import {MainViewModel} from '../../view_model/MainViewModel';
+import {MainViewModel} from '../../viewModel/mainviewmodel';
 import {AppLoader} from '../appLoader';
 
 type AppProps = {

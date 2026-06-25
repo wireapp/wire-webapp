@@ -21,7 +21,7 @@ import {INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, REMOVE_LIST_
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getSelection, $isRangeSelection} from 'lexical';
 
-import {isListNode} from '../common/isListNode/isListNode';
+import {isListNode} from '../common/islistnode/islistnode';
 
 export const useListState = () => {
   const [editor] = useLexicalComposerContext();

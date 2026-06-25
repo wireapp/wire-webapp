@@ -20,24 +20,24 @@
 import {act, render} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {useLegalHoldModalState} from 'Components/modals/legalholdmodal/legalholdmodal.state';
+import {CallingRepository} from 'Repositories/calling/callingrepository';
 import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {translateForTest} from 'Util/test/translateForTest';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyrepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {SearchRepository} from 'Repositories/search/searchrepository';
+import {TeamRepository} from 'Repositories/team/teamrepository';
+import {UserRepository} from 'Repositories/user/userrepository';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {LegalHoldModal, LegalHoldModalType} from './legalHoldModal';
+import {LegalHoldModal, LegalHoldModalType} from './legalholdmodal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';

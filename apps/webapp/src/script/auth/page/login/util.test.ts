@@ -23,8 +23,8 @@ import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api
 import {StatusCodes} from 'http-status-codes';
 import {Dispatch} from 'redux';
 
-import {APIClient} from 'src/script/service/apiClientSingleton';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {APIClient} from 'src/script/service/apiclientsingleton';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicwallclock';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ROUTE} from '../../route';

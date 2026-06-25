@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {InfoToggle} from './infoToggle';
+import {InfoToggle} from './infotoggle';
 
 describe('InfoToggle', () => {
   it('toggles check property', () => {

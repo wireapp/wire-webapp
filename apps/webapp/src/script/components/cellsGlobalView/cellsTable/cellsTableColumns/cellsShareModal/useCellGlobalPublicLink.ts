@@ -19,10 +19,10 @@
 
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useCellPublicLink} from 'src/script/components/cells/common/useCellPublicLink/useCellPublicLink';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {useCellPublicLink} from 'src/script/components/cells/common/usecellpubliclink/usecellpubliclink';
 
-import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
+import {useCellsStore} from '../../../common/usecellsstore/usecellsstore';
 
 interface UseCellGlobalPublicLinkParams {
   uuid: string;

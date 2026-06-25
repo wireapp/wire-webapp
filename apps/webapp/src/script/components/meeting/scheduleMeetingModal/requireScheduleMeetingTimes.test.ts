@@ -18,13 +18,13 @@
  */
 
 import {maybe} from 'true-myth';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicwallclock';
+import {unwrap, unwrapErr} from 'Util/test/resulttestsupport';
 
-import {scheduleFormErrors} from '../scheduleFormErrors';
+import {scheduleFormErrors} from '../scheduleformerrors';
 
-import {requireScheduleMeetingTimes} from './requireScheduleMeetingTimes';
-import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+import {requireScheduleMeetingTimes} from './requireschedulemeetingtimes';
+import type {ScheduleMeetingFormState} from './schedulemeetingtypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');

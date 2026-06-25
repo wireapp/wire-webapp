@@ -17,7 +17,7 @@
  *
  */
 
-import {openFolder} from './openFolder';
+import {openFolder} from './openfolder';
 
 const CONV_ID = 'abc-123';
 const DOMAIN = 'staging.zinfra.io';

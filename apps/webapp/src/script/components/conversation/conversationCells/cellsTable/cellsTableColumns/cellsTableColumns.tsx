@@ -20,15 +20,15 @@
 import {createColumnHelper} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {CellNode} from 'src/script/types/cellNode';
 
-import {CellsTableDateColumn} from './cellsTableDateColumn/cellsTableDateColumn';
-import {CellsTableNameColumn} from './cellsTableNameColumn/cellsTableNameColumn';
-import {CellsTableOwnerColumn} from './cellsTableOwnerColumn/cellsTableOwnerColumn';
-import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions';
-import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
-import {CellsTagsColumn} from './cellsTagsColumn/cellsTagsColumn';
+import {CellsTableDateColumn} from './cellstabledatecolumn/cellstabledatecolumn';
+import {CellsTableNameColumn} from './cellstablenamecolumn/cellstablenamecolumn';
+import {CellsTableOwnerColumn} from './cellstableownercolumn/cellstableownercolumn';
+import {CellsTableRowOptions} from './cellstablerowoptions/cellstablerowoptions';
+import {CellsTableSharedColumn} from './cellstablesharedcolumn/cellstablesharedcolumn';
+import {CellsTagsColumn} from './cellstagscolumn/cellstagscolumn';
 
 const columnHelper = createColumnHelper<CellNode>();
 

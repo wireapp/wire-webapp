@@ -17,16 +17,16 @@
  *
  */
 
-import {AssetType} from 'Repositories/assets/assetType';
+import {AssetType} from 'Repositories/assets/assettype';
 import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {ContentMessage} from './contentMessage';
-import {FileAsset} from './fileAsset';
+import {ContentMessage} from './contentmessage';
+import {FileAsset} from './fileasset';
 import {Message} from './message';
-import {MessageTimerUpdateMessage} from './messageTimerUpdateMessage';
+import {MessageTimerUpdateMessage} from './messagetimerupdatemessage';
 import {Multipart} from './multipart';
-import {PingMessage} from './pingMessage';
+import {PingMessage} from './pingmessage';
 import {Text} from './text';
 
 import {SuperType} from '../../../message/superType';

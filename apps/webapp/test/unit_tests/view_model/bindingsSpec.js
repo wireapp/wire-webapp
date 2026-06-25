@@ -20,7 +20,7 @@
 // eslint-disable-next-line id-length
 import ko from 'knockout';
 
-import '../../../src/script/view_model/bindings/CommonBindings';
+import '../../../src/script/viewModel/bindings/commonbindings';
 
 describe('ko.bindingHandlers', () => {
   describe('ko.subscribable.fn.subscribe_once', () => {

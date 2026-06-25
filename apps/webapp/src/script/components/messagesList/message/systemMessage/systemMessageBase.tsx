@@ -19,10 +19,10 @@
 
 import {ReactNode} from 'react';
 
-import {SystemMessage} from 'Repositories/entity/message/systemMessage';
+import {SystemMessage} from 'Repositories/entity/message/systemmessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {MessageTime} from '../messageTime';
+import {MessageTime} from '../messagetime';
 
 interface SystemMessageProps {
   message: SystemMessage;

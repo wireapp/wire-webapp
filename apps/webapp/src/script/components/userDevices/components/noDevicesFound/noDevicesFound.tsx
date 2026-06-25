@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

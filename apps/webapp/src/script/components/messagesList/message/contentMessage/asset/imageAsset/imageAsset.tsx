@@ -23,14 +23,14 @@ import {CSSObject} from '@emotion/react';
 
 import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/image';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {MediumImage} from 'Repositories/entity/message/mediumimage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
-import {AssetLoader} from '../common/assetLoader/assetLoader';
-import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
+import {AssetLoader} from '../common/assetloader/assetloader';
+import {useAssetTransfer} from '../common/useassettransfer/useassettransfer';
 
 export interface ImageAssetProps {
   asset: MediumImage;

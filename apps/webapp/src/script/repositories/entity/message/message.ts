@@ -22,36 +22,36 @@ import ko from 'knockout';
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {AssetType} from 'Repositories/assets/assetType';
-import type {ReadReceipt} from 'Repositories/storage/record/eventRecord';
+import {AssetTransferState} from 'Repositories/assets/assettransferstate';
+import {AssetType} from 'Repositories/assets/assettype';
+import type {ReadReceipt} from 'Repositories/storage/record/eventrecord';
 import {type Translate, getUserName} from 'Util/localizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {CallingTimeoutMessage} from './callingTimeoutMessage';
-import type {CallMessage} from './callMessage';
-import type {CompositeMessage} from './compositeMessage';
-import type {ContentMessage} from './contentMessage';
-import type {DecryptErrorMessage} from './decryptErrorMessage';
-import type {DeleteMessage} from './deleteMessage';
-import {E2EIVerificationMessage} from './e2eiVerificationMessage';
-import type {FailedToAddUsersMessage} from './failedToAddUsersMessage';
-import type {FederationStopMessage} from './federationStopMessage';
-import type {FileAsset} from './fileAsset';
-import type {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
-import type {LegalHoldMessage} from './legalHoldMessage';
-import type {LinkPreview} from './linkPreview';
-import type {MemberMessage} from './memberMessage';
-import type {MissedMessage} from './missedMessage';
-import type {PingMessage} from './pingMessage';
-import type {SystemMessage} from './systemMessage';
-import type {VerificationMessage} from './verificationMessage';
+import {CallingTimeoutMessage} from './callingtimeoutmessage';
+import type {CallMessage} from './callmessage';
+import type {CompositeMessage} from './compositemessage';
+import type {ContentMessage} from './contentmessage';
+import type {DecryptErrorMessage} from './decrypterrormessage';
+import type {DeleteMessage} from './deletemessage';
+import {E2EIVerificationMessage} from './e2eiverificationmessage';
+import type {FailedToAddUsersMessage} from './failedtoaddusersmessage';
+import type {FederationStopMessage} from './federationstopmessage';
+import type {FileAsset} from './fileasset';
+import type {FileTypeRestrictedMessage} from './filetyperestrictedmessage';
+import type {LegalHoldMessage} from './legalholdmessage';
+import type {LinkPreview} from './linkpreview';
+import type {MemberMessage} from './membermessage';
+import type {MissedMessage} from './missedmessage';
+import type {PingMessage} from './pingmessage';
+import type {SystemMessage} from './systemmessage';
+import type {VerificationMessage} from './verificationmessage';
 
-import {EphemeralStatusType} from '../../../message/ephemeralStatusType';
-import type {MessageCategory} from '../../../message/messageCategory';
+import {EphemeralStatusType} from '../../../message/ephemeralstatustype';
+import type {MessageCategory} from '../../../message/messagecategory';
 import {StatusType} from '../../../message/statusType';
 import {SuperType} from '../../../message/superType';
-import {User} from '../User';
+import {User} from '../user';
 
 export class Message {
   protected readonly translate: Translate;

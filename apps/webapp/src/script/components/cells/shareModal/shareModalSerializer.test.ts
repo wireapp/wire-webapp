@@ -17,7 +17,7 @@
  *
  */
 
-import {serializeShareModalInput} from './shareModalSerializer';
+import {serializeShareModalInput} from './sharemodalserializer';
 
 describe('serializeShareModalInput', () => {
   const baseInput: {

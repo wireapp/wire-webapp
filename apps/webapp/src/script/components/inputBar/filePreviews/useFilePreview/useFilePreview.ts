@@ -19,9 +19,9 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {FileWithPreview, useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {Config} from 'src/script/Config';
+import {FileWithPreview, useFileUploadState} from 'Components/conversation/usefilesuploadstate/usefilesuploadstate';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 

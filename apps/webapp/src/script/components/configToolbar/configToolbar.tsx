@@ -24,15 +24,15 @@ import {container} from 'tsyringe';
 
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Config, Configuration} from 'src/script/Config';
-import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureToggles/startupFeatureToggleQueryParameters';
-import {useClickOutside} from 'src/script/hooks/useClickOutside';
+import {ConversationState} from 'Repositories/conversation/conversationstate';
+import {Config, Configuration} from 'src/script/config';
+import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/featureToggles/startupfeaturetogglenames';
+import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureToggles/startupfeaturetogglequeryparameters';
+import {useClickOutside} from 'src/script/hooks/useclickoutside';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
 
-import {wrapperStyles} from './configToolbar.styles';
+import {wrapperStyles} from './configtoolbar.styles';
 
 export function createLocationUrl(pathname: string, search: string, hash: string): string {
   return `${pathname}${search}${hash}`;

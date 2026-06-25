@@ -17,7 +17,7 @@
  *
  */
 
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {FileAsset} from 'Repositories/entity/message/fileasset';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {trimFileExtension} from 'Util/util';
 

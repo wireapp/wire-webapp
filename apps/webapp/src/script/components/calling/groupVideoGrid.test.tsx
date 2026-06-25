@@ -21,20 +21,20 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 
-import {Call} from 'Repositories/calling/Call';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Call} from 'Repositories/calling/call';
+import {Participant} from 'Repositories/calling/participant';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {translate} from 'Util/localizerUtil';
 
-import {GroupVideoGrid, GroupVideoGripProps} from './groupVideoGrid';
+import {GroupVideoGrid, GroupVideoGripProps} from './groupvideogrid';
 
-import {buildMediaDevicesHandler} from '../../auth/util/test/TestUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {buildMediaDevicesHandler} from '../../auth/util/test/testutil';
+import {translateForTest} from 'Util/test/translatefortest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('Components/avatar', () => ({

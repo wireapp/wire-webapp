@@ -22,12 +22,12 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {UserState} from 'Repositories/user/userState';
+import {UserState} from 'Repositories/user/userstate';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {createConversationHeaderContainerCss} from './createConversation.styles';
-import {CreateConversationSubmit} from './createConversationSubmit';
-import {useCreateConversationModal} from './hooks/useCreateConversationModal';
+import {createConversationHeaderContainerCss} from './createconversation.styles';
+import {CreateConversationSubmit} from './createconversationsubmit';
+import {useCreateConversationModal} from './hooks/usecreateconversationmodal';
 import {ConversationType, ConversationCreationStep} from './types';
 
 export const CreateConversationHeader = () => {

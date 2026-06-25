@@ -19,15 +19,15 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
-import {User} from 'Repositories/entity/User';
-import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
+import {Conversation} from 'Repositories/entity/conversation';
+import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/e2eiverificationmessage';
+import {User} from 'Repositories/entity/user';
+import {E2EIVerificationMessageType} from 'src/script/message/e2eiverificationmessagetype';
 
-import {E2EIVerificationMessage} from './e2eiVerificationMessage';
+import {E2EIVerificationMessage} from './e2eiverificationmessage';
 
-import {withTheme} from '../../../../auth/util/test/TestUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {withTheme} from '../../../../auth/util/test/testutil';
+import {translateForTest} from 'Util/test/translatefortest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const createVerificationMessage = (partialVerificationMessage: Partial<VerificationMessageEntity>) => {

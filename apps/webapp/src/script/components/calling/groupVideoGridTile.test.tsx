@@ -21,17 +21,17 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
-import {Participant} from 'Repositories/calling/Participant';
-import {User} from 'Repositories/entity/User';
-import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {Participant} from 'Repositories/calling/participant';
+import {User} from 'Repositories/entity/user';
+import {backgroundEffectsStore} from 'Repositories/media/usebackgroundeffectsstore';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {createUuid} from 'Util/uuid';
 
-import {GroupVideoGridTile} from './groupVideoGridTile';
-import {translateForTest} from 'Util/test/translateForTest';
+import {GroupVideoGridTile} from './groupvideogridtile';
+import {translateForTest} from 'Util/test/translatefortest';
 
 const loadingOverlaySelector = '[data-uie-name="background-effect-initializing"]';
 const rootProviderWrapper = createRootProviderWrapperForTest(

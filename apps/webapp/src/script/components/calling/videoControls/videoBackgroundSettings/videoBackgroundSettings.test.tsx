@@ -19,15 +19,15 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import type {BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {BuiltinBackground} from 'Repositories/media/videobackgroundeffects';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {withTheme} from '../../../../auth/util/test/TestUtil';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
+import {withTheme} from '../../../../auth/util/test/testutil';
 
-import {getBackgroundEffectLabel, VideoBackgroundSettings} from './videoBackgroundSettings';
+import {getBackgroundEffectLabel, VideoBackgroundSettings} from './videobackgroundsettings';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

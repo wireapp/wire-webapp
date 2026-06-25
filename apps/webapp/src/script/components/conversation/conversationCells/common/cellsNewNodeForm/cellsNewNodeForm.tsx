@@ -21,9 +21,9 @@ import {ChangeEvent, FormEvent} from 'react';
 
 import {TextInput} from 'Components/textInput';
 
-import {inputWrapperStyles} from './cellsNewNodeForm.styles';
+import {inputWrapperStyles} from './cellsnewnodeform.styles';
 
-import {useInputAutoFocus} from '../useInputAutoFocus/useInputAutoFocus';
+import {useInputAutoFocus} from '../useinputautofocus/useinputautofocus';
 
 interface CellsNewNodeFormProps {
   label: string;

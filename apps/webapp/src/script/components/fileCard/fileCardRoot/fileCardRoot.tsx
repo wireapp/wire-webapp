@@ -19,9 +19,9 @@
 
 import {ReactNode, memo, useMemo} from 'react';
 
-import {contentStyles, wrapperStylesLarge, wrapperStylesSmall} from './fileCardRoot.styles';
+import {contentStyles, wrapperStylesLarge, wrapperStylesSmall} from './filecardroot.styles';
 
-import {FileCardContextProvider} from '../common/fileCardContext/fileCardContext';
+import {FileCardContextProvider} from '../common/filecardcontext/filecardcontext';
 
 interface FileCardOptions {
   /**

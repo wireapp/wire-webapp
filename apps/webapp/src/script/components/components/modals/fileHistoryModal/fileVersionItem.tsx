@@ -33,7 +33,7 @@ import {
   versionMetaTextCss,
   versionOwnerSpanCss,
   versionTimeTextCss,
-} from './fileHistoryModal.styles';
+} from './filehistorymodal.styles';
 
 interface FileVersionItemProps {
   version: {

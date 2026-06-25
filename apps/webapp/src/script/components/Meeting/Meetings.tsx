@@ -18,10 +18,10 @@
  */
 
 import {contentStyles} from 'Components/meeting/meeting.styles';
-import {MeetingHeader} from 'Components/meeting/meetingHeader/meetingHeader';
-import {MeetingList} from 'Components/meeting/meetingList/meetingList';
-import {ScheduleMeetingModal} from 'Components/meeting/scheduleMeetingModal';
-import {useMeetingsList} from 'Components/meeting/useMeetingsList';
+import {MeetingHeader} from 'Components/meeting/meetingheader/meetingheader';
+import {MeetingList} from 'Components/meeting/meetinglist/meetinglist';
+import {ScheduleMeetingModal} from 'Components/meeting/schedulemeetingmodal';
+import {useMeetingsList} from 'Components/meeting/usemeetingslist';
 
 export const Meetings = () => {
   const meetingsList = useMeetingsList();

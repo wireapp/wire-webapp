@@ -19,18 +19,18 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {AssetError} from 'Repositories/assets/assetError';
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {AssetError} from 'Repositories/assets/asseterror';
+import {AssetRemoteData} from 'Repositories/assets/assetremotedata';
+import {AssetTransferState} from 'Repositories/assets/assettransferstate';
+import type {FileAsset} from 'Repositories/entity/message/fileasset';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {useGetAssetUrl} from './useGetAssetUrl';
-import {translateForTest} from 'Util/test/translateForTest';
+import {useGetAssetUrl} from './usegetasseturl';
+import {translateForTest} from 'Util/test/translatefortest';
 
 jest.mock('Util/logger', () => ({
   getLogger: jest.fn(() => ({

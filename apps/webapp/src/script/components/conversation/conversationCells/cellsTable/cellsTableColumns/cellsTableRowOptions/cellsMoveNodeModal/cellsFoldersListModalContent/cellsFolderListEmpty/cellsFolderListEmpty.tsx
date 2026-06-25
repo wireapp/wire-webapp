@@ -19,7 +19,7 @@
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {textStyles, wrapperStyles} from './cellsFolderListEmpty.styles';
+import {textStyles, wrapperStyles} from './cellsfolderlistempty.styles';
 
 export const CellsFolderListEmpty = () => {
   const {translate} = useApplicationContext();

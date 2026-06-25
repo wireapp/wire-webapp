@@ -22,8 +22,8 @@ import {
   fileHistoryDateHeadingCss,
   fileHistoryListCss,
   fileHistoryTimelineContainerCss,
-} from './fileHistoryModal.styles';
-import {FileVersionItem} from './fileVersionItem';
+} from './filehistorymodal.styles';
+import {FileVersionItem} from './fileversionitem';
 import {FileVersion} from './types';
 
 export const FileHistoryContent = ({

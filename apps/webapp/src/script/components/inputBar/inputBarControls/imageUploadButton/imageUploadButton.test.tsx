@@ -19,13 +19,13 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {ImageUploadButton} from './imageUploadButton';
+import {ImageUploadButton} from './imageuploadbutton';
 
 const ALLOWED_IMAGE_TYPES = ['image/gif', 'image/avif'];
 

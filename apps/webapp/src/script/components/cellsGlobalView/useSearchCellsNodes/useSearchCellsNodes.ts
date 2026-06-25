@@ -27,17 +27,17 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {
   GlobalDriveFiltersState,
   toGlobalDriveSearchParams,
-} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
+} from 'Components/conversation/conversationcells/common/drivefilters/drivefilters';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {UserRepository} from 'Repositories/user/userrepository';
 
-import {getConversationsFromNodes} from './getConversationsFromNodes';
-import {getUsersFromNodes} from './getUsersFromNodes';
+import {getConversationsFromNodes} from './getconversationsfromnodes';
+import {getUsersFromNodes} from './getusersfromnodes';
 
-import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
-import {transformCellsNodes} from '../transformCellsNodes/transformCellsNodes';
-import {transformCellsPagination} from '../transformCellsPagination/transformCellsPagination';
+import {useCellsStore, Status} from '../common/usecellsstore/usecellsstore';
+import {transformCellsNodes} from '../transformcellsnodes/transformcellsnodes';
+import {transformCellsPagination} from '../transformcellspagination/transformcellspagination';
 
 interface UseSearchCellsNodesProps {
   cellsRepository: CellsRepository;

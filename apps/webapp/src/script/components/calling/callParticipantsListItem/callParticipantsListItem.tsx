@@ -23,21 +23,21 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserStatusBadges} from 'Components/badge';
-import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/callParticipantsListItem/callParticipantsListItemHandRaiseIcon';
-import {Participant} from 'Repositories/calling/Participant';
+import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/callparticipantslistitem/callparticipantslistitemhandraiseicon';
+import {Participant} from 'Repositories/calling/participant';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import {CallParticipantItemContent} from './callParticipantItemContent';
+import {CallParticipantItemContent} from './callparticipantitemcontent';
 import {
   callParticipantListItemWrapper,
   callParticipantListItem,
   callParticipantAvatar,
   callParticipantConnecting,
-} from './callParticipantsListItem.styles';
-import {CallParticipantStatusIcons} from './callParticipantStatusIcons';
+} from './callparticipantslistitem.styles';
+import {CallParticipantStatusIcons} from './callparticipantstatusicons';
 
 interface CallParticipantsListItemProps {
   callParticipant: Participant;

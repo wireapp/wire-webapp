@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {Translate} from 'Util/localizerUtil';
 
-import {useFilePaste} from './useFilePaste/useFilePaste';
+import {useFilePaste} from './usefilepaste/usefilepaste';
 
 interface UseFileHandlingProps {
   uploadDroppedFiles: (files: File[]) => void;

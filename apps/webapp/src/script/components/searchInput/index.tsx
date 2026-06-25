@@ -17,4 +17,4 @@
  *
  */
 
-export * from './searchInput';
+export * from './searchinput';

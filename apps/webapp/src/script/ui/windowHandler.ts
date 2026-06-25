@@ -19,7 +19,7 @@
 
 import {getLogger, Logger} from 'Util/logger';
 
-import {ConversationError} from '../error/conversationError';
+import {ConversationError} from '../error/conversationerror';
 
 export class WindowHandler {
   logger: Logger;

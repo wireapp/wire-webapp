@@ -22,7 +22,7 @@ import {
   getErrorStatus,
   isClientSideNodeNameError,
   NODE_NAME_MAX_LENGTH,
-} from './cellsNodeFormUtils';
+} from './cellsnodeformutils';
 
 describe('cellsNodeFormUtils', () => {
   const validationCopy = {

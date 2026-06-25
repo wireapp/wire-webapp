@@ -22,7 +22,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from 'Repositories/entity/conversation';
 
 import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';

@@ -35,14 +35,14 @@ import {
   groupVideoParticipantNameWrapper,
   groupVideoPauseOverlayLabel,
   groupVideoTileWrapper,
-} from 'Components/calling/groupVideoGridTile.styles';
+} from 'Components/calling/groupvideogridtile.styles';
 import * as Icon from 'Components/icon';
-import type {Participant} from 'Repositories/calling/Participant';
+import type {Participant} from 'Repositories/calling/participant';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';
 
-import {useShowLoadingOverlay} from './useShowLoadingOverlay';
+import {useShowLoadingOverlay} from './useshowloadingoverlay';
 import {Video} from './video';
 
 interface GroupVideoGridTileProps {

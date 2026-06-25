@@ -17,4 +17,4 @@
  *
  */
 
-export * from './titleBar';
+export * from './titlebar';

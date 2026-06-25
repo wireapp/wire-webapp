@@ -19,7 +19,7 @@
 
 import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
 
-import {wrapperStyles} from './cellsTableTagsColumn.styles';
+import {wrapperStyles} from './cellstabletagscolumn.styles';
 
 interface CellsTableTagsColumnProps {
   tags: string[];

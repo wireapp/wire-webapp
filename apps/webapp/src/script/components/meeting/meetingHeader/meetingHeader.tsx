@@ -17,8 +17,8 @@
  *
  */
 
-import {actionsStyles, headingStyles, wrapperStyles} from 'Components/meeting/meetingHeader/meetingHeader.styles';
-import {MeetNowMultiActionButton} from 'Components/meeting/meetNowMultiActionButton/meetNowMultiActionButton';
+import {actionsStyles, headingStyles, wrapperStyles} from 'Components/meeting/meetingheader/meetingheader.styles';
+import {MeetNowMultiActionButton} from 'Components/meeting/meetnowmultiactionbutton/meetnowmultiactionbutton';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const MeetingHeader = () => {

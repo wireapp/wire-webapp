@@ -17,7 +17,7 @@
  *
  */
 
-import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
+import {serverTimeHandler} from 'src/script/time/servertimehandler';
 
 describe('serverTimeHandler', () => {
   describe('getTimeOffset', () => {

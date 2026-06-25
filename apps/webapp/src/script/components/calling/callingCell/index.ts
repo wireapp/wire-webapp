@@ -17,4 +17,4 @@
  *
  */
 
-export * from './callingCell';
+export * from './callingcell';

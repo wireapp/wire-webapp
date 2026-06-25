@@ -29,8 +29,8 @@ import {
   indicatorAnimationWrapperStyles,
   indicatorTitleStyles,
   wrapperStyles,
-} from './typingIndicator.styles';
-import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
+} from './typingindicator.styles';
+import {useTypingIndicatorState} from './usetypingindicatorstate/usetypingindicatorstate';
 
 const MAX_VISIBLE_TYPING_USERS = 3;
 const TWO_TYPING_USERS = 2;

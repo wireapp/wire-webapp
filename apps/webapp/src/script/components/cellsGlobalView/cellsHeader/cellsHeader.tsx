@@ -17,17 +17,17 @@
  *
  */
 
-import {CellsFiltersBar} from 'Components/conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
-import type {FilterConfig} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsFiltersBar} from 'Components/conversation/conversationcells/common/cellsfiltersbar/cellsfiltersbar';
+import type {FilterConfig} from 'Components/conversation/conversationcells/common/cellsfiltersbar/filterconfig';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {CellsFilters} from './cellsFilters/cellsFilters';
-import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cellsHeader.styles';
-import {CellsRefresh} from './cellsRefresh/cellsRefresh';
-import {CellsSearch} from './cellsSearch/cellsSeach';
+import {CellsFilters} from './cellsfilters/cellsfilters';
+import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cellsheader.styles';
+import {CellsRefresh} from './cellsrefresh/cellsrefresh';
+import {CellsSearch} from './cellssearch/cellsseach';
 
-import {CellsTableLoader} from '../common/cellsTableLoader/cellsTableLoader';
+import {CellsTableLoader} from '../common/cellstableloader/cellstableloader';
 
 interface CellsHeaderProps {
   searchValue: string;

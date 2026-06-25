@@ -19,7 +19,7 @@
 
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assettransferstate';
 import {
   AssetAddEvent,
   DeleteEvent,
@@ -29,9 +29,9 @@ import {
   MessageAddEvent,
   MultipartMessageAddEvent,
   ReactionEvent,
-} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CONVERSATION} from 'Repositories/event/Client';
+} from 'Repositories/conversation/eventbuilder';
+import {Conversation} from 'Repositories/entity/conversation';
+import {CONVERSATION} from 'Repositories/event/client';
 import {StatusType} from 'src/script/message/statusType';
 import {createUuid} from 'Util/uuid';
 

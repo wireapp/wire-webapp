@@ -19,32 +19,32 @@
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
-import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {InputBar} from 'Components/inputBar/index';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfService} from 'Repositories/self/SelfService';
+import {FileWithPreview} from 'Components/conversation/usefilesuploadstate/usefilesuploadstate';
+import {InputBar} from 'Components/inputBar';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {EventRepository} from 'Repositories/event/eventrepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesrepository';
+import {PropertiesService} from 'Repositories/properties/propertiesservice';
+import {SearchRepository} from 'Repositories/search/searchrepository';
+import {SelfService} from 'Repositories/self/selfservice';
 import {StorageRepository} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Config} from 'src/script/Config';
+import {TeamState} from 'Repositories/team/teamstate';
+import {withTheme} from 'src/script/auth/util/test/testutil';
+import {Config} from 'src/script/config';
 import {translate} from 'Util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('Components/avatar', () => ({

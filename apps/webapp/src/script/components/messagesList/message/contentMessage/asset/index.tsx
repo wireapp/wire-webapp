@@ -20,32 +20,32 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {AssetType} from 'Repositories/assets/assetType';
+import {AssetType} from 'Repositories/assets/assettype';
 import {Asset} from 'Repositories/entity/message/asset';
 import {Button} from 'Repositories/entity/message/button';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
+import {CompositeMessage} from 'Repositories/entity/message/compositemessage';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileasset';
 import type {Location} from 'Repositories/entity/message/location';
-import type {MediumImage} from 'Repositories/entity/message/mediumImage';
+import type {MediumImage} from 'Repositories/entity/message/mediumimage';
 import {Multipart} from 'Repositories/entity/message/multipart';
 import {Text} from 'Repositories/entity/message/text';
 import {StatusType} from 'src/script/message/statusType';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
 
-import {AudioAsset} from './audioAsset/audioAsset';
-import {FileAsset} from './fileAsset/fileAsset';
-import {ImageAsset} from './imageAsset';
-import {LinkPreviewAsset} from './linkPreviewAssetComponent';
-import {LocationAsset} from './locationAsset';
-import {MessageButton} from './messageButton';
-import {MultipartAssets} from './multipartAssets/multipartAssets';
-import {TextMessageRenderer} from './textMessageRenderer';
-import {VideoAsset} from './videoAsset/videoAsset';
+import {AudioAsset} from './audioasset/audioasset';
+import {FileAsset} from './fileasset/fileasset';
+import {ImageAsset} from './imageasset';
+import {LinkPreviewAsset} from './linkpreviewassetcomponent';
+import {LocationAsset} from './locationasset';
+import {MessageButton} from './messagebutton';
+import {MultipartAssets} from './multipartassets/multipartassets';
+import {TextMessageRenderer} from './textmessagerenderer';
+import {VideoAsset} from './videoasset/videoasset';
 
 import {MessageActions} from '../..';
-import {ReadIndicator} from '../../readIndicator';
+import {ReadIndicator} from '../../readindicator';
 
 interface ContentAssetProps {
   asset: Asset;

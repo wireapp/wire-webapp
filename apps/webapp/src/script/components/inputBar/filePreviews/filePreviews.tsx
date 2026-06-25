@@ -21,17 +21,17 @@ import {useAutoAnimate} from '@formkit/auto-animate/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {isAudio, isVideo, isImage} from 'Repositories/assets/assetMetaDataBuilder';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {FileWithPreview} from 'Components/conversation/usefilesuploadstate/usefilesuploadstate';
+import {isAudio, isVideo, isImage} from 'Repositories/assets/assetmetadatabuilder';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {isPreviewableImage} from 'Util/imageUtil';
 
-import {AudioPreviewCard} from './audioPreviewCard/audioPreviewCard';
-import {FilePreviewCard} from './filePreviewCard/filePreviewCard';
-import {wrapperStyles} from './filePreviews.styles';
-import {ImagePreviewCard} from './imagePreviewCard/imagePreviewCard';
-import {useFilePreview} from './useFilePreview/useFilePreview';
-import {VideoPreviewCard} from './videoPreviewCard/videoPreviewCard';
+import {AudioPreviewCard} from './audiopreviewcard/audiopreviewcard';
+import {FilePreviewCard} from './filepreviewcard/filepreviewcard';
+import {wrapperStyles} from './filepreviews.styles';
+import {ImagePreviewCard} from './imagepreviewcard/imagepreviewcard';
+import {useFilePreview} from './usefilepreview/usefilepreview';
+import {VideoPreviewCard} from './videopreviewcard/videopreviewcard';
 
 interface FilePreviewsProps {
   files: FileWithPreview[];

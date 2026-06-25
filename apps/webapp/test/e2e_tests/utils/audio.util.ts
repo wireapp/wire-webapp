@@ -19,7 +19,7 @@
 
 import {Page} from '@playwright/test';
 
-import {AudioType} from 'Repositories/audio/audioType';
+import {AudioType} from 'Repositories/audio/audiotype';
 
 /**
  * Detect if the given sound is currently being played. The sounds played are managed by `AudioRepository.ts`

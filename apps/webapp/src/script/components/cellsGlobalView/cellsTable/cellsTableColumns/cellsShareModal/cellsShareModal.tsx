@@ -21,12 +21,12 @@ import {ReactElement, useEffect, useRef, useState} from 'react';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {CellsShareModalContent} from 'Components/cells/shareModal/cellsShareModalContent';
-import {serializeShareModalInput} from 'Components/cells/shareModal/shareModalSerializer';
-import {useCellExpirationToggle} from 'Components/cells/shareModal/useCellExpirationToggle';
-import {useCellPasswordToggle} from 'Components/cells/shareModal/useCellPasswordToggle';
-import {PrimaryModal} from 'Components/modals/primaryModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsShareModalContent} from 'Components/cells/sharemodal/cellssharemodalcontent';
+import {serializeShareModalInput} from 'Components/cells/sharemodal/sharemodalserializer';
+import {useCellExpirationToggle} from 'Components/cells/sharemodal/usecellexpirationtoggle';
+import {useCellPasswordToggle} from 'Components/cells/sharemodal/usecellpasswordtoggle';
+import {PrimaryModal} from 'Components/modals/primarymodal';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {createUuid} from 'Util/uuid';
 
@@ -50,10 +50,10 @@ import {
   switchWrapperStyles,
   toggleContentStyles,
   wrapperStyles,
-} from './cellsShareModal.styles';
-import {useCellGlobalPublicLink} from './useCellGlobalPublicLink';
+} from './cellssharemodal.styles';
+import {useCellGlobalPublicLink} from './usecellglobalpubliclink';
 
-import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
+import {useCellsStore} from '../../../common/usecellsstore/usecellsstore';
 
 interface ShareModalParams {
   type: 'file' | 'folder';

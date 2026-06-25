@@ -17,4 +17,4 @@
  *
  */
 
-export * from './errorFallback';
+export * from './errorfallback';

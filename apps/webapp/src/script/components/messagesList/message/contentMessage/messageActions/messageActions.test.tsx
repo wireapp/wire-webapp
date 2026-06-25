@@ -20,16 +20,16 @@
 import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {createUuid} from 'Util/uuid';
 
-import {MessageActionsMenu, MessageActionsMenuProps} from './messageActions';
+import {MessageActionsMenu, MessageActionsMenuProps} from './messageactions';
 const defaultProps: MessageActionsMenuProps = {
   isMsgWithHeader: true,
   message: new ContentMessage(createUuid(), translateForTest),

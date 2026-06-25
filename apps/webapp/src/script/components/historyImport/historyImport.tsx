@@ -22,9 +22,9 @@ import {useCallback, useEffect, useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/modals/primaryModal';
-import {ProgressBar} from 'Components/progressBar/progressBar';
-import {BackupRepository} from 'Repositories/backup/backupRepository';
+import {PrimaryModal} from 'Components/modals/primarymodal';
+import {ProgressBar} from 'Components/progressBar/progressbar';
+import {BackupRepository} from 'Repositories/backup/backuprepository';
 import {
   CancelError,
   DifferentAccountError,
@@ -32,17 +32,17 @@ import {
   IncompatibleBackupFormatError,
   InvalidPassword,
 } from 'Repositories/backup/error';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {checkBackupEncryption} from 'Util/backupUtil';
 import {getLogger} from 'Util/logger';
 import {loadFileBuffer} from 'Util/util';
 
-import {BackupFileUpload} from './backupFileUpload';
+import {BackupFileUpload} from './backupfileupload';
 
-import {Config} from '../../Config';
-import {MotionDuration} from '../../motion/MotionDuration';
+import {Config} from '../../config';
+import {MotionDuration} from '../../motion/motionduration';
 
 export enum HistoryImportState {
   DONE = 'HistoryImportState.STATE.DONE',

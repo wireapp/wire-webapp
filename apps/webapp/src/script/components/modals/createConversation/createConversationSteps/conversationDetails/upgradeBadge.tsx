@@ -19,7 +19,7 @@
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {upgradeBadgeCss} from './conversationDetails.styles';
+import {upgradeBadgeCss} from './conversationdetails.styles';
 
 export const UpgradeBadge = () => {
   const {translate} = useApplicationContext();

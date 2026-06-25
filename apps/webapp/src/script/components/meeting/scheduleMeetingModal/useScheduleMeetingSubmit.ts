@@ -19,16 +19,16 @@
 
 import {useCallback, useState} from 'react';
 
-import {PrimaryModal} from 'Components/modals/primaryModal';
+import {PrimaryModal} from 'Components/modals/primarymodal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 
-import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
-import {performMeetingSubmit} from './scheduleMeetingService';
-import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
-import {useScheduleMeetingModal} from './useScheduleMeetingModal';
+import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './schedulemeetingerrorkeys';
+import {performMeetingSubmit} from './schedulemeetingservice';
+import type {ScheduleMeetingFormState} from './schedulemeetingtypes';
+import {useScheduleMeetingModal} from './useschedulemeetingmodal';
 
-import type {MeetingSubmitErrors} from '../meetingSubmitErrors';
+import type {MeetingSubmitErrors} from '../meetingsubmiterrors';
 
 const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {
   const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[error];

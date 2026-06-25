@@ -17,8 +17,8 @@
  *
  */
 
-import {VideoAssetPlayer} from './videoAssetPlayer/videoAssetPlayer';
-import {VideoAssetSmall} from './videoAssetSmall/videoAssetSmall';
+import {VideoAssetPlayer} from './videoassetplayer/videoassetplayer';
+import {VideoAssetSmall} from './videoassetsmall/videoassetsmall';
 
 interface VideoAssetCardProps {
   variant: 'large' | 'small';

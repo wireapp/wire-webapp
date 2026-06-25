@@ -22,10 +22,10 @@ import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
 import {GroupAvatar} from 'Components/avatar';
 import {ChannelAvatar} from 'Components/avatar';
-import type {FilterItem} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+import type {FilterItem} from 'Components/conversation/conversationcells/common/cellsfiltersbar/filterconfig';
+import type {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import type {Conversation} from 'Repositories/entity/conversation';
+import {useChannelsFeatureFlag} from 'Util/usechannelsfeatureflag';
 
 export const getDriveEnabledConversationFilterId = (conversation: Conversation): string =>
   stringifyQualifiedId(conversation.qualifiedId);

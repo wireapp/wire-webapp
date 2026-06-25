@@ -17,16 +17,16 @@
  *
  */
 
-import {FileLoader} from 'Components/fileFullscreenModal/fileLoader/fileLoader';
-import {ModalComponent} from 'Components/modals/modalComponent';
+import {FileLoader} from 'Components/filefullscreenmodal/fileloader/fileloader';
+import {ModalComponent} from 'Components/modals/modalcomponent';
 import {handleEscDown} from 'Util/keyboardUtil';
 
-import {FileHistoryContent} from './fileHistoryContent';
-import {FileHistoryHeader} from './fileHistoryHeader';
-import {fileHistoryModalWrapperCss, fileVersionRestoreModalWrapperCss} from './fileHistoryModal.styles';
-import {FileRestoreConfirmContent} from './fileRestoreConfirmContent';
-import {useFileHistoryModal} from './hooks/useFileHistoryModal';
-import {useFileVersions} from './hooks/useFileVersions';
+import {FileHistoryContent} from './filehistorycontent';
+import {FileHistoryHeader} from './filehistoryheader';
+import {fileHistoryModalWrapperCss, fileVersionRestoreModalWrapperCss} from './filehistorymodal.styles';
+import {FileRestoreConfirmContent} from './filerestoreconfirmcontent';
+import {useFileHistoryModal} from './hooks/usefilehistorymodal';
+import {useFileVersions} from './hooks/usefileversions';
 
 export const FileHistoryModal = () => {
   const {isOpen, hideModal, nodeUuid, onRestore} = useFileHistoryModal();

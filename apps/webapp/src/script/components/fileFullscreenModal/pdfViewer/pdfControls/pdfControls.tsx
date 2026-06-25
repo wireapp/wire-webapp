@@ -29,7 +29,7 @@ import {
 import {ZoomInIcon, ZoomOutIcon} from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {buttonStyles, pageNumberStyles, wrapperStyles} from './pdfControls.styles';
+import {buttonStyles, pageNumberStyles, wrapperStyles} from './pdfcontrols.styles';
 
 interface PdfControlsProps {
   sidebarOpen: boolean;

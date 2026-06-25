@@ -23,16 +23,16 @@ import is from '@sindresorhus/is';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {openFolder} from 'Components/cellsglobalview/common/openfolder/openfolder';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {forcedDownloadFile} from 'Util/util';
 
-import {buttonStyles, iconStyles, textStyles} from './cellsTableRowOptions.styles';
+import {buttonStyles, iconStyles, textStyles} from './cellstablerowoptions.styles';
 
-import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
-import {showShareModal} from '../cellsShareModal/cellsShareModal';
+import {useCellsFilePreviewModal} from '../../common/cellsfilepreviewmodalcontext/cellsfilepreviewmodalcontext';
+import {showShareModal} from '../cellssharemodal/cellssharemodal';
 
 interface CellsTableRowOptionsProps {
   node: CellNode;

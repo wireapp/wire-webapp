@@ -23,7 +23,7 @@ import {Select} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {wrapperStyles, labelStyles, selectWrapperStyles, selectStyles} from './cellsPageSizeSelect.styles';
+import {wrapperStyles, labelStyles, selectWrapperStyles, selectStyles} from './cellspagesizeselect.styles';
 
 const options = [
   {value: '10', label: '10'},

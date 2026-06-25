@@ -21,8 +21,8 @@ import {memo, useMemo} from 'react';
 
 import {CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
 
-import {Meeting} from 'Components/meeting/meetingList/meetingList';
-import {MeetingAction} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingAction';
+import {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import {MeetingAction} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitem/meetingaction/meetingaction';
 import {
   badgeWrapperStyles,
   callingIconStyles,
@@ -32,10 +32,10 @@ import {
   onGoingMeetingStyles,
   rightStyles,
   titleStyles,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingListItem.styles';
-import {MeetingStatus} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingStatus/meetingStatus';
-import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingRecurrence';
-import {getMeetingStatusAt, MeetingStatuses} from 'Components/meeting/utils/meetingStatusUtil';
+} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitem/meetinglistitem.styles';
+import {MeetingStatus} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitem/meetingstatus/meetingstatus';
+import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from 'Components/meeting/schedulemeetingmodal/schedulemeetingrecurrence';
+import {getMeetingStatusAt, MeetingStatuses} from 'Components/meeting/utils/meetingstatusutil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
 

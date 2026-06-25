@@ -19,9 +19,9 @@
 
 import {Thumbnail} from 'react-pdf';
 
-import {containerStyles, pageNumberStyle, thumbnailWrapperStyles} from './pdfPageThumbnail.styles';
+import {containerStyles, pageNumberStyle, thumbnailWrapperStyles} from './pdfpagethumbnail.styles';
 
-import {PdfLoader} from '../../common/pdfLoader/pdfLoader';
+import {PdfLoader} from '../../common/pdfloader/pdfloader';
 
 interface PdfPageThumbnailProps {
   index: number;

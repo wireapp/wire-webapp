@@ -17,11 +17,11 @@
  *
  */
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import {User} from 'Repositories/entity/user';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {canEditMeeting} from './canEditMeeting';
+import {canEditMeeting} from './caneditmeeting';
 
 const FUTURE_MEETING_TIMESTAMP = Date.parse('2026-06-15T13:00:00.000Z');
 const ONGOING_MEETING_TIMESTAMP = Date.parse('2026-06-15T14:30:00.000Z');

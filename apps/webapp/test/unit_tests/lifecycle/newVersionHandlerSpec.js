@@ -17,8 +17,8 @@
  *
  */
 
-import {startNewVersionPolling, stopNewVersionPolling} from 'src/script/lifecycle/newVersionHandler';
-import 'src/script/util/test/mock/fetchMock';
+import {startNewVersionPolling, stopNewVersionPolling} from 'src/script/lifecycle/newversionhandler';
+import 'src/script/util/test/mock/fetchmock';
 
 describe('newVersionHandler', () => {
   afterEach(stopNewVersionPolling);

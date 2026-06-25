@@ -19,9 +19,9 @@
 
 import {useEffect} from 'react';
 
-import {useCellsStore} from 'Components/cellsGlobalView/common/useCellsStore/useCellsStore';
+import {useCellsStore} from 'Components/cellsglobalview/common/usecellsstore/usecellsstore';
 
-import {useModalFiltersStore} from '../useModalFiltersStore/useModalFiltersStore';
+import {useModalFiltersStore} from '../usemodalfiltersstore/usemodalfiltersstore';
 
 export const useModalFilters = ({enabled}: {enabled: boolean}) => {
   const {filters} = useCellsStore();

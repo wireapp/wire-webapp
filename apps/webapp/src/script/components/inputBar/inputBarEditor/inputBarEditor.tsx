@@ -21,13 +21,13 @@ import {MutableRefObject} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {User} from 'Repositories/entity/user';
 
-import {RichTextEditor} from './richTextEditor';
+import {RichTextEditor} from './richtexteditor';
 
-import {DraftState} from '../common/draftState/draftState';
-import {MessageContent} from '../common/messageContent/messageContent';
+import {DraftState} from '../common/draftstate/draftstate';
+import {MessageContent} from '../common/messagecontent/messagecontent';
 
 interface InputBarEditorProps {
   editorRef: MutableRefObject<LexicalEditor | null>;

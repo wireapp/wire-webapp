@@ -21,18 +21,18 @@ import {render} from '@testing-library/react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {Participant} from 'Repositories/calling/Participant';
-import {User} from 'Repositories/entity/User';
-import {ROLE} from 'Repositories/user/userPermission';
+import {Participant} from 'Repositories/calling/participant';
+import {User} from 'Repositories/entity/user';
+import {ROLE} from 'Repositories/user/userpermission';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
-import {CallParticipantsListItem} from './callParticipantsListItem';
-import {translateForTest} from 'Util/test/translateForTest';
+import {CallParticipantsListItem} from './callparticipantslistitem';
+import {translateForTest} from 'Util/test/translatefortest';
 
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);

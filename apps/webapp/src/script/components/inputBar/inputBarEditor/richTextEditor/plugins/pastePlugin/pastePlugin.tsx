@@ -31,9 +31,9 @@ import {
   BaseSelection,
 } from 'lexical';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
-import {$createMentionNode} from '../../nodes/mentionNode';
+import {$createMentionNode} from '../../nodes/mentionnode';
 
 interface PastePluginProps {
   /** Function that returns list of users that can be mentioned in the current context */

@@ -21,8 +21,8 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {useCreateConversation} from './hooks/useCreateConversation';
-import {useCreateConversationModal} from './hooks/useCreateConversationModal';
+import {useCreateConversation} from './hooks/usecreateconversation';
+import {useCreateConversationModal} from './hooks/usecreateconversationmodal';
 import {getNonFederatingParticipantsModalCopy} from './utils';
 
 export const CreateConversationSubmit = () => {

@@ -26,22 +26,22 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TestFactory} from 'test/helper/TestFactory';
 
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/modals/qualityFeedbackModal/constants';
-import {RatingListLabel} from 'Components/modals/qualityFeedbackModal/typings';
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {User} from 'Repositories/entity/User';
-import {EventName} from 'Repositories/tracking/eventName';
+import {useCallAlertState} from 'Components/calling/usecallalertstate';
+import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/modals/qualityfeedbackmodal/constants';
+import {RatingListLabel} from 'Components/modals/qualityfeedbackmodal/typings';
+import {Call} from 'Repositories/calling/call';
+import {CallingRepository} from 'Repositories/calling/callingrepository';
+import {User} from 'Repositories/entity/user';
+import {EventName} from 'Repositories/tracking/eventname';
 import {Segmentation} from 'Repositories/tracking/segmentation';
-import {UserState} from 'Repositories/user/userState';
+import {UserState} from 'Repositories/user/userstate';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {QualityFeedbackModal} from './qualityFeedbackModal';
-import {translateForTest} from 'Util/test/translateForTest';
+import {QualityFeedbackModal} from './qualityfeedbackmodal';
+import {translateForTest} from 'Util/test/translatefortest';
 
 import {
   buildMediaDevicesHandler,
@@ -49,7 +49,7 @@ import {
   createSelfParticipant,
   withIntl,
   withTheme,
-} from '../../../auth/util/test/TestUtil';
+} from '../../../auth/util/test/testutil';
 
 jest.mock('Repositories/tracking/telemetry.helpers', () => ({
   isTelemetryEnabledAtCurrentEnvironment: () => true,

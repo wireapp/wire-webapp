@@ -19,14 +19,14 @@
 
 import {container} from 'tsyringe';
 
-import {UserState} from 'Repositories/user/userState';
+import {UserState} from 'Repositories/user/userstate';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {ChannelSettings} from './channelSettings';
-import {groupsNotAllowedSectionCss} from './conversationDetails.styles';
-import {ConversationNameInput} from './conversationNameInput';
+import {ChannelSettings} from './channelsettings';
+import {groupsNotAllowedSectionCss} from './conversationdetails.styles';
+import {ConversationNameInput} from './conversationnameinput';
 
-import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
+import {useCreateConversationModal} from '../../hooks/usecreateconversationmodal';
 import {ConversationType} from '../../types';
 import {Preference} from '../preference';
 

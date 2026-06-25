@@ -24,13 +24,13 @@ import {container} from 'tsyringe';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {MultipleFilesIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {FileFullscreenModal} from 'Components/fileFullscreenModal/fileFullscreenModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {FileTypeIcon} from 'Components/conversation/common/filetypeicon/filetypeicon';
+import {FileFullscreenModal} from 'Components/filefullscreenmodal/filefullscreenmodal';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {isPreviewableImage} from 'Util/imageUtil';
 import {getFileExtension, getName} from 'Util/util';
 
-import {useGetMultipartAsset} from './multipartAssets/useGetMultipartAsset/useGetMultipartAsset';
+import {useGetMultipartAsset} from './multipartassets/usegetmultipartasset/usegetmultipartasset';
 
 interface MultipartAssetPreviewProps {
   cellAssets: ICellAsset[];

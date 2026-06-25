@@ -19,7 +19,7 @@
 
 import {renderHook} from '@testing-library/react';
 
-import {useSyncCurrentRange} from './useSyncCurrentRange';
+import {useSyncCurrentRange} from './usesynccurrentrange';
 
 describe('useSyncCurrentRange', () => {
   it('should increment currentStart when currentPage is the last in the range but not the last page', () => {

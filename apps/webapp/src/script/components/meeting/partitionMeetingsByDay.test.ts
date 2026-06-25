@@ -17,10 +17,10 @@
  *
  */
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicwallclock';
 
-import {partitionMeetingsByDay} from './partitionMeetingsByDay';
+import {partitionMeetingsByDay} from './partitionmeetingsbyday';
 
 const createMeeting = (start: string, end: string, title: string): Meeting => ({
   start_date: start,

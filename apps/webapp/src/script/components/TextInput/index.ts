@@ -17,4 +17,4 @@
  *
  */
 
-export * from './textInput';
+export * from './textinput';

@@ -1,7 +1,7 @@
 import {Maybe} from 'true-myth';
-import {areCapabilityInfosEqual} from 'Components/calling/videoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
+import {areCapabilityInfosEqual} from 'Components/calling/videocontrols/videobackgroundperformancepanel/capabilityinformationvalidator';
 import {createFactory} from '@enormora/objectory';
-import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import {CapabilityInfo} from 'Repositories/media/backgroundeffects/backgroundeffectsworkertypes';
 
 const capabilityInfoFactory = createFactory<CapabilityInfo>(() => {
   return {

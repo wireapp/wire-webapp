@@ -17,9 +17,9 @@
  *
  */
 
-import {mapApiMeetingToListMeeting} from 'Components/meeting/mapApiMeetingToListMeeting';
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+import {mapApiMeetingToListMeeting} from 'Components/meeting/mapapimeetingtolistmeeting';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsrepository';
 import {getLogger} from 'Util/logger';
 
 export type MeetingsListErrorKey = 'meetings.list.loadError';

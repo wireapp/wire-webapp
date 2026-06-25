@@ -19,8 +19,8 @@
 
 import {Button, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/modals/modalComponent';
-import {Config} from 'src/script/Config';
+import {ModalComponent} from 'Components/modals/modalcomponent';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
@@ -32,9 +32,9 @@ import {
   salesModalBodyHeaderCss,
   salesModalBodyTextCss,
   salesModalBodyButtonCss,
-} from './conversationDetails.styles';
+} from './conversationdetails.styles';
 
-import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
+import {useCreateConversationModal} from '../../hooks/usecreateconversationmodal';
 
 export const UpgradePlanModal = () => {
   const {translate} = useApplicationContext();

@@ -23,13 +23,13 @@ import {render} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {createFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {createFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
-import {CellsShareModal} from './cellsShareModal';
+import {CellsShareModal} from './cellssharemodal';
 
-import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
+import {useCellsStore} from '../../../common/usecellsstore/usecellsstore';
 
 const withTheme = (component: ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 

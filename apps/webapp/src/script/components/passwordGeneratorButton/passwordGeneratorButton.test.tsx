@@ -20,11 +20,11 @@
 import {act} from 'react';
 import {render} from '@testing-library/react';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {PasswordGeneratorButton} from './passwordGeneratorButton';
+import {PasswordGeneratorButton} from './passwordgeneratorbutton';
 
-import {withTheme} from '../../auth/util/test/TestUtil';
+import {withTheme} from '../../auth/util/test/testutil';
 
 describe('PasswordGeneratorButton', () => {
   it('calls onGeneratePassword prop with a random password when clicked', () => {

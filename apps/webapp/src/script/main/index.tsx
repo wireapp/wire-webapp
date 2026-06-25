@@ -29,8 +29,8 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {createFireAndForgetInvoker} from '@wireapp/core';
 
-import {AppContainer} from 'Components/appContainer/appContainer';
-import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
+import {AppContainer} from 'Components/appContainer/appcontainer';
+import {doSimpleRedirect} from 'Repositories/lifecyclerepository/lifecyclerepository';
 import {StorageKey} from 'Repositories/storage';
 import {translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
@@ -38,14 +38,14 @@ import {enableLogging} from 'Util/loggerUtil';
 import {loadValue} from 'Util/storageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
-import {createApplicationServices} from './createApplicationServices';
+import {createApplicationServices} from './createapplicationservices';
 
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {createWallClock} from '../clock/wallClock';
-import {Config} from '../Config';
-import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
-import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
-import {APIClient} from '../service/apiClientSingleton';
+import {Config} from '../config';
+import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupfeaturetoggles';
+import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createincrementalhttpretrybackoffreset';
+import {APIClient} from '../service/apiclientsingleton';
 import {Core} from '../service/coreSingleton';
 
 document.addEventListener('DOMContentLoaded', async () => {

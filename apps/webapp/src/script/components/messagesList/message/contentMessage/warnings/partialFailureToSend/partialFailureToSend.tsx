@@ -26,7 +26,7 @@ import {countBy, map} from 'underscore';
 import {Bold, Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 

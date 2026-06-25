@@ -25,11 +25,11 @@ import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {UserList} from 'Components/userList';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
+import {ConversationState} from 'Repositories/conversation/conversationstate';
+import type {User} from 'Repositories/entity/user';
+import {SearchRepository} from 'Repositories/search/searchrepository';
+import type {TeamRepository} from 'Repositories/team/teamrepository';
+import {TeamState} from 'Repositories/team/teamstate';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {partition} from 'Util/arrayUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';

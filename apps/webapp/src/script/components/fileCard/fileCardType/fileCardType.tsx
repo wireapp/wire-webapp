@@ -17,9 +17,9 @@
  *
  */
 
-import {categoryStyles, wrapperStyles} from './fileCardType.styles';
+import {categoryStyles, wrapperStyles} from './filecardtype.styles';
 
-import {useFileCardContext} from '../common/fileCardContext/fileCardContext';
+import {useFileCardContext} from '../common/filecardcontext/filecardcontext';
 
 export const FileCardType = () => {
   const {extension, size} = useFileCardContext();

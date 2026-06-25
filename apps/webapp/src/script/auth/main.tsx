@@ -36,16 +36,16 @@ import type {Translate} from 'Util/localizerUtil';
 import {enableLogging} from 'Util/loggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
-import './configureEnvironment';
+import './configureenvironment';
 import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
-import {Root} from './page/Root';
+import {Root} from './page/root';
 
 import {createWallClock} from '../clock/wallClock';
-import {Config} from '../Config';
-import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
-import {setAppLocale} from '../localization/Localizer';
-import {APIClient} from '../service/apiClientSingleton';
+import {Config} from '../config';
+import {updateApiVersion} from '../lifecycle/updateremoteconfigs';
+import {setAppLocale} from '../localization/localizer';
+import {APIClient} from '../service/apiclientsingleton';
 import {Core} from '../service/coreSingleton';
 
 exposeWrapperGlobals();
@@ -102,7 +102,7 @@ async function runApp() {
   setAppLocale();
   if (hotReloadCapableModule.hot !== undefined) {
     hotReloadCapableModule.hot.accept('./page/Root', () => {
-      render(require('./page/Root').Root);
+      render(require('./page/root').Root);
     });
   }
 }

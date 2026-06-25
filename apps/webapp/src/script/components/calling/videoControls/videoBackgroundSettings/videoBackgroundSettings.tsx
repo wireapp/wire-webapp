@@ -23,9 +23,9 @@ import {match} from 'ts-pattern';
 
 import {BlurHighIcon, BlurLowIcon, Checkbox, CheckboxLabel, CircleIcon} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingscrollbar';
 import * as Icon from 'Components/icon';
-import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
+import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/media/videobackgroundeffects';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -41,9 +41,9 @@ import {
   tileGridStyles,
   tilePreviewContentStyles,
   tilePreviewStyles,
-} from './videoBackgroundSettings.styles';
+} from './videobackgroundsettings.styles';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 
 interface VideoBackgroundSettingsProps {
   selectedEffect: BackgroundEffectSelection;

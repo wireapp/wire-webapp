@@ -19,9 +19,9 @@
 
 import {useCallback, useState} from 'react';
 
-import {useAppNotification} from 'Components/appNotification';
-import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useAppNotification} from 'Components/appnotification';
+import {FileWithPreview} from 'Components/conversation/usefilesuploadstate/usefilesuploadstate';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 
 type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
 

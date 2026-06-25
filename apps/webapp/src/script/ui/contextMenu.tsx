@@ -27,11 +27,11 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {IgnoreOutsideClickWrapper} from 'Components/inputBar/util/clickHandlers';
-import {useMessageActionsState} from 'Components/messagesList/message/contentMessage/messageActions/messageActions.state';
+import {IgnoreOutsideClickWrapper} from 'Components/inputBar/util/clickhandlers';
+import {useMessageActionsState} from 'Components/messagesList/message/contentmessage/messageactions/messageactions.state';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/keyboardUtil';
 
-import {useActiveWindowState} from '../hooks/useActiveWindow';
+import {useActiveWindowState} from '../hooks/useactivewindow';
 
 export interface ContextMenuEntry {
   availability?: Availability.Type;

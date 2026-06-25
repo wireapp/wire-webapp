@@ -17,8 +17,8 @@
  *
  */
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {FileLoader} from 'Components/fileFullscreenModal/fileLoader/fileLoader';
+import {FileTypeIcon} from 'Components/conversation/common/filetypeicon/filetypeicon';
+import {FileLoader} from 'Components/filefullscreenmodal/fileloader/fileloader';
 import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -28,8 +28,8 @@ import {
   fileHistoryHeaderTitleCss,
   fileHeaderInfoWrapperCss,
   fileHeaderFileInfoCss,
-} from './fileHistoryModal.styles';
-import {useFileHistoryModal} from './hooks/useFileHistoryModal';
+} from './filehistorymodal.styles';
+import {useFileHistoryModal} from './hooks/usefilehistorymodal';
 import {FileInfo} from './types';
 
 export const FileHistoryHeader = ({file}: {file?: FileInfo}) => {

@@ -17,9 +17,9 @@
  *
  */
 
-import type {User} from 'Repositories/entity/User';
-import type {TeamState} from 'Repositories/team/TeamState';
-import type {UserState} from 'Repositories/user/userState';
+import type {User} from 'Repositories/entity/user';
+import type {TeamState} from 'Repositories/team/teamstate';
+import type {UserState} from 'Repositories/user/userstate';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 export const getScheduleMeetingParticipantPool = (userState: UserState, teamState: TeamState): User[] => {

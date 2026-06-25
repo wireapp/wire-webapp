@@ -19,7 +19,7 @@
 
 import type {Maybe} from 'true-myth';
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 export type ScheduleMeetingMode = 'create' | 'edit';
 

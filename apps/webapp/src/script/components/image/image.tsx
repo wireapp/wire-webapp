@@ -24,19 +24,19 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {InViewport} from 'Components/inViewport';
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {TeamState} from 'Repositories/team/TeamState';
+import {AssetRemoteData} from 'Repositories/assets/assetremotedata';
+import {MediumImage} from 'Repositories/entity/message/mediumimage';
+import {TeamState} from 'Repositories/team/teamstate';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {getImageStyle, getWrapperStyles} from './image.styles';
-import {RestrictedImage} from './restrictedImage';
+import {RestrictedImage} from './restrictedimage';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {
   AssetUrl,
   useAssetTransfer,
-} from '../messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
+} from '../messagesList/message/contentmessage/asset/common/useassettransfer/useassettransfer';
 
 interface BaseImageProps extends React.HTMLProps<HTMLDivElement> {
   alt?: string;

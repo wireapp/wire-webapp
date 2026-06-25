@@ -25,8 +25,8 @@ import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CallState} from 'Repositories/calling/CallState';
-import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
+import {CallState} from 'Repositories/calling/callstate';
+import {useActiveWindow} from 'src/script/hooks/useactivewindow';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import '../../../../../../style/default.less';

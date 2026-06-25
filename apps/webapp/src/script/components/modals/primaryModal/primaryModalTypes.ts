@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
+import {ClientNotificationData} from 'Repositories/notification/preferencenotificationrepository';
 import type {Translate as TranslationFunction} from 'Util/localizerUtil';
 
 export interface ButtonAction {

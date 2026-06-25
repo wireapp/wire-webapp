@@ -20,16 +20,16 @@
 import {Button, ButtonVariant, CollectionIcon} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {User} from 'Repositories/entity/User';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/membermessage';
+import {User} from 'Repositories/entity/user';
+import {SystemMessageType} from 'src/script/message/systemmessagetype';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {E2eEncryptionMessage} from './e2eEncryptionMessage/e2eEncryptionMessage';
-import {ConnectedMessage} from './memberMessage/connectedMessage';
-import {MessageContent} from './memberMessage/messageContent';
-import {MessageTime} from './messageTime';
+import {E2eEncryptionMessage} from './e2eencryptionmessage/e2eencryptionmessage';
+import {ConnectedMessage} from './membermessage/connectedmessage';
+import {MessageContent} from './membermessage/messagecontent';
+import {MessageTime} from './messagetime';
 
 interface MemberMessageProps {
   classifiedDomains?: string[];

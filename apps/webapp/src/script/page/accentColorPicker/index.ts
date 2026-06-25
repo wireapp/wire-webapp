@@ -17,4 +17,4 @@
  *
  */
 
-export * from './accentColorPicker';
+export * from './accentcolorpicker';

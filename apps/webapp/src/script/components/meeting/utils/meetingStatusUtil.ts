@@ -17,7 +17,7 @@
  *
  */
 
-import {Meeting} from 'Components/meeting/meetingList/meetingList';
+import {Meeting} from 'Components/meeting/meetinglist/meetinglist';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 export enum MeetingStatuses {

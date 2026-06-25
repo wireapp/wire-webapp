@@ -21,7 +21,7 @@ import {MutableRefObject, useEffect} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {GroupedMessage, isMarker, Marker} from 'Components/messagesList/utils/virtualizedMessagesGroup';
+import {GroupedMessage, isMarker, Marker} from 'Components/messagesList/utils/virtualizedmessagesgroup';
 
 interface Props {
   isConversationLoaded: boolean;

@@ -23,22 +23,22 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import * as Icon from 'Components/icon';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
+import {AssetTransferState} from 'Repositories/assets/assettransferstate';
+import type {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import type {FileAsset} from 'Repositories/entity/message/fileasset';
+import {TeamState} from 'Repositories/team/teamstate';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getLogger} from 'Util/logger';
 import {formatSeconds} from 'Util/timeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {AudioSeekBar} from './audioSeekBar/audioSeekBar';
-import {RestrictedAudio} from './restrictedAudio/restrictedAudio';
+import {AudioSeekBar} from './audioseekbar/audioseekbar';
+import {RestrictedAudio} from './restrictedaudio/restrictedaudio';
 
-import {AssetHeader} from '../common/assetHeader/assetHeader';
-import {MediaButton} from '../common/mediaButton/mediaButton';
-import {SeekBar} from '../common/seekBar/seekBar';
-import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
+import {AssetHeader} from '../common/assetheader/assetheader';
+import {MediaButton} from '../common/mediabutton/mediabutton';
+import {SeekBar} from '../common/seekbar/seekbar';
+import {AssetUrl, useAssetTransfer} from '../common/useassettransfer/useassettransfer';
 
 const logger = getLogger('AudioAssetComponent');
 

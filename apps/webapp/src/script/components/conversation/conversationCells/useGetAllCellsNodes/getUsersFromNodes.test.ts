@@ -19,9 +19,9 @@
 
 import {RestNode} from 'cells-sdk-ts';
 
-import {UserRepository} from 'Repositories/user/userRepository';
+import {UserRepository} from 'Repositories/user/userrepository';
 
-import {getUsersFromNodes} from './getUsersFromNodes';
+import {getUsersFromNodes} from './getusersfromnodes';
 
 type FakeUserRepository = jest.Mocked<Pick<UserRepository, 'getUsersById'>>;
 

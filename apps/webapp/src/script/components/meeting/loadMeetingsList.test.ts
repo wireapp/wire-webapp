@@ -19,9 +19,9 @@
 
 import {task} from 'true-myth';
 
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsrepository';
 
-import {loadMeetingsList} from './loadMeetingsList';
+import {loadMeetingsList} from './loadmeetingslist';
 
 describe('loadMeetingsList', () => {
   const apiMeeting = {

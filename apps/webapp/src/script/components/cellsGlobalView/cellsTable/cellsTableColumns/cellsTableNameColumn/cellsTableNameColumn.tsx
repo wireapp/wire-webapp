@@ -21,8 +21,8 @@ import is from '@sindresorhus/is';
 
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
-import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
+import {openFolder} from 'Components/cellsglobalview/common/openfolder/openfolder';
+import {FileTypeIcon} from 'Components/conversation/common/filetypeicon/filetypeicon';
 import {CellFile, CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {getFileExtension} from 'Util/util';
 
@@ -33,9 +33,9 @@ import {
   mobileNameStyles,
   playIconStyles,
   wrapperStyles,
-} from './cellsTableNameColumn.styles';
+} from './cellstablenamecolumn.styles';
 
-import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
+import {useCellsFilePreviewModal} from '../../common/cellsfilepreviewmodalcontext/cellsfilepreviewmodalcontext';
 interface CellsTableNameColumnProps {
   node: CellNode;
 }

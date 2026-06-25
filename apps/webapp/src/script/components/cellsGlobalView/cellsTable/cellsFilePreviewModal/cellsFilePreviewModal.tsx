@@ -19,10 +19,10 @@
 
 import is from '@sindresorhus/is';
 
-import {FileFullscreenModal} from 'Components/fileFullscreenModal/fileFullscreenModal';
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {FileFullscreenModal} from 'Components/filefullscreenmodal/filefullscreenmodal';
+import {getFileTypeFromExtension} from 'Util/getfiletypefromextension/getfiletypefromextension';
 
-import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
+import {useCellsFilePreviewModal} from '../common/cellsfilepreviewmodalcontext/cellsfilepreviewmodalcontext';
 
 // This component is duplicated across global view and conversation view
 // TODO: Abstract when it starts to grow / feels right

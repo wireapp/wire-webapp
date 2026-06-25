@@ -19,16 +19,16 @@
 
 import {useState, RefObject, FC, useRef} from 'react';
 
-import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
+import {EmojiPicker} from 'Components/emojiPicker/emojipicker';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 
-import {EmojiChar} from './emojiChar';
-import {reactionImgSize} from './emojiChar.styles';
+import {EmojiChar} from './emojichar';
+import {reactionImgSize} from './emojichar.styles';
 
-import {MessageActionsId} from '../messageActions';
-import {useMessageActionsState} from '../messageActions.state';
-import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../messageActions.styles';
+import {MessageActionsId} from '../messageactions';
+import {useMessageActionsState} from '../messageactions.state';
+import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../messageactions.styles';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';

@@ -17,11 +17,11 @@
  *
  */
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import {User} from 'Repositories/entity/user';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {mapMeetingToScheduleFormState} from './mapMeetingToScheduleFormState';
+import {mapMeetingToScheduleFormState} from './mapmeetingtoscheduleformstate';
 
 const createUser = (id: string, email?: string) => {
   const user = new User(id, 'example.com', translateForTest);

@@ -24,8 +24,8 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {StorageKey} from 'Repositories/storage';
-import {EventName} from 'Repositories/tracking/eventName';
-import {Config} from 'src/script/Config';
+import {EventName} from 'Repositories/tracking/eventname';
+import {Config} from 'src/script/config';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
 export const useFormatToolbar = () => {

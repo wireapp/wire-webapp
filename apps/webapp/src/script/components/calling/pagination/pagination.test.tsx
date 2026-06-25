@@ -19,12 +19,12 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {withTheme} from 'src/script/auth/util/test/testutil';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
 import {Pagination} from './pagination';
 

@@ -19,7 +19,7 @@
 
 import is from '@sindresorhus/is';
 
-import {FILE_TYPE_CATALOG} from './fileTypeCatalog';
+import {FILE_TYPE_CATALOG} from './filetypecatalog';
 
 export interface ConversationDriveFiltersState {
   selectedTagIds: string[];

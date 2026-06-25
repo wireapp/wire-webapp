@@ -24,6 +24,25 @@ ls:
   apps/webapp/src/script/util/test/mock:
     .ts: camelCase
     .mock.ts: camelCase
+  apps/webapp/src/script:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .spec.ts: camelCase
+    .spec.tsx: camelCase
+    .styles.ts: camelCase
+    .styles.tsx: camelCase
+    .style.ts: camelCase
+    .style.tsx: camelCase
+    .types.ts: camelCase
+    .mock.ts: camelCase
+    .mocks.ts: camelCase
+    .schema.ts: camelCase
+    .helpers.ts: camelCase
+    .store.ts: camelCase
+    .state.ts: camelCase
   apps/webapp/src/script/components/icon.tsx:
     .tsx: camelCase
   apps/webapp/src/script/components:

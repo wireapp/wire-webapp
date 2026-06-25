@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
 const CONFIG = Config.getConfig();

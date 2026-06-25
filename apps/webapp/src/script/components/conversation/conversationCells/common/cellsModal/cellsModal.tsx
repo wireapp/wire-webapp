@@ -19,17 +19,17 @@
 
 import {ReactNode} from 'react';
 
-import {ModalComponent} from 'Components/modals/modalComponent';
+import {ModalComponent} from 'Components/modals/modalcomponent';
 import {handleEscDown} from 'Util/keyboardUtil';
 
-import {largeModalStyles, wrapperStyles} from './cellsModal.styles';
+import {largeModalStyles, wrapperStyles} from './cellsmodal.styles';
 import {
   CellsModalActions,
   CellsModalPrimaryButton,
   CellsModalSecondaryButton,
-} from './cellsModalActions/cellsModalActions';
-import {CellsModalProvider} from './cellsModalContext/cellsModalContext';
-import {CellsModalHeader} from './cellsModalHeader/cellsModalHeader';
+} from './cellsmodalactions/cellsmodalactions';
+import {CellsModalProvider} from './cellsmodalcontext/cellsmodalcontext';
+import {CellsModalHeader} from './cellsmodalheader/cellsmodalheader';
 
 interface CellsModalProps {
   size?: 'small' | 'large';

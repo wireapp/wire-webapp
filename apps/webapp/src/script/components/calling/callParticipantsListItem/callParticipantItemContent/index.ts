@@ -17,4 +17,4 @@
  *
  */
 
-export * from './callParticipantItemContent';
+export * from './callparticipantitemcontent';

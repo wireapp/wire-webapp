@@ -19,8 +19,8 @@
 
 import cx from 'classnames';
 
-import {ServiceListItem} from 'Components/serviceList/components/serviceListItem';
-import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ServiceListItem} from 'Components/serviceList/components/servicelistitem';
+import type {ServiceEntity} from 'Repositories/integration/serviceentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 enum MODE {

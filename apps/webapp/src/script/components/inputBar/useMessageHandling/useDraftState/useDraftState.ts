@@ -21,13 +21,13 @@ import {useCallback} from 'react';
 
 import {LexicalEditor, CLEAR_EDITOR_COMMAND} from 'lexical';
 
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {StorageRepository} from 'Repositories/storage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {sanitizeMarkdown} from 'Util/markdownUtil';
 
-import {DraftState, loadDraftState, saveDraftState} from '../../common/draftState/draftState';
+import {DraftState, loadDraftState, saveDraftState} from '../../common/draftstate/draftstate';
 
 interface UseDraftStateProps {
   conversation: Conversation;

@@ -17,9 +17,9 @@
  *
  */
 
-import {useDatePassed} from 'Hooks/useDatePassed/useDatePassed';
+import {useDatePassed} from 'Hooks/useDatePassed/usedatepassed';
 
-import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import {useCellsStore} from '../common/usecellsstore/usecellsstore';
 
 // Every node has a url to its destination, which expires after some time.
 // When the url expires, we need to refresh the nodes to get the new url.

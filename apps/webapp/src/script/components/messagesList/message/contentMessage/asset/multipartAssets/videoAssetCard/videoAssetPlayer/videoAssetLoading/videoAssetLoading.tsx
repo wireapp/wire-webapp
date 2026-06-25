@@ -17,7 +17,7 @@
  *
  */
 
-import {VideoAssetPlaceholder} from '../common/videoAssetPlaceholder/videoAssetPlaceholder';
+import {VideoAssetPlaceholder} from '../common/videoassetplaceholder/videoassetplaceholder';
 
 export const VideoAssetLoading = () => {
   return (

@@ -17,7 +17,7 @@
  *
  */
 
-import {createRequestVersionGate} from './requestVersionGate';
+import {createRequestVersionGate} from './requestversiongate';
 
 describe('createRequestVersionGate', () => {
   it('marks older requests as stale when a newer request starts', () => {

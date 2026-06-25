@@ -17,6 +17,6 @@
  *
  */
 
-export * from './meetingsApiDataSource';
-export * from './meetingsDataSource';
-export * from './meetingsRepository';
+export * from './meetingsapidatasource';
+export * from './meetingsdatasource';
+export * from './meetingsrepository';

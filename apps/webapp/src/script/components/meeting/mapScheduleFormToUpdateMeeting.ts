@@ -20,13 +20,13 @@
 import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
 import {Result, result} from 'true-myth';
 
-import {getInvitedEmailsFromSelectedUsers} from 'Components/meeting/getInvitedEmailsFromSelectedUsers';
-import {requireScheduleMeetingTimes} from 'Components/meeting/scheduleMeetingModal/requireScheduleMeetingTimes';
-import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingRecurrence';
-import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
+import {getInvitedEmailsFromSelectedUsers} from 'Components/meeting/getinvitedemailsfromselectedusers';
+import {requireScheduleMeetingTimes} from 'Components/meeting/schedulemeetingmodal/requireschedulemeetingtimes';
+import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/meeting/schedulemeetingmodal/schedulemeetingrecurrence';
+import type {ScheduleMeetingFormState} from 'Components/meeting/schedulemeetingmodal/schedulemeetingtypes';
 import type {WallClock} from 'src/script/clock/wallClock';
 
-import {scheduleFormErrors, ScheduleFormErrors} from './scheduleFormErrors';
+import {scheduleFormErrors, ScheduleFormErrors} from './scheduleformerrors';
 
 export type MapScheduleFormToUpdateMeetingResult = {
   payload: UpdateMeeting;

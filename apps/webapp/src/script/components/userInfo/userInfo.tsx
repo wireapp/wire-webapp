@@ -22,9 +22,9 @@ import React from 'react';
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import {selfIndicator} from 'Components/participantItemContent/participantItem.styles';
+import {selfIndicator} from 'Components/participantitemcontent/participantitem.styles';
 import {UserName} from 'Components/userName';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {KEY} from 'Util/keyboardUtil';
 

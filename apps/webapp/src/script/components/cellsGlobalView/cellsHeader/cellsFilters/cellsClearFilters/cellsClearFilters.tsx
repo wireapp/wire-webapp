@@ -21,7 +21,7 @@ import {Button, ButtonVariant, CloseIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {buttonStyles} from './cellsClearFilters.styles';
+import {buttonStyles} from './cellsclearfilters.styles';
 
 interface CellsClearFiltersProps {
   onClearAll: () => void;

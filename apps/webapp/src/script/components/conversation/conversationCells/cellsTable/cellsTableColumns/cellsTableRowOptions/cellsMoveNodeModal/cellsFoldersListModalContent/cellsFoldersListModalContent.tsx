@@ -17,15 +17,15 @@
  *
  */
 
-import {CellsBreadcrumbs} from 'Components/conversation/conversationCells/common/cellsBreadcrumbs/cellsBreadcrumbs';
-import {getBreadcrumbsFromPath} from 'Components/conversation/conversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
+import {CellsBreadcrumbs} from 'Components/conversation/conversationcells/common/cellsbreadcrumbs/cellsbreadcrumbs';
+import {getBreadcrumbsFromPath} from 'Components/conversation/conversationcells/common/getbreadcrumbsfrompath/getbreadcrumbsfrompath';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {CellsCreateNewFolderHint} from './cellsCreateNewFolderHint/cellsCreateNewFolderHint';
-import {CellsFolderList} from './cellsFolderList/cellsFolderList';
-import {CellsFolderListEmpty} from './cellsFolderListEmpty/cellsFolderListEmpty';
-import {CellsFolderListLoading} from './cellsFolderListLoading/cellsFolderListLoading';
-import {breadcrumbsWrapperStyles, listWrapperStyles} from './cellsFoldersListModalContent.styles';
+import {CellsCreateNewFolderHint} from './cellscreatenewfolderhint/cellscreatenewfolderhint';
+import {CellsFolderList} from './cellsfolderlist/cellsfolderlist';
+import {CellsFolderListEmpty} from './cellsfolderlistempty/cellsfolderlistempty';
+import {CellsFolderListLoading} from './cellsfolderlistloading/cellsfolderlistloading';
+import {breadcrumbsWrapperStyles, listWrapperStyles} from './cellsfolderslistmodalcontent.styles';
 
 interface CellsFoldersListModalContentProps {
   items: Array<{id: string; name: string; path: string}>;

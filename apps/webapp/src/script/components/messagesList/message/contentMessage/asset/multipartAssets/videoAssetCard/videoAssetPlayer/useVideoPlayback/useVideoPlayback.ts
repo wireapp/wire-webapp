@@ -19,7 +19,7 @@
 
 import {useState, useCallback, useRef, SyntheticEvent} from 'react';
 
-import {isVideoPlayable} from './isVideoPlayable/isVideoPlayable';
+import {isVideoPlayable} from './isvideoplayable/isvideoplayable';
 
 interface UseVideoPlaybackProps {
   url?: string;

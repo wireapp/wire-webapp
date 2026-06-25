@@ -19,7 +19,7 @@
 
 import {Maybe} from 'true-myth';
 
-import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import {CapabilityInfo} from 'Repositories/media/backgroundeffects/backgroundeffectsworkertypes';
 
 // Business logic for checking if the capability info has changed
 const capabilityComparator = (initialCapabilityInfo: CapabilityInfo) => (futureCapabilityInfo: CapabilityInfo) => {

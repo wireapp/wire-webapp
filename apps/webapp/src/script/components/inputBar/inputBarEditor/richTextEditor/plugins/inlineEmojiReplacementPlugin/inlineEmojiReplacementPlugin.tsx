@@ -23,7 +23,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {mergeRegister} from '@lexical/utils';
 import {$getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, KEY_SPACE_COMMAND, TextNode} from 'lexical';
 
-import {inlineReplacements} from './inlineReplacements';
+import {inlineReplacements} from './inlinereplacements';
 
 const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 

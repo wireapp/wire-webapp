@@ -21,11 +21,11 @@ import {ReactElement, useState} from 'react';
 
 import {IconButton, IconButtonVariant, OptionsIcon} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 
-import {buttonStyles, counterStyles} from './cellsFiltersMenu.styles';
-import {CellsFiltersModal} from './cellsFiltersModal/cellsFiltersModal';
-import {useGetAllTags} from './useGetAllTags/useGetAllTags';
+import {buttonStyles, counterStyles} from './cellsfiltersmenu.styles';
+import {CellsFiltersModal} from './cellsfiltersmodal/cellsfiltersmodal';
+import {useGetAllTags} from './usegetalltags/usegetalltags';
 
 import {useApplicationContext} from '../../../../../page/rootProvider';
 

@@ -23,15 +23,15 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {VerificationIcon} from 'Components/verificationIcon';
-import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationMessage';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {VerificationIcon} from 'Components/verificationicon';
+import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationmessage';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/usesidebarstore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Declension, joinNames} from 'Util/localizerUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
-import {VerificationMessageType} from '../../../message/verificationMessageType';
+import {VerificationMessageType} from '../../../message/verificationmessagetype';
 
 interface VerificationMessageProps {
   message: VerificationMessageEntity;

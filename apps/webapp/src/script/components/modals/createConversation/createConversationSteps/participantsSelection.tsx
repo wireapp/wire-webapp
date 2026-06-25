@@ -21,19 +21,19 @@ import {useMemo, useState} from 'react';
 
 import {container} from 'tsyringe';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingscrollbar';
 import {SearchInput} from 'Components/searchInput';
-import {UserSearchableList} from 'Components/userSearchableList';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {UserSearchableList} from 'Components/usersearchablelist';
+import {TeamState} from 'Repositories/team/teamstate';
+import {UserState} from 'Repositories/user/userstate';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
-import {participantsSelectionListCss, participantsSelectionSearchCss} from './createConversationSteps.styles';
+import {participantsSelectionListCss, participantsSelectionSearchCss} from './createconversationsteps.styles';
 
-import {useCreateConversation} from '../hooks/useCreateConversation';
-import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
+import {useCreateConversation} from '../hooks/usecreateconversation';
+import {useCreateConversationModal} from '../hooks/usecreateconversationmodal';
 import {getNonFederatingParticipantsModalCopy} from '../utils';
 
 export const ParticipantsSelection = () => {

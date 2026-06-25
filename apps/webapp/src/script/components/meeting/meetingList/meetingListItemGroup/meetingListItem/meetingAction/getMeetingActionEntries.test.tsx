@@ -17,10 +17,10 @@
  *
  */
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import {getMeetingActionEntries} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/getMeetingActionEntries';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import {getMeetingActionEntries} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitem/meetingaction/getmeetingactionentries';
+import {User} from 'Repositories/entity/user';
+import {translateForTest} from 'Util/test/translatefortest';
 
 const createMeeting = (overrides: Partial<Meeting> = {}): Meeting => ({
   start_date: '2026-06-15T14:00:00.000Z',

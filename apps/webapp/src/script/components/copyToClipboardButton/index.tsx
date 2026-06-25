@@ -17,4 +17,4 @@
  *
  */
 
-export * from './copyToClipboardButton';
+export * from './copytoclipboardbutton';

@@ -23,31 +23,31 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {JumpToLastMessageButton} from 'Components/messagesList/jumpToLastMessageButton';
-import {filterMessages} from 'Components/messagesList/utils/messagesFilter';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import {FadingScrollbar} from 'Components/fadingscrollbar';
+import {JumpToLastMessageButton} from 'Components/messagesList/jumptolastmessagebutton';
+import {filterMessages} from 'Components/messagesList/utils/messagesfilter';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/decrypterrormessage';
+import {MemberMessage} from 'Repositories/entity/message/membermessage';
 import {Message as MessageEntity} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {User} from 'Repositories/entity/user';
+import {ServiceEntity} from 'Repositories/integration/serviceentity';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isLastReceivedMessage} from 'Util/conversationMessages';
-import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
-import {useResizeObserver} from 'Util/DOM/resizeObserver';
+import {isLastReceivedMessage} from 'Util/conversationmessages';
+import {onHitTopOrBottom} from 'Util/dom/onhittoporbottom';
+import {useResizeObserver} from 'Util/dom/resizeobserver';
 
 import {Message, MessageActions} from './message';
 import {MarkerComponent} from './message/marker';
 import {ScrollToElement} from './message/types';
-import {UploadAssets} from './uploadAssets';
-import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
-import {updateScroll, FocusedElement} from './utils/scrollUpdater';
+import {UploadAssets} from './uploadassets';
+import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesgroup';
+import {updateScroll, FocusedElement} from './utils/scrollupdater';
 
 interface MessagesListParams {
   assetRepository: AssetRepository;

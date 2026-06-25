@@ -91,7 +91,7 @@ export {
   passwordInputLabelStyles,
   passwordInputRowStyles,
   passwordInputStyles,
-} from 'Components/cells/shareModal/cellsSharePasswordStyles';
+} from 'Components/cells/sharemodal/cellssharepasswordstyles';
 
 export const loaderWrapperStyles: CSSObject = {
   display: 'flex',

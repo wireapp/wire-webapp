@@ -21,10 +21,10 @@ import {useState} from 'react';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {containerStyles, imageStyles} from './imageAssetSmall.styles';
+import {containerStyles, imageStyles} from './imageassetsmall.styles';
 
-import {FileFullscreenModal} from '../../../../../../../fileFullscreenModal/fileFullscreenModal';
-import {MediaFilePreviewCard} from '../../common/mediaFilePreviewCard/mediaFilePreviewCard';
+import {FileFullscreenModal} from '../../../../../../../filefullscreenmodal/filefullscreenmodal';
+import {MediaFilePreviewCard} from '../../common/mediafilepreviewcard/mediafilepreviewcard';
 
 interface ImageAssetSmallProps {
   filePreviewUrl?: string;

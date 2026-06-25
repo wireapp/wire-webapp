@@ -23,10 +23,10 @@ import {$isLinkNode} from '@lexical/link';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getSelection, $isRangeSelection} from 'lexical';
 
-import {isBlockquoteNode} from '../common/isBlockquoteNode/isBlockquoteNode';
-import {isCodeBlockNode} from '../common/isCodeBlockNode/isCodeBlockNode';
-import {isHeadingNode} from '../common/isHeadingNode/isHeadingNode';
-import {isListNode} from '../common/isListNode/isListNode';
+import {isBlockquoteNode} from '../common/isblockquotenode/isblockquotenode';
+import {isCodeBlockNode} from '../common/iscodeblocknode/iscodeblocknode';
+import {isHeadingNode} from '../common/isheadingnode/isheadingnode';
+import {isListNode} from '../common/islistnode/islistnode';
 
 type FormatTypes =
   | 'bold'

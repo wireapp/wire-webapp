@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {useAppMainState} from 'src/script/page/state';
 
-import {IgnoreOutsideClickWrapper} from '../util/clickHandlers';
+import {IgnoreOutsideClickWrapper} from '../util/clickhandlers';
 
 interface InputBarContainerProps {
   children: ReactNode;

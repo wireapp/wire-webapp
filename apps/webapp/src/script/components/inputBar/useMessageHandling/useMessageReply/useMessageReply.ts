@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
 
 export const useMessageReply = () => {
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);

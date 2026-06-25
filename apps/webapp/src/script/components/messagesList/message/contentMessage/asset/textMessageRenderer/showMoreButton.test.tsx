@@ -22,10 +22,10 @@ import {fireEvent, render} from '@testing-library/react';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {ShowMoreButton} from './showMoreButton';
-import {translateForTest} from 'Util/test/translateForTest';
+import {ShowMoreButton} from './showmorebutton';
+import {translateForTest} from 'Util/test/translatefortest';
 
 describe('ShowMoreButton', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

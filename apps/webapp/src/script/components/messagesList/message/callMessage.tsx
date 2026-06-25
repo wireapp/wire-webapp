@@ -18,10 +18,10 @@
  */
 
 import * as Icon from 'Components/icon';
-import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/callMessage';
+import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/callmessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {MessageTime} from './messageTime';
+import {MessageTime} from './messagetime';
 
 interface CallMessageProps {
   message: CallMessageEntity;

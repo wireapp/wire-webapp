@@ -19,16 +19,16 @@
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-import {EventMapper} from 'Repositories/conversation/EventMapper';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {EventMapper} from 'Repositories/conversation/eventmapper';
+import {Conversation} from 'Repositories/entity/conversation';
 import {Message} from 'Repositories/entity/message/message';
 import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
 import {translate} from 'Util/localizerUtil';
 import {getRandomNumber} from 'Util/numberUtil';
 import {createUuid} from 'Util/uuid';
 
-import {groupMessagesBySenderAndTime, isMarker} from './messagesGroup';
-import {translateForTest} from 'Util/test/translateForTest';
+import {groupMessagesBySenderAndTime, isMarker} from './messagesgroup';
+import {translateForTest} from 'Util/test/translatefortest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('MessagesGroup', () => {

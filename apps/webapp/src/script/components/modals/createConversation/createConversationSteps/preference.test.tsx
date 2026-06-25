@@ -1,15 +1,15 @@
 import {getByRole, render} from '@testing-library/react';
-import {Preference} from 'Components/modals/createConversation/createConversationSteps/preference';
-import {TeamState} from 'Repositories/team/TeamState';
+import {Preference} from 'Components/modals/createconversation/createconversationsteps/preference';
+import {TeamState} from 'Repositories/team/teamstate';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;

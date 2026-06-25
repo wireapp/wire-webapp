@@ -26,14 +26,14 @@ import {QUERY} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import * as Icon from 'Components/icon';
-import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
-import {Call} from 'Repositories/calling/Call';
-import type {Participant} from 'Repositories/calling/Participant';
-import type {Grid} from 'Repositories/calling/videoGridHandler';
+import {useActiveWindowMatchMedia} from 'Hooks/useactivewindowmatchmedia';
+import {Call} from 'Repositories/calling/call';
+import type {Participant} from 'Repositories/calling/participant';
+import type {Grid} from 'Repositories/calling/videogridhandler';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {GroupVideoGridTile} from './groupVideoGridTile';
+import {GroupVideoGridTile} from './groupvideogridtile';
 import {Video} from './video';
 
 const PARTICIPANTS_LIMITS = {

@@ -39,7 +39,7 @@ const configureStore = (thunkArguments: object = {}) => {
   if (process.env.NODE_ENV !== 'production') {
     if (hotReloadCapableModule.hot !== undefined) {
       hotReloadCapableModule.hot.accept('./module/reducer/index.ts', () => {
-        store.replaceReducer(combineReducers(require('./module/reducer/index.ts').default) as any);
+        store.replaceReducer(combineReducers(require('./module/reducer').default) as any);
       });
     }
   }

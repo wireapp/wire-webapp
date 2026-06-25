@@ -17,28 +17,28 @@
  *
  */
 
-export {ScheduleMeetingModal} from './scheduleMeetingModal';
-export {ScheduleMeetingForm} from './scheduleMeetingForm';
-export type {ScheduleMeetingFormProps} from './scheduleMeetingForm';
+export {ScheduleMeetingModal} from './schedulemeetingmodal';
+export {ScheduleMeetingForm} from './schedulemeetingform';
+export type {ScheduleMeetingFormProps} from './schedulemeetingform';
 export {
   getDefaultScheduleMeetingFormState,
   hasScheduleMeetingFormErrors,
   useScheduleMeetingModal,
   validateScheduleMeetingForm,
-} from './useScheduleMeetingModal';
+} from './useschedulemeetingmodal';
 export type {
   ScheduleMeetingFormErrors,
   ScheduleMeetingFormState,
   ScheduleMeetingModalMode,
   ScheduleMeetingRecurrenceOption,
-} from './useScheduleMeetingModal';
+} from './useschedulemeetingmodal';
 export type {
   ScheduleMeetingFormDisplayErrors,
   ScheduleMeetingFormErrorKey,
   ScheduleMeetingMode,
-} from './scheduleMeetingTypes';
+} from './schedulemeetingtypes';
 export {
   SCHEDULE_MEETING_RECURRENCE_OPTIONS,
   SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
   mapMeetingRecurrenceToOption,
-} from './scheduleMeetingRecurrence';
+} from './schedulemeetingrecurrence';

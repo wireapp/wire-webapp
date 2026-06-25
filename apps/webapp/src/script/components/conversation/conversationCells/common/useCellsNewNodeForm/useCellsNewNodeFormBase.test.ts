@@ -20,7 +20,7 @@
 import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 
-import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
+import {useCellsNewNodeFormBase} from './usecellsnewnodeformbase';
 
 type CreateNodeMock = jest.MockedFunction<(name: string) => Promise<void>>;
 

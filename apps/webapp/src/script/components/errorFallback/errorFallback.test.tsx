@@ -19,14 +19,14 @@
 
 import {render} from '@testing-library/react';
 
-import {PrimaryModal} from 'Components/modals/primaryModal';
-import {translateForTest} from 'Util/test/translateForTest';
+import {PrimaryModal} from 'Components/modals/primarymodal';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {ErrorFallback} from './errorFallback';
+import {ErrorFallback} from './errorfallback';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

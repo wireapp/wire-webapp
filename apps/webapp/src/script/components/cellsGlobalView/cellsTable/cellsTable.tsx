@@ -19,11 +19,11 @@
 
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 
-import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
+import {CellsFilePreviewModal} from './cellsfilepreviewmodal/cellsfilepreviewmodal';
 import {
   headerCellStyles,
   tableActionsCellStyles,
@@ -31,9 +31,9 @@ import {
   tableCellStyles,
   tableStyles,
   wrapperStyles,
-} from './cellsTable.styles';
-import {getCellsTableColumns} from './cellsTableColumns/cellsTableColumns';
-import {FilePreviewProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
+} from './cellstable.styles';
+import {getCellsTableColumns} from './cellstablecolumns/cellstablecolumns';
+import {FilePreviewProvider} from './common/cellsfilepreviewmodalcontext/cellsfilepreviewmodalcontext';
 
 interface CellsTableProps {
   nodes: CellNode[];

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './legalHoldDot';
+export * from './legalholddot';

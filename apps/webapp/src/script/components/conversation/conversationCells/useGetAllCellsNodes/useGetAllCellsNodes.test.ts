@@ -20,13 +20,13 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {UserRepository} from 'Repositories/user/userrepository';
+import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {useGetAllCellsNodes} from './useGetAllCellsNodes';
+import {useGetAllCellsNodes} from './usegetallcellsnodes';
 
-import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import {useCellsStore} from '../common/usecellsstore/usecellsstore';
 
 const CONV_ID = 'conv-abc';
 const DOMAIN = 'staging.zinfra.io';

@@ -19,12 +19,12 @@
 
 import {useState} from 'react';
 
-import {FileCard} from 'Components/fileCard/fileCard';
+import {FileCard} from 'Components/fileCard/filecard';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {hollowWrapperButtonStyles} from '../../multipartAssets.styles';
-import {FileAssetOptions} from '../common/fileAssetOptions/fileAssetOptions';
-import {FilePreviewModal} from '../common/filePreviewModal/filePreviewModal';
+import {hollowWrapperButtonStyles} from '../../multipartassets.styles';
+import {FileAssetOptions} from '../common/fileassetoptions/fileassetoptions';
+import {FilePreviewModal} from '../common/filepreviewmodal/filepreviewmodal';
 
 interface FileAssetSmallProps {
   src?: string;

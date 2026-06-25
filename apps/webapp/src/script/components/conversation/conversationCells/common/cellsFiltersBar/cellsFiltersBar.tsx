@@ -19,10 +19,10 @@
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {clearAllButtonStyles, filterGroupStyles, toggleFilterButtonStyles} from './cellsFiltersBar.styles';
-import type {FilterConfig} from './filterConfig';
+import {clearAllButtonStyles, filterGroupStyles, toggleFilterButtonStyles} from './cellsfiltersbar.styles';
+import type {FilterConfig} from './filterconfig';
 
-import {FilterPopover} from '../filterPopover/filterPopover';
+import {FilterPopover} from '../filterpopover/filterpopover';
 
 interface CellsFiltersBarProps {
   filters: FilterConfig[];

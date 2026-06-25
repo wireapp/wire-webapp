@@ -17,7 +17,7 @@
  *
  */
 
-import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'Util/PeerConnectionUtil';
+import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'Util/peerconnectionutil';
 
 describe('PeerConnectionUtil', () => {
   const hostIceCandidates = [

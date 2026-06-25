@@ -17,6 +17,6 @@
  *
  */
 
-export * from './components/userStatusBadges';
-export * from './components/userBlockedBadge';
-export * from './components/verificationBadges';
+export * from './components/userstatusbadges';
+export * from './components/userblockedbadge';
+export * from './components/verificationbadges';

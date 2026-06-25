@@ -35,17 +35,17 @@ import '@testing-library/jest-dom';
  * Wire specific side-effect mocks (mutate global objects when imported)
  * ---------------------------------------------------------------------------
  */
-import 'src/script/util/test/mock/createObjectUrlMock';
-import 'src/script/util/test/mock/cryptoMock';
-import 'src/script/util/test/mock/intersectionObserverMock';
-import 'src/script/util/test/mock/matchMediaMock';
-import 'src/script/util/test/mock/mediaDevicesMock';
-import 'src/script/util/test/mock/navigatorPermissionsMock';
-import 'src/script/util/test/mock/responseMock';
-import 'src/script/util/test/mock/webRtcMock';
-import 'src/script/util/test/mock/resizeObserver.mock';
-import 'src/script/util/test/mock/wireEnvMock';
-import 'src/script/util/test/mock/browserApiMock';
+import 'src/script/util/test/mock/createobjecturlmock';
+import 'src/script/util/test/mock/cryptomock';
+import 'src/script/util/test/mock/intersectionobservermock';
+import 'src/script/util/test/mock/matchmediamock';
+import 'src/script/util/test/mock/mediadevicesmock';
+import 'src/script/util/test/mock/navigatorpermissionsmock';
+import 'src/script/util/test/mock/responsemock';
+import 'src/script/util/test/mock/webrtcmock';
+import 'src/script/util/test/mock/resizeobserver.mock';
+import 'src/script/util/test/mock/wireenvmock';
+import 'src/script/util/test/mock/browserapimock';
 
 /**
  * ---------------------------------------------------------------------------

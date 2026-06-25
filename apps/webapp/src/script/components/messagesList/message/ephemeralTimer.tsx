@@ -23,7 +23,7 @@ import type {Message} from 'Repositories/entity/message/message';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {ephemeralTimerBackgroundStyle, ephemeralTimerDialStyle} from './ephemeralTimer.styles';
+import {ephemeralTimerBackgroundStyle, ephemeralTimerDialStyle} from './ephemeraltimer.styles';
 
 interface EphemeralTimerProps {
   message: Message;

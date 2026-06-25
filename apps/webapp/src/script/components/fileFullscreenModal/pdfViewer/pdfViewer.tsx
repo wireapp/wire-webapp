@@ -21,13 +21,13 @@ import {useState} from 'react';
 
 import {Document, Page} from 'react-pdf';
 
-import {PdfLoader} from './common/pdfLoader/pdfLoader';
-import {PdfControls} from './pdfControls/pdfControls';
-import {PdfError} from './pdfError/pdfError';
-import {PdfSidebar} from './pdfSidebar/pdfSidebar';
-import {mainContentStyles, pageWrapperStyles, wrapperStyles} from './pdfViewer.styles';
-import {usePageControls} from './usePageControls/usePageControls';
-import {useZoomControls} from './useZoomControls/useZoomControls';
+import {PdfLoader} from './common/pdfloader/pdfloader';
+import {PdfControls} from './pdfcontrols/pdfcontrols';
+import {PdfError} from './pdferror/pdferror';
+import {PdfSidebar} from './pdfsidebar/pdfsidebar';
+import {mainContentStyles, pageWrapperStyles, wrapperStyles} from './pdfviewer.styles';
+import {usePageControls} from './usepagecontrols/usepagecontrols';
+import {useZoomControls} from './usezoomcontrols/usezoomcontrols';
 
 interface PDFViewerProps {
   src?: string;

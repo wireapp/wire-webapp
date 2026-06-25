@@ -19,13 +19,13 @@
 
 import {memo, useMemo} from 'react';
 
-import {TodayAndOngoingSectionProps} from 'Components/meeting/meetingList/meetingList';
+import {TodayAndOngoingSectionProps} from 'Components/meeting/meetinglist/meetinglist';
 import {
   MeetingGroupBy,
   MeetingListItemGroup,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItemGroup';
-import {groupByStartHour} from 'Components/meeting/utils/meetingDatesUtil';
-import {getOnGoingMeetingsAt} from 'Components/meeting/utils/meetingStatusUtil';
+} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitemgroup';
+import {groupByStartHour} from 'Components/meeting/utils/meetingdatesutil';
+import {getOnGoingMeetingsAt} from 'Components/meeting/utils/meetingstatusutil';
 
 const TodayAndOngoingSectionComponent = ({meetingsToday, headerForToday, nowMs}: TodayAndOngoingSectionProps) => {
   const onGoingMeetings = useMemo(() => getOnGoingMeetingsAt(meetingsToday, nowMs), [meetingsToday, nowMs]);

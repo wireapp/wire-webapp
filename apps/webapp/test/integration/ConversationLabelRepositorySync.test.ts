@@ -18,9 +18,9 @@
  */
 
 import ko from 'knockout';
-import {ConversationLabelRepository, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
+import {ConversationLabelRepository, LabelType} from 'Repositories/conversation/conversationlabelrepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {PropertiesService} from 'Repositories/properties/propertiesservice';
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 

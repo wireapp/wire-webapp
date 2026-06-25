@@ -17,7 +17,7 @@
  *
  */
 
-import {search} from 'Repositories/search/fullTextSearch';
+import {search} from 'Repositories/search/fulltextsearch';
 
 describe('FullTextSearch', () => {
   describe('search', () => {

@@ -27,27 +27,27 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/image';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
 import {Multipart} from 'Repositories/entity/message/multipart';
 import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
 import {type Translate} from 'Util/localizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/timeUtil';
-import {isErrorWithType} from 'Util/typePredicateUtil';
+import {isErrorWithType} from 'Util/typepredicateutil';
 
-import {AudioAsset} from './asset/audioAsset/audioAsset';
-import {FileAsset} from './asset/fileAsset/fileAsset';
-import {LocationAsset} from './asset/locationAsset';
-import {MultipartAssetPreview} from './asset/multipartAssetPreview';
-import {TextMessageRenderer} from './asset/textMessageRenderer';
-import {VideoAsset} from './asset/videoAsset/videoAsset';
+import {AudioAsset} from './asset/audioasset/audioasset';
+import {FileAsset} from './asset/fileasset/fileasset';
+import {LocationAsset} from './asset/locationasset';
+import {MultipartAssetPreview} from './asset/multipartassetpreview';
+import {TextMessageRenderer} from './asset/textmessagerenderer';
+import {VideoAsset} from './asset/videoasset/videoasset';
 
 import {MessageActions} from '..';
-import {ConversationError} from '../../../../error/conversationError';
+import {ConversationError} from '../../../../error/conversationerror';
 import {QuoteEntity} from '../../../../message/quoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
 

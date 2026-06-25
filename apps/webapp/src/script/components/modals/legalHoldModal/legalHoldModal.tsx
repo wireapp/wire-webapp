@@ -25,23 +25,23 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import * as Icon from 'Components/icon';
 import {LegalHoldDot} from 'Components/legalHoldDot';
-import {ModalComponent} from 'Components/modals/modalComponent';
+import {ModalComponent} from 'Components/modals/modalcomponent';
 import {UserDevicesState, UserDevices} from 'Components/userDevices';
-import {UserSearchableList} from 'Components/userSearchableList';
-import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
+import {UserSearchableList} from 'Components/usersearchablelist';
+import {useUserDevicesHistory} from 'Hooks/useuserdeviceshistory';
 import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyrepository';
+import {User} from 'Repositories/entity/user';
+import {SearchRepository} from 'Repositories/search/searchrepository';
+import {TeamRepository} from 'Repositories/team/teamrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
 import {toError} from 'Util/toError';
-import {isErrorWithCode} from 'Util/typePredicateUtil';
+import {isErrorWithCode} from 'Util/typepredicateutil';
 
-import {useLegalHoldModalState} from './legalHoldModal.state';
+import {useLegalHoldModalState} from './legalholdmodal.state';
 
 const DISABLE_SUBMIT_TEXT_LENGTH = 1;
 

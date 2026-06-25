@@ -20,7 +20,7 @@
 import {UrlUtil} from '@wireapp/commons';
 
 import {QUERY_KEY} from './route';
-import {Locales, SupportedLocale} from './supportedLocales';
+import {Locales, SupportedLocale} from './supportedlocales';
 
 const DEFAULT_LANGUAGE: SupportedLocale = 'en-US';
 

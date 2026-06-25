@@ -25,23 +25,23 @@ import cx from 'classnames';
 import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {MarkerComponent} from 'Components/messagesList/message/marker';
-import {Message} from 'Components/messagesList/message/virtualizedMessage';
-import {MessagesListParams} from 'Components/messagesList/messageList.types';
-import {UploadAssets} from 'Components/messagesList/uploadAssets';
+import {Message} from 'Components/messagesList/message/virtualizedmessage';
+import {MessagesListParams} from 'Components/messagesList/messagelist.types';
+import {UploadAssets} from 'Components/messagesList/uploadassets';
 import {verticallyCenterMessage} from 'Components/messagesList/utils/helpers';
-import {filterMessages} from 'Components/messagesList/utils/messagesFilter';
-import {useLoadConversation} from 'Components/messagesList/utils/useLoadConversation';
-import {useScrollToLastUnreadMessage} from 'Components/messagesList/utils/useScrollToLastUnreadMessage';
-import {groupMessagesBySenderAndTime, isMarker} from 'Components/messagesList/utils/virtualizedMessagesGroup';
-import {useLoadMessages} from 'Components/messagesList/virtualizedMessagesList/useLoadMessages';
-import {useScrollMessages} from 'Components/messagesList/virtualizedMessagesList/useScrollMessages';
+import {filterMessages} from 'Components/messagesList/utils/messagesfilter';
+import {useLoadConversation} from 'Components/messagesList/utils/useloadconversation';
+import {useScrollToLastUnreadMessage} from 'Components/messagesList/utils/usescrolltolastunreadmessage';
+import {groupMessagesBySenderAndTime, isMarker} from 'Components/messagesList/utils/virtualizedmessagesgroup';
+import {useLoadMessages} from 'Components/messagesList/virtualizedmessageslist/useloadmessages';
+import {useScrollMessages} from 'Components/messagesList/virtualizedmessageslist/usescrollmessages';
 import {useRoveFocus} from 'Hooks/useRoveFocus';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {VirtualizedJumpToLastMessageButton} from '../virtualizedJumpToLastMessageButton';
+import {VirtualizedJumpToLastMessageButton} from '../virtualizedjumptolastmessagebutton';
 
 const ESTIMATED_ELEMENT_SIZE = 70;
 const MARKER_ESTIMATE = 56;

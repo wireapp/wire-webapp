@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/modals/modalComponent';
+import {ModalComponent} from 'Components/modals/modalcomponent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 
@@ -29,9 +29,9 @@ import {
   confirmConversationTextCss,
   confirmConversationButtonContainerCss,
   confirmConversationButtonCss,
-} from './conversationType.styles';
+} from './conversationtype.styles';
 
-import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
+import {useCreateConversationModal} from '../hooks/usecreateconversationmodal';
 
 interface ConfirmDiscardModalProps {
   onCancel: () => void;

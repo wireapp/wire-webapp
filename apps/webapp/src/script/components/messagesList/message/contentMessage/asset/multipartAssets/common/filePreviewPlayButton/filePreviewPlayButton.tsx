@@ -19,7 +19,7 @@
 
 import {PlayIcon} from '@wireapp/react-ui-kit';
 
-import {buttonStyles, playIconStyles} from './filePreviewPlayButton.styles';
+import {buttonStyles, playIconStyles} from './filepreviewplaybutton.styles';
 
 export const FilePreviewPlayButton = () => {
   return (

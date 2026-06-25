@@ -19,8 +19,8 @@
 
 import {Button, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/modals/modalComponent';
-import {useTeamCreationModal} from 'src/script/page/leftSidebar/panels/conversations/conversationTabs/teamCreation/useTeamCreationModal';
+import {ModalComponent} from 'Components/modals/modalcomponent';
+import {useTeamCreationModal} from 'src/script/page/leftSidebar/panels/conversations/conversationtabs/teamcreation/useteamcreationmodal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 
@@ -31,9 +31,9 @@ import {
   salesModalBodyTextCss,
   salesModalBodyWrapperCss,
   salesModalWrapperCss,
-} from './conversationDetails.styles';
+} from './conversationdetails.styles';
 
-import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
+import {useCreateConversationModal} from '../../hooks/usecreateconversationmodal';
 
 export const CreateTeamModal = () => {
   const {translate} = useApplicationContext();

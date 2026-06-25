@@ -20,7 +20,7 @@
 import {LinkIcon} from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {wrapperStyles, iconWrapperStyles, textStyles, wrapperStylesHidden} from './cellsTableSharedColumn.styles';
+import {wrapperStyles, iconWrapperStyles, textStyles, wrapperStylesHidden} from './cellstablesharedcolumn.styles';
 
 interface CellsTableSharedColumnProps {
   isShared: boolean;

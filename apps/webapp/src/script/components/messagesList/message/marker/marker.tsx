@@ -24,15 +24,15 @@ import {SerializedStyles, css} from '@emotion/react';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {ScrollToElement} from 'Components/messagesList/message/types';
-import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/userelativetimestamp';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './marker.styles';
 import {getMessagesGroupLabel} from './marker.utils';
 
-import {Config} from '../../../../Config';
-import {Marker} from '../../utils/messagesGroup';
-import {MessageTime} from '../messageTime';
+import {Config} from '../../../../config';
+import {Marker} from '../../utils/messagesgroup';
+import {MessageTime} from '../messagetime';
 
 const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,

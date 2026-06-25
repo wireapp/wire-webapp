@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {wrapperStyles} from './videoAssetPlaceholder.styles';
+import {wrapperStyles} from './videoassetplaceholder.styles';
 
 interface VideoAssetPlaceholderProps {
   children: ReactNode;

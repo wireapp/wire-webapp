@@ -34,10 +34,10 @@ import {
   createCommand,
 } from 'lexical';
 
-import {createNewLink} from './createNewLink/createNewLink';
-import {getSelectedNode} from './getSelectedNode/getSelectedNode';
-import {useLinkEditing} from './useLinkEditing/useLinkEditing';
-import {useModalState} from './useModalState/useModalState';
+import {createNewLink} from './createnewlink/createnewlink';
+import {getSelectedNode} from './getselectednode/getselectednode';
+import {useLinkEditing} from './uselinkediting/uselinkediting';
+import {useModalState} from './usemodalstate/usemodalstate';
 
 import {sanitizeUrl} from '../../utils/url';
 

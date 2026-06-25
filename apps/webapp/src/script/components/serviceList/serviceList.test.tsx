@@ -19,15 +19,15 @@
 
 import {render} from '@testing-library/react';
 
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/serviceentity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {createUuid} from 'Util/uuid';
 
-import {ServiceList} from './serviceList';
-import {translateForTest} from 'Util/test/translateForTest';
+import {ServiceList} from './servicelist';
+import {translateForTest} from 'Util/test/translatefortest';
 
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);

@@ -22,10 +22,10 @@ import {useEffect, useState} from 'react';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {ProgressBar} from 'Components/progressBar';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {uploadingProgressText} from './uploadAssetItem.styles';
+import {uploadingProgressText} from './uploadassetitem.styles';
 
 interface Props {
   assetRepository: AssetRepository;

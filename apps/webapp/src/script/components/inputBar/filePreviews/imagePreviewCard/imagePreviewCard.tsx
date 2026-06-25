@@ -19,9 +19,9 @@
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {imageStyles} from './imagePreviewCard.styles';
+import {imageStyles} from './imagepreviewcard.styles';
 
-import {MediaFilePreviewCard} from '../common/mediaFilePreviewCard/mediaFilePreviewCard';
+import {MediaFilePreviewCard} from '../common/mediafilepreviewcard/mediafilepreviewcard';
 
 interface ImagePreviewCardProps {
   src: string;

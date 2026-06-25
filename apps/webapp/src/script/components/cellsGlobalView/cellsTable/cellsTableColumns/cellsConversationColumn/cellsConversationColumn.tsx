@@ -19,12 +19,12 @@
 
 import {GroupAvatar} from 'Components/avatar';
 import {ChannelAvatar} from 'Components/avatar';
-import {openConversation} from 'Components/cellsGlobalView/common/openConversation/openConversation';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {openConversation} from 'Components/cellsglobalview/common/openconversation/openconversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+import {useChannelsFeatureFlag} from 'Util/usechannelsfeatureflag';
 
-import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsConversationColumn.styles';
+import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsconversationcolumn.styles';
 
 interface CellsConversationColumnProps {
   conversation?: Conversation;

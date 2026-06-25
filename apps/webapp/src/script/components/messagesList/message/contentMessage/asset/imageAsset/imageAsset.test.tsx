@@ -20,19 +20,19 @@
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {User} from 'Repositories/entity/User';
+import {AssetRemoteData} from 'Repositories/assets/assetremotedata';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {MediumImage} from 'Repositories/entity/message/mediumimage';
+import {User} from 'Repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {ImageAsset, ImageAssetProps} from './imageAsset';
+import {ImageAsset, ImageAssetProps} from './imageasset';
 
 jest.mock('Components/inViewport', () => ({
   InViewport: ({onVisible, children, ...props}: {onVisible: () => void; children: any; [key: string]: any}) => {

@@ -18,16 +18,16 @@
  */
 
 import {MeetingsRepository} from 'Repositories/meetings';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from 'Repositories/entity/user';
+import {translateForTest} from 'Util/test/translatefortest';
 import {maybe, task} from 'true-myth';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
-import {unwrapErr} from 'Util/test/resultTestSupport';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicwallclock';
+import {unwrapErr} from 'Util/test/resulttestsupport';
 
-import {meetingSubmitErrors} from '../meetingSubmitErrors';
+import {meetingSubmitErrors} from '../meetingsubmiterrors';
 
-import {tryScheduleMeeting, tryUpdateMeeting, performMeetingSubmit} from './scheduleMeetingService';
-import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+import {tryScheduleMeeting, tryUpdateMeeting, performMeetingSubmit} from './schedulemeetingservice';
+import type {ScheduleMeetingFormState} from './schedulemeetingtypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');

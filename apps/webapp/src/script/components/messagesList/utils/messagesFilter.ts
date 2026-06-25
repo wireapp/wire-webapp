@@ -20,11 +20,11 @@
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {Message as MessageEntity} from 'Repositories/entity/message/message';
-import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateMessage';
-import {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import {ClientEvent} from 'Repositories/event/Client';
+import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolupdatemessage';
+import {SystemMessage} from 'Repositories/entity/message/systemmessage';
+import {ClientEvent} from 'Repositories/event/client';
 
-import {isMemberMessage} from '../../../guards/Message';
+import {isMemberMessage} from '../../../guards/message';
 
 /**
  * Filters out duplicated system messages.

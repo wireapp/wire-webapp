@@ -19,7 +19,7 @@
 
 import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
 
-import {mapApiMeetingToListMeeting} from './mapApiMeetingToListMeeting';
+import {mapApiMeetingToListMeeting} from './mapapimeetingtolistmeeting';
 
 describe('mapApiMeetingToListMeeting', () => {
   it('maps API meeting fields to list meeting shape', () => {

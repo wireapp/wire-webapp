@@ -23,24 +23,24 @@ import {container} from 'tsyringe';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {useInView} from 'Hooks/useInView/useInView';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useInView} from 'Hooks/useInView/useinview';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isPreviewableImage} from 'Util/imageUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import {MediaFilePreviewCard} from './common/mediaFilePreviewCard/mediaFilePreviewCard';
-import {FileAssetCard} from './fileAssetCard/fileAssetCard';
-import {ImageAssetCard} from './imageAssetCard/imageAssetCard';
+import {MediaFilePreviewCard} from './common/mediafilepreviewcard/mediafilepreviewcard';
+import {FileAssetCard} from './fileassetcard/fileassetcard';
+import {ImageAssetCard} from './imageassetcard/imageassetcard';
 import {
   fileCardStyles,
   imageCardStyles,
   listSingleItemStyles,
   listStyles,
   videoCardStyles,
-} from './multipartAssets.styles';
-import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset';
-import {VideoAssetCard} from './videoAssetCard/videoAssetCard';
+} from './multipartassets.styles';
+import {useGetMultipartAsset} from './usegetmultipartasset/usegetmultipartasset';
+import {VideoAssetCard} from './videoassetcard/videoassetcard';
 
 interface MultipartAssetsProps {
   assets: ICellAsset[];

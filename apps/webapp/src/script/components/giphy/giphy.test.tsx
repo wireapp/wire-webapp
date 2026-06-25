@@ -19,15 +19,15 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
-import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {GiphyRepository} from 'Repositories/extension/giphyrepository';
+import {withTheme} from 'src/script/auth/util/test/testutil';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {Giphy, GiphyState} from '.';
+import {Giphy, GiphyState} from './';
 
 const inputValue = 'Yammy yammy';
 const getDefaultProps = () => ({

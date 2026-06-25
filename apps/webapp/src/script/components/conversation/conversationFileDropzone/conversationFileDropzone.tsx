@@ -25,7 +25,7 @@ import {DropzoneInputProps, DropzoneRootProps} from 'react-dropzone/.';
 import {DropFileArea} from 'Components/dropFileArea';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
-import {FileDropzone} from './fileDropzone/fileDropzone';
+import {FileDropzone} from './filedropzone/filedropzone';
 
 interface ConversationFileDropzoneProps {
   isCellsEnabled: boolean;

@@ -23,24 +23,24 @@ import {render, waitFor} from '@testing-library/react';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {TeamState} from 'Repositories/team/TeamState';
+import {Call} from 'Repositories/calling/call';
+import {CallingRepository} from 'Repositories/calling/callingrepository';
+import {Participant} from 'Repositories/calling/participant';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {PropertiesRepository} from 'Repositories/properties/propertiesrepository';
+import {TeamState} from 'Repositories/team/teamstate';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CallActions} from 'src/script/view_model/CallingViewModel';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
+import {CallActions} from 'src/script/viewModel/callingviewmodel';
 import {createUuid} from 'Util/uuid';
 
-import {CallingCell, CallingCellProps} from './callingCell';
+import {CallingCell, CallingCellProps} from './callingcell';
 
-import {buildMediaDevicesHandler} from '../../../auth/util/test/TestUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {buildMediaDevicesHandler} from '../../../auth/util/test/testutil';
+import {translateForTest} from 'Util/test/translatefortest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const mockCallAlertState = {
@@ -48,7 +48,7 @@ const mockCallAlertState = {
   showAlert: false,
 };
 
-jest.mock('Components/calling/useCallAlertState', () => ({
+jest.mock('Components/calling/usecallalertstate', () => ({
   useCallAlertState: jest.fn(() => mockCallAlertState),
 }));
 

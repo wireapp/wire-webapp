@@ -19,10 +19,10 @@
 
 import {act, render, waitFor} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
-import {AppLoader} from '.';
-import {translateForTest} from 'Util/test/translateForTest';
+import {AppLoader} from './';
+import {translateForTest} from 'Util/test/translatefortest';
 
 describe('AppLoader', () => {
   it('triggers loading of the app once mounted', async () => {

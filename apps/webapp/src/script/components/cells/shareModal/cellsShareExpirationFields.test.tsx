@@ -19,13 +19,13 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 
 import {
   CellsShareExpirationFields,
   CellsShareExpirationSelection,
   getNextHourDateTime,
-} from './cellsShareExpirationFields';
+} from './cellsshareexpirationfields';
 
 const defaultLabels = {
   expiresLabel: 'Expires',

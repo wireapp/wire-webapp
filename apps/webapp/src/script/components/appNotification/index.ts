@@ -17,4 +17,4 @@
  *
  */
 
-export * from './appNotification';
+export * from './appnotification';

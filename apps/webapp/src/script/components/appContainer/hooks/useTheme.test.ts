@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Theme, useTheme} from './useTheme';
+import {Theme, useTheme} from './usetheme';
 
 describe('useTheme', () => {
   it.each([

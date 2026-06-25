@@ -37,7 +37,7 @@ import {
   versionOwnerSpanCss,
   versionSizeSpanCss,
   versionTimeTextCss,
-} from './fileHistoryModal.styles';
+} from './filehistorymodal.styles';
 
 interface FileVersionItemProps {
   version: {

@@ -19,16 +19,16 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useInView} from 'src/script/hooks/useInView/useInView';
+import {useInView} from 'src/script/hooks/useInView/useinview';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {useVideoPlayback} from './useVideoPlayback/useVideoPlayback';
-import {VideoAssetCard} from './videoAssetCard/videoAssetCard';
-import {VideoAssetError} from './videoAssetError/videoAssetError';
-import {VideoAssetLoading} from './videoAssetLoading/videoAssetLoading';
-import {wrapperStyles, videoStyles, controlsWrapperStyles} from './videoAssetPlayer.styles';
-import {VideoControls} from './videoControls/videoControls';
-import {VideoPlayOverlay} from './videoPlayOverlay/videoPlayOverlay';
+import {useVideoPlayback} from './usevideoplayback/usevideoplayback';
+import {VideoAssetCard} from './videoassetcard/videoassetcard';
+import {VideoAssetError} from './videoasseterror/videoasseterror';
+import {VideoAssetLoading} from './videoassetloading/videoassetloading';
+import {wrapperStyles, videoStyles, controlsWrapperStyles} from './videoassetplayer.styles';
+import {VideoControls} from './videocontrols/videocontrols';
+import {VideoPlayOverlay} from './videoplayoverlay/videoplayoverlay';
 
 interface VideoAssetPlayerProps {
   url?: string;

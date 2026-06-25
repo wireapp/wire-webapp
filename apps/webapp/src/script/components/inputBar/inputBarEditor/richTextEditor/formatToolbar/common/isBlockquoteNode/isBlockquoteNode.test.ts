@@ -19,7 +19,7 @@
 
 import {ElementNode, TextNode} from 'lexical';
 
-import {isBlockquoteNode} from './isBlockquoteNode';
+import {isBlockquoteNode} from './isblockquotenode';
 
 const createMockElementNode = (type: string, parent: ElementNode | null = null): ElementNode => {
   return {

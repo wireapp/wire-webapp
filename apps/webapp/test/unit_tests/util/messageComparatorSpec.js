@@ -17,8 +17,8 @@
  *
  */
 
-import {Text} from 'Repositories/entity/message/Text';
-import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
+import {Text} from 'Repositories/entity/message/text';
+import {areMentionsDifferent, isTextDifferent} from 'Util/messagecomparator';
 import {createUuid} from 'Util/uuid';
 
 describe('MessageComparator', () => {

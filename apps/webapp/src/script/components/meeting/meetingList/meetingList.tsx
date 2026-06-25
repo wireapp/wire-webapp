@@ -24,15 +24,15 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Loading} from '@wireapp/react-ui-kit';
 
-import {emptyListContainerStyles} from 'Components/meeting/emptyMeetingList/emptyListStyles';
-import {EmptyMeetingList} from 'Components/meeting/emptyMeetingList/emptyMeetingList';
-import type {MeetingsListErrorKey} from 'Components/meeting/loadMeetingsList';
-import {meetingListContainerStyles} from 'Components/meeting/meetingList/meetingList.styles';
-import {MeetingListItemGroup} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItemGroup';
-import {TodayAndOngoingSection} from 'Components/meeting/meetingList/todayAndOngoingSection/todayAndOngoingSection';
-import {partitionMeetingsByDay} from 'Components/meeting/partitionMeetingsByDay';
-import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-import {getTodayTomorrowLabels, groupByStartHour} from 'Components/meeting/utils/meetingDatesUtil';
+import {emptyListContainerStyles} from 'Components/meeting/emptymeetinglist/emptyliststyles';
+import {EmptyMeetingList} from 'Components/meeting/emptymeetinglist/emptymeetinglist';
+import type {MeetingsListErrorKey} from 'Components/meeting/loadmeetingslist';
+import {meetingListContainerStyles} from 'Components/meeting/meetinglist/meetinglist.styles';
+import {MeetingListItemGroup} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitemgroup';
+import {TodayAndOngoingSection} from 'Components/meeting/meetinglist/todayandongoingsection/todayandongoingsection';
+import {partitionMeetingsByDay} from 'Components/meeting/partitionmeetingsbyday';
+import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/schedulemeetingmodal/schedulemeetingtypes';
+import {getTodayTomorrowLabels, groupByStartHour} from 'Components/meeting/utils/meetingdatesutil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

@@ -20,9 +20,9 @@
 import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 
-import {useCellsNewFolderForm} from './useCellsNewFolderForm';
+import {useCellsNewFolderForm} from './usecellsnewfolderform';
 
 describe('useCellsNewFolderForm', () => {
   const validationCopy = {

@@ -17,13 +17,13 @@
  *
  */
 
-import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsModal} from 'Components/conversation/conversationcells/common/cellsmodal/cellsmodal';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
-import {CellsRenameForm} from './cellsRenameForm/cellsRenameForm';
-import {useCellsRenameForm} from './useCellsRenameNodeForm/useCellsRenameNodeForm';
+import {CellsRenameForm} from './cellsrenameform/cellsrenameform';
+import {useCellsRenameForm} from './usecellsrenamenodeform/usecellsrenamenodeform';
 
 interface CellsRenameNodeModalProps {
   isOpen: boolean;

@@ -21,9 +21,9 @@ import {AlertIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {wrapperStyles, iconStyles, textStyles} from './videoAssetError.styles';
+import {wrapperStyles, iconStyles, textStyles} from './videoasseterror.styles';
 
-import {VideoAssetPlaceholder} from '../common/videoAssetPlaceholder/videoAssetPlaceholder';
+import {VideoAssetPlaceholder} from '../common/videoassetplaceholder/videoassetplaceholder';
 
 interface VideoAssetErrorProps {
   isFileShareRestricted: boolean;

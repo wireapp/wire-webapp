@@ -23,22 +23,22 @@ import {container} from 'tsyringe';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Repositories/calling/CallState';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {Participant} from 'Repositories/calling/Participant';
-import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {useCallAlertState} from 'Components/calling/usecallalertstate';
+import {Call} from 'Repositories/calling/call';
+import {CallingRepository} from 'Repositories/calling/callingrepository';
+import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Repositories/calling/callstate';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/leavecallreason';
+import {Participant} from 'Repositories/calling/participant';
+import {useVideoGrid} from 'Repositories/calling/videogridhandler';
+import {MediaDevicesHandler} from 'Repositories/media/mediadeviceshandler';
+import {useMediaDevicesStore} from 'Repositories/media/usemediadevicesstore';
+import {PropertiesRepository} from 'Repositories/properties/propertiesrepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {ChooseScreen} from './chooseScreen';
-import {FullscreenVideoCall} from './fullscreenVideoCall';
+import {ChooseScreen} from './choosescreen';
+import {FullscreenVideoCall} from './fullscreenvideocall';
 
-import {CallViewTab} from '../../view_model/CallingViewModel';
+import {CallViewTab} from '../../viewModel/callingviewmodel';
 
 interface CallingContainerProps {
   readonly propertiesRepository: PropertiesRepository;

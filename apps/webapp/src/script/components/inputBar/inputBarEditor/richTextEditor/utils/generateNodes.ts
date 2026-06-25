@@ -17,7 +17,7 @@
  *
  */
 
-import {MentionEntity} from '../../../../../message/mentionEntity';
+import {MentionEntity} from '../../../../../message/mentionentity';
 
 const intoPairs = (xs: number[]) => xs.slice(1).map((x, index) => [xs[index], x]);
 

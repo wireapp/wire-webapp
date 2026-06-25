@@ -27,7 +27,7 @@ import {
   isFilterTypeDisabled,
   toConversationDriveSearchParams,
   toGlobalDriveSearchParams,
-} from './driveFilters';
+} from './drivefilters';
 
 const emptyFilters: ConversationDriveFiltersState = {
   selectedTagIds: [],

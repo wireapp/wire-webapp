@@ -19,19 +19,19 @@
 
 import {useCallback, useMemo, useState} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
-import type {FilterConfig, FilterItem} from '../cellsFiltersBar/filterConfig';
+import type {FilterConfig, FilterItem} from '../cellsfiltersbar/filterconfig';
 import {
   type ConversationDriveFiltersState,
   getActiveConversationDriveFilterType,
   isFilterTypeDisabled,
-} from '../driveFilters/driveFilters';
-import {FILE_TYPE_CATALOG} from '../driveFilters/fileTypeCatalog';
-import {useDriveEnabledParticipantFilterItems} from '../useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
-import {useGetAllTags} from '../useGetAllTags/useGetAllTags';
+} from '../drivefilters/drivefilters';
+import {FILE_TYPE_CATALOG} from '../drivefilters/filetypecatalog';
+import {useDriveEnabledParticipantFilterItems} from '../usedriveenabledparticipantfilteritems/usedriveenabledparticipantfilteritems';
+import {useGetAllTags} from '../usegetalltags/usegetalltags';
 
 export interface UseConversationDriveFiltersResult {
   filters: FilterConfig[];

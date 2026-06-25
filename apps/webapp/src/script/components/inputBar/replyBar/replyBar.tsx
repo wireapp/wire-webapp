@@ -19,12 +19,12 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {RestrictedVideo} from 'Components/asset/restrictedVideo';
-import {ParticipantMicOnIcon} from 'Components/calling/participantMicOnIcon';
+import {RestrictedVideo} from 'Components/asset/restrictedvideo';
+import {ParticipantMicOnIcon} from 'Components/calling/participantmiconicon';
 import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/image';
-import {MultipartAssetPreview} from 'Components/messagesList/message/contentMessage/asset/multipartAssetPreview';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {MultipartAssetPreview} from 'Components/messagesList/message/contentmessage/asset/multipartassetpreview';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {renderMessage} from 'Util/messageRenderer';

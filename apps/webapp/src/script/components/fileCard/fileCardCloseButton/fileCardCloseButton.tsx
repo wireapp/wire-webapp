@@ -21,7 +21,7 @@ import {CloseIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {buttonStyles} from './fileCardCloseButton.styles';
+import {buttonStyles} from './filecardclosebutton.styles';
 
 interface FileCardCloseButtonProps {
   label?: string;

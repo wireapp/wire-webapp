@@ -23,14 +23,14 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {CellsNewFileModal} from './cellsNewFileModal/cellsNewFileModal';
-import {CellsNewFolderModal} from './cellsNewFolderModal/cellsNewFolderModal';
-import {buttonStyles, iconStyles} from './cellsNewMenu.styles';
+import {CellsNewFileModal} from './cellsnewfilemodal/cellsnewfilemodal';
+import {CellsNewFolderModal} from './cellsnewfoldermodal/cellsnewfoldermodal';
+import {buttonStyles, iconStyles} from './cellsnewmenu.styles';
 
-import {getCellsFilesPath} from '../../common/getCellsFilesPath/getCellsFilesPath';
+import {getCellsFilesPath} from '../../common/getcellsfilespath/getcellsfilespath';
 
 interface CellsNewMenuProps {
   cellsRepository: CellsRepository;

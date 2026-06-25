@@ -23,26 +23,26 @@ import {LexicalEditor} from 'lexical';
 
 import {IAttachment} from '@wireapp/protocol-messaging';
 
-import {useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {MessageContent} from 'Components/inputBar/common/messageContent/messageContent';
-import {PrimaryModal} from 'Components/modals/primaryModal';
-import {showWarningModal} from 'Components/modals/utils/showWarningModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {Config} from 'src/script/Config';
-import {ConversationError} from 'src/script/error/conversationError';
-import {MentionEntity} from 'src/script/message/mentionEntity';
-import {MessageHasher} from 'src/script/message/messageHasher';
+import {useFileUploadState} from 'Components/conversation/usefilesuploadstate/usefilesuploadstate';
+import {MessageContent} from 'Components/inputBar/common/messagecontent/messagecontent';
+import {PrimaryModal} from 'Components/modals/primarymodal';
+import {showWarningModal} from 'Components/modals/utils/showwarningmodal';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationverificationstate';
+import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {EventRepository} from 'Repositories/event/eventrepository';
+import {Config} from 'src/script/config';
+import {ConversationError} from 'src/script/error/conversationerror';
+import {MentionEntity} from 'src/script/message/mentionentity';
+import {MessageHasher} from 'src/script/message/messagehasher';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import type {RootContextValue} from 'src/script/page/rootProvider';
-import {isErrorWithType} from 'src/script/util/typePredicateUtil';
+import {isErrorWithType} from 'src/script/util/typepredicateutil';
 
-import {useSendFiles} from './useSendFiles/useSendFiles';
+import {useSendFiles} from './usesendfiles/usesendfiles';
 
 interface UseMessageSendProps {
   replyMessageEntity: ContentMessage | null;

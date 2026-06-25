@@ -19,12 +19,12 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 
-import {CellsNewNodeFormValidationCopy} from './cellsNodeFormUtils';
-import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
+import {CellsNewNodeFormValidationCopy} from './cellsnodeformutils';
+import {useCellsNewNodeFormBase} from './usecellsnewnodeformbase';
 
-import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
+import {getCellsApiPath} from '../getcellsapipath/getcellsapipath';
 
 interface UseCellsNewFolderFormProps {
   cellsRepository: CellsRepository;

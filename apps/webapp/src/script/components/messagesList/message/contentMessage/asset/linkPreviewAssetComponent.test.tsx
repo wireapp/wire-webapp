@@ -19,18 +19,18 @@
 
 import {render} from '@testing-library/react';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {LinkPreview} from 'Repositories/entity/message/linkPreview';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {LinkPreview} from 'Repositories/entity/message/linkpreview';
 import {Text} from 'Repositories/entity/message/text';
 import {StatusType} from 'src/script/message/statusType';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {LinkPreviewAsset} from './linkPreviewAssetComponent';
+import {LinkPreviewAsset} from './linkpreviewassetcomponent';
 
 describe('LinkPreviewAssetComponent', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

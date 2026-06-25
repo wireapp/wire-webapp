@@ -17,12 +17,12 @@
  *
  */
 
-import {MessagesList} from 'Components/messagesList/messageList';
-import {MessagesListParams} from 'Components/messagesList/messageList.types';
+import {MessagesList} from 'Components/messagesList/messagelist';
+import {MessagesListParams} from 'Components/messagesList/messagelist.types';
 
-import {VirtualizedMessageListWrapper} from './virtualizedMessageListWrapper';
+import {VirtualizedMessageListWrapper} from './virtualizedmessagelistwrapper';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 export const MessageListWrapper = ({
   assetRepository,

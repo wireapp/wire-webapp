@@ -19,10 +19,10 @@
 
 import {useEffect} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {useAllCellsTagsStore} from '../useAllCellsTagsStore/useAllCellsTagsStore';
+import {useAllCellsTagsStore} from '../useallcellstagsstore/useallcellstagsstore';
 
 export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
   const {fireAndForgetInvoker} = useApplicationContext();

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './uploadAssetItem';
+export * from './uploadassetitem';

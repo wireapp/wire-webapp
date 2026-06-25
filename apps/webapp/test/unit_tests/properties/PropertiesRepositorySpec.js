@@ -17,10 +17,10 @@
  *
  */
 
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SelfService} from 'Repositories/self/SelfService';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PropertiesRepository} from 'Repositories/properties/propertiesrepository';
+import {PropertiesService} from 'Repositories/properties/propertiesservice';
+import {SelfService} from 'Repositories/self/selfservice';
+import {PrimaryModal} from 'Components/modals/primarymodal';
 import {translate} from 'Util/localizerUtil';
 
 describe('PropertiesRepository', () => {

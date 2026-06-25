@@ -19,21 +19,21 @@
 
 import {renderHook} from '@testing-library/react';
 
-import {useAppNotification} from 'Components/appNotification';
-import {useKeyPressAndHold} from 'Hooks/useKeyPressAndHold/useKeyPressAndHold';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import {useAppNotification} from 'Components/appnotification';
+import {useKeyPressAndHold} from 'Hooks/usekeypressandhold/usekeypressandhold';
+import {CallingViewMode, CallState} from 'Repositories/calling/callstate';
 
-import {usePressSpaceToUnmute} from './usePressSpaceToUnmute';
+import {usePressSpaceToUnmute} from './usepressspacetounmute';
 
-jest.mock('Hooks/useKeyPressAndHold/useKeyPressAndHold', () => ({
+jest.mock('Hooks/usekeypressandhold/usekeypressandhold', () => ({
   useKeyPressAndHold: jest.fn(),
 }));
 
-jest.mock('Components/appNotification', () => ({
+jest.mock('Components/appnotification', () => ({
   useAppNotification: jest.fn(),
 }));
 
-jest.mock('Hooks/useActiveWindow', () => ({
+jest.mock('Hooks/useactivewindow', () => ({
   useActiveWindowState: {
     getState: jest.fn().mockReturnValue({
       activeWindow: {
@@ -179,7 +179,7 @@ describe('usePressSpaceToUnmute', () => {
     } as unknown as CallState;
 
     jest
-      .spyOn(require('Hooks/useActiveWindow').useActiveWindowState, 'getState')
+      .spyOn(require('Hooks/useactivewindow').useActiveWindowState, 'getState')
       .mockReturnValue({activeWindow: mockActiveWindow});
 
     renderHook(() =>

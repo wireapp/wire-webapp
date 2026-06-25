@@ -21,7 +21,7 @@ import {MeetingRecurrence, MeetingRecurrenceFrequency} from '@wireapp/api-client
 
 import type {TranslationKey} from 'Util/localizerUtil';
 
-import type {ScheduleMeetingRecurrenceOption} from './scheduleMeetingTypes';
+import type {ScheduleMeetingRecurrenceOption} from './schedulemeetingtypes';
 
 export const SCHEDULE_MEETING_RECURRENCE_OPTIONS = [
   'doesNotRepeat',

@@ -17,7 +17,7 @@
  *
  */
 
-const webappTranslations = require('../src/i18n/en-US.json');
+const webappTranslations = require('../src/i18n/en-US');
 
 /**
  * Determines if a translation key appears to be dynamically generated

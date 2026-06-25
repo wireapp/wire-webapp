@@ -22,7 +22,7 @@ import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 import {
   jumpToLastMessageButtonStyles,
   jumpToLastMessageChevronStyles,
-} from 'Components/messagesList/messageList.styles';
+} from 'Components/messagesList/messagelist.styles';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface VirtualizedJumpToLastMessageButtonProps {

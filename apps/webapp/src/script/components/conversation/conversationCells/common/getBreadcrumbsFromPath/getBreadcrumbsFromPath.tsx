@@ -19,7 +19,7 @@
 
 import {TrashIcon} from '@wireapp/react-ui-kit';
 
-import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
+import {RECYCLE_BIN_PATH} from '../recyclebin/recyclebin';
 
 export const getBreadcrumbsFromPath = ({
   baseCrumb,

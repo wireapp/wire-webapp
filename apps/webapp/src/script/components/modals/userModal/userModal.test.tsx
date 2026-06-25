@@ -20,18 +20,18 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from 'Repositories/entity/user';
+import {TeamState} from 'Repositories/team/teamstate';
+import {UserRepository} from 'Repositories/user/userrepository';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {Core} from 'src/script/service/coreSingleton';
 
-import {UserModal, UserModalProps} from './userModal';
-import {showUserModal} from './userModal.state';
+import {UserModal, UserModalProps} from './usermodal';
+import {showUserModal} from './usermodal.state';
 
 describe('UserModal', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

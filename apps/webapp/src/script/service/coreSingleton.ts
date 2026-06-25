@@ -23,11 +23,11 @@ import {Account} from '@wireapp/core';
 
 import {supportsMLS} from 'Util/util';
 
-import {APIClient} from './apiClientSingleton';
-import {createStorageEngine, DatabaseTypes} from './storeEngineProvider';
-import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
+import {APIClient} from './apiclientsingleton';
+import {createStorageEngine, DatabaseTypes} from './storeengineprovider';
+import {SystemCrypto, wrapSystemCrypto} from './utils/systemcryptowrapper';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 
 declare global {
   interface Window {

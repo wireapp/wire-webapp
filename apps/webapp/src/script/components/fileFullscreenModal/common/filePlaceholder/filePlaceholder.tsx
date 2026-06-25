@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {contentStyles, descriptionStyles, titleStyles, wrapperStyles} from './filePlaceholder.styles';
+import {contentStyles, descriptionStyles, titleStyles, wrapperStyles} from './fileplaceholder.styles';
 
 interface FilePlaceholderProps {
   title: string;

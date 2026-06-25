@@ -17,4 +17,4 @@
  *
  */
 
-export * from './e2eiVerificationMessage';
+export * from './e2eiverificationmessage';

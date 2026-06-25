@@ -21,9 +21,9 @@ import {useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {openBreadcrumb} from 'Components/conversation/conversationCells/common/openBreadcrumb/openBreadcrumb';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {getCellsApiPath} from 'Components/conversation/conversationcells/common/getcellsapipath/getcellsapipath';
+import {openBreadcrumb} from 'Components/conversation/conversationcells/common/openbreadcrumb/openbreadcrumb';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {CellNode} from 'src/script/types/cellNode';
 
 interface UseMoveCellsNodeProps {

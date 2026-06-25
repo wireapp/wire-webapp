@@ -21,13 +21,13 @@ import {memo} from 'react';
 
 import {set} from 'date-fns';
 
-import {Meeting} from 'Components/meeting/meetingList/meetingList';
-import {MeetingListItem} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingListItem';
+import {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import {MeetingListItem} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitem/meetinglistitem';
 import {
   hourLabelStyles,
   sectionHeaderStyles,
   sectionStyles,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItemGroup.styles';
+} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitemgroup.styles';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface MeetingListItemGroupProps {

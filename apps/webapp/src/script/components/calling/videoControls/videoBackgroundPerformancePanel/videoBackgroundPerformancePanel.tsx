@@ -23,7 +23,7 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
 
-import {areCapabilityInfosEqual} from 'Components/calling/videoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
+import {areCapabilityInfosEqual} from 'Components/calling/videocontrols/videobackgroundperformancepanel/capabilityinformationvalidator';
 import {
   buttonBaseStyles,
   buttonNeutralStyles,
@@ -38,11 +38,11 @@ import {
   performancePanelResetButtonStyles,
   performancePanelStyles,
   performancePanelTitleStyles,
-} from 'Components/calling/videoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel.styles';
-import {QualityMode} from 'Repositories/media/backgroundEffects';
-import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {RenderMetrics, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+} from 'Components/calling/videocontrols/videobackgroundperformancepanel/videobackgroundperformancepanel.styles';
+import {QualityMode} from 'Repositories/media/backgroundeffects';
+import {CapabilityInfo} from 'Repositories/media/backgroundeffects/backgroundeffectsworkertypes';
+import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundeffectshandler';
+import {RenderMetrics, useBackgroundEffectsStore} from 'Repositories/media/usebackgroundeffectsstore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 type PerformancePanelProps = {

@@ -19,9 +19,9 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {useAppNotification} from 'Components/appNotification';
-import {useCellsStore} from 'Components/conversation/conversationCells/common/useCellsStore/useCellsStore';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useAppNotification} from 'Components/appnotification';
+import {useCellsStore} from 'Components/conversation/conversationcells/common/usecellsstore/usecellsstore';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 
 interface UseDeleteNodeProps {
   conversationQualifiedId: QualifiedId;

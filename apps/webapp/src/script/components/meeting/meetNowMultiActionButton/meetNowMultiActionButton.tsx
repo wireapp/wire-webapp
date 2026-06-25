@@ -24,8 +24,8 @@ import {ButtonGroup, ButtonVariant, CallIcon, TriangleIcon} from '@wireapp/react
 import {
   callingButtonGroupStyles,
   dropdownIconStyles,
-} from 'Components/meeting/meetNowMultiActionButton/meetNowMultiActionButton.styles';
-import {useMeetingActions} from 'Components/meeting/useMeetingActions';
+} from 'Components/meeting/meetnowmultiactionbutton/meetnowmultiactionbutton.styles';
+import {useMeetingActions} from 'Components/meeting/usemeetingactions';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {showContextMenu} from '../../../ui/contextMenu';

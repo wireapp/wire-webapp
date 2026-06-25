@@ -19,17 +19,17 @@
 
 import {render, fireEvent, within} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {ReactionMap} from 'Repositories/storage';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {MessageReactionsList, MessageReactionsListProps} from './messageReactionsList';
+import {MessageReactionsList, MessageReactionsListProps} from './messagereactionslist';
 
 const user1 = new User('', '', translateForTest);
 const user2 = new User('', '', translateForTest);

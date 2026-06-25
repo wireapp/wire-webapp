@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect} from 'react';
 
-import {checkFileSharingPermission} from 'Components/conversation/utils/checkFileSharingPermission';
+import {checkFileSharingPermission} from 'Components/conversation/utils/checkfilesharingpermission';
 import type {Translate} from 'Util/localizerUtil';
 import {formatLocale} from 'Util/timeUtil';
 import {getFileExtension, sanitizeFilename} from 'Util/util';

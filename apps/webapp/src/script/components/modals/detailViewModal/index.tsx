@@ -25,25 +25,25 @@ import cx from 'classnames';
 import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ZoomableImage} from 'Components/zoomableImage';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {User} from 'Repositories/entity/User';
+import {ZoomableImage} from 'Components/zoomableimage';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {MediumImage} from 'Repositories/entity/message/mediumimage';
+import {User} from 'Repositories/entity/user';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
 import {waitFor} from 'Util/waitFor';
 
-import {DetailViewModalFooter} from './detailViewModalFooter';
-import {DetailViewModalHeader} from './detailViewModalHeader';
+import {DetailViewModalFooter} from './detailviewmodalfooter';
+import {DetailViewModalHeader} from './detailviewmodalheader';
 
-import {isContentMessage} from '../../../guards/Message';
-import {MessageCategory} from '../../../message/messageCategory';
+import {isContentMessage} from '../../../guards/message';
+import {MessageCategory} from '../../../message/messagecategory';
 import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
 
 interface DetailViewModalProps {

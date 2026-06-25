@@ -22,14 +22,14 @@ import ko from 'knockout';
 
 import {Message as MessageEntity} from 'Repositories/entity/message/message';
 import {ReadReceipt} from 'Repositories/storage';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {formatTimeShort} from 'Util/timeUtil';
 
-import {ReadReceiptStatus} from './readReceiptStatus';
+import {ReadReceiptStatus} from './readreceiptstatus';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

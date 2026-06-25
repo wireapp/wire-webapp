@@ -26,7 +26,7 @@ import {
   textStyles,
   wrapperStylesHidden,
   iconStyles,
-} from './cellsTableSharedColumn.styles';
+} from './cellstablesharedcolumn.styles';
 
 interface CellsTableSharedColumnProps {
   isShared: boolean;

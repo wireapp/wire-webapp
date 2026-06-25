@@ -27,7 +27,7 @@ import {
   conversationFeatureCss,
   conversationFeatureIconCss,
   conversationFeatureVerifiedIconCss,
-} from './conversationType.styles';
+} from './conversationtype.styles';
 
 import {ConversationType} from '../types';
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {useScheduleMeetingModal} from 'Components/meeting/scheduleMeetingModal';
+import {useScheduleMeetingModal} from 'Components/meeting/schedulemeetingmodal';
 
 export const useMeetingActions = () => {
   const openCreate = useScheduleMeetingModal(state => state.openCreate);

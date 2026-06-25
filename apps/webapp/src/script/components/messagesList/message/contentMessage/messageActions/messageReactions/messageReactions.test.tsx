@@ -24,12 +24,12 @@ import {render, act, fireEvent, waitFor} from '@testing-library/react';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {MessageReactions, MessageReactionsProps} from './messageReactions';
+import {MessageReactions, MessageReactionsProps} from './messagereactions';
 
-import {MessageActionsId} from '../messageActions';
+import {MessageActionsId} from '../messageactions';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';

@@ -21,17 +21,17 @@ import {container} from 'tsyringe';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {UserState} from 'Repositories/user/userState';
+import {Call} from 'Repositories/calling/call';
+import {CallingRepository} from 'Repositories/calling/callingrepository';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/callstate';
+import {PropertiesRepository} from 'Repositories/properties/propertiesrepository';
+import {UserState} from 'Repositories/user/userstate';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {DetachedWindow} from './components/detachedWindow';
+import {DetachedWindow} from './components/detachedwindow';
 
-import {CallingContainer} from '../callingOverlayContainer';
-import {WindowContextProvider} from '../useWindow';
+import {CallingContainer} from '../callingoverlaycontainer';
+import {WindowContextProvider} from '../usewindow';
 
 interface DetachedCallingCellProps {
   propertiesRepository: PropertiesRepository;

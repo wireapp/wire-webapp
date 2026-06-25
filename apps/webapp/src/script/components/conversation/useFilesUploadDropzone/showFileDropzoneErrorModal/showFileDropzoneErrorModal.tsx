@@ -17,12 +17,12 @@
  *
  */
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {PrimaryModal} from 'Components/modals/primaryModal';
+import {FileTypeIcon} from 'Components/conversation/common/filetypeicon/filetypeicon';
+import {PrimaryModal} from 'Components/modals/primarymodal';
 import type {Translate} from 'Util/localizerUtil';
 import {getFileExtension} from 'Util/util';
 
-import {fileNameStyles, itemStyles, listStyles} from './showFileDropzoneErrorModal.styles';
+import {fileNameStyles, itemStyles, listStyles} from './showfiledropzoneerrormodal.styles';
 
 interface ShowFileDropzoneErrorModalParams {
   title: string;

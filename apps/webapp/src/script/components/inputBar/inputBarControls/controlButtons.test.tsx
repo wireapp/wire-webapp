@@ -19,15 +19,15 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {translateForTest} from 'Util/test/translateForTest';
+import {Conversation} from 'Repositories/entity/conversation';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 
-import {ControlButtons} from './controlButtons';
+import {ControlButtons} from './controlbuttons';
 
 type PropsType = React.ComponentProps<typeof ControlButtons>;
 const defaultParams: PropsType = {

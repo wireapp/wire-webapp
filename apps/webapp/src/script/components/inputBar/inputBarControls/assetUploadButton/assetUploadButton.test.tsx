@@ -19,13 +19,13 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {AssetUploadButton} from './assetUploadButton';
+import {AssetUploadButton} from './assetuploadbutton';
 
 const pngFile = new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'});
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});

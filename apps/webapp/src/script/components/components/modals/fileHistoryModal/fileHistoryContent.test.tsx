@@ -19,14 +19,14 @@
 
 import {render, screen, fireEvent} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {FileHistoryContent} from './fileHistoryContent';
+import {FileHistoryContent} from './filehistorycontent';
 import {FileVersion} from './types';
 
 describe('FileHistoryContent', () => {

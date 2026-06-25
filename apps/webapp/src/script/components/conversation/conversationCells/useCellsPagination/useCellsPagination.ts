@@ -19,8 +19,8 @@
 
 import {useCallback, useEffect} from 'react';
 
-import {CellPagination} from '../common/cellPagination/cellPagination';
-import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import {CellPagination} from '../common/cellpagination/cellpagination';
+import {useCellsStore} from '../common/usecellsstore/usecellsstore';
 
 interface UsePaginationProps {
   pagination: CellPagination | null;

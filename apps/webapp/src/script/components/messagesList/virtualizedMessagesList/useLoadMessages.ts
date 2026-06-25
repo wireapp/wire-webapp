@@ -21,10 +21,10 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isLastReceivedMessage} from 'Util/conversationMessages';
+import {isLastReceivedMessage} from 'Util/conversationmessages';
 
 type UseLoadMessagesProps = {
   conversation: Conversation;

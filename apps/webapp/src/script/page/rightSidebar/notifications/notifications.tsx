@@ -21,15 +21,15 @@ import {useMemo, FC} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingscrollbar';
 import {RadioGroup} from 'Components/radio';
-import {NOTIFICATION_STATE, getNotificationText} from 'Repositories/conversation/NotificationSetting';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {NOTIFICATION_STATE, getNotificationText} from 'Repositories/conversation/notificationsetting';
+import {Conversation} from 'Repositories/entity/conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {PanelHeader} from '../panelHeader';
+import {ViewModelRepositories} from '../../../viewModel/mainviewmodel';
+import {PanelHeader} from '../panelheader';
 
 interface NotificationsProps {
   activeConversation: Conversation;

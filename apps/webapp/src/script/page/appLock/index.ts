@@ -17,4 +17,4 @@
  *
  */
 
-export * from './appLock';
+export * from './applock';

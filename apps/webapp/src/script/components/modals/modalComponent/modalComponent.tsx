@@ -33,7 +33,7 @@ import {
   ModalContentVisibleStyles,
   ModalOverlayStyles,
   ModalOverlayVisibleStyles,
-} from './modalComponent.styles';
+} from './modalcomponent.styles';
 
 import {LoadingIcon} from '../../icon';
 

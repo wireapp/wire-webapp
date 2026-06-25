@@ -17,10 +17,10 @@
  *
  */
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {replaceAccents} from 'Util/stringUtil';
 
-import {SidebarTabs} from './useSidebarStore';
+import {SidebarTabs} from './usesidebarstore';
 
 export const conversationFilters = {
   hasUnread: (conv: Conversation) => conv.hasUnread(),

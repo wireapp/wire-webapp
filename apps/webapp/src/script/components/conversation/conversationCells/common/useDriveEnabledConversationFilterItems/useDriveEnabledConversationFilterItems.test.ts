@@ -17,10 +17,10 @@
  *
  */
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import type {Conversation} from 'Repositories/entity/conversation';
 
-import {getDriveEnabledConversations} from './useDriveEnabledConversationFilterItems';
+import {getDriveEnabledConversations} from './usedriveenabledconversationfilteritems';
 
 const createConversation = ({id, lastEventTimestamp}: {id: string; lastEventTimestamp: number}): Conversation =>
   ({

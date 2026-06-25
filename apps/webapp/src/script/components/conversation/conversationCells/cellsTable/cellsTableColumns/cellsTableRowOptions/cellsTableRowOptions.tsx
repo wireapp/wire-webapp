@@ -23,33 +23,33 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {useAppNotification} from 'Components/appNotification/appNotification';
-import {openFolder} from 'Components/conversation/conversationCells/common/openFolder/openFolder';
+import {useAppNotification} from 'Components/appnotification/appnotification';
+import {openFolder} from 'Components/conversation/conversationcells/common/openfolder/openfolder';
 import {
   isInRecycleBin,
   isRootRecycleBinPath,
-} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import {useFileHistoryModal} from 'Components/modals/fileHistoryModal/hooks/useFileHistoryModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+} from 'Components/conversation/conversationcells/common/recyclebin/recyclebin';
+import {useFileHistoryModal} from 'Components/modals/filehistorymodal/hooks/usefilehistorymodal';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {forcedDownloadFile} from 'Util/util';
 
-import {CellsMoveNodeModal} from './cellsMoveNodeModal/cellsMoveNodeModal';
-import {CellsRenameNodeModal} from './cellsRenameNodeModal/cellsRenameNodeModal';
-import {buttonStyles, iconStyles, textStyles} from './cellsTableRowOptions.styles';
-import {CellsTagsModal} from './cellsTagsModal/cellsTagsModal';
-import {showDeletePermanentlyModal} from './showDeletePermanentlyModal/showDeletePermanentlyModal';
-import {showMoveToRecycleBinModal} from './showMoveToRecycleBinModal/showMoveToRecycleBinModal';
-import {showRestoreNestedNodeModal} from './showRestoreNestedNodeModal/showRestoreNestedNodeModal';
-import {showRestoreRootNodeModal} from './showRestoreRootNodeModal/showRestoreRootNodeModal';
-import {useDeleteNode} from './useDeleteNode/useDeleteNode';
-import {useRestoreNestedNode} from './useRestoreNestedNode/useRestoreNestedNode';
-import {useRestoreParentNode} from './useRestoreParentNode/useRestoreParentNode';
+import {CellsMoveNodeModal} from './cellsmovenodemodal/cellsmovenodemodal';
+import {CellsRenameNodeModal} from './cellsrenamenodemodal/cellsrenamenodemodal';
+import {buttonStyles, iconStyles, textStyles} from './cellstablerowoptions.styles';
+import {CellsTagsModal} from './cellstagsmodal/cellstagsmodal';
+import {showDeletePermanentlyModal} from './showdeletepermanentlymodal/showdeletepermanentlymodal';
+import {showMoveToRecycleBinModal} from './showmovetorecyclebinmodal/showmovetorecyclebinmodal';
+import {showRestoreNestedNodeModal} from './showrestorenestednodemodal/showrestorenestednodemodal';
+import {showRestoreRootNodeModal} from './showrestorerootnodemodal/showrestorerootnodemodal';
+import {useDeleteNode} from './usedeletenode/usedeletenode';
+import {useRestoreNestedNode} from './userestorenestednode/userestorenestednode';
+import {useRestoreParentNode} from './userestoreparentnode/userestoreparentnode';
 
-import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
-import {showShareModal} from '../cellsNodeShareModal/cellsNodeShareModal';
+import {useCellsFilePreviewModal} from '../../common/cellsfilepreviewmodalcontext/cellsfilepreviewmodalcontext';
+import {showShareModal} from '../cellsnodesharemodal/cellsnodesharemodal';
 
 interface CellsTableRowOptionsProps {
   node: CellNode;

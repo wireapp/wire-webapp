@@ -21,7 +21,7 @@ import {create} from 'zustand';
 
 import {CellNode} from 'src/script/types/cellNode';
 
-import {CellPagination} from '../cellPagination/cellPagination';
+import {CellPagination} from '../cellpagination/cellpagination';
 
 type Status = 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
 

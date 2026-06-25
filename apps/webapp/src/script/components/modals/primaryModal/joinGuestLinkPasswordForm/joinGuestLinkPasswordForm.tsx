@@ -21,10 +21,10 @@ import type {FormEvent} from 'react';
 
 import {COLOR, Form, Link, Text} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import type {Translate} from 'Util/localizerUtil';
 
-import {labelStyles, inputStyles, linkStyles, linkTextStyles} from './joinGuestLinkPasswordForm.styles';
+import {labelStyles, inputStyles, linkStyles, linkTextStyles} from './joinguestlinkpasswordform.styles';
 
 interface JoinGuestLinkPasswordFormProps {
   readonly translate: Translate;

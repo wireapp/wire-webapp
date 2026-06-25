@@ -17,7 +17,7 @@
  *
  */
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 export const filterUsersByQuery = (users: User[], query: string): User[] => {
   const normalizedQuery = query.trim().toLowerCase();

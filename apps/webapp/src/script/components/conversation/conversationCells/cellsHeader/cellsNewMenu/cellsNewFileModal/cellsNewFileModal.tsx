@@ -19,18 +19,18 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsNewNodeForm} from 'Components/conversation/conversationCells/common/cellsNewNodeForm/cellsNewNodeForm';
+import {CellsNewNodeForm} from 'Components/conversation/conversationcells/common/cellsnewnodeform/cellsnewnodeform';
 import {
   CellsFileType,
   getFileExtensionByType,
   useCellsNewFileForm,
-} from 'Components/conversation/conversationCells/common/useCellsNewNodeForm/useCellsNewFileForm';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+} from 'Components/conversation/conversationcells/common/usecellsnewnodeform/usecellsnewfileform';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {descriptionStyles} from './cellsNewFileModal.styles';
+import {descriptionStyles} from './cellsnewfilemodal.styles';
 
-import {CellsModal} from '../../../common/cellsModal/cellsModal';
+import {CellsModal} from '../../../common/cellsmodal/cellsmodal';
 
 interface CellsNewFileModalProps {
   isOpen: boolean;

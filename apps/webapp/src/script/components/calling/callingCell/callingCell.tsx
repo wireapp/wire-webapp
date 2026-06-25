@@ -25,35 +25,35 @@ import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/av
 import {TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/appNotification';
-import {callingContainer} from 'Components/calling/callingCell/callingCell.styles';
-import {CallingControls} from 'Components/calling/callingCell/callingControls';
-import {CallingHeader} from 'Components/calling/callingCell/callingHeader';
-import {GroupVideoGrid} from 'Components/calling/groupVideoGrid';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
+import {useAppNotification} from 'Components/appnotification';
+import {callingContainer} from 'Components/calling/callingcell/callingcell.styles';
+import {CallingControls} from 'Components/calling/callingcell/callingcontrols';
+import {CallingHeader} from 'Components/calling/callingcell/callingheader';
+import {GroupVideoGrid} from 'Components/calling/groupvideogrid';
+import {useCallAlertState} from 'Components/calling/usecallalertstate';
+import {ConversationClassifiedBar} from 'Components/classifiedbar/classifiedbar';
 import * as Icon from 'Components/icon';
-import {useConversationCall} from 'Hooks/useConversationCall';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import type {Call} from 'Repositories/calling/Call';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
-import type {Participant} from 'Repositories/calling/Participant';
-import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {TeamState} from 'Repositories/team/TeamState';
-import {Config} from 'src/script/Config';
-import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
+import {useConversationCall} from 'Hooks/useconversationcall';
+import {useNoInternetCallGuard} from 'Hooks/usenointernetcallguard/usenointernetcallguard';
+import type {Call} from 'Repositories/calling/call';
+import type {CallingRepository} from 'Repositories/calling/callingrepository';
+import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/callstate';
+import type {Participant} from 'Repositories/calling/participant';
+import {useVideoGrid} from 'Repositories/calling/videogridhandler';
+import {PropertiesRepository} from 'Repositories/properties/propertiesrepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiestype';
+import {TeamState} from 'Repositories/team/teamstate';
+import {Config} from 'src/script/config';
+import {useUserPropertyValue} from 'src/script/hooks/useuserproperty';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
 
-import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
+import {usePressSpaceToUnmute} from './usepressspacetounmute/usepressspacetounmute';
 
 import {generateConversationUrl} from '../../../router/routeGenerator';
-import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
+import {CallActions, CallViewTab} from '../../../viewModel/callingviewmodel';
 
 interface VideoCallProps {
   hasAccessToCamera?: boolean;

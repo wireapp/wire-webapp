@@ -17,7 +17,7 @@
  *
  */
 
-import {loaderIconStyles} from './pdfLoader.styles';
+import {loaderIconStyles} from './pdfloader.styles';
 
 export const PdfLoader = () => {
   return <div className="icon-spinner spin" css={loaderIconStyles} />;

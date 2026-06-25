@@ -19,11 +19,11 @@
 
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 
-import {FileHistoryModal} from './fileHistoryModal';
-import {useFileHistoryModal} from './hooks/useFileHistoryModal';
-import {useFileVersions} from './hooks/useFileVersions';
+import {FileHistoryModal} from './filehistorymodal';
+import {useFileHistoryModal} from './hooks/usefilehistorymodal';
+import {useFileVersions} from './hooks/usefileversions';
 
 jest.mock('@wireapp/react-ui-kit', () => {
   const actualModule = jest.requireActual('@wireapp/react-ui-kit');
@@ -37,17 +37,17 @@ jest.mock('@wireapp/react-ui-kit', () => {
   };
 });
 
-jest.mock('./hooks/useFileHistoryModal');
-jest.mock('./hooks/useFileVersions');
-jest.mock('./fileHistoryHeader', () => ({
+jest.mock('./hooks/usefilehistorymodal');
+jest.mock('./hooks/usefileversions');
+jest.mock('./filehistoryheader', () => ({
   FileHistoryHeader: ({file}: {file?: {name: string; extension: string}}) => (
     <div data-uie-name="file-history-header">{file?.name}</div>
   ),
 }));
-jest.mock('./fileHistoryContent', () => ({
+jest.mock('./filehistorycontent', () => ({
   FileHistoryContent: () => <div data-uie-name="file-history-content">Content</div>,
 }));
-jest.mock('Components/fileFullscreenModal/fileLoader/fileLoader', () => ({
+jest.mock('Components/filefullscreenmodal/fileloader/fileloader', () => ({
   FileLoader: () => <div data-uie-name="file-loader">Loading...</div>,
 }));
 

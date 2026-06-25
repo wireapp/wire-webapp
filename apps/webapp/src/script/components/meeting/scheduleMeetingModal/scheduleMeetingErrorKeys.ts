@@ -17,7 +17,7 @@
  *
  */
 
-import type {MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
+import type {MeetingSubmitErrors} from 'Components/meeting/meetingsubmiterrors';
 import type {TranslationKey} from 'Util/localizerUtil';
 
 export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {

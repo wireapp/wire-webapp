@@ -23,11 +23,11 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {getCellsApiPath} from 'Components/conversation/conversationcells/common/getcellsapipath/getcellsapipath';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {CellNode} from 'src/script/types/cellNode';
 
-import {transformNodesToCellsFolders} from './transformNodesToCellsFolders';
+import {transformNodesToCellsFolders} from './transformnodestocellsfolders';
 
 interface UseGetCellsFoldersProps {
   currentPath: string;

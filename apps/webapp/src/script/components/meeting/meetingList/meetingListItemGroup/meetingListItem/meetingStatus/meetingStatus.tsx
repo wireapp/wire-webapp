@@ -28,8 +28,8 @@ import {
   participatingStatusIconStyles,
   participatingStatusStyles,
   startingSoonStatusStyles,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingStatus/meetingStatus.styles';
-import {getCountdownSeconds, getMeetingStatusAt, MeetingStatuses} from 'Components/meeting/utils/meetingStatusUtil';
+} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitem/meetingstatus/meetingstatus.styles';
+import {getCountdownSeconds, getMeetingStatusAt, MeetingStatuses} from 'Components/meeting/utils/meetingstatusutil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatSeconds} from 'Util/timeUtil';
 

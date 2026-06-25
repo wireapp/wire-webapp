@@ -19,17 +19,17 @@
 
 import {handleEscDown} from 'Util/keyboardUtil';
 
-import {ConfirmDiscardModal} from './conversationType/confirmDiscardModal';
-import {createConversationModalWrapperCss} from './createConversation.styles';
-import {CreateConversationHeader} from './createConversationHeader';
-import {CreateTeamModal} from './createConversationSteps/conversationDetails/createTeamModal';
-import {CustomHistoryModal} from './createConversationSteps/conversationDetails/customHistoryModal';
-import {UpgradePlanModal} from './createConversationSteps/conversationDetails/upgradePlanModal';
-import {CreateConversationSteps} from './createConversationSteps/createConversationSteps';
-import {useCreateConversationModal} from './hooks/useCreateConversationModal';
+import {ConfirmDiscardModal} from './conversationtype/confirmdiscardmodal';
+import {createConversationModalWrapperCss} from './createconversation.styles';
+import {CreateConversationHeader} from './createconversationheader';
+import {CreateTeamModal} from './createconversationsteps/conversationdetails/createteammodal';
+import {CustomHistoryModal} from './createconversationsteps/conversationdetails/customhistorymodal';
+import {UpgradePlanModal} from './createconversationsteps/conversationdetails/upgradeplanmodal';
+import {CreateConversationSteps} from './createconversationsteps/createconversationsteps';
+import {useCreateConversationModal} from './hooks/usecreateconversationmodal';
 import {ConversationType} from './types';
 
-import {ModalComponent} from '../modalComponent';
+import {ModalComponent} from '../modalcomponent';
 
 export const CreateConversationModal = () => {
   const {isOpen, hideModal, setIsConfirmDiscardModalOpen, setConversationType, gotoPreviousStep, discardTrigger} =

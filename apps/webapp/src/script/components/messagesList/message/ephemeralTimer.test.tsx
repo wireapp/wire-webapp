@@ -23,10 +23,10 @@ import {Message} from 'Repositories/entity/message/message';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {EphemeralTimer} from './ephemeralTimer';
+import {EphemeralTimer} from './ephemeraltimer';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

@@ -21,7 +21,7 @@ import React from 'react';
 
 import {Select} from '@wireapp/react-ui-kit';
 
-import {selectGroupStyles} from 'Components/calling/videoControls/videoControlsSelect/videoControlsSelect.styles';
+import {selectGroupStyles} from 'Components/calling/videocontrols/videocontrolsselect/videocontrolsselect.styles';
 import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -35,7 +35,7 @@ import {
   videoOptionsSelectMenuStyles,
   videoOptionsSheetHeaderStyles,
   videoOptionsSheetTitleStyles,
-} from '../videoControls.styles';
+} from '../videocontrols.styles';
 
 type SelectProps = React.ComponentProps<typeof Select<false>>;
 type SelectOption = SelectProps['options'] extends Array<infer T> ? T : never;

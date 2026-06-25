@@ -17,4 +17,4 @@
  *
  */
 
-export * from './protocolUpdateMessage';
+export * from './protocolupdatemessage';

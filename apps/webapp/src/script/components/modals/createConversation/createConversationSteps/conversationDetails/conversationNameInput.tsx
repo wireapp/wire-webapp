@@ -18,11 +18,11 @@
  */
 
 import {TextInput} from 'Components/textInput';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
 
-import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
+import {useCreateConversationModal} from '../../hooks/usecreateconversationmodal';
 import {ConversationType} from '../../types';
 
 export const ConversationNameInput = () => {

@@ -19,8 +19,8 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {loadMeetingsList, type MeetingsListErrorKey} from 'Components/meeting/loadMeetingsList';
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
+import {loadMeetingsList, type MeetingsListErrorKey} from 'Components/meeting/loadmeetingslist';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useMeetingsList = () => {

@@ -22,12 +22,12 @@ import ko from 'knockout';
 
 import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
-import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationMessage';
-import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {VerificationMessageType} from 'src/script/message/verificationMessageType';
+import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationmessage';
+import {User} from 'Repositories/entity/user';
+import {withTheme} from 'src/script/auth/util/test/testutil';
+import {VerificationMessageType} from 'src/script/message/verificationmessagetype';
 
-import {VerificationMessage} from './verificationMessage';
+import {VerificationMessage} from './verificationmessage';
 
 const createVerificationMessage = (partialVerificationMessage: Partial<VerificationMessageEntity>) => {
   const verificationMessage: Partial<VerificationMessageEntity> = {

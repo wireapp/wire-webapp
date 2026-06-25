@@ -20,9 +20,9 @@
 import is from '@sindresorhus/is';
 import {maybe} from 'true-myth';
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-import {User} from 'Repositories/entity/User';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import type {ScheduleMeetingFormState} from 'Components/meeting/schedulemeetingmodal/schedulemeetingtypes';
+import {User} from 'Repositories/entity/user';
 import {translate} from 'Util/localizerUtil';
 
 const createPlaceholderUserForEmail = (email: string): User => {

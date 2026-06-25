@@ -21,11 +21,11 @@ import {render} from '@testing-library/react';
 
 import {Runtime} from '@wireapp/commons';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
 import {Preferences} from './preferences';
 

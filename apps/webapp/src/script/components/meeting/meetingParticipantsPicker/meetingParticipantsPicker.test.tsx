@@ -23,17 +23,17 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import en from 'I18n/en-US.json';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {MeetingParticipantsPicker} from './meetingParticipantsPicker';
-import {formatSelectedSummary} from './formatSelectedSummary';
+import {MeetingParticipantsPicker} from './meetingparticipantspicker';
+import {formatSelectedSummary} from './formatselectedsummary';
 
 setStrings({en});
 

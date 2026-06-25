@@ -22,8 +22,8 @@ import React from 'react';
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
-import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import {useLegalHoldModalState} from 'Components/modals/legalholdmodal/legalholdmodal.state';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface LegalHoldDotProps {

@@ -21,9 +21,9 @@ import React, {HTMLProps, RefObject, useEffect, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {containerStyle, imageStyle} from './zoomableImage.style';
+import {containerStyle, imageStyle} from './zoomableimage.style';
 
-import {isHTMLImageElement} from '../../guards/HTMLElement';
+import {isHTMLImageElement} from '../../guards/htmlElement';
 
 type Offset = {
   x: number;

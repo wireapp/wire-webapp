@@ -17,4 +17,4 @@
  *
  */
 
-export * from './appLoader';
+export * from './apploader';

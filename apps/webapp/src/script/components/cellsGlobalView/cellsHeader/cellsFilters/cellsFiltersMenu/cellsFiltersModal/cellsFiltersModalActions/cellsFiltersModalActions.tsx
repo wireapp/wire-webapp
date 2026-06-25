@@ -21,7 +21,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {buttonStyles, wrapperStyles} from './cellsFiltersModalActions.styles';
+import {buttonStyles, wrapperStyles} from './cellsfiltersmodalactions.styles';
 
 interface CellsFiltersModalActionsProps {
   onSecondaryAction: () => void;

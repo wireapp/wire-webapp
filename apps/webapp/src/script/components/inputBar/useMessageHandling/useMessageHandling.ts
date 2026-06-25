@@ -24,22 +24,22 @@ import {LexicalEditor} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {EventRepository} from 'Repositories/event/EventRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {EventRepository} from 'Repositories/event/eventrepository';
 import {StorageRepository} from 'Repositories/storage';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
-import {useDraftState} from './useDraftState/useDraftState';
-import {useMessageEditing} from './useMessageEditing/useMessageEditing';
-import {useMessageReply} from './useMessageReply/useMessageReply';
-import {useMessageSend} from './useMessageSend/useMessageSend';
-import {useOutsideInputClick} from './useOutsideInputClick/useOutsideInputClick';
+import {useDraftState} from './usedraftstate/usedraftstate';
+import {useMessageEditing} from './usemessageediting/usemessageediting';
+import {useMessageReply} from './usemessagereply/usemessagereply';
+import {useMessageSend} from './usemessagesend/usemessagesend';
+import {useOutsideInputClick} from './useoutsideinputclick/useoutsideinputclick';
 
-import {MessageContent} from '../common/messageContent/messageContent';
+import {MessageContent} from '../common/messagecontent/messagecontent';
 
 interface UseMessageHandlingProps {
   messageContent: MessageContent;

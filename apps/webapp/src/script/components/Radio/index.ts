@@ -17,4 +17,4 @@
  *
  */
 
-export * from './radioGroup';
+export * from './radiogroup';

@@ -19,7 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 
-import {SelectText} from './selectText';
+import {SelectText} from './selecttext';
 
 const selectionMock = window.getSelection() || ({} as Selection);
 selectionMock.removeAllRanges = jest.fn();

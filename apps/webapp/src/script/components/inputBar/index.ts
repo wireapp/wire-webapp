@@ -17,4 +17,4 @@
  *
  */
 
-export * from './inputBar';
+export * from './inputbar';

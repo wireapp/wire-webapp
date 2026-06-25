@@ -17,4 +17,4 @@
  *
  */
 
-export * from './zoomableImage';
+export * from './zoomableimage';

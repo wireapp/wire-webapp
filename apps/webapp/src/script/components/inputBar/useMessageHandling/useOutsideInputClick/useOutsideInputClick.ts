@@ -19,7 +19,7 @@
 
 import {useEffect} from 'react';
 
-import {handleClickOutsideOfInputBar} from 'Components/inputBar/util/clickHandlers';
+import {handleClickOutsideOfInputBar} from 'Components/inputBar/util/clickhandlers';
 
 interface UseOutsideInputClickParams {
   isEditing: boolean;

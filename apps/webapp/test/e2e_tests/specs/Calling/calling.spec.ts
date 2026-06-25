@@ -18,7 +18,7 @@
  */
 
 import {Page} from 'playwright/test';
-import {AudioType} from 'Repositories/audio/audioType';
+import {AudioType} from 'Repositories/audio/audiotype';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, withLogin, expect, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';

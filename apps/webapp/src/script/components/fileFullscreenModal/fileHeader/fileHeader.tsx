@@ -32,14 +32,14 @@ import {
   ShowIcon,
 } from '@wireapp/react-ui-kit';
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
+import {FileTypeIcon} from 'Components/conversation/common/filetypeicon/filetypeicon';
+import {isInRecycleBin} from 'Components/conversation/conversationcells/common/recyclebin/recyclebin';
 import {EditIcon} from 'Components/icon';
-import {iconStyles} from 'Components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/fileAssetOptions/fileAssetOptions.styles';
-import {MessageTime} from 'Components/messagesList/message/messageTime';
-import {useFileHistoryModal} from 'Components/modals/fileHistoryModal/hooks/useFileHistoryModal';
-import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {iconStyles} from 'Components/messagesList/message/contentmessage/asset/multipartassets/fileassetcard/common/fileassetoptions/fileassetoptions.styles';
+import {MessageTime} from 'Components/messagesList/message/messagetime';
+import {useFileHistoryModal} from 'Components/modals/filehistorymodal/hooks/usefilehistorymodal';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'Hooks/userelativetimestamp';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
@@ -53,7 +53,7 @@ import {
   downloadButtonStyles,
   actionButtonsStyles,
   editModeButtonStyles,
-} from './fileHeader.styles';
+} from './fileheader.styles';
 
 interface FileHeaderProps {
   id: string;

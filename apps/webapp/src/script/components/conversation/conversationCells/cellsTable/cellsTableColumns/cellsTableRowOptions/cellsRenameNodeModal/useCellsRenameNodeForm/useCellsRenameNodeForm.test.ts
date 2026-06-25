@@ -20,10 +20,10 @@
 import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
-import {useCellsRenameForm} from './useCellsRenameNodeForm';
+import {useCellsRenameForm} from './usecellsrenamenodeform';
 
 describe('useCellsRenameForm', () => {
   const renameNodeCopy = {

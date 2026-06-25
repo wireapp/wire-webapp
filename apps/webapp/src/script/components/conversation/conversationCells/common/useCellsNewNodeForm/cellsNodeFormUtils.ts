@@ -19,7 +19,7 @@
 
 import {Maybe} from 'true-myth';
 
-import {isAxiosError} from 'Util/typePredicateUtil';
+import {isAxiosError} from 'Util/typepredicateutil';
 
 export const ITEM_ALREADY_EXISTS_ERROR = 409;
 export const NODE_NAME_MAX_LENGTH = 64;

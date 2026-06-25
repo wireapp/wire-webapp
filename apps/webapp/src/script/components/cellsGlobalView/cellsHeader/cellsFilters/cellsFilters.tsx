@@ -17,11 +17,11 @@
  *
  */
 
-import {useCellsStore} from 'Components/cellsGlobalView/common/useCellsStore/useCellsStore';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useCellsStore} from 'Components/cellsglobalview/common/usecellsstore/usecellsstore';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 
-import {CellsClearFilters} from './cellsClearFilters/cellsClearFilters';
-import {CellsFiltersMenu} from './cellsFiltersMenu/cellsFiltersMenu';
+import {CellsClearFilters} from './cellsclearfilters/cellsclearfilters';
+import {CellsFiltersMenu} from './cellsfiltersmenu/cellsfiltersmenu';
 
 interface CellsFiltersProps {
   cellsRepository: CellsRepository;

@@ -18,8 +18,8 @@
  */
 
 import {PlusIcon} from 'Components/icon';
-import type {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {ConversationLabelRepository} from 'Repositories/conversation/conversationlabelrepository';
+import type {Conversation} from 'Repositories/entity/conversation';
 
 import {ContextMenuEntry, showContextMenu} from './contextMenu';
 

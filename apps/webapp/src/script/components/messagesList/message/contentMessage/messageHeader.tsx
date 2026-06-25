@@ -23,14 +23,14 @@ import {AVATAR_SIZE, Avatar} from 'Components/avatar';
 import {UserBlockedBadge} from 'Components/badge';
 import * as Icon from 'Components/icon';
 import {UserName} from 'Components/userName';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DeleteMessage} from 'Repositories/entity/message/deleteMessage';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {DeleteMessage} from 'Repositories/entity/message/deletemessage';
+import {User} from 'Repositories/entity/user';
+import {ServiceEntity} from 'Repositories/integration/serviceentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './messageHeader.styles';
+import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './messageheader.styles';
 
 type MessageHeaderParams = {
   message: ContentMessage | DeleteMessage;

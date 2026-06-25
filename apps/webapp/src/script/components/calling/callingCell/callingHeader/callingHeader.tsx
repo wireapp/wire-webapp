@@ -22,9 +22,9 @@ import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/avatar';
 import {Duration} from 'Components/calling/duration';
 import * as Icon from 'Components/icon';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
+import {isDetachedCallingFeatureEnabled} from 'Util/isdetachedcallingfeatureenabled';
 
 import {
   callAvatar,
@@ -35,7 +35,7 @@ import {
   cbrCallState,
   conversationCallName,
   detachedWindowButton,
-} from './callingHeader.styles';
+} from './callingheader.styles';
 
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 

@@ -17,18 +17,18 @@
  *
  */
 
-import {FileCard} from 'Components/fileCard/fileCard';
+import {FileCard} from 'Components/fileCard/filecard';
 import {
   controlStyles,
   playerWrapperStyles,
-} from 'Components/messagesList/message/contentMessage/asset/audioAsset/audioAssetV2.styles';
+} from 'Components/messagesList/message/contentmessage/asset/audioasset/audioassetv2.styles';
 
-import {AudioEmptySeekBar} from './audioEmptySeekBar/audioEmptySeekBar';
-import {wrapperStyles} from './audioPreviewCard.styles';
+import {AudioEmptySeekBar} from './audioemptyseekbar/audioemptyseekbar';
+import {wrapperStyles} from './audiopreviewcard.styles';
 
-import {FilePreviewDeleteButton} from '../common/filePreviewDeleteButton/filePreviewDeleteButton';
-import {FilePreviewErrorMoreButton} from '../common/filePreviewErrorMoreButton/filePreviewErrorMoreButton';
-import {FilePreviewPlayButton} from '../common/filePreviewPlayButton/filePreviewPlayButton';
+import {FilePreviewDeleteButton} from '../common/filepreviewdeletebutton/filepreviewdeletebutton';
+import {FilePreviewErrorMoreButton} from '../common/filepreviewerrormorebutton/filepreviewerrormorebutton';
+import {FilePreviewPlayButton} from '../common/filepreviewplaybutton/filepreviewplaybutton';
 
 interface AudioPreviewCardProps {
   extension: string;

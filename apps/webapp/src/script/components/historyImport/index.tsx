@@ -17,4 +17,4 @@
  *
  */
 
-export * from './historyImport';
+export * from './historyimport';

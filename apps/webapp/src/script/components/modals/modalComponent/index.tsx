@@ -17,4 +17,4 @@
  *
  */
 
-export * from './modalComponent';
+export * from './modalcomponent';

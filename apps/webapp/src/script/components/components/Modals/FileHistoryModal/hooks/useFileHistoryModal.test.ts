@@ -19,7 +19,7 @@
 
 import {renderHook, act} from '@testing-library/react';
 
-import {useFileHistoryModal} from './useFileHistoryModal';
+import {useFileHistoryModal} from './usefilehistorymodal';
 
 describe('useFileHistoryModal', () => {
   it('should initialize with closed state', () => {

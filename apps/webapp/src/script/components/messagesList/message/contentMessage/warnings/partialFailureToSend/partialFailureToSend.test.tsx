@@ -21,14 +21,14 @@ import {act, render} from '@testing-library/react';
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {generateQualifiedIds, generateUserClients, generateUsers, withTheme} from 'src/script/auth/util/test/TestUtil';
+import {generateQualifiedIds, generateUserClients, generateUsers, withTheme} from 'src/script/auth/util/test/testutil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {PartialFailureToSendWarning} from './partialFailureToSend';
-import {translateForTest} from 'Util/test/translateForTest';
+import {PartialFailureToSendWarning} from './partialfailuretosend';
+import {translateForTest} from 'Util/test/translatefortest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

@@ -23,17 +23,17 @@ import {RestNode} from 'cells-sdk-ts';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {MultipartAssets} from './multipartAssets';
-import {translateForTest} from 'Util/test/translateForTest';
+import {MultipartAssets} from './multipartassets';
+import {translateForTest} from 'Util/test/translatefortest';
 
-jest.mock('Hooks/useInView/useInView', () => ({
+jest.mock('Hooks/useInView/useinview', () => ({
   useInView: (): {elementRef: {current: null}; hasBeenInView: boolean} => ({
     elementRef: {current: null},
     hasBeenInView: true,

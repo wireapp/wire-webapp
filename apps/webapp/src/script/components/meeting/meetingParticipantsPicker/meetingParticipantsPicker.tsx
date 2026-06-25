@@ -25,11 +25,11 @@ import {Button, Popover} from 'react-aria-components';
 import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from '@wireapp/react-ui-kit';
 
 import {UserList} from 'Components/userList';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import type {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {formatSelectedSummary} from './formatSelectedSummary';
+import {formatSelectedSummary} from './formatselectedsummary';
 import {
   chevronButtonStyles,
   chevronIconStyles,
@@ -45,8 +45,8 @@ import {
   selectedSummaryStyles,
   valueContainerStyles,
   wrapperStyles,
-} from './meetingParticipantsPicker.styles';
-import {filterUsersByQuery, toggleUserInSelection} from './participantPickerUtils';
+} from './meetingparticipantspicker.styles';
+import {filterUsersByQuery, toggleUserInSelection} from './participantpickerutils';
 
 export interface MeetingParticipantsPickerProps {
   id: string;

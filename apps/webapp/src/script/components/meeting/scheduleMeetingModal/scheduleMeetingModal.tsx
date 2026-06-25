@@ -23,12 +23,12 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CalendarIcon, CloseIcon} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/modals/modalComponent';
-import {UserState} from 'Repositories/user/userState';
+import {ModalComponent} from 'Components/modals/modalcomponent';
+import {UserState} from 'Repositories/user/userstate';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
-import {ScheduleMeetingForm} from './scheduleMeetingForm';
+import {ScheduleMeetingForm} from './schedulemeetingform';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -39,9 +39,9 @@ import {
   submitButtonIconStyles,
   submitButtonStyles,
   wrapperStyles,
-} from './scheduleMeetingModal.styles';
-import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
-import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
+} from './schedulemeetingmodal.styles';
+import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useschedulemeetingmodal';
+import {useScheduleMeetingSubmit} from './useschedulemeetingsubmit';
 
 export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?: () => Promise<void>}) => {
   const {fireAndForgetInvoker, translate, wallClock} = useApplicationContext();

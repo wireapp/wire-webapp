@@ -36,35 +36,35 @@ import {
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/appNotification/appNotification';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {VideoBackgroundPerformancePanel} from 'Components/calling/videoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
-import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
+import {useAppNotification} from 'Components/appnotification/appnotification';
+import {useCallAlertState} from 'Components/calling/usecallalertstate';
+import {VideoBackgroundPerformancePanel} from 'Components/calling/videocontrols/videobackgroundperformancepanel/videobackgroundperformancepanel';
+import {ConversationClassifiedBar} from 'Components/classifiedbar/classifiedbar';
 import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/modals/modalComponent';
-import type {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import type {Grid} from 'Repositories/calling/videoGridHandler';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {detectCapabilities} from 'Repositories/media/backgroundEffects';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
-import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
+import {ModalComponent} from 'Components/modals/modalcomponent';
+import type {Call} from 'Repositories/calling/call';
+import {CallingRepository} from 'Repositories/calling/callingrepository';
+import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/callstate';
+import {Participant} from 'Repositories/calling/participant';
+import type {Grid} from 'Repositories/calling/videogridhandler';
+import type {Conversation} from 'Repositories/entity/conversation';
+import {detectCapabilities} from 'Repositories/media/backgroundeffects';
+import {MediaDevicesHandler} from 'Repositories/media/mediadeviceshandler';
+import {useBackgroundEffectsStore} from 'Repositories/media/usebackgroundeffectsstore';
+import type {BackgroundEffectSelection} from 'Repositories/media/videobackgroundeffects';
+import {BUILTIN_BACKGROUNDS} from 'Repositories/media/videobackgroundeffects';
+import {PropertiesRepository} from 'Repositories/properties/propertiesrepository';
+import {TeamState} from 'Repositories/team/teamstate';
+import {useActiveWindowMatchMedia} from 'src/script/hooks/useactivewindowmatchmedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CallViewTab} from 'src/script/view_model/CallingViewModel';
+import {CallViewTab} from 'src/script/viewModel/callingviewmodel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
+import {isDetachedCallingFeatureEnabled} from 'Util/isdetachedcallingfeatureenabled';
 import {handleKeyDown, isTabKey, KEY} from 'Util/keyboardUtil';
 import {preventFocusOutside} from 'Util/util';
 
-import {CallingParticipantList} from './callingCell/callIngParticipantList';
+import {CallingParticipantList} from './callingcell/callingparticipantlist';
 import {Duration} from './duration';
 import {
   classifiedBarStyles,
@@ -74,14 +74,14 @@ import {
   paginationStyles,
   paginationWrapperStyles,
   videoTopBarStyles,
-} from './fullscreenVideoCall.styles';
-import {GroupVideoGrid} from './groupVideoGrid';
+} from './fullscreenvideocall.styles';
+import {GroupVideoGrid} from './groupvideogrid';
 import {Pagination} from './pagination/pagination';
-import {VideoBackgroundSettings} from './videoControls/videoBackgroundSettings/videoBackgroundSettings';
-import {VideoControls} from './videoControls/videoControls';
+import {VideoBackgroundSettings} from './videocontrols/videobackgroundsettings/videobackgroundsettings';
+import {VideoControls} from './videocontrols/videocontrols';
 
-import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
-import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
+import {useWarningsState} from '../../viewModel/warningscontainer/warningsstate';
+import {CONFIG, TYPE} from '../../viewModel/warningscontainer/warningstypes';
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;

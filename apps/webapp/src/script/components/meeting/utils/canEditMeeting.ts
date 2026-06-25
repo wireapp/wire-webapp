@@ -17,8 +17,8 @@
  *
  */
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import type {User} from 'Repositories/entity/User';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import type {User} from 'Repositories/entity/user';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export const canEditMeeting = (meeting: Meeting, selfUser: User, nowMs: number): boolean => {

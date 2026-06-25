@@ -21,20 +21,20 @@ import {render} from '@testing-library/react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {translateForTest} from 'Util/test/translateForTest';
+import {Conversation} from 'Repositories/entity/conversation';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/membermessage';
+import {User} from 'Repositories/entity/user';
+import {withTheme} from 'src/script/auth/util/test/testutil';
+import {SystemMessageType} from 'src/script/message/systemmessagetype';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 
-import {MessageWrapper} from './messageWrapper';
+import {MessageWrapper} from './messagewrapper';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

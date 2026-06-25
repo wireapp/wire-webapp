@@ -20,13 +20,13 @@
 import {render} from '@testing-library/react';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {ReceiptModeToggle} from './receiptModeToggle';
+import {ReceiptModeToggle} from './receiptmodetoggle';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

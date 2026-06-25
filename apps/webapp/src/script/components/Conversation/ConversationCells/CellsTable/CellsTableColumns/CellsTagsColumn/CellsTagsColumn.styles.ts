@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {styleBreakpoint} from 'Components/conversation/conversationCells/common/styleBreakpoint/styleBreakpoint';
+import {styleBreakpoint} from 'Components/conversation/conversationcells/common/stylebreakpoint/stylebreakpoint';
 
 export const wrapperStyles: CSSObject = {
   display: 'inline-flex',

@@ -25,11 +25,11 @@ import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {Dispatch, UnknownAction} from 'redux';
 import {match, P} from 'ts-pattern';
 
-import {APIClient} from 'src/script/service/apiClientSingleton';
+import {APIClient} from 'src/script/service/apiclientsingleton';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
-import {ValidationError} from '../../module/action/ValidationError';
-import {ConversationState} from '../../module/reducer/conversationReducer';
+import {ValidationError} from '../../module/action/validationerror';
+import {ConversationState} from '../../module/reducer/conversationreducer';
 import {QUERY_KEY, ROUTE} from '../../route';
 
 export const requiresPasswordModal = (

@@ -21,9 +21,9 @@ import {result, Result} from 'true-myth';
 
 import type {WallClock} from 'src/script/clock/wallClock';
 
-import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+import type {ScheduleMeetingFormState} from './schedulemeetingtypes';
 
-import {ScheduleFormErrors, scheduleFormErrors} from '../scheduleFormErrors';
+import {ScheduleFormErrors, scheduleFormErrors} from '../scheduleformerrors';
 
 export const requireScheduleMeetingTimes = (
   formState: ScheduleMeetingFormState,

@@ -21,15 +21,15 @@ import {act} from 'react';
 import {render, fireEvent} from '@testing-library/react';
 import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decrypterrormessage';
+import {User} from 'Repositories/entity/user';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {DecryptErrorMessage} from './decryptErrorMessage';
+import {DecryptErrorMessage} from './decrypterrormessage';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

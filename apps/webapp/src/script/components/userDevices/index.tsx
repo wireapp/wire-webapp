@@ -17,5 +17,5 @@
  *
  */
 
-export * from './userDevices';
-export * from './userDevices.types';
+export * from './userdevices';
+export * from './userdevices.types';

@@ -20,13 +20,13 @@
 import is from '@sindresorhus/is';
 import {RestNode, RestPagination} from 'cells-sdk-ts';
 
-import {CellPagination} from 'Components/conversation/conversationCells/common/cellPagination/cellPagination';
-import {User} from 'Repositories/entity/User';
+import {CellPagination} from 'Components/conversation/conversationcells/common/cellpagination/cellpagination';
+import {User} from 'Repositories/entity/user';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
-import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
+import {getUserQualifiedIdFromNode} from '../common/getuserqualifiedidfromnode/getuserqualifiedidfromnode';
 
 export const transformDataToCellsNodes = ({nodes, users}: {nodes: RestNode[]; users: User[]}): Array<CellNode> => {
   return nodes.map(node => {

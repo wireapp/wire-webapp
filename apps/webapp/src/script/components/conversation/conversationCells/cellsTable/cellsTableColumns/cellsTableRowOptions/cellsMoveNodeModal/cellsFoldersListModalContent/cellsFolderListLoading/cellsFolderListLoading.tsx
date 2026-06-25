@@ -17,7 +17,7 @@
  *
  */
 
-import {spinnerStyles, wrapperStyles} from './cellsFolderListLoading.styles';
+import {spinnerStyles, wrapperStyles} from './cellsfolderlistloading.styles';
 
 export const CellsFolderListLoading = () => {
   return (

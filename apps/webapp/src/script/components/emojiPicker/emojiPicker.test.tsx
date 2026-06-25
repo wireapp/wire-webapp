@@ -21,12 +21,12 @@ import React from 'react';
 
 import {render, waitFor} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {withTheme} from 'src/script/auth/util/test/testutil';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {EmojiPicker} from './emojiPicker';
+import {EmojiPicker} from './emojipicker';
 
-import {handleClickOutsideOfInputBar} from '../inputBar/util/clickHandlers';
+import {handleClickOutsideOfInputBar} from '../inputBar/util/clickhandlers';
 
 describe('EmojiPicker', () => {
   it('marks the dialog as ignored for input bar outside-click handling', async () => {

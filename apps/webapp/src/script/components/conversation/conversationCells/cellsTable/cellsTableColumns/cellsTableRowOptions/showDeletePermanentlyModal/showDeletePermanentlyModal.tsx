@@ -17,10 +17,10 @@
  *
  */
 
-import {PrimaryModal} from 'Components/modals/primaryModal';
+import {PrimaryModal} from 'Components/modals/primarymodal';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import {replaceReactComponents} from 'Util/localizerUtil/reactlocalizerutil';
 
 export const showDeletePermanentlyModal = ({
   node,

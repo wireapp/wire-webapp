@@ -25,36 +25,36 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {E2EIVerificationMessage} from 'Components/messagesList/message/e2eiVerificationMessage';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {E2EIVerificationMessage} from 'Components/messagesList/message/e2eiverificationmessage';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
+import {OutgoingQuote} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {CompositeMessage} from 'Repositories/entity/message/compositemessage';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
 import {Text} from 'Repositories/entity/message/text';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamstate';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {CallMessage} from './callMessage';
-import {CallTimeoutMessage} from './callTimeoutMessage';
-import {ContentMessageComponent} from './contentMessage';
-import {DecryptErrorMessage} from './decryptErrorMessage';
-import {DeleteMessage} from './deleteMessage';
-import {FailedToAddUsersMessage} from './failedToAddUsersMessage';
-import {FederationStopMessage} from './federationStopMessage';
-import {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
-import {LegalHoldMessage} from './legalHoldMessage';
-import {MemberMessage} from './memberMessage';
-import {MissedMessage} from './missedMessage';
-import {PingMessage} from './pingMessage';
-import {SystemMessage} from './systemMessage';
-import {VerificationMessage} from './verificationMessage';
+import {CallMessage} from './callmessage';
+import {CallTimeoutMessage} from './calltimeoutmessage';
+import {ContentMessageComponent} from './contentmessage';
+import {DecryptErrorMessage} from './decrypterrormessage';
+import {DeleteMessage} from './deletemessage';
+import {FailedToAddUsersMessage} from './failedtoaddusersmessage';
+import {FederationStopMessage} from './federationstopmessage';
+import {FileTypeRestrictedMessage} from './filetyperestrictedmessage';
+import {LegalHoldMessage} from './legalholdmessage';
+import {MemberMessage} from './membermessage';
+import {MissedMessage} from './missedmessage';
+import {PingMessage} from './pingmessage';
+import {SystemMessage} from './systemmessage';
+import {VerificationMessage} from './verificationmessage';
 
 import {ContextMenuEntry} from '../../../ui/contextMenu';
 
-import {MessageParams} from './index';
+import {MessageParams} from './';
 
 const isOutgoingQuote = (QuoteEntity: QuoteEntity): QuoteEntity is OutgoingQuote => {
   return QuoteEntity.hash !== undefined;

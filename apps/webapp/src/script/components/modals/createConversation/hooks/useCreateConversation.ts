@@ -28,16 +28,16 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {ACCESS_STATE} from 'Repositories/conversation/accessstate';
 import {
   toggleFeature,
   teamPermissionsForAccessState,
   ACCESS_TYPES,
   ACCESS_MODES,
-} from 'Repositories/conversation/ConversationAccessPermission';
-import {TeamState} from 'Repositories/team/TeamState';
-import {Config} from 'src/script/Config';
-import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+} from 'Repositories/conversation/conversationaccesspermission';
+import {TeamState} from 'Repositories/team/teamstate';
+import {Config} from 'src/script/config';
+import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/usesidebarstore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
@@ -45,8 +45,8 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKeyboardEvent} from 'Util/keyboardUtil';
 import {replaceLink} from 'Util/localizerUtil';
 
-import {PrimaryModal} from '../../primaryModal';
-import {useCreateConversationModal} from './useCreateConversationModal';
+import {PrimaryModal} from '../../primarymodal';
+import {useCreateConversationModal} from './usecreateconversationmodal';
 import {ConversationAccess, ConversationCreationStep, ConversationType} from '../types';
 import {NonFederatingParticipantsModalCopy} from '../utils';
 

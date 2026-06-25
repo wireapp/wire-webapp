@@ -17,4 +17,4 @@
  *
  */
 
-export * from './systemMessage';
+export * from './systemmessage';

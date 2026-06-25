@@ -23,9 +23,9 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import * as Icon from 'Components/icon';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamState} from 'Repositories/team/TeamState';
-import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
+import {Conversation} from 'Repositories/entity/conversation';
+import {TeamState} from 'Repositories/team/teamstate';
+import {EphemeralTimings} from 'src/script/ephemeral/ephemeraltimings';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {showContextMenu} from 'src/script/ui/contextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './userList';
+export * from './userlist';

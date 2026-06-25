@@ -19,7 +19,7 @@
 
 import is from '@sindresorhus/is';
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 export const filterUsersByQuery = (users: User[], query: string): User[] => {
   if (is.emptyString(query.trim())) {

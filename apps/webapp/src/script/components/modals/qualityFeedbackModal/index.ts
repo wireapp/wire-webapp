@@ -17,4 +17,4 @@
  *
  */
 
-export * from './qualityFeedbackModal';
+export * from './qualityfeedbackmodal';

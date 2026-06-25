@@ -26,25 +26,25 @@ import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
-import {showDetailViewModal} from 'Components/modals/detailViewModal';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
-import {Config} from 'src/script/Config';
+import {showDetailViewModal} from 'Components/modals/detailviewmodal';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {User} from 'Repositories/entity/user';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {CollectionDetails} from './collectionDetails';
-import {CollectionSection} from './collectionSection';
-import {FullSearch} from './fullSearch';
+import {CollectionDetails} from './collectiondetails';
+import {CollectionSection} from './collectionsection';
+import {FullSearch} from './fullsearch';
 import {Category, isOfCategory} from './utils';
 
-import {MessageCategory} from '../../../../message/messageCategory';
+import {MessageCategory} from '../../../../message/messagecategory';
 
 type CollectionProps = {
   conversation: Conversation;

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './connectionRequests';
+export * from './connectionrequests';

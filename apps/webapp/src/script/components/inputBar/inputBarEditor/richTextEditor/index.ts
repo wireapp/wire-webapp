@@ -17,4 +17,4 @@
  *
  */
 
-export * from './richTextEditor';
+export * from './richtexteditor';

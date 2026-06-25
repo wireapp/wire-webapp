@@ -25,23 +25,23 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {UserRepository} from 'Repositories/user/userrepository';
 
-import {createRequestVersionGate} from './requestVersionGate';
+import {createRequestVersionGate} from './requestversiongate';
 
 import {
   ConversationDriveFiltersState,
   hasActiveSearchParams,
   toConversationDriveSearchParams,
-} from '../common/driveFilters/driveFilters';
-import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
-import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
-import {LOAD_MORE_INCREMENT, LOAD_MORE_INITIAL_SIZE} from '../common/loadMorePagination/loadMorePagination';
-import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
-import {useCellsStore} from '../common/useCellsStore/useCellsStore';
-import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
-import {transformDataToCellsNodes, transformToCellPagination} from '../useGetAllCellsNodes/transformDataToCellsNodes';
+} from '../common/drivefilters/drivefilters';
+import {getCellsApiPath} from '../common/getcellsapipath/getcellsapipath';
+import {getCellsFilesPath} from '../common/getcellsfilespath/getcellsfilespath';
+import {LOAD_MORE_INCREMENT, LOAD_MORE_INITIAL_SIZE} from '../common/loadmorepagination/loadmorepagination';
+import {RECYCLE_BIN_PATH} from '../common/recyclebin/recyclebin';
+import {useCellsStore} from '../common/usecellsstore/usecellsstore';
+import {getUsersFromNodes} from '../usegetallcellsnodes/getusersfromnodes';
+import {transformDataToCellsNodes, transformToCellPagination} from '../usegetallcellsnodes/transformdatatocellsnodes';
 
 interface UseConversationSearchFilesProps {
   cellsRepository: CellsRepository;

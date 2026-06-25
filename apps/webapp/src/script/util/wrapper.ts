@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ROLE} from 'Repositories/user/userPermission';
+import {ROLE} from 'Repositories/user/userpermission';
 
 import {Environment} from './environment';
 

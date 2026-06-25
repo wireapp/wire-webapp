@@ -20,15 +20,15 @@
 import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {AssetTransferState} from 'Repositories/assets/assettransferstate';
+import {FileAsset} from 'Repositories/entity/message/fileasset';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {MediaButton, MediaButtonProps} from './mediaButton';
-import {translateForTest} from 'Util/test/translateForTest';
+import {MediaButton, MediaButtonProps} from './mediabutton';
+import {translateForTest} from 'Util/test/translatefortest';
 
 describe('MediaButton', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

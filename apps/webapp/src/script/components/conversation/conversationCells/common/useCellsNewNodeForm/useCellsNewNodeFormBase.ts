@@ -25,7 +25,7 @@ import {
   getClientSideNodeNameError,
   getErrorStatus,
   isClientSideNodeNameError,
-} from './cellsNodeFormUtils';
+} from './cellsnodeformutils';
 
 interface UseCellsNewNodeFormBaseProps {
   createNode: (name: string) => Promise<void>;

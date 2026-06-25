@@ -21,8 +21,8 @@ import {useCallback, useRef} from 'react';
 
 import {groupBy} from 'underscore';
 
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {Message} from 'Repositories/entity/message/message';
 
 type ReadMessageBuffer = {conversation: Conversation; message: Message};

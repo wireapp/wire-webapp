@@ -29,7 +29,7 @@ import {
   radioLabelStyles,
   radioOptionHorizontalStyles,
   radioOptionStyles,
-} from './radioGroup.styles';
+} from './radiogroup.styles';
 
 interface RadioGroupProps<T> {
   ariaLabelledBy: string;

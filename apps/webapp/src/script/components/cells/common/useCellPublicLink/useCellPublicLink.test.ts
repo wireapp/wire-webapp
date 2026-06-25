@@ -19,13 +19,13 @@
 
 import {act, renderHook, waitFor} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
-import {useCellPublicLink} from './useCellPublicLink';
+import {useCellPublicLink} from './usecellpubliclink';
 
-jest.mock('src/script/Config', () => ({
+jest.mock('src/script/config', () => ({
   Config: {
     getConfig: () => ({
       CELLS_PYDIO_URL: 'https://cells.example.com',

@@ -19,15 +19,15 @@
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/modals/modalComponent';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {ModalComponent} from 'Components/modals/modalcomponent';
+import {IntegrationRepository} from 'Repositories/integration/integrationrepository';
+import {ServiceEntity} from 'Repositories/integration/serviceentity';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/usesidebarstore';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../viewModel/actionsviewmodel';
 
 interface ServiceModalProps {
   translate: Translate;

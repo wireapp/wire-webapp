@@ -18,9 +18,9 @@
  */
 
 import {Maybe} from 'true-myth';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {unwrap, unwrapErr} from 'Util/test/resulttestsupport';
 
-import {validateCollaboraUrl} from './validateCollaboraUrl';
+import {validateCollaboraUrl} from './validatecollaboraurl';
 
 const TRUSTED_ORIGIN = 'https://cells.example.com';
 

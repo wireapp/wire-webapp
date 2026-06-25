@@ -19,10 +19,10 @@
 
 import {LexicalEditor, $nodesOfType} from 'lexical';
 
-import {User} from 'Repositories/entity/User';
-import {MentionEntity} from 'src/script/message/mentionEntity';
+import {User} from 'Repositories/entity/user';
+import {MentionEntity} from 'src/script/message/mentionentity';
 
-import {MentionNode} from '../nodes/mentionNode';
+import {MentionNode} from '../nodes/mentionnode';
 
 export const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[]) => {
   const editorMentions = editor.getEditorState().read(() =>

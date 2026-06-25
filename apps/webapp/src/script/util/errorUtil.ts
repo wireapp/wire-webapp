@@ -19,7 +19,7 @@
 
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 
-import {LabeledError} from '../auth/module/action/LabeledError';
+import {LabeledError} from '../auth/module/action/labelederror';
 
 export const errorHandlerStrings = {
   [BackendErrorLabel.NO_CONVERSATION_CODE]: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',

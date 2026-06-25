@@ -19,8 +19,8 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
-import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
+import {getCellsFilesPath} from '../getcellsfilespath/getcellsfilespath';
+import {RECYCLE_BIN_PATH} from '../recyclebin/recyclebin';
 
 export const getCellsApiPath = ({
   conversationQualifiedId,

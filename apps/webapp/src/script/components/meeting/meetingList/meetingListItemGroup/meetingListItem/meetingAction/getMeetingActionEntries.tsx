@@ -19,13 +19,13 @@
 
 import {CallIcon, CirclePlusIcon, CloseIcon, EditIcon, ShareLinkIcon, TrashIcon} from '@wireapp/react-ui-kit';
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
 import {
   contextMenuDangerItemIconStyles,
   contextMenuDangerItemStyles,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingAction.styles';
-import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
-import type {User} from 'Repositories/entity/User';
+} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitem/meetingaction/meetingaction.styles';
+import {canEditMeeting} from 'Components/meeting/utils/caneditmeeting';
+import type {User} from 'Repositories/entity/user';
 import type {ContextMenuEntry} from 'src/script/ui/contextMenu';
 import type {Translate} from 'Util/localizerUtil';
 

@@ -23,8 +23,8 @@ import {create} from 'zustand';
 
 import {getNextHourDateTime} from '@wireapp/react-ui-kit';
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import type {User} from 'Repositories/entity/User';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import type {User} from 'Repositories/entity/user';
 import type {WallClock} from 'src/script/clock/wallClock';
 
 import type {
@@ -32,15 +32,15 @@ import type {
   ScheduleMeetingFormState,
   ScheduleMeetingMode,
   ScheduleMeetingRecurrenceOption,
-} from './scheduleMeetingTypes';
-import {hasScheduleMeetingFormErrors, validateScheduleMeetingForm} from './scheduleMeetingValidation';
+} from './schedulemeetingtypes';
+import {hasScheduleMeetingFormErrors, validateScheduleMeetingForm} from './schedulemeetingvalidation';
 
 export type {
   ScheduleMeetingFormErrors,
   ScheduleMeetingFormState,
   ScheduleMeetingRecurrenceOption,
-} from './scheduleMeetingTypes';
-export type {ScheduleMeetingMode as ScheduleMeetingModalMode} from './scheduleMeetingTypes';
+} from './schedulemeetingtypes';
+export type {ScheduleMeetingMode as ScheduleMeetingModalMode} from './schedulemeetingtypes';
 
 export {hasScheduleMeetingFormErrors, validateScheduleMeetingForm};
 

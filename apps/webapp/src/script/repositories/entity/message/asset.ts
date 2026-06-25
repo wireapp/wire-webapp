@@ -17,11 +17,11 @@
  *
  */
 
-import {AssetType} from 'Repositories/assets/assetType';
+import {AssetType} from 'Repositories/assets/assettype';
 
-import type {FileAsset} from './fileAsset';
+import type {FileAsset} from './fileasset';
 import type {Location as LocationAsset} from './location';
-import type {MediumImage as MediumImageAsset} from './mediumImage';
+import type {MediumImage as MediumImageAsset} from './mediumimage';
 import type {Multipart as MultipartAsset} from './multipart';
 import type {Text as TextAsset} from './text';
 

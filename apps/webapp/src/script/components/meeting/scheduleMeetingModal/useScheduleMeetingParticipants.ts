@@ -21,10 +21,10 @@ import {useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
-import {getScheduleMeetingParticipantPool} from 'Components/meeting/getScheduleMeetingParticipantPool';
-import type {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {getScheduleMeetingParticipantPool} from 'Components/meeting/getschedulemeetingparticipantpool';
+import type {User} from 'Repositories/entity/user';
+import {TeamState} from 'Repositories/team/teamstate';
+import {UserState} from 'Repositories/user/userstate';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 export const useScheduleMeetingParticipants = (): {users: User[]} => {

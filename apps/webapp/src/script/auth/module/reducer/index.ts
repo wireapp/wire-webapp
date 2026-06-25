@@ -23,14 +23,14 @@ import type {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatc
 import type {APIClient} from '@wireapp/api-client';
 import type {Account} from '@wireapp/core';
 
-import {AuthState, authReducer, initialAuthState} from './authReducer';
-import {ClientState, clientReducer, initialClientState} from './clientReducer';
-import {ConversationState, conversationReducer, initialConversationState} from './conversationReducer';
-import {InvitationState, initialInvitationState, invitationReducer} from './inviteReducer';
-import {LanguageState, initialLanguageState, languageReducer} from './languageReducer';
-import {SelfState, initialSelfState, selfReducer} from './selfReducer';
+import {AuthState, authReducer, initialAuthState} from './authreducer';
+import {ClientState, clientReducer, initialClientState} from './clientreducer';
+import {ConversationState, conversationReducer, initialConversationState} from './conversationreducer';
+import {InvitationState, initialInvitationState, invitationReducer} from './invitereducer';
+import {LanguageState, initialLanguageState, languageReducer} from './languagereducer';
+import {SelfState, initialSelfState, selfReducer} from './selfreducer';
 
-import type {Configuration} from '../../../Config';
+import type {Configuration} from '../../../config';
 import type {ActionRoot} from '../action';
 
 export type Api = {

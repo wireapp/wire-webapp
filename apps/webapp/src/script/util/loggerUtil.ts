@@ -21,7 +21,7 @@ import is from '@sindresorhus/is';
 
 import {getStorage} from './localStorage';
 
-import {Configuration} from '../Config';
+import {Configuration} from '../config';
 
 export function enableLogging(config: Configuration, search = window.location.search) {
   const storage = getStorage();

@@ -21,7 +21,7 @@ import {useEffect} from 'react';
 
 import {FallbackProps} from 'react-error-boundary';
 
-import {PrimaryModal} from 'Components/modals/primaryModal';
+import {PrimaryModal} from 'Components/modals/primarymodal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 

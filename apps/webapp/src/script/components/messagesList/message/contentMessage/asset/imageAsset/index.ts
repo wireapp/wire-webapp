@@ -17,4 +17,4 @@
  *
  */
 
-export * from './imageAsset';
+export * from './imageasset';

@@ -33,18 +33,18 @@ import {
   LinkIcon,
 } from '@wireapp/react-ui-kit';
 
-import {FormatSeparator} from 'Components/inputBar/common/formatSeparator/formatSeparator';
+import {FormatSeparator} from 'Components/inputBar/common/formatseparator/formatseparator';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {FormatButton} from './formatButton/formatButton';
-import {wrapperStyles} from './formatToolbar.styles';
-import {LinkDialog} from './linkDialog/linkDialog';
-import {useBlockquoteState} from './useBlockquoteState/useBlockquoteState';
-import {useCodeBlockState} from './useCodeBlockState/useCodeBlockState';
-import {useHeadingState} from './useHeadingState/useHeadingState';
-import {useLinkState} from './useLinkState/useLinkState';
-import {useListState} from './useListState/useListState';
-import {useToolbarState} from './useToolbarState/useToolbarState';
+import {FormatButton} from './formatbutton/formatbutton';
+import {wrapperStyles} from './formattoolbar.styles';
+import {LinkDialog} from './linkdialog/linkdialog';
+import {useBlockquoteState} from './useblockquotestate/useblockquotestate';
+import {useCodeBlockState} from './usecodeblockstate/usecodeblockstate';
+import {useHeadingState} from './useheadingstate/useheadingstate';
+import {useLinkState} from './uselinkstate/uselinkstate';
+import {useListState} from './useliststate/useliststate';
+import {useToolbarState} from './usetoolbarstate/usetoolbarstate';
 
 interface FormatToolbarProps {
   isEditing: boolean;

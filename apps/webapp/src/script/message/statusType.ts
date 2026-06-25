@@ -17,7 +17,7 @@
  *
  */
 
-import {EventRecord} from 'Repositories/storage/record/eventRecord';
+import {EventRecord} from 'Repositories/storage/record/eventrecord';
 
 /** Enum for different confirmation types */
 export enum StatusType {

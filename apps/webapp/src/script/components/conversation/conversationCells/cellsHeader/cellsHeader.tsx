@@ -19,8 +19,8 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsSearchInput} from 'Components/cellssearchinput/cellssearchinput';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -29,18 +29,18 @@ import {
   contentStyles,
   searchWrapperStyles,
   wrapperStyles,
-} from './cellsHeader.styles';
-import {CellsMoreMenu} from './cellsMoreMenu/cellsMoreMenu';
-import {CellsNewMenu} from './cellsNewMenu/cellsNewMenu';
-import {CellsRefresh} from './cellsRefresh/cellsRefresh';
-import {CellsRootHomeIcon} from './cellsRootHomeIcon';
+} from './cellsheader.styles';
+import {CellsMoreMenu} from './cellsmoremenu/cellsmoremenu';
+import {CellsNewMenu} from './cellsnewmenu/cellsnewmenu';
+import {CellsRefresh} from './cellsrefresh/cellsrefresh';
+import {CellsRootHomeIcon} from './cellsroothomeicon';
 
-import {CellsBreadcrumbs} from '../common/cellsBreadcrumbs/cellsBreadcrumbs';
-import {CellsFiltersBar} from '../common/cellsFiltersBar/cellsFiltersBar';
-import type {FilterConfig} from '../common/cellsFiltersBar/filterConfig';
-import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
-import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
-import {openBreadcrumb} from '../common/openBreadcrumb/openBreadcrumb';
+import {CellsBreadcrumbs} from '../common/cellsbreadcrumbs/cellsbreadcrumbs';
+import {CellsFiltersBar} from '../common/cellsfiltersbar/cellsfiltersbar';
+import type {FilterConfig} from '../common/cellsfiltersbar/filterconfig';
+import {getBreadcrumbsFromPath} from '../common/getbreadcrumbsfrompath/getbreadcrumbsfrompath';
+import {getCellsFilesPath} from '../common/getcellsfilespath/getcellsfilespath';
+import {openBreadcrumb} from '../common/openbreadcrumb/openbreadcrumb';
 
 interface CellsHeaderProps {
   onRefresh: () => void;

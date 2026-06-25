@@ -21,7 +21,7 @@ import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {closeButtonStyles, headerStyles, headingStyles} from './cellsFilterModalHeader.styles';
+import {closeButtonStyles, headerStyles, headingStyles} from './cellsfiltermodalheader.styles';
 
 interface CellsFilterModalHeaderProps {
   onClose: () => void;

@@ -20,13 +20,13 @@
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 import {result, Result} from 'true-myth';
 
-import {getInvitedEmailsFromSelectedUsers} from 'Components/meeting/getInvitedEmailsFromSelectedUsers';
-import {requireScheduleMeetingTimes} from 'Components/meeting/scheduleMeetingModal/requireScheduleMeetingTimes';
-import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingRecurrence';
-import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
+import {getInvitedEmailsFromSelectedUsers} from 'Components/meeting/getinvitedemailsfromselectedusers';
+import {requireScheduleMeetingTimes} from 'Components/meeting/schedulemeetingmodal/requireschedulemeetingtimes';
+import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/meeting/schedulemeetingmodal/schedulemeetingrecurrence';
+import type {ScheduleMeetingFormState} from 'Components/meeting/schedulemeetingmodal/schedulemeetingtypes';
 import type {WallClock} from 'src/script/clock/wallClock';
 
-import {ScheduleFormErrors, scheduleFormErrors} from './scheduleFormErrors';
+import {ScheduleFormErrors, scheduleFormErrors} from './scheduleformerrors';
 
 export const mapScheduleFormToCreateMeeting = (
   formState: ScheduleMeetingFormState,

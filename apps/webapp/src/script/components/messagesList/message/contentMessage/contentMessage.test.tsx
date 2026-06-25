@@ -20,21 +20,21 @@
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {LinkPreview} from 'Repositories/entity/message/linkPreview';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {LinkPreview} from 'Repositories/entity/message/linkpreview';
 import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {createUuid} from 'Util/uuid';
 
-import {ContentMessageComponent, ContentMessageProps} from './contentMessage';
+import {ContentMessageComponent, ContentMessageProps} from './contentmessage';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(

@@ -23,17 +23,17 @@ import {container} from 'tsyringe';
 import {
   cellControlsList,
   cellControlsWrapper,
-} from 'Components/calling/callingCell/callingControls/callingControls.styles';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
+} from 'Components/calling/callingcell/callingcontrols/callingcontrols.styles';
+import {useCallAlertState} from 'Components/calling/usecallalertstate';
 import * as Icon from 'Components/icon';
-import {Call} from 'Repositories/calling/Call';
-import {DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import {TeamState} from 'Repositories/team/TeamState';
+import {Call} from 'Repositories/calling/call';
+import {DesktopScreenShareMenu} from 'Repositories/calling/callstate';
+import {Participant} from 'Repositories/calling/participant';
+import {TeamState} from 'Repositories/team/teamstate';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {CallActions} from '../../../../view_model/CallingViewModel';
+import {CallActions} from '../../../../viewModel/callingviewmodel';
 
 interface CallingControlsProps {
   answerCall: () => void;

@@ -20,7 +20,7 @@
 import is from '@sindresorhus/is';
 import {escape} from 'underscore';
 
-import type {Substitutions, TranslationKey} from './translationTypes';
+import type {Substitutions, TranslationKey} from './translationtypes';
 
 type TranslationSubstitutions = Substitutions;
 

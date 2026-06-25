@@ -23,14 +23,14 @@ import {$convertFromMarkdownString} from '@lexical/markdown';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getRoot, $setSelection} from 'lexical';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
 
-import {getMentionMarkdownTransformer} from './getMentionMarkdownTransformer/getMentionMarkdownTransformer';
-import {getMentionNodesFromMessage} from './getMentionNodesFromMessage/getMentionNodesFromMessage';
-import {getRawMarkdownNodesWithMentions} from './getRawMarkdownFromMessage/getRawMarkdownFromMessage';
-import {wrapMentionsWithTags} from './wrapMentionsWithTags/wrapMentionsWithTags';
+import {getMentionMarkdownTransformer} from './getmentionmarkdowntransformer/getmentionmarkdowntransformer';
+import {getMentionNodesFromMessage} from './getmentionnodesfrommessage/getmentionnodesfrommessage';
+import {getRawMarkdownNodesWithMentions} from './getrawmarkdownfrommessage/getrawmarkdownfrommessage';
+import {wrapMentionsWithTags} from './wrapmentionswithtags/wrapmentionswithtags';
 
-import {markdownTransformers} from '../../utils/markdownTransformers';
+import {markdownTransformers} from '../../utils/markdowntransformers';
 
 type Props = {
   message?: ContentMessage;

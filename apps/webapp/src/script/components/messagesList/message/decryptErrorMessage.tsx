@@ -20,15 +20,15 @@
 import {useState} from 'react';
 
 import * as Icon from 'Components/icon';
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
-import {Config} from 'src/script/Config';
-import {MotionDuration} from 'src/script/motion/MotionDuration';
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decrypterrormessage';
+import {Config} from 'src/script/config';
+import {MotionDuration} from 'src/script/motion/motionduration';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {splitFingerprint} from 'Util/stringUtil';
 
-import {messageBodyWrapper} from './contentMessage/contentMessage.styles';
+import {messageBodyWrapper} from './contentmessage/contentmessage.styles';
 
-import {FormattedId} from '../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
+import {FormattedId} from '../../../page/mainContent/panels/preferences/devicespreferences/components/formattedid';
 
 interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;

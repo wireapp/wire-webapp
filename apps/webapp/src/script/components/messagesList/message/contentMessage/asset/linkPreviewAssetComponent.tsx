@@ -22,7 +22,7 @@ import {UIEvent, useRef} from 'react';
 import cx from 'classnames';
 
 import {Image} from 'Components/image';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {ContentMessage} from 'Repositories/entity/message/contentmessage';
 import type {Text} from 'Repositories/entity/message/text';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -31,7 +31,7 @@ import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {cleanURL, prependProtocol} from 'Util/urlUtil';
 import {isTweetUrl} from 'Util/validationUtil';
 
-import {AssetHeader} from './common/assetHeader/assetHeader';
+import {AssetHeader} from './common/assetheader/assetheader';
 
 import {useMessageFocusedTabIndex} from '../../util';
 

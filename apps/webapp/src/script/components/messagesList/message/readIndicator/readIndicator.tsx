@@ -22,7 +22,7 @@ import {Message} from 'Repositories/entity/message/message';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {formatTimeShort} from 'Util/timeUtil';
 
-import {ReadIndicatorContainer, ReadIndicatorStyles, ReadReceiptText} from './readIndicator.styles';
+import {ReadIndicatorContainer, ReadIndicatorStyles, ReadReceiptText} from './readindicator.styles';
 
 interface ReadIndicatorProps {
   message: Message;

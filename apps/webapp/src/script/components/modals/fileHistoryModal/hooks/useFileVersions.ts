@@ -26,14 +26,14 @@ import {container} from 'tsyringe';
 
 import {parseQualifiedId} from '@wireapp/core';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserState} from 'Repositories/user/userState';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {UserState} from 'Repositories/user/userstate';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
 import {FileInfo, FileVersion} from '../types';
-import {groupVersionsByDate} from '../utils/fileVersionUtils';
+import {groupVersionsByDate} from '../utils/fileversionutils';
 
 const logger = getLogger('FileVersionHistoryModal');
 

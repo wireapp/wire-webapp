@@ -20,10 +20,10 @@
 import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 
-import {useCellsNewFileForm} from './useCellsNewFileForm';
-import type {CellsFileType} from './useCellsNewFileForm';
+import {useCellsNewFileForm} from './usecellsnewfileform';
+import type {CellsFileType} from './usecellsnewfileform';
 
 describe('useCellsNewFileForm', () => {
   const validationCopy = {

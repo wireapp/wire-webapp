@@ -19,9 +19,9 @@
 
 import {act, fireEvent, render} from '@testing-library/react';
 
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {FileAsset} from 'Repositories/entity/message/fileasset';
 
-import {AudioSeekBarNew} from './audioSeekBarV2';
+import {AudioSeekBarNew} from './audioseekbarv2';
 
 describe('AudioSeekBarNew', () => {
   const getAudioAsset = () =>

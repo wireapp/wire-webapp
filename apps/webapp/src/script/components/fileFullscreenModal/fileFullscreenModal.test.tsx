@@ -19,17 +19,17 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {FileFullscreenModal} from './fileFullscreenModal';
+import {FileFullscreenModal} from './filefullscreenmodal';
 
-jest.mock('Components/fullscreenModal/fullscreenModal', () => ({
+jest.mock('Components/fullscreenmodal/fullscreenmodal', () => ({
   FullscreenModal: ({children, isOpen}: any) => (isOpen ? <div>{children}</div> : null),
 }));
 
-jest.mock('./fileHeader/fileHeader', () => ({
+jest.mock('./fileheader/fileheader', () => ({
   FileHeader: () => <div data-uie-name="file-header">Header</div>,
 }));
 
-jest.mock('./fileEditor/fileEditor', () => {
+jest.mock('./fileeditor/fileeditor', () => {
   let renderCount = 0;
   return {
     FileEditor: ({id}: {id: string; key?: number}) => {
@@ -43,11 +43,11 @@ jest.mock('./fileEditor/fileEditor', () => {
   };
 });
 
-jest.mock('./fileLoader/fileLoader', () => ({
+jest.mock('./fileloader/fileloader', () => ({
   FileLoader: () => <div data-uie-name="file-loader">Loading...</div>,
 }));
 
-jest.mock('./imageFileView/imageFileView', () => ({
+jest.mock('./imagefileview/imagefileview', () => ({
   ImageFileView: ({src}: {src?: string}) => (
     <div data-uie-name="image-view" data-src={src}>
       Image View
@@ -55,11 +55,11 @@ jest.mock('./imageFileView/imageFileView', () => ({
   ),
 }));
 
-jest.mock('./noPreviewAvailable/noPreviewAvailable', () => ({
+jest.mock('./nopreviewavailable/nopreviewavailable', () => ({
   NoPreviewAvailable: () => <div data-uie-name="no-preview">No preview available</div>,
 }));
 
-jest.mock('./pdfViewer/pdfViewer', () => ({
+jest.mock('./pdfviewer/pdfviewer', () => ({
   PDFViewer: () => <div data-uie-name="pdf-viewer">PDF Viewer</div>,
 }));
 
@@ -67,7 +67,7 @@ jest.mock('Util/fileTypeUtil', () => ({
   isFileEditable: (extension: string) => ['txt', 'md', 'json'].includes(extension),
 }));
 
-jest.mock('Util/getFileTypeFromExtension/getFileTypeFromExtension', () => ({
+jest.mock('Util/getfiletypefromextension/getfiletypefromextension', () => ({
   getFileTypeFromExtension: (extension: string) => {
     if (extension === 'pdf') {
       return 'pdf';

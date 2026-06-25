@@ -24,22 +24,22 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import type {GlobalDriveFiltersState} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
+import type {GlobalDriveFiltersState} from 'Components/conversation/conversationcells/common/drivefilters/drivefilters';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {UserRepository} from 'Repositories/user/userrepository';
 
-import {loadMoreWrapperStyles, wrapperStyles} from './cellsGlobalView.styles';
-import {CellsHeader} from './cellsHeader/cellsHeader';
-import {CellsLoader} from './cellsLoader/cellsLoader';
-import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
-import {CellsTable} from './cellsTable/cellsTable';
-import {useCellsStore} from './common/useCellsStore/useCellsStore';
-import {useGlobalDriveFilters} from './common/useGlobalDriveFilters/useGlobalDriveFilters';
-import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
-import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
+import {loadMoreWrapperStyles, wrapperStyles} from './cellsglobalview.styles';
+import {CellsHeader} from './cellsheader/cellsheader';
+import {CellsLoader} from './cellsloader/cellsloader';
+import {CellsStateInfo} from './cellsstateinfo/cellsstateinfo';
+import {CellsTable} from './cellstable/cellstable';
+import {useCellsStore} from './common/usecellsstore/usecellsstore';
+import {useGlobalDriveFilters} from './common/useglobaldrivefilters/useglobaldrivefilters';
+import {useOnPresignedUrlExpired} from './useonpresignedurlexpired/useonpresignedurlexpired';
+import {useSearchCellsNodes} from './usesearchcellsnodes/usesearchcellsnodes';
 
-import {sharedDriveSearchAndFiltersFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {sharedDriveSearchAndFiltersFeatureToggleName} from '../../featureToggles/startupfeaturetogglenames';
 import {useApplicationContext} from '../../page/rootProvider';
 
 interface CellsGlobalViewProps {

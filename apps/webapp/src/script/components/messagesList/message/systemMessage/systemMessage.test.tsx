@@ -19,14 +19,14 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
-import {RenameMessage} from 'Repositories/entity/message/renameMessage';
-import {translateForTest} from 'Util/test/translateForTest';
+import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberroleupdatemessage';
+import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messagetimerupdatemessage';
+import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptmodeupdatemessage';
+import {RenameMessage} from 'Repositories/entity/message/renamemessage';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {SystemMessage} from './systemMessage';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {SystemMessage} from './systemmessage';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 
 jest.mock('Components/icon', () => ({
   EditIcon: () => {

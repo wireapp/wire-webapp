@@ -17,9 +17,9 @@
  *
  */
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
 
-import {MessageCategory} from '../../../../message/messageCategory';
+import {MessageCategory} from '../../../../message/messagecategory';
 
 export type Category = 'images' | 'links' | 'files' | 'audio';
 

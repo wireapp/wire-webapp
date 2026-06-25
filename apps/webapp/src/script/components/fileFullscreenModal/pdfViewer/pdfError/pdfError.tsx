@@ -19,7 +19,7 @@
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {FilePlaceholder} from '../../common/filePlaceholder/filePlaceholder';
+import {FilePlaceholder} from '../../common/fileplaceholder/fileplaceholder';
 
 export const PdfError = () => {
   const {translate} = useApplicationContext();

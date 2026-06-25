@@ -26,7 +26,7 @@ import {showContextMenu} from 'src/script/ui/contextMenu';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import {buttonStyles, iconStyles} from './filePreviewErrorMoreButton.styles';
+import {buttonStyles, iconStyles} from './filepreviewerrormorebutton.styles';
 
 interface FilePreviewErrorMoreButtonProps {
   onDelete: () => void;

@@ -22,14 +22,14 @@ import ko from 'knockout';
 
 import {REASON} from '@wireapp/avs';
 
-import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'Repositories/entity/message/callingTimeoutMessage';
-import {translateForTest} from 'Util/test/translateForTest';
+import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'Repositories/entity/message/callingtimeoutmessage';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {CallTimeoutMessage} from './callTimeoutMessage';
+import {CallTimeoutMessage} from './calltimeoutmessage';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

@@ -22,18 +22,18 @@ import React from 'react';
 import {act, render} from '@testing-library/react';
 import {observable} from 'knockout';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {ConversationRepository} from 'Repositories/conversation/conversationrepository';
+import {User} from 'Repositories/entity/user';
+import {SearchRepository} from 'Repositories/search/searchrepository';
+import {UserRepository} from 'Repositories/user/userrepository';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 import {ListState} from 'src/script/page/useAppState';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {Conversations} from './';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 
-jest.mock('./conversationSidebar/conversationSidebar', () => ({
+jest.mock('./conversationsidebar/conversationsidebar', () => ({
   ConversationSidebar: ({onClickPreferences}: {onClickPreferences: (contentState: number) => void}) => {
     const {ContentState} = require('src/script/page/useAppState');
 
@@ -47,7 +47,7 @@ jest.mock('./conversationSidebar/conversationSidebar', () => ({
   },
 }));
 
-jest.mock('./conversationHeader', () => ({
+jest.mock('./conversationheader', () => ({
   ConversationHeader: () => null,
 }));
 

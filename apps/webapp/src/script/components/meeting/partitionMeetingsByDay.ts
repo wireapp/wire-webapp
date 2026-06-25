@@ -17,7 +17,7 @@
  *
  */
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
 import type {WallClock} from 'src/script/clock/wallClock';
 
 export interface PartitionedMeetings {

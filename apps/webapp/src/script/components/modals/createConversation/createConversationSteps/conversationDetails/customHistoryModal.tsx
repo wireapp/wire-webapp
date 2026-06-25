@@ -19,11 +19,11 @@
 
 import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/modals/modalComponent';
+import {ModalComponent} from 'Components/modals/modalcomponent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 
-import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
+import {useCreateConversationModal} from '../../hooks/usecreateconversationmodal';
 import {ChatHistory, HistorySharingUnit} from '../../types';
 import {getChatHistorySharingUnitOptions} from '../../utils';
 import {
@@ -33,7 +33,7 @@ import {
   customHistorySharingSelectCss,
   customHistorySharingButtonContainerCss,
   customHistorySharingButtonCss,
-} from '../createConversationSteps.styles';
+} from '../createconversationsteps.styles';
 
 export const CustomHistoryModal = () => {
   const {translate} = useApplicationContext();

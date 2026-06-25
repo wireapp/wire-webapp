@@ -21,9 +21,9 @@ import {ReactNode, useRef} from 'react';
 
 import {createPortal} from 'react-dom';
 
-import {useActiveWindowState} from 'src/script/hooks/useActiveWindow';
+import {useActiveWindowState} from 'src/script/hooks/useactivewindow';
 
-import {portalContainerCss} from './bannerPortal.styles';
+import {portalContainerCss} from './bannerportal.styles';
 
 interface Props {
   onClose: () => void;

@@ -17,8 +17,8 @@
  *
  */
 
-import type {ActiveFilterType} from '../driveFilters/driveFilters';
-import {FilterItem} from '../filterPopover/filterPopover';
+import type {ActiveFilterType} from '../drivefilters/drivefilters';
+import {FilterItem} from '../filterpopover/filterpopover';
 
 export type {FilterItem};
 

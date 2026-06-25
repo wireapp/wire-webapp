@@ -20,15 +20,15 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {UserRepository} from 'Repositories/user/userrepository';
+import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
-import {useConversationSearchFiles} from './useConversationSearchFiles';
+import {useConversationSearchFiles} from './useconversationsearchfiles';
 
-import type {ConversationDriveFiltersState} from '../common/driveFilters/driveFilters';
-import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import type {ConversationDriveFiltersState} from '../common/drivefilters/drivefilters';
+import {useCellsStore} from '../common/usecellsstore/usecellsstore';
 
 const CONV_ID = 'conv-abc';
 const DOMAIN = 'staging.zinfra.io';

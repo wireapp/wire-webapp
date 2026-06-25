@@ -19,14 +19,14 @@
 
 import {useState, useCallback, useEffect} from 'react';
 
-import {AssetError} from 'Repositories/assets/assetError';
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {AssetError} from 'Repositories/assets/asseterror';
+import {AssetRemoteData} from 'Repositories/assets/assetremotedata';
+import {AssetTransferState} from 'Repositories/assets/assettransferstate';
+import type {FileAsset} from 'Repositories/entity/message/fileasset';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 
-import {AssetUrl} from '../useAssetTransfer/useAssetTransfer';
+import {AssetUrl} from '../useassettransfer/useassettransfer';
 
 const logger = getLogger('useGetAssetUrl');
 

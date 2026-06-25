@@ -20,15 +20,15 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {RestNode} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {useGetMultipartAsset} from './useGetMultipartAsset';
-import {translateForTest} from 'Util/test/translateForTest';
+import {useGetMultipartAsset} from './usegetmultipartasset';
+import {translateForTest} from 'Util/test/translatefortest';
 
 const mockNode: RestNode = {
   Path: '/path/to/test.pdf',

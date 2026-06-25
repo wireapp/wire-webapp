@@ -17,4 +17,4 @@
  *
  */
 
-export * from './mentionsPlugin';
+export * from './mentionsplugin';

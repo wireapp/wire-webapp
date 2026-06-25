@@ -37,12 +37,12 @@ import {
 import {
   CellsShareExpirationFields,
   type CellsShareExpirationSelection,
-} from 'Components/cells/shareModal/cellsShareExpirationFields';
-import {CellsTableLoader} from 'Components/conversation/conversationCells/common/cellsTableLoader/cellsTableLoader';
-import {CopyToClipboardButton} from 'Components/copyToClipboardButton/copyToClipboardButton';
+} from 'Components/cells/sharemodal/cellsshareexpirationfields';
+import {CellsTableLoader} from 'Components/conversation/conversationcells/common/cellstableloader/cellstableloader';
+import {CopyToClipboardButton} from 'Components/copytoclipboardbutton/copytoclipboardbutton';
 import * as Icon from 'Components/icon';
-import {PasswordGeneratorButton} from 'Components/passwordGeneratorButton';
-import {Config} from 'src/script/Config';
+import {PasswordGeneratorButton} from 'Components/passwordgeneratorbutton';
+import {Config} from 'src/script/config';
 import {type RootContextValue} from 'src/script/page/rootProvider';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';

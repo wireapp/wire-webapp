@@ -24,9 +24,9 @@ import {$createHeadingNode} from '@lexical/rich-text';
 import {$setBlocksType} from '@lexical/selection';
 import {$getSelection, createCommand, $isRangeSelection, $createParagraphNode} from 'lexical';
 
-import {headingCommand} from './headingCommand';
+import {headingCommand} from './headingcommand';
 
-import {isHeadingNode} from '../common/isHeadingNode/isHeadingNode';
+import {isHeadingNode} from '../common/isheadingnode/isheadingnode';
 
 const INSERT_HEADING_COMMAND = createCommand();
 

@@ -21,19 +21,19 @@ import {useEffect, useState} from 'react';
 
 import {Maybe} from 'true-myth';
 
-import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import {PDFViewer} from 'Components/fileFullscreenModal/pdfViewer/pdfViewer';
-import {FullscreenModal} from 'Components/fullscreenModal/fullscreenModal';
+import {isInRecycleBin} from 'Components/conversation/conversationcells/common/recyclebin/recyclebin';
+import {PDFViewer} from 'Components/filefullscreenmodal/pdfviewer/pdfviewer';
+import {FullscreenModal} from 'Components/fullscreenmodal/fullscreenmodal';
 import {isFileEditable} from 'Util/fileTypeUtil';
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {getFileTypeFromExtension} from 'Util/getfiletypefromextension/getfiletypefromextension';
 import {getBestPreviewSource} from 'Util/imageUtil';
 import {getFileExtensionFromUrl} from 'Util/util';
 
-import {FileEditor} from './fileEditor/fileEditor';
-import {FileHeader} from './fileHeader/fileHeader';
-import {FileLoader} from './fileLoader/fileLoader';
-import {ImageFileView} from './imageFileView/imageFileView';
-import {NoPreviewAvailable} from './noPreviewAvailable/noPreviewAvailable';
+import {FileEditor} from './fileeditor/fileeditor';
+import {FileHeader} from './fileheader/fileheader';
+import {FileLoader} from './fileloader/fileloader';
+import {ImageFileView} from './imagefileview/imagefileview';
+import {NoPreviewAvailable} from './nopreviewavailable/nopreviewavailable';
 
 type Status = 'loading' | 'unavailable' | 'success';
 

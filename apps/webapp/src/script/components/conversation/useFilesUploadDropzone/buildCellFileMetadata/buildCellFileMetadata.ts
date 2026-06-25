@@ -24,7 +24,7 @@ import {
   isImage,
   isAudio,
   buildMetadataAudio,
-} from 'Repositories/assets/assetMetaDataBuilder';
+} from 'Repositories/assets/assetmetadatabuilder';
 
 export const buildCellFileMetadata = async (file: File) => {
   if (isImage(file)) {

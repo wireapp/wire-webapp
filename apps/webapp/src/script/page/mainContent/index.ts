@@ -17,4 +17,4 @@
  *
  */
 
-export * from './mainContent';
+export * from './maincontent';

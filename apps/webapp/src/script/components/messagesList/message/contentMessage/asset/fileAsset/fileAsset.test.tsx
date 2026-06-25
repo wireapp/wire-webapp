@@ -20,18 +20,18 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {FileAsset} from 'Repositories/entity/message/fileasset';
+import {TeamState} from 'Repositories/team/teamstate';
 import {StatusType} from 'src/script/message/statusType';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {FileAsset as FileAssetComponent} from './fileAsset';
+import {FileAsset as FileAssetComponent} from './fileasset';
 
 describe('FileAssetComponent', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

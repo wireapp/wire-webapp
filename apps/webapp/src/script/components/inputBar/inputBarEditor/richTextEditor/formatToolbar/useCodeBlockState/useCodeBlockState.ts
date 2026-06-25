@@ -22,7 +22,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$setBlocksType} from '@lexical/selection';
 import {$getSelection, $isRangeSelection, $createParagraphNode} from 'lexical';
 
-import {isCodeBlockNode} from '../common/isCodeBlockNode/isCodeBlockNode';
+import {isCodeBlockNode} from '../common/iscodeblocknode/iscodeblocknode';
 
 export const useCodeBlockState = () => {
   const [editor] = useLexicalComposerContext();

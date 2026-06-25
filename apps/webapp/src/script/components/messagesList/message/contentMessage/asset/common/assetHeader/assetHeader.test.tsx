@@ -20,12 +20,12 @@
 import {render} from '@testing-library/react';
 
 import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from 'Repositories/entity/user';
+import {translateForTest} from 'Util/test/translatefortest';
 import * as TimeUtil from 'Util/timeUtil';
 import {createUuid} from 'Util/uuid';
 
-import {AssetHeader} from './assetHeader';
+import {AssetHeader} from './assetheader';
 
 describe('AssetHeader', () => {
   it('displays the expected username and time', () => {

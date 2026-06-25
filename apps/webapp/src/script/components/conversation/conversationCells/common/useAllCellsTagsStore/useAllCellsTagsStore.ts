@@ -21,7 +21,7 @@ import {Result, result} from 'true-myth';
 import {z} from 'zod';
 import {create} from 'zustand';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 
 interface AllCellsTagsState {
   tags: string[];

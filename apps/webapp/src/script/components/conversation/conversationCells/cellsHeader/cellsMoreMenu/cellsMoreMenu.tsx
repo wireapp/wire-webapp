@@ -23,10 +23,10 @@ import {DropdownMenu, IconButton, IconButtonVariant, MoreIcon, TrashIcon} from '
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {buttonStyles, itemStyles} from './cellsMoreMenu.styles';
+import {buttonStyles, itemStyles} from './cellsmoremenu.styles';
 
-import {openBreadcrumb} from '../../common/openBreadcrumb/openBreadcrumb';
-import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
+import {openBreadcrumb} from '../../common/openbreadcrumb/openbreadcrumb';
+import {RECYCLE_BIN_PATH} from '../../common/recyclebin/recyclebin';
 
 interface CellsMoreMenuProps {
   conversationQualifiedId: QualifiedId;

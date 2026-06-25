@@ -25,18 +25,18 @@ import {randomInt} from 'crypto';
 import {generateUser} from 'test/helper/UserGenerator';
 
 import en from 'I18n/en-US.json';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/membermessage';
+import {User} from 'Repositories/entity/user';
+import {withTheme} from 'src/script/auth/util/test/testutil';
+import {SystemMessageType} from 'src/script/message/systemmessagetype';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {setStrings, translate} from 'Util/localizerUtil';
 
-import {MemberMessage} from './memberMessage';
-import {CONFIG} from './memberMessage/messageContent';
+import {MemberMessage} from './membermessage';
+import {CONFIG} from './membermessage/messagecontent';
 
 jest.mock('Components/avatar', () => ({
   AVATAR_SIZE: {

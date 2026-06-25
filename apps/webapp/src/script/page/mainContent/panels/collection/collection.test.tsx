@@ -20,34 +20,34 @@
 import {fireEvent, render, waitFor, act} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {LinkPreview} from 'Repositories/entity/message/linkPreview';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
+import {AssetRepository} from 'Repositories/assets/assetrepository';
+import {MessageRepository} from 'Repositories/conversation/messagerepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
+import {FileAsset} from 'Repositories/entity/message/fileasset';
+import {LinkPreview} from 'Repositories/entity/message/linkpreview';
+import {MediumImage} from 'Repositories/entity/message/mediumimage';
 import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {MessageCategory} from 'src/script/message/messageCategory';
+import {User} from 'Repositories/entity/user';
+import {withTheme} from 'src/script/auth/util/test/testutil';
+import {MessageCategory} from 'src/script/message/messagecategory';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {createUuid} from 'Util/uuid';
 
 import {Collection} from './collection';
-import {FullSearch} from './fullSearch';
+import {FullSearch} from './fullsearch';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('./collectionDetails', () => ({
+jest.mock('./collectiondetails', () => ({
   CollectionDetails: () => <div>CollectionDetails</div>,
   __esModule: true,
 }));
-jest.mock('./collectionItem', () => ({
+jest.mock('./collectionitem', () => ({
   CollectionItem: () => <div>CollectionItem</div>,
   __esModule: true,
 }));

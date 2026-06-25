@@ -19,7 +19,7 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {
   conversationFilters,
   conversationSearchFilter,
@@ -30,7 +30,7 @@ import {
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
 
-import {SidebarTabs} from './useSidebarStore';
+import {SidebarTabs} from './usesidebarstore';
 
 const searchInputPlaceholders = {
   searchConversations: 'searchConversations',

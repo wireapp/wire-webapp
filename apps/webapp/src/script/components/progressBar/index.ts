@@ -17,4 +17,4 @@
  *
  */
 
-export * from './progressBar';
+export * from './progressbar';

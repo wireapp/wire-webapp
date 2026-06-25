@@ -21,10 +21,10 @@ import {ChangeEvent, FormEvent} from 'react';
 
 import {CircleCloseIcon, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
 
-import {useInputAutoFocus} from 'Components/conversation/conversationCells/common/useInputAutoFocus/useInputAutoFocus';
+import {useInputAutoFocus} from 'Components/conversation/conversationcells/common/useinputautofocus/useinputautofocus';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {closeIconStyles, formStyles} from './cellsRenameForm.styles';
+import {closeIconStyles, formStyles} from './cellsrenameform.styles';
 
 interface CellsRenameFormProps {
   isOpen: boolean;

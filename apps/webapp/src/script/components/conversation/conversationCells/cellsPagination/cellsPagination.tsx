@@ -24,8 +24,8 @@ import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {CellsPageList} from './cellsPageList/cellsPageList';
-import {CellsPageSizeSelect} from './cellsPageSizeSelect/cellsPageSizeSelect';
+import {CellsPageList} from './cellspagelist/cellspagelist';
+import {CellsPageSizeSelect} from './cellspagesizeselect/cellspagesizeselect';
 import {
   pagesContainerStyles,
   arrowButtonStyles,
@@ -37,7 +37,7 @@ import {
   pageResultStyles,
   arrowPreviousIconDisabledStyles,
   arrowNextIconDisabledStyles,
-} from './cellsPagination.styles';
+} from './cellspagination.styles';
 
 interface CellsPaginationProps {
   currentPage?: number;

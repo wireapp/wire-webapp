@@ -21,19 +21,19 @@ import React from 'react';
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {generateConversation} from 'test/helper/ConversationGenerator';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {withTheme} from 'src/script/auth/util/test/testutil';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {LeaveGroupAdminModal} from './leaveGroupAdminModal';
-import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';
+import {LeaveGroupAdminModal} from './leavegroupadminmodal';
+import {useLeaveGroupAdminModalStore} from './useleavegroupadminmodalstore';
 
-jest.mock('./adminSearchInput', () => ({
+jest.mock('./adminsearchinput', () => ({
   AdminSearchInput: () => <div data-uie-name="admin-search-input" />,
 }));
 

@@ -23,10 +23,10 @@ import {
   customHistorySharingOptionContainerCss,
   customHistorySharingOptionLeftSectionCss,
   customHistorySharingOptionIconCss,
-} from './conversationDetails.styles';
-import {UpgradeBadge} from './upgradeBadge';
+} from './conversationdetails.styles';
+import {UpgradeBadge} from './upgradebadge';
 
-import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
+import {useCreateConversationModal} from '../../hooks/usecreateconversationmodal';
 import {ChatHistory} from '../../types';
 
 interface ChatHistorySharingOptionProps {

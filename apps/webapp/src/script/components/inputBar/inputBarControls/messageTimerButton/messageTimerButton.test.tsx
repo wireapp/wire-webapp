@@ -20,17 +20,17 @@
 import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {TeamState} from 'Repositories/team/TeamState';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Conversation} from 'Repositories/entity/conversation';
+import {TeamState} from 'Repositories/team/teamstate';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import * as Context from 'src/script/ui/contextMenu';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {MessageTimerButton} from './messageTimerButton';
+import {MessageTimerButton} from './messagetimerbutton';
 
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);

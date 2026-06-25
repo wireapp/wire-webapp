@@ -21,7 +21,7 @@ import type {Maybe} from 'true-myth';
 
 import type {WallClock} from 'src/script/clock/wallClock';
 
-import type {ScheduleMeetingFormErrors} from './scheduleMeetingTypes';
+import type {ScheduleMeetingFormErrors} from './schedulemeetingtypes';
 
 export interface ScheduleMeetingValidationInput {
   title: string;

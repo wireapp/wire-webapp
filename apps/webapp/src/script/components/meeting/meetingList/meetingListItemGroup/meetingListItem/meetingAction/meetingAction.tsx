@@ -23,15 +23,15 @@ import {container} from 'tsyringe';
 
 import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import {getMeetingActionEntries} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/getMeetingActionEntries';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import {getMeetingActionEntries} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitem/meetingaction/getmeetingactionentries';
 import {
   iconContainerStyle,
   iconStyles,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingAction.styles';
-import {useEditMeeting} from 'Components/meeting/useEditMeeting';
-import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
-import {UserState} from 'Repositories/user/userState';
+} from 'Components/meeting/meetinglist/meetinglistitemgroup/meetinglistitem/meetingaction/meetingaction.styles';
+import {useEditMeeting} from 'Components/meeting/useeditmeeting';
+import {canEditMeeting} from 'Components/meeting/utils/caneditmeeting';
+import {UserState} from 'Repositories/user/userstate';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {showContextMenu} from '../../../../../../ui/contextMenu';

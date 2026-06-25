@@ -19,16 +19,16 @@
 
 import {render} from '@testing-library/react';
 
-import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/deleteMessage';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/deletemessage';
+import {User} from 'Repositories/entity/user';
+import {translateForTest} from 'Util/test/translatefortest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {createUuid} from 'Util/uuid';
 
-import {DeleteMessage} from './deleteMessage';
+import {DeleteMessage} from './deletemessage';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

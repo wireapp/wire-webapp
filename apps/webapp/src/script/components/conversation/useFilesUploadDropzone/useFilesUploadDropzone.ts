@@ -21,19 +21,19 @@ import {useState} from 'react';
 
 import {Accept, FileRejection, useDropzone} from 'react-dropzone';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Config} from 'src/script/Config';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {Config} from 'src/script/config';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 
-import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
-import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
-import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
-import {transformAcceptedFiles} from './transformAcceptedFiles/transformAcceptedFiles';
+import {buildCellFileMetadata} from './buildcellfilemetadata/buildcellfilemetadata';
+import {validateFiles, ValidationResult} from './filevalidation/filevalidation';
+import {showFileDropzoneErrorModal} from './showfiledropzoneerrormodal/showfiledropzoneerrormodal';
+import {transformAcceptedFiles} from './transformacceptedfiles/transformacceptedfiles';
 
-import {FileWithPreview, useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
-import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
+import {FileWithPreview, useFileUploadState} from '../usefilesuploadstate/usefilesuploadstate';
+import {checkFileSharingPermission} from '../utils/checkfilesharingpermission';
 
 const MAX_FILES = 10;
 const IMAGE_FILE_TYPES = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];

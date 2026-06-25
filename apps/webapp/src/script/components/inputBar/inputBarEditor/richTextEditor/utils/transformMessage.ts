@@ -17,7 +17,7 @@
  *
  */
 
-import {findAndTransformEmoji} from '../plugins/inlineEmojiReplacementPlugin';
+import {findAndTransformEmoji} from '../plugins/inlineemojireplacementplugin';
 
 export const transformMessage = ({replaceEmojis, markdown}: {replaceEmojis: boolean; markdown: string}) => {
   return replaceEmojis ? findAndTransformEmoji(markdown) : markdown;

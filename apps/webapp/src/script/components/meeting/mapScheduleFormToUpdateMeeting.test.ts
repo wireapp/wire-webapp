@@ -19,14 +19,14 @@
 
 import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
 import {maybe} from 'true-myth';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicwallclock';
+import {unwrap, unwrapErr} from 'Util/test/resulttestsupport';
 
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from 'Repositories/entity/user';
+import {translateForTest} from 'Util/test/translatefortest';
 
-import {computeInvitationDiff, mapScheduleFormToUpdateMeeting} from './mapScheduleFormToUpdateMeeting';
-import type {ScheduleMeetingFormState} from './scheduleMeetingModal/scheduleMeetingTypes';
+import {computeInvitationDiff, mapScheduleFormToUpdateMeeting} from './mapscheduleformtoupdatemeeting';
+import type {ScheduleMeetingFormState} from './schedulemeetingmodal/schedulemeetingtypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './selectText';
+export * from './selecttext';

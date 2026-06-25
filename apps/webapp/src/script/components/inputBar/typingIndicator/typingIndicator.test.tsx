@@ -20,15 +20,15 @@
 import {render} from '@testing-library/react';
 import {act} from 'react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {TypingIndicator, TypingIndicatorProps} from './typingIndicator';
-import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {TypingIndicator, TypingIndicatorProps} from './typingindicator';
+import {useTypingIndicatorState} from './usetypingindicatorstate/usetypingindicatorstate';
+import {translateForTest} from 'Util/test/translatefortest';
 
 function createUser(id: string, name: string): User {
   const user = new User(id, '', translateForTest);

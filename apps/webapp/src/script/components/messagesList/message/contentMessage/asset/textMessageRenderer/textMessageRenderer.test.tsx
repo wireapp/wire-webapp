@@ -22,10 +22,10 @@ import {fireEvent, render} from '@testing-library/react';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {TextMessageRenderer} from './textMessageRenderer';
-import {translateForTest} from 'Util/test/translateForTest';
+import {TextMessageRenderer} from './textmessagerenderer';
+import {translateForTest} from 'Util/test/translatefortest';
 
 describe('TextMessageRenderer', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

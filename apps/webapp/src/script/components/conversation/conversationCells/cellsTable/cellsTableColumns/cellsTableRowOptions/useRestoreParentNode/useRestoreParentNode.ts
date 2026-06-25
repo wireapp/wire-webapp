@@ -19,14 +19,14 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {openBreadcrumb} from 'Components/conversation/conversationCells/common/openBreadcrumb/openBreadcrumb';
+import {getCellsApiPath} from 'Components/conversation/conversationcells/common/getcellsapipath/getcellsapipath';
+import {openBreadcrumb} from 'Components/conversation/conversationcells/common/openbreadcrumb/openbreadcrumb';
 import {
   getNodeRootParentPath,
   RECYCLE_BIN_PATH,
-} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import {useCellsStore} from 'Components/conversation/conversationCells/common/useCellsStore/useCellsStore';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+} from 'Components/conversation/conversationcells/common/recyclebin/recyclebin';
+import {useCellsStore} from 'Components/conversation/conversationcells/common/usecellsstore/usecellsstore';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {CellNode} from 'src/script/types/cellNode';
 
 interface UseRestoreParentNodeProps {

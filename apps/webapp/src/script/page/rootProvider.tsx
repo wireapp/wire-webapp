@@ -24,8 +24,8 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import type {Translate} from 'Util/localizerUtil';
 
 import {WallClock} from '../clock/wallClock';
-import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
-import {MainViewModel} from '../view_model/MainViewModel';
+import {StartupFeatureToggleName} from '../featureToggles/startupfeaturetoggles';
+import {MainViewModel} from '../viewModel/mainviewmodel';
 
 export type ApplicationNavigation = {
   readonly currentPathname: string;

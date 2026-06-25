@@ -19,7 +19,7 @@
 
 import {fireEvent, render, act} from '@testing-library/react';
 
-import {FadingScrollbar, parseColor} from './fadingScrollbar';
+import {FadingScrollbar, parseColor} from './fadingscrollbar';
 
 jest.useFakeTimers();
 

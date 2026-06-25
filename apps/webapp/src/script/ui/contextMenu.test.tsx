@@ -22,7 +22,7 @@ import {act, waitFor} from '@testing-library/react';
 
 import {showContextMenu} from './contextMenu';
 
-import * as ActiveWindowMod from '../hooks/useActiveWindow';
+import * as ActiveWindowMod from '../hooks/useactivewindow';
 
 beforeAll(() => {
   jest.spyOn(ActiveWindowMod, 'useActiveWindowState').mockImplementation(() => ({activeWindow: window}));

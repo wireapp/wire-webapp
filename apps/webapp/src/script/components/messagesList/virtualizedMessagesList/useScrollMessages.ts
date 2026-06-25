@@ -22,7 +22,7 @@ import {useLayoutEffect, useRef} from 'react';
 import {Virtualizer} from '@tanstack/react-virtual';
 
 import {StatusType} from '../../../message/statusType';
-import {GroupedMessage, isMarker, Marker} from '../utils/virtualizedMessagesGroup';
+import {GroupedMessage, isMarker, Marker} from '../utils/virtualizedmessagesgroup';
 
 interface Props {
   messages: (Marker | GroupedMessage)[];

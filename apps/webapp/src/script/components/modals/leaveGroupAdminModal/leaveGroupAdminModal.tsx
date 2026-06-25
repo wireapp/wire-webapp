@@ -24,11 +24,11 @@ import is from '@sindresorhus/is';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/modals/modalComponent';
+import {ModalComponent} from 'Components/modals/modalcomponent';
 import {handleEscDown} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 
-import {AdminSearchInput} from './adminSearchInput';
+import {AdminSearchInput} from './adminsearchinput';
 import {
   actionGroupStyles,
   buttonStyles,
@@ -38,7 +38,7 @@ import {
   modalHeaderStyles,
   modalTitleStyles,
 } from './styles';
-import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';
+import {useLeaveGroupAdminModalStore} from './useleavegroupadminmodalstore';
 
 interface LeaveGroupAdminModalProps {
   readonly translate: Translate;

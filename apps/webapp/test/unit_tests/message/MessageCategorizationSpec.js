@@ -17,8 +17,8 @@
  *
  */
 
-import {categoryFromEvent} from 'src/script/message/MessageCategorization';
-import {MessageCategory} from 'src/script/message/MessageCategory';
+import {categoryFromEvent} from 'src/script/message/messagecategorization';
+import {MessageCategory} from 'src/script/message/messagecategory';
 
 describe('MessageCategorization', () => {
   describe('categoryFromEvent', () => {

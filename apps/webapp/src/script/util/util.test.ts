@@ -17,7 +17,7 @@
  *
  */
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {
   arrayToBase64,
   base64ToArray,
@@ -35,7 +35,7 @@ import {
 } from 'Util/util';
 
 import {createUuid} from './uuid';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from 'Util/test/translatefortest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('base64ToBlob', () => {

@@ -21,7 +21,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 
 type UseGetAllTagsProps = {
   cellsRepository: CellsRepository;

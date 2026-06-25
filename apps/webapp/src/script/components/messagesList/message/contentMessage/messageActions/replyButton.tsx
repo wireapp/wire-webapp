@@ -22,8 +22,8 @@ import {FC} from 'react';
 import * as Icon from 'Components/icon';
 import type {Translate} from 'Util/localizerUtil';
 
-import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './messageActions.styles';
-import {reactionImgSize} from './messageReactions/emojiChar.styles';
+import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './messageactions.styles';
+import {reactionImgSize} from './messagereactions/emojichar.styles';
 
 interface ReplyButtonProps {
   translate: Translate;

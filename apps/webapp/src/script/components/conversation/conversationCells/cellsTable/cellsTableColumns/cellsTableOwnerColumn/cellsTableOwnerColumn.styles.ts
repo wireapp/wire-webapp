@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 import {ellipsis} from '@wireapp/react-ui-kit';
 
-import {styleBreakpoint} from '../../../common/styleBreakpoint/styleBreakpoint';
+import {styleBreakpoint} from '../../../common/stylebreakpoint/stylebreakpoint';
 
 export const wrapperStyles: CSSObject = {
   display: 'inline-flex',

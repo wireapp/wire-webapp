@@ -22,15 +22,15 @@ import {useEffect} from 'react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
-import {AppsDisabledNote} from 'Components/note/appsDisabledNote/appsDisabledNote';
-import {InfoToggle} from 'Components/toggle/infoToggle';
-import {TeamState} from 'Repositories/team/TeamState';
-import {Config} from 'src/script/Config';
+import {AppsDisabledNote} from 'Components/note/appsdisablednote/appsdisablednote';
+import {InfoToggle} from 'Components/toggle/infotoggle';
+import {TeamState} from 'Repositories/team/teamstate';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 
-import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
+import {useCreateConversationModal} from '../hooks/usecreateconversationmodal';
 
 export const Preference = () => {
   const {translate} = useApplicationContext();

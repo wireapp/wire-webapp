@@ -21,13 +21,13 @@ import {useCallback} from 'react';
 
 import {container} from 'tsyringe';
 
-import {getScheduleMeetingParticipantPool} from 'Components/meeting/getScheduleMeetingParticipantPool';
-import {mapMeetingToScheduleFormState} from 'Components/meeting/mapMeetingToScheduleFormState';
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {getScheduleMeetingParticipantPool} from 'Components/meeting/getschedulemeetingparticipantpool';
+import {mapMeetingToScheduleFormState} from 'Components/meeting/mapmeetingtoscheduleformstate';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import {TeamState} from 'Repositories/team/teamstate';
+import {UserState} from 'Repositories/user/userstate';
 
-import {useScheduleMeetingModal} from './scheduleMeetingModal/useScheduleMeetingModal';
+import {useScheduleMeetingModal} from './schedulemeetingmodal/useschedulemeetingmodal';
 
 export const useEditMeeting = () => {
   const openEdit = useScheduleMeetingModal(state => state.openEdit);

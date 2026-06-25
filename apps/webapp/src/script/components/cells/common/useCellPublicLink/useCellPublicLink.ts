@@ -24,8 +24,8 @@ import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {Config} from 'src/script/Config';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
+import {Config} from 'src/script/config';
 import type {CellNode} from 'src/script/types/cellNode';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';

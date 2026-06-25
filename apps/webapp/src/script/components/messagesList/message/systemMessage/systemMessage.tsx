@@ -20,22 +20,22 @@
 import {ConversationSettingsIcon, MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {E2EIVerificationMessage} from 'Repositories/entity/message/e2eiVerificationMessage';
-import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
-import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
-import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/mlsConversationRecoveredMessage';
-import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/mlsMigrationFinalisationOngoingCallMessage';
-import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/oneToOneMigratedToMlsMessage';
-import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
-import {RenameMessage} from 'Repositories/entity/message/renameMessage';
-import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/systemMessage';
+import {E2EIVerificationMessage} from 'Repositories/entity/message/e2eiverificationmessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedaftermlsmigrationfinalisationmessage';
+import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberroleupdatemessage';
+import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messagetimerupdatemessage';
+import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/mlsconversationrecoveredmessage';
+import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/mlsmigrationfinalisationongoingcallmessage';
+import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/onetoonemigratedtomlsmessage';
+import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolupdatemessage';
+import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptmodeupdatemessage';
+import {RenameMessage} from 'Repositories/entity/message/renamemessage';
+import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/systemmessage';
 
-import {SystemMessageBase} from './systemMessageBase';
+import {SystemMessageBase} from './systemmessagebase';
 
-import {messageBodyWrapper} from '../contentMessage/contentMessage.styles';
-import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../protocolUpdateMessage';
+import {messageBodyWrapper} from '../contentmessage/contentmessage.styles';
+import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../protocolupdatemessage';
 
 interface SystemMessageProps {
   message: SystemMessageEntity;

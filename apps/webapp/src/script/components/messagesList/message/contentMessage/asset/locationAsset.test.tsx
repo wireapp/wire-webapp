@@ -23,10 +23,10 @@ import type {Location} from 'Repositories/entity/message/location';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 
-import {LocationAsset} from './locationAsset';
-import {translateForTest} from 'Util/test/translateForTest';
+import {LocationAsset} from './locationasset';
+import {translateForTest} from 'Util/test/translatefortest';
 
 describe('LocationAsset', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

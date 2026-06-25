@@ -22,15 +22,15 @@ import ko from 'knockout';
 
 import {IAttachment, ICellAsset} from '@wireapp/protocol-messaging';
 
-import {AssetType} from 'Repositories/assets/assetType';
-import {containsOnlyLink} from 'Repositories/conversation/linkPreviews/helpers';
-import {mediaParser} from 'Repositories/media/MediaParser';
+import {AssetType} from 'Repositories/assets/assettype';
+import {containsOnlyLink} from 'Repositories/conversation/linkpreviews/helpers';
+import {mediaParser} from 'Repositories/media/mediaparser';
 import {renderMessage} from 'Util/messageRenderer';
 
 import {Asset} from './asset';
-import type {LinkPreview} from './linkPreview';
+import type {LinkPreview} from './linkpreview';
 
-import type {MentionEntity} from '../../../message/mentionEntity';
+import type {MentionEntity} from '../../../message/mentionentity';
 
 export class Multipart extends Asset {
   public readonly mentions: ko.ObservableArray<MentionEntity>;

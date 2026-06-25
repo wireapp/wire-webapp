@@ -17,7 +17,7 @@
  *
  */
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import type {Translate} from 'Util/localizerUtil';
 
 const MAX_VISIBLE_NAMES = 2;

@@ -23,8 +23,8 @@ import {$convertToMarkdownString} from '@lexical/markdown';
 import {LexicalEditor} from 'lexical';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {markdownTransformers} from './markdownTransformers';
-import {transformMessage} from './transformMessage';
+import {markdownTransformers} from './markdowntransformers';
+import {transformMessage} from './transformmessage';
 
 const DRAFT_SAVE_DELAY = 800;
 

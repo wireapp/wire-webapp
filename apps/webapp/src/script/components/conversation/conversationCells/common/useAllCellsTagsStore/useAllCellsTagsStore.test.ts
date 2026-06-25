@@ -20,9 +20,9 @@
 import assert from 'node:assert';
 import {result} from 'true-myth';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 
-import {useAllCellsTagsStore, validateGetAllTagsResponse} from './useAllCellsTagsStore';
+import {useAllCellsTagsStore, validateGetAllTagsResponse} from './useallcellstagsstore';
 
 describe('validateGetAllTagsResponse()', () => {
   it('returns Result ok with tags for a valid getAllTags response', () => {

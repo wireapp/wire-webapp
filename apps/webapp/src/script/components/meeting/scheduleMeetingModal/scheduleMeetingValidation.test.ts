@@ -18,9 +18,9 @@
  */
 
 import {maybe} from 'true-myth';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicwallclock';
 
-import {hasScheduleMeetingFormErrors, validateScheduleMeetingForm} from './scheduleMeetingValidation';
+import {hasScheduleMeetingFormErrors, validateScheduleMeetingForm} from './schedulemeetingvalidation';
 
 describe('scheduleMeetingValidation', () => {
   const fixedNow = new Date('2026-06-23T14:30:00.000Z');

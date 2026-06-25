@@ -17,7 +17,7 @@
  *
  */
 
-import {getLoadMoreOffset} from './loadMorePagination';
+import {getLoadMoreOffset} from './loadmorepagination';
 
 describe('getLoadMoreOffset', () => {
   it('returns Nothing when pagination is missing', () => {

@@ -20,7 +20,7 @@
 import {getWebEnvironment} from 'Util/environment';
 import {getLogger, Logger} from 'Util/logger';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 const logger: Logger = getLogger('TelemetryHelpers');
 

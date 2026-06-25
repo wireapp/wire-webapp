@@ -19,17 +19,17 @@
 
 import {createColumnHelper} from '@tanstack/react-table';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 
-import {CellsConversationColumn} from './cellsConversationColumn/cellsConversationColumn';
-import {CellsTableOwnerColumn} from './cellsOwnerColumn/cellsOwnerColumn';
-import {CellsTableDateColumn} from './cellsTableDateColumn/cellsTableDateColumn';
-import {CellsTableNameColumn} from './cellsTableNameColumn/cellsTableNameColumn';
-import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions';
-import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
-import {CellsTableTagsColumn} from './cellsTableTagsColumn/cellsTableTagsColumn';
+import {CellsConversationColumn} from './cellsconversationcolumn/cellsconversationcolumn';
+import {CellsTableOwnerColumn} from './cellsownercolumn/cellsownercolumn';
+import {CellsTableDateColumn} from './cellstabledatecolumn/cellstabledatecolumn';
+import {CellsTableNameColumn} from './cellstablenamecolumn/cellstablenamecolumn';
+import {CellsTableRowOptions} from './cellstablerowoptions/cellstablerowoptions';
+import {CellsTableSharedColumn} from './cellstablesharedcolumn/cellstablesharedcolumn';
+import {CellsTableTagsColumn} from './cellstabletagscolumn/cellstabletagscolumn';
 
 const columnHelper = createColumnHelper<CellNode>();
 

@@ -19,8 +19,8 @@
 
 import type {Meeting as ApiMeeting} from '@wireapp/api-client/lib/meetings/meeting';
 
-import type {Meeting} from 'Components/meeting/meetingList/meetingList';
-import {mapMeetingRecurrenceToOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingRecurrence';
+import type {Meeting} from 'Components/meeting/meetinglist/meetinglist';
+import {mapMeetingRecurrenceToOption} from 'Components/meeting/schedulemeetingmodal/schedulemeetingrecurrence';
 
 export const mapApiMeetingToListMeeting = (apiMeeting: ApiMeeting): Meeting => ({
   start_date: apiMeeting.start_time,

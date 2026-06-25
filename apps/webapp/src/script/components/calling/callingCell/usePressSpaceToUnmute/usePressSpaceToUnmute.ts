@@ -21,12 +21,12 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/appNotification';
+import {useAppNotification} from 'Components/appnotification';
 import {MicOnIcon} from 'Components/icon';
-import {useActiveWindowState} from 'Hooks/useActiveWindow';
-import {useKeyPressAndHold} from 'Hooks/useKeyPressAndHold/useKeyPressAndHold';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {EventName} from 'Repositories/tracking/eventName';
+import {useActiveWindowState} from 'Hooks/useactivewindow';
+import {useKeyPressAndHold} from 'Hooks/usekeypressandhold/usekeypressandhold';
+import {CallingViewMode, CallState} from 'Repositories/calling/callstate';
+import {EventName} from 'Repositories/tracking/eventname';
 import {KEY} from 'Util/keyboardUtil';
 
 interface UsePressSpaceToUnmuteParams {

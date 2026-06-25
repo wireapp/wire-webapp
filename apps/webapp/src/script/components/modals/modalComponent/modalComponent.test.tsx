@@ -19,9 +19,9 @@
 
 import {act, fireEvent, render} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testutil';
 
-import {ModalComponent} from './modalComponent';
+import {ModalComponent} from './modalcomponent';
 
 const renderModal = ({
   isShown = true,

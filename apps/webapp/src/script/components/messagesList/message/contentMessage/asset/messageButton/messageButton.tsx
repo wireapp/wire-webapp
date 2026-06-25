@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
 
-import type {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import type {CompositeMessage} from 'Repositories/entity/message/compositemessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {noop} from 'Util/util';
 

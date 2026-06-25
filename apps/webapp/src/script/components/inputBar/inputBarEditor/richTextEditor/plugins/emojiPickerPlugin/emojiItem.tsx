@@ -21,9 +21,9 @@ import {forwardRef, ForwardRefRenderFunction} from 'react';
 
 import cx from 'classnames';
 
-import {itemStyle, symbolStyle, nameStyle} from './emojiItem.styles';
+import {itemStyle, symbolStyle, nameStyle} from './emojiitem.styles';
 
-import {EmojiOption} from './emojiPickerPlugin';
+import {EmojiOption} from './emojipickerplugin';
 
 interface EmojiItemProps {
   emoji: EmojiOption;

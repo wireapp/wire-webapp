@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {ConversationTabPanel} from '../conversationTabPanel/conversationTabPanel';
+import {ConversationTabPanel} from '../conversationtabpanel/conversationtabpanel';
 
 interface ConversationMessagesWrapperProps {
   isCellsEnabled: boolean;

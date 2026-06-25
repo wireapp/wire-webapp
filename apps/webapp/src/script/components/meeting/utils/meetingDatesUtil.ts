@@ -17,7 +17,7 @@
  *
  */
 
-import {Meeting} from 'Components/meeting/meetingList/meetingList';
+import {Meeting} from 'Components/meeting/meetinglist/meetinglist';
 import {FnDate, formatLocale} from 'Util/timeUtil';
 
 /**

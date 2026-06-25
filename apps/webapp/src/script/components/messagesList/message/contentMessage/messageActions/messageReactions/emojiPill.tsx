@@ -20,13 +20,13 @@
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {getEmojiTitleFromEmojiUnicode} from 'Util/emojiUtil';
 import {isTabKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import {replaceReactComponents} from 'Util/localizerUtil/reactlocalizerutil';
 
-import {EmojiChar} from './emojiChar';
+import {EmojiChar} from './emojichar';
 import {
   getReactionsButtonCSS,
   messageReactionButton,
@@ -36,7 +36,7 @@ import {
   messageReactionButtonTooltipTextLink,
   messageReactionCount,
   userBoldStyle,
-} from './messageReactions.styles';
+} from './messagereactions.styles';
 
 interface EmojiPillProps {
   translate: Translate;

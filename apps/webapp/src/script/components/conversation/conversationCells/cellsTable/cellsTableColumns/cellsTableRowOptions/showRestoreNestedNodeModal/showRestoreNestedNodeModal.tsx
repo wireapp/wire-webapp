@@ -17,12 +17,12 @@
  *
  */
 
-import {PrimaryModal} from 'Components/modals/primaryModal';
+import {PrimaryModal} from 'Components/modals/primarymodal';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNodeType, CellNode} from 'src/script/types/cellNode';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import {replaceReactComponents} from 'Util/localizerUtil/reactlocalizerutil';
 
-import {modalContentStyles} from './showRestoreNestedNodeModal.styles';
+import {modalContentStyles} from './showrestorenestednodemodal.styles';
 
 export const showRestoreNestedNodeModal = ({
   node,

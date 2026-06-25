@@ -27,7 +27,7 @@ import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isTabKey} from 'Util/keyboardUtil';
 
-import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './textInput.styles';
+import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './textinput.styles';
 
 interface UserInputProps {
   autoFocus?: boolean;

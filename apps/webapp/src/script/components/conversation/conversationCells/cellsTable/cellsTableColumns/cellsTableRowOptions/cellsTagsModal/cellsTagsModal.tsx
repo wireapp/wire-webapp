@@ -19,12 +19,12 @@
 
 import {ComboboxSelect, ErrorMessage} from '@wireapp/react-ui-kit';
 
-import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsModal} from 'Components/conversation/conversationcells/common/cellsmodal/cellsmodal';
+import {CellsRepository} from 'Repositories/cells/cellsrepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {contentStyles, descriptionStyles, menuListCSS, selectWrapperStyles} from './cellsTagsModal.styles';
-import {useTagsManagement} from './useTagsManagement/useTagsManagement';
+import {contentStyles, descriptionStyles, menuListCSS, selectWrapperStyles} from './cellstagsmodal.styles';
+import {useTagsManagement} from './usetagsmanagement/usetagsmanagement';
 
 interface CellsTagsModalProps {
   uuid: string;

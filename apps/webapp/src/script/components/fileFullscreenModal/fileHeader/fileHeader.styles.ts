@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 import {COLOR_V2} from '@wireapp/react-ui-kit';
 
-import {fileHeaderHeight} from '../common/fileHeaderHeight';
+import {fileHeaderHeight} from '../common/fileheaderheight';
 
 export const headerStyles: CSSObject = {
   display: 'flex',

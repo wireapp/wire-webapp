@@ -20,9 +20,9 @@
 import {render, screen} from '@testing-library/react';
 import ko from 'knockout';
 
-import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/callMessage';
+import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/callmessage';
 
-import {CallMessage} from './callMessage';
+import {CallMessage} from './callmessage';
 
 jest.mock('Components/icon', () => ({
   HangupIcon: () => {

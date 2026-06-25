@@ -26,8 +26,8 @@ import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 import {
   jumpToLastMessageButtonStyles,
   jumpToLastMessageChevronStyles,
-} from 'Components/messagesList/messageList.styles';
-import {Conversation} from 'Repositories/entity/Conversation';
+} from 'Components/messagesList/messagelist.styles';
+import {Conversation} from 'Repositories/entity/conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface JumpToLastMessageButtonProps {

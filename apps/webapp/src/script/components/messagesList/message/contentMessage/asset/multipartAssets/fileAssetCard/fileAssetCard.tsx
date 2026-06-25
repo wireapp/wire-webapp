@@ -19,8 +19,8 @@
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {FileAssetSmall} from './fileAssetSmall/fileAssetSmall';
-import {FileAssetWithPreview} from './fileAssetWithPreview/fileAssetWithPreview';
+import {FileAssetSmall} from './fileassetsmall/fileassetsmall';
+import {FileAssetWithPreview} from './fileassetwithpreview/fileassetwithpreview';
 
 interface FileAssetCardProps {
   src?: string;

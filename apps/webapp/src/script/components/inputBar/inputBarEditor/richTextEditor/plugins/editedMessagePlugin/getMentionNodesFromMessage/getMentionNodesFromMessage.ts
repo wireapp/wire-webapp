@@ -17,11 +17,11 @@
  *
  */
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentmessage';
 import {Text} from 'Repositories/entity/message/text';
 
-import {$createMentionNode, MentionNode} from '../../../nodes/mentionNode';
-import {createNodes} from '../../../utils/generateNodes';
+import {$createMentionNode, MentionNode} from '../../../nodes/mentionnode';
+import {createNodes} from '../../../utils/generatenodes';
 
 export const getMentionNodesFromMessage = (message: ContentMessage): MentionNode[] => {
   const firstAsset = message.getFirstAsset() as Text;

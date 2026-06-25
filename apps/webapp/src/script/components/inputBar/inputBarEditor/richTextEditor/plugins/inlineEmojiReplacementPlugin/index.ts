@@ -17,4 +17,4 @@
  *
  */
 
-export * from './inlineEmojiReplacementPlugin';
+export * from './inlineemojireplacementplugin';

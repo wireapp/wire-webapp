@@ -17,4 +17,4 @@
  *
  */
 
-export * from './serviceList';
+export * from './servicelist';

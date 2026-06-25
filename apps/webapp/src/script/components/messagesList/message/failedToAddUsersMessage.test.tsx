@@ -23,18 +23,18 @@ import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/convers
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import en from 'I18n/en-US.json';
-import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
-import {generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
+import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedtoaddusersmessage';
+import {User} from 'Repositories/entity/user';
+import {UserState} from 'Repositories/user/userstate';
+import {generateQualifiedIds} from 'src/script/auth/util/test/testutil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from 'src/script/page/testSupport/rootcontexttestsupport';
 import {setStrings, translate} from 'Util/localizerUtil';
 
-import {FailedToAddUsersMessage} from './failedToAddUsersMessage';
-import {translateForTest} from 'Util/test/translateForTest';
+import {FailedToAddUsersMessage} from './failedtoaddusersmessage';
+import {translateForTest} from 'Util/test/translatefortest';
 
 setStrings({en});
 const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translate}));

@@ -21,20 +21,20 @@ import is from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, Result, result, Task, task} from 'true-myth';
 
-import {mapScheduleFormToCreateMeeting} from 'Components/meeting/mapScheduleFormToCreateMeeting';
-import {mapScheduleFormToUpdateMeeting} from 'Components/meeting/mapScheduleFormToUpdateMeeting';
+import {mapScheduleFormToCreateMeeting} from 'Components/meeting/mapscheduleformtocreatemeeting';
+import {mapScheduleFormToUpdateMeeting} from 'Components/meeting/mapscheduleformtoupdatemeeting';
 import {
   meetingSubmitErrors,
   type MeetingSubmitErrors,
   type ScheduleMeetingErrors,
   type UpdateMeetingErrors,
-} from 'Components/meeting/meetingSubmitErrors';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+} from 'Components/meeting/meetingsubmiterrors';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsrepository';
 import type {WallClock} from 'src/script/clock/wallClock';
 
-import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
+import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './schedulemeetingtypes';
 
-export type {ScheduleMeetingErrors, UpdateMeetingErrors} from 'Components/meeting/meetingSubmitErrors';
+export type {ScheduleMeetingErrors, UpdateMeetingErrors} from 'Components/meeting/meetingsubmiterrors';
 
 export type TryScheduleMeetingDependencies = {
   meetingsRepository: MeetingsRepository;

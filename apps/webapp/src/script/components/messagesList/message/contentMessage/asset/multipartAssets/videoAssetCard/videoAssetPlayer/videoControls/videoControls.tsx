@@ -19,10 +19,10 @@
 
 import {formatSeconds} from 'Util/timeUtil';
 
-import {wrapperStyles, playButtonWrapperStyles, seekbarStyles, timeStyles} from './videoControls.styles';
+import {wrapperStyles, playButtonWrapperStyles, seekbarStyles, timeStyles} from './videocontrols.styles';
 
-import {SeekBar} from '../../../../common/seekBar/seekBar';
-import {VideoPlayButton} from '../common/videoPlayButton/videoPlayButton';
+import {SeekBar} from '../../../../common/seekbar/seekbar';
+import {VideoPlayButton} from '../common/videoplaybutton/videoplaybutton';
 
 interface VideoControlsProps {
   videoElement: HTMLVideoElement;
