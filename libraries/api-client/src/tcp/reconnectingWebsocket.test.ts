@@ -21,7 +21,7 @@
 
 import is from '@sindresorhus/is';
 import {once} from 'events';
-import type {CloseEvent, ErrorEvent, Event as ReconnectingWebsocketEvent} from 'reconnecting-websocket';
+import type {CloseEvent, ErrorEvent} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
 import {Server as WebSocketServer} from 'ws';
 
@@ -50,7 +50,7 @@ type MockReconnectingWebsocketWrapper = {
   onclose: ((event: CloseEvent) => void) | null;
   onerror: ((event: ErrorEvent) => void) | null;
   onmessage: ((event: MessageEvent) => void) | null;
-  onopen: ((event: ReconnectingWebsocketEvent) => void) | null;
+  onopen: ((event: Event) => void) | null;
   readyState: WEBSOCKET_STATE;
   reconnect: jest.Mock;
   send: jest.Mock;
@@ -407,7 +407,7 @@ describe('ReconnectingWebsocket', () => {
 
       RWS.connect();
       socket.readyState = WEBSOCKET_STATE.OPEN;
-      socket.onopen?.({type: 'open'} as ReconnectingWebsocketEvent);
+      socket.onopen?.({type: 'open'} as Event);
 
       deterministicWallClock.advanceByMilliseconds(connectingTimeoutInMilliseconds);
 
