@@ -19,7 +19,7 @@
 
 import is from '@sindresorhus/is';
 import logdown from 'logdown';
-import RWS, {CloseEvent, ErrorEvent, Event, Options} from 'reconnecting-websocket';
+import PartySocketWebSocket, {type CloseEvent, type ErrorEvent, type Options} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
 
 import {LogFactory, TimeUtil} from '@wireapp/commons';
@@ -60,11 +60,17 @@ const connectingTimeoutInMilliseconds = TimeUtil.TimeInMillis.SECOND * 20;
 type BackFromSleepHandler = typeof onBackFromSleep;
 
 type ReconnectingWebsocketWrapper = Pick<
-  RWS,
+  PartySocketWebSocket,
   'binaryType' | 'close' | 'onclose' | 'onerror' | 'onmessage' | 'onopen' | 'readyState' | 'reconnect' | 'send'
 >;
 
 type TimeoutIdentifier = ReturnType<typeof globalThis.setTimeout>;
+type WebSocketEventListener = (event: Event) => void;
+type WebSocketConstructor = new (url: string, protocols?: string | string[]) => WebSocket;
+type WebSocketWithEventListeners = WebSocket & {
+  addEventListener: WebSocket['addEventListener'];
+  removeEventListener: WebSocket['removeEventListener'];
+};
 
 export type ReconnectingWebsocketWallClock = {
   readonly currentTimestampInMilliseconds: number;
@@ -81,9 +87,75 @@ type ReconnectingWebsocketOptions = {
   readonly websocketFactory: Maybe<() => ReconnectingWebsocketWrapper>;
 };
 
+function normalizeMessageEventForPartysocket(event: Event): Event {
+  if (!('data' in event)) {
+    return event;
+  }
+
+  if ((event as MessageEvent).ports !== null) {
+    return event;
+  }
+
+  return {
+    data: (event as MessageEvent).data,
+    lastEventId: (event as MessageEvent).lastEventId,
+    origin: (event as MessageEvent).origin,
+    ports: [],
+    source: (event as MessageEvent).source,
+    type: event.type,
+  } as unknown as MessageEvent;
+}
+
+function createPartysocketCompatibleWebSocketConstructor(
+  WebSocketConstructor: WebSocketConstructor,
+): WebSocketConstructor {
+  return function PartysocketCompatibleWebSocket(url: string, protocols?: string | string[]) {
+    const socket = (
+      is.undefined(protocols) ? new WebSocketConstructor(url) : new WebSocketConstructor(url, protocols)
+    ) as WebSocketWithEventListeners;
+    const originalAddEventListener = socket.addEventListener.bind(socket) as EventTarget['addEventListener'];
+    const originalRemoveEventListener = socket.removeEventListener.bind(socket) as EventTarget['removeEventListener'];
+    const wrappedMessageListeners = new WeakMap<WebSocketEventListener, WebSocketEventListener>();
+
+    socket.addEventListener = ((
+      type: string,
+      listener: EventListenerOrEventListenerObject | null,
+      options?: boolean | AddEventListenerOptions,
+    ) => {
+      if (type !== 'message' || !is.function_(listener)) {
+        originalAddEventListener(type, listener, options);
+        return;
+      }
+
+      const wrappedListener = (event: Event) => {
+        listener(normalizeMessageEventForPartysocket(event));
+      };
+      wrappedMessageListeners.set(listener as WebSocketEventListener, wrappedListener);
+      originalAddEventListener(type, wrappedListener as EventListener, options);
+    }) as WebSocket['addEventListener'];
+
+    socket.removeEventListener = ((
+      type: string,
+      listener: EventListenerOrEventListenerObject | null,
+      options?: boolean | EventListenerOptions,
+    ) => {
+      if (type !== 'message' || !is.function_(listener)) {
+        originalRemoveEventListener(type, listener, options);
+        return;
+      }
+
+      const wrappedListener = wrappedMessageListeners.get(listener as WebSocketEventListener);
+      originalRemoveEventListener(type, (wrappedListener ?? listener) as EventListener, options);
+      wrappedMessageListeners.delete(listener as WebSocketEventListener);
+    }) as WebSocket['removeEventListener'];
+
+    return socket;
+  } as unknown as WebSocketConstructor;
+}
+
 export class ReconnectingWebsocket {
   private static readonly RECONNECTING_OPTIONS: Options = {
-    WebSocket: WebSocketNode,
+    WebSocket: createPartysocketCompatibleWebSocketConstructor(WebSocketNode),
     connectionTimeout: TimeUtil.TimeInMillis.SECOND * 4,
     debug: false,
     maxReconnectionDelay: TimeUtil.TimeInMillis.SECOND * 10,
@@ -251,6 +323,11 @@ export class ReconnectingWebsocket {
   private readonly sendPing = (): void => {
     if (!this.socket) {
       this.logger.debug('WebSocket instance does not exist, skipping ping');
+      return;
+    }
+
+    if (this.socket.readyState !== WEBSOCKET_STATE.OPEN) {
+      this.logger.debug(`WebSocket is not OPEN (state: ${WEBSOCKET_STATE[this.socket.readyState]}), skipping ping`);
       return;
     }
 
@@ -480,7 +557,11 @@ export class ReconnectingWebsocket {
         return websocketFactory();
       },
       Nothing: () => {
-        return new RWS(this.internalOnReconnect, undefined, ReconnectingWebsocket.RECONNECTING_OPTIONS);
+        return new PartySocketWebSocket(
+          this.internalOnReconnect,
+          undefined,
+          ReconnectingWebsocket.RECONNECTING_OPTIONS,
+        );
       },
     });
   }

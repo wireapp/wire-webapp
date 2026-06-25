@@ -17,7 +17,7 @@
  *
  */
 
-import {CloseEvent, ErrorEvent, Event} from 'reconnecting-websocket';
+import type {CloseEvent, ErrorEvent} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
 
 import {

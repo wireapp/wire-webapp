@@ -384,6 +384,49 @@ describe('WebSocketClient', () => {
     });
   });
 
+  describe('buildWebSocketUrl', () => {
+    function createHttpClientWithWebSocketTokens(accessToken: string, nextMarkerToken: string): WebSocketHttpClient {
+      return {
+        ...fakeHttpClient,
+        accessTokenStore: {
+          getAccessToken: () => accessToken,
+          getNextMarkerToken: () => nextMarkerToken,
+        },
+      };
+    }
+
+    it('builds a legacy await WebSocket URL without the async sync marker', () => {
+      const websocketClient = createWebSocketClientWithTestWallClock(
+        'wss://websocket.example.test',
+        createHttpClientWithWebSocketTokens('access-token', 'marker-token'),
+      );
+      webSocketClients.push(websocketClient);
+
+      websocketClient.useVersion(MINIMUM_API_VERSION);
+      websocketClient['clientId'] = 'client-id';
+
+      expect(websocketClient.buildWebSocketUrl()).toBe(
+        'wss://websocket.example.test/await?access_token=access-token&client=client-id',
+      );
+    });
+
+    it('builds an async events WebSocket URL with the sync marker', () => {
+      const websocketClient = createWebSocketClientWithTestWallClock(
+        'wss://websocket.example.test',
+        createHttpClientWithWebSocketTokens('access-token', 'marker-token'),
+      );
+      webSocketClients.push(websocketClient);
+
+      websocketClient.useVersion(MINIMUM_API_VERSION);
+      websocketClient.useAsyncNotificationsSocket();
+      websocketClient['clientId'] = 'client-id';
+
+      expect(websocketClient.buildWebSocketUrl()).toBe(
+        `wss://websocket.example.test/v${MINIMUM_API_VERSION}/events?access_token=access-token&sync_marker=marker-token&client=client-id`,
+      );
+    });
+  });
+
   describe('connect', () => {
     const fakeNotification: ConsumableNotification = {
       type: ConsumableEvent.EVENT,

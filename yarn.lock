@@ -11582,9 +11582,9 @@ __metadata:
     http-status-codes: "npm:2.3.0"
     jest: "npm:30.4.2"
     pako: "npm:2.1.0"
+    partysocket: "npm:1.3.0"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
-    reconnecting-websocket: "npm:4.4.0"
     spark-md5: "npm:3.0.2"
     tough-cookie: "npm:4.1.4"
     ts-node: "npm:10.9.2"
@@ -17439,6 +17439,13 @@ __metadata:
     stream-combiner: "npm:~0.0.4"
     through: "npm:~2.3.1"
   checksum: 10/48ea0e17df89ff45778c25e7111a6691401c902162823ddd7656d83fc972e75380f789f7a48f272f50fe7015420cc04f835d458560bf95e34b2c7a479570c8fb
+  languageName: node
+  linkType: hard
+
+"event-target-polyfill@npm:^0.0.4":
+  version: 0.0.4
+  resolution: "event-target-polyfill@npm:0.0.4"
+  checksum: 10/465f7abfc7d4716365cae732f6940732b0c48315358b228df80d13c85d1b55f2ff8c02c6c98bd1d474fe9e21119d40ff4d907dffe8387ae89ee8a09608365bf9
   languageName: node
   linkType: hard
 
@@ -24584,6 +24591,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"partysocket@npm:1.3.0":
+  version: 1.3.0
+  resolution: "partysocket@npm:1.3.0"
+  dependencies:
+    event-target-polyfill: "npm:^0.0.4"
+  peerDependencies:
+    react: ">=17"
+  peerDependenciesMeta:
+    react:
+      optional: true
+  checksum: 10/9e5566a87377b4337b2554d55c2a6586b5810bbf3db53de2196fc3f8132fe86253e2d3d16f90237f377f9ec24bde59b511798e80e3a5bfde12c2604d006684fe
+  languageName: node
+  linkType: hard
+
 "pascal-case@npm:^3.1.2":
   version: 3.1.2
   resolution: "pascal-case@npm:3.1.2"
@@ -27195,13 +27216,6 @@ __metadata:
   dependencies:
     resolve: "npm:^1.20.0"
   checksum: 10/ad3caed8afdefbc33fbc30e6d22b86c35b3d51c2005546f4e79bcc03c074df804b3640ad18945e6bef9ed12caedc035655ec1082f64a5e94c849ff939dc0a788
-  languageName: node
-  linkType: hard
-
-"reconnecting-websocket@npm:4.4.0":
-  version: 4.4.0
-  resolution: "reconnecting-websocket@npm:4.4.0"
-  checksum: 10/542b09b4604c4050833017e9602867d2dd76631de1790d46238e5a5857a41183e09faf38d373406e4ed7fef8614b43bf43c89aac677104997ccbbf6fa071338c
   languageName: node
   linkType: hard
 
