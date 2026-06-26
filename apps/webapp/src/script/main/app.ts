@@ -98,6 +98,8 @@ import {getLogger, Logger} from 'Util/logger';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
+import {reportStartupFailure} from './reportStartupFailure';
+
 import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config, Configuration} from '../Config';
@@ -113,6 +115,7 @@ import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRem
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import type {ApplicationObservability} from '../observability/applicationObservability';
+import type {ApplicationStartupReport} from '../observability/applicationStartupReport';
 import {reportApplicationStartup} from '../observability/reportApplicationStartup';
 import {configureDownloadPath} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/downloadPath';
 import {configureE2EI} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
@@ -424,13 +427,31 @@ export class App {
    * @param onProgress
    */
   async initApp(clientType: ClientType, onProgress: (message?: string) => void, startupInput: ApplicationStartupInput) {
+    const application = this;
     const {applicationObservability, monotonicClock} = startupInput.dependencies;
     const {applicationBootstrapStartedAt, domContentLoadedAt} = startupInput.timing;
     const appInitStartedAtMilliseconds = monotonicClock.nowMilliseconds;
+    const applicationStartupReportingDependencies = {applicationObservability, logger: this.logger};
 
     const telemetry = new AppInitTelemetry(monotonicClock, applicationBootstrapStartedAt);
     telemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, domContentLoadedAt);
     telemetry.timeStepAt(AppInitTimingsStep.INIT_APP_STARTED, appInitStartedAtMilliseconds);
+
+    function reportStartup(result: ApplicationStartupReport['result']) {
+      return reportApplicationStartup(
+        {
+          result,
+          timings: telemetry.timings,
+          statistics: telemetry.getStatistics(),
+          lastStep: telemetry.lastStep,
+        },
+        applicationStartupReportingDependencies,
+      );
+    }
+
+    async function handleBaseError(baseError: BaseError) {
+      await application._appInitFailure(baseError);
+    }
 
     // add body information
     await updateApiVersion();
@@ -465,15 +486,7 @@ export class App {
         selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
       } catch (error: unknown) {
         this.logger.error('Could not get self user', error);
-        await reportApplicationStartup(
-          {
-            result: 'failure',
-            timings: telemetry.timings,
-            statistics: telemetry.getStatistics(),
-            lastStep: telemetry.lastStep,
-          },
-          {applicationObservability, logger: this.logger},
-        );
+        await reportStartup('failure');
         await this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
         return undefined;
       }
@@ -734,20 +747,10 @@ export class App {
 
       return selfUser;
     } catch (error: unknown) {
-      if (error instanceof BaseError) {
-        await reportApplicationStartup(
-          {
-            result: 'failure',
-            timings: telemetry.timings,
-            statistics: telemetry.getStatistics(),
-            lastStep: telemetry.lastStep,
-          },
-          {applicationObservability, logger: this.logger},
-        );
-        await this._appInitFailure(error);
-        return undefined;
-      }
-      throw error;
+      return reportStartupFailure(error, {
+        handleBaseError,
+        reportStartup,
+      });
     }
   }
 
