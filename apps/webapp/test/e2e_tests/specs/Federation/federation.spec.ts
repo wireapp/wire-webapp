@@ -391,7 +391,7 @@ test.describe('Federation', () => {
 
         const messageWithImage2Device = normalUserDevice2Pages
           .conversation()
-          .getMessage({sender: normalUser})
+          .getMessage({sender: federatedUser})
           .filter({has: normalUserDevice2.getByRole('img')});
         await expect(messageWithImage2Device).toBeVisible();
       });
