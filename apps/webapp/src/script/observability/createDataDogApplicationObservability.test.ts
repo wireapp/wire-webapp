@@ -86,6 +86,30 @@ describe('createDataDogApplicationObservability', () => {
     expect(importBrowserRum).not.toHaveBeenCalled();
   });
 
+  it('omits last step when it was not reported', async () => {
+    const addAction = jest.fn();
+    const applicationObservability = createDataDogApplicationObservability({
+      isDataDogAvailable: () => true,
+      importBrowserRum: async () => {
+        return {datadogRum: {addAction}};
+      },
+    });
+
+    await applicationObservability.reportApplicationStartup({
+      result: 'failure',
+      timings: {},
+      statistics: {result: 'failure'},
+    });
+
+    expect(addAction).toHaveBeenCalledWith(dataDogApplicationStartupActionName, {
+      result: 'failure',
+      timings: {},
+      statistics: {
+        result: 'failure',
+      },
+    });
+  });
+
   it('does not throw when importing Datadog fails', async () => {
     const applicationObservability = createDataDogApplicationObservability({
       isDataDogAvailable: () => true,

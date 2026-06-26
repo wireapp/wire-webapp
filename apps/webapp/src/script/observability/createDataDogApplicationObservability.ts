@@ -95,7 +95,7 @@ function pickAllowedStatistics(
 function createDataDogApplicationStartupContext(report: ApplicationStartupReport): DataDogApplicationStartupContext {
   return {
     result: report.result,
-    last_step: report.lastStep,
+    ...(is.nonEmptyString(report.lastStep) ? {last_step: report.lastStep} : {}),
     timings: pickAllowedTimings(report.timings),
     statistics: pickAllowedStatistics(report.statistics),
   };
