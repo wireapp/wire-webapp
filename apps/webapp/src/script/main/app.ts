@@ -427,7 +427,7 @@ export class App {
     const {applicationObservability, monotonicClock} = startupInput.dependencies;
     const {applicationBootstrapStartedAt, domContentLoadedAt} = startupInput.timing;
     // add body information
-    const startTime = Date.now();
+    const appInitStartedAtMilliseconds = monotonicClock.nowMilliseconds;
     await updateApiVersion();
     await scheduleApiVersionUpdate();
 
@@ -723,7 +723,8 @@ export class App {
       );
 
       await e2eiHandler?.startTimers();
-      this.logger.info(`App version ${Environment.version()} loaded in ${Date.now() - startTime}ms`);
+      const appInitDurationMilliseconds = monotonicClock.nowMilliseconds - appInitStartedAtMilliseconds;
+      this.logger.info(`App version ${Environment.version()} loaded in ${appInitDurationMilliseconds}ms`);
 
       eventLogger.log(AppInitializationStep.AppInitCompleted);
 
