@@ -18,7 +18,7 @@
  */
 
 export type MonotonicClock = {
-  readonly nowMilliseconds: () => number;
+  readonly nowMilliseconds: number;
 };
 
 type PerformanceMonotonicClockDependencies = {
@@ -31,7 +31,7 @@ export function createPerformanceMonotonicClock(
   const {performance} = dependencies;
 
   return {
-    nowMilliseconds() {
+    get nowMilliseconds() {
       return performance.now();
     },
   };

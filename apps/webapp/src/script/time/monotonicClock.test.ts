@@ -28,7 +28,7 @@ describe('createPerformanceMonotonicClock', () => {
     };
     const monotonicClock = createPerformanceMonotonicClock({performance});
 
-    expect(monotonicClock.nowMilliseconds()).toBe(123.45);
+    expect(monotonicClock.nowMilliseconds).toBe(123.45);
     expect(performance.now).toHaveBeenCalledTimes(1);
   });
 });

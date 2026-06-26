@@ -39,7 +39,7 @@ export function createDeterministicMonotonicClock(
       currentTimeMilliseconds += durationMilliseconds;
     },
 
-    nowMilliseconds() {
+    get nowMilliseconds() {
       return currentTimeMilliseconds;
     },
 

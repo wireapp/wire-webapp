@@ -42,7 +42,7 @@ export class AppInitTimings {
 
   constructor(monotonicClock: MonotonicClock) {
     this.logger = getLogger('AppInitTimings');
-    this.init = monotonicClock.nowMilliseconds();
+    this.init = monotonicClock.nowMilliseconds;
     this.monotonicClock = monotonicClock;
     this.timings = {};
   }
@@ -64,7 +64,7 @@ export class AppInitTimings {
 
   timeStep(step: AppInitTimingsStep): void {
     if (!this.timings[step]) {
-      this.timings[step] = this.monotonicClock.nowMilliseconds() - this.init;
+      this.timings[step] = this.monotonicClock.nowMilliseconds - this.init;
     }
   }
 }

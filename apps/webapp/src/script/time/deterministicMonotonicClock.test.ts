@@ -23,7 +23,7 @@ describe('createDeterministicMonotonicClock', () => {
   it('returns the configured current time', () => {
     const monotonicClock = createDeterministicMonotonicClock({initialCurrentTimeMilliseconds: 123});
 
-    expect(monotonicClock.nowMilliseconds()).toBe(123);
+    expect(monotonicClock.nowMilliseconds).toBe(123);
   });
 
   it('advances current time by a duration', () => {
@@ -31,7 +31,7 @@ describe('createDeterministicMonotonicClock', () => {
 
     monotonicClock.advanceByMilliseconds(23);
 
-    expect(monotonicClock.nowMilliseconds()).toBe(123);
+    expect(monotonicClock.nowMilliseconds).toBe(123);
   });
 
   it('sets current time explicitly', () => {
@@ -39,6 +39,6 @@ describe('createDeterministicMonotonicClock', () => {
 
     monotonicClock.setCurrentTimeMilliseconds(42);
 
-    expect(monotonicClock.nowMilliseconds()).toBe(42);
+    expect(monotonicClock.nowMilliseconds).toBe(42);
   });
 });
