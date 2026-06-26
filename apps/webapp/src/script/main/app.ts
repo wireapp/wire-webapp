@@ -426,18 +426,19 @@ export class App {
   async initApp(clientType: ClientType, onProgress: (message?: string) => void, startupInput: ApplicationStartupInput) {
     const {applicationObservability, monotonicClock} = startupInput.dependencies;
     const {applicationBootstrapStartedAt, domContentLoadedAt} = startupInput.timing;
-    // add body information
     const appInitStartedAtMilliseconds = monotonicClock.nowMilliseconds;
+
+    const telemetry = new AppInitTelemetry(monotonicClock, applicationBootstrapStartedAt);
+    telemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, domContentLoadedAt);
+    telemetry.timeStepAt(AppInitTimingsStep.INIT_APP_STARTED, appInitStartedAtMilliseconds);
+
+    // add body information
     await updateApiVersion();
     await scheduleApiVersionUpdate();
 
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
-
-    const telemetry = new AppInitTelemetry(monotonicClock, applicationBootstrapStartedAt);
-    telemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, domContentLoadedAt);
-    telemetry.timeStep(AppInitTimingsStep.INIT_APP_STARTED);
 
     try {
       const {
