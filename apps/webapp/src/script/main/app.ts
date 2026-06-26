@@ -113,8 +113,7 @@ import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRem
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import type {ApplicationObservability} from '../observability/applicationObservability';
-import type {ApplicationStartupReport} from '../observability/applicationStartupReport';
-import {createApplicationStartupReport} from '../observability/createApplicationStartupReport';
+import {reportApplicationStartup} from '../observability/reportApplicationStartup';
 import {configureDownloadPath} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/downloadPath';
 import {configureE2EI} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
 import {APIClient} from '../service/apiClientSingleton';
@@ -439,20 +438,6 @@ export class App {
     const telemetry = new AppInitTelemetry(monotonicClock, applicationBootstrapStartedAt);
     telemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, domContentLoadedAt);
     telemetry.timeStep(AppInitTimingsStep.INIT_APP_STARTED);
-    const reportApplicationStartup = async (result: ApplicationStartupReport['result']): Promise<void> => {
-      try {
-        await applicationObservability.reportApplicationStartup(
-          createApplicationStartupReport({
-            result,
-            timings: telemetry.timings,
-            statistics: telemetry.getStatistics(),
-            lastStep: telemetry.lastStep,
-          }),
-        );
-      } catch (error: unknown) {
-        this.logger.warn('Failed to report application startup', {error});
-      }
-    };
 
     try {
       const {
@@ -479,7 +464,15 @@ export class App {
         selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
       } catch (error: unknown) {
         this.logger.error('Could not get self user', error);
-        await reportApplicationStartup('failure');
+        await reportApplicationStartup(
+          {
+            result: 'failure',
+            timings: telemetry.timings,
+            statistics: telemetry.getStatistics(),
+            lastStep: telemetry.lastStep,
+          },
+          {applicationObservability, logger: this.logger},
+        );
         await this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
         return undefined;
       }
@@ -719,7 +712,15 @@ export class App {
       await conversationRepository.cleanupEphemeralMessages();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
-      await reportApplicationStartup('success');
+      await reportApplicationStartup(
+        {
+          result: 'success',
+          timings: telemetry.timings,
+          statistics: telemetry.getStatistics(),
+          lastStep: telemetry.lastStep,
+        },
+        {applicationObservability, logger: this.logger},
+      );
 
       await e2eiHandler?.startTimers();
       this.logger.info(`App version ${Environment.version()} loaded in ${Date.now() - startTime}ms`);
@@ -732,7 +733,15 @@ export class App {
       return selfUser;
     } catch (error: unknown) {
       if (error instanceof BaseError) {
-        await reportApplicationStartup('failure');
+        await reportApplicationStartup(
+          {
+            result: 'failure',
+            timings: telemetry.timings,
+            statistics: telemetry.getStatistics(),
+            lastStep: telemetry.lastStep,
+          },
+          {applicationObservability, logger: this.logger},
+        );
         await this._appInitFailure(error);
         return undefined;
       }
