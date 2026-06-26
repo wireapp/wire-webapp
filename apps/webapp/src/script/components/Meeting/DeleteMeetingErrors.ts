@@ -17,13 +17,8 @@
  *
  */
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import type {User} from 'Repositories/entity/User';
+export const deleteMeetingErrors = {
+  deleteFailed: 'deleteFailed',
+} as const;
 
-import {isMeetingHost} from './isMeetingHost';
-
-export const canEditMeeting = (meeting: Meeting, selfUser: User, nowMs: number): boolean => {
-  const hasNotStarted = nowMs < new Date(meeting.start_date).getTime();
-
-  return isMeetingHost(meeting, selfUser) && hasNotStarted;
-};
+export type DeleteMeetingErrorCode = (typeof deleteMeetingErrors)[keyof typeof deleteMeetingErrors];

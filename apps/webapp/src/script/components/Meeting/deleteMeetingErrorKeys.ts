@@ -17,13 +17,12 @@
  *
  */
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import type {User} from 'Repositories/entity/User';
+import type {DeleteMeetingErrorCode} from 'Components/Meeting/DeleteMeetingErrors';
+import type {TranslationKey} from 'Util/localizerUtil';
 
-import {isMeetingHost} from './isMeetingHost';
-
-export const canEditMeeting = (meeting: Meeting, selfUser: User, nowMs: number): boolean => {
-  const hasNotStarted = nowMs < new Date(meeting.start_date).getTime();
-
-  return isMeetingHost(meeting, selfUser) && hasNotStarted;
-};
+export const DELETE_MEETING_ERROR_TRANSLATION_KEYS = {
+  deleteFailed: {
+    titleKey: 'meetings.deleteModal.errorTitle',
+    messageKey: 'meetings.deleteModal.errorMessage',
+  },
+} as const satisfies Record<DeleteMeetingErrorCode, {titleKey: TranslationKey; messageKey: TranslationKey}>;

@@ -41,9 +41,10 @@ import {formatLocale} from 'Util/timeUtil';
 
 interface MeetingListItemProps extends Meeting {
   nowMs?: number;
+  onMeetingDeleted?: () => Promise<void>;
 }
 
-const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => {
+const MeetingListItemComponent = ({nowMs, onMeetingDeleted, ...meeting}: MeetingListItemProps) => {
   const {title, start_date, end_date, recurrence, attending} = meeting;
   const {translate} = useApplicationContext();
   const timestamp = nowMs ?? Date.now();
@@ -113,7 +114,7 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
       </div>
       <div css={rightStyles}>
         <MeetingStatus start_date={start_date} end_date={end_date} attending={attending} nowMs={timestamp} />
-        <MeetingAction meeting={meeting} />
+        <MeetingAction meeting={meeting} onMeetingDeleted={onMeetingDeleted ?? (async () => {})} />
       </div>
     </div>
   );

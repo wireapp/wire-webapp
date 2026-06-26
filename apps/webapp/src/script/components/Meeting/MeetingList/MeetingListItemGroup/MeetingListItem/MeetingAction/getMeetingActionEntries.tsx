@@ -17,7 +17,7 @@
  *
  */
 
-import {CallIcon, CirclePlusIcon, CloseIcon, EditIcon, ShareLinkIcon, TrashIcon} from '@wireapp/react-ui-kit';
+import {CallIcon, CirclePlusIcon, EditIcon, ShareLinkIcon, TrashIcon} from '@wireapp/react-ui-kit';
 
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {
@@ -35,6 +35,7 @@ type GetMeetingActionEntriesParams = {
   nowMs: number;
   translate: Translate;
   onEdit: () => void;
+  onDeleteForAll: () => void;
 };
 
 export const getMeetingActionEntries = ({
@@ -43,11 +44,19 @@ export const getMeetingActionEntries = ({
   nowMs,
   translate,
   onEdit,
+  onDeleteForAll,
 }: GetMeetingActionEntriesParams): ContextMenuEntry[] => {
   const editEntry: ContextMenuEntry = {
     icon: () => <EditIcon />,
     label: translate('meetings.action.editMeeting'),
     click: onEdit,
+  };
+
+  const deleteForAllEntry: ContextMenuEntry = {
+    css: contextMenuDangerItemStyles,
+    icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
+    label: translate('meetings.action.deleteMeetingForAll'),
+    click: onDeleteForAll,
   };
 
   return [
@@ -63,16 +72,6 @@ export const getMeetingActionEntries = ({
       icon: () => <ShareLinkIcon />,
       label: translate('meetings.action.copyLink'),
     },
-    ...(canEditMeeting(meeting, selfUser, nowMs) ? [editEntry] : []),
-    {
-      css: contextMenuDangerItemStyles,
-      icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
-      label: translate('meetings.action.deleteMeetingForMe'),
-    },
-    {
-      css: contextMenuDangerItemStyles,
-      icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
-      label: translate('meetings.action.deleteMeetingForAll'),
-    },
+    ...(canEditMeeting(meeting, selfUser, nowMs) ? [editEntry, deleteForAllEntry] : []),
   ];
 };

@@ -41,4 +41,16 @@ describe('MeetingsApiDataSource', () => {
     expect(createMeeting).toHaveBeenCalledTimes(1);
     expect(getMeetingsList).toHaveBeenCalledTimes(1);
   });
+
+  it('delegates deleteMeeting to the injected MeetingsAPI', async () => {
+    const meetingId = {id: 'meeting-id', domain: 'example.com'};
+    const deleteMeeting = jest.fn().mockResolvedValue(undefined);
+    const meetingsApi = {deleteMeeting} as unknown as MeetingsAPI;
+
+    const dataSource = new MeetingsApiDataSource(meetingsApi);
+
+    await dataSource.deleteMeeting(meetingId);
+
+    expect(deleteMeeting).toHaveBeenCalledWith(meetingId);
+  });
 });

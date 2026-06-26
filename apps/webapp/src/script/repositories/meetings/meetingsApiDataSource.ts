@@ -43,4 +43,8 @@ export class MeetingsApiDataSource implements MeetingsDataSource {
   removeMeetingInvitation(meetingId: Parameters<MeetingsDataSource['removeMeetingInvitation']>[0], emails: string[]) {
     return this.meetingsApi.removeMeetingInvitation(meetingId, {emails});
   }
+
+  deleteMeeting(...args: Parameters<MeetingsDataSource['deleteMeeting']>) {
+    return this.meetingsApi.deleteMeeting(...args);
+  }
 }

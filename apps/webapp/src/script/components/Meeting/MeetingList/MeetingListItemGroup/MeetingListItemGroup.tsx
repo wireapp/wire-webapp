@@ -35,6 +35,7 @@ interface MeetingListItemGroupProps {
   groupedMeetings: Record<number, Meeting[]>;
   groupBy?: MeetingGroupBy;
   nowMs?: number;
+  onMeetingDeleted?: () => Promise<void>;
 }
 
 export enum MeetingGroupBy {
@@ -47,6 +48,7 @@ const MeetingListItemGroupComponent = ({
   groupedMeetings,
   groupBy = MeetingGroupBy.HOUR,
   nowMs,
+  onMeetingDeleted,
 }: MeetingListItemGroupProps) => {
   const {translate} = useApplicationContext();
   const formatHourLabel = (date: string) =>
@@ -77,7 +79,12 @@ const MeetingListItemGroupComponent = ({
         <div>
           {nonEmptyGroups.flatMap(([, items]) =>
             items.map(item => (
-              <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
+              <MeetingListItem
+                key={`meeting-list-item-${item.title}-${item.start_date}`}
+                nowMs={nowMs}
+                onMeetingDeleted={onMeetingDeleted}
+                {...item}
+              />
             )),
           )}
         </div>
@@ -91,7 +98,12 @@ const MeetingListItemGroupComponent = ({
             </div>
             <div>
               {items.map(item => (
-                <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
+                <MeetingListItem
+                  key={`meeting-list-item-${item.title}-${item.start_date}`}
+                  nowMs={nowMs}
+                  onMeetingDeleted={onMeetingDeleted}
+                  {...item}
+                />
               ))}
             </div>
           </div>

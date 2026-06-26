@@ -30,7 +30,7 @@ export const Meetings = () => {
     <>
       <MeetingHeader />
       <div css={contentStyles}>
-        <MeetingList {...meetingsList} />
+        <MeetingList {...meetingsList} onMeetingDeleted={meetingsList.fetchMeetings} />
       </div>
       <ScheduleMeetingModal onMeetingScheduled={meetingsList.fetchMeetings} />
     </>

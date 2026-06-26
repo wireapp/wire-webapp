@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent} from 'react';
+import {MouseEvent, useCallback} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -29,6 +29,7 @@ import {
   iconContainerStyle,
   iconStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
+import {showDeleteMeetingModal} from 'Components/Meeting/showDeleteMeetingModal';
 import {useEditMeeting} from 'Components/Meeting/useEditMeeting';
 import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
 import {UserState} from 'Repositories/user/userState';
@@ -38,12 +39,29 @@ import {showContextMenu} from '../../../../../../ui/contextMenu';
 
 interface MeetingActionProps {
   meeting: Meeting;
+  onMeetingDeleted: () => Promise<void>;
 }
 
-export const MeetingAction = ({meeting}: MeetingActionProps) => {
-  const {translate, wallClock} = useApplicationContext();
+export const MeetingAction = ({meeting, onMeetingDeleted}: MeetingActionProps) => {
+  const {mainViewModel, translate, wallClock} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const selfUser = container.resolve(UserState).self();
+  const meetingsRepository = mainViewModel.content.repositories.meetings;
+
+  const handleDeleteForAll = useCallback(() => {
+    if (!canEditMeeting(meeting, selfUser, wallClock.currentTimestampInMilliseconds)) {
+      return;
+    }
+
+    showDeleteMeetingModal({
+      meeting,
+      dependencies: {
+        meetingsRepository,
+        fetchMeetings: onMeetingDeleted,
+      },
+      translate,
+    });
+  }, [meeting, meetingsRepository, onMeetingDeleted, selfUser, translate, wallClock]);
 
   const handleActionButton = (event: MouseEvent<HTMLElement>) => {
     const nowMs = wallClock.currentTimestampInMilliseconds;
@@ -60,6 +78,7 @@ export const MeetingAction = ({meeting}: MeetingActionProps) => {
             editMeeting(meeting);
           }
         },
+        onDeleteForAll: handleDeleteForAll,
       }),
       identifier: 'message-options-menu',
     });

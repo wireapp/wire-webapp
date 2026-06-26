@@ -42,55 +42,88 @@ const createSelfUser = (id = 'host-id') => {
 
 const translate = (key: string) => key;
 
-const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.find(entry => entry.label === 'meetings.action.editMeeting');
+const getEntryByLabel = (entries: ReturnType<typeof getMeetingActionEntries>, label: string) =>
+  entries.find(entry => entry.label === label);
+
+const defaultParams = {
+  meeting: createMeeting(),
+  selfUser: createSelfUser(),
+  nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+  translate,
+  onEdit: jest.fn(),
+  onDeleteForAll: jest.fn(),
+};
 
 describe('getMeetingActionEntries', () => {
   it('includes Edit meeting for an eligible host', () => {
-    const entries = getMeetingActionEntries({
-      meeting: createMeeting(),
-      selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
-      translate,
-      onEdit: jest.fn(),
-    });
+    const entries = getMeetingActionEntries(defaultParams);
 
-    expect(getEditEntryLabel(entries)).toBeDefined();
+    expect(getEntryByLabel(entries, 'meetings.action.editMeeting')).toBeDefined();
   });
 
   it('omits Edit meeting for a non-host invitee', () => {
     const entries = getMeetingActionEntries({
-      meeting: createMeeting(),
+      ...defaultParams,
       selfUser: createSelfUser('invitee-id'),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
-      translate,
-      onEdit: jest.fn(),
     });
 
-    expect(getEditEntryLabel(entries)).toBeUndefined();
+    expect(getEntryByLabel(entries, 'meetings.action.editMeeting')).toBeUndefined();
   });
 
   it('omits Edit meeting for an ongoing meeting', () => {
     const entries = getMeetingActionEntries({
-      meeting: createMeeting(),
-      selfUser: createSelfUser(),
+      ...defaultParams,
       nowMs: new Date('2026-06-15T14:30:00.000Z').getTime(),
-      translate,
-      onEdit: jest.fn(),
     });
 
-    expect(getEditEntryLabel(entries)).toBeUndefined();
+    expect(getEntryByLabel(entries, 'meetings.action.editMeeting')).toBeUndefined();
   });
 
   it('omits Edit meeting for a past meeting', () => {
     const entries = getMeetingActionEntries({
-      meeting: createMeeting(),
-      selfUser: createSelfUser(),
+      ...defaultParams,
       nowMs: new Date('2026-06-15T16:00:00.000Z').getTime(),
-      translate,
-      onEdit: jest.fn(),
     });
 
-    expect(getEditEntryLabel(entries)).toBeUndefined();
+    expect(getEntryByLabel(entries, 'meetings.action.editMeeting')).toBeUndefined();
+  });
+
+  it('includes Delete meeting for everyone for the host of an upcoming meeting', () => {
+    const entries = getMeetingActionEntries(defaultParams);
+
+    expect(getEntryByLabel(entries, 'meetings.action.deleteMeetingForAll')).toBeDefined();
+  });
+
+  it('omits Delete meeting for everyone for an ongoing meeting', () => {
+    const entries = getMeetingActionEntries({
+      ...defaultParams,
+      nowMs: new Date('2026-06-15T14:30:00.000Z').getTime(),
+    });
+
+    expect(getEntryByLabel(entries, 'meetings.action.deleteMeetingForAll')).toBeUndefined();
+  });
+
+  it('omits Delete meeting for everyone for a started meeting', () => {
+    const entries = getMeetingActionEntries({
+      ...defaultParams,
+      nowMs: new Date('2026-06-15T16:00:00.000Z').getTime(),
+    });
+
+    expect(getEntryByLabel(entries, 'meetings.action.deleteMeetingForAll')).toBeUndefined();
+  });
+
+  it('omits Delete meeting for everyone for a non-host', () => {
+    const entries = getMeetingActionEntries({
+      ...defaultParams,
+      selfUser: createSelfUser('invitee-id'),
+    });
+
+    expect(getEntryByLabel(entries, 'meetings.action.deleteMeetingForAll')).toBeUndefined();
+  });
+
+  it('does not include Delete meeting for me', () => {
+    const entries = getMeetingActionEntries(defaultParams);
+
+    expect(getEntryByLabel(entries, 'meetings.action.deleteMeetingForMe')).toBeUndefined();
   });
 });

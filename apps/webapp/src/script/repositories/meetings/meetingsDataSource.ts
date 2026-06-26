@@ -28,4 +28,5 @@ export interface MeetingsDataSource {
   updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Promise<Meeting>;
   addMeetingInvitation(meetingId: QualifiedId, emails: string[]): Promise<void>;
   removeMeetingInvitation(meetingId: QualifiedId, emails: string[]): Promise<void>;
+  deleteMeeting(meetingId: QualifiedId): Promise<void>;
 }

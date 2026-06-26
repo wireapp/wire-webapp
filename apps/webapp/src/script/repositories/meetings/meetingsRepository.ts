@@ -62,4 +62,11 @@ export class MeetingsRepository {
       () => this.dataSource.removeMeetingInvitation(meetingId, emails),
     );
   }
+
+  deleteMeeting(meetingId: QualifiedId): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.dataSource.deleteMeeting(meetingId),
+    );
+  }
 }

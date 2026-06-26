@@ -27,7 +27,12 @@ import {
 import {groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
 import {getOnGoingMeetingsAt} from 'Components/Meeting/utils/MeetingStatusUtil';
 
-const TodayAndOngoingSectionComponent = ({meetingsToday, headerForToday, nowMs}: TodayAndOngoingSectionProps) => {
+const TodayAndOngoingSectionComponent = ({
+  meetingsToday,
+  headerForToday,
+  nowMs,
+  onMeetingDeleted,
+}: TodayAndOngoingSectionProps) => {
   const onGoingMeetings = useMemo(() => getOnGoingMeetingsAt(meetingsToday, nowMs), [meetingsToday, nowMs]);
   const ongoingIds = useMemo(() => new Set(onGoingMeetings.map(meeting => meeting.conversation_id)), [onGoingMeetings]);
 
@@ -41,9 +46,19 @@ const TodayAndOngoingSectionComponent = ({meetingsToday, headerForToday, nowMs}:
   return (
     <>
       {onGoingMeetings.length > 0 && (
-        <MeetingListItemGroup groupBy={MeetingGroupBy.NONE} groupedMeetings={{0: onGoingMeetings}} nowMs={nowMs} />
+        <MeetingListItemGroup
+          groupBy={MeetingGroupBy.NONE}
+          groupedMeetings={{0: onGoingMeetings}}
+          nowMs={nowMs}
+          onMeetingDeleted={onMeetingDeleted}
+        />
       )}
-      <MeetingListItemGroup header={headerForToday} groupedMeetings={groupedMeetingsToday} nowMs={nowMs} />
+      <MeetingListItemGroup
+        header={headerForToday}
+        groupedMeetings={groupedMeetingsToday}
+        nowMs={nowMs}
+        onMeetingDeleted={onMeetingDeleted}
+      />
     </>
   );
 };

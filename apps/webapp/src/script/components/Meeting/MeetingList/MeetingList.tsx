@@ -53,15 +53,17 @@ export interface TodayAndOngoingSectionProps {
   meetingsToday: Meeting[];
   headerForToday: string;
   nowMs: number;
+  onMeetingDeleted?: () => Promise<void>;
 }
 
 export interface MeetingListProps {
   meetings: Meeting[];
   isLoading: boolean;
   errorKey?: MeetingsListErrorKey;
+  onMeetingDeleted?: () => Promise<void>;
 }
 
-export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) => {
+export const MeetingList = ({meetings, isLoading, errorKey, onMeetingDeleted}: MeetingListProps) => {
   const {translate, wallClock} = useApplicationContext();
   const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
 
@@ -112,11 +114,20 @@ export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) =
     <div css={meetingListContainerStyles}>
       <>
         {hasMeetingsToday && (
-          <TodayAndOngoingSection meetingsToday={meetingsToday} headerForToday={headerForToday} nowMs={nowMs} />
+          <TodayAndOngoingSection
+            meetingsToday={meetingsToday}
+            headerForToday={headerForToday}
+            nowMs={nowMs}
+            onMeetingDeleted={onMeetingDeleted}
+          />
         )}
 
         {hasMeetingsTomorrow && (
-          <MeetingListItemGroup header={headerForTomorrow} groupedMeetings={groupedMeetingsTomorrow} />
+          <MeetingListItemGroup
+            header={headerForTomorrow}
+            groupedMeetings={groupedMeetingsTomorrow}
+            onMeetingDeleted={onMeetingDeleted}
+          />
         )}
       </>
     </div>
