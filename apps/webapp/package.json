@@ -173,6 +173,6 @@
     "webpack-dev-middleware": "7.4.5",
     "webpack-hot-middleware": "2.26.1",
     "workbox-webpack-plugin": "7.4.1",
-    "worker-timers": "8.0.32"
+    "worker-timers": "8.0.33"
   }
 }

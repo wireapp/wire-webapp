@@ -12211,7 +12211,7 @@ __metadata:
     webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.6"
     workbox-webpack-plugin: "npm:7.4.1"
-    worker-timers: "npm:8.0.32"
+    worker-timers: "npm:8.0.33"
     xstate: "npm:5.32.1"
     zustand: "npm:4.5.7"
   languageName: unknown
@@ -13652,15 +13652,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"broker-factory@npm:^3.1.14":
-  version: 3.1.14
-  resolution: "broker-factory@npm:3.1.14"
+"broker-factory@npm:^3.1.15":
+  version: 3.1.15
+  resolution: "broker-factory@npm:3.1.15"
   dependencies:
-    "@babel/runtime": "npm:^7.29.2"
+    "@babel/runtime": "npm:^7.29.7"
     fast-unique-numbers: "npm:^9.0.27"
     tslib: "npm:^2.8.1"
-    worker-factory: "npm:^7.0.49"
-  checksum: 10/fd5e47837ec1da1b61c88d8df7f5445429e586e35a31635491225874e92d9a0d3a5b48b4b83f2fe38722eadded66c47800488836acf16690504ae511bcb5d6c3
+    worker-factory: "npm:^7.0.50"
+  checksum: 10/f720bf40931314e4c9eb7dbe9acac479b380b843645325ddeb0ebd2f18a44d01b3c2d13daec8e6da4a3b4b911ded66ea45e02fd1fd6f383d320fd8c47a6d47f1
   languageName: node
   linkType: hard
 
@@ -32605,50 +32605,50 @@ __metadata:
   languageName: node
   linkType: hard
 
-"worker-factory@npm:^7.0.49":
-  version: 7.0.49
-  resolution: "worker-factory@npm:7.0.49"
+"worker-factory@npm:^7.0.50":
+  version: 7.0.50
+  resolution: "worker-factory@npm:7.0.50"
   dependencies:
-    "@babel/runtime": "npm:^7.29.2"
+    "@babel/runtime": "npm:^7.29.7"
     fast-unique-numbers: "npm:^9.0.27"
     tslib: "npm:^2.8.1"
-  checksum: 10/33825e9ded286bb965f31d6494ccdb008c1ba9cfcc7454c60bc30771a01bcd05ad970b5db3824b34eab758df60f3d29ea6929651f6661dcaff4cd67a6c40acc6
+  checksum: 10/09eff4fc39b11a02fcb712cab9b9bbdbaf0ddd6e868512f671711d3a5f4bf7f2e8fb3aa6d231626d4e9bfaf4da5c93ea123ba7b2dfdd5d035c2f8e02f9a80bf6
   languageName: node
   linkType: hard
 
-"worker-timers-broker@npm:^8.0.16":
-  version: 8.0.16
-  resolution: "worker-timers-broker@npm:8.0.16"
+"worker-timers-broker@npm:^8.0.18":
+  version: 8.0.18
+  resolution: "worker-timers-broker@npm:8.0.18"
   dependencies:
-    "@babel/runtime": "npm:^7.29.2"
-    broker-factory: "npm:^3.1.14"
+    "@babel/runtime": "npm:^7.29.7"
+    broker-factory: "npm:^3.1.15"
     fast-unique-numbers: "npm:^9.0.27"
     tslib: "npm:^2.8.1"
-    worker-timers-worker: "npm:^9.0.14"
-  checksum: 10/899305ee83651b3f5e74d2c729fed7aa1d5bccf30ef6a046f1117a13e500d817af99777adeb4e8c09ae1b2ae6e4fad85dd04c7a0018c179576438c1b96d63f45
+    worker-timers-worker: "npm:^9.0.15"
+  checksum: 10/6fb4533f16b3b824400d220e63a5c0df010744913367fe0eab2cfdc762ec3a827a0a83f0bbd23e61bd595ceda039d9a4ffd01298955fc58e56ee82fa2dd466f4
   languageName: node
   linkType: hard
 
-"worker-timers-worker@npm:^9.0.14":
-  version: 9.0.14
-  resolution: "worker-timers-worker@npm:9.0.14"
-  dependencies:
-    "@babel/runtime": "npm:^7.29.2"
-    tslib: "npm:^2.8.1"
-    worker-factory: "npm:^7.0.49"
-  checksum: 10/5bddee22289acbed3f4454699e9b86b9baf2380ab79dab42535b1b5106f1826d9f75526e9deacc3180967be9b792d2948c00f13e9d5796cde18c95f5b40a27f0
-  languageName: node
-  linkType: hard
-
-"worker-timers@npm:8.0.32":
-  version: 8.0.32
-  resolution: "worker-timers@npm:8.0.32"
+"worker-timers-worker@npm:^9.0.15":
+  version: 9.0.15
+  resolution: "worker-timers-worker@npm:9.0.15"
   dependencies:
     "@babel/runtime": "npm:^7.29.7"
     tslib: "npm:^2.8.1"
-    worker-timers-broker: "npm:^8.0.16"
-    worker-timers-worker: "npm:^9.0.14"
-  checksum: 10/c1415f9e214199027b40bd4890df4b83432640132f211679a3da20e249c99a825248bb4cc102a0fea90abfa4693d3e1da41d102bb83c713f10347516627b9c2f
+    worker-factory: "npm:^7.0.50"
+  checksum: 10/c2878f590dd29257f60b8534c8bc6d4624e15ac74f754ecd5f582f06f323db3dc22e553dd10217af4a82743af149b2e2bef172882099c338f3b5addd0a0cb841
+  languageName: node
+  linkType: hard
+
+"worker-timers@npm:8.0.33":
+  version: 8.0.33
+  resolution: "worker-timers@npm:8.0.33"
+  dependencies:
+    "@babel/runtime": "npm:^7.29.7"
+    tslib: "npm:^2.8.1"
+    worker-timers-broker: "npm:^8.0.18"
+    worker-timers-worker: "npm:^9.0.15"
+  checksum: 10/6f710d17f2fa1dc9ccf02c3b0171d5f6adc3d7733e4751bc2b71b0240c73e524cdf64804d712a21a461e8e6ded39d5e0ee42db2cd4911609d74c3520bdc3bbef
   languageName: node
   linkType: hard
 
