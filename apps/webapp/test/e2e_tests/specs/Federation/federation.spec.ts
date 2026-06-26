@@ -382,12 +382,18 @@ test.describe('Federation', () => {
           .conversationList()
           .getConversation(federatedUser.fullName, {protocol: 'mls'})
           .open();
+        await expect(normalUserDevice2Pages.conversation().getMessage({sender: normalUser})).toBeVisible();
         await expect(normalUserDevice2Pages.conversation().getMessage({sender: federatedUser})).toBeVisible();
       });
 
       await test.step('Verify group messages and media are restored on the new device', async () => {
         await normalUserDevice2Pages.conversationList().getConversation(groupName).open();
-        await expect(normalUserDevice2Pages.conversation().getMessage({sender: federatedUser})).toBeVisible();
+
+        await expect(
+          normalUserDevice2Pages
+            .conversation()
+            .getMessage({sender: federatedUser, content: 'Group message from federated user'}),
+        ).toBeVisible();
 
         const messageWithImage2Device = normalUserDevice2Pages
           .conversation()
