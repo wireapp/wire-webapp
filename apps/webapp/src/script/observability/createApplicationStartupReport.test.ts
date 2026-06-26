@@ -40,7 +40,7 @@ describe('createApplicationStartupReport', () => {
         [AppInitStatisticsValue.NOTIFICATIONS]: 7,
         [AppInitStatisticsValue.CONNECTIONS]: 50,
         [AppInitStatisticsValue.CONVERSATIONS]: 100,
-        [AppInitStatisticsValue.CLIENTS]: 3,
+        [AppInitStatisticsValue.CLIENTS]: 5,
         [AppInitStatisticsValue.CLIENT_TYPE]: 'permanent',
         [AppInitStatisticsValue.BACKEND_REQUESTS]: 42,
       },
@@ -65,7 +65,7 @@ describe('createApplicationStartupReport', () => {
         notification_count: 7,
         connection_count_bucket: 50,
         conversation_count_bucket: 100,
-        client_count_bucket: 3,
+        client_count_bucket: 5,
         client_type: 'permanent',
       },
     });

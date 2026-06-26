@@ -682,7 +682,7 @@ export class App {
       void eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
 
       eventLogger.log(AppInitializationStep.ClientsUpdated, {count: clientEntities.length});
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length, 5);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
       selfUser.devices(clientEntities);
