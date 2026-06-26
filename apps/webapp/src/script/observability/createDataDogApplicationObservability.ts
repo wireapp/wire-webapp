@@ -125,3 +125,7 @@ export function createDataDogApplicationObservability(
     },
   };
 }
+
+export function importDataDogBrowserRum(): Promise<{readonly datadogRum?: BrowserRum}> {
+  return import('@datadog/browser-rum');
+}
