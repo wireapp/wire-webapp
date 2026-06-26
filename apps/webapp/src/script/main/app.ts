@@ -416,7 +416,7 @@ export class App {
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
 
-    const telemetry = new AppInitTelemetry(monotonicClock);
+    const telemetry = new AppInitTelemetry(monotonicClock, monotonicClock.nowMilliseconds);
 
     try {
       const {

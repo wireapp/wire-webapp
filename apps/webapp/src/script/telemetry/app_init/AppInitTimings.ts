@@ -17,6 +17,8 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import {Logger, getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -31,6 +33,7 @@ export class AppInitTimings {
   private readonly init: number;
   private readonly logger: Logger;
   private readonly monotonicClock: MonotonicClock;
+  private lastRecordedStep: Maybe<AppInitTimingsStep> = Maybe.nothing();
 
   static get CONFIG() {
     return {
@@ -51,6 +54,10 @@ export class AppInitTimings {
     return {...this.timings};
   }
 
+  get lastStep(): Maybe<AppInitTimingsStep> {
+    return this.lastRecordedStep;
+  }
+
   getAppLoad(): number {
     const appLoaded = this.timings[AppInitTimingsStep.APP_LOADED] ?? 0;
     const appLoadedInSeconds = appLoaded / TIME_IN_MILLIS.SECOND;
@@ -69,6 +76,7 @@ export class AppInitTimings {
   timeStepAt(step: AppInitTimingsStep, occurredAtMilliseconds: number): void {
     if (this.timings[step] === undefined) {
       this.timings[step] = occurredAtMilliseconds - this.init;
+      this.lastRecordedStep = Maybe.just(step);
     }
   }
 }
