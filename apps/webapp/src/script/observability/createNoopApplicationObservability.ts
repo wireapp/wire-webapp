@@ -17,10 +17,12 @@
  *
  */
 
+import {asyncNoop} from 'noop-esm';
+
 import type {ApplicationObservability} from './applicationObservability';
 
 export function createNoopApplicationObservability(): ApplicationObservability {
   return {
-    async reportApplicationStartup() {},
+    reportApplicationStartup: asyncNoop,
   };
 }

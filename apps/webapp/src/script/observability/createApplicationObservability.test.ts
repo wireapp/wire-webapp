@@ -17,16 +17,18 @@
  *
  */
 
+import {asyncNoop} from 'noop-esm';
+
 import type {ApplicationObservability} from './applicationObservability';
 import {createApplicationObservability} from './createApplicationObservability';
 
 describe('createApplicationObservability', () => {
   it('returns noop observability when Datadog config is missing', () => {
     const noopObservability: ApplicationObservability = {
-      reportApplicationStartup: jest.fn(async () => {}),
+      reportApplicationStartup: jest.fn(asyncNoop),
     };
     const datadogObservability: ApplicationObservability = {
-      reportApplicationStartup: jest.fn(async () => {}),
+      reportApplicationStartup: jest.fn(asyncNoop),
     };
     const createNoopObservability = jest.fn(() => {
       return noopObservability;
@@ -47,10 +49,10 @@ describe('createApplicationObservability', () => {
 
   it('returns noop observability when Datadog config is incomplete', () => {
     const noopObservability: ApplicationObservability = {
-      reportApplicationStartup: jest.fn(async () => {}),
+      reportApplicationStartup: jest.fn(asyncNoop),
     };
     const datadogObservability: ApplicationObservability = {
-      reportApplicationStartup: jest.fn(async () => {}),
+      reportApplicationStartup: jest.fn(asyncNoop),
     };
     const createNoopObservability = jest.fn(() => {
       return noopObservability;
@@ -71,10 +73,10 @@ describe('createApplicationObservability', () => {
 
   it('returns Datadog observability when Datadog config is complete', () => {
     const noopObservability: ApplicationObservability = {
-      reportApplicationStartup: jest.fn(async () => {}),
+      reportApplicationStartup: jest.fn(asyncNoop),
     };
     const datadogObservability: ApplicationObservability = {
-      reportApplicationStartup: jest.fn(async () => {}),
+      reportApplicationStartup: jest.fn(asyncNoop),
     };
     const createNoopObservability = jest.fn(() => {
       return noopObservability;

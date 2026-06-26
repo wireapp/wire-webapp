@@ -20,6 +20,7 @@
 import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {asyncNoop} from 'noop-esm';
 
 import type {ApplicationObservability} from '../observability/applicationObservability';
 import {createDeterministicMonotonicClock} from '../time/deterministicMonotonicClock';
@@ -31,11 +32,11 @@ describe('createApplicationServices', () => {
     const deterministicMonotonicClock = createDeterministicMonotonicClock();
     const deterministicWallClock = createDeterministicWallClock();
     const applicationObservability: ApplicationObservability = {
-      reportApplicationStartup: jest.fn(async () => {}),
+      reportApplicationStartup: jest.fn(asyncNoop),
     };
     const fireAndForgetInvoker = {
       fireAndForget: jest.fn(),
-      waitUntilAllSettled: jest.fn(async () => {}),
+      waitUntilAllSettled: jest.fn(asyncNoop),
     } as FireAndForgetInvoker;
     const createApplicationObservability = jest.fn(() => {
       return applicationObservability;
