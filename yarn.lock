@@ -11573,7 +11573,7 @@ __metadata:
     concurrently: "npm:9.2.3"
     http-status-codes: "npm:2.3.0"
     jest: "npm:30.4.2"
-    pako: "npm:2.1.0"
+    pako: "npm:2.2.0"
     partysocket: "npm:1.3.0"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
@@ -24441,10 +24441,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pako@npm:2.1.0":
-  version: 2.1.0
-  resolution: "pako@npm:2.1.0"
-  checksum: 10/38a04991d0ec4f4b92794a68b8c92bf7340692c5d980255c92148da96eb3e550df7a86a7128b5ac0c65ecddfe5ef3bbe9c6dab13e1bc315086e759b18f7c1401
+"pako@npm:2.2.0":
+  version: 2.2.0
+  resolution: "pako@npm:2.2.0"
+  checksum: 10/4311a3d5fa32d146d4fd926e8b0af43f9d4713034ac53fce78445065893f541da4435b1e77290a49fd80dd49f82163230fc6ccad39530c844d8c6caf3d21848d
   languageName: node
   linkType: hard
 
