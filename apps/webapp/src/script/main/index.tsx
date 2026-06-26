@@ -48,7 +48,7 @@ import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
-import {createNoopApplicationObservability} from '../observability/createNoopApplicationObservability';
+import {createApplicationObservability as createApplicationObservabilityFromConfig} from '../observability/createApplicationObservability';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {createPerformanceMonotonicClock} from '../time/monotonicClock';
@@ -84,7 +84,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const applicationServices = createApplicationServices({
-    createApplicationObservability: createNoopApplicationObservability,
+    createApplicationObservability() {
+      return createApplicationObservabilityFromConfig(config);
+    },
     createFireAndForgetInvoker: () => {
       return createFireAndForgetInvoker({logger: fireAndForgetInvokerLogger});
     },
