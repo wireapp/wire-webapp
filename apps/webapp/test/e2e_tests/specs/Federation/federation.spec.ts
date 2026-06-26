@@ -320,20 +320,26 @@ test.describe('Federation', () => {
       });
 
       await test.step('Exchange direct messages and verify receipt', async () => {
-        await normalUserPages.conversationList().getConversation(federatedUser.fullName, {protocol: 'mls'}).open();
         await federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}).open();
+        const oneOnOneConversation = await normalUserPages
+          .conversationList()
+          .getConversation(federatedUser.fullName, {protocol: 'mls'})
+          .open();
 
         await normalUserPages.conversation().sendMessage('Message from normal user');
         await federatedUserPages.conversation().sendMessage('Message from federated user');
 
         await expect(normalUserPages.conversation().getMessage({sender: federatedUser})).toBeVisible();
         await expect(federatedUserPages.conversation().getMessage({sender: normalUser})).toBeVisible();
+
+        // Wait for messages to be read before exporting backup
+        await expect(oneOnOneConversation.unreadIndicator).not.toBeVisible();
       });
 
       await test.step('Create a group chat and exchange text and image messages', async () => {
         await createGroup(normalUserPages, groupName, [federatedUser]);
         await federatedUserPages.conversationList().getConversation(groupName).open();
-        await normalUserPages.conversationList().getConversation(groupName).open();
+        const groupConversation = await normalUserPages.conversationList().getConversation(groupName).open();
 
         await federatedUserPages.conversation().sendMessage('Group message from federated user');
         await shareAssetHelper(
@@ -351,6 +357,9 @@ test.describe('Federation', () => {
           .getMessage({sender: federatedUser})
           .filter({has: normalUserPage.getByRole('img')});
         await expect(messageWithImage).toBeVisible();
+
+        // Wait for messages to be read before exporting backup
+        await expect(groupConversation.unreadIndicator).not.toBeVisible();
       });
 
       const backupName = await test.step('Create and save backup for the normal user', async () => {
