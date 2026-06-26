@@ -31,16 +31,16 @@ export type ApplicationServices = {
 
 type CreateApplicationServicesDependencies = {
   readonly createFireAndForgetInvoker: () => FireAndForgetInvoker;
-  readonly createMonotonicClock: () => MonotonicClock;
   readonly createWallClock: () => WallClock;
+  readonly monotonicClock: MonotonicClock;
 };
 
 export function createApplicationServices(dependencies: CreateApplicationServicesDependencies): ApplicationServices {
-  const {createFireAndForgetInvoker, createMonotonicClock, createWallClock} = dependencies;
+  const {createFireAndForgetInvoker, createWallClock, monotonicClock} = dependencies;
 
   return {
     fireAndForgetInvoker: createFireAndForgetInvoker(),
-    monotonicClock: createMonotonicClock(),
+    monotonicClock,
     wallClock: createWallClock(),
   };
 }

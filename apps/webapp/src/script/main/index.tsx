@@ -86,10 +86,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     createFireAndForgetInvoker: () => {
       return createFireAndForgetInvoker({logger: fireAndForgetInvokerLogger});
     },
-    createMonotonicClock: () => {
-      return applicationMonotonicClock;
-    },
     createWallClock,
+    monotonicClock: applicationMonotonicClock,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {fireAndForgetInvoker, wallClock} = applicationServices;

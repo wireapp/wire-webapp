@@ -36,24 +36,20 @@ describe('createApplicationServices', () => {
     const createFireAndForgetInvoker = jest.fn(() => {
       return fireAndForgetInvoker;
     });
-    const createMonotonicClock = jest.fn(() => {
-      return deterministicMonotonicClock;
-    });
     const createWallClock = jest.fn(() => {
       return deterministicWallClock;
     });
 
     const applicationServices = createApplicationServices({
       createFireAndForgetInvoker,
-      createMonotonicClock,
       createWallClock,
+      monotonicClock: deterministicMonotonicClock,
     });
 
     expect(applicationServices.fireAndForgetInvoker).toBe(fireAndForgetInvoker);
     expect(applicationServices.monotonicClock).toBe(deterministicMonotonicClock);
     expect(applicationServices.wallClock).toBe(deterministicWallClock);
     expect(createFireAndForgetInvoker).toHaveBeenCalledTimes(1);
-    expect(createMonotonicClock).toHaveBeenCalledTimes(1);
     expect(createWallClock).toHaveBeenCalledTimes(1);
   });
 });
