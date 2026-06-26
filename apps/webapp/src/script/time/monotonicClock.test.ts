@@ -17,16 +17,16 @@
  *
  */
 
-import {createPerformanceMonotonicClock} from './monotonicClock';
+import {createMonotonicClock} from './monotonicClock';
 
-describe('createPerformanceMonotonicClock', () => {
+describe('createMonotonicClock', () => {
   it('uses the injected performance object for elapsed-time measurements', () => {
     const performance = {
       now: jest.fn(() => {
         return 123.45;
       }),
     };
-    const monotonicClock = createPerformanceMonotonicClock({performance});
+    const monotonicClock = createMonotonicClock({performance});
 
     expect(monotonicClock.nowMilliseconds).toBe(123.45);
     expect(performance.now).toHaveBeenCalledTimes(1);

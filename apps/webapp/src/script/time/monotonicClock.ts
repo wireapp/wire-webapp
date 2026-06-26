@@ -21,11 +21,11 @@ export type MonotonicClock = {
   readonly nowMilliseconds: number;
 };
 
-type PerformanceMonotonicClockDependencies = {
+type MonotonicClockDependencies = {
   readonly performance: Pick<Performance, 'now'>;
 };
 
-export function createPerformanceMonotonicClock(dependencies: PerformanceMonotonicClockDependencies): MonotonicClock {
+export function createMonotonicClock(dependencies: MonotonicClockDependencies): MonotonicClock {
   const {performance} = dependencies;
 
   return {

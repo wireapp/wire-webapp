@@ -51,9 +51,9 @@ import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncreme
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import {createPerformanceMonotonicClock} from '../time/monotonicClock';
+import {createMonotonicClock} from '../time/monotonicClock';
 
-const applicationMonotonicClock = createPerformanceMonotonicClock({performance: globalThis.performance});
+const applicationMonotonicClock = createMonotonicClock({performance: globalThis.performance});
 const applicationBootstrapStartedAt = applicationMonotonicClock.nowMilliseconds;
 
 document.addEventListener('DOMContentLoaded', async () => {
