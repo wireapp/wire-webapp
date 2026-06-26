@@ -21,27 +21,23 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
-import type {MonotonicClock} from '../time/monotonicClock';
+import {createDeterministicMonotonicClock} from '../time/deterministicMonotonicClock';
 
 import {createApplicationServices} from './createApplicationServices';
 
 describe('createApplicationServices', () => {
   it('creates application services through injected dependencies', () => {
+    const deterministicMonotonicClock = createDeterministicMonotonicClock();
     const deterministicWallClock = createDeterministicWallClock();
     const fireAndForgetInvoker = {
       fireAndForget: jest.fn(),
       waitUntilAllSettled: jest.fn(async () => {}),
     } as FireAndForgetInvoker;
-    const monotonicClock: MonotonicClock = {
-      nowMilliseconds: jest.fn(() => {
-        return 0;
-      }),
-    };
     const createFireAndForgetInvoker = jest.fn(() => {
       return fireAndForgetInvoker;
     });
     const createMonotonicClock = jest.fn(() => {
-      return monotonicClock;
+      return deterministicMonotonicClock;
     });
     const createWallClock = jest.fn(() => {
       return deterministicWallClock;
@@ -54,7 +50,7 @@ describe('createApplicationServices', () => {
     });
 
     expect(applicationServices.fireAndForgetInvoker).toBe(fireAndForgetInvoker);
-    expect(applicationServices.monotonicClock).toBe(monotonicClock);
+    expect(applicationServices.monotonicClock).toBe(deterministicMonotonicClock);
     expect(applicationServices.wallClock).toBe(deterministicWallClock);
     expect(createFireAndForgetInvoker).toHaveBeenCalledTimes(1);
     expect(createMonotonicClock).toHaveBeenCalledTimes(1);
