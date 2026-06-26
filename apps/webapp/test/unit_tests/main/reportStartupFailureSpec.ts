@@ -19,9 +19,8 @@
 
 import {asyncNoop} from 'noop-esm';
 
-import {BASE_ERROR_TYPE, BaseError} from '../error/baseError';
-
-import {reportStartupFailure} from './reportStartupFailure';
+import {BASE_ERROR_TYPE, BaseError} from '../../../src/script/error/baseError';
+import {reportStartupFailure} from '../../../src/script/main/reportStartupFailure';
 
 describe('reportStartupFailure', () => {
   it('reports startup failure before handling a BaseError', async () => {
@@ -41,9 +40,7 @@ describe('reportStartupFailure', () => {
     const reportStartup = jest.fn(asyncNoop);
     const handleBaseError = jest.fn(asyncNoop);
 
-    await expect(reportStartupFailure(unexpectedError, {handleBaseError, reportStartup})).rejects.toBe(
-      unexpectedError,
-    );
+    await expect(reportStartupFailure(unexpectedError, {handleBaseError, reportStartup})).rejects.toBe(unexpectedError);
 
     expect(reportStartup).toHaveBeenCalledWith('failure');
     expect(handleBaseError).not.toHaveBeenCalled();
