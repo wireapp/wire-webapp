@@ -112,6 +112,7 @@ import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
+import type {ApplicationObservability} from '../observability/applicationObservability';
 import {configureDownloadPath} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/downloadPath';
 import {configureE2EI} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
 import {APIClient} from '../service/apiClientSingleton';
@@ -135,7 +136,16 @@ type WaitUntilAllMessagesAreProcessedDependencies = {
 type ApplicationStartupTimingInput = {
   readonly applicationBootstrapStartedAt: number;
   readonly domContentLoadedAt: number;
+};
+
+type ApplicationStartupDependencies = {
+  readonly applicationObservability: ApplicationObservability;
   readonly monotonicClock: MonotonicClock;
+};
+
+type ApplicationStartupInput = {
+  readonly dependencies: ApplicationStartupDependencies;
+  readonly timing: ApplicationStartupTimingInput;
 };
 
 export async function waitUntilAllMessagesAreProcessed(dependencies: WaitUntilAllMessagesAreProcessedDependencies) {
@@ -412,12 +422,9 @@ export class App {
    * @param config
    * @param onProgress
    */
-  async initApp(
-    clientType: ClientType,
-    onProgress: (message?: string) => void,
-    startupTimingInput: ApplicationStartupTimingInput,
-  ) {
-    const {applicationBootstrapStartedAt, domContentLoadedAt, monotonicClock} = startupTimingInput;
+  async initApp(clientType: ClientType, onProgress: (message?: string) => void, startupInput: ApplicationStartupInput) {
+    const {monotonicClock} = startupInput.dependencies;
+    const {applicationBootstrapStartedAt, domContentLoadedAt} = startupInput.timing;
     // add body information
     const startTime = Date.now();
     await updateApiVersion();

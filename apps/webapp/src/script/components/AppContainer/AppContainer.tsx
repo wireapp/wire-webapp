@@ -48,6 +48,7 @@ import {Config, Configuration} from '../../Config';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
+import type {ApplicationObservability} from '../../observability/applicationObservability';
 import {AppMain} from '../../page/appMain';
 import {RootProvider} from '../../page/rootProvider';
 import {APIClient} from '../../service/apiClientSingleton';
@@ -60,6 +61,7 @@ import {AppLoader} from '../AppLoader';
 type AppProps = {
   readonly config: Configuration;
   readonly clientType: ClientType;
+  readonly applicationObservability: ApplicationObservability;
   readonly applicationBootstrapStartedAt: number;
   readonly domContentLoadedAt: number;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
@@ -73,6 +75,7 @@ export const AppContainer = (properties: AppProps) => {
   const {
     config,
     clientType,
+    applicationObservability,
     applicationBootstrapStartedAt,
     domContentLoadedAt,
     fireAndForgetInvoker,
@@ -178,9 +181,14 @@ export const AppContainer = (properties: AppProps) => {
       <AppLoader
         init={onProgress => {
           return app.initApp(clientType, onProgress, {
-            applicationBootstrapStartedAt,
-            domContentLoadedAt,
-            monotonicClock,
+            dependencies: {
+              applicationObservability,
+              monotonicClock,
+            },
+            timing: {
+              applicationBootstrapStartedAt,
+              domContentLoadedAt,
+            },
           });
         }}
       >
