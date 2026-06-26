@@ -21,21 +21,26 @@ import type {WallClock} from '@enormora/wall-clock/wall-clock';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
+import type {MonotonicClock} from '../time/monotonicClock';
+
 export type ApplicationServices = {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
+  readonly monotonicClock: MonotonicClock;
   readonly wallClock: WallClock;
 };
 
 type CreateApplicationServicesDependencies = {
   readonly createFireAndForgetInvoker: () => FireAndForgetInvoker;
+  readonly createMonotonicClock: () => MonotonicClock;
   readonly createWallClock: () => WallClock;
 };
 
 export function createApplicationServices(dependencies: CreateApplicationServicesDependencies): ApplicationServices {
-  const {createFireAndForgetInvoker, createWallClock} = dependencies;
+  const {createFireAndForgetInvoker, createMonotonicClock, createWallClock} = dependencies;
 
   return {
     fireAndForgetInvoker: createFireAndForgetInvoker(),
+    monotonicClock: createMonotonicClock(),
     wallClock: createWallClock(),
   };
 }
