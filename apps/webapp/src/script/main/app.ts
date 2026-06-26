@@ -132,6 +132,12 @@ type WaitUntilAllMessagesAreProcessedDependencies = {
   eventRepository: EventRepository;
 };
 
+type ApplicationStartupTimingInput = {
+  readonly applicationBootstrapStartedAt: number;
+  readonly domContentLoadedAt: number;
+  readonly monotonicClock: MonotonicClock;
+};
+
 export async function waitUntilAllMessagesAreProcessed(dependencies: WaitUntilAllMessagesAreProcessedDependencies) {
   const {eventRepository} = dependencies;
 
@@ -406,7 +412,12 @@ export class App {
    * @param config
    * @param onProgress
    */
-  async initApp(clientType: ClientType, onProgress: (message?: string) => void, monotonicClock: MonotonicClock) {
+  async initApp(
+    clientType: ClientType,
+    onProgress: (message?: string) => void,
+    startupTimingInput: ApplicationStartupTimingInput,
+  ) {
+    const {applicationBootstrapStartedAt, domContentLoadedAt, monotonicClock} = startupTimingInput;
     // add body information
     const startTime = Date.now();
     await updateApiVersion();
@@ -416,7 +427,9 @@ export class App {
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
 
-    const telemetry = new AppInitTelemetry(monotonicClock, monotonicClock.nowMilliseconds);
+    const telemetry = new AppInitTelemetry(monotonicClock, applicationBootstrapStartedAt);
+    telemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, domContentLoadedAt);
+    telemetry.timeStep(AppInitTimingsStep.INIT_APP_STARTED);
 
     try {
       const {

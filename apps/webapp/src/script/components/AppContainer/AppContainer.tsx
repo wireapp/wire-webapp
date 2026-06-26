@@ -60,6 +60,8 @@ import {AppLoader} from '../AppLoader';
 type AppProps = {
   readonly config: Configuration;
   readonly clientType: ClientType;
+  readonly applicationBootstrapStartedAt: number;
+  readonly domContentLoadedAt: number;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly monotonicClock: MonotonicClock;
@@ -68,8 +70,17 @@ type AppProps = {
 };
 
 export const AppContainer = (properties: AppProps) => {
-  const {config, clientType, fireAndForgetInvoker, isFeatureToggleEnabled, monotonicClock, translate, wallClock} =
-    properties;
+  const {
+    config,
+    clientType,
+    applicationBootstrapStartedAt,
+    domContentLoadedAt,
+    fireAndForgetInvoker,
+    isFeatureToggleEnabled,
+    monotonicClock,
+    translate,
+    wallClock,
+  } = properties;
   setAppLocale();
   const app = useMemo(() => {
     return new App(container.resolve(Core), container.resolve(APIClient), config, translate);
@@ -166,7 +177,11 @@ export const AppContainer = (properties: AppProps) => {
     <RootProvider value={rootContextValue}>
       <AppLoader
         init={onProgress => {
-          return app.initApp(clientType, onProgress, monotonicClock);
+          return app.initApp(clientType, onProgress, {
+            applicationBootstrapStartedAt,
+            domContentLoadedAt,
+            monotonicClock,
+          });
         }}
       >
         {selfUser => {

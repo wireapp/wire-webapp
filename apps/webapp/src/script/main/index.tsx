@@ -54,8 +54,10 @@ import {Core} from '../service/coreSingleton';
 import {createPerformanceMonotonicClock} from '../time/monotonicClock';
 
 const applicationMonotonicClock = createPerformanceMonotonicClock({performance: globalThis.performance});
+const applicationBootstrapStartedAt = applicationMonotonicClock.nowMilliseconds;
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const domContentLoadedAt = applicationMonotonicClock.nowMilliseconds;
   const config = Config.getConfig();
 
   enableLogging(config);
@@ -129,6 +131,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     <AppContainer
       config={config}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
+      applicationBootstrapStartedAt={applicationBootstrapStartedAt}
+      domContentLoadedAt={domContentLoadedAt}
       fireAndForgetInvoker={fireAndForgetInvoker}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
       monotonicClock={monotonicClock}
