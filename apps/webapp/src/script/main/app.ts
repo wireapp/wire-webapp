@@ -119,6 +119,7 @@ import {Core} from '../service/coreSingleton';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import type {MonotonicClock} from '../time/monotonicClock';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -405,7 +406,7 @@ export class App {
    * @param config
    * @param onProgress
    */
-  async initApp(clientType: ClientType, onProgress: (message?: string) => void) {
+  async initApp(clientType: ClientType, onProgress: (message?: string) => void, monotonicClock: MonotonicClock) {
     // add body information
     const startTime = Date.now();
     await updateApiVersion();
@@ -415,7 +416,7 @@ export class App {
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
 
-    const telemetry = new AppInitTelemetry();
+    const telemetry = new AppInitTelemetry(monotonicClock);
 
     try {
       const {

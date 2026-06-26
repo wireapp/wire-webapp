@@ -22,12 +22,15 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
+import type {MonotonicClock} from '../../time/monotonicClock';
+
 type AppTimings = Partial<Record<AppInitTimingsStep, number>>;
 
 export class AppInitTimings {
   private readonly timings: AppTimings;
   private readonly init: number;
   private readonly logger: Logger;
+  private readonly monotonicClock: MonotonicClock;
 
   static get CONFIG() {
     return {
@@ -37,9 +40,10 @@ export class AppInitTimings {
     };
   }
 
-  constructor() {
+  constructor(monotonicClock: MonotonicClock) {
     this.logger = getLogger('AppInitTimings');
-    this.init = window.performance.now();
+    this.init = monotonicClock.nowMilliseconds();
+    this.monotonicClock = monotonicClock;
     this.timings = {};
   }
 
@@ -60,7 +64,7 @@ export class AppInitTimings {
 
   timeStep(step: AppInitTimingsStep): void {
     if (!this.timings[step]) {
-      this.timings[step] = window.performance.now() - this.init;
+      this.timings[step] = this.monotonicClock.nowMilliseconds() - this.init;
     }
   }
 }

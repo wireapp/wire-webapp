@@ -22,12 +22,14 @@ import type {AppInitStatisticsValue} from './AppInitStatisticsValue';
 import {AppInitTimings} from './AppInitTimings';
 import type {AppInitTimingsStep} from './AppInitTimingsStep';
 
+import type {MonotonicClock} from '../../time/monotonicClock';
+
 export class AppInitTelemetry {
   private readonly timings: AppInitTimings;
   private readonly statistics: AppInitStatistics;
 
-  constructor() {
-    this.timings = new AppInitTimings();
+  constructor(monotonicClock: MonotonicClock) {
+    this.timings = new AppInitTimings(monotonicClock);
     this.statistics = new AppInitStatistics();
   }
 

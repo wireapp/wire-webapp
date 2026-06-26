@@ -52,6 +52,7 @@ import {AppMain} from '../../page/appMain';
 import {RootProvider} from '../../page/rootProvider';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import type {MonotonicClock} from '../../time/monotonicClock';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {AppLoader} from '../AppLoader';
@@ -61,12 +62,14 @@ type AppProps = {
   readonly clientType: ClientType;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
+  readonly monotonicClock: MonotonicClock;
   readonly translate: Translate;
   readonly wallClock: WallClock;
 };
 
 export const AppContainer = (properties: AppProps) => {
-  const {config, clientType, fireAndForgetInvoker, isFeatureToggleEnabled, translate, wallClock} = properties;
+  const {config, clientType, fireAndForgetInvoker, isFeatureToggleEnabled, monotonicClock, translate, wallClock} =
+    properties;
   setAppLocale();
   const app = useMemo(() => {
     return new App(container.resolve(Core), container.resolve(APIClient), config, translate);
@@ -161,7 +164,11 @@ export const AppContainer = (properties: AppProps) => {
 
   return (
     <RootProvider value={rootContextValue}>
-      <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
+      <AppLoader
+        init={onProgress => {
+          return app.initApp(clientType, onProgress, monotonicClock);
+        }}
+      >
         {selfUser => {
           return (
             <AppMain

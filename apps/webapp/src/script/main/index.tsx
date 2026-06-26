@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     monotonicClock: applicationMonotonicClock,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
-  const {fireAndForgetInvoker, wallClock} = applicationServices;
+  const {fireAndForgetInvoker, monotonicClock, wallClock} = applicationServices;
   const apiClient = new APIClient({
     wallClock,
   });
@@ -127,6 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
       fireAndForgetInvoker={fireAndForgetInvoker}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
+      monotonicClock={monotonicClock}
       translate={translate}
       wallClock={wallClock}
     />,
