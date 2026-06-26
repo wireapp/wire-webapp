@@ -594,6 +594,7 @@ export class App {
 
       let previousMessage = '';
 
+      telemetry.timeStep(AppInitTimingsStep.NOTIFICATION_PROCESSING_STARTED);
       await eventRepository.connectWebSocket(
         this.core,
         useLegacyNotificationStream,
@@ -616,6 +617,7 @@ export class App {
       );
 
       await waitUntilAllMessagesAreProcessed({eventRepository});
+      telemetry.timeStep(AppInitTimingsStep.NOTIFICATION_PROCESSING_COMPLETED);
 
       this.logger.info(`Finished loading notifications, total: ${totalNotifications}`);
 
@@ -689,6 +691,7 @@ export class App {
       await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
+      telemetry.timeStep(AppInitTimingsStep.UI_LOADED);
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (selfUser.isActivatedAccount()) {
