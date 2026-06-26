@@ -25,9 +25,7 @@ type PerformanceMonotonicClockDependencies = {
   readonly performance: Pick<Performance, 'now'>;
 };
 
-export function createPerformanceMonotonicClock(
-  dependencies: PerformanceMonotonicClockDependencies = {performance: globalThis.performance},
-): MonotonicClock {
+export function createPerformanceMonotonicClock(dependencies: PerformanceMonotonicClockDependencies): MonotonicClock {
   const {performance} = dependencies;
 
   return {
