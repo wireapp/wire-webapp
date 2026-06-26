@@ -29,7 +29,7 @@ export class AppInitTelemetry {
   private readonly statistics: AppInitStatistics;
 
   constructor(monotonicClock: MonotonicClock) {
-    this.timings = new AppInitTimings(monotonicClock);
+    this.timings = new AppInitTimings(monotonicClock, monotonicClock.nowMilliseconds);
     this.statistics = new AppInitStatistics();
   }
 

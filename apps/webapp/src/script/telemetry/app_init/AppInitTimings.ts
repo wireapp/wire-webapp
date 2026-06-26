@@ -40,9 +40,9 @@ export class AppInitTimings {
     };
   }
 
-  constructor(monotonicClock: MonotonicClock) {
+  constructor(monotonicClock: MonotonicClock, startedAtMilliseconds: number) {
     this.logger = getLogger('AppInitTimings');
-    this.init = monotonicClock.nowMilliseconds;
+    this.init = startedAtMilliseconds;
     this.monotonicClock = monotonicClock;
     this.timings = {};
   }
@@ -63,8 +63,12 @@ export class AppInitTimings {
   }
 
   timeStep(step: AppInitTimingsStep): void {
-    if (!this.timings[step]) {
-      this.timings[step] = this.monotonicClock.nowMilliseconds - this.init;
+    this.timeStepAt(step, this.monotonicClock.nowMilliseconds);
+  }
+
+  timeStepAt(step: AppInitTimingsStep, occurredAtMilliseconds: number): void {
+    if (this.timings[step] === undefined) {
+      this.timings[step] = occurredAtMilliseconds - this.init;
     }
   }
 }
