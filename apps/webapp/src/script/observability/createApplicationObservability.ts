@@ -20,17 +20,15 @@
 import is from '@sindresorhus/is';
 
 import type {ApplicationObservability} from './applicationObservability';
-import {createDataDogApplicationObservability, importDataDogBrowserRum} from './createDataDogApplicationObservability';
-import {createNoopApplicationObservability} from './createNoopApplicationObservability';
 
-type ApplicationObservabilityConfiguration = {
+export type ApplicationObservabilityConfiguration = {
   readonly dataDog?: {
     readonly applicationId?: string;
     readonly clientToken?: string;
   };
 };
 
-type CreateApplicationObservabilityDependencies = {
+export type CreateApplicationObservabilityDependencies = {
   readonly createDataDogObservability: () => ApplicationObservability;
   readonly createNoopObservability: () => ApplicationObservability;
 };
@@ -41,17 +39,7 @@ function isDataDogConfigured(config: ApplicationObservabilityConfiguration): boo
 
 export function createApplicationObservability(
   config: ApplicationObservabilityConfiguration,
-  dependencies: CreateApplicationObservabilityDependencies = {
-    createDataDogObservability() {
-      return createDataDogApplicationObservability({
-        importBrowserRum: importDataDogBrowserRum,
-        isDataDogAvailable() {
-          return true;
-        },
-      });
-    },
-    createNoopObservability: createNoopApplicationObservability,
-  },
+  dependencies: CreateApplicationObservabilityDependencies,
 ): ApplicationObservability {
   const {createDataDogObservability, createNoopObservability} = dependencies;
 

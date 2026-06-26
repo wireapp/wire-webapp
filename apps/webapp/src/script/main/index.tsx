@@ -48,7 +48,7 @@ import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
-import {createApplicationObservability as createApplicationObservabilityFromConfig} from '../observability/createApplicationObservability';
+import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {createPerformanceMonotonicClock} from '../time/monotonicClock';
