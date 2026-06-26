@@ -50,6 +50,9 @@ import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/s
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
+import {createPerformanceMonotonicClock} from '../time/monotonicClock';
+
+const applicationMonotonicClock = createPerformanceMonotonicClock({performance: globalThis.performance});
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
@@ -82,6 +85,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const applicationServices = createApplicationServices({
     createFireAndForgetInvoker: () => {
       return createFireAndForgetInvoker({logger: fireAndForgetInvokerLogger});
+    },
+    createMonotonicClock: () => {
+      return applicationMonotonicClock;
     },
     createWallClock,
   });
