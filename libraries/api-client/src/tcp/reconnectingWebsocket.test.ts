@@ -395,6 +395,174 @@ describe('ReconnectingWebsocket', () => {
       expectSocketHandlersToBeBound(secondSocket);
     });
 
+    it('restarts the watchdog from internalOnReconnect after close stopped it', async () => {
+      const deterministicWallClock = createDeterministicTimeoutWallClock(0);
+      const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+      const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+      const websocketFactory = createSocketFactory(firstSocket, secondSocket);
+      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+        ...defaultReconnectingWebsocketTestOptions,
+        wallClock: deterministicWallClock,
+        websocketFactory: Maybe.just(websocketFactory),
+      });
+
+      RWS.connect();
+
+      expect(RWS['connectingTimeoutId']).toBeDefined();
+
+      firstSocket.onclose?.({code: CloseEventCode.NORMAL_CLOSURE, reason: 'closed', wasClean: true} as CloseEvent);
+
+      expect(RWS['connectingTimeoutId']).toBeUndefined();
+
+      firstSocket.readyState = WEBSOCKET_STATE.CONNECTING;
+      await RWS['internalOnReconnect']();
+
+      expect(RWS['connectingTimeoutId']).toBeDefined();
+
+      deterministicWallClock.advanceByMilliseconds(connectingTimeoutInMilliseconds);
+
+      expect(firstSocket.close).toHaveBeenCalledTimes(1);
+      expect(firstSocket.close).toHaveBeenCalledWith(CloseEventCode.NORMAL_CLOSURE, 'Connecting timeout');
+      expect(websocketFactory).toHaveBeenCalledTimes(2);
+      expect(RWS['socket']).toBe(secondSocket);
+    });
+
+    it('does not throw when internalOnReconnect runs before a socket is assigned', async () => {
+      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'));
+
+      await expect(RWS['internalOnReconnect']()).resolves.toBe('ws://example.invalid');
+    });
+
+    it('starts the watchdog from internalOnReconnect before the socket becomes CONNECTING', async () => {
+      const deterministicWallClock = createDeterministicTimeoutWallClock(0);
+      const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.OPEN);
+      const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+      const websocketFactory = createSocketFactory(firstSocket, secondSocket);
+      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+        ...defaultReconnectingWebsocketTestOptions,
+        wallClock: deterministicWallClock,
+        websocketFactory: Maybe.just(websocketFactory),
+      });
+
+      RWS.connect();
+      firstSocket.onopen?.({type: 'open'} as Event);
+
+      expect(RWS['connectingTimeoutId']).toBeUndefined();
+
+      await RWS['internalOnReconnect']();
+
+      expect(RWS['connectingTimeoutId']).toBeDefined();
+
+      deterministicWallClock.advanceByMilliseconds(connectingTimeoutInMilliseconds);
+
+      expect(firstSocket.close).not.toHaveBeenCalled();
+      expect(websocketFactory).toHaveBeenCalledTimes(1);
+      expect(RWS['socket']).toBe(firstSocket);
+      expect(RWS['connectingTimeoutId']).toBeUndefined();
+    });
+
+    it('starts the watchdog when reconnecting in place', () => {
+      const deterministicWallClock = createDeterministicTimeoutWallClock(0);
+      const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.OPEN);
+      const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+      const websocketFactory = createSocketFactory(firstSocket, secondSocket);
+      firstSocket.reconnect.mockImplementation(() => {
+        firstSocket.readyState = WEBSOCKET_STATE.CONNECTING;
+      });
+      const RWS = createRWS(jest.fn(), {
+        ...defaultReconnectingWebsocketTestOptions,
+        wallClock: deterministicWallClock,
+        websocketFactory: Maybe.just(websocketFactory),
+      });
+
+      RWS.connect();
+      firstSocket.onopen?.({type: 'open'} as Event);
+
+      expect(RWS['connectingTimeoutId']).toBeUndefined();
+
+      RWS.connect();
+
+      expect(firstSocket.reconnect).toHaveBeenCalledTimes(1);
+      expect(RWS['connectingTimeoutId']).toBeDefined();
+
+      deterministicWallClock.advanceByMilliseconds(connectingTimeoutInMilliseconds);
+
+      expect(firstSocket.close).toHaveBeenCalledTimes(1);
+      expect(firstSocket.close).toHaveBeenCalledWith(CloseEventCode.NORMAL_CLOSURE, 'Connecting timeout');
+      expect(websocketFactory).toHaveBeenCalledTimes(2);
+      expect(RWS['socket']).toBe(secondSocket);
+    });
+
+    it('does not let repeated internalOnReconnect watchdog timers replace a newer socket wrapper', async () => {
+      const deterministicWallClock = createDeterministicTimeoutWallClock(0);
+      let shouldClearTimeout = true;
+      const wallClockWithOptionalClear: DeterministicTimeoutWallClock = {
+        advanceByMilliseconds: deterministicWallClock.advanceByMilliseconds,
+        clearInterval: deterministicWallClock.clearInterval,
+        clearTimeout(timeoutIdentifier): void {
+          if (shouldClearTimeout) {
+            deterministicWallClock.clearTimeout(timeoutIdentifier);
+          }
+        },
+        get currentTimestampInMilliseconds() {
+          return deterministicWallClock.currentTimestampInMilliseconds;
+        },
+        setInterval: deterministicWallClock.setInterval,
+        setTimeout: deterministicWallClock.setTimeout,
+      };
+      const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+      const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+      const websocketFactory = createSocketFactory(firstSocket, secondSocket);
+      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+        ...defaultReconnectingWebsocketTestOptions,
+        wallClock: wallClockWithOptionalClear,
+        websocketFactory: Maybe.just(websocketFactory),
+      });
+
+      RWS.connect();
+      firstSocket.onclose?.({code: CloseEventCode.NORMAL_CLOSURE, reason: 'closed', wasClean: true} as CloseEvent);
+      firstSocket.readyState = WEBSOCKET_STATE.CONNECTING;
+      shouldClearTimeout = false;
+
+      await RWS['internalOnReconnect']();
+      await RWS['internalOnReconnect']();
+
+      deterministicWallClock.advanceByMilliseconds(connectingTimeoutInMilliseconds / 2);
+      RWS['replaceSocketWrapper'](firstSocket, 'Manual replacement');
+
+      deterministicWallClock.advanceByMilliseconds(connectingTimeoutInMilliseconds / 2);
+
+      expect(firstSocket.close).toHaveBeenCalledTimes(1);
+      expect(firstSocket.close).toHaveBeenCalledWith(CloseEventCode.NORMAL_CLOSURE, 'Manual replacement');
+      expect(websocketFactory).toHaveBeenCalledTimes(2);
+      expect(RWS['socket']).toBe(secondSocket);
+    });
+
+    it('clears the watchdog when a socket opens after internalOnReconnect', async () => {
+      const deterministicWallClock = createDeterministicTimeoutWallClock(0);
+      const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+      const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+      const websocketFactory = createSocketFactory(firstSocket, secondSocket);
+      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+        ...defaultReconnectingWebsocketTestOptions,
+        wallClock: deterministicWallClock,
+        websocketFactory: Maybe.just(websocketFactory),
+      });
+
+      RWS.connect();
+      await RWS['internalOnReconnect']();
+      firstSocket.readyState = WEBSOCKET_STATE.OPEN;
+      firstSocket.onopen?.({type: 'open'} as Event);
+
+      expect(RWS['connectingTimeoutId']).toBeUndefined();
+
+      deterministicWallClock.advanceByMilliseconds(connectingTimeoutInMilliseconds);
+
+      expect(websocketFactory).toHaveBeenCalledTimes(1);
+      expect(firstSocket.close).not.toHaveBeenCalled();
+      expect(RWS['socket']).toBe(firstSocket);
+    });
+
     it('does not replace the socket wrapper if it opens before the watchdog timeout', () => {
       const deterministicWallClock = createDeterministicTimeoutWallClock(0);
       const socket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
