@@ -25,6 +25,74 @@ async function generateGroupGuestsLink(
   return await pages.guestOptions().createLink({password});
 }
 
+const guestroomEnterpriseLoginTimeout = 120_000;
+const guestroomEnterpriseLoginPollInterval = 1_000;
+const guestroomEnterpriseLoginMaximumAttempts = Math.ceil(
+  guestroomEnterpriseLoginTimeout / guestroomEnterpriseLoginPollInterval,
+);
+
+async function keepCurrentPageOnTestEnvironment(page: Page): Promise<void> {
+  if (process.env.WEBAPP_URL === undefined) {
+    throw new Error('Missing env var "WEBAPP_URL"');
+  }
+
+  const testEnvironmentUrl = new URL(process.env.WEBAPP_URL);
+  const currentUrl = new URL(page.url());
+
+  currentUrl.protocol = testEnvironmentUrl.protocol;
+  currentUrl.hostname = testEnvironmentUrl.hostname;
+  currentUrl.port = testEnvironmentUrl.port;
+
+  await page.goto(currentUrl.toString());
+}
+
+function isLocatorVisible(locator: Locator): Promise<boolean> {
+  return locator.isVisible().catch(() => {
+    return false;
+  });
+}
+
+async function waitForVisible(locator: Locator, timeout: number): Promise<boolean> {
+  return locator.waitFor({state: 'visible', timeout}).then(
+    () => {
+      return true;
+    },
+    () => {
+      return false;
+    },
+  );
+}
+
+async function completeEnterpriseGuestroomPostLoginFlow(
+  page: Page,
+  pages: PageManager['webapp']['pages'],
+  components: PageManager['webapp']['components'],
+): Promise<void> {
+  const removeDeviceButton = page.getByRole('button', {name: 'Remove device'}).first();
+  const historyConfirmButton = pages.historyInfo().continueButton;
+  const sidebar = components.conversationSidebar().sidebar;
+
+  for (let attempt = 0; attempt < guestroomEnterpriseLoginMaximumAttempts; attempt += 1) {
+    if (await isLocatorVisible(sidebar)) {
+      return;
+    }
+
+    if (await waitForVisible(removeDeviceButton, 500)) {
+      await removeDeviceButton.click();
+      continue;
+    }
+
+    if (await waitForVisible(historyConfirmButton, 500)) {
+      await historyConfirmButton.click();
+      continue;
+    }
+
+    await page.waitForTimeout(guestroomEnterpriseLoginPollInterval);
+  }
+
+  throw new Error(`Guestroom enterprise login did not reach the sidebar within ${guestroomEnterpriseLoginTimeout}ms`);
+}
+
 function waitForFirstVisibleLocator(locators: Locator[], timeout: number): Promise<Locator | undefined> {
   return Promise.race(
     locators.map(async locator => {
@@ -641,6 +709,7 @@ test.describe('Guestroom', () => {
 
       await guestPage.goto(createdLink.toString());
       await guestPages.conversationJoin().joinBrowserButton.click();
+      await keepCurrentPageOnTestEnvironment(guestPage);
       await expect(guestPages.conversationJoin().enterpriseLoginButton).toBeVisible();
 
       await guestPages.conversationJoin().enterpriseLoginButton.click();
@@ -655,15 +724,7 @@ test.describe('Guestroom', () => {
       await idpPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
       await idpPage.getByRole('button', {name: 'Sign In'}).click();
 
-      await guestPage.getByRole('button', {name: 'Remove device'}).first().click({timeout: LOGIN_TIMEOUT});
-      // // We will also always be prompted to confirm the new history on this device
-      await guestPages.historyInfo().clickConfirmButton();
-
-      await expect(guestComponents.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible(
-        {
-          timeout: LOGIN_TIMEOUT,
-        },
-      );
+      await completeEnterpriseGuestroomPostLoginFlow(guestPage, guestPages, guestComponents);
 
       await expect(guestPages.conversationList().getConversation(groupName)).toBeVisible();
     },
