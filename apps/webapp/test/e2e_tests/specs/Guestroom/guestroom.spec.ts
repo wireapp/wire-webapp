@@ -1,4 +1,4 @@
-import {Page} from 'playwright/test';
+import {Locator, Page} from 'playwright/test';
 import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, Team, LOGIN_TIMEOUT, withGuestUser} from 'test/e2e_tests/test.fixtures';
@@ -13,13 +13,52 @@ import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActio
  * * @returns A promise that resolves to the generated guest link string.
  */
 
-const generateGroupGuestsLink = async (pages: PageManager['webapp']['pages'], groupName: string, password?: string) => {
+async function generateGroupGuestsLink(
+  pages: PageManager['webapp']['pages'],
+  groupName: string,
+  password?: string,
+): Promise<string> {
   await pages.conversationList().getConversation(groupName).open();
   await pages.conversation().toggleGroupInformation();
   await pages.conversationDetails().openGuestOptions();
 
   return await pages.guestOptions().createLink({password});
-};
+}
+
+function waitForFirstVisibleLocator(locators: Locator[], timeout: number): Promise<Locator | undefined> {
+  return Promise.race(
+    locators.map(async locator => {
+      try {
+        await locator.waitFor({state: 'visible', timeout});
+        return locator;
+      } catch {
+        return undefined;
+      }
+    }),
+  );
+}
+
+async function openPasswordJoinFormAsExistingUser(
+  guestPages: PageManager['webapp']['pages'],
+  guestBModals: PageManager['webapp']['modals'],
+  guestUser: User,
+): Promise<void> {
+  const joinAsMemberButton = guestPages.conversationJoin().joinAsMemberButton;
+  const passwordJoinForm = guestBModals.joinGuestLinkPassword().joinForm;
+
+  await guestPages.login().login(guestUser);
+
+  const visiblePostLoginTarget = await waitForFirstVisibleLocator(
+    [joinAsMemberButton, passwordJoinForm],
+    LOGIN_TIMEOUT,
+  );
+
+  if (visiblePostLoginTarget === joinAsMemberButton) {
+    await joinAsMemberButton.click();
+  }
+
+  await expect(passwordJoinForm).toBeVisible();
+}
 
 test.describe('Guestroom', () => {
   let team: Team;
@@ -55,8 +94,7 @@ test.describe('Guestroom', () => {
         await guestPages.conversationJoin().joinBrowserButton.click();
         await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
-        await guestPages.login().login(guestUser);
-        await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible();
+        await openPasswordJoinFormAsExistingUser(guestPages, guestBModals, guestUser);
 
         await guestBModals.joinGuestLinkPassword().joinConversation('WrongPassword');
         await expect(guestBModals.joinGuestLinkPassword().joinForm).toContainText(
