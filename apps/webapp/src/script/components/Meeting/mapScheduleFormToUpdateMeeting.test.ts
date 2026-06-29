@@ -25,8 +25,7 @@ import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {createParticipantMissingEmailError} from './ScheduleFormErrors';
-import {computeInvitationDiff, mapScheduleFormToUpdateMeeting} from './mapScheduleFormToUpdateMeeting';
+import {mapScheduleFormToUpdateMeeting} from './mapScheduleFormToUpdateMeeting';
 import type {ScheduleMeetingFormState} from './ScheduleMeetingModal/scheduleMeetingTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
@@ -37,12 +36,9 @@ const futureEndIso = futureEndDate.toISOString();
 
 const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
 
-const createUser = (id: string, email?: string) => {
+const createUser = (id: string) => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
-  if (email !== undefined) {
-    user.email(email);
-  }
   return user;
 };
 
@@ -55,23 +51,13 @@ const baseFormState = (): ScheduleMeetingFormState => ({
   participantsFilter: '',
 });
 
-describe('computeInvitationDiff', () => {
-  it('computes added and removed emails case-insensitively', () => {
-    expect(computeInvitationDiff(['alice@wire.com', 'bob@wire.com'], ['Alice@wire.com', 'charlie@wire.com'])).toEqual({
-      addedParticipantEmails: ['charlie@wire.com'],
-      removedParticipantEmails: ['bob@wire.com'],
-    });
-  });
-});
-
 describe('mapScheduleFormToUpdateMeeting', () => {
-  it('maps title, times, recurrence, and invitation diff', () => {
+  it('maps title, times, and recurrence metadata only', () => {
     const result = mapScheduleFormToUpdateMeeting(
       {
         ...baseFormState(),
-        selectedUsers: [createUser('1', 'alice@wire.com'), createUser('3', 'charlie@wire.com')],
+        selectedUsers: [createUser('1'), createUser('3')],
       },
-      ['alice@wire.com', 'bob@wire.com'],
       wallClock,
     );
 
@@ -82,22 +68,6 @@ describe('mapScheduleFormToUpdateMeeting', () => {
       end_time: futureEndIso,
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
     });
-    expect(unwrap(result).addedParticipantEmails).toEqual(['charlie@wire.com']);
-    expect(unwrap(result).removedParticipantEmails).toEqual(['bob@wire.com']);
-  });
-
-  it('returns participantMissingEmail with user names when a selected user has no email', () => {
-    const result = mapScheduleFormToUpdateMeeting(
-      {
-        ...baseFormState(),
-        selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2')],
-      },
-      ['alice@wire.com'],
-      wallClock,
-    );
-
-    expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toEqual(createParticipantMissingEmailError(['User 2']));
   });
 
   it('returns missingTimes when start or end is missing', () => {
@@ -106,7 +76,6 @@ describe('mapScheduleFormToUpdateMeeting', () => {
         ...baseFormState(),
         end: maybe.nothing(),
       },
-      ['alice@wire.com'],
       wallClock,
     );
 
@@ -120,7 +89,6 @@ describe('mapScheduleFormToUpdateMeeting', () => {
         ...baseFormState(),
         recurrence: 'doesNotRepeat',
       },
-      [],
       wallClock,
     );
 

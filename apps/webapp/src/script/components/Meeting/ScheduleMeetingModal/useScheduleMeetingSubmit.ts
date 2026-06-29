@@ -19,7 +19,7 @@
 
 import {useCallback, useState} from 'react';
 
-import {isStringMeetingSubmitError, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
@@ -29,50 +29,14 @@ import {performMeetingSubmit} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
-const PAIR_OF_NAMES = 2;
-
-const formatParticipantNames = (names: string[], translate: Translate): string => {
-  if (names.length === PAIR_OF_NAMES) {
-    return `${names[0]} ${translate('and')} ${names[1]}`;
-  }
-
-  const lastName = names[names.length - 1];
-  const otherNames = names.slice(0, -1).join(', ');
-
-  return `${otherNames}${translate('enumerationAnd')}${lastName}`;
-};
-
 const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {
-  if (isStringMeetingSubmitError(error)) {
-    const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[error];
-    PrimaryModal.show(
-      PrimaryModal.type.ACKNOWLEDGE,
-      {
-        text: {
-          title: translate(titleKey),
-          message: translate(messageKey),
-        },
-      },
-      undefined,
-      translate,
-    );
-    return;
-  }
-
-  const messageKey =
-    error.userNames.length === 1
-      ? 'meetings.scheduleModal.error.participantMissingEmailSingular'
-      : 'meetings.scheduleModal.error.participantMissingEmailPlural';
-
+  const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[error];
   PrimaryModal.show(
     PrimaryModal.type.ACKNOWLEDGE,
     {
       text: {
-        title: translate('meetings.scheduleModal.error.createFailedTitle'),
-        message:
-          error.userNames.length === 1
-            ? translate(messageKey, {name: error.userNames[0]})
-            : translate(messageKey, {names: formatParticipantNames(error.userNames, translate)}),
+        title: translate(titleKey),
+        message: translate(messageKey),
       },
     },
     undefined,
@@ -84,9 +48,11 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {mainViewModel, translate, wallClock} = useApplicationContext();
   const meetingsRepository = mainViewModel.content.repositories.meetings;
+  const conversationRepository = mainViewModel.content.repositories.conversation;
   const mode = useScheduleMeetingModal(state => state.mode);
   const editingMeetingId = useScheduleMeetingModal(state => state.editingMeetingId);
-  const originalInvitedParticipantEmails = useScheduleMeetingModal(state => state.originalInvitedParticipantEmails);
+  const qualifiedConversation = useScheduleMeetingModal(state => state.qualifiedConversation);
+  const originalSelectedUsers = useScheduleMeetingModal(state => state.originalSelectedUsers);
 
   const submit = useCallback(
     async (formState: ScheduleMeetingFormState): Promise<boolean> => {
@@ -97,9 +63,11 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
           mode,
           editingMeetingId,
           formState,
-          originalInvitedParticipantEmails,
+          qualifiedConversation,
+          originalSelectedUsers,
           dependencies: {
             meetingsRepository,
+            conversationRepository,
             fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve(),
             wallClock,
           },
@@ -116,11 +84,13 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
       }
     },
     [
+      conversationRepository,
       editingMeetingId,
       meetingsRepository,
       mode,
       onMeetingScheduled,
-      originalInvitedParticipantEmails,
+      originalSelectedUsers,
+      qualifiedConversation,
       translate,
       wallClock,
     ],

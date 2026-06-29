@@ -35,8 +35,6 @@ import type {
 } from './scheduleMeetingTypes';
 import {hasScheduleMeetingFormErrors, validateScheduleMeetingForm} from './scheduleMeetingValidation';
 
-import {getInvitedEmailsFromSelectedUsers} from '../getInvitedEmailsFromSelectedUsers';
-
 export type {
   ScheduleMeetingFormErrors,
   ScheduleMeetingFormState,
@@ -72,10 +70,15 @@ type ScheduleMeetingModalState = {
   formState: ScheduleMeetingFormState;
   errors: ScheduleMeetingFormErrors;
   editingMeetingId: Maybe<QualifiedId>;
-  /** Backend `invited_emails` from previously selected Wire contacts (not free-text email invites). */
-  originalInvitedParticipantEmails: string[];
+  qualifiedConversation: Maybe<QualifiedId>;
+  originalSelectedUsers: User[];
   openCreate: () => void;
-  openEdit: (meeting: Meeting, formState: ScheduleMeetingFormState) => void;
+  openEdit: (
+    meeting: Meeting,
+    formState: ScheduleMeetingFormState,
+    qualifiedConversation: QualifiedId,
+    originalSelectedUsers: User[],
+  ) => void;
   close: () => void;
   reset: () => void;
   setTitle: (title: string) => void;
@@ -94,7 +97,8 @@ const initialState = {
   formState: getDefaultScheduleMeetingFormState(),
   errors: {} as ScheduleMeetingFormErrors,
   editingMeetingId: Maybe.nothing<QualifiedId>(),
-  originalInvitedParticipantEmails: [] as string[],
+  qualifiedConversation: Maybe.nothing<QualifiedId>(),
+  originalSelectedUsers: [] as User[],
 };
 
 export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, get) => ({
@@ -106,20 +110,30 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       formState: getDefaultScheduleMeetingFormState(),
       errors: {},
       editingMeetingId: Maybe.nothing(),
-      originalInvitedParticipantEmails: [],
+      qualifiedConversation: Maybe.nothing(),
+      originalSelectedUsers: [],
     }),
-  openEdit: (meeting: Meeting, formState: ScheduleMeetingFormState) =>
+  openEdit: (
+    meeting: Meeting,
+    formState: ScheduleMeetingFormState,
+    qualifiedConversation: QualifiedId,
+    originalSelectedUsers: User[],
+  ) =>
     set({
       isOpen: true,
       mode: 'edit',
       formState,
       errors: {},
       editingMeetingId: maybe.just(meeting.qualified_id),
-      // Only emails the form can represent (resolved Wire contacts). Unmatched backend
-      // invited_emails stay on the meeting but are not tracked for invitation diff.
-      originalInvitedParticipantEmails: getInvitedEmailsFromSelectedUsers(formState.selectedUsers).emails,
+      qualifiedConversation: maybe.just(qualifiedConversation),
+      originalSelectedUsers,
     }),
-  close: () => set({isOpen: false}),
+  close: () =>
+    set({
+      isOpen: false,
+      qualifiedConversation: Maybe.nothing(),
+      originalSelectedUsers: [],
+    }),
   reset: () => set({...initialState, formState: getDefaultScheduleMeetingFormState()}),
   setTitle: title =>
     set(state => ({

@@ -57,7 +57,7 @@ export const MeetingAction = ({meeting}: MeetingActionProps) => {
         translate,
         onEdit: () => {
           if (canEditMeeting(meeting, selfUser, wallClock.currentTimestampInMilliseconds)) {
-            editMeeting(meeting);
+            void editMeeting(meeting);
           }
         },
       }),

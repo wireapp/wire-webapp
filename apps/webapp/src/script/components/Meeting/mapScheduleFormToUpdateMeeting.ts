@@ -21,40 +21,18 @@ import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
 import {Result, result} from 'true-myth';
 
-import {getInvitedEmailsFromSelectedUsers} from 'Components/Meeting/getInvitedEmailsFromSelectedUsers';
 import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 
-import {createParticipantMissingEmailError, ScheduleFormErrors} from './ScheduleFormErrors';
+import {ScheduleFormErrors} from './ScheduleFormErrors';
 
 export type MapScheduleFormToUpdateMeetingResult = {
   payload: UpdateMeeting;
-  addedParticipantEmails: string[];
-  removedParticipantEmails: string[];
-};
-
-const normalizeEmail = (email: string): string => email.toLowerCase();
-
-/**
- * Diff backend `invited_emails` lists. Values are Wire contact profile emails, not free-text invites.
- */
-export const computeInvitationDiff = (
-  originalInvitedParticipantEmails: string[],
-  newInvitedParticipantEmails: string[],
-): {addedParticipantEmails: string[]; removedParticipantEmails: string[]} => {
-  const originalSet = new Set(originalInvitedParticipantEmails.map(normalizeEmail));
-  const newSet = new Set(newInvitedParticipantEmails.map(normalizeEmail));
-
-  const addedParticipantEmails = newInvitedParticipantEmails.filter(email => !originalSet.has(normalizeEmail(email)));
-  const removedParticipantEmails = originalInvitedParticipantEmails.filter(email => !newSet.has(normalizeEmail(email)));
-
-  return {addedParticipantEmails, removedParticipantEmails};
 };
 
 export const mapScheduleFormToUpdateMeeting = (
   formState: ScheduleMeetingFormState,
-  originalInvitedParticipantEmails: string[],
   wallClock: WallClock,
 ): Result<MapScheduleFormToUpdateMeetingResult, ScheduleFormErrors> => {
   const timesResult = requireScheduleMeetingTimes(formState, wallClock);
@@ -63,17 +41,7 @@ export const mapScheduleFormToUpdateMeeting = (
   }
   const {start, end} = timesResult.value;
 
-  const {emails: invitedEmails, usersWithoutEmail} = getInvitedEmailsFromSelectedUsers(formState.selectedUsers);
-
-  if (usersWithoutEmail.length > 0) {
-    return result.err(createParticipantMissingEmailError(usersWithoutEmail.map(user => user.name())));
-  }
-
   const recurrence = mapRecurrenceOptionToMeetingRecurrence(formState.recurrence);
-  const {addedParticipantEmails, removedParticipantEmails} = computeInvitationDiff(
-    originalInvitedParticipantEmails,
-    invitedEmails,
-  );
 
   return result.ok({
     payload: {
@@ -82,7 +50,5 @@ export const mapScheduleFormToUpdateMeeting = (
       end_time: end.toISOString(),
       recurrence: recurrence ?? null,
     },
-    addedParticipantEmails,
-    removedParticipantEmails,
   });
 };

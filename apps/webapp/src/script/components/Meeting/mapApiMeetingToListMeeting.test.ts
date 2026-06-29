@@ -41,11 +41,11 @@ describe('mapApiMeetingToListMeeting', () => {
       start_date: '2026-06-15T10:00:00.000Z',
       end_date: '2026-06-15T11:00:00.000Z',
       conversation_id: 'conv-id',
+      qualified_conversation: {id: 'conv-id', domain: 'example.com'},
       title: 'Weekly sync',
       recurrence: 'weekly',
       qualified_id: {id: 'meeting-id', domain: 'example.com'},
       qualified_creator: {id: 'creator-id', domain: 'example.com'},
-      invited_emails: ['alice@wire.com'],
     });
   });
 

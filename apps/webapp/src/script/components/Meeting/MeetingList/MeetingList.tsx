@@ -41,10 +41,10 @@ export interface Meeting {
   end_date: string;
   recurrence: ScheduleMeetingRecurrenceOption;
   conversation_id: string;
+  qualified_conversation: QualifiedId;
   title: string;
   qualified_id: QualifiedId;
   qualified_creator: QualifiedId;
-  invited_emails: string[];
   // TODO: Ask iOS and Android about how to identify this status
   attending?: boolean;
 }

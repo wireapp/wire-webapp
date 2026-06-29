@@ -17,32 +17,16 @@
  *
  */
 
-import {
-  type ParticipantMissingEmailError,
-  type ScheduleFormErrorCode,
-  type ScheduleFormErrors,
-} from './ScheduleFormErrors';
+import type {ScheduleFormErrorCode} from './ScheduleFormErrors';
 
 export const meetingSubmitErrors = {
   createFailed: 'createFailed',
   updateFailed: 'updateFailed',
   editMeetingIdMissing: 'editMeetingIdMissing',
-  addInvitationFailed: 'addInvitationFailed',
-  removeInvitationFailed: 'removeInvitationFailed',
+  addParticipantsFailed: 'addParticipantsFailed',
+  removeParticipantsFailed: 'removeParticipantsFailed',
 } as const;
 
 export type MeetingSubmitErrorCode = (typeof meetingSubmitErrors)[keyof typeof meetingSubmitErrors];
 
-export type StringMeetingSubmitError = ScheduleFormErrorCode | MeetingSubmitErrorCode;
-
-export type MeetingSubmitErrors = StringMeetingSubmitError | ParticipantMissingEmailError;
-
-export type ScheduleMeetingErrors = ScheduleFormErrors | Extract<MeetingSubmitErrorCode, 'createFailed'>;
-
-export type UpdateMeetingErrors = ScheduleFormErrors | Exclude<MeetingSubmitErrorCode, 'createFailed'>;
-
-export const isStringMeetingSubmitError = (error: MeetingSubmitErrors): error is StringMeetingSubmitError =>
-  typeof error === 'string';
-
-export const isParticipantMissingEmailError = (error: MeetingSubmitErrors): error is ParticipantMissingEmailError =>
-  typeof error !== 'string';
+export type MeetingSubmitErrors = ScheduleFormErrorCode | MeetingSubmitErrorCode;

@@ -30,7 +30,7 @@ const createMeeting = (start: string, end: string, title: string): Meeting => ({
   title,
   qualified_id: {id: `meeting-${title}`, domain: 'example.com'},
   qualified_creator: {id: 'creator-id', domain: 'example.com'},
-  invited_emails: [],
+  qualified_conversation: {id: 'conv-id', domain: 'example.com'},
 });
 
 describe('partitionMeetingsByDay', () => {

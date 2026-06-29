@@ -25,16 +25,4 @@ export const scheduleFormErrors = {
 
 export type ScheduleFormErrorCode = (typeof scheduleFormErrors)[keyof typeof scheduleFormErrors];
 
-export const PARTICIPANT_MISSING_EMAIL_ERROR_CODE = 'participantMissingEmail' as const;
-
-export type ParticipantMissingEmailError = {
-  code: typeof PARTICIPANT_MISSING_EMAIL_ERROR_CODE;
-  userNames: string[];
-};
-
-export type ScheduleFormErrors = ScheduleFormErrorCode | ParticipantMissingEmailError;
-
-export const createParticipantMissingEmailError = (userNames: string[]): ParticipantMissingEmailError => ({
-  code: PARTICIPANT_MISSING_EMAIL_ERROR_CODE,
-  userNames,
-});
+export type ScheduleFormErrors = ScheduleFormErrorCode;

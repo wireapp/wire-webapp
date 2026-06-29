@@ -21,11 +21,9 @@ import {useCallback} from 'react';
 
 import {container} from 'tsyringe';
 
-import {getScheduleMeetingParticipantPool} from 'Components/Meeting/getScheduleMeetingParticipantPool';
 import {mapMeetingToScheduleFormState} from 'Components/Meeting/mapMeetingToScheduleFormState';
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 
 import {useScheduleMeetingModal} from './ScheduleMeetingModal/useScheduleMeetingModal';
 
@@ -33,13 +31,13 @@ export const useEditMeeting = () => {
   const openEdit = useScheduleMeetingModal(state => state.openEdit);
 
   const editMeeting = useCallback(
-    (meeting: Meeting) => {
-      const userState = container.resolve(UserState);
-      const teamState = container.resolve(TeamState);
-      const availableUsers = getScheduleMeetingParticipantPool(userState, teamState);
-      const formState = mapMeetingToScheduleFormState(meeting, availableUsers);
+    async (meeting: Meeting) => {
+      const conversationRepository = container.resolve(ConversationRepository);
+      const conversation = await conversationRepository.getConversationById(meeting.qualified_conversation);
+      const selectedUsers = [...conversation.participating_user_ets()];
+      const formState = mapMeetingToScheduleFormState(meeting, selectedUsers);
 
-      openEdit(meeting, formState);
+      openEdit(meeting, formState, meeting.qualified_conversation, selectedUsers);
     },
     [openEdit],
   );

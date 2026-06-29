@@ -25,7 +25,6 @@ import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {createParticipantMissingEmailError} from './ScheduleFormErrors';
 import {mapScheduleFormToCreateMeeting} from './mapScheduleFormToCreateMeeting';
 import type {ScheduleMeetingFormState} from './ScheduleMeetingModal/scheduleMeetingTypes';
 
@@ -37,12 +36,9 @@ const futureEndIso = futureEndDate.toISOString();
 
 const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
 
-const createUser = (id: string, email?: string) => {
+const createUser = (id: string) => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
-  if (email !== undefined) {
-    user.email(email);
-  }
   return user;
 };
 
@@ -56,11 +52,11 @@ const baseFormState = (): ScheduleMeetingFormState => ({
 });
 
 describe('mapScheduleFormToCreateMeeting', () => {
-  it('maps title, times, recurrence, and invited emails', () => {
+  it('maps title, times, and recurrence metadata only', () => {
     const result = mapScheduleFormToCreateMeeting(
       {
         ...baseFormState(),
-        selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2', 'bob@wire.com')],
+        selectedUsers: [createUser('1'), createUser('2')],
       },
       wallClock,
     );
@@ -71,41 +67,20 @@ describe('mapScheduleFormToCreateMeeting', () => {
       start_time: futureStartIso,
       end_time: futureEndIso,
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
-      invited_emails: ['alice@wire.com', 'bob@wire.com'],
     });
   });
 
-  it('omits invited_emails when no participants are selected', () => {
-    const result = mapScheduleFormToCreateMeeting(baseFormState(), wallClock);
+  it('does not include invited_emails regardless of selected participants', () => {
+    const result = mapScheduleFormToCreateMeeting(
+      {
+        ...baseFormState(),
+        selectedUsers: [createUser('1')],
+      },
+      wallClock,
+    );
 
     expect(result.isOk).toBe(true);
     expect(unwrap(result).invited_emails).toBeUndefined();
-  });
-
-  it('returns participantMissingEmail with user names when a selected user has no email', () => {
-    const result = mapScheduleFormToCreateMeeting(
-      {
-        ...baseFormState(),
-        selectedUsers: [createUser('1', 'alice@wire.com'), createUser('2')],
-      },
-      wallClock,
-    );
-
-    expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toEqual(createParticipantMissingEmailError(['User 2']));
-  });
-
-  it('returns participantMissingEmail with all affected user names', () => {
-    const result = mapScheduleFormToCreateMeeting(
-      {
-        ...baseFormState(),
-        selectedUsers: [createUser('1'), createUser('2')],
-      },
-      wallClock,
-    );
-
-    expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toEqual(createParticipantMissingEmailError(['User 1', 'User 2']));
   });
 
   it('returns missingTimes when start or end is missing', () => {
