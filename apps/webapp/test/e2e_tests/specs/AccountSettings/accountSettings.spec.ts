@@ -17,9 +17,10 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Page} from '@playwright/test';
 
 import {getUser, User} from 'test/e2e_tests/data/user';
+import {isLocatorVisible, waitForVisible} from 'test/e2e_tests/locators/visibility';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {connectWithUser, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
@@ -29,23 +30,6 @@ const SCIM_LOGIN_TIMEOUT = 120_000;
 const newDeviceModalTestId = 'modal-account-new-devices';
 const scimLoginPollIntervalMilliseconds = 1_000;
 const scimLoginMaximumAttempts = Math.ceil(SCIM_LOGIN_TIMEOUT / scimLoginPollIntervalMilliseconds);
-
-function isLocatorVisible(locator: Locator): Promise<boolean> {
-  return locator.isVisible().catch(() => {
-    return false;
-  });
-}
-
-async function waitForVisible(locator: Locator, timeout: number): Promise<boolean> {
-  return locator.waitFor({state: 'visible', timeout}).then(
-    () => {
-      return true;
-    },
-    () => {
-      return false;
-    },
-  );
-}
 
 async function dismissNewDeviceModalIfVisible(page: Page): Promise<boolean> {
   const newDeviceModal = page.getByTestId(newDeviceModalTestId);

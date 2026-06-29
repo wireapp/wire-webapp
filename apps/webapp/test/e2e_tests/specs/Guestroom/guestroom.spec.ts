@@ -1,5 +1,7 @@
 import {Locator, Page} from 'playwright/test';
+
 import {getUser, User} from 'test/e2e_tests/data/user';
+import {isLocatorVisible, waitForVisible} from 'test/e2e_tests/locators/visibility';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, Team, LOGIN_TIMEOUT, withGuestUser} from 'test/e2e_tests/test.fixtures';
 import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
@@ -44,23 +46,6 @@ async function keepCurrentPageOnTestEnvironment(page: Page): Promise<void> {
   currentUrl.port = testEnvironmentUrl.port;
 
   await page.goto(currentUrl.toString());
-}
-
-function isLocatorVisible(locator: Locator): Promise<boolean> {
-  return locator.isVisible().catch(() => {
-    return false;
-  });
-}
-
-async function waitForVisible(locator: Locator, timeout: number): Promise<boolean> {
-  return locator.waitFor({state: 'visible', timeout}).then(
-    () => {
-      return true;
-    },
-    () => {
-      return false;
-    },
-  );
 }
 
 async function completeEnterpriseGuestroomPostLoginFlow(
