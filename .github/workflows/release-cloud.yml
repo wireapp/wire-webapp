@@ -370,8 +370,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build_artifact, production_preflight]
     if: ${{ needs.production_preflight.outputs.should_deploy == 'true' }}
-    permissions:
-      contents: write
+    permissions: {}
     # Production approval is enforced by the wire-webapp-prod GitHub Environment settings.
     environment: wire-webapp-prod
     concurrency:
@@ -405,13 +404,25 @@ jobs:
           deployment-timeout: 150
           use-existing-application-version-if-available: true
 
-      - name: Checkout release commit for Production tag
+  create_production_tag:
+    name: Create Production tag
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, production_preflight, deploy_to_production]
+    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' && needs.deploy_to_production.result == 'success' }}
+    permissions:
+      contents: write
+    outputs:
+      production_tag_name: ${{ steps.production_tag.outputs.production_tag_name }}
+
+    steps:
+      - name: Checkout release commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
       - name: Create and push Production tag
+        id: production_tag
         env:
           PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
@@ -431,10 +442,21 @@ jobs:
           git tag --annotate "$PRODUCTION_TAG_NAME" --message "Release $PRODUCTION_TAG_NAME" "$RELEASE_COMMIT_SHA"
           git push origin "refs/tags/$PRODUCTION_TAG_NAME"
 
+          echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "$GITHUB_OUTPUT"
+
   summarize_release:
     name: Summarize release
     runs-on: ubuntu-24.04
-    needs: [build_artifact, deploy_to_beta, create_beta_tag, run_e2e, production_preflight, deploy_to_production]
+    needs:
+      [
+        build_artifact,
+        deploy_to_beta,
+        create_beta_tag,
+        run_e2e,
+        production_preflight,
+        deploy_to_production,
+        create_production_tag,
+      ]
     if: ${{ always() }}
     permissions: {}
 
@@ -454,6 +476,7 @@ jobs:
           PRODUCTION_PREFLIGHT_RESULT: ${{ needs.production_preflight.outputs.production_preflight_result }}
           PRODUCTION_PROMOTION_REQUESTED: ${{ inputs.promote_to_production }}
           PRODUCTION_SKIPPED_REASON: ${{ needs.production_preflight.outputs.production_skipped_reason }}
+          PRODUCTION_TAG_CREATION_RESULT: ${{ needs.create_production_tag.result }}
           PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
           RELEASE_BRANCH: ${{ needs.build_artifact.outputs.release_branch }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
@@ -497,6 +520,7 @@ jobs:
             fi
 
             echo "- Production deployment result: ${PRODUCTION_DEPLOYMENT_RESULT}"
+            echo "- Production tag creation result: ${PRODUCTION_TAG_CREATION_RESULT}"
             echo "- Production environment: ${PRODUCTION_ENVIRONMENT_NAME}"
             echo "- Production artifact name: ${PRODUCTION_ARTIFACT_NAME}"
             echo "- Production artifact checksum: ${PRODUCTION_ARTIFACT_CHECKSUM}"
@@ -506,7 +530,16 @@ jobs:
   notify_release_failure:
     name: Notify release failure
     runs-on: ubuntu-24.04
-    needs: [build_artifact, deploy_to_beta, create_beta_tag, run_e2e, production_preflight, deploy_to_production]
+    needs:
+      [
+        build_artifact,
+        deploy_to_beta,
+        create_beta_tag,
+        run_e2e,
+        production_preflight,
+        deploy_to_production,
+        create_production_tag,
+      ]
     if: ${{ always() && contains(join(needs.*.result, ','), 'failure') }}
     permissions: {}
 
