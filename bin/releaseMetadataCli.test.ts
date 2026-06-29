@@ -78,6 +78,26 @@ describe('releaseMetadataCli', () => {
     });
   });
 
+  it('prints the production tag name for the release identifier', () => {
+    const actualResult = runCommand(['production-tag', '2026-06-19.1']);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['2026-06-19.1-production'],
+    });
+  });
+
+  it('rejects an invalid production tag release identifier', () => {
+    const actualResult = runCommand(['production-tag', '2026-06-19']);
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid release identifier: 2026-06-19'],
+      exitCode: 1,
+      outputs: [],
+    });
+  });
+
   it('prints usage text for missing command arguments', () => {
     const actualResult = runCommand(['next-beta-tag']);
 

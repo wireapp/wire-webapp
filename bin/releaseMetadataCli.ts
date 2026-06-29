@@ -19,21 +19,31 @@
 
 import process from 'node:process';
 
-import {createNextBetaTagName, extractReleaseIdentifierFromBranchName} from './releaseMetadata';
+import {
+  createNextBetaTagName,
+  createProductionTagName,
+  extractReleaseIdentifierFromBranchName,
+} from './releaseMetadata';
 
 type ReleaseMetadataCliDependencies = {
   readonly writeError: (message: string) => void;
   readonly writeOutput: (message: string) => void;
 };
 
+const nodeExecutableAndScriptPathArgumentCount = 2;
+
 const usageText = [
   'Usage:',
   '  releaseMetadataCli.ts release-identifier-from-branch <release/YYYY-MM-DD.N>',
   '  releaseMetadataCli.ts next-beta-tag <YYYY-MM-DD.N> [existing-tag ...]',
+  '  releaseMetadataCli.ts production-tag <YYYY-MM-DD.N>',
 ].join('\n');
 
 function writeResult(
-  result: ReturnType<typeof extractReleaseIdentifierFromBranchName> | ReturnType<typeof createNextBetaTagName>,
+  result:
+    | ReturnType<typeof extractReleaseIdentifierFromBranchName>
+    | ReturnType<typeof createNextBetaTagName>
+    | ReturnType<typeof createProductionTagName>,
   dependencies: ReleaseMetadataCliDependencies,
 ): number {
   if (result.isErr) {
@@ -59,12 +69,16 @@ export function runReleaseMetadataCli(
     return writeResult(createNextBetaTagName(primaryValue, remainingValues), dependencies);
   }
 
+  if (commandName === 'production-tag' && primaryValue !== undefined) {
+    return writeResult(createProductionTagName(primaryValue), dependencies);
+  }
+
   dependencies.writeError(usageText);
   return 1;
 }
 
 if (require.main === module) {
-  process.exitCode = runReleaseMetadataCli(process.argv.slice(2), {
+  process.exitCode = runReleaseMetadataCli(process.argv.slice(nodeExecutableAndScriptPathArgumentCount), {
     writeError(message): void {
       console.error(message);
     },
