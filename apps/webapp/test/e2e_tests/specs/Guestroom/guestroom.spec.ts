@@ -93,17 +93,17 @@ async function completeEnterpriseGuestroomPostLoginFlow(
   throw new Error(`Guestroom enterprise login did not reach the sidebar within ${guestroomEnterpriseLoginTimeout}ms`);
 }
 
-function waitForFirstVisibleLocator(locators: Locator[], timeout: number): Promise<Locator | undefined> {
-  return Promise.race(
-    locators.map(async locator => {
-      try {
+async function waitForFirstVisibleLocator(locators: Locator[], timeout: number): Promise<Locator | undefined> {
+  try {
+    return await Promise.any(
+      locators.map(async locator => {
         await locator.waitFor({state: 'visible', timeout});
         return locator;
-      } catch {
-        return undefined;
-      }
-    }),
-  );
+      }),
+    );
+  } catch {
+    return undefined;
+  }
 }
 
 async function openPasswordJoinFormAsExistingUser(
