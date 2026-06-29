@@ -290,11 +290,7 @@ export class ReconnectingWebsocket {
     const attempt = this.reconnectAttemptCount + 1;
     this.logger.info(`Connecting to WebSocket (attempt #${attempt})`);
     this.recordReconnectAttempt(this.options.wallClock.currentTimestampInMilliseconds);
-    const socket = this.socket;
-
-    if (!is.undefined(socket)) {
-      this.startConnectingWatchdog(socket);
-    }
+    const reconnectingSocket = this.socket;
 
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
@@ -302,7 +298,19 @@ export class ReconnectingWebsocket {
       this.startPinging();
       this.logger.debug(`Ping started (interval: ${this.PING_INTERVAL}ms)`);
     }
-    return this.onReconnect();
+
+    const websocketUrl = await this.onReconnect();
+    const socket = reconnectingSocket;
+
+    if (this.socket !== socket) {
+      return websocketUrl;
+    }
+
+    if (!is.undefined(socket) && socket.readyState === WEBSOCKET_STATE.CONNECTING) {
+      this.startConnectingWatchdog(socket);
+    }
+
+    return websocketUrl;
   };
 
   private readonly internalOnClose = (event: CloseEvent) => {
@@ -430,7 +438,6 @@ export class ReconnectingWebsocket {
         `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[existingSocket.readyState]} (${existingSocket.readyState}); reconnecting in place`,
       );
       this.reconnectInPlace(existingSocket);
-      this.startConnectingWatchdog(existingSocket);
       return;
     }
 
@@ -449,7 +456,6 @@ export class ReconnectingWebsocket {
     const nextSocket = this.getReconnectingWebsocket();
     this.socket = nextSocket;
     this.bindSocketHandlers(nextSocket);
-    this.startConnectingWatchdog(nextSocket);
   }
 
   private bindSocketHandlers(socket: ReconnectingWebsocketWrapper): void {
