@@ -9,7 +9,7 @@
   "configMigration": true,
   "minimumReleaseAge": "3 days",
   "lockFileMaintenance": {
-    "enabled": true
+    "enabled": false
   },
   "customManagers": [
     {
