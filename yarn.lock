@@ -4143,10 +4143,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@enormora/objectory@npm:0.0.7":
-  version: 0.0.7
-  resolution: "@enormora/objectory@npm:0.0.7"
-  checksum: 10/ecf200672c95f26e2aae19788cffee701bd171d1b0cf00e99abf03d6868c1d421046665127093e57c525045946dbae1f0484dde15c482af2bdf2b7841cddf26b
+"@enormora/objectory@npm:0.0.10":
+  version: 0.0.10
+  resolution: "@enormora/objectory@npm:0.0.10"
+  checksum: 10/81a0e62de533fbb90fa624d51b4f09916cb07f3deb38126225e177d2999e2f41988de84d5c1b20643c7b4fd73108f81bbe06534756cb38247d0ece5bdb212ae2
   languageName: node
   linkType: hard
 
@@ -32331,7 +32331,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wire-webapp@workspace:."
   dependencies:
-    "@enormora/objectory": "npm:0.0.7"
+    "@enormora/objectory": "npm:0.0.10"
     "@faker-js/faker": "npm:9.9.0"
     "@inquirer/prompts": "npm:8.5.2"
     "@ls-lint/ls-lint": "npm:2.3.1"
