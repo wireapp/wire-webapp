@@ -15,8 +15,8 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["/^\\.github/workflows/e2e-tests\\.yml$/"],
-      "matchStrings": ["image:\\s+mcr\\.microsoft\\.com/playwright:(?<currentValue>v\\d+\\.\\d+\\.\\d+-noble)"],
-      "depNameTemplate": "mcr.microsoft.com/playwright",
+      "matchStrings": ["image:\\s+quay\\.io/wire/mirror-images/playwright:(?<currentValue>v\\d+\\.\\d+\\.\\d+-noble)"],
+      "depNameTemplate": "quay.io/wire/mirror-images/playwright",
       "datasourceTemplate": "docker",
       "extractVersionTemplate": "^v(?<version>\\d+\\.\\d+\\.\\d+)-noble$"
     }
@@ -39,8 +39,9 @@
       "groupName": "docker images"
     },
     {
-      "matchDepNames": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"],
-      "groupName": "playwright"
+      "matchDepNames": ["playwright", "@playwright/test", "quay.io/wire/mirror-images/playwright"],
+      "groupName": "playwright",
+      "addLabels": ["run-e2e"]
     },
     {
       "matchPackageNames": ["nx", "@nx/**"],
