@@ -39,7 +39,7 @@
       "groupName": "docker images"
     },
     {
-      "matchPackageNames": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"],
+      "matchDepNames": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"],
       "groupName": "playwright"
     },
     {
