@@ -26,6 +26,7 @@ type NonZeroDecimalDigit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 
 export type ReleaseIdentifier =
   NonEmptyString<`${number}${number}${number}${number}-${number}${number}-${number}${number}.${NonZeroDecimalDigit}${string}`>;
+export type ReleaseBranchName = NonEmptyString<`release/${ReleaseIdentifier}`>;
 export type BetaTagName = NonEmptyString<`${ReleaseIdentifier}-beta.${number}`>;
 export type ProductionTagName = NonEmptyString<`${ReleaseIdentifier}-production`>;
 export type ReleaseTagName = BetaTagName | ProductionTagName;
@@ -71,6 +72,16 @@ export function extractReleaseIdentifierFromBranchName(branchName: string): Resu
   }
 
   return Result.ok(branchNameMatch[1] as ReleaseIdentifier);
+}
+
+export function createReleaseBranchName(releaseIdentifier: string): Result<ReleaseBranchName, Error> {
+  const releaseIdentifierResult = validateReleaseIdentifier(releaseIdentifier);
+
+  if (releaseIdentifierResult.isErr) {
+    return Result.err(releaseIdentifierResult.error);
+  }
+
+  return Result.ok(`release/${releaseIdentifierResult.value}` as ReleaseBranchName);
 }
 
 export function createProductionTagName(releaseIdentifier: string): Result<ProductionTagName, Error> {

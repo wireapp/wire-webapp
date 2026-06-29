@@ -22,6 +22,7 @@ import assert from 'node:assert';
 import {
   createNextBetaTagName,
   createProductionTagName,
+  createReleaseBranchName,
   extractReleaseIdentifierFromBranchName,
   isReleaseBranchName,
   productionTagExists,
@@ -86,6 +87,27 @@ describe('releaseMetadata', () => {
 
     expect(actualReleaseIdentifier.error.message).toBe('Invalid release branch name: release/2026-06-01');
   });
+
+  it('createReleaseBranchName() creates the release branch name from the release identifier', () => {
+    const releaseIdentifier = '2026-06-19.1';
+
+    const actualReleaseBranchName = createReleaseBranchName(releaseIdentifier);
+
+    assert(actualReleaseBranchName.isOk === true);
+
+    expect(actualReleaseBranchName.value).toBe('release/2026-06-19.1');
+  });
+
+  it.each(['2026-06-19.0', '2026-06-19', '2026-6-19.1', 'release/2026-06-19.1'])(
+    'createReleaseBranchName() rejects invalid release identifier "%s"',
+    invalidReleaseIdentifier => {
+      const actualReleaseBranchName = createReleaseBranchName(invalidReleaseIdentifier);
+
+      assert(actualReleaseBranchName.isErr === true);
+
+      expect(actualReleaseBranchName.error.message).toBe(`Invalid release identifier: ${invalidReleaseIdentifier}`);
+    },
+  );
 
   it('createProductionTagName() creates the production tag name from the release identifier', () => {
     const releaseIdentifier = '2026-06-19.1';

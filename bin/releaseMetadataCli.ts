@@ -22,6 +22,7 @@ import process from 'node:process';
 import {
   createNextBetaTagName,
   createProductionTagName,
+  createReleaseBranchName,
   extractReleaseIdentifierFromBranchName,
 } from './releaseMetadata';
 
@@ -35,6 +36,7 @@ const nodeExecutableAndScriptPathArgumentCount = 2;
 const usageText = [
   'Usage:',
   '  releaseMetadataCli.ts release-identifier-from-branch <release/YYYY-MM-DD.N>',
+  '  releaseMetadataCli.ts release-branch <YYYY-MM-DD.N>',
   '  releaseMetadataCli.ts next-beta-tag <YYYY-MM-DD.N> [existing-tag ...]',
   '  releaseMetadataCli.ts production-tag <YYYY-MM-DD.N>',
 ].join('\n');
@@ -42,6 +44,7 @@ const usageText = [
 function writeResult(
   result:
     | ReturnType<typeof extractReleaseIdentifierFromBranchName>
+    | ReturnType<typeof createReleaseBranchName>
     | ReturnType<typeof createNextBetaTagName>
     | ReturnType<typeof createProductionTagName>,
   dependencies: ReleaseMetadataCliDependencies,
@@ -63,6 +66,10 @@ export function runReleaseMetadataCli(
 
   if (commandName === 'release-identifier-from-branch' && primaryValue !== undefined) {
     return writeResult(extractReleaseIdentifierFromBranchName(primaryValue), dependencies);
+  }
+
+  if (commandName === 'release-branch' && primaryValue !== undefined) {
+    return writeResult(createReleaseBranchName(primaryValue), dependencies);
   }
 
   if (commandName === 'next-beta-tag' && primaryValue !== undefined) {

@@ -61,6 +61,26 @@ describe('releaseMetadataCli', () => {
     });
   });
 
+  it('prints the release branch name for the release identifier', () => {
+    const actualResult = runCommand(['release-branch', '2026-06-19.1']);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['release/2026-06-19.1'],
+    });
+  });
+
+  it('rejects an invalid release branch release identifier', () => {
+    const actualResult = runCommand(['release-branch', 'release/2026-06-19.1']);
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid release identifier: release/2026-06-19.1'],
+      exitCode: 1,
+      outputs: [],
+    });
+  });
+
   it('prints the next beta tag name for the release identifier', () => {
     const actualResult = runCommand([
       'next-beta-tag',
