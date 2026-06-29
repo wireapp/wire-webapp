@@ -21,7 +21,10 @@ import {MouseEvent} from 'react';
 
 import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
 
-import {callingButtonStyles} from 'Components/Meeting/MeetingMultiActionButton/MeetingMultiActionButton.styles';
+import {
+  callingButtonIconStyles,
+  callingButtonStyles,
+} from 'Components/Meeting/MeetingMultiActionButton/MeetingMultiActionButton.styles';
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -69,11 +72,10 @@ export const MeetingMultiActionButton = ({
     <Button
       variant={ButtonVariant.TERTIARY}
       css={callingButtonStyles}
-      icon={<CallIcon />}
       onClick={handleCreateMeetingClick}
       data-uie-name="create-meeting"
     >
-      {translate('meetings.action.createMeeting')}
+      <CallIcon css={callingButtonIconStyles} /> {translate('meetings.action.createMeeting')}
     </Button>
   );
 };

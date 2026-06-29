@@ -20,3 +20,7 @@
 export const callingButtonStyles = {
   margin: '7px 0',
 };
+
+export const callingButtonIconStyles = {
+  marginRight: '8px',
+};
