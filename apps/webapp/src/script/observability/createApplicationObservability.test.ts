@@ -27,71 +27,95 @@ describe('createApplicationObservability', () => {
     const noopObservability: ApplicationObservability = {
       reportApplicationStartup: jest.fn(asyncNoop),
     };
-    const datadogObservability: ApplicationObservability = {
+    const dataDogLogsObservability: ApplicationObservability = {
       reportApplicationStartup: jest.fn(asyncNoop),
     };
     const createNoopObservability = jest.fn(() => {
       return noopObservability;
     });
-    const createDataDogObservability = jest.fn(() => {
-      return datadogObservability;
+    const createDataDogLogsObservability = jest.fn(() => {
+      return dataDogLogsObservability;
     });
 
     const applicationObservability = createApplicationObservability(
       {dataDog: {}},
-      {createDataDogObservability, createNoopObservability},
+      {createDataDogLogsObservability, createNoopObservability},
     );
 
     expect(applicationObservability).toBe(noopObservability);
     expect(createNoopObservability).toHaveBeenCalledTimes(1);
-    expect(createDataDogObservability).not.toHaveBeenCalled();
+    expect(createDataDogLogsObservability).not.toHaveBeenCalled();
   });
 
-  it('returns noop observability when Datadog config is incomplete', () => {
+  it('returns noop observability when Datadog Logs config is missing', () => {
     const noopObservability: ApplicationObservability = {
       reportApplicationStartup: jest.fn(asyncNoop),
     };
-    const datadogObservability: ApplicationObservability = {
+    const dataDogLogsObservability: ApplicationObservability = {
       reportApplicationStartup: jest.fn(asyncNoop),
     };
     const createNoopObservability = jest.fn(() => {
       return noopObservability;
     });
-    const createDataDogObservability = jest.fn(() => {
-      return datadogObservability;
+    const createDataDogLogsObservability = jest.fn(() => {
+      return dataDogLogsObservability;
     });
 
     const applicationObservability = createApplicationObservability(
       {dataDog: {applicationId: 'application-id'}},
-      {createDataDogObservability, createNoopObservability},
+      {createDataDogLogsObservability, createNoopObservability},
     );
 
     expect(applicationObservability).toBe(noopObservability);
     expect(createNoopObservability).toHaveBeenCalledTimes(1);
-    expect(createDataDogObservability).not.toHaveBeenCalled();
+    expect(createDataDogLogsObservability).not.toHaveBeenCalled();
   });
 
-  it('returns Datadog observability when Datadog config is complete', () => {
+  it('returns Datadog Logs observability when Datadog Logs config is available', () => {
     const noopObservability: ApplicationObservability = {
       reportApplicationStartup: jest.fn(asyncNoop),
     };
-    const datadogObservability: ApplicationObservability = {
+    const dataDogLogsObservability: ApplicationObservability = {
       reportApplicationStartup: jest.fn(asyncNoop),
     };
     const createNoopObservability = jest.fn(() => {
       return noopObservability;
     });
-    const createDataDogObservability = jest.fn(() => {
-      return datadogObservability;
+    const createDataDogLogsObservability = jest.fn(() => {
+      return dataDogLogsObservability;
     });
 
     const applicationObservability = createApplicationObservability(
       {dataDog: {applicationId: 'application-id', clientToken: 'client-token'}},
-      {createDataDogObservability, createNoopObservability},
+      {createDataDogLogsObservability, createNoopObservability},
     );
 
-    expect(applicationObservability).toBe(datadogObservability);
-    expect(createDataDogObservability).toHaveBeenCalledTimes(1);
+    expect(applicationObservability).toBe(dataDogLogsObservability);
+    expect(createDataDogLogsObservability).toHaveBeenCalledTimes(1);
+    expect(createNoopObservability).not.toHaveBeenCalled();
+  });
+
+  it('returns Datadog Logs observability without Datadog RUM config', () => {
+    const noopObservability: ApplicationObservability = {
+      reportApplicationStartup: jest.fn(asyncNoop),
+    };
+    const dataDogLogsObservability: ApplicationObservability = {
+      reportApplicationStartup: jest.fn(asyncNoop),
+    };
+    const createNoopObservability = jest.fn(() => {
+      return noopObservability;
+    });
+    const createDataDogLogsObservability = jest.fn(() => {
+      return dataDogLogsObservability;
+    });
+
+    const applicationObservability = createApplicationObservability(
+      {dataDog: {clientToken: 'client-token'}},
+      {createDataDogLogsObservability, createNoopObservability},
+    );
+
+    expect(applicationObservability).toBe(dataDogLogsObservability);
+    expect(createDataDogLogsObservability).toHaveBeenCalledTimes(1);
     expect(createNoopObservability).not.toHaveBeenCalled();
   });
 });
