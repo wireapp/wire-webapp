@@ -4150,10 +4150,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@enormora/wall-clock@npm:0.0.1":
-  version: 0.0.1
-  resolution: "@enormora/wall-clock@npm:0.0.1"
-  checksum: 10/ca928172be2b284a58b64df7bca982319cc7c6d1295e47cac4d3cbdf8dfdd082ef2742eb546f1e9ec346a6b8d179bfb67b0e0ba9cc523bf90e175a22871315c2
+"@enormora/wall-clock@npm:0.0.2":
+  version: 0.0.2
+  resolution: "@enormora/wall-clock@npm:0.0.2"
+  checksum: 10/a8e8e1459c6043a1cc69291eef94880a31e20b86c33c41e226a45bbe1568da0458a9472a6f13eeee41e0ba2cf07f1ab8da345bec5691fbeab8af74aa200d2236
   languageName: node
   linkType: hard
 
@@ -12072,7 +12072,7 @@ __metadata:
     "@datadog/browser-rum": "npm:7.4.0"
     "@emotion/eslint-plugin": "npm:11.12.0"
     "@emotion/react": "npm:11.14.0"
-    "@enormora/wall-clock": "npm:0.0.1"
+    "@enormora/wall-clock": "npm:0.0.2"
     "@formatjs/cli": "npm:6.16.11"
     "@formkit/auto-animate": "npm:0.9.0"
     "@lexical/code": "npm:0.27.2"
