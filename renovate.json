@@ -40,7 +40,8 @@
     },
     {
       "matchDepNames": ["playwright", "@playwright/test", "quay.io/wire/mirror-images/playwright"],
-      "groupName": "playwright"
+      "groupName": "playwright",
+      "addLabels": ["run-e2e"]
     },
     {
       "matchPackageNames": ["nx", "@nx/**"],
