@@ -17,13 +17,6 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-export const dropdownIconStyles = (isMenuOpen: boolean): CSSObject => ({
-  transform: isMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-  transition: 'transform 150ms ease',
-});
-
-export const callingButtonGroupStyles = {
+export const callingButtonStyles = {
   margin: '7px 0',
 };

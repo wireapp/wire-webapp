@@ -17,14 +17,11 @@
  *
  */
 
-import {MouseEvent, useState} from 'react';
+import {MouseEvent} from 'react';
 
-import {ButtonGroup, ButtonVariant, CallIcon, TriangleIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
 
-import {
-  callingButtonGroupStyles,
-  dropdownIconStyles,
-} from 'Components/Meeting/MeetingMultiActionButton/MeetingMultiActionButton.styles';
+import {callingButtonStyles} from 'Components/Meeting/MeetingMultiActionButton/MeetingMultiActionButton.styles';
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -40,15 +37,13 @@ export const MeetingMultiActionButton = ({
   useMeetingActionsHook = useMeetingActions,
 }: MeetingMultiActionButtonProps) => {
   const {translate} = useApplicationContext();
-  const [invertIcon, setInvertIcon] = useState(false);
   const {handleMeetNow, handleScheduleMeeting} = useMeetingActionsHook();
 
-  const handleMeetingOptionButton = (event: MouseEvent<HTMLElement>) => {
-    setInvertIcon(val => !val);
+  const handleCreateMeetingClick = (event: MouseEvent<HTMLElement>) => {
     triggerContextMenu({
       event,
-      anchor: event.target as HTMLElement,
-      placement: 'bottom-end',
+      anchor: event.currentTarget,
+      placement: 'bottom-start',
       offset: 0,
       entries: [
         {
@@ -56,33 +51,29 @@ export const MeetingMultiActionButton = ({
           label: translate('meetings.action.meetNow'),
           click: () => {
             handleMeetNow();
-            resetIconInversion();
+          },
+        },
+        {
+          title: translate('meetings.action.scheduleMeeting'),
+          label: translate('meetings.action.scheduleMeeting'),
+          click: () => {
+            handleScheduleMeeting();
           },
         },
       ],
-      identifier: 'message-options-menu',
-      resetMenuStates: resetIconInversion,
+      identifier: 'meeting-actions-menu',
     });
   };
 
-  const resetIconInversion = () => setInvertIcon(false);
-
   return (
-    <ButtonGroup>
-      <ButtonGroup.Button
-        variant={ButtonVariant.TERTIARY}
-        css={callingButtonGroupStyles}
-        icon={<CallIcon />}
-        onClick={handleScheduleMeeting}
-      >
-        {translate('meetings.action.createMeeting')}
-      </ButtonGroup.Button>
-      <ButtonGroup.Button
-        css={callingButtonGroupStyles}
-        onClick={handleMeetingOptionButton}
-        variant={ButtonVariant.TERTIARY}
-        icon={<TriangleIcon height={10} width={10} css={dropdownIconStyles(invertIcon)} />}
-      />
-    </ButtonGroup>
+    <Button
+      variant={ButtonVariant.TERTIARY}
+      css={callingButtonStyles}
+      icon={<CallIcon />}
+      onClick={handleCreateMeetingClick}
+      data-uie-name="create-meeting"
+    >
+      {translate('meetings.action.createMeeting')}
+    </Button>
   );
 };

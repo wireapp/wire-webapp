@@ -48,38 +48,60 @@ const rootContextValue = createRootContextValueForTest({translate: translateForT
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('MeetingMultiActionButton', () => {
-  it('opens the schedule meeting modal when clicking Create meeting', () => {
-    const {props, handleMeetNow, handleScheduleMeeting} = createTestProps();
+  it('opens the meeting actions menu when clicking Create meeting', () => {
+    const {props, handleMeetNow, handleScheduleMeeting, triggerContextMenu} = createTestProps();
 
     render(withThemeAndRootContext(<MeetingMultiActionButton {...props} />, rootProviderWrapper));
 
     fireEvent.click(screen.getByRole('button', {name: translateForTest('meetings.action.createMeeting')}));
 
-    expect(handleScheduleMeeting).toHaveBeenCalledTimes(1);
+    expect(triggerContextMenu).toHaveBeenCalledTimes(1);
     expect(handleMeetNow).not.toHaveBeenCalled();
+    expect(handleScheduleMeeting).not.toHaveBeenCalled();
   });
 
-  it('shows only Meet Now in the dropdown menu', () => {
+  it('shows Meet Now and Schedule Meeting in the dropdown menu', () => {
     const {props, triggerContextMenu} = createTestProps();
 
     render(withThemeAndRootContext(<MeetingMultiActionButton {...props} />, rootProviderWrapper));
 
-    const buttons = screen.getAllByRole('button');
-    fireEvent.click(buttons[1]);
+    fireEvent.click(screen.getByRole('button', {name: translateForTest('meetings.action.createMeeting')}));
 
     expect(triggerContextMenu).toHaveBeenCalledWith(
       expect.objectContaining({
+        identifier: 'meeting-actions-menu',
+        placement: 'bottom-start',
         entries: [
           expect.objectContaining({
             title: translateForTest('meetings.action.meetNow'),
             label: translateForTest('meetings.action.meetNow'),
+          }),
+          expect.objectContaining({
+            title: translateForTest('meetings.action.scheduleMeeting'),
+            label: translateForTest('meetings.action.scheduleMeeting'),
           }),
         ],
       }),
     );
 
     const {entries} = triggerContextMenu.mock.calls[0][0];
-    expect(entries).toHaveLength(1);
-    expect(entries[0].title).not.toBe(translateForTest('meetings.action.scheduleMeeting'));
+    expect(entries).toHaveLength(2);
+  });
+
+  it('calls the correct action when a menu entry is clicked', () => {
+    const {props, handleMeetNow, handleScheduleMeeting, triggerContextMenu} = createTestProps();
+
+    render(withThemeAndRootContext(<MeetingMultiActionButton {...props} />, rootProviderWrapper));
+
+    fireEvent.click(screen.getByRole('button', {name: translateForTest('meetings.action.createMeeting')}));
+
+    const {entries} = triggerContextMenu.mock.calls[0][0];
+
+    entries[0].click();
+    expect(handleMeetNow).toHaveBeenCalledTimes(1);
+    expect(handleScheduleMeeting).not.toHaveBeenCalled();
+
+    entries[1].click();
+    expect(handleScheduleMeeting).toHaveBeenCalledTimes(1);
   });
 });
