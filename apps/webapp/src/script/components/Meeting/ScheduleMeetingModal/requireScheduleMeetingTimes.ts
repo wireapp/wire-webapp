@@ -17,9 +17,8 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {result, Result} from 'true-myth';
-
-import type {WallClock} from 'src/script/clock/wallClock';
 
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 

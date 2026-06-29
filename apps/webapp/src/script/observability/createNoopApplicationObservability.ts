@@ -17,13 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {asyncNoop} from 'noop-esm';
 
-export const dropdownIconStyles = (isMenuOpen: boolean): CSSObject => ({
-  transform: isMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-  transition: 'transform 150ms ease',
-});
+import type {ApplicationObservability} from './applicationObservability';
 
-export const callingButtonGroupStyles = {
-  margin: '7px 0',
-};
+export function createNoopApplicationObservability(): ApplicationObservability {
+  return {
+    reportApplicationStartup: asyncNoop,
+  };
+}

@@ -17,6 +17,7 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
 import {Result, result} from 'true-myth';
 
@@ -24,7 +25,6 @@ import {getInvitedEmailsFromSelectedUsers} from 'Components/Meeting/getInvitedEm
 import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
-import type {WallClock} from 'src/script/clock/wallClock';
 
 import {createParticipantMissingEmailError, ScheduleFormErrors} from './ScheduleFormErrors';
 

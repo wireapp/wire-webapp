@@ -23,7 +23,8 @@ import {ReactElement} from 'react';
 import {render} from '@testing-library/react';
 
 import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
-import {createDeterministicWallClock, DeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import type {DeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {translate} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';

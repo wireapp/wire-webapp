@@ -30,6 +30,7 @@ import {
 import {
   BackgroundEffectSelection,
   BackgroundSource,
+  BgStrength,
   BLUR_STRENGTHS,
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
@@ -52,7 +53,7 @@ const isVirtualEffect = (effect: BackgroundEffectSelection): boolean => {
   return effect.type === 'virtual' || effect.type === 'custom';
 };
 
-const getBlurStrength = (effect: BackgroundEffectSelection) => {
+const getBlurSettings = (effect: BackgroundEffectSelection): BgStrength => {
   return effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
 };
 
@@ -157,7 +158,7 @@ export class BackgroundEffectsHandler {
     }
 
     const isVirtual = isVirtualEffect(preferredEffect);
-    const blurStrength = getBlurStrength(preferredEffect);
+    const blurStrength = getBlurSettings(preferredEffect);
     const backgroundSource = isVirtual ? await this.loadBackgroundSource(preferredEffect) : null;
 
     if (this.controller.isProcessing() && this.currentReleasableStream) {
@@ -177,9 +178,10 @@ export class BackgroundEffectsHandler {
       const outputTrack = await this.controller.start(videoTrack, {
         ...defaultOpts,
         mode: isVirtual ? 'virtual' : 'blur',
-        blurStrength,
         quality: 'auto',
-        backgroundSource,
+        backgroundSource: isVirtual ? backgroundSource : null,
+        bgBlur: blurStrength.bgBlur,
+        bgBlurRadius: blurStrength.bgBlurRadius,
         onMetrics: this.onMetrics,
         onModelChange: this.onModelChange,
       });

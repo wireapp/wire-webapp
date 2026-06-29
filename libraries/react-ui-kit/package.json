@@ -44,7 +44,7 @@
     "@storybook/react": "^8.5.2",
     "@storybook/react-webpack5": "^8.5.2",
     "@storybook/test": "^8.5.2",
-    "@swc/core": "1.15.41",
+    "@swc/core": "1.15.43",
     "@swc/jest": "0.2.39",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
@@ -65,7 +65,7 @@
     "rimraf": "6.1.3",
     "storybook": "^8.5.2",
     "typescript": "6.0.3",
-    "webpack": "5.107.2"
+    "webpack": "5.108.0"
   },
   "peerDependencies": {
     "@emotion/react": "^11",

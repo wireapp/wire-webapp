@@ -27,6 +27,16 @@ const isContinuousIntegrationEnvironment = process.env.CI === 'true';
 
 process.env.TZ = 'UTC';
 
+const esmPackagesToTransform = [
+  'true-myth',
+  'p-timeout',
+  'p-cancelable',
+  'noop-esm',
+  'uuid',
+  '@enormora/objectory',
+  '@enormora/wall-clock',
+];
+
 const config: Config = {
   displayName: 'webapp',
   preset: '../../jest.preset.js',
@@ -42,6 +52,7 @@ const config: Config = {
   moduleDirectories: ['node_modules', __dirname],
   // Must be in sync with tsconfig.json >> paths
   moduleNameMapper: {
+    '^@enormora/wall-clock/(.*)$': '<rootDir>/../../node_modules/@enormora/wall-clock/$1.js',
     'Components/(.*)': '<rootDir>/src/script/components/$1',
     'Hooks/(.*)': '<rootDir>/src/script/hooks/$1',
     'I18n/(.*)': '<rootDir>/src/i18n/$1',
@@ -53,14 +64,17 @@ const config: Config = {
   },
   coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
   reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
+  resolver: '<rootDir>/jest.resolver.cjs',
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
-    customExportConditions: ['node', 'node-addons'],
+    customExportConditions: ['node', 'node-addons', 'require', 'import', 'default'],
   },
   testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc', '<rootDir>/test/e2e_tests'],
   testRunner: 'jest-jasmine2',
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|noop-esm|uuid|@enormora/objectory)/)'],
+  // Some dependencies are ESM and/or expose only package.json exports import conditions.
+  // Jest still needs help resolving and transforming them in this CommonJS-ish test setup.
+  transformIgnorePatterns: [`/node_modules/(?!(${esmPackagesToTransform.join('|')})/)`],
   // Override transform to use babel-jest for webapp (uses React automatic runtime with Emotion)
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',

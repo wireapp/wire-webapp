@@ -17,30 +17,36 @@
  *
  */
 
-import {MouseEvent, useState} from 'react';
+import {MouseEvent} from 'react';
 
-import {ButtonGroup, ButtonVariant, CallIcon, TriangleIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
 
 import {
-  callingButtonGroupStyles,
-  dropdownIconStyles,
-} from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton.styles';
+  callingButtonIconStyles,
+  callingButtonStyles,
+} from 'Components/Meeting/MeetingMultiActionButton/MeetingMultiActionButton.styles';
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {showContextMenu} from '../../../ui/contextMenu';
 
-export const MeetNowMultiActionButton = () => {
-  const {translate} = useApplicationContext();
-  const [invertIcon, setInvertIcon] = useState(false);
-  const {handleMeetNow, handleScheduleMeeting} = useMeetingActions();
+export interface MeetingMultiActionButtonProps {
+  useMeetingActionsHook?: typeof useMeetingActions;
+  triggerContextMenu?: typeof showContextMenu;
+}
 
-  const handleMeetingOptionButton = (event: MouseEvent<HTMLElement>) => {
-    setInvertIcon(val => !val);
-    showContextMenu({
+export const MeetingMultiActionButton = ({
+  triggerContextMenu = showContextMenu,
+  useMeetingActionsHook = useMeetingActions,
+}: MeetingMultiActionButtonProps) => {
+  const {translate} = useApplicationContext();
+  const {handleMeetNow, handleScheduleMeeting} = useMeetingActionsHook();
+
+  const handleCreateMeetingClick = (event: MouseEvent<HTMLElement>) => {
+    triggerContextMenu({
       event,
-      anchor: event.target as HTMLElement,
-      placement: 'bottom-end',
+      anchor: event.currentTarget,
+      placement: 'bottom-start',
       offset: 0,
       entries: [
         {
@@ -48,7 +54,6 @@ export const MeetNowMultiActionButton = () => {
           label: translate('meetings.action.meetNow'),
           click: () => {
             handleMeetNow();
-            resetIconInversion();
           },
         },
         {
@@ -56,33 +61,21 @@ export const MeetNowMultiActionButton = () => {
           label: translate('meetings.action.scheduleMeeting'),
           click: () => {
             handleScheduleMeeting();
-            resetIconInversion();
           },
         },
       ],
-      identifier: 'message-options-menu',
-      resetMenuStates: resetIconInversion,
+      identifier: 'meeting-actions-menu',
     });
   };
 
-  const resetIconInversion = () => setInvertIcon(false);
-
   return (
-    <ButtonGroup>
-      <ButtonGroup.Button
-        variant={ButtonVariant.TERTIARY}
-        css={callingButtonGroupStyles}
-        icon={<CallIcon />}
-        onClick={handleMeetNow}
-      >
-        {translate('meetings.action.createMeeting')}
-      </ButtonGroup.Button>
-      <ButtonGroup.Button
-        css={callingButtonGroupStyles}
-        onClick={handleMeetingOptionButton}
-        variant={ButtonVariant.TERTIARY}
-        icon={<TriangleIcon height={10} width={10} css={dropdownIconStyles(invertIcon)} />}
-      />
-    </ButtonGroup>
+    <Button
+      variant={ButtonVariant.TERTIARY}
+      css={callingButtonStyles}
+      onClick={handleCreateMeetingClick}
+      data-uie-name="create-meeting"
+    >
+      <CallIcon css={callingButtonIconStyles} /> {translate('meetings.action.createMeeting')}
+    </Button>
   );
 };

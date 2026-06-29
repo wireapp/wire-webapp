@@ -19,7 +19,7 @@
 
 import is from '@sindresorhus/is';
 import logdown from 'logdown';
-import {ErrorEvent} from 'reconnecting-websocket';
+import type {ErrorEvent} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
 
 import {EventEmitter} from 'events';

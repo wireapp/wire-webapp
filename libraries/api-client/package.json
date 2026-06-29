@@ -18,23 +18,23 @@
     "./lib/shims/node/websocket": "./lib/shims/browser/websocket.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.1073.0",
-    "@aws-sdk/lib-storage": "3.1073.0",
+    "@aws-sdk/client-s3": "3.1075.0",
+    "@aws-sdk/lib-storage": "3.1075.0",
     "@wireapp/commons": "workspace:^",
     "@wireapp/priority-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.56.0",
     "axios-retry": "4.5.0",
     "cells-sdk-ts": "0.1.1-alpha18",
     "http-status-codes": "2.3.0",
-    "pako": "2.1.0",
-    "reconnecting-websocket": "4.4.0",
+    "pako": "2.2.0",
+    "partysocket": "1.3.0",
     "spark-md5": "3.0.2",
     "tough-cookie": "4.1.4",
     "ws": "8.21.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "@swc/core": "1.15.41",
+    "@swc/core": "1.15.43",
     "@swc/jest": "0.2.39",
     "@types/jest": "30.0.0",
     "@types/pako": "2.0.4",
@@ -48,7 +48,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "ts-node": "10.9.2",
-    "webpack": "5.107.2",
+    "webpack": "5.108.0",
     "ws": "8.21.0"
   },
   "scripts": {

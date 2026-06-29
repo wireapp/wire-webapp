@@ -5,7 +5,20 @@
     "paths": {
       "@wireapp/core/lib/*": ["libraries/core/src/*"],
       "@wireapp/core": ["libraries/core/src/index.ts"],
-      "@wireapp/api-client": ["libraries/api-client/src/apiClient.ts"]
+      "@wireapp/api-client/lib/*": ["libraries/api-client/src/*"],
+      "@wireapp/api-client": ["libraries/api-client/src/apiClient.ts"],
+      "@wireapp/react-ui-kit/lib/*": ["libraries/react-ui-kit/src/*"],
+      "@wireapp/react-ui-kit/lib": ["libraries/react-ui-kit/src/index.ts"],
+      "@wireapp/react-ui-kit": ["libraries/react-ui-kit/src/index.ts"],
+      "@wireapp/commons/lib/*": ["libraries/commons/src/*"],
+      "@wireapp/commons": ["libraries/commons/src/index.ts"],
+      "@wireapp/webapp-events": ["libraries/webapp-events/src/index.ts"],
+      "@wireapp/store-engine/lib/*": ["libraries/store-engine/src/*"],
+      "@wireapp/store-engine": ["libraries/store-engine/src/index.ts"],
+      "@wireapp/store-engine-dexie": ["libraries/store-engine-dexie/src/index.ts"],
+      "@wireapp/config": ["libraries/config/src/index.ts"],
+      "@wireapp/telemetry": ["libraries/telemetry/src/index.ts"],
+      "@wireapp/promise-queue": ["libraries/promise-queue/src/index.ts"]
     }
   },
   "include": [

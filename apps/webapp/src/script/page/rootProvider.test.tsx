@@ -22,7 +22,7 @@ import {ReactNode, useContext} from 'react';
 import {renderHook} from '@testing-library/react';
 
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
-import {createDeterministicWallClock} from '../clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {applockRefactoredFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from './testSupport/rootContextTestSupport';

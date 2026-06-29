@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '../clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {startApplicationPeriodicChecks} from './startApplicationPeriodicChecks';
 
 describe('startApplicationPeriodicChecks', () => {

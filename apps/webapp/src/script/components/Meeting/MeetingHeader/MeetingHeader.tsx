@@ -18,7 +18,7 @@
  */
 
 import {actionsStyles, headingStyles, wrapperStyles} from 'Components/Meeting/MeetingHeader/MeetingHeader.styles';
-import {MeetNowMultiActionButton} from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton';
+import {MeetingMultiActionButton} from 'Components/Meeting/MeetingMultiActionButton/MeetingMultiActionButton';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const MeetingHeader = () => {
@@ -28,7 +28,7 @@ export const MeetingHeader = () => {
     <header css={wrapperStyles}>
       <h2 css={headingStyles}>{translate('meetings.navigation.title')}</h2>
       <div css={actionsStyles}>
-        <MeetNowMultiActionButton />
+        <MeetingMultiActionButton />
       </div>
     </header>
   );
