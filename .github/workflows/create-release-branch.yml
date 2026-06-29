@@ -77,6 +77,21 @@ jobs:
             exit 1
           fi
 
+          if [[ "${SOURCE_REF}" == refs/* || "${SOURCE_REF}" == origin/* ]]; then
+            echo "source_ref must be a branch name like dev, main, or release/YYYY-MM-DD.N, not a fully qualified or remote-style ref: ${SOURCE_REF}" >&2
+            exit 1
+          fi
+
+          if [[ "${SOURCE_REF}" == -* ]]; then
+            echo "source_ref must not begin with '-': ${SOURCE_REF}" >&2
+            exit 1
+          fi
+
+          if ! git check-ref-format --branch "${SOURCE_REF}" > /dev/null; then
+            echo "source_ref must be a valid branch name: ${SOURCE_REF}" >&2
+            exit 1
+          fi
+
           release_branch="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts release-branch "${RELEASE_IDENTIFIER}")"
 
           if git ls-remote --exit-code --heads origin "${release_branch}" > /dev/null; then
