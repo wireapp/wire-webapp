@@ -43,10 +43,12 @@ import {createUuid} from 'Util/uuid';
 
 import {Call} from './Call';
 import {CallingRepository, setupDetachedWindowExternalLinksClick} from './CallingRepository';
-import {CallState, MuteState} from './CallState';
+import {CallingViewMode, CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
+import type {ActiveWindowState} from 'Hooks/useActiveWindow';
+import {useActiveWindowState} from 'Hooks/useActiveWindow';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
@@ -403,6 +405,79 @@ describe('CallingRepository', () => {
         undefined,
         translate,
       );
+    });
+  });
+
+  describe('showNoCameraModal', () => {
+    it('renders in the main window when the main window is focused', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const isolatedCallingRepository = new CallingRepository(
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        translate,
+      );
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined as never);
+      const activeWindowSpy = jest
+        .spyOn(useActiveWindowState, 'getState')
+        .mockReturnValue({activeWindow: window} as unknown as ActiveWindowState);
+      const detachedDocument = document.implementation.createHTMLDocument('detached');
+      isolatedCallingRepository['callState'].viewMode(CallingViewMode.DETACHED_WINDOW);
+      isolatedCallingRepository['callState'].detachedWindow({document: detachedDocument} as Window);
+
+      isolatedCallingRepository['showNoCameraModal']();
+
+      expect(showModal).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          container: undefined,
+        }),
+        undefined,
+        translate,
+      );
+
+      activeWindowSpy.mockRestore();
+      showModal.mockRestore();
+    });
+
+    it('renders in the detached window when the detached window is focused', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const isolatedCallingRepository = new CallingRepository(
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        translate,
+      );
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined as never);
+      const detachedDocument = document.implementation.createHTMLDocument('detached');
+      const detachedWindow = {document: detachedDocument} as Window;
+      const activeWindowSpy = jest
+        .spyOn(useActiveWindowState, 'getState')
+        .mockReturnValue({activeWindow: detachedWindow} as unknown as ActiveWindowState);
+      isolatedCallingRepository['callState'].viewMode(CallingViewMode.DETACHED_WINDOW);
+      isolatedCallingRepository['callState'].detachedWindow(detachedWindow);
+
+      isolatedCallingRepository['showNoCameraModal']();
+
+      expect(showModal).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          container: detachedDocument.body,
+        }),
+        undefined,
+        translate,
+      );
+
+      activeWindowSpy.mockRestore();
+      showModal.mockRestore();
     });
   });
 
@@ -1240,11 +1315,18 @@ describe('init AVS state', () => {
   });
 });
 
+const createLinkInsideDetachedWindow = (detachedWindow: Window, target = '_blank') => {
+  detachedWindow.document.body.innerHTML = `<a href="https://wire.com" target="${target}">Wire</a>`;
+  return detachedWindow.document.querySelector('a')!;
+};
+
 describe('setupDetachedWindowExternalLinksClick', () => {
   let detachedWindow: Window;
   let openerWindow: Window;
 
   beforeEach(() => {
+    jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(true);
+
     detachedWindow = {
       document: document.implementation.createHTMLDocument('detached-window'),
     } as Window;
@@ -1259,12 +1341,9 @@ describe('setupDetachedWindowExternalLinksClick', () => {
   });
 
   it('opens _blank links in the opener window', () => {
-    detachedWindow.document.body.innerHTML = `
-      <a href="https://wire.com" target="_blank">Wire</a>
-    `;
+    const link = createLinkInsideDetachedWindow(detachedWindow, '_blank');
 
     const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
-    const link = detachedWindow.document.querySelector('a')!;
 
     link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
 
@@ -1273,12 +1352,22 @@ describe('setupDetachedWindowExternalLinksClick', () => {
   });
 
   it('does not handle non _blank links', () => {
-    detachedWindow.document.body.innerHTML = `
-      <a href="https://wire.com" target="_self">Wire</a>
-    `;
+    const link = createLinkInsideDetachedWindow(detachedWindow, '_self');
 
     const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
-    const link = detachedWindow.document.querySelector('a')!;
+
+    link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+
+    expect(openerWindow.open).not.toHaveBeenCalled();
+    cleanup();
+  });
+
+  it('does not handle links outside the desktop app', () => {
+    jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(false);
+
+    const link = createLinkInsideDetachedWindow(detachedWindow, '_blank');
+
+    const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
 
     link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
 
@@ -1287,14 +1376,11 @@ describe('setupDetachedWindowExternalLinksClick', () => {
   });
 
   it('removes the click listener on cleanup', () => {
-    detachedWindow.document.body.innerHTML = `
-      <a href="https://wire.com" target="_blank">Wire</a>
-    `;
+    const link = createLinkInsideDetachedWindow(detachedWindow, '_blank');
 
     const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
     cleanup();
 
-    const link = detachedWindow.document.querySelector('a')!;
     link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
 
     expect(openerWindow.open).not.toHaveBeenCalled();

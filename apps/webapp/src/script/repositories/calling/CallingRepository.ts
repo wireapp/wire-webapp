@@ -62,6 +62,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {useActiveWindowState} from 'Hooks/useActiveWindow';
 import {NetworkQualityInfo, NetworkQualityInfoSchema} from 'Repositories/calling/calling.schema';
 import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -155,7 +156,11 @@ type SubconversationData = {
   members: SubconversationEpochInfoMember[];
 };
 
-export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, openerWindow: Window): (() => void) => {
+export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, openerWindow: Window) => {
+  if (!Runtime.isDesktopApp()) {
+    return () => {};
+  }
+
   const handleClick = (event: MouseEvent) => {
     const anchor = (event.target as HTMLElement).closest('a');
     if (anchor?.target === '_blank' && anchor.href) {
@@ -3001,15 +3006,18 @@ export class CallingRepository {
   /**
    * Helper method to get modal container and restore focus callback
    * Call this method immediately before showing a modal to ensure the correct active element is captured.
+   * Prefer the currently focused window so detached calls still show modals in the window the user interacted with.
    * @returns Object containing container and focus restoration callback
    */
   private getModalContainerAndRestoreFocusCallback() {
     const detachedWindow = this.callState.detachedWindow();
     const isDetachedWindow = this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
+    const activeWindow = useActiveWindowState.getState().activeWindow;
+    const modalWindow = isDetachedWindow && detachedWindow && activeWindow === detachedWindow ? detachedWindow : window;
 
     const context = captureModalFocusContext({
-      targetDocument: isDetachedWindow && detachedWindow ? detachedWindow.document : undefined,
-      container: isDetachedWindow && detachedWindow ? detachedWindow.document.body : undefined,
+      targetDocument: modalWindow.document,
+      container: modalWindow === window ? undefined : modalWindow.document.body,
     });
 
     return {
