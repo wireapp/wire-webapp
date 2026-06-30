@@ -20,13 +20,11 @@
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
 export const sharedDriveSearchAndFiltersFeatureToggleName = 'shared-drive-search-and-filters';
 export const meetingsFeatureToggleName = 'meetings';
-export const websocketConnectivityDiagnosticsFeatureToggleName = 'websocket-connectivity-diagnostics';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
   sharedDriveSearchAndFiltersFeatureToggleName,
   meetingsFeatureToggleName,
-  websocketConnectivityDiagnosticsFeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

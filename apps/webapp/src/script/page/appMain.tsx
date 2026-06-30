@@ -67,10 +67,7 @@ import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
-import {
-  meetingsFeatureToggleName,
-  websocketConnectivityDiagnosticsFeatureToggleName,
-} from '../featureToggles/startupFeatureToggleNames';
+import {meetingsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -111,9 +108,6 @@ export const AppMain = (properties: AppMainProps) => {
   } = properties;
   const translate = mainView.translate;
   const apiContext = app.getAPIContext();
-  const isWebSocketConnectivityDiagnosticsEnabled = isFeatureToggleEnabled(
-    websocketConnectivityDiagnosticsFeatureToggleName,
-  );
 
   useActiveWindow(window);
 
@@ -358,10 +352,7 @@ export const AppMain = (properties: AppMainProps) => {
         )}
 
         <AppLock appLockRepository={appLockRepository} clientRepository={repositories.client} />
-        <WarningsContainer
-          onRefresh={app.refresh}
-          isWebSocketConnectivityDiagnosticsEnabled={isWebSocketConnectivityDiagnosticsEnabled}
-        />
+        <WarningsContainer onRefresh={app.refresh} />
 
         {!locked && (
           <>
