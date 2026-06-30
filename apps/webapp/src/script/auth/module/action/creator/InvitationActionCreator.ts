@@ -28,10 +28,7 @@ export enum INVITATION_ACTION {
 }
 
 export type InvitationActions =
-  | AddInviteStartAction
-  | AddInviteSuccessAction
-  | AddInviteFailedAction
-  | ResetInviteErrorAction;
+  AddInviteStartAction | AddInviteSuccessAction | AddInviteFailedAction | ResetInviteErrorAction;
 
 export interface AddInviteStartAction {
   type: INVITATION_ACTION.INVITE_ADD_START;

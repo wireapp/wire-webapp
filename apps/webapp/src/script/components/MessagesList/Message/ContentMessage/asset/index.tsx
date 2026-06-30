@@ -189,9 +189,12 @@ const ContentAsset = ({
 
     case AssetType.BUTTON:
       const assetId = asset.id;
-      if (
-        !(message instanceof CompositeMessage && asset instanceof Button && assetId !== undefined && assetId !== '')
-      ) {
+      if (!(
+        message instanceof CompositeMessage &&
+        asset instanceof Button &&
+        assetId !== undefined &&
+        assetId !== ''
+      )) {
         return null;
       }
 
