@@ -50,9 +50,10 @@ describe('EventRepository', () => {
 
     it('should not save but distribute "user.*" events', () => {
       return testFactory
-        .event_repository![
-          'handleEvent'
-        ]({event: {type: USER_EVENT.UPDATE, user: {id: ''}}}, EventSource.NOTIFICATION_STREAM)
+        .event_repository!['handleEvent'](
+          {event: {type: USER_EVENT.UPDATE, user: {id: ''}}},
+          EventSource.NOTIFICATION_STREAM,
+        )
         .then(() => {
           expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
         });
@@ -60,9 +61,10 @@ describe('EventRepository', () => {
 
     it('should not save but distribute "call.*" events', () => {
       return testFactory
-        .event_repository![
-          'handleEvent'
-        ]({event: {type: ClientEvent.CALL.E_CALL} as any}, EventSource.NOTIFICATION_STREAM)
+        .event_repository!['handleEvent'](
+          {event: {type: ClientEvent.CALL.E_CALL} as any},
+          EventSource.NOTIFICATION_STREAM,
+        )
         .then(() => {
           expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
         });
@@ -70,9 +72,10 @@ describe('EventRepository', () => {
 
     it('should not save but distribute "conversation.create" events', () => {
       return testFactory
-        .event_repository![
-          'handleEvent'
-        ]({event: {type: CONVERSATION_EVENT.CREATE} as any}, EventSource.NOTIFICATION_STREAM)
+        .event_repository!['handleEvent'](
+          {event: {type: CONVERSATION_EVENT.CREATE} as any},
+          EventSource.NOTIFICATION_STREAM,
+        )
         .then(() => {
           expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
         });
