@@ -24,6 +24,7 @@ import {
   createProductionTagName,
   createReleaseBranchName,
   extractReleaseIdentifierFromBranchName,
+  validateProductionTagName,
 } from './releaseMetadata';
 
 type ReleaseMetadataCliDependencies = {
@@ -39,6 +40,7 @@ const usageText = [
   '  releaseMetadataCli.ts release-branch <YYYY-MM-DD.N>',
   '  releaseMetadataCli.ts next-beta-tag <YYYY-MM-DD.N> [existing-tag ...]',
   '  releaseMetadataCli.ts production-tag <YYYY-MM-DD.N>',
+  '  releaseMetadataCli.ts validate-production-tag <YYYY-MM-DD.N-production>',
 ].join('\n');
 
 function writeResult(
@@ -46,7 +48,8 @@ function writeResult(
     | ReturnType<typeof extractReleaseIdentifierFromBranchName>
     | ReturnType<typeof createReleaseBranchName>
     | ReturnType<typeof createNextBetaTagName>
-    | ReturnType<typeof createProductionTagName>,
+    | ReturnType<typeof createProductionTagName>
+    | ReturnType<typeof validateProductionTagName>,
   dependencies: ReleaseMetadataCliDependencies,
 ): number {
   if (result.isErr) {
@@ -78,6 +81,10 @@ export function runReleaseMetadataCli(
 
   if (commandName === 'production-tag' && primaryValue !== undefined) {
     return writeResult(createProductionTagName(primaryValue), dependencies);
+  }
+
+  if (commandName === 'validate-production-tag' && primaryValue !== undefined) {
+    return writeResult(validateProductionTagName(primaryValue), dependencies);
   }
 
   dependencies.writeError(usageText);
