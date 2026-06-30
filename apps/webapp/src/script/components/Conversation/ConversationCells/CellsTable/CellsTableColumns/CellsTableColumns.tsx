@@ -22,7 +22,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/localizerUtil';
 
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
@@ -31,50 +30,107 @@ import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions'
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 import {CellsTagsColumn} from './CellsTagsColumn/CellsTagsColumn';
 
+import {CellsSortDirection} from '../../common/CellsSortIcon/CellsSortIcon';
+import {CellsTableSortableHeader} from '../../common/CellsTableSortableHeader/CellsTableSortableHeader';
+import {CellsSortField} from '../../common/useCellsSorting/useCellsSorting';
+
 const columnHelper = createColumnHelper<CellNode>();
+
+interface CellsTableLabels {
+  actions: string;
+  created: string;
+  name: string;
+  owner: string;
+  publicLink: string;
+  size: string;
+  tags: string;
+}
+
+export const getCellsTableDataCellLabels = (labels: CellsTableLabels): Record<string, string | undefined> => ({
+  name: labels.name,
+  owner: labels.owner,
+  publicLink: labels.publicLink,
+  sizeMb: labels.size,
+  tags: labels.tags,
+  uploadedAtTimestamp: labels.created,
+});
 
 export const getCellsTableColumns = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  labels,
   onRefresh,
+  onCloseSearchView,
+  getDirectionFor,
+  isSortingEnabled,
+  onToggleSort,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  labels: CellsTableLabels;
   onRefresh: () => void;
+  onCloseSearchView?: () => void;
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  isSortingEnabled: boolean;
+  onToggleSort: (field: CellsSortField) => void;
 }) => [
   columnHelper.accessor('name', {
-    header: t('cells.tableRow.name'),
-    cell: info => <CellsTableNameColumn node={info.row.original} conversationQualifiedId={conversationQualifiedId} />,
+    header: isSortingEnabled
+      ? () => (
+          <CellsTableSortableHeader
+            label={labels.name}
+            direction={getDirectionFor('name_ci')}
+            onClick={() => onToggleSort('name_ci')}
+          />
+        )
+      : labels.name,
+    cell: info => <CellsTableNameColumn node={info.row.original} onCloseSearchView={onCloseSearchView} />,
   }),
   columnHelper.accessor('owner', {
-    header: t('cells.tableRow.owner'),
+    header: labels.owner,
     cell: info => <CellsTableOwnerColumn owner={info.getValue()} user={info.row.original.user} />,
     size: 170,
   }),
   columnHelper.accessor('sizeMb', {
-    header: t('cells.tableRow.size'),
+    header: isSortingEnabled
+      ? () => (
+          <CellsTableSortableHeader
+            label={labels.size}
+            direction={getDirectionFor('size')}
+            onClick={() => onToggleSort('size')}
+          />
+        )
+      : labels.size,
     cell: info => info.getValue(),
     size: 100,
   }),
   columnHelper.accessor('tags', {
-    header: t('cells.tableRow.tags'),
+    header: labels.tags,
     cell: info => <CellsTagsColumn tags={info.getValue()} />,
     size: 120,
   }),
   columnHelper.accessor('uploadedAtTimestamp', {
-    header: t('cells.tableRow.created'),
+    header: isSortingEnabled
+      ? () => (
+          <CellsTableSortableHeader
+            label={labels.created}
+            direction={getDirectionFor('mtime')}
+            onClick={() => onToggleSort('mtime')}
+          />
+        )
+      : labels.created,
     cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
     size: 125,
   }),
   columnHelper.accessor('publicLink', {
-    header: t('cells.tableRow.publicLink'),
+    header: labels.publicLink,
     cell: info => <CellsTableSharedColumn isShared={info.getValue()?.alreadyShared === true} />,
     size: 60,
   }),
   columnHelper.accessor('id', {
-    header: () => <span className="visually-hidden">{t('cells.tableRow.actions')}</span>,
+    header: () => <span className="visually-hidden">{labels.actions}</span>,
     size: 40,
     cell: info => {
       return (
@@ -84,6 +140,7 @@ export const getCellsTableColumns = ({
           conversationQualifiedId={conversationQualifiedId}
           conversationName={conversationName}
           onRefresh={onRefresh}
+          onCloseSearchView={onCloseSearchView}
         />
       );
     },

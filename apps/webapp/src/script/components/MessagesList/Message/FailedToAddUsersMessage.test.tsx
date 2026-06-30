@@ -20,17 +20,28 @@
 import {act, render} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import en from 'I18n/en-US.json';
-import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
+import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
-import {withTheme, generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
-import {setStrings} from 'Util/localizerUtil';
+import {generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from 'Util/localizerUtil';
 
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+import {translateForTest} from 'Util/test/translateForTest';
 
 setStrings({en});
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translate}));
+
+function withTheme(component: React.ReactNode): React.ReactElement {
+  return <StyledApp themeId={THEME_ID.DEFAULT}>{rootProviderWrapper({children: component})}</StyledApp>;
+}
 
 const createFailedToAddUsersMessages = (
   failures: AddUsersFailure[] = [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}],
@@ -39,7 +50,7 @@ const createFailedToAddUsersMessages = (
 };
 
 function createUser(qualifiedId: QualifiedId, name: string) {
-  const user = new User(qualifiedId.id, qualifiedId.domain);
+  const user = new User(qualifiedId.id, qualifiedId.domain, translateForTest);
   user.name(name);
   return user;
 }

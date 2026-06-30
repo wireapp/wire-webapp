@@ -39,10 +39,8 @@ export class AuthRepositoryE2E extends BackendClientE2E {
     }
 
     user.id = response.data.id;
-    user.qualifiedId = {
-      domain: response.data?.domain ?? '',
-      id: response.data.id,
-    };
+    user.qualifiedId = response.data?.qualified_id;
+
     return response;
   }
 

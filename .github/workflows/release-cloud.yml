@@ -1,0 +1,556 @@
+---
+name: Release Cloud
+
+on:
+  # Automatic release/** triggering is intentionally disabled during the
+  # transition. Enable it after release-cloud is the official Beta release path.
+  workflow_dispatch:
+    inputs:
+      release_branch:
+        description: 'Release branch to deploy to Beta, for example release/2026-06-25.1'
+        required: true
+        type: string
+      confirm_beta_deploy:
+        description: 'Confirm that this will deploy the selected release branch to Beta'
+        required: true
+        default: false
+        type: boolean
+      promote_to_production:
+        description: 'Promote the Beta-tested artifact to Production after E2E'
+        required: true
+        default: false
+        type: boolean
+      reason:
+        description: 'Optional reason for manually deploying to Beta'
+        required: false
+        type: string
+
+concurrency:
+  group: release-cloud-beta-${{ inputs.release_branch }}
+  cancel-in-progress: false
+
+permissions: {}
+
+env:
+  AWS_REGION: eu-central-1
+  ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
+  BETA_ARTIFACT_NAME_PREFIX: release-cloud-ebs
+  BETA_BACKEND_URL: https://staging-nginz-https.zinfra.io/
+  # ADR 0002 calls this target Beta. During the transition, Beta maps to the
+  # existing wire-webapp-staging Elastic Beanstalk environment and URL.
+  BETA_ENVIRONMENT_NAME: wire-webapp-staging
+  BETA_WEBAPP_URL: https://wire-webapp-staging.zinfra.io/
+  PRODUCTION_ENVIRONMENT_NAME: wire-webapp-prod
+
+jobs:
+  validate_request:
+    name: Validate manual request
+    runs-on: ubuntu-24.04
+    permissions: {}
+    outputs:
+      release_branch: ${{ steps.validate_request.outputs.release_branch }}
+
+    steps:
+      - name: Validate manual request
+        id: validate_request
+        env:
+          CONFIRM_BETA_DEPLOY: ${{ inputs.confirm_beta_deploy }}
+          RELEASE_BRANCH: ${{ inputs.release_branch }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${CONFIRM_BETA_DEPLOY}" != 'true' ]]; then
+            echo 'confirm_beta_deploy must be true to deploy to Beta.' >&2
+            exit 1
+          fi
+
+          if [[ ! "${RELEASE_BRANCH}" =~ ^release/[0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*$ ]]; then
+            echo "release_branch must match release/YYYY-MM-DD.N, where N starts at 1: ${RELEASE_BRANCH}" >&2
+            exit 1
+          fi
+
+          echo "release_branch=${RELEASE_BRANCH}" >> "$GITHUB_OUTPUT"
+
+  build_artifact:
+    name: Validate release branch and build artifact
+    runs-on: ubuntu-24.04
+    needs: validate_request
+    permissions:
+      contents: read
+    outputs:
+      artifact_checksum: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
+      artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
+      release_branch: ${{ steps.release_metadata.outputs.release_branch }}
+      release_commit_sha: ${{ steps.release_metadata.outputs.release_commit_sha }}
+      release_identifier: ${{ steps.release_metadata.outputs.release_identifier }}
+
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ needs.validate_request.outputs.release_branch }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Validate release branch
+        id: release_metadata
+        env:
+          RELEASE_BRANCH: ${{ needs.validate_request.outputs.release_branch }}
+        run: |
+          set -euo pipefail
+
+          release_identifier="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts release-identifier-from-branch "${RELEASE_BRANCH}")"
+          release_commit_sha="$(git rev-parse HEAD)"
+
+          {
+            echo "release_branch=${RELEASE_BRANCH}"
+            echo "release_identifier=${release_identifier}"
+            echo "release_commit_sha=${release_commit_sha}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Update configuration
+        run: ./bin/yarn nx run webapp:configure
+
+      - name: Build and package
+        run: ./bin/yarn nx run server:package
+
+      - name: Compute artifact metadata
+        id: artifact_metadata
+        env:
+          RELEASE_IDENTIFIER: ${{ steps.release_metadata.outputs.release_identifier }}
+        run: |
+          set -euo pipefail
+
+          artifact_name="${BETA_ARTIFACT_NAME_PREFIX}-${RELEASE_IDENTIFIER}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          artifact_checksum="$(sha256sum "${ARTIFACT_PATH}" | awk '{print $1}')"
+
+          {
+            echo "artifact_name=${artifact_name}"
+            echo "artifact_checksum=${artifact_checksum}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ${{ steps.artifact_metadata.outputs.artifact_name }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+  deploy_to_beta:
+    name: Deploy to Beta
+    runs-on: ubuntu-24.04
+    needs: build_artifact
+    permissions: {}
+    environment: wire-webapp-staging
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ needs.build_artifact.outputs.artifact_name }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
+        with:
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to Beta
+        id: deploy
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: ${{ env.BETA_ENVIRONMENT_NAME }}
+          version-label: ${{ needs.build_artifact.outputs.release_identifier }}-${{ github.run_id }}-${{ github.run_attempt }}-beta
+          deployment-package-path: ebs.zip
+          wait-for-deployment: true
+          wait-for-environment-recovery: true
+          deployment-timeout: 150
+          use-existing-application-version-if-available: true
+
+  create_beta_tag:
+    name: Create Beta tag
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, deploy_to_beta]
+    permissions:
+      contents: write
+    outputs:
+      beta_tag_name: ${{ steps.beta_tag.outputs.beta_tag_name }}
+
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Create and push Beta tag
+        id: beta_tag
+        env:
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
+        run: |
+          set -euo pipefail
+
+          git fetch --tags origin
+
+          mapfile -t existing_beta_tag_names < <(git tag --list "${RELEASE_IDENTIFIER}-beta.*")
+          beta_tag_name="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts next-beta-tag "${RELEASE_IDENTIFIER}" "${existing_beta_tag_names[@]}")"
+
+          git config user.email "zebot@users.noreply.github.com"
+          git config user.name "Zebot"
+          git tag --annotate "$beta_tag_name" --message "Release $beta_tag_name" "$RELEASE_COMMIT_SHA"
+          git push origin "refs/tags/$beta_tag_name"
+
+          echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
+
+  run_e2e:
+    name: Run E2E against Beta
+    needs: [build_artifact, create_beta_tag]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/e2e-tests.yml
+    with:
+      webappUrl: https://wire-webapp-staging.zinfra.io/
+      backendUrl: https://staging-nginz-https.zinfra.io/
+      grep: '@regression|@crit-flow-web'
+      testinyRunName: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+
+  production_preflight:
+    name: Production preflight
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, create_beta_tag, run_e2e]
+    permissions:
+      contents: read
+    outputs:
+      production_preflight_result: ${{ steps.production_preflight.outputs.production_preflight_result }}
+      production_skipped_reason: ${{ steps.production_preflight.outputs.production_skipped_reason }}
+      production_tag_name: ${{ steps.production_preflight.outputs.production_tag_name }}
+      should_deploy: ${{ steps.production_preflight.outputs.should_deploy }}
+
+    steps:
+      - name: Checkout release commit
+        if: ${{ inputs.promote_to_production == true }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        if: ${{ inputs.promote_to_production == true }}
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        if: ${{ inputs.promote_to_production == true }}
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        if: ${{ inputs.promote_to_production == true }}
+        run: ./bin/yarn --immutable
+
+      - name: Check Production promotion eligibility
+        id: production_preflight
+        env:
+          BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          PROMOTE_TO_PRODUCTION: ${{ inputs.promote_to_production }}
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${PROMOTE_TO_PRODUCTION}" != 'true' ]]; then
+            production_tag_name="${RELEASE_IDENTIFIER}-production"
+            production_skipped_reason='Production promotion was not requested'
+
+            {
+              echo 'should_deploy=false'
+              echo 'production_preflight_result=skipped'
+              echo "production_skipped_reason=${production_skipped_reason}"
+              echo "production_tag_name=${production_tag_name}"
+            } >> "$GITHUB_OUTPUT"
+
+            {
+              echo '## Production promotion'
+              echo "- Production promotion requested: false"
+              echo "- Production deployment skipped: true"
+              echo "- Skip reason: ${production_skipped_reason}"
+              echo "- Production tag: ${production_tag_name}"
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            exit 0
+          fi
+
+          git fetch --tags origin
+
+          production_tag_name="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts production-tag "${RELEASE_IDENTIFIER}")"
+          beta_tag_commit_sha="$(git rev-parse "${BETA_TAG_NAME}^{commit}")"
+
+          if [[ "${beta_tag_commit_sha}" != "${RELEASE_COMMIT_SHA}" ]]; then
+            echo "Beta tag ${BETA_TAG_NAME} points to ${beta_tag_commit_sha}, expected ${RELEASE_COMMIT_SHA}." >&2
+            exit 1
+          fi
+
+          if git rev-parse --quiet --verify "refs/tags/${production_tag_name}" >/dev/null; then
+            production_tag_commit_sha="$(git rev-parse "${production_tag_name}^{commit}")"
+
+            if [[ "${production_tag_commit_sha}" != "${RELEASE_COMMIT_SHA}" ]]; then
+              echo "Production tag ${production_tag_name} points to ${production_tag_commit_sha}, expected ${RELEASE_COMMIT_SHA}." >&2
+              exit 1
+            fi
+
+            production_skipped_reason="Release is already tagged as Production with ${production_tag_name}"
+
+            {
+              echo 'should_deploy=false'
+              echo 'production_preflight_result=already_tagged'
+              echo "production_skipped_reason=${production_skipped_reason}"
+              echo "production_tag_name=${production_tag_name}"
+            } >> "$GITHUB_OUTPUT"
+
+            {
+              echo '## Production promotion'
+              echo "- Production promotion requested: true"
+              echo "- Production deployment skipped: true"
+              echo "- Skip reason: ${production_skipped_reason}"
+              echo "- Production tag: ${production_tag_name}"
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            exit 0
+          fi
+
+          {
+            echo 'should_deploy=true'
+            echo 'production_preflight_result=ready'
+            echo 'production_skipped_reason='
+            echo "production_tag_name=${production_tag_name}"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo '## Production promotion'
+            echo "- Production promotion requested: true"
+            echo "- Production deployment skipped: false"
+            echo "- Production tag: ${production_tag_name}"
+            echo "- Approval gate: ${PRODUCTION_ENVIRONMENT_NAME} GitHub Environment settings"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy_to_production:
+    name: Deploy to Production
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, production_preflight]
+    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' }}
+    permissions: {}
+    # Production approval is enforced by the wire-webapp-prod GitHub Environment settings.
+    environment: wire-webapp-prod
+    concurrency:
+      group: release-cloud-production
+      cancel-in-progress: false
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ needs.build_artifact.outputs.artifact_name }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
+        with:
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to Production
+        id: deploy
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: ${{ env.PRODUCTION_ENVIRONMENT_NAME }}
+          version-label: ${{ needs.build_artifact.outputs.release_identifier }}-${{ github.run_id }}-${{ github.run_attempt }}-production
+          deployment-package-path: ebs.zip
+          wait-for-deployment: true
+          wait-for-environment-recovery: true
+          deployment-timeout: 150
+          use-existing-application-version-if-available: true
+
+  create_production_tag:
+    name: Create Production tag
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, production_preflight, deploy_to_production]
+    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' && needs.deploy_to_production.result == 'success' }}
+    permissions:
+      contents: write
+    outputs:
+      production_tag_name: ${{ steps.production_tag.outputs.production_tag_name }}
+
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+
+      - name: Create and push Production tag
+        id: production_tag
+        env:
+          PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          git fetch --tags origin
+
+          if git rev-parse --quiet --verify "refs/tags/${PRODUCTION_TAG_NAME}" >/dev/null; then
+            existing_production_tag_commit_sha="$(git rev-parse "${PRODUCTION_TAG_NAME}^{commit}")"
+            echo "Production tag ${PRODUCTION_TAG_NAME} already exists at ${existing_production_tag_commit_sha}." >&2
+            exit 1
+          fi
+
+          git config user.email "zebot@users.noreply.github.com"
+          git config user.name "Zebot"
+          git tag --annotate "$PRODUCTION_TAG_NAME" --message "Release $PRODUCTION_TAG_NAME" "$RELEASE_COMMIT_SHA"
+          git push origin "refs/tags/$PRODUCTION_TAG_NAME"
+
+          echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "$GITHUB_OUTPUT"
+
+  summarize_release:
+    name: Summarize release
+    runs-on: ubuntu-24.04
+    needs:
+      [
+        build_artifact,
+        deploy_to_beta,
+        create_beta_tag,
+        run_e2e,
+        production_preflight,
+        deploy_to_production,
+        create_production_tag,
+      ]
+    if: ${{ always() }}
+    permissions: {}
+
+    steps:
+      - name: Add release summary
+        env:
+          ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
+          ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
+          BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          E2E_REPORT_URL: ${{ needs.run_e2e.outputs.reportUrl }}
+          E2E_RESULT: ${{ needs.run_e2e.result }}
+          PRODUCTION_ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
+          PRODUCTION_ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
+          PRODUCTION_DEPLOYMENT_RESULT: ${{ needs.deploy_to_production.result }}
+          PRODUCTION_DEPLOYMENT_SKIPPED: ${{ needs.production_preflight.outputs.should_deploy != 'true' }}
+          PRODUCTION_ENVIRONMENT_NAME: ${{ env.PRODUCTION_ENVIRONMENT_NAME }}
+          PRODUCTION_PREFLIGHT_RESULT: ${{ needs.production_preflight.outputs.production_preflight_result }}
+          PRODUCTION_PROMOTION_REQUESTED: ${{ inputs.promote_to_production }}
+          PRODUCTION_SKIPPED_REASON: ${{ needs.production_preflight.outputs.production_skipped_reason }}
+          PRODUCTION_TAG_CREATION_RESULT: ${{ needs.create_production_tag.result }}
+          PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
+          RELEASE_BRANCH: ${{ needs.build_artifact.outputs.release_branch }}
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
+          RELEASE_REASON: ${{ inputs.reason }}
+          TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo '## Release Cloud Beta'
+            echo "- Release branch: ${RELEASE_BRANCH}"
+            echo "- Release identifier: ${RELEASE_IDENTIFIER}"
+            echo "- Commit SHA: ${RELEASE_COMMIT_SHA}"
+            echo "- Beta environment: ${BETA_ENVIRONMENT_NAME}"
+            echo "- Beta URL: ${BETA_WEBAPP_URL}"
+            echo "- Artifact name: ${ARTIFACT_NAME}"
+            echo "- Artifact checksum: ${ARTIFACT_CHECKSUM}"
+            echo "- Beta tag: ${BETA_TAG_NAME}"
+            echo "- E2E result: ${E2E_RESULT}"
+
+            if [[ -n "${E2E_REPORT_URL}" ]]; then
+              echo "- E2E report URL: ${E2E_REPORT_URL}"
+            fi
+
+            if [[ -n "${RELEASE_REASON}" ]]; then
+              echo "- Reason: ${RELEASE_REASON}"
+            fi
+
+            echo "- Testiny run name: ${TESTINY_RUN_NAME}"
+
+            echo
+            echo '## Release Cloud Production'
+            echo "- Production promotion requested: ${PRODUCTION_PROMOTION_REQUESTED}"
+            echo "- Production preflight result: ${PRODUCTION_PREFLIGHT_RESULT}"
+            echo "- Production tag: ${PRODUCTION_TAG_NAME}"
+            echo "- Production deployment skipped: ${PRODUCTION_DEPLOYMENT_SKIPPED}"
+
+            if [[ -n "${PRODUCTION_SKIPPED_REASON}" ]]; then
+              echo "- Production skip reason: ${PRODUCTION_SKIPPED_REASON}"
+            fi
+
+            echo "- Production deployment result: ${PRODUCTION_DEPLOYMENT_RESULT}"
+            echo "- Production tag creation result: ${PRODUCTION_TAG_CREATION_RESULT}"
+            echo "- Production environment: ${PRODUCTION_ENVIRONMENT_NAME}"
+            echo "- Production artifact name: ${PRODUCTION_ARTIFACT_NAME}"
+            echo "- Production artifact checksum: ${PRODUCTION_ARTIFACT_CHECKSUM}"
+            echo "- Production approval gate: ${PRODUCTION_ENVIRONMENT_NAME} GitHub Environment settings"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  notify_release_failure:
+    name: Notify release failure
+    runs-on: ubuntu-24.04
+    needs:
+      [
+        build_artifact,
+        deploy_to_beta,
+        create_beta_tag,
+        run_e2e,
+        production_preflight,
+        deploy_to_production,
+        create_production_tag,
+      ]
+    if: ${{ always() && contains(join(needs.*.result, ','), 'failure') }}
+    permissions: {}
+
+    steps:
+      - name: Announce release failure
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+        with:
+          status: failure
+          text: |
+            Release Cloud failed for ${{ needs.build_artifact.outputs.release_branch || inputs.release_branch }} (${{ needs.build_artifact.outputs.release_identifier || needs.build_artifact.outputs.release_branch || inputs.release_branch }})
+            Triggered by: ${{ github.actor }}
+            Build log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

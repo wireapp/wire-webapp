@@ -17,10 +17,32 @@
  *
  */
 
+const isContinuousIntegrationEnvironment = process.env.CI === 'true';
+
 module.exports = {
   preset: '../../jest.preset.js',
-  collectCoverageFrom: ['src/**/*.{js,ts}', '!src/**/*.d.ts', '!src/**/*.test.{js,ts}'],
+  collectCoverageFrom: [
+    '*.{js,ts}',
+    'routes/**/*.{js,ts}',
+    'util/**/*.{js,ts}',
+    '!**/*.d.ts',
+    '!**/*.test.{js,ts}',
+    '!babel.config.js',
+    '!jest.config.js',
+    '!dist/**',
+    '!bin/**',
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 20,
+      functions: 13,
+      lines: 18,
+      statements: 18,
+    },
+  },
+  coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
   moduleDirectories: ['node_modules', __dirname],
+  reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist'],
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|@sindresorhus/is)/)'],

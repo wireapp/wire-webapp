@@ -21,8 +21,8 @@ import {Quote} from '@wireapp/protocol-messaging';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {MessageHasher} from 'src/script/message/MessageHasher';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {MessageHasher} from 'src/script/message/messageHasher';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
@@ -30,6 +30,8 @@ import {createUuid} from 'Util/uuid';
 import {QuotedMessageMiddleware} from './QuoteDecoderMiddleware';
 
 import {EventService} from '../EventService';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildQuotedMessageMiddleware() {
   const eventService = {
@@ -43,8 +45,8 @@ function buildQuotedMessageMiddleware() {
 }
 
 describe('QuotedMessageMiddleware', () => {
-  const conversation = new Conversation(createUuid());
-  conversation.selfUser(new User());
+  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  conversation.selfUser(new User('', '', translateForTest));
 
   describe('processEvent', () => {
     it('ignores messages that do not have quotes', async () => {

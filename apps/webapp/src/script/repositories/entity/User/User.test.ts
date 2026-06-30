@@ -19,41 +19,43 @@
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ACCENT_ID} from 'src/script/Config';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {User} from './User';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('User', () => {
   describe('Initials', () => {
     it('returns correct initials for user with first name and last name', () => {
-      const user = new User();
+      const user = new User('', '', translateForTest);
       user.name('John Doe');
 
       expect(user.initials()).toBe('JD');
     });
 
     it('returns correct initials for user with just a first name', () => {
-      const user = new User();
+      const user = new User('', '', translateForTest);
       user.name('John');
 
       expect(user.initials()).toBe('JO');
     });
 
     it('returns correct initials for user with middle name', () => {
-      const user = new User();
+      const user = new User('', '', translateForTest);
       user.name('John Peter Doe');
 
       expect(user.initials()).toBe('JD');
     });
 
     it('returns correct initials for user with one character as name', () => {
-      const user = new User();
+      const user = new User('', '', translateForTest);
       user.name('J');
 
       expect(user.initials()).toBe('J');
     });
 
     it('returns correct initials for user with an emoji as name', () => {
-      const user = new User();
+      const user = new User('', '', translateForTest);
       user.name('🐒');
 
       expect(user.initials()).toBe('🐒');
@@ -68,7 +70,7 @@ describe('User', () => {
       const second_client = new ClientEntity(false, null);
       second_client.id = '575b7a890cdb7635';
 
-      const user = new User();
+      const user = new User('', '', translateForTest);
       user.addClient(first_client);
       user.addClient(second_client);
       user.addClient(second_client);
@@ -85,7 +87,7 @@ describe('User', () => {
       newerClient.id = 'newer-client';
       newerClient.time = '2024-01-02T00:00:00.000Z';
 
-      const user = new User();
+      const user = new User('', '', translateForTest);
       user.isMe = true;
 
       user.addClient(olderClient);
@@ -97,7 +99,7 @@ describe('User', () => {
 
   describe('accent_color', () => {
     it('can change the accent color', () => {
-      const userEntity = new User();
+      const userEntity = new User('', '', translateForTest);
       userEntity.accent_id(ACCENT_ID.BLUE);
 
       expect(userEntity.accent_color()).toBe(User.ACCENT_COLOR[ACCENT_ID.BLUE]);
@@ -111,6 +113,19 @@ describe('User', () => {
       userEntity.accent_id(undefined);
 
       expect(userEntity.accent_color()).toBe(User.ACCENT_COLOR[ACCENT_ID.BLUE]);
+    });
+  });
+
+  describe('translation injection', () => {
+    it('uses the injected translate function for temporary guest expiration text', () => {
+      const translate = jest.fn((translationKey: string, replacements?: {time: number}) => {
+        return `translated:${translationKey}:${replacements?.time}`;
+      });
+      const user = new User('', '', translate);
+
+      user.setGuestExpiration(Date.now() + 30 * TIME_IN_MILLIS.MINUTE);
+
+      expect(user.expirationText()).toBe('translated:userRemainingTimeMinutes:30');
     });
   });
 });

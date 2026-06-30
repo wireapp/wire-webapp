@@ -38,7 +38,7 @@ import {useScrollMessages} from 'Components/MessagesList/VirtualizedMessagesList
 import {useRoveFocus} from 'Hooks/useRoveFocus';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {VirtualizedJumpToLastMessageButton} from '../VirtualizedJumpToLastMessageButton';

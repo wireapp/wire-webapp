@@ -18,7 +18,7 @@
  */
 
 import {CellsSearchInput} from 'Components/CellsSearchInput/CellsSearchInput';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {wrapperStyles} from './CellsSearch.styles';
 
@@ -28,15 +28,19 @@ interface CellsSearchProps {
   onClearSearch: () => void;
 }
 
-export const CellsSearch = ({searchValue, onSearch, onClearSearch}: CellsSearchProps) => (
-  <div css={wrapperStyles}>
-    <CellsSearchInput
-      value={searchValue}
-      placeholder={t('cells.search.placeholder')}
-      onChange={onSearch}
-      onClear={onClearSearch}
-      clearAriaLabel={t('cells.search.closeButton')}
-      uieName="cells-search-input"
-    />
-  </div>
-);
+export const CellsSearch = ({searchValue, onSearch, onClearSearch}: CellsSearchProps) => {
+  const {translate} = useApplicationContext();
+
+  return (
+    <div css={wrapperStyles}>
+      <CellsSearchInput
+        value={searchValue}
+        placeholder={translate('cells.search.placeholder')}
+        onChange={onSearch}
+        onClear={onClearSearch}
+        clearAriaLabel={translate('cells.search.closeButton')}
+        uieName="cells-search-input"
+      />
+    </div>
+  );
+};

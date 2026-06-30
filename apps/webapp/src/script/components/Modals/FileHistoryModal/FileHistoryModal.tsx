@@ -18,6 +18,7 @@
  */
 
 import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
 import {FileHistoryContent} from './FileHistoryContent';
@@ -30,6 +31,7 @@ import {useFileVersions} from './hooks/useFileVersions';
 import {ModalComponent} from '../ModalComponent';
 
 export const FileHistoryModal = () => {
+  const {translate} = useApplicationContext();
   const {isOpen, hideModal, nodeUuid, onRestore} = useFileHistoryModal();
   const {
     fileVersions,
@@ -39,7 +41,11 @@ export const FileHistoryModal = () => {
     toBeRestoredVersionId,
     setToBeRestoredVersionId,
     handleRestore,
-  } = useFileVersions(nodeUuid, hideModal, onRestore);
+  } = useFileVersions(nodeUuid, hideModal, onRestore, {
+    failedToLoadVersions: translate('fileHistoryModal.failedToLoadVersions'),
+    failedToRestore: translate('fileHistoryModal.failedToRestore'),
+    invalidNodeData: translate('fileHistoryModal.invalidNodeData'),
+  });
 
   return (
     <ModalComponent

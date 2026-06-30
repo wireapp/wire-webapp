@@ -48,13 +48,14 @@ import {Backend} from './env/backend';
 import {GenericAPI} from './generic/genericApi';
 import {GiphyAPI} from './giphy/giphyApi';
 import {BackendError, HttpClient} from './http/';
+import {MeetingsAPI} from './meetings/meetingsApi';
 import {NotificationAPI} from './notification/';
 import {OAuthAPI} from './oauth/oAuthApi';
 import {ObfuscationUtil} from './obfuscation';
 import {SelfAPI} from './self/';
 import {ServiceProviderAPI} from './serviceProvider';
 import {ServicesAPI} from './services';
-import {OnConnect, WebSocketClient} from './tcp/';
+import {OnConnect, ReconnectingWebsocketWallClock, WebSocketClient} from './tcp/';
 import {
   FeatureAPI,
   IdentityProviderAPI,
@@ -83,8 +84,19 @@ enum TOPIC {
 }
 
 const defaultConfig = {
+  wallClock: {
+    clearInterval: globalThis.clearInterval.bind(globalThis),
+    clearTimeout: globalThis.clearTimeout.bind(globalThis),
+
+    get currentTimestampInMilliseconds() {
+      return Date.now();
+    },
+
+    setInterval: globalThis.setInterval.bind(globalThis),
+    setTimeout: globalThis.setTimeout.bind(globalThis),
+  },
   urls: Backend.PRODUCTION,
-} as Config;
+} as Config & APIClientConfiguration;
 
 export interface APIClient {
   on(event: TOPIC.ON_LOGOUT, listener: (error: InvalidTokenError) => void): this;
@@ -94,9 +106,11 @@ export interface APIClient {
   on(event: TOPIC.ACCESS_TOKEN_REFRESH, listener: (accessToken: AccessTokenData) => void): this;
 }
 
-export type APIClientConfiguration = {};
+export type APIClientConfiguration = {
+  readonly wallClock: ReconnectingWebsocketWallClock;
+};
 
-export type APIClientConstructorConfiguration = Config & APIClientConfiguration;
+export type APIClientConstructorConfiguration = Config & Partial<APIClientConfiguration>;
 
 type Apis = {
   account: AccountAPI;
@@ -108,6 +122,7 @@ type Apis = {
   connection: ConnectionAPI;
   conversation: ConversationAPI;
   giphy: GiphyAPI;
+  meetings: MeetingsAPI;
   notification: NotificationAPI;
   oauth: OAuthAPI;
   self: SelfAPI;
@@ -166,7 +181,7 @@ export class APIClient extends EventEmitter {
   private readonly accessTokenStore: AccessTokenStore;
   public context?: Context;
   public transport: {http: HttpClient; ws: WebSocketClient};
-  public config: Config;
+  public config: Config & APIClientConfiguration;
   public backendFeatures: BackendFeatures;
 
   // Store reference to cookie listener for cleanup
@@ -192,7 +207,9 @@ export class APIClient extends EventEmitter {
     this.logger = LogFactory.getLogger('@wireapp/api-client/Client');
 
     const httpClient = new HttpClient(this.config, this.accessTokenStore);
-    const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
+    const webSocket = new WebSocketClient(this.config.urls.ws, httpClient, {
+      wallClock: this.config.wallClock,
+    });
 
     const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError) => {
       try {
@@ -237,6 +254,7 @@ export class APIClient extends EventEmitter {
       connection: new ConnectionAPI(this.transport.http),
       conversation: new ConversationAPI(this.transport.http, backendFeatures),
       giphy: new GiphyAPI(this.transport.http),
+      meetings: new MeetingsAPI(this.transport.http),
       notification: new NotificationAPI(this.transport.http),
       oauth: new OAuthAPI(this.transport.http),
       self: new SelfAPI(this.transport.http),

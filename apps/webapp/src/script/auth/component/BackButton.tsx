@@ -21,16 +21,17 @@ import {useNavigate} from 'react-router';
 
 import {ArrowIcon, COLOR} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const BackButton = () => {
+  const {translate} = useApplicationContext();
   const navigate = useNavigate();
 
   return (
     <button
       type="button"
       onClick={() => navigate(-1)}
-      aria-label={t('createPersonalAccount.goBack')}
+      aria-label={translate('createPersonalAccount.goBack')}
       data-uie-name="go-index"
       css={{background: 'none', border: 'none', cursor: 'pointer'}}
     >

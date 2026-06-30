@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {StorageKey, StorageRepository} from 'Repositories/storage';
 
 export const DRAFT_STATE_CHANGED_EVENT = 'conversation.draft-changed';

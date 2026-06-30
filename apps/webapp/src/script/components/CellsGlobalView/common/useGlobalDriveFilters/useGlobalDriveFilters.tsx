@@ -29,34 +29,25 @@ import {
   isFilterTypeDisabled,
 } from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
 import {FILE_TYPE_CATALOG} from 'Components/Conversation/ConversationCells/common/driveFilters/fileTypeCatalog';
+import {useDriveEnabledConversationFilterItems} from 'Components/Conversation/ConversationCells/common/useDriveEnabledConversationFilterItems/useDriveEnabledConversationFilterItems';
+import {useDriveEnabledParticipantFilterItems} from 'Components/Conversation/ConversationCells/common/useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
 import {useGetAllTags} from 'Components/Conversation/ConversationCells/common/useGetAllTags/useGetAllTags';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
-
-// ---------------------------------------------------------------------------
-// Mock data — replace each array with an API call in the integration sprint.
-// ---------------------------------------------------------------------------
-
-const MOCK_CONVERSATIONS: FilterItem[] = [
-  {id: 'conv-1', label: 'Marketing Team'},
-  {id: 'conv-2', label: 'Engineering'},
-  {id: 'conv-3', label: 'Design'},
-];
-
-const MOCK_CREATORS: FilterItem[] = [
-  {id: 'a-user', label: 'A User', subLabel: '@auser'},
-  {id: 'hello-user', label: 'Hello User', subLabel: '@hellouser'},
-  {id: 'b-user', label: 'B User', subLabel: '@buser'},
-];
-
-// ---------------------------------------------------------------------------
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 
 export const useGlobalDriveFilters = ({
   cellsRepository,
+  conversationRepository,
+  translate,
 }: {
   cellsRepository: CellsRepository;
+  conversationRepository: ConversationRepository;
+  translate: RootContextValue['translate'];
 }): {filters: FilterConfig[]; filterState: GlobalDriveFiltersState} => {
   const {tags: allTags} = useGetAllTags({cellsRepository});
+  const creatorItems = useDriveEnabledParticipantFilterItems({conversationRepository});
+  const conversationItems = useDriveEnabledConversationFilterItems({conversationRepository});
 
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [selectedFileTypeIds, setSelectedFileTypeIds] = useState<string[]>([]);
@@ -83,10 +74,10 @@ export const useGlobalDriveFilters = ({
     () =>
       FILE_TYPE_CATALOG.map(({id, labelKey, Icon}) => ({
         id,
-        label: t(labelKey),
+        label: translate(labelKey),
         startContent: <Icon />,
       })),
-    [],
+    [translate],
   );
 
   const filters = useMemo<FilterConfig[]>(
@@ -94,7 +85,7 @@ export const useGlobalDriveFilters = ({
       {
         type: 'popover',
         id: 'tags',
-        label: t('cells.filter.tags'),
+        label: translate('cells.filter.tags'),
         items: tagItems,
         selectedIds: selectedTagIds,
         onSelectionChange: setSelectedTagIds,
@@ -104,7 +95,7 @@ export const useGlobalDriveFilters = ({
       {
         type: 'popover',
         id: 'fileType',
-        label: t('cells.filter.fileType'),
+        label: translate('cells.filter.fileType'),
         items: fileTypes,
         selectedIds: selectedFileTypeIds,
         onSelectionChange: setSelectedFileTypeIds,
@@ -114,8 +105,8 @@ export const useGlobalDriveFilters = ({
       {
         type: 'popover',
         id: 'conversation',
-        label: t('cells.filter.conversation'),
-        items: MOCK_CONVERSATIONS,
+        label: translate('cells.filter.conversation'),
+        items: conversationItems,
         selectedIds: selectedConversationIds,
         onSelectionChange: setSelectedConversationIds,
         disabled: isFilterTypeDisabled('conversation', activeFilterType),
@@ -124,8 +115,8 @@ export const useGlobalDriveFilters = ({
       {
         type: 'popover',
         id: 'createdBy',
-        label: t('cells.filter.createdBy'),
-        items: MOCK_CREATORS,
+        label: translate('cells.filter.createdBy'),
+        items: creatorItems,
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
         disabled: isFilterTypeDisabled('createdBy', activeFilterType),
@@ -134,7 +125,7 @@ export const useGlobalDriveFilters = ({
       {
         type: 'toggle',
         id: 'sharedViaLink',
-        label: t('cells.filter.sharedViaLink'),
+        label: translate('cells.filter.sharedViaLink'),
         isActive: isSharedViaLink,
         onToggle: toggleSharedViaLink,
         disabled: isFilterTypeDisabled('sharedViaLink', activeFilterType),
@@ -142,6 +133,8 @@ export const useGlobalDriveFilters = ({
     ],
     [
       activeFilterType,
+      conversationItems,
+      creatorItems,
       fileTypes,
       tagItems,
       selectedTagIds,
@@ -150,6 +143,7 @@ export const useGlobalDriveFilters = ({
       selectedCreatorIds,
       isSharedViaLink,
       toggleSharedViaLink,
+      translate,
     ],
   );
 

@@ -18,11 +18,14 @@
  */
 
 import {Config} from '../Config';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {APIClient} from './apiClientSingleton';
 
 describe('APIClientSingleton', () => {
   it('configures wire client metadata headers for backend requests', () => {
-    const apiClient = new APIClient();
+    const apiClient = new APIClient({
+      wallClock: createDeterministicWallClock(),
+    });
 
     try {
       expect(apiClient.config.headers).toEqual({
@@ -35,7 +38,9 @@ describe('APIClientSingleton', () => {
   });
 
   it('uses the incremental http retry backoff http client by default', () => {
-    const apiClient = new APIClient();
+    const apiClient = new APIClient({
+      wallClock: createDeterministicWallClock(),
+    });
 
     try {
       expect(apiClient.transport.http['incrementalRetryBackoffRunner']).toBeDefined();

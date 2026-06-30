@@ -49,6 +49,7 @@ jest.mock('./conversation', () => {
     constructor(..._args: any[]) {}
     // Return unhandled so NotificationService falls back to generic handling in tests
     handleEvent = jest.fn(async () => ({status: 'unhandled' as const}));
+    runDeferredEpochRecovery = jest.fn(async () => undefined);
   }
   return {
     ...actual,
@@ -56,7 +57,8 @@ jest.mock('./conversation', () => {
   };
 });
 
-import {Account, ConnectionState} from './account';
+import {Account} from './account';
+import {ConnectionState} from './connectionState/connectionState';
 import type {MLSService} from './messagingProtocols/mls';
 import {NotificationSource} from './notification';
 
@@ -521,6 +523,28 @@ describe('Account', () => {
             onNotificationStreamProgress: onNotificationStreamProgress,
           });
         });
+      });
+
+      it('emits CLOSED without unlocking websocket when legacy notification catch-up fails after websocket open', async () => {
+        const catchUpError = new Error('Legacy catch-up failed');
+        jest
+          .spyOn(dependencies.account.service!.notification, 'legacyProcessNotificationStream')
+          .mockRejectedValue(catchUpError);
+        const unlock = jest.spyOn(dependencies.apiClient.transport.ws, 'unlock');
+        const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
+
+        const disconnect = await dependencies.account.listen({
+          useLegacy: true,
+          onConnectionStateChanged,
+        });
+
+        await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.CLOSED));
+
+        expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.PROCESSING_NOTIFICATIONS);
+        expect(onConnectionStateChanged).not.toHaveBeenCalledWith(ConnectionState.LIVE);
+        expect(unlock).not.toHaveBeenCalled();
+
+        disconnect();
       });
     });
   });

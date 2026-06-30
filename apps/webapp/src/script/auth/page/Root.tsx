@@ -17,8 +17,9 @@
  *
  */
 
-import {FC, ReactNode, useEffect} from 'react';
+import {FC, ReactNode, useEffect, useMemo} from 'react';
 
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import is from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
@@ -26,9 +27,11 @@ import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {RootProvider} from 'src/script/page/rootProvider';
+import type {Translate} from 'Util/localizerUtil';
 
 import {ClientManager} from './ClientManager';
 import {ConversationJoin} from './ConversationJoin';
@@ -51,6 +54,7 @@ import {VerifyEmailCode} from './VerifyEmailCode';
 import {VerifyEmailLink} from './VerifyEmailLink';
 
 import {Config} from '../../Config';
+import {MainViewModel} from '../../view_model/MainViewModel';
 import {RouteA11y} from '../component/RouteA11y';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -60,7 +64,22 @@ import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
 import {getOAuthQueryString} from '../util/oauthUtil';
 
-interface RootProps {}
+interface RootProps {
+  translate: Translate;
+}
+
+const authFireAndForgetInvoker: FireAndForgetInvoker = {
+  fireAndForget(asyncAction) {
+    void asyncAction();
+  },
+  async waitUntilAllSettled(): Promise<void> {
+    return undefined;
+  },
+};
+
+function createAuthMainViewModel(): MainViewModel {
+  return {} as MainViewModel;
+}
 
 const Title: FC<{title: string; children: ReactNode}> = ({title, children}) => {
   useEffect(() => {
@@ -74,7 +93,34 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   language,
   isFetchingSSOSettings,
   doGetSSOSettings,
+  translate,
 }) => {
+  const rootContextValue = useMemo(() => {
+    return {
+      fireAndForgetInvoker: authFireAndForgetInvoker,
+      mainViewModel: createAuthMainViewModel(),
+      wallClock: createWallClock(),
+      doesApplicationNeedForceReload: false,
+      isFeatureToggleEnabled() {
+        return false;
+      },
+      translate,
+      applicationNavigation: {
+        get currentPathname(): string {
+          return window.location.pathname;
+        },
+        get currentSearch(): string {
+          return window.location.search;
+        },
+        get currentHash(): string {
+          return window.location.hash;
+        },
+        navigateTo(url: string): void {
+          window.location.assign(url);
+        },
+      },
+    };
+  }, [translate]);
   // Injects the helper class used by useRouteA11y so programmatic focus targets (for screen readers)
   // lose their outlines while the focus trap is active.
   useEffect(() => {
@@ -102,8 +148,8 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   }, []);
 
   useEffect(() => {
-    doGetSSOSettings();
-  }, []);
+    void doGetSSOSettings();
+  }, [doGetSSOSettings]);
 
   const loadLanguage = (language: string) => {
     return require(`I18n/${mapLanguage(language)}.json`);
@@ -149,100 +195,104 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   const brandName = Config.getConfig().BRAND_NAME;
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
-      <StyledApp
-        themeId={THEME_ID.DEFAULT}
-        style={{alignContent: 'center', height: '100%', minHeight: '100vh', display: 'flex'}}
-      >
-        {isFetchingSSOSettings ? (
-          <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
-            <Loading />
-          </ContainerXS>
-        ) : (
-          <Router>
-            <RouteA11y />
-            <Routes>
-              <Route
-                path={ROUTE.INDEX}
-                element={
-                  <Title title={`${t('authLandingPageTitleP1')} ${brandName} . ${t('authLandingPageTitleP2')}`}>
-                    <Index />
-                  </Title>
-                }
-              />
-              <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
-              <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
-              <Route path={ROUTE.CONVERSATION_JOIN} element={<ConversationJoin />} />
-              <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
-              <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
-              <Route path={ROUTE.CUSTOM_BACKEND} element={<CustomBackend />} />
-              <Route path={ROUTE.SUCCESS} element={<Success />} />
-              <Route
-                path={`${ROUTE.LOGIN}/*`}
-                element={
-                  <Title title={`${t('authLoginTitle')} . ${brandName}`}>
-                    <Login />
-                  </Title>
-                }
-              />
-              <Route
-                path={ROUTE.SET_ACCOUNT_TYPE}
-                element={
-                  <Title title={`${t('authAccCreationTitle')} . ${brandName}`}>
-                    <SetAccountType />
-                  </Title>
-                }
-              />
-              <Route path={ROUTE.SET_EMAIL} element={<ProtectedSetEmail />} />
-              <Route
-                path={ROUTE.SET_HANDLE}
-                element={
-                  <Title title={`${t('authSetUsername')} . ${brandName}`}>
-                    <ProtectedSetHandle />
-                  </Title>
-                }
-              />
-              <Route
-                path={ROUTE.SET_PASSWORD}
-                element={
-                  <Title title={`${t('authForgotPasswordTitle')} . ${brandName}`}>
-                    <ProtectedSetPassword />
-                  </Title>
-                }
-              />
-              <Route path={`${ROUTE.SSO}`}>
+      <RootProvider value={rootContextValue}>
+        <StyledApp
+          themeId={THEME_ID.DEFAULT}
+          style={{alignContent: 'center', height: '100%', minHeight: '100vh', display: 'flex'}}
+        >
+          {isFetchingSSOSettings ? (
+            <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
+              <Loading />
+            </ContainerXS>
+          ) : (
+            <Router>
+              <RouteA11y />
+              <Routes>
                 <Route
-                  path=""
+                  path={ROUTE.INDEX}
                   element={
-                    <Title title={`${t('authLoginTitle')} . ${brandName}`}>
-                      <SingleSignOn />
+                    <Title
+                      title={`${translate('authLandingPageTitleP1')} ${brandName} . ${translate('authLandingPageTitleP2')}`}
+                    >
+                      <Index />
+                    </Title>
+                  }
+                />
+                <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
+                <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
+                <Route path={ROUTE.CONVERSATION_JOIN} element={<ConversationJoin />} />
+                <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
+                <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
+                <Route path={ROUTE.CUSTOM_BACKEND} element={<CustomBackend />} />
+                <Route path={ROUTE.SUCCESS} element={<Success />} />
+                <Route
+                  path={`${ROUTE.LOGIN}/*`}
+                  element={
+                    <Title title={`${translate('authLoginTitle')} . ${brandName}`}>
+                      <Login />
                     </Title>
                   }
                 />
                 <Route
-                  path=":code"
+                  path={ROUTE.SET_ACCOUNT_TYPE}
                   element={
-                    <Title title={`${t('authSSOLoginTitle')} . ${brandName}`}>
-                      <SingleSignOn />
+                    <Title title={`${translate('authAccCreationTitle')} . ${brandName}`}>
+                      <SetAccountType />
                     </Title>
                   }
                 />
-              </Route>
-              <Route path={ROUTE.VERIFY_EMAIL_LINK} element={<VerifyEmailLink />} />
-              <Route path={ROUTE.CUSTOM_ENV_REDIRECT} element={<CustomEnvironmentRedirect />} />
-              {Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (
-                <Route path={ROUTE.SET_ENTROPY} element={<SetEntropyPage />} />
-              )}
-              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.VERIFY_EMAIL_CODE} element={<VerifyEmailCode />} />
-              )}
-              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.CREATE_ACCOUNT} element={<CreatePersonalAccount />} />
-              )}
-              <Route path="*" element={<Navigate to={ROUTE.INDEX} replace />} />
-            </Routes>
-          </Router>
-        )}
-      </StyledApp>
+                <Route path={ROUTE.SET_EMAIL} element={<ProtectedSetEmail />} />
+                <Route
+                  path={ROUTE.SET_HANDLE}
+                  element={
+                    <Title title={`${translate('authSetUsername')} . ${brandName}`}>
+                      <ProtectedSetHandle />
+                    </Title>
+                  }
+                />
+                <Route
+                  path={ROUTE.SET_PASSWORD}
+                  element={
+                    <Title title={`${translate('authForgotPasswordTitle')} . ${brandName}`}>
+                      <ProtectedSetPassword />
+                    </Title>
+                  }
+                />
+                <Route path={`${ROUTE.SSO}`}>
+                  <Route
+                    path=""
+                    element={
+                      <Title title={`${translate('authLoginTitle')} . ${brandName}`}>
+                        <SingleSignOn />
+                      </Title>
+                    }
+                  />
+                  <Route
+                    path=":code"
+                    element={
+                      <Title title={`${translate('authSSOLoginTitle')} . ${brandName}`}>
+                        <SingleSignOn />
+                      </Title>
+                    }
+                  />
+                </Route>
+                <Route path={ROUTE.VERIFY_EMAIL_LINK} element={<VerifyEmailLink />} />
+                <Route path={ROUTE.CUSTOM_ENV_REDIRECT} element={<CustomEnvironmentRedirect />} />
+                {Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (
+                  <Route path={ROUTE.SET_ENTROPY} element={<SetEntropyPage />} />
+                )}
+                {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                  <Route path={ROUTE.VERIFY_EMAIL_CODE} element={<VerifyEmailCode />} />
+                )}
+                {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                  <Route path={ROUTE.CREATE_ACCOUNT} element={<CreatePersonalAccount />} />
+                )}
+                <Route path="*" element={<Navigate to={ROUTE.INDEX} replace />} />
+              </Routes>
+            </Router>
+          )}
+        </StyledApp>
+      </RootProvider>
     </IntlProvider>
   );
 };

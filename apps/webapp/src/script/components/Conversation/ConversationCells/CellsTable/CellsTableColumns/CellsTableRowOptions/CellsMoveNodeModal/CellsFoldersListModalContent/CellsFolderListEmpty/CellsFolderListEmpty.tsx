@@ -17,14 +17,16 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {textStyles, wrapperStyles} from './CellsFolderListEmpty.styles';
 
 export const CellsFolderListEmpty = () => {
+  const {translate} = useApplicationContext();
+
   return (
     <div css={wrapperStyles}>
-      <p css={textStyles}>{t('cells.moveNodeModal.emptyList')}</p>
+      <p css={textStyles}>{translate('cells.moveNodeModal.emptyList')}</p>
     </div>
   );
 };

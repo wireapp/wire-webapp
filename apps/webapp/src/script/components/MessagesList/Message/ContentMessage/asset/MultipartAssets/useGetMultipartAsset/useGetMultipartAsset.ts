@@ -20,7 +20,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 type Status = 'idle' | 'loading' | 'success' | 'error' | 'retrying';
 

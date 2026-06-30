@@ -51,7 +51,7 @@ import {
 import {MLSServiceEvents} from '../../messagingProtocols/mls/mlsService/mlsService';
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
-import {openDB} from '../../storage/coreDb';
+import {CoreDatabase, openDB} from '../../storage/coreDb';
 import * as PayloadHelper from '../../test/payloadHelper';
 import * as MessageBuilder from '../message/messageBuilder';
 import {SubconversationService} from '../subconversationService/subconversationService';
@@ -788,6 +788,81 @@ describe('ConversationService', () => {
       await conversationService.handleEvent(mockMLSMessageAddEvent);
 
       await new Promise(resolve => setImmediate(resolve));
+
+      expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);
+      expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {conversationId});
+    });
+
+    it('defers MLS epoch recovery during notification replay and runs recovery after LIVE', async () => {
+      const client = new APIClient({urls: APIClient.BACKEND.STAGING});
+      apiClients.push(client);
+      jest.spyOn(client.api.conversation, 'postMlsMessage').mockResolvedValue({
+        events: [],
+        time: new Date().toISOString(),
+      });
+      jest.spyOn(client.api.user, 'postListClients').mockResolvedValue({
+        qualified_user_map: {},
+      });
+      jest
+        .spyOn(client.api.user, 'getUserSupportedProtocols')
+        .mockResolvedValue([CONVERSATION_PROTOCOL.MLS, CONVERSATION_PROTOCOL.PROTEUS]);
+      client.context = {
+        clientType: ClientType.NONE,
+        userId: PayloadHelper.getUUID(),
+        clientId: PayloadHelper.getUUID(),
+      };
+
+      const mockedMLSService = {
+        on: jest.fn(),
+        handleMLSMessageAddEvent: jest.fn(),
+        getSafeEpoch: jest.fn(),
+        joinByExternalCommit: jest.fn(),
+      };
+
+      const mockedDb = {
+        get: jest.fn().mockResolvedValue(undefined),
+      } as unknown as CoreDatabase;
+
+      let isConnectionLive = false;
+
+      const conversationService = new ConversationService(
+        client,
+        {} as ProteusService,
+        mockedDb,
+        async () => 'mock-group-id',
+        {joinConferenceSubconversation: jest.fn()} as unknown as SubconversationService,
+        () => Promise.resolve(true),
+        mockedMLSService as unknown as MLSService,
+        () => isConnectionLive,
+      );
+
+      jest.spyOn(conversationService, 'joinByExternalCommit');
+      jest.spyOn(conversationService, 'emit');
+
+      const conversationId = {id: 'conversationId', domain: 'staging.zinfra.io'};
+      const mockMLSMessageAddEvent = createMLSMessageAddEventMock(conversationId);
+
+      const wrongEpochError = new Error();
+      wrongEpochError.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch;
+
+      jest.spyOn(mockedMLSService, 'handleMLSMessageAddEvent').mockRejectedValue(wrongEpochError);
+
+      jest.spyOn(mockedMLSService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(4)));
+
+      jest.spyOn(client.api.conversation, 'getConversation').mockResolvedValue({
+        qualified_id: conversationId,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        epoch: 5,
+        group_id: 'mock-group-id',
+      } as unknown as Conversation);
+
+      await conversationService.handleEvent(mockMLSMessageAddEvent);
+
+      expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
+      expect(conversationService.emit).not.toHaveBeenCalledWith('MLSConversationRecovered', {conversationId});
+
+      isConnectionLive = true;
+      await conversationService.runDeferredEpochRecovery();
 
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);
       expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {conversationId});

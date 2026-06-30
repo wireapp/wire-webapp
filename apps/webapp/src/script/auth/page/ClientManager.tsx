@@ -26,7 +26,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, Muted, QUERY, Text, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Page} from './Page';
 
@@ -40,6 +40,7 @@ import {getEnterpriseLoginV2FF} from '../util/helpers';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
   const isMobile = useMatchMedia(QUERY.mobile);
@@ -54,13 +55,13 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
     () => {
       localStorage.removeItem(QUERY_KEY.CONVERSATION_CODE);
       localStorage.removeItem(QUERY_KEY.JOIN_EXPIRES);
-      logout();
+      void logout();
     },
     timeRemaining - Date.now() > 0 ? timeRemaining - Date.now() : 0,
   );
 
   useEffect(() => {
-    doGetAllClients();
+    void doGetAllClients();
     if (is.nonEmptyString(SFAcode)) {
       startTimeout();
     }
@@ -69,7 +70,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
   const logout = async () => {
     try {
       await doLogout();
-    } catch (error: unknown) {
+    } catch {
       // ignore errors on logout
     }
   };
@@ -88,7 +89,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
         }}
       >
         <Text center block style={{marginTop: '1rem', fontSize: '1.5rem', fontWeight: '500'}}>
-          {t('clientManager.headline')}
+          {translate('clientManager.headline')}
         </Text>
         <Muted
           center
@@ -98,8 +99,8 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
           data-uie-name="status-device-limit-info"
         >
           {isOauth
-            ? t('clientManager.oauth', {device})
-            : t('clientManager.subhead', {brandName: Config.getConfig().BRAND_NAME})}
+            ? translate('clientManager.oauth', {device})
+            : translate('clientManager.subhead', {brandName: Config.getConfig().BRAND_NAME})}
         </Muted>
         <ClientList />
         <Button
@@ -108,7 +109,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
           style={{alignSelf: 'center', margin: '48px 0 1rem 0'}}
           data-uie-name="go-sign-out"
         >
-          {t('clientManager.logout')}
+          {translate('clientManager.logout')}
         </Button>
       </ContainerXS>
     </Page>
@@ -116,7 +117,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({});
+const mapStateToProps = (): RootState extends never ? never : {} => ({});
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>

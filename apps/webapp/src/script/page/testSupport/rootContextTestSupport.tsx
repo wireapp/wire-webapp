@@ -19,20 +19,24 @@
 
 import {ReactNode} from 'react';
 
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {noop} from 'noop-esm';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {WallClock, createWallClock} from '../../clock/wallClock';
+import type {Translate} from 'Util/localizerUtil';
+
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../../view_model/MainViewModel';
-import {RootContextValue, RootProvider} from '../RootProvider';
+import {RootContextValue, RootProvider} from '../rootProvider';
 
 type CreateRootContextValueForTestParameters = {
   readonly doesApplicationNeedForceReload?: boolean;
   readonly fireAndForgetInvoker?: FireAndForgetInvoker;
   readonly isFeatureToggleEnabled?: (featureName: StartupFeatureToggleName) => boolean;
   readonly mainViewModel?: MainViewModel;
+  readonly translate: Translate;
   readonly wallClock?: WallClock;
 };
 
@@ -92,6 +96,7 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     fireAndForgetInvoker = createFireAndForgetInvokerForTest(),
     isFeatureToggleEnabled = isFeatureToggleDisabledForTest,
     mainViewModel = createMainViewModelForTest(),
+    translate,
     wallClock = createWallClock(),
   } = parameters;
 
@@ -100,6 +105,7 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     fireAndForgetInvoker,
     isFeatureToggleEnabled,
     mainViewModel,
+    translate,
     wallClock,
     applicationNavigation: {
       get currentPathname(): string {

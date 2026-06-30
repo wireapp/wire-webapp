@@ -31,7 +31,7 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {trackCallQualityFeedback} from 'Repositories/tracking/helpers';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {CALL_QUALITY_FEEDBACK_KEY, CALL_SURVEY_MUTE_INTERVAL, ratingListItems} from './constants';
@@ -50,9 +50,10 @@ const logger = getLogger('CallQualityFeedback');
 
 interface Props {
   callingRepository: CallingRepository;
+  translate: Translate;
 }
 
-export const QualityFeedbackModal = ({callingRepository}: Props) => {
+export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
   const userState = container.resolve(UserState);
   const {conversationId} = useCallAlertState();
   const call = conversationId && callingRepository.findCall(conversationId);
@@ -61,7 +62,7 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const submittedNotification = useAppNotification({
-    message: t('qualityFeedback.notificationSubmitted'),
+    message: translate('qualityFeedback.notificationSubmitted'),
   });
 
   if (!qualityFeedbackModalShown) {
@@ -110,9 +111,9 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
   return (
     <ModalComponent isShown data-uie-name="modal-call-quality-feedback" className="quality-feedback">
       <div css={wrapper}>
-        <h2 css={title}>{t('qualityFeedback.heading')}</h2>
+        <h2 css={title}>{translate('qualityFeedback.heading')}</h2>
 
-        <p css={description}>{t('qualityFeedback.description')}</p>
+        <p css={description}>{translate('qualityFeedback.description')}</p>
 
         <ul css={ratingList}>
           {ratingListItems.map(ratingItem => (
@@ -120,7 +121,7 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
               {ratingItem?.headingTranslationKey && (
                 // headingTranslationKey has to broad type to specify it
                 // TODO: narrow down the type
-                <div css={ratingItemHeading}>{t(ratingItem.headingTranslationKey)}</div>
+                <div css={ratingItemHeading}>{translate(ratingItem.headingTranslationKey)}</div>
               )}
               <Button
                 variant={ButtonVariant.TERTIARY}
@@ -144,7 +145,7 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
             data-uie-name="go-skip-call-quality-feedback"
             css={buttonStyle}
           >
-            {t('qualityFeedback.skip')}
+            {translate('qualityFeedback.skip')}
           </Button>
         </div>
 
@@ -156,7 +157,7 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
           >
             <CheckboxLabel className="label-xs" htmlFor="do-not-ask-again-checkbox">
-              {t('qualityFeedback.doNotAskAgain')}
+              {translate('qualityFeedback.doNotAskAgain')}
             </CheckboxLabel>
           </Checkbox>
         </div>

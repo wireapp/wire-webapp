@@ -22,9 +22,10 @@ import ko from 'knockout';
 
 import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
-import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/VerificationMessage';
+import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationMessage';
 import {User} from 'Repositories/entity/User';
-import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {VerificationMessageType} from 'src/script/message/verificationMessageType';
 
 import {VerificationMessage} from './VerificationMessage';
 
@@ -43,10 +44,10 @@ describe('VerificationMessage', () => {
   describe('with verified message', () => {
     it('shows verified icon when message is verified', async () => {
       const message = createVerificationMessage({
-        verificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.VERIFIED),
+        VerificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.VERIFIED),
       });
 
-      const {queryByTestId, getByTestId} = render(<VerificationMessage message={message} />);
+      const {queryByTestId, getByTestId} = render(withTheme(<VerificationMessage message={message} />));
 
       const elementMessageVerification = getByTestId('element-message-verification');
       expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(VerificationMessageType.VERIFIED);
@@ -56,7 +57,7 @@ describe('VerificationMessage', () => {
     it('shows unverified icon when message is not verified', async () => {
       const message = createVerificationMessage({});
 
-      const {queryByTestId} = render(<VerificationMessage message={message} />);
+      const {queryByTestId} = render(withTheme(<VerificationMessage message={message} />));
 
       expect(queryByTestId('element-message-verification')).not.toBeNull();
       expect(queryByTestId('user-device-not-verified')).not.toBeNull();
@@ -66,10 +67,10 @@ describe('VerificationMessage', () => {
   describe('with unverified message', () => {
     it('shows unverified message', async () => {
       const message = createVerificationMessage({
-        verificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.UNVERIFIED),
+        VerificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.UNVERIFIED),
       });
 
-      const {queryByTestId, getByTestId} = render(<VerificationMessage message={message} />);
+      const {queryByTestId, getByTestId} = render(withTheme(<VerificationMessage message={message} />));
 
       const elementMessageVerification = getByTestId('element-message-verification');
       expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(VerificationMessageType.UNVERIFIED);
@@ -82,10 +83,10 @@ describe('VerificationMessage', () => {
   describe('with new device message', () => {
     it('shows new device message', async () => {
       const message = createVerificationMessage({
-        verificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.NEW_DEVICE),
+        VerificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.NEW_DEVICE),
       });
 
-      const {queryByTestId, getByTestId} = render(<VerificationMessage message={message} />);
+      const {queryByTestId, getByTestId} = render(withTheme(<VerificationMessage message={message} />));
 
       const elementMessageVerification = getByTestId('element-message-verification');
       expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(VerificationMessageType.NEW_DEVICE);
@@ -98,10 +99,10 @@ describe('VerificationMessage', () => {
   describe('with new member message', () => {
     it('shows new member message', async () => {
       const message = createVerificationMessage({
-        verificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.NEW_MEMBER),
+        VerificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.NEW_MEMBER),
       });
 
-      const {queryByTestId, getByTestId} = render(<VerificationMessage message={message} />);
+      const {queryByTestId, getByTestId} = render(withTheme(<VerificationMessage message={message} />));
 
       const elementMessageVerification = getByTestId('element-message-verification');
       expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(VerificationMessageType.NEW_MEMBER);

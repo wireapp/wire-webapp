@@ -19,6 +19,7 @@
 
 import {CellsBreadcrumbs} from 'Components/Conversation/ConversationCells/common/CellsBreadcrumbs/CellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from 'Components/Conversation/ConversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CellsCreateNewFolderHint} from './CellsCreateNewFolderHint/CellsCreateNewFolderHint';
 import {CellsFolderList} from './CellsFolderList/CellsFolderList';
@@ -45,7 +46,12 @@ export const CellsFoldersListModalContent = ({
   onPathChange,
   onChangeModalContent,
 }: CellsFoldersListModalContentProps) => {
-  const breadcrumbs = getBreadcrumbsFromPath({baseCrumb: `${conversationName} files`, currentPath});
+  const {translate} = useApplicationContext();
+  const breadcrumbs = getBreadcrumbsFromPath({
+    baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
+    currentPath,
+    recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
+  });
 
   const shouldDisplayEmptyItems = status === 'success' && !items.length;
 

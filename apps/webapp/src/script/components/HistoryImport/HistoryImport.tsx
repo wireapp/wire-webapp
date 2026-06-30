@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -33,9 +33,9 @@ import {
   InvalidPassword,
 } from 'Repositories/backup/error';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {checkBackupEncryption} from 'Util/backupUtil';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {loadFileBuffer} from 'Util/util';
 
@@ -50,6 +50,9 @@ export enum HistoryImportState {
   PREPARING = 'HistoryImportState.STATE.PREPARING',
 }
 
+const HISTORY_IMPORT_DISMISS_DELAY_MULTIPLIER = 2;
+const PERCENTAGE_MULTIPLIER = 100;
+
 interface HistoryImportProps {
   readonly backupRepository: BackupRepository;
   file: File;
@@ -59,6 +62,7 @@ interface HistoryImportProps {
 
 const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImportProps) => {
   const logger = getLogger('HistoryImportViewModel');
+  const {translate} = useApplicationContext();
 
   const [historyImportState, setHistoryImportState] = useState(HistoryImportState.PREPARING);
   const [error, setError] = useState<Error | null>(null);
@@ -67,7 +71,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
 
   const [numberOfRecords, setNumberOfRecords] = useState<number>(0);
   const [numberOfProcessedRecords, setNumberOfProcessedRecords] = useState<number>(0);
-  const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * 100);
+  const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * PERCENTAGE_MULTIPLIER);
 
   const isPreparing = !error && historyImportState === HistoryImportState.PREPARING;
   const isImporting = !error && historyImportState === HistoryImportState.IMPORTING;
@@ -80,126 +84,142 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
   };
 
   const historyImportMessages: Partial<Record<HistoryImportState, string>> = {
-    [HistoryImportState.PREPARING]: t('backupImportProgressHeadline'),
-    [HistoryImportState.IMPORTING]: t('backupImportProgressSecondary', replacements),
+    [HistoryImportState.PREPARING]: translate('backupImportProgressHeadline'),
+    [HistoryImportState.IMPORTING]: translate('backupImportProgressSecondary', replacements),
   };
 
   const loadingMessage = historyImportMessages[historyImportState] ?? '';
 
   const onCancel = () => backupRepository.cancelAction();
 
-  const dismissImport = () => {
+  const dismissImport = useCallback(() => {
     switchContent(ContentState.PREFERENCES_ACCOUNT);
-  };
+  }, [switchContent]);
 
-  const onInit = (numberOfRecords: number) => {
+  const onInit = useCallback((numberOfRecords: number) => {
     setHistoryImportState(HistoryImportState.IMPORTING);
     setNumberOfRecords(numberOfRecords);
     setNumberOfProcessedRecords(0);
-  };
+  }, []);
 
-  const onProgress = (numberProcessed: number) => setNumberOfProcessedRecords(prevState => prevState + numberProcessed);
+  const onProgress = useCallback((numberProcessed: number) => {
+    setNumberOfProcessedRecords(prevState => prevState + numberProcessed);
+  }, []);
 
-  const onSuccess = (): void => {
+  const onSuccess = useCallback((): void => {
     setError(null);
     setHistoryImportState(HistoryImportState.DONE);
 
-    window.setTimeout(dismissImport, MotionDuration.X_LONG * 2);
-  };
+    window.setTimeout(dismissImport, MotionDuration.X_LONG * HISTORY_IMPORT_DISMISS_DELAY_MULTIPLIER);
+  }, [dismissImport]);
 
-  const onError = (error: Error) => {
-    if (error instanceof CancelError) {
-      logger.log('History import was cancelled');
-      dismissImport();
+  const onError = useCallback(
+    (error: Error) => {
+      if (error instanceof CancelError) {
+        logger.log('History import was cancelled');
+        dismissImport();
 
-      return;
-    }
-
-    setError(error);
-    logger.error(`Failed to import history: ${error.message}`, error);
-
-    if (error instanceof DifferentAccountError) {
-      setErrorHeadline(t('backupImportAccountErrorHeadline'));
-      setErrorSecondary(t('backupImportAccountErrorSecondary'));
-    } else if (error instanceof IncompatibleBackupError) {
-      setErrorHeadline(t('backupImportVersionErrorHeadline'));
-      //the "brandname" should be provided
-      //the correct syntax is suspected to create issues with electron's console see https://wearezeta.atlassian.net/browse/WPB-15317
-      //TODO: figure out the issue with the electron console
-      //@ts-expect-error
-      setErrorSecondary(t('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
-    } else if (error instanceof IncompatibleBackupFormatError) {
-      setErrorHeadline(t('backupImportFormatErrorHeadline'));
-      setErrorSecondary(t('backupImportFormatErrorSecondary'));
-    } else if (error instanceof InvalidPassword) {
-      setErrorHeadline(t('backupImportPasswordErrorHeadline'));
-      setErrorSecondary(t('backupImportPasswordErrorSecondary'));
-    } else {
-      setErrorHeadline(t('backupImportGenericErrorHeadline'));
-      setErrorSecondary(t('backupImportGenericErrorSecondary'));
-    }
-  };
-
-  const getBackUpPassword = (): Promise<string> => {
-    return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
-        primaryAction: {
-          action: async (password: string) => {
-            resolve(password);
-          },
-          text: t('backupDecryptionModalAction'),
-        },
-        secondaryAction: [
-          {
-            action: () => {
-              resolve('');
-              dismissImport();
-            },
-            text: t('backupEncryptionModalCloseBtn'),
-          },
-        ],
-        passwordOptional: false,
-        text: {
-          closeBtnLabel: t('backupEncryptionModalCloseBtn'),
-          input: t('backupDecryptionModalPlaceholder'),
-          message: t('backupDecryptionModalMessage'),
-          title: t('backupDecryptionModalTitle'),
-        },
-      });
-    });
-  };
-
-  const importHistory = async (file: File) => {
-    const isEncrypted = await checkBackupEncryption(file);
-
-    if (isEncrypted) {
-      const password = await getBackUpPassword();
-
-      if (password) {
-        await processHistoryImport(file, password);
+        return;
       }
-    } else {
-      await processHistoryImport(file);
-    }
-  };
 
-  const processHistoryImport = async (file: File, password?: string) => {
-    setHistoryImportState(HistoryImportState.PREPARING);
-    setError(null);
+      setError(error);
+      logger.error(`Failed to import history: ${error.message}`, error);
 
-    const data = await loadFileBuffer(file);
+      if (error instanceof DifferentAccountError) {
+        setErrorHeadline(translate('backupImportAccountErrorHeadline'));
+        setErrorSecondary(translate('backupImportAccountErrorSecondary'));
+      } else if (error instanceof IncompatibleBackupError) {
+        setErrorHeadline(translate('backupImportVersionErrorHeadline'));
+        //the "brandname" should be provided
+        //the correct syntax is suspected to create issues with electron's console see https://wearezeta.atlassian.net/browse/WPB-15317
+        //TODO: figure out the issue with the electron console
+        //@ts-expect-error
+        setErrorSecondary(translate('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
+      } else if (error instanceof IncompatibleBackupFormatError) {
+        setErrorHeadline(translate('backupImportFormatErrorHeadline'));
+        setErrorSecondary(translate('backupImportFormatErrorSecondary'));
+      } else if (error instanceof InvalidPassword) {
+        setErrorHeadline(translate('backupImportPasswordErrorHeadline'));
+        setErrorSecondary(translate('backupImportPasswordErrorSecondary'));
+      } else {
+        setErrorHeadline(translate('backupImportGenericErrorHeadline'));
+        setErrorSecondary(translate('backupImportGenericErrorSecondary'));
+      }
+    },
+    [dismissImport, logger, translate],
+  );
 
-    try {
-      await backupRepository.importHistory(user, data, onInit, onProgress, password);
-      onSuccess();
-    } catch (error: unknown) {
-      onError(error as Error);
-    }
-  };
+  const getBackUpPassword = useCallback((): Promise<string> => {
+    return new Promise(resolve => {
+      PrimaryModal.show(
+        PrimaryModal.type.PASSWORD_ADVANCED_SECURITY,
+        {
+          primaryAction: {
+            action: async (password: string) => {
+              resolve(password);
+            },
+            text: translate('backupDecryptionModalAction'),
+          },
+          secondaryAction: [
+            {
+              action: () => {
+                resolve('');
+                dismissImport();
+              },
+              text: translate('backupEncryptionModalCloseBtn'),
+            },
+          ],
+          passwordOptional: false,
+          text: {
+            closeBtnLabel: translate('backupEncryptionModalCloseBtn'),
+            input: translate('backupDecryptionModalPlaceholder'),
+            message: translate('backupDecryptionModalMessage'),
+            title: translate('backupDecryptionModalTitle'),
+          },
+        },
+        undefined,
+        translate,
+      );
+    });
+  }, [dismissImport, translate]);
+
+  const processHistoryImport = useCallback(
+    async (file: File, password?: string) => {
+      setHistoryImportState(HistoryImportState.PREPARING);
+      setError(null);
+
+      const data = await loadFileBuffer(file);
+
+      try {
+        await backupRepository.importHistory(user, data, onInit, onProgress, password);
+        onSuccess();
+      } catch (error: unknown) {
+        onError(error as Error);
+      }
+    },
+    [backupRepository, onError, onInit, onProgress, onSuccess, user],
+  );
+
+  const importHistory = useCallback(
+    async (file: File) => {
+      const isEncrypted = await checkBackupEncryption(file);
+
+      if (isEncrypted) {
+        const password = await getBackUpPassword();
+
+        if (password) {
+          await processHistoryImport(file, password);
+        }
+      } else {
+        await processHistoryImport(file);
+      }
+    },
+    [getBackUpPassword, processHistoryImport],
+  );
 
   useEffect(() => {
-    importHistory(file);
-  }, []);
+    void importHistory(file);
+  }, [file, importHistory]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -211,7 +231,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
 
   return (
     <div style={{height: '100%'}}>
-      <h2 className="visually-hidden">{t('accessibility.headings.historyImport')}</h2>
+      <h2 className="visually-hidden">{translate('accessibility.headings.historyImport')}</h2>
 
       <div id="history-import">
         {isPreparing && <ProgressBar progress={loadingProgress} message={loadingMessage} />}
@@ -221,7 +241,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
             <ProgressBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
 
             <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-cancel-history-import">
-              {t('backupCancel')}
+              {translate('backupCancel')}
             </Button>
           </>
         )}
@@ -230,7 +250,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
           <div className="history-message">
             <Icon.CheckIcon />
             <h2 className="history-message__headline" data-uie-name="status-history-import-success">
-              {t('backupImportSuccessHeadline')}
+              {translate('backupImportSuccessHeadline')}
             </h2>
           </div>
         )}
@@ -252,11 +272,11 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
                 onClick={dismissImport}
                 data-uie-name="do-dismiss-history-import-error"
               >
-                {t('backupCancel')}
+                {translate('backupCancel')}
               </Button>
               <BackupFileUpload
                 onFileChange={handleFileChange}
-                backupImportHeadLine={t('preferencesOptionsBackupTryAgain')}
+                backupImportHeadLine={translate('preferencesOptionsBackupTryAgain')}
                 variant={ButtonVariant.PRIMARY}
               />
             </div>

@@ -1,5 +1,7 @@
-import {Page} from 'playwright/test';
+import {Locator, Page} from 'playwright/test';
+
 import {getUser, User} from 'test/e2e_tests/data/user';
+import {isLocatorVisible, waitForVisible} from 'test/e2e_tests/locators/visibility';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, Team, LOGIN_TIMEOUT, withGuestUser} from 'test/e2e_tests/test.fixtures';
 import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
@@ -13,13 +15,103 @@ import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActio
  * * @returns A promise that resolves to the generated guest link string.
  */
 
-const generateGroupGuestsLink = async (pages: PageManager['webapp']['pages'], groupName: string, password?: string) => {
+async function generateGroupGuestsLink(
+  pages: PageManager['webapp']['pages'],
+  groupName: string,
+  password?: string,
+): Promise<string> {
   await pages.conversationList().getConversation(groupName).open();
   await pages.conversation().toggleGroupInformation();
   await pages.conversationDetails().openGuestOptions();
 
   return await pages.guestOptions().createLink({password});
-};
+}
+
+const guestroomEnterpriseLoginTimeout = 120_000;
+const guestroomEnterpriseLoginPollInterval = 1_000;
+const guestroomEnterpriseLoginMaximumAttempts = Math.ceil(
+  guestroomEnterpriseLoginTimeout / guestroomEnterpriseLoginPollInterval,
+);
+
+async function keepCurrentPageOnTestEnvironment(page: Page): Promise<void> {
+  if (process.env.WEBAPP_URL === undefined) {
+    throw new Error('Missing env var "WEBAPP_URL"');
+  }
+
+  const testEnvironmentUrl = new URL(process.env.WEBAPP_URL);
+  const currentUrl = new URL(page.url());
+
+  currentUrl.protocol = testEnvironmentUrl.protocol;
+  currentUrl.hostname = testEnvironmentUrl.hostname;
+  currentUrl.port = testEnvironmentUrl.port;
+
+  await page.goto(currentUrl.toString());
+}
+
+async function completeEnterpriseGuestroomPostLoginFlow(
+  page: Page,
+  pages: PageManager['webapp']['pages'],
+  components: PageManager['webapp']['components'],
+): Promise<void> {
+  const removeDeviceButton = page.getByRole('button', {name: 'Remove device'}).first();
+  const historyConfirmButton = pages.historyInfo().continueButton;
+  const sidebar = components.conversationSidebar().sidebar;
+
+  for (let attempt = 0; attempt < guestroomEnterpriseLoginMaximumAttempts; attempt += 1) {
+    if (await isLocatorVisible(sidebar)) {
+      return;
+    }
+
+    if (await waitForVisible(removeDeviceButton, 500)) {
+      await removeDeviceButton.click();
+      continue;
+    }
+
+    if (await waitForVisible(historyConfirmButton, 500)) {
+      await historyConfirmButton.click();
+      continue;
+    }
+
+    await page.waitForTimeout(guestroomEnterpriseLoginPollInterval);
+  }
+
+  throw new Error(`Guestroom enterprise login did not reach the sidebar within ${guestroomEnterpriseLoginTimeout}ms`);
+}
+
+async function waitForFirstVisibleLocator(locators: Locator[], timeout: number): Promise<Locator | undefined> {
+  try {
+    return await Promise.any(
+      locators.map(async locator => {
+        await locator.waitFor({state: 'visible', timeout});
+        return locator;
+      }),
+    );
+  } catch {
+    return undefined;
+  }
+}
+
+async function openPasswordJoinFormAsExistingUser(
+  guestPages: PageManager['webapp']['pages'],
+  guestBModals: PageManager['webapp']['modals'],
+  guestUser: User,
+): Promise<void> {
+  const joinAsMemberButton = guestPages.conversationJoin().joinAsMemberButton;
+  const passwordJoinForm = guestBModals.joinGuestLinkPassword().joinForm;
+
+  await guestPages.login().login(guestUser);
+
+  const visiblePostLoginTarget = await waitForFirstVisibleLocator(
+    [joinAsMemberButton, passwordJoinForm],
+    LOGIN_TIMEOUT,
+  );
+
+  if (visiblePostLoginTarget === joinAsMemberButton) {
+    await joinAsMemberButton.click();
+  }
+
+  await expect(passwordJoinForm).toBeVisible();
+}
 
 test.describe('Guestroom', () => {
   let team: Team;
@@ -55,11 +147,7 @@ test.describe('Guestroom', () => {
         await guestPages.conversationJoin().joinBrowserButton.click();
         await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
-        // Allow the login to be retried if the modal doesn't show up automatically, this is a workaround since the login mask for guest links is out of our control
-        await expect(async () => {
-          await guestPages.login().login(guestUser);
-          await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible();
-        }).toPass({timeout: LOGIN_TIMEOUT});
+        await openPasswordJoinFormAsExistingUser(guestPages, guestBModals, guestUser);
 
         await guestBModals.joinGuestLinkPassword().joinConversation('WrongPassword');
         await expect(guestBModals.joinGuestLinkPassword().joinForm).toContainText(
@@ -164,7 +252,7 @@ test.describe('Guestroom', () => {
       await pages.conversation().toggleGroupInformation();
       await expect(pages.conversationDetails().groupMembers.filter({hasText: guestUser.firstName})).toBeVisible();
 
-      await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
+      await pages.conversationDetails().getParticipant(guestUser.firstName).openDetails();
       await verify(pages);
     });
   });
@@ -395,7 +483,7 @@ test.describe('Guestroom', () => {
         await expect(guestMember).toBeVisible({timeout: LOGIN_TIMEOUT});
 
         await userAPage.waitForTimeout(60_000);
-        await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
+        await pages.conversationDetails().getParticipant(guestUser.firstName).openDetails();
         await expect(pages.participantDetails().userStatus).toBeVisible();
       });
 
@@ -417,7 +505,7 @@ test.describe('Guestroom', () => {
       const createdLink = await generateGroupGuestsLink(pages, groupName);
 
       await createPage(withGuestUser(createdLink, guestUser.firstName));
-      await expect(pages.conversation().guestsIndicator).toBeVisible();
+      await expect(pages.conversation().statusIndicator).toContainText('Guests are present');
     },
   );
 
@@ -571,7 +659,7 @@ test.describe('Guestroom', () => {
       await test.step('User A sees guest details (to trigger access validation) after 1 minute', async () => {
         await pages.conversation().toggleGroupInformation();
         await userAPage.waitForTimeout(60_000);
-        await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
+        await pages.conversationDetails().getParticipant(guestUser.firstName).openDetails();
         await expect(pages.participantDetails().userStatus).toBeVisible();
       });
 
@@ -593,6 +681,7 @@ test.describe('Guestroom', () => {
     'I want to join guestroom invite with enterprise login',
     {tag: ['@TC-3477', '@regression']},
     async ({context, createPage}) => {
+      test.setTimeout(150_000); // Due to the two logins this test can sometimes take a bit longer
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage(context)]);
 
       const userAPageManager = PageManager.from(userAPage).webapp;
@@ -605,6 +694,7 @@ test.describe('Guestroom', () => {
 
       await guestPage.goto(createdLink.toString());
       await guestPages.conversationJoin().joinBrowserButton.click();
+      await keepCurrentPageOnTestEnvironment(guestPage);
       await expect(guestPages.conversationJoin().enterpriseLoginButton).toBeVisible();
 
       await guestPages.conversationJoin().enterpriseLoginButton.click();
@@ -619,15 +709,7 @@ test.describe('Guestroom', () => {
       await idpPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
       await idpPage.getByRole('button', {name: 'Sign In'}).click();
 
-      await guestPage.getByRole('button', {name: 'Remove device'}).first().click({timeout: LOGIN_TIMEOUT});
-      // // We will also always be prompted to confirm the new history on this device
-      await guestPages.historyInfo().clickConfirmButton();
-
-      await expect(guestComponents.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible(
-        {
-          timeout: LOGIN_TIMEOUT,
-        },
-      );
+      await completeEnterpriseGuestroomPostLoginFlow(guestPage, guestPages, guestComponents);
 
       await expect(guestPages.conversationList().getConversation(groupName)).toBeVisible();
     },

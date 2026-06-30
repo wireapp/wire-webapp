@@ -21,20 +21,23 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
 import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import 'src/script/localization/Localizer';
-import {StatusType} from 'src/script/message/StatusType';
+import {StatusType} from 'src/script/message/statusType';
+import {translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {Conversation} from './Conversation';
-import {ContentMessage} from './message/ContentMessage';
-import {Message} from './message/Message';
-import {PingMessage} from './message/PingMessage';
-import {Text} from './message/Text';
+import {ContentMessage} from './message/contentMessage';
+import {Message} from './message/message';
+import {PingMessage} from './message/pingMessage';
+import {Text} from './message/text';
 import {User} from './User';
 
 import {entities} from '../../../../test/api/payloads';
@@ -44,20 +47,32 @@ describe('Conversation', () => {
   let conversation_et: Conversation = null;
   let other_user: User = null;
 
-  const self_user = new User(entities.user.john_doe.id, null);
+  const self_user = new User(entities.user.john_doe.id, null, translateForTest);
   self_user.isMe = true;
 
   const first_timestamp = new Date('2017-09-26T09:21:14.225Z').getTime();
   const second_timestamp = new Date('2017-09-26T10:27:18.837Z').getTime();
   const third_timestamp = new Date('2017-09-26T11:29:21.837Z').getTime();
 
+  function createMessageForTest(id: string = createUuid()) {
+    return new Message(id, undefined, translateForTest);
+  }
+
+  function createLocalizedConversationForTest(
+    conversationId: string = '',
+    domain: string = '',
+    protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS,
+  ) {
+    return new Conversation(conversationId, domain, protocol, translate);
+  }
+
   beforeEach(() => {
-    conversation_et = new Conversation();
-    other_user = new User(entities.user.jane_roe.id, null);
+    conversation_et = createLocalizedConversationForTest();
+    other_user = new User(entities.user.jane_roe.id, null, translateForTest);
   });
 
   describe('type checks', () => {
-    beforeEach(() => (conversation_et = new Conversation()));
+    beforeEach(() => (conversation_et = createLocalizedConversationForTest()));
 
     it('should return the expected value for personal conversations', () => {
       conversation_et.type(CONVERSATION_TYPE.CONNECT);
@@ -138,11 +153,23 @@ describe('Conversation', () => {
     });
   });
 
+  describe('translation injection', () => {
+    it('uses the injected translate function for unavailable 1:1 display names', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translate);
+
+      conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+      conversation.participating_user_ets([new User('', '', translateForTest)]);
+
+      expect(conversation.display_name()).toBe('translated:unavailableUser');
+    });
+  });
+
   describe('add message', () => {
     let initial_message_et: Message = undefined;
 
     beforeEach(() => {
-      initial_message_et = new Message(createUuid());
+      initial_message_et = createMessageForTest();
       initial_message_et.timestamp(first_timestamp);
       conversation_et.addMessage(initial_message_et);
     });
@@ -157,7 +184,7 @@ describe('Conversation', () => {
 
     it('does not add new message if it already exists in the message list', () => {
       const initialLength = conversation_et.messages().length;
-      const newMessageEntity = new Message(createUuid());
+      const newMessageEntity = createMessageForTest();
       newMessageEntity.id = initial_message_et.id;
 
       conversation_et.addMessage(newMessageEntity);
@@ -167,7 +194,7 @@ describe('Conversation', () => {
     });
 
     it('should add message with a newer timestamp', () => {
-      const message_et = new Message(createUuid());
+      const message_et = createMessageForTest();
       message_et.timestamp(second_timestamp);
 
       conversation_et.addMessage(message_et);
@@ -181,7 +208,7 @@ describe('Conversation', () => {
 
     it('should add message with an older timestamp', () => {
       const older_timestamp = first_timestamp - 100;
-      const message_et = new Message(createUuid());
+      const message_et = createMessageForTest();
       message_et.timestamp(older_timestamp);
 
       conversation_et.addMessage(message_et);
@@ -195,7 +222,7 @@ describe('Conversation', () => {
 
     describe('affects last_event_timestamp', () => {
       it('and adding a message should update it', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_event_timestamp(first_timestamp);
@@ -207,7 +234,7 @@ describe('Conversation', () => {
       });
 
       it('and adding a message should not update it if affect_order is false', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
         //@ts-ignore
         message_et.affect_order(false);
@@ -221,7 +248,7 @@ describe('Conversation', () => {
       });
 
       it('and adding a message should not update it if timestamp is greater than the last server timestamp', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_event_timestamp(first_timestamp);
@@ -235,7 +262,7 @@ describe('Conversation', () => {
 
     describe('affects last_read_timestamp', () => {
       it('and adding a message should update it if sent by self user', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
         message_et.user(self_user);
 
@@ -248,7 +275,7 @@ describe('Conversation', () => {
       });
 
       it('should not update last read if last message was not send from self user', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_read_timestamp(first_timestamp);
@@ -260,7 +287,7 @@ describe('Conversation', () => {
       });
 
       it('should not update last read if timestamp is greater than the last server timestamp', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_read_timestamp(first_timestamp);
@@ -276,12 +303,12 @@ describe('Conversation', () => {
   describe('addMessages', () => {
     const reference_timestamp = Date.now();
 
-    const message1 = new ContentMessage();
+    const message1 = new ContentMessage(undefined, translateForTest);
     message1.id = createUuid();
     message1.timestamp(reference_timestamp - 10000);
     message1.user(self_user);
 
-    const message2 = new ContentMessage();
+    const message2 = new ContentMessage(undefined, translateForTest);
     message2.id = createUuid();
     message2.timestamp(reference_timestamp - 5000);
 
@@ -299,39 +326,39 @@ describe('Conversation', () => {
     });
 
     it('returns last delivered message', () => {
-      const remoteUserEntity = new User(createUuid(), null);
-      const selfUserEntity = new User(createUuid(), null);
+      const remoteUserEntity = new User(createUuid(), null, translateForTest);
+      const selfUserEntity = new User(createUuid(), null, translateForTest);
       selfUserEntity.isMe = true;
 
-      const sentMessageEntity = new ContentMessage(createUuid());
+      const sentMessageEntity = new ContentMessage(createUuid(), translateForTest);
       sentMessageEntity.user(selfUserEntity);
       sentMessageEntity.status(StatusType.SENT);
       conversation_et.addMessage(sentMessageEntity);
 
       expect(conversation_et.lastDeliveredMessage()).not.toBeDefined();
 
-      const deliveredMessageEntity = new ContentMessage(createUuid());
+      const deliveredMessageEntity = new ContentMessage(createUuid(), translateForTest);
       deliveredMessageEntity.user(selfUserEntity);
       deliveredMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(deliveredMessageEntity);
 
       expect(conversation_et.lastDeliveredMessage()).toBe(deliveredMessageEntity);
 
-      const nextSentMessageEntity = new ContentMessage(createUuid());
+      const nextSentMessageEntity = new ContentMessage(createUuid(), translateForTest);
       nextSentMessageEntity.user(selfUserEntity);
       nextSentMessageEntity.status(StatusType.SENT);
       conversation_et.addMessage(nextSentMessageEntity);
 
       expect(conversation_et.lastDeliveredMessage()).toBe(deliveredMessageEntity);
 
-      const nextDeliveredMessageEntity = new ContentMessage(createUuid());
+      const nextDeliveredMessageEntity = new ContentMessage(createUuid(), translateForTest);
       nextDeliveredMessageEntity.user(selfUserEntity);
       nextDeliveredMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(nextDeliveredMessageEntity);
 
       expect(conversation_et.lastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
 
-      const remoteMessageEntity = new ContentMessage(createUuid());
+      const remoteMessageEntity = new ContentMessage(createUuid(), translateForTest);
       remoteMessageEntity.user(remoteUserEntity);
       remoteMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(remoteMessageEntity);
@@ -344,7 +371,7 @@ describe('Conversation', () => {
     let self_user_et: User = undefined;
 
     beforeEach(() => {
-      self_user_et = new User('', null);
+      self_user_et = new User('', null, translateForTest);
       self_user_et.isMe = true;
     });
 
@@ -355,16 +382,16 @@ describe('Conversation', () => {
     });
 
     it('returns undefined if last message is not text and not added by self user', () => {
-      const message_et = new PingMessage();
+      const message_et = new PingMessage(translateForTest);
       message_et.id = createUuid();
-      message_et.user(new User('', null));
+      message_et.user(new User('', null, translateForTest));
       conversation_et.addMessage(message_et);
 
       expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
     });
 
     it('returns undefined if last message is not text and is added by self user', () => {
-      const message_et = new PingMessage();
+      const message_et = new PingMessage(translateForTest);
       message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
@@ -373,17 +400,17 @@ describe('Conversation', () => {
     });
 
     it('returns undefined if last message is text and not send by self user', () => {
-      const message_et = new ContentMessage();
+      const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
-      message_et.user(new User('', null));
+      message_et.user(new User('', null, translateForTest));
       conversation_et.addMessage(message_et);
 
       expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
     });
 
     it('returns message if last message is text and send by self user', () => {
-      const message_et = new ContentMessage();
+      const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
       message_et.user(self_user_et);
@@ -393,15 +420,15 @@ describe('Conversation', () => {
     });
 
     it('returns last text message if last message is not text and send by self user', () => {
-      const message_et = new ContentMessage();
+      const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
-      const ping_message_et = new PingMessage();
+      const ping_message_et = new PingMessage(translateForTest);
       ping_message_et.id = createUuid();
-      ping_message_et.user(new User('', null));
+      ping_message_et.user(new User('', null, translateForTest));
       conversation_et.addMessage(ping_message_et);
 
       expect(conversation_et.getLastEditableMessage()).toBeDefined();
@@ -409,13 +436,13 @@ describe('Conversation', () => {
     });
 
     it('returns last message if last message is text and send by self user', () => {
-      const message_et = new ContentMessage();
+      const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
-      const next_message_et = new ContentMessage();
+      const next_message_et = new ContentMessage(undefined, translateForTest);
       next_message_et.addAsset(new Text());
       next_message_et.id = createUuid();
       next_message_et.user(self_user_et);
@@ -426,13 +453,13 @@ describe('Conversation', () => {
     });
 
     it('returns message if last message is text and ephemeral', () => {
-      const message_et = new ContentMessage();
+      const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
-      const ephemeral_message_et = new ContentMessage();
+      const ephemeral_message_et = new ContentMessage(undefined, translateForTest);
       ephemeral_message_et.addAsset(new Text());
       ephemeral_message_et.id = createUuid();
       ephemeral_message_et.user(self_user_et);
@@ -489,7 +516,7 @@ describe('Conversation', () => {
     });
 
     it('displays a group conversation name with names from the participants', () => {
-      const third_user = new User(createUuid(), null);
+      const third_user = new User(createUuid(), null, translateForTest);
       third_user.name('Brad Delson');
       other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
@@ -509,7 +536,7 @@ describe('Conversation', () => {
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
-      const user = new User(createUuid(), null);
+      const user = new User(createUuid(), null, translateForTest);
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
       conversation_et.participating_user_ids.push({domain: '', id: other_user.id});
       conversation_et.participating_user_ids.push({domain: '', id: user.id});
@@ -540,11 +567,11 @@ describe('Conversation', () => {
       const third_client = new ClientEntity(false, null);
       third_client.id = '6c0daa855d6b8b6e';
 
-      const user_et = new User('', null);
+      const user_et = new User('', null, translateForTest);
       user_et.devices.push(first_client);
       user_et.devices.push(second_client);
 
-      const second_user_et = new User('', null);
+      const second_user_et = new User('', null, translateForTest);
       second_user_et.devices.push(third_client);
 
       conversation_et.participating_user_ets.push(user_et);
@@ -563,11 +590,11 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity(false, null);
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User(createUuid(), null);
+      const self_user_et = new User(createUuid(), null, translateForTest);
       self_user_et.isMe = true;
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User('', null);
+      const user_et = new User('', null, translateForTest);
       user_et.devices.push(verified_client_et);
       conversation_et.participating_user_ets.push(user_et);
 
@@ -579,16 +606,16 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity(false, null);
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User('', null);
+      const self_user_et = new User('', null, translateForTest);
       self_user_et.isMe = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User('', null);
+      const user_et = new User('', null, translateForTest);
       user_et.devices.push(unverified_client_et);
       user_et.devices.push(verified_client_et);
 
-      const user_et_two = new User('', null);
+      const user_et_two = new User('', null, translateForTest);
       user_et_two.devices.push(verified_client_et);
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
@@ -600,16 +627,16 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity(false, null);
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User('', null);
+      const self_user_et = new User('', null, translateForTest);
       self_user_et.isMe = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User('', null);
+      const user_et = new User('', null, translateForTest);
       user_et.devices.push(verified_client_et);
       user_et.devices.push(verified_client_et);
 
-      const user_et_two = new User('', null);
+      const user_et_two = new User('', null, translateForTest);
       user_et_two.devices.push(verified_client_et);
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
@@ -620,14 +647,14 @@ describe('Conversation', () => {
 
   describe('hasGuest', () => {
     it('detects conversations with guest', () => {
-      conversation_et = new Conversation(createUuid());
-      const selfUserEntity = new User(createUuid(), null);
+      conversation_et = createLocalizedConversationForTest(createUuid());
+      const selfUserEntity = new User(createUuid(), null, translateForTest);
       selfUserEntity.isMe = true;
       selfUserEntity.teamId = createUuid();
       conversation_et.selfUser(selfUserEntity);
 
       // Is false for conversations not containing a guest
-      const userEntity = new User(createUuid(), null);
+      const userEntity = new User(createUuid(), null, translateForTest);
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -639,7 +666,7 @@ describe('Conversation', () => {
       expect(conversation_et.hasGuest()).toBe(false);
 
       // Is true for group conversations containing a guest
-      const secondUserEntity = new User(createUuid(), null);
+      const secondUserEntity = new User(createUuid(), null, translateForTest);
       secondUserEntity.isGuest(true);
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -666,9 +693,9 @@ describe('Conversation', () => {
   describe('federation', () => {
     it('is considered a team conversation when teamId and domain are equal', () => {
       const teamId = 'team1';
-      const conversation = new Conversation(createUuid(), 'domain.test');
+      const conversation = createLocalizedConversationForTest(createUuid(), 'domain.test');
       conversation.teamId = teamId;
-      const selfUser = new User(createUuid(), 'domain.test');
+      const selfUser = new User(createUuid(), 'domain.test', translateForTest);
       selfUser.isMe = true;
       selfUser.teamId = teamId;
       conversation.selfUser(selfUser);
@@ -679,9 +706,9 @@ describe('Conversation', () => {
     // @SF.Federation @SF.Separation @TSFI.UserInterface @S0.2
     it('is not considered a team conversation when teamId are equal but domains differ', () => {
       const teamId = 'team1';
-      const conversation = new Conversation(createUuid(), 'otherdomain.test');
+      const conversation = createLocalizedConversationForTest(createUuid(), 'otherdomain.test');
       conversation.teamId = teamId;
-      const selfUser = new User(createUuid(), 'domain.test');
+      const selfUser = new User(createUuid(), 'domain.test', translateForTest);
       selfUser.isMe = true;
       selfUser.teamId = teamId;
       conversation.selfUser(selfUser);
@@ -692,9 +719,9 @@ describe('Conversation', () => {
 
   describe('hasService', () => {
     it('detects conversations with services', () => {
-      const userEntity = new User(createUuid(), null);
+      const userEntity = new User(createUuid(), null, translateForTest);
 
-      conversation_et = new Conversation(createUuid());
+      conversation_et = createLocalizedConversationForTest(createUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -705,7 +732,7 @@ describe('Conversation', () => {
 
       expect(conversation_et.hasService()).toBe(false);
 
-      const secondUserEntity = new User(createUuid(), null);
+      const secondUserEntity = new User(createUuid(), null, translateForTest);
       secondUserEntity.isService = true;
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -721,14 +748,14 @@ describe('Conversation', () => {
 
   describe('hasApps', () => {
     it('detects conversations with apps', () => {
-      const userEntity = new User(createUuid(), null);
+      const userEntity = new User(createUuid(), null, translateForTest);
 
-      conversation_et = new Conversation(createUuid());
+      conversation_et = createLocalizedConversationForTest(createUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
       expect(conversation_et.hasApps()).toBe(false);
 
-      const secondUserEntity = new User(createUuid(), null);
+      const secondUserEntity = new User(createUuid(), null, translateForTest);
       secondUserEntity.type = UserType.APP;
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -738,12 +765,12 @@ describe('Conversation', () => {
 
   describe('release', () => {
     it('if there are any incoming messages, they should be moved to regular messages', () => {
-      const message_et = new Message(createUuid());
+      const message_et = createMessageForTest();
       message_et.timestamp(second_timestamp);
       conversation_et.addMessage(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
 
-      const incomingMessage = new Message(createUuid());
+      const incomingMessage = createMessageForTest();
       conversation_et.last_event_timestamp(third_timestamp);
       conversation_et.addMessage(incomingMessage);
 
@@ -758,7 +785,7 @@ describe('Conversation', () => {
     });
 
     it('should release messages if conversation has no unread messages', () => {
-      const message_et = new Message(createUuid());
+      const message_et = createMessageForTest();
       message_et.timestamp(first_timestamp);
       conversation_et.addMessage(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
@@ -778,7 +805,7 @@ describe('Conversation', () => {
     let message_id: string = undefined;
 
     beforeEach(() => {
-      const message_et = new Message(createUuid());
+      const message_et = createMessageForTest();
       conversation_et.addMessage(message_et);
       message_id = message_et.id;
     });
@@ -793,7 +820,7 @@ describe('Conversation', () => {
     });
 
     it('should remove all message with the same id', () => {
-      const duplicated_message_et = new Message(message_id);
+      const duplicated_message_et = createMessageForTest(message_id);
 
       expect(conversation_et.messages().length).toBe(1);
       conversation_et.addMessage(duplicated_message_et);
@@ -813,11 +840,11 @@ describe('Conversation', () => {
     let message_et = undefined;
 
     beforeEach(() => {
-      const first_message_et = new Message(createUuid());
+      const first_message_et = createMessageForTest();
       first_message_et.timestamp(first_timestamp);
       conversation_et.addMessage(first_message_et);
 
-      message_et = new Message(createUuid());
+      message_et = createMessageForTest();
       message_et.timestamp(second_timestamp);
       conversation_et.addMessage(message_et);
     });
@@ -954,7 +981,7 @@ describe('Conversation', () => {
 
       const connectionEntity = ConnectionMapper.mapConnectionFromJson(payload_connection);
 
-      const [new_conversation] = ConversationMapper.mapConversations([payload_conversation]);
+      const [new_conversation] = ConversationMapper.mapConversations([payload_conversation], 1, translate);
       new_conversation.connection(connectionEntity);
 
       expect(new_conversation.participating_user_ids().length).toBe(1);
@@ -965,8 +992,8 @@ describe('Conversation', () => {
   describe('notificationState', () => {
     it('returns expected values', () => {
       const NOTIFICATION_STATES = NOTIFICATION_STATE;
-      const conversationEntity = new Conversation(createUuid());
-      const selfUserEntity = new User(createUuid(), undefined);
+      const conversationEntity = createLocalizedConversationForTest(createUuid());
+      const selfUserEntity = new User(createUuid(), undefined, translateForTest);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
 

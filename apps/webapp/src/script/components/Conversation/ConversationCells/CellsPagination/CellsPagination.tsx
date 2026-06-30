@@ -22,7 +22,7 @@ import {useCallback} from 'react';
 import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CellsPageList} from './CellsPageList/CellsPageList';
 import {CellsPageSizeSelect} from './CellsPageSizeSelect/CellsPageSizeSelect';
@@ -60,6 +60,7 @@ export const CellsPagination = ({
   pageSize,
   setPageSize,
 }: CellsPaginationProps) => {
+  const {translate} = useApplicationContext();
   const isLastPage = currentPage === numberOfPages - 1;
   const isFirstPage = currentPage === 0;
 
@@ -74,7 +75,7 @@ export const CellsPagination = ({
     <FlexBox css={containerStyles}>
       <p css={pageResultStyles}>
         {totalRows !== undefined && lastRow !== undefined
-          ? t('cells.pagination.resultsOutOf', {start: firstRow, end: lastRow, total: totalRows})
+          ? translate('cells.pagination.resultsOutOf', {start: firstRow, end: lastRow, total: totalRows})
           : null}
       </p>
       {numberOfPages > 1 && (
@@ -86,8 +87,8 @@ export const CellsPagination = ({
               disabled={isFirstPage}
               aria-disabled={isFirstPage}
               css={arrowButtonStyles}
-              aria-label={t('cells.pagination.previousPage')}
-              title={t('cells.pagination.previousPage')}
+              aria-label={translate('cells.pagination.previousPage')}
+              title={translate('cells.pagination.previousPage')}
             >
               <Icon.ArrowNextIcon css={isFirstPage ? arrowPreviousIconDisabledStyles : arrowPreviousIconStyles} />
             </IconButton>
@@ -102,8 +103,8 @@ export const CellsPagination = ({
               disabled={isLastPage}
               aria-disabled={isLastPage}
               css={arrowButtonStyles}
-              aria-label={t('cells.pagination.nextPage')}
-              title={t('cells.pagination.nextPage')}
+              aria-label={translate('cells.pagination.nextPage')}
+              title={translate('cells.pagination.nextPage')}
             >
               <Icon.ArrowNextIcon css={isLastPage ? arrowNextIconDisabledStyles : arrowNextIconStyles} />
             </IconButton>

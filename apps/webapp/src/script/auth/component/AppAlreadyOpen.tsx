@@ -20,7 +20,7 @@
 import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
 
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Config} from '../../Config';
 
@@ -28,6 +28,7 @@ interface AppAlreadyOpenProps {
   fullscreen?: boolean;
 }
 export const AppAlreadyOpen = ({fullscreen}: AppAlreadyOpenProps) => {
+  const {translate} = useApplicationContext();
   const {hasOtherInstance, killRunningInstance} = useSingleInstance();
   if (!hasOtherInstance) {
     return null;
@@ -37,9 +38,9 @@ export const AppAlreadyOpen = ({fullscreen}: AppAlreadyOpenProps) => {
     <Modal fullscreen={fullscreen}>
       <Container style={{maxWidth: '320px'}} data-uie-name="modal-already-open">
         <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="status-modal-title">
-          {t('appAlreadyOpen.headline', {brandName: Config.getConfig().BRAND_NAME})}
+          {translate('appAlreadyOpen.headline', {brandName: Config.getConfig().BRAND_NAME})}
         </H3>
-        <Text data-uie-name="status-modal-text">{t('appAlreadyOpen.text')}</Text>
+        <Text data-uie-name="status-modal-text">{translate('appAlreadyOpen.text')}</Text>
         <Columns style={{marginTop: '20px'}}>
           <Column style={{textAlign: 'center'}}>
             <Button
@@ -49,7 +50,7 @@ export const AppAlreadyOpen = ({fullscreen}: AppAlreadyOpenProps) => {
               style={{marginBottom: '10px'}}
               data-uie-name="do-action"
             >
-              {t('appAlreadyOpen.continueButton')}
+              {translate('appAlreadyOpen.continueButton')}
             </Button>
           </Column>
         </Columns>

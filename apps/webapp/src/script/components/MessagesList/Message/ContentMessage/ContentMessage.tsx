@@ -28,14 +28,14 @@ import {OutlineCheck} from '@wireapp/react-ui-kit';
 import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {useClickOutside} from 'Hooks/useClickOutside';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
-import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
-import {StatusType} from 'src/script/message/StatusType';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
+import {StatusType} from 'src/script/message/statusType';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {t} from 'Util/localizerUtil';
 
 import {ContentAsset} from './asset';
 import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './ContentMessage.styles';
@@ -47,8 +47,8 @@ import {Quote} from './MessageQuote';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warnings';
 
 import {MessageActions} from '..';
-import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
-import {ContextMenuEntry} from '../../../../ui/ContextMenu';
+import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
+import {ContextMenuEntry} from '../../../../ui/contextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
 import {useMessageFocusedTabIndex} from '../util';
@@ -97,6 +97,7 @@ export const ContentMessageComponent = ({
   isFileShareRestricted,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
+  const {translate} = useApplicationContext();
 
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(() => isMsgElementsFocusable && isFocused, [isMsgElementsFocusable, isFocused]);
@@ -127,7 +128,14 @@ export const ContentMessageComponent = ({
     'isObfuscated',
   ]);
 
-  const timeAgo = useRelativeTimestamp(message.timestamp());
+  const relativeTimestampFormatter = useMemo(() => {
+    return createRelativeTimestampFormatter({
+      justNow: translate('conversationJustNow'),
+      today: translate('conversationToday'),
+      yesterday: translate('conversationYesterday'),
+    });
+  }, [translate]);
+  const timeAgo = useRelativeTimestamp(message.timestamp(), false, relativeTimestampFormatter);
 
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,
@@ -277,7 +285,7 @@ export const ContentMessageComponent = ({
             {is1to1 === true && isLastDeliveredMessage && (
               <div
                 data-uie-name="status-message-read-receipt-delivered"
-                title={t('conversationMessageDelivered')}
+                title={translate('conversationMessageDelivered')}
                 className="delivered-message-icon"
               >
                 <OutlineCheck />
@@ -305,6 +313,7 @@ export const ContentMessageComponent = ({
 
       {reactions.length > 0 && (
         <MessageReactionsList
+          translate={translate}
           reactions={reactions}
           selfUserId={selfId}
           handleReactionClick={onClickReaction}

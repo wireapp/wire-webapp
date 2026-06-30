@@ -32,7 +32,7 @@ import {
   MLSStatuses,
   WireIdentity,
 } from 'src/script/E2EIdentity';
-import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
+import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
 import {Core} from 'src/script/service/coreSingleton';
 import {Logger, getLogger} from 'Util/logger';
 import {waitFor} from 'Util/waitFor';
@@ -93,7 +93,7 @@ export class MLSConversationVerificationStateHandler {
     this.onConversationVerificationStateChange({
       conversationEntity: conversation,
       conversationVerificationState: state,
-      verificationMessageType: E2EIVerificationMessageType.NO_LONGER_VERIFIED,
+      VerificationMessageType: E2EIVerificationMessageType.NO_LONGER_VERIFIED,
       userIds: degradedUsers,
     });
   }
@@ -115,7 +115,8 @@ export class MLSConversationVerificationStateHandler {
    * This function checks if self client certificate is revoked
    */
   private handleNewRevocationList = async (domain: string): Promise<void> => {
-    if (domain === this.selfDomain) {
+    // CRL hosts can be tenant-prefixed, so a suffix match is enough to scope this event to the backend domain.
+    if (domain.endsWith(this.selfDomain)) {
       // The crl of the self user has changed, we need to check if the self client certificate is revoked
       const activeIdentity = await getActiveWireIdentity();
       if (activeIdentity?.status === MLSStatuses.REVOKED) {

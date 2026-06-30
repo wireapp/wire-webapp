@@ -22,9 +22,15 @@ import {container} from 'tsyringe';
 
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {User} from 'Repositories/entity/User';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {ImageAsset, ImageAssetProps} from './ImageAsset';
 
@@ -37,11 +43,14 @@ jest.mock('Components/InViewport', () => ({
 }));
 
 describe('image-asset', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
   const fakeImageUrl = 'https://test.com/image.png';
-  const mockUser = new User('user-id', 'test-domain.wire.com');
+  const mockUser = new User('user-id', 'test-domain.wire.com', translateForTest);
 
   const createDefaultMessage = () => {
-    const message = new ContentMessage();
+    const message = new ContentMessage(undefined, translateForTest);
     mockUser.name('Test User');
     message.user(mockUser);
     return message;
@@ -69,7 +78,7 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     const imageElement = screen.getByTestId('image-loader');
     expect(imageElement).toBeDefined();
@@ -93,7 +102,7 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
       expect(window.URL.createObjectURL).toHaveBeenCalled();
@@ -110,7 +119,7 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    const {container} = render(<ImageAsset {...props} />);
+    const {container} = render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     const imageContainer = container.querySelector('[data-uie-name="image-asset"]');
     expect(imageContainer).toBeDefined();
@@ -137,7 +146,7 @@ describe('image-asset', () => {
     const message = createDefaultMessage();
     const props = {...defaultProps, asset: image, message, onClick: onClickMock};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
       const imageElement = screen.getByTestId('image-asset-img');
@@ -169,7 +178,7 @@ describe('image-asset', () => {
     const message = createDefaultMessage();
     const props = {...defaultProps, asset: image, message, onClick: onClickMock};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
       const imageElement = screen.getByTestId('image-asset-img');
@@ -202,7 +211,7 @@ describe('image-asset', () => {
     const message = createDefaultMessage();
     const props = {...defaultProps, asset: image, message, onClick: onClickMock};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
       const imageElement = screen.getByTestId('image-asset-img');
@@ -234,7 +243,7 @@ describe('image-asset', () => {
     const message = createDefaultMessage();
     const props = {...defaultProps, asset: image, message};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
       const imageElement = screen.getByTestId('image-asset-img');
@@ -256,7 +265,7 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    const {container} = render(<ImageAsset {...props} />);
+    const {container} = render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
     const imageContainer = container.querySelector('.image-asset');
 
     expect(imageContainer).toBeDefined();

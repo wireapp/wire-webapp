@@ -23,8 +23,8 @@ import cx from 'classnames';
 import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {
   // if a conversation is hosted on an unclassified domain it is not considered classified
@@ -49,12 +49,14 @@ interface UserClassifiedBarProps extends ClassifiedBarProps {
 }
 
 export const UserClassifiedBar = ({users, conversationDomain, classifiedDomains, style}: UserClassifiedBarProps) => {
+  const {translate} = useApplicationContext();
+
   if (typeof classifiedDomains === 'undefined') {
     return null;
   }
 
   const classified = isClassified(users, classifiedDomains, conversationDomain);
-  const text = classified ? t('conversationClassified') : t('conversationNotClassified');
+  const text = classified ? translate('conversationClassified') : translate('conversationNotClassified');
 
   return (
     <div

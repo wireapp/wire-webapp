@@ -24,6 +24,24 @@ import {UserRepository} from 'Repositories/user/userRepository';
 
 import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
+const getQualifiedIdKey = ({domain, id}: QualifiedId): string => `${domain}/${id}`;
+
+const isQualifiedId = (userId: QualifiedId | null): userId is QualifiedId => userId !== null;
+
+const getUniqueQualifiedIds = (userIds: QualifiedId[]): QualifiedId[] => {
+  const uniqueUserIds = new Map<string, QualifiedId>();
+
+  userIds.forEach(userId => {
+    const key = getQualifiedIdKey(userId);
+
+    if (!uniqueUserIds.has(key)) {
+      uniqueUserIds.set(key, userId);
+    }
+  });
+
+  return Array.from(uniqueUserIds.values());
+};
+
 export const getUsersFromNodes = async ({
   nodes,
   userRepository,
@@ -35,7 +53,7 @@ export const getUsersFromNodes = async ({
     return [];
   }
 
-  return userRepository.getUsersById(
-    nodes.map(node => getUserQualifiedIdFromNode(node)).filter(Boolean) as QualifiedId[],
-  );
+  const userIds = nodes.map(node => getUserQualifiedIdFromNode(node)).filter(isQualifiedId);
+
+  return userRepository.getUsersById(getUniqueQualifiedIds(userIds));
 };

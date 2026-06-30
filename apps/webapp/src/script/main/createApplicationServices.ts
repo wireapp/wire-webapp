@@ -17,25 +17,34 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {WallClock} from '../clock/wallClock';
+import type {ApplicationObservability} from '../observability/applicationObservability';
+import type {MonotonicClock} from '../time/monotonicClock';
 
 export type ApplicationServices = {
+  readonly applicationObservability: ApplicationObservability;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
+  readonly monotonicClock: MonotonicClock;
   readonly wallClock: WallClock;
 };
 
 type CreateApplicationServicesDependencies = {
+  readonly createApplicationObservability: () => ApplicationObservability;
   readonly createFireAndForgetInvoker: () => FireAndForgetInvoker;
   readonly createWallClock: () => WallClock;
+  readonly monotonicClock: MonotonicClock;
 };
 
 export function createApplicationServices(dependencies: CreateApplicationServicesDependencies): ApplicationServices {
-  const {createFireAndForgetInvoker, createWallClock} = dependencies;
+  const {createApplicationObservability, createFireAndForgetInvoker, createWallClock, monotonicClock} = dependencies;
 
   return {
+    applicationObservability: createApplicationObservability(),
     fireAndForgetInvoker: createFireAndForgetInvoker(),
+    monotonicClock,
     wallClock: createWallClock(),
   };
 }

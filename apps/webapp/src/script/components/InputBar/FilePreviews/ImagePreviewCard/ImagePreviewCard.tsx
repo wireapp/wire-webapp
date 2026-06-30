@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {imageStyles} from './ImagePreviewCard.styles';
 
@@ -32,9 +32,11 @@ interface ImagePreviewCardProps {
 }
 
 export const ImagePreviewCard = ({src, onDelete, onRetry, isError, uploadProgress}: ImagePreviewCardProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <MediaFilePreviewCard
-      label={t('conversationFileImagePreviewLabel', {src})}
+      label={translate('conversationFileImagePreviewLabel', {src})}
       onDelete={onDelete}
       onRetry={onRetry}
       isError={isError}

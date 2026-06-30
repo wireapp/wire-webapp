@@ -21,13 +21,18 @@ import {act, render} from '@testing-library/react';
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import en from 'I18n/en-US.json';
 import {generateQualifiedIds, generateUserClients, generateUsers, withTheme} from 'src/script/auth/util/test/TestUtil';
-import {setStrings} from 'Util/localizerUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {PartialFailureToSendWarning} from './PartialFailureToSend';
+import {translateForTest} from 'Util/test/translateForTest';
 
-setStrings({en});
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('PartialFailureToSendWarning', () => {
   it('displays the number of users that did not get the message', () => {
@@ -37,8 +42,10 @@ describe('PartialFailureToSendWarning', () => {
     const queued = generateUserClients(users);
     const {container} = render(
       withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{queued}} />),
+      {wrapper: rootProviderWrapper},
     );
-    expect(container.textContent).toContain(`${nbUsers} participants didn't get your message`);
+    expect(container.textContent).toContain('messageFailedToSendParticipants');
+    expect(container.textContent).toContain('messageFailedToSendPlural');
   });
 
   it('displays the number of named users that did not get the message across multiple domains', () => {
@@ -53,8 +60,10 @@ describe('PartialFailureToSendWarning', () => {
     };
     const {container} = render(
       withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{queued}} />),
+      {wrapper: rootProviderWrapper},
     );
-    expect(container.textContent).toContain(`${nbUsersDomain1 + nbUsersDomain2} participants didn't get your message`);
+    expect(container.textContent).toContain('messageFailedToSendParticipants');
+    expect(container.textContent).toContain('messageFailedToSendPlural');
   });
 
   it('displays the number of unreachable users that did not get the message across multiple domains', () => {
@@ -66,8 +75,10 @@ describe('PartialFailureToSendWarning', () => {
     const failed = [...users1, ...users2];
     const {container} = render(
       withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{failed}} />),
+      {wrapper: rootProviderWrapper},
     );
-    expect(container.textContent).toContain(`${nbUsersDomain1 + nbUsersDomain2} participants didn't get your message`);
+    expect(container.textContent).toContain('messageFailedToSendParticipants');
+    expect(container.textContent).toContain('messageFailedToSendPlural');
   });
 
   it('displays the number of users, named or unreachable that did not get the message across multiple domains', () => {
@@ -89,12 +100,10 @@ describe('PartialFailureToSendWarning', () => {
     const failed = [...unreachableUsers1, ...unreachableUsers2];
     const {container} = render(
       withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{queued, failed}} />),
+      {wrapper: rootProviderWrapper},
     );
-    expect(container.textContent).toContain(
-      `${
-        nbUsersDomain1 + nbUsersDomain2 + nbUnreachableUsersDomain1 + nbUnreachableUsersDomain2
-      } participants didn't get your message`,
-    );
+    expect(container.textContent).toContain('messageFailedToSendParticipants');
+    expect(container.textContent).toContain('messageFailedToSendPlural');
   });
 
   it('does not show the extra info toggle if there is only a single named user', () => {
@@ -102,10 +111,12 @@ describe('PartialFailureToSendWarning', () => {
     const queued = generateUserClients(users);
     const {queryByText, container} = render(
       withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={users} failedToSend={{queued}} />),
+      {wrapper: rootProviderWrapper},
     );
 
-    expect(queryByText('Show details')).toBeNull();
-    expect(container.textContent).toContain(`${users[0].name()} will get your message later`);
+    expect(queryByText('messageFailedToSendShowDetails')).toBeNull();
+    expect(container.textContent).toContain(users[0].name());
+    expect(container.textContent).toContain('messageFailedToSendWillReceiveSingular');
   });
 
   it('does not show the extra info toggle if there is only a single unreachable user', () => {
@@ -113,29 +124,32 @@ describe('PartialFailureToSendWarning', () => {
     const failed = users;
     const {queryByText, container} = render(
       withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{failed}} />),
+      {wrapper: rootProviderWrapper},
     );
 
-    expect(queryByText('Show details')).toBeNull();
-    expect(container.textContent).toContain(`1 participant from domain won't get your message`);
+    expect(queryByText('messageFailedToSendShowDetails')).toBeNull();
+    expect(container.textContent).toContain('messageFailedToSendParticipantsFromDomainSingular');
+    expect(container.textContent).toContain('messageFailedToSendWillNotReceiveSingular');
   });
 
   it('toggles the extra info', () => {
     const queued = generateUserClients(generateUsers(2, 'domain'));
     const {getByText} = render(
       withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{queued}} />),
+      {wrapper: rootProviderWrapper},
     );
 
     act(() => {
-      getByText('Show details').click();
+      getByText('messageFailedToSendShowDetails').click();
     });
 
-    expect(getByText('Hide details')).not.toBeNull();
+    expect(getByText('messageFailedToSendHideDetails')).not.toBeNull();
 
     act(() => {
-      getByText('Hide details').click();
+      getByText('messageFailedToSendHideDetails').click();
     });
 
-    expect(getByText('Show details')).not.toBeNull();
+    expect(getByText('messageFailedToSendShowDetails')).not.toBeNull();
   });
 
   it('displays the username of participant that could not receive the message', () => {
@@ -145,14 +159,15 @@ describe('PartialFailureToSendWarning', () => {
     const queued = generateUserClients(users);
     const {getByText, getAllByTestId} = render(
       withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={users} failedToSend={{queued}} />),
+      {wrapper: rootProviderWrapper},
     );
 
     act(() => {
-      getByText('Show details').click();
+      getByText('messageFailedToSendShowDetails').click();
     });
 
     expect(getAllByTestId('named-user')).toHaveLength(nbUsers);
-    expect(getByText('Hide details')).not.toBeNull();
+    expect(getByText('messageFailedToSendHideDetails')).not.toBeNull();
   });
 
   it('displays both the username of named participants and the correct domain of unreachable users when applicable', () => {
@@ -171,16 +186,16 @@ describe('PartialFailureToSendWarning', () => {
       withTheme(
         <PartialFailureToSendWarning isMessageFocused knownUsers={namedUsers} failedToSend={{queued, failed}} />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     act(() => {
-      getByText('Show details').click();
+      getByText('messageFailedToSendShowDetails').click();
     });
 
     expect(getAllByTestId('named-user')).toHaveLength(nbNamedUsers);
-    expect(container.textContent).toContain(
-      `${nbUsersDomain1} participants from domain1, ${nbUsersDomain2} participants from domain2 won't get your message`,
-    );
+    expect(container.textContent).toContain('messageFailedToSendParticipantsFromDomainPlural');
+    expect(container.textContent).toContain('messageFailedToSendWillNotReceivePlural');
   });
 
   it('displays the info toggle when there is a single named user and a single unreachable user', () => {
@@ -193,18 +208,19 @@ describe('PartialFailureToSendWarning', () => {
       withTheme(
         <PartialFailureToSendWarning isMessageFocused knownUsers={namedUsers} failedToSend={{queued, failed}} />,
       ),
+      {wrapper: rootProviderWrapper},
     );
     act(() => {
-      getByText('Show details').click();
+      getByText('messageFailedToSendShowDetails').click();
     });
 
-    expect(getByText('Hide details')).not.toBeNull();
+    expect(getByText('messageFailedToSendHideDetails')).not.toBeNull();
 
     act(() => {
-      getByText('Hide details').click();
+      getByText('messageFailedToSendHideDetails').click();
     });
 
-    expect(getByText('Show details')).not.toBeNull();
+    expect(getByText('messageFailedToSendShowDetails')).not.toBeNull();
   });
 
   it('does not display an unreachable user warning if there are no unreachable users', () => {
@@ -217,12 +233,14 @@ describe('PartialFailureToSendWarning', () => {
       withTheme(
         <PartialFailureToSendWarning isMessageFocused knownUsers={namedUsers} failedToSend={{queued, failed}} />,
       ),
+      {wrapper: rootProviderWrapper},
     );
     act(() => {
-      getByText('Show details').click();
+      getByText('messageFailedToSendShowDetails').click();
     });
 
-    expect(container.textContent).not.toContain(`won't get your message`);
+    expect(container.textContent).not.toContain('messageFailedToSendWillNotReceiveSingular');
+    expect(container.textContent).not.toContain('messageFailedToSendWillNotReceivePlural');
   });
 
   it('does not display a named user warning if there are no named users', () => {
@@ -232,11 +250,13 @@ describe('PartialFailureToSendWarning', () => {
 
     const {getByText, container} = render(
       withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{queued, failed}} />),
+      {wrapper: rootProviderWrapper},
     );
     act(() => {
-      getByText('Show details').click();
+      getByText('messageFailedToSendShowDetails').click();
     });
 
-    expect(container.textContent).not.toContain(`will get your message later`);
+    expect(container.textContent).not.toContain('messageFailedToSendWillReceiveSingular');
+    expect(container.textContent).not.toContain('messageFailedToSendWillReceivePlural');
   });
 });

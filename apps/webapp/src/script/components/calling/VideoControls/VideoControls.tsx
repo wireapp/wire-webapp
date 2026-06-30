@@ -58,11 +58,11 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
-import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {EmojisBar} from './EmojisBar/EmojisBar';
 import {VideoCallCancelButton} from './VideoCallCancelButton/VideoCallCancelButton';
@@ -82,6 +82,7 @@ import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
 type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
 
 const BACKGROUND_OPTION_VALUES = new Set<string>(['none', 'blur-high', 'blur-low', 'virtual', 'settings']);
+const MIN_PARTICIPANTS_FOR_CALL_VIEW_CONTROL = 2;
 
 const mapValueToEffect = (value: BackgroundOptionValue, lastVirtualBackgroundId: string): BackgroundEffectSelection => {
   switch (value) {
@@ -113,11 +114,14 @@ const mapEffectToValue = (effect: BackgroundEffectSelection): BackgroundOptionVa
 /**
  * Maps video input devices to select options.
  */
-const mapVideoInputDevices = (devices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[]) => {
+const mapVideoInputDevices = (
+  devices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[],
+  translate: ReturnType<typeof useApplicationContext>['translate'],
+) => {
   if (!devices.length) {
     return [
       {
-        label: t('videoCallNoCameraAvailable'),
+        label: translate('videoCallNoCameraAvailable'),
         value: 'no-camera',
         dataUieName: 'no-camera',
         id: 'no-camera',
@@ -171,6 +175,7 @@ interface VideoControlsProps {
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   sendEmoji: (emoji: string, call: Call) => void;
   onOpenBackgroundSettings?: () => void;
+  isWebGLAvailable: boolean;
 }
 
 export const VideoControls = ({
@@ -196,9 +201,11 @@ export const VideoControls = ({
   setMaximizedParticipant,
   sendEmoji,
   onOpenBackgroundSettings,
+  isWebGLAvailable = true,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: VideoControlsProps) => {
+  const {translate} = useApplicationContext();
   const selfParticipant = call.getSelfParticipant();
   const {
     sharesScreen: selfSharesScreen,
@@ -263,14 +270,14 @@ export const VideoControls = ({
 
   const callViewOptions = [
     {
-      label: t('videoCallOverlayViewModeLabel'),
+      label: translate('videoCallOverlayViewModeLabel'),
       options: [
         {
-          label: t('videoCallOverlayViewModeAll'),
+          label: translate('videoCallOverlayViewModeAll'),
           value: CallViewTab.ALL,
         },
         {
-          label: t('videoCallOverlayViewModeSpeakers'),
+          label: translate('videoCallOverlayViewModeSpeakers'),
           value: CallViewTab.SPEAKERS,
         },
       ],
@@ -283,7 +290,7 @@ export const VideoControls = ({
   const audioOptions = useMemo(
     () => [
       {
-        label: t('videoCallaudioInputMicrophone'),
+        label: translate('videoCallaudioInputMicrophone'),
         options: audioInputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
           return isMediaDevice(device)
             ? {
@@ -301,7 +308,7 @@ export const VideoControls = ({
         }),
       },
       {
-        label: t('videoCallaudioOutputSpeaker'),
+        label: translate('videoCallaudioOutputSpeaker'),
         options: audioOutputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
           return isMediaDevice(device)
             ? {
@@ -319,7 +326,7 @@ export const VideoControls = ({
         }),
       },
     ],
-    [audioInputDevices, audioOutputDevices],
+    [audioInputDevices, audioOutputDevices, translate],
   );
 
   const [allMicrophones, allSpeaker] = audioOptions;
@@ -354,14 +361,14 @@ export const VideoControls = ({
   };
 
   const cameraOptions = useMemo(() => {
-    const cameraDevices = mapVideoInputDevices(videoInputDevices);
+    const cameraDevices = mapVideoInputDevices(videoInputDevices, translate);
     return [
       {
-        label: t('videoCallvideoInputCamera'),
+        label: translate('videoCallvideoInputCamera'),
         options: cameraDevices,
       },
     ];
-  }, [videoInputDevices]);
+  }, [translate, videoInputDevices]);
 
   const selectedCameraOption =
     cameraOptions[0].options.find(({id}) => id === currentCameraDevice) ?? cameraOptions[0].options[0];
@@ -382,32 +389,46 @@ export const VideoControls = ({
   const currentBlurOption = useMemo(
     () =>
       selectedBackgroundEffect.type === 'blur' && selectedBackgroundEffect.level === 'low'
-        ? {label: t('videoCallBackgroundBlurLow'), value: 'blur-low', icon: <BlurLowIcon />}
+        ? {label: translate('videoCallBackgroundBlurLow'), value: 'blur-low', icon: <BlurLowIcon />}
         : {
-            label: t('videoCallBackgroundBlurHigh'),
+            label: translate('videoCallBackgroundBlurHigh'),
             value: 'blur-high',
             icon: <BlurHighIcon />,
           },
-    [selectedBackgroundEffect],
+    [selectedBackgroundEffect, translate],
   );
+
+  const getEffectOptions = useMemo(() => {
+    if (!isWebGLAvailable) {
+      return [];
+    }
+
+    return [
+      currentBlurOption,
+      {
+        label: translate('videoCallBackgroundVirtual'),
+        value: 'virtual',
+        icon: <ImageIcon />,
+      },
+    ];
+  }, [currentBlurOption, isWebGLAvailable, translate]);
 
   const backgroundOptions = useMemo(
     () => [
       {
-        label: t('videoCallBackgroundEffectsLabel'),
+        label: translate('videoCallBackgroundEffectsLabel'),
         options: [
-          {label: t('videoCallBackgroundNone'), value: 'none', icon: <CircleIcon />},
-          currentBlurOption,
-          {label: t('videoCallBackgroundVirtual'), value: 'virtual', icon: <ImageIcon />},
+          {label: translate('videoCallBackgroundNone'), value: 'none', icon: <CircleIcon />},
+          ...getEffectOptions,
           {
-            label: t('videoCallBackgroundSettings'),
+            label: translate('videoCallBackgroundSettings'),
             value: 'settings',
             icon: <Icon.ChevronIcon css={{...videoOptionsRowIconStyles, transform: 'rotate(270deg)'}} />,
           },
         ],
       },
     ],
-    [currentBlurOption],
+    [getEffectOptions, translate],
   );
 
   /** Merged options: camera group + (if enabled) background group. */
@@ -492,14 +513,14 @@ export const VideoControls = ({
             click: () => {
               setAudioOptionsOpen(prev => !prev);
             },
-            label: t('videoCallMenuMoreAudioSettings'),
+            label: translate('videoCallMenuMoreAudioSettings'),
             icon: Icon.MicOnIcon,
           },
           {
             click: () => {
               setVideoOptionsOpen(prev => !prev);
             },
-            label: t('videoCallMenuMoreVideoSettings'),
+            label: translate('videoCallMenuMoreVideoSettings'),
             icon: Icon.CameraIcon,
           },
         ]
@@ -509,7 +530,9 @@ export const VideoControls = ({
       ? [
           {
             click: () => setShowEmojisBar(prev => !prev),
-            label: showEmojisBar ? t('videoCallMenuMoreCloseReactions') : t('videoCallMenuMoreAddReaction'),
+            label: showEmojisBar
+              ? translate('videoCallMenuMoreCloseReactions')
+              : translate('videoCallMenuMoreAddReaction'),
             icon: props => <EmojiIcon {...props} height={16} width={16} scale={1} />,
           },
         ]
@@ -519,7 +542,7 @@ export const VideoControls = ({
       ? [
           {
             click: () => toggleIsHandRaised(isSelfHandRaised),
-            label: isSelfHandRaised ? t('videoCallMenuMoreLowerHand') : t('videoCallMenuMoreRaiseHand'),
+            label: isSelfHandRaised ? translate('videoCallMenuMoreLowerHand') : translate('videoCallMenuMoreRaiseHand'),
             icon: props => <RaiseHandIcon {...props} height={16} width={16} scale={1} />,
           },
         ]
@@ -532,15 +555,15 @@ export const VideoControls = ({
         ...raiseHandEntry,
         {
           click: () => setIsCallViewOpen(prev => !prev),
-          label: t('videoCallMenuMoreChangeView'),
+          label: translate('videoCallMenuMoreChangeView'),
           icon: props => <GridIcon {...props} height={16} width={16} scale={1} />,
         },
         ...emojiBarEntry,
         {
           click: toggleParticipantsList,
           label: isParticipantsListOpen
-            ? t('videoCallMenuMoreHideParticipants')
-            : t('videoCallMenuMoreSeeParticipants'),
+            ? translate('videoCallMenuMoreHideParticipants')
+            : translate('videoCallMenuMoreSeeParticipants'),
           icon: Icon.PeopleIcon,
         },
       ],
@@ -654,7 +677,7 @@ export const VideoControls = ({
             }
             type="button"
             data-uie-name="do-call-controls-video-minimize"
-            title={t('videoCallOverlayCloseFullScreen')}
+            title={translate('videoCallOverlayCloseFullScreen')}
           >
             {viewMode === CallingViewMode.DETACHED_WINDOW ? <Icon.CloseDetachedWindowIcon /> : <Icon.MessageIcon />}
           </button>
@@ -679,7 +702,7 @@ export const VideoControls = ({
             data-uie-name="do-call-controls-video-call-mute"
             role="switch"
             aria-checked={!isMuted}
-            title={t('videoCallOverlayMicrophone')}
+            title={translate('videoCallOverlayMicrophone')}
           >
             {isMuted ? <Icon.MicOffIcon width={16} height={16} /> : <Icon.MicOnIcon width={16} height={16} />}
           </button>
@@ -703,8 +726,8 @@ export const VideoControls = ({
               }}
               aria-label={
                 audioOptionsOpen
-                  ? t('videoCallOverlayCloseOptions')
-                  : t('videoCallOverlayOpenMicrophoneAndSpeakerOptions')
+                  ? translate('videoCallOverlayCloseOptions')
+                  : translate('videoCallOverlayOpenMicrophoneAndSpeakerOptions')
               }
             >
               {audioOptionsOpen ? (
@@ -751,7 +774,7 @@ export const VideoControls = ({
               tabIndex={TabIndex.FOCUSABLE}
               css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
               data-uie-name="do-call-controls-toggle-video"
-              title={t('videoCallOverlayCamera')}
+              title={translate('videoCallOverlayCamera')}
             >
               {selfSharesCamera ? (
                 <Icon.CameraIcon width={16} height={16} />
@@ -774,8 +797,8 @@ export const VideoControls = ({
                   }
                   type="button"
                   aria-expanded={videoOptionsOpen}
-                  aria-label={t('videoCallMenuMoreCameraSettings')}
-                  title={t('videoCallMenuMoreCameraSettings')}
+                  aria-label={translate('videoCallMenuMoreCameraSettings')}
+                  title={translate('videoCallMenuMoreCameraSettings')}
                 >
                   <Icon.ChevronIcon css={{rotate: videoOptionsOpen ? '0deg' : '180deg', height: '16px'}} />
                 </button>
@@ -802,7 +825,7 @@ export const VideoControls = ({
         <li className="video-controls__item">
           <button
             className={`video-controls__button ${!canShareScreen ? 'with-tooltip with-tooltip--top' : ''}`}
-            data-tooltip={t('videoCallScreenShareNotSupported')}
+            data-tooltip={translate('videoCallScreenShareNotSupported')}
             css={
               !canShareScreen
                 ? videoControlDisabledStyles
@@ -824,7 +847,7 @@ export const VideoControls = ({
             data-uie-name="do-toggle-screen"
             role="switch"
             aria-checked={selfSharesScreen}
-            title={t('videoCallOverlayShareScreen')}
+            title={translate('videoCallOverlayShareScreen')}
           >
             {selfSharesScreen ? (
               <Icon.ScreenshareIcon width={16} height={16} />
@@ -851,7 +874,7 @@ export const VideoControls = ({
               />
             )}
             <button
-              title={t('callMenuMoreInteractions')}
+              title={translate('callMenuMoreInteractions')}
               className={classNames(
                 {
                   'video-controls__button': isMobile,
@@ -895,7 +918,9 @@ export const VideoControls = ({
                   role="switch"
                   aria-checked={isSelfHandRaised}
                   title={
-                    isSelfHandRaised ? t('videoCallParticipantLowerYourHand') : t('videoCallParticipantRaiseYourHand')
+                    isSelfHandRaised
+                      ? translate('videoCallParticipantLowerYourHand')
+                      : translate('videoCallParticipantRaiseYourHand')
                   }
                 >
                   <RaiseHandIcon width={16} height={16} />
@@ -903,7 +928,7 @@ export const VideoControls = ({
               </li>
             )}
 
-            {participants.length > 2 && (
+            {participants.length > MIN_PARTICIPANTS_FOR_CALL_VIEW_CONTROL && (
               <li className="video-controls__item">
                 <button
                   onBlur={event => {
@@ -924,7 +949,7 @@ export const VideoControls = ({
                   data-uie-name="do-call-controls-video-call-view"
                   role="switch"
                   aria-checked={!isMuted}
-                  title={t('videoCallOverlayChangeViewMode')}
+                  title={translate('videoCallOverlayChangeViewMode')}
                 >
                   {isCallViewOpen && (
                     <VideoControlsSelect
@@ -959,7 +984,7 @@ export const VideoControls = ({
                   />
                 )}
                 <button
-                  title={t('callReactions')}
+                  title={translate('callReactions')}
                   className={classNames('video-controls__button_primary', {active: showEmojisBar})}
                   onClick={() => setShowEmojisBar(prev => !prev)}
                   type="button"
@@ -988,8 +1013,8 @@ export const VideoControls = ({
                 aria-checked={isParticipantsListOpen}
                 title={
                   isParticipantsListOpen
-                    ? t('videoCallOverlayHideParticipantsList')
-                    : t('videoCallOverlayShowParticipantsList')
+                    ? translate('videoCallOverlayHideParticipantsList')
+                    : translate('videoCallOverlayShowParticipantsList')
                 }
               >
                 <Icon.PeopleIcon width={16} height={16} />

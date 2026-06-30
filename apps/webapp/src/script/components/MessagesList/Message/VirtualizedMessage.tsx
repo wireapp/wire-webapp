@@ -24,10 +24,10 @@ import cx from 'classnames';
 
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
-import type {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
-import {Message as BaseMessage} from 'Repositories/entity/message/Message';
+import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
+import type {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
+import {Message as BaseMessage} from 'Repositories/entity/message/message';
 import type {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';

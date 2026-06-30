@@ -26,7 +26,7 @@ import {NIL as NilUuid} from 'uuid';
 import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {stripImageExifData} from 'Util/imageUtil';

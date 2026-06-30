@@ -571,6 +571,8 @@ test.describe('Calling', () => {
     'I want to accept a group video call as a personal account guest',
     {tag: ['@TC-2852', '@regression']},
     async ({createPage}) => {
+      test.setTimeout(150_000);
+
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
       const {pages: ownerPages, modals: ownerModals} = PageManager.from(userAPage).webapp;
       const guestPages = PageManager.from(guestPage).webapp.pages;
@@ -602,8 +604,11 @@ test.describe('Calling', () => {
 
         await ownerPages.conversation().toggleGroupInformation();
         await ownerPages.conversation().clickCallButton();
+
         // Warning modal that guest started using a new device
+        await expect(ownerModals.confirm().modalTitle).toContainText('new device');
         await ownerModals.confirm().clickAction();
+
         await expect(ownerPages.calling().callCell).toBeVisible();
       });
 
@@ -836,7 +841,7 @@ test.describe('Calling', () => {
   );
 
   test(
-    'I want to see a group call timing out after 90s if I`m the last one left in the call',
+    "I want to see a group call timing out after 90s if I'm the last one left in the call",
     {tag: ['@TC-2937', '@regression']},
     async ({createPage}, testInfo) => {
       test.setTimeout(testInfo.timeout + 90_000);

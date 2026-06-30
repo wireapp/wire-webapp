@@ -28,6 +28,7 @@ import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {NotificationBackendRepository} from './notificationBackendRepository';
 import {NotificationDatabaseRepository} from './notificationDatabaseRepository';
 import {NotificationSource} from './notificationSource.types';
+import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEventTypes';
 
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
@@ -49,9 +50,7 @@ export type HandledEventPayload = {
  * - handled: The event was handled and its payload will be emitted
  */
 export type HandledEventResult =
-  | {status: 'unhandled'}
-  | {status: 'ignored'}
-  | {status: 'handled'; payload: HandledEventPayload | null};
+  {status: 'unhandled'} | {status: 'ignored'} | {status: 'handled'; payload: HandledEventPayload | null};
 
 enum TOPIC {
   NOTIFICATION_ERROR = 'NotificationService.TOPIC.NOTIFICATION_ERROR',
@@ -195,16 +194,8 @@ export class NotificationService extends TypedEventEmitter<Events> {
    * @param source
    * @param lastEventDate?
    */
-  private isOutdatedEvent(event: {time: string}, source: NotificationSource, lastEventDate?: Date) {
-    const isFromNotificationStream = source === NotificationSource.NOTIFICATION_STREAM;
-    const shouldCheckEventDate = event.time.length > 0 && isFromNotificationStream && lastEventDate !== undefined;
-
-    if (shouldCheckEventDate) {
-      /** This check prevents duplicated "You joined" system messages. */
-      const isOutdated = lastEventDate.getTime() >= new Date(event.time).getTime();
-      return isOutdated;
-    }
-    return false;
+  private isOutdatedEvent(event: {time: string; type: string}, source: NotificationSource, lastEventDate?: Date) {
+    return isOutdatedNotificationStreamEvent(event, source, lastEventDate);
   }
 
   public async *handleNotification(

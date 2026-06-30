@@ -31,6 +31,8 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 
 import {initializeDataDog} from 'Util/dataDog';
+import {translate} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {enableLogging} from 'Util/loggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
@@ -39,18 +41,22 @@ import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
 import {Root} from './page/Root';
 
+// eslint-disable-next-line import/order
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+
 import {Config} from '../Config';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import {createAPIClient} from '../service/createApiClient';
 
 exposeWrapperGlobals();
 
 const mainId = 'main';
 
-const apiClient = createAPIClient();
+const apiClient = new APIClient({
+  wallClock: createWallClock(),
+});
 container.registerInstance(APIClient, apiClient);
 const core = container.resolve(Core);
 
@@ -69,14 +75,14 @@ const store = configureStore({
   localStorage,
 });
 
-const render = (Component: FC): void => {
+const render = (Component: FC<{translate: Translate}>): void => {
   const container = document.getElementById(mainId);
   if (!container) {
     throw new Error(`No container '${mainId}' found to render application`);
   }
   createRoot(container).render(
     <Provider store={store}>
-      <Component />
+      <Component translate={translate} />
     </Provider>,
   );
 };
@@ -112,4 +118,4 @@ if (enforceDesktopApplication) {
   window.location.replace(unSupportedPageUrl);
 }
 
-runApp();
+void runApp();

@@ -17,10 +17,16 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 interface QualifiedEntity {
   [index: string]: any;
-  domain: string | null;
+  domain?: string | null;
   id: string;
+}
+
+function isUnqualifiedDomain(domain: string | null | undefined): boolean {
+  return is.nullOrUndefined(domain) || is.emptyString(domain);
 }
 
 /**
@@ -31,17 +37,14 @@ interface QualifiedEntity {
  * @param entity2 - The second entity to compare
  * @return boolean - do the entities match
  */
-export function matchQualifiedIds(entity1?: QualifiedEntity, entity2?: QualifiedEntity) {
-  if (entity1 === undefined || entity2 === undefined) {
+export function matchQualifiedIds(entity1?: QualifiedEntity, entity2?: QualifiedEntity): boolean {
+  if (is.undefined(entity1) || is.undefined(entity2)) {
     return false;
   }
 
   const idsMatch = entity1.id === entity2.id;
   const domainsMatch =
-    entity1.domain === null ||
-    entity2.domain === null ||
-    entity1.domain.length === 0 ||
-    entity2.domain.length === 0 ||
-    entity1.domain === entity2.domain;
+    isUnqualifiedDomain(entity1.domain) || isUnqualifiedDomain(entity2.domain) || entity1.domain === entity2.domain;
+
   return idsMatch && domainsMatch;
 }

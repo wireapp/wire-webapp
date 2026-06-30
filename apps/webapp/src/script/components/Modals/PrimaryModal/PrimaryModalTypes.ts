@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
+import type {Translate as TranslationFunction} from 'Util/localizerUtil';
 
 export interface ButtonAction {
   action?: Function;
@@ -39,6 +40,7 @@ export interface Text {
 }
 
 export type ModalSize = 'small' | 'medium' | 'large';
+export type Translate = TranslationFunction;
 
 export interface ModalOptions {
   close?: () => void;
@@ -109,5 +111,6 @@ export interface ModalContent {
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};
+export type QueuedModalItem = {id: string; options: ModalOptions; type: PrimaryModalType; translate: Translate};
 
-export type ModalQueue = ModalItem[];
+export type ModalQueue = QueuedModalItem[];

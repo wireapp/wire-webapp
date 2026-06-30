@@ -30,7 +30,7 @@ import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactio
 import {EventValidationError} from './eventHandlers/EventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
-import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/StatusType';
+import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/statusType';
 import {CONVERSATION} from '../../Client';
 import {EventMiddleware, IncomingEvent} from '../../EventProcessor';
 import {EventService} from '../../EventService';

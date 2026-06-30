@@ -1,3 +1,4 @@
+---
 name: Publish and deploy webapp
 
 on:
@@ -40,6 +41,9 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -65,13 +69,13 @@ jobs:
           echo -e "COMMITTER = ${COMMITTER}"
 
       - name: Install JS dependencies
-        run: yarn --immutable
+        run: ./bin/yarn --immutable
 
       - name: Update configuration
-        run: yarn nx run webapp:configure
+        run: ./bin/yarn nx run webapp:configure
 
       - name: Build and package
-        run: yarn nx run server:package
+        run: ./bin/yarn nx run server:package
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -91,7 +95,7 @@ jobs:
         id: generate_changelog
         if: ${{ env.changelog_type }}
         run: |
-          yarn nx run workspace-tools:changelog-${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
+          ./bin/yarn nx run workspace-tools:changelog-${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
           echo "changelog=${{ env.CHANGELOG_FILE }}" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -108,7 +112,7 @@ jobs:
           aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
         run: |
           version_tag="${TAG:-$BRANCH_NAME}"
-          yarn docker "$version_tag" ./image_tag.txt
+          ./bin/yarn docker "$version_tag" ./image_tag.txt
 
           image_tag="$(cat ./image_tag.txt)"
           echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
@@ -119,7 +123,7 @@ jobs:
 
       - uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
         with:
-          version: '3.12.2'
+          version: '3.21.2'
 
       - name: Bump helm chart version
         shell: bash
@@ -273,14 +277,30 @@ jobs:
             echo "targets=${deployment_targets_json}" >> "$GITHUB_ENV"
           fi
 
+  release_critical_flow:
+    name: Playwright Critical Flow (release)
+    needs: [build]
+    if: ${{ github.repository == 'wireapp/wire-webapp' && github.ref_type == 'tag' && (contains(github.ref_name, 'staging') || contains(github.ref_name, 'production')) }}
+    uses: ./.github/workflows/precommit-slot-run.yml
+    with:
+      env_name: wire-webapp-precommit-3
+      backendUrl: https://staging-nginz-https.zinfra.io/
+      grep: '@crit-flow-web'
+      notify_deployoholics_on_failure: true
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+      WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+      WIRE_DEPLOYOHOLICS_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+
   deploy_to_aws:
     name: 'Deploy to live environments'
     runs-on: ubuntu-24.04
     env:
       AWS_REGION: eu-central-1
     environment: ${{ matrix.target }}
-    needs: [build, set_deployment_targets]
-    if: ${{needs.set_deployment_targets.outputs.deployment_targets}}
+    needs: [build, set_deployment_targets, release_critical_flow]
+    if: ${{ always() && needs.build.result == 'success' && needs.set_deployment_targets.result == 'success' && needs.set_deployment_targets.outputs.deployment_targets && (needs.release_critical_flow.result == 'success' || needs.release_critical_flow.result == 'skipped') }}
 
     strategy:
       matrix:

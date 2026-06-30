@@ -20,29 +20,29 @@
 import {MouseEvent as ReactMouseEvent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
-
 interface OpenFolderParams {
-  conversationQualifiedId: QualifiedId;
-  name: string;
+  path: string;
   event?: ReactMouseEvent<Element, MouseEvent>;
+  // Called before navigating so the search view can close before the browse view re-enables.
+  onBeforeNavigate?: () => void;
+  conversationQualifiedId?: QualifiedId;
 }
 
-export const openFolder = ({conversationQualifiedId, name, event}: OpenFolderParams) => {
-  const currentPath = getCellsFilesPath();
-  const pathSegments = currentPath ? currentPath.split('/') : [];
-  const encodedSegments = [...pathSegments, name].map(segment => encodeURIComponent(segment));
-  const newPath = encodedSegments.join('/');
+export const openFolder = ({path, event, onBeforeNavigate, conversationQualifiedId}: OpenFolderParams) => {
+  const stripped = path.startsWith('/') ? path.slice(1) : path;
+  const [firstSegment, ...rest] = stripped.split('/');
 
-  createNavigate(
-    generateConversationUrl({
-      id: conversationQualifiedId.id,
-      domain: conversationQualifiedId.domain,
-      filePath: `files/${newPath}`,
-    }),
-  )(event);
+  const isAbsolute = firstSegment.includes('@');
+  const {id, domain} = isAbsolute ? parseQualifiedId(firstSegment) : (conversationQualifiedId ?? {id: '', domain: ''});
+  const filePathParts = isAbsolute ? rest : stripped.split('/').filter(Boolean);
+
+  const filePath = `files/${filePathParts.map(encodeURIComponent).join('/')}`;
+
+  onBeforeNavigate?.();
+  createNavigate(generateConversationUrl({id, domain, filePath}))(event);
 };

@@ -20,7 +20,7 @@
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   fileHistoryRestoreCloseButtonCss,
@@ -38,24 +38,26 @@ interface FileRestoreConfirmModalProps {
 }
 
 export const FileRestoreConfirmContent = ({isLoading, onClose, onConfirm}: FileRestoreConfirmModalProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div css={restoreModalContainerCss}>
       <button
         css={fileHistoryRestoreCloseButtonCss}
         onClick={onClose}
-        aria-label={t('cells.versionHistory.closeAriaLabel')}
+        aria-label={translate('cells.versionHistory.closeAriaLabel')}
         data-uie-name="do-close-file-history"
       >
         <Icon.CloseIcon width={14} height={14} />
       </button>
-      <h2 css={restoreModalTitleCss}>{t('cells.versionHistory.restoreModal.title')}</h2>
-      <p css={restoreModalDescriptionCss}>{t('cells.versionHistory.restoreModal.description')}</p>
+      <h2 css={restoreModalTitleCss}>{translate('cells.versionHistory.restoreModal.title')}</h2>
+      <p css={restoreModalDescriptionCss}>{translate('cells.versionHistory.restoreModal.description')}</p>
       <div css={restoreModalButtonsContainerCss}>
         <Button css={restoreModalButtonCss} onClick={onClose} variant={ButtonVariant.TERTIARY}>
-          {t('cells.versionHistory.restoreModal.cancel')}
+          {translate('cells.versionHistory.restoreModal.cancel')}
         </Button>
         <Button showLoading={isLoading} css={restoreModalButtonCss} onClick={onConfirm}>
-          {t('cells.versionHistory.restoreModal.confirm')}
+          {translate('cells.versionHistory.restoreModal.confirm')}
         </Button>
       </div>
     </div>

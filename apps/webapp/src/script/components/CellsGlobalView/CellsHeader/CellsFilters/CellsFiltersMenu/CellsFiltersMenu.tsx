@@ -27,7 +27,7 @@ import {buttonStyles, counterStyles} from './CellsFiltersMenu.styles';
 import {CellsFiltersModal} from './CellsFiltersModal/CellsFiltersModal';
 import {useGetAllTags} from './useGetAllTags/useGetAllTags';
 
-import {useApplicationContext} from '../../../../../page/RootProvider';
+import {useApplicationContext} from '../../../../../page/rootProvider';
 
 interface CellsFiltersMenuProps {
   activeFiltersCount: number;

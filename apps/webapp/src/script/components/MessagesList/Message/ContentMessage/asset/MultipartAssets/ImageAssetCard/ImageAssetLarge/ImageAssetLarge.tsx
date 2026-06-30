@@ -24,8 +24,8 @@ import {Maybe} from 'true-myth';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getBestPreviewSource} from 'Util/imageUtil';
-import {t} from 'Util/localizerUtil';
 
 import {
   containerStyles,
@@ -63,6 +63,7 @@ export const ImageAssetLarge = ({
   senderName,
   timestamp,
 }: ImageAssetLargeProps) => {
+  const {translate} = useApplicationContext();
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasLoadError, setHasLoadError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -82,7 +83,7 @@ export const ImageAssetLarge = ({
       <button
         css={containerStyles}
         onClick={() => setIsOpen(true)}
-        aria-label={t('accessibility.conversationAssetImageAlt', {
+        aria-label={translate('accessibility.conversationAssetImageAlt', {
           username: senderName,
           messageDate: timestamp,
         })}
@@ -102,7 +103,7 @@ export const ImageAssetLarge = ({
             {isUnavailable && (
               <>
                 <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
-                <p css={errorTextStyles}>{t('cells.unavailableFile')}</p>
+                <p css={errorTextStyles}>{translate('cells.unavailableFile')}</p>
               </>
             )}
           </div>

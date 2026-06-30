@@ -20,6 +20,11 @@
 import {render, fireEvent} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {Pagination} from './Pagination';
 
@@ -29,11 +34,21 @@ const testIdentifiers = {
   paginationNext: 'pagination-next',
 };
 
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
+
 describe('Pagination', () => {
   const onChangePageMock = jest.fn();
 
-  const renderPagination = (props = {}) =>
-    render(withTheme(<Pagination totalPages={10} currentPage={0} onChangePage={onChangePageMock} {...props} />));
+  const renderPagination = (props = {}) => {
+    return render(
+      withTheme(<Pagination totalPages={10} currentPage={0} onChangePage={onChangePageMock} {...props} />),
+      {
+        wrapper: rootProviderWrapper,
+      },
+    );
+  };
 
   beforeEach(() => {
     onChangePageMock.mockClear();

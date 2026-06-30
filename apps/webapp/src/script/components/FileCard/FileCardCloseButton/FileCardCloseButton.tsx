@@ -19,7 +19,7 @@
 
 import {CloseIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles} from './FileCardCloseButton.styles';
 
@@ -28,12 +28,12 @@ interface FileCardCloseButtonProps {
   onClose: () => void;
 }
 
-export const FileCardCloseButton = ({
-  label = t('fileCardDefaultCloseButtonLabel'),
-  onClose,
-}: FileCardCloseButtonProps) => {
+export const FileCardCloseButton = ({label, onClose}: FileCardCloseButtonProps) => {
+  const {translate} = useApplicationContext();
+  const closeButtonLabel = label ?? translate('fileCardDefaultCloseButtonLabel');
+
   return (
-    <button aria-label={label} type="button" onClick={onClose} css={buttonStyles}>
+    <button aria-label={closeButtonLabel} type="button" onClick={onClose} css={buttonStyles}>
       <CloseIcon />
     </button>
   );

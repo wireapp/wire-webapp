@@ -24,28 +24,39 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {VerificationIcon} from 'Components/VerificationIcon';
-import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/VerificationMessage';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationMessage';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {Declension, joinNames, t} from 'Util/localizerUtil';
+import {Declension, joinNames} from 'Util/localizerUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
-import {VerificationMessageType} from '../../../message/VerificationMessageType';
+import {VerificationMessageType} from '../../../message/verificationMessageType';
 
 interface VerificationMessageProps {
   message: VerificationMessageEntity;
 }
 
 const VerificationMessage = ({message}: VerificationMessageProps) => {
-  const {userIds, userEntities, unsafeSenderName, verificationMessageType, isSelfClient} = useKoSubscribableChildren(
-    message,
-    ['userIds', 'userEntities', 'unsafeSenderName', 'verificationMessageType', 'isSelfClient'],
-  );
+  const {translate} = useApplicationContext();
+  const {
+    userIds,
+    userEntities,
+    unsafeSenderName,
+    VerificationMessageType: verificationMessageType,
+    isSelfClient,
+  } = useKoSubscribableChildren(message, [
+    'userIds',
+    'userEntities',
+    'unsafeSenderName',
+    'VerificationMessageType',
+    'isSelfClient',
+  ]);
 
   const nameList = useMemo(() => {
-    const namesString = joinNames(userEntities, Declension.NOMINATIVE);
+    const namesString = joinNames(userEntities, translate, Declension.NOMINATIVE);
     return capitalizeFirstChar(namesString);
-  }, [userEntities]);
+  }, [translate, userEntities]);
 
   const {setCurrentTab} = useSidebarStore();
 
@@ -71,11 +82,11 @@ const VerificationMessage = ({message}: VerificationMessageProps) => {
         data-uie-name="element-message-verification"
         data-uie-value={verificationMessageType}
       >
-        {isTypeVerified && <span>{t('conversation.AllVerified')}</span>}
+        {isTypeVerified && <span>{translate('conversation.AllVerified')}</span>}
         {isTypeUnverified && (
           <>
             <span className="message-header-sender-name">{unsafeSenderName}</span>
-            <span>{t('conversationDeviceUnverified')}</span>
+            <span>{translate('conversationDeviceUnverified')}</span>
             <button
               type="button"
               className="button-reset-default message-verification-action accent-text"
@@ -83,8 +94,8 @@ const VerificationMessage = ({message}: VerificationMessageProps) => {
               data-uie-name="go-devices"
             >
               {isSelfClient
-                ? t('conversationDeviceYourDevices')
-                : t('conversationDeviceUserDevices', {user: userEntities[0]?.name()})}
+                ? translate('conversationDeviceYourDevices')
+                : translate('conversationDeviceUserDevices', {user: userEntities[0]?.name()})}
             </button>
           </>
         )}
@@ -93,10 +104,10 @@ const VerificationMessage = ({message}: VerificationMessageProps) => {
             <span className="message-header-plain-sender-name">{nameList}</span>
             <span>
               {hasMultipleUsers
-                ? t('conversationDeviceStartedUsingMany')
+                ? translate('conversationDeviceStartedUsingMany')
                 : isSelfClient
-                  ? t('conversationDeviceStartedUsingYou')
-                  : t('conversationDeviceStartedUsingOne')}
+                  ? translate('conversationDeviceStartedUsingYou')
+                  : translate('conversationDeviceStartedUsingOne')}
             </span>
             <button
               type="button"
@@ -104,13 +115,15 @@ const VerificationMessage = ({message}: VerificationMessageProps) => {
               onClick={showDevice}
               data-uie-name="go-devices"
             >
-              {hasMultipleUsers ? t('conversationDeviceNewDeviceMany') : t('conversationDeviceNewDeviceOne')}
+              {hasMultipleUsers
+                ? translate('conversationDeviceNewDeviceMany')
+                : translate('conversationDeviceNewDeviceOne')}
             </button>
           </>
         )}
         {isTypeNewMember && (
           <>
-            <span>{t('conversationDeviceNewPeopleJoined')}</span>
+            <span>{translate('conversationDeviceNewPeopleJoined')}</span>
             &nbsp;
             <button
               type="button"
@@ -118,7 +131,7 @@ const VerificationMessage = ({message}: VerificationMessageProps) => {
               onClick={showDevice}
               data-uie-name="go-devices"
             >
-              {t('conversationDeviceNewPeopleJoinedVerify')}
+              {translate('conversationDeviceNewPeopleJoinedVerify')}
             </button>
           </>
         )}

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+readonly script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly repository_root="$(cd "$script_directory/.." && pwd)"
+readonly yarn_configuration_file="$repository_root/.yarnrc.yml"
+
+if [[ ! -f "$yarn_configuration_file" ]]; then
+  echo "Missing Yarn configuration file: $yarn_configuration_file" >&2
+  exit 1
+fi
+
+yarn_path="$(
+  sed -n 's/^[[:space:]]*yarnPath:[[:space:]]*//p' "$yarn_configuration_file" | head -n 1
+)"
+
+if [[ -z "$yarn_path" ]]; then
+  echo "Missing yarnPath in $yarn_configuration_file" >&2
+  exit 1
+fi
+
+yarn_path="${yarn_path%\"}"
+yarn_path="${yarn_path#\"}"
+yarn_path="${yarn_path%\'}"
+yarn_path="${yarn_path#\'}"
+
+if [[ "$yarn_path" = /* ]]; then
+  yarn_binary_path="$yarn_path"
+else
+  yarn_binary_path="$repository_root/$yarn_path"
+fi
+
+if [[ ! -f "$yarn_binary_path" ]]; then
+  echo "Configured Yarn binary does not exist: $yarn_binary_path" >&2
+  echo "Configured by yarnPath in $yarn_configuration_file" >&2
+  exit 1
+fi
+
+exec node "$yarn_binary_path" "$@"

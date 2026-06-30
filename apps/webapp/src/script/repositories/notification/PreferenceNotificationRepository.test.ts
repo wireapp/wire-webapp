@@ -29,9 +29,10 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {createUuid} from 'Util/uuid';
 
 import {Notification, PreferenceNotificationRepository} from './PreferenceNotificationRepository';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('PreferenceNotificationRepository', () => {
-  const user = new User(createUuid(), null);
+  const user = new User(createUuid(), null, translateForTest);
   const userObservable = ko.observable(user);
 
   beforeEach(() => {

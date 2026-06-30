@@ -23,6 +23,6 @@ import {BaseModal} from './base.modal';
 
 export class OptionModal extends BaseModal {
   constructor(page: Page) {
-    super(page, 'modal-template-option');
+    super(page);
   }
 }

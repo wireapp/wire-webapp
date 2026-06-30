@@ -22,7 +22,7 @@ import {FC} from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Config} from '../../../Config';
 
@@ -33,6 +33,7 @@ interface PastedFileControlsProps {
 }
 
 export const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, onSend}) => {
+  const {translate} = useApplicationContext();
   const isSupportedFileType = (Config.getConfig().ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(
     pastedFile.type,
   );
@@ -68,7 +69,7 @@ export const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onC
           type="button"
           className="conversation-input-bar-paste-cancel button-icon-large"
           onClick={onClear}
-          aria-label={t('pastedFileCloseMessage')}
+          aria-label={translate('pastedFileCloseMessage')}
         >
           <Icon.CloseIcon />
         </button>
@@ -77,7 +78,7 @@ export const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onC
           type="button"
           className="conversation-input-bar-paste-send"
           onClick={onSend}
-          aria-label={t('pastedFileSendMessage')}
+          aria-label={translate('pastedFileSendMessage')}
         >
           <Icon.SendIcon />
         </button>

@@ -13,6 +13,15 @@
         "parallel": false
       }
     },
+    "build-dev": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["config-lib:build"],
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copy_server_assets.js"],
+        "parallel": false
+      }
+    },
     "package": {
       "executor": "nx:run-commands",
       "dependsOn": ["^build"],
@@ -23,9 +32,11 @@
       }
     },
     "serve": {
+      "continuous": true,
+      "dependsOn": ["config-lib:build", "webapp:build-libs", "webapp:watch-deps-dynamic"],
       "executor": "@nx/js:node",
       "options": {
-        "buildTarget": "server:build",
+        "buildTarget": "server:build-dev",
         "buildTargetOptions": {
           "outputPath": "{projectRoot}/dist",
           "outputFileName": "index.js"
@@ -49,18 +60,19 @@
         "ci": {
           "ci": true,
           "coverage": true,
-          "coverageReporters": ["lcov", "text"]
+          "coverageReporters": ["html", "lcov", "text"]
         }
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=1289 --ext .js,.ts {projectRoot}"
+        "command": "eslint --config eslint.config.ts --cache --cache-location node_modules/.cache/eslint/server --max-warnings=1289 --ext .js,.ts {projectRoot}"
       }
     },
     "type-check": {
       "executor": "nx:run-commands",
+      "dependsOn": ["config-lib:build"],
       "options": {
         "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
       }

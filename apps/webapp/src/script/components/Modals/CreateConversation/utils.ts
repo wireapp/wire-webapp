@@ -21,72 +21,81 @@ import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/localizerUtil';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 
 import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
 
-export const getConversationAccessOptions = (isPublicOptionEnabled = true) => {
+export type Translate = RootContextValue['translate'];
+
+export type NonFederatingParticipantsModalCopy = {
+  readonly editParticipantsButtonText: string;
+  readonly leaveButtonText: string;
+  readonly titleText: string;
+  readonly getMessageHtml: (backendString: string, replaceBackends: Record<string, string>) => string;
+};
+
+export const getConversationAccessOptions = (translate: Translate, isPublicOptionEnabled = true) => {
   return [
     {
       value: ConversationAccess.Public,
-      label: t('createConversationAccessOptionPublic'),
+      label: translate('createConversationAccessOptionPublic'),
       isDisabled: !isPublicOptionEnabled,
     },
     {
       value: ConversationAccess.Private,
-      label: t('createConversationAccessOptionPrivate'),
+      label: translate('createConversationAccessOptionPrivate'),
     },
   ];
 };
 
-export const getConversationManagerOptions = () => {
+export const getConversationManagerOptions = (translate: Translate) => {
   return [
     {
       value: ADD_PERMISSION.ADMINS,
-      label: t('createConversationManagerOptionAdmins'),
+      label: translate('createConversationManagerOptionAdmins'),
     },
     {
       value: ADD_PERMISSION.EVERYONE,
-      label: t('createConversationManagerOptionAdminsAndMembers'),
+      label: translate('createConversationManagerOptionAdminsAndMembers'),
     },
   ];
 };
 
-export const getConversationTypeOptions = () => {
+export const getConversationTypeOptions = (translate: Translate) => {
   return [
     {
       conversationType: ConversationType.Channel,
-      label: t('conversationTypeChannelOption'),
+      label: translate('conversationTypeChannelOption'),
     },
     {
       conversationType: ConversationType.Group,
-      label: t('conversationTypeGroupOption'),
+      label: translate('conversationTypeGroupOption'),
     },
   ];
 };
 
-export const getChatHistorySharingUnitOptions = (historySharingQuantity: number) => {
+export const getChatHistorySharingUnitOptions = (translate: Translate, historySharingQuantity: number) => {
   const chatHistorySharingUnitOptions = [
     {
       value: HistorySharingUnit.Days,
       label:
         historySharingQuantity && historySharingQuantity > 1
-          ? t('conversationHistoryModalOptionDays')
-          : t('conversationHistoryModalOptionDay'),
+          ? translate('conversationHistoryModalOptionDays')
+          : translate('conversationHistoryModalOptionDay'),
     },
     {
       value: HistorySharingUnit.Weeks,
       label:
         historySharingQuantity && historySharingQuantity > 1
-          ? t('conversationHistoryModalOptionWeeks')
-          : t('conversationHistoryModalOptionWeek'),
+          ? translate('conversationHistoryModalOptionWeeks')
+          : translate('conversationHistoryModalOptionWeek'),
     },
     {
       value: HistorySharingUnit.Months,
       label:
         historySharingQuantity && historySharingQuantity > 1
-          ? t('conversationHistoryModalOptionMonths')
-          : t('conversationHistoryModalOptionMonth'),
+          ? translate('conversationHistoryModalOptionMonths')
+          : translate('conversationHistoryModalOptionMonth'),
     },
   ];
 
@@ -94,22 +103,23 @@ export const getChatHistorySharingUnitOptions = (historySharingQuantity: number)
 };
 
 export const getChatHistoryOptions = (
+  translate: Translate,
   chatHistory: ChatHistory,
   historySharingQuantity: number,
   historySharingUnit: HistorySharingUnit,
   enableCustomHistory?: boolean,
 ) => {
   const teamState = container.resolve(TeamState);
-  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(historySharingQuantity);
+  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(translate, historySharingQuantity);
 
   const chatHistoryOptions = [
     {
       value: ChatHistory.Off,
-      label: t('conversationHistoryOptionOff'),
+      label: translate('conversationHistoryOptionOff'),
     },
     {
       value: ChatHistory.OneDay,
-      label: t('conversationHistoryOptionDay'),
+      label: translate('conversationHistoryOptionDay'),
     },
   ];
 
@@ -117,11 +127,11 @@ export const getChatHistoryOptions = (
     chatHistoryOptions.push(
       {
         value: ChatHistory.OneWeek,
-        label: t('conversationHistoryOptionWeek'),
+        label: translate('conversationHistoryOptionWeek'),
       },
       {
         value: ChatHistory.Unlimited,
-        label: t('conversationHistoryOptionUnlimited'),
+        label: translate('conversationHistoryOptionUnlimited'),
       },
     );
   }
@@ -129,9 +139,20 @@ export const getChatHistoryOptions = (
   if (enableCustomHistory === true || teamState.isConferenceCallingEnabled()) {
     chatHistoryOptions.push({
       value: ChatHistory.Custom,
-      label: `${t('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
+      label: `${translate('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
     });
   }
 
   return chatHistoryOptions;
+};
+
+export const getNonFederatingParticipantsModalCopy = (translate: Translate): NonFederatingParticipantsModalCopy => {
+  return {
+    editParticipantsButtonText: translate('groupCreationPreferencesNonFederatingEditList'),
+    leaveButtonText: translate('groupCreationPreferencesNonFederatingLeave'),
+    titleText: translate('groupCreationPreferencesNonFederatingHeadline'),
+    getMessageHtml: (backendString: string, replaceBackends: Record<string, string>) => {
+      return translate('groupCreationPreferencesNonFederatingMessage', {backends: backendString}, replaceBackends);
+    },
+  };
 };

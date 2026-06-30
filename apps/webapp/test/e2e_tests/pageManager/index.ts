@@ -105,20 +105,20 @@ export class PageManager {
     }
   };
 
-  openMainPage = () => {
-    return this.page.goto(webAppPath, {waitUntil: 'networkidle'});
+  openMainPage = (baseUrl: string = webAppPath) => {
+    return this.page.goto(new URL('/', baseUrl).toString(), {waitUntil: 'networkidle'});
   };
 
-  openLoginPage = async () => {
-    await this.page.goto(`${webAppPath}auth/#/login`);
+  openLoginPage = async (baseUrl: string = webAppPath) => {
+    await this.page.goto(new URL(`/auth/#/login`, baseUrl).toString());
   };
 
-  openRegistrationPage = async () => {
-    await this.page.goto(`${webAppPath}auth/#/createaccount`);
+  openRegistrationPage = async (baseUrl: string = webAppPath) => {
+    await this.page.goto(new URL(`/auth/#/createaccount`, baseUrl).toString());
   };
 
-  openSSOPage = async () => {
-    await this.page.goto(`${webAppPath}auth/#/sso`);
+  openSSOPage = async (baseUrl: string = webAppPath) => {
+    await this.page.goto(new URL(`/auth/#/sso`, baseUrl).toString());
   };
 
   openUrl = (url: string) => {

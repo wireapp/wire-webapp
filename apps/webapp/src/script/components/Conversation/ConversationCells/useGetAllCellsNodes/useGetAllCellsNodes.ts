@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useCallback, useState} from 'react';
+import {useEffect, useCallback, useRef, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -33,6 +33,7 @@ import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import {createRequestVersionGate} from '../useConversationSearch/requestVersionGate';
 
 interface UseGetAllCellsNodesProps {
   cellsRepository: CellsRepository;
@@ -51,27 +52,52 @@ export const useGetAllCellsNodes = ({
 }: UseGetAllCellsNodesProps) => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
+  const requestVersionGate = useRef(createRequestVersionGate());
+  const enabledRef = useRef(enabled);
+  enabledRef.current = enabled;
 
-  const {id} = conversationQualifiedId;
+  const {domain, id} = conversationQualifiedId;
+
+  const isCurrentFetchRequest = useCallback((requestVersion: number): boolean => {
+    return enabledRef.current && !requestVersionGate.current.isStale(requestVersion);
+  }, []);
 
   const fetchNodes = useCallback(async () => {
+    if (!enabledRef.current) {
+      return;
+    }
+
+    const requestVersion = requestVersionGate.current.next();
+
     try {
+      setError(null);
       setStatus('loading');
 
+      // Resolve the path fresh on every fetch (not memoized) so folder navigation works.
+      // Memoizing on [domain, id] froze it to the conversation root and broke navigation.
       const result = await cellsRepository.getAllNodes({
-        path: getCellsApiPath({conversationQualifiedId}),
+        path: getCellsApiPath({conversationQualifiedId: {domain, id}}),
         limit: pageSize,
         offset,
         deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
       });
 
+      if (!isCurrentFetchRequest(requestVersion)) {
+        return;
+      }
+
       if (result.Nodes === undefined || result.Nodes.length === 0) {
+        setNodes({conversationId: id, nodes: []});
         setStatus('success');
         setPagination({conversationId: id, pagination: null});
         return;
       }
 
       const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
+
+      if (!isCurrentFetchRequest(requestVersion)) {
+        return;
+      }
 
       // filter out draft nodes from results
       const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
@@ -84,14 +110,18 @@ export const useGetAllCellsNodes = ({
 
       setStatus('success');
     } catch (error: unknown) {
+      if (!isCurrentFetchRequest(requestVersion)) {
+        return;
+      }
+
       setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
       setPagination({conversationId: id, pagination: null});
       setStatus('error');
       throw error;
     }
-    // cellsRepository is not a dependency because it's a singleton
+    // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setNodes, setStatus, setError, id, offset, pageSize, setPagination]);
+  }, [domain, id, isCurrentFetchRequest, offset, pageSize, setError, setNodes, setPagination, setStatus]);
 
   const handleHashChange = useCallback((): void => {
     if (enabled !== true) {
@@ -100,10 +130,11 @@ export const useGetAllCellsNodes = ({
     clearAll({conversationId: id});
     setOffset(0);
     fireAndForgetInvoker.fireAndForget(fetchNodes);
-  }, [clearAll, enabled, fetchNodes, fireAndForgetInvoker, id, setOffset]);
+  }, [clearAll, enabled, fetchNodes, fireAndForgetInvoker, id]);
 
   useEffect(() => {
     if (enabled !== true) {
+      requestVersionGate.current.invalidate();
       return;
     }
 

@@ -30,11 +30,11 @@ require('dotenv').config({quiet: true});
  *
  * To run this script, you need to have Docker installed (i.e. "Docker Desktop for Mac"). The docker daemon (or Docker for Desktop app) has to be started before running this script. Make sure to set "DOCKER_USERNAME" and "DOCKER_PASSWORD" in your local ".env" file or system environment variables.
  *
- * Note: You must run "yarn nx run server:package" before creating the Docker image, otherwise the compiled JavaScript code (and other assets) won't be part of the bundle.
+ * Note: You must run "./bin/yarn nx run server:package" from the repository root before creating the Docker image, otherwise the compiled JavaScript code (and other assets) won't be part of the bundle.
  *
  * Demo execution:
- * yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
- * yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff' --pr
+ * ./bin/yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
+ * ./bin/yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff' --pr
  */
 
 /** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev", "pr-123") */

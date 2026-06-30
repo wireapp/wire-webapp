@@ -18,9 +18,11 @@
  */
 
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 
 const CONFIG = Config.getConfig();
+
+type Translate = RootContextValue['translate'];
 
 interface ValidationError {
   title: string;
@@ -34,12 +36,19 @@ interface ValidateFilesParams {
   currentFiles: File[];
   maxSize: number;
   maxFiles: number;
+  translate: Translate;
 }
 
-export const validateFiles = ({newFiles, currentFiles, maxSize, maxFiles}: ValidateFilesParams): ValidationResult => {
+export const validateFiles = ({
+  newFiles,
+  currentFiles,
+  maxSize,
+  maxFiles,
+  translate,
+}: ValidateFilesParams): ValidationResult => {
   const validations = [
-    validateFileCount({currentFiles, newFiles, maxFiles}),
-    validateFileSize({files: newFiles, maxSize}),
+    validateFileCount({currentFiles, newFiles, maxFiles, translate}),
+    validateFileSize({files: newFiles, maxSize, translate}),
   ];
 
   const firstError = validations.find(validation => !validation.isValid);
@@ -54,9 +63,10 @@ export const validateFiles = ({newFiles, currentFiles, maxSize, maxFiles}: Valid
 interface ValidateFileSizeParams {
   files: File[];
   maxSize: number;
+  translate: Translate;
 }
 
-const validateFileSize = ({files, maxSize}: ValidateFileSizeParams): ValidationResult => {
+const validateFileSize = ({files, maxSize, translate}: ValidateFileSizeParams): ValidationResult => {
   const bytesMultiplier = 1024;
   const fileMaxSizeInMB = maxSize / bytesMultiplier / bytesMultiplier;
   const imageMaxSizeInMB = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / bytesMultiplier / bytesMultiplier;
@@ -71,22 +81,22 @@ const validateFileSize = ({files, maxSize}: ValidateFileSizeParams): ValidationR
 
   const getMessage = () => {
     if (oversizedImages.length > 0 && oversizedFiles.length > 0) {
-      return t('conversationFileUploadFailedTooLargeFilesAndImagesMessage', {
+      return translate('conversationFileUploadFailedTooLargeFilesAndImagesMessage', {
         maxImageSize: imageMaxSizeInMB,
         maxFileSize: fileMaxSizeInMB,
       });
     }
     if (oversizedImages.length > 0) {
-      return t('conversationFileUploadFailedTooLargeImagesMessage', {maxSize: imageMaxSizeInMB});
+      return translate('conversationFileUploadFailedTooLargeImagesMessage', {maxSize: imageMaxSizeInMB});
     }
-    return t('conversationFileUploadFailedTooLargeFilesMessage', {maxSize: fileMaxSizeInMB});
+    return translate('conversationFileUploadFailedTooLargeFilesMessage', {maxSize: fileMaxSizeInMB});
   };
 
   if (oversizedFiles.length > 0 || oversizedImages.length > 0) {
     return {
       isValid: false,
       error: {
-        title: t('conversationFileUploadFailedTooLargeFilesHeading'),
+        title: translate('conversationFileUploadFailedTooLargeFilesHeading'),
         message: getMessage(),
       },
       invalidFiles: [...oversizedFiles, ...oversizedImages],
@@ -99,15 +109,21 @@ interface ValidateFileCountParams {
   currentFiles: File[];
   newFiles: File[];
   maxFiles: number;
+  translate: Translate;
 }
 
-const validateFileCount = ({currentFiles, newFiles, maxFiles}: ValidateFileCountParams): ValidationResult => {
+const validateFileCount = ({
+  currentFiles,
+  newFiles,
+  maxFiles,
+  translate,
+}: ValidateFileCountParams): ValidationResult => {
   if (currentFiles.length + newFiles.length > maxFiles) {
     return {
       isValid: false,
       error: {
-        title: t('conversationFileUploadFailedTooManyFilesHeading'),
-        message: t('conversationFileUploadFailedTooManyFilesMessage', {maxFiles}),
+        title: translate('conversationFileUploadFailedTooManyFilesHeading'),
+        message: translate('conversationFileUploadFailedTooManyFilesMessage', {maxFiles}),
       },
       invalidFiles: [],
     };

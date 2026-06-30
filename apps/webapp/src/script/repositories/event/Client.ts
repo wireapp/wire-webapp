@@ -38,6 +38,7 @@ export enum CONVERSATION {
   KNOCK = 'conversation.knock',
   LEGAL_HOLD_UPDATE = 'conversation.legal-hold-update',
   LOCATION = 'conversation.location',
+  MEMBER_ROLE_UPDATE = 'conversation.member-role-update',
   MESSAGE_ADD = 'conversation.message-add',
   MULTIPART_MESSAGE_ADD = 'conversation.multipart-message-add',
   MESSAGE_DELETE = 'conversation.message-delete',

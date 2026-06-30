@@ -17,6 +17,8 @@
  *
  */
 
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {singleton} from 'tsyringe';
 
 import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
@@ -31,9 +33,17 @@ type RetryBackoffResettableHttpClient = {
   readonly resetRetryBackoff: () => void;
 };
 
+type APIClientProperties = {
+  readonly wallClock: WallClock;
+};
+
 @singleton()
 export class APIClient extends APIClientUnconfigured {
-  constructor() {
+  constructor(
+    {wallClock}: APIClientProperties = {
+      wallClock: createWallClock(),
+    },
+  ) {
     const webAppConfiguration = Config.getConfig();
 
     const unconfiguredApiClientConfiguration = {
@@ -46,6 +56,7 @@ export class APIClient extends APIClientUnconfigured {
         rest: webAppConfiguration.BACKEND_REST,
         ws: webAppConfiguration.BACKEND_WS,
       },
+      wallClock,
     };
 
     super(unconfiguredApiClientConfiguration);

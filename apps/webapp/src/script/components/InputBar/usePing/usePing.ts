@@ -23,8 +23,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 interface UsePingProps {
@@ -34,7 +33,7 @@ interface UsePingProps {
 }
 
 export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [isPingDisabled, setIsPingDisabled] = useState(false);
 
   const maxUsersWithoutAlert = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
@@ -57,15 +56,20 @@ export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps)
     if (!enablePingConfirmation || is1to1 || totalConversationUsers < maxUsersWithoutAlert) {
       pingConversation();
     } else {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: pingConversation,
-          text: t('tooltipConversationPing'),
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: pingConversation,
+            text: translate('tooltipConversationPing'),
+          },
+          text: {
+            title: translate('conversationPingConfirmTitle', {memberCount: totalConversationUsers.toString()}),
+          },
         },
-        text: {
-          title: t('conversationPingConfirmTitle', {memberCount: totalConversationUsers.toString()}),
-        },
-      });
+        undefined,
+        translate,
+      );
     }
   };
 

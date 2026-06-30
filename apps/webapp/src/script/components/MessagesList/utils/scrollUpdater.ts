@@ -17,8 +17,8 @@
  *
  */
 
-import {Message} from 'Repositories/entity/message/Message';
-import {StatusType} from 'src/script/message/StatusType';
+import {Message} from 'Repositories/entity/message/message';
+import {StatusType} from 'src/script/message/statusType';
 
 export type FocusedElement = {center?: boolean; element: Element};
 

@@ -27,7 +27,7 @@ import {useCellExpirationToggle} from 'Components/Cells/ShareModal/useCellExpira
 import {useCellPasswordToggle} from 'Components/Cells/ShareModal/useCellPasswordToggle';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 import {createUuid} from 'Util/uuid';
 
 import {
@@ -60,6 +60,7 @@ interface ShareModalParams {
   uuid: string;
   cellsRepository: CellsRepository;
   fireAndForgetInvoker: FireAndForgetInvoker;
+  translate: RootContextValue['translate'];
 }
 
 type CellsShareModalProps = ShareModalParams & {
@@ -70,7 +71,7 @@ const submitHandlers = new Map<string, () => Promise<void> | void>();
 const ACCESS_END_SECONDS_TO_MILLISECONDS = 1000;
 
 export const showShareModal = (properties: ShareModalParams): void => {
-  const {type, uuid, cellsRepository, fireAndForgetInvoker} = properties;
+  const {type, uuid, cellsRepository, fireAndForgetInvoker, translate} = properties;
   const modalId = createUuid();
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
@@ -86,7 +87,7 @@ export const showShareModal = (properties: ShareModalParams): void => {
             });
           }
         },
-        text: t('cells.shareModal.primaryAction'),
+        text: translate('cells.shareModal.primaryAction'),
       },
       text: {
         message: (
@@ -96,17 +97,19 @@ export const showShareModal = (properties: ShareModalParams): void => {
             cellsRepository={cellsRepository}
             fireAndForgetInvoker={fireAndForgetInvoker}
             modalId={modalId}
+            translate={translate}
           />
         ),
-        title: t('cells.shareModal.heading'),
+        title: translate('cells.shareModal.heading'),
       },
     },
     modalId,
+    translate,
   );
 };
 
 export const CellsShareModal = (properties: CellsShareModalProps): ReactElement => {
-  const {type, uuid, cellsRepository, fireAndForgetInvoker, modalId} = properties;
+  const {type, uuid, cellsRepository, fireAndForgetInvoker, modalId, translate} = properties;
   const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellGlobalPublicLink({
     uuid,
     cellsRepository,
@@ -263,7 +266,8 @@ export const CellsShareModal = (properties: CellsShareModalProps): ReactElement 
 
   return (
     <CellsShareModalContent
-      publicLinkDescription={t(
+      translate={translate}
+      publicLinkDescription={translate(
         type === 'file'
           ? 'cells.shareModal.enablePublicLink.file.description'
           : 'cells.shareModal.enablePublicLink.folder.description',

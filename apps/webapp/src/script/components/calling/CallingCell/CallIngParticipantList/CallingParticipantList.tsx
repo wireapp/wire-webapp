@@ -23,13 +23,13 @@ import cx from 'classnames';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {CallParticipantsListItem} from 'Components/calling/CallParticipantsListItem';
+import {CallParticipantsListItem} from 'Components/calling/callParticipantsListItem';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/icon';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {
@@ -39,7 +39,7 @@ import {
   participantListWrapperStyles,
 } from './CallingParticipantList.styles';
 
-import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
+import {ContextMenuEntry, showContextMenu} from '../../../../ui/contextMenu';
 
 interface CallingParticipantListProps {
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
@@ -62,6 +62,8 @@ export const CallingParticipantList = ({
   showParticipants,
   onClose,
 }: CallingParticipantListProps) => {
+  const {translate} = useApplicationContext();
+
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
 
@@ -70,19 +72,19 @@ export const CallingParticipantList = ({
       icon: Icon.MicOffIcon,
       identifier: `moderator-mute-participant`,
       isDisabled: participant.isMuted(),
-      label: t('moderatorMenuEntryMute'),
+      label: translate('moderatorMenuEntryMute'),
     };
 
     const muteOthers: ContextMenuEntry = {
       click: () => {
         callingRepository.sendModeratorMute(
           conversation.qualifiedId,
-          participants.filter(p => p !== participant),
+          participants.filter(participantCandidate => participantCandidate !== participant),
         );
       },
       icon: Icon.MicOffIcon,
       identifier: 'moderator-mute-others',
-      label: t('moderatorMenuEntryMuteAllOthers'),
+      label: translate('moderatorMenuEntryMuteAllOthers'),
     };
 
     const entries: ContextMenuEntry[] = [muteOthers].concat(!participant.user.isMe ? muteParticipant : []);
@@ -102,7 +104,7 @@ export const CallingParticipantList = ({
             type="button"
             className="icon-button"
             onClick={onClose}
-            title={t('videoCallOverlayParticipantsListCloseButton')}
+            title={translate('videoCallOverlayParticipantsListCloseButton')}
           >
             <Icon.CloseIcon />
           </button>
@@ -110,8 +112,8 @@ export const CallingParticipantList = ({
         {handRaisedParticipants.length > 0 && (
           <>
             <p css={labelWithIconStyles}>
-              {t('videoCallOverlayParticipantsRaisedHandListLabel', {count: handRaisedParticipants.length})}
-              <Tooltip body={t('videoCallParticipantRaisedSortByTime')} data-uie-name="hand-sort-info">
+              {translate('videoCallOverlayParticipantsRaisedHandListLabel', {count: handRaisedParticipants.length})}
+              <Tooltip body={translate('videoCallParticipantRaisedSortByTime')} data-uie-name="hand-sort-info">
                 <Icon.InfoIcon />
               </Tooltip>
             </p>
@@ -132,7 +134,7 @@ export const CallingParticipantList = ({
             </ul>
           </>
         )}
-        <p css={labelStyles}>{t('videoCallOverlayParticipantsListLabel', {count: participants.length})}</p>
+        <p css={labelStyles}>{translate('videoCallOverlayParticipantsListLabel', {count: participants.length})}</p>
         <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
           {participants
             .slice()

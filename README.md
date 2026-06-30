@@ -27,18 +27,18 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
 - Root-level tooling (`package.json`, Nx, bin scripts) orchestrates both apps and libraries
 
-The root `yarn` and `nx` scripts are the entry points; package-level scripts delegate to them.
+The repository-local `./bin/yarn` wrapper and root `nx` scripts are the entry points; package-level scripts delegate to them.
 
 # How to Build the Open Source Client
 
 Prerequisites:
 
 1. Install [Node.js](https://nodejs.org/)
-1. Install [Yarn](https://yarnpkg.com)
+1. Use the repository-local `./bin/yarn` wrapper. Do not install Yarn globally.
 
 ## 1. Install Dependencies & Fetch Configuration
 
-1. Run `yarn` (uses Yarn 4 workspaces)
+1. Run `./bin/yarn` (uses Yarn 4 workspaces)
    - This will install all dependencies and run `webapp:configure` (via root `postinstall`).
    - `webapp:configure` uses `apps/webapp/app-config/package.json` to select a config repository version (`wire-web-config-wire` or `wire-web-config-default`), then copies:
      - config content into `apps/webapp/resource/`
@@ -53,8 +53,10 @@ Prerequisites:
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
    - `127.0.0.1 local.zinfra.io` (to connect with the staging backend)
    - `127.0.0.1 local.imai.wire.link` (to connect with the imai backend)
-1. Run `yarn nx build webapp --configuration=development` to build static assets
-1. Run `yarn start` (runs `nx serve server`); the app will be available at https://local.zinfra.io:8081/auth/
+1. Run `./bin/yarn nx build webapp --configuration=development` to build static assets
+1. Run `./bin/yarn start` (runs `nx serve server`); the app will be available at https://local.zinfra.io:8081/auth/
+1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
+   `FEATURE_CHECK_CONSENT="false"` to the env file
 
 #### Install Self-Signed Certificate
 
@@ -98,27 +100,27 @@ After updating the environment variables, the app will be available at the corre
 
 ### Production
 
-1. Build and package for production: `yarn nx run server:package` (or `yarn build:prod`)
+1. Build and package for production: `./bin/yarn nx run server:package` (or `./bin/yarn build:prod`)
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
-1. Start the server output from `apps/server/dist` (or build a Docker image with `yarn docker <tag>`)
+1. Start the server output from `apps/server/dist` (or build a Docker image with `./bin/yarn docker <tag>`)
 
-**Note:** The `yarn zip` command has been deprecated. Packaging is now integrated into the build process via `yarn build:prod` or `yarn nx run server:package`.
+**Note:** The `./bin/yarn zip` command has been deprecated. Packaging is now integrated into the build process via `./bin/yarn build:prod` or `./bin/yarn nx run server:package`.
 
 ## Testing
-
-[![codecov](https://codecov.io/gh/wireapp/wire-webapp/branch/dev/graph/badge.svg?token=9ELBEPM793)](https://codecov.io/gh/wireapp/wire-webapp)
 
 To launch the full test suite:
 
 ```bash
-yarn nx run-many -t test --all
+./bin/yarn nx run-many -t test --all
 ```
+
+CI runs the Nx/Jest test targets with `--configuration=ci`, which generates coverage, prints the coverage table to the GitHub Actions logs, and fails the `Test` step when project coverage drops below the configured Jest thresholds. Coverage reports are also uploaded as a GitHub Actions artifact for inspection.
 
 Other useful tasks:
 
-- Lint: `yarn nx run-many -t lint --all`
-- Type-check: `yarn nx run-many -t type-check --all`
-- E2E (Playwright): `yarn nx e2e webapp`
+- Lint: `./bin/yarn lint`
+- Type-check: `./bin/yarn nx run-many -t type-check --all`
+- E2E (Playwright): `./bin/yarn nx e2e webapp`
 
 ## CI Status
 
@@ -155,14 +157,14 @@ If our CI pipeline is broken, you still have the option to upload new strings ma
 
 1. Install [Crowdin CLI v3](https://support.crowdin.com/cli-tool/)
 1. Verify you have a `keys/crowdin.yaml` in place
-1. Run `yarn translate:upload`
+1. Run `./bin/yarn translate:upload`
 
 Once translations are uploaded on Crowdin, our (and external) translators can translate the new strings on Crowdin. There is a script that will run to create PRs with translation updates. As an alternative, translations can be downloaded in the following way:
 
 1. Verify your string shows up on the [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
 1. Add a translation on Crowdin
 1. Approve the translation on Crowdin
-1. Run `yarn translate:download`
+1. Run `./bin/yarn translate:download`
 
 ## Contributing
 

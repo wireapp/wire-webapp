@@ -217,8 +217,8 @@ const sharedRowLayout: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  padding: '10px 6px',
-  gap: '10px',
+  padding: '12px',
+  gap: '8px',
   cursor: 'pointer',
 };
 
@@ -226,12 +226,30 @@ export const checkboxWrapperStyles: CSSObject = {
   ...sharedRowLayout,
   margin: 0,
   left: '0',
-  justifyContent: 'space-between',
   minWidth: 0,
-  '& > label': {
+  position: 'relative',
+  '& .wireinput': {
+    position: 'absolute',
+    right: '12px',
+    width: '18px',
+    height: '18px',
+    margin: 0,
+    zIndex: 1,
+  },
+  '& .wireinput + label': {
+    display: 'grid',
+    gridTemplateColumns: '28px minmax(0, 1fr) 18px',
+    columnGap: '8px',
+    alignItems: 'center',
+    width: '100%',
     minWidth: 0,
+    margin: 0,
+    lineHeight: 'normal',
   },
   '& .wireinput + label::before': {
+    gridColumn: '3',
+    gridRow: '1',
+    margin: 0,
     minWidth: '18px',
     height: '18px',
   },
@@ -239,31 +257,44 @@ export const checkboxWrapperStyles: CSSObject = {
     borderColor: 'var(--accent-color)',
   },
   '& .wireinput + label > svg': {
+    gridColumn: '3',
+    gridRow: '1',
+    position: 'static',
+    transform: 'none',
+    justifySelf: 'center',
+    alignSelf: 'center',
     width: '12px',
     height: '11px',
   },
 };
 
 export const startContentStyles: CSSObject = {
+  gridColumn: '1',
+  gridRow: '1',
   flexShrink: 0,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   width: '28px',
   height: '28px',
-  '& svg': {
+  '& > svg': {
     width: '18px',
     height: '22px',
   },
 };
 
 export const labelGroupStyles: CSSObject = {
+  gridColumn: '1 / 3',
+  gridRow: '1',
   flex: 1,
   minWidth: 0,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   marginRight: '8px',
+  '&[data-has-start-content="true"]': {
+    gridColumn: '2',
+  },
 };
 
 export const checkboxLabelStyles: CSSObject = {
@@ -274,6 +305,17 @@ export const checkboxLabelStyles: CSSObject = {
   fontSize: 'var(--font-size-medium)',
   fontWeight: 'var(--font-weight-medium)',
   lineHeight: 'var(--line-height-md)',
+  letterSpacing: '0.05px',
+};
+
+export const checkboxSubLabelStyles: CSSObject = {
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  color: 'var(--foreground-secondary, #71767B)',
+  fontSize: 'var(--font-size-small)',
+  fontWeight: 'var(--font-weight-regular)',
+  lineHeight: 'var(--line-height-small-plus)',
 };
 
 export const footerStyles: CSSObject = {

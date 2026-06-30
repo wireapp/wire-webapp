@@ -25,10 +25,10 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import type {GlobalDriveFiltersState} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
+import {useCellsSorting} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {t} from 'Util/localizerUtil';
 
 import {loadMoreWrapperStyles, wrapperStyles} from './CellsGlobalView.styles';
 import {CellsHeader} from './CellsHeader/CellsHeader';
@@ -41,7 +41,7 @@ import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresigne
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
 import {sharedDriveSearchAndFiltersFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from '../../page/RootProvider';
+import {useApplicationContext} from '../../page/rootProvider';
 
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;
@@ -55,12 +55,14 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
     userRepository = container.resolve(UserRepository),
     conversationRepository = container.resolve(ConversationRepository),
   } = properties;
-  const {fireAndForgetInvoker, isFeatureToggleEnabled} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
   const legacyFilters = useCellsStore(state => state.filters);
   const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
 
-  const {filters, filterState} = useGlobalDriveFilters({cellsRepository});
+  const {filters, filterState} = useGlobalDriveFilters({cellsRepository, conversationRepository, translate});
+
+  const {getDirectionFor, toggleSort} = useCellsSorting();
   const legacyFilterState = useMemo<GlobalDriveFiltersState>(
     () => ({
       selectedTagIds: legacyFilters.tags,
@@ -119,23 +121,33 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
       />
       {emptySearchResults && (
         <CellsStateInfo
-          heading={t('cells.emptySearchResults.heading')}
-          description={t('cells.emptySearchResults.description')}
+          heading={translate('cells.emptySearchResults.heading')}
+          description={translate('cells.emptySearchResults.description')}
         />
       )}
-      {showTable && <CellsTable nodes={nodes} cellsRepository={cellsRepository} />}
+      {showTable && (
+        <CellsTable
+          nodes={nodes}
+          cellsRepository={cellsRepository}
+          getDirectionFor={getDirectionFor}
+          isSortingEnabled={isSharedDriveSearchAndFiltersEnabled}
+          onToggleSort={toggleSort}
+        />
+      )}
       {showNoFiles && (
         <CellsStateInfo
-          heading={t('cells.noNodes.global.heading')}
-          description={t('cells.noNodes.global.description')}
+          heading={translate('cells.noNodes.global.heading')}
+          description={translate('cells.noNodes.global.description')}
         />
       )}
       {showLoader && <CellsLoader />}
-      {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
+      {isError && (
+        <CellsStateInfo heading={translate('cells.error.heading')} description={translate('cells.error.description')} />
+      )}
       {showLoadMore && (
         <div css={loadMoreWrapperStyles}>
           <Button variant={ButtonVariant.TERTIARY} onClick={increasePageSize}>
-            {t('cells.pagination.loadMoreResults')}
+            {translate('cells.pagination.loadMoreResults')}
           </Button>
         </div>
       )}

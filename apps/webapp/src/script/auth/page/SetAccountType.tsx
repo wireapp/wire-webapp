@@ -22,7 +22,7 @@ import {Navigate, useNavigate} from 'react-router-dom';
 import {Runtime} from '@wireapp/commons';
 import {Button, ButtonVariant, CheckRoundIcon, FlexBox} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Page} from './Page';
 import {styles} from './SetAccountType.styles';
@@ -34,6 +34,7 @@ import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
 
 export const SetAccountType = () => {
+  const {translate} = useApplicationContext();
   const navigate = useNavigate();
 
   const onCreatePersonalAccount = () => {
@@ -52,23 +53,23 @@ export const SetAccountType = () => {
 
   const accountTypeOptions = [
     {
-      heading: t('selectTeamAccountTypeOptionHeading'),
-      description: t('selectTeamAccountTypeOptionDescription'),
-      buttonText: t('selectTeamAccountTypeOptionButtonText'),
+      heading: translate('selectTeamAccountTypeOptionHeading'),
+      description: translate('selectTeamAccountTypeOptionDescription'),
+      buttonText: translate('selectTeamAccountTypeOptionButtonText'),
       action: onCreateTeamAccount,
       features: [
-        t('selectTeamAccountTypeOptionFeature1'),
-        ...(!isMacDesktopApp ? [t('selectTeamAccountTypeOptionFeature2')] : []),
+        translate('selectTeamAccountTypeOptionFeature1'),
+        ...(!isMacDesktopApp ? [translate('selectTeamAccountTypeOptionFeature2')] : []),
       ],
       isPrimary: true,
     },
     {
-      heading: t('selectPersonalAccountTypeOptionHeading'),
-      description: t('selectPersonalAccountTypeOptionDescription'),
-      buttonText: t('selectPersonalAccountTypeOptionButtonText'),
+      heading: translate('selectPersonalAccountTypeOptionHeading'),
+      description: translate('selectPersonalAccountTypeOptionDescription'),
+      buttonText: translate('selectPersonalAccountTypeOptionButtonText'),
       features: [
-        t('selectPersonalAccountTypeOptionFeature1'),
-        ...(!isMacDesktopApp ? [t('selectPersonalAccountTypeOptionFeature2')] : []),
+        translate('selectPersonalAccountTypeOptionFeature1'),
+        ...(!isMacDesktopApp ? [translate('selectPersonalAccountTypeOptionFeature2')] : []),
       ],
       action: onCreatePersonalAccount,
     },
@@ -82,7 +83,7 @@ export const SetAccountType = () => {
             <BackButton />
           </FlexBox>
           <FlexBox css={styles.headerText} role="heading" aria-level={1} data-page-title tabIndex={-1}>
-            {t('selectAccountTypeHeading')}
+            {translate('selectAccountTypeHeading')}
           </FlexBox>
         </FlexBox>
         <FlexBox css={styles.optionWrapper}>

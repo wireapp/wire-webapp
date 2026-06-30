@@ -20,6 +20,7 @@
 import {act, renderHook} from '@testing-library/react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {TranslationKey} from 'Util/localizerUtil';
 
 import {useNoInternetCallGuard} from './useNoInternetCallGuard';
 
@@ -33,11 +34,22 @@ jest.mock('Components/Modals/PrimaryModal', () => ({
     show: jest.fn(),
   },
 }));
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
+
+function translateForTest(identifier: TranslationKey): string {
+  return identifier;
+}
 
 const mockedUseWarningsState = jest.mocked(useWarningsState);
+const noInternetCallGuardCopy = {
+  description: 'callNotEstablishedDescription',
+  descriptionPoints: [
+    'callNotEstablishedDescriptionPoint1',
+    'callNotEstablishedDescriptionPoint2',
+    'callNotEstablishedDescriptionPoint3',
+  ] as [string, string, string],
+  title: 'callNotEstablishedTitle',
+  translate: translateForTest,
+};
 
 describe('useNoInternetCallGuard', () => {
   beforeEach(() => {
@@ -46,7 +58,7 @@ describe('useNoInternetCallGuard', () => {
 
   it('should show modal and not call startCall when warning is NO_INTERNET', () => {
     mockedUseWarningsState.mockReturnValue([TYPE.NO_INTERNET]);
-    const {result} = renderHook(() => useNoInternetCallGuard());
+    const {result} = renderHook(() => useNoInternetCallGuard(noInternetCallGuardCopy));
     const startCall = jest.fn();
 
     act(() => {
@@ -54,18 +66,23 @@ describe('useNoInternetCallGuard', () => {
     });
 
     expect(PrimaryModal.show).toHaveBeenCalledTimes(1);
-    expect(PrimaryModal.show).toHaveBeenCalledWith(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {
-        message: expect.any(Object),
-        title: 'callNotEstablishedTitle',
+    expect(PrimaryModal.show).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          message: expect.any(Object),
+          title: 'callNotEstablishedTitle',
+        },
       },
-    });
+      undefined,
+      translateForTest,
+    );
     expect(startCall).not.toHaveBeenCalled();
   });
 
   it('should call startCall when there is no warning', () => {
     mockedUseWarningsState.mockReturnValue([]);
-    const {result} = renderHook(() => useNoInternetCallGuard());
+    const {result} = renderHook(() => useNoInternetCallGuard(noInternetCallGuardCopy));
     const startCall = jest.fn();
 
     act(() => {
@@ -78,7 +95,7 @@ describe('useNoInternetCallGuard', () => {
 
   it('should call startCall when warning is different from NO_INTERNET', () => {
     mockedUseWarningsState.mockReturnValue(['SOME_OTHER_WARNING']);
-    const {result} = renderHook(() => useNoInternetCallGuard());
+    const {result} = renderHook(() => useNoInternetCallGuard(noInternetCallGuardCopy));
     const startCall = jest.fn();
 
     act(() => {
@@ -91,7 +108,7 @@ describe('useNoInternetCallGuard', () => {
 
   it('should update behavior when warnings change between renders', () => {
     mockedUseWarningsState.mockReturnValue([TYPE.NO_INTERNET]);
-    const {result, rerender} = renderHook(() => useNoInternetCallGuard());
+    const {result, rerender} = renderHook(() => useNoInternetCallGuard(noInternetCallGuardCopy));
     const startCall = jest.fn();
 
     act(() => {
@@ -109,9 +126,32 @@ describe('useNoInternetCallGuard', () => {
     expect(startCall).toHaveBeenCalledTimes(1);
   });
 
+  it('should keep the same guard callback when copy values stay the same', () => {
+    mockedUseWarningsState.mockReturnValue([]);
+    const {result, rerender} = renderHook(({copy}) => useNoInternetCallGuard(copy), {
+      initialProps: {copy: noInternetCallGuardCopy},
+    });
+    const initialGuardCall = result.current;
+
+    rerender({
+      copy: {
+        description: noInternetCallGuardCopy.description,
+        descriptionPoints: [
+          noInternetCallGuardCopy.descriptionPoints[0],
+          noInternetCallGuardCopy.descriptionPoints[1],
+          noInternetCallGuardCopy.descriptionPoints[2],
+        ],
+        title: noInternetCallGuardCopy.title,
+        translate: noInternetCallGuardCopy.translate,
+      },
+    });
+
+    expect(result.current).toBe(initialGuardCall);
+  });
+
   it('should work with different startCall implementations', () => {
     mockedUseWarningsState.mockReturnValue([]);
-    const {result} = renderHook(() => useNoInternetCallGuard());
+    const {result} = renderHook(() => useNoInternetCallGuard(noInternetCallGuardCopy));
     const startAudio = jest.fn();
     const startVideo = jest.fn();
 

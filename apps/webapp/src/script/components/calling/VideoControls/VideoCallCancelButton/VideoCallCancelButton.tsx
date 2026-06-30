@@ -18,14 +18,16 @@
  */
 
 import * as Icon from 'Components/icon';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 interface VideoCallCancelButtonProps {
   onAction: () => void;
 }
 
 export const VideoCallCancelButton = ({onAction}: VideoCallCancelButtonProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <button
       className="video-controls__button video-controls__button--red"
@@ -39,7 +41,7 @@ export const VideoCallCancelButton = ({onAction}: VideoCallCancelButtonProps) =>
       }
       type="button"
       data-uie-name="do-call-controls-video-call-cancel"
-      title={t('videoCallOverlayHangUp')}
+      title={translate('videoCallOverlayHangUp')}
     >
       <Icon.HangupIcon />
     </button>

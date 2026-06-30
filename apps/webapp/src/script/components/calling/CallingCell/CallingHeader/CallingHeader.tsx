@@ -19,12 +19,12 @@
 
 import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/avatar';
 import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/icon';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/localizerUtil';
 
 import {
   callAvatar,
@@ -80,6 +80,7 @@ export const CallingHeader = ({
   isDetachedWindow,
   conversationID,
 }: CallingHeaderProps) => {
+  const {translate} = useApplicationContext();
   return (
     <div css={callingHeaderContainer}>
       <div
@@ -101,7 +102,7 @@ export const CallingHeader = ({
         aria-label={
           showAlert
             ? callStartedAlert
-            : `${isOngoing ? `${ongoingCallAlert} ` : ''}${t('accessibility.openConversation', {name: conversationName})}`
+            : `${isOngoing ? `${ongoingCallAlert} ` : ''}${translate('accessibility.openConversation', {name: conversationName})}`
         }
       >
         {isDetachedWindow && !isTemporaryUser && (
@@ -130,19 +131,19 @@ export const CallingHeader = ({
           {isOngoing && startedAt != null && (
             <div css={callDescription}>
               {isDetachedWindow ? (
-                <span data-uie-name="call-lead" aria-label={t('viewingInAnotherWindow')}>
-                  {t('viewingInAnotherWindow')}
+                <span data-uie-name="call-lead" aria-label={translate('viewingInAnotherWindow')}>
+                  {translate('viewingInAnotherWindow')}
                 </span>
               ) : (
-                <span data-uie-name="call-duration" aria-label={t('callDurationLabel')}>
+                <span data-uie-name="call-duration" aria-label={translate('callDurationLabel')}>
                   <Duration {...{startedAt}} />
                 </span>
               )}
 
               {isCbrEnabled && (
                 <span
-                  title={t('callStateCbr')}
-                  aria-label={t('callStateCbr')}
+                  title={translate('callStateCbr')}
+                  aria-label={translate('callStateCbr')}
                   data-uie-name="call-cbr"
                   css={cbrCallState}
                 >
@@ -158,7 +159,7 @@ export const CallingHeader = ({
         <div>
           <IconButton
             variant={IconButtonVariant.SECONDARY}
-            title={t('videoCallOverlayOpenPopupWindow')}
+            title={translate('videoCallOverlayOpenPopupWindow')}
             css={detachedWindowButton}
             onClick={toggleDetachedWindow}
           >

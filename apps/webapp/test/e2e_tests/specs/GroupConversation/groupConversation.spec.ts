@@ -91,7 +91,7 @@ test.describe('Group Conversation', () => {
     },
   );
 
-  // This test is currently broken due to the backend taking more than 20s to delete the conversation
+  // Skipped due to WPB-25900 -> Group conversations are only deleted locally but not for the other members
   test.skip(
     'I want to delete a group as the Group Creator',
     {tag: ['@TC-1089', '@regression']},
@@ -125,12 +125,12 @@ test.describe('Group Conversation', () => {
       await userAModals.confirm().actionButton.click();
 
       // Verify the group no longer exists for any user
-      await expect(adminGroupLocator).toBeHidden({timeout: 20_000});
-      await expect(memberGroupLocator).toBeHidden({timeout: 20_000});
+      await expect(adminGroupLocator).toBeHidden();
+      await expect(memberGroupLocator).toBeHidden();
     },
   );
 
-  // This test is currently broken due to the backend taking more than 20s to delete the conversation
+  // Skipped due to WPB-25900 -> Group conversations are only deleted locally but not for the other members
   test.skip(
     'I want to be notified about the group deletion when app is in background',
     {tag: ['@TC-1093', '@regression']},
@@ -154,7 +154,7 @@ test.describe('Group Conversation', () => {
       await userAPages.conversation().clickConversationInfoButton();
       await userAPages.conversationDetails().deleteGroupButton.click();
       await userAModals.confirm().actionButton.click();
-      await expect(userAConversation).not.toBeAttached({timeout: 20_000});
+      await expect(userAConversation).not.toBeAttached();
 
       await expect
         .poll(() => getUserBNotifications())
@@ -171,7 +171,7 @@ test.describe('Group Conversation', () => {
     },
   );
 
-  // This test is currently broken due to the backend taking more than 20s to delete the conversation
+  // Skipped due to WPB-25900 -> Group conversations are only deleted locally but not for the other members
   test.skip(
     'I should not be able to search for deleted group',
     {tag: ['@TC-1095', '@regression']},
@@ -203,9 +203,7 @@ test.describe('Group Conversation', () => {
         await pages.conversation().clickConversationInfoButton();
         await pages.conversationDetails().deleteGroupButton.click();
         await modals.confirm().actionButton.click();
-        await expect(userCPages.conversationList().getConversation(group.name)).not.toBeAttached({
-          timeout: 20_000,
-        });
+        await expect(userCPages.conversationList().getConversation(group.name)).not.toBeAttached();
 
         await userCPages.conversationList().searchConversationsInput.fill(group.name);
         await expect(userCPages.conversationList().list).toContainText('No results found');
@@ -247,7 +245,7 @@ test.describe('Group Conversation', () => {
 
       await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
 
-      await pages.conversationDetails().openParticipantDetails(userB.fullName);
+      await pages.conversationDetails().getParticipant(userB.fullName).openDetails();
       await pages.participantDetails().removeFromGroup();
 
       await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).not.toBeVisible();
@@ -268,13 +266,13 @@ test.describe('Group Conversation', () => {
       await pages.conversation().toggleGroupInformation();
 
       await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
-      await pages.conversationDetails().openParticipantDetails(userB.fullName);
+      await pages.conversationDetails().getParticipant(userB.fullName).openDetails();
       await expect(pages.conversation().makeAdminToggle).toBeVisible();
     },
   );
 
   test(
-    'As a group member I should not see group admin toggle while viewing Admin`s profile in Conversation details',
+    "As a group member I should not see group admin toggle while viewing Admin's profile in Conversation details",
     {tag: ['@TC-1483', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
@@ -287,7 +285,7 @@ test.describe('Group Conversation', () => {
       await userBPages.conversation().toggleGroupInformation();
 
       await expect(userBPages.conversationDetails().groupAdmins.filter({hasText: userA.fullName})).toBeVisible();
-      await userBPages.conversationDetails().openParticipantDetails(userA.fullName);
+      await userBPages.conversationDetails().getParticipant(userA.fullName).openDetails();
       await expect(userBPages.conversation().makeAdminToggle).not.toBeVisible();
     },
   );

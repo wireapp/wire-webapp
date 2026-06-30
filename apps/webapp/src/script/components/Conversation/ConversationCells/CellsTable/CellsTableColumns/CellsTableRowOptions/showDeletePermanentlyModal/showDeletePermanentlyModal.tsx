@@ -18,40 +18,47 @@
  */
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 export const showDeletePermanentlyModal = ({
   node,
   onDeletePermanently,
+  translate,
 }: {
   node: CellNode;
   onDeletePermanently: (uuid: string) => void;
+  translate: RootContextValue['translate'];
 }) => {
-  PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    primaryAction: {
-      action: () => onDeletePermanently(node.id),
-      text: t('cells.deletePermanentlyModal.button'),
-    },
-    text: {
-      message: replaceReactComponents(
-        t(
-          node.type === CellNodeType.FILE
-            ? 'cells.deletePermanentlyModal.file.description'
-            : 'cells.deletePermanentlyModal.folder.description',
-          {
-            name: '{name}',
-          },
+  PrimaryModal.show(
+    PrimaryModal.type.CONFIRM,
+    {
+      primaryAction: {
+        action: () => onDeletePermanently(node.id),
+        text: translate('cells.deletePermanentlyModal.button'),
+      },
+      text: {
+        message: replaceReactComponents(
+          translate(
+            node.type === CellNodeType.FILE
+              ? 'cells.deletePermanentlyModal.file.description'
+              : 'cells.deletePermanentlyModal.folder.description',
+            {
+              name: '{name}',
+            },
+          ),
+          [
+            {
+              exactMatch: '{name}',
+              render: () => <b>{node.name}</b>,
+            },
+          ],
         ),
-        [
-          {
-            exactMatch: '{name}',
-            render: () => <b>{node.name}</b>,
-          },
-        ],
-      ),
-      title: t('cells.deletePermanentlyModal.headline'),
+        title: translate('cells.deletePermanentlyModal.headline'),
+      },
     },
-  });
+    undefined,
+    translate,
+  );
 };

@@ -26,9 +26,7 @@ export enum USER_ACTION {
 }
 
 export type UserActions =
-  | SendActivationCodeStartAction
-  | SendActivationCodeSuccessAction
-  | SendActivationCodeFailedAction;
+  SendActivationCodeStartAction | SendActivationCodeSuccessAction | SendActivationCodeFailedAction;
 
 export interface SendActivationCodeStartAction extends AppAction {
   readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_START;

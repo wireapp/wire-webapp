@@ -260,7 +260,7 @@ describe('MLSService', () => {
       const {failures, keyPackages} = await mlsService.getKeyPackagesPayload(users);
 
       expect(failures).toEqual([
-        {reason: AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG, users: [users[1]]},
+        {reason: AddUsersFailureReasons.NOT_MLS_CAPABLE, users: [users[1]]},
         {reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS, users: [users[0]], backends: [users[1].domain]},
       ]);
 

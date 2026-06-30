@@ -14,7 +14,7 @@
     "build": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/lib"],
-      "dependsOn": ["clean"],
+      "dependsOn": ["clean", "^build"],
       "options": {
         "command": "tsc",
         "cwd": "{projectRoot}"
@@ -38,7 +38,7 @@
         "ci": {
           "ci": true,
           "coverage": true,
-          "coverageReporters": ["lcov", "text"]
+          "coverageReporters": ["html", "lcov", "text"]
         }
       }
     },
@@ -61,7 +61,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=1289 --ext .js,.ts {projectRoot}"
+        "command": "eslint --config eslint.config.ts --cache --cache-location node_modules/.cache/eslint/api-client --max-warnings=1289 --ext .js,.ts {projectRoot}"
       }
     },
     "type-check": {

@@ -43,8 +43,8 @@ import {
 import * as Icon from 'Components/icon';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
 import {loadDataUrl} from 'Util/util';
 
@@ -80,13 +80,6 @@ export enum Scope {
   READ_FEATURE_CONFIGS = 'read:feature_configs',
 }
 
-const scopeText: Record<Scope, string> = {
-  [Scope.WRITE_CONVERSATIONS]: t('oauth.scope.write_conversations'),
-  [Scope.WRITE_CONVERSATIONS_CODE]: t('oauth.scope.write_conversations_code'),
-  [Scope.READ_SELF]: t('oauth.scope.read_self'),
-  [Scope.READ_FEATURE_CONFIGS]: t('oauth.scope.read_feature_configs'),
-};
-
 const OAuthPermissionsComponent = ({
   doLogout,
   getOAuthApp,
@@ -97,10 +90,17 @@ const OAuthPermissionsComponent = ({
   getSelf,
   getTeam,
 }: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const [teamImage, setTeamImage] = React.useState<string | ArrayBuffer | undefined>(undefined);
   const isMobile = useMatchMedia(QUERY.mobile);
 
   const [oAuthApp, setOAuthApp] = useState<OAuthClient | null>(null);
+  const scopeText: Record<Scope, string> = {
+    [Scope.WRITE_CONVERSATIONS]: translate('oauth.scope.write_conversations'),
+    [Scope.WRITE_CONVERSATIONS_CODE]: translate('oauth.scope.write_conversations_code'),
+    [Scope.READ_SELF]: translate('oauth.scope.read_self'),
+    [Scope.READ_FEATURE_CONFIGS]: translate('oauth.scope.read_feature_configs'),
+  };
   const oauthParams = oAuthParams(window.location);
   const oauthScope = oAuthScope(oauthParams);
   const cleanedScopes = oAuthScopesToString(oauthScope);
@@ -165,7 +165,7 @@ const OAuthPermissionsComponent = ({
           <Icon.LoadingIcon width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
         ) : (
           <>
-            <H2 css={headerCSS}>{t('oauth.headline')}</H2>
+            <H2 css={headerCSS}>{translate('oauth.headline')}</H2>
             {typeof teamImage === 'string' && <img src={teamImage} css={teamImageCSS} alt="teamIcon" />}
             <Text css={{marginBottom: '8px'}}>{selfUser.email}</Text>
             <Link
@@ -175,11 +175,11 @@ const OAuthPermissionsComponent = ({
               variant={LinkVariant.PRIMARY}
               color={COLOR_V2.BLUE}
             >
-              {t('oauth.logout')}
+              {translate('oauth.logout')}
             </Link>
 
             <Text data-uie-name="oauth-permissions-requester" css={{marginBottom: '24px'}}>
-              {t('oauth.subhead')}
+              {translate('oauth.subhead')}
             </Text>
 
             {oauthParams.scope.length > 1 && (
@@ -211,7 +211,7 @@ const OAuthPermissionsComponent = ({
               </Box>
             )}
             <Text muted css={isMobile ? mobileTextCSS : textCSS} data-uie-name="oauth-details">
-              {t('oauth.details')}
+              {translate('oauth.details')}
             </Text>
             <div css={isMobile ? mobileButtonsCSS : buttonsCSS}>
               <Button
@@ -222,7 +222,7 @@ const OAuthPermissionsComponent = ({
                 data-uie-name="do-oauth-cancel"
                 onKeyDown={event => handleEscDown(event, onCancel)}
               >
-                {t('oauth.cancel')}
+                {translate('oauth.cancel')}
               </Button>
               <Button
                 css={isMobile ? mobileButtonCSS : buttonCSS}
@@ -231,7 +231,7 @@ const OAuthPermissionsComponent = ({
                 data-uie-name="do-oauth-allow"
                 onKeyDown={event => handleKeyDown({event, callback: onContinue, keys: [KEY.ENTER, KEY.SPACE]})}
               >
-                {t('oauth.allow')}
+                {translate('oauth.allow')}
               </Button>
             </div>
             <Paragraph center css={{marginTop: 40}}>

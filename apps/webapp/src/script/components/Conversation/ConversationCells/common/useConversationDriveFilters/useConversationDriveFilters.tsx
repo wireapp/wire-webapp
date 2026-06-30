@@ -20,7 +20,8 @@
 import {useCallback, useMemo, useState} from 'react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 
 import type {FilterConfig, FilterItem} from '../CellsFiltersBar/filterConfig';
 import {
@@ -29,19 +30,8 @@ import {
   isFilterTypeDisabled,
 } from '../driveFilters/driveFilters';
 import {FILE_TYPE_CATALOG} from '../driveFilters/fileTypeCatalog';
+import {useDriveEnabledParticipantFilterItems} from '../useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
 import {useGetAllTags} from '../useGetAllTags/useGetAllTags';
-
-// ---------------------------------------------------------------------------
-// Mock data — replace each array with an API call in the integration sprint.
-// ---------------------------------------------------------------------------
-
-const MOCK_CREATORS: FilterItem[] = [
-  {id: 'a-user', label: 'A User', subLabel: '@auser'},
-  {id: 'hello-user', label: 'Hello User', subLabel: '@hellouser'},
-  {id: 'b-user', label: 'B User', subLabel: '@buser'},
-];
-
-// ---------------------------------------------------------------------------
 
 export interface UseConversationDriveFiltersResult {
   filters: FilterConfig[];
@@ -51,10 +41,15 @@ export interface UseConversationDriveFiltersResult {
 
 export const useConversationDriveFilters = ({
   cellsRepository,
+  conversationRepository,
+  translate,
 }: {
   cellsRepository: CellsRepository;
+  conversationRepository: ConversationRepository;
+  translate: RootContextValue['translate'];
 }): UseConversationDriveFiltersResult => {
   const {tags: allTags} = useGetAllTags({cellsRepository});
+  const creatorItems = useDriveEnabledParticipantFilterItems({conversationRepository});
 
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [selectedFileTypeIds, setSelectedFileTypeIds] = useState<string[]>([]);
@@ -85,10 +80,10 @@ export const useConversationDriveFilters = ({
     () =>
       FILE_TYPE_CATALOG.map(({id, labelKey, Icon}) => ({
         id,
-        label: t(labelKey),
+        label: translate(labelKey),
         startContent: <Icon />,
       })),
-    [],
+    [translate],
   );
 
   const filters = useMemo<FilterConfig[]>(
@@ -96,7 +91,7 @@ export const useConversationDriveFilters = ({
       {
         type: 'popover',
         id: 'tags',
-        label: t('cells.filter.tags'),
+        label: translate('cells.filter.tags'),
         items: tagItems,
         selectedIds: selectedTagIds,
         onSelectionChange: setSelectedTagIds,
@@ -106,7 +101,7 @@ export const useConversationDriveFilters = ({
       {
         type: 'popover',
         id: 'fileType',
-        label: t('cells.filter.fileType'),
+        label: translate('cells.filter.fileType'),
         items: fileTypes,
         selectedIds: selectedFileTypeIds,
         onSelectionChange: setSelectedFileTypeIds,
@@ -116,8 +111,8 @@ export const useConversationDriveFilters = ({
       {
         type: 'popover',
         id: 'createdBy',
-        label: t('cells.filter.createdBy'),
-        items: MOCK_CREATORS,
+        label: translate('cells.filter.createdBy'),
+        items: creatorItems,
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
         disabled: isFilterTypeDisabled('createdBy', activeFilterType),
@@ -126,7 +121,7 @@ export const useConversationDriveFilters = ({
       {
         type: 'toggle',
         id: 'sharedViaLink',
-        label: t('cells.filter.sharedViaLink'),
+        label: translate('cells.filter.sharedViaLink'),
         isActive: isSharedViaLink,
         onToggle: toggleSharedViaLink,
         disabled: isFilterTypeDisabled('sharedViaLink', activeFilterType),
@@ -134,6 +129,7 @@ export const useConversationDriveFilters = ({
     ],
     [
       activeFilterType,
+      creatorItems,
       fileTypes,
       tagItems,
       selectedTagIds,
@@ -141,6 +137,7 @@ export const useConversationDriveFilters = ({
       selectedCreatorIds,
       isSharedViaLink,
       toggleSharedViaLink,
+      translate,
     ],
   );
 

@@ -17,20 +17,24 @@
  *
  */
 
-import {MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {
+  CompositeMessageAddEvent,
+  MessageAddEvent,
+  MultipartMessageAddEvent,
+} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage';
 import {EventError} from 'src/script/error/eventError';
 
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
-import {CONVERSATION, ClientEvent} from '../../../Client';
+import {ClientEvent, CONVERSATION} from '../../../Client';
 import {EventHandler, HandledEvents} from '../types';
 
 function throwValidationError(message: string): never {
   throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${message}`);
 }
 
-export type EditableEvent = MessageAddEvent | MultipartMessageAddEvent;
+export type EditableEvent = MessageAddEvent | MultipartMessageAddEvent | CompositeMessageAddEvent;
 
 function validateEditEvent(
   originalEvent: HandledEvents | undefined,
@@ -42,7 +46,8 @@ function validateEditEvent(
 
   if (
     originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD &&
-    originalEvent.type !== ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD
+    originalEvent.type !== ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD &&
+    originalEvent.type !== ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD
   ) {
     throwValidationError('Edit event for non-text message');
   }
@@ -74,7 +79,11 @@ function computeEventUpdates(originalEvent: StoredEvent<EditableEvent>, newEvent
 }
 
 export const handleEditEvent: EventHandler = async (event, {findEvent}) => {
-  if (event.type !== CONVERSATION.MESSAGE_ADD && event.type !== CONVERSATION.MULTIPART_MESSAGE_ADD) {
+  if (
+    event.type !== CONVERSATION.MESSAGE_ADD &&
+    event.type !== CONVERSATION.MULTIPART_MESSAGE_ADD &&
+    event.type !== CONVERSATION.COMPOSITE_MESSAGE_ADD
+  ) {
     return undefined;
   }
   const editedEventId = event.data.replacing_message_id;

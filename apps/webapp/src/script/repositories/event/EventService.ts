@@ -41,8 +41,8 @@ import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {StorageError} from '../../error/storageError';
-import {categoryFromEvent} from '../../message/MessageCategorization';
-import {MessageCategory} from '../../message/MessageCategory';
+import {categoryFromEvent} from '../../message/messageCategorization';
+import {MessageCategory} from '../../message/messageCategory';
 
 type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;

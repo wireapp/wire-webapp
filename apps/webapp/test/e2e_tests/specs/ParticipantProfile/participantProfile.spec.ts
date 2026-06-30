@@ -30,7 +30,7 @@ async function openParticipantDetailsFromGroup(
 ) {
   await pages.conversationList().getConversation(groupName).open();
   await pages.conversation().clickConversationInfoButton();
-  await pages.conversationDetails().openParticipantDetails(participantName);
+  await pages.conversationDetails().getParticipant(participantName).openDetails();
 }
 
 async function acceptConnectionRequest(pages: PageManager['webapp']['pages']) {
@@ -162,7 +162,7 @@ test.describe('Participant Profile', () => {
       });
 
       await test.step('User C opens individual people profile of User A', async () => {
-        await pages.conversationDetails().openParticipantDetails(userC.fullName);
+        await pages.conversationDetails().getParticipant(userC.fullName).openDetails();
 
         await expect(pages.participantDetails().userPicture).toBeVisible();
         await expect(pages.participantDetails().userPicture).toHaveAttribute('data-uie-status', 'blocked');

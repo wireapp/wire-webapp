@@ -30,11 +30,11 @@ import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {User} from 'Repositories/entity/User';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
 import {waitFor} from 'Util/waitFor';
@@ -43,8 +43,8 @@ import {DetailViewModalFooter} from './DetailViewModalFooter';
 import {DetailViewModalHeader} from './DetailViewModalHeader';
 
 import {isContentMessage} from '../../../guards/Message';
-import {MessageCategory} from '../../../message/MessageCategory';
-import {isOfCategory} from '../../../page/MainContent/panels/Collection/utils';
+import {MessageCategory} from '../../../message/messageCategory';
+import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
 
 interface DetailViewModalProps {
   readonly assetRepository: AssetRepository;
@@ -54,6 +54,7 @@ interface DetailViewModalProps {
   currentMessageEntity: ContentMessage;
   onClose?: () => void;
   selfUser: User;
+  translate: Translate;
 }
 
 export const DetailViewModal = ({
@@ -64,6 +65,7 @@ export const DetailViewModal = ({
   currentMessageEntity,
   onClose,
   selfUser,
+  translate,
 }: DetailViewModalProps) => {
   const currentMessageEntityId = useRef<string>(currentMessageEntity.id);
 
@@ -268,12 +270,12 @@ export const DetailViewModal = ({
             'modal-content-anim-open': isImageVisible,
           })}
         >
-          <DetailViewModalHeader messageEntity={messageEntity} onCloseClick={onCloseClick} />
+          <DetailViewModalHeader messageEntity={messageEntity} onCloseClick={onCloseClick} translate={translate} />
 
           <button
             className="detail-view-main button-reset-default"
             onKeyDown={handleOnClosePress}
-            aria-label={t('accessibility.conversationDetailsCloseLabel')}
+            aria-label={translate('accessibility.conversationDetailsCloseLabel')}
           >
             <ZoomableImage key={currentMessageEntityId.current} src={imageSrc} data-uie-name="status-picture" />
           </button>
@@ -286,6 +288,7 @@ export const DetailViewModal = ({
             onReplyClick={onReplyClick}
             onDownloadClick={onDownloadClick}
             selfId={selfUser.qualifiedId}
+            translate={translate}
           />
         </div>
       )}

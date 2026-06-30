@@ -18,7 +18,7 @@
  */
 
 import {ZoomableImage} from 'Components/ZoomableImage/ZoomableImage';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {imageWrapperStyles, wrapperStyles} from './ImageFileView.styles';
 
@@ -29,12 +29,14 @@ interface ImageFileViewProps {
 }
 
 export const ImageFileView = ({src, senderName, timestamp}: ImageFileViewProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div css={wrapperStyles}>
       <div css={imageWrapperStyles}>
         <ZoomableImage
           src={src}
-          alt={t('accessibility.conversationAssetImageAlt', {
+          alt={translate('accessibility.conversationAssetImageAlt', {
             username: senderName,
             messageDate: timestamp,
           })}

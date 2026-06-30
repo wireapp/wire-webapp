@@ -17,10 +17,10 @@
  *
  */
 
-import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/DeleteMessage';
+import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/deleteMessage';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageHeader} from './ContentMessage/MessageHeader';
@@ -32,9 +32,10 @@ interface DeleteMessageProps {
 }
 
 const DeleteMessage = ({message, onClickAvatar = () => {}}: DeleteMessageProps) => {
+  const {translate} = useApplicationContext();
   const deletedTimeStamp = message.deleted_timestamp ?? 0;
 
-  const formattedDeletionTime = t('conversationDeleteTimestamp', {
+  const formattedDeletionTime = translate('conversationDeleteTimestamp', {
     date: formatTimeShort(fromUnixTime(deletedTimeStamp / TIME_IN_MILLIS.SECOND)),
   });
 

@@ -21,10 +21,10 @@ import {useCallback, KeyboardEvent, MouseEvent, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 interface ConversationTabsProps {
   activeTabIndex: number;
@@ -35,6 +35,7 @@ interface ConversationTabsProps {
 const FILE_PATH = 'files';
 
 export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQualifiedId}: ConversationTabsProps) => {
+  const {translate} = useApplicationContext();
   const filesUrl = generateConversationUrl({...conversationQualifiedId, filePath: FILE_PATH});
   const messagesUrl = generateConversationUrl(conversationQualifiedId);
 
@@ -80,10 +81,10 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQua
 
   return (
     <div className="conversation-tabs">
-      <div className="conversation-tabs__list" role="tablist" aria-label={t('conversationTabs')}>
+      <div className="conversation-tabs__list" role="tablist" aria-label={translate('conversationTabs')}>
         <ConversationTab
           id="conversation"
-          label={t('cells.tableRow.conversationName')}
+          label={translate('cells.tableRow.conversationName')}
           isActive={activeTabIndex === 0}
           onClick={event => {
             createNavigate(messagesUrl)(event);
@@ -93,7 +94,7 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQua
         />
         <ConversationTab
           id="files"
-          label={t('conversationDetailsActionCellsTitle')}
+          label={translate('conversationDetailsActionCellsTitle')}
           isActive={activeTabIndex === 1}
           onClick={event => {
             createNavigate(filesUrl)(event);

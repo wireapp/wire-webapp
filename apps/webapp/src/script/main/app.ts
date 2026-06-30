@@ -74,6 +74,8 @@ import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHand
 import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MeetingsApiDataSource} from 'Repositories/meetings/meetingsApiDataSource';
+import {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import {initializePermissions} from 'Repositories/permission/permissionHandlers';
@@ -91,16 +93,18 @@ import {UserService} from 'Repositories/user/userService';
 import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
+
+import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config, Configuration} from '../Config';
 import {E2EIHandler} from '../E2EIdentity';
-import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
+import {getModalOptions, ModalType} from '../E2EIdentity/modals';
 import {AccessTokenError} from '../error/accessTokenError';
 import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';
@@ -110,15 +114,19 @@ import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
-import {configureDownloadPath} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/downloadPath';
-import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
+import type {ApplicationObservability} from '../observability/applicationObservability';
+import type {ApplicationStartupReport} from '../observability/applicationStartupReport';
+import {reportApplicationStartup} from '../observability/reportApplicationStartup';
+import {configureDownloadPath} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/downloadPath';
+import {configureE2EI} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import type {MonotonicClock} from '../time/monotonicClock';
 import {serverTimeHandler} from '../time/serverTimeHandler';
-import {WindowHandler} from '../ui/WindowHandler';
+import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
@@ -127,6 +135,21 @@ pdfjs.GlobalWorkerOptions.workerSrc = '/min/pdf.worker.mjs';
 
 type WaitUntilAllMessagesAreProcessedDependencies = {
   eventRepository: EventRepository;
+};
+
+type ApplicationStartupTimingInput = {
+  readonly applicationBootstrapStartedAt: number;
+  readonly domContentLoadedAt: number;
+};
+
+type ApplicationStartupDependencies = {
+  readonly applicationObservability: ApplicationObservability;
+  readonly monotonicClock: MonotonicClock;
+};
+
+type ApplicationStartupInput = {
+  readonly dependencies: ApplicationStartupDependencies;
+  readonly timing: ApplicationStartupTimingInput;
 };
 
 export async function waitUntilAllMessagesAreProcessed(dependencies: WaitUntilAllMessagesAreProcessedDependencies) {
@@ -171,6 +194,7 @@ export class App {
     private readonly core: Core,
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
+    private readonly translate: Translate,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -221,12 +245,12 @@ export class App {
     repositories.asset = container.resolve(AssetRepository);
 
     repositories.giphy = new GiphyRepository(new GiphyService());
-    repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
+    repositories.properties = new PropertiesRepository(new PropertiesService(), selfService, this.translate);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository();
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, this.translate);
     repositories.audio = new AudioRepository();
 
     repositories.user = new UserRepository(
@@ -236,12 +260,14 @@ export class App {
       repositories.client,
       serverTimeHandler,
       repositories.properties,
+      this.translate,
     );
     repositories.connection = new ConnectionRepository(
       new ConnectionService(),
       repositories.user,
       selfService,
       teamService,
+      this.translate,
     );
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(repositories.user);
@@ -251,6 +277,7 @@ export class App {
       repositories.asset,
       () => this.repository.lifeCycle.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
       teamService,
+      this.translate,
     );
 
     repositories.message = new MessageRepository(
@@ -267,6 +294,7 @@ export class App {
       repositories.user,
       repositories.asset,
       repositories.audio,
+      this.translate,
     );
 
     repositories.calling = new CallingRepository(
@@ -277,6 +305,7 @@ export class App {
       mediaDevicesHandler,
       serverTimeHandler,
       backgroundEffectsHandler,
+      this.translate,
     );
 
     repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
@@ -292,6 +321,7 @@ export class App {
       repositories.properties,
       repositories.calling,
       serverTimeHandler,
+      this.translate,
     );
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message, this.apiClient);
@@ -307,10 +337,13 @@ export class App {
       repositories.conversation,
       repositories.audio,
       repositories.calling,
+      this.translate,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     repositories.cells = container.resolve(CellsRepository);
+
+    repositories.meetings = new MeetingsRepository(new MeetingsApiDataSource(this.apiClient.api.meetings));
 
     // Initialize LifeCycleRepository with all required dependencies
     repositories.lifeCycle = new LifeCycleRepository({
@@ -393,17 +426,40 @@ export class App {
    * @param config
    * @param onProgress
    */
-  async initApp(clientType: ClientType, onProgress: (message?: string) => void) {
+  async initApp(clientType: ClientType, onProgress: (message?: string) => void, startupInput: ApplicationStartupInput) {
+    const application = this;
+    const {applicationObservability, monotonicClock} = startupInput.dependencies;
+    const {applicationBootstrapStartedAt, domContentLoadedAt} = startupInput.timing;
+    const appInitStartedAtMilliseconds = monotonicClock.nowMilliseconds;
+    const applicationStartupReportingDependencies = {applicationObservability, logger: this.logger};
+
+    const telemetry = new AppInitTelemetry(monotonicClock, applicationBootstrapStartedAt);
+    telemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, domContentLoadedAt);
+    telemetry.timeStepAt(AppInitTimingsStep.INIT_APP_STARTED, appInitStartedAtMilliseconds);
+
+    function reportStartup(result: ApplicationStartupReport['result']) {
+      return reportApplicationStartup(
+        {
+          result,
+          timings: telemetry.timings,
+          statistics: telemetry.getStatistics(),
+          lastStep: telemetry.lastStep,
+        },
+        applicationStartupReportingDependencies,
+      );
+    }
+
+    async function handleBaseError(baseError: BaseError) {
+      await application._appInitFailure(baseError);
+    }
+
     // add body information
-    const startTime = Date.now();
     await updateApiVersion();
     await scheduleApiVersionUpdate();
 
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
-
-    const telemetry = new AppInitTelemetry();
 
     try {
       const {
@@ -430,6 +486,7 @@ export class App {
         selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
       } catch (error: unknown) {
         this.logger.error('Could not get self user', error);
+        await reportStartup('failure');
         await this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
         return undefined;
       }
@@ -440,7 +497,7 @@ export class App {
       const eventLogger = new InitializationEventLogger(selfUser.id);
       eventLogger.log(AppInitializationStep.AppInitialize);
 
-      onProgress(t('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
+      onProgress(this.translate('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
 
       try {
         await this.core.init(clientType);
@@ -486,7 +543,7 @@ export class App {
       }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
-      configureDownloadPath(teamFeatures);
+      configureDownloadPath(teamFeatures, this.translate);
 
       this.core.configureCoreCallbacks({
         groupIdFromConversationId: async conversationId => {
@@ -517,7 +574,7 @@ export class App {
       const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
       callingRepository.initAvs(selfUser, clientEntity.id);
 
-      onProgress(t('initValidatedClient'));
+      onProgress(this.translate('initValidatedClient'));
 
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type ?? clientType);
@@ -546,7 +603,7 @@ export class App {
         );
       }
 
-      onProgress(t('initReceivedUserData'));
+      onProgress(this.translate('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents(selfUser);
       this._subscribeToBeforeUnload();
@@ -561,6 +618,7 @@ export class App {
 
       let previousMessage = '';
 
+      telemetry.timeStep(AppInitTimingsStep.NOTIFICATION_PROCESSING_STARTED);
       await eventRepository.connectWebSocket(
         this.core,
         useLegacyNotificationStream,
@@ -571,7 +629,7 @@ export class App {
            * even when app is already loaded and in the main screen view
            */
           const message = this.config.FEATURE.SHOW_LOADING_INFORMATION
-            ? formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))
+            ? formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp), this.translate)
             : '';
 
           totalNotifications++;
@@ -583,6 +641,7 @@ export class App {
       );
 
       await waitUntilAllMessagesAreProcessed({eventRepository});
+      telemetry.timeStep(AppInitTimingsStep.NOTIFICATION_PROCESSING_COMPLETED);
 
       this.logger.info(`Finished loading notifications, total: ${totalNotifications}`);
 
@@ -629,7 +688,7 @@ export class App {
       eventLogger.log(AppInitializationStep.SetupMLS);
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
-      onProgress(t('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
+      onProgress(this.translate('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
 
@@ -637,7 +696,7 @@ export class App {
       void eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
 
       eventLogger.log(AppInitializationStep.ClientsUpdated, {count: clientEntities.length});
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length, 5);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
       selfUser.devices(clientEntities);
@@ -656,6 +715,7 @@ export class App {
       await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
+      telemetry.timeStep(AppInitTimingsStep.UI_LOADED);
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (selfUser.isActivatedAccount()) {
@@ -666,9 +726,19 @@ export class App {
       await conversationRepository.cleanupEphemeralMessages();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
+      await reportApplicationStartup(
+        {
+          result: 'success',
+          timings: telemetry.timings,
+          statistics: telemetry.getStatistics(),
+          lastStep: telemetry.lastStep,
+        },
+        {applicationObservability, logger: this.logger},
+      );
 
       await e2eiHandler?.startTimers();
-      this.logger.info(`App version ${Environment.version()} loaded in ${Date.now() - startTime}ms`);
+      const appInitDurationMilliseconds = monotonicClock.nowMilliseconds - appInitStartedAtMilliseconds;
+      this.logger.info(`App version ${Environment.version()} loaded in ${appInitDurationMilliseconds}ms`);
 
       eventLogger.log(AppInitializationStep.AppInitCompleted);
 
@@ -677,11 +747,10 @@ export class App {
 
       return selfUser;
     } catch (error: unknown) {
-      if (error instanceof BaseError) {
-        await this._appInitFailure(error);
-        return undefined;
-      }
-      throw error;
+      return reportStartupFailure(error, {
+        handleBaseError,
+        reportStartup,
+      });
     }
   }
 
@@ -861,7 +930,7 @@ export class App {
   private readonly updateConversationE2EIVerificationState: OnConversationE2EIVerificationStateChange = async ({
     conversationEntity,
     conversationVerificationState,
-    verificationMessageType,
+    VerificationMessageType,
     userIds,
   }) => {
     switch (conversationVerificationState) {
@@ -870,11 +939,11 @@ export class App {
         await this.repository.event.injectEvent(allVerifiedEvent);
         break;
       case ConversationVerificationState.DEGRADED:
-        if (verificationMessageType) {
-          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, verificationMessageType, userIds);
+        if (VerificationMessageType) {
+          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, VerificationMessageType, userIds);
           await this.repository.event.injectEvent(degradedEvent);
         } else {
-          this.logger.error('updateConversationE2EIVerificationState: Missing verificationMessageType while degrading');
+          this.logger.error('updateConversationE2EIVerificationState: Missing VerificationMessageType while degrading');
         }
         break;
       default:
@@ -883,12 +952,15 @@ export class App {
   };
 
   private readonly showClientCertificateRevokedWarning = async () => {
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.SELF_CERTIFICATE_REVOKED,
-      primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
-    });
+    const {modalOptions, modalType} = getModalOptions(
+      {
+        type: ModalType.SELF_CERTIFICATE_REVOKED,
+        primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
+      },
+      this.translate,
+    );
 
-    PrimaryModal.show(modalType, modalOptions);
+    PrimaryModal.show(modalType, modalOptions, undefined, this.translate);
   };
 
   // Todo: Move this to a separate hook or service
@@ -898,20 +970,25 @@ export class App {
     const e2eiHandler = E2EIHandler.getInstance();
     e2eiHandler.emit('deviceStatusUpdated', {status: 'locked'});
 
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      hideCloseBtn: true,
-      preventClose: true,
-      hideSecondary: true,
-      primaryAction: {
-        action: async () => {
-          await this.repository.lifeCycle.logout(reason, false);
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        hideCloseBtn: true,
+        preventClose: true,
+        hideSecondary: true,
+        primaryAction: {
+          action: async () => {
+            await this.repository.lifeCycle.logout(reason, false);
+          },
+          text: this.translate('modalAccountLogoutAction'),
         },
-        text: t('modalAccountLogoutAction'),
+        text: {
+          title: this.translate('unknownApplicationErrorTitle'),
+          message: this.translate('modalUnableToReceiveMessages'),
+        },
       },
-      text: {
-        title: t('unknownApplicationErrorTitle'),
-        message: t('modalUnableToReceiveMessages'),
-      },
-    });
+      undefined,
+      this.translate,
+    );
   };
 }

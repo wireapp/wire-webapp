@@ -20,7 +20,7 @@
 import {useEffect} from 'react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {useAllCellsTagsStore} from '../useAllCellsTagsStore/useAllCellsTagsStore';
 

@@ -17,9 +17,11 @@
  *
  */
 
-import React, {useEffect, useId, useRef, useState, HTMLProps} from 'react';
+import React, {HTMLProps, useEffect, useId, useRef, useState} from 'react';
 
-import {CSSObject} from '@emotion/react';
+import createCache from '@emotion/cache';
+import {CacheProvider, CSSObject} from '@emotion/react';
+import weakMemoize from '@emotion/weak-memoize';
 import {createPortal} from 'react-dom';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -49,6 +51,8 @@ interface ModalComponentProps extends HTMLProps<HTMLDivElement> {
 }
 
 const CLOSE_DELAY = 350;
+
+const memoizedCreateCacheForHead = weakMemoize((container: HTMLHeadElement) => createCache({container, key: 'modal'}));
 
 const ModalComponent = ({
   id,
@@ -113,39 +117,46 @@ const ModalComponent = ({
     return null;
   }
 
-  return (
-    <>
-      {createPortal(
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
+  const portalTarget = container || document.body;
+  const targetDocument = (portalTarget as HTMLElement).ownerDocument ?? document;
+  const isForeignDocument = targetDocument !== document;
+
+  const content = (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onBgClick}
+      id={id}
+      css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
+      tabIndex={TabIndex.FOCUSABLE}
+      className={className}
+      {...rest}
+    >
+      {showLoading ? (
+        <LoadingIcon width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
+      ) : (
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions --- tabIndex is already set to -1 through enum value
         <div
-          role="dialog"
-          aria-modal="true"
-          onClick={onBgClick}
-          id={id}
-          css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
-          tabIndex={TabIndex.FOCUSABLE}
-          className={className}
-          {...rest}
+          id={trapId}
+          onClick={event => event.stopPropagation()}
+          tabIndex={TabIndex.UNFOCUSABLE}
+          onKeyDown={event => (onKeyDown ? onKeyDown(event) : event.stopPropagation())}
+          css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
         >
-          {showLoading ? (
-            <LoadingIcon width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
-          ) : (
-            <div
-              id={trapId}
-              onClick={event => event.stopPropagation()}
-              role="button"
-              tabIndex={TabIndex.UNFOCUSABLE}
-              onKeyDown={event => (onKeyDown ? onKeyDown(event) : event.stopPropagation())}
-              css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
-            >
-              {hasVisibleClass ? children : null}
-            </div>
-          )}
-        </div>,
-        container || document.body,
+          {hasVisibleClass ? children : null}
+        </div>
       )}
-    </>
+    </div>
   );
+
+  const portalContent = isForeignDocument ? (
+    <CacheProvider value={memoizedCreateCacheForHead(targetDocument.head)}>{content}</CacheProvider>
+  ) : (
+    content
+  );
+
+  return createPortal(portalContent, portalTarget);
 };
 
 export {ModalComponent};

@@ -27,6 +27,14 @@ describe('QualifiedId util', () => {
         {domain: '', id: '1', property: 1},
       ],
       [
+        {id: '1', stuff: 'extra'},
+        {domain: 'wire.com', id: '1', property: 1},
+      ],
+      [
+        {domain: undefined, id: '1', stuff: 'extra'},
+        {domain: 'wire.com', id: '1', property: 1},
+      ],
+      [
         {domain: 'wire.com', id: '1', other: 12},
         {domain: 'wire.com', id: '1'},
       ],
@@ -47,6 +55,10 @@ describe('QualifiedId util', () => {
         {domain: 'wire.com', id: '1', other: 12},
         {domain: '', id: '1'},
       ],
+      [
+        {domain: null, id: '1', other: 12},
+        {domain: 'wire.com', id: '1'},
+      ],
     ])('only matches ids if one domain is empty (%s, %s)', (entity1, entity2) => {
       expect(matchQualifiedIds(entity1, entity2)).toBe(true);
     });
@@ -60,7 +72,19 @@ describe('QualifiedId util', () => {
         {domain: 'bella.wire.link', id: '1'},
         {domain: 'wire.com', id: '1'},
       ],
+      [{id: '1'}, {domain: 'wire.com', id: '2'}],
+      [
+        {domain: undefined, id: '1'},
+        {domain: 'wire.com', id: '2'},
+      ],
     ])('does not match entities that have different ids (%s, %s)', (entity1, entity2) => {
+      expect(matchQualifiedIds(entity1, entity2)).toBe(false);
+    });
+
+    it.each([
+      [{domain: 'wire.com', id: '1'}, undefined],
+      [undefined, {domain: 'wire.com', id: '1'}],
+    ])('returns false when one entity is undefined (%s, %s)', (entity1, entity2) => {
       expect(matchQualifiedIds(entity1, entity2)).toBe(false);
     });
   });

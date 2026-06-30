@@ -19,6 +19,7 @@
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {Translate} from 'Util/localizerUtil';
 import {getFileExtension} from 'Util/util';
 
 import {fileNameStyles, itemStyles, listStyles} from './showFileDropzoneErrorModal.styles';
@@ -27,22 +28,33 @@ interface ShowFileDropzoneErrorModalParams {
   title: string;
   message: string;
   invalidFiles: File[];
+  translate: Translate;
 }
 
-export const showFileDropzoneErrorModal = ({title, message, invalidFiles}: ShowFileDropzoneErrorModalParams) => {
+export const showFileDropzoneErrorModal = ({
+  title,
+  message,
+  invalidFiles,
+  translate,
+}: ShowFileDropzoneErrorModalParams) => {
   // Timeout needed to display a modal
   setTimeout(() => {
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {
-        message: (
-          <>
-            {!!invalidFiles.length && <InvalidFilesList invalidFiles={invalidFiles} />}
-            <p>{message}</p>
-          </>
-        ),
-        title,
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          message: (
+            <>
+              {!!invalidFiles.length && <InvalidFilesList invalidFiles={invalidFiles} />}
+              <p>{message}</p>
+            </>
+          ),
+          title,
+        },
       },
-    });
+      undefined,
+      translate,
+    );
   }, 0);
 };
 

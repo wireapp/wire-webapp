@@ -78,8 +78,7 @@ graph LR
         G[nx.json]
         H[tsconfig.base.json]
         I[eslint.config.ts]
-        J[codecov.yml]
-        K[.github/labeler.yml]
+        J[.github/labeler.yml]
     end
 
     A --> E2
@@ -110,7 +109,6 @@ wire-webapp/
 ├── tsconfig.eslint.json # ESLint TypeScript config
 ├── eslint.config.ts     # ESLint 9+ flat config
 ├── jest.preset.js       # Shared Jest preset
-├── codecov.yml          # Codecov configuration
 ├── Jenkinsfile          # Jenkins deployment pipeline
 └── .nx/                # Nx cache & workspace data
     ├── cache/            # Local cache storage
@@ -132,7 +130,6 @@ wire-webapp/
 | [`jest.preset.js`](jest.preset.js) | Shared Jest configuration | ⭐⭐⭐ Critical |
 | [`eslint.config.ts`](eslint.config.ts) | ESLint 9+ flat config | ⭐⭐⭐ Critical |
 | [`package.json`](package.json) | Root package with workspaces | ⭐⭐⭐ Critical |
-| [`codecov.yml`](codecov.yml) | Codecov coverage configuration | ⭐⭐⭐ Critical |
 | [`.github/labeler.yml`](.github/labeler.yml) | PR auto-labeling | ⭐⭐ High |
 
 ### Project-Specific Files
@@ -308,60 +305,9 @@ The `typesVersions` field is a TypeScript feature that maps type resolution path
 
 Without `typesVersions`, consumers would get type errors or no IntelliSense when importing subpaths like `@wireapp/core/lib/connection`.
 
-### [`codecov.yml`](codecov.yml) - Coverage Configuration
+### Jest/Nx Coverage Configuration
 
-```yaml
-codecov:
-  require_ci_to_pass: yes
-
-  coverage:
-    precision: 2
-    round: down
-    range: '45...80'
-    status:
-      project:
-        default:
-          target: auto
-        app_webapp:
-          target: auto
-          flags:
-            - app_webapp
-        app_server:
-          target: auto
-          flags:
-            - app_server
-        lib_core:
-          target: auto
-          flags:
-            - lib_core
-        lib_api_client:
-          target: auto
-          flags:
-            - lib_api_client
-
-  flags:
-    app_webapp:
-      paths:
-        - 'apps/webapp/**'
-      carryforward: false
-    app_server:
-      paths:
-        - 'apps/server/**'
-      carryforward: true
-    lib_core:
-      paths:
-        - 'libraries/core/**'
-      carryforward: true
-    lib_api_client:
-      paths:
-        - 'libraries/api-client/**'
-      carryforward: true
-
-  github_checks:
-    annotations: false
-```
-
-**Note:** The `lib_config` library does not have a separate Codecov flag as it is a smaller utility library. Its coverage is tracked through the default project coverage.
+Project Jest configs define `coverageThreshold` for CI coverage enforcement. The `ci` test target in each covered Nx project enables coverage and keeps `text`, `lcov`, and `html` reporters so GitHub Actions logs show a coverage table and the workflow can upload browsable coverage artifacts.
 
 ### [`.github/labeler.yml`](.github/labeler.yml) - PR Auto-Labeling
 
@@ -410,7 +356,7 @@ codecov:
 | [`apps/new-app/tsconfig.json`](apps/new-app/tsconfig.json) | **Create** | TypeScript config |
 | [`tsconfig.json`](tsconfig.json) | **Modify** | Add project reference |
 | [`tsconfig.eslint.json`](tsconfig.eslint.json) | **Modify** | Add to include array |
-| [`codecov.yml`](codecov.yml) | **Modify** | Add new flag for coverage |
+| [`apps/new-app/jest.config.js`](apps/new-app/jest.config.js) | **Create/Modify** | Configure project coverage thresholds when tests are added |
 | [`.github/labeler.yml`](.github/labeler.yml) | **Modify** | Add app label rule |
 
 #### For a New Library (e.g., `libraries/new-lib`)
@@ -423,7 +369,7 @@ codecov:
 | [`tsconfig.json`](tsconfig.json) | **Modify** | Add project reference |
 | [`tsconfig.eslint.json`](tsconfig.eslint.json) | **Modify** | Add to include array & paths |
 | [`tsconfig.base.json`](tsconfig.base.json) | **Modify** | Add path mapping (optional) |
-| [`codecov.yml`](codecov.yml) | **Modify** | Add new flag for coverage |
+| [`libraries/new-lib/jest.config.js`](libraries/new-lib/jest.config.js) | **Create/Modify** | Configure project coverage thresholds when tests are added |
 | [`.github/labeler.yml`](.github/labeler.yml) | **Modify** | Add library label rule |
 
 ### Example: New Library `libraries/ui-kit`
@@ -522,23 +468,17 @@ codecov:
 }
 ```
 
-**Step 5: Update [`codecov.yml`](codecov.yml)**
+**Step 5: Add coverage thresholds to `libraries/ui-kit/jest.config.js` when tests are added**
 
-```yaml
-flags:
-  # ... existing flags
-  lib_ui_kit:
-    paths:
-      - 'libraries/ui-kit/**'
-    carryforward: true
-
-status:
-  project:
-    # ... existing projects
-    lib_ui_kit:
-      target: auto
-      flags:
-        - lib_ui_kit
+```js
+coverageThreshold: {
+  global: {
+    branches: 80,
+    functions: 80,
+    lines: 80,
+    statements: 80,
+  },
+},
 ```
 
 **Step 6: Update [`.github/labeler.yml`](.github/labeler.yml)**
@@ -1003,7 +943,7 @@ If you see errors about missing library files during deployment:
 If deployment fails due to version issues:
 1. Check that [`libraries/{lib}/package.json`](libraries/core/package.json) has correct versions
 2. Verify [`apps/server/package.json`](apps/server/package.json) uses `workspace:^` for workspace deps
-3. Run `yarn install` to update local workspace resolution
+3. Run `./bin/yarn install` to update local workspace resolution
 
 **Asset Copy Failures:**
 
@@ -1091,7 +1031,6 @@ const ignores = [
   '**/*.test.*',
   '**/*.spec.*',
   '*.js',
-  'apps/webapp/src/types/i18n.d.ts',
   'apps/webapp/playwright-report/',
   'libraries/core/lib/',
   'libraries/api-client/lib/',
@@ -1406,7 +1345,7 @@ Nx will:
 **What happens when you run webpack directly:**
 
 ```bash
-cd apps/webapp && yarn build
+cd apps/webapp && ../../bin/yarn build
 ```
 
 You might get:
@@ -1554,24 +1493,24 @@ Running underlying tools directly (webpack, jest, tsc, eslint) can cause several
 
 ### Common Pitfalls
 
-**Running `yarn build` directly:**
+**Running package `build` scripts directly:**
 
 ```bash
 # DON'T DO THIS
-cd apps/webapp && yarn build
+cd apps/webapp && ../../bin/yarn build
 
 # INSTEAD DO THIS
-nx build webapp
+./bin/yarn nx build webapp
 ```
 
-**Running `yarn test` directly:**
+**Running package `test` scripts directly:**
 
 ```bash
 # DON'T DO THIS
-cd apps/webapp && yarn test
+cd apps/webapp && ../../bin/yarn test
 
 # INSTEAD DO THIS
-nx test webapp
+./bin/yarn nx test webapp
 ```
 
 **Running `tsc` directly:**
@@ -1622,16 +1561,16 @@ nx affected -t lint
 # 1. Make changes to code
 
 # 2. Build everything manually
-cd apps/webapp && yarn build
-cd apps/server && yarn build
+cd apps/webapp && ../../bin/yarn build
+cd apps/server && ../../bin/yarn build
 
 # 3. Test everything manually
-cd apps/webapp && yarn test
-cd apps/server && yarn test
+cd apps/webapp && ../../bin/yarn test
+cd apps/server && ../../bin/yarn test
 
 # 4. Lint everything manually
-cd apps/webapp && yarn lint
-cd apps/server && yarn lint
+cd apps/webapp && ../../bin/yarn lint
+cd apps/server && ../../bin/yarn lint
 ```
 
 The incorrect workflow:
@@ -1719,7 +1658,6 @@ nx show project webapp
   uses: actions/setup-node@v6
   with:
     node-version-file: '.nvmrc'
-    cache: 'yarn'  # Yarn cache for node_modules
 ```
 
 **Note**: Nx cache is local by default. For CI cache persistence, consider:
@@ -1739,34 +1677,26 @@ nx show project webapp
 | [`precommit.yml`](.github/workflows/precommit.yml) | `nx run webapp:configure`, `nx run server:package` |
 | [`publish-and-deploy-webapp.yml`](.github/workflows/publish-and-deploy-webapp.yml) | `nx run webapp:configure`, `nx run-many -t test --all`, `nx run server:package` |
 
-### Codecov Upload in CI
+### Coverage in CI
 
 From [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
 
 ```yaml
-- name: Upload webapp coverage to Codecov
-  uses: codecov/codecov-action@v5.5.2
-  with:
-    fail_ci_if_error: false
-    files: ./apps/webapp/coverage/lcov.info
-    flags: app_webapp
-    token: ${{ secrets.CODECOV_TOKEN }}
+- name: Test
+  run: ./bin/run-with-network-isolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
-- name: Upload server coverage to Codecov
-  uses: codecov/codecov-action@v5.5.2
+- name: Upload coverage reports
+  if: always()
+  uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
   with:
-    fail_ci_if_error: false
-    files: ./apps/server/coverage/lcov.info
-    flags: app_server
-    token: ${{ secrets.CODECOV_TOKEN }}
-
-- name: Upload core library coverage to Codecov
-  uses: codecov/codecov-action@v5.5.2
-  with:
-    fail_ci_if_error: false
-    files: ./coverage/libraries/core/lcov.info
-    flags: lib_core
-    token: ${{ secrets.CODECOV_TOKEN }}
+    name: coverage-reports
+    if-no-files-found: warn
+    retention-days: 14
+    path: |
+      apps/webapp/coverage
+      apps/server/coverage
+      coverage/libraries/core
+      coverage/libraries/api-client
 ```
 
 ### Common Nx CI Patterns
@@ -1804,17 +1734,29 @@ stage('Wait for GitHub action to finish') {
 
 ## Local Development - Watching Libraries
 
-### Nx Watch Mode
+### Single-command dev server
 
-Nx automatically watches all projects in the workspace. When you add a new library, Nx will automatically detect it and include it in the dependency graph.
+Start the full dev stack with one command:
 
 ```bash
-# Start dev server with watch mode
-nx serve webapp --watch
-
-# Start multiple dev servers
-nx run-many -t serve --parallel --watch
+yarn dev
 ```
+
+This runs `nx serve server`, which:
+
+1. Builds each upstream library once before its watcher starts (`watch` → `dependsOn: ["build"]` in `nx.json`)
+2. Starts `watch` on every upstream library in the webapp dependency graph (`webapp:watch-deps` → `^watch` — `tsc --watch` or `vite build --watch`)
+3. Starts the Express server with webpack-dev-middleware in watch mode (`server:build-dev` — server only, no `^build` or `webapp:build`)
+
+Library changes flow: `libraries/*/src` → `watch` recompiles `lib/` → webpack detects `@wireapp/*` changes → full page reload (`webpack-hot-middleware/client?reload=true`).
+
+Only libraries reachable from the server/webapp dependency graph are watched (e.g. `core`, `api-client`, `commons`, `store-engine*`). Config-only packages (`eslint-config`, `prettier-config`) are excluded — they are not part of the webapp bundle.
+
+Configuration:
+
+- [`nx.json`](../nx.json) — `targetDefaults.watch.continuous: true` (long-running watchers)
+- [`apps/webapp/project.json`](../apps/webapp/project.json) — `watch-deps` starts `^watch` on webapp's upstream libraries
+- [`apps/server/project.json`](../apps/server/project.json) — `serve.continuous: true`, `serve.dependsOn: ["webapp:watch-deps"]`, `serve` uses `server:build-dev` (not `server:build`) to avoid racing lib `clean` with `watch`
 
 ### TypeScript Path Mappings for Import Resolution
 
@@ -1850,18 +1792,13 @@ In [`apps/webapp/package.json`](apps/webapp/package.json):
 ```
 
 The `workspace:^` protocol ensures:
-- Local workspace packages are linked (no symlinks needed)
+- Local workspace packages are linked via Yarn workspaces
 - Version is automatically resolved to the local workspace version
-- Changes to the library trigger rebuilds of dependent projects
+- Webpack consumes compiled `lib/` output; `watch` targets keep `lib/` in sync during dev
 
 ### Nx Daemon for Fast Rebuilds
 
-Nx runs a daemon process that:
-- Watches file changes
-- Maintains the project graph in memory
-- Provides instant dependency resolution
-
-The daemon is located at `.nx/workspace-data/` and runs automatically.
+Nx runs a daemon process that maintains the project graph in memory and provides instant dependency resolution. The daemon is located at `.nx/workspace-data/` and runs automatically.
 
 ---
 
@@ -1885,8 +1822,8 @@ nx lint <project>                     # Lint specific project
 nx run-many -t lint --all             # Lint all projects
 
 # Development
-nx serve <project>                    # Start dev server
-nx run-many -t serve --parallel       # Start multiple dev servers
+yarn dev                              # Dev server + upstream lib watchers
+nx serve server                       # Same as yarn dev / yarn start
 
 # Graph & Analysis
 nx graph                              # Visualize dependency graph
@@ -1925,11 +1862,11 @@ nx run-many -t test --projects=tag:lib
 4. **Add projects to [`tsconfig.json`](tsconfig.json)** - Project references are required
 5. **Update [`tsconfig.eslint.json`](tsconfig.eslint.json)** - For type-aware linting to work
 6. **Use `workspace:^`** - For local workspace dependencies in package.json
-7. **Update [`codecov.yml`](codecov.yml)** - Add new flags for new libraries/apps
+7. **Configure Jest coverage thresholds** - Add realistic project-local baselines when new libraries/apps add tests
 8. **Update [`.github/labeler.yml`](.github/labeler.yml)** - Add label rules for new projects
 9. **Check `nx graph`** - Visualize dependencies before making changes
 10. **CI uses Nx** - All GitHub workflows use Nx commands
-11. **Nx watches all projects** - No manual symlink setup needed for library watching
+11. **`yarn dev` watches upstream libs** - `server:serve` depends on `webapp:watch-deps`, which starts `^watch` on webapp's library dependencies
 12. **Path mappings enable clean imports** - Use TypeScript paths for library imports
 13. **`typesVersions` in libraries** - Maps `lib/*` imports to `src/*` for source-based type resolution
 14. **`paths` in tsconfig.eslint.json** - Required for ESLint TypeScript Project Service to resolve imports during linting

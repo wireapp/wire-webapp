@@ -28,13 +28,14 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/Image';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Multipart} from 'Repositories/entity/message/Multipart';
-import {Text} from 'Repositories/entity/message/Text';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Multipart} from 'Repositories/entity/message/multipart';
+import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/timeUtil';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 
@@ -47,12 +48,12 @@ import {VideoAsset} from './asset/VideoAsset/VideoAsset';
 
 import {MessageActions} from '..';
 import {ConversationError} from '../../../../error/conversationError';
-import {QuoteEntity} from '../../../../message/QuoteEntity';
+import {QuoteEntity} from '../../../../message/quoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
 
-function createPlaceholderMessage() {
-  const message = new ContentMessage();
-  const user = new User();
+function createPlaceholderMessage(translate: Translate) {
+  const message = new ContentMessage(undefined, translate);
+  const user = new User('', '', translate);
   user.name(' ');
   message.user(user);
   const textAsset = new Text('fake-text', ' ');
@@ -85,6 +86,7 @@ export const Quote: FC<QuoteProps> = ({
 }) => {
   const [quotedMessage, setQuotedMessage] = useState<ContentMessage>();
   const [error, setError] = useState<Error | string | undefined>(quote.error);
+  const {translate} = useApplicationContext();
 
   useEffect(() => {
     const handleQuoteDeleted = (messageId: string) => {
@@ -122,17 +124,17 @@ export const Quote: FC<QuoteProps> = ({
           throw error;
         });
     }
-  }, [quote, error]);
+  }, [conversation, error, findMessage, quote]);
 
   return (
     <div className="message-quote" data-uie-name="quote-item">
       {error !== undefined ? (
         <div className="message-quote__error" data-uie-name="label-error-quote">
-          {t('replyQuoteError')}
+          {translate('replyQuoteError')}
         </div>
       ) : (
         <QuotedMessage
-          quotedMessage={quotedMessage ?? createPlaceholderMessage()}
+          quotedMessage={quotedMessage ?? createPlaceholderMessage(translate)}
           selfId={selfId}
           focusMessage={focusMessage}
           handleClickOnMessage={handleClickOnMessage}
@@ -172,6 +174,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
     'timestamp',
   ]);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
+  const {translate} = useApplicationContext();
 
   return (
     <>
@@ -201,8 +204,8 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
               const attachmentsCount = cellAssets.length;
               const attachmentsCountCopy =
                 attachmentsCount === 1
-                  ? t('replyBarSingleAttachment')
-                  : t('replyBarMultipleAttachments', {count: attachmentsCount});
+                  ? translate('replyBarSingleAttachment')
+                  : translate('replyBarMultipleAttachments', {count: attachmentsCount});
 
               return (
                 <>
@@ -296,8 +299,8 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
         tabIndex={messageFocusedTabIndex}
       >
         {isBeforeToday(timestamp)
-          ? t('replyQuoteTimeStampDate', {date: formatDateNumeral(timestamp)})
-          : t('replyQuoteTimeStampTime', {time: formatTimeShort(timestamp)})}
+          ? translate('replyQuoteTimeStampDate', {date: formatDateNumeral(timestamp)})
+          : translate('replyQuoteTimeStampTime', {time: formatTimeShort(timestamp)})}
       </button>
     </>
   );

@@ -36,8 +36,10 @@ export class AccountPage {
   readonly usernameDisplay: Locator;
   readonly editEmailButton: Locator;
   readonly editDisplayNameButton: Locator;
+  readonly editUserNameButton: Locator;
   readonly emailInput: Locator;
   readonly displayNameInput: Locator;
+  readonly userNameInput: Locator;
   readonly resetPasswordButton: Locator;
   readonly receiveNewsletterCheckbox: Locator;
   readonly typingIndicator: Locator;
@@ -56,8 +58,10 @@ export class AccountPage {
     this.logoutButton = page.getByTestId('do-logout');
     this.editEmailButton = page.getByTestId('go-edit-email');
     this.editDisplayNameButton = page.getByTestId('go-edit-email');
+    this.editUserNameButton = page.getByRole('button', {name: 'Username'});
     this.emailInput = page.getByTestId('enter-email-input');
     this.displayNameInput = page.getByTestId('enter-displayname-input');
+    this.userNameInput = page.getByLabel('Username');
     this.emailDisplay = page.getByTestId('email-display');
     this.nameDisplay = page.getByTestId('displayname-display');
     this.domainDisplay = page.getByTestId('item-enriched-value');
@@ -139,6 +143,12 @@ export class AccountPage {
     await this.editDisplayNameButton.click();
     await this.displayNameInput.fill(newName);
     await this.displayNameInput.press('Enter');
+  }
+
+  async changeUserName(newUserName: string) {
+    await this.editUserNameButton.click();
+    await this.userNameInput.fill(newUserName);
+    await this.userNameInput.press('Enter');
   }
 
   statusOption(status: 'Away' | 'Busy' | 'Available' | 'None') {

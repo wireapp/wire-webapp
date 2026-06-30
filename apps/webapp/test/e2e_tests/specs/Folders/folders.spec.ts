@@ -309,7 +309,7 @@ test.describe('Folders', () => {
 
         await expect(userBPages.conversationDetails().groupMembers.filter({hasText: userA.fullName})).toBeVisible();
 
-        await userBPages.conversationDetails().openParticipantDetails(userA.fullName);
+        await userBPages.conversationDetails().getParticipant(userA.fullName).openDetails();
         await userBPages.participantDetails().removeFromGroup();
       });
 
@@ -322,7 +322,7 @@ test.describe('Folders', () => {
       await test.step('User A removes 1:1 and group conversation with User B from Favorites', async () => {
         const contextMenuDirectConversation = await userAPages
           .conversationList()
-          .getConversation(userB.fullName)
+          .getConversation(userB.fullName, {protocol: 'mls'})
           .openContextMenu();
         await contextMenuDirectConversation.getByRole('button', {name: 'Remove from favorites'}).click();
 

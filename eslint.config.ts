@@ -3,7 +3,6 @@
  * Flat ESLint configuration (ESLint 9+)
  */
 
-import path from 'path';
 import {FlatCompat} from '@eslint/eslintrc';
 // @ts-ignore - No types available for @emotion/eslint-plugin with ESLint 9
 import emotionPlugin from '@emotion/eslint-plugin';
@@ -51,14 +50,18 @@ const ignores = [
   'apps/webapp/src/script/components/icon.tsx',
   '**/*.test.*',
   '**/*.spec.*',
+  '**/*.stories.*',
+  '**/storybook-static/',
+  '**/.storybook/',
   '*.js',
-  'apps/webapp/src/types/i18n.d.ts',
   'apps/webapp/playwright-report/',
   'libraries/core/lib/',
   'libraries/api-client/lib/',
   'libraries/core/.tmp/',
   'libraries/core/src/test/',
   'libraries/config/lib/',
+  'libraries/react-ui-kit/lib/',
+  'libraries/*/lib/',
   '**/jest.setup.ts',
 ];
 
@@ -78,6 +81,30 @@ const cleanedBase = base.map(cfg => {
   }
   return cfg;
 });
+const webappImportOrderRule: Linter.RuleEntry = [
+  'error',
+  {
+    groups: ['external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
+    pathGroups: [
+      {pattern: 'react', group: 'external', position: 'before'},
+      {pattern: '@wireapp/*', group: 'internal', position: 'before'},
+      // One group for all webapp TS path aliases — alphabetize sorts Components/…/Util/…/src/…
+      {
+        pattern: '{apps,Components,Hooks,I18n,Repositories,Resource,src,Util}/**',
+        group: 'internal',
+        position: 'after',
+      },
+    ],
+    pathGroupsExcludedImportTypes: ['react', '@wireapp/*'],
+    'newlines-between': 'always',
+    alphabetize: {
+      order: 'asc',
+      caseInsensitive: true,
+    },
+    warnOnUnassignedImports: true,
+  },
+];
+
 const config: Linter.Config[] = [
   {ignores},
   ...cleanedBase,
@@ -244,14 +271,78 @@ const config: Linter.Config[] = [
   },
   {
     files: ['apps/webapp/**/*.{ts,tsx}'],
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: './apps/webapp/tsconfig.json',
+        },
+      },
+    },
     rules: {
       '@typescript-eslint/strict-boolean-expressions': 'off',
+      // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
+      'import/no-unresolved': ['error', {caseSensitive: false}],
+      // Pin alias import order so Linux CI and macOS agree on webapp path aliases.
+      'import/order': webappImportOrderRule,
+    },
+  },
+  {
+    files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
+    rules: {
+      'import/no-default-export': 'off',
     },
   },
   {
     files: ['apps/webapp/src/script/components/**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': 'error',
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/Modals/PrimaryModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/LeaveGroupAdminModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/QualityFeedbackModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/DetailViewModal/**/*.{ts,tsx}',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'src/script/page/RootProvider',
+              importNames: ['useApplicationContext'],
+              message: 'This modal is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/page/components/WindowTitleUpdater.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'src/script/page/RootProvider',
+              importNames: ['useApplicationContext'],
+              message:
+                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+            {
+              name: '../RootProvider',
+              importNames: ['useApplicationContext'],
+              message:
+                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+          ],
+        },
+      ],
     },
   },
   {

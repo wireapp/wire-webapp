@@ -26,7 +26,7 @@ export class PasswordModal extends BaseModal {
 
   constructor(page: Page) {
     // For some reason the password modal is rendered using the `modal-template-option` attribute
-    super(page, 'modal-template-option');
+    super(page);
 
     this.passwordInput = this.modal.getByLabel('Password');
   }

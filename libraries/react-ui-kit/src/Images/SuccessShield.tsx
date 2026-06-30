@@ -1,0 +1,73 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+export const SuccessShield = () => (
+  <svg
+    width="240"
+    height="241"
+    viewBox="0 0 240 241"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M124.995 30.3382L125.813 31.1008L126.372 31.5963L127.228 32.302L128.379 33.1958C131.092 35.2446 134.401 37.3271 138.303 39.2916C149.684 45.0214 163.443 48.4847 179.674 48.4847C185.311 48.4847 189.882 53.0865 189.882 58.763V140.989C189.882 163.089 179.827 181.78 163.083 195.267C149.451 206.247 132.012 212.937 118.426 212.937C104.841 212.937 87.4008 206.247 73.7696 195.267C57.0254 181.78 46.9707 163.089 46.9707 140.989V58.763C46.9707 53.0865 51.5409 48.4847 57.1786 48.4847C73.4093 48.4847 87.168 45.0214 98.5491 39.2916C102.451 37.3271 105.76 35.2446 108.473 33.1958L109.624 32.302L110.797 31.3209L111.208 30.9387C114.985 27.136 120.984 26.9359 124.995 30.3382Z"
+      fill="url(#paint0_linear_8509_36899)"
+      stroke="black"
+      strokeWidth="4.11429"
+    />
+    <rect x="51.0859" y="52.0981" width="136.455" height="120.32" rx="16.1385" fill="url(#pattern0_8509_36899)" />
+    <path
+      d="M87.626 105.797C90.3875 105.797 92.6337 108.06 92.6338 110.842L92.6299 127.9C92.6299 131.189 91.4525 134.195 89.4756 136.513C91.2438 137.831 93.4488 138.621 95.8125 138.621C101.498 138.621 106.107 134.108 106.39 128.452L106.403 127.9V107.091H108.907V127.9C108.907 135.202 103.049 141.144 95.7998 141.144C92.7262 141.144 89.9413 140.068 87.7002 138.281C85.4591 140.068 82.6085 141.144 79.5352 141.144C72.2859 141.143 66.3359 135.202 66.3359 127.9V107.091H68.8398V127.9C68.8398 133.812 73.6402 138.621 79.5088 138.621C81.8728 138.621 84.0784 137.831 85.8467 136.513C83.8697 134.195 82.6133 131.189 82.6133 127.9L82.6172 110.842C82.6173 108.06 84.8644 105.797 87.626 105.797ZM144.623 111.521C151.336 104.753 162.258 104.753 168.971 111.521C169.268 111.821 169.552 112.129 169.823 112.445L157.679 124.689L147.316 135.137C153.09 140.048 161.758 139.765 167.196 134.285L168.968 136.07C162.255 142.835 151.335 142.834 144.623 136.067C137.91 129.3 137.91 118.288 144.623 111.521ZM118.929 140.476H116.424V107.022H118.929V140.476ZM140.853 108.966C134.288 108.966 128.946 114.346 128.946 120.958H128.945V140.476H126.44V107.022H128.945V112.787C131.543 108.958 135.911 106.439 140.853 106.439V108.966ZM87.626 108.319C86.2453 108.319 85.1212 109.451 85.1211 110.842L85.1172 127.9C85.1172 130.525 86.0611 132.929 87.6211 134.795C89.181 132.93 90.1249 130.525 90.125 127.901L90.1299 110.842C90.1298 109.451 89.0065 108.32 87.626 108.319ZM166.276 112.451C160.502 107.539 151.832 107.823 146.394 113.306C140.956 118.788 140.673 127.53 145.546 133.352L166.276 112.451Z"
+      fill="white"
+    />
+    <rect x="144" y="167.5" width="50" height="50" rx="25" fill="white" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M169 167.5C155.193 167.5 144 178.693 144 192.5C144 206.307 155.193 217.5 169 217.5C182.807 217.5 194 206.307 194 192.5C194 178.693 182.807 167.5 169 167.5ZM186.875 185.828L164.802 207.681L150.972 194.039L155.391 189.62L164.802 198.842L182.455 181.409L186.875 185.828Z"
+      fill="#1D7833"
+    />
+    <defs>
+      <pattern id="pattern0_8509_36899" patternContentUnits="objectBoundingBox" width="0.0236539" height="0.0268259">
+        <use xlinkHref="#image0_8509_36899" transform="scale(0.00295674 0.00335324)" />
+      </pattern>
+      <linearGradient
+        id="paint0_linear_8509_36899"
+        x1="160.772"
+        y1="200.018"
+        x2="62.5707"
+        y2="35.9853"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop offset="0.82932" />
+        <stop offset="1" stopColor="#54A6FF" />
+      </linearGradient>
+      <image
+        id="image0_8509_36899"
+        width="8"
+        height="8"
+        preserveAspectRatio="none"
+        xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAACZJREFUGBljYGBg+A/EuAA+OVx6CIiDjEQxlomABipJo9iJZuZ/AC8NBf1LtGs1AAAAAElFTkSuQmCC"
+      />
+    </defs>
+  </svg>
+);

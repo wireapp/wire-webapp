@@ -38,21 +38,21 @@ import {ConversationEphemeralHandler} from 'Repositories/conversation/Conversati
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {CallMessage} from 'Repositories/entity/message/CallMessage';
-import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {DeleteConversationMessage} from 'Repositories/entity/message/DeleteConversationMessage';
-import type {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import type {Message} from 'Repositories/entity/message/Message';
-import type {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
-import type {RenameMessage} from 'Repositories/entity/message/RenameMessage';
-import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
+import type {CallMessage} from 'Repositories/entity/message/callMessage';
+import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {DeleteConversationMessage} from 'Repositories/entity/message/deleteConversationMessage';
+import type {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import type {Message} from 'Repositories/entity/message/message';
+import type {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
+import type {RenameMessage} from 'Repositories/entity/message/renameMessage';
+import type {SystemMessage} from 'Repositories/entity/message/systemMessage';
 import type {User} from 'Repositories/entity/User';
 import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {getPermissionState, setPermissionState} from 'Repositories/permission/permissionHandlers';
 import {normalizePermissionState} from 'Repositories/permission/Permissions.types';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {UserState} from 'Repositories/user/userState';
-import {Declension, t, getUserName} from 'Util/localizerUtil';
+import {type Translate, Declension, getUserName} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {truncate} from 'Util/stringUtil';
@@ -61,8 +61,8 @@ import {ValidationUtilError} from 'Util/validationUtil';
 
 import {AppPermissionState} from './AppPermissionState';
 
-import {SuperType} from '../../message/SuperType';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {SuperType} from '../../message/superType';
+import {SystemMessageType} from '../../message/systemMessageType';
 import {ContentState, useAppState} from '../../page/useAppState';
 import {Warnings} from '../../view_model/WarningsContainer';
 
@@ -119,6 +119,7 @@ export class NotificationRepository {
     conversationRepository: ConversationRepository,
     private readonly audioRepository: AudioRepository,
     private readonly callingRepository: CallingRepository,
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
@@ -285,11 +286,11 @@ export class NotificationRepository {
    */
   private createBodyCall(messageEntity: CallMessage): string | void {
     if (messageEntity.isActivation()) {
-      return t('notificationVoiceChannelActivate');
+      return this.translate('notificationVoiceChannelActivate');
     }
 
     if (messageEntity.isDeactivation() && messageEntity.finished_reason === TERMINATION_REASON.MISSED) {
-      return t('notificationVoiceChannelDeactivate');
+      return this.translate('notificationVoiceChannelDeactivate');
     }
   }
 
@@ -306,9 +307,9 @@ export class NotificationRepository {
           let notificationText;
 
           if (assetEntity.isUserMentioned(this.userState.self().qualifiedId)) {
-            notificationText = t('notificationMention', {text: assetEntity.text}, {}, true);
+            notificationText = this.translate('notificationMention', {text: assetEntity.text}, {}, true);
           } else if (messageEntity.isUserQuoted(this.userState.self().id)) {
-            notificationText = t('notificationReply', {text: assetEntity.text}, {}, true);
+            notificationText = this.translate('notificationReply', {text: assetEntity.text}, {}, true);
           } else {
             notificationText = getRenderedTextContent(assetEntity.text);
           }
@@ -319,11 +320,11 @@ export class NotificationRepository {
     }
 
     if (messageEntity.hasAssetImage()) {
-      return t('notificationAssetAdd');
+      return this.translate('notificationAssetAdd');
     }
 
     if (messageEntity.hasAssetLocation()) {
-      return t('notificationSharedLocation');
+      return this.translate('notificationSharedLocation');
     }
 
     if (messageEntity.hasAsset()) {
@@ -333,15 +334,15 @@ export class NotificationRepository {
       }
 
       if (assetEntity.isAudio()) {
-        return t('notificationSharedAudio');
+        return this.translate('notificationSharedAudio');
       }
 
       if (assetEntity.isVideo()) {
-        return t('notificationSharedVideo');
+        return this.translate('notificationSharedVideo');
       }
 
       if (assetEntity.isFile()) {
-        return t('notificationSharedFile');
+        return this.translate('notificationSharedFile');
       }
     }
   }
@@ -358,19 +359,19 @@ export class NotificationRepository {
       const [otherUserEntity] = messageEntity.userEntities();
 
       const declension = Declension.ACCUSATIVE;
-      const nameOfJoinedUser = getUserName(otherUserEntity, declension);
+      const nameOfJoinedUser = getUserName(otherUserEntity, this.translate, declension, false);
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {
-        return t('notificationMemberJoinSelf', {user: nameOfJoinedUser}, {}, true);
+        return this.translate('notificationMemberJoinSelf', {user: nameOfJoinedUser}, {}, true);
       }
 
       const substitutions = {user1: messageEntity.user().name(), user2: nameOfJoinedUser};
-      return t('notificationMemberJoinOne', substitutions, {}, true);
+      return this.translate('notificationMemberJoinOne', substitutions, {}, true);
     }
 
     const substitutions = {number: messageEntity.userIds().length.toString(), user: messageEntity.user().name()};
-    return t('notificationMemberJoinMany', substitutions, {}, true);
+    return this.translate('notificationMemberJoinMany', substitutions, {}, true);
   }
 
   /**
@@ -383,7 +384,7 @@ export class NotificationRepository {
   private createBodyMemberLeave(messageEntity: MemberMessage): string | void {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant && !messageEntity.remoteUserEntities().length) {
-      return t('notificationMemberLeaveRemovedYou', {user: messageEntity.user().name()}, {}, true);
+      return this.translate('notificationMemberLeaveRemovedYou', {user: messageEntity.user().name()}, {}, true);
     }
   }
 
@@ -408,13 +409,13 @@ export class NotificationRepository {
         }
         break;
       case SystemMessageType.CONNECTION_ACCEPTED:
-        return t('notificationConnectionAccepted');
+        return this.translate('notificationConnectionAccepted');
       case SystemMessageType.CONNECTION_CONNECTED:
-        return t('notificationConnectionConnected');
+        return this.translate('notificationConnectionConnected');
       case SystemMessageType.CONNECTION_REQUEST:
-        return t('notificationConnectionRequest');
+        return this.translate('notificationConnectionRequest');
       case SystemMessageType.CONVERSATION_CREATE:
-        return t('notificationConversationCreate', {user: messageEntity.user().name()}, {}, true);
+        return this.translate('notificationConversationCreate', {user: messageEntity.user().name()}, {}, true);
     }
   }
 
@@ -429,17 +430,17 @@ export class NotificationRepository {
       const isSelfMentioned = messageEntity.isUserMentioned(this.userState.self().qualifiedId);
 
       if (isSelfMentioned) {
-        return t('notificationObfuscatedMention');
+        return this.translate('notificationObfuscatedMention');
       }
 
       const isSelfQuoted = messageEntity.isUserQuoted(this.userState.self().id);
 
       if (isSelfQuoted) {
-        return t('notificationObfuscatedReply');
+        return this.translate('notificationObfuscatedReply');
       }
     }
 
-    return t('notificationObfuscated');
+    return this.translate('notificationObfuscated');
   }
 
   /**
@@ -447,7 +448,7 @@ export class NotificationRepository {
    * @returns Notification message body
    */
   private createBodyPing(): string {
-    return t('notificationPing');
+    return this.translate('notificationPing');
   }
 
   /**
@@ -456,7 +457,7 @@ export class NotificationRepository {
    * @returns Notification message body
    */
   private createBodyReaction(messageEntity: any): string {
-    return t('notificationReaction', messageEntity.reaction);
+    return this.translate('notificationReaction', messageEntity.reaction);
   }
 
   /**
@@ -472,16 +473,16 @@ export class NotificationRepository {
       );
 
       if (messageTimer) {
-        const timeString = formatDuration(messageTimer).text;
+        const timeString = formatDuration(messageTimer, this.translate).text;
         const substitutions = {time: timeString, user: messageEntity.user().name()};
-        return t('notificationConversationMessageTimerUpdate', substitutions, {}, true);
+        return this.translate('notificationConversationMessageTimerUpdate', substitutions, {}, true);
       }
-      return t('notificationConversationMessageTimerReset', {user: messageEntity.user().name()}, {}, true);
+      return this.translate('notificationConversationMessageTimerReset', {user: messageEntity.user().name()}, {}, true);
     };
 
     const createBodyRename = () => {
       const substitutions = {name: (messageEntity as RenameMessage).name, user: messageEntity.user().name()};
-      return t('notificationConversationRename', substitutions, {}, true);
+      return this.translate('notificationConversationRename', substitutions, {}, true);
     };
 
     switch ((messageEntity as SystemMessage).system_message_type) {
@@ -638,7 +639,12 @@ export class NotificationRepository {
     let title;
     if (conversationName) {
       title = conversationEntity.isGroupOrChannel()
-        ? t('notificationTitleGroup', {conversation: truncatedConversationName, user: truncatedName}, {}, true)
+        ? this.translate(
+            'notificationTitleGroup',
+            {conversation: truncatedConversationName, user: truncatedName},
+            {},
+            true,
+          )
         : conversationName;
     }
 
@@ -651,7 +657,7 @@ export class NotificationRepository {
    * @returns Obfuscated notification message title
    */
   private createTitleObfuscated(): string {
-    const obfuscatedTitle = t('notificationObfuscatedTitle');
+    const obfuscatedTitle = this.translate('notificationObfuscatedTitle');
     return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_MAX_LENGTH, false);
   }
 

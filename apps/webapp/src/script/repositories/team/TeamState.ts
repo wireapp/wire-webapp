@@ -19,7 +19,7 @@
 
 import {Backend} from '@wireapp/api-client/lib/env';
 import {Role} from '@wireapp/api-client/lib/team';
-import {FeatureList, FEATURE_STATUS, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_STATUS, FeatureList, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
@@ -48,6 +48,7 @@ export class TeamState {
   public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   public readonly isMLSEnabled: ko.PureComputed<boolean>;
   public readonly isProtocolToggleEnabledForUser: ko.PureComputed<boolean>;
+  public readonly isBackgroundEffectsEnabled: ko.PureComputed<boolean>;
   public readonly isGuestLinkEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
@@ -62,6 +63,7 @@ export class TeamState {
   readonly teamSize: ko.PureComputed<number>;
   readonly selfRole: ko.PureComputed<Role | undefined>;
   readonly isCellsEnabled: ko.PureComputed<boolean>;
+  readonly isMeetingsEnabled: ko.PureComputed<boolean>;
   readonly isAuditLogEnabled: ko.PureComputed<boolean>;
   readonly isAppsEnabled: ko.PureComputed<boolean>;
 
@@ -132,6 +134,10 @@ export class TeamState {
       () => this.teamFeatures()?.conferenceCalling?.status === FEATURE_STATUS.ENABLED,
     );
 
+    this.isBackgroundEffectsEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.backgroundEffects?.status === FEATURE_STATUS.ENABLED;
+    });
+
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FEATURE_STATUS.ENABLED,
     );
@@ -144,6 +150,10 @@ export class TeamState {
 
     this.isCellsEnabled = ko.pureComputed(() => {
       return this.teamFeatures()?.cells?.status === FEATURE_STATUS.ENABLED;
+    });
+
+    this.isMeetingsEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.meetings?.status === FEATURE_STATUS.ENABLED;
     });
 
     this.isAppsEnabled = ko.pureComputed(() => {

@@ -39,4 +39,14 @@ describe('backgroundEffectsStore:lastVirtualBackgroundId', () => {
 
     expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(true);
   });
+
+  it('initializes performance panel as disabled', () => {
+    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
+  });
+
+  it('updates isPerformancePanelEnabled when setIsPerformancePanelEnabled is called', () => {
+    backgroundEffectsStore.getState().setIsPerformancePanelEnabled(true);
+
+    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(true);
+  });
 });

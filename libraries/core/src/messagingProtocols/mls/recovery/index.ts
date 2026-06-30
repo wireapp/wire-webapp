@@ -36,3 +36,4 @@ export type {
   MlsEpochRecoveryTrigger,
 } from './mlsRecoveryOrchestrator';
 export {MlsRecoveryOrchestratorImpl, minimalDefaultPolicies, OperationName} from './mlsRecoveryOrchestrator';
+export {MlsEpochRecoveryDeferredError} from './mlsEpochRecoveryDeferredError';

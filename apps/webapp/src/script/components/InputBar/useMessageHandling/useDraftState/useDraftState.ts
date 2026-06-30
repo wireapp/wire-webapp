@@ -24,7 +24,7 @@ import {LexicalEditor, CLEAR_EDITOR_COMMAND} from 'lexical';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {StorageRepository} from 'Repositories/storage';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {sanitizeMarkdown} from 'Util/markdownUtil';
 
 import {DraftState, loadDraftState, saveDraftState} from '../../common/draftState/draftState';

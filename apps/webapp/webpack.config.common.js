@@ -245,7 +245,8 @@ module.exports = {
         },
         // Copy and flatten everything from core-crypto src
         {
-          from: path.resolve(ROOT_PATH, 'node_modules/@wireapp/core-crypto/src/**/*'),
+          context: path.resolve(ROOT_PATH, 'node_modules/@wireapp/core-crypto/src'),
+          from: '**/*',
           to: `${dist}/min/[name][ext]`,
         },
       ],

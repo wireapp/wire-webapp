@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
+import {SystemMessage} from 'Repositories/entity/message/systemMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {MessageTime} from '../MessageTime';
@@ -36,7 +36,9 @@ export const SystemMessageBase = ({message, isSenderNameVisible = false, icon}: 
   return (
     <div className="message-header" data-uie-name="element-message-system">
       {icon !== undefined && icon !== null && (
-        <div className="message-header-icon message-header-icon--svg text-foreground">{icon}</div>
+        <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
+          {icon}
+        </div>
       )}
       <p className="message-header-label">
         <span className="message-header-label__multiline">

@@ -131,7 +131,7 @@ test.describe('Proteus verification', () => {
   );
 
   test(
-    'My other clients should be notified when I`m login on a new device',
+    "My other clients should be notified when I'm login on a new device",
     {tag: ['@TC-717', '@regression']},
     async ({createPage}) => {
       const {pages, components, modals} = PageManager.from(await createPage(withLogin(userA))).webapp;
@@ -185,7 +185,7 @@ test.describe('Proteus verification', () => {
     },
   );
 
-  test('Verify other user`s devices in 1on1 conversation', {tag: ['@TC-719', '@regression']}, async ({createPage}) => {
+  test('Verify other users devices in 1on1 conversation', {tag: ['@TC-719', '@regression']}, async ({createPage}) => {
     const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(userAPage, userB);
 
@@ -225,7 +225,7 @@ test.describe('Proteus verification', () => {
       }
     });
 
-    await test.step('Action: User A verifies User B`s device', async () => {
+    await test.step('Action: User A verifies User Bs device', async () => {
       await userAComponents.conversationSidebar().clickAllConversationsButton();
       await userAPages.conversationList().getConversation(userB.fullName).open();
       await userAPages.conversation().clickConversationInfoButton();
@@ -338,7 +338,8 @@ test.describe('Proteus verification', () => {
           await pages.conversation().clickConversationInfoButton();
           await pages
             .conversationDetails()
-            .openParticipantDetails(pages === userAPages ? userB.fullName : userA.fullName);
+            .getParticipant(pages === userAPages ? userB.fullName : userA.fullName)
+            .openDetails();
           await pages.participantDetails().devicesButton.click();
           await expect(pages.participantDevices().activeDevices).toHaveCount(1);
 
@@ -364,8 +365,8 @@ test.describe('Proteus verification', () => {
         ).toBeVisible();
       });
 
-      await test.step('Action: User A verifies User C`s device', async () => {
-        await userAPages.conversationDetails().openParticipantDetails(userC.fullName);
+      await test.step('Action: User A verifies User Cs device', async () => {
+        await userAPages.conversationDetails().getParticipant(userC.fullName).openDetails();
         await userAPages.participantDetails().devicesButton.click();
 
         await expect(userAPages.participantDevices().activeDevices).toHaveCount(1);

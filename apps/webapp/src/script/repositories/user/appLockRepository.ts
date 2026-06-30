@@ -21,7 +21,7 @@ import sodium, {ready} from 'libsodium-wrappers-sumo';
 import {container, singleton} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {AppLockState} from './appLockState';
 import {UserState} from './userState';
@@ -66,6 +66,7 @@ export class AppLockRepository {
   getPassphraseStorageKey: () => string;
   getEnabledStorageKey: () => string;
   constructor(
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly appLockState = container.resolve(AppLockState),
     private readonly appLockCrypto: AppLockCrypto = defaultAppLockCrypto,
@@ -119,19 +120,24 @@ export class AppLockRepository {
       this.appLockState.isActivatedInPreferences(true);
     } else if (this.appLockState.hasPassphrase()) {
       // If the user has set a passphrase we want to ask confirmation before disabling the feature
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: this.disableFeature,
-          text: t('AppLockDisableTurnOff'),
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: this.disableFeature,
+            text: this.translate('AppLockDisableTurnOff'),
+          },
+          secondaryAction: {
+            text: this.translate('AppLockDisableCancel'),
+          },
+          text: {
+            title: this.translate('ApplockDisableHeadline'),
+            message: this.translate('AppLockDisableInfo'),
+          },
         },
-        secondaryAction: {
-          text: t('AppLockDisableCancel'),
-        },
-        text: {
-          title: t('ApplockDisableHeadline'),
-          message: t('AppLockDisableInfo'),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     } else {
       this.disableFeature();
     }

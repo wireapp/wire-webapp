@@ -32,6 +32,8 @@ export const FullScreenCallPage = (page: Page) => {
   const gridTiles = component.getByTestId('item-grid');
   const nextPageButton = component.getByRole('button', {name: 'Go to next page'});
   const previousPageButton = component.getByRole('button', {name: 'Go to previous page'});
+  const toggleScreenShareButton = component.getByRole('switch', {name: 'Share Screen'});
+  const toggleVideoButton = component.getByRole('switch', {name: 'Camera'});
 
   /* Press the react button and click the given emoji within the opened toolbar */
   const sendReaction = async (emoji: '👍') => {
@@ -114,5 +116,7 @@ export const FullScreenCallPage = (page: Page) => {
     getGridTile,
     goToNextPage,
     goToPreviousPage,
+    toggleScreenShareButton,
+    toggleVideoButton,
   };
 };

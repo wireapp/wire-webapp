@@ -17,15 +17,26 @@
  *
  */
 
+import {useMemo} from 'react';
+
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
-import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface CellsTableDateColumnProps {
   timestamp: number;
 }
 
 export const CellsTableDateColumn = ({timestamp}: CellsTableDateColumnProps) => {
-  const timeAgo = useRelativeTimestamp(timestamp);
+  const {translate} = useApplicationContext();
+  const relativeTimestampFormatter = useMemo(() => {
+    return createRelativeTimestampFormatter({
+      justNow: translate('conversationJustNow'),
+      today: translate('conversationToday'),
+      yesterday: translate('conversationYesterday'),
+    });
+  }, [translate]);
+  const timeAgo = useRelativeTimestamp(timestamp, false, relativeTimestampFormatter);
   return (
     <MessageTime timestamp={timestamp} data-timestamp-type="normal">
       {timeAgo}

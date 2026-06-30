@@ -34,7 +34,7 @@ import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/Message';
+import type {Message} from 'Repositories/entity/message/message';
 import type {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {ReactionMap, ReadReceipt, UserReactionMap} from 'Repositories/storage';
@@ -42,9 +42,9 @@ import {createUuid} from 'Util/uuid';
 
 import {BuildMessageAddParams} from './EventBuilder.types';
 
-import {E2EIVerificationMessageType} from '../../../message/E2EIVerificationMessageType';
-import {StatusType} from '../../../message/StatusType';
-import {VerificationMessageType} from '../../../message/VerificationMessageType';
+import {E2EIVerificationMessageType} from '../../../message/e2eiVerificationMessageType';
+import {StatusType} from '../../../message/statusType';
+import {VerificationMessageType} from '../../../message/verificationMessageType';
 
 export interface BaseEvent {
   conversation: string;
@@ -138,6 +138,16 @@ export type QuoteData =
     }
   | {error: {type: string}};
 
+interface MessageAddMetadata {
+  /** who have received/read the event */
+  read_receipts?: ReadReceipt[];
+  /** who reacted to the event */
+  reactions?: UserReactionMap | ReactionMap;
+  edited_time?: string;
+  status: StatusType;
+  version?: number;
+}
+
 export type MessageAddEvent = ConversationEvent<
   CONVERSATION.MESSAGE_ADD,
   {
@@ -153,15 +163,9 @@ export type MessageAddEvent = ConversationEvent<
     /** @deprecated this was legacy field for the conversationId */
     id?: string;
   }
-> & {
-  /** who have received/read the event */
-  read_receipts?: ReadReceipt[];
-  /** who reacted to the event */
-  reactions?: UserReactionMap | ReactionMap;
-  edited_time?: string;
-  status: StatusType;
-  version?: number;
-};
+> &
+  MessageAddMetadata;
+
 export type MultipartMessageAddEvent = ConversationEvent<
   CONVERSATION.MULTIPART_MESSAGE_ADD,
   {
@@ -175,15 +179,9 @@ export type MultipartMessageAddEvent = ConversationEvent<
     replacing_message_id?: string;
     expects_read_confirmation?: boolean;
   }
-> & {
-  /** who have received/read the event */
-  read_receipts?: ReadReceipt[];
-  /** who reacted to the event */
-  reactions?: UserReactionMap | ReactionMap;
-  edited_time?: string;
-  status: StatusType;
-  version?: number;
-};
+> &
+  MessageAddMetadata;
+
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
@@ -222,8 +220,14 @@ export type DeleteEverywhereEvent = ConversationEvent<
 >;
 export type CompositeMessageAddEvent = ConversationEvent<
   CONVERSATION.COMPOSITE_MESSAGE_ADD,
-  {items: {button: {id: string; text: string}; text: MessageAddEvent['data']}[]}
->;
+  {
+    items: {button: {id: string; text: string}; text: MessageAddEvent['data']}[];
+    replacing_message_id?: string;
+    expects_read_confirmation?: boolean;
+  }
+> &
+  MessageAddMetadata;
+
 export type IncomingMessageTooBigEvent = ConversationEvent<CONVERSATION.INCOMING_MESSAGE_TOO_BIG>;
 export type KnockEvent = ConversationEvent<
   CONVERSATION.KNOCK,
@@ -242,6 +246,10 @@ export type VerificationEvent = ConversationEvent<CONVERSATION.VERIFICATION>;
 export type FileTypeRestrictedEvent = ConversationEvent<
   CONVERSATION.FILE_TYPE_RESTRICTED,
   {fileExt: string; isIncoming: boolean; name: string}
+>;
+export type MemberRoleUpdateEvent = ConversationEvent<
+  CONVERSATION.MEMBER_ROLE_UPDATE,
+  {conversation_role: string; user_id: QualifiedId}
 >;
 export type CallingTimeoutEvent = ConversationEvent<
   CONVERSATION.CALL_TIME_OUT,
@@ -288,6 +296,7 @@ export type ClientConversationEvent =
   | OneToOneMigratedToMlsEvent
   | VoiceChannelDeactivateEvent
   | FileTypeRestrictedEvent
+  | MemberRoleUpdateEvent
   | CallingTimeoutEvent
   | FailedToAddUsersMessageEvent
   | UnableToDecryptEvent
@@ -486,6 +495,25 @@ export const EventBuilder = {
       id,
       time: conversation.getNextIsoDate(),
       type: ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED,
+    };
+  },
+
+  buildMemberRoleUpdate(
+    conversation: Conversation,
+    conversationRole: string,
+    userId: QualifiedId,
+    fromUserId: string,
+  ): MemberRoleUpdateEvent {
+    return {
+      ...buildQualifiedId(conversation),
+      data: {
+        conversation_role: conversationRole,
+        user_id: userId,
+      },
+      from: fromUserId,
+      id: createUuid(),
+      time: conversation.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.MEMBER_ROLE_UPDATE,
     };
   },
 

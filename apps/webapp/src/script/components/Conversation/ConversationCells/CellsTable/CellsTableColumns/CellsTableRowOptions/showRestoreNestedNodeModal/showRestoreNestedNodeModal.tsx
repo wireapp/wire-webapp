@@ -18,8 +18,8 @@
  */
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNodeType, CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {modalContentStyles} from './showRestoreNestedNodeModal.styles';
@@ -28,40 +28,47 @@ export const showRestoreNestedNodeModal = ({
   node,
   onRestoreNode,
   parentNodeName,
+  translate,
 }: {
   node: CellNode;
   onRestoreNode: () => void;
   parentNodeName: string;
+  translate: RootContextValue['translate'];
 }) => {
-  PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    size: 'large',
-    primaryAction: {
-      action: onRestoreNode,
-      text: t('cells.restoreNestedNodeModal.button'),
+  PrimaryModal.show(
+    PrimaryModal.type.CONFIRM,
+    {
+      size: 'large',
+      primaryAction: {
+        action: onRestoreNode,
+        text: translate('cells.restoreNestedNodeModal.button'),
+      },
+      text: {
+        message: (
+          <div css={modalContentStyles}>
+            <p>{translate('cells.restoreNestedNodeModal.description1')}</p>
+            <p>
+              {replaceReactComponents(
+                translate('cells.restoreNestedNodeModal.description2', {
+                  name: '{name}',
+                }),
+                [
+                  {
+                    exactMatch: '{name}',
+                    render: () => <b>{parentNodeName}</b>,
+                  },
+                ],
+              )}
+            </p>
+          </div>
+        ),
+        title:
+          node.type === CellNodeType.FILE
+            ? translate('cells.restoreNestedNodeModal.file.headline')
+            : translate('cells.restoreNestedNodeModal.folder.headline'),
+      },
     },
-    text: {
-      message: (
-        <div css={modalContentStyles}>
-          <p>{t('cells.restoreNestedNodeModal.description1')}</p>
-          <p>
-            {replaceReactComponents(
-              t('cells.restoreNestedNodeModal.description2', {
-                name: '{name}',
-              }),
-              [
-                {
-                  exactMatch: '{name}',
-                  render: () => <b>{parentNodeName}</b>,
-                },
-              ],
-            )}
-          </p>
-        </div>
-      ),
-      title:
-        node.type === CellNodeType.FILE
-          ? t('cells.restoreNestedNodeModal.file.headline')
-          : t('cells.restoreNestedNodeModal.folder.headline'),
-    },
-  });
+    undefined,
+    translate,
+  );
 };

@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {randomUUID} from 'crypto';
@@ -27,13 +27,14 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 
 import {ConversationState} from './ConversationState';
+import {translateForTest} from 'Util/test/translateForTest';
 
 function createConversationState() {
   return new ConversationState(new UserState(), new TeamState());
 }
 
 function createConversation(protocol?: CONVERSATION_PROTOCOL, type?: CONVERSATION_TYPE) {
-  const conversation = new Conversation(randomUUID(), '', protocol);
+  const conversation = new Conversation(randomUUID(), '', protocol, translateForTest);
   if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = `groupid-${randomUUID()}`;
     conversation.epoch = 0;
@@ -91,6 +92,20 @@ describe('ConversationState', () => {
       const conversationState = createConversationState();
       conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
       expect(conversationState.getSelfConversations(false)).toEqual([selfProteusConversation]);
+    });
+  });
+
+  describe('visibleConversations', () => {
+    it('excludes meeting conversations from the sidebar list', () => {
+      const conversationState = createConversationState();
+      const meetingConversation = createConversation(CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.REGULAR);
+      meetingConversation.groupConversationType(GROUP_CONVERSATION_TYPE.MEETING);
+
+      conversationState.conversations([regularConversation, meetingConversation]);
+
+      expect(conversationState.conversations()).toHaveLength(2);
+      expect(conversationState.visibleConversations()).toEqual([regularConversation]);
+      expect(conversationState.findConversation(meetingConversation.qualifiedId)).toBe(meetingConversation);
     });
   });
 

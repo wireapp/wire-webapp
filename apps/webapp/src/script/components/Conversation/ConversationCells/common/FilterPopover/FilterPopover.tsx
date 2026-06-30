@@ -23,11 +23,12 @@ import {Button, Dialog, DialogTrigger, Popover} from 'react-aria-components';
 
 import {Checkbox, CheckboxLabel, CircleCloseIcon, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   badgeStyles,
   checkboxLabelStyles,
+  checkboxSubLabelStyles,
   checkboxWrapperStyles,
   clearAllButtonStyles,
   dialogStyles,
@@ -57,7 +58,9 @@ export const filterItems = (items: FilterItem[], query: string): FilterItem[] =>
     return items;
   }
   const lowerQuery = query.toLowerCase();
-  return items.filter(item => item.label.toLowerCase().includes(lowerQuery));
+  return items.filter(
+    item => item.label.toLowerCase().includes(lowerQuery) || item.subLabel?.toLowerCase().includes(lowerQuery) === true,
+  );
 };
 
 export const computeNextSelection = (currentIds: string[], id: string): string[] =>
@@ -80,6 +83,7 @@ export const FilterPopover = ({
   disabled = false,
   singleSelect,
 }: FilterPopoverProps) => {
+  const {translate} = useApplicationContext();
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
 
@@ -122,7 +126,7 @@ export const FilterPopover = ({
       >
         {triggerLabel}
         {count > 0 && (
-          <span css={badgeStyles} aria-label={t('cells.filterPopover.selectedCount', {count})}>
+          <span css={badgeStyles} aria-label={translate('cells.filterPopover.selectedCount', {count})}>
             {count}
           </span>
         )}
@@ -150,8 +154,12 @@ export const FilterPopover = ({
             <input
               css={searchInputStyles}
               type="text"
-              placeholder={t('cells.filterPopover.search.placeholder', {filterName: triggerLabel.toLowerCase()})}
-              aria-label={t('cells.filterPopover.search.placeholder', {filterName: triggerLabel.toLowerCase()})}
+              placeholder={translate('cells.filterPopover.search.placeholder', {
+                filterName: triggerLabel.toLowerCase(),
+              })}
+              aria-label={translate('cells.filterPopover.search.placeholder', {
+                filterName: triggerLabel.toLowerCase(),
+              })}
               value={searchValue}
               onChange={event => setSearchValue(event.target.value)}
               data-uie-name="filter-popover-search"
@@ -160,7 +168,7 @@ export const FilterPopover = ({
               <button
                 type="button"
                 css={searchClearButtonStyles}
-                aria-label={t('cells.filterPopover.search.clearButton')}
+                aria-label={translate('cells.filterPopover.search.clearButton')}
                 onClick={() => setSearchValue('')}
               >
                 <CircleCloseIcon color="currentColor" />
@@ -170,11 +178,12 @@ export const FilterPopover = ({
 
           <ul css={itemListStyles} role="listbox" aria-multiselectable={!singleSelect} aria-label={triggerLabel}>
             {filteredItems.length === 0 ? (
-              <li css={emptyStateStyles}>{t('cells.filtersModal.tags.noTagsFound')}</li>
+              <li css={emptyStateStyles}>{translate('cells.filtersModal.tags.noTagsFound')}</li>
             ) : (
               filteredItems.map(item => {
                 const isSelected = selectedIds.includes(item.id);
                 const isItemDisabled = singleSelect && selectedIds.length > 0 && !isSelected;
+                const hasStartContent = item.startContent !== undefined && item.startContent !== null;
                 return (
                   <li key={item.id} css={itemRowHoverStyles} role="option" aria-selected={isSelected}>
                     <Checkbox
@@ -186,12 +195,13 @@ export const FilterPopover = ({
                       data-uie-name="filter-popover-item"
                       data-uie-value={item.id}
                     >
-                      <span css={labelGroupStyles}>
+                      {hasStartContent && <span css={startContentStyles}>{item.startContent}</span>}
+                      <span css={labelGroupStyles} data-has-start-content={hasStartContent}>
                         <CheckboxLabel css={checkboxLabelStyles}>{item.label}</CheckboxLabel>
+                        {item.subLabel !== undefined && item.subLabel.length > 0 && (
+                          <span css={checkboxSubLabelStyles}>{item.subLabel}</span>
+                        )}
                       </span>
-                      {item.startContent !== undefined && item.startContent !== null && (
-                        <span css={startContentStyles}>{item.startContent}</span>
-                      )}
                     </Checkbox>
                   </li>
                 );
@@ -206,7 +216,7 @@ export const FilterPopover = ({
               onClick={clearAll}
               data-uie-name="filter-popover-clear-all"
             >
-              {t('cells.clearFilters.button')}
+              {translate('cells.clearFilters.button')}
             </button>
           </div>
         </Dialog>

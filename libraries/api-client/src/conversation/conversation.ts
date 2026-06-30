@@ -57,6 +57,7 @@ export enum CONVERSATION_ACCESS {
 export enum GROUP_CONVERSATION_TYPE {
   CHANNEL = 'channel',
   GROUP_CONVERSATION = 'group_conversation',
+  MEETING = 'meeting',
 }
 
 export enum ADD_PERMISSION {
