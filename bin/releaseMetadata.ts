@@ -45,6 +45,7 @@ export type ProductionTagPointsToCommitParameters = {
 
 const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
 const releaseBranchNamePattern = new RegExp(`^release/(${releaseIdentifierPattern})$`);
+const productionTagNamePattern = new RegExp(`^(${releaseIdentifierPattern})-production$`);
 
 function escapeRegularExpression(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
@@ -92,6 +93,16 @@ export function createProductionTagName(releaseIdentifier: string): Result<Produ
   }
 
   return Result.ok(`${releaseIdentifierResult.value}-production` as ProductionTagName);
+}
+
+export function validateProductionTagName(productionTagName: string): Result<ProductionTagName, Error> {
+  const productionTagNameMatches = productionTagNamePattern.test(productionTagName);
+
+  if (!productionTagNameMatches) {
+    return Result.err(new Error(`Invalid production tag name: ${productionTagName}`));
+  }
+
+  return Result.ok(productionTagName as ProductionTagName);
 }
 
 export function createNextBetaTagName(

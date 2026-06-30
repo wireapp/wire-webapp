@@ -118,6 +118,26 @@ describe('releaseMetadataCli', () => {
     });
   });
 
+  it('validates a production tag name', () => {
+    const actualResult = runCommand(['validate-production-tag', '2026-06-19.1-production']);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['2026-06-19.1-production'],
+    });
+  });
+
+  it('rejects an invalid production tag name', () => {
+    const actualResult = runCommand(['validate-production-tag', '2026-06-19.0-production']);
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid production tag name: 2026-06-19.0-production'],
+      exitCode: 1,
+      outputs: [],
+    });
+  });
+
   it('prints usage text for missing command arguments', () => {
     const actualResult = runCommand(['next-beta-tag']);
 
