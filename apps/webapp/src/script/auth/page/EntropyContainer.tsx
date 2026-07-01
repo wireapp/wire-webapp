@@ -95,7 +95,10 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
       ) : (
         <>
           <Muted center css={styles.subheadline}>
-            {translate('setEntropy.subheadline')}
+            {translate('setEntropy.subheadline1')}
+            <br />
+            <br />
+            {translate('setEntropy.subheadline2')}
           </Muted>
           <EntropyCanvas
             css={styles.entropyCanvas(pause === true)}
