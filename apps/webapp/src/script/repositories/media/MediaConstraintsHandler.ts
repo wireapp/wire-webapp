@@ -17,12 +17,14 @@
  *
  */
 
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {UserState} from 'Repositories/user/userState';
 import {getLogger, Logger} from 'Util/logger';
 
+import {parseSerializedAgcPreference} from './agcPreferenceStorage';
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 
 interface Config {
@@ -115,8 +117,7 @@ export class MediaConstraintsHandler {
   }
 
   getAgcPreference(): boolean {
-    const storedValue = window.localStorage.getItem(this.agcStorageKey);
-    return storedValue !== null ? (JSON.parse(storedValue) ?? false) : false;
+    return this.getStoredAgcPreference().unwrapOr(false);
   }
 
   getMediaStreamConstraints(
@@ -196,9 +197,28 @@ export class MediaConstraintsHandler {
     return hasMediaDevice ? {deviceId: {exact: mediaDeviceId}} : {};
   }
 
+  private getStoredAgcPreference(): Maybe<boolean> {
+    const storedValue = window.localStorage.getItem(this.agcStorageKey);
+
+    if (storedValue === null) {
+      return Maybe.nothing<boolean>();
+    }
+
+    return parseSerializedAgcPreference(storedValue);
+  }
+
   private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints & {autoGainControl: boolean} {
+    const autoGainControl = this.getStoredAgcPreference().unwrapOr(this.isEnhancedCallAudioProcessingEnabled);
+    const enhancedAudioProcessingConstraints = this.isEnhancedCallAudioProcessingEnabled
+      ? {
+          echoCancellation: true,
+          noiseSuppression: true,
+        }
+      : {};
+
     return {
-      autoGainControl: this.getAgcPreference(),
+      autoGainControl,
+      ...enhancedAudioProcessingConstraints,
       ...this.getDeviceConstraint(mediaDeviceId),
     };
   }
