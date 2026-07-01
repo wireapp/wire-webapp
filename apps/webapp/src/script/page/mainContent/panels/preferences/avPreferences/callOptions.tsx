@@ -29,16 +29,28 @@ import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsH
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {getLogger} from 'Util/logger';
 
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/preferencesSection';
 
+const logger = getLogger('CallOptions');
+
 interface CallOptionsProps {
   constraintsHandler: MediaConstraintsHandler;
+  hasActiveCall: () => boolean;
+  isEnhancedCallAudioProcessingEnabled: boolean;
   propertiesRepository: PropertiesRepository;
+  refreshAudioInput: () => Promise<MediaStream>;
 }
 
-const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProps) => {
+const CallOptions = ({
+  constraintsHandler,
+  hasActiveCall,
+  isEnhancedCallAudioProcessingEnabled,
+  propertiesRepository,
+  refreshAudioInput,
+}: CallOptionsProps) => {
   const {translate} = useApplicationContext();
   const {current: isCbrEncodingEnforced} = useRef(Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE);
   const [vbrEncoding, setVbrEncoding] = useState(
@@ -79,12 +91,22 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
   );
 
   const handleAgcChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    async (event: ChangeEvent<HTMLInputElement>) => {
       const isChecked = event.target.checked;
       constraintsHandler.setAgcPreference(isChecked);
       setAgcEnabled(isChecked);
+
+      if (isEnhancedCallAudioProcessingEnabled && hasActiveCall()) {
+        try {
+          await refreshAudioInput();
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            logger.warn(`Refreshing audio input after AGC preference change failed: ${error.message}`, error);
+          }
+        }
+      }
     },
-    [constraintsHandler],
+    [constraintsHandler, hasActiveCall, isEnhancedCallAudioProcessingEnabled, refreshAudioInput],
   );
 
   const handleSoundlessCallsChange = useCallback(
