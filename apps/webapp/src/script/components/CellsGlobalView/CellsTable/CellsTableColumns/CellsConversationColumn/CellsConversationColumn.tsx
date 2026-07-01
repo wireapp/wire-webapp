@@ -17,8 +17,7 @@
  *
  */
 
-import {GroupAvatar} from 'Components/avatar';
-import {ChannelAvatar} from 'Components/avatar';
+import {GroupAvatar, ChannelAvatar} from 'Components/avatar';
 import {openConversation} from 'Components/CellsGlobalView/common/openConversation/openConversation';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
