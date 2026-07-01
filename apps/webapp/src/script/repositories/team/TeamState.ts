@@ -134,9 +134,9 @@ export class TeamState {
       () => this.teamFeatures()?.conferenceCalling?.status === FEATURE_STATUS.ENABLED,
     );
 
-    this.isBackgroundEffectsEnabled = ko.pureComputed(() => {
-      return this.teamFeatures()?.backgroundEffects?.status === FEATURE_STATUS.ENABLED;
-    });
+    // Temporarily disable the Background effects regardless of backend state.
+    // This will be reverted after 6th of July 2026
+    this.isBackgroundEffectsEnabled = ko.pureComputed(() => false);
 
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FEATURE_STATUS.ENABLED,
