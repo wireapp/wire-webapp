@@ -28,6 +28,7 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {useConversationSearchFiles} from './useConversationSearchFiles';
 
 import type {ConversationDriveFiltersState} from '../common/driveFilters/driveFilters';
+import type {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 const CONV_ID = 'conv-abc';
@@ -87,6 +88,7 @@ function renderSearchHook({
   onClear = jest.fn(),
   fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
   filters = emptyFilters,
+  sort = null,
 }: {
   cellsRepository?: FakeCellsRepository;
   userRepository?: FakeUserRepository;
@@ -95,6 +97,7 @@ function renderSearchHook({
   onClear?: () => void;
   fireAndForgetInvoker?: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
   filters?: ConversationDriveFiltersState;
+  sort?: CellsSort | null;
 } = {}) {
   return {
     fireAndForgetInvoker,
@@ -109,6 +112,7 @@ function renderSearchHook({
         fireAndForgetInvoker,
         filters,
         onClear,
+        sort,
       }),
     ),
   };
@@ -166,6 +170,24 @@ describe('useConversationSearchFiles', () => {
         deleted: false,
         sortBy: undefined,
         sortDirection: undefined,
+      }),
+    );
+  });
+
+  it('uses the selected sort for the empty search view', async () => {
+    const cellsRepository = createFakeCellsRepository();
+    const {fireAndForgetInvoker} = renderSearchHook({
+      cellsRepository,
+      sort: {field: 'size', direction: 'asc'},
+    });
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: '',
+        recursive: false,
+        sortBy: 'size',
+        sortDirection: 'asc',
       }),
     );
   });
@@ -250,6 +272,7 @@ describe('useConversationSearchFiles', () => {
           fireAndForgetInvoker,
           filters: emptyFilters,
           onClear: jest.fn(),
+          sort: null,
         }),
       {initialProps: {enabled: true}},
     );
@@ -280,6 +303,8 @@ describe('useConversationSearchFiles', () => {
           query: 'doc',
           recursive: true,
           path: `${CONV_ID}@${DOMAIN}/Arjita`,
+          sortBy: 'mtime',
+          sortDirection: 'desc',
         }),
       ),
     );
@@ -303,7 +328,34 @@ describe('useConversationSearchFiles', () => {
     expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
       expect.objectContaining({
         recursive: true,
+        sortBy: 'mtime',
+        sortDirection: 'desc',
       }),
+    );
+  });
+
+  it('lets the selected sort override the active search default', async () => {
+    const cellsRepository = createFakeCellsRepository();
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const {result} = renderSearchHook({
+      cellsRepository,
+      fireAndForgetInvoker,
+      sort: {field: 'name', direction: 'asc'},
+    });
+
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    act(() => result.current.handleSearch('doc'));
+
+    await waitFor(() =>
+      expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
+        expect.objectContaining({
+          query: 'doc',
+          recursive: true,
+          sortBy: 'name',
+          sortDirection: 'asc',
+        }),
+      ),
     );
   });
 
@@ -323,6 +375,7 @@ describe('useConversationSearchFiles', () => {
           fireAndForgetInvoker,
           filters,
           onClear,
+          sort: null,
         }),
       {
         initialProps: {
