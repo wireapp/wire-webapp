@@ -24,6 +24,7 @@ import {
 } from './startupFeatureToggles';
 import {
   applockRefactoredFeatureToggleName,
+  enhancedCallAudioProcessingFeatureToggleName,
   meetingsFeatureToggleName,
   sharedDriveSearchAndFiltersFeatureToggleName,
   startupFeatureToggleNames,
@@ -33,6 +34,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
   sharedDriveSearchAndFiltersFeatureToggleName,
   meetingsFeatureToggleName,
+  enhancedCallAudioProcessingFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -101,6 +103,23 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(meetingsFeatureToggleName)).toBe(true);
   });
 
+  it('enables the enhanced call audio processing feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${enhancedCallAudioProcessingFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(enhancedCallAudioProcessingFeatureToggleName)).toBe(true);
+  });
+
+  it('enables the enhanced call audio processing feature toggle together with other startup feature toggles', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName},${enhancedCallAudioProcessingFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(meetingsFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(enhancedCallAudioProcessingFeatureToggleName)).toBe(true);
+  });
+
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${applockRefactoredFeatureToggleName} `,
@@ -142,6 +161,7 @@ describe('startupFeatureToggles', function () {
       applockRefactoredFeatureToggleName,
       sharedDriveSearchAndFiltersFeatureToggleName,
       meetingsFeatureToggleName,
+      enhancedCallAudioProcessingFeatureToggleName,
     ]);
   });
 

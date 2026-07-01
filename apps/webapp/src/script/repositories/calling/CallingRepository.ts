@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
@@ -30,6 +31,7 @@ import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQuali
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
 import {z} from 'zod';
@@ -1925,51 +1927,93 @@ export class CallingRepository {
     this.avsVersion = version;
   };
 
-  private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
-    return this.mediaStreamHandler
-      .requestMediaStream(audio, camera, screen, isGroup)
-      .then(stream => {
-        if (!stream) {
-          throw new Error('Failed to get media stream');
+  private async getMediaStream(
+    {audio = false, camera = false, screen = false}: MediaStreamQuery,
+    isGroup: boolean,
+  ): Promise<MediaStream> {
+    try {
+      const stream = await this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
+      if (is.nullOrUndefined(stream)) {
+        throw new Error('Failed to get media stream');
+      }
+
+      // For camera streams, verify we have video tracks
+      if (camera === true) {
+        const videoTracks = stream.getVideoTracks();
+        if (videoTracks.length === 0) {
+          throw new Error('No video tracks found in camera stream');
         }
 
-        // For camera streams, verify we have video tracks
-        if (camera) {
-          const videoTracks = stream.getVideoTracks();
-          if (!videoTracks.length) {
-            throw new Error('No video tracks found in camera stream');
-          }
-
-          const videoTrack = videoTracks[0];
-          if (videoTrack.readyState !== 'live') {
-            throw new Error(`Camera track not live. State: ${videoTrack.readyState}`);
-          }
-
-          // Log camera track details for debugging
-          this.logger.info('Camera track details:', {
-            enabled: videoTrack.enabled,
-            muted: videoTrack.muted,
-            readyState: videoTrack.readyState,
-            settings: videoTrack.getSettings(),
-            constraints: videoTrack.getConstraints(),
-            capabilities: videoTrack.getCapabilities(),
-          });
+        const videoTrack = videoTracks[0];
+        if (is.undefined(videoTrack)) {
+          throw new Error('No video tracks found in camera stream');
         }
 
-        return this.mediaDevicesHandler
-          .initializeMediaDevices(camera, false)
-          .then(() => {
-            return stream;
-          })
-          .catch((error: unknown) => {
-            this.logger.warn('Failed to initialize media devices:', error);
-            return stream;
+        if (videoTrack.readyState !== 'live') {
+          throw new Error(`Camera track not live. State: ${videoTrack.readyState}`);
+        }
+
+        // Log camera track details for debugging
+        this.logger.info('Camera track details:', {
+          enabled: videoTrack.enabled,
+          muted: videoTrack.muted,
+          readyState: videoTrack.readyState,
+          settings: this.getMediaTrackSettings(videoTrack).unwrapOr(undefined),
+          constraints: this.getMediaTrackConstraints(videoTrack).unwrapOr(undefined),
+          capabilities: this.getMediaTrackCapabilities(videoTrack).unwrapOr(undefined),
+        });
+      }
+
+      if (audio === true) {
+        const audioTrack = stream.getAudioTracks()[0];
+
+        if (is.undefined(audioTrack) === false) {
+          this.logger.info('Audio track details:', {
+            enabled: audioTrack.enabled,
+            muted: audioTrack.muted,
+            readyState: audioTrack.readyState,
+            settings: this.getMediaTrackSettings(audioTrack).unwrapOr(undefined),
+            constraints: this.getMediaTrackConstraints(audioTrack).unwrapOr(undefined),
+            capabilities: this.getMediaTrackCapabilities(audioTrack).unwrapOr(undefined),
           });
-      })
-      .catch((error: unknown) => {
-        this.logger.error('Failed to get media stream:', error);
-        throw error;
-      });
+        }
+      }
+
+      try {
+        await this.mediaDevicesHandler.initializeMediaDevices(camera === true, false);
+      } catch (error: unknown) {
+        this.logger.warn('Failed to initialize media devices:', error);
+      }
+
+      return stream;
+    } catch (error: unknown) {
+      this.logger.error('Failed to get media stream:', error);
+      throw error;
+    }
+  }
+
+  private getMediaTrackSettings(mediaTrack: MediaStreamTrack): Maybe<MediaTrackSettings> {
+    if (is.function_(mediaTrack.getSettings) === false) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.of(mediaTrack.getSettings());
+  }
+
+  private getMediaTrackConstraints(mediaTrack: MediaStreamTrack): Maybe<MediaTrackConstraints> {
+    if (is.function_(mediaTrack.getConstraints) === false) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.of(mediaTrack.getConstraints());
+  }
+
+  private getMediaTrackCapabilities(mediaTrack: MediaStreamTrack): Maybe<MediaTrackCapabilities> {
+    if (is.function_(mediaTrack.getCapabilities) === false) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.of(mediaTrack.getCapabilities());
   }
 
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error | unknown): void {
