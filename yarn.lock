@@ -30531,9 +30531,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsc-watch@npm:7.2.0":
-  version: 7.2.0
-  resolution: "tsc-watch@npm:7.2.0"
+"tsc-watch@npm:7.2.1":
+  version: 7.2.1
+  resolution: "tsc-watch@npm:7.2.1"
   dependencies:
     cross-spawn: "npm:^7.0.6"
     node-cleanup: "npm:^2.1.2"
@@ -30543,7 +30543,7 @@ __metadata:
     typescript: "*"
   bin:
     tsc-watch: dist/lib/tsc-watch.js
-  checksum: 10/988b4d0385f354423dba46b84699d1653c1e1e5af375c1745013ac4d6b4f6cacdc8c38b79774b676eef7a57ab9b6214aaea4a043b0d6eebfd1837224faeeace5
+  checksum: 10/6b29890a2e171ac9f24e6b1352037f3b186a996c3b1938f9facbe654dfd6561dc37ee663e4ba9b9890a4c9823a80d0bfc8a009e1001db3810a32ebe831b2b698
   languageName: node
   linkType: hard
 
@@ -32502,7 +32502,7 @@ __metadata:
     stylelint-config-idiomatic-order: "npm:10.0.0"
     ts-node: "npm:10.9.2"
     ts-pattern: "npm:5.9.0"
-    tsc-watch: "npm:7.2.0"
+    tsc-watch: "npm:7.2.1"
     tslib: "npm:2.8.1"
     type-fest: "npm:5.7.0"
     typescript: "npm:6.0.3"
