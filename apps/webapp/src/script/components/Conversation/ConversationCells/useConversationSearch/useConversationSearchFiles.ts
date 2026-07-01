@@ -39,6 +39,7 @@ import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {LOAD_MORE_INCREMENT, LOAD_MORE_INITIAL_SIZE} from '../common/loadMorePagination/loadMorePagination';
 import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
+import {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from '../useGetAllCellsNodes/transformDataToCellsNodes';
@@ -52,6 +53,7 @@ interface UseConversationSearchFilesProps {
   fireAndForgetInvoker: FireAndForgetInvoker;
   filters: ConversationDriveFiltersState;
   onClear?: () => void;
+  sort: CellsSort | null;
 }
 
 type ClearSearchRefreshOptions = {
@@ -72,6 +74,7 @@ export const useConversationSearchFiles = ({
   fireAndForgetInvoker,
   filters,
   onClear,
+  sort,
 }: UseConversationSearchFilesProps) => {
   const {setNodes, appendNodes, setStatus, setPagination, setError, clearAll} = useCellsStore();
 
@@ -146,9 +149,6 @@ export const useConversationSearchFiles = ({
         const isRecycleBin = getCellsFilesPath() === RECYCLE_BIN_PATH;
         const isSearchingOrFiltering = hasQuery || hasFilters;
 
-        // recency sort for searches inside the recycle bin only
-        const forceRecencySort = isRecycleBin && hasQuery;
-
         // search scopes to the folder the user is browsing
         const searchRootPath = getCellsApiPath({conversationQualifiedId: {id, domain}});
 
@@ -158,8 +158,10 @@ export const useConversationSearchFiles = ({
           limit: append ? LOAD_MORE_INCREMENT : LOAD_MORE_INITIAL_SIZE,
           offset,
           path: searchRootPath,
-          sortBy: forceRecencySort ? 'mtime' : undefined,
-          sortDirection: forceRecencySort ? 'desc' : undefined,
+          // A user-selected sort always wins; for active searches/filters fall back to recency;
+          // the empty view (no query, no filters) sends no sort to preserve browse/folders-first order.
+          sortBy: sort?.field ?? (isSearchingOrFiltering ? 'mtime' : undefined),
+          sortDirection: sort?.direction ?? (isSearchingOrFiltering ? 'desc' : undefined),
           deleted: isRecycleBin,
           ...searchParams,
         });
@@ -217,7 +219,7 @@ export const useConversationSearchFiles = ({
     },
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain, isValidSearchRequest],
+    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain, isValidSearchRequest, sort],
   );
 
   useLayoutEffect(() => {
@@ -349,6 +351,30 @@ export const useConversationSearchFiles = ({
     }
     hadActiveSearchParamsRef.current = hasActiveParams;
   }, [canSearchOwnResults, filters, fireAndForgetInvoker, hasActiveParams, onClear, searchNodes, searchValue]);
+
+  // Re-run the search whenever the sort changes. The main search effect above already
+  // refetches when a query/filter is active (it depends on the sort-aware searchNodes), so
+  // this only needs to cover the empty search view, which that effect bails out of.
+  const hasInitialisedSortRef = useRef(false);
+  useEffect(() => {
+    if (!enabled) {
+      hasInitialisedSortRef.current = false;
+      return;
+    }
+    if (!hasInitialisedSortRef.current) {
+      hasInitialisedSortRef.current = true;
+      return;
+    }
+    const hasSearchOrActiveParams = searchQuery.trim().length > 0 || hasActiveParams;
+    if (hasSearchOrActiveParams) {
+      return;
+    }
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await searchNodes({query: '', filters});
+    });
+    // searchQuery/filters are read at fire time; only sort (and enable state) should trigger this.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sort, enabled]);
 
   const loadMore = useCallback(
     async (offset: number): Promise<void> => {

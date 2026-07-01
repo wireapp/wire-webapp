@@ -61,8 +61,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
   const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
 
   const {filters, filterState} = useGlobalDriveFilters({cellsRepository, conversationRepository, translate});
-
-  const {getDirectionFor, toggleSort} = useCellsSorting();
+  const {sort, getDirectionFor, toggleSort} = useCellsSorting();
   const legacyFilterState = useMemo<GlobalDriveFiltersState>(
     () => ({
       selectedTagIds: legacyFilters.tags,
@@ -82,6 +81,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
     conversationRepository,
     fireAndForgetInvoker,
     filters: searchFilterState,
+    sort,
   });
 
   useOnPresignedUrlExpired({refreshCallback: handleReload});

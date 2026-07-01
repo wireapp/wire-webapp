@@ -32,6 +32,7 @@ import {transformDataToCellsNodes, transformToCellPagination} from './transformD
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
+import {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {createRequestVersionGate} from '../useConversationSearch/requestVersionGate';
 
@@ -41,6 +42,7 @@ interface UseGetAllCellsNodesProps {
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
   fireAndForgetInvoker: FireAndForgetInvoker;
+  sort: CellsSort | null;
 }
 
 export const useGetAllCellsNodes = ({
@@ -49,6 +51,7 @@ export const useGetAllCellsNodes = ({
   conversationQualifiedId,
   enabled,
   fireAndForgetInvoker,
+  sort,
 }: UseGetAllCellsNodesProps) => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
@@ -80,6 +83,8 @@ export const useGetAllCellsNodes = ({
         limit: pageSize,
         offset,
         deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
+        sortBy: sort?.field,
+        sortDirection: sort?.direction,
       });
 
       if (!isCurrentFetchRequest(requestVersion)) {
@@ -121,7 +126,13 @@ export const useGetAllCellsNodes = ({
     }
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, id, isCurrentFetchRequest, offset, pageSize, setError, setNodes, setPagination, setStatus]);
+  }, [domain, id, isCurrentFetchRequest, offset, pageSize, sort, setError, setNodes, setPagination, setStatus]);
+
+  // A new sort criterion re-pages from the top; the fetch effect below then refetches
+  // because fetchNodes depends on both offset and sort.
+  useEffect(() => {
+    setOffset(0);
+  }, [sort]);
 
   const handleHashChange = useCallback((): void => {
     if (enabled !== true) {

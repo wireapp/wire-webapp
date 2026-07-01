@@ -21,7 +21,7 @@ import {useCallback, useState} from 'react';
 
 import {CellsSortDirection} from '../CellsSortIcon/CellsSortIcon';
 
-export type CellsSortField = 'name_ci' | 'mtime' | 'size';
+export type CellsSortField = 'name' | 'mtime' | 'size';
 
 export interface CellsSort {
   field: CellsSortField;
@@ -31,7 +31,7 @@ export interface CellsSort {
 // Direction applied the first time a column is selected:
 // name → A→Z, modified → newest first, size → smallest first.
 const DEFAULT_DIRECTION: Record<CellsSortField, CellsSortDirection> = {
-  name_ci: 'asc',
+  name: 'asc',
   mtime: 'desc',
   size: 'asc',
 };
@@ -39,7 +39,7 @@ const DEFAULT_DIRECTION: Record<CellsSortField, CellsSortDirection> = {
 // Maps a table column id (the accessor key) to its backend sort field. Columns absent
 // from this map are not sortable and receive no aria-sort.
 export const SORTABLE_COLUMN_FIELD: Record<string, CellsSortField> = {
-  name: 'name_ci',
+  name: 'name',
   sizeMb: 'size',
   uploadedAtTimestamp: 'mtime',
 };
