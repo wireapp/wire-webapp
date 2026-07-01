@@ -117,7 +117,7 @@ export class MediaConstraintsHandler {
   }
 
   getAgcPreference(): boolean {
-    return this.getStoredAgcPreference().unwrapOr(false);
+    return this.getStoredAgcPreference().unwrapOr(this.isEnhancedCallAudioProcessingEnabled);
   }
 
   getMediaStreamConstraints(

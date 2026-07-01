@@ -34,6 +34,7 @@ import {CallOptions} from './callOptions';
 interface RenderCallOptionsParameters {
   isEnhancedCallAudioProcessingEnabled?: boolean;
   hasActiveCall?: boolean;
+  agcPreference?: boolean;
 }
 
 function createPropertiesRepositoryForTest(): PropertiesRepository {
@@ -52,10 +53,10 @@ function createPropertiesRepositoryForTest(): PropertiesRepository {
 }
 
 function renderCallOptions(parameters: RenderCallOptionsParameters = {}) {
-  const {isEnhancedCallAudioProcessingEnabled = false, hasActiveCall = false} = parameters;
+  const {isEnhancedCallAudioProcessingEnabled = false, hasActiveCall = false, agcPreference = false} = parameters;
   const constraintsHandler = {
     getAgcPreference: jest.fn(() => {
-      return false;
+      return agcPreference;
     }),
     setAgcPreference: jest.fn(),
   } as unknown as MediaConstraintsHandler;
@@ -89,6 +90,15 @@ function getAgcCheckbox(): HTMLInputElement {
 }
 
 describe('CallOptions', () => {
+  it('shows AGC as enabled by default when enhanced call audio processing is enabled', () => {
+    renderCallOptions({
+      agcPreference: true,
+      isEnhancedCallAudioProcessingEnabled: true,
+    });
+
+    expect(getAgcCheckbox().checked).toBe(true);
+  });
+
   it('stores the AGC preference when the AGC checkbox changes', () => {
     const {constraintsHandler} = renderCallOptions();
 

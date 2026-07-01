@@ -353,6 +353,34 @@ describe('MediaConstraintsHandler', () => {
       expect(constraintsHandler.getAgcPreference()).toEqual(true);
       expect(getItemSpy).toHaveBeenCalledWith(expect.stringContaining(selfUserId));
     });
+
+    it('defaults AGC to disabled when enhanced call audio processing is disabled and no AGC preference is stored', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue(null);
+      const constraintsHandler = createConstraintsHandler(createUuid(), false);
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(false);
+    });
+
+    it('defaults AGC to enabled when enhanced call audio processing is enabled and no AGC preference is stored', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue(null);
+      const constraintsHandler = createConstraintsHandler(createUuid(), true);
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
+    });
+
+    it('keeps AGC disabled when enhanced call audio processing is enabled and AGC is stored as disabled', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('false');
+      const constraintsHandler = createConstraintsHandler(createUuid(), true);
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(false);
+    });
+
+    it('keeps AGC enabled when enhanced call audio processing is enabled and AGC is stored as enabled', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('true');
+      const constraintsHandler = createConstraintsHandler(createUuid(), true);
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
+    });
   });
 });
 
