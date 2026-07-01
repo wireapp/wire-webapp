@@ -17,16 +17,22 @@
  *
  */
 
-export const applockRefactoredFeatureToggleName = 'applock-refactored';
-export const sharedDriveSearchAndFiltersFeatureToggleName = 'shared-drive-search-and-filters';
-export const meetingsFeatureToggleName = 'meetings';
-export const enhancedCallAudioProcessingFeatureToggleName = 'enhanced-call-audio-processing';
+import {Maybe} from 'true-myth';
+import {z} from 'zod';
 
-export const startupFeatureToggleNames = [
-  applockRefactoredFeatureToggleName,
-  sharedDriveSearchAndFiltersFeatureToggleName,
-  meetingsFeatureToggleName,
-  enhancedCallAudioProcessingFeatureToggleName,
-] as const;
+const storedAgcPreferenceSchema = z.boolean();
 
-export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];
+export function parseSerializedAgcPreference(serializedStoredAgcPreference: string): Maybe<boolean> {
+  try {
+    const parsedStoredAgcPreference: unknown = JSON.parse(serializedStoredAgcPreference);
+    const validationResult = storedAgcPreferenceSchema.safeParse(parsedStoredAgcPreference);
+
+    if (!validationResult.success) {
+      return Maybe.nothing<boolean>();
+    }
+
+    return Maybe.just(validationResult.data);
+  } catch {
+    return Maybe.nothing<boolean>();
+  }
+}

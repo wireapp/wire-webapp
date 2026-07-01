@@ -33,6 +33,8 @@ interface ExtendedMediaTrackConstraints extends MediaTrackConstraints {
   audio: {
     autoGainControl?: boolean;
     deviceId?: SelectedDeviceId;
+    echoCancellation?: boolean;
+    noiseSuppression?: boolean;
   };
   video: {
     facingMode?: string;
@@ -74,11 +76,13 @@ describe('MediaConstraintsHandler', () => {
     createAvailableDevices();
   };
 
-  const createConstraintsHandler = (selfUserId = createUuid()) => {
+  const createConstraintsHandler = (selfUserId = createUuid(), isEnhancedCallAudioProcessingEnabled = false) => {
     const userState = {
-      self: () => new User(selfUserId, '', translateForTest),
+      self: () => {
+        return new User(selfUserId, '', translateForTest);
+      },
     };
-    return new MediaConstraintsHandler(userState as UserState);
+    return new MediaConstraintsHandler(userState as UserState, isEnhancedCallAudioProcessingEnabled);
   };
 
   const defaultId = MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
@@ -131,6 +135,88 @@ describe('MediaConstraintsHandler', () => {
     });
 
     describe('Audio Constraints', () => {
+      it('keeps legacy audio constraints when enhanced call audio processing is disabled and no AGC preference is stored', () => {
+        createAvailableDevices({audio: defaultId});
+        const constraintsHandler = createConstraintsHandler(createUuid(), false);
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({autoGainControl: false});
+      });
+
+      it('applies enhanced audio constraints when enhanced call audio processing is enabled and no AGC preference is stored', () => {
+        createAvailableDevices({audio: defaultId});
+        const constraintsHandler = createConstraintsHandler(createUuid(), true);
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+      });
+
+      it('respects a stored disabled AGC preference when enhanced call audio processing is enabled', () => {
+        createAvailableDevices({audio: defaultId});
+        const selfUserId = createUuid();
+        const constraintsHandler = createConstraintsHandler(selfUserId, true);
+        localStorage.setItem(`agc_enabled_${selfUserId}`, 'false');
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: false,
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+      });
+
+      it('respects a stored enabled AGC preference when enhanced call audio processing is enabled', () => {
+        createAvailableDevices({audio: defaultId});
+        const selfUserId = createUuid();
+        const constraintsHandler = createConstraintsHandler(selfUserId, true);
+        localStorage.setItem(`agc_enabled_${selfUserId}`, 'true');
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+      });
+
+      it('treats a stored non-boolean AGC preference as missing when enhanced call audio processing is enabled', () => {
+        createAvailableDevices({audio: defaultId});
+        const selfUserId = createUuid();
+        const constraintsHandler = createConstraintsHandler(selfUserId, true);
+        localStorage.setItem(`agc_enabled_${selfUserId}`, '"not-a-boolean"');
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+      });
+
+      it('treats a malformed stored AGC preference as missing when enhanced call audio processing is enabled', () => {
+        createAvailableDevices({audio: defaultId});
+        const selfUserId = createUuid();
+        const constraintsHandler = createConstraintsHandler(selfUserId, true);
+        localStorage.setItem(`agc_enabled_${selfUserId}`, 'not-json');
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+      });
+
       it('should apply the AGC preference from storage to the audio constraints', () => {
         const selfUserId = createUuid();
         const constraintsHandler = createConstraintsHandler(selfUserId);
@@ -149,6 +235,20 @@ describe('MediaConstraintsHandler', () => {
         const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
 
         expect(constraints.audio.deviceId.exact).toBe('specific-mic-id');
+      });
+
+      it('keeps exact deviceId when enhanced call audio processing is enabled', () => {
+        createAvailableDevices({audio: 'specific-mic-id'});
+        const constraintsHandler = createConstraintsHandler(createUuid(), true);
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+          deviceId: {exact: 'specific-mic-id'},
+        });
       });
 
       it('should NOT include deviceId when the default audio device is selected', () => {
@@ -252,6 +352,34 @@ describe('MediaConstraintsHandler', () => {
 
       expect(constraintsHandler.getAgcPreference()).toEqual(true);
       expect(getItemSpy).toHaveBeenCalledWith(expect.stringContaining(selfUserId));
+    });
+
+    it('defaults AGC to disabled when enhanced call audio processing is disabled and no AGC preference is stored', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue(null);
+      const constraintsHandler = createConstraintsHandler(createUuid(), false);
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(false);
+    });
+
+    it('defaults AGC to enabled when enhanced call audio processing is enabled and no AGC preference is stored', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue(null);
+      const constraintsHandler = createConstraintsHandler(createUuid(), true);
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
+    });
+
+    it('keeps AGC disabled when enhanced call audio processing is enabled and AGC is stored as disabled', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('false');
+      const constraintsHandler = createConstraintsHandler(createUuid(), true);
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(false);
+    });
+
+    it('keeps AGC enabled when enhanced call audio processing is enabled and AGC is stored as enabled', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('true');
+      const constraintsHandler = createConstraintsHandler(createUuid(), true);
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
     });
   });
 });
