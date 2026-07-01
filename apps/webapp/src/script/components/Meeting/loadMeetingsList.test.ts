@@ -30,7 +30,6 @@ describe('loadMeetingsList', () => {
     start_time: '2026-06-16T10:00:00.000Z',
     end_time: '2026-06-16T11:00:00.000Z',
     title: 'Weekly sync',
-    invited_emails: [],
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},

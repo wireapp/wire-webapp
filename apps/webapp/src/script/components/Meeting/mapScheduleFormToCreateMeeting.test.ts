@@ -70,19 +70,6 @@ describe('mapScheduleFormToCreateMeeting', () => {
     });
   });
 
-  it('does not include invited_emails regardless of selected participants', () => {
-    const result = mapScheduleFormToCreateMeeting(
-      {
-        ...baseFormState(),
-        selectedUsers: [createUser('1')],
-      },
-      wallClock,
-    );
-
-    expect(result.isOk).toBe(true);
-    expect(unwrap(result).invited_emails).toBeUndefined();
-  });
-
   it('returns missingTimes when start or end is missing', () => {
     const result = mapScheduleFormToCreateMeeting(
       {
