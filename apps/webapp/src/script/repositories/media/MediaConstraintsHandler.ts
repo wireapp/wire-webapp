@@ -99,7 +99,10 @@ export class MediaConstraintsHandler {
     };
   }
 
-  constructor(private readonly userState = container.resolve(UserState)) {
+  constructor(
+    private readonly userState = container.resolve(UserState),
+    readonly isEnhancedCallAudioProcessingEnabled: boolean = false,
+  ) {
     this.logger = getLogger('MediaConstraintsHandler');
   }
 
