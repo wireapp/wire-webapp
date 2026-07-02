@@ -32,6 +32,7 @@ import type {Translate} from 'Util/localizerUtil';
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
 import type {MeetingSubmitSuccess, UpdateMeetingParams} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
+import {showMeetingPartialAddFailureModal} from './showMeetingPartialAddFailureModal';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
 const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {
@@ -113,6 +114,14 @@ export const useScheduleMeetingSubmit = () => {
       if (submitResult.isErr) {
         showMeetingSubmitError(translate, submitResult.error);
         return false;
+      }
+
+      if (submitResult.value.failedToAdd.length > 0) {
+        showMeetingPartialAddFailureModal({
+          failedToAdd: submitResult.value.failedToAdd,
+          users: formState.selectedUsers,
+          translate,
+        });
       }
 
       return true;
