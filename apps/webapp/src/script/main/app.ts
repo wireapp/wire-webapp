@@ -196,7 +196,6 @@ export class App {
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
     private readonly translate: Translate,
-    private readonly isEnhancedCallAudioProcessingEnabled: boolean,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -235,10 +234,7 @@ export class App {
     // Initialize permissions
     void initializePermissions();
 
-    const mediaConstraintsHandler = new MediaConstraintsHandler(
-      container.resolve(UserState),
-      this.isEnhancedCallAudioProcessingEnabled,
-    );
+    const mediaConstraintsHandler = new MediaConstraintsHandler(container.resolve(UserState));
 
     const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
     const mediaDevicesHandler = new MediaDevicesHandler();

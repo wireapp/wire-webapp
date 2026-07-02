@@ -17,11 +17,7 @@
  *
  */
 
-import {
-  applockRefactoredFeatureToggleName,
-  enhancedCallAudioProcessingFeatureToggleName,
-  meetingsFeatureToggleName,
-} from './startupFeatureToggleNames';
+import {applockRefactoredFeatureToggleName, meetingsFeatureToggleName} from './startupFeatureToggleNames';
 import {startupFeatureToggleQueryParameterName} from './startupFeatureToggles';
 import {updateLocationSearchForStartupFeatureToggle} from './startupFeatureToggleQueryParameters';
 
@@ -48,15 +44,15 @@ describe('updateLocationSearchForStartupFeatureToggle', () => {
     expect(updatedLocationSearch).toBe(`?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName}`);
   });
 
-  it('adds the enhanced call audio processing feature toggle while preserving other enabled toggles', () => {
+  it('adds a startup feature toggle while preserving other enabled toggles', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
       locationSearch: `?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName}`,
-      featureToggleName: enhancedCallAudioProcessingFeatureToggleName,
+      featureToggleName: applockRefactoredFeatureToggleName,
       shouldEnableFeatureToggle: true,
     });
 
     expect(updatedLocationSearch).toBe(
-      `?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName}%2C${enhancedCallAudioProcessingFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}%2C${meetingsFeatureToggleName}`,
     );
   });
 

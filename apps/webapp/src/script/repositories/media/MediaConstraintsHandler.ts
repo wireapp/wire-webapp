@@ -101,10 +101,7 @@ export class MediaConstraintsHandler {
     };
   }
 
-  constructor(
-    private readonly userState = container.resolve(UserState),
-    readonly isEnhancedCallAudioProcessingEnabled: boolean = false,
-  ) {
+  constructor(private readonly userState = container.resolve(UserState)) {
     this.logger = getLogger('MediaConstraintsHandler');
   }
 
@@ -117,7 +114,7 @@ export class MediaConstraintsHandler {
   }
 
   getAgcPreference(): boolean {
-    return this.getStoredAgcPreference().unwrapOr(this.isEnhancedCallAudioProcessingEnabled);
+    return this.getStoredAgcPreference().unwrapOr(true);
   }
 
   getMediaStreamConstraints(
@@ -208,17 +205,12 @@ export class MediaConstraintsHandler {
   }
 
   private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints & {autoGainControl: boolean} {
-    const autoGainControl = this.getStoredAgcPreference().unwrapOr(this.isEnhancedCallAudioProcessingEnabled);
-    const enhancedAudioProcessingConstraints = this.isEnhancedCallAudioProcessingEnabled
-      ? {
-          echoCancellation: true,
-          noiseSuppression: true,
-        }
-      : {};
+    const autoGainControl = this.getStoredAgcPreference().unwrapOr(true);
 
     return {
       autoGainControl,
-      ...enhancedAudioProcessingConstraints,
+      echoCancellation: true,
+      noiseSuppression: true,
       ...this.getDeviceConstraint(mediaDeviceId),
     };
   }
