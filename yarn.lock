@@ -26299,7 +26299,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.9.1, prettier@npm:^3":
+"prettier@npm:3.9.3":
+  version: 3.9.3
+  resolution: "prettier@npm:3.9.3"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10/2aa4232a7ae2204a6d0758e8083117509f13a499ae49f87ed8e4a9c15967083f400e4e189a64948de60987974d3441f4b5e5110e7a3e56f9b83f4e2904cef376
+  languageName: node
+  linkType: hard
+
+"prettier@npm:^3":
   version: 3.9.1
   resolution: "prettier@npm:3.9.1"
   bin:
@@ -32495,7 +32504,7 @@ __metadata:
     nock: "npm:14.0.16"
     nx: "npm:22.7.6"
     playwright: "npm:1.61.1"
-    prettier: "npm:3.9.1"
+    prettier: "npm:3.9.3"
     rimraf: "npm:6.1.3"
     simple-git: "npm:3.36.0"
     stylelint: "npm:17.14.0"
