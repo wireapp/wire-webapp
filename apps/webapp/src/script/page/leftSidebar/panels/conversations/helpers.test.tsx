@@ -284,9 +284,60 @@ describe('getTabConversations', () => {
     expect(filteredConversations[0].display_name()).toEqual('Tim');
   });
 
+  it('should return a group conversation once when its name and participant name match the search filter', () => {
+    const florianSupportConversation = generateConversation({
+      name: 'Florian Support',
+      type: CONVERSATION_TYPE.REGULAR,
+      users: [generateUser(undefined, {name: 'Florian'})],
+    });
+
+    const {conversations: filteredConversations} = getTabConversations({
+      currentTab: SidebarTabs.RECENT,
+      conversations: [florianSupportConversation],
+      groupConversations: [florianSupportConversation],
+      directConversations: [],
+      favoriteConversations: [],
+      archivedConversations: [],
+      conversationsFilter: 'Florian',
+      channelAndGroupConversations: [florianSupportConversation],
+      channelConversations: [],
+      isChannelsEnabled: false,
+      draftConversations: [],
+      searchInputPlaceholders,
+    });
+
+    expect(filteredConversations).toEqual([florianSupportConversation]);
+  });
+
+  it('should return a group conversation when only its participant name matches the search filter', () => {
+    const supportRoomConversation = generateConversation({
+      name: 'Support Room',
+      type: CONVERSATION_TYPE.REGULAR,
+      users: [generateUser(undefined, {name: 'Florian'})],
+    });
+
+    const {conversations: filteredConversations} = getTabConversations({
+      currentTab: SidebarTabs.RECENT,
+      conversations: [supportRoomConversation],
+      groupConversations: [supportRoomConversation],
+      directConversations: [],
+      favoriteConversations: [],
+      archivedConversations: [],
+      conversationsFilter: 'Florian',
+      channelAndGroupConversations: [supportRoomConversation],
+      channelConversations: [],
+      isChannelsEnabled: false,
+      draftConversations: [],
+      searchInputPlaceholders,
+    });
+
+    expect(filteredConversations).toEqual([supportRoomConversation]);
+  });
+
   it('should ignore special characters when filtering conversations', () => {
     const {conversations: filteredConversations} = runTest(SidebarTabs.RECENT, 'web team');
 
+    expect(filteredConversations).toHaveLength(1);
     expect(filteredConversations[0].display_name()).toEqual('Wêb Têam');
   });
 

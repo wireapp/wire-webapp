@@ -97,14 +97,27 @@ export function getTabConversations({
     }
 
     const filterWord = replaceAccents(conversationsFilter.toLowerCase());
+    const filteredConversations = conversations.filter(conversationSearchFilter);
+    const filteredConversationIds = new Set(
+      filteredConversations.map(conversation => {
+        const {domain, id} = conversation.qualifiedId;
+        return `${domain ?? ''}/${id}`;
+      }),
+    );
     const filteredGroupConversations = groupConversations.filter(group => {
+      const {domain, id} = group.qualifiedId;
+      const groupConversationId = `${domain ?? ''}/${id}`;
+
+      if (filteredConversationIds.has(groupConversationId)) {
+        return false;
+      }
+
       return group.participating_user_ets().some(user => {
         const conversationDisplayName = replaceAccents(user.name().toLowerCase());
         return conversationDisplayName.includes(filterWord);
       });
     });
 
-    const filteredConversations = conversations.filter(conversationSearchFilter);
     const combinedConversations = [...filteredConversations, ...filteredGroupConversations];
 
     return {
