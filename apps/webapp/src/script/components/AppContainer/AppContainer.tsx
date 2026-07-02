@@ -45,7 +45,6 @@ import {useTheme} from './hooks/useTheme';
 import {runClientVersionCheck} from '../../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../application-periodic-checks/startApplicationPeriodicChecks';
 import {Config, Configuration} from '../../Config';
-import {enhancedCallAudioProcessingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
@@ -86,16 +85,9 @@ export const AppContainer = (properties: AppProps) => {
     wallClock,
   } = properties;
   setAppLocale();
-  const isEnhancedCallAudioProcessingEnabled = isFeatureToggleEnabled(enhancedCallAudioProcessingFeatureToggleName);
   const app = useMemo(() => {
-    return new App(
-      container.resolve(Core),
-      container.resolve(APIClient),
-      config,
-      translate,
-      isEnhancedCallAudioProcessingEnabled,
-    );
-  }, [config, isEnhancedCallAudioProcessingEnabled, translate]);
+    return new App(container.resolve(Core), container.resolve(APIClient), config, translate);
+  }, [config, translate]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
 
   // Publishing application on the global scope for debug and testing purposes.

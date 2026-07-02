@@ -28,7 +28,6 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {enhancedCallAudioProcessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {AudioOutPreferences} from './avPreferences/audioOutPreferences';
@@ -49,8 +48,7 @@ interface AVPreferencesProps {
 }
 
 const AVPreferencesComponent = ({propertiesRepository, callingRepository, deviceSupport}: AVPreferencesProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const isEnhancedCallAudioProcessingEnabled = isFeatureToggleEnabled(enhancedCallAudioProcessingFeatureToggleName);
+  const {translate} = useApplicationContext();
   const devicesHandler = container.resolve(MediaDevicesHandler);
   const constraintsHandler = container.resolve(MediaConstraintsHandler);
   const streamHandler = container.resolve(MediaStreamHandler);
@@ -88,7 +86,6 @@ const AVPreferencesComponent = ({propertiesRepository, callingRepository, device
       <CallOptions
         {...{constraintsHandler, propertiesRepository}}
         hasActiveCall={callingRepository.hasActiveCall}
-        isEnhancedCallAudioProcessingEnabled={isEnhancedCallAudioProcessingEnabled}
         refreshAudioInput={() => {
           return callingRepository.refreshAudioInput();
         }}

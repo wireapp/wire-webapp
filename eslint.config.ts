@@ -42,6 +42,7 @@ const ignores = [
   'apps/webapp/*.config.*',
   'apps/webapp/src/sw.js',
   'apps/server/bin/',
+  'apps/server/coverage/',
   'apps/server/dist/',
   'apps/server/node_modules/',
   'apps/webapp/src/ext/',
