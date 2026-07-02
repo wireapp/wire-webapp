@@ -110,8 +110,8 @@ test.describe('account settings', () => {
         await page.getByRole('button', {name: 'Remove device'}).first().click({timeout: LOGIN_TIMEOUT});
         // We will also always be prompted to confirm the new history on this device
         await pages.historyInfo().clickConfirmButton();
-        await expect(components.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible({
-          timeout: LOGIN_TIMEOUT,
+        await expect(components.conversationSidebar().sidebar, 'Login took more than 60s').toBeVisible({
+          timeout: 60_000, // The login for this user may take some time since it's persisted and checking for messages takes extra time
         });
       });
 

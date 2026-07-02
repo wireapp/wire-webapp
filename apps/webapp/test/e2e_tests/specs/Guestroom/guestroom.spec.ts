@@ -621,11 +621,9 @@ test.describe('Guestroom', () => {
       // // We will also always be prompted to confirm the new history on this device
       await guestPages.historyInfo().clickConfirmButton();
 
-      await expect(guestComponents.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible(
-        {
-          timeout: LOGIN_TIMEOUT,
-        },
-      );
+      await expect(guestComponents.conversationSidebar().sidebar, 'Login took more than 60s').toBeVisible({
+        timeout: 60_000, // The login for this user may take some time since it's persisted and checking for messages takes extra time
+      });
 
       await expect(guestPages.conversationList().getConversation(groupName)).toBeVisible();
     },
