@@ -17,18 +17,20 @@
  *
  */
 
-import {MeetingsRepository} from 'Repositories/meetings';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {maybe, task} from 'true-myth';
+
+import type {MeetingStoreDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
+import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import {translateForTest} from 'Util/test/translateForTest';
-import {maybe, task} from 'true-myth';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
-import {meetingSubmitErrors} from '../MeetingSubmitErrors';
-
-import {tryScheduleMeeting, tryUpdateMeeting, performMeetingSubmit} from './scheduleMeetingService';
+import {scheduleMeeting, updateMeeting} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
@@ -50,6 +52,7 @@ const formState: ScheduleMeetingFormState = {
 
 const meetingId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
+const groupId = 'group-id';
 
 const createUser = (id: string) => {
   const user = new User(id, 'example.com', translateForTest);
@@ -57,66 +60,78 @@ const createUser = (id: string) => {
   return user;
 };
 
-const mockConversation = {} as Conversation;
+const createConversation = (epoch = 0) => {
+  const conversation = new Conversation(
+    qualifiedConversation.id,
+    qualifiedConversation.domain,
+    CONVERSATION_PROTOCOL.MLS,
+    translateForTest,
+  );
+  conversation.groupId = groupId;
+  conversation.epoch = epoch;
+  return conversation;
+};
 
-describe('tryScheduleMeeting', () => {
+describe('scheduleMeeting', () => {
   const createDeps = ({
-    createMeeting = jest.fn().mockReturnValue(
+    createMeetingMock = jest.fn().mockReturnValue(
       task.resolve({
         qualified_conversation: qualifiedConversation,
         qualified_id: meetingId,
       }),
     ),
-    getConversationById = jest.fn().mockResolvedValue(mockConversation),
-    addUsers = jest.fn().mockResolvedValue(undefined),
-    fetchMeetings = jest.fn().mockResolvedValue(undefined),
+    safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation())),
+    establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    safeAddUsers = jest.fn().mockReturnValue(task.resolve(undefined)),
   }: {
-    createMeeting?: jest.Mock;
-    getConversationById?: jest.Mock;
-    addUsers?: jest.Mock;
-    fetchMeetings?: jest.Mock;
-  } = {}) => {
+    createMeetingMock?: jest.Mock;
+    safeGetConversationById?: jest.Mock;
+    establishMeetingConversation?: jest.Mock;
+    safeAddUsers?: jest.Mock;
+  } = {}): {deps: MeetingStoreDeps; createMeetingMock: jest.Mock; establishMeetingConversation: jest.Mock} => {
     const meetingsRepository = {
-      createMeeting,
+      createMeeting: createMeetingMock,
       getMeetingsList: jest.fn(),
     } as unknown as MeetingsRepository;
 
     const conversationRepository = {
-      getConversationById,
-      addUsers,
+      safeGetConversationById,
+      establishMeetingConversation,
+      safeAddUsers,
     } as unknown as ConversationRepository;
 
     return {
-      deps: {meetingsRepository, conversationRepository, fetchMeetings, wallClock},
-      createMeeting,
-      getConversationById,
-      addUsers,
-      fetchMeetings,
+      deps: {meetingsRepository, conversationRepository, wallClock},
+      createMeetingMock,
+      establishMeetingConversation,
     };
   };
 
-  it('creates a meeting without invited_emails and refreshes the list', async () => {
-    const {deps, createMeeting, fetchMeetings, getConversationById, addUsers} = createDeps();
+  it('creates a meeting and establishes the MLS conversation without participants', async () => {
+    const {deps, createMeetingMock, establishMeetingConversation} = createDeps();
 
-    const result = await tryScheduleMeeting(formState, deps);
+    const result = await scheduleMeeting(formState, deps);
 
     expect(result.isOk).toBe(true);
-    expect(createMeeting).toHaveBeenCalledWith({
+    expect(result.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual([]);
+    expect(createMeetingMock).toHaveBeenCalledWith({
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
     });
-    expect(getConversationById).not.toHaveBeenCalled();
-    expect(addUsers).not.toHaveBeenCalled();
-    expect(fetchMeetings).toHaveBeenCalled();
+    expect(establishMeetingConversation).toHaveBeenCalledWith({
+      groupId,
+      userIdsToAdd: [],
+      conversationQualifiedId: qualifiedConversation,
+    });
   });
 
-  it('adds selected users to the meeting conversation after create', async () => {
+  it('establishes the meeting conversation with selected users on create', async () => {
     const alice = createUser('1');
     const bob = createUser('2');
-    const {deps, createMeeting, getConversationById, addUsers} = createDeps();
+    const {deps, establishMeetingConversation} = createDeps();
 
-    const result = await tryScheduleMeeting(
+    const result = await scheduleMeeting(
       {
         ...formState,
         selectedUsers: [alice, bob],
@@ -125,39 +140,28 @@ describe('tryScheduleMeeting', () => {
     );
 
     expect(result.isOk).toBe(true);
-    expect(createMeeting).toHaveBeenCalledWith({
-      title: 'Weekly sync',
-      start_time: futureStartIso,
-      end_time: futureEndIso,
+    expect(establishMeetingConversation).toHaveBeenCalledWith({
+      groupId,
+      userIdsToAdd: [alice.qualifiedId, bob.qualifiedId],
+      conversationQualifiedId: qualifiedConversation,
     });
-    expect(getConversationById).toHaveBeenCalledWith(qualifiedConversation);
-    expect(addUsers).toHaveBeenCalledWith(mockConversation, [alice, bob]);
   });
 
-  it('returns addParticipantsFailed and refreshes the list when addUsers fails after create', async () => {
-    const alice = createUser('1');
-    const {deps, fetchMeetings, addUsers} = createDeps({
-      addUsers: jest.fn().mockRejectedValue(new Error('add failed')),
+  it('returns addParticipantsFailed when MLS establishment fails after create', async () => {
+    const {deps} = createDeps({
+      establishMeetingConversation: jest.fn().mockReturnValue(task.reject(new Error('establish failed'))),
     });
 
-    const result = await tryScheduleMeeting(
-      {
-        ...formState,
-        selectedUsers: [alice],
-      },
-      deps,
-    );
+    const result = await scheduleMeeting(formState, deps);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.addParticipantsFailed);
-    expect(addUsers).toHaveBeenCalled();
-    expect(fetchMeetings).toHaveBeenCalled();
   });
 
   it('returns missingTimes and does not call API', async () => {
-    const {deps, createMeeting} = createDeps();
+    const {deps, createMeetingMock} = createDeps();
 
-    const result = await tryScheduleMeeting(
+    const result = await scheduleMeeting(
       {
         ...formState,
         start: maybe.nothing(),
@@ -167,286 +171,202 @@ describe('tryScheduleMeeting', () => {
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe('missingTimes');
-    expect(createMeeting).not.toHaveBeenCalled();
+    expect(createMeetingMock).not.toHaveBeenCalled();
   });
 
   it('returns createFailed when API fails', async () => {
-    const {deps, fetchMeetings} = createDeps({
-      createMeeting: jest.fn().mockReturnValue(task.reject(new Error('network'))),
+    const {deps} = createDeps({
+      createMeetingMock: jest.fn().mockReturnValue(task.reject(new Error('network'))),
     });
 
-    const result = await tryScheduleMeeting(formState, deps);
+    const result = await scheduleMeeting(formState, deps);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.createFailed);
-    expect(fetchMeetings).not.toHaveBeenCalled();
   });
 });
 
-describe('tryUpdateMeeting', () => {
+describe('updateMeeting', () => {
   const createDeps = ({
-    updateMeeting = jest.fn().mockReturnValue(task.resolve({})),
-    getConversationById = jest.fn().mockResolvedValue(mockConversation),
-    addUsers = jest.fn().mockResolvedValue(undefined),
-    removeMembers = jest.fn().mockResolvedValue(undefined),
-    fetchMeetings = jest.fn().mockResolvedValue(undefined),
+    updateMeetingMock = jest.fn().mockReturnValue(task.resolve({})),
+    safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation(1))),
+    safeAddUsers = jest.fn().mockReturnValue(task.resolve(undefined)),
+    safeRemoveMembers = jest.fn().mockReturnValue(task.resolve(undefined)),
+    establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
   }: {
-    updateMeeting?: jest.Mock;
-    getConversationById?: jest.Mock;
-    addUsers?: jest.Mock;
-    removeMembers?: jest.Mock;
-    fetchMeetings?: jest.Mock;
+    updateMeetingMock?: jest.Mock;
+    safeGetConversationById?: jest.Mock;
+    safeAddUsers?: jest.Mock;
+    safeRemoveMembers?: jest.Mock;
+    establishMeetingConversation?: jest.Mock;
   } = {}) => {
     const meetingsRepository = {
-      updateMeeting,
+      updateMeeting: updateMeetingMock,
       getMeetingsList: jest.fn(),
     } as unknown as MeetingsRepository;
 
     const conversationRepository = {
-      getConversationById,
-      addUsers,
-      removeMembers,
+      safeGetConversationById,
+      safeAddUsers,
+      safeRemoveMembers,
+      establishMeetingConversation,
     } as unknown as ConversationRepository;
 
     return {
-      deps: {meetingsRepository, conversationRepository, fetchMeetings, wallClock},
-      updateMeeting,
-      getConversationById,
-      addUsers,
-      removeMembers,
-      fetchMeetings,
+      deps: {meetingsRepository, conversationRepository, wallClock},
+      updateMeetingMock,
+      safeGetConversationById,
+      safeAddUsers,
+      safeRemoveMembers,
+      establishMeetingConversation,
     };
   };
 
-  it('updates metadata, applies participant diff, and refreshes the list', async () => {
+  it('updates metadata, applies participant diff, and returns failedToAdd', async () => {
     const alice = createUser('1');
     const bob = createUser('2');
     const charlie = createUser('3');
-    const {deps, updateMeeting, getConversationById, removeMembers, addUsers, fetchMeetings} = createDeps();
-
-    const result = await tryUpdateMeeting({
-      meetingId,
-      formState: {
-        ...formState,
-        selectedUsers: [bob, charlie],
-      },
-      qualifiedConversation: maybe.just(qualifiedConversation),
-      originalSelectedUsers: [alice, bob],
-      dependencies: deps,
+    const establishedConversation = createConversation(1);
+    const {deps, updateMeetingMock, safeRemoveMembers, safeAddUsers} = createDeps({
+      safeGetConversationById: jest.fn().mockReturnValue(task.resolve(establishedConversation)),
     });
 
+    const result = await updateMeeting(
+      {
+        meetingId,
+        formState: {
+          ...formState,
+          selectedUsers: [bob, charlie],
+        },
+        qualifiedConversation: maybe.just(qualifiedConversation),
+        originalSelectedUsers: [alice, bob],
+      },
+      deps,
+    );
+
     expect(result.isOk).toBe(true);
-    expect(updateMeeting).toHaveBeenCalledWith(meetingId, {
+    expect(updateMeetingMock).toHaveBeenCalledWith(meetingId, {
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
       recurrence: null,
     });
-    expect(getConversationById).toHaveBeenCalledWith(qualifiedConversation);
-    expect(removeMembers).toHaveBeenCalledWith(mockConversation, [alice.qualifiedId]);
-    expect(addUsers).toHaveBeenCalledWith(mockConversation, [charlie]);
-    expect(fetchMeetings).toHaveBeenCalled();
+    expect(safeRemoveMembers).toHaveBeenCalledWith(establishedConversation, [alice.qualifiedId]);
+    expect(safeAddUsers).toHaveBeenCalledWith(establishedConversation, [charlie]);
   });
 
   it('does not sync participants when the selection is unchanged', async () => {
     const alice = createUser('1');
     const bob = createUser('2');
-    const {deps, updateMeeting, getConversationById, addUsers, removeMembers} = createDeps();
+    const {deps, updateMeetingMock, safeGetConversationById, safeAddUsers, safeRemoveMembers} = createDeps();
 
-    const result = await tryUpdateMeeting({
-      meetingId,
-      formState: {
-        ...formState,
-        selectedUsers: [alice, bob],
+    const result = await updateMeeting(
+      {
+        meetingId,
+        formState: {
+          ...formState,
+          selectedUsers: [alice, bob],
+        },
+        qualifiedConversation: maybe.just(qualifiedConversation),
+        originalSelectedUsers: [alice, bob],
       },
-      qualifiedConversation: maybe.just(qualifiedConversation),
-      originalSelectedUsers: [alice, bob],
-      dependencies: deps,
-    });
+      deps,
+    );
 
     expect(result.isOk).toBe(true);
-    expect(updateMeeting).toHaveBeenCalled();
-    expect(getConversationById).not.toHaveBeenCalled();
-    expect(removeMembers).not.toHaveBeenCalled();
-    expect(addUsers).not.toHaveBeenCalled();
+    expect(updateMeetingMock).toHaveBeenCalled();
+    expect(safeGetConversationById).not.toHaveBeenCalled();
+    expect(safeRemoveMembers).not.toHaveBeenCalled();
+    expect(safeAddUsers).not.toHaveBeenCalled();
   });
 
   it('returns missingTimes and does not call API', async () => {
-    const {deps, updateMeeting} = createDeps();
+    const {deps, updateMeetingMock} = createDeps();
 
-    const result = await tryUpdateMeeting({
-      meetingId,
-      formState: {
-        ...formState,
-        end: maybe.nothing(),
+    const result = await updateMeeting(
+      {
+        meetingId,
+        formState: {
+          ...formState,
+          end: maybe.nothing(),
+        },
+        qualifiedConversation: maybe.just(qualifiedConversation),
+        originalSelectedUsers: [],
       },
-      qualifiedConversation: maybe.just(qualifiedConversation),
-      originalSelectedUsers: [],
-      dependencies: deps,
-    });
+      deps,
+    );
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe('missingTimes');
-    expect(updateMeeting).not.toHaveBeenCalled();
+    expect(updateMeetingMock).not.toHaveBeenCalled();
   });
 
   it('returns updateFailed when updateMeeting fails', async () => {
-    const {deps, fetchMeetings} = createDeps({
-      updateMeeting: jest.fn().mockReturnValue(task.reject(new Error('network'))),
+    const {deps} = createDeps({
+      updateMeetingMock: jest.fn().mockReturnValue(task.reject(new Error('network'))),
     });
 
-    const result = await tryUpdateMeeting({
-      meetingId,
-      formState,
-      qualifiedConversation: maybe.just(qualifiedConversation),
-      originalSelectedUsers: [],
-      dependencies: deps,
-    });
+    const result = await updateMeeting(
+      {
+        meetingId,
+        formState,
+        qualifiedConversation: maybe.just(qualifiedConversation),
+        originalSelectedUsers: [],
+      },
+      deps,
+    );
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.updateFailed);
-    expect(fetchMeetings).not.toHaveBeenCalled();
   });
 
-  it('returns removeParticipantsFailed and refreshes the list when removeMembers fails', async () => {
+  it('returns removeParticipantsFailed when removeMembers fails', async () => {
     const alice = createUser('1');
     const bob = createUser('2');
-    const {deps, fetchMeetings, removeMembers} = createDeps({
-      removeMembers: jest.fn().mockRejectedValue(new Error('remove failed')),
+    const {deps, safeRemoveMembers} = createDeps({
+      safeRemoveMembers: jest.fn().mockReturnValue(task.reject(new Error('remove failed'))),
     });
 
-    const result = await tryUpdateMeeting({
-      meetingId,
-      formState: {
-        ...formState,
-        selectedUsers: [bob],
+    const result = await updateMeeting(
+      {
+        meetingId,
+        formState: {
+          ...formState,
+          selectedUsers: [bob],
+        },
+        qualifiedConversation: maybe.just(qualifiedConversation),
+        originalSelectedUsers: [alice, bob],
       },
-      qualifiedConversation: maybe.just(qualifiedConversation),
-      originalSelectedUsers: [alice, bob],
-      dependencies: deps,
-    });
+      deps,
+    );
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.removeParticipantsFailed);
-    expect(removeMembers).toHaveBeenCalled();
-    expect(fetchMeetings).toHaveBeenCalled();
+    expect(safeRemoveMembers).toHaveBeenCalled();
   });
 
-  it('returns addParticipantsFailed and refreshes the list when addUsers fails', async () => {
+  it('returns addParticipantsFailed when addUsers fails', async () => {
     const alice = createUser('1');
     const charlie = createUser('3');
-    const {deps, fetchMeetings, addUsers} = createDeps({
-      addUsers: jest.fn().mockRejectedValue(new Error('add failed')),
+    const {deps, safeAddUsers} = createDeps({
+      safeAddUsers: jest.fn().mockReturnValue(task.reject(new Error('add failed'))),
     });
 
-    const result = await tryUpdateMeeting({
-      meetingId,
-      formState: {
-        ...formState,
-        selectedUsers: [alice, charlie],
+    const result = await updateMeeting(
+      {
+        meetingId,
+        formState: {
+          ...formState,
+          selectedUsers: [alice, charlie],
+        },
+        qualifiedConversation: maybe.just(qualifiedConversation),
+        originalSelectedUsers: [alice],
       },
-      qualifiedConversation: maybe.just(qualifiedConversation),
-      originalSelectedUsers: [alice],
-      dependencies: deps,
-    });
+      deps,
+    );
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.addParticipantsFailed);
-    expect(addUsers).toHaveBeenCalled();
-    expect(fetchMeetings).toHaveBeenCalled();
-  });
-});
-
-describe('performMeetingSubmit', () => {
-  const createDeps = ({
-    createMeeting = jest.fn().mockReturnValue(
-      task.resolve({
-        qualified_conversation: qualifiedConversation,
-        qualified_id: meetingId,
-      }),
-    ),
-    updateMeeting = jest.fn().mockReturnValue(task.resolve({})),
-    getConversationById = jest.fn().mockResolvedValue(mockConversation),
-    addUsers = jest.fn().mockResolvedValue(undefined),
-    removeMembers = jest.fn().mockResolvedValue(undefined),
-    fetchMeetings = jest.fn().mockResolvedValue(undefined),
-  }: {
-    createMeeting?: jest.Mock;
-    updateMeeting?: jest.Mock;
-    getConversationById?: jest.Mock;
-    addUsers?: jest.Mock;
-    removeMembers?: jest.Mock;
-    fetchMeetings?: jest.Mock;
-  } = {}) => {
-    const meetingsRepository = {
-      createMeeting,
-      updateMeeting,
-      getMeetingsList: jest.fn(),
-    } as unknown as MeetingsRepository;
-
-    const conversationRepository = {
-      getConversationById,
-      addUsers,
-      removeMembers,
-    } as unknown as ConversationRepository;
-
-    return {
-      dependencies: {meetingsRepository, conversationRepository, fetchMeetings, wallClock},
-      createMeeting,
-      updateMeeting,
-      fetchMeetings,
-    };
-  };
-
-  it('creates a meeting in create mode', async () => {
-    const {dependencies, createMeeting, updateMeeting} = createDeps();
-
-    const result = await performMeetingSubmit({
-      mode: 'create',
-      editingMeetingId: maybe.nothing(),
-      formState,
-      qualifiedConversation: maybe.nothing(),
-      originalSelectedUsers: [],
-      dependencies,
-    });
-
-    expect(result.isOk).toBe(true);
-    expect(createMeeting).toHaveBeenCalled();
-    expect(updateMeeting).not.toHaveBeenCalled();
-  });
-
-  it('updates a meeting in edit mode when the meeting id is present', async () => {
-    const {dependencies, createMeeting, updateMeeting} = createDeps();
-
-    const result = await performMeetingSubmit({
-      mode: 'edit',
-      editingMeetingId: maybe.just(meetingId),
-      formState,
-      qualifiedConversation: maybe.just(qualifiedConversation),
-      originalSelectedUsers: [],
-      dependencies,
-    });
-
-    expect(result.isOk).toBe(true);
-    expect(updateMeeting).toHaveBeenCalledWith(meetingId, expect.any(Object));
-    expect(createMeeting).not.toHaveBeenCalled();
-  });
-
-  it('returns editMeetingIdMissing in edit mode when the meeting id is missing', async () => {
-    const {dependencies, createMeeting, updateMeeting} = createDeps();
-
-    const result = await performMeetingSubmit({
-      mode: 'edit',
-      editingMeetingId: maybe.nothing(),
-      formState,
-      qualifiedConversation: maybe.just(qualifiedConversation),
-      originalSelectedUsers: [],
-      dependencies,
-    });
-
-    expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe(meetingSubmitErrors.editMeetingIdMissing);
-    expect(createMeeting).not.toHaveBeenCalled();
-    expect(updateMeeting).not.toHaveBeenCalled();
+    expect(safeAddUsers).toHaveBeenCalled();
   });
 });

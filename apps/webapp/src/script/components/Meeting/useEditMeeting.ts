@@ -19,26 +19,44 @@
 
 import {useCallback} from 'react';
 
-import {mapMeetingToScheduleFormState} from 'Components/Meeting/mapMeetingToScheduleFormState';
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingErrorKeys';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {useScheduleMeetingModal} from './ScheduleMeetingModal/useScheduleMeetingModal';
 
 export const useEditMeeting = () => {
-  const {mainViewModel} = useApplicationContext();
-  const conversationRepository = mainViewModel.content.repositories.conversation;
+  const {translate} = useApplicationContext();
+  const loadMeetingForEdit = useMeetingStore(state => state.loadMeetingForEdit);
   const openEdit = useScheduleMeetingModal(state => state.openEdit);
 
   const editMeeting = useCallback(
     async (meeting: Meeting) => {
-      const conversation = await conversationRepository.getConversationById(meeting.qualified_conversation);
-      const selectedUsers = [...conversation.participating_user_ets()];
-      const formState = mapMeetingToScheduleFormState(meeting, selectedUsers);
+      const loadResult = await loadMeetingForEdit(meeting);
 
-      openEdit(meeting, formState, meeting.qualified_conversation, selectedUsers);
+      if (loadResult.isErr) {
+        const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[meetingSubmitErrors.updateFailed];
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            text: {
+              title: translate(titleKey),
+              message: translate(messageKey),
+            },
+          },
+          undefined,
+          translate,
+        );
+        return;
+      }
+
+      const {formState, qualifiedConversation, originalSelectedUsers} = loadResult.value;
+      openEdit(meeting, formState, qualifiedConversation, originalSelectedUsers);
     },
-    [conversationRepository, openEdit],
+    [loadMeetingForEdit, openEdit, translate],
   );
 
   return {editMeeting};

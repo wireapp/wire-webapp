@@ -43,7 +43,7 @@ import {
 import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 
-export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?: () => Promise<void>}) => {
+export const ScheduleMeetingModal = () => {
   const {fireAndForgetInvoker, translate, wallClock} = useApplicationContext();
   const {
     isOpen,
@@ -61,7 +61,7 @@ export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?:
     validate,
   } = useScheduleMeetingModal();
 
-  const {isSubmitting, submit} = useScheduleMeetingSubmit(onMeetingScheduled);
+  const {isSubmitting, submit} = useScheduleMeetingSubmit();
   const selfUser = container.resolve(UserState).self();
 
   const displayErrors = useMemo(

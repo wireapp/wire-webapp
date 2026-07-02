@@ -25,6 +25,7 @@ export const meetingSubmitErrors = {
   editMeetingIdMissing: 'editMeetingIdMissing',
   addParticipantsFailed: 'addParticipantsFailed',
   removeParticipantsFailed: 'removeParticipantsFailed',
+  refreshFailed: 'refreshFailed',
 } as const;
 
 export type MeetingSubmitErrorCode = (typeof meetingSubmitErrors)[keyof typeof meetingSubmitErrors];

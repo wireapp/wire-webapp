@@ -19,14 +19,19 @@
 
 import {useCallback, useState} from 'react';
 
-import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {result, type Maybe, type Result} from 'true-myth';
+
+import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
-import {performMeetingSubmit} from './scheduleMeetingService';
-import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+import type {MeetingSubmitSuccess, UpdateMeetingParams} from './scheduleMeetingService';
+import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
 const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {
@@ -44,11 +49,46 @@ const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors
   );
 };
 
-export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void>) => {
+type SubmitMeetingParams = {
+  formState: ScheduleMeetingFormState;
+  mode: ScheduleMeetingMode;
+  editingMeetingId: Maybe<QualifiedId>;
+  qualifiedConversation: Maybe<QualifiedId>;
+  originalSelectedUsers: User[];
+  scheduleMeeting: (formState: ScheduleMeetingFormState) => Promise<Result<MeetingSubmitSuccess, MeetingSubmitErrors>>;
+  updateMeeting: (params: UpdateMeetingParams) => Promise<Result<MeetingSubmitSuccess, MeetingSubmitErrors>>;
+};
+
+const submitMeeting = ({
+  formState,
+  mode,
+  editingMeetingId,
+  qualifiedConversation,
+  originalSelectedUsers,
+  scheduleMeeting,
+  updateMeeting,
+}: SubmitMeetingParams): Promise<Result<MeetingSubmitSuccess, MeetingSubmitErrors>> => {
+  if (mode === 'create') {
+    return scheduleMeeting(formState);
+  }
+
+  if (editingMeetingId.isNothing) {
+    return Promise.resolve(result.err(meetingSubmitErrors.editMeetingIdMissing));
+  }
+
+  return updateMeeting({
+    meetingId: editingMeetingId.value,
+    formState,
+    qualifiedConversation,
+    originalSelectedUsers,
+  });
+};
+
+export const useScheduleMeetingSubmit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {mainViewModel, translate, wallClock} = useApplicationContext();
-  const meetingsRepository = mainViewModel.content.repositories.meetings;
-  const conversationRepository = mainViewModel.content.repositories.conversation;
+  const {translate} = useApplicationContext();
+  const scheduleMeeting = useMeetingStore(state => state.scheduleMeeting);
+  const updateMeeting = useMeetingStore(state => state.updateMeeting);
   const mode = useScheduleMeetingModal(state => state.mode);
   const editingMeetingId = useScheduleMeetingModal(state => state.editingMeetingId);
   const qualifiedConversation = useScheduleMeetingModal(state => state.qualifiedConversation);
@@ -58,42 +98,26 @@ export const useScheduleMeetingSubmit = (onMeetingScheduled?: () => Promise<void
     async (formState: ScheduleMeetingFormState): Promise<boolean> => {
       setIsSubmitting(true);
 
-      try {
-        const result = await performMeetingSubmit({
-          mode,
-          editingMeetingId,
-          formState,
-          qualifiedConversation,
-          originalSelectedUsers,
-          dependencies: {
-            meetingsRepository,
-            conversationRepository,
-            fetchMeetings: () => onMeetingScheduled?.() ?? Promise.resolve(),
-            wallClock,
-          },
-        });
+      const submitResult = await submitMeeting({
+        formState,
+        mode,
+        editingMeetingId,
+        qualifiedConversation,
+        originalSelectedUsers,
+        scheduleMeeting,
+        updateMeeting,
+      });
 
-        if (result.isErr) {
-          showMeetingSubmitError(translate, result.error);
-          return false;
-        }
+      setIsSubmitting(false);
 
-        return true;
-      } finally {
-        setIsSubmitting(false);
+      if (submitResult.isErr) {
+        showMeetingSubmitError(translate, submitResult.error);
+        return false;
       }
+
+      return true;
     },
-    [
-      conversationRepository,
-      editingMeetingId,
-      meetingsRepository,
-      mode,
-      onMeetingScheduled,
-      originalSelectedUsers,
-      qualifiedConversation,
-      translate,
-      wallClock,
-    ],
+    [editingMeetingId, mode, originalSelectedUsers, qualifiedConversation, scheduleMeeting, translate, updateMeeting],
   );
 
   return {isSubmitting, submit};
