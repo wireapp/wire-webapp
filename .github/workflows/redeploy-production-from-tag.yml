@@ -150,10 +150,9 @@ jobs:
 
     steps:
       - name: Announce production redeploy failure
-        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+        uses: ./.github/actions/notify-deployoholics
         with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           status: failure
           text: |
             ❌ Production redeploy failed for tag ${{ needs.validate_request.outputs.tag }} ❌
