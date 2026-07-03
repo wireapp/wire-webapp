@@ -47,7 +47,14 @@ export const pillStyle: <T>(theme: Theme, props: PillProps<T>) => CSSObject = (
     [PILL_TYPE.success]: COLOR.GREEN_OPAQUE_32,
     [PILL_TYPE.warning]: COLOR.YELLOW_OPAQUE_32,
   };
-  const backgroundColor = active ? '#eee' : !is.nullOrUndefined(type) ? backgroundColors[type] : 'transparent';
+  let backgroundColor: string;
+  if (active) {
+    backgroundColor = '#eee';
+  } else if (!is.nullOrUndefined(type)) {
+    backgroundColor = backgroundColors[type];
+  } else {
+    backgroundColor = 'transparent';
+  }
   const pillAnimation = keyframes`
     0% {
       background-color: transparent;

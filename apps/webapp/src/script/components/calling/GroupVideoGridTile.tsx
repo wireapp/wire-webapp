@@ -106,10 +106,17 @@ const GroupVideoGridTile = ({
     }
   };
 
+  let audioStatusUieName = 'status-audio-on';
+  if (isActivelySpeaking) {
+    audioStatusUieName = 'status-active-speaking';
+  } else if (isMuted) {
+    audioStatusUieName = 'status-audio-off';
+  }
+
   const nameContainer = !minimized && (
     <div className="group-video-grid__element__label" css={groupVideoActiveSpeaker(isActivelySpeaking)}>
       <span
-        data-uie-name={isActivelySpeaking ? 'status-active-speaking' : isMuted ? 'status-audio-off' : 'status-audio-on'}
+        data-uie-name={audioStatusUieName}
         css={groupVideoParticipantNameWrapper(isActivelySpeaking, isAudioEstablished)}
       >
         <span

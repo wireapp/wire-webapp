@@ -97,11 +97,12 @@ export class ClientAction {
     }
     const deviceLabel = `${Runtime.getOS()}${Runtime.getOS().version ? ` ${Runtime.getOS().version}` : ''}`;
     let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
-    const developmentSuffix = Runtime.isEdgeEnvironment()
-      ? '(Edge)'
-      : Runtime.isStagingEnvironment()
-        ? '(Staging)'
-        : '';
+    let developmentSuffix = '';
+    if (Runtime.isEdgeEnvironment()) {
+      developmentSuffix = '(Edge)';
+    } else if (Runtime.isStagingEnvironment()) {
+      developmentSuffix = '(Staging)';
+    }
 
     if (Runtime.isDesktopApp()) {
       if (Runtime.isMacOS()) {

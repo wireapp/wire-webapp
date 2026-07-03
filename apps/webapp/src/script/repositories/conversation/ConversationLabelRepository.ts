@@ -114,18 +114,20 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly unmarshal = (labelJson: LabelProperty) => {
-    const labels = labelJson.labels.map(({id, type, name, conversations}): ConversationLabel => ({
-      conversations: ko.observableArray(
-        conversations
-          .map(conversationId =>
-            this.allConversations().find(({id}) => id.toLowerCase() === conversationId.toLowerCase()),
-          )
-          .filter(conversation => !!conversation),
-      ),
-      id,
-      name,
-      type,
-    }));
+    const labels = labelJson.labels.map(
+      ({id, type, name, conversations}): ConversationLabel => ({
+        conversations: ko.observableArray(
+          conversations
+            .map(conversationId =>
+              this.allConversations().find(({id}) => id.toLowerCase() === conversationId.toLowerCase()),
+            )
+            .filter(conversation => !!conversation),
+        ),
+        id,
+        name,
+        type,
+      }),
+    );
 
     this.labels(labels);
   };

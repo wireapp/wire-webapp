@@ -226,7 +226,9 @@ export type LocalDecision =
  * the fetch failed, the response shape was wrong, or the value was not a non-negative finite number.
  */
 export type RemoteDecision =
-  {kind: 'establish'; epoch: 0} | {kind: 'joinExisting'; epoch: number} | {kind: 'unreadable'; error: unknown};
+  | {kind: 'establish'; epoch: 0}
+  | {kind: 'joinExisting'; epoch: number}
+  | {kind: 'unreadable'; error: unknown};
 
 export const classifyLocal = ({existsLocally, epoch}: LocalMLSState): LocalDecision => {
   if (!existsLocally) {

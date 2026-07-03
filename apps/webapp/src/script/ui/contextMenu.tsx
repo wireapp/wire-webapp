@@ -47,7 +47,14 @@ export interface ContextMenuEntry {
 }
 
 type Placement =
-  'bottom-start' | 'bottom-end' | 'top-start' | 'top-end' | 'right-start' | 'right-end' | 'left-start' | 'left-end';
+  | 'bottom-start'
+  | 'bottom-end'
+  | 'top-start'
+  | 'top-end'
+  | 'right-start'
+  | 'right-end'
+  | 'left-start'
+  | 'left-end';
 
 interface ContextMenuProps {
   defaultIdentifier?: string;

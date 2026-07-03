@@ -272,7 +272,7 @@ export const PeopleTab = ({
       )}
       {!hasFederationError && !hasResults && (
         <>
-          {!canSearchUnconnectedUsers ? (
+          {!canSearchUnconnectedUsers && (
             <div className="start-ui-no-search-results__content">
               <span className="start-ui-no-search-results__icon">
                 <Icon.MessageIcon />
@@ -281,7 +281,8 @@ export const PeopleTab = ({
                 {translate('searchNoMatchesPartner')}
               </p>
             </div>
-          ) : isFederated ? (
+          )}
+          {canSearchUnconnectedUsers && isFederated && (
             <div className="start-ui-fed-wrapper">
               <span className="start-ui-fed-wrapper__icon">
                 <Icon.ProfileIcon />
@@ -295,7 +296,8 @@ export const PeopleTab = ({
           */}
               </div>
             </div>
-          ) : (
+          )}
+          {canSearchUnconnectedUsers && !isFederated && (
             <p className="start-ui-no-search-results">{translate('searchTrySearch')}</p>
           )}
         </>

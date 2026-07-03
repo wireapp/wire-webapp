@@ -107,6 +107,7 @@ module.exports = {
     'no-sparse-arrays': 'error',
     'no-trailing-spaces': 'error',
     'no-undef': 'error',
+    'no-nested-ternary': 'error',
     'no-unneeded-ternary': 'error',
     'no-unused-expressions': 'error',
     '@typescript-eslint/no-unused-vars': [

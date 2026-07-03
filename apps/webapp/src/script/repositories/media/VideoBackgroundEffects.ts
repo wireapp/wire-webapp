@@ -32,7 +32,10 @@ export type BlurLevel = 'low' | 'high';
  * - 'custom': Custom background (user-provided image/video)
  */
 export type BackgroundEffectSelection =
-  {type: 'none'} | {type: 'blur'; level: BlurLevel} | {type: 'virtual'; backgroundId: string} | {type: 'custom'};
+  | {type: 'none'}
+  | {type: 'blur'; level: BlurLevel}
+  | {type: 'virtual'; backgroundId: string}
+  | {type: 'custom'};
 
 export type ImageBackgroundSource = HTMLImageElement | ImageBitmap | ReadableStream;
 
