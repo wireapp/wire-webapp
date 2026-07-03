@@ -196,7 +196,7 @@ jobs:
           ref: ${{matrix.target_branch}}
           fetch-depth: 1
 
-      - name: Create new build in wire-build
+      - name: Create new build in wire-builds
         shell: bash
         run: |
           set -eo pipefail
@@ -207,43 +207,43 @@ jobs:
           git config --global user.email "zebot@users.noreply.github.com"
           git config --global user.name "Zebot"
 
+          push_succeeded=false
+
           for retry in $(seq 3); do
-            set +e
-            (
-            set -e
+            if (
+              set -e
 
-            if (( retry > 1 )); then
-              echo "Retrying..."
-            fi
+              if (( retry > 1 )); then
+                echo "Retrying..."
+              fi
 
-            git fetch --depth 1 origin "${{ matrix.target_branch }}"
-            git checkout "${{ matrix.target_branch }}"
-            git reset --hard @{upstream}
+              git fetch --depth 1 origin "${{ matrix.target_branch }}"
+              git checkout "${{ matrix.target_branch }}"
+              git reset --hard @{upstream}
 
-            build_json=$(cat ./build.json | \
-              ./bin/set-chart-fields webapp \
-              "version=$chart_version" \
-              "repo=https://s3-eu-west-1.amazonaws.com/public.wire.com/charts-webapp" \
-              "meta.appVersion=$image_tag" \
-              "meta.commitURL=${{github.event.head_commit.url}}" \
-              "meta.commit=${{github.event.head_commit.id}}" \
-              | ./bin/bump-prerelease )
-            echo "$build_json" > ./build.json
+              build_json=$(cat ./build.json | \
+                ./bin/set-chart-fields webapp \
+                "version=$chart_version" \
+                "repo=https://s3-eu-west-1.amazonaws.com/public.wire.com/charts-webapp" \
+                "meta.appVersion=$image_tag" \
+                "meta.commitURL=${{github.event.head_commit.url}}" \
+                "meta.commit=${{github.event.head_commit.id}}" \
+                | ./bin/bump-prerelease )
+              echo "$build_json" > ./build.json
 
-            git add build.json
-            git commit -m "Bump webapp to $chart_version"
-            git push origin "${{ matrix.target_branch }}"
-
-            )
-            if [ $? -eq 0 ]; then
+              git add build.json
+              git commit -m "Bump webapp to $chart_version"
+              git push origin "${{ matrix.target_branch }}"
+            ); then
               echo "pushing to wire-builds succeeded"
+              push_succeeded=true
               break
-            else
-              echo "pushing to wire-builds FAILED (in retry $retry)"
             fi
-            set -e
+
+            echo "pushing to wire-builds FAILED (retry $retry)"
           done
-          if (( $? != 0 )); then
+
+          if [[ "$push_succeeded" != "true" ]]; then
               echo "Retrying didn't help. Failing the step."
               exit 1
           fi
