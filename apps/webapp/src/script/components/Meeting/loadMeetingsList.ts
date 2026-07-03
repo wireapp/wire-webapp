@@ -25,8 +25,7 @@ import {getLogger} from 'Util/logger';
 export type MeetingsListErrorKey = 'meetings.list.loadError';
 
 export type LoadMeetingsListResult =
-  | {meetings: Meeting[]; errorKey?: undefined}
-  | {meetings: Meeting[]; errorKey: MeetingsListErrorKey};
+  {meetings: Meeting[]; errorKey?: undefined} | {meetings: Meeting[]; errorKey: MeetingsListErrorKey};
 
 const logger = getLogger('loadMeetingsList');
 
