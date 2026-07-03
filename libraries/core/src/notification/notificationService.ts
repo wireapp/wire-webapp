@@ -50,9 +50,7 @@ export type HandledEventPayload = {
  * - handled: The event was handled and its payload will be emitted
  */
 export type HandledEventResult =
-  | {status: 'unhandled'}
-  | {status: 'ignored'}
-  | {status: 'handled'; payload: HandledEventPayload | null};
+  {status: 'unhandled'} | {status: 'ignored'} | {status: 'handled'; payload: HandledEventPayload | null};
 
 enum TOPIC {
   NOTIFICATION_ERROR = 'NotificationService.TOPIC.NOTIFICATION_ERROR',

@@ -83,7 +83,13 @@ const AVPreferencesComponent = ({propertiesRepository, callingRepository, device
           hasActiveCameraStream={callingRepository.hasActiveCameraStream()}
         />
       )}
-      <CallOptions {...{constraintsHandler, propertiesRepository}} />
+      <CallOptions
+        {...{constraintsHandler, propertiesRepository}}
+        hasActiveCall={callingRepository.hasActiveCall}
+        refreshAudioInput={() => {
+          return callingRepository.refreshAudioInput();
+        }}
+      />
       {callingRepository.supportsCalling && <SaveCallLogs {...{callingRepository}} />}
     </PreferencesPage>
   );

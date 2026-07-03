@@ -22,17 +22,20 @@ import {
   createApplicationObservability,
   type ApplicationObservabilityConfiguration,
 } from './createApplicationObservability';
-import {createDataDogApplicationObservability, importDataDogBrowserRum} from './createDataDogApplicationObservability';
+import {
+  createDataDogLogsApplicationObservability,
+  importDataDogBrowserLogs,
+} from './createDataDogLogsApplicationObservability';
 import {createNoopApplicationObservability} from './createNoopApplicationObservability';
 
 export function createApplicationObservabilityFromConfig(
   config: ApplicationObservabilityConfiguration,
 ): ApplicationObservability {
   return createApplicationObservability(config, {
-    createDataDogObservability() {
-      return createDataDogApplicationObservability({
-        importBrowserRum: importDataDogBrowserRum,
-        isDataDogAvailable() {
+    createDataDogLogsObservability() {
+      return createDataDogLogsApplicationObservability({
+        importBrowserLogs: importDataDogBrowserLogs,
+        isDataDogLogsAvailable() {
           return true;
         },
       });

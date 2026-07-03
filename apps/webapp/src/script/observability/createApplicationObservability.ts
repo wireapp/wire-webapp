@@ -29,19 +29,19 @@ export type ApplicationObservabilityConfiguration = {
 };
 
 export type CreateApplicationObservabilityDependencies = {
-  readonly createDataDogObservability: () => ApplicationObservability;
+  readonly createDataDogLogsObservability: () => ApplicationObservability;
   readonly createNoopObservability: () => ApplicationObservability;
 };
 
-function isDataDogConfigured(config: ApplicationObservabilityConfiguration): boolean {
-  return is.nonEmptyString(config.dataDog?.applicationId) && is.nonEmptyString(config.dataDog?.clientToken);
+function isDataDogLogsConfigured(config: ApplicationObservabilityConfiguration): boolean {
+  return is.nonEmptyString(config.dataDog?.clientToken);
 }
 
 export function createApplicationObservability(
   config: ApplicationObservabilityConfiguration,
   dependencies: CreateApplicationObservabilityDependencies,
 ): ApplicationObservability {
-  const {createDataDogObservability, createNoopObservability} = dependencies;
+  const {createDataDogLogsObservability, createNoopObservability} = dependencies;
 
-  return isDataDogConfigured(config) ? createDataDogObservability() : createNoopObservability();
+  return isDataDogLogsConfigured(config) ? createDataDogLogsObservability() : createNoopObservability();
 }

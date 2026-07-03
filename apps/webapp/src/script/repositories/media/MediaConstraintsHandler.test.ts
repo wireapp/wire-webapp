@@ -33,6 +33,8 @@ interface ExtendedMediaTrackConstraints extends MediaTrackConstraints {
   audio: {
     autoGainControl?: boolean;
     deviceId?: SelectedDeviceId;
+    echoCancellation?: boolean;
+    noiseSuppression?: boolean;
   };
   video: {
     facingMode?: string;
@@ -76,7 +78,9 @@ describe('MediaConstraintsHandler', () => {
 
   const createConstraintsHandler = (selfUserId = createUuid()) => {
     const userState = {
-      self: () => new User(selfUserId, '', translateForTest),
+      self: () => {
+        return new User(selfUserId, '', translateForTest);
+      },
     };
     return new MediaConstraintsHandler(userState as UserState);
   };
@@ -118,7 +122,11 @@ describe('MediaConstraintsHandler', () => {
       ) as ExtendedMediaTrackConstraints;
 
       expect(constraints.audio.deviceId).toBeUndefined();
-      expect(constraints.audio).toEqual({autoGainControl: false});
+      expect(constraints.audio).toEqual({
+        autoGainControl: true,
+        echoCancellation: true,
+        noiseSuppression: true,
+      });
       expect(constraints.video.deviceId).toBeUndefined();
       expect(constraints.video).toEqual(
         expect.objectContaining({
@@ -131,6 +139,79 @@ describe('MediaConstraintsHandler', () => {
     });
 
     describe('Audio Constraints', () => {
+      it('uses enhanced audio constraints when no AGC preference is stored', () => {
+        createAvailableDevices({audio: defaultId});
+        const constraintsHandler = createConstraintsHandler();
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+      });
+
+      it('respects a stored disabled AGC preference', () => {
+        createAvailableDevices({audio: defaultId});
+        const selfUserId = createUuid();
+        const constraintsHandler = createConstraintsHandler(selfUserId);
+        localStorage.setItem(`agc_enabled_${selfUserId}`, 'false');
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: false,
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+      });
+
+      it('respects a stored enabled AGC preference', () => {
+        createAvailableDevices({audio: defaultId});
+        const selfUserId = createUuid();
+        const constraintsHandler = createConstraintsHandler(selfUserId);
+        localStorage.setItem(`agc_enabled_${selfUserId}`, 'true');
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+      });
+
+      it('treats a stored non-boolean AGC preference as missing', () => {
+        createAvailableDevices({audio: defaultId});
+        const selfUserId = createUuid();
+        const constraintsHandler = createConstraintsHandler(selfUserId);
+        localStorage.setItem(`agc_enabled_${selfUserId}`, '"not-a-boolean"');
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+      });
+
+      it('treats a malformed stored AGC preference as missing', () => {
+        createAvailableDevices({audio: defaultId});
+        const selfUserId = createUuid();
+        const constraintsHandler = createConstraintsHandler(selfUserId);
+        localStorage.setItem(`agc_enabled_${selfUserId}`, 'not-json');
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+      });
+
       it('should apply the AGC preference from storage to the audio constraints', () => {
         const selfUserId = createUuid();
         const constraintsHandler = createConstraintsHandler(selfUserId);
@@ -149,6 +230,20 @@ describe('MediaConstraintsHandler', () => {
         const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
 
         expect(constraints.audio.deviceId.exact).toBe('specific-mic-id');
+      });
+
+      it('keeps exact deviceId with enhanced audio constraints', () => {
+        createAvailableDevices({audio: 'specific-mic-id'});
+        const constraintsHandler = createConstraintsHandler();
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio).toEqual({
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+          deviceId: {exact: 'specific-mic-id'},
+        });
       });
 
       it('should NOT include deviceId when the default audio device is selected', () => {
@@ -252,6 +347,41 @@ describe('MediaConstraintsHandler', () => {
 
       expect(constraintsHandler.getAgcPreference()).toEqual(true);
       expect(getItemSpy).toHaveBeenCalledWith(expect.stringContaining(selfUserId));
+    });
+
+    it('defaults AGC to enabled when no AGC preference is stored', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue(null);
+      const constraintsHandler = createConstraintsHandler();
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
+    });
+
+    it('keeps AGC disabled when AGC is stored as disabled', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('false');
+      const constraintsHandler = createConstraintsHandler();
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(false);
+    });
+
+    it('keeps AGC enabled when AGC is stored as enabled', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('true');
+      const constraintsHandler = createConstraintsHandler();
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
+    });
+
+    it('defaults AGC to enabled when the stored AGC preference is malformed', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('not-json');
+      const constraintsHandler = createConstraintsHandler();
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
+    });
+
+    it('defaults AGC to enabled when the stored AGC preference is not boolean', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('"not-a-boolean"');
+      const constraintsHandler = createConstraintsHandler();
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
     });
   });
 });

@@ -20,12 +20,7 @@
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 
-export type ImageTexture = {
-  texture: WebGLTexture;
-  width: number;
-  height: number;
-  url: string;
-};
+export type ImageTexture = {texture: WebGLTexture; width: number; height: number; url: string};
 
 type ImageInfo = {
   type: 'image';
@@ -80,18 +75,9 @@ export class WebGLRenderer {
 
   private running = false;
   private static readonly DEFAULT_BG_COLOR: readonly [number, number, number, number] = [33, 150, 243, 255];
-  // Windows/Chrome/Edge often run WebGL through ANGLE on Direct3D.
-  // Keeping the temporal mask smaller than the output canvas reduces D3D texture writes a lot.
-  private static readonly STATE_SCALE = 0.5;
   private currentStateIndex = 0;
   private backgroundRenderInfo: BackgroundRenderInfo | null = null;
   private activeBackgroundSourceIdentifier: string | null = null;
-
-  private frameTexture: WebGLTexture | null = null;
-  private frameTextureWidth = 0;
-  private frameTextureHeight = 0;
-  private stateTextureWidth = 0;
-  private stateTextureHeight = 0;
 
   constructor(canvas: OffscreenCanvas) {
     this.canvas = canvas;
@@ -170,6 +156,12 @@ export class WebGLRenderer {
             uniform float u_bgBlurRadius;
             uniform int u_enabled;
 
+            const float PI = 3.141592653589793;
+
+            float gaussianWeight(float offset, float sigma) {
+                return exp(-(offset * offset) / (2.0 * sigma * sigma));
+            }
+
             vec4 getMixedFragColor(vec2 bgTexCoord, vec2 categoryCoord, vec2 offset) {
                 vec4 backgroundColor = texture2D(u_backgroundTexture, bgTexCoord + offset);
                 vec4 frameColor = texture2D(u_frameTexture, v_texCoord + offset);
@@ -177,28 +169,26 @@ export class WebGLRenderer {
                 return mix(backgroundColor, frameColor, categoryValue);
             }
 
-            // Cheap 9-tap blur. The old radial blur sampled hundreds of pixels per output pixel,
-            // which is especially expensive on ANGLE/D3D11 on Windows.
-            vec4 cheapBlurFrame(vec2 coord, float radius) {
+            vec4 blurColor(float blur, float radius, bool mixed) {
+                vec2 categoryCoord = vec2(v_texCoord.x, 1.0 - v_texCoord.y);
                 vec2 texelSize = 1.0 / u_canvasDimensions;
-                vec2 r1 = texelSize * radius;
-                vec2 r2 = texelSize * radius * 0.5;
-
-                vec4 c = vec4(0.0);
-
-                c += texture2D(u_frameTexture, coord) * 4.0;
-
-                c += texture2D(u_frameTexture, coord + vec2( r1.x, 0.0)) * 2.0;
-                c += texture2D(u_frameTexture, coord + vec2(-r1.x, 0.0)) * 2.0;
-                c += texture2D(u_frameTexture, coord + vec2(0.0,  r1.y)) * 2.0;
-                c += texture2D(u_frameTexture, coord + vec2(0.0, -r1.y)) * 2.0;
-
-                c += texture2D(u_frameTexture, coord + vec2( r2.x,  r2.y));
-                c += texture2D(u_frameTexture, coord + vec2(-r2.x,  r2.y));
-                c += texture2D(u_frameTexture, coord + vec2( r2.x, -r2.y));
-                c += texture2D(u_frameTexture, coord + vec2(-r2.x, -r2.y));
-
-                return c / 20.0;
+                vec4 blurredColor = vec4(0.0);
+                float totalWeight = 0.0;
+                for (float angle = 0.0; angle <= 2.0 * PI; angle += PI / 12.0) {
+                    vec2 direction = vec2(cos(angle), sin(angle));
+                    for (int i = -10; i <= 10; i++) {
+                        float offset = float(i) * (radius / 10.0);
+                        float weight = gaussianWeight(offset, blur);
+                        vec2 v_offset = direction * texelSize * offset;
+                        if (mixed) {
+                            blurredColor += getMixedFragColor(v_texCoord, categoryCoord, v_offset) * weight;
+                        } else {
+                            blurredColor += texture2D(u_frameTexture, v_texCoord + v_offset) * weight;
+                        }
+                        totalWeight += weight;
+                    }
+                }
+                return blurredColor / totalWeight;
             }
 
             void main() {
@@ -211,19 +201,11 @@ export class WebGLRenderer {
                 float categoryValue = texture2D(u_currentStateTexture, categoryCoord).r;
 
                 if (u_bgBlur > 0.0 && u_bgBlurRadius > 0.0) {
-                    float mask = smoothstep(0.08, 0.55, categoryValue);
-                    mask = clamp(mask * 1.25, 0.0, 1.0);
-
-                    vec4 sharp = texture2D(u_frameTexture, v_texCoord);
-
-                    float effectiveRadius = clamp(u_bgBlurRadius, 1.0, 10.0);
-                    float blurStrength = clamp(u_bgBlur, 0.0, 1.0);
-
-                    vec4 blurred = cheapBlurFrame(v_texCoord, effectiveRadius);
-
-                    vec4 backgroundBlur = mix(sharp, blurred, blurStrength);
-
-                    gl_FragColor = mix(backgroundBlur, sharp, mask);
+                    if (categoryValue < 0.3) {
+                        gl_FragColor = blurColor(u_bgBlur, u_bgBlurRadius, false);
+                    } else {
+                        gl_FragColor = texture2D(u_frameTexture, v_texCoord);
+                    }
                     return;
                 }
 
@@ -249,15 +231,11 @@ export class WebGLRenderer {
                 bgTexCoord = vec2( (v_texCoord.x - offsetX) / scaleX, (v_texCoord.y - offsetY) / scaleY );
 
                 // Apply border smoothing
-                // Quick fix against ghost edges.
-                // Strong blur needs a more conservative foreground mask.
-                float mask = smoothstep(0.08, 0.55, categoryValue);
-                mask = clamp(mask * 1.25, 0.0, 1.0);
-
-                vec4 backgroundColor = texture2D(u_backgroundTexture, bgTexCoord);
-                vec4 frameColor = texture2D(u_frameTexture, v_texCoord);
-
-                gl_FragColor = mix(backgroundColor, frameColor, mask);
+                if (u_borderSmooth > 0.0 && categoryValue > 0.1 && categoryValue < 0.9) {
+                    gl_FragColor = blurColor(u_borderSmooth, u_bgBlurRadius, false);
+                } else {
+                    gl_FragColor = getMixedFragColor(bgTexCoord, categoryCoord, vec2(0.0, 0.0));
+                }
             }
         `;
     this.blendProgram = this.createAndLinkProgram(blendVertexShaderSource, blendFragmentShaderSource);
@@ -316,17 +294,6 @@ export class WebGLRenderer {
 
     this.fbo = gl.createFramebuffer();
 
-    this.frameTexture = gl.createTexture();
-    if (!this.frameTexture) {
-      throw new Error('Failed to create frame texture');
-    }
-    gl.bindTexture(gl.TEXTURE_2D, this.frameTexture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.bindTexture(gl.TEXTURE_2D, null);
-
     this.running = true;
   }
 
@@ -372,10 +339,7 @@ export class WebGLRenderer {
     g: number,
     b: number,
     a: number,
-  ): {
-    texture: WebGLTexture;
-    color: readonly [number, number, number, number];
-  } {
+  ): {texture: WebGLTexture; color: readonly [number, number, number, number]} {
     const texture = this.gl.createTexture();
     if (!texture) {
       throw new Error('Failed to create texture for color');
@@ -389,27 +353,6 @@ export class WebGLRenderer {
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     return {texture, color: [r, g, b, a] as const};
-  }
-
-  private uploadVideoFrame(videoFrame: VideoFrame, width: number, height: number) {
-    const gl = this.gl;
-
-    if (!this.frameTexture) {
-      return;
-    }
-
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.frameTexture);
-
-    // texSubImage2D avoids reallocating the underlying D3D texture every frame.
-    // Fall back to texImage2D when the frame size changes.
-    if (this.frameTextureWidth === width && this.frameTextureHeight === height) {
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, videoFrame);
-    } else {
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoFrame);
-      this.frameTextureWidth = width;
-      this.frameTextureHeight = height;
-    }
   }
 
   private updateBackgroundIfNeeded(newSource?: BackgroundSource | null) {
@@ -500,22 +443,19 @@ export class WebGLRenderer {
 
     const width = this.canvas.width;
     const height = this.canvas.height;
-    const stateWidth = Math.max(1, Math.floor(width * WebGLRenderer.STATE_SCALE));
-    const stateHeight = Math.max(1, Math.floor(height * WebGLRenderer.STATE_SCALE));
-
-    if (!this.frameTexture) {
-      return;
-    }
-
-    this.uploadVideoFrame(videoFrame, width, height);
 
     if (!categoryTexture || !confidenceTexture) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
       gl.useProgram(blendProgram);
 
+      const frameTexture = gl.createTexture();
       gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.frameTexture);
+      gl.bindTexture(gl.TEXTURE_2D, frameTexture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoFrame);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
       gl.uniform1i(blendLocations.frameTexture, 0);
       gl.uniform1i(blendLocations.enabled, 0);
 
@@ -528,6 +468,7 @@ export class WebGLRenderer {
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
+      gl.deleteTexture(frameTexture);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, null);
 
@@ -535,17 +476,6 @@ export class WebGLRenderer {
     }
 
     // Determine read/write indices for state ping-pong
-    if (stateWidth !== this.stateTextureWidth || stateHeight !== this.stateTextureHeight) {
-      for (const texture of storedStateTextures) {
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, stateWidth, stateHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-      }
-
-      this.currentStateIndex = 0;
-      this.stateTextureWidth = stateWidth;
-      this.stateTextureHeight = stateHeight;
-    }
-
     const readStateIndex = this.currentStateIndex;
     const writeStateIndex = (this.currentStateIndex + 1) % 2;
     const prevStateTexture = storedStateTextures[readStateIndex];
@@ -557,7 +487,11 @@ export class WebGLRenderer {
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, newStateTexture, 0);
 
-    gl.viewport(0, 0, stateWidth, stateHeight);
+    // Ensure state texture is correctly sized
+    gl.bindTexture(gl.TEXTURE_2D, newStateTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+    gl.viewport(0, 0, width, height);
     gl.useProgram(stateUpdateProgram);
 
     // Bind inputs: Current Cat (0), Current Conf (1), Prev State (2)
@@ -595,12 +529,25 @@ export class WebGLRenderer {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.useProgram(blendProgram);
 
+    // Bind Frame Texture (Unit 0)
+    const frameTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.frameTexture);
+    gl.bindTexture(gl.TEXTURE_2D, frameTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoFrame);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.uniform1i(blendLocations.frameTexture, 0);
+    gl.uniform1f(blendLocations.borderSmooth, options.borderSmooth);
+    gl.uniform1f(blendLocations.bgBlur, options.bgBlur);
+    gl.uniform1f(blendLocations.bgBlurRadius, options.bgBlurRadius);
+    gl.uniform1i(blendLocations.enabled, 1);
 
+    // Bind Current State Texture (Unit 1)
+    const currentStateTexture = storedStateTextures[writeStateIndex]; // Use the *newly written* state
     gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, newStateTexture);
+    gl.bindTexture(gl.TEXTURE_2D, currentStateTexture);
     gl.uniform1i(blendLocations.currentStateTexture, 1);
 
     // Bind Background Texture (Unit 2)
@@ -622,11 +569,7 @@ export class WebGLRenderer {
       this.logger.warn('backgroundRenderInfo is null in render loop. Background may not render correctly.');
     }
 
-    gl.uniform1f(blendLocations.borderSmooth, options.borderSmooth);
-    gl.uniform1f(blendLocations.bgBlur, options.bgBlur);
-    gl.uniform1f(blendLocations.bgBlurRadius, options.bgBlurRadius);
-    gl.uniform1i(blendLocations.enabled, 1);
-
+    // Set vertex attributes
     gl.enableVertexAttribArray(blendLocations.position);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.vertexAttribPointer(blendLocations.position, 2, gl.FLOAT, false, 0, 0);
@@ -634,13 +577,18 @@ export class WebGLRenderer {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
     gl.vertexAttribPointer(blendLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
 
+    // Draw quad to blend onto canvas
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
+    // --- 3. Cleanup ---
+    gl.deleteTexture(frameTexture);
+    // Unbind textures (Units 0, 1, 2 used)
     for (let i = 0; i < 3; ++i) {
       gl.activeTexture(gl.TEXTURE0 + i);
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
+    // Swap state index for next frame
     this.currentStateIndex = writeStateIndex;
   }
 
@@ -669,11 +617,5 @@ export class WebGLRenderer {
       this.backgroundRenderInfo = null;
     }
     this.activeBackgroundSourceIdentifier = null;
-    if (this.frameTexture) {
-      gl.deleteTexture(this.frameTexture);
-      this.frameTexture = null;
-      this.frameTextureWidth = 0;
-      this.frameTextureHeight = 0;
-    }
   }
 }

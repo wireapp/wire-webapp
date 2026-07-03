@@ -37,8 +37,7 @@ type BackFromSleepRegistrationWithDisconnectedGate = {
 };
 
 type BackFromSleepRegistration =
-  | BackFromSleepRegistrationWithoutDisconnectedGate
-  | BackFromSleepRegistrationWithDisconnectedGate;
+  BackFromSleepRegistrationWithoutDisconnectedGate | BackFromSleepRegistrationWithDisconnectedGate;
 
 type BackFromSleepHandlerTestDependencies = {
   readonly backFromSleepHandler: jest.Mock<() => void, [BackFromSleepRegistration]>;

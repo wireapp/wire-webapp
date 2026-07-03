@@ -90,6 +90,7 @@ import {TeamService} from 'Repositories/team/TeamService';
 import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserService} from 'Repositories/user/userService';
+import {UserState} from 'Repositories/user/userState';
 import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
@@ -233,13 +234,14 @@ export class App {
     // Initialize permissions
     void initializePermissions();
 
-    const mediaConstraintsHandler = new MediaConstraintsHandler();
+    const mediaConstraintsHandler = new MediaConstraintsHandler(container.resolve(UserState));
 
     const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
     const mediaDevicesHandler = new MediaDevicesHandler();
     const backgroundEffectsHandler = new BackgroundEffectsHandler(new BackgroundEffectsController());
 
     container.registerInstance(MediaDevicesHandler, mediaDevicesHandler);
+    container.registerInstance(MediaConstraintsHandler, mediaConstraintsHandler);
     container.registerInstance(MediaStreamHandler, mediaStreamHandler);
 
     repositories.asset = container.resolve(AssetRepository);

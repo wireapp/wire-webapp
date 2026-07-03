@@ -67,23 +67,23 @@ describe('areCapabilityInfosEqual', () => {
     capabilityInfo
     ${capabilityInfoFactory.build()}
     ${capabilityInfoFactory.build({
-  offscreenCanvas: true,
-  worker: true,
-  webgl2: true,
-  requestVideoFrameCallback: true,
-})}
+      offscreenCanvas: true,
+      worker: true,
+      webgl2: true,
+      requestVideoFrameCallback: true,
+    })}
     ${capabilityInfoFactory.build({
-  offscreenCanvas: true,
-  worker: false,
-  webgl2: true,
-  requestVideoFrameCallback: false,
-})}
+      offscreenCanvas: true,
+      worker: false,
+      webgl2: true,
+      requestVideoFrameCallback: false,
+    })}
     ${capabilityInfoFactory.build({
-  offscreenCanvas: false,
-  worker: true,
-  webgl2: false,
-  requestVideoFrameCallback: true,
-})}
+      offscreenCanvas: false,
+      worker: true,
+      webgl2: false,
+      requestVideoFrameCallback: true,
+    })}
   `('returns true when all attributes are equal: $capabilityInfo', ({capabilityInfo}) => {
     const initialCapabilityInfo = Maybe.just(capabilityInfo);
     const futureCapabilityInfo = Maybe.just({...capabilityInfo});

@@ -43,7 +43,7 @@ test.describe('Federation', () => {
         const messageWithImage = federatedUserPages
           .conversation()
           .getMessage({sender: normalUser})
-          .filter({has: federatedUserPage.getByRole('img')});
+          .filter({has: federatedUserPage.getByTestId('image-asset')});
         await expect(messageWithImage).toBeVisible();
       },
     },
@@ -86,7 +86,7 @@ test.describe('Federation', () => {
         const messageWithAudio = federatedUserPages
           .conversation()
           .getMessage({sender: normalUser})
-          .filter({has: federatedUserPage.locator('[data-uie-name="audio-asset"]')});
+          .filter({has: federatedUserPage.getByTestId('audio-asset')});
         await expect(messageWithAudio).toBeVisible();
       },
     },
@@ -104,7 +104,7 @@ test.describe('Federation', () => {
         const messageWithVideo = federatedUserPages
           .conversation()
           .getMessage({sender: normalUser})
-          .filter({has: federatedUserPage.locator('[data-uie-name="video-asset"]')});
+          .filter({has: federatedUserPage.getByTestId('video-asset')});
         await expect(messageWithVideo).toBeVisible();
       },
     },
@@ -122,7 +122,7 @@ test.describe('Federation', () => {
         const messageWithFile = federatedUserPages
           .conversation()
           .getMessage({sender: normalUser})
-          .filter({has: federatedUserPage.locator('[data-uie-name="file-asset"]')});
+          .filter({has: federatedUserPage.getByTestId('file-asset')});
         await expect(messageWithFile).toBeVisible();
       },
     },
@@ -355,7 +355,7 @@ test.describe('Federation', () => {
         const messageWithImage = normalUserPages
           .conversation()
           .getMessage({sender: federatedUser})
-          .filter({has: normalUserPage.getByRole('img')});
+          .filter({has: normalUserPage.getByTestId('image-asset')});
         await expect(messageWithImage).toBeVisible();
 
         // Wait for messages to be read before exporting backup
@@ -407,7 +407,7 @@ test.describe('Federation', () => {
         const messageWithImage2Device = normalUserDevice2Pages
           .conversation()
           .getMessage({sender: federatedUser})
-          .filter({has: normalUserDevice2.getByRole('img')});
+          .filter({has: normalUserDevice2.getByTestId('image-asset')});
         await expect(messageWithImage2Device).toBeVisible();
       });
     },

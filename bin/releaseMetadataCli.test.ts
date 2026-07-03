@@ -61,6 +61,26 @@ describe('releaseMetadataCli', () => {
     });
   });
 
+  it('prints the release branch name for the release identifier', () => {
+    const actualResult = runCommand(['release-branch', '2026-06-19.1']);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['release/2026-06-19.1'],
+    });
+  });
+
+  it('rejects an invalid release branch release identifier', () => {
+    const actualResult = runCommand(['release-branch', 'release/2026-06-19.1']);
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid release identifier: release/2026-06-19.1'],
+      exitCode: 1,
+      outputs: [],
+    });
+  });
+
   it('prints the next beta tag name for the release identifier', () => {
     const actualResult = runCommand([
       'next-beta-tag',
@@ -75,6 +95,46 @@ describe('releaseMetadataCli', () => {
       errors: [],
       exitCode: 0,
       outputs: ['2026-06-19.1-beta.3'],
+    });
+  });
+
+  it('prints the production tag name for the release identifier', () => {
+    const actualResult = runCommand(['production-tag', '2026-06-19.1']);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['2026-06-19.1-production'],
+    });
+  });
+
+  it('rejects an invalid production tag release identifier', () => {
+    const actualResult = runCommand(['production-tag', '2026-06-19']);
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid release identifier: 2026-06-19'],
+      exitCode: 1,
+      outputs: [],
+    });
+  });
+
+  it('validates a production tag name', () => {
+    const actualResult = runCommand(['validate-production-tag', '2026-06-19.1-production']);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['2026-06-19.1-production'],
+    });
+  });
+
+  it('rejects an invalid production tag name', () => {
+    const actualResult = runCommand(['validate-production-tag', '2026-06-19.0-production']);
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid production tag name: 2026-06-19.0-production'],
+      exitCode: 1,
+      outputs: [],
     });
   });
 

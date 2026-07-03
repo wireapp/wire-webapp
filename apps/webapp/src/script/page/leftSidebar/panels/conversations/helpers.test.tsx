@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {createFactory} from '@enormora/objectory';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {
@@ -45,6 +46,45 @@ const searchInputPlaceholders = {
   searchDraftsConversations: 'searchDraftsConversations',
   searchPingsConversations: 'searchPingsConversations',
 };
+
+type RecentConversationSearchInputOptions = {
+  conversation: Conversation;
+  conversationsFilter: string;
+};
+
+type GetTabConversationsInput = Parameters<typeof getTabConversations>[0];
+
+const recentConversationSearchInputFactory = createFactory<GetTabConversationsInput>(() => {
+  return {
+    currentTab: SidebarTabs.RECENT,
+    conversations: [],
+    groupConversations: [],
+    directConversations: [],
+    favoriteConversations: [],
+    archivedConversations: [],
+    conversationsFilter: '',
+    channelAndGroupConversations: [],
+    channelConversations: [],
+    isChannelsEnabled: false,
+    draftConversations: [],
+    searchInputPlaceholders,
+  };
+});
+
+function createRecentConversationSearchInput(options: RecentConversationSearchInputOptions): GetTabConversationsInput {
+  const {conversation, conversationsFilter} = options;
+
+  const recentConversationSearchInput = recentConversationSearchInputFactory.build({
+    conversationsFilter,
+  });
+
+  return {
+    ...recentConversationSearchInput,
+    conversations: [conversation],
+    groupConversations: [conversation],
+    channelAndGroupConversations: [conversation],
+  };
+}
 
 describe('conversationFilters', () => {
   it('detects mentions, replies, pings, and archived state', () => {
@@ -284,9 +324,44 @@ describe('getTabConversations', () => {
     expect(filteredConversations[0].display_name()).toEqual('Tim');
   });
 
+  it('should return a group conversation once when its name and participant name match the search filter', () => {
+    const florianSupportConversation = generateConversation({
+      name: 'Florian Support',
+      type: CONVERSATION_TYPE.REGULAR,
+      users: [generateUser(undefined, {name: 'Florian'})],
+    });
+
+    const {conversations: filteredConversations} = getTabConversations(
+      createRecentConversationSearchInput({
+        conversation: florianSupportConversation,
+        conversationsFilter: 'Florian',
+      }),
+    );
+
+    expect(filteredConversations).toEqual([florianSupportConversation]);
+  });
+
+  it('should return a group conversation when only its participant name matches the search filter', () => {
+    const supportRoomConversation = generateConversation({
+      name: 'Support Room',
+      type: CONVERSATION_TYPE.REGULAR,
+      users: [generateUser(undefined, {name: 'Florian'})],
+    });
+
+    const {conversations: filteredConversations} = getTabConversations(
+      createRecentConversationSearchInput({
+        conversation: supportRoomConversation,
+        conversationsFilter: 'Florian',
+      }),
+    );
+
+    expect(filteredConversations).toEqual([supportRoomConversation]);
+  });
+
   it('should ignore special characters when filtering conversations', () => {
     const {conversations: filteredConversations} = runTest(SidebarTabs.RECENT, 'web team');
 
+    expect(filteredConversations).toHaveLength(1);
     expect(filteredConversations[0].display_name()).toEqual('Wêb Têam');
   });
 
