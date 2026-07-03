@@ -36,7 +36,7 @@ interface ConnectionQualityHandler {
 export const getConnectionQualityHander = (): ConnectionQualityHandler | null => {
   const navigatorConnection = window.navigator?.connection;
 
-  if (!navigatorConnection) {
+  if (navigatorConnection === null || navigatorConnection === undefined) {
     logger.warn('Listening for connection quality is disabled, navigator.connection is not supported by the browser');
     return null;
   }

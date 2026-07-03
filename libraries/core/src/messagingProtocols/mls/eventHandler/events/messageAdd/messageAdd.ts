@@ -67,14 +67,14 @@ export const handleMLSMessageAdd = async ({
     qualifiedConversationId,
   );
 
-  if (!decryptedMessage) {
+  if (decryptedMessage === null || decryptedMessage === undefined) {
     // If the message is not decrypted, we return null
     return null;
   }
 
   const {message, commitDelay, senderClientId: encodedSenderClientId} = decryptedMessage;
 
-  if (encodedSenderClientId) {
+  if (encodedSenderClientId !== null && encodedSenderClientId !== undefined) {
     const decoder = new TextDecoder();
     const senderClientId = decoder.decode(optionalToUint8Array(encodedSenderClientId.copyBytes()));
     event.senderClientId = senderClientId;
@@ -95,5 +95,5 @@ export const handleMLSMessageAdd = async ({
     });
   }
 
-  return message ? {event, decryptedData: GenericMessage.decode(message)} : null;
+  return message !== null && message !== undefined ? {event, decryptedData: GenericMessage.decode(message)} : null;
 };

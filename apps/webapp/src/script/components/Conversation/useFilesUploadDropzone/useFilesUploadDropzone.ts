@@ -198,7 +198,7 @@ export const useFilesUploadDropzone = ({
         try {
           const metadata = await buildCellFileMetadata(file);
 
-          if (!metadata) {
+          if (metadata === null || metadata === undefined) {
             return;
           }
 

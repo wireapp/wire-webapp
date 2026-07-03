@@ -118,7 +118,7 @@ const mapVideoInputDevices = (
   devices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[],
   translate: ReturnType<typeof useApplicationContext>['translate'],
 ) => {
-  if (!devices.length) {
+  if (devices.length === 0 || Number.isNaN(devices.length)) {
     return [
       {
         label: translate('videoCallNoCameraAvailable'),
@@ -233,7 +233,10 @@ export const VideoControls = ({
   const [showEmojisBar, setShowEmojisBar] = useState(false);
 
   const {viewMode, detachedWindow} = useKoSubscribableChildren(callState, ['viewMode', 'detachedWindow']);
-  const activeWindow = viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow ? detachedWindow : window;
+  const activeWindow =
+    viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow !== null && detachedWindow !== undefined
+      ? detachedWindow
+      : window;
 
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 

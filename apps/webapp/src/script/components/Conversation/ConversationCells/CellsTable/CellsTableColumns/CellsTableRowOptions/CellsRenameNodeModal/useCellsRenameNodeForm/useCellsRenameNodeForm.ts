@@ -44,11 +44,11 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess, renameNode
   const originalBaseName = trimFileExtension(node.name);
   const normalizedName = name.trim();
   const hasInvalidCharacters = INVALID_CHARACTERS.some(char => normalizedName.includes(char));
-  const isDisabled = isSubmitting || normalizedName === originalBaseName || !normalizedName;
+  const isDisabled = isSubmitting || normalizedName === originalBaseName || normalizedName.length === 0;
 
   const buildNewName = (baseName: string) => {
     const extension = getFileExtension(node.name);
-    return extension ? `${baseName}.${extension}` : baseName;
+    return extension.length > 0 ? `${baseName}.${extension}` : baseName;
   };
 
   const renameNode = async (name: string) => {
@@ -70,7 +70,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess, renameNode
     setError(null);
     setIsSubmitting(true);
 
-    if (!normalizedName) {
+    if (normalizedName.length === 0) {
       setError(renameNodeCopy.nameRequired);
       setIsSubmitting(false);
       return;

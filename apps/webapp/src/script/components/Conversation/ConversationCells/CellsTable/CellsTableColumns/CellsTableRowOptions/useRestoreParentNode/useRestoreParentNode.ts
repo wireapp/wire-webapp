@@ -54,7 +54,7 @@ export const useRestoreParentNode = ({
       try {
         const rootParentNode = await cellsRepository.lookupNodeByPath({path});
 
-        if (!rootParentNode) {
+        if (rootParentNode === null || rootParentNode === undefined) {
           throw new Error('Root parent node not found');
         }
 

@@ -27,7 +27,7 @@ export const useConnectionQuality = () => {
   useEffect(() => {
     const connectionQualityHandler = getConnectionQualityHander();
 
-    if (!connectionQualityHandler) {
+    if (connectionQualityHandler === null || connectionQualityHandler === undefined) {
       return () => {};
     }
 

@@ -191,7 +191,7 @@ export const AccountPreferences = ({
               domain={showDomain ? domain : undefined}
             />
 
-            {email && !selfUser.isNoPasswordSSO && (
+            {email !== null && email !== undefined && email.length > 0 && !selfUser.isNoPasswordSSO && (
               <EmailInput canEditProfile={canEditProfile} email={email} userRepository={userRepository} />
             )}
 

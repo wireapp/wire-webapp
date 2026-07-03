@@ -43,21 +43,24 @@ export const conversationHasDraft = (conversation: Conversation): boolean => {
   const storageKey = `${storageKeyPrefix}${conversation.id}`;
   const draftData = localStorage.getItem(storageKey);
 
-  if (!draftData) {
+  if (draftData === null || draftData === undefined || draftData.length === 0) {
     return false;
   }
 
   try {
     const amplifyData: AmplifyWrapper | DraftData = JSON.parse(draftData);
     // Amplify wraps the data in an object with 'data' and 'expires' properties
-    const draft = (amplifyData as AmplifyWrapper).data || (amplifyData as DraftData);
+    const draft = (amplifyData as AmplifyWrapper).data ?? (amplifyData as DraftData);
 
-    if (!draft) {
+    if (draft === null || draft === undefined) {
       return false;
     }
 
     // Check plainMessage for actual content (not just whitespace)
-    const plainMessage = draft.plainMessage || '';
+    const plainMessage =
+      draft.plainMessage !== null && draft.plainMessage !== undefined && draft.plainMessage.length > 0
+        ? draft.plainMessage
+        : '';
     const hasTextContent = plainMessage.trim().length > 0;
     const hasEditorStateContent = Boolean(draft.editorState);
 

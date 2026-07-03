@@ -78,7 +78,7 @@ const getMultipartTextBytes = (event: any): number[] => {
     .filter(Boolean)
     .join(', ');
 
-  const attachmentBytes = uuidString ? stringToUtf16BE(uuidString) : [];
+  const attachmentBytes = uuidString !== null && uuidString !== undefined ? stringToUtf16BE(uuidString) : [];
 
   return textBytes.concat(attachmentBytes);
 };

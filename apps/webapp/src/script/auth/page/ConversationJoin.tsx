@@ -99,7 +99,8 @@ const ConversationJoinComponent = ({
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
     const localConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
-    const localExpiresIn = parseInt(UrlUtil.getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
+    const parsedExpiresIn = parseInt(UrlUtil.getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10);
+    const localExpiresIn = parsedExpiresIn !== 0 && !Number.isNaN(parsedExpiresIn) ? parsedExpiresIn : undefined;
 
     setConversationCode(localConversationCode);
     setConversationKey(localConversationKey);
@@ -108,7 +109,7 @@ const ConversationJoinComponent = ({
     void doInit({isImmediateLogin: false, shouldValidateLocalClient: true})
       .catch(noop)
       .then(async () => {
-        if (localConversationCode && localConversationKey) {
+        if (localConversationCode.length > 0 && localConversationKey.length > 0) {
           await doCheckConversationCode(localConversationKey, localConversationCode);
           await doGetConversationInfoByCode(localConversationKey, localConversationCode);
         }
@@ -144,7 +145,12 @@ const ConversationJoinComponent = ({
        * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
        * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
        */
-      await setLastEventDate(conversationEvent?.time ? new Date(conversationEvent.time) : new Date());
+      const conversationEventTime = conversationEvent?.time;
+      await setLastEventDate(
+        conversationEventTime !== undefined && conversationEventTime.length > 0
+          ? new Date(conversationEventTime)
+          : new Date(),
+      );
 
       routeToApp(conversationEvent?.conversation, conversationEvent?.qualified_conversation?.domain ?? '');
     } catch (error: unknown) {
@@ -203,7 +209,7 @@ const ConversationJoinComponent = ({
         setShowEntropyForm(false);
       }
     }
-    if (nameInput.current) {
+    if (nameInput.current !== null && nameInput.current !== undefined) {
       nameInput.current.focus();
     }
   };
@@ -211,7 +217,7 @@ const ConversationJoinComponent = ({
   const checkNameValidity = async (event: FormEvent) => {
     setIsTemporaryGuest(true);
     event.preventDefault();
-    if (!nameInput.current) {
+    if (nameInput.current === null || nameInput.current === undefined) {
       return;
     }
     nameInput.current.value = nameInput.current.value.trim();
@@ -260,7 +266,7 @@ const ConversationJoinComponent = ({
             setIsJoinGuestLinkPasswordModalOpen(false);
             setIsTemporaryGuest(false);
           }}
-          error={conversationError || generalError}
+          error={conversationError ?? generalError}
           isLoading={isFetching}
           conversationName={conversationInfo?.name}
           onSubmitPassword={!isTemporaryGuest ? getConversationInfoAndJoin : submitJoinCodeWithPassword}

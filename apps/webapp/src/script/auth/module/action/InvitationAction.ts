@@ -39,7 +39,7 @@ export class InvitationAction {
       const inviteList = InviteSelector.getInvites(state);
       const invitationEmail = invitation.email.toLowerCase();
       const alreadyInvited = inviteList.find(inviteItem => inviteItem.email.toLowerCase() === invitationEmail);
-      if (alreadyInvited) {
+      if (alreadyInvited !== null && alreadyInvited !== undefined) {
         const error = new BackendError(
           'This email has already been invited',
           SyntheticErrorLabel.ALREADY_INVITED,

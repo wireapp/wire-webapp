@@ -52,7 +52,7 @@ export const safeMailOpen = (email: string): void => {
   }
 
   const newWindow = window.open(`mailto:${pureEmail}`);
-  if (newWindow) {
+  if (newWindow !== null && newWindow !== undefined) {
     window.setTimeout(() => newWindow.close(), 10);
   }
 };

@@ -74,17 +74,18 @@ export class ClientAction {
 
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
-      const creationStatus = localClient
-        ? {isNew: false, client: localClient}
-        : {
-            isNew: true,
-            client: await core.registerClient(
-              {clientType, password, verificationCode},
-              useLegacyNotificationStream,
-              entropyData,
-              clientAction.generateClientPayload(clientType),
-            ),
-          };
+      const creationStatus =
+        localClient !== null && localClient !== undefined
+          ? {isNew: false, client: localClient}
+          : {
+              isNew: true,
+              client: await core.registerClient(
+                {clientType, password, verificationCode},
+                useLegacyNotificationStream,
+                entropyData,
+                clientAction.generateClientPayload(clientType),
+              ),
+            };
 
       await core.initClient(creationStatus.client, getClientMLSConfig(commonConfig));
       dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
@@ -95,7 +96,7 @@ export class ClientAction {
     if (clientType === ClientType.NONE) {
       return undefined;
     }
-    const deviceLabel = `${Runtime.getOS()}${Runtime.getOS().version ? ` ${Runtime.getOS().version}` : ''}`;
+    const deviceLabel = `${Runtime.getOS()}${Runtime.getOS().version.length > 0 ? ` ${Runtime.getOS().version}` : ''}`;
     let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
     const developmentSuffix = Runtime.isEdgeEnvironment()
       ? '(Edge)'

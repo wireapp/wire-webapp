@@ -123,8 +123,9 @@ const ConversationDetailsOptions = ({
   });
 
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
-  const isTeamConversation = !!teamId;
-  const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isTeamConversation = teamId.length !== 0;
+  const isCellsConversation =
+    cellsState !== null && cellsState !== undefined && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
   const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
@@ -168,11 +169,11 @@ const ConversationDetailsOptions = ({
               className="conversation-details__access"
               onClick={openAccessPanel}
               dataUieName="go-access"
-              icon={isChannelPublic ? <UnlockedIcon /> : <LockClosedIcon width={14} height={14} />}
+              icon={isChannelPublic === true ? <UnlockedIcon /> : <LockClosedIcon width={14} height={14} />}
               title={translate('conversationAccessTitle')}
               statusUieName="status-access"
               statusText={
-                isChannelPublic
+                isChannelPublic === true
                   ? translate('createConversationAccessOptionPublic')
                   : translate('createConversationAccessOptionPrivate')
               }
@@ -275,7 +276,8 @@ const ConversationDetailsOptions = ({
               isDeviceActionEnabled={
                 !!(
                   isSingleUserMode &&
-                  firstParticipant &&
+                  firstParticipant !== null &&
+                  firstParticipant !== undefined &&
                   (firstParticipant.isConnected() || teamState.isInTeam(firstParticipant))
                 )
               }

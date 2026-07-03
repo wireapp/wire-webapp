@@ -205,7 +205,11 @@ export class DebugUtil {
       const value = eventTarget.innerText;
       const localConversation = this.conversationState.conversations().find(({id}) => id === value);
 
-      if (!localConversation || !isMLSCapableConversation(localConversation)) {
+      if (
+        localConversation === null ||
+        localConversation === undefined ||
+        !isMLSCapableConversation(localConversation)
+      ) {
         return;
       }
 
@@ -402,7 +406,7 @@ export class DebugUtil {
 
     const mlsFeature = this.teamState.teamFeatures()?.mls;
 
-    if (!mlsFeature) {
+    if (mlsFeature === null || mlsFeature === undefined) {
       throw new Error('MLS feature is not enabled');
     }
 
@@ -475,7 +479,7 @@ export class DebugUtil {
   async refreshE2EIRevocationData(): Promise<void> {
     const e2eIdentityService = this.core.service?.e2eIdentity;
 
-    if (!e2eIdentityService) {
+    if (e2eIdentityService === null || e2eIdentityService === undefined) {
       throw new Error('E2EI service is not available');
     }
 
@@ -526,7 +530,7 @@ export class DebugUtil {
     amount = 10,
     conversationId = this.conversationState.activeConversation()?.id ?? '',
   ): Promise<EventRecord[]> {
-    if (this.storageRepository.storageService.db) {
+    if (this.storageRepository.storageService.db !== null && this.storageRepository.storageService.db !== undefined) {
       const records = await this.storageRepository.storageService.db.events.toArray();
       const messages = records.filter(event => event.conversation === conversationId);
       return messages.slice(-amount).toReversed();
@@ -691,9 +695,10 @@ export class DebugUtil {
     const selfClients = await this.clientRepository.getClientsForSelf();
     const selfClientIds = selfClients.map(client => client.id);
     const missingClients = selfClientIds.filter(id => recipients.includes(id));
-    const logMessage = missingClients.length
-      ? `Message was sent to all other "${selfClients.length}" clients.`
-      : `Message was NOT sent to the following own clients: ${missingClients.join(',')}`;
+    const logMessage =
+      missingClients.length !== 0 && !Number.isNaN(missingClients.length)
+        ? `Message was sent to all other "${selfClients.length}" clients.`
+        : `Message was NOT sent to the following own clients: ${missingClients.join(',')}`;
     this.logger.info(logMessage);
   }
 
@@ -725,7 +730,7 @@ export class DebugUtil {
 
   getActiveCallStats() {
     const activeCall = this.callState.joinedCall();
-    if (!activeCall) {
+    if (activeCall === null || activeCall === undefined) {
       throw new Error('no active call found');
     }
     return this.callingRepository.getStats(activeCall.conversation.qualifiedId);

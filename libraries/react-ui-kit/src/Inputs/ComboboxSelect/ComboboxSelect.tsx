@@ -104,7 +104,7 @@ export const ComboboxSelect = ({
         menuPosition={menuPosition}
         createOptionLabel={createOptionLabel}
         onCreateOption={onCreateOption}
-        creatable={!!onCreateOption}
+        creatable={onCreateOption !== null && onCreateOption !== undefined}
         isLoading={isLoading}
         noOptionsMessage={noOptionsMessage}
         loadingMessage={loadingMessage}

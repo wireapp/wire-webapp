@@ -43,7 +43,7 @@ export function flattenUserMap<T = unknown>(userMap: QualifiedUserMap<T>): {data
  */
 export function nestUsersList<T = unknown>(users: {data: T; userId: QualifiedId}[]): QualifiedUserMap<T> {
   return users.reduce((users, {data, userId: {domain, id}}) => {
-    if (!users[domain]) {
+    if (users[domain] === null || users[domain] === undefined) {
       users[domain] = {};
     }
     users[domain][id] = data;

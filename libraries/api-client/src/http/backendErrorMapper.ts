@@ -218,7 +218,7 @@ export function mapBackendError(error: BackendError): BackendError {
 
   // 1) Message-specific variant
   const messageVariantHandler = messageVariantHandlers[code]?.[label]?.[message];
-  if (messageVariantHandler) {
+  if (messageVariantHandler !== null && messageVariantHandler !== undefined) {
     const mapped = messageVariantHandler({...error, label});
     logger.info('Mapped backend error with message variant', {error, mapped});
     return mapped;
@@ -226,7 +226,7 @@ export function mapBackendError(error: BackendError): BackendError {
 
   // 2) Default fallback for this (code,label)
   const fallbackHandler = defaultHandlers[code]?.[label];
-  if (fallbackHandler) {
+  if (fallbackHandler !== null && fallbackHandler !== undefined) {
     const mapped = fallbackHandler({...error, label});
     logger.info('Mapped backend error with default handler', {error, mapped});
     return mapped;

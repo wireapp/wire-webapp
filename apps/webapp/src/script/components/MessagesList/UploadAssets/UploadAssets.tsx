@@ -35,13 +35,13 @@ export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Pro
     'uploadProgressQueue',
   ]);
 
-  if (!processQueue?.length) {
+  if (processQueue?.length === 0 || Number.isNaN(processQueue?.length)) {
     return null;
   }
 
   const currentConversationProcessQueue = processQueue.filter(item => item.conversationId === conversationId);
 
-  if (!currentConversationProcessQueue.length) {
+  if (currentConversationProcessQueue.length === 0 || Number.isNaN(currentConversationProcessQueue.length)) {
     return null;
   }
 
@@ -52,7 +52,7 @@ export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Pro
       {currentConversationProcessQueue.map(processingMessage => {
         const processingAsset = uploadProgressMap.get(processingMessage.message.messageId);
 
-        if (!processingAsset) {
+        if (processingAsset === null || processingAsset === undefined) {
           return null;
         }
 

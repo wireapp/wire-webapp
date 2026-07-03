@@ -64,9 +64,11 @@ export class UserMapper {
    * @note Return an empty array in any case to prevent crashes.
    * @returns Mapped user entities
    */
-  mapUsersFromJson(usersData: UserRecord[], localDomain: string): User[] {
-    if (usersData?.length) {
-      return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData, localDomain));
+  mapUsersFromJson(usersData: UserRecord[] | undefined, localDomain: string): User[] {
+    if (usersData !== undefined && usersData.length !== 0 && !Number.isNaN(usersData.length)) {
+      return usersData
+        .filter(userData => userData !== null && userData !== undefined)
+        .map(userData => this.mapUserFromJson(userData, localDomain));
     }
     this.logger.warn('We got no user data from the backend');
     return [];
@@ -82,20 +84,25 @@ export class UserMapper {
    */
   updateUserFromObject(userEntity: User, userData: Partial<UserRecord>, localDomain: string): User {
     // We are trying to update non-matching users
-    const isUnexpectedId = userEntity.id && userData.id && userData.id !== userEntity.id;
+    const isUnexpectedId =
+      userEntity.id.length > 0 &&
+      userData.id !== null &&
+      userData.id !== undefined &&
+      userData.id.length > 0 &&
+      userData.id !== userEntity.id;
     if (isUnexpectedId) {
       throw new Error(`Updating wrong user entity. User '${userEntity.id}' does not match data '${userData.id}'.`);
     }
 
     const isNewUser = userEntity.id === '' && userData.id !== '';
-    if (isNewUser && userData.id) {
+    if (isNewUser && userData.id !== null && userData.id !== undefined && userData.id.length > 0) {
       userEntity.id = userData.id;
     }
 
-    if (userData.qualified_id) {
+    if (userData.qualified_id !== null && userData.qualified_id !== undefined) {
       userEntity.domain = userData.qualified_id.domain;
       userEntity.id = userData.qualified_id.id;
-      userEntity.isFederated = !!localDomain && userData.qualified_id.domain !== localDomain;
+      userEntity.isFederated = localDomain.length !== 0 && userData.qualified_id.domain !== localDomain;
     }
 
     const isSelf = isSelfAPIUser(userData);
@@ -118,8 +125,9 @@ export class UserMapper {
       type,
     } = userData;
 
-    if (accentId) {
-      userEntity.accent_id(accentId);
+    const accentColorId = accentId as typeof accentId | 0;
+    if (accentColorId !== null && accentColorId !== undefined && accentColorId !== 0) {
+      userEntity.accent_id(accentColorId);
     }
 
     if (availability !== undefined) {
@@ -128,24 +136,29 @@ export class UserMapper {
     }
 
     let mappedAssets: MappedAsset = {};
-    if (assets?.length) {
+    if (
+      assets?.length !== null &&
+      assets?.length !== undefined &&
+      assets?.length !== 0 &&
+      !Number.isNaN(assets?.length)
+    ) {
       mappedAssets = mapProfileAssets(userEntity.qualifiedId, assets);
     }
     updateUserEntityAssets(userEntity, mappedAssets);
 
-    if (email) {
+    if (email !== null && email !== undefined && email.length > 0) {
       userEntity.email(email);
     }
 
-    if (managedBy) {
+    if (managedBy !== null && managedBy !== undefined && managedBy !== false) {
       userEntity.managedBy(managedBy);
     }
 
-    if (supportedProtocols) {
+    if (supportedProtocols !== null && supportedProtocols !== undefined) {
       userEntity.supportedProtocols(supportedProtocols);
     }
 
-    if (expirationDate) {
+    if (expirationDate !== null && expirationDate !== undefined && expirationDate.length > 0) {
       userEntity.isTemporaryGuest(true);
       const setAdjustedTimestamp = () => {
         const adjustedTimestamp = this.serverTimeHandler.toLocalTimestamp(new Date(expirationDate).getTime());
@@ -159,39 +172,45 @@ export class UserMapper {
       }
     }
 
-    if (handle) {
+    if (handle !== null && handle !== undefined && handle.length > 0) {
       userEntity.username(handle);
     }
 
-    if (name) {
+    if (name !== null && name !== undefined && name.length > 0) {
       userEntity.name(name.trim());
     }
 
-    if (service) {
+    if (service !== null && service !== undefined) {
       userEntity.isService = true;
       userEntity.providerId = service.provider;
       userEntity.providerName('');
       userEntity.serviceId = service.id;
     }
 
-    if (ssoId && Object.keys(ssoId).length) {
+    if (
+      ssoId !== null &&
+      ssoId !== undefined &&
+      ssoId !== false &&
+      Object.keys(ssoId).length !== 0 &&
+      !Number.isNaN(Object.keys(ssoId).length)
+    ) {
       userEntity.isSingleSignOn = true;
-      if (ssoId.subject) {
+      if (ssoId.subject.length > 0) {
         userEntity.isNoPasswordSSO = true;
       }
     }
 
-    if (teamId) {
+    if (teamId !== null && teamId !== undefined && teamId.length > 0) {
       userEntity.teamId = teamId;
     }
 
-    if (deleted) {
+    if (deleted === true) {
       userEntity.isDeleted = true;
     }
 
     userEntity.type = type ?? UserType.REGULAR;
 
-    if (app) {
+    if (app !== null && app !== undefined) {
       userEntity.description = app.description;
       userEntity.category = app.category;
     } else {

@@ -143,7 +143,8 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       return messageEntity;
     }
 
-    const isExpired = !!(await this._updateTimedMessage(messageEntity));
+    const expiredMessage = await this._updateTimedMessage(messageEntity);
+    const isExpired = expiredMessage !== undefined;
     if (!isExpired) {
       const {id, conversation_id: conversationId} = messageEntity;
       const matchingMessageEntity = this.timedMessages().find(timedMessageEntity => {
@@ -151,7 +152,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         return timedMessageId === id && timedConversationId === conversationId;
       });
 
-      if (matchingMessageEntity) {
+      if (matchingMessageEntity !== null && matchingMessageEntity !== undefined) {
         this.timedMessages.replace(matchingMessageEntity, messageEntity);
       } else {
         this.timedMessages.push(messageEntity);
@@ -165,7 +166,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     const validatedMessages = await Promise.all(
       messageEntities.map(messageEntity => this.validateMessage(messageEntity)),
     );
-    return validatedMessages.filter(messageEntity => !!messageEntity) as Message[];
+    return validatedMessages.filter(
+      messageEntity => messageEntity !== null && messageEntity !== undefined,
+    ) as Message[];
   }
 
   private _obfuscateAssetMessage(messageEntity: ContentMessage): void {
@@ -303,7 +306,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     const updatedMessages = await Promise.all(
       this.timedMessages().map(messageEntity => this._updateTimedMessage(messageEntity)),
     );
-    const expiredMessages = updatedMessages.filter(messageEntity => !!messageEntity) as ContentMessage[];
+    const expiredMessages = updatedMessages.filter(
+      messageEntity => messageEntity !== null && messageEntity !== undefined,
+    ) as ContentMessage[];
 
     if (expiredMessages.length !== 0) {
       this.timedMessages.remove(messageEntity => {

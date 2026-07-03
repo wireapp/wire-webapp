@@ -64,7 +64,7 @@ export const UserStatusBadges = ({config}: UserStatusBadgesProps) => {
   const badges = Object.entries(config).filter(([_badge, shouldShow]) => shouldShow);
   const badgesCount = badges.length;
 
-  if (!badgesCount) {
+  if (badgesCount === 0 || Number.isNaN(badgesCount)) {
     return null;
   }
 

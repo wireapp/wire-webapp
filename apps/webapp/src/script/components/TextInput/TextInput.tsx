@@ -130,7 +130,7 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
             css={cancelButtonCSS}
             onClick={() => {
               onCancel();
-              if (textInputRef && 'current' in textInputRef) {
+              if (textInputRef !== null && textInputRef !== undefined && 'current' in textInputRef) {
                 textInputRef.current?.focus();
               }
             }}

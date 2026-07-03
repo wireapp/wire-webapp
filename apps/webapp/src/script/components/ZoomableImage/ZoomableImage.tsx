@@ -35,7 +35,7 @@ const DEFAULT_OFFSET: Offset = {x: 0, y: 0};
 function calculateZoomRatio(element: HTMLImageElement) {
   const parentElement = element.parentElement;
 
-  if (!parentElement) {
+  if (parentElement === null || parentElement === undefined) {
     return 1;
   }
 
@@ -49,7 +49,12 @@ function calculateZoomRatio(element: HTMLImageElement) {
 
 // if we will add more image zooming, we need to pass 2 props, for check if is image is zoomed and imageScale
 function calculateMaxOffset(containerRef: RefObject<HTMLDivElement>, imgRef: RefObject<HTMLImageElement>) {
-  if (!containerRef.current || !imgRef.current) {
+  if (
+    containerRef.current === null ||
+    containerRef.current === undefined ||
+    imgRef.current === null ||
+    imgRef.current === undefined
+  ) {
     return {
       maxXOffset: 0,
       maxYOffset: 0,
@@ -120,7 +125,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
     });
 
     if (!draggingRef.current && !isZoomEnabled) {
-      if (!imageRef.current) {
+      if (imageRef.current === null || imageRef.current === undefined) {
         return;
       }
 
@@ -186,7 +191,14 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!isZoomEnabled || !mouseDownRef.current || !containerRef.current || !imageRef.current) {
+    if (
+      !isZoomEnabled ||
+      !mouseDownRef.current ||
+      containerRef.current === null ||
+      containerRef.current === undefined ||
+      imageRef.current === null ||
+      imageRef.current === undefined
+    ) {
       return;
     }
 
@@ -198,7 +210,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
 
     draggingRef.current = true;
 
-    if (element.style.transition) {
+    if (element.style.transition.length > 0) {
       element.style.transition = '';
     }
 
@@ -217,7 +229,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
   };
 
   const updateZoomRatio = () => {
-    if (!imageRef.current) {
+    if (imageRef.current === null || imageRef.current === undefined) {
       return;
     }
 

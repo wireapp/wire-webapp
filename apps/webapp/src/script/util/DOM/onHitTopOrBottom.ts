@@ -54,7 +54,7 @@ export const onHitTopOrBottom = (
     return onHitBottom();
   };
 
-  if (scrollingElement) {
+  if (scrollingElement !== null && scrollingElement !== undefined) {
     scrollingElement.addEventListener('scroll', onScroll);
     scrollingElement.addEventListener('wheel', onMouseWheel);
   }

@@ -50,8 +50,10 @@ export const getActiveConversationsWithUsers = ({
         }
 
         const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUser.qualifiedId);
-        const matchingUserIds = userIdsInConversation.filter(userIdInConversation =>
-          userIds.find(userId => matchQualifiedIds(userId, userIdInConversation)),
+        const matchingUserIds = userIdsInConversation.filter(
+          userIdInConversation =>
+            userIds.find(userId => matchQualifiedIds(userId, userIdInConversation)) !== null &&
+            userIds.find(userId => matchQualifiedIds(userId, userIdInConversation)) !== undefined,
         );
 
         const hasMatchingUserIds = matchingUserIds.length > 0;

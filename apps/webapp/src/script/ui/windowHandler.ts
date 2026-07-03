@@ -32,7 +32,7 @@ export class WindowHandler {
 
   private _listenToUnhandledPromiseRejection(): void {
     window.addEventListener('unhandledrejection', (promiseRejectionEvent: any): void | false => {
-      const error = promiseRejectionEvent.reason || {};
+      const error = promiseRejectionEvent.reason ?? {};
 
       const isLegalHoldReject = error.type === ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
       if (isLegalHoldReject) {

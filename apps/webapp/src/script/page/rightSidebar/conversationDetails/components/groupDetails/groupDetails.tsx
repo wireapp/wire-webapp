@@ -53,17 +53,17 @@ const GroupDetails: FC<GroupDetailsProps> = ({
   return (
     <>
       <div className="conversation-details__participant_count">
-        {!!userParticipants.length && (
+        {userParticipants.length !== 0 && !Number.isNaN(userParticipants.length) && (
           <span className="conversation-details__participant_count__user">
             <span className="conversation-details__participant_count__number" data-uie-name="status-user-count">
-              {allUsersCount || userParticipants.length}
+              {allUsersCount !== 0 && !Number.isNaN(allUsersCount) ? allUsersCount : userParticipants.length}
             </span>
             &nbsp;
             <span className="conversation-details__participant_count__text">{participantsUserText}</span>
           </span>
         )}
 
-        {!!serviceParticipants.length && (
+        {serviceParticipants.length !== 0 && !Number.isNaN(serviceParticipants.length) && (
           <span className="conversation-details__participant_count__service">
             <span className="conversation-details__participant_count__number" data-uie-name="status-service-count">
               {serviceParticipants.length}

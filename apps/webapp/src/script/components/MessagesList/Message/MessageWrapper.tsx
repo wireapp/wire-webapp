@@ -109,7 +109,9 @@ export const MessageWrapper = ({
       const mentions = firstAsset.mentions();
       const incomingQuote = message.quote();
       const quote: OutgoingQuote | undefined =
-        incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
+        incomingQuote !== null && incomingQuote !== undefined && isOutgoingQuote(incomingQuote)
+          ? (incomingQuote as OutgoingQuote)
+          : undefined;
 
       await messageRepository.sendTextWithLinkPreview({
         conversation,

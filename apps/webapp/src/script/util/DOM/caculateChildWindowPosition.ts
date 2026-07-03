@@ -18,17 +18,25 @@
  */
 
 export const calculateChildWindowPosition = (childHeight: number, childWidth: number) => {
-  const screenLeft = window.screenLeft || window.screenX;
-  const screenTop = window.screenTop || window.screenY;
+  const screenLeft = window.screenLeft !== 0 && !Number.isNaN(window.screenLeft) ? window.screenLeft : window.screenX;
+  const screenTop = window.screenTop !== 0 && !Number.isNaN(window.screenTop) ? window.screenTop : window.screenY;
 
-  const hasInnerMeasurements = window.innerHeight && window.innerWidth;
+  const hasInnerMeasurements =
+    window.innerHeight !== 0 &&
+    !Number.isNaN(window.innerHeight) &&
+    window.innerWidth !== 0 &&
+    !Number.isNaN(window.innerWidth);
 
   const parentHeight = hasInnerMeasurements
     ? window.innerHeight
-    : document.documentElement.clientHeight || window.screen.height;
+    : document.documentElement.clientHeight !== 0 && !Number.isNaN(document.documentElement.clientHeight)
+      ? document.documentElement.clientHeight
+      : window.screen.height;
   const parentWidth = hasInnerMeasurements
     ? window.innerWidth
-    : document.documentElement.clientWidth || window.screen.width;
+    : document.documentElement.clientWidth !== 0 && !Number.isNaN(document.documentElement.clientWidth)
+      ? document.documentElement.clientWidth
+      : window.screen.width;
 
   const left = parentWidth / 2 - childWidth / 2 + screenLeft;
   const top = parentHeight / 2 - childHeight / 2 + screenTop;

@@ -52,7 +52,7 @@ const drawImageOnCanvas = (img: HTMLImageElement): HTMLCanvasElement => {
   canvas.height = img.height;
 
   const ctx = canvas.getContext('2d');
-  if (!ctx) {
+  if (ctx === null || ctx === undefined) {
     throw new Error('Failed to get 2D context from canvas');
   }
 
@@ -64,7 +64,7 @@ const canvasToBlob = (canvas: HTMLCanvasElement, type: string): Promise<Blob> =>
   const validType = is.nonEmptyString(type) ? type : 'image/png';
   return new Promise((resolve, reject) => {
     canvas.toBlob(blob => {
-      if (blob) {
+      if (blob !== null && blob !== undefined) {
         resolve(blob);
       } else {
         reject(new Error('Failed to convert canvas to Blob'));

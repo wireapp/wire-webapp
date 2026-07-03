@@ -39,7 +39,7 @@ export function userReactionMapToReactionMap(userReactions: UserReactionMap | Re
     reactions.split(',').forEach(reaction => {
       const existingReaction = acc.find(([r]) => r === reaction);
       const qualifiedId = {id: userId, domain: ''};
-      if (existingReaction) {
+      if (existingReaction !== null && existingReaction !== undefined) {
         existingReaction[1].push(qualifiedId);
       } else {
         acc.push([reaction, [qualifiedId]]);
@@ -58,10 +58,10 @@ export function addReaction(reactions: ReactionMap, reactionsStr: string, userId
   });
 
   userReactions
-    .filter(([reaction]) => !!reaction)
+    .filter(reaction => reaction.length > 0)
     .forEach(reaction => {
       const existingEntry = filteredReactions.find(([r]) => r === reaction);
-      if (existingEntry) {
+      if (existingEntry !== null && existingEntry !== undefined) {
         existingEntry[1].push(userId);
       } else {
         filteredReactions.push([reaction, [userId]]);

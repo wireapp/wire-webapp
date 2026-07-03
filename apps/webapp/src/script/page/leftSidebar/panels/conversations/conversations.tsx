@@ -240,7 +240,7 @@ export const Conversations = ({
   });
 
   const isGroupParticipantsVisible =
-    !!conversationsFilter &&
+    conversationsFilter.length !== 0 &&
     ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
     groupParticipantsConversations.length > 0;
 
@@ -268,7 +268,7 @@ export const Conversations = ({
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
-      if (!conversation) {
+      if (conversation === null || conversation === undefined) {
         return;
       }
 
@@ -281,14 +281,18 @@ export const Conversations = ({
   }, [currentTabConversations, setCurrentTab]);
 
   useEffect(() => {
-    if (activeConversation && !conversationState.isVisible(activeConversation)) {
+    if (
+      activeConversation !== null &&
+      activeConversation !== undefined &&
+      !conversationState.isVisible(activeConversation)
+    ) {
       // If the active conversation is not visible, switch to the recent view
       listViewModel.contentViewModel.loadPreviousContent();
     }
   }, [activeConversation, conversationState, listViewModel.contentViewModel, conversations.length]);
 
   useEffect(() => {
-    if (!activeConversation) {
+    if (activeConversation === null || activeConversation === undefined) {
       return () => {};
     }
 
@@ -312,7 +316,7 @@ export const Conversations = ({
 
   const changeTab = useCallback(
     (nextTab: SidebarTabs, folderId?: string) => {
-      if (!folderId) {
+      if (folderId === null || folderId === undefined || folderId.length === 0) {
         closeFolder();
       }
 
@@ -396,7 +400,7 @@ export const Conversations = ({
     (event: ReactKeyBoardEvent<HTMLDivElement>) => {
       const firstFoundConversation = currentTabConversations?.[0];
 
-      if (firstFoundConversation) {
+      if (firstFoundConversation !== null && firstFoundConversation !== undefined) {
         createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
         setConversationsFilter('');
         scrollToConversation(firstFoundConversation.id);
@@ -428,7 +432,7 @@ export const Conversations = ({
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
-            showSearchInput={(showSearchInput && hasVisibleConversations) || !!conversationsFilter}
+            showSearchInput={(showSearchInput && hasVisibleConversations) || conversationsFilter.length !== 0}
             searchValue={conversationsFilter}
             setSearchValue={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}

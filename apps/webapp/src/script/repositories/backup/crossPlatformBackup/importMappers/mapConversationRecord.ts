@@ -30,11 +30,14 @@ export const mapConversationRecord = ({
   name,
   lastModifiedTime,
 }: BackUpConversation): ConversationRecord | null => {
-  if (!qualifiedId) {
+  if (qualifiedId === null || qualifiedId === undefined) {
     return null;
   }
 
-  const lastEventTimestamp = lastModifiedTime ? new Date(lastModifiedTime.date.toString()).getTime() : 0;
+  const lastEventTimestamp =
+    lastModifiedTime !== null && lastModifiedTime !== undefined
+      ? new Date(lastModifiedTime.date.toString()).getTime()
+      : 0;
   const conversationName = name?.toString?.() ?? '';
 
   // We dont get all the "required" fields from the backup, so we need to outsmart the type system.

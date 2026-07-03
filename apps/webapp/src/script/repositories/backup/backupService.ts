@@ -47,7 +47,7 @@ export class BackupService {
   }
 
   getDatabaseVersion(): number {
-    if (this.storageService.db) {
+    if (this.storageService.db !== null && this.storageService.db !== undefined) {
       return this.storageService.db.verno;
     }
     return 1;
@@ -68,7 +68,7 @@ export class BackupService {
 
   async runDbSchemaUpdates(archiveVersion: number): Promise<void> {
     const {db} = this.storageService;
-    if (!db) {
+    if (db === null || db === undefined) {
       this.logger.warn('Database schema will not run because the database is not initialized');
       return;
     }
@@ -91,9 +91,9 @@ export class BackupService {
       generateId,
     }: {generatePrimaryKey?: (entry: T) => string; generateId?: (entry: T) => string | undefined} = {},
   ): Promise<number> {
-    if (this.storageService.db) {
+    if (this.storageService.db !== null && this.storageService.db !== undefined) {
       const table = await this.storageService.db.table(tableName);
-      if (generatePrimaryKey) {
+      if (generatePrimaryKey !== null && generatePrimaryKey !== undefined) {
         return this.addByPrimaryKeys(table, entities, generatePrimaryKey);
       }
       return this.addByIds(table, entities, generateId);
@@ -125,7 +125,7 @@ export class BackupService {
     entities: T[],
     generateId?: (entry: T) => string | undefined,
   ): Promise<number> {
-    if (!generateId) {
+    if (generateId === null || generateId === undefined) {
       await table.bulkAdd(entities);
       return entities.length;
     }

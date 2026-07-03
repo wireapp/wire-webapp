@@ -62,7 +62,7 @@ export class EncryptedStore<EncryptedPayload = unknown> {
 
   async getSecretValue(primaryKey: string) {
     const result = await this.db.get('secrets', primaryKey);
-    if (!result) {
+    if (result === null || result === undefined) {
       return undefined;
     }
     return this.#decrypt(result);
@@ -123,7 +123,7 @@ export async function createEncryptedStore(dbName: string): Promise<EncryptedSto
 
   const keyPrimaryKey = 'dbKey';
   let key = await db.get('key', keyPrimaryKey);
-  if (!key) {
+  if (key === null || key === undefined) {
     key = await generateKey();
     await db.put('key', key, keyPrimaryKey);
   }

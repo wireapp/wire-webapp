@@ -57,7 +57,7 @@ const outputFile = path.resolve('licenses.json');
 
 (async () => {
   const licenses = await new LicenseCollector({devDependencies: false, filter, repositories}).collect();
-  if (licenses.length) {
+  if (licenses.length !== 0 && !Number.isNaN(licenses.length)) {
     await writeJSON(outputFile, licenses, {spaces: 2});
     console.info(`Saved licenses to "${outputFile}".`);
   } else {

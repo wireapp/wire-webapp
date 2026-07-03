@@ -90,7 +90,7 @@ const GroupVideoGridTile = ({
   const sharesCamera = [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(videoState);
   const hasPausedVideo = videoState === VIDEO_STATE.PAUSED;
   const doVideoReconnecting = videoState === VIDEO_STATE.RECONNECTING;
-  const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream;
+  const hasActiveVideo = (sharesCamera || sharesScreen) && videoStream !== null && videoStream !== undefined;
 
   const {showLoadingOverlay, onVideoCanPlay} = useShowLoadingOverlay(
     isSelfParticipant,

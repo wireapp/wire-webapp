@@ -78,7 +78,12 @@ export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props
   `;
 
   useLayoutEffect(() => {
-    if (!isVirtualizedMessagesListEnabled && marker.type === 'unread' && elementRef.current) {
+    if (
+      !isVirtualizedMessagesListEnabled &&
+      marker.type === 'unread' &&
+      elementRef.current !== null &&
+      elementRef.current !== undefined
+    ) {
       scrollTo?.({element: elementRef.current}, true);
     }
   }, [isVirtualizedMessagesListEnabled, marker.type, scrollTo]);

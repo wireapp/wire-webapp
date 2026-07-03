@@ -189,7 +189,11 @@ export class MediaConstraintsHandler {
   }
 
   private getDeviceConstraint(mediaDeviceId?: string) {
-    const hasMediaDevice = mediaDeviceId && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
+    const hasMediaDevice =
+      mediaDeviceId !== null &&
+      mediaDeviceId !== undefined &&
+      mediaDeviceId.length > 0 &&
+      mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
 
     return hasMediaDevice ? {deviceId: {exact: mediaDeviceId}} : {};
   }
@@ -220,7 +224,7 @@ export class MediaConstraintsHandler {
 
     const deviceConstraint = this.getDeviceConstraint(mediaDeviceId);
 
-    if (deviceConstraint.deviceId) {
+    if (deviceConstraint.deviceId !== null && deviceConstraint.deviceId !== undefined) {
       return {
         ...streamConstraints,
         ...deviceConstraint,

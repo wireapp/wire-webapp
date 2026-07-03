@@ -65,7 +65,7 @@ async function loadMessagesForTimestampSelection(options: LoadMessagesForTimesta
 
   const messageIsLoaded = conversation.getMessage(messageId);
 
-  if (messageIsLoaded) {
+  if (messageIsLoaded !== null && messageIsLoaded !== undefined) {
     return;
   }
 
@@ -160,7 +160,9 @@ export const VirtualizedMessagesList = ({
         return element.getBoundingClientRect().height;
       }
 
-      return cachedMeasurement || element.getBoundingClientRect().height;
+      return cachedMeasurement !== 0 && !Number.isNaN(cachedMeasurement)
+        ? cachedMeasurement
+        : element.getBoundingClientRect().height;
     },
     getItemKey,
   });
@@ -324,12 +326,13 @@ export const VirtualizedMessagesList = ({
               css={{
                 position: 'absolute',
                 width: '100%',
-                ...(isLast &&
-                  !currentConversationProcessQueue?.length && {
-                    '.message': {
-                      paddingBottom: '40px',
-                    },
-                  }),
+                ...(isLast && currentConversationProcessQueue?.length === 0
+                  ? {
+                      '.message': {
+                        paddingBottom: '40px',
+                      },
+                    }
+                  : {}),
               }}
             >
               {isMarker(item) ? (

@@ -76,7 +76,7 @@ export const getModalOptions = (
     skipEscaping?: boolean,
   ) => string,
 ) => {
-  if (!secondaryActionFn) {
+  if (secondaryActionFn === null || secondaryActionFn === undefined) {
     hideSecondary = true;
   }
   let options: ModalOptions = {};

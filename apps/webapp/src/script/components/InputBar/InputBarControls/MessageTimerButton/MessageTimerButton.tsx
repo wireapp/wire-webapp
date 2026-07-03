@@ -48,7 +48,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
     'isSelfDeletingMessagesEnabled',
     'isSelfDeletingMessagesEnforced',
   ]);
-  const hasMessageTimer = !!messageTimer;
+  const hasMessageTimer = messageTimer !== 0 && !Number.isNaN(messageTimer);
   const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer;
   const duration = hasMessageTimer ? formatDuration(messageTimer, translate) : ({} as DurationUnit);
 

@@ -61,7 +61,7 @@ export class TeamInvitationAPI {
     allInvitations = allInvitations.concat(invitationChunk.invitations);
     while (invitationChunk.has_more) {
       const invitations = invitationChunk.invitations;
-      const lastInvitation = invitations[invitations.length - 1] || {};
+      const lastInvitation = invitations[invitations.length - 1] ?? {};
       const lastChunkId = (lastInvitation as TeamInvitation).id;
       invitationChunk = await this.getInvitations(teamId, lastChunkId);
       allInvitations = allInvitations.concat(invitationChunk.invitations);

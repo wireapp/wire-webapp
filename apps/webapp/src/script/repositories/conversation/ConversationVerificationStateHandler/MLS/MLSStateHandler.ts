@@ -59,7 +59,11 @@ export class MLSConversationVerificationStateHandler {
   ) {
     this.logger = getLogger('MLSConversationVerificationStateHandler');
     // We need to check if the core account has a valid MLS device and that e2ei is enabled
-    if (!this.core.hasMLSDevice || !this.core.service?.e2eIdentity) {
+    if (
+      !this.core.hasMLSDevice ||
+      this.core.service?.e2eIdentity === null ||
+      this.core.service?.e2eIdentity === undefined
+    ) {
       return;
     }
 
@@ -76,7 +80,7 @@ export class MLSConversationVerificationStateHandler {
     conversation: MLSConversation,
     userIdentities: Map<string, WireIdentity[]> | undefined,
   ) {
-    if (!userIdentities) {
+    if (userIdentities === null || userIdentities === undefined) {
       return;
     }
 
@@ -136,7 +140,7 @@ export class MLSConversationVerificationStateHandler {
     const processedUserIds: Set<StringifiedQualifiedId> = new Set();
     let userVerificationState = UserVerificationState.ALL_VALID;
 
-    if (userIdentities) {
+    if (userIdentities !== null && userIdentities !== undefined) {
       for (const [stringifiedQualifiedId, identities] of userIdentities.entries()) {
         if (processedUserIds.has(stringifiedQualifiedId)) {
           continue;
@@ -154,7 +158,7 @@ export class MLSConversationVerificationStateHandler {
         );
         const identity = identities.at(0);
 
-        if (!identity || !user) {
+        if (identity === null || identity === undefined || user === null || user === undefined) {
           this.logger.warn(`Could not find user or identity for userId: ${stringifiedQualifiedId}`);
           userVerificationState = UserVerificationState.SOME_INVALID;
           break;
@@ -190,7 +194,7 @@ export class MLSConversationVerificationStateHandler {
       getConversationByGroupId({conversationState: this.conversationState, groupId}),
     );
 
-    if (!conversation) {
+    if (conversation === null || conversation === undefined) {
       return this.logger.warn(`Epoch changed but conversation could not be found after waiting for 5 seconds`);
     }
 
@@ -216,7 +220,7 @@ export class MLSConversationVerificationStateHandler {
     }
 
     const conversationExists = await this.core.service?.mls?.conversationExists(conversation.groupId);
-    if (!conversationExists) {
+    if (conversationExists !== true) {
       conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
       return;
     }
@@ -242,7 +246,7 @@ export class MLSConversationVerificationStateHandler {
 }
 
 export const checkUserHandle = (identity: WireIdentity, user: User): boolean => {
-  if (!identity.x509Identity) {
+  if (identity.x509Identity === null || identity.x509Identity === undefined) {
     return false;
   }
   // WireIdentity handle format is "{scheme}%40{username}@{domain}"

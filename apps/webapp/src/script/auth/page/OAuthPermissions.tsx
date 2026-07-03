@@ -128,7 +128,9 @@ const OAuthPermissionsComponent = ({
           setTeamImage(`${Config.getConfig().APP_BASE}/image/logo/wire-logo-120.png`);
         } else {
           const teamImageBlob = await assetRepository.load(teamIcon);
-          setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
+          setTeamImage(
+            teamImageBlob !== null && teamImageBlob !== undefined ? await loadDataUrl(teamImageBlob) : undefined,
+          );
         }
       }
       if (is.nonEmptyString(oauthParams.client_id)) {
@@ -161,7 +163,7 @@ const OAuthPermissionsComponent = ({
   return (
     <Page>
       <ContainerXS centerText verticalCenter css={containerCSS}>
-        {!oAuthApp ? (
+        {oAuthApp === null || oAuthApp === undefined ? (
           <Icon.LoadingIcon width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
         ) : (
           <>

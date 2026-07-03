@@ -63,7 +63,7 @@ export function extractClientDiff(
     missingClients: missingClients.map(toClientDiff),
     missingUserIds: [],
   };
-  if (!users) {
+  if (users === null || users === undefined) {
     return clientDiff;
   }
 
@@ -72,7 +72,7 @@ export function extractClientDiff(
     .filter(user => {
       const userClients = user.devices().map(({id}) => id);
       const userDeletedClients =
-        deletedClients.find(({userId}) => matchQualifiedIds(user.qualifiedId, userId))?.data || [];
+        deletedClients.find(({userId}) => matchQualifiedIds(user.qualifiedId, userId))?.data ?? [];
       const commonDevices = intersection(userClients, userDeletedClients);
       return commonDevices.length === userClients.length;
     });
@@ -108,14 +108,18 @@ export function findDeletedClients<T extends Recipients>(referenceRecipients: T,
     return Object.entries(clients).reduce<UserClients>((missing, [userId, clients]) => {
       const knownUserClients = knownClients[userId] ?? [];
       const missingClients = difference(knownUserClients, clients);
-      return missingClients.length ? {...missing, [userId]: missingClients} : missing;
+      return missingClients.length !== 0 && !Number.isNaN(missingClients.length)
+        ? {...missing, [userId]: missingClients}
+        : missing;
     }, {});
   };
 
   const filterKnownQualifiedClients = (clients: QualifiedUserClients, knownClients: QualifiedUserClients) => {
     return Object.entries(clients).reduce<QualifiedUserClients>((missing, [domain, userClients]) => {
       const missingUserClients = filterKnownClients(userClients, knownClients[domain]);
-      return Object.keys(missingUserClients).length ? {...missing, [domain]: missingUserClients} : missing;
+      return Object.keys(missingUserClients).length !== 0 && !Number.isNaN(Object.keys(missingUserClients).length)
+        ? {...missing, [domain]: missingUserClients}
+        : missing;
     }, {});
   };
 

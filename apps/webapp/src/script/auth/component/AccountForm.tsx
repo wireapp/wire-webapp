@@ -105,7 +105,7 @@ const AccountFormComponent = ({
     const newValidInputs: Record<string, boolean> = {};
     Object.entries(inputs).forEach(([inputKey, currentInput]) => {
       const currentInputNode = currentInput.current;
-      if (currentInputNode) {
+      if (currentInputNode !== null && currentInputNode !== undefined) {
         if (!['password', 'terms', 'confirmPassword'].includes(inputKey)) {
           currentInputNode.value = currentInputNode.value.trim();
         }
@@ -116,7 +116,7 @@ const AccountFormComponent = ({
             currentInputNode.validity,
           );
 
-          if (validationError) {
+          if (validationError !== null && validationError !== undefined) {
             errors.push(validationError);
             if (inputKey === 'password') {
               setHasMultiplePasswordEntries(true);
@@ -255,7 +255,11 @@ const AccountFormComponent = ({
           showTogglePasswordLabel={translate('showTogglePasswordLabel')}
           hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
         />
-        <Text muted css={styles.passwordInfo(!!validationErrors.length)} data-uie-name="element-password-help">
+        <Text
+          muted
+          css={styles.passwordInfo(validationErrors.length !== 0 && !Number.isNaN(validationErrors.length))}
+          data-uie-name="element-password-help"
+        >
           {translate('accountForm.passwordHelp', {
             minPasswordLength: String(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
           })}

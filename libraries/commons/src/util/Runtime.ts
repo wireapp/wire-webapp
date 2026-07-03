@@ -49,14 +49,14 @@ export class Runtime {
   }
 
   public static getOSFamily(): OperatingSystem {
-    const family = Runtime.getOS().family?.toLowerCase() || '';
-    if (family.includes('windows')) {
+    const family = Runtime.getOS().family?.toLowerCase() ?? '';
+    if (family.includes('windows') === true) {
       return OperatingSystem.WINDOWS;
     }
-    if (family.includes('android')) {
+    if (family.includes('android') === true) {
       return OperatingSystem.ANDROID;
     }
-    if (family.includes('ios')) {
+    if (family.includes('ios') === true) {
       return OperatingSystem.IOS;
     }
     if (['os x', 'mac os'].includes(family)) {

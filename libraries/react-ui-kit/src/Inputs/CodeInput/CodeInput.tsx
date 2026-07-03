@@ -170,7 +170,8 @@ export const CodeInput = ({
   }, [values]);
 
   const labelId = React.useId();
-  const getDigitAriaLabel = (value: string) => (value ? `${codePlaceholder}, ${value}` : `${codePlaceholder}`);
+  const getDigitAriaLabel = (value: string) =>
+    value.length > 0 ? `${codePlaceholder}, ${value}` : `${codePlaceholder}`;
 
   return (
     <CodeInputWrapper role="group" aria-labelledby={labelId} style={style}>

@@ -97,13 +97,13 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     : isTeamStateGuestLinkEnabled && conversationHasGuestLinkEnabled;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
 
-  const hasAccessCode: boolean = isGuestEnabled ? !!accessCode : false;
+  const hasAccessCode: boolean = isGuestEnabled ? accessCode.length !== 0 : false;
 
   const guestInfoText = useMemo(() => {
     if (!inTeam) {
       return translate('guestRoomToggleInfoDisabled');
     }
-    if (accessCodeHasPassword) {
+    if (accessCodeHasPassword === true) {
       return isGuestEnabled ? (
         <span>
           <span style={{marginBottom: 8, display: 'block'}}>{translate('guestOptionsInfoTextWithPassword')}</span>
@@ -250,7 +250,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   };
 
   const updateCode = useCallback(async () => {
-    const canUpdateCode = (isGuestRoom || isGuestAndServicesRoom) && !accessCode && isGuestLinkEnabled;
+    const canUpdateCode = (isGuestRoom || isGuestAndServicesRoom) && accessCode.length === 0 && isGuestLinkEnabled;
 
     if (canUpdateCode) {
       setIsRequestOngoing(true);
@@ -295,7 +295,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           toggleId="guests"
         />
         <p className="guest-options__info-head">
-          {hasAccessCode && accessCodeHasPassword ? (
+          {hasAccessCode && accessCodeHasPassword === true ? (
             <span style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
               <Icon.ShieldIcon
                 data-uie-name="generate-password-icon"

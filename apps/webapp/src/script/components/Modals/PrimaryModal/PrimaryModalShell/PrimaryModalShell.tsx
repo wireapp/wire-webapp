@@ -50,18 +50,22 @@ export const PrimaryModalShell = ({
 }: PrimaryModalShellProps) => {
   // Make detached window background inert when modal is shown
   useEffect(() => {
-    if (!container) {
+    if (container === null || container === undefined) {
       return undefined;
     }
 
     // Safety check
     const element = container instanceof HTMLElement ? container : null;
-    if (!element?.querySelector) {
+    if (element?.querySelector === null || element?.querySelector === undefined) {
       return undefined;
     }
 
     const detachedWindowRoot = element.querySelector('#detached-window');
-    if (!detachedWindowRoot || !(detachedWindowRoot instanceof HTMLElement)) {
+    if (
+      detachedWindowRoot === null ||
+      detachedWindowRoot === undefined ||
+      !(detachedWindowRoot instanceof HTMLElement)
+    ) {
       return undefined;
     }
 

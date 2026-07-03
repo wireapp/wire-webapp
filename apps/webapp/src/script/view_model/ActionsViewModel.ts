@@ -457,7 +457,7 @@ export class ActionsViewModel {
     const conversationEntity = await this.conversationRepository.resolve1To1Conversation(userEntity.qualifiedId, {
       mls: {allowUnestablished: false},
     });
-    if (conversationEntity) {
+    if (conversationEntity !== null && conversationEntity !== undefined) {
       return conversationEntity;
     }
     throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.qualifiedId.id}".`);
@@ -477,7 +477,7 @@ export class ActionsViewModel {
       return this.openConversation(conversationEntity);
     }
 
-    if (!serviceEntity.qualifiedId) {
+    if (serviceEntity.qualifiedId === null || serviceEntity.qualifiedId === undefined) {
       throw new Error("Can't create 1on1 conversation for an entity without qualifiedId");
     }
 
@@ -486,7 +486,7 @@ export class ActionsViewModel {
   };
 
   readonly openGroupConversation = async (conversationEntity?: Conversation): Promise<void> => {
-    if (!conversationEntity) {
+    if (conversationEntity === null || conversationEntity === undefined) {
       throw new Error();
     }
     return this.openConversation(conversationEntity);
@@ -577,7 +577,7 @@ export class ActionsViewModel {
                 userEntity.qualifiedId,
               );
               resolve();
-              if (conversationEntity) {
+              if (conversationEntity !== null && conversationEntity !== undefined) {
                 await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
               }
             },

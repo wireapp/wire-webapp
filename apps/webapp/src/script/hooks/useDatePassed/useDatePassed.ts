@@ -33,14 +33,14 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
   const targetTime = useRef<number | null>(null);
 
   const checkTime = useCallback(() => {
-    if (!target || !enabled) {
+    if (target === null || target === undefined || !enabled) {
       return;
     }
 
     const currentTime = Date.now();
     if (currentTime >= target.getTime()) {
       hasPassed.current = true;
-      if (intervalId.current) {
+      if (intervalId.current !== null && intervalId.current !== undefined) {
         clearInterval(intervalId.current);
       }
       callback();
@@ -49,10 +49,10 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
 
   useEffect(() => {
     // Clear interval if disabled or no target
-    if (!enabled || !target) {
+    if (!enabled || target === null || target === undefined) {
       hasPassed.current = false;
       targetTime.current = null;
-      if (intervalId.current) {
+      if (intervalId.current !== null && intervalId.current !== undefined) {
         clearInterval(intervalId.current);
       }
       return undefined;
@@ -65,7 +65,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
       hasPassed.current = false;
       targetTime.current = newTargetTime;
 
-      if (intervalId.current) {
+      if (intervalId.current !== null && intervalId.current !== undefined) {
         clearInterval(intervalId.current);
       }
     }
@@ -80,7 +80,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
     intervalId.current = setInterval(checkTime, TIME_IN_MILLIS.SECOND);
 
     return () => {
-      if (intervalId.current) {
+      if (intervalId.current !== null && intervalId.current !== undefined) {
         clearInterval(intervalId.current);
       }
     };

@@ -148,13 +148,13 @@ export class NotificationAPI {
 
       const {notifications, has_more} = payload;
 
-      if (notifications?.length) {
+      if (notifications?.length !== 0 && !Number.isNaN(notifications?.length)) {
         notificationList = notificationList.concat(notifications);
       }
 
       if (has_more) {
         const lastNotification = notifications[notifications.length - 1];
-        if (lastNotification) {
+        if (lastNotification !== null && lastNotification !== undefined) {
           return getNotificationChunks(notificationList, currentClientId, lastNotification.id);
         }
       }

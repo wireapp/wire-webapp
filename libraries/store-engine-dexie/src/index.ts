@@ -167,7 +167,7 @@ export class IndexedDBEngine implements CRUDEngine {
     primaryKey: PrimaryKey,
   ): Promise<EntityType> {
     const record = await this.db.table<EntityType>(tableName).get(primaryKey as IndexableType);
-    if (record) {
+    if (record !== null && record !== undefined) {
       return record;
     }
     const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;

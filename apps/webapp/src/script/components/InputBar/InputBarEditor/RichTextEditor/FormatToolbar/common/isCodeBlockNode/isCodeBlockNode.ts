@@ -20,7 +20,7 @@
 import {ElementNode, TextNode} from 'lexical';
 
 export const isCodeBlockNode = (node: TextNode | ElementNode | null): boolean => {
-  if (!node) {
+  if (node === null || node === undefined) {
     return false;
   }
 

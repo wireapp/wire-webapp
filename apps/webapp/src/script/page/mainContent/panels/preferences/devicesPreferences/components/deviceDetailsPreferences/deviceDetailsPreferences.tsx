@@ -95,7 +95,11 @@ export const DeviceDetailsPreferences = ({
             />
           </legend>
 
-          <DetailedDevice getDeviceIdentity={getDeviceIdentity} device={device} fingerprint={fingerprint || ''} />
+          <DetailedDevice
+            getDeviceIdentity={getDeviceIdentity}
+            device={device}
+            fingerprint={fingerprint !== null && fingerprint !== undefined && fingerprint.length > 0 ? fingerprint : ''}
+          />
 
           <h3 className="label preferences-label preferences-devices-fingerprint-label">
             {translate('preferencesDeviceDetailsVerificationStatus')}

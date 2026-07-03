@@ -108,11 +108,12 @@ export const PeopleTab = ({
     } else {
       const teamUsers = teamState.teamUsers();
 
-      contacts = unfiltered
-        ? teamUsers
-        : teamUsers.filter(
-            user => conversationState.hasConversationWith(user) || teamRepository.isSelfConnectedTo(user.id),
-          );
+      contacts =
+        unfiltered === true
+          ? teamUsers
+          : teamUsers.filter(
+              user => conversationState.hasConversationWith(user) || teamRepository.isSelfConnectedTo(user.id),
+            );
     }
 
     return contacts.filter(user => user.isAvailable());
@@ -163,7 +164,7 @@ export const PeopleTab = ({
   const debouncedSearch = useDebouncedCallback(async () => {
     setHasFederationError(false);
     const {query} = searchRepository.normalizeQuery(searchQuery);
-    if (!query) {
+    if (query.length === 0) {
       setResults({contacts: getLocalUsers(), others: []});
       onSearchResults(undefined);
       return;
@@ -244,7 +245,11 @@ export const PeopleTab = ({
       {searchQuery.length === 0 && (
         <>
           <ul className="start-ui-list left-list-items">
-            {teamSize === 1 && canInviteTeamMembers && !!manageTeamUrl && (
+            {teamSize === 1 &&
+            canInviteTeamMembers &&
+            manageTeamUrl !== null &&
+            manageTeamUrl !== undefined &&
+            manageTeamUrl.length > 0 ? (
               <li className="left-list-item">
                 <button
                   className="left-list-item-button"
@@ -256,7 +261,7 @@ export const PeopleTab = ({
                   <span className="column-center">{translate('searchMemberInvite')}</span>
                 </button>
               </li>
-            )}
+            ) : null}
           </ul>
           {topPeople.length > 0 && (
             <div className="start-ui-list-top-people" data-uie-name="status-top-people">
@@ -325,7 +330,7 @@ export const PeopleTab = ({
         {results.others.length > 0 && (
           <div className="others">
             <h3 className="start-ui-list-header">
-              {searchOnFederatedDomain()
+              {searchOnFederatedDomain().length > 0
                 ? translate('searchOthersFederation', {domainName: searchOnFederatedDomain()})
                 : translate('searchOthers')}
             </h3>

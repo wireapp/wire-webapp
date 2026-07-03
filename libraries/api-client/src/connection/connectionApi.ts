@@ -95,7 +95,7 @@ export class ConnectionAPI {
 
       const {connections, has_more, paging_state} = data;
 
-      if (connections.length) {
+      if (connections.length !== 0 && !Number.isNaN(connections.length)) {
         allConnections = allConnections.concat(connections);
       }
 

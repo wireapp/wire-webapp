@@ -150,14 +150,14 @@ export class CryptographyMapper {
    * @returns Resolves with the mapped event
    */
   async mapGenericMessage(genericMessage: GenericMessage, event: EncryptedEvent) {
-    if (!genericMessage) {
+    if (genericMessage === null || genericMessage === undefined) {
       throw new CryptographyError(
         CryptographyError.TYPE.NO_GENERIC_MESSAGE,
         CryptographyError.MESSAGE.NO_GENERIC_MESSAGE,
       );
     }
 
-    if (genericMessage.external) {
+    if (genericMessage.external !== null && genericMessage.external !== undefined) {
       genericMessage = await this._unwrapExternal(genericMessage.external as External, event);
     }
 
@@ -271,7 +271,7 @@ export class CryptographyMapper {
       }
 
       case GenericMessageType.MULTIPART: {
-        if (!genericMessage.multipart) {
+        if (genericMessage.multipart === null || genericMessage.multipart === undefined) {
           const logMessage = `Skipped event '${genericMessage.messageId}' of type '${genericMessage.content}', no data found`;
           this.logger.debug(logMessage, {event, generic_message: genericMessage});
           return undefined;
@@ -430,11 +430,11 @@ export class CryptographyMapper {
 
   private _mapAssetMetaData(original: Asset.IOriginal): MappedAssetMetaData | undefined {
     const audioData = original.audio;
-    if (audioData) {
-      const loudnessArray = audioData.normalizedLoudness || new ArrayBuffer(0);
-      const durationInSeconds = audioData.durationInMillis
-        ? Number(audioData.durationInMillis) / TIME_IN_MILLIS.SECOND
-        : 0;
+    if (audioData !== null && audioData !== undefined) {
+      const loudnessArray = audioData.normalizedLoudness ?? new ArrayBuffer(0);
+      const durationInMillis = Number(audioData.durationInMillis);
+      const durationInSeconds =
+        durationInMillis !== 0 && !Number.isNaN(durationInMillis) ? durationInMillis / TIME_IN_MILLIS.SECOND : 0;
 
       return {
         duration: durationInSeconds,
@@ -489,7 +489,7 @@ export class CryptographyMapper {
     return {
       data: {
         message_id: confirmation.firstMessageId,
-        more_message_ids: confirmation.moreMessageIds || [],
+        more_message_ids: confirmation.moreMessageIds ?? [],
         status: (() => {
           switch (confirmation.type) {
             case Confirmation.Type.DELIVERED:
@@ -516,15 +516,15 @@ export class CryptographyMapper {
   }
 
   private _mapEdited(edited: MessageEdit) {
-    if (edited.multipart) {
-      if (!edited.multipart.text) {
+    if (edited.multipart !== null && edited.multipart !== undefined) {
+      if (edited.multipart.text === null || edited.multipart.text === undefined) {
         const message = 'Edited multipart message is missing required text content.';
         throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
       }
       const mappedMultipart = this._mapMultipart(edited.multipart.text as Text, edited.multipart.attachments);
       mappedMultipart.data.replacing_message_id = edited.replacingMessageId;
       return mappedMultipart;
-    } else if (edited.composite) {
+    } else if (edited.composite !== null && edited.composite !== undefined) {
       const mappedComposite = this._mapComposite(edited.composite as Composite);
       mappedComposite.data.replacing_message_id = edited.replacingMessageId;
       return mappedComposite;
@@ -564,7 +564,15 @@ export class CryptographyMapper {
     try {
       // Only OTR proteus messages can be sent as external, MLS message should throw an error at this point
       const eventData = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data : undefined;
-      if (!eventData?.data || !otrKey || !sha256) {
+      if (
+        eventData?.data === null ||
+        eventData?.data === undefined ||
+        eventData?.data.length === 0 ||
+        otrKey === null ||
+        otrKey === undefined ||
+        sha256 === null ||
+        sha256 === undefined
+      ) {
         throw new Error('Not all expected properties defined');
       }
       const cipherTextArray = base64ToArray(eventData.data);
@@ -683,7 +691,11 @@ export class CryptographyMapper {
 
     const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
 
-    if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
+    if (
+      protoMentions !== null &&
+      protoMentions !== undefined &&
+      protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE
+    ) {
       this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`);
       protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
@@ -702,7 +714,7 @@ export class CryptographyMapper {
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
 
-    if (protoQuote) {
+    if (protoQuote !== null && protoQuote !== undefined) {
       const quote = arrayToBase64(Quote.encode(protoQuote).finish());
       mappedText.data.quote = quote;
     }

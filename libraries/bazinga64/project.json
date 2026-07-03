@@ -61,7 +61,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=1289 --cache --cache-location node_modules/.cache/eslint/bazinga64 --ext .js,.ts,.tsx --ignore-pattern '**/test/**' {projectRoot}/src"
+        "command": "eslint --config eslint.config.ts --max-warnings=15 --cache --cache-location node_modules/.cache/eslint/bazinga64 --ext .js,.ts,.tsx --ignore-pattern '**/test/**' {projectRoot}/src"
       }
     },
     "type-check": {

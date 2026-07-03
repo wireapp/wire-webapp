@@ -55,7 +55,9 @@ export class Text extends Asset {
   // Process text before rendering it
   render(selfId: QualifiedId, themeColor?: string): string {
     const message = renderMessage(this.text, selfId, this.mentions());
-    return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
+    return this.previews().length === 0 || Number.isNaN(this.previews().length)
+      ? mediaParser.renderMediaEmbeds(message, themeColor)
+      : message;
   }
 
   isUserMentioned(userId: QualifiedId): boolean {

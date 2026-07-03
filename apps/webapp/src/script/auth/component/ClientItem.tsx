@@ -131,7 +131,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   }, [executeAnimateIn, executeAnimateOut, isSelected, selected]);
 
   const formatDate = (dateString: string): string =>
-    dateString
+    dateString.length > 0
       ? new Date(dateString).toLocaleString('en-US', {
           day: 'numeric',
           hour: 'numeric',
@@ -187,7 +187,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     event.preventDefault();
     let localValidationError = null;
 
-    if (passwordInput.current) {
+    if (passwordInput.current !== null && passwordInput.current !== undefined) {
       if (!passwordInput.current.checkValidity()) {
         localValidationError = ValidationError.handleValidationState(
           passwordInput.current.name,
@@ -344,9 +344,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           </ContainerXS>
         )}
       </ContainerXS>
-      {validationError && selected ? (
+      {validationError !== null && validationError !== undefined && selected ? (
         <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
-      ) : clientError && selected ? (
+      ) : clientError !== null && clientError !== undefined && selected ? (
         <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}} data-uie-name="error-message">
           {parseError(clientError)}
         </div>

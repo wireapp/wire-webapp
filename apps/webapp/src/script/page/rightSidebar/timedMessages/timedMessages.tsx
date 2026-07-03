@@ -76,7 +76,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
       value: time,
     }));
 
-    if (!!messageTimer && !EphemeralTimings.VALUES.includes(messageTimer)) {
+    if (messageTimer !== 0 && !Number.isNaN(messageTimer) && !EphemeralTimings.VALUES.includes(messageTimer)) {
       mappedTimes.push({
         isCustom: true,
         text: formatDuration(messageTimer, translate).text,

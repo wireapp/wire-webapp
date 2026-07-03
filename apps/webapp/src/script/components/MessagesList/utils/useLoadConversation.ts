@@ -46,7 +46,7 @@ export const useLoadConversation = ({
 
       const initialMessage = conversationToLoad.initialMessage();
 
-      return initialMessage
+      return initialMessage !== null && initialMessage !== undefined
         ? await conversationRepository.getMessagesWithOffset(conversationToLoad, initialMessage)
         : await conversationRepository.getPrecedingMessages(conversationToLoad);
     } finally {

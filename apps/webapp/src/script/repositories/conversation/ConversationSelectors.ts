@@ -35,15 +35,22 @@ export type MLSConversation = Conversation & {groupId: string; protocol: CONVERS
 export type MLSCapableConversation = MixedConversation | MLSConversation;
 
 export function isProteusConversation(conversation: Conversation): conversation is ProteusConversation {
-  return !conversation.groupId && conversation.protocol === CONVERSATION_PROTOCOL.PROTEUS;
+  const hasNoGroupId =
+    conversation.groupId === null || conversation.groupId === undefined || conversation.groupId.length === 0;
+
+  return hasNoGroupId && conversation.protocol === CONVERSATION_PROTOCOL.PROTEUS;
+}
+
+function hasGroupId(conversation: Conversation): conversation is Conversation & {groupId: string} {
+  return conversation.groupId !== null && conversation.groupId !== undefined && conversation.groupId.length > 0;
 }
 
 export function isMixedConversation(conversation: Conversation): conversation is MixedConversation {
-  return !!conversation.groupId && conversation.protocol === CONVERSATION_PROTOCOL.MIXED;
+  return hasGroupId(conversation) && conversation.protocol === CONVERSATION_PROTOCOL.MIXED;
 }
 
 export function isMLSConversation(conversation: Conversation): conversation is MLSConversation {
-  return !!conversation.groupId && conversation.protocol === CONVERSATION_PROTOCOL.MLS;
+  return hasGroupId(conversation) && conversation.protocol === CONVERSATION_PROTOCOL.MLS;
 }
 
 export function isMLSCapableConversation(conversation: Conversation): conversation is MLSCapableConversation {
@@ -68,14 +75,15 @@ export function isProteusTeam1to1Conversation({
   inTeam,
   otherMembersLength,
 }: {
-  name: string | undefined;
+  name: string | null | undefined;
   type: CONVERSATION_TYPE;
   inTeam: boolean;
   otherMembersLength: number;
 }): boolean {
   const isGroupConversation = type === CONVERSATION_TYPE.REGULAR;
   const hasOneParticipant = otherMembersLength === 1;
-  return isGroupConversation && hasOneParticipant && inTeam && !name;
+  const hasNoName = name === null || name === undefined || name.length === 0;
+  return isGroupConversation && hasOneParticipant && inTeam && hasNoName;
 }
 
 export function isBackendProteus1to1Conversation(conversation: BackendConversation): boolean {
@@ -88,7 +96,7 @@ export function isBackendProteus1to1Conversation(conversation: BackendConversati
     isProteusTeam1to1Conversation({
       name,
       type,
-      inTeam: !!team,
+      inTeam: team !== null && team !== undefined && team.length > 0,
       otherMembersLength: members.others.length,
     }) || isProteus1to1
   );
@@ -119,7 +127,7 @@ const is1to1ConversationWithUser =
     }
 
     const connection = conversation.connection();
-    if (connection?.userId) {
+    if (connection?.userId !== null && connection?.userId !== undefined) {
       return matchQualifiedIds(connection.userId, userId);
     }
 
@@ -132,7 +140,10 @@ const is1to1ConversationWithUser =
 
     const conversationMembersIds = conversation.participating_user_ids();
     const otherUserQualifiedId = conversationMembersIds.length === 1 ? conversationMembersIds[0] : null;
-    const doesUserIdMatch = !!otherUserQualifiedId && matchQualifiedIds(otherUserQualifiedId, userId);
+    const doesUserIdMatch =
+      otherUserQualifiedId !== null &&
+      otherUserQualifiedId !== undefined &&
+      matchQualifiedIds(otherUserQualifiedId, userId);
 
     return doesUserIdMatch;
   };
@@ -156,5 +167,8 @@ export const isReadableConversation = (conversation: Conversation): boolean => {
 
   const connection = conversation.connection();
 
-  return !(isSelfConversation(conversation) || (connection && states_to_filter.includes(connection.status())));
+  return !(
+    isSelfConversation(conversation) ||
+    (connection !== null && connection !== undefined && states_to_filter.includes(connection.status()))
+  );
 };

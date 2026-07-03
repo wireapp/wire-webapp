@@ -115,7 +115,7 @@ export const RedirectRoutes = (config: ServerConfig) => [
       .join('&');
     return res.redirect(
       HTTP_STATUS.MOVED_TEMPORARILY,
-      `/?${queryString ? queryString : 'no_query=true'}#/e2ei-redirect`,
+      `/?${queryString.length > 0 ? queryString : 'no_query=true'}#/e2ei-redirect`,
     );
   }),
 ];

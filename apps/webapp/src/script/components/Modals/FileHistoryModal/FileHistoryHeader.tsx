@@ -42,7 +42,7 @@ export const FileHistoryHeader = ({file}: {file?: FileInfo}) => {
         <h2 css={fileHistoryHeaderTitleCss}>{translate('cells.versionHistory.title')}</h2>
 
         <div css={fileHeaderFileInfoCss}>
-          {file ? (
+          {file !== null && file !== undefined ? (
             <>
               <FileTypeIcon extension={file.extension} />
               {file.name}

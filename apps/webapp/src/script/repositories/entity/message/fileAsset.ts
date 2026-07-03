@@ -66,7 +66,7 @@ export class FileAsset extends Asset {
     this.preview_resource = ko.observable<AssetRemoteData>() as ko.Observable<AssetRemoteData>;
 
     this.downloadProgress = ko.pureComputed(() => {
-      if (this.original_resource()) {
+      if (this.original_resource() !== null && this.original_resource() !== undefined) {
         return this.original_resource().downloadProgress;
       }
 
@@ -74,7 +74,7 @@ export class FileAsset extends Asset {
     });
 
     this.cancelDownload = () => {
-      if (this.original_resource()) {
+      if (this.original_resource() !== null && this.original_resource() !== undefined) {
         this.original_resource().cancelDownload();
       }
     };

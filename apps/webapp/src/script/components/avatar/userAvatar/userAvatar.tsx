@@ -103,7 +103,7 @@ export const UserAvatar = ({
     'initials',
   ]);
 
-  const avatarImgAlt = avatarAlt ? avatarAlt : `${translate('userProfileImageAlt')} ${name}`;
+  const avatarImgAlt = avatarAlt.length > 0 ? avatarAlt : `${translate('userProfileImageAlt')} ${name}`;
 
   const hasAvailabilityState = typeof availability === 'number' && availability !== AvailabilityType.Type.NONE;
 
@@ -122,7 +122,7 @@ export const UserAvatar = ({
     >
       <AvatarBackground backgroundColor={backgroundColor} />
 
-      {initials && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
+      {initials.length > 0 && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
       {!hideProfilePicture && (
         <AvatarImage
           avatarSize={avatarSize}

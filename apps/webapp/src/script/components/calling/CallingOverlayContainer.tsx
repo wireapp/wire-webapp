@@ -103,7 +103,7 @@ const CallingContainer = ({
 
   const setActiveCallViewTab = (tab: CallViewTab) => {
     callState.activeCallViewTab(tab);
-    if (tab === CallViewTab.ALL && joinedCall) {
+    if (tab === CallViewTab.ALL && joinedCall !== null && joinedCall !== undefined) {
       callingRepository.requestCurrentPageVideoStreams(joinedCall);
     }
   };
@@ -151,7 +151,13 @@ const CallingContainer = ({
 
   const conversation = joinedCall?.conversation;
 
-  if (!joinedCall || !conversation || conversation.isSelfUserRemoved()) {
+  if (
+    joinedCall === null ||
+    joinedCall === undefined ||
+    conversation === null ||
+    conversation === undefined ||
+    conversation.isSelfUserRemoved()
+  ) {
     return null;
   }
 
@@ -164,7 +170,7 @@ const CallingContainer = ({
 
   return (
     <Fragment>
-      {isFullScreenOrDetached && !!videoGrid?.grid.length && (
+      {isFullScreenOrDetached && (videoGrid?.grid.length ?? 0) !== 0 ? (
         <FullscreenVideoCall
           key={conversation.id}
           videoGrid={videoGrid}
@@ -194,7 +200,7 @@ const CallingContainer = ({
           leave={leave}
           changePage={changePage}
         />
-      )}
+      ) : null}
 
       {isScreenshareActive && <ChooseScreen choose={callingRepository.onChooseScreen} />}
     </Fragment>

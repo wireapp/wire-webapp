@@ -37,7 +37,7 @@ export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploa
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {files} = event.target;
 
-    if (!files) {
+    if (files === null || files === undefined) {
       return;
     }
 

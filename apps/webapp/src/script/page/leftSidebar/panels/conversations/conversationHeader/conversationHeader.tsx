@@ -118,7 +118,9 @@ export const ConversationHeaderComponent = ({
     <>
       <div css={header}>
         <h2 css={label} data-uie-name="conversation-list-header-title">
-          {isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab]}
+          {isFolderView && currentFolder !== null && currentFolder !== undefined
+            ? currentFolder.name
+            : conversationsHeaderTitle[currentTab]}
         </h2>
 
         {currentTab !== SidebarTabs.ARCHIVES && (canCreateGroupConversation() || canExternalUserCreateChannel) && (
@@ -142,7 +144,7 @@ export const ConversationHeaderComponent = ({
           onChange={event => setSearchValue(event.currentTarget.value)}
           startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
           endContent={
-            searchValue && (
+            searchValue.length > 0 && (
               <CircleCloseIcon className="cursor-pointer" onClick={() => setSearchValue('')} css={closeIconStyles} />
             )
           }

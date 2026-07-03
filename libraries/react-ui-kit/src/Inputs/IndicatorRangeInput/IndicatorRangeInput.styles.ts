@@ -44,7 +44,7 @@ export const rangeStyles = (
     height: '8px',
     backgroundImage: `linear-gradient(${theme.general.primaryColor}, ${theme.general.primaryColor})`,
     backgroundColor: theme.IndicatorRangeInput.trackBg,
-    backgroundSize: backgroundSize || '0% 100%',
+    backgroundSize: backgroundSize.length > 0 ? backgroundSize : '0% 100%',
     backgroundRepeat: 'no-repeat',
     display: 'flex',
     alignItems: 'center',

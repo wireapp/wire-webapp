@@ -62,7 +62,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=1289 --cache --cache-location node_modules/.cache/eslint/telemetry --ext .js,.ts,.tsx {projectRoot}/src"
+        "command": "eslint --config eslint.config.ts --max-warnings=0 --cache --cache-location node_modules/.cache/eslint/telemetry --ext .js,.ts,.tsx {projectRoot}/src"
       }
     }
   },

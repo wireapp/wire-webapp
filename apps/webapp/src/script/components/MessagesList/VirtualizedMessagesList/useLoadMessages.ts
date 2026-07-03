@@ -70,7 +70,7 @@ export const useLoadMessages = (
   const loadFollowingMessages = useCallback(async () => {
     const lastMessage = conversation.getNewestMessage();
 
-    if (lastMessage) {
+    if (lastMessage !== null && lastMessage !== undefined) {
       if (!isLastReceivedMessage(lastMessage, conversation)) {
         virtualizer.measure();
         setIsLoadingMessages(true);

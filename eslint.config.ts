@@ -205,7 +205,20 @@ const config: Linter.Config[] = [
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/strict-boolean-expressions': 'error',
+      '@typescript-eslint/strict-boolean-expressions': [
+        'error',
+        {
+          allowString: false,
+          allowNumber: false,
+          allowNullableObject: false,
+          allowNullableBoolean: false,
+          allowNullableString: false,
+          allowNullableNumber: false,
+          allowNullableEnum: false,
+          allowAny: false,
+          allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: false,
+        },
+      ],
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -250,6 +263,7 @@ const config: Linter.Config[] = [
     rules: {
       // Disable TS-only rules on JS mocks/shims
       '@typescript-eslint/require-array-sort-compare': 'off',
+      '@typescript-eslint/strict-boolean-expressions': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'unicorn/no-array-reverse': 'error',
       'unicorn/no-array-sort': 'error',
@@ -281,7 +295,6 @@ const config: Linter.Config[] = [
       },
     },
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': 'off',
       // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
       'import/no-unresolved': ['error', {caseSensitive: false}],
       // Pin alias import order so Linux CI and macOS agree on webapp path aliases.
@@ -292,12 +305,6 @@ const config: Linter.Config[] = [
     files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
     rules: {
       'import/no-default-export': 'off',
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/components/**/*.{ts,tsx}'],
-    rules: {
-      '@typescript-eslint/strict-boolean-expressions': 'error',
     },
   },
   {

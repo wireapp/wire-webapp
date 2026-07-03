@@ -22,11 +22,11 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 export const generateConversationUrl = ({id, domain, filePath}: QualifiedId & {filePath?: string}): string => {
   let baseUrl = `/conversation/${id}`;
 
-  if (domain) {
+  if (domain.length > 0) {
     baseUrl += `/${domain}`;
   }
 
-  if (filePath) {
+  if (filePath !== null && filePath !== undefined && filePath.length > 0) {
     baseUrl += `/${filePath}`;
   }
 

@@ -50,7 +50,7 @@ export class ReceiptsMiddleware implements EventMiddleware {
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
-        const qualifiedConversation = event.qualified_conversation || {domain: '', id: event.conversation};
+        const qualifiedConversation = event.qualified_conversation ?? {domain: '', id: event.conversation};
         const conversation = await this.conversationRepository.getConversationById(qualifiedConversation);
         if (conversation?.isGroupOrChannel()) {
           // We only override the value of expects_read_confirmation for group conversations (one to one conversation use the value set by the sender)
@@ -82,7 +82,12 @@ export class ReceiptsMiddleware implements EventMiddleware {
     confirmationEvent: ConfirmationEvent,
   ): Promise<EventRecord | void> {
     const status = confirmationEvent.data.status;
-    const currentReceipts = ('read_receipts' in originalEvent && originalEvent.read_receipts) || [];
+    const currentReceipts =
+      'read_receipts' in originalEvent &&
+      originalEvent.read_receipts !== null &&
+      originalEvent.read_receipts !== undefined
+        ? originalEvent.read_receipts
+        : [];
 
     // I shouldn't receive this read receipt
     if (!this.isMyMessage(originalEvent)) {
@@ -91,7 +96,7 @@ export class ReceiptsMiddleware implements EventMiddleware {
 
     const hasReadMessage =
       status === StatusType.SEEN && currentReceipts.some(({userId}) => confirmationEvent.from === userId);
-    if (hasReadMessage) {
+    if (hasReadMessage === true) {
       // if the user is already among the readers of the message, nothing more to do
       return Promise.resolve();
     }

@@ -44,8 +44,8 @@ const providePermanentEngine = async (
 
   // In case the encryption key is empty, we just give an empty config to the encryption middleware.
   // We still need to set it up, even if encryption at rest is disabled, as we need to upgrade the DB version for the middleware to install its config table
-  const encryptionConfig = key ? {events: NON_INDEXED_FIELDS} : {};
-  const encryptionKey = key ? key : new Uint8Array(32).fill(0);
+  const encryptionConfig = key !== null && key !== undefined ? {events: NON_INDEXED_FIELDS} : {};
+  const encryptionKey = key !== null && key !== undefined ? key : new Uint8Array(32).fill(0);
   applyEncryptionMiddleware(db, encryptionKey, encryptionConfig, async () =>
     logger.info('DB encyption config has changed'),
   );

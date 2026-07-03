@@ -110,7 +110,7 @@ export class ClientService {
   async loadClientFromDb(primaryKey: string): Promise<ClientRecord | string> {
     let clientRecord;
 
-    if (this.storageService.db) {
+    if (this.storageService.db !== null && this.storageService.db !== undefined) {
       clientRecord = await this.storageService.db
         .table(this.CLIENT_STORE_NAME)
         .where('meta.primary_key')
@@ -135,7 +135,7 @@ export class ClientService {
    * @returns Resolves with the client payload stored in database
    */
   saveClientInDb(primaryKey: string, clientPayload: ClientRecord): Promise<ClientRecord> {
-    if (!clientPayload.meta) {
+    if (clientPayload.meta === null || clientPayload.meta === undefined) {
       clientPayload.meta = {};
     }
 

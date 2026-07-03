@@ -31,16 +31,18 @@ interface PanelActionsProps {
 }
 
 export const PanelActions = ({items}: PanelActionsProps) =>
-  items.map(({click, identifier, Icon, label}) => (
-    <li key={identifier}>
-      <button className="panel__action-item" onClick={click} data-uie-name={identifier} type="button">
-        <span className="panel__action-item__icon">
-          <Icon />
-        </span>
+  items
+    .filter((item): item is MenuItem => item !== null && item !== undefined)
+    .map(({click, identifier, Icon, label}) => (
+      <li key={identifier}>
+        <button className="panel__action-item" onClick={click} data-uie-name={identifier} type="button">
+          <span className="panel__action-item__icon">
+            <Icon />
+          </span>
 
-        <span data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
-          {label}
-        </span>
-      </button>
-    </li>
-  ));
+          <span data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
+            {label}
+          </span>
+        </button>
+      </li>
+    ));

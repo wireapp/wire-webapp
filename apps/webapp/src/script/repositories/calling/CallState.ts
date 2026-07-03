@@ -82,7 +82,12 @@ export class CallState {
 
   constructor() {
     this.joinedCall = ko.pureComputed(() => this.calls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
-    this.activeCalls = ko.pureComputed(() => this.calls().filter(call => !call.reason()));
+    this.activeCalls = ko.pureComputed(() =>
+      this.calls().filter(
+        call =>
+          call.reason() === null || call.reason() === undefined || call.reason() === 0 || Number.isNaN(call.reason()),
+      ),
+    );
     this.joinableCalls = ko.pureComputed(() =>
       this.calls().filter(
         call => call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE,
@@ -99,7 +104,7 @@ export class CallState {
 
     this.isMaximisedViewActive = ko.pureComputed(() => {
       const call = this.joinedCall();
-      if (!call) {
+      if (call === null || call === undefined) {
         return false;
       }
       return call.maximizedParticipant() !== null;

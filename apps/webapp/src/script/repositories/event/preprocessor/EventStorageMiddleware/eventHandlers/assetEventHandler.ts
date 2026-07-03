@@ -29,7 +29,7 @@ import {CONVERSATION, ClientEvent} from '../../../Client';
 import {DBOperation, EventHandler, HandledEvents} from '../types';
 
 function validateAssetEvent(originalEvent: HandledEvents | undefined): originalEvent is StoredEvent<AssetAddEvent> {
-  if (!originalEvent) {
+  if (originalEvent === null || originalEvent === undefined) {
     return false;
   }
 
@@ -50,8 +50,14 @@ function computeEventUpdates(
   const ASSET_PREVIEW = 'preview';
   // similarly, no status is sent by the client when we retry sending a failed message
   const RETRY_EVENT = 'retry';
-  const isPreviewEvent = !newEventData.status && !!newEventData.preview_key;
-  const isRetryEvent = !!newEventData.content_length;
+  const hasPreviewKey =
+    newEventData.preview_key !== null && newEventData.preview_key !== undefined && newEventData.preview_key.length > 0;
+  const isPreviewEvent = (newEventData.status === null || newEventData.status === undefined) && hasPreviewKey;
+  const isRetryEvent =
+    newEventData.content_length !== null &&
+    newEventData.content_length !== undefined &&
+    newEventData.content_length !== 0 &&
+    !Number.isNaN(newEventData.content_length);
   const handledEvent = isRetryEvent ? RETRY_EVENT : newEventData.status;
   const previewStatus = isPreviewEvent ? ASSET_PREVIEW : handledEvent;
 

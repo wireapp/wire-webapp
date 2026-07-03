@@ -61,15 +61,19 @@ export class ServiceMiddleware implements EventMiddleware {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, qualified_conversation, data: eventData} = event;
-    const qualifiedConversation = qualified_conversation || {domain: '', id: conversationId};
+    const qualifiedConversation = qualified_conversation ?? {
+      domain: '',
+      id: conversationId,
+    };
     const userQualifiedIds = this.extractQualifiedUserIds(eventData);
     const containsSelfUser = userQualifiedIds.find((user: QualifiedId) => matchQualifiedIds(user, this.selfUser));
 
-    const userIds: QualifiedId[] = containsSelfUser
-      ? await this.conversationRepository
-          .getConversationById(qualifiedConversation)
-          .then(conversationEntity => conversationEntity.participating_user_ids())
-      : userQualifiedIds;
+    const userIds: QualifiedId[] =
+      containsSelfUser !== null && containsSelfUser !== undefined
+        ? await this.conversationRepository
+            .getConversationById(qualifiedConversation)
+            .then(conversationEntity => conversationEntity.participating_user_ids())
+        : userQualifiedIds;
 
     const hasService = await this.containsService(userIds);
     return hasService ? this.decorateWithHasServiceFlag(event) : event;
@@ -77,9 +81,10 @@ export class ServiceMiddleware implements EventMiddleware {
 
   private extractQualifiedUserIds(data: MemberJoinEvent['data'] | ConversationMemberJoinEvent['data']): QualifiedId[] {
     const users = 'users' in data ? data.users : undefined;
-    const userIds = users
-      ? users.map(user => user.qualified_id || {domain: '', id: user.id})
-      : data.user_ids.map(id => ({domain: '', id}));
+    const userIds =
+      users !== null && users !== undefined
+        ? users.map(user => user.qualified_id ?? {domain: '', id: user.id})
+        : data.user_ids.map(id => ({domain: '', id}));
     return userIds;
   }
 

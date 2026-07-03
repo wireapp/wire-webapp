@@ -48,7 +48,7 @@ export const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onC
       <div className="controls-left"></div>
 
       <div className="controls-center">
-        {pastedFilePreviewUrl ? (
+        {pastedFilePreviewUrl.length > 0 ? (
           <img
             className="conversation-input-bar-paste-image conversation-input-bar-paste-icon"
             src={pastedFilePreviewUrl}

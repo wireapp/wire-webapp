@@ -117,7 +117,7 @@ const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
   const renderMetrics = useBackgroundEffectsStore(state => state.metrics);
   const model = useBackgroundEffectsStore(state => state.model);
 
-  const metricRows = renderMetrics ? getMetricRows(renderMetrics) : [];
+  const metricRows = renderMetrics !== null && renderMetrics !== undefined ? getMetricRows(renderMetrics) : [];
 
   const capabilityRows = getCapabilityRows(capabilityInfo);
 
@@ -282,7 +282,9 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
             </Button>
           </div>
 
-          {capabilityInfo && <MetricsDisplay capabilityInfo={capabilityInfo} />}
+          {capabilityInfo !== null && capabilityInfo !== undefined && (
+            <MetricsDisplay capabilityInfo={capabilityInfo} />
+          )}
         </div>
       )}
     </div>

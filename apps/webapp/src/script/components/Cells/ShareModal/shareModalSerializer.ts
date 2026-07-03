@@ -46,10 +46,11 @@ export const serializeShareModalInput = ({
   isEditingPassword,
 }: ShareModalInput): ShareModalSerializedInput => {
   const trimmedPassword = passwordValue.trim();
-  const hasValidExpiration = !expirationEnabled || (expirationDateTime && !expirationInvalid);
+  const hasValidExpiration =
+    !expirationEnabled || (expirationDateTime !== null && expirationDateTime !== undefined && !expirationInvalid);
 
   const accessEnd = expirationEnabled
-    ? expirationDateTime && !expirationInvalid
+    ? expirationDateTime !== null && expirationDateTime !== undefined && !expirationInvalid
       ? Math.floor(expirationDateTime.getTime() / 1000).toString()
       : undefined
     : null;

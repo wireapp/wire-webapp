@@ -159,7 +159,8 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       : translate('conversationDetailsOff');
     const isChannelPublic = activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK);
 
-    const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+    const isCellsConversation =
+      cellsState !== null && cellsState !== undefined && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
 
     const notificationStatusText = getNotificationText(notificationState, translate);
     function getTimedMessagesText(): string {
@@ -169,7 +170,13 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       if (isSelfDeletingMessagesEnforced) {
         return formatDuration(getEnforcedSelfDeletingMessagesTimeout, translate).text;
       }
-      if (hasTimer && globalMessageTimer) {
+      if (
+        hasTimer &&
+        globalMessageTimer !== null &&
+        globalMessageTimer !== undefined &&
+        globalMessageTimer !== 0 &&
+        !Number.isNaN(globalMessageTimer)
+      ) {
         return formatDuration(globalMessageTimer, translate).text;
       }
       return translate('ephemeralUnitsNone');
@@ -236,7 +243,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
       const user = participatingUserEts.find(participant => participant.id === entity.id);
 
-      if (user) {
+      if (user !== null && user !== undefined) {
         const serviceEntity = integrationRepository.mapServiceFromUser(user);
         togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
       }
@@ -255,17 +262,17 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     }, [activeConversation, conversationRepository]);
 
     useEffect(() => {
-      if (team.id && isSingleUserMode) {
+      if (team.id !== null && team.id !== undefined && team.id.length > 0 && isSingleUserMode) {
         void teamRepository.updateTeamMembersByIds(team.id, [firstParticipant!.id], true);
       }
     }, [firstParticipant, isSingleUserMode, team, teamRepository]);
 
     useEffect(() => {
       const getService = async () => {
-        if (firstParticipant) {
+        if (firstParticipant !== null && firstParticipant !== undefined) {
           const serviceEntity = await integrationRepository.getServiceFromUser(firstParticipant);
 
-          if (serviceEntity) {
+          if (serviceEntity !== null && serviceEntity !== undefined) {
             setSelectedService(serviceEntity);
             await integrationRepository.addProviderNameToParticipant(serviceEntity);
           }
@@ -294,9 +301,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         />
 
         <FadingScrollbar className="panel__content">
-          {isSingleUserMode && isServiceMode && selectedService && <ServiceDetails service={selectedService} />}
+          {isSingleUserMode && isServiceMode && selectedService !== null && selectedService !== undefined && (
+            <ServiceDetails service={selectedService} />
+          )}
 
-          {isSingleUserMode && !isServiceMode && firstParticipant && (
+          {isSingleUserMode && !isServiceMode && firstParticipant !== null && firstParticipant !== undefined && (
             <>
               <UserDetails
                 groupId={activeConversation.groupId}
@@ -351,19 +360,21 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 </div>
               )}
 
-              {isGroupOrChannel && (!!userParticipants.length || !!serviceParticipants.length) && (
-                <ConversationDetailsParticipants
-                  activeConversation={activeConversation}
-                  allUsersCount={allUsersCount}
-                  conversationRepository={conversationRepository}
-                  selfUser={selfUser}
-                  serviceParticipants={serviceParticipants}
-                  showAllParticipants={showAllParticipants}
-                  showService={showService}
-                  showUser={showUser}
-                  userParticipants={userParticipants}
-                />
-              )}
+              {isGroupOrChannel &&
+                ((userParticipants.length !== 0 && !Number.isNaN(userParticipants.length)) ||
+                  (serviceParticipants.length !== 0 && !Number.isNaN(serviceParticipants.length))) && (
+                  <ConversationDetailsParticipants
+                    activeConversation={activeConversation}
+                    allUsersCount={allUsersCount}
+                    conversationRepository={conversationRepository}
+                    selfUser={selfUser}
+                    serviceParticipants={serviceParticipants}
+                    showAllParticipants={showAllParticipants}
+                    showService={showService}
+                    showUser={showUser}
+                    userParticipants={userParticipants}
+                  />
+                )}
             </>
           )}
 

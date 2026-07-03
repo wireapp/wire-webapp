@@ -50,7 +50,7 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
   }, [svgRef]);
 
   const onTimeUpdate = useCallback(() => {
-    if (!audioElement?.duration) {
+    if (audioElement?.duration === 0 || Number.isNaN(audioElement?.duration)) {
       return;
     }
 
@@ -66,7 +66,12 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
 
   const onLevelClick = useCallback(
     (event: MouseEvent<SVGSVGElement>) => {
-      if (!svgRef.current || !audioElement?.duration) {
+      if (
+        svgRef.current === null ||
+        svgRef.current === undefined ||
+        audioElement?.duration === 0 ||
+        Number.isNaN(audioElement?.duration)
+      ) {
         return;
       }
 
@@ -81,7 +86,7 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
   );
 
   const path = useMemo(() => {
-    if (!svgWidth) {
+    if (svgWidth === 0 || Number.isNaN(svgWidth)) {
       return '';
     }
 
@@ -106,7 +111,7 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
 
   useEffect(() => {
     const assetLoudness = asset.meta?.loudness;
-    if (!assetLoudness) {
+    if (assetLoudness === null || assetLoudness === undefined) {
       return;
     }
 

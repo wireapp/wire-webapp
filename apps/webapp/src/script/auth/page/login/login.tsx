@@ -191,8 +191,10 @@ const LoginComponent = ({
   }, [defaultSSOCode, embedded, navigate]);
 
   useEffect(() => {
-    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
-    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
+    const conversationCodeParameter = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
+    const conversationKeyParameter = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
+    const queryConversationCode = conversationCodeParameter.length > 0 ? conversationCodeParameter : null;
+    const queryConversationKey = conversationKeyParameter.length > 0 ? conversationKeyParameter : null;
 
     const keyAndCodeExistent = is.nonEmptyString(queryConversationKey) && is.nonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
@@ -258,7 +260,7 @@ const LoginComponent = ({
 
     try {
       const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-      if (validationErrors.length) {
+      if (validationErrors.length !== 0 && !Number.isNaN(validationErrors.length)) {
         throw validationErrors[0];
       }
 
@@ -448,7 +450,7 @@ const LoginComponent = ({
                 centerText
                 style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '16px'}}
               >
-                {twoFactorLoginData ? (
+                {twoFactorLoginData !== null && twoFactorLoginData !== undefined ? (
                   <div>
                     <Text
                       fontSize="1.5rem"

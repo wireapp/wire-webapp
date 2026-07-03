@@ -22,25 +22,38 @@ import {Config} from './Config';
 
 const {URL, TERMS_OF_USE_URL_DE, PRIVACY_POLICY_URL_DE} = Config.getConfig();
 
-const isProductionWebsite = URL.WEBSITE_BASE && URL.WEBSITE_BASE === 'https://wire.com';
+const websiteBaseUrl = URL.WEBSITE_BASE;
+const teamsBaseUrl = URL.TEAMS_BASE;
+const accountBaseUrl = URL.ACCOUNT_BASE;
+
+const isProductionWebsite =
+  websiteBaseUrl !== null && websiteBaseUrl !== undefined && websiteBaseUrl === 'https://wire.com';
 
 const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | undefined => {
-  const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
-  const teamSettingsUrl = `${URL.TEAMS_BASE}${path}${query}`;
-  return URL.TEAMS_BASE ? teamSettingsUrl : undefined;
+  const query =
+    utmSource !== null && utmSource !== undefined && utmSource.length > 0
+      ? `?utm_source=${utmSource}&utm_term=desktop`
+      : '';
+  const teamSettingsUrl = `${teamsBaseUrl}${path}${query}`;
+  return teamsBaseUrl !== null && teamsBaseUrl !== undefined && teamsBaseUrl.length > 0 ? teamSettingsUrl : undefined;
 };
 
 const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | undefined => {
-  if (URL.WEBSITE_BASE) {
-    const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
-    const websiteUrl = `${URL.WEBSITE_BASE}${path}${query}`;
+  if (websiteBaseUrl !== null && websiteBaseUrl !== undefined && websiteBaseUrl.length > 0) {
+    const query =
+      pkCampaign !== null && pkCampaign !== undefined && pkCampaign.length > 0
+        ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop`
+        : '';
+    const websiteUrl = `${websiteBaseUrl}${path}${query}`;
     return addLocaleToUrl(websiteUrl);
   }
   return undefined;
 };
 
 const getAccountPagesUrl = (path: string = ''): string | undefined => {
-  return URL.ACCOUNT_BASE ? `${URL.ACCOUNT_BASE}${path}` : undefined;
+  return accountBaseUrl !== null && accountBaseUrl !== undefined && accountBaseUrl.length > 0
+    ? `${accountBaseUrl}${path}`
+    : undefined;
 };
 
 const getPrivacyPolicyUrl = () => {
@@ -80,10 +93,12 @@ export const getManageTeamUrl = (utmSource?: string): string | undefined =>
   getTeamSettingsUrl(URL.URL_PATH?.MANAGE_TEAM, utmSource);
 
 const getCreateTeamUrl = (): string | undefined =>
-  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}` : undefined;
+  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && teamsBaseUrl !== null && teamsBaseUrl !== undefined
+    ? `${teamsBaseUrl}${URL.URL_PATH.CREATE_TEAM}`
+    : undefined;
 
 const addLocaleToUrl = (url?: string): string | undefined => {
-  if (!url) {
+  if (url === null || url === undefined || url.length === 0) {
     return undefined;
   }
   if (!isProductionWebsite) {

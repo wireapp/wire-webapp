@@ -23,7 +23,7 @@ import {weeksPassedSinceDate} from 'Util/timeUtil';
 
 export const wasClientActiveWithinLast4Weeks = ({last_active: lastActiveISODate}: RegisteredClient): boolean => {
   //if client has not requested /notifications endpoint yet with backend supporting last_active field, we assume it is not active
-  if (!lastActiveISODate) {
+  if (lastActiveISODate === null || lastActiveISODate === undefined || lastActiveISODate.length === 0) {
     return false;
   }
 

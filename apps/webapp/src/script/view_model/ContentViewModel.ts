@@ -103,7 +103,7 @@ export class ContentViewModel {
       const {contentState} = useAppState.getState();
 
       const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
-      if (isStateRequests && !requests.length) {
+      if ((isStateRequests && requests.length === 0) || Number.isNaN(requests.length)) {
         showMostRecentConversation();
       }
     });
@@ -260,16 +260,16 @@ export class ContentViewModel {
       openFirstSelfMention = false,
       openNotificationSettings = false,
       filePath,
-    } = options || {};
+    } = options ?? {};
 
-    if (!conversation) {
+    if (conversation === null || conversation === undefined) {
       return this.handleMissingConversation();
     }
 
     try {
       const conversationEntity = await this.getConversationEntity(conversation);
 
-      if (!conversationEntity) {
+      if (conversationEntity === null || conversationEntity === undefined) {
         this.closeRightSidebar();
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
@@ -290,7 +290,8 @@ export class ContentViewModel {
       }
 
       void this.conversationRepository.refreshMLSConversationVerificationState(conversationEntity);
-      const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
+      const messageEntity =
+        openFirstSelfMention === true ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.changeConversation(conversationEntity, messageEntity);
       this.showAndNavigate(conversationEntity, openNotificationSettings, filePath);
     } catch (error: unknown) {
@@ -353,7 +354,8 @@ export class ContentViewModel {
   private readonly checkContentAvailability = (newState: ContentState): ContentState => {
     const isStateRequests = newState === ContentState.CONNECTION_REQUESTS;
     if (isStateRequests) {
-      const hasConnectRequests = !!this.userState.connectRequests().length;
+      const hasConnectRequests =
+        this.userState.connectRequests().length !== 0 && !Number.isNaN(this.userState.connectRequests().length);
       if (!hasConnectRequests) {
         return ContentState.WATERMARK;
       }

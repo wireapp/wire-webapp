@@ -104,7 +104,7 @@ export class AuthAction {
         let entropyData: Uint8Array | undefined = undefined;
         if (getEntropy !== undefined) {
           const existingClient = await core.service!.client.loadClient();
-          entropyData = existingClient ? undefined : await getEntropy();
+          entropyData = existingClient !== null && existingClient !== undefined ? undefined : await getEntropy();
         }
         await onAfterLogin(dispatch, getState, global);
         await dispatch(

@@ -69,7 +69,7 @@ export class NotificationService {
     return this.storageService
       .load<{value: string}>(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED)
       .then(record => {
-        if (record?.value) {
+        if (record?.value !== null && record?.value !== undefined && record?.value.length > 0) {
           return record.value;
         }
         return undefined;

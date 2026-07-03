@@ -50,7 +50,7 @@ export function getConversationType(conversationEntity: any): ConversationType |
   }
 }
 export function getGuestAttributes(conversationEntity: Conversation): GuestAttributes {
-  const isTeamConversation = !!conversationEntity.teamId;
+  const isTeamConversation = conversationEntity.teamId.length !== 0;
   if (isTeamConversation) {
     const isAllowGuests = !conversationEntity.isTeamOnly();
     const _getUserType = (_conversationEntity: Conversation) => {
@@ -78,7 +78,7 @@ export function getParticipantTypes(
   userEntities: User[],
   countSelf?: boolean,
 ): {guests: number; temporaryGuests: number; users: number} {
-  const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf ? 1 : 0};
+  const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf === true ? 1 : 0};
   return userEntities.reduce((accumulator, userEntity) => {
     if (userEntity.isTemporaryGuest()) {
       accumulator.temporaryGuests += 1;
@@ -108,13 +108,20 @@ export function getPlatform(): PlatformType {
 }
 
 export function trackCallQualityFeedback({call, score, label}: {call?: Call; score?: number; label: RatingListLabel}) {
-  if (!call) {
+  if (call === null || call === undefined) {
     return;
   }
 
-  const duration = call.endedAt() - (call.startedAt() || 0) / TIME_IN_MILLIS.SECOND;
+  const startedAt = call.startedAt();
+  const duration =
+    call.endedAt() -
+    (startedAt !== null && startedAt !== undefined && startedAt !== 0 && !Number.isNaN(startedAt) ? startedAt : 0) /
+      TIME_IN_MILLIS.SECOND;
   amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
-    ...(score && {[Segmentation.CALL.SCORE]: score}),
+    ...(score !== null &&
+      score !== undefined &&
+      score !== 0 &&
+      !Number.isNaN(score) && {[Segmentation.CALL.SCORE]: score}),
     [Segmentation.CALL.QUALITY_REVIEW_LABEL]: label,
     [Segmentation.CALL.DURATION]: duration,
     [Segmentation.CALL.SCREEN_SHARE]: call.analyticsScreenSharing,

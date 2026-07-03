@@ -47,10 +47,10 @@ function validateLinkPreviewEvent(
   editEvent: MessageAddEvent,
 ): originalEvent is StoredEvent<MessageAddEvent> {
   const {previews, content} = editEvent.data;
-  if (!previews?.length) {
+  if (previews === null || previews === undefined || previews.length === 0) {
     return false;
   }
-  if (!originalEvent) {
+  if (originalEvent === null || originalEvent === undefined) {
     // It is fine to receive a linkPreview message without the original event
     return false;
   }
@@ -59,7 +59,7 @@ function validateLinkPreviewEvent(
   }
 
   const {previews: originalPreviews, content: originalContent} = originalEvent.data;
-  if (!!originalPreviews?.length) {
+  if (originalPreviews !== null && originalPreviews !== undefined && originalPreviews.length > 0) {
     throw new EventValidationError('Link preview already existing on original message');
   }
 

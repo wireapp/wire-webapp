@@ -61,7 +61,7 @@ const mapCommonMessageFields = ({
     },
     time: creationDate.date.toISOString(),
     primary_key: webPrimaryKey?.toString() ?? '',
-    edited_time: lastEditTime ? lastEditTime.date.toISOString() : undefined,
+    edited_time: lastEditTime !== null && lastEditTime !== undefined ? lastEditTime.date.toISOString() : undefined,
   };
   return common;
 };
@@ -109,8 +109,8 @@ const mapMessageContentToCategory = (message: BackupMessage): MessageCategory =>
   if (isAssetContent(message.content)) {
     const name = message.content.name;
     const metadata = message.content.metaData;
-    if (!metadata) {
-      if (name) {
+    if (metadata === null || metadata === undefined) {
+      if (name !== null && name !== undefined && name.length > 0) {
         return MessageCategory.FILE;
       }
       return MessageCategory.UNDEFINED;

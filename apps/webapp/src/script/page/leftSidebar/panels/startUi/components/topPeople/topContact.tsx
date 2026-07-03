@@ -55,7 +55,8 @@ const TopContact = ({user, clickOnUser}: TopContactProps) => {
         clickOnUser?.(user, event);
       }}
       onKeyPress={event =>
-        clickOnUser &&
+        clickOnUser !== null &&
+        clickOnUser !== undefined &&
         handleKeyDown({
           event,
           callback: clickOnUser.bind(this, user, event),

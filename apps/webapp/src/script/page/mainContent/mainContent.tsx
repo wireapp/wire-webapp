@@ -94,7 +94,11 @@ const MainContent = ({
   const isShowingConversation = useAppState(state => state.isShowingConversation);
 
   useEffect(() => {
-    if (!isShowingConversation() && conversationState.activeConversation()) {
+    if (
+      !isShowingConversation() &&
+      conversationState.activeConversation() !== null &&
+      conversationState.activeConversation() !== undefined
+    ) {
       // Reset active conversation for all states that do not require a loaded conversation
       conversationState.activeConversation(undefined);
     }
@@ -150,15 +154,17 @@ const MainContent = ({
       <SwitchTransition>
         <Animated key={contentState}>
           <>
-            {contentState === ContentState.COLLECTION && activeConversation && (
-              <Collection
-                conversation={activeConversation}
-                conversationRepository={repositories.conversation}
-                assetRepository={repositories.asset}
-                messageRepository={repositories.message}
-                selfUser={selfUser}
-              />
-            )}
+            {contentState === ContentState.COLLECTION &&
+              activeConversation !== null &&
+              activeConversation !== undefined && (
+                <Collection
+                  conversation={activeConversation}
+                  conversationRepository={repositories.conversation}
+                  assetRepository={repositories.asset}
+                  messageRepository={repositories.message}
+                  selfUser={selfUser}
+                />
+              )}
 
             {contentState === ContentState.PREFERENCES_ABOUT && (
               <div
@@ -263,7 +269,7 @@ const MainContent = ({
               <HistoryExport user={selfUser} switchContent={switchContent} />
             )}
 
-            {contentState === ContentState.HISTORY_IMPORT && uploadedFile && (
+            {contentState === ContentState.HISTORY_IMPORT && uploadedFile !== null && uploadedFile !== undefined && (
               <HistoryImport
                 user={selfUser}
                 file={uploadedFile}

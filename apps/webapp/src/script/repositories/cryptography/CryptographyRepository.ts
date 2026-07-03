@@ -48,7 +48,7 @@ export class CryptographyRepository {
   }
 
   get proteusService() {
-    if (!this.core.service) {
+    if (this.core.service === null || this.core.service === undefined) {
       throw new Error('Core is not initiated');
     }
     return this.core.service!.proteus;

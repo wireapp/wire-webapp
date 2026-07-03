@@ -105,7 +105,7 @@ const MessageDetails = ({failure, isMessageFocused, allUsers, translate}: Messag
   const users = useMemo(() => {
     const users: User[] = userIds.reduce<User[]>((previous, current) => {
       const foundUser = allUsers.find(user => matchQualifiedIds(current, user.qualifiedId));
-      return foundUser ? [...previous, foundUser] : previous;
+      return foundUser !== null && foundUser !== undefined ? [...previous, foundUser] : previous;
     }, []);
     return users;
   }, [allUsers, userIds]);
@@ -114,7 +114,7 @@ const MessageDetails = ({failure, isMessageFocused, allUsers, translate}: Messag
     users.length === 1 ? 'failedToAddParticipantsSingularDetails' : 'failedToAddParticipantsPluralDetails';
 
   const uniqueDomains = 'backends' in failure ? Array.from(new Set(failure.backends)) : undefined;
-  const domainStr = uniqueDomains && uniqueDomains.join(', ');
+  const domainStr = uniqueDomains !== null && uniqueDomains !== undefined && uniqueDomains.join(', ');
 
   const {link, translationLabel} = reasonToMessageDataMap[reason];
 
@@ -176,7 +176,7 @@ const MessageDetails = ({failure, isMessageFocused, allUsers, translate}: Messag
 
   return (
     <p data-uie-name="multi-user-not-added-details" data-uie-value={domainStr}>
-      {text && (
+      {text.length > 0 && (
         <span
           css={warning}
           dangerouslySetInnerHTML={{
@@ -243,7 +243,7 @@ const FailedToAddUsersMessage = ({
           data-uie-name="element-message-failed-to-add-users"
           data-uie-value={totalNumberOfUsers <= 1 ? '1-user-not-added' : 'multi-users-not-added'}
         >
-          {totalNumberOfUsers <= 1 && firstUser && (
+          {totalNumberOfUsers <= 1 && firstUser !== null && firstUser !== undefined && (
             <p data-uie-name="1-user-not-added-details" data-uie-value={firstUser.id}>
               <span
                 css={warning}

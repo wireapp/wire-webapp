@@ -34,7 +34,7 @@ export class SelfService {
 
   private get coreSelfService() {
     const selfService = this.core.service?.self;
-    if (!selfService) {
+    if (selfService === null || selfService === undefined) {
       throw new Error('Self service not available');
     }
 

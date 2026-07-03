@@ -52,7 +52,7 @@ const groupByDate = (
   return Object.entries(
     messages.reduce<{[group: string]: ContentMessage[]}>((groups, message) => {
       const group = getTitleForHeader(message.timestamp(), translate);
-      groups[group] = groups[group] || [];
+      groups[group] = groups[group] ?? [];
       groups[group].unshift(message);
       return groups;
     }, {}),

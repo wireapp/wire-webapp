@@ -26,11 +26,11 @@ export function useRouteA11y(screenKey?: string) {
 
   useEffect(() => {
     const focusTarget: HTMLElement | null =
-      document.querySelector<HTMLElement>('[data-page-title]') ||
-      document.querySelector<HTMLElement>('main,[role="main"]') ||
+      document.querySelector<HTMLElement>('[data-page-title]') ??
+      document.querySelector<HTMLElement>('main,[role="main"]') ??
       document.querySelector<HTMLElement>('h1');
 
-    if (!focusTarget) {
+    if (focusTarget === null || focusTarget === undefined) {
       return;
     }
 

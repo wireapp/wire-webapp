@@ -29,9 +29,9 @@
 export function getMapsUrl(latitude: number, longitude: number, name: string, zoom: string): string {
   const baseUrl = 'https://google.com/maps/';
 
-  const nameParam = name ? `place/${name}/` : '';
+  const nameParam = name.length > 0 ? `place/${name}/` : '';
   const locationParam = `@${latitude},${longitude}`;
-  const zoomParam = zoom ? `,${zoom}z` : '';
+  const zoomParam = zoom.length > 0 ? `,${zoom}z` : '';
 
   return `${baseUrl}${nameParam}${locationParam}${zoomParam}`;
 }

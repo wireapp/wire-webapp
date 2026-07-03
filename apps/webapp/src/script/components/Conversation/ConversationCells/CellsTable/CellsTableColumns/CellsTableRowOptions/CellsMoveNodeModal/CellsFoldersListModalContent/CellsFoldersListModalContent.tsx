@@ -53,7 +53,7 @@ export const CellsFoldersListModalContent = ({
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
 
-  const shouldDisplayEmptyItems = status === 'success' && !items.length;
+  const shouldDisplayEmptyItems = (status === 'success' && items.length === 0) || Number.isNaN(items.length);
 
   const handleFolderNavigate = (path: string) => {
     const newPath = path.split('/').slice(1).join('/');

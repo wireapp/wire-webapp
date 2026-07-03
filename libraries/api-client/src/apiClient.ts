@@ -236,7 +236,7 @@ export class APIClient extends EventEmitter {
     const assetAPI = new AssetAPI(this.transport.http);
 
     // Prevents the CellsAPI from being initialized multiple times
-    if (!this.cellsApi) {
+    if (this.cellsApi === null || this.cellsApi === undefined) {
       this.cellsApi = new CellsAPI({
         httpClientConfig: this.config,
         accessTokenStore: this.accessTokenStore,
@@ -359,7 +359,7 @@ export class APIClient extends EventEmitter {
   }
 
   public async login(loginData: LoginData): Promise<Context> {
-    if (this.context) {
+    if (this.context !== null && this.context !== undefined) {
       await this.logout();
     }
 
@@ -391,7 +391,7 @@ export class APIClient extends EventEmitter {
   }
 
   public async register(userAccount: RegisterData, clientType: ClientType = ClientType.PERMANENT): Promise<Context> {
-    if (this.context) {
+    if (this.context !== null && this.context !== undefined) {
       await this.logout();
     }
 
@@ -430,16 +430,17 @@ export class APIClient extends EventEmitter {
       this.logger.warn('Could not get self user', (error as BackendError).message);
     }
 
-    this.context = this.context
-      ? {...this.context, clientType, domain: selfDomain}
-      : {clientType, userId, domain: selfDomain};
+    this.context =
+      this.context !== null && this.context !== undefined
+        ? {...this.context, clientType, domain: selfDomain}
+        : {clientType, userId, domain: selfDomain};
     return this.context;
   }
 
   public disconnect(reason?: string): void {
     this.transport.ws.disconnect(reason);
     // Remove the cookie refresh listener to prevent memory leaks
-    if (this.cookieRefreshListener) {
+    if (this.cookieRefreshListener !== null && this.cookieRefreshListener !== undefined) {
       CookieStore.emitter.off(CookieStore.TOPIC.COOKIE_REFRESH, this.cookieRefreshListener);
     }
   }

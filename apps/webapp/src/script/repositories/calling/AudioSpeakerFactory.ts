@@ -26,7 +26,7 @@ export class AudioSpeakerFactory {
   public static createNewCallingAudioSpeaker(stream: MediaStream): HTMLAudioElement {
     AudioSpeakerFactory.initBaseElement();
 
-    if (!AudioSpeakerFactory.baseElement) {
+    if (AudioSpeakerFactory.baseElement === null || AudioSpeakerFactory.baseElement === undefined) {
       AudioSpeakerFactory.logger.error('No audio base element exist in DOM!');
       throw new Error('Audio element could not be crated!');
     }
@@ -43,7 +43,7 @@ export class AudioSpeakerFactory {
   }
 
   private static initBaseElement(): void {
-    if (!AudioSpeakerFactory.baseElement) {
+    if (AudioSpeakerFactory.baseElement === null || AudioSpeakerFactory.baseElement === undefined) {
       AudioSpeakerFactory.baseElement = document.getElementById('calling-audio-speaker-elements');
     }
   }

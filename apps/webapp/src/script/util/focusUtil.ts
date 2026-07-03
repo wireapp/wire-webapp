@@ -36,7 +36,10 @@ export const getAllFocusableElements = (
   }
 
   const defaultSelectors = `button:not([disabled]), [role="button"], [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled]), details:not([disabled]), summary:not(:disabled)`;
-  const selectors = customSelector.length ? `${defaultSelectors}, ${[...customSelector]}` : `${defaultSelectors}`;
+  const selectors =
+    customSelector.length !== 0 && !Number.isNaN(customSelector.length)
+      ? `${defaultSelectors}, ${[...customSelector]}`
+      : `${defaultSelectors}`;
   return parent.querySelectorAll(selectors);
 };
 

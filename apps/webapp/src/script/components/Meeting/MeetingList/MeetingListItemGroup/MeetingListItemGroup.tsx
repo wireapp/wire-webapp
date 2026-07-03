@@ -57,7 +57,7 @@ const MeetingListItemGroupComponent = ({
 
   // Sort by hour key
   const groups = Object.entries(groupedMeetings).toSorted(([meetingA], [meetingB]) => +meetingA - +meetingB);
-  const nonEmptyGroups = groups.filter(([, items]) => items?.length);
+  const nonEmptyGroups = groups.filter(([, items]) => items?.length !== 0 && !Number.isNaN(items?.length));
   const isEmpty = nonEmptyGroups.length === 0;
 
   if (isEmpty) {

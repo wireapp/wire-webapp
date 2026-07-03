@@ -68,7 +68,7 @@ const SetEmailComponent = ({
     }
     setIsValidEmail(currentInputNode.validity.valid);
     try {
-      if (validationError) {
+      if (validationError !== null && validationError !== undefined) {
         throw validationError;
       }
       await doSetEmail(currentInputNode.value);
@@ -111,11 +111,11 @@ const SetEmailComponent = ({
             required
             data-uie-name="enter-email"
           />
-          {!error ? <>&nbsp;</> : <Exception errors={[error]} />}
+          {error === null || error === undefined ? <>&nbsp;</> : <Exception errors={[error]} />}
           <Button
             block
             showLoading={isFetching}
-            disabled={isFetching || !email}
+            disabled={isFetching || email.length === 0}
             formNoValidate
             type="submit"
             data-uie-name="do-verify-email"

@@ -41,7 +41,7 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
   useEffect(() => {
-    if (message.expectsReadConfirmation && readReceipts.length) {
+    if (message.expectsReadConfirmation && readReceipts.length !== 0 && !Number.isNaN(readReceipts.length)) {
       const text = is1to1Conversation
         ? formatTimeShort(readReceipts[0].time)
         : readReceipts.length.toString(DECIMAL_NUMBER_BASE);
@@ -49,7 +49,7 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
     }
   }, [is1to1Conversation, message.expectsReadConfirmation, readReceipts]);
 
-  const showEyeIndicator = !!readReceiptText;
+  const showEyeIndicator = readReceiptText.length !== 0;
 
   if (!showEyeIndicator) {
     return null;
@@ -60,7 +60,7 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
       className={cx(
         'message-status-read',
         is1to1Conversation && 'message-status-read__one-on-one',
-        !!onClickDetails && 'message-status-read__clickable',
+        onClickDetails !== null && onClickDetails !== undefined && 'message-status-read__clickable',
       )}
       data-uie-name="status-message-read-receipts"
       aria-label={translate('accessibility.messageDetailsReadReceipts', {readReceiptText})}

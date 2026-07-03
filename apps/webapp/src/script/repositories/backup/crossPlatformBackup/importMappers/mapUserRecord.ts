@@ -22,7 +22,7 @@ import {UserRecord} from 'Repositories/storage';
 import {BackupUser} from '../CPB.library';
 
 export const mapUserRecord = ({id: qualifiedId, name, handle}: BackupUser): UserRecord | null => {
-  if (!qualifiedId || !name || !handle) {
+  if (qualifiedId === null || qualifiedId === undefined || name.length === 0 || handle.length === 0) {
     return null;
   }
   // We dont get all the "required" fields from the backup, so we need to outsmart the type system.

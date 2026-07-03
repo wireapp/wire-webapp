@@ -81,7 +81,7 @@ export const showShareModal = (properties: ShareModalParams): void => {
       primaryAction: {
         action: () => {
           const submitHandler = submitHandlers.get(modalId);
-          if (submitHandler) {
+          if (submitHandler !== null && submitHandler !== undefined) {
             fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
               await submitHandler();
             });

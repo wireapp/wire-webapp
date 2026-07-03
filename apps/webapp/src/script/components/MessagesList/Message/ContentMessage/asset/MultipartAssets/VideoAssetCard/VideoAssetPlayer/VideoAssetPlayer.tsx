@@ -152,7 +152,7 @@ export const VideoAssetPlayer = ({
               isFocusable={isFocusable}
             />
           )}
-          {videoElement && isPlayedRef.current && (
+          {videoElement !== null && videoElement !== undefined && isPlayedRef.current && (
             <VideoControls
               isPlaying={isPlaying}
               videoElement={videoElement}

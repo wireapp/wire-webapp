@@ -59,7 +59,7 @@ export const MessageButton = ({id, label, message, onClick = noop}: MessageButto
         {label}
       </Button>
 
-      {hasError && errorMessage && (
+      {hasError && errorMessage.length > 0 && (
         <div className="message-button__error" data-uie-name="message-button-error">
           {errorMessage}
         </div>

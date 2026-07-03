@@ -101,7 +101,7 @@ export const useMessageSend = ({
   const cellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
 
   const generateQuote = useCallback(async (): Promise<OutgoingQuote | undefined> => {
-    return !replyMessageEntity
+    return replyMessageEntity === null || replyMessageEntity === undefined
       ? Promise.resolve(undefined)
       : eventRepository.eventService
           .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
@@ -123,11 +123,11 @@ export const useMessageSend = ({
         draftState.reset();
       });
 
-      if (!messageText.length && editedMessage) {
+      if (messageText.length === 0 && editedMessage !== null && editedMessage !== undefined) {
         return messageRepository.deleteMessageForEveryone(conversation, editedMessage);
       }
 
-      if (editedMessage) {
+      if (editedMessage !== null && editedMessage !== undefined) {
         messageRepository
           .sendMessageEdit(conversation, messageText, editedMessage, mentionEntities)
           .catch((error: unknown) => {
@@ -207,7 +207,7 @@ export const useMessageSend = ({
       return;
     }
 
-    if (pastedFile) {
+    if (pastedFile !== null && pastedFile !== undefined) {
       return void sendPastedFile();
     }
 
@@ -231,7 +231,7 @@ export const useMessageSend = ({
       return;
     }
 
-    if (editedMessage) {
+    if (editedMessage !== null && editedMessage !== undefined) {
       await sendMessageEdit(messageText, mentions);
     } else {
       await sendFiles();

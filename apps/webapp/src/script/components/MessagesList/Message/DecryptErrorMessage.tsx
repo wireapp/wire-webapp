@@ -85,13 +85,13 @@ const DecryptErrorMessage = ({message, onClickResetSession}: DecryptErrorMessage
       <div css={messageBodyWrapper()}>
         <div className="message-body message-body-decrypt-error">
           <p className="message-header-decrypt-error-label" data-uie-name="status-decrypt-error">
-            {message.code && (
+            {message.code !== 0 && !Number.isNaN(message.code) && (
               <>
                 {`${translate('conversationUnableToDecryptErrorMessage')} `}
                 <span className="label-bold-xs">{message.code}</span>{' '}
               </>
             )}
-            {message.clientId && (
+            {message.clientId.length > 0 && (
               <>
                 {'ID: '}
                 <FormattedId idSlices={splitFingerprint(message.clientId)} smallPadding />

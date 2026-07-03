@@ -107,12 +107,12 @@ export const TimePickerField = ({
         selectMenuCSS={timeSelectMenuStyles}
         menuPlacement={menuPlacement}
         maxMenuHeight={maxMenuHeight}
-        {...(portalTarget ? {menuPortalTarget: portalTarget} : {})}
+        {...(portalTarget !== null && portalTarget !== undefined ? {menuPortalTarget: portalTarget} : {})}
         menuPosition="fixed"
         menuShouldScrollIntoView={false}
         selectMenuPortalCSS={timeSelectMenuPortalStyles}
         onChange={option => {
-          onChange(option ? (option as Option) : null);
+          onChange(option !== null && option !== undefined ? (option as Option) : null);
         }}
       />
     </div>

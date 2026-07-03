@@ -188,5 +188,5 @@ function getFieldError(field: keyof FormData, translate: RootContextValue['trans
     text: translate('richTextLinkDialogTextError'),
   } as const;
 
-  return fieldErrors?.[field] || '';
+  return fieldErrors?.[field] ?? '';
 }

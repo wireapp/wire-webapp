@@ -25,7 +25,12 @@ export function loadFeatureConfig(selfUserId: string): FeatureList | undefined {
   const featureConfigs: {[selfId: string]: FeatureList} = JSON.parse(
     window.localStorage.getItem(LOCAL_STORAGE_FEATURE_CONFIG_KEY) ?? '{}',
   );
-  if (featureConfigs && featureConfigs[selfUserId]) {
+  if (
+    featureConfigs !== null &&
+    featureConfigs !== undefined &&
+    featureConfigs[selfUserId] !== null &&
+    featureConfigs[selfUserId] !== undefined
+  ) {
     return featureConfigs[selfUserId];
   }
   return undefined;

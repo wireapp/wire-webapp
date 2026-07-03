@@ -124,7 +124,7 @@ export const FileHeader = ({
           <MessageTime timestamp={timestamp} data-timestamp-type="normal" css={textStyles}>
             {timeAgo}
           </MessageTime>
-          {badges && badges.length > 0 && <BadgesWithTooltip items={badges} />}
+          {badges !== null && badges !== undefined && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
       {isEditable === true && (

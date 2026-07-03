@@ -74,7 +74,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
 
-    if (!e2eiService) {
+    if (e2eiService === null || e2eiService === undefined) {
       throw new Error('E2EI Service not available');
     }
 
@@ -114,7 +114,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   private get config() {
-    if (!this.#config) {
+    if (this.#config === null || this.#config === undefined) {
       throw new Error('Trying to access config without initializing the E2EIHandler');
     }
     return this.#config;
@@ -192,7 +192,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   public async startTimers() {
     // We store the first time the user was prompted with the enrollment modal
     const storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
-    const e2eActivatedAt = storedE2eActivatedAt || Date.now();
+    const e2eActivatedAt =
+      storedE2eActivatedAt !== 0 && !Number.isNaN(storedE2eActivatedAt) ? storedE2eActivatedAt : Date.now();
     this.enrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
 
     const timerKey = 'enrollmentTimer';
@@ -200,7 +201,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     const isNotActivated = identity?.status === MLSStatuses.NOT_ACTIVATED;
     const isBasicDevice = identity?.credentialType === CredentialType.Basic;
-    const isFirstE2EIActivation = !storedE2eActivatedAt && (!identity || isNotActivated || isBasicDevice);
+    const isFirstE2EIActivation =
+      (storedE2eActivatedAt === 0 || Number.isNaN(storedE2eActivatedAt)) &&
+      (identity === null || identity === undefined || isNotActivated || isBasicDevice);
 
     const {firingDate: computedFiringDate, isSnoozable} = getEnrollmentTimer(
       identity,
@@ -213,7 +216,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     };
 
     const storedFiringDate = this.enrollmentStore.get.timer();
-    const firingDate = isFirstE2EIActivation ? Date.now() : storedFiringDate || computedFiringDate;
+    const firingDate = isFirstE2EIActivation
+      ? Date.now()
+      : storedFiringDate !== 0 && !Number.isNaN(storedFiringDate)
+        ? storedFiringDate
+        : computedFiringDate;
     this.enrollmentStore.store.timer(firingDate);
 
     if (firingDate <= Date.now()) {
@@ -261,7 +268,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     silent: boolean,
     challengeData?: {keyAuth: string; challenge: {url: string; target: string}},
   ) {
-    if (challengeData) {
+    if (challengeData !== null && challengeData !== undefined) {
       // If a challengeData is provided, that means we are at the beginning of the enrollment process
       // We need to first authenticate the user (either silently if we are renewing the certificate, or by redirection if it an initial enrollment)
       const {challenge, keyAuth} = challengeData;

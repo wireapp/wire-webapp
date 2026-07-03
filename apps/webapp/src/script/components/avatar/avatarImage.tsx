@@ -74,7 +74,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
           setShowTransition(!isCached && !isSmall);
           try {
             const url = await assetRepository.getObjectUrl(pictureResource);
-            if (url) {
+            if (url.length > 0) {
               setAvatarImage(url);
             }
             setAvatarLoadingBlocked(false);
@@ -95,7 +95,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
   return (
     <InViewport onVisible={() => setIsVisible(true)}>
-      <Transition in={!!avatarImage} timeout={showTransition ? 700 : 0}>
+      <Transition in={avatarImage.length !== 0} timeout={showTransition ? 700 : 0}>
         {(state: string) => {
           return (
             <img

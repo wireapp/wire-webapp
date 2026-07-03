@@ -33,7 +33,13 @@ export const defaultScreenInputId = 'screen';
  * return MediaDeviceInfo[]
  */
 const filterInvalidDevices = (devices: MediaDeviceInfo[]): MediaDeviceInfo[] =>
-  devices.filter(device => device.deviceId && device.label);
+  devices.filter(
+    device =>
+      device.deviceId !== null &&
+      device.deviceId !== undefined &&
+      device.label !== undefined &&
+      device.label.length > 0,
+  );
 
 type MediaChannelPatch<T> = Partial<Pick<MediaChannel<T>, 'devices' | 'selectedId' | 'supported'>>;
 // omit thumbnail (which is a native image) to avoid serialization issues in Zustand immer

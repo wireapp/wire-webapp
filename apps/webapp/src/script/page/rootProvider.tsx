@@ -65,7 +65,7 @@ export function RootProvider(properties: RootProviderProps): ReactElement {
 export function useApplicationContext(): RootContextValue {
   const applicationContextOrNull = useContext(RootContext);
 
-  if (!applicationContextOrNull) {
+  if (applicationContextOrNull === null || applicationContextOrNull === undefined) {
     throw new Error('RootContext has not been set');
   }
 

@@ -45,7 +45,9 @@ export const showFileDropzoneErrorModal = ({
         text: {
           message: (
             <>
-              {!!invalidFiles.length && <InvalidFilesList invalidFiles={invalidFiles} />}
+              {invalidFiles.length !== 0 && !Number.isNaN(invalidFiles.length) && (
+                <InvalidFilesList invalidFiles={invalidFiles} />
+              )}
               <p>{message}</p>
             </>
           ),

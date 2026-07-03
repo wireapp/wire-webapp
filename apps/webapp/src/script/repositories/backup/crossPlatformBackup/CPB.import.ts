@@ -63,7 +63,7 @@ export const importCPBHistoryToDatabase = async ({
       const messages = pager.messagesPager.nextPage();
       messages.forEach(message => {
         const eventRecord = mapEventRecord(message);
-        if (eventRecord) {
+        if (eventRecord !== null && eventRecord !== undefined) {
           eventRecords.push(eventRecord);
         }
       });
@@ -77,7 +77,7 @@ export const importCPBHistoryToDatabase = async ({
       const conversations = pager.conversationsPager.nextPage();
       conversations.forEach(conversation => {
         const conversationRecord = mapConversationRecord(conversation);
-        if (conversationRecord) {
+        if (conversationRecord !== null && conversationRecord !== undefined) {
           conversationRecords.push(conversationRecord);
         }
       });
@@ -91,7 +91,7 @@ export const importCPBHistoryToDatabase = async ({
       const users = pager.usersPager.nextPage();
       users.forEach(user => {
         const userRecord = mapUserRecord(user);
-        if (userRecord) {
+        if (userRecord !== null && userRecord !== undefined) {
           userRecords.push(userRecord);
         }
       });

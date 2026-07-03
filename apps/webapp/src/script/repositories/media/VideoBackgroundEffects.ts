@@ -145,7 +145,7 @@ const backgroundImageCache = new Map<string, HTMLImageElement>();
  */
 const getCachedImage = (backgroundId: string): HTMLImageElement | undefined => {
   const cached = backgroundImageCache.get(backgroundId);
-  if (!cached) {
+  if (cached === null || cached === undefined) {
     return undefined;
   }
   backgroundImageCache.delete(backgroundId);
@@ -169,7 +169,7 @@ const setCachedImage = (backgroundId: string, image: HTMLImageElement): void => 
   backgroundImageCache.set(backgroundId, image);
   if (backgroundImageCache.size > MAX_BACKGROUND_CACHE_ENTRIES) {
     const oldestKey = backgroundImageCache.keys().next().value;
-    if (oldestKey) {
+    if (oldestKey !== null && oldestKey !== undefined && oldestKey.length > 0) {
       backgroundImageCache.delete(oldestKey);
     }
   }
@@ -216,7 +216,7 @@ const createGradientBitmap = async (colors: string[]): Promise<ImageBitmap> => {
     (canvas as HTMLCanvasElement).height = height;
   }
   const ctx = canvas.getContext('2d');
-  if (!ctx) {
+  if (ctx === null || ctx === undefined) {
     throw new Error('Failed to create 2D context for background gradient.');
   }
   const gradient = ctx.createLinearGradient(0, 0, width, height);
@@ -258,11 +258,11 @@ export const getBuiltinBackground = (backgroundId: string): BuiltinBackground | 
  */
 export const loadBackgroundSource = async (backgroundId: string): Promise<BackgroundSource> => {
   const background = getBuiltinBackground(backgroundId);
-  if (!background) {
+  if (background === null || background === undefined) {
     throw new Error(`Unknown background id: ${backgroundId}`);
   }
   const cachedImage = getCachedImage(backgroundId);
-  if (cachedImage) {
+  if (cachedImage !== null && cachedImage !== undefined) {
     return {
       type: 'image',
       media: cachedImage,

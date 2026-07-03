@@ -139,7 +139,7 @@ function Collection(props: CollectionProps) {
     });
   };
 
-  if (detailCategory && categories[detailCategory].length > 0) {
+  if (detailCategory !== null && detailCategory !== undefined && categories[detailCategory].length > 0) {
     return (
       <CollectionDetails
         conversation={conversation}
@@ -150,47 +150,48 @@ function Collection(props: CollectionProps) {
     );
   }
 
-  const content = searchTerm ? null : (
-    <>
-      <CollectionSection
-        messages={images}
-        limit={12}
-        uieName={'collection-section-image'}
-        onSelect={() => setDetailCategory('images')}
-        onImageClick={onImageClick}
-        label={translate('collectionSectionImages')}
-      >
-        <span className={`collection-header-icon icon-library`}></span>
-      </CollectionSection>
-      <CollectionSection
-        messages={links}
-        limit={4}
-        uieName={'collection-section-link'}
-        onSelect={() => setDetailCategory('links')}
-        label={translate('collectionSectionLinks')}
-      >
-        <span className={`collection-header-icon icon-link`}></span>
-      </CollectionSection>
-      <CollectionSection
-        messages={audio}
-        limit={4}
-        uieName={'collection-section-audio'}
-        onSelect={() => setDetailCategory('audio')}
-        label={translate('collectionSectionAudio')}
-      >
-        <Icon.MicOnIcon className="collection-header-icon" />
-      </CollectionSection>
-      <CollectionSection
-        messages={files}
-        limit={4}
-        uieName={'collection-section-file'}
-        onSelect={() => setDetailCategory('files')}
-        label={translate('collectionSectionFiles')}
-      >
-        <span className={`collection-header-icon icon-file`}></span>
-      </CollectionSection>
-    </>
-  );
+  const content =
+    searchTerm.length > 0 ? null : (
+      <>
+        <CollectionSection
+          messages={images}
+          limit={12}
+          uieName={'collection-section-image'}
+          onSelect={() => setDetailCategory('images')}
+          onImageClick={onImageClick}
+          label={translate('collectionSectionImages')}
+        >
+          <span className={`collection-header-icon icon-library`}></span>
+        </CollectionSection>
+        <CollectionSection
+          messages={links}
+          limit={4}
+          uieName={'collection-section-link'}
+          onSelect={() => setDetailCategory('links')}
+          label={translate('collectionSectionLinks')}
+        >
+          <span className={`collection-header-icon icon-link`}></span>
+        </CollectionSection>
+        <CollectionSection
+          messages={audio}
+          limit={4}
+          uieName={'collection-section-audio'}
+          onSelect={() => setDetailCategory('audio')}
+          label={translate('collectionSectionAudio')}
+        >
+          <Icon.MicOnIcon className="collection-header-icon" />
+        </CollectionSection>
+        <CollectionSection
+          messages={files}
+          limit={4}
+          uieName={'collection-section-file'}
+          onSelect={() => setDetailCategory('files')}
+          label={translate('collectionSectionFiles')}
+        >
+          <span className={`collection-header-icon icon-file`}></span>
+        </CollectionSection>
+      </>
+    );
 
   const filesUrl = generateConversationUrl({...conversation.qualifiedId, filePath: 'files'});
   const isCellsEnabled =

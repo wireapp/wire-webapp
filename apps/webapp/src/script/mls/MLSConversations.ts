@@ -60,8 +60,13 @@ export async function initMLSGroupConversations(
     onError?: (conversation: Conversation, error: unknown) => void;
   },
 ): Promise<void> {
-  const {mls: mlsService, conversation: conversationService} = core.service || {};
-  if (!mlsService || !conversationService) {
+  const {mls: mlsService, conversation: conversationService} = core.service ?? {};
+  if (
+    mlsService === null ||
+    mlsService === undefined ||
+    conversationService === null ||
+    conversationService === undefined
+  ) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
@@ -102,8 +107,13 @@ export async function initMLSGroupConversation(
     conversationId: mlsConversation.qualifiedId,
     groupId: mlsConversation.groupId,
   });
-  const {mls: mlsService, conversation: conversationService} = core.service || {};
-  if (!mlsService || !conversationService) {
+  const {mls: mlsService, conversation: conversationService} = core.service ?? {};
+  if (
+    mlsService === null ||
+    mlsService === undefined ||
+    conversationService === null ||
+    conversationService === undefined
+  ) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
@@ -113,7 +123,7 @@ export async function initMLSGroupConversation(
     const doesMLSGroupExist = await conversationService.mlsGroupExistsLocally(groupId);
 
     // if group is already established, we just schedule periodic key material updates
-    if (doesMLSGroupExist) {
+    if (doesMLSGroupExist === true) {
       await mlsService.scheduleKeyMaterialRenewal(groupId);
       return;
     }
@@ -149,8 +159,13 @@ export async function initialiseSelfAndTeamConversations(
   core: Account,
 ): Promise<void> {
   logger.info('Initialising self and team conversations');
-  const {mls: mlsService, conversation: conversationService} = core.service || {};
-  if (!mlsService || !conversationService) {
+  const {mls: mlsService, conversation: conversationService} = core.service ?? {};
+  if (
+    mlsService === null ||
+    mlsService === undefined ||
+    conversationService === null ||
+    conversationService === undefined
+  ) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
@@ -176,7 +191,7 @@ export async function initialiseSelfAndTeamConversations(
         isGroupAlreadyEstablished,
         qualifiedId: conversation.qualifiedId,
       });
-      if (isGroupAlreadyEstablished) {
+      if (isGroupAlreadyEstablished === true) {
         return Promise.resolve();
       }
 
@@ -390,13 +405,13 @@ async function establishMlsGroupConversation({
   const selfUser = userState.self();
   const conversation = conversationState.findConversation(conversationId);
 
-  if (!selfUser || !conversation) {
+  if (selfUser === null || selfUser === undefined || conversation === null || conversation === undefined) {
     logger.error('Self user or conversation is not available!', {selfUser, conversation});
     throw new Error('Self user or conversation is not available!');
   }
 
   const selfUserClientId = selfUser.localClient?.id;
-  if (!selfUserClientId) {
+  if (selfUserClientId === null || selfUserClientId === undefined || selfUserClientId.length === 0) {
     logger.error('Self user client id is not available!', {selfUserClientId});
     throw new Error('Self user client id is not available!');
   }

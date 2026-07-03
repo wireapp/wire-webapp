@@ -60,7 +60,9 @@ export class Participant {
   ) {
     this.logger = getLogger('Participant');
     this.hasActiveVideo = pureComputed(() => {
-      return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
+      return (
+        (this.sharesCamera() || this.sharesScreen()) && this.videoStream() !== null && this.videoStream() !== undefined
+      );
     });
     this.sharesScreen = pureComputed(() => {
       return this.videoState() === VIDEO_STATE.SCREENSHARE;
@@ -78,7 +80,7 @@ export class Participant {
 
     computed(() => {
       const stream = this.videoStream();
-      if (stream && stream.getVideoTracks().length > 0) {
+      if (stream !== null && stream !== undefined && stream.getVideoTracks().length > 0) {
         if (AvsDebugger.hasTrack(this.user.id)) {
           AvsDebugger.removeTrack(this.user.id);
         }
@@ -108,10 +110,10 @@ export class Participant {
   }
 
   updateMediaStream(newStream: MediaStream, stopTracks: boolean): MediaStream {
-    if (newStream.getVideoTracks().length) {
+    if (newStream.getVideoTracks().length !== 0 && !Number.isNaN(newStream.getVideoTracks().length)) {
       this.setVideoStream(new MediaStream(newStream.getVideoTracks()), stopTracks);
     }
-    if (newStream.getAudioTracks().length) {
+    if (newStream.getAudioTracks().length !== 0 && !Number.isNaN(newStream.getAudioTracks().length)) {
       this.setAudioStream(new MediaStream(newStream.getAudioTracks()), stopTracks);
     }
     return this.getMediaStream();
@@ -150,7 +152,7 @@ export class Participant {
   }
 
   private releaseStream(mediaStream: MediaStream | undefined, stopTracks: boolean): void {
-    if (!mediaStream) {
+    if (mediaStream === null || mediaStream === undefined) {
       return;
     }
 

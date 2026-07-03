@@ -116,7 +116,7 @@ export const DetailViewModal = ({
     setIsImageVisible(false);
 
     assetRepository.load((contentMessage.getFirstAsset() as MediumImage).resource()).then(blob => {
-      if (blob) {
+      if (blob !== null && blob !== undefined) {
         setImageSrc(window.URL.createObjectURL(blob));
         setIsImageVisible(true);
       }
@@ -238,7 +238,10 @@ export const DetailViewModal = ({
 
   useEffect(() => {
     const conversationId = currentMessageEntity.conversation_id;
-    const isExpectedId = conversationEntity ? conversationId === conversationEntity.id : false;
+    const isExpectedId =
+      conversationEntity !== null && conversationEntity !== undefined
+        ? conversationId === conversationEntity.id
+        : false;
 
     if (!isExpectedId) {
       conversationRepository.getConversationById({domain: '', id: conversationId}).then(conversation => {
@@ -264,34 +267,37 @@ export const DetailViewModal = ({
 
   return (
     <div id={modalId} className={cx('modal detail-view modal-show', {'modal-fadein': isImageVisible})}>
-      {messageEntity && conversationEntity && (
-        <div
-          className={cx('detail-view-content modal-content-anim-close', {
-            'modal-content-anim-open': isImageVisible,
-          })}
-        >
-          <DetailViewModalHeader messageEntity={messageEntity} onCloseClick={onCloseClick} translate={translate} />
-
-          <button
-            className="detail-view-main button-reset-default"
-            onKeyDown={handleOnClosePress}
-            aria-label={translate('accessibility.conversationDetailsCloseLabel')}
+      {messageEntity !== null &&
+        messageEntity !== undefined &&
+        conversationEntity !== null &&
+        conversationEntity !== undefined && (
+          <div
+            className={cx('detail-view-content modal-content-anim-close', {
+              'modal-content-anim-open': isImageVisible,
+            })}
           >
-            <ZoomableImage key={currentMessageEntityId.current} src={imageSrc} data-uie-name="status-picture" />
-          </button>
+            <DetailViewModalHeader messageEntity={messageEntity} onCloseClick={onCloseClick} translate={translate} />
 
-          <DetailViewModalFooter
-            messageEntity={messageEntity}
-            conversationEntity={conversationEntity}
-            messageRepository={messageRepository}
-            fireAndForgetInvoker={fireAndForgetInvoker}
-            onReplyClick={onReplyClick}
-            onDownloadClick={onDownloadClick}
-            selfId={selfUser.qualifiedId}
-            translate={translate}
-          />
-        </div>
-      )}
+            <button
+              className="detail-view-main button-reset-default"
+              onKeyDown={handleOnClosePress}
+              aria-label={translate('accessibility.conversationDetailsCloseLabel')}
+            >
+              <ZoomableImage key={currentMessageEntityId.current} src={imageSrc} data-uie-name="status-picture" />
+            </button>
+
+            <DetailViewModalFooter
+              messageEntity={messageEntity}
+              conversationEntity={conversationEntity}
+              messageRepository={messageRepository}
+              fireAndForgetInvoker={fireAndForgetInvoker}
+              onReplyClick={onReplyClick}
+              onDownloadClick={onDownloadClick}
+              selfId={selfUser.qualifiedId}
+              translate={translate}
+            />
+          </div>
+        )}
     </div>
   );
 };

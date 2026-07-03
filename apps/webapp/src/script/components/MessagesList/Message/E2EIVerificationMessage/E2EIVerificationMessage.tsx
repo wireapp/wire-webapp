@@ -72,8 +72,10 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
   const isSelfUser =
     messageUserId !== undefined && selfUser !== undefined && matchQualifiedIds(messageUserId, selfUser.qualifiedId);
 
-  const degradedUsers = participatingUserEts.filter(user =>
-    userIds.find(userId => matchQualifiedIds(userId, user.qualifiedId)),
+  const degradedUsers = participatingUserEts.filter(
+    user =>
+      userIds.find(userId => matchQualifiedIds(userId, user.qualifiedId)) !== null &&
+      userIds.find(userId => matchQualifiedIds(userId, user.qualifiedId)) !== undefined,
   );
 
   const usersName = degradedUsers?.map(user => user.name()).join(', ');

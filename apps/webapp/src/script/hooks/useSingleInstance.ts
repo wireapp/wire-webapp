@@ -36,7 +36,10 @@ function isRunningInstance(instanceId?: string) {
     return true;
   }
   const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
-  const otherInstanceId = cookieValue ? JSON.parse(cookieValue).appInstanceId : cookieValue;
+  const otherInstanceId =
+    cookieValue !== null && cookieValue !== undefined && cookieValue.length > 0
+      ? JSON.parse(cookieValue).appInstanceId
+      : cookieValue;
   return otherInstanceId === instanceId;
 }
 

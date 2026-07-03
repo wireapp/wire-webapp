@@ -154,7 +154,11 @@ export class Message {
   }
 
   public get qualifiedFrom(): QualifiedId {
-    return {domain: this.fromDomain || '', id: this.from};
+    return {
+      domain:
+        this.fromDomain !== null && this.fromDomain !== undefined && this.fromDomain.length > 0 ? this.fromDomain : '',
+      id: this.from,
+    };
   }
 
   readonly displayTimestampShort = (): string => {
@@ -263,7 +267,11 @@ export class Message {
     if (this.isContent()) {
       const assetEntity = this.getFirstAsset();
 
-      if (assetEntity && typeof (assetEntity as FileAsset).original_resource === 'function') {
+      if (
+        assetEntity !== null &&
+        assetEntity !== undefined &&
+        typeof (assetEntity as FileAsset).original_resource === 'function'
+      ) {
         return true;
       }
     }
@@ -280,7 +288,7 @@ export class Message {
       this.hasAssetText() &&
       (this as unknown as ContentMessage)
         .assets()
-        .some(assetEntity => assetEntity.isText() && assetEntity.previews().length)
+        .some(assetEntity => assetEntity.isText() && assetEntity.previews().length > 0)
     );
   }
 

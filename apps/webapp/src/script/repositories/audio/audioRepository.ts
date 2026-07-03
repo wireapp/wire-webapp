@@ -77,7 +77,7 @@ export class AudioRepository {
 
   private updateSinkIds() {
     const currentOutputDevice = mediaDevicesStore.getState().audio.output.selectedId;
-    if (!currentOutputDevice) {
+    if (currentOutputDevice.length === 0) {
       return;
     }
     Object.values(this.audioElements).forEach(element => {
@@ -142,7 +142,7 @@ export class AudioRepository {
   async play(audioId: AudioType, playInLoop: boolean = false): Promise<void> {
     this.updateSinkIds();
     const audioElement = this.getSoundById(audioId);
-    if (!audioElement) {
+    if (audioElement === null || audioElement === undefined) {
       this.logger.error(`Failed to play '${audioId}': sound not found`);
       return;
     }

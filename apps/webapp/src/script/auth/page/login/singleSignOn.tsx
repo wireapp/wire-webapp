@@ -86,10 +86,10 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 
       const onChildWindowClose = () => {
         clearInterval(timerId);
-        if (onReceiveChildWindowMessage) {
+        if (onReceiveChildWindowMessage !== null && onReceiveChildWindowMessage !== undefined) {
           window.removeEventListener('message', onReceiveChildWindowMessage);
         }
-        if (onParentWindowClose) {
+        if (onParentWindowClose !== null && onParentWindowClose !== undefined) {
           window.removeEventListener('unload', onParentWindowClose);
         }
         setIsOverlayOpen(false);
@@ -172,9 +172,9 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         reject(new BackendError('', SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR, StatusCodes.INTERNAL_SERVER_ERROR));
       });
 
-      if (ssoWindowRef.current) {
+      if (ssoWindowRef.current !== null && ssoWindowRef.current !== undefined) {
         timerId = window.setInterval(() => {
-          if (ssoWindowRef.current && ssoWindowRef.current.closed) {
+          if (ssoWindowRef.current !== null && ssoWindowRef.current !== undefined && ssoWindowRef.current.closed) {
             onChildWindowClose();
             reject(
               new BackendError('', SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR, StatusCodes.INTERNAL_SERVER_ERROR),

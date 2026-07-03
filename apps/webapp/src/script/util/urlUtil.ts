@@ -73,7 +73,7 @@ export const cleanURL = (url: string = ''): string => {
   url = url.replace(/^(?!https?:\/\/)/i, 'http://');
   try {
     const {hostname, port, pathname, search, hash} = new URL(url);
-    return `${hostname.replace(/^www./, '')}${port ? `:${port}` : ''}${pathname.replace(/\/$/, '')}${search}${hash}`;
+    return `${hostname.replace(/^www./, '')}${port.length > 0 ? `:${port}` : ''}${pathname.replace(/\/$/, '')}${search}${hash}`;
   } catch (error: unknown) {
     return '';
   }
@@ -116,7 +116,8 @@ export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
  * @param url URL to be prepended
  * @returns prepended URL
  */
-export const prependProtocol = (url: string) => (!url.match(/^http[s]?:\/\//i) ? `http://${url}` : url);
+export const prependProtocol = (url: string) =>
+  url.match(/^http[s]?:\/\//i) === null || url.match(/^http[s]?:\/\//i) === undefined ? `http://${url}` : url;
 
 /**
  * Removes all URL parameters from the current URL

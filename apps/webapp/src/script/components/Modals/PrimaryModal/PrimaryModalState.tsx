@@ -259,14 +259,14 @@ const updateCurrentModalContent = (
       break;
     }
   }
-  if (content.secondaryAction) {
+  if (content.secondaryAction !== null && content.secondaryAction !== undefined) {
     const updatedSecondaryAction = Array.isArray(content.secondaryAction)
       ? content.secondaryAction
       : [content.secondaryAction];
     // force it into array format
     const uieNames = ['do-secondary', 'do-tertiary', 'do-quaternary'];
     content.secondaryAction = updatedSecondaryAction.map((action, index) => {
-      const uieName = uieNames[index] || 'do-remaining';
+      const uieName = uieNames[index].length > 0 ? uieNames[index] : 'do-remaining';
       return {...action, uieName};
     });
   }

@@ -63,7 +63,11 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
 
   const handleClickOutside = useCallback(
     (event: MouseEvent) => {
-      if (emojisBarRef.current && !emojisBarRef.current.contains(event.target as Node)) {
+      if (
+        emojisBarRef.current !== null &&
+        emojisBarRef.current !== undefined &&
+        !emojisBarRef.current.contains(event.target as Node)
+      ) {
         onPickerEmojiClick();
       }
     },

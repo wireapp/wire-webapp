@@ -112,10 +112,10 @@ export class CallingViewModel {
 
     const toggleState = async (): Promise<void> => {
       const conversation = this.conversationState.activeConversation();
-      if (conversation) {
+      if (conversation !== null && conversation !== undefined) {
         const isActiveCall = this.callingRepository.findCall(conversation.qualifiedId);
 
-        if (isActiveCall) {
+        if (isActiveCall !== null && isActiveCall !== undefined) {
           this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE);
           return;
         }
@@ -161,7 +161,7 @@ export class CallingViewModel {
       }
 
       const call = await this.callingRepository.startCall(conversation);
-      if (!call) {
+      if (call === null || call === undefined) {
         return;
       }
 
@@ -186,7 +186,7 @@ export class CallingViewModel {
     };
 
     const hasJoinedCall = (): boolean => {
-      return !!this.callState.joinedCall();
+      return this.callState.joinedCall() !== null && this.callState.joinedCall() !== undefined;
     };
 
     this.callingRepository.onIncomingCall(async (call: Call) => {
@@ -393,7 +393,7 @@ export class CallingViewModel {
         call =>
           !matchQualifiedIds(call.conversation.qualifiedId, conversationId) && !idleCallStates.includes(call.state()),
       );
-    if (!otherActiveCall) {
+    if (otherActiveCall === null || otherActiveCall === undefined) {
       return Promise.resolve(true);
     }
 

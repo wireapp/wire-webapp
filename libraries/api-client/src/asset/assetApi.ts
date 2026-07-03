@@ -150,7 +150,7 @@ export class AssetAPI {
       domain: options?.domain,
     };
 
-    if (options?.auditData) {
+    if (options?.auditData !== null && options?.auditData !== undefined) {
       metadataObject.convId = options.auditData.conversationId;
       metadataObject.filename = options.auditData.filename;
       metadataObject.filetype = options.auditData.filetype;
@@ -222,7 +222,7 @@ export class AssetAPI {
     }
 
     const isValidDomain = (domain: string) =>
-      !!domain && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
+      domain.length !== 0 && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
 
     if (!isValidDomain(assetDomain)) {
       throw new TypeError(`Invalid asset domain ${assetDomain}`);

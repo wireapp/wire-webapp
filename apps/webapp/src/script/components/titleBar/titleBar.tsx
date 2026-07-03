@@ -147,7 +147,7 @@ export const TitleBar = ({
       hasService: hasService || hasApps,
     });
 
-    if (translationKey) {
+    if (translationKey !== '') {
       return translate(translationKey);
     }
 
@@ -155,8 +155,10 @@ export const TitleBar = ({
   }, [hasApps, hasDirectGuest, hasExternal, hasFederatedUsers, hasService, is1to1, isRequest, translate]);
 
   const hasCall = useMemo(() => {
-    const hasEntities = !!joinedCall;
-    return hasEntities && matchQualifiedIds(conversation.qualifiedId, joinedCall.conversation.qualifiedId);
+    if (joinedCall === null || joinedCall === undefined) {
+      return false;
+    }
+    return matchQualifiedIds(conversation.qualifiedId, joinedCall.conversation.qualifiedId);
   }, [conversation, joinedCall]);
 
   const showCallControls = ConversationFilter.showCallControls(conversation, hasCall);
@@ -252,7 +254,7 @@ export const TitleBar = ({
   };
 
   useEffect(() => {
-    if (!activeCalls.length && currentFocusedElementRef.current) {
+    if (activeCalls.length === 0 && currentFocusedElementRef.current !== null) {
       currentFocusedElementRef.current.focus();
       currentFocusedElementRef.current = null;
     }
@@ -341,7 +343,9 @@ export const TitleBar = ({
             <ConversationVerificationBadges conversation={conversation} />
           </div>
 
-          {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
+          {conversationSubtitle.length > 0 && (
+            <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>
+          )}
         </div>
       </li>
 
@@ -406,7 +410,7 @@ export const TitleBar = ({
         )}
       </li>
 
-      {badgeLabelCopy && (
+      {badgeLabelCopy.length > 0 && (
         <li
           className="conversation-title-bar-indication-badge"
           data-uie-name="status-indication-badge"

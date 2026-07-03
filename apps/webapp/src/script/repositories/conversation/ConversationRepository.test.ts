@@ -1978,6 +1978,7 @@ describe('ConversationRepository', () => {
         );
 
         conversation_et = _generateConversation();
+        await testFactory.conversation_repository['saveConversation'](conversation_et);
 
         memberJoinEvent = {
           conversation: conversation_et.id,

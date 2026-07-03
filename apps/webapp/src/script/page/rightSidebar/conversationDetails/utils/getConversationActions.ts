@@ -52,7 +52,7 @@ const getConversationActions = ({
   isParticipantBlocked = false,
   translate,
 }: GetConversationActionsParams): MenuItem[] => {
-  if (!conversationEntity) {
+  if (conversationEntity === null || conversationEntity === undefined) {
     return [];
   }
 
@@ -97,7 +97,7 @@ const getConversationActions = ({
       condition: conversationEntity.isRequest(),
       item: {
         click: async () => {
-          if (!userEntity) {
+          if (userEntity === null || userEntity === undefined) {
             return;
           }
           void actionsViewModel.cancelConnectionRequest(userEntity, true, getNextConversation());
@@ -117,10 +117,10 @@ const getConversationActions = ({
       },
     },
     {
-      condition: isSingleUser && Boolean(userEntity?.isConnected() || userEntity?.isRequest()),
+      condition: isSingleUser && Boolean(userEntity?.isConnected() === true || userEntity?.isRequest()),
       item: {
         click: () => {
-          if (!userEntity) {
+          if (userEntity === null || userEntity === undefined) {
             return;
           }
           void actionsViewModel.blockUser(userEntity);
@@ -134,7 +134,7 @@ const getConversationActions = ({
       condition: isSingleUser && isParticipantBlocked,
       item: {
         click: () => {
-          if (!userEntity) {
+          if (userEntity === null || userEntity === undefined) {
             return;
           }
           void actionsViewModel.unblockUser(userEntity);

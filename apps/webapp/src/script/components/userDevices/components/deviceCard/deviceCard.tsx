@@ -42,10 +42,10 @@ interface DeviceCardProps {
 
 const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = false}: DeviceCardProps) => {
   const {translate} = useApplicationContext();
-  const messageFocusedTabIndex = useMessageFocusedTabIndex(!!click);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(click !== null && click !== undefined);
   const {class: deviceClass = '?', id = '', label = '?'} = clientEntity;
   const name = clientEntity.getName();
-  const clickable = !!click;
+  const clickable = click !== null && click !== undefined;
 
   const deviceIdentity = getDeviceIdentity?.(clientEntity.id);
 
@@ -53,7 +53,7 @@ const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = 
 
   const clickOnDevice = () => {
     if (clickable) {
-      click(clientEntity);
+      click?.(clientEntity);
     }
   };
 

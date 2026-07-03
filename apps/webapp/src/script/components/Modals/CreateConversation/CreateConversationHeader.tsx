@@ -76,7 +76,9 @@ export const CreateConversationHeader = () => {
   };
 
   const isNextButtonDisabled =
-    !!error || !conversationName || (selfUser?.isExternal() && conversationType === ConversationType.Group);
+    error.length !== 0 ||
+    conversationName.length === 0 ||
+    (selfUser?.isExternal() && conversationType === ConversationType.Group);
 
   return (
     <div className="modal__header modal__header--list" css={createConversationHeaderContainerCss}>

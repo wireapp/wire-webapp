@@ -129,7 +129,8 @@ export class ListViewModel {
         return preferenceItems;
       }
 
-      const hasConnectRequests = !!this.userState.connectRequests().length;
+      const hasConnectRequests =
+        this.userState.connectRequests().length !== 0 && !Number.isNaN(this.userState.connectRequests().length);
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentState.CONNECTION_REQUESTS] : [];
 
       return states.concat(this.conversationState.visibleConversations());
@@ -157,7 +158,7 @@ export class ListViewModel {
   readonly answerCall = async (conversationEntity: Conversation): Promise<void> => {
     const call = this.callingRepository.findCall(conversationEntity.qualifiedId);
 
-    if (!call) {
+    if (call === null || call === undefined) {
       return;
     }
 
@@ -406,7 +407,7 @@ export class ListViewModel {
 
       const customLabel = conversationLabelRepository.getConversationCustomLabel(conversationEntity);
 
-      if (customLabel) {
+      if (customLabel !== null && customLabel !== undefined) {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
           label: this.translate('conversationsPopoverRemoveFrom', {name: customLabel.name}, {}, true),
@@ -553,7 +554,10 @@ export class ListViewModel {
 
   readonly clickToUnarchive = (conversationEntity: Conversation): void => {
     void this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
-      if (!this.conversationState.archivedConversations().length) {
+      if (
+        this.conversationState.archivedConversations().length === 0 ||
+        Number.isNaN(this.conversationState.archivedConversations().length)
+      ) {
         this.switchList(ListState.CONVERSATIONS);
       }
     });

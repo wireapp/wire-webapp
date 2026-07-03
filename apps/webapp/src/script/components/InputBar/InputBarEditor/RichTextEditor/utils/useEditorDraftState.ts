@@ -37,7 +37,7 @@ interface UseEditorDraftStateProps {
 export const useEditorDraftState = ({editorRef, saveDraftState, replaceEmojis}: UseEditorDraftStateProps) => {
   const saveDraft = useCallback(() => {
     const editor = editorRef.current;
-    if (!editor) {
+    if (editor === null || editor === undefined) {
       return;
     }
 

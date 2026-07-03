@@ -20,11 +20,13 @@
 export function getIceCandidatesTypes(iceCandidates: string[]): Record<string, number> {
   return iceCandidates.reduce<Record<string, number>>((types, candidateStr) => {
     const typeMatches = candidateStr.match(/typ (\w+)/);
-    if (!typeMatches) {
+    if (typeMatches === null || typeMatches === undefined) {
       return types;
     }
     const candidateType = typeMatches[1];
-    types[candidateType] = types[candidateType] + 1 || 1;
+    const currentCount = types[candidateType];
+    types[candidateType] =
+      (currentCount !== undefined && currentCount !== 0 && !Number.isNaN(currentCount) ? currentCount : 0) + 1;
     return types;
   }, {});
 }
@@ -46,7 +48,7 @@ export function isValidIceCandidatesGathering(
     return false;
   }
   const numberOfRelays = iceCandidates.filter(candidate => candidate.toLowerCase().includes('relay')).length;
-  const numberOfIceServers = (peerConnectionConfig.iceServers || []).length;
+  const numberOfIceServers = (peerConnectionConfig.iceServers ?? []).length;
   if (numberOfIceServers <= 0) {
     return true;
   }

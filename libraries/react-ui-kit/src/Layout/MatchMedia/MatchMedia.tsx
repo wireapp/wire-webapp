@@ -36,8 +36,8 @@ export interface MatchMediaProps extends React.HTMLProps<ReactFragment> {
   query: Query;
 }
 
-export const useMatchMedia = (query: Query, customWindowObj?: Window) => {
-  const windowObj = customWindowObj || window;
+export const useMatchMedia = (query: Query, customWindowObj?: Window): boolean => {
+  const windowObj = customWindowObj ?? window;
   const matchMedia = useMemo(() => windowObj.matchMedia(`(${query})`), [query, windowObj]);
 
   const [isMatching, setIsMatching] = useState(matchMedia.matches);

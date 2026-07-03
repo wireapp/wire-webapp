@@ -98,7 +98,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
 
   useEffect(() => {
     if (isEditingName) {
-      if (textAreaRef.current) {
+      if (textAreaRef.current !== null && textAreaRef.current !== undefined) {
         textAreaRef.current.style.height = `0px`;
         const {scrollHeight} = textAreaRef.current;
         textAreaRef.current.style.height = `${scrollHeight}px`;
@@ -107,7 +107,10 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
       if (!isEditGroupNameTouched.current) {
         setTimeout(() => {
           const currentValue = textAreaRef.current?.value;
-          const caretPosition = currentValue?.length || 0;
+          const caretPosition =
+            currentValue?.length !== undefined && currentValue.length !== 0 && !Number.isNaN(currentValue.length)
+              ? currentValue.length
+              : 0;
 
           textAreaRef.current?.setSelectionRange(caretPosition, caretPosition);
           textAreaRef.current?.focus();
@@ -130,7 +133,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
                 onClick: clickToEditGroupName,
               })}
             >
-              {displayName && <span className="conversation-details__name">{displayName}</span>}
+              {displayName.length > 0 && <span className="conversation-details__name">{displayName}</span>}
 
               {canRenameGroup && (
                 <button

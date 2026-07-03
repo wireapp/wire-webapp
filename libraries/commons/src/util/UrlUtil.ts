@@ -25,11 +25,11 @@ export function pathWithParams(
 ): string {
   const params: Record<string, any> = paramsToRecord(search);
 
-  if (additionalParams) {
+  if (additionalParams !== null && additionalParams !== undefined) {
     Object.assign(params, additionalParams);
   }
 
-  if (whitelistParams) {
+  if (whitelistParams !== null && whitelistParams !== undefined) {
     Object.keys(params).forEach(key => {
       if (!whitelistParams.includes(key)) {
         delete params[key];
@@ -37,7 +37,7 @@ export function pathWithParams(
     });
   }
   const queryString = new URLSearchParams(params).toString();
-  return `${path}${queryString ? `?${queryString}` : ''}`;
+  return `${path}${queryString.length > 0 ? `?${queryString}` : ''}`;
 }
 
 export function paramsToRecord(params: string): Record<string, any> {

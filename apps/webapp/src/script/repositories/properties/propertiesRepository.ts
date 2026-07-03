@@ -127,11 +127,11 @@ export class PropertiesRepository {
 
     let userConsentStatus = UserConsentStatus.ALL_DENIED;
 
-    if (marketingConsent && telemetryConsent) {
+    if (marketingConsent === true && telemetryConsent === true) {
       userConsentStatus = UserConsentStatus.ALL_GRANTED;
-    } else if (marketingConsent) {
+    } else if (marketingConsent === true) {
       userConsentStatus = UserConsentStatus.MARKETING_GRANTED;
-    } else if (telemetryConsent) {
+    } else if (telemetryConsent === true) {
       userConsentStatus = UserConsentStatus.TRACKING_GRANTED;
     }
 
@@ -205,7 +205,9 @@ export class PropertiesRepository {
   init(selfUserEntity: User): Promise<void> | Promise<WebappProperties> {
     this.selfUser(selfUserEntity);
 
-    return this.selfUser()?.isTemporaryGuest() ? this.initTemporaryGuestAccount() : this.initActivatedAccount();
+    return this.selfUser()?.isTemporaryGuest() === true
+      ? this.initTemporaryGuestAccount()
+      : this.initActivatedAccount();
   }
 
   private fetchWebAppAccountSettings(): Promise<void> {
@@ -255,9 +257,10 @@ export class PropertiesRepository {
     if (updatedPreference !== this.getPreference(propertiesType)) {
       this.setPreference(propertiesType, updatedPreference);
 
-      const savePromise = this.selfUser()?.isTemporaryGuest()
-        ? this.savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
-        : this.savePreferenceActivatedAccount(propertiesType, updatedPreference);
+      const savePromise =
+        this.selfUser()?.isTemporaryGuest() === true
+          ? this.savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
+          : this.savePreferenceActivatedAccount(propertiesType, updatedPreference);
 
       void savePromise.then(() => this.publishPropertyUpdate(propertiesType, updatedPreference));
     }

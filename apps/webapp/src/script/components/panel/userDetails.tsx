@@ -74,13 +74,15 @@ const UserDetailsComponent = ({
         </UserInfo>
       </div>
 
-      {participant.handle && (
+      {participant.handle.length > 0 && (
         <p className="panel-participant__user-name" data-uie-name="status-username" title={participant.handle}>
           {participant.handle}
         </p>
       )}
 
-      {classifiedDomains && <UserClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />}
+      {classifiedDomains !== null && classifiedDomains !== undefined && (
+        <UserClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />
+      )}
 
       <Avatar
         className="panel-participant__avatar"

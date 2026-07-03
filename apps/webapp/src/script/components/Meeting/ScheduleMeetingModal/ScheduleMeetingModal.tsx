@@ -66,10 +66,10 @@ export const ScheduleMeetingModal = ({onMeetingScheduled}: {onMeetingScheduled?:
 
   const displayErrors = useMemo(
     () => ({
-      title: errors.title ? translate(errors.title) : undefined,
-      startInPast: errors.startInPast ? translate(errors.startInPast) : undefined,
-      endInPast: errors.endInPast ? translate(errors.endInPast) : undefined,
-      endBeforeStart: errors.endBeforeStart ? translate(errors.endBeforeStart) : undefined,
+      title: errors.title !== undefined ? translate(errors.title) : undefined,
+      startInPast: errors.startInPast !== undefined ? translate(errors.startInPast) : undefined,
+      endInPast: errors.endInPast !== undefined ? translate(errors.endInPast) : undefined,
+      endBeforeStart: errors.endBeforeStart !== undefined ? translate(errors.endBeforeStart) : undefined,
     }),
     [errors, translate],
   );

@@ -73,13 +73,13 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     switch (event.type) {
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         const originalMessageId = event.data.replacing_message_id;
-        return originalMessageId
+        return originalMessageId !== null && originalMessageId !== undefined && originalMessageId.length > 0
           ? this.handleEditEvent(event, originalMessageId, messageAddQuoteAccessor)
           : this.handleAddEvent(event, messageAddQuoteAccessor);
       }
       case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD: {
         const originalMessageId = event.data.replacing_message_id;
-        return originalMessageId
+        return originalMessageId !== null && originalMessageId !== undefined && originalMessageId.length > 0
           ? this.handleEditEvent(event, originalMessageId, multipartMessageAddQuoteAccessor)
           : this.handleAddEvent(event, multipartMessageAddQuoteAccessor);
       }
@@ -95,7 +95,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     const originalEvent = (await this.eventService.loadEvent(event.conversation, originalMessageId)) as StoredEvent<
       MessageAddEvent | MultipartMessageAddEvent | undefined
     >;
-    if (!originalEvent) {
+    if (originalEvent === null || originalEvent === undefined) {
       return event;
     }
 
@@ -120,7 +120,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
   ): Promise<T> {
     const rawQuote = accessor.get(event);
 
-    if (!rawQuote || typeof rawQuote !== 'string') {
+    if (typeof rawQuote !== 'string' || rawQuote.length === 0) {
       return event;
     }
 
@@ -142,7 +142,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     const messageId = quote.quotedMessageId;
 
     const quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
-    if (!quotedMessage) {
+    if (quotedMessage === null || quotedMessage === undefined) {
       this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
       const quoteData: ProcessedQuoteData = {
         error: {

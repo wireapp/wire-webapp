@@ -162,12 +162,17 @@ export const InputBar = ({
     },
   });
 
-  const inputPlaceholder = messageTimer
-    ? translate('tooltipConversationEphemeral')
-    : translate('tooltipConversationInputPlaceholder');
+  const inputPlaceholder =
+    messageTimer !== 0 && !Number.isNaN(messageTimer)
+      ? translate('tooltipConversationEphemeral')
+      : translate('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
-  const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
+  const hasLocalEphemeralTimer =
+    isSelfDeletingMessagesEnabled &&
+    localMessageTimer !== 0 &&
+    !Number.isNaN(localMessageTimer) &&
+    !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
   const shouldReplaceEmoji = useUserPropertyValue<boolean>(
@@ -243,7 +248,7 @@ export const InputBar = ({
     translate,
   });
 
-  if (fileHandling.pastedFile && !!isCellsEnabled) {
+  if (fileHandling.pastedFile !== null && fileHandling.pastedFile !== undefined && !!isCellsEnabled) {
     uploadPastedFiles(fileHandling.pastedFile);
     fileHandling.clearPastedFile();
   }
@@ -272,18 +277,18 @@ export const InputBar = ({
     fireAndForgetInvoker.fireAndForget(sendMessage);
   }, [fireAndForgetInvoker, isSendingDisabled, sendMessage]);
 
-  const showAvatar = !!messageContent.text.length;
+  const showAvatar = messageContent.text.length !== 0 && !Number.isNaN(messageContent.text.length);
 
   return (
     <div ref={wrapperRef}>
       <InputBarContainer>
         {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
-        {classifiedDomains && !isConnectionRequest && (
+        {classifiedDomains !== null && classifiedDomains !== undefined && !isConnectionRequest && (
           <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
         )}
 
-        {isReplying && !isEditing && replyMessageEntity && (
+        {isReplying && !isEditing && replyMessageEntity !== null && replyMessageEntity !== undefined && (
           <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply(false)} />
         )}
 
@@ -291,7 +296,7 @@ export const InputBar = ({
           className={cx(`conversation-input-bar__input input-bar-container`, {
             [`conversation-input-bar__input--editing`]: isEditing,
             'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
-            'input-bar-container--with-files': !!files.length,
+            'input-bar-container--with-files': files.length !== 0 && !Number.isNaN(files.length),
           })}
         >
           {!isOutgoingRequest && (
@@ -306,7 +311,7 @@ export const InputBar = ({
                   />
                 )}
               </div>
-              {!isSelfUserRemoved && !fileHandling.pastedFile && (
+              {!isSelfUserRemoved && (fileHandling.pastedFile === null || fileHandling.pastedFile === undefined) ? (
                 <InputBarEditor
                   editorRef={editorRef}
                   editedMessage={editedMessage}
@@ -332,7 +337,9 @@ export const InputBar = ({
                   loadDraftState={draftState.load}
                   replaceEmojis={shouldReplaceEmoji}
                 >
-                  {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
+                  {files.length !== 0 && !Number.isNaN(files.length) && (
+                    <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />
+                  )}
                   <InputBarControls
                     conversation={conversation}
                     isCellsFeatureEnabled={isCellsEnabled}
@@ -356,11 +363,11 @@ export const InputBar = ({
                     onCellAssetUpload={onCellAssetUpload}
                   />
                 </InputBarEditor>
-              )}
+              ) : null}
             </>
           )}
 
-          {fileHandling.pastedFile && !isCellsEnabled && (
+          {fileHandling.pastedFile !== null && fileHandling.pastedFile !== undefined && !isCellsEnabled && (
             <PastedFileControls
               pastedFile={fileHandling.pastedFile}
               onClear={fileHandling.clearPastedFile}

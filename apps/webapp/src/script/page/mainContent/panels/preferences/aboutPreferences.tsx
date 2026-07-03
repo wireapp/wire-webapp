@@ -43,14 +43,23 @@ const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
   const desktopConfig = Config.getDesktopConfig();
 
   const termsOfUseUrl = useMemo(() => {
-    if (selfUser) {
+    if (selfUser !== null && selfUser !== undefined) {
       return externalUrl.termsOfUse;
     }
     return '';
   }, [selfUser]);
 
-  const showWireSection = !!(termsOfUseUrl || websiteUrl || privacyPolicyUrl);
-  const showSupportSection = !!(config.URL.SUPPORT.INDEX || config.URL.SUPPORT.CONTACT);
+  const showWireSection = !!(
+    (termsOfUseUrl !== undefined && termsOfUseUrl.length > 0) ||
+    (websiteUrl !== null && websiteUrl !== undefined && websiteUrl.length > 0) ||
+    (privacyPolicyUrl !== undefined && privacyPolicyUrl.length > 0)
+  );
+  const supportIndexUrl = config.URL.SUPPORT.INDEX;
+  const supportContactUrl = config.URL.SUPPORT.CONTACT;
+  const showSupportSection = !!(
+    (supportIndexUrl !== undefined && supportIndexUrl.length > 0) ||
+    (supportContactUrl !== undefined && supportContactUrl.length > 0)
+  );
 
   return (
     <PreferencesPage title={translate('preferencesAbout')}>
@@ -58,12 +67,7 @@ const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
         <PreferencesSection title={translate('preferencesAboutSupport')}>
           <ul className="preferences-about-list">
             <li className="preferences-about-list-item">
-              <Link
-                variant={LinkVariant.PRIMARY}
-                targetBlank
-                href={config.URL.SUPPORT.INDEX}
-                data-uie-name="go-support"
-              >
+              <Link variant={LinkVariant.PRIMARY} targetBlank href={supportIndexUrl} data-uie-name="go-support">
                 {translate('preferencesAboutSupportWebsite')}
               </Link>
             </li>
@@ -71,7 +75,7 @@ const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
               <Link
                 variant={LinkVariant.PRIMARY}
                 targetBlank
-                href={config.URL.SUPPORT.CONTACT}
+                href={supportContactUrl}
                 data-uie-name="go-contact-support"
               >
                 {translate('preferencesAboutSupportContact')}
@@ -83,21 +87,21 @@ const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
       {showWireSection && (
         <PreferencesSection title={config.BRAND_NAME}>
           <ul className="preferences-about-list">
-            {termsOfUseUrl && (
+            {termsOfUseUrl !== undefined && termsOfUseUrl.length > 0 && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={termsOfUseUrl} data-uie-name="go-legal">
                   {translate('preferencesAboutTermsOfUse')}
                 </Link>
               </li>
             )}
-            {privacyPolicyUrl && (
+            {privacyPolicyUrl !== undefined && privacyPolicyUrl.length > 0 && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={privacyPolicyUrl} data-uie-name="go-privacy">
                   {translate('preferencesAboutPrivacyPolicy')}
                 </Link>
               </li>
             )}
-            {websiteUrl && (
+            {websiteUrl !== null && websiteUrl !== undefined && websiteUrl.length > 0 && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={websiteUrl} data-uie-name="go-wire-dot-com">
                   {translate('preferencesAboutWebsite', {brandName: config.BRAND_NAME})}
@@ -108,7 +112,7 @@ const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
         </PreferencesSection>
       )}
       <PreferencesSection hasSeparator>
-        {desktopConfig && (
+        {desktopConfig !== null && desktopConfig !== undefined && (
           <p className="preferences-detail">
             {translate('preferencesAboutDesktopVersion', {version: desktopConfig.version})}
           </p>

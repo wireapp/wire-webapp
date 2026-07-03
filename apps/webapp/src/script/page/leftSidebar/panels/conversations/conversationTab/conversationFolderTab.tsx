@@ -78,7 +78,10 @@ export const ConversationFolderTab = ({
   const folders = labels
     .filter(label => label.type !== LabelType.Favorite)
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
-    .filter(({conversations, name}) => !!conversations().length && !!name);
+    .filter(
+      ({conversations, name}) =>
+        conversations().length !== 0 && !Number.isNaN(conversations().length) && name.length !== 0,
+    );
 
   const placeholder = useMemo(
     () => (
@@ -146,7 +149,9 @@ export const ConversationFolderTab = ({
       >
         <span className="conversations-sidebar-btn--text-wrapper">
           {Icon}
-          <span className="conversations-sidebar-btn--text">{label || title}</span>
+          <span className="conversations-sidebar-btn--text">
+            {label !== null && label !== undefined && label.length > 0 ? label : title}
+          </span>
           <Icons.ChevronIcon className="folders-open-indicator" />
         </span>
       </button>
@@ -169,7 +174,7 @@ export const ConversationFolderTab = ({
                 onClick={() => toggleFolder(folder.id)}
               >
                 <span>{folder.name}</span>
-                {!!unreadCount && (
+                {unreadCount !== 0 && !Number.isNaN(unreadCount) && (
                   <span
                     className={cx('conversations-sidebar-btn--badge', {active: isActive})}
                     data-uie-name="unread-badge"

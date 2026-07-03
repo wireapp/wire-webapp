@@ -164,7 +164,7 @@ export class StorageSchemata {
             .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
             .toCollection()
             .modify(event => {
-              const mappedEvent = event.mapped || event.raw;
+              const mappedEvent = event.mapped ?? event.raw;
               delete event.mapped;
               delete event.raw;
               delete event.meta;

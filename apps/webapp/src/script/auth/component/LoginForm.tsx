@@ -56,7 +56,12 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
       return;
     }
 
-    if (!emailInput.current || !passwordInput.current) {
+    if (
+      emailInput.current === null ||
+      emailInput.current === undefined ||
+      passwordInput.current === null ||
+      passwordInput.current === undefined
+    ) {
       return;
     }
 
@@ -69,7 +74,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         emailInput.current.name,
         emailInput.current.validity,
       );
-      if (emailValidationError) {
+      if (emailValidationError !== null && emailValidationError !== undefined) {
         validationErrors.push(emailValidationError);
       }
     }
@@ -83,7 +88,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         passwordInput.current.name,
         passwordInput.current.validity,
       );
-      if (passwordValidationError) {
+      if (passwordValidationError !== null && passwordValidationError !== undefined) {
         validationErrors.push(passwordValidationError);
       }
     }

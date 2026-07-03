@@ -82,7 +82,9 @@ export const getBackgroundEffectLabel = (
     .with({type: 'virtual'}, ({backgroundId}: {backgroundId: string}) => {
       const background = backgrounds.find(({id}) => id === backgroundId);
 
-      return background ? translate(background.labelKey) : translate('videoCallBackgroundVirtual');
+      return background !== null && background !== undefined
+        ? translate(background.labelKey)
+        : translate('videoCallBackgroundVirtual');
     })
     .with({type: 'custom'}, () => translate('videoCallBackgroundCustom'))
     .exhaustive();

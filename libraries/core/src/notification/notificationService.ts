@@ -103,7 +103,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
 
   public async hasHistory(): Promise<boolean> {
     const notificationEvents = await this.getNotificationEventList();
-    return !!notificationEvents.length;
+    return notificationEvents.length !== 0 && !Number.isNaN(notificationEvents.length);
   }
 
   public getNotificationEventList(): Promise<BackendEvent[]> {

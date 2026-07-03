@@ -67,11 +67,17 @@ const PanelHeader: FC<PanelHeaderProps> = ({
 }: PanelHeaderProps) => {
   const {translate} = useApplicationContext();
   const panelHeaderRef = useRef<HTMLHeadingElement>(null);
-  const effectiveGoBackTitle = goBackTitle || translate('accessibility.rightPanel.GoBack');
-  const effectiveCloseButtonTitle = closeBtnTitle || translate('accessibility.rightPanel.close');
+  const effectiveGoBackTitle =
+    goBackTitle !== null && goBackTitle !== undefined && goBackTitle.length > 0
+      ? goBackTitle
+      : translate('accessibility.rightPanel.GoBack');
+  const effectiveCloseButtonTitle =
+    closeBtnTitle !== null && closeBtnTitle !== undefined && closeBtnTitle.length > 0
+      ? closeBtnTitle
+      : translate('accessibility.rightPanel.close');
 
   useEffect(() => {
-    if (!!panelHeaderRef.current && shouldFocusFirstButton) {
+    if (panelHeaderRef.current !== null && shouldFocusFirstButton) {
       const nextElementToFocus = panelHeaderRef.current.querySelector('button');
       // TO-DO Remove setTimeout after replacing transition group animation libray
       // triggering focus method without setTimeout is not working due to right side bar animation
@@ -91,7 +97,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
         </DraggableClickWrapper>
       )}
 
-      {title && (
+      {title.length > 0 && (
         <h2 className="panel__header__title" tabIndex={TabIndex.FOCUSABLE} data-uie-name={titleDataUieName}>
           {title}
         </h2>

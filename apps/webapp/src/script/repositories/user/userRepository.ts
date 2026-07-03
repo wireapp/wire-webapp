@@ -89,7 +89,7 @@ type GetUserOptions = {
 };
 
 function generateQualifiedId(userData: {id: string; qualified_id?: QualifiedId; domain?: string}): QualifiedId {
-  if (userData.qualified_id) {
+  if (userData.qualified_id !== null && userData.qualified_id !== undefined) {
     return userData.qualified_id;
   }
   return {
@@ -233,7 +233,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
       const userWithEscapedDefaultName = this.replaceDeletedUserNameWithNameInDb(user, localUser);
 
-      if (userWithAvailability) {
+      if (userWithAvailability !== null && userWithAvailability !== undefined) {
         return {
           availability: userWithAvailability.availability,
           ...userWithEscapedDefaultName,
@@ -251,7 +251,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     // Assign connections to users
     mappedUsers.forEach(user => {
       const connection = connections.find(connection => matchQualifiedIds(connection.userId, user.qualifiedId));
-      if (connection) {
+      if (connection !== null && connection !== undefined) {
         user.connection(connection);
       }
     });
@@ -303,7 +303,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     // Check if user's supported protocols were updated, if they were, we need to re-evaluate a 1:1 conversation to use with that user
     const newSupportedProtocols = user.supported_protocols;
-    if (newSupportedProtocols) {
+    if (newSupportedProtocols !== null && newSupportedProtocols !== undefined) {
       await this.onUserSupportedProtocolsUpdate(userId, newSupportedProtocols);
     }
 
@@ -317,7 +317,8 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
 
     const hasSupportedProtocolsChanged =
-      !localSupportedProtocols ||
+      localSupportedProtocols === null ||
+      localSupportedProtocols === undefined ||
       !(
         localSupportedProtocols.length === newSupportedProtocols.length &&
         [...localSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
@@ -334,10 +335,10 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * Will update the user both in database and in memory.
    */
   private async updateUser(userId: QualifiedId, user: Partial<UserRecord>, isWebSocket = false): Promise<User> {
-    if (user.deleted && user.name) {
+    if (user.deleted === true && user.name !== null && user.name !== undefined && user.name.length > 0) {
       const dbUser = await this.userService.loadUserFromDb(userId);
 
-      if (dbUser && dbUser.name) {
+      if (dbUser !== null && dbUser !== undefined && dbUser.name.length > 0) {
         user.name = dbUser.name;
       }
     }
@@ -346,7 +347,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const isSelfUser = matchQualifiedIds(userId, selfUser.qualifiedId);
     const userEntity = isSelfUser ? selfUser : await this.getUserById(userId);
 
-    if (isWebSocket && user.name) {
+    if (isWebSocket && user.name !== null && user.name !== undefined && user.name.length > 0) {
       user.name = fixWebsocketString(user.name);
     }
 
@@ -370,7 +371,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     userEntities.forEach(userEntity => {
       const connectionEntity = connectionEntities.find(({userId}) => matchQualifiedIds(userId, userEntity));
-      if (connectionEntity) {
+      if (connectionEntity !== null && connectionEntity !== undefined) {
         userEntity.connection(connectionEntity);
       }
     });
@@ -392,7 +393,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
-      const clientEntities = recipients[userEntity.id];
+      const clientEntities = recipients[userEntity.id] ?? [];
       const tooManyClients = clientEntities.length > 8;
       if (tooManyClients) {
         this.logger.debug(`Found '${clientEntities.length}' clients for user`);
@@ -460,7 +461,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       await Promise.all(
         users.map(async ({userId, clients}) => {
           return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).filter(
-            client => !!client,
+            client => client !== null && client !== undefined,
           );
         }),
       ),
@@ -493,7 +494,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
   private readonly setAvailability = async (availability: Availability.Type): Promise<void> => {
     const selfUser = this.userState.self();
-    if (!selfUser) {
+    if (selfUser === null || selfUser === undefined) {
       return;
     }
     const hasAvailabilityChanged = availability !== selfUser.availability();
@@ -560,12 +561,15 @@ export class UserRepository extends TypedEventEmitter<Events> {
     defaultDomain: string,
   ): Promise<{found: APIClientUser[]; failed: QualifiedId[]}> {
     const chunksOfUserIds = chunk<QualifiedId>(
-      userIds.filter(({id}) => !!id),
+      userIds.filter(({id}) => id !== undefined && id.length !== 0),
       Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
     );
 
     const getChunk = async (chunkOfUserIds: QualifiedId[]) => {
-      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || defaultDomain, id}));
+      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({
+        domain: domain !== undefined && domain.length > 0 ? domain : defaultDomain,
+        id,
+      }));
 
       try {
         const {found, failed = [], not_found = []} = await this.userService.getUsers(chunkOfQualifiedUserIds);
@@ -595,11 +599,11 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
   // Replaces a deleted user name ("default") with the name from the local database.
   private replaceDeletedUserNameWithNameInDb(user: APIClientUser, localUser?: UserRecord): UserRecord {
-    if (!user.deleted) {
+    if (user.deleted !== true) {
       return user;
     }
 
-    if (localUser && localUser.name) {
+    if (localUser !== null && localUser !== undefined && localUser.name.length > 0) {
       return {
         ...user,
         name: localUser.name,
@@ -612,7 +616,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
   private mapUserResponse(found: APIClientUser[], failed: QualifiedId[], dbUsers: UserRecord[]): User[] {
     const selfUser = this.userState.self();
 
-    if (!selfUser) {
+    if (selfUser === null || selfUser === undefined) {
       throw new Error('Self user is not defined');
     }
 
@@ -622,7 +626,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       // When a federated backend is unreachable, we try to load a user from the local database.
       const dbUserRecord = dbUsers?.find(user => matchQualifiedIds(user.qualified_id, userId));
 
-      if (dbUserRecord && selfUser) {
+      if (dbUserRecord !== null && dbUserRecord !== undefined && selfUser !== null && selfUser !== undefined) {
         return this.userMapper.mapUserFromJson(dbUserRecord, selfDomain);
       }
 
@@ -661,7 +665,13 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   findUsersByIds(userIds: QualifiedId[]): User[] {
-    return this.userState.users().filter(user => userIds.find(userId => matchQualifiedIds(user.qualifiedId, userId)));
+    return this.userState
+      .users()
+      .filter(
+        user =>
+          userIds.find(userId => matchQualifiedIds(user.qualifiedId, userId)) !== null &&
+          userIds.find(userId => matchQualifiedIds(user.qualifiedId, userId)) !== undefined,
+      );
   }
 
   /**
@@ -698,10 +708,10 @@ export class UserRepository extends TypedEventEmitter<Events> {
    */
   async getUserById(userId: QualifiedId, {localOnly}: GetUserOptions = {}): Promise<User> {
     const user = this.findUserById(userId);
-    if (user) {
+    if (user !== null && user !== undefined) {
       return user;
     }
-    if (localOnly) {
+    if (localOnly === true) {
       const deletedUser = new User(userId.id, userId.domain, this.translate);
       deletedUser.isDeleted = true;
       deletedUser.name(this.translate('deletedUser'));
@@ -731,7 +741,8 @@ export class UserRepository extends TypedEventEmitter<Events> {
       const supportedProtocols = await this.userService.getUserSupportedProtocols(user.qualifiedId);
 
       const haveSupportedProtocolsChanged =
-        !localSupportedProtocols ||
+        localSupportedProtocols === null ||
+        localSupportedProtocols === undefined ||
         !(
           localSupportedProtocols.length === supportedProtocols.length &&
           [...localSupportedProtocols].every(protocol => supportedProtocols.includes(protocol))
@@ -760,12 +771,12 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const localUser = this.findUserById(userId);
     const localSupportedProtocols = localUser?.supportedProtocols();
 
-    if (shouldRefreshUser && localUser) {
+    if (shouldRefreshUser && localUser !== null && localUser !== undefined) {
       // Trigger a refresh of the supported protocols in the background. No need to await for this one.
       void this.refreshUserSupportedProtocols(localUser);
     }
 
-    if (localSupportedProtocols) {
+    if (localSupportedProtocols !== null && localSupportedProtocols !== undefined) {
       return localSupportedProtocols;
     }
 
@@ -776,7 +787,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       await this.updateUserSupportedProtocols(userId, supportedProtocols);
       return supportedProtocols;
     } catch (error: unknown) {
-      if (localSupportedProtocols) {
+      if (localSupportedProtocols !== null && localSupportedProtocols !== undefined) {
         this.logger.warn(
           `Failed when fetching supported protocols of user ${userId.id}, using local supported protocols as fallback: `,
           localSupportedProtocols,
@@ -808,17 +819,22 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * Check for users locally and fetch them from the server otherwise.
    */
   async getUsersById(userIds: QualifiedId[] = [], {localOnly}: GetUserOptions = {}): Promise<User[]> {
-    if (!userIds.length) {
+    if (userIds.length === 0 || Number.isNaN(userIds.length)) {
       return [];
     }
 
-    const allUsers = await Promise.all(userIds.map(userId => this.findUserById(userId) || userId));
+    const allUsers = await Promise.all(
+      userIds.map(userId => {
+        const knownUser = this.findUserById(userId);
+        return knownUser !== null && knownUser !== undefined ? knownUser : userId;
+      }),
+    );
     const [knownUserEntities, unknownUserIds] = partition(allUsers, item => item instanceof User) as [
       User[],
       QualifiedId[],
     ];
 
-    if (localOnly || !unknownUserIds.length) {
+    if (localOnly === true || unknownUserIds.length === 0 || Number.isNaN(unknownUserIds.length)) {
       return knownUserEntities;
     }
 
@@ -836,7 +852,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
    */
   private saveUser(userEntity: User, isMe: boolean = false): User {
     const user = this.findUserById(userEntity.qualifiedId);
-    if (!user) {
+    if (user === null || user === undefined) {
       if (isMe) {
         userEntity.isMe = true;
         this.userState.self(userEntity);
@@ -851,7 +867,10 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * @returns Resolves with users passed as parameter
    */
   private saveUsers(userEntities: User[]): User[] {
-    const newUsers = userEntities.filter(userEntity => !this.findUserById(userEntity.qualifiedId));
+    const newUsers = userEntities.filter(
+      userEntity =>
+        this.findUserById(userEntity.qualifiedId) === null || this.findUserById(userEntity.qualifiedId) === undefined,
+    );
     this.userState.users.push(...newUsers);
     return userEntities;
   }
@@ -896,7 +915,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
    */
   private async updateSavedUser(user: APIClientUser): Promise<User> {
     const localUserEntity = this.findUserById(generateQualifiedId(user));
-    if (!localUserEntity) {
+    if (localUserEntity === null || localUserEntity === undefined) {
       // If the user could not be found locally, we will get it and save it locally
       return this.getUserById(user.qualified_id);
     }
@@ -909,7 +928,12 @@ export class UserRepository extends TypedEventEmitter<Events> {
     if (this.teamState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
     }
-    if (updatedUser && this.teamState.isInTeam(updatedUser) && updatedUser.isDeleted) {
+    if (
+      updatedUser !== null &&
+      updatedUser !== undefined &&
+      this.teamState.isInTeam(updatedUser) &&
+      updatedUser.isDeleted
+    ) {
       amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, userId);
     }
     return updatedUser;
@@ -934,7 +958,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     for (const userId of userIds) {
       const matchingUserIds = this.findMatchingUser(userId, userEntities);
 
-      if (!matchingUserIds) {
+      if (matchingUserIds === null || matchingUserIds === undefined) {
         userEntities.push(this.createDeletedUser(userId));
       }
     }
@@ -1024,7 +1048,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
   mapGuestStatus(userEntities = this.userState.users()): void {
     const selfTeamId = this.userState.self().teamId;
     userEntities.forEach(userEntity => {
-      if (!userEntity.isMe && selfTeamId) {
+      if (!userEntity.isMe && selfTeamId !== null && selfTeamId !== undefined && selfTeamId.length > 0) {
         const isTeamMember = this.teamState.isInTeam(userEntity);
         const isGuest = !userEntity.isService && !isTeamMember;
         userEntity.isGuest(isGuest);

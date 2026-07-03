@@ -76,20 +76,23 @@ const AccountSecuritySection = ({
 
   return (
     <PreferencesSection hasSeparator className="preferences-section-account-security">
-      {manageTeamUrl && hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
-        <Link
-          tabIndex={TabIndex.FOCUSABLE}
-          variant={LinkVariant.PRIMARY}
-          href={manageTeamUrl}
-          targetBlank
-          data-uie-name="do-manage-team"
-          type="button"
-        >
-          {translate('preferencesAccountManageTeam')}
-        </Link>
-      )}
+      {manageTeamUrl !== null &&
+        manageTeamUrl !== undefined &&
+        manageTeamUrl.length > 0 &&
+        hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
+          <Link
+            tabIndex={TabIndex.FOCUSABLE}
+            variant={LinkVariant.PRIMARY}
+            href={manageTeamUrl}
+            targetBlank
+            data-uie-name="do-manage-team"
+            type="button"
+          >
+            {translate('preferencesAccountManageTeam')}
+          </Link>
+        )}
 
-      {createTeamUrl && !isMacOsWrapper && (
+      {createTeamUrl !== null && createTeamUrl !== undefined && createTeamUrl.length > 0 && !isMacOsWrapper && (
         <Link variant={LinkVariant.PRIMARY} targetBlank href={createTeamUrl} data-uie-name="do-create-team">
           {translate('preferencesAccountCreateTeam')}
         </Link>

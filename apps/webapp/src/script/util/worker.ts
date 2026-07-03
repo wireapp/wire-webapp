@@ -28,7 +28,7 @@ export class WebWorker {
   constructor(private workerCreator: () => Worker) {}
 
   private get worker(): Worker {
-    if (!this.#worker) {
+    if (this.#worker === null || this.#worker === undefined) {
       this.#worker = this.workerCreator();
     }
     return this.#worker;

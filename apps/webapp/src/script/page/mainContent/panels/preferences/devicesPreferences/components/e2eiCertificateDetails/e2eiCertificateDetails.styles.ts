@@ -60,7 +60,7 @@ export const styles: stylesProps = {
     },
   },
   e2eiStatus: (MLSStatus?: MLSStatuses) => ({
-    color: MLSStatus ? MLSStatusColor[MLSStatus] : 'var(--green-500)',
+    color: MLSStatus !== null && MLSStatus !== undefined ? MLSStatusColor[MLSStatus] : 'var(--green-500)',
     marginLeft: '4px',
   }),
   serialNumberWrapper: {

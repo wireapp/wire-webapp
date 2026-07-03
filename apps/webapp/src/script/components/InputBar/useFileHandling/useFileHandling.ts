@@ -53,7 +53,7 @@ export const useFileHandling = ({
   const clearPastedFile = () => setPastedFile(null);
 
   const sendPastedFile = () => {
-    if (pastedFile) {
+    if (pastedFile !== null && pastedFile !== undefined) {
       uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
@@ -66,7 +66,7 @@ export const useFileHandling = ({
   };
 
   useEffect(() => {
-    if (!pastedFile) {
+    if (pastedFile === null || pastedFile === undefined) {
       return () => undefined;
     }
 

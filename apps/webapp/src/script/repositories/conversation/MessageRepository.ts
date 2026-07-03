@@ -19,6 +19,7 @@
 
 import {AssetAuditData} from '@wireapp/api-client/lib/asset';
 import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
@@ -366,7 +367,10 @@ export class MessageRepository {
       quote?: OutgoingQuote;
     },
   ): T {
-    const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
+    const quoteData =
+      quote !== null && quote !== undefined
+        ? {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)}
+        : undefined;
 
     return new TextContentBuilder(baseMessage)
       .withMentions(
@@ -378,7 +382,7 @@ export class MessageRepository {
         })),
       )
       .withQuote(quoteData)
-      .withLinkPreviews(linkPreview ? [linkPreview] : [])
+      .withLinkPreviews(linkPreview !== null && linkPreview !== undefined ? [linkPreview] : [])
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .withLegalHoldStatus(conversation.legalHoldStatus())
       .build();
@@ -419,7 +423,7 @@ export class MessageRepository {
     };
 
     let state;
-    if (attachments && attachments.length > 0) {
+    if (attachments !== null && attachments !== undefined && attachments.length > 0) {
       state = (await this.sendMultipartText({...textPayload, attachments})).state;
     } else {
       state = (await this.sendText(textPayload)).state;
@@ -460,7 +464,7 @@ export class MessageRepository {
     const messagePayload = {
       attachments: originalMessage
         .getMultipartAssets()
-        .map(multipart => multipart.attachments?.() || [])
+        .map(multipart => multipart.attachments?.() ?? [])
         .flat()
         .filter(Boolean),
       conversation,
@@ -488,7 +492,8 @@ export class MessageRepository {
   private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}, conversationId: QualifiedId) {
     // check if the user actually wants to send link previews
     if (
-      !this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND) ||
+      this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND) === null ||
+      this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND) === undefined ||
       Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS === false
     ) {
       return;
@@ -501,20 +506,21 @@ export class MessageRepository {
     }
 
     const linkPreview = await getLinkPreviewFromString(textPayload.message);
-    if (linkPreview) {
+    if (linkPreview !== null && linkPreview !== undefined) {
       const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
 
       // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
       await this.sendText(
         {
           ...textPayload,
-          linkPreview: linkPreview.image
-            ? await this.core.service!.linkPreview.uploadLinkPreviewImage(
-                linkPreview as LinkPreviewContent,
-                conversationId,
-                isAuditLogEnabled,
-              )
-            : linkPreview,
+          linkPreview:
+            linkPreview.image !== null && linkPreview.image !== undefined
+              ? await this.core.service!.linkPreview.uploadLinkPreviewImage(
+                  linkPreview as LinkPreviewContent,
+                  conversationId,
+                  isAuditLogEnabled,
+                )
+              : linkPreview,
         },
         {syncTimestamp: false},
       );
@@ -536,7 +542,7 @@ export class MessageRepository {
     tag: string | number | Record<string, string>,
     QuoteEntity?: OutgoingQuote,
   ): Promise<void> {
-    if (!tag) {
+    if (tag === null || tag === undefined) {
       tag = this.translate('extensionsGiphyRandom');
     }
 
@@ -574,7 +580,12 @@ export class MessageRepository {
    * @returns Can assets be uploaded
    */
   private canUploadAssetsToConversation(conversationEntity: Conversation) {
-    return !!conversationEntity && !conversationEntity.isRequest() && !conversationEntity.isSelfUserRemoved();
+    return (
+      conversationEntity !== null &&
+      conversationEntity !== undefined &&
+      !conversationEntity.isRequest() &&
+      !conversationEntity.isSelfUserRemoved()
+    );
   }
 
   /**
@@ -600,7 +611,7 @@ export class MessageRepository {
     window.addEventListener('beforeunload', beforeUnload);
     const assetMetadata = await this.createAssetMetadata(conversation, file, asImage, originalId);
 
-    if (!assetMetadata) {
+    if (assetMetadata === null || assetMetadata === undefined) {
       window.removeEventListener('beforeunload', beforeUnload);
       return;
     }
@@ -693,7 +704,7 @@ export class MessageRepository {
     }
 
     const asset_et = message_et.getFirstAsset() as FileAsset;
-    if (asset_et) {
+    if (asset_et !== null && asset_et !== undefined) {
       if (!asset_et.isDownloadable()) {
         throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
       }
@@ -711,18 +722,22 @@ export class MessageRepository {
    * @returns Array of attachment ids
    */
   public getCellsAssetAttachmentIds(messageEntity: Message): string[] {
-    if (!messageEntity.hasMultipartAsset || !messageEntity.isContent()) {
+    if (!messageEntity.hasMultipartAsset() || !messageEntity.isContent()) {
       return [];
     }
 
     const multipartAsset = messageEntity.getFirstAsset();
-    if (!multipartAsset || !multipartAsset.isMultipart()) {
+    if (multipartAsset === null || multipartAsset === undefined || !multipartAsset.isMultipart()) {
       return [];
     }
 
     const attachments = multipartAsset.attachments?.() ?? [];
     const cellsAttachmentsIds = attachments.flatMap(attachment =>
-      attachment.cellAsset?.uuid ? [attachment.cellAsset.uuid] : [],
+      attachment.cellAsset?.uuid !== null &&
+      attachment.cellAsset?.uuid !== undefined &&
+      attachment.cellAsset?.uuid.length > 0
+        ? [attachment.cellAsset.uuid]
+        : [],
     );
 
     return cellsAttachmentsIds;
@@ -740,9 +755,12 @@ export class MessageRepository {
     try {
       const metadata = await buildMetadata(file);
       const meta = {
-        audio: (isAudio(file) && metadata) || null,
-        video: (isVideo(file) && metadata) || null,
-        image: (allowImageDetection && isImage(file) && metadata) || null,
+        audio: isAudio(file) && metadata !== null && metadata !== undefined ? metadata : null,
+        video: isVideo(file) && metadata !== null && metadata !== undefined ? metadata : null,
+        image:
+          allowImageDetection === true && isImage(file) && metadata !== null && metadata !== undefined
+            ? metadata
+            : null,
         length: file.size,
         name: (file as File).name,
         type: file.type,
@@ -799,22 +817,23 @@ export class MessageRepository {
       expectsReadConfirmation: this.expectReadReceipt(conversation),
     };
 
-    const assetMessage = metadata
-      ? MessageBuilder.buildImageMessage(
-          {
-            ...commonMessageData,
-            image: metadata,
-          },
-          messageId,
-        )
-      : MessageBuilder.buildFileDataMessage(
-          {
-            metaData: meta,
-            ...commonMessageData,
-            file: {data: Buffer.from(await file.arrayBuffer())},
-          },
-          messageId,
-        );
+    const assetMessage =
+      metadata !== null && metadata !== undefined
+        ? MessageBuilder.buildImageMessage(
+            {
+              ...commonMessageData,
+              image: metadata,
+            },
+            messageId,
+          )
+        : MessageBuilder.buildFileDataMessage(
+            {
+              metaData: meta,
+              ...commonMessageData,
+              file: {data: Buffer.from(await file.arrayBuffer())},
+            },
+            messageId,
+          );
 
     return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true});
   }
@@ -939,13 +958,16 @@ export class MessageRepository {
     },
   ): Promise<SendAndInjectResult> {
     const messageTimer = conversation.messageTimer();
-    const payload = enableEphemeral && messageTimer ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
+    const payload =
+      enableEphemeral && messageTimer !== 0 && !Number.isNaN(messageTimer)
+        ? MessageBuilder.wrapInEphemeral(message, messageTimer)
+        : message;
 
     const injectOptimisticEvent = async () => {
-      if (!skipInjection) {
+      if (skipInjection !== true) {
         const clientId = this.clientState.currentClient?.id;
 
-        if (!clientId) {
+        if (clientId === null || clientId === undefined || clientId.length === 0) {
           this.logger.error('No current client id found, cannot send message optimistically');
           return true;
         }
@@ -964,7 +986,9 @@ export class MessageRepository {
         );
         await this.eventRepository.injectEvent(mappedEvent);
       }
-      return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
+      return silentDegradationWarning === true
+        ? true
+        : this.requestUserSendingPermission(conversation, false, consentType);
     };
 
     const handleSuccess = async ({sentAt, failedToSend}: SendResult) => {
@@ -973,7 +997,7 @@ export class MessageRepository {
       const preMessageTimestamp = new Date(sentTimestamp).toISOString();
       // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
       await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
-      if (!skipInjection) {
+      if (skipInjection !== true) {
         await this.updateMessageAsSent(
           conversation,
           payload.messageId,
@@ -1144,7 +1168,10 @@ export class MessageRepository {
         return;
       }
     }
-    const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
+    const moreMessageIds =
+      moreMessageEntities.length !== 0 && !Number.isNaN(moreMessageEntities.length)
+        ? moreMessageEntities.map(entity => entity.id)
+        : undefined;
     const confirmationMessage = MessageBuilder.buildConfirmationMessage({
       firstMessageId: messageEntity.id,
       moreMessageIds,
@@ -1195,11 +1222,11 @@ export class MessageRepository {
 
   private expectReadReceipt(conversationEntity: Conversation): boolean {
     if (conversationEntity.is1to1()) {
-      return !!this.propertyRepository.receiptMode();
+      return this.propertyRepository.receiptMode() === RECEIPT_MODE.ON;
     }
 
-    if (conversationEntity.teamId && conversationEntity.isGroupOrChannel()) {
-      return !!conversationEntity.receiptMode();
+    if (conversationEntity.teamId.length > 0 && conversationEntity.isGroupOrChannel()) {
+      return conversationEntity.receiptMode() === RECEIPT_MODE.ON;
     }
 
     return false;
@@ -1231,21 +1258,30 @@ export class MessageRepository {
     }
 
     try {
-      if (!message.user().isMe && !message.ephemeral_expires()) {
+      const ephemeralExpiration = message.ephemeral_expires();
+      const hasNoEphemeralExpiration =
+        ephemeralExpiration === false ||
+        (typeof ephemeralExpiration === 'number' && (ephemeralExpiration === 0 || Number.isNaN(ephemeralExpiration))) ||
+        (typeof ephemeralExpiration === 'string' && ephemeralExpiration.length === 0);
+
+      if (message.user().isMe === false && hasNoEphemeralExpiration) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const userIds = options.targetedUsers || conversation.allUserEntities().map(user => user!.qualifiedId);
+      const userIds =
+        options.targetedUsers !== null && options.targetedUsers !== undefined
+          ? options.targetedUsers
+          : conversation.allUserEntities().map(user => user!.qualifiedId);
       const payload = MessageBuilder.buildDeleteMessage({
         messageId: message.id,
       });
       await this.sendAndInjectMessage(payload, conversation, {
         recipients: userIds,
         // if we want optimistic removal, we can rely on the injection system that will handle the event and remove the message even before the message is sent
-        skipInjection: !options.optimisticRemoval,
+        skipInjection: options.optimisticRemoval !== true,
         // If there are recipients to the message, we only want to target those users (case of ephemeral messages that should be deleted in the sender's client and the user's own clients)
-        targetMode: userIds ? MessageTargetMode.USERS : undefined,
+        targetMode: userIds !== null && userIds !== undefined ? MessageTargetMode.USERS : undefined,
       });
-      if (!options.optimisticRemoval) {
+      if (options.optimisticRemoval !== true) {
         this.deleteMessageById(conversation, message.id);
       }
     } catch (error: unknown) {
@@ -1305,7 +1341,11 @@ export class MessageRepository {
    */
   public async updateClearedTimestamp(conversation: Conversation): Promise<void> {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
-    if (timestamp && conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
+    if (timestamp !== 0 && !Number.isNaN(timestamp)) {
+      const clearedTimestamp = conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
+      if (clearedTimestamp === false) {
+        return;
+      }
       const payload = MessageBuilder.buildClearedMessage(conversation.qualifiedId);
       await this.sendToSelfConversations(payload);
     }
@@ -1324,7 +1364,7 @@ export class MessageRepository {
     }
 
     const changes = message.getSelectionChange(buttonId);
-    if (!changes) {
+    if (changes === false) {
       return;
     }
 
@@ -1372,7 +1412,13 @@ export class MessageRepository {
 
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
 
-    if (isLastDeleted && previousMessage?.timestamp()) {
+    if (
+      isLastDeleted &&
+      previousMessage?.timestamp() !== null &&
+      previousMessage?.timestamp() !== undefined &&
+      previousMessage?.timestamp() !== 0 &&
+      !Number.isNaN(previousMessage?.timestamp())
+    ) {
       conversationEntity.updateTimestamps(previousMessage, true);
     }
 
@@ -1430,14 +1476,17 @@ export class MessageRepository {
   ) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
-      const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
+      const updatedStatus =
+        messageEntity.readReceipts().length !== 0 && !Number.isNaN(messageEntity.readReceipts().length)
+          ? StatusType.SEEN
+          : StatusType.SENT;
       messageEntity.status(updatedStatus);
       const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData'> = {
         status: updatedStatus,
         failedToSend,
         fileData: undefined,
       };
-      if (isoDate) {
+      if (isoDate !== null && isoDate !== undefined && isoDate.length > 0) {
         const timestamp = new Date(isoDate).getTime();
         if (!isNaN(timestamp)) {
           changes.time = isoDate;
@@ -1463,10 +1512,9 @@ export class MessageRepository {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const errorStatus =
         isBackendError(error) &&
-        error.label ===
-          (BackendErrorLabel.FEDERATION_REMOTE_ERROR ||
-            BackendErrorLabel.FEDERATION_NOT_AVAILABLE ||
-            BackendErrorLabel.SERVER_ERROR)
+        (error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR ||
+          error.label === BackendErrorLabel.FEDERATION_NOT_AVAILABLE ||
+          error.label === BackendErrorLabel.SERVER_ERROR)
           ? StatusType.FEDERATION_ERROR
           : StatusType.FAILED;
       messageEntity.status(errorStatus);
@@ -1499,11 +1547,14 @@ export class MessageRepository {
     const filteredUsers = conversation
       .allUserEntities()
       // filter possible undefined values
-      .flatMap(user => (user ? [user] : []))
+      .flatMap(user => (user !== null && user !== undefined ? [user] : []))
       // if users are given by the caller, we filter to only keep those users
-      .filter(user => !recipients || recipients.some(userId => matchQualifiedIds(user, userId)))
+      .filter(
+        user =>
+          recipients === null || recipients === undefined || recipients.some(userId => matchQualifiedIds(user, userId)),
+      )
       // we filter the self user if skipSelf is true
-      .filter(user => !skipSelf || !user.isMe);
+      .filter(user => skipSelf !== true || !user.isMe);
 
     // Check if we have users without assigned clients and assign them from local database if possible
     if (filteredUsers.some(user => user?.devices().length === 0)) {
@@ -1523,12 +1574,13 @@ export class MessageRepository {
   async getMessageInConversationById(conversation: Conversation, messageId: string): Promise<StoredContentMessage> {
     const messageEntity = conversation.getMessage(messageId);
     const message =
-      messageEntity ||
-      (await this.eventService.loadEvent(conversation.id, messageId).then(event => {
-        return event && this.event_mapper.mapJsonEvent(event, conversation);
-      }));
+      messageEntity !== null && messageEntity !== undefined
+        ? messageEntity
+        : await this.eventService.loadEvent(conversation.id, messageId).then(event => {
+            return event !== null && event !== undefined ? this.event_mapper.mapJsonEvent(event, conversation) : false;
+          });
 
-    if (!message) {
+    if (message === null || message === undefined || message === false) {
       throw new ConversationError(
         ConversationError.TYPE.MESSAGE_NOT_FOUND,
         ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
@@ -1550,7 +1602,7 @@ export class MessageRepository {
     messageId: string,
   ): Promise<StoredContentMessage> {
     const message = conversation.getMessageByReplacementId(messageId);
-    if (!message) {
+    if (message === null || message === undefined) {
       throw new ConversationError(
         ConversationError.TYPE.MESSAGE_NOT_FOUND,
         ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
@@ -1561,7 +1613,7 @@ export class MessageRepository {
   }
 
   async ensureMessageSender(message: Message) {
-    if (message.from && !message.user().id) {
+    if (message.from.length > 0 && message.user().id.length === 0) {
       const user = await this.userRepository.getUserById({domain: message.user().domain, id: message.from});
       message.user(user);
       return message as StoredContentMessage;
@@ -1641,11 +1693,14 @@ export class MessageRepository {
       ...options,
       consentType: CONSENT_TYPE.OUTGOING_CALL,
       // We want to show the degradation warning only when message should be sent to all participants
-      silentDegradationWarning: !!options?.recipients,
+      silentDegradationWarning: options.recipients !== undefined,
 
       skipInjection: true,
 
-      targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
+      targetMode:
+        options?.recipients !== null && options?.recipients !== undefined
+          ? MessageTargetMode.USERS_CLIENTS
+          : MessageTargetMode.USERS,
     });
   }
 
@@ -1675,12 +1730,12 @@ export class MessageRepository {
     switch (messageContentType) {
       case 'asset': {
         const protoAsset = genericMessage.asset;
-        if (protoAsset?.original) {
-          if (!!protoAsset.original.image) {
+        if (protoAsset?.original !== null && protoAsset?.original !== undefined) {
+          if (protoAsset.original.image !== null && protoAsset.original.image !== undefined) {
             actionType = 'photo';
-          } else if (!!protoAsset.original.audio) {
+          } else if (protoAsset.original.audio !== null && protoAsset.original.audio !== undefined) {
             actionType = 'audio';
-          } else if (!!protoAsset.original.video) {
+          } else if (protoAsset.original.video !== null && protoAsset.original.video !== undefined) {
             actionType = 'video';
           } else {
             actionType = 'file';
@@ -1707,10 +1762,10 @@ export class MessageRepository {
       case 'text': {
         const protoText = genericMessage.text;
         const length = protoText?.[PROTO_MESSAGE_TYPE.LINK_PREVIEWS]?.length;
-        if (!length) {
+        if (length === null || length === undefined || length === 0 || Number.isNaN(length)) {
           actionType = 'text';
         }
-        if (protoText) {
+        if (protoText !== null && protoText !== undefined) {
           isRichText = isMarkdownText(protoText.content);
         }
         break;
@@ -1743,7 +1798,7 @@ export class MessageRepository {
         }),
       };
 
-      const isTeamConversation = !!conversationEntity.teamId;
+      const isTeamConversation = conversationEntity.teamId.length !== 0;
       if (isTeamConversation) {
         segmentations = {
           ...segmentations,

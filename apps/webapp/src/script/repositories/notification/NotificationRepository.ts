@@ -185,7 +185,7 @@ export class NotificationRepository {
   clearNotifications(): void {
     this.notifications.forEach(notification => {
       notification.close();
-      if (notification.data) {
+      if (notification.data !== null && notification.data !== undefined) {
         const {conversationId, messageId} = notification.data;
         this.logger.info(`Notification for '${messageId}' in '${conversationId?.id}' closed on unload.`);
       }
@@ -221,13 +221,14 @@ export class NotificationRepository {
       return Promise.resolve();
     }
 
-    const notifyInConversation = conversationEntity
-      ? NotificationRepository.shouldNotifyInConversation(
-          conversationEntity,
-          messageEntity,
-          this.userState.self().qualifiedId,
-        )
-      : true;
+    const notifyInConversation =
+      conversationEntity !== null && conversationEntity !== undefined
+        ? NotificationRepository.shouldNotifyInConversation(
+            conversationEntity,
+            messageEntity,
+            this.userState.self().qualifiedId,
+          )
+        : true;
 
     if (notifyInConversation) {
       this.notifySound(messageEntity);
@@ -240,18 +241,27 @@ export class NotificationRepository {
   /** Remove notifications from the queue that are no longer unread */
   readonly removeReadNotifications = (): void => {
     this.notifications.forEach(notification => {
-      const {conversationId, messageId, messageType} = notification.data || {};
+      const {conversationId, messageId, messageType} = notification.data ?? {};
 
-      if (conversationId && messageId) {
+      if (
+        conversationId !== null &&
+        conversationId !== undefined &&
+        messageId !== null &&
+        messageId !== undefined &&
+        messageId.length > 0
+      ) {
         this.conversationRepository.isMessageRead(conversationId, messageId).then(isRead => {
           if (isRead) {
             notification.close();
-            const messageInfo = messageId
-              ? `message '${messageId}' of type '${messageType}'`
-              : `'${messageType}' message`;
-            this.logger.info(
-              `Removed read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
-            );
+            const messageInfo =
+              messageId.length > 0 ? `message '${messageId}' of type '${messageType}'` : `'${messageType}' message`;
+            const conversationIdText =
+              typeof conversationId === 'string'
+                ? conversationId
+                : conversationId.id.length > 0
+                  ? conversationId.id
+                  : conversationId;
+            this.logger.info(`Removed read notification for ${messageInfo} in '${conversationIdText}'.`);
           }
         });
       }
@@ -383,7 +393,10 @@ export class NotificationRepository {
    */
   private createBodyMemberLeave(messageEntity: MemberMessage): string | void {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
-    if (updatedOneParticipant && !messageEntity.remoteUserEntities().length) {
+    if (
+      (updatedOneParticipant && messageEntity.remoteUserEntities().length === 0) ||
+      Number.isNaN(messageEntity.remoteUserEntities().length)
+    ) {
       return this.translate('notificationMemberLeaveRemovedYou', {user: messageEntity.user().name()}, {}, true);
     }
   }
@@ -395,11 +408,12 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    */
   private createBodyMemberUpdate(messageEntity?: MemberMessage, conversationEntity?: Conversation): string | void {
-    const isGroupOrChannel = conversationEntity && conversationEntity.isGroupOrChannel();
+    const isGroupOrChannel =
+      conversationEntity !== null && conversationEntity !== undefined && conversationEntity.isGroupOrChannel();
 
     switch (messageEntity?.memberMessageType) {
       case SystemMessageType.NORMAL:
-        if (isGroupOrChannel) {
+        if (isGroupOrChannel === true) {
           if (messageEntity.isMemberJoin()) {
             return this.createBodyMemberJoin(messageEntity);
           }
@@ -472,7 +486,7 @@ export class NotificationRepository {
         (messageEntity as MessageTimerUpdateMessage).message_timer,
       );
 
-      if (messageTimer) {
+      if (messageTimer !== null && messageTimer !== undefined && messageTimer !== 0 && !Number.isNaN(messageTimer)) {
         const timeString = formatDuration(messageTimer, this.translate).text;
         const substitutions = {time: timeString, user: messageEntity.user().name()};
         return this.translate('notificationConversationMessageTimerUpdate', substitutions, {}, true);
@@ -509,7 +523,7 @@ export class NotificationRepository {
     conversationEntity?: Conversation,
   ): Promise<NotificationContent | undefined> {
     const body = this.createOptionsBody(messageEntity, conversationEntity);
-    if (!body) {
+    if (body === null || body === undefined || body.length === 0) {
       return Promise.resolve(undefined);
     }
     const shouldObfuscateSender = this.shouldObfuscateNotificationSender(messageEntity);
@@ -584,7 +598,10 @@ export class NotificationRepository {
    * @returns Resolves with the icon URL
    */
   private async createOptionsIcon(shouldObfuscateSender: boolean, userEntity: User): Promise<string> {
-    const canShowUserImage = userEntity.previewPictureResource() && !shouldObfuscateSender;
+    const canShowUserImage =
+      userEntity.previewPictureResource() !== null &&
+      userEntity.previewPictureResource() !== undefined &&
+      !shouldObfuscateSender;
     if (canShowUserImage) {
       try {
         return await this.assetRepository.getObjectUrl(userEntity.previewPictureResource());
@@ -606,7 +623,8 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    */
   private createOptionsTag(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
-    return this.getConversationId(connectionEntity, conversationEntity)?.id || '';
+    const conversationId = this.getConversationId(connectionEntity, conversationEntity)?.id;
+    return conversationId !== null && conversationId !== undefined && conversationId.length > 0 ? conversationId : '';
   }
 
   /**
@@ -625,7 +643,8 @@ export class NotificationRepository {
    * @param Notification message title
    */
   private createTitle(messageEntity: Message, conversationEntity?: Conversation): string {
-    const conversationName = conversationEntity && conversationEntity.display_name();
+    const conversationName =
+      conversationEntity !== null && conversationEntity !== undefined ? conversationEntity.display_name() : '';
     const userEntity = messageEntity.user();
 
     const truncatedConversationName = truncate(
@@ -637,7 +656,13 @@ export class NotificationRepository {
     const truncatedName = truncate(userEntity.name(), this.calculatedTitleLength(conversationName ?? ''), false);
 
     let title;
-    if (conversationName) {
+    if (
+      conversationEntity !== null &&
+      conversationEntity !== undefined &&
+      conversationName !== null &&
+      conversationName !== undefined &&
+      conversationName.length > 0
+    ) {
       title = conversationEntity.isGroupOrChannel()
         ? this.translate(
             'notificationTitleGroup',
@@ -687,7 +712,7 @@ export class NotificationRepository {
       };
     }
 
-    return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity || conversationId, {});
+    return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity ?? conversationId, {});
   }
 
   /**
@@ -701,7 +726,7 @@ export class NotificationRepository {
     connectionEntity?: ConnectionEntity,
     conversationEntity?: Conversation,
   ): QualifiedId | undefined {
-    if (connectionEntity) {
+    if (connectionEntity !== null && connectionEntity !== undefined) {
       return connectionEntity.conversationId;
     }
     return conversationEntity?.qualifiedId;
@@ -749,9 +774,9 @@ export class NotificationRepository {
       connectionEntity,
       conversationEntity,
     );
-    if (notificationContent) {
+    if (notificationContent !== null && notificationContent !== undefined) {
       const isPermitted = await this.checkPermission();
-      if (isPermitted) {
+      if (isPermitted === true) {
         this.showNotification(notificationContent);
       }
     }
@@ -787,7 +812,7 @@ export class NotificationRepository {
     Warnings.showWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
-    if (window.Notification.requestPermission) {
+    if (window.Notification.requestPermission !== null && window.Notification.requestPermission !== undefined) {
       const permissionState = await window.Notification.requestPermission();
       Warnings.hideWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
       this.updatePermissionState(permissionState);
@@ -823,13 +848,15 @@ export class NotificationRepository {
    * @returns Returns `true` if the notification should be shown, `false` otherwise
    */
   private shouldShowNotification(messageEntity: Message, conversationEntity?: Conversation): boolean {
-    const inActiveConversation = conversationEntity
-      ? this.conversationState.isActiveConversation(conversationEntity)
-      : false;
+    const inActiveConversation =
+      conversationEntity !== null && conversationEntity !== undefined
+        ? this.conversationState.isActiveConversation(conversationEntity)
+        : false;
     const {contentState} = useAppState.getState();
     const inConversationView = contentState === ContentState.CONVERSATION;
+    const joinedCall = this.callState.joinedCall();
     const inMaximizedCall =
-      !!this.callState.joinedCall() && this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
+      joinedCall !== null && joinedCall !== undefined && this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().isMe;
@@ -870,42 +897,44 @@ export class NotificationRepository {
     const {conversationId, messageId, messageType} = notificationContent.options.data;
     let timeoutTriggerId: number;
 
-    const messageInfo = messageId ? `message '${messageId}' of type '${messageType}'` : `'${messageType}' message`;
+    const messageInfo =
+      messageId !== null && messageId !== undefined && messageId.length > 0
+        ? `message '${messageId}' of type '${messageType}'`
+        : `'${messageType}' message`;
+    const conversationIdLabel =
+      conversationId?.id !== null && conversationId?.id !== undefined && conversationId.id.length > 0
+        ? conversationId.id
+        : conversationId;
     notification.onclick = () => {
       amplify.publish(WebAppEvents.NOTIFICATION.CLICK);
       window.focus();
       void this.callingRepository.setViewModeMinimized();
       notificationContent.trigger();
 
-      this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);
+      this.logger.info(`Notification for ${messageInfo} in '${conversationIdLabel}' closed by click.`);
       notification.close();
     };
 
     notification.onclose = () => {
       window.clearTimeout(timeoutTriggerId);
       this.notifications = this.notifications.toSpliced(this.notifications.indexOf(notification), 1);
-      this.logger.info(`Removed notification for ${messageInfo} in '${conversationId?.id || conversationId}' locally.`);
+      this.logger.info(`Removed notification for ${messageInfo} in '${conversationIdLabel}' locally.`);
     };
 
     notification.onerror = error => {
-      this.logger.error(
-        `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by error.`,
-        error,
-      );
+      this.logger.error(`Notification for ${messageInfo} in '${conversationIdLabel}' closed by error.`, error);
       notification.close();
     };
 
     notification.onshow = () => {
       timeoutTriggerId = window.setTimeout(() => {
-        this.logger.info(
-          `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by timeout.`,
-        );
+        this.logger.info(`Notification for ${messageInfo} in '${conversationIdLabel}' closed by timeout.`);
         notification.close();
       }, notificationContent.timeout);
     };
 
     this.notifications = this.notifications.concat(notification);
-    this.logger.info(`Added notification for ${messageInfo} in '${conversationId?.id || conversationId}' to queue.`);
+    this.logger.info(`Added notification for ${messageInfo} in '${conversationIdLabel}' to queue.`);
   }
 
   /**

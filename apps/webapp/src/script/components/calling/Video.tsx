@@ -28,7 +28,7 @@ const Video = ({srcObject, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (!refVideo.current) {
+    if (refVideo.current === null || refVideo.current === undefined) {
       return;
     }
     refVideo.current.srcObject = srcObject;
@@ -36,7 +36,7 @@ const Video = ({srcObject, ...props}: VideoProps) => {
 
   useEffect(
     () => () => {
-      if (refVideo.current) {
+      if (refVideo.current !== null && refVideo.current !== undefined) {
         refVideo.current.srcObject = null;
       }
     },

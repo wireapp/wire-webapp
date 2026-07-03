@@ -105,7 +105,11 @@ export class ClientEntity {
   }
 
   getName(): string | undefined {
-    const hasModel = this.model && this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
+    const hasModel =
+      this.model !== null &&
+      this.model !== undefined &&
+      this.model.length > 0 &&
+      this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
     return hasModel ? this.model : this.class.toUpperCase();
   }
 
@@ -134,7 +138,7 @@ export class ClientEntity {
     jsonObject.meta.is_mls_verified = jsonObject.meta.isMLSVerified;
     delete jsonObject.meta.isMLSVerified;
 
-    if (jsonObject.meta.primaryKey) {
+    if (jsonObject.meta.primaryKey !== null && jsonObject.meta.primaryKey !== undefined) {
       jsonObject.meta.primary_key = jsonObject.meta.primaryKey;
       delete jsonObject.meta.primaryKey;
     }

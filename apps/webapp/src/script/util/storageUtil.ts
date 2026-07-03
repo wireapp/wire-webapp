@@ -36,7 +36,7 @@ export function storeValue(key: string, value: any, secondsToExpire?: number): v
 }
 
 export function constructUserPrimaryKey({id, domain}: QualifiedId): string {
-  if (domain) {
+  if (domain.length > 0) {
     return `${domain}@${id}`;
   }
   return id;

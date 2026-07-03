@@ -94,7 +94,7 @@ function createPlaceholder1to1Conversation(
 ) {
   const userConnection = user.connection();
 
-  if (!userConnection) {
+  if (userConnection === null || userConnection === undefined) {
     throw new Error(`There's no connection with user ${user.qualifiedId.id}.`);
   }
 
@@ -193,7 +193,7 @@ const UserActions = ({
       : undefined;
 
   const open1To1Conversation: MenuItem | undefined =
-    isNotMe && isAvailable && (isConnected || isTeamMember) && has1to1Conversation
+    isNotMe && isAvailable && !isBlocked && (isConnected || isTeamMember) && has1to1Conversation
       ? {
           click: async () => {
             await create1to1Conversation(user, true);
@@ -206,7 +206,7 @@ const UserActions = ({
       : undefined;
 
   const start1To1Conversation: MenuItem | undefined =
-    isNotMe && isAvailable && (isConnected || isTeamMember) && !has1to1Conversation
+    isNotMe && isAvailable && !isBlocked && (isConnected || isTeamMember) && !has1to1Conversation
       ? {
           click: async () => {
             try {
@@ -287,7 +287,7 @@ const UserActions = ({
           click: async () => {
             const connectionData = await actionsViewModel.sendConnectionRequest(user);
 
-            if (!connectionData) {
+            if (connectionData === null || connectionData === undefined) {
               // Sending the connection failed, there is nothing more to do
               return;
             }
@@ -302,7 +302,7 @@ const UserActions = ({
                 : await actionsViewModel.getConversationById(conversationId);
 
             const savedConversation = await actionsViewModel.saveConversation(connectionConversation);
-            if (!conversation) {
+            if (conversation === null || conversation === undefined) {
               // Only open the new conversation if we aren't currently in a conversation context
               await actionsViewModel.open1to1Conversation(savedConversation);
             }
@@ -334,7 +334,7 @@ const UserActions = ({
       ? {
           click: async () => {
             await actionsViewModel.unblockUser(user);
-            await create1to1Conversation(user, !conversation);
+            await create1to1Conversation(user, conversation === null || conversation === undefined);
             onAction(Actions.UNBLOCK);
           },
           Icon: Icon.BlockIcon,
@@ -345,7 +345,8 @@ const UserActions = ({
 
   const removeUserFromConversation: MenuItem | undefined =
     isNotMe &&
-    conversation &&
+    conversation !== null &&
+    conversation !== undefined &&
     !conversation.isSelfUserRemoved() &&
     conversation.participating_user_ids().some(userId => matchQualifiedIds(userId, user)) &&
     conversationRoleRepository?.canRemoveParticipants(conversation) === true
@@ -372,7 +373,7 @@ const UserActions = ({
     blockUser,
     unblockUser,
     removeUserFromConversation,
-  ].filter((item): item is MenuItem => !!item);
+  ].filter((item): item is MenuItem => item !== null && item !== undefined);
 
   return items.length === 1 && isModal ? (
     <SingleAction

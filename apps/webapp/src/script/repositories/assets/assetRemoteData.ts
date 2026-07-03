@@ -104,7 +104,7 @@ export class AssetRemoteData {
    */
   public updateProgress(progress: number): void {
     this.progress = progress;
-    if (this.progressCallback) {
+    if (this.progressCallback !== null && this.progressCallback !== undefined) {
       this.progressCallback(progress);
     }
   }

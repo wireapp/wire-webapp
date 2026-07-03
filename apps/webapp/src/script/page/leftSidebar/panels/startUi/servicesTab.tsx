@@ -54,7 +54,7 @@ export const ServicesTab = ({
 
   const debouncedSearch = useDebouncedCallback(async () => {
     const results = await integrationRepository.searchForServices(searchQuery);
-    if (results) {
+    if (results !== null && results !== undefined) {
       setServices(results);
     }
   }, SEARCH_DEBOUNCE_MILLISECONDS);
@@ -67,23 +67,26 @@ export const ServicesTab = ({
     <>
       {services.length > 0 && (
         <>
-          {canManageServices && manageServicesUrl && (
-            <ul className="start-ui-manage-services left-list-items">
-              <li className="left-list-item">
-                <button
-                  className="left-list-item-button"
-                  type="button"
-                  onClick={openManageServices}
-                  data-uie-name="go-manage-services"
-                >
-                  <span className="left-column-icon">
-                    <Icon.ServiceIcon />
-                  </span>
-                  <span className="column-center">{translate('searchManageServices')}</span>
-                </button>
-              </li>
-            </ul>
-          )}
+          {canManageServices &&
+            manageServicesUrl !== null &&
+            manageServicesUrl !== undefined &&
+            manageServicesUrl.length > 0 && (
+              <ul className="start-ui-manage-services left-list-items">
+                <li className="left-list-item">
+                  <button
+                    className="left-list-item-button"
+                    type="button"
+                    onClick={openManageServices}
+                    data-uie-name="go-manage-services"
+                  >
+                    <span className="left-column-icon">
+                      <Icon.ServiceIcon />
+                    </span>
+                    <span className="column-center">{translate('searchManageServices')}</span>
+                  </button>
+                </li>
+              </ul>
+            )}
 
           <ServiceList onServiceClick={onClickService} services={services} />
         </>
@@ -94,7 +97,10 @@ export const ServicesTab = ({
             <Icon.ServiceIcon />
           </span>
 
-          {canManageServices && manageServicesUrl ? (
+          {canManageServices &&
+          manageServicesUrl !== null &&
+          manageServicesUrl !== undefined &&
+          manageServicesUrl.length > 0 ? (
             <>
               <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
                 {translate('searchNoServicesManager')}

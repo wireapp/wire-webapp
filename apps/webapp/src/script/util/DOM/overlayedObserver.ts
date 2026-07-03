@@ -31,7 +31,7 @@ let overlayCheckerInterval: number | undefined = undefined;
 function checkOverlayedElements() {
   overlayedElements.forEach(({onVisible, onChange}, element) => {
     const isVisible = !isOverlayed(element);
-    if (onChange) {
+    if (onChange !== null && onChange !== undefined) {
       return onChange(isVisible);
     }
     if (isVisible) {

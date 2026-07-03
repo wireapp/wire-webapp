@@ -248,7 +248,9 @@ const FullscreenVideoCall = ({
     }
 
     const targetDocument =
-      viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow ? detachedWindow.document : document;
+      viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow !== null && detachedWindow !== undefined
+        ? detachedWindow.document
+        : document;
 
     const onKeyDown = (event: KeyboardEvent): void => {
       const target = event.target as HTMLElement;
@@ -260,7 +262,7 @@ const FullscreenVideoCall = ({
 
       // Allow focus to move into the ChooseScreen dialog if it's open
       const chooseScreenDialog = targetDocument.querySelector('.choose-screen[role="dialog"]');
-      if (chooseScreenDialog) {
+      if (chooseScreenDialog !== null && chooseScreenDialog !== undefined) {
         return;
       }
 
@@ -296,9 +298,12 @@ const FullscreenVideoCall = ({
   });
 
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
-  const isPaginationVisible = !maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1;
+  const isPaginationVisible =
+    maximizedParticipant === null ||
+    (maximizedParticipant === undefined && activeCallViewTab === CallViewTab.ALL && totalPages > 1);
 
-  const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
+  const isModerator =
+    selfUser !== null && selfUser !== undefined && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
   const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
   const isWebGLAvailable = detectCapabilities().webgl2;
 
@@ -414,7 +419,7 @@ const FullscreenVideoCall = ({
             call={call}
             setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
           />
-          {classifiedDomains && (
+          {classifiedDomains !== null && classifiedDomains !== undefined && (
             <ConversationClassifiedBar
               conversation={conversation}
               classifiedDomains={classifiedDomains}
@@ -538,7 +543,9 @@ const FullscreenVideoCall = ({
         data-uie-name="confirm-close-with-active-screen-share-modal"
         wrapperCSS={{borderRadius: 10, width: 328}}
         container={
-          viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow ? detachedWindow.document.body : undefined
+          viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow !== null && detachedWindow !== undefined
+            ? detachedWindow.document.body
+            : undefined
         }
       >
         {isConfirmCloseModalOpen && (

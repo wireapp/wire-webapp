@@ -54,7 +54,7 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
   const currentAlpha = useRef<number>(0);
 
   const getInitialColor = (element: HTMLElement) => {
-    if (!initalColor.current) {
+    if (initalColor.current === null || initalColor.current === undefined) {
       initalColor.current = parseColor(window.getComputedStyle(element).getPropertyValue('--scrollbar-color'));
       currentAlpha.current = initalColor.current[3];
     }

@@ -29,9 +29,11 @@ interface PreferencesSectionProps {
 
 const PreferencesSection = ({title, className = '', uieName, hasSeparator, children}: PreferencesSectionProps) => (
   <>
-    {hasSeparator && <hr className="preferences-separator" />}
+    {hasSeparator === true && <hr className="preferences-separator" />}
     <fieldset className={`preferences-section ${className}`} data-uie-name={uieName}>
-      {title && <legend className="preferences-header">{title}</legend>}
+      {title !== null && title !== undefined && title.length > 0 && (
+        <legend className="preferences-header">{title}</legend>
+      )}
       {children}
     </fieldset>
   </>

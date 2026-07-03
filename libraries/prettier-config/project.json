@@ -14,7 +14,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --cache --cache-location node_modules/.cache/eslint/prettier-config --max-warnings=1289 --no-error-on-unmatched-pattern --ext .js,.ts {projectRoot}"
+        "command": "eslint --config eslint.config.ts --cache --cache-location node_modules/.cache/eslint/prettier-config --max-warnings=0 --no-error-on-unmatched-pattern --ext .js,.ts {projectRoot}"
       }
     }
   },

@@ -43,7 +43,7 @@ export class UserService {
   private get coreUserService() {
     const userService = this.core.service?.user;
 
-    if (!userService) {
+    if (userService === null || userService === undefined) {
       throw new Error('User service not available');
     }
 
@@ -82,7 +82,7 @@ export class UserService {
     const deletedEntries = [];
     for (const key of nonQualifiedKeys) {
       const entry = await this.storageService.load<UserRecord>(this.USER_STORE_NAME, key);
-      if (entry) {
+      if (entry !== null && entry !== undefined) {
         deletedEntries.push(entry);
         await this.storageService.delete(this.USER_STORE_NAME, key);
       }
@@ -108,7 +108,7 @@ export class UserService {
   async updateUser(userId: QualifiedId, updates: Partial<UserRecord>) {
     const primaryKey = constructUserPrimaryKey(userId);
     const hasBeenUpdated = await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
-    if (!hasBeenUpdated) {
+    if (hasBeenUpdated === 0 || Number.isNaN(hasBeenUpdated)) {
       // If the user could not be found, create an entry for it
       await this.storageService.save(this.USER_STORE_NAME, primaryKey, {id: userId.id, ...updates});
     }
@@ -128,7 +128,7 @@ export class UserService {
   }
 
   async getUserByFQN({domain, handle}: QualifiedHandle): Promise<APIClientUser> {
-    if (domain) {
+    if (domain.length > 0) {
       return this.apiClient.api.user.getUserByHandle({
         domain,
         handle,

@@ -72,7 +72,7 @@ export const useLinkState = () => {
       const node = getSelectedNode(selection);
       const existingLink = $findMatchingParent(node, $isLinkNode);
 
-      if (!existingLink) {
+      if (existingLink === null || existingLink === undefined) {
         setEditingLink({
           text: selection.getTextContent(),
           url: '',
@@ -113,7 +113,7 @@ export const useLinkState = () => {
       editor.update(() => {
         const sanitizedUrl = sanitizeUrl(url);
 
-        if (editingLink.node && $isLinkNode(editingLink.node)) {
+        if (editingLink.node !== null && editingLink.node !== undefined && $isLinkNode(editingLink.node)) {
           if (!editingLink.node.isAttached()) {
             // Node no longer exists in the editor
             return;
@@ -140,7 +140,7 @@ export const useLinkState = () => {
           return;
         }
 
-        if (editingLink.selection) {
+        if (editingLink.selection !== null && editingLink.selection !== undefined) {
           restoreSelection(selection, editingLink.selection);
         }
 
@@ -185,7 +185,7 @@ export const useLinkState = () => {
   const handleClickCommand = useCallback(
     (event: MouseEvent) => {
       const linkDomNode = (event.target as HTMLElement).closest('a');
-      if (!linkDomNode) {
+      if (linkDomNode === null || linkDomNode === undefined) {
         return false;
       }
 
@@ -199,7 +199,7 @@ export const useLinkState = () => {
 
         const node = getSelectedNode(selection);
         const linkNode = $findMatchingParent(node, $isLinkNode);
-        if (linkNode) {
+        if (linkNode !== null && linkNode !== undefined) {
           handleLinkClick(linkNode);
         }
       });

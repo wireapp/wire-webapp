@@ -27,7 +27,7 @@ export function getClientMLSConfig(teamFeatures: FeatureList) {
   const keyingMaterialUpdateThreshold = Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD;
   const mlsConfig = getMLSConfig(teamFeatures);
   const willEnrollE2ei = getE2EIConfig(teamFeatures) !== undefined;
-  return mlsConfig
+  return mlsConfig !== null && mlsConfig !== undefined
     ? {
         keyingMaterialUpdateThreshold,
         defaultCiphersuite: mlsConfig.config.defaultCipherSuite,

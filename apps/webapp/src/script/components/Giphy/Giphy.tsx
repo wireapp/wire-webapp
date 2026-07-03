@@ -112,7 +112,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   const onGridClick = async () => getGifs(currentQuery);
 
   const onBackClick = () => {
-    if (currentGif) {
+    if (currentGif !== null && currentGif !== undefined) {
       setGifs([currentGif]);
       setSelectedGif(currentGif);
       setGiphyState(GiphyState.RESULT);
@@ -155,7 +155,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   };
 
   const onSend = () => {
-    if (selectedGif) {
+    if (selectedGif !== null && selectedGif !== undefined) {
       amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SEND, selectedGif.animated, currentQuery);
       setSelectedGif(null);
 
@@ -176,7 +176,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   };
 
   useEffect(() => {
-    if (inputValue) {
+    if (inputValue.length > 0) {
       requestAnimationFrame(() => setPlayAnimation(true));
       void showGiphy(inputValue);
     }
@@ -229,7 +229,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
               </div>
             )}
 
-            {isSingleGif && currentGif && (
+            {isSingleGif && currentGif !== null && currentGif !== undefined && (
               <div className="gif-container">
                 <div className="button-reset-default gif-container-item">
                   <GifImage src={currentGif.animated} />
@@ -278,8 +278,8 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
 
             <Button
               type="button"
-              aria-disabled={!selectedGif}
-              disabled={!selectedGif}
+              aria-disabled={selectedGif === null || selectedGif === undefined}
+              disabled={selectedGif === null || selectedGif === undefined}
               onClick={onSend}
               data-uie-name="do-send-gif"
               aria-label={translate('accessibility.giphyModal.sendGif')}

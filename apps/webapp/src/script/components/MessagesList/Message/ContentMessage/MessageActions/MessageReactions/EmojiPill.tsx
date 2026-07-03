@@ -102,7 +102,7 @@ export const EmojiPill = ({
       );
     }
 
-    return translate('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] || ''}, {}, true);
+    return translate('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] ?? ''}, {}, true);
   };
 
   const caption = conversationReactionCaption();
@@ -129,7 +129,8 @@ export const EmojiPill = ({
   ]);
 
   return (
-    !!emojiCount && (
+    emojiCount !== 0 &&
+    !Number.isNaN(emojiCount) && (
       <Tooltip
         body={
           <div css={messageReactionButtonTooltip}>

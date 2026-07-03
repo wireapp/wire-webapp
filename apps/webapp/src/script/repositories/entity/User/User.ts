@@ -155,7 +155,10 @@ export class User {
 
     this.accent_id = ko.observable(ACCENT_ID.BLUE);
 
-    this.accent_color = ko.pureComputed(() => User.ACCENT_COLOR[this.accent_id()] || User.ACCENT_COLOR[ACCENT_ID.BLUE]);
+    this.accent_color = ko.pureComputed(() => {
+      const accentColor = User.ACCENT_COLOR[this.accent_id()];
+      return accentColor !== undefined && accentColor.length > 0 ? accentColor : User.ACCENT_COLOR[ACCENT_ID.BLUE];
+    });
 
     this.email = ko.observable();
 
@@ -186,20 +189,20 @@ export class User {
 
     this.connection = ko.observable<ConnectionEntity | null>(null);
 
-    this.isBlocked = ko.pureComputed(() => !!this.connection()?.isBlocked() || this.isBlockedLegalHold());
-    this.isBlockedLegalHold = ko.pureComputed(() => !!this.connection()?.isMissingLegalHoldConsent());
-    this.isCanceled = ko.pureComputed(() => !!this.connection()?.isCanceled());
-    this.isConnected = ko.pureComputed(() => !!this.connection()?.isConnected());
-    this.isIgnored = ko.pureComputed(() => !!this.connection()?.isIgnored());
-    this.isIncomingRequest = ko.pureComputed(() => !!this.connection()?.isIncomingRequest());
-    this.isOutgoingRequest = ko.pureComputed(() => !!this.connection()?.isOutgoingRequest());
+    this.isBlocked = ko.pureComputed(() => this.connection()?.isBlocked() === true || this.isBlockedLegalHold());
+    this.isBlockedLegalHold = ko.pureComputed(() => this.connection()?.isMissingLegalHoldConsent() === true);
+    this.isCanceled = ko.pureComputed(() => this.connection()?.isCanceled() === true);
+    this.isConnected = ko.pureComputed(() => this.connection()?.isConnected() === true);
+    this.isIgnored = ko.pureComputed(() => this.connection()?.isIgnored() === true);
+    this.isIncomingRequest = ko.pureComputed(() => this.connection()?.isIncomingRequest() === true);
+    this.isOutgoingRequest = ko.pureComputed(() => this.connection()?.isOutgoingRequest() === true);
     this.isUnknown = ko.pureComputed(() => {
       const connection = this.connection();
-      return !connection || connection.isUnknown();
+      return connection === null || connection === undefined || connection.isUnknown();
     });
     this.isExternal = ko.pureComputed(() => this.teamRole() === TEAM_ROLE.PARTNER);
     this.isAdminOrOwner = ko.pureComputed(() => [TEAM_ROLE.ADMIN, TEAM_ROLE.OWNER].includes(this.teamRole()));
-    this.isRequest = ko.pureComputed(() => !!this.connection()?.isRequest());
+    this.isRequest = ko.pureComputed(() => this.connection()?.isRequest() === true);
 
     this.isGuest = ko.observable(false);
     this.isDirectGuest = ko.pureComputed(() => {
@@ -248,7 +251,7 @@ export class User {
     return {domain: this.domain, id: this.id};
   }
   get hasDomain(): boolean {
-    return !!this.domain;
+    return this.domain.length !== 0;
   }
 
   /**
@@ -256,7 +259,7 @@ export class User {
    * @example "@handle@wire.com"
    */
   get handle(): string {
-    if (!this.username()) {
+    if (this.username().length === 0) {
       /** Very old user accounts don't have a handle on Wire. */
       return '';
     }
@@ -288,7 +291,8 @@ export class User {
   }
 
   hasActivatedIdentity(): boolean {
-    return !!this.email() || this.isSingleSignOn;
+    const email = this.email();
+    return (email !== undefined && email.length > 0) || this.isSingleSignOn;
   }
 
   removeClient(client_id: string): ClientEntity[] {
@@ -304,7 +308,12 @@ export class User {
   }
 
   setGuestExpiration(timestamp: number): void {
-    if (this.expirationIntervalId) {
+    if (
+      this.expirationIntervalId !== null &&
+      this.expirationIntervalId !== undefined &&
+      this.expirationIntervalId !== 0 &&
+      !Number.isNaN(this.expirationIntervalId)
+    ) {
       window.clearInterval(this.expirationIntervalId);
       this.expirationIntervalId = undefined;
     }
@@ -324,14 +333,23 @@ export class User {
   }
 
   clearExpirationTimeout(): void {
-    if (this.expirationTimeoutId) {
+    if (
+      this.expirationTimeoutId !== null &&
+      this.expirationTimeoutId !== undefined &&
+      this.expirationTimeoutId !== 0 &&
+      !Number.isNaN(this.expirationTimeoutId)
+    ) {
       window.clearTimeout(this.expirationTimeoutId);
       this.expirationTimeoutId = undefined;
     }
   }
 
   checkGuestExpiration(): void {
-    const checkExpiration = this.isTemporaryGuest() && !this.expirationTimeoutId;
+    const checkExpiration =
+      this.isTemporaryGuest() &&
+      (this.expirationTimeoutId === undefined ||
+        this.expirationTimeoutId === 0 ||
+        Number.isNaN(this.expirationTimeoutId));
     if (checkExpiration) {
       if (this.isExpired()) {
         amplify.publish(WebAppEvents.USER.UPDATE, this.qualifiedId);

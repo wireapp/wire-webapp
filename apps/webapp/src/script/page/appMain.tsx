@@ -113,7 +113,7 @@ export const AppMain = (properties: AppMainProps) => {
 
   useInitializeRootFontSize();
 
-  if (!apiContext) {
+  if (apiContext === null || apiContext === undefined) {
     throw new Error('API Context has not been set');
   }
 
@@ -179,14 +179,17 @@ export const AppMain = (properties: AppMainProps) => {
       if (selfUser.isTemporaryGuest()) {
         return mainView.list.showTemporaryGuest();
       }
-      if (activeConversation) {
+      if (activeConversation !== null && activeConversation !== undefined) {
         // There is already an active conversation, keeping state as is
         return;
       }
       const mostRecentConversation = conversationState.getMostRecentConversation();
-      if (mostRecentConversation) {
+      if (mostRecentConversation !== null && mostRecentConversation !== undefined) {
         navigate(generateConversationUrl(mostRecentConversation.qualifiedId));
-      } else if (repositories.user['userState'].connectRequests().length) {
+      } else if (
+        repositories.user['userState'].connectRequests().length !== 0 &&
+        !Number.isNaN(repositories.user['userState'].connectRequests().length)
+      ) {
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
       }
     };
@@ -194,7 +197,12 @@ export const AppMain = (properties: AppMainProps) => {
     // on app load reset last message focus to ensure last message is focused
     // only when user enters a new conversation using keyboard(press enter)
     const historyState = window.history.state;
-    if (historyState && !!historyState.eventKey) {
+    if (
+      historyState !== null &&
+      historyState !== undefined &&
+      historyState.eventKey !== null &&
+      historyState.eventKey !== undefined
+    ) {
       historyState.eventKey = '';
       window.history.replaceState(historyState, '', window.location.hash);
     }
@@ -212,16 +220,23 @@ export const AppMain = (properties: AppMainProps) => {
 
       await mainView.content.showConversation(
         {id: conversationId, domain},
-        {filePath: `files${pathString ? `/${pathString}` : ''}`},
+        {filePath: `files${pathString.length > 0 ? `/${pathString}` : ''}`},
       );
     };
 
     const showUserProfile = (param1: string, param2?: string) => {
       // If param1 is a UUID, it's the userId, otherwise param2 must be the userId
       const userId = isUUID(param1) ? param1 : param2;
-      const domain = isUUID(param1) ? param2 || apiContext.domain || '' : param1;
+      const apiContextDomain = apiContext.domain;
+      const domain = isUUID(param1)
+        ? param2 !== undefined && param2.length > 0
+          ? param2
+          : apiContextDomain !== undefined && apiContextDomain.length > 0
+            ? apiContextDomain
+            : ''
+        : param1;
 
-      if (!userId) {
+      if (userId === null || userId === undefined || userId.length === 0) {
         navigate('/');
         return;
       }
@@ -254,17 +269,17 @@ export const AppMain = (properties: AppMainProps) => {
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
 
-    if (redirect) {
+    if (redirect !== null && redirect !== undefined && redirect.length > 0) {
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
       window.location.replace(redirect);
     }
 
     const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
 
-    if (conversationRedirect) {
+    if (conversationRedirect !== null && conversationRedirect !== undefined && conversationRedirect.length > 0) {
       const {conversation, domain} = JSON.parse(conversationRedirect)?.data;
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-      window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
+      window.location.replace(`#/conversation/${conversation}${domain !== undefined ? `/${domain}` : ''}`);
     }
 
     repositories.properties.checkTelemetrySharingPermission();
@@ -329,14 +344,14 @@ export const AppMain = (properties: AppMainProps) => {
             {showMainContent && (
               <MainContent
                 selfUser={selfUser}
-                isRightSidebarOpen={!!currentState}
+                isRightSidebarOpen={currentState !== undefined}
                 openRightSidebar={toggleRightSidebar}
                 reloadApp={app.refresh}
                 appLockRepository={appLockRepository}
               />
             )}
 
-            {currentState && (
+            {currentState !== undefined ? (
               <RightSidebar
                 lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
                 currentEntity={currentEntity}
@@ -347,7 +362,7 @@ export const AppMain = (properties: AppMainProps) => {
                 selfUser={selfUser}
                 userState={userState}
               />
-            )}
+            ) : null}
           </div>
         )}
 

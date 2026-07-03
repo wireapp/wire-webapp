@@ -42,12 +42,16 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
     switch (event.type) {
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         const originalMessageId = event.data.replacing_message_id;
-        return originalMessageId ? this.handleEditEvent(event, originalMessageId) : event;
+        return originalMessageId !== null && originalMessageId !== undefined && originalMessageId.length > 0
+          ? this.handleEditEvent(event, originalMessageId)
+          : event;
       }
 
       case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD: {
         const originalMessageId = event.data.replacing_message_id;
-        return originalMessageId ? this.handleMultipartEditEvent(event, originalMessageId) : event;
+        return originalMessageId !== null && originalMessageId !== undefined && originalMessageId.length > 0
+          ? this.handleMultipartEditEvent(event, originalMessageId)
+          : event;
       }
 
       case ClientEvent.CONVERSATION.MESSAGE_DELETE: {
@@ -68,7 +72,11 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
       replies.map(async reply => {
         if (reply.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
           reply.data.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
-        } else if (reply.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD && reply.data.text) {
+        } else if (
+          reply.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD &&
+          reply.data.text !== null &&
+          reply.data.text !== undefined
+        ) {
           reply.data.text.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
         }
         await this.eventService.replaceEvent(reply);
@@ -88,12 +96,16 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
       replies.map(async reply => {
         if (reply.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
           const quote = reply.data.quote;
-          if (quote && typeof quote !== 'string' && 'message_id' in quote) {
+          if (quote !== null && quote !== undefined && typeof quote !== 'string' && 'message_id' in quote) {
             quote.message_id = newMessageId;
           }
-        } else if (reply.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD && reply.data.text?.quote) {
+        } else if (
+          reply.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD &&
+          reply.data.text?.quote !== null &&
+          reply.data.text?.quote !== undefined
+        ) {
           const quote = reply.data.text.quote;
-          if (quote && typeof quote !== 'string' && 'message_id' in quote) {
+          if (quote !== null && quote !== undefined && typeof quote !== 'string' && 'message_id' in quote) {
             quote.message_id = newMessageId;
           }
         }
@@ -107,7 +119,7 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
    */
   private async handleEditEvent(event: MessageAddEvent, originalMessageId: string) {
     const {originalEvent, replies} = await this.findRepliesToMessage(event.conversation, originalMessageId, event.id);
-    if (!originalEvent || !event.id) {
+    if (originalEvent === null || originalEvent === undefined || event.id.length === 0) {
       return event;
     }
 
@@ -121,7 +133,7 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
    */
   private async handleMultipartEditEvent(event: MultipartMessageAddEvent, originalMessageId: string) {
     const {originalEvent, replies} = await this.findRepliesToMessage(event.conversation, originalMessageId, event.id);
-    if (!originalEvent || !event.id) {
+    if (originalEvent === null || originalEvent === undefined || event.id.length === 0) {
       return event;
     }
 
@@ -142,7 +154,8 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
     const originalEvent = await this.eventService.loadEvent(conversationId, previousMessageId ?? messageId);
 
     if (
-      !originalEvent ||
+      originalEvent === null ||
+      originalEvent === undefined ||
       (originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD &&
         originalEvent.type !== ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD)
     ) {

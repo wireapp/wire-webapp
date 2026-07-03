@@ -35,7 +35,7 @@ export const CreateConversationSubmit = () => {
     <Button
       id="group-go-next"
       css={{marginBottom: 0}}
-      disabled={!!error || !conversationName}
+      disabled={error.length !== 0 || conversationName.length === 0}
       type="button"
       onClick={onSubmit}
       data-uie-name="do-create-group"

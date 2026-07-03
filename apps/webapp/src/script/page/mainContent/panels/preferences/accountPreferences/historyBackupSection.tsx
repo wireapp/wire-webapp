@@ -42,7 +42,7 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
   const {translate} = useApplicationContext();
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
+    if (file !== null && file !== undefined) {
       importFile(file);
     }
   };

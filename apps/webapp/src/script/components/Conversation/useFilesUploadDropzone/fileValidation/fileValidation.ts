@@ -53,7 +53,7 @@ export const validateFiles = ({
 
   const firstError = validations.find(validation => !validation.isValid);
 
-  if (!firstError) {
+  if (firstError === null || firstError === undefined) {
     return {isValid: true};
   }
 

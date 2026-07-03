@@ -92,7 +92,7 @@ export class AssetRepository {
 
     const urlPromise = new Promise<string>(async (resolve, reject) => {
       const blob = await this.load(asset);
-      if (!blob) {
+      if (blob === null || blob === undefined) {
         return reject(undefined);
       }
       const url = window.URL.createObjectURL(blob);
@@ -124,12 +124,13 @@ export class AssetRepository {
   }
 
   private loadBuffer(asset: AssetRemoteData) {
-    const isEncryptedAsset = !!asset.otrKey && !!asset.sha256;
+    const isEncryptedAsset =
+      asset.otrKey !== null && asset.otrKey !== undefined && asset.sha256 !== null && asset.sha256 !== undefined;
     const progressCallback = (fraction: number) => {
       asset.updateProgress(fraction * 100);
     };
 
-    if (!isEncryptedAsset) {
+    if (isEncryptedAsset !== true) {
       return this.core.service!.asset.downloadRawAsset(asset.urlData, progressCallback);
     }
     const otrKey = asset.otrKey instanceof Uint8Array ? asset.otrKey : Uint8Array.from(Object.values(asset.otrKey));
@@ -140,7 +141,7 @@ export class AssetRepository {
   public async download(asset: AssetRemoteData, fileName: string) {
     try {
       const blob = await this.load(asset);
-      if (!blob) {
+      if (blob === null || blob === undefined) {
         throw new Error('No blob received.');
       }
       return downloadBlob(blob, fileName);
@@ -153,7 +154,7 @@ export class AssetRepository {
     try {
       asset.status(AssetTransferState.DOWNLOADING);
       const blob = await this.load(asset.original_resource());
-      if (!blob) {
+      if (blob === null || blob === undefined) {
         throw new Error('No blob received.');
       }
       asset.status(AssetTransferState.UPLOADED);
@@ -203,7 +204,7 @@ export class AssetRepository {
     ]);
 
     const toAssetImageKey = (uploadedAsset: {domain?: string; key?: string}) => {
-      if (!uploadedAsset.key) {
+      if (uploadedAsset.key === null || uploadedAsset.key === undefined || uploadedAsset.key.length === 0) {
         throw new Error('Asset upload response is missing the asset key.');
       }
       return {domain: uploadedAsset.domain, key: uploadedAsset.key};
@@ -272,7 +273,10 @@ export class AssetRepository {
 
     if (isAuditLogEnabled) {
       const isIncompleteAuditData =
-        !options.auditData?.conversationId || !options.auditData.filename || !options.auditData.filetype;
+        options.auditData?.conversationId === null ||
+        options.auditData?.conversationId === undefined ||
+        options.auditData.filename.length === 0 ||
+        options.auditData.filetype.length === 0;
       if (isIncompleteAuditData) {
         this.removeFromUploadQueue(messageId);
         throw new Error('Audit data is incomplete, file cannot be uploaded');
@@ -296,7 +300,7 @@ export class AssetRepository {
 
   cancelUpload(messageId: string): void {
     const cancelToken = this.uploadCancelTokens[messageId];
-    if (cancelToken) {
+    if (cancelToken !== null && cancelToken !== undefined) {
       cancelToken();
       this.removeFromUploadQueue(messageId);
     }

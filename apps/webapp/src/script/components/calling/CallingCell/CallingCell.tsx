@@ -187,7 +187,7 @@ export const CallingCell = ({
 
   const videoGrid = useVideoGrid(call);
 
-  const conversationParticipants = selfUser ? userEts.concat(selfUser) : userEts;
+  const conversationParticipants = selfUser !== null && selfUser !== undefined ? userEts.concat(selfUser) : userEts;
   const conversationUrl = generateConversationUrl(conversation.qualifiedId);
 
   const isOutgoingVideoCall = isOutgoing && selfSharesCamera;
@@ -398,7 +398,10 @@ export const CallingCell = ({
             conversationID={conversation.id}
           />
 
-          {(isOngoing || selfHasActiveVideo) && !isDetachedWindow && !!videoGrid?.grid?.length && isFullUi ? (
+          {(isOngoing || selfHasActiveVideo) &&
+          !isDetachedWindow &&
+          (videoGrid?.grid?.length ?? 0) !== 0 &&
+          isFullUi ? (
             <>
               {!isDetachedWindow && (
                 <div
@@ -438,7 +441,7 @@ export const CallingCell = ({
             )
           )}
 
-          {classifiedDomains && (
+          {classifiedDomains !== null && classifiedDomains !== undefined && (
             <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
           )}
 

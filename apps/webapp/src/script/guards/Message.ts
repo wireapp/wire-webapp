@@ -24,15 +24,16 @@ import {MemberMessage} from 'Repositories/entity/message/memberMessage';
 import {SuperType} from '../message/superType';
 
 export const isReadableMessage = (message: any): message is ContentMessage =>
-  message &&
+  message !== null &&
+  message !== undefined &&
   'super_type' in message &&
   (message.super_type === SuperType.CONTENT || message.super_type === SuperType.PING);
 
 export const isContentMessage = (message: any): message is ContentMessage =>
-  message && 'super_type' in message && message.super_type === SuperType.CONTENT;
+  message !== null && message !== undefined && 'super_type' in message && message.super_type === SuperType.CONTENT;
 
 export const isDeleteMessage = (message: any): message is DeleteMessage =>
-  message && 'super_type' in message && message.super_type === SuperType.DELETE;
+  message !== null && message !== undefined && 'super_type' in message && message.super_type === SuperType.DELETE;
 
 export const isMemberMessage = (message: any | undefined | null): message is MemberMessage =>
-  message && 'super_type' in message && message.super_type === SuperType.MEMBER;
+  message !== null && message !== undefined && 'super_type' in message && message.super_type === SuperType.MEMBER;

@@ -85,7 +85,10 @@ export const UserSearchableList = ({
     setRemoteTeamMembers([]);
   }, [filter]);
 
-  const filteredSelectedUsers = selectedUsers ? searchRepository.searchUserInSet(filter, selectedUsers) : undefined;
+  const filteredSelectedUsers =
+    selectedUsers !== null && selectedUsers !== undefined
+      ? searchRepository.searchUserInSet(filter, selectedUsers)
+      : undefined;
 
   const selfInTeam = teamState.isInTeam(selfUser);
 
@@ -174,15 +177,19 @@ export const UserSearchableList = ({
     );
   };
 
-  const toggleUserSelection = selectedUsers
-    ? (user: User) => {
-        if (selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
-          onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
-        } else {
-          onUpdateSelectedUsers?.([...selectedUsers, user]);
+  const toggleUserSelection =
+    selectedUsers !== null && selectedUsers !== undefined
+      ? (user: User) => {
+          if (
+            selectedUsers.find(selectedUser => selectedUser.id === user.id) !== null &&
+            selectedUsers.find(selectedUser => selectedUser.id === user.id) !== undefined
+          ) {
+            onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
+          } else {
+            onUpdateSelectedUsers?.([...selectedUsers, user]);
+          }
         }
-      }
-    : undefined;
+      : undefined;
 
   const userList = foundUserEntities().filter(
     user =>

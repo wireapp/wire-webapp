@@ -235,7 +235,7 @@ export class Conversation {
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.allUserEntities = ko.pureComputed(() => {
       const selfUser = this.selfUser();
-      const selfUserArray = selfUser ? [selfUser] : [];
+      const selfUserArray = selfUser !== null && selfUser !== undefined ? [selfUser] : [];
       return selfUserArray.concat(this.participating_user_ets());
     });
     this.selfUser = ko.observable();
@@ -250,7 +250,7 @@ export class Conversation {
     this.inTeam = ko.pureComputed(() => {
       const isSameTeam = this.selfUser()?.teamId === this.teamId;
       const isSameDomain = this.domain === this.selfUser()?.domain;
-      return !!this.teamId && isSameTeam && !this.isGuest() && isSameDomain;
+      return this.teamId.length !== 0 && isSameTeam && !this.isGuest() && isSameDomain;
     });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -262,12 +262,12 @@ export class Conversation {
       isProteusTeam1to1Conversation({
         name: this.name(),
         type: this.type(),
-        inTeam: !!this.teamId,
+        inTeam: this.teamId.length !== 0,
         otherMembersLength: this.participating_user_ids().length,
       }),
     );
 
-    this.isConversationWithBlockedUser = ko.pureComputed(() => !!this.connection()?.isBlocked());
+    this.isConversationWithBlockedUser = ko.pureComputed(() => this.connection()?.isBlocked() === true);
 
     this.isConversationWithDeletedUser = ko.pureComputed(() => {
       const hasDeletedUser = this.participating_user_ets().some(userEntity => userEntity.isDeleted);
@@ -339,7 +339,11 @@ export class Conversation {
     this.connection = ko.observable(null);
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity?.userId;
-      if (connectedUserId && this.participating_user_ids().every(user => !matchQualifiedIds(user, connectedUserId))) {
+      if (
+        connectedUserId !== null &&
+        connectedUserId !== undefined &&
+        this.participating_user_ids().every(user => !matchQualifiedIds(user, connectedUserId))
+      ) {
         this.participating_user_ids.push(connectedUserId);
       }
     });
@@ -360,7 +364,7 @@ export class Conversation {
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
-      if (!this.selfUser()) {
+      if (this.selfUser() === null || this.selfUser() === undefined) {
         return NOTIFICATION_STATE.NOTHING;
       }
       return this.mutedState();
@@ -450,7 +454,11 @@ export class Conversation {
     // setting of the conversation.
     this.messageTimer = ko.pureComputed(() => {
       // If cells is enabled for a conversation, always return 0
-      if (!!this.cellsState && this.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED) {
+      if (
+        this.cellsState !== null &&
+        this.cellsState !== undefined &&
+        this.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED
+      ) {
         return 0;
       }
       // If team does not allow self-deleting messages, return 0
@@ -459,7 +467,7 @@ export class Conversation {
       }
       // If team enforces a timeout, use it
       const enforcedTimeout = this.teamState.getEnforcedSelfDeletingMessagesTimeout();
-      if (enforcedTimeout) {
+      if (enforcedTimeout !== null && enforcedTimeout !== undefined) {
         return enforcedTimeout;
       }
       // Otherwise, use global or local timer if available
@@ -467,7 +475,7 @@ export class Conversation {
       if (globalMessageTimer !== null) {
         return globalMessageTimer;
       }
-      if (this.localMessageTimer()) {
+      if (this.localMessageTimer() !== 0 && !Number.isNaN(this.localMessageTimer())) {
         return this.localMessageTimer();
       }
       return 0;
@@ -595,15 +603,15 @@ export class Conversation {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName || this.translate('unavailableUser');
+        return userName !== undefined && userName.length > 0 ? userName : this.translate('unavailableUser');
       }
 
       if (this.isGroupOrChannel()) {
-        if (this.name()) {
+        if (this.name().length > 0) {
           return this.name();
         }
 
-        const hasUserEntities = !!this.participating_user_ets().length;
+        const hasUserEntities = this.participating_user_ets().length > 0;
         if (hasUserEntities) {
           const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
           const joinedNames = this.participating_user_ets()
@@ -615,7 +623,7 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        const hasUserIds = !!this.participating_user_ids().length;
+        const hasUserIds = this.participating_user_ids().length > 0;
         if (!hasUserIds) {
           return this.translate('conversationsEmptyConversation');
         }
@@ -637,8 +645,8 @@ export class Conversation {
   }
 
   private hasInitializedUsers() {
-    const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
-    return Boolean(this.selfUser() && hasMappedUsers);
+    const hasMappedUsers = this.participating_user_ets().length > 0 || this.participating_user_ids().length === 0;
+    return this.selfUser() !== null && this.selfUser() !== undefined && hasMappedUsers;
   }
 
   private _initSubscriptions() {
@@ -680,12 +688,12 @@ export class Conversation {
    */
   release(): void {
     // If there are no unread messages, we can remove all messages from memory (we will keep the unread messages)
-    if (!this.unreadState().allEvents.length) {
+    if (this.unreadState().allEvents.length === 0 || Number.isNaN(this.unreadState().allEvents.length)) {
       this.removeMessages();
       this.hasAdditionalMessages(true);
     }
 
-    if (this.incomingMessages().length) {
+    if (this.incomingMessages().length !== 0 && !Number.isNaN(this.incomingMessages().length)) {
       this.messages_unordered.push(...this.incomingMessages());
       this.incomingMessages.removeAll();
     }
@@ -731,7 +739,7 @@ export class Conversation {
         break;
     }
 
-    if (!entityTimestamp) {
+    if (entityTimestamp === null || entityTimestamp === undefined) {
       throw new ConversationError(
         ConversationError.TYPE.INVALID_PARAMETER,
         ConversationError.MESSAGE.INVALID_PARAMETER,
@@ -780,7 +788,7 @@ export class Conversation {
     if (messageEntity.isContent()) {
       this.hasContentMessages(true);
     }
-    if (alreadyAdded) {
+    if (alreadyAdded !== null && alreadyAdded !== undefined) {
       return false;
     }
 
@@ -810,7 +818,7 @@ export class Conversation {
   addMessages(message_ets: ContentMessage[]): void {
     message_ets = message_ets
       .map(message_et => this._checkForDuplicate(message_et))
-      .filter(message_et => !!message_et) as ContentMessage[];
+      .filter(message_et => message_et !== null && message_et !== undefined) as ContentMessage[];
 
     // in order to avoid multiple db writes check the messages from the end and stop once
     // we found a message from self user
@@ -913,7 +921,13 @@ export class Conversation {
    * @param timestamp Optional timestamp which messages should be removed
    */
   removeMessages(timestamp?: number): void {
-    if (timestamp && typeof timestamp === 'number') {
+    if (
+      timestamp !== null &&
+      timestamp !== undefined &&
+      timestamp !== 0 &&
+      !Number.isNaN(timestamp) &&
+      typeof timestamp === 'number'
+    ) {
       this.messages_unordered.remove(message_et => timestamp >= message_et.timestamp());
       return;
     }
@@ -927,9 +941,9 @@ export class Conversation {
    * @returns Message if it is not a duplicate
    */
   private _checkForDuplicate(messageEntity: ContentMessage): ContentMessage | undefined {
-    if (messageEntity) {
+    if (messageEntity !== null && messageEntity !== undefined) {
       const existingMessageEntity = this._findDuplicate(messageEntity.id, messageEntity.from);
-      if (existingMessageEntity) {
+      if (existingMessageEntity !== null && existingMessageEntity !== undefined) {
         this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`);
         return undefined;
       }
@@ -941,7 +955,7 @@ export class Conversation {
   private _findDuplicate(): undefined;
   private _findDuplicate(messageId: string, from: string): Message;
   private _findDuplicate(messageId?: string, from?: string): Message | undefined {
-    if (messageId) {
+    if (messageId !== null && messageId !== undefined && messageId.length > 0) {
       return this.messages_unordered().find(messageEntity => {
         const sameId = messageEntity.id === messageId;
         const sameSender = messageEntity.from === from;
@@ -968,7 +982,7 @@ export class Conversation {
    * @param forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    */
   updateTimestamps(message_et?: Message, forceUpdate: boolean = false): void {
-    if (message_et) {
+    if (message_et !== null && message_et !== undefined) {
       const timestamp = message_et.timestamp();
       if (timestamp <= this.last_server_timestamp()) {
         // Some message do not bubble the conversation up in the conversation list (call messages for example or some system messages).
@@ -1002,7 +1016,9 @@ export class Conversation {
    * Variant for getOldestMessage() which checks timestamp too.
    */
   getOldestMessageWithTimestamp(): Message | undefined {
-    return this.messages().find(message => !isDeleteMessage(message) && message.timestamp());
+    return this.messages().find(
+      message => !isDeleteMessage(message) && message.timestamp() !== 0 && !Number.isNaN(message.timestamp()),
+    );
   }
 
   /**
@@ -1090,7 +1106,12 @@ export class Conversation {
 
   readonly hasLastReceivedMessageLoaded = (): boolean => {
     const newestMessage = this.getNewestMessage();
-    return newestMessage?.timestamp() ? newestMessage.timestamp() >= this.last_event_timestamp() : true;
+    return newestMessage?.timestamp() !== null &&
+      newestMessage?.timestamp() !== undefined &&
+      newestMessage?.timestamp() !== 0 &&
+      !Number.isNaN(newestMessage?.timestamp())
+      ? newestMessage.timestamp() >= this.last_event_timestamp()
+      : true;
   };
 
   serialize(): ConversationRecord {

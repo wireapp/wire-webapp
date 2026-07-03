@@ -117,7 +117,7 @@ export const AvatarInput = ({
       return;
     }
     const newUserPicture = files.item(0);
-    if (newUserPicture) {
+    if (newUserPicture !== null && newUserPicture !== undefined) {
       setPicture(newUserPicture).catch((error: unknown) => {
         const isInvalidUpdate = isErrorWithType(error) && error.type === UserError.TYPE.INVALID_UPDATE;
         if (!isInvalidUpdate) {

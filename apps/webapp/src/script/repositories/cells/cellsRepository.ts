@@ -74,7 +74,7 @@ export class CellsRepository {
     path: string;
     progressCallback?: (progress: number) => void;
   }): Promise<{uuid: string; versionId: string}> {
-    const filePath = `${path || this.basePath}/${file.name}`;
+    const filePath = `${path.length > 0 ? path : this.basePath}/${file.name}`;
     const versionId = createUuid();
 
     const controller = new AbortController();
@@ -101,7 +101,7 @@ export class CellsRepository {
 
   cancelUpload(uuid: string): void {
     const controller = this.uploadControllers.get(uuid);
-    if (controller) {
+    if (controller !== null && controller !== undefined) {
       controller.abort();
     }
   }
@@ -142,12 +142,12 @@ export class CellsRepository {
     deleted?: boolean;
   }) {
     return this.apiClient.api.cells.getAllNodes({
-      path: path || this.basePath,
+      path: path.length > 0 ? path : this.basePath,
       limit,
       offset,
       sortBy,
       sortDirection,
-      ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
+      ...(type !== null && type !== undefined ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
       deleted,
     });
   }
@@ -165,14 +165,14 @@ export class CellsRepository {
   }
 
   async createFolder({path, name}: {path: string; name: string}) {
-    const filePath = `${path || this.basePath}/${name}`;
+    const filePath = `${path.length > 0 ? path : this.basePath}/${name}`;
     const uuid = createUuid();
 
     return this.apiClient.api.cells.createFolder({path: filePath, uuid});
   }
 
   async createFile({path, name, templateUuid}: {path: string; name: string; templateUuid?: string}) {
-    const filePath = `${path || this.basePath}/${name}`;
+    const filePath = `${path.length > 0 ? path : this.basePath}/${name}`;
     const uuid = createUuid();
     const versionId = createUuid();
 
@@ -180,12 +180,12 @@ export class CellsRepository {
   }
 
   async checkFileAlreadyExists({path, name}: {path: string; name: string}): Promise<boolean> {
-    const filePath = `${path || this.basePath}/${name}`;
+    const filePath = `${path.length > 0 ? path : this.basePath}/${name}`;
     const uuid = createUuid();
     const versionId = createUuid();
     const result = await this.apiClient.api.cells.checkNodeCreation({path: filePath, uuid, versionId, type: 'LEAF'});
 
-    return result.Results?.some(checkResult => checkResult.Exists) ?? false;
+    return result.Results?.some(checkResult => checkResult.Exists === true) ?? false;
   }
 
   async createPublicLink({
@@ -279,7 +279,7 @@ export class CellsRepository {
       creatorIds,
       path,
       deleted,
-      ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
+      ...(type !== null && type !== undefined ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
   }
 

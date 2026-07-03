@@ -77,7 +77,7 @@ export const DevicesPreferences = ({
     void cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);
 
-  if (selectedDevice) {
+  if (selectedDevice !== null && selectedDevice !== undefined) {
     return (
       <DeviceDetailsPreferences
         getDeviceIdentity={getDeviceIdentity}
@@ -100,7 +100,7 @@ export const DevicesPreferences = ({
     <PreferencesPage title={translate('preferencesDevices')}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
         <legend className="preferences-header">{translate('preferencesDevicesCurrent')}</legend>
-        {currentClient && (
+        {currentClient !== null && currentClient !== undefined && (
           <DetailedDevice
             isCurrentDevice
             device={currentClient}

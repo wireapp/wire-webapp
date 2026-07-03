@@ -53,7 +53,7 @@ export const checkVersion = async (overrideCurrentVersion: string): Promise<stri
   if (navigator.onLine) {
     const serverVersion = await fetchLatestVersion();
     newVersionListeners.forEach(({currentVersion, onNewVersionAvailable}) => {
-      const baseVersion = overrideCurrentVersion || currentVersion;
+      const baseVersion = overrideCurrentVersion.length > 0 ? overrideCurrentVersion : currentVersion;
       logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${baseVersion}'`);
 
       const isOutdatedVersion = serverVersion > baseVersion;

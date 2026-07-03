@@ -193,9 +193,9 @@ export const useMessageHandling = ({
   );
 
   const cancelSending = useCallback(() => {
-    if (editedMessage) {
+    if (editedMessage !== null && editedMessage !== undefined) {
       cancelMesssageEditingWithDraftReset();
-    } else if (replyMessageEntity) {
+    } else if (replyMessageEntity !== null && replyMessageEntity !== undefined) {
       cancelMessageReply();
     }
   }, [editedMessage, replyMessageEntity, cancelMesssageEditingWithDraftReset, cancelMessageReply]);

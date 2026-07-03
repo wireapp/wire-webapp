@@ -59,7 +59,7 @@ export const ConnectedMessage = ({
         <p className="message-connected-username label-username">{handle}</p>
       )}
 
-      {isOutgoingRequest && classifiedDomains && (
+      {isOutgoingRequest && classifiedDomains !== null && classifiedDomains !== undefined && (
         <UserClassifiedBar users={[user]} classifiedDomains={classifiedDomains} />
       )}
 

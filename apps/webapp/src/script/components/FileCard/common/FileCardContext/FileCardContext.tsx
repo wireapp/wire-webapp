@@ -39,7 +39,7 @@ export const FileCardContextProvider = ({value, children}: FileCardContextProvid
 
 export const useFileCardContext = () => {
   const context = useContext(FileCardContext);
-  if (!context) {
+  if (context === null || context === undefined) {
     throw new Error('useFileCardContext must be used within a FileCardRoot');
   }
   return context;

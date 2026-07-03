@@ -368,7 +368,11 @@ export class EventRepository {
   // Notification Stream handling
   //##############################################################################
   private getServerTimeFromAxiosError(errorResponse: unknown): string | undefined {
-    if (!isAxiosError<{time?: string}>(errorResponse) || !errorResponse.response) {
+    if (
+      !isAxiosError<{time?: string}>(errorResponse) ||
+      errorResponse.response === null ||
+      errorResponse.response === undefined
+    ) {
       return undefined;
     }
 
@@ -378,7 +382,8 @@ export class EventRepository {
 
     if (
       'data' in errorResponse.response &&
-      errorResponse.response.data &&
+      errorResponse.response.data !== null &&
+      errorResponse.response.data !== undefined &&
       typeof errorResponse.response.data === 'object' &&
       'time' in errorResponse.response.data &&
       typeof errorResponse.response.data.time === 'string'
@@ -403,7 +408,7 @@ export class EventRepository {
   }
 
   private getIsoDateFromEvent(event: IncomingEvent, defaultValue = false): string | void {
-    if ('time' in event && event.time) {
+    if ('time' in event && event.time.length > 0) {
       return event.time;
     }
 
@@ -465,7 +470,7 @@ export class EventRepository {
     event: ClientConversationEvent | IncomingEvent,
     source: EventSource = EventSource.INJECTED,
   ): Promise<void> {
-    if (!event) {
+    if (event === null || event === undefined) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
 
@@ -540,7 +545,7 @@ export class EventRepository {
         if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD || event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD) {
           eventToProcess = await this.mapEncryptedEvent(event, {decryptedData, decryptionError}, source);
         }
-        if (!eventToProcess) {
+        if (eventToProcess === null || eventToProcess === undefined) {
           return event;
         }
 
@@ -553,7 +558,7 @@ export class EventRepository {
     {decryptedData, decryptionError}: Pick<HandledEventPayload, 'decryptedData' | 'decryptionError'>,
     source: EventSource,
   ): Promise<IncomingEvent | undefined> {
-    if (decryptionError) {
+    if (decryptionError !== null && decryptionError !== undefined) {
       this.logger.warn(`Decryption Error: '${event.type}'`, {
         source,
         eventType: event.type,
@@ -567,7 +572,13 @@ export class EventRepository {
         209, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
       ];
 
-      if (decryptionError.code && ignoredCodes.includes(decryptionError.code)) {
+      if (
+        decryptionError.code !== null &&
+        decryptionError.code !== undefined &&
+        decryptionError.code !== 0 &&
+        !Number.isNaN(decryptionError.code) &&
+        ignoredCodes.includes(decryptionError.code)
+      ) {
         return undefined;
       }
 
@@ -578,7 +589,7 @@ export class EventRepository {
       return EventBuilder.buildUnableToDecrypt(event, decryptionError);
     }
 
-    if (decryptedData) {
+    if (decryptedData !== null && decryptedData !== undefined) {
       return await new CryptographyMapper().mapGenericMessage(decryptedData, event);
     }
 
@@ -618,8 +629,8 @@ export class EventRepository {
   private async handleEventDistribution(event: IncomingEvent, source: EventSource) {
     const eventDate = this.getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
-    const canSetEventDate = !isInjectedEvent && eventDate;
-    if (canSetEventDate) {
+    const canSetEventDate = !isInjectedEvent && eventDate !== undefined && eventDate.length > 0;
+    if (canSetEventDate === true) {
       /*
        * HOTFIX: The "conversation.voice-channel-deactivate" event is the ONLY event which we inject with a source set to WebSocket.
        * This is wrong but changing it will break our current conversation archive functionality (WEBAPP-6435).

@@ -156,7 +156,7 @@ export class ProteusConversationVerificationStateHandler {
     if (isProteusConversation(conversationEntity) || isMixedConversation(conversationEntity)) {
       const conversationVerificationState = attemptChangeToVerified({conversationEntity, logger: this.logger});
 
-      if (conversationVerificationState) {
+      if (conversationVerificationState !== null && conversationVerificationState !== undefined) {
         this.onConversationVerificationStateChange({
           conversationEntity,
           conversationVerificationState,
@@ -198,7 +198,7 @@ export class ProteusConversationVerificationStateHandler {
          * As we are unsure of the trigger of the degradation we temporarily throw an error to get to the bottom of this.
          * The conversation is also reset to the verified state to ensure we can continue to send messages.
          */
-        if (!userIds.length) {
+        if (userIds.length === 0 || Number.isNaN(userIds.length)) {
           conversationEntity.verification_state(ConversationVerificationState.VERIFIED);
           throw new Error('Conversation degraded without affected users');
         }

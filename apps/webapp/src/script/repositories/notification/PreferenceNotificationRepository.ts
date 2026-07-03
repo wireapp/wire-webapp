@@ -44,6 +44,20 @@ export interface Notification {
   type: string;
 }
 
+type UserPreferenceEventValue = string | number | boolean | null | undefined;
+
+const isTruthyPreferenceEventValue = (value: UserPreferenceEventValue): boolean => {
+  if (typeof value === 'string') {
+    return value.length > 0;
+  }
+
+  if (typeof value === 'number') {
+    return value !== 0 && !Number.isNaN(value);
+  }
+
+  return value === true;
+};
+
 interface GroupedNotifications {
   notification: Notification[];
   type: string;
@@ -71,7 +85,11 @@ export class PreferenceNotificationRepository {
   constructor(selfUser: ko.Subscribable<User | undefined>) {
     const notificationsStorageKey = PreferenceNotificationRepository.CONFIG.STORAGE_KEY;
     const storedNotifications = loadValue<string>(notificationsStorageKey);
-    this.notifications = ko.observableArray(storedNotifications ? JSON.parse(storedNotifications) : []);
+    this.notifications = ko.observableArray(
+      storedNotifications !== null && storedNotifications !== undefined && storedNotifications.length > 0
+        ? JSON.parse(storedNotifications)
+        : [],
+    );
     this.notifications.subscribe(notifications => {
       return notifications.length > 0
         ? storeValue(notificationsStorageKey, JSON.stringify(notifications))
@@ -134,12 +152,14 @@ export class PreferenceNotificationRepository {
     });
   }
 
-  readonly onUserEvent = (event: UserEvent & {value?: string}): void => {
+  readonly onUserEvent = (event: UserEvent & {value?: UserPreferenceEventValue}): void => {
     if (event.type === USER_EVENT.PROPERTIES_DELETE || event.type === USER_EVENT.PROPERTIES_SET) {
       if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
-        const defaultValue = !!PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue;
+        const defaultReceiptMode = PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue;
+        const defaultValue = defaultReceiptMode !== 0 && !Number.isNaN(defaultReceiptMode);
+        const eventValue = event.value;
         this.notifications.push({
-          data: event.value === undefined ? defaultValue : !!event.value,
+          data: eventValue === undefined ? defaultValue : isTruthyPreferenceEventValue(eventValue),
           type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
         });
       }

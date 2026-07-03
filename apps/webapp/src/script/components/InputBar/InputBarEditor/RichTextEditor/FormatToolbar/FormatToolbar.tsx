@@ -146,7 +146,7 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
       />
       <LinkDialog
         isOpen={isModalOpen}
-        isEditing={!!linkNode}
+        isEditing={linkNode !== null && linkNode !== undefined}
         initialUrl={linkUrl}
         initialText={selectedText}
         onSubmit={insertLink}

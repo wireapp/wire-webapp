@@ -75,7 +75,7 @@ export const useFileVersions = (
         ]);
 
         // Validate node data
-        if (!node?.Path) {
+        if (!is.nonEmptyString(node?.Path)) {
           throw new Error(invalidNodeData);
         }
 

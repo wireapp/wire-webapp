@@ -156,15 +156,18 @@ const SingleSignOnFormComponent = ({
   }, [doCheckConversationCode, doGetConversationInfoByCode]);
 
   useEffect(() => {
-    const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+    const logoutReasonParameter = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON);
+    const queryLogoutReason = logoutReasonParameter.length > 0 ? logoutReasonParameter : null;
     if (is.nonEmptyString(queryLogoutReason)) {
       setLogoutReason(queryLogoutReason);
     }
   }, [doCheckConversationCode, doGetConversationInfoByCode]);
 
   useEffect(() => {
-    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
-    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
+    const conversationCodeParameter = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
+    const conversationKeyParameter = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
+    const queryConversationCode = conversationCodeParameter.length > 0 ? conversationCodeParameter : null;
+    const queryConversationKey = conversationKeyParameter.length > 0 ? conversationKeyParameter : null;
 
     const keyAndCodeExistent = is.nonEmptyString(queryConversationKey) && is.nonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
@@ -208,7 +211,7 @@ const SingleSignOnFormComponent = ({
 
   const handleSubmit = useCallback(
     async (event?: React.FormEvent, password?: string): Promise<void> => {
-      if (event) {
+      if (event !== null && event !== undefined) {
         event.preventDefault();
       }
       void resetAuthError();
@@ -227,7 +230,7 @@ const SingleSignOnFormComponent = ({
       setIsCodeOrMailInputValid(isValid);
 
       try {
-        if (currentValidationError) {
+        if (currentValidationError !== null && currentValidationError !== undefined) {
           throw currentValidationError;
         }
         const email = codeOrMail.trim();

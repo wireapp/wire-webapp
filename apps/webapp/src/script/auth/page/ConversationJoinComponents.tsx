@@ -221,7 +221,7 @@ const GuestLoginColumn = ({
                   <Button
                     block
                     type="submit"
-                    disabled={!enteredName || !isValidName || isSubmitingName || !isTermOfUseAccepted}
+                    disabled={enteredName.length === 0 || !isValidName || isSubmitingName || !isTermOfUseAccepted}
                     formNoValidate
                     onClick={checkNameValidity}
                     aria-label={translate('conversationJoin.joinButton')}

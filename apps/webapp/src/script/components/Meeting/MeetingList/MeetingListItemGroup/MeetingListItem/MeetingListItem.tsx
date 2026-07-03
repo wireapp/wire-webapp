@@ -103,7 +103,7 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
           <div css={metaStyles}>
             {showCalendarIcon && <CalendarIcon css={{marginRight: '4px'}} height={12} />}
             {time}
-            {recurrence && (
+            {recurrence.length > 0 && (
               <div css={badgeWrapperStyles}>
                 <span>{translate(SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS[recurrence])}</span>
               </div>

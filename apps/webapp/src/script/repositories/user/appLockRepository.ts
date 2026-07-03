@@ -73,7 +73,8 @@ export class AppLockRepository {
   ) {
     this.getPassphraseStorageKey = (): string => `${APP_LOCK_STORAGE}_${this.userState.self().id}`;
     this.getEnabledStorageKey = (): string => `${APP_LOCK_ENABLED_STORAGE}_${this.userState.self().id}`;
-    const hasPassphrase = !!this.getStoredPassphrase();
+    const storedPassphrase = this.getStoredPassphrase();
+    const hasPassphrase = storedPassphrase !== null && storedPassphrase !== undefined && storedPassphrase.length > 0;
     this.appLockState.hasPassphrase(hasPassphrase);
     this.appLockState.isActivatedInPreferences(this.getStoredEnabled() === 'true');
     if (hasPassphrase) {
@@ -164,7 +165,7 @@ export class AppLockRepository {
 
   checkCode = async (code: string): Promise<boolean> => {
     const hashedCode = this.getStoredPassphrase();
-    if (!hashedCode) {
+    if (hashedCode === null || hashedCode === undefined || hashedCode.length === 0) {
       return false;
     }
 

@@ -98,23 +98,27 @@ function createSearchAbortError() {
 }
 
 function throwIfSearchAborted(abortSignal?: AbortSignal) {
-  if (abortSignal?.aborted) {
+  if (abortSignal?.aborted === true) {
     throw createSearchAbortError();
   }
 }
 
+const nonEmptyStringOrFallback = (value: string | null | undefined, fallback = ''): string =>
+  value !== null && value !== undefined && value.length > 0 ? value : fallback;
+
 const TextExtractors: Partial<Record<string, (event: SearchableConversationEvent) => string>> = {
-  [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => event.data?.content || event.data?.message || '',
-  [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => event.data?.text?.content || '',
+  [ClientEvent.CONVERSATION.MESSAGE_ADD]: event =>
+    nonEmptyStringOrFallback(event.data?.content, nonEmptyStringOrFallback(event.data?.message)),
+  [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => nonEmptyStringOrFallback(event.data?.text?.content),
   [ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD]: event => {
     const items: CompositeMessageItem[] = is.array(event.data?.items) ? event.data.items : [];
     return items
       .flatMap(item => {
-        if (item?.text) {
-          return [item.text.content || item.text.message || ''];
+        if (item?.text !== null && item?.text !== undefined) {
+          return [nonEmptyStringOrFallback(item.text.content, nonEmptyStringOrFallback(item.text.message))];
         }
-        if (item?.button) {
-          return [item.button.text || ''];
+        if (item?.button !== null && item?.button !== undefined) {
+          return [nonEmptyStringOrFallback(item.button.text)];
         }
         return [];
       })
@@ -151,7 +155,7 @@ async function findMatchingConversationEvents(
 
     const searchableText = getSearchableText(event);
     searchRegex.lastIndex = 0;
-    if (searchableText && searchRegex.test(searchableText)) {
+    if (searchableText.length > 0 && searchRegex.test(searchableText)) {
       matchingEvents.push(event);
     }
   }
@@ -174,7 +178,7 @@ export class ConversationService {
   private get coreConversationService() {
     const conversationService = this.core.service?.conversation;
 
-    if (!conversationService) {
+    if (conversationService === null || conversationService === undefined) {
       throw new Error('Conversation service not available');
     }
 
@@ -474,7 +478,7 @@ export class ConversationService {
 
     let events;
 
-    if (this.storageService.db) {
+    if (this.storageService.db !== null && this.storageService.db !== undefined) {
       events = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('time')
@@ -489,7 +493,9 @@ export class ConversationService {
 
     const conversations = events.reduce((accumulated, event) => {
       // TODO(federation): generate fully qualified ids
-      accumulated[event.conversation] = (accumulated[event.conversation] || 0) + 1;
+      const currentCount = accumulated[event.conversation];
+      accumulated[event.conversation] =
+        (currentCount !== undefined && currentCount !== 0 && !Number.isNaN(currentCount) ? currentCount : 0) + 1;
       return accumulated;
     }, {});
 
@@ -512,7 +518,7 @@ export class ConversationService {
    * @returns Resolves with a list of conversation records
    */
   async saveConversationsInDb(conversations: ConversationRecord[]): Promise<ConversationRecord[]> {
-    if (this.storageService.db) {
+    if (this.storageService.db !== null && this.storageService.db !== undefined) {
       const keys = conversations.map(conversation => conversation.id);
       await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
     } else {
@@ -550,7 +556,7 @@ export class ConversationService {
     abortSignal?: AbortSignal,
   ): Promise<SearchableConversationEvent[]> {
     const trimmedQuery = query.trim();
-    if (!trimmedQuery.length) {
+    if (trimmedQuery.length === 0 || Number.isNaN(trimmedQuery.length)) {
       return [];
     }
 
@@ -576,10 +582,13 @@ export class ConversationService {
 
   private getEventSearchableText(event: SearchableConversationEvent): string {
     try {
-      const contentOrLegacyText = event.data?.content || event.data?.message || '';
-      const extractor = event.type ? TextExtractors[event.type] : undefined;
-      const extractedText = extractor?.(event) || '';
-      return extractedText.length ? extractedText : contentOrLegacyText;
+      const contentOrLegacyText = nonEmptyStringOrFallback(
+        event.data?.content,
+        nonEmptyStringOrFallback(event.data?.message),
+      );
+      const extractor = event.type !== null && event.type !== undefined ? TextExtractors[event.type] : undefined;
+      const extractedText = nonEmptyStringOrFallback(extractor?.(event));
+      return extractedText.length !== 0 && !Number.isNaN(extractedText.length) ? extractedText : contentOrLegacyText;
     } catch (err) {
       logger.error('Error extracting searchable text from event', {event, error: err});
       return '';

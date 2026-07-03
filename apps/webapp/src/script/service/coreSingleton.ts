@@ -58,7 +58,10 @@ export class Core extends Account {
        * We then give those crypto primitives to the key generator that will use them to encrypt secrets.
        * When in a browser context, then this systemCrypto will be undefined and the key generator will then use it's internal encryption system
        */
-      systemCrypto: window.systemCrypto ? wrapSystemCrypto(window.systemCrypto) : undefined,
+      systemCrypto:
+        window.systemCrypto !== null && window.systemCrypto !== undefined
+          ? wrapSystemCrypto(window.systemCrypto)
+          : undefined,
       coreCryptoConfig: {
         enabled: enableCoreCrypto,
         wasmFilePath: `/min/`,

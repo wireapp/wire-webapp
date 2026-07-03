@@ -31,18 +31,18 @@ export class TeamMapper {
   updateTeamFromObject(): void;
   updateTeamFromObject(teamData: TeamData | TeamUpdateData, teamEntity?: TeamEntity): TeamEntity;
   updateTeamFromObject(teamData?: TeamData | TeamUpdateData, teamEntity = new TeamEntity()): TeamEntity | void {
-    if (teamData) {
+    if (teamData !== null && teamData !== undefined) {
       const {icon, icon_key: iconKey, name} = teamData;
 
       if ('creator' in teamData) {
         teamEntity.creator = teamData.creator;
       }
 
-      if (icon) {
+      if (icon.length > 0) {
         teamEntity.icon = icon;
       }
 
-      if (iconKey) {
+      if (iconKey !== null && iconKey !== undefined && iconKey.length > 0) {
         teamEntity.iconKey = iconKey;
       }
 
@@ -50,7 +50,7 @@ export class TeamMapper {
         teamEntity.id = teamData.id;
       }
 
-      if (name) {
+      if (name.length > 0) {
         teamEntity.name(name);
       }
 
@@ -65,13 +65,13 @@ export class TeamMapper {
   mapMember(data: MemberData): TeamMemberEntity {
     const {created_by, permissions, user = '', legalhold_status} = data;
     const member = new TeamMemberEntity(user);
-    if (created_by) {
+    if (created_by !== null && created_by !== undefined && created_by.length > 0) {
       member.invitedBy = created_by;
     }
-    if (permissions) {
+    if (permissions !== null && permissions !== undefined) {
       member.permissions = permissions;
     }
-    if (legalhold_status) {
+    if (legalhold_status !== null && legalhold_status !== undefined) {
       member.legalholdStatus = legalhold_status;
     }
 

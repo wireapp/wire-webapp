@@ -31,7 +31,7 @@ const store = new Map<string, (() => void)[]>();
 const addCall = (conversationId: QualifiedId, unsubscribe: () => void) => {
   const serializedId = serializeQualifiedId(conversationId);
 
-  const existingCallbacks = store.get(serializedId) || [];
+  const existingCallbacks = store.get(serializedId) ?? [];
   store.set(serializedId, [...existingCallbacks, unsubscribe]);
 };
 
@@ -43,7 +43,7 @@ const removeCall = (conversationId: QualifiedId) => {
   const serializedId = serializeQualifiedId(conversationId);
 
   const existingCallbacks = store.get(serializedId);
-  if (existingCallbacks) {
+  if (existingCallbacks !== null && existingCallbacks !== undefined) {
     existingCallbacks.forEach(unsubscribe => unsubscribe());
   }
   store.delete(serializedId);

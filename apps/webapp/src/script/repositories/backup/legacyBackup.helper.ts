@@ -89,7 +89,7 @@ export const importLegacyBackupToDatabase = async ({
   fileDescriptors: FileDescriptor[];
 }> => {
   // Import legacy backup
-  if (!fileData[Filename.METADATA]) {
+  if (fileData[Filename.METADATA] === null || fileData[Filename.METADATA] === undefined) {
     throw new InvalidMetaDataError();
   }
 

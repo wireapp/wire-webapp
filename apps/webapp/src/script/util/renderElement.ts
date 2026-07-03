@@ -37,7 +37,7 @@ const roots = new Map<
 
 const cleanUpElement = (elementId: string) => {
   const root = roots.get(elementId);
-  if (root && root.elementContainer) {
+  if (root !== null && root !== undefined && root.elementContainer !== null && root.elementContainer !== undefined) {
     root.reactRoot.unmount();
     document.getElementById(elementId)?.removeChild(root.elementContainer);
     root.elementContainer = undefined;
@@ -49,7 +49,7 @@ const generateStyleString = (style: Partial<CSSStyleDeclaration>) => {
   let styleString = '';
 
   Object.entries(style).forEach(([key, value]) => {
-    styleString = styleString ? `${styleString} ${key}: ${value};` : `${key}: ${value};`;
+    styleString = styleString.length > 0 ? `${styleString} ${key}: ${value};` : `${key}: ${value};`;
   });
 
   return styleString;
@@ -70,7 +70,7 @@ const renderElement =
 
     const parentElement = document.getElementById(parentElementId);
 
-    if (!parentElement) {
+    if (parentElement === null || parentElement === undefined) {
       logger.warn(`Unable to find element with id: ${parentElementId}`);
 
       return;
@@ -78,7 +78,7 @@ const renderElement =
 
     const elementContainer = document.createElement('div');
 
-    if (style) {
+    if (style !== null && style !== undefined) {
       elementContainer.setAttribute('style', generateStyleString(style));
     }
 

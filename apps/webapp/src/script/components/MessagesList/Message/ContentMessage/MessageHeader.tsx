@@ -124,7 +124,7 @@ export function MessageHeader({
         <h4
           className={`message-header-label-sender ${!noColor && message.accent_color()}`}
           css={!isAvailable ? {color: 'var(--text-input-placeholder)'} : {}}
-          data-uie-name={uieName ? `${uieName}-sender-name` : 'sender-name'}
+          data-uie-name={uieName.length > 0 ? `${uieName}-sender-name` : 'sender-name'}
           data-uie-uid={sender.id}
         >
           <UserName user={sender} />

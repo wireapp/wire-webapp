@@ -53,7 +53,7 @@ export const useEnrichedFields = (
     const returnFields: RichInfoField[] =
       addEmail && email != null && email !== '' ? [{type: translate('userProfileEmail'), value: email}] : [];
 
-    if (addDomain && user.domain) {
+    if (addDomain && user.domain.length > 0) {
       returnFields.push({
         type: translate('userProfileDomain'),
         value: user.domain,

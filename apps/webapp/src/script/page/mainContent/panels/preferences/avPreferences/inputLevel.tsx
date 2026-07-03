@@ -52,11 +52,14 @@ const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevel
   const [level, setLevel] = useState(0);
 
   useEffect(() => {
-    if (!mediaStream) {
+    if (mediaStream === null || mediaStream === undefined) {
       return undefined;
     }
     logger.info(`Initiating new audio meter for stream ID "${mediaStream.id}"`);
-    if (!window.AudioContext?.prototype.createMediaStreamSource) {
+    if (
+      window.AudioContext?.prototype.createMediaStreamSource === null ||
+      window.AudioContext?.prototype.createMediaStreamSource === undefined
+    ) {
       logger.warn('AudioContext is not supported, no volume indicator can be generated');
     }
     const audioContext = new window.AudioContext();

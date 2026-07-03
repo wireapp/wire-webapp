@@ -183,7 +183,7 @@ export const ConversationCells = memo(
     const isError = nodesStatus === 'error';
     const isSuccess = nodesStatus === 'success';
 
-    const hasNodes = !!nodes.length;
+    const hasNodes = nodes.length !== 0 && !Number.isNaN(nodes.length);
     const emptyView = !isError && !hasNodes && isCellsStateReady;
 
     const isTableVisible = (isSuccess || isLoading || isFetchingMore) && isCellsStateReady;

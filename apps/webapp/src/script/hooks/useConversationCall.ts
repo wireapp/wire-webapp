@@ -53,7 +53,7 @@ export const useConversationCall = (conversation: Conversation): ConversationCal
 
   // Subscribe to the call's state changes
   useEffect(() => {
-    if (!call) {
+    if (call === null || call === undefined) {
       setCurrentCallState(null);
       return () => {};
     }

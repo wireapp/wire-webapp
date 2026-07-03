@@ -1477,7 +1477,7 @@ export const getCountryByCode = (countryCode: string): string | void => {
   const country = COUNTRY_CODES.filter(({code}) => code === parsedCode)
     .toSorted((countryA, countryB) => countryA.population - countryB.population)
     .pop();
-  if (country) {
+  if (country !== null && country !== undefined) {
     return country.iso;
   }
 };
@@ -1489,7 +1489,7 @@ export const getCountryByCode = (countryCode: string): string | void => {
  */
 export const getCountryCode = (isoName: string): number | void => {
   const country = COUNTRY_CODES.find(({iso}) => iso === isoName);
-  if (country) {
+  if (country !== null && country !== undefined) {
     return country.code;
   }
 };

@@ -46,7 +46,7 @@ export function pathWithParams(
   whitelistParams: string[] = FORWARDED_QUERY_KEYS,
 ): string {
   const params = getSearchParams(additionalParams, whitelistParams);
-  return `${path}${params.length ? `?${params}` : ''}`;
+  return `${path}${params.length !== 0 && !Number.isNaN(params.length) ? `?${params}` : ''}`;
 }
 
 export function hasURLParameter(parameterName: string): boolean {
@@ -58,7 +58,7 @@ export function hasURLParameter(parameterName: string): boolean {
 
 export function openTab(url: string): Window | null {
   const newWindow = window.open(url);
-  if (newWindow) {
+  if (newWindow !== null && newWindow !== undefined) {
     newWindow.opener = null;
   }
   return newWindow;

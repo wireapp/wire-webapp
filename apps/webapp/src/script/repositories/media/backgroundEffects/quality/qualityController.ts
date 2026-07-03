@@ -352,7 +352,7 @@ export class QualityController {
    */
   private addSample(sample: PerformanceSample): void {
     const outgoing = this.samples[this.sampleIndex];
-    if (outgoing) {
+    if (outgoing !== null && outgoing !== undefined) {
       this.sampleTotals.totalMs -= outgoing.totalMs;
       this.sampleTotals.segmentationMs -= outgoing.segmentationMs;
       this.sampleTotals.gpuMs -= outgoing.gpuMs;
@@ -490,7 +490,7 @@ export class QualityController {
    * @param cap - The highest tier allowed for future upgrades.
    */
   private applyMaxTierCap(cap: QualityTier): void {
-    if (!this.maxTier || this.getTierRank(cap) < this.getTierRank(this.maxTier)) {
+    if (this.maxTier === null || this.maxTier === undefined || this.getTierRank(cap) < this.getTierRank(this.maxTier)) {
       this.maxTier = cap;
       this.logger.info('maxTier cap set', {maxTier: this.maxTier});
     }
@@ -507,7 +507,7 @@ export class QualityController {
    * @returns True if upgrade to the tier is allowed, false if it exceeds maxTier.
    */
   private canUpgradeTo(tier: QualityTier): boolean {
-    if (!this.maxTier) {
+    if (this.maxTier === null || this.maxTier === undefined) {
       return true;
     }
     return this.getTierRank(tier) <= this.getTierRank(this.maxTier);

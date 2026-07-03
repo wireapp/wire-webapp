@@ -40,7 +40,7 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
   const firstAsset = assets[0];
   const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
 
-  if (isOfCategory('images', message) && firstAsset.isImage() && resource) {
+  if (isOfCategory('images', message) && firstAsset.isImage() && resource !== null && resource !== undefined) {
     return (
       <AssetImage
         css={{width: '110px', height: '110px'}}

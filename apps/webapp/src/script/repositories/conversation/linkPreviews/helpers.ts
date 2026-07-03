@@ -34,7 +34,7 @@ const linkify = new Linkify();
 export const containsOnlyLink = (text: string): boolean => {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '').replace(inlineCodeRegex, ``);
 
-  const urls = linkify.match(textWithoutCode) || [];
+  const urls = linkify.match(textWithoutCode) ?? [];
   return urls.length === 1 && urls[0].raw === textWithoutCode;
 };
 
@@ -46,10 +46,10 @@ export const containsOnlyLink = (text: string): boolean => {
 export const getFirstLinkWithOffset = (text: string): {offset: number; url: string} | undefined => {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '').replace(inlineCodeRegex, ``);
 
-  const links = linkify.match(textWithoutCode) || [];
+  const links = linkify.match(textWithoutCode) ?? [];
   const [firstLink] = links.filter(link => ['http:', 'https:', ''].includes(link.schema));
 
-  return firstLink
+  return firstLink !== null && firstLink !== undefined
     ? {
         offset: firstLink.index,
         url: firstLink.raw,

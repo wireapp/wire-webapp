@@ -93,7 +93,7 @@ const calculateRowsAndColumns = (params: CalculateRowsAndColumsParams): RowsAndC
   const {totalCount} = params;
   const desiredColumns = getDesiredColumns(params);
   const columns = Math.min(totalCount, desiredColumns);
-  const rows = totalCount ? Math.ceil(totalCount / columns) : 1;
+  const rows = totalCount !== 0 && !Number.isNaN(totalCount) ? Math.ceil(totalCount / columns) : 1;
 
   return {'--columns': columns, '--rows': rows};
 };
@@ -170,11 +170,13 @@ const GroupVideoGrid = ({
       return;
     }
 
-    const participant = grid.grid.find(participant => participant?.doesMatchIds(userId, clientId)) || null;
+    const participant = grid.grid.find(participant => participant?.doesMatchIds(userId, clientId)) ?? null;
     setMaximizedParticipant(participant);
   };
 
-  const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(Boolean);
+  const participants = (
+    maximizedParticipant !== null && maximizedParticipant !== undefined ? [maximizedParticipant] : grid.grid
+  ).filter(Boolean);
 
   useEffect(() => {
     setRowsAndColumns(
@@ -196,7 +198,7 @@ const GroupVideoGrid = ({
     }) => {
       if (isShort) {
         // Special case: use different layout for 2 participants when in short mode
-        if (grid.thumbnail && limits.WITH_THUMBNAIL != null) {
+        if (grid.thumbnail !== null && grid.thumbnail !== undefined && limits.WITH_THUMBNAIL != null) {
           return call.setNumberOfParticipantsInOnePage(limits.WITH_THUMBNAIL);
         }
         return call.setNumberOfParticipantsInOnePage(limits.SHORT);
@@ -269,7 +271,7 @@ const GroupVideoGrid = ({
             key={participant.clientId}
             selfParticipant={selfParticipant}
             participantCount={participants.length}
-            isMaximized={!!maximizedParticipant}
+            isMaximized={maximizedParticipant !== null && maximizedParticipant !== undefined}
             onTileDoubleClick={doubleClickedOnVideo}
           />
         ))}
@@ -303,7 +305,7 @@ const GroupVideoGrid = ({
           )}
         </GroupVideoThumbnailWrapper>
       )}
-      {grid.thumbnail && !thumbnail.hasActiveVideo && (
+      {grid.thumbnail !== null && grid.thumbnail !== undefined && !thumbnail.hasActiveVideo && (
         <GroupVideoThumbnailWrapper minimized={minimized}>
           <div
             css={{

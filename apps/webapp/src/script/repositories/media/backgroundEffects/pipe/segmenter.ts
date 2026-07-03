@@ -44,7 +44,7 @@ export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
 async function createSegmenter(canvas: OffscreenCanvas) {
   const logger = getSafeLogger('segmenter:createSegmenter');
   const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
-  if (!wasmLoaderPath || !wasmBinaryPath) {
+  if (wasmLoaderPath.length === 0 || wasmBinaryPath.length === 0) {
     logger.error('wasmLoaderPath and wasmBinaryPath must be provided');
     throw new Error('wasmLoaderPath and wasmBinaryPath must be provided');
   }
@@ -52,7 +52,7 @@ async function createSegmenter(canvas: OffscreenCanvas) {
   const fileset = {wasmLoaderPath, wasmBinaryPath};
   logger.log(`[virtual-background] createSegmenter`);
 
-  if (!modelPath) {
+  if (modelPath.length === 0) {
     logger.error('Model path must be provided');
     throw new Error('Model path must be provided');
   }
@@ -99,15 +99,15 @@ export async function runSegmenter(
   let webGLRenderer: WebGLRenderer | null = new WebGLRenderer(canvas);
 
   function onContextLost(event: Event) {
-    logger.log(`[virtual-background] webglcontextlost (${!!webGLRenderer})`);
+    logger.log(`[virtual-background] webglcontextlost (${webGLRenderer !== null && webGLRenderer !== undefined})`);
     event.preventDefault();
     webGLRenderer?.close();
     webGLRenderer = null;
   }
 
   function onContextRestored() {
-    logger.log(`[virtual-background] webglcontextrestored (${!!webGLRenderer})`);
-    if (!webGLRenderer) {
+    logger.log(`[virtual-background] webglcontextrestored (${webGLRenderer !== null && webGLRenderer !== undefined})`);
+    if (webGLRenderer === null || webGLRenderer === undefined) {
       const timer = createWallClock();
       timer.setTimeout(() => {
         logger.log('[virtual-background] restart segmenter onContextRestored');
@@ -204,7 +204,7 @@ export async function runSegmenter(
     {
       async write(videoFrame: VideoFrame) {
         const {codedWidth, codedHeight, timestamp} = videoFrame;
-        if (!codedWidth || !codedHeight) {
+        if (codedWidth === 0 || Number.isNaN(codedWidth) || codedHeight === 0 || Number.isNaN(codedHeight)) {
           videoFrame.close();
           return;
         }
@@ -250,7 +250,12 @@ export async function runSegmenter(
                   const confidenceMask = result.confidenceMasks?.[0];
 
                   try {
-                    if (!categoryMask || !confidenceMask) {
+                    if (
+                      categoryMask === null ||
+                      categoryMask === undefined ||
+                      confidenceMask === null ||
+                      confidenceMask === undefined
+                    ) {
                       logger.warn('Skipping frame: Missing masks or WebGL data.');
                       return;
                     }

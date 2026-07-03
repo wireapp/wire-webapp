@@ -40,7 +40,7 @@ export class RenameMessage extends SystemMessage {
     this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
     this.name = name;
 
-    if (userId) {
+    if (userId !== null && userId !== undefined && userId.length > 0) {
       this.from = userId;
       this.fromDomain = userDomain;
       this.user(new User(userId, userDomain ?? '', this.translate));
@@ -50,7 +50,7 @@ export class RenameMessage extends SystemMessage {
   }
 
   private generateCaption(): string {
-    if (!this.user()) {
+    if (this.user() === null || this.user() === undefined) {
       return this.translate('conversationRename');
     }
 

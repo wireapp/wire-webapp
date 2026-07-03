@@ -388,14 +388,14 @@ export class UserAPI {
       return response.data;
     };
 
-    if ('handles' in parameters && parameters.handles.length) {
+    if ('handles' in parameters && parameters.handles.length !== 0 && !Number.isNaN(parameters.handles.length)) {
       const uniqueHandles = ArrayUtil.removeDuplicates(parameters.handles);
       const handleChunks = ArrayUtil.chunk(uniqueHandles, limit);
       const resolvedTasks = await Promise.all(handleChunks.map(handleChunk => fetchUsers({handles: handleChunk})));
       return ArrayUtil.flatten(resolvedTasks);
     }
 
-    if ('ids' in parameters && parameters.ids.length) {
+    if ('ids' in parameters && parameters.ids.length !== 0 && !Number.isNaN(parameters.ids.length)) {
       const uniqueIds = ArrayUtil.removeDuplicates(parameters.ids);
       const idChunks = ArrayUtil.chunk(uniqueIds, limit);
       const resolvedTasks = await Promise.all(idChunks.map(idChunk => fetchUsers({ids: idChunk})));

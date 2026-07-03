@@ -216,7 +216,7 @@ export const ContentMessageComponent = ({
         {isEphemeralMessage && (
           <div
             css={messageEphemeralTimer}
-            {...(ephemeralCaption && {title: ephemeralCaption})}
+            {...(ephemeralCaption.length > 0 && {title: ephemeralCaption})}
             className="message-ephemeral-timer"
           >
             <EphemeralTimer message={message} />
@@ -226,13 +226,13 @@ export const ContentMessageComponent = ({
         <div
           className={cx('message-body', {
             'message-asset': isAssetMessage,
-            'message-quoted': !!quote,
+            'message-quoted': quote !== null && quote !== undefined,
             'ephemeral-asset-expired': isObfuscated && isAssetMessage,
             'icon-file': isObfuscated && isFileMessage,
             'icon-movie': isObfuscated && isVideoMessage,
           })}
         >
-          {quote && (
+          {quote !== null && quote !== undefined && (
             <Quote
               conversation={conversation}
               quote={quote}
@@ -303,7 +303,7 @@ export const ContentMessageComponent = ({
         />
       )}
 
-      {failedToSend && (
+      {failedToSend !== null && failedToSend !== undefined && (
         <PartialFailureToSendWarning
           isMessageFocused={msgFocusState}
           failedToSend={failedToSend}

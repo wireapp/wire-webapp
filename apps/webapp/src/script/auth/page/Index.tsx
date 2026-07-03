@@ -60,7 +60,8 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   useEffect(() => {
-    const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+    const logoutReasonParameter = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON);
+    const queryLogoutReason = logoutReasonParameter.length > 0 ? logoutReasonParameter : null;
     if (is.nonEmptyString(queryLogoutReason)) {
       setLogoutReason(queryLogoutReason);
     }
@@ -69,7 +70,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
   const immediateLogin = useCallback(async () => {
     await doInit({isImmediateLogin: true, shouldValidateLocalClient: true});
     // Check if the user is already logged in
-    if (!hasOtherInstance && core.getLocalClient()) {
+    if (!hasOtherInstance && core.getLocalClient() !== null && core.getLocalClient() !== undefined) {
       navigate(ROUTE.HISTORY_INFO);
     }
   }, [core, doInit, navigate, hasOtherInstance]);

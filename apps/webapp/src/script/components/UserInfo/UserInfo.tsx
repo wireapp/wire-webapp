@@ -91,24 +91,25 @@ export const UserInfo = ({
     </span>
   );
 
-  const wrappedContent = onClick ? (
-    <button
-      type="button"
-      css={
-        isActive
-          ? {...buttonCommonStyles, color: 'var(--accent-color)', userSelect: 'none'}
-          : {...buttonCommonStyles, userSelect: 'none'}
-      }
-      data-uie-name="status-label"
-      onClick={onClick}
-      onKeyDown={handleKeyDown}
-    >
-      <span>search me</span>
-      {content}
-    </button>
-  ) : (
-    content
-  );
+  const wrappedContent =
+    onClick !== null && onClick !== undefined ? (
+      <button
+        type="button"
+        css={
+          isActive
+            ? {...buttonCommonStyles, color: 'var(--accent-color)', userSelect: 'none'}
+            : {...buttonCommonStyles, userSelect: 'none'}
+        }
+        data-uie-name="status-label"
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+      >
+        <span>search me</span>
+        {content}
+      </button>
+    ) : (
+      content
+    );
 
   if (className !== undefined && className !== '') {
     return <span className={className}>{wrappedContent}</span>;

@@ -70,7 +70,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
       handleMenuOpen(false);
       setShowEmojis(false);
     }
-    if (emojiButtonRef.current) {
+    if (emojiButtonRef.current !== null && emojiButtonRef.current !== undefined) {
       emojiButtonRef.current.focus();
     }
   };

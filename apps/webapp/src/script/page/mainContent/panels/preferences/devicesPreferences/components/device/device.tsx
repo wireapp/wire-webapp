@@ -87,15 +87,17 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
           <DeviceVerificationBadges device={device} getIdentity={getDeviceIdentity} />
         </div>
 
-        {deviceIdentity?.thumbprint && (
-          <p className="preferences-devices-id">
-            <span>{translate('preferencesMLSThumbprint')}</span>
+        {deviceIdentity?.thumbprint !== null &&
+          deviceIdentity?.thumbprint !== undefined &&
+          deviceIdentity?.thumbprint.length > 0 && (
+            <p className="preferences-devices-id">
+              <span>{translate('preferencesMLSThumbprint')}</span>
 
-            <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
-              <FormattedId idSlices={splitFingerprint(deviceIdentity.thumbprint)} smallPadding />
-            </span>
-          </p>
-        )}
+              <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
+                <FormattedId idSlices={splitFingerprint(deviceIdentity.thumbprint)} smallPadding />
+              </span>
+            </p>
+          )}
 
         <p className="preferences-devices-id">
           <span>{translate('preferencesDevicesId')}</span>

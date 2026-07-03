@@ -67,12 +67,16 @@ export class Asset {
   }
 
   isVideo(): boolean {
-    return this.type === AssetType.FILE && !!this.file_type?.startsWith('video');
+    return (
+      this.type === AssetType.FILE &&
+      this.file_type?.startsWith('video') !== null &&
+      (this.file_type?.startsWith('video') !== undefined) === true
+    );
   }
 
   isAudio(): boolean {
     const is_audio_asset = this.type === AssetType.FILE && this.file_type?.startsWith('audio');
-    if (is_audio_asset) {
+    if (is_audio_asset === true) {
       const can_play = document.createElement('audio').canPlayType(this.file_type!);
       if (can_play !== '') {
         return true;

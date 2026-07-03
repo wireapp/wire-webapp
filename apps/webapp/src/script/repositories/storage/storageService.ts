@@ -197,7 +197,7 @@ export class StorageService {
   }
 
   async deleteEventInConversation(storeName: string, conversationId: string, eventId: string): Promise<number> {
-    if (!this.db) {
+    if (this.db === null || this.db === undefined) {
       return 0;
     }
 
@@ -210,7 +210,7 @@ export class StorageService {
   }
 
   async deleteEventsByDate(storeName: string, conversationId: string, isoDate?: string): Promise<number> {
-    if (!this.db) {
+    if (this.db === null || this.db === undefined) {
       return 0;
     }
 
@@ -218,7 +218,7 @@ export class StorageService {
       .table(storeName)
       .where('conversation')
       .equals(conversationId)
-      .filter(record => !isoDate || isoDate >= record.time)
+      .filter(record => isoDate === null || isoDate === undefined || isoDate.length === 0 || isoDate >= record.time)
       .delete();
   }
 
@@ -243,7 +243,7 @@ export class StorageService {
    * @returns Resolves with matching tables
    */
   getTables(tableNames: string[]): Dexie.Table<any, any>[] {
-    if (!this.db) {
+    if (this.db === null || this.db === undefined) {
       return [];
     }
     const database = this.db;
@@ -287,7 +287,7 @@ export class StorageService {
    * @returns Resolves with the primary key of the persisted object
    */
   async save<T = Object>(storeName: string, primaryKey: string, entity: T): Promise<string> {
-    if (!entity) {
+    if (entity === null || entity === undefined) {
       throw new StorageError(StorageError.TYPE.NO_DATA, StorageError.MESSAGE.NO_DATA);
     }
 
@@ -311,7 +311,7 @@ export class StorageService {
    */
   terminate(reason: string = 'unknown reason'): void {
     this.logger.info(`Closing database connection with '${this.dbName}' because of '${reason}'.`);
-    if (this.db) {
+    if (this.db !== null && this.db !== undefined) {
       this.db.close();
     }
   }

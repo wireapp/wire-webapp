@@ -34,7 +34,7 @@ type Translate = (
 
 function showModal(storageKey: string, title: string, message: string, translate: Translate): void {
   const hideModal = loadValue(storageKey);
-  if (!hideModal) {
+  if (hideModal !== true) {
     PrimaryModal.show(
       PrimaryModal.type.OPTION,
       {
@@ -42,7 +42,7 @@ function showModal(storageKey: string, title: string, message: string, translate
         preventClose: true,
         primaryAction: {
           action: (dontShowAgain?: boolean) => {
-            if (dontShowAgain) {
+            if (dontShowAgain === true) {
               storeValue(storageKey, 'true');
             }
           },
@@ -106,7 +106,7 @@ export function showAvailabilityModal(availability: Availability.Type, translate
 
 export function showInitialModal(availability: Availability.Type, translate: Translate): void {
   const hideInitialModal = loadValue(initialKey);
-  if (!hideInitialModal && availability !== Availability.Type.NONE) {
+  if (hideInitialModal !== true && availability !== Availability.Type.NONE) {
     showAvailabilityModal(availability, translate);
   }
 }

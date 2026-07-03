@@ -30,7 +30,10 @@ type Logger = Record<LogLevel, (...args: unknown[]) => void>;
 export function getSafeLogger(scope = 'worker'): Logger {
   const prefix = `[${scope}]`;
 
-  const safeConsole = typeof globalThis !== 'undefined' && globalThis.console ? globalThis.console : undefined;
+  const safeConsole =
+    typeof globalThis !== 'undefined' && globalThis.console !== null && globalThis.console !== undefined
+      ? globalThis.console
+      : undefined;
 
   const noop = () => {};
 

@@ -47,7 +47,7 @@ const DeviceSelect = ({
   title,
 }: DeviceSelectProps) => {
   const devicesList = devices.map(({deviceId, label}) => ({
-    label: label || defaultDeviceName,
+    label: label.length > 0 ? label : defaultDeviceName,
     value: deviceId,
   }));
   const currentValue = devicesList.find(device => device.value === value);
@@ -71,7 +71,7 @@ const DeviceSelect = ({
           onChange={option => {
             const currentOption = option?.value.toString();
 
-            if (currentOption) {
+            if (currentOption !== null && currentOption !== undefined && currentOption.length > 0) {
               onChange(currentOption);
             }
           }}

@@ -39,7 +39,7 @@ export function updateScroll(
   const scrollBottomPosition = container.scrollTop + container.clientHeight;
   const shouldStickToBottom = prevScrollHeight - scrollBottomPosition < 100;
 
-  if (focusedElement) {
+  if (focusedElement !== null && focusedElement !== undefined) {
     // If we have an element we want to focus
     const {element, center} = focusedElement;
     const elementPosition = element.getBoundingClientRect();

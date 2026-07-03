@@ -48,7 +48,7 @@ export const useMessageEditing = () => {
   return {
     editedMessage,
     editMessage,
-    isEditing: !!editedMessage,
+    isEditing: editedMessage !== null && editedMessage !== undefined,
     cancelMessageEditing,
   };
 };

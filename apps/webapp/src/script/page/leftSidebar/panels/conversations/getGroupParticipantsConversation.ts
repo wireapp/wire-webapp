@@ -57,7 +57,9 @@ export const getGroupParticipantsConversations = ({
   const archivedSet = new Set(archivedConversations);
   const conversationsSet = new Set(conversations);
   const currentFolderConversations =
-    isFolderView && currentFolder?.conversations() ? new Set(currentFolder.conversations()) : null;
+    isFolderView && currentFolder?.conversations() !== null && currentFolder?.conversations() !== undefined
+      ? new Set(currentFolder.conversations())
+      : null;
 
   if (isFavoritesView) {
     filteredGroup = filteredGroup.filter(item => favoriteSet.has(item));
@@ -67,7 +69,7 @@ export const getGroupParticipantsConversations = ({
     filteredGroup = filteredGroup.filter(item => archivedSet.has(item));
   }
 
-  if (isFolderView && currentFolderConversations) {
+  if (isFolderView && currentFolderConversations !== null && currentFolderConversations !== undefined) {
     filteredGroup = filteredGroup.filter(item => currentFolderConversations.has(item));
   }
 

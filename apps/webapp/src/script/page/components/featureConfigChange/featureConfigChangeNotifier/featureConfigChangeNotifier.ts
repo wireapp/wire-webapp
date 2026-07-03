@@ -72,7 +72,7 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.FILE_SHARING],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status) {
+      if (status === null || status === undefined) {
         return undefined;
       }
       return {
@@ -88,7 +88,7 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.VIDEO_CALLING],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status) {
+      if (status === null || status === undefined) {
         return undefined;
       }
       return {
@@ -121,7 +121,7 @@ const createFeatureNotifications = (
       const handleDlPathChange: (
         status: FEATURE_STATUS | undefined,
       ) => undefined | {htmlMessage: string; title: Title; primaryAction?: ButtonAction} = status => {
-        if (newConfig && 'config' in newConfig) {
+        if (newConfig !== null && newConfig !== undefined && 'config' in newConfig) {
           localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation ?? '');
           amplify.publish(
             WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
@@ -154,14 +154,19 @@ const createFeatureNotifications = (
         };
       };
 
-      if (!oldConfig && newConfig?.status === FEATURE_STATUS.ENABLED && 'config' in newConfig) {
+      if (
+        oldConfig === null ||
+        (oldConfig === undefined && newConfig?.status === FEATURE_STATUS.ENABLED && 'config' in newConfig)
+      ) {
         return handleDlPathChange(FEATURE_STATUS.ENABLED);
       }
 
       if (
-        newConfig &&
+        newConfig !== null &&
+        newConfig !== undefined &&
         'config' in newConfig &&
-        oldConfig &&
+        oldConfig !== null &&
+        oldConfig !== undefined &&
         'config' in oldConfig &&
         Runtime.isDesktopApp() &&
         Runtime.isWindows()
@@ -171,7 +176,7 @@ const createFeatureNotifications = (
           newConfig?.config?.enforcedDownloadLocation !== oldConfig?.config?.enforcedDownloadLocation;
 
         // separate call for type narrowing
-        if (!status) {
+        if (status === null || status === undefined) {
           return undefined;
         }
         if (configStatus === undefined) {
@@ -187,7 +192,14 @@ const createFeatureNotifications = (
       oldConfig: FeatureList[FEATURE_KEY.SELF_DELETING_MESSAGES],
       newConfig: FeatureList[FEATURE_KEY.SELF_DELETING_MESSAGES],
     ) => {
-      if (!oldConfig || !('config' in oldConfig) || !newConfig || !('config' in newConfig)) {
+      if (
+        oldConfig === null ||
+        oldConfig === undefined ||
+        !('config' in oldConfig) ||
+        newConfig === null ||
+        newConfig === undefined ||
+        !('config' in newConfig)
+      ) {
         return undefined;
       }
       const previousTimeout = oldConfig?.config?.enforcedTimeoutSeconds * millisecondsInSecond;
@@ -220,7 +232,7 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.CONFERENCE_CALLING],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status || status === FEATURE_STATUS.DISABLED) {
+      if (status === null || status === undefined || status === FEATURE_STATUS.DISABLED) {
         return undefined;
       }
       const replaceEnterprise = replaceLink(
@@ -243,7 +255,7 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.CONVERSATION_GUEST_LINKS],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status) {
+      if (status === null || status === undefined) {
         return undefined;
       }
       return {
@@ -261,7 +273,13 @@ function wasTurnedOnOrOff(
   oldConfig?: FeatureWithoutConfig,
   newConfig?: FeatureWithoutConfig,
 ): FEATURE_STATUS | undefined {
-  if (oldConfig?.status && newConfig?.status && oldConfig.status !== newConfig.status) {
+  if (
+    oldConfig?.status !== null &&
+    oldConfig?.status !== undefined &&
+    newConfig?.status !== null &&
+    newConfig?.status !== undefined &&
+    oldConfig.status !== newConfig.status
+  ) {
     return newConfig.status === FEATURE_STATUS.ENABLED ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED;
   }
   return undefined;
@@ -282,15 +300,15 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
 
   useEffect(() => {
     const previous = previousConfig.current;
-    if (config) {
+    if (config !== null && config !== undefined) {
       previousConfig.current = config;
       saveFeatureConfig(selfUserId, config);
     }
 
-    if (!previous) {
+    if (previous === null || previous === undefined) {
       return;
     }
-    if (!config) {
+    if (config === null || config === undefined) {
       return;
     }
 
@@ -299,7 +317,7 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
       const message = getMessage(previous[featureKey], config[featureKey]);
       const isEnforceDownloadPath = featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH;
 
-      if (!message) {
+      if (message === null || message === undefined) {
         continue;
       }
 

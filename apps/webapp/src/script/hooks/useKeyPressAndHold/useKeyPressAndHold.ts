@@ -44,7 +44,7 @@ export const useKeyPressAndHold = ({
   const isPressHandledRef = useRef(false);
 
   const handlePress = useCallback(() => {
-    if (holdTimeoutRef.current) {
+    if (holdTimeoutRef.current !== null && holdTimeoutRef.current !== undefined) {
       clearTimeout(holdTimeoutRef.current);
     }
 
@@ -60,7 +60,7 @@ export const useKeyPressAndHold = ({
   }, [onHold, holdDelayMs]);
 
   const clearHoldTimeout = useCallback(() => {
-    if (holdTimeoutRef.current) {
+    if (holdTimeoutRef.current !== null && holdTimeoutRef.current !== undefined) {
       clearTimeout(holdTimeoutRef.current);
       holdTimeoutRef.current = null;
     }

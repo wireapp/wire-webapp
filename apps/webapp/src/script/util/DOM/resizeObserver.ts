@@ -48,7 +48,7 @@ export const useResizeObserver = (
 ) => {
   // We need to use a layout effect here as we want to make sure the observer is set up (and removed!) before the component is rendered
   useLayoutEffect(() => {
-    if (!element) {
+    if (element === null || element === undefined) {
       return () => {};
     }
 

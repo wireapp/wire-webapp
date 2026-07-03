@@ -56,7 +56,7 @@ const registerBlockquoteEnterCommand = (editor: LexicalEditor) => {
   return editor.registerCommand(
     KEY_ENTER_COMMAND,
     event => {
-      if (!event) {
+      if (event === null || event === undefined) {
         return false;
       }
 

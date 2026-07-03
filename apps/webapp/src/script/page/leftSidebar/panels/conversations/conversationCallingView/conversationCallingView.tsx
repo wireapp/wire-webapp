@@ -43,7 +43,8 @@ export const ConversationCallingView = ({
         const {callingRepository} = callingViewModel;
 
         return (
-          conversation && (
+          conversation !== null &&
+          conversation !== undefined && (
             <CallingCell
               key={conversation.id}
               classifiedDomains={classifiedDomains}

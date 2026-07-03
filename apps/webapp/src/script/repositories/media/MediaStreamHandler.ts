@@ -53,9 +53,12 @@ export class MediaStreamHandler {
     this.requestHintTimeout = undefined;
 
     this.screensharingMethod = ScreensharingMethods.NONE;
-    if (window.desktopCapturer) {
+    if (window.desktopCapturer !== null && window.desktopCapturer !== undefined) {
       this.screensharingMethod = ScreensharingMethods.DESKTOP_CAPTURER;
-    } else if (!!navigator.mediaDevices?.getDisplayMedia) {
+    } else if (
+      navigator.mediaDevices?.getDisplayMedia !== null &&
+      navigator.mediaDevices?.getDisplayMedia !== undefined
+    ) {
       this.screensharingMethod = ScreensharingMethods.DISPLAY_MEDIA;
     } else if (Runtime.isFirefox()) {
       this.screensharingMethod = ScreensharingMethods.USER_MEDIA;
@@ -134,7 +137,9 @@ export class MediaStreamHandler {
       permissionTypes.push(PermissionType.CAMERA);
     }
     const shouldCheckPermissions = permissionTypes.length;
-    return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : true;
+    return shouldCheckPermissions !== 0 && !Number.isNaN(shouldCheckPermissions)
+      ? checkPermissionStates(permissionTypes)
+      : true;
   }
 
   releaseTracksFromStream(mediaStream: MediaStream, mediaType?: MediaType): void {
@@ -228,7 +233,7 @@ export class MediaStreamHandler {
   }
 
   private getMediaTracks(mediaStream: MediaStream, mediaType: MediaType = MediaType.AUDIO_VIDEO): MediaStreamTrack[] {
-    if (!mediaStream) {
+    if (mediaStream === null || mediaStream === undefined) {
       throw new MediaError(MediaError.TYPE.STREAM_NOT_FOUND, MediaError.MESSAGE.STREAM_NOT_FOUND);
     }
 

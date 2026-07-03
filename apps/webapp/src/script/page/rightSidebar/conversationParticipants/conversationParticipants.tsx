@@ -72,7 +72,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
       return isUser ? [user] : [];
     });
 
-    if (!isSelfUserRemoved && selfUser) {
+    if (!isSelfUserRemoved && selfUser !== null && selfUser !== undefined) {
       return [...users, selfUser].toSorted(sortUsersByPriority);
     }
 

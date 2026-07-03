@@ -33,8 +33,9 @@ export class DeleteConversationMessage extends SystemMessage {
     this.type = TEAM_EVENT.DELETE;
     this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
 
-    this.caption = conversationEntity
-      ? this.translate('notificationConversationDeletedNamed', {name: conversationEntity.name()})
-      : this.translate('notificationConversationDeleted');
+    this.caption =
+      conversationEntity !== null && conversationEntity !== undefined
+        ? this.translate('notificationConversationDeletedNamed', {name: conversationEntity.name()})
+        : this.translate('notificationConversationDeleted');
   }
 }

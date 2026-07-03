@@ -26,12 +26,12 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {E2EIHandler, MLSStatuses, WireIdentity} from '../E2EIdentity';
 
 const getCertificateStatus = (identity?: WireIdentity, isSelfWithinGracePeriod: boolean = false) => {
-  if (!identity || identity.credentialType === CredentialType.Basic) {
+  if (identity === null || identity === undefined || identity.credentialType === CredentialType.Basic) {
     return MLSStatuses.NOT_ACTIVATED;
   }
 
   const certificate = identity.x509Identity?.certificate;
-  const hasCertificate = !!certificate && Boolean(certificate.length);
+  const hasCertificate = certificate !== null && certificate !== undefined && certificate.length > 0;
 
   if (!hasCertificate) {
     return MLSStatuses.NOT_ACTIVATED;
@@ -55,7 +55,10 @@ export const useCertificateStatus = (
 
   const refreshCertificateStatus = useCallback(async () => {
     const identityCertificate = identity?.x509Identity?.certificate;
-    const certificate = !!identityCertificate && Boolean(identityCertificate.length) ? identityCertificate : null;
+    const certificate =
+      identityCertificate !== null && identityCertificate !== undefined && identityCertificate.length > 0
+        ? identityCertificate
+        : null;
 
     const hasGracePeriodStarted = isCurrentDevice
       ? await E2EIHandler.getInstance().hasGracePeriodStartedForSelfClient()

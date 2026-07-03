@@ -50,7 +50,7 @@ const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPre
     previews: [preview],
   } = useKoSubscribableChildren(message.getFirstAsset() as Text, ['previews']);
 
-  const isTypeTweet = !!preview?.tweet;
+  const isTypeTweet = preview?.tweet !== null && preview?.tweet !== undefined;
   const isTweet = isTypeTweet && isTweetUrl(preview?.url);
   const author = isTweet ? preview.tweet?.author?.substring(0, maximumTweetAuthorLength) : '';
   const previewImage = preview?.image;

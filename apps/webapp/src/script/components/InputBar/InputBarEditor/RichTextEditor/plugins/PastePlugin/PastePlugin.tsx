@@ -92,7 +92,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
    */
   const handleLexicalMentions = useCallback(
     (doc: Document, selection: Selection, availableUsers: User[]): boolean => {
-      if (!selection) {
+      if (selection === null || selection === undefined) {
         return false;
       }
 
@@ -112,7 +112,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
         // Only convert to plain text if the mention is invalid
         if (!isValid) {
           const parent = mention.parentNode;
-          if (!parent) {
+          if (parent === null || parent === undefined) {
             return;
           }
 
@@ -225,7 +225,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
   const handlePaste = useCallback(
     (event: ClipboardEvent) => {
       const clipboardData = event.clipboardData;
-      if (!clipboardData) {
+      if (clipboardData === null || clipboardData === undefined) {
         return false;
       }
 
@@ -236,12 +236,12 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
       editor.update(() => {
         try {
           const selection = $getSelection();
-          if (!selection) {
+          if (selection === null || selection === undefined) {
             $getSelection()?.insertText(plainText);
             return false;
           }
 
-          if (!htmlContent) {
+          if (htmlContent.length === 0) {
             selection.insertText(plainText);
             return false;
           }

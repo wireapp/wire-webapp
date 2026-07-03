@@ -49,7 +49,7 @@ export const VideoPlayButton = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
-    if (!mediaElement) {
+    if (mediaElement === null || mediaElement === undefined) {
       return undefined;
     }
 

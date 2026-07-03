@@ -94,7 +94,7 @@ export class MemoryEngine implements CRUDEngine {
 
   private assignDb<ObjectType = Object>(storeName: string, object: ObjectType): MemoryStore {
     this.storeName = storeName;
-    this.stores[this.storeName] = (this.stores[this.storeName] || object) as Record<string, Record<string, any>>;
+    this.stores[this.storeName] = (this.stores[this.storeName] ?? object) as Record<string, Record<string, any>>;
     return this.stores;
   }
 
@@ -166,10 +166,10 @@ export class MemoryEngine implements CRUDEngine {
   }
 
   private prepareTable(tableName: string): void {
-    if (!this.stores[this.storeName]) {
+    if (this.stores[this.storeName] === null || this.stores[this.storeName] === undefined) {
       this.stores[this.storeName] = {};
     }
-    if (!this.store[tableName]) {
+    if (this.store[tableName] === null || this.store[tableName] === undefined) {
       this.store[tableName] = {};
     }
   }

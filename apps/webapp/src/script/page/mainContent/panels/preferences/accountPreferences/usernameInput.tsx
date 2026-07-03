@@ -122,7 +122,7 @@ const UsernameInput = ({username, domain, userRepository, canEditProfile}: Usern
         onInput={({target}: FormEvent) => verifyUsername((target as HTMLInputElement).value)}
         readOnly={!canEditProfile}
         prefix="@"
-        suffix={domain && `@${domain}`}
+        suffix={domain !== null && domain !== undefined && domain.length > 0 ? `@${domain}` : undefined}
         setIsEditing={setIsEditing}
         isDone={usernameInputDone.isDone}
         onValueChange={changeUsername}
@@ -134,7 +134,7 @@ const UsernameInput = ({username, domain, userRepository, canEditProfile}: Usern
         <p
           className={cx('font-size-xs', {
             'preferences-account-username-error': errorState,
-            'text-foreground': !errorState,
+            'text-foreground': errorState === null || errorState === undefined || errorState.length === 0,
             'text-red': errorState === UserNameState.TAKEN,
           })}
           css={{margin: '-15px 0 0 8px'}}
@@ -143,7 +143,9 @@ const UsernameInput = ({username, domain, userRepository, canEditProfile}: Usern
             <>
               {errorState === UserNameState.AVAILABLE && translate('preferencesAccountUsernameAvailable')}
               {errorState === UserNameState.TAKEN && translate('preferencesAccountUsernameErrorTaken')}
-              {!errorState && translate('preferencesAccountUsernameHint')}
+              {errorState === null ||
+                errorState === undefined ||
+                (errorState.length === 0 && translate('preferencesAccountUsernameHint'))}
             </>
           )}
         </p>

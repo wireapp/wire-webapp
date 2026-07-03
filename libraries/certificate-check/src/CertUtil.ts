@@ -72,13 +72,13 @@ export function hostnameShouldBePinned(hostname: string): boolean {
 }
 
 export function verifyPinning(hostname: string, remoteCertificate?: ElectronCertificate): PinningResult {
-  if (!remoteCertificate) {
+  if (remoteCertificate === null || remoteCertificate === undefined) {
     return {
       errorMessage: 'No certificate provided by Electron.',
     };
   }
 
-  if (!remoteCertificate.issuerCert) {
+  if (remoteCertificate.issuerCert === null || remoteCertificate.issuerCert === undefined) {
     return {
       errorMessage: 'No issuer certificate in certificate.',
     };
@@ -87,7 +87,9 @@ export function verifyPinning(hostname: string, remoteCertificate?: ElectronCert
   const {data: certData, issuerCert} = remoteCertificate;
 
   function getRemoteIssuerCertData(remoteIssuerCert: ElectronCertificate = issuerCert): ElectronCertificate {
-    return remoteIssuerCert.issuerCert ? getRemoteIssuerCertData(remoteIssuerCert.issuerCert) : remoteIssuerCert;
+    return remoteIssuerCert.issuerCert !== null && remoteIssuerCert.issuerCert !== undefined
+      ? getRemoteIssuerCertData(remoteIssuerCert.issuerCert)
+      : remoteIssuerCert;
   }
 
   let remoteIssuerCertHex: string;

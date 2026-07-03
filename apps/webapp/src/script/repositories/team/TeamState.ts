@@ -68,7 +68,10 @@ export class TeamState {
   readonly isAppsEnabled: ko.PureComputed<boolean>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
-    this.isTeam = ko.pureComputed(() => !!this.team()?.id);
+    this.isTeam = ko.pureComputed(() => {
+      const teamId = this.team()?.id;
+      return teamId !== null && teamId !== undefined && teamId.length > 0;
+    });
     this.isTeamDeleted = ko.observable(false);
 
     /** Note: this does not include the self user */
@@ -92,11 +95,11 @@ export class TeamState {
 
     this.isFileSharingSendingEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.fileSharing?.status;
-      return status ? status === FEATURE_STATUS.ENABLED : true;
+      return status !== null && status !== undefined ? status === FEATURE_STATUS.ENABLED : true;
     });
     this.isFileSharingReceivingEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.fileSharing?.status;
-      return status ? status === FEATURE_STATUS.ENABLED : true;
+      return status !== null && status !== undefined ? status === FEATURE_STATUS.ENABLED : true;
     });
 
     this.classifiedDomains = ko.pureComputed(() => {
@@ -108,10 +111,14 @@ export class TeamState {
     this.isSelfDeletingMessagesEnabled = ko.pureComputed(
       () => this.teamFeatures()?.selfDeletingMessages?.status === FEATURE_STATUS.ENABLED,
     );
-    this.getEnforcedSelfDeletingMessagesTimeout = ko.pureComputed(
-      () =>
-        (this.teamFeatures()?.selfDeletingMessages?.config?.enforcedTimeoutSeconds || SELF_DELETING_TIMEOUT.OFF) * 1000,
-    );
+    this.getEnforcedSelfDeletingMessagesTimeout = ko.pureComputed(() => {
+      const enforcedTimeoutSeconds = this.teamFeatures()?.selfDeletingMessages?.config?.enforcedTimeoutSeconds;
+      return (
+        (enforcedTimeoutSeconds !== undefined && enforcedTimeoutSeconds !== 0 && !Number.isNaN(enforcedTimeoutSeconds)
+          ? enforcedTimeoutSeconds
+          : SELF_DELETING_TIMEOUT.OFF) * 1000
+      );
+    });
     this.isSelfDeletingMessagesEnforced = ko.pureComputed(
       () => this.getEnforcedSelfDeletingMessagesTimeout() > SELF_DELETING_TIMEOUT.OFF,
     );
@@ -145,7 +152,7 @@ export class TeamState {
     this.selfRole = ko.pureComputed(() => {
       const roles = this.memberRoles();
       const userId = this.userState.self()?.id;
-      return roles && userId ? roleMap[roles[userId]] : undefined;
+      return roles !== null && roles !== undefined && userId.length > 0 ? roleMap[roles[userId]] : undefined;
     });
 
     this.isCellsEnabled = ko.pureComputed(() => {
@@ -174,7 +181,13 @@ export class TeamState {
 
   isInTeam(entity: User | Conversation): boolean {
     const team = this.team();
-    return !!team.id && entity.domain === this.teamDomain() && entity.teamId === team.id;
+    return (
+      team.id !== null &&
+      team.id !== undefined &&
+      team.id.length > 0 &&
+      entity.domain === this.teamDomain() &&
+      entity.teamId === team.id
+    );
   }
 
   isExternal(userId: string): boolean {

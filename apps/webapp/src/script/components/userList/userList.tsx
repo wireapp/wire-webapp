@@ -182,7 +182,7 @@ export const UserList = ({
   const membersHeaderId = useId();
   let content;
 
-  const showRoles = !!conversation;
+  const showRoles = conversation !== null && conversation !== undefined;
   if (showRoles) {
     let members: User[] = [];
     let admins: User[] = [];
@@ -209,7 +209,7 @@ export const UserList = ({
 
     content = (
       <>
-        {(admins.length > 0 || showEmptyAdmin) && (
+        {admins.length > 0 || showEmptyAdmin ? (
           <>
             <h3 id={adminsHeaderId} className="user-list__header" data-uie-name="label-conversation-admins">
               {translate('searchListAdmins', {count: adminCount})}
@@ -231,7 +231,7 @@ export const UserList = ({
               </div>
             )}
           </>
-        )}
+        ) : null}
 
         {members.length > 0 && maxShownUsers > admins.length && (
           <>

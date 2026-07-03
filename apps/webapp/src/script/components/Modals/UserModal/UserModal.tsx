@@ -240,7 +240,9 @@ const UserModal = ({
       onClosed={onModalClosed}
       className="user-modal"
       css={userModalStyle}
-      data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
+      data-uie-name={
+        user !== null && user !== undefined ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''
+      }
       wrapperCSS={userModalWrapperStyle}
     >
       <div className="modal__header">
@@ -266,9 +268,11 @@ const UserModal = ({
       </div>
 
       <FadingScrollbar
-        className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}
+        className={cx('modal__body user-modal__wrapper', {
+          'user-modal__wrapper--max': (user === null || user === undefined) && !userNotFound,
+        })}
       >
-        {user && (
+        {user !== null && user !== undefined && (
           <>
             <UserDetails participant={user} classifiedDomains={classifiedDomains} />
 
@@ -289,7 +293,7 @@ const UserModal = ({
             />
           </>
         )}
-        {isShown && !user && !userNotFound && (
+        {isShown && (user === null || user === undefined) && !userNotFound && (
           <div className="loading-wrapper">
             <Icon.LoadingIcon aria-hidden="true" />
           </div>

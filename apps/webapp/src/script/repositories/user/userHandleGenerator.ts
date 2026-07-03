@@ -84,12 +84,19 @@ export const normalizeName = (name: string): string =>
  * Validates that an input is a valid handle.
  */
 export const validateHandle = (handle: string = '', domain?: string): boolean => {
-  if (!handle.length || handle.length < MIN_HANDLE_LENGTH || handle.length > MAX_HANDLE_LENGTH) {
+  if (
+    handle.length === 0 ||
+    Number.isNaN(handle.length) ||
+    handle.length < MIN_HANDLE_LENGTH ||
+    handle.length > MAX_HANDLE_LENGTH
+  ) {
     return false;
   }
 
   const isValidDomain =
-    !domain ||
+    domain === null ||
+    domain === undefined ||
+    domain.length === 0 ||
     /^((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(domain);
   const isValidName = handle.split('').every(validateCharacter);
 
@@ -114,7 +121,7 @@ export const createSuggestions = (name: string): string[] => {
   const randomName = getRandomWordCombination();
   const suggestions = [];
 
-  if (normalizedName) {
+  if (normalizedName.length > 0) {
     suggestions.push(normalizedName);
     const normalizedNameVariations = generateHandleVariations(normalizedName);
     suggestions.push(...normalizedNameVariations);

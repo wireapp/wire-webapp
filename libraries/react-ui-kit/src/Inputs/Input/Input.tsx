@@ -143,7 +143,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
   ) => {
     const [isPasswordVisible, setTogglePassword] = useState<boolean>(false);
 
-    const hasError = !!error;
+    const hasError = error !== null && error !== undefined;
     const isPasswordInput = type === 'password';
     const toggledPasswordType = isPasswordVisible ? 'text' : 'password';
 

@@ -24,10 +24,10 @@ export const TIME_OPTIONS_COUNT = 96;
 
 export const parseTimeLabel = (value: string | number): {hour24: number; minutes: number} => {
   const [timePart, periodPart] = `${value}`.trim().split(' ');
-  const [hourPart, minutePart] = (timePart || '').split(':');
+  const [hourPart, minutePart] = (timePart.length > 0 ? timePart : '').split(':');
   const hour = Number(hourPart);
   const minutes = Number(minutePart);
-  const isPm = (periodPart || '').toUpperCase() === 'PM';
+  const isPm = (periodPart.length > 0 ? periodPart : '').toUpperCase() === 'PM';
   const hour24 = Number.isFinite(hour) ? (isPm ? (hour % 12) + 12 : hour % 12) : 0;
   const safeMinutes = Number.isFinite(minutes) ? minutes : 0;
 

@@ -61,7 +61,7 @@ export const useMessageReply = () => {
   }, [handleRepliedMessageDeleted, handleRepliedMessageUpdated, replyMessage]);
 
   return {
-    isReplying: !!replyMessageEntity,
+    isReplying: replyMessageEntity !== null && replyMessageEntity !== undefined,
     replyMessageEntity,
     replyMessage,
   };

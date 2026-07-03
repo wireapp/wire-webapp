@@ -159,7 +159,7 @@ export const roleMap: {[key in ROLE]?: Role} = {
 const RolesByPriority = [ROLE.OWNER, ROLE.ADMIN, ROLE.MEMBER, ROLE.PARTNER, ROLE.NONE, ROLE.INVALID];
 
 export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
-  if (!permissions) {
+  if (permissions === null || permissions === undefined) {
     throw new TeamError(TeamError.TYPE.NO_PERMISSIONS, TeamError.MESSAGE.NO_PERMISSIONS);
   }
 
@@ -168,7 +168,7 @@ export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
     hasPermissionForRole(permissions.self, role),
   );
 
-  return detectedRole || ROLE.INVALID;
+  return detectedRole ?? ROLE.INVALID;
 }
 
 /**
@@ -192,7 +192,7 @@ export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string,
 
 export function hasAccessToFeature(feature: number, role: ROLE): boolean {
   const permissions = combinePermissions([teamPermissionsForRole(role), publicPermissionsForRole(role)]);
-  return !!(feature & permissions);
+  return (feature & permissions) !== 0;
 }
 
 export function combinePermissions(permissions: number[]): number {

@@ -112,7 +112,11 @@ export class EventTrackingRepository {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
       this.telemetryLogger.info('Received data transfer event with new telemetry tracking id', eventJson.data);
-      if (!!eventJson.data.trackingIdentifier && eventJson.data.trackingIdentifier !== this.telemetryDeviceId) {
+      if (
+        eventJson.data.trackingIdentifier !== null &&
+        eventJson.data.trackingIdentifier !== undefined &&
+        eventJson.data.trackingIdentifier !== this.telemetryDeviceId
+      ) {
         void this.migrateDeviceId(eventJson.data.trackingIdentifier);
       }
     }
@@ -124,7 +128,7 @@ export class EventTrackingRepository {
       return;
     }
 
-    if (!newId || !newId.length) {
+    if (newId.length === 0 || newId.length === 0 || Number.isNaN(newId.length)) {
       this.telemetryLogger.warn('New telemetry tracking id is not defined');
       return;
     }
@@ -172,17 +176,26 @@ export class EventTrackingRepository {
       }
     }
 
-    if (previousTelemetryDeviceId) {
+    if (
+      previousTelemetryDeviceId !== null &&
+      previousTelemetryDeviceId !== undefined &&
+      previousTelemetryDeviceId.length > 0
+    ) {
       this.telemetryDeviceId = previousTelemetryDeviceId;
       const notMigratedTelemetryTrackingId = loadValue<string>(
         EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID,
       );
 
       // Migrate the device id if it has not been migrated yet and it is different from the previous one
-      if (!!notMigratedTelemetryTrackingId && notMigratedTelemetryTrackingId !== previousTelemetryDeviceId) {
+      if (
+        notMigratedTelemetryTrackingId !== null &&
+        notMigratedTelemetryTrackingId !== undefined &&
+        notMigratedTelemetryTrackingId.length > 0 &&
+        notMigratedTelemetryTrackingId !== previousTelemetryDeviceId
+      ) {
         await this.migrateDeviceId(notMigratedTelemetryTrackingId);
       }
-      if (!hasAtLeastSyncedOnce) {
+      if (hasAtLeastSyncedOnce === null || hasAtLeastSyncedOnce === undefined || hasAtLeastSyncedOnce.length === 0) {
         try {
           await this.messageRepository.sendCountlySync(this.telemetryDeviceId);
           storeValue(
@@ -258,7 +271,7 @@ export class EventTrackingRepository {
 
     // Initialize telemetry if it is not initialized yet
     if (!this.telemetryInitialized) {
-      if (!COUNTLY_API_KEY.length) {
+      if (COUNTLY_API_KEY.length === 0 || Number.isNaN(COUNTLY_API_KEY.length)) {
         this.telemetryLogger.error('Countly API key is not defined in the environment');
         return;
       }
@@ -287,7 +300,7 @@ export class EventTrackingRepository {
 
     const device_id = Boolean(trackingId.length) ? trackingId : this.telemetryDeviceId;
 
-    if (!device_id) {
+    if (device_id === null || device_id === undefined || device_id.length === 0) {
       this.telemetryLogger.error('Telemetry device id is not defined');
       return;
     }
@@ -390,7 +403,8 @@ export class EventTrackingRepository {
       segmentation[Segmentation.COMMON.TEAM_IS_ENTERPRISE] = this.teamState.isConferenceCallingEnabled();
       if (this.teamState.teamSize() >= TEAM_SIZE_THRESHOLD_VALUE) {
         const selfRole = this.teamState.selfRole();
-        segmentation[Segmentation.COMMON.TEAM_USER_TYPE] = selfRole ? selfRole.toString() : '';
+        segmentation[Segmentation.COMMON.TEAM_USER_TYPE] =
+          selfRole !== null && selfRole !== undefined ? selfRole.toString() : '';
         segmentation[Segmentation.COMMON.TEAM_TEAM_ID] = this.teamState.team().id!;
         segmentation[Segmentation.COMMON.TEAM_TEAM_SIZE] = this.teamState.teamSize();
       }

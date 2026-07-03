@@ -44,7 +44,8 @@ export const hasQuoteForMessage = (event: EventRecord, quotedMessageId: string):
   // Check normal message quote (MessageAddEvent)
   if (
     isMessageAddEvent(event) &&
-    event.data.quote &&
+    event.data.quote !== null &&
+    event.data.quote !== undefined &&
     typeof event.data.quote === 'object' &&
     'message_id' in event.data.quote
   ) {
@@ -53,8 +54,10 @@ export const hasQuoteForMessage = (event: EventRecord, quotedMessageId: string):
   // Check multipart message quote (MultipartMessageAddEvent)
   if (
     isMultipartMessageAddEvent(event) &&
-    event.data.text &&
-    event.data.text.quote &&
+    event.data.text !== null &&
+    event.data.text !== undefined &&
+    event.data.text.quote !== null &&
+    event.data.text.quote !== undefined &&
     typeof event.data.text.quote === 'object' &&
     'message_id' in event.data.text.quote
   ) {

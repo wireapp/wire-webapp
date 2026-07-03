@@ -128,7 +128,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   }, [currentUser, goToRoot]);
 
   useEffect(() => {
-    if (team.id) {
+    if (team.id !== null && team.id !== undefined && team.id.length > 0) {
       void teamRepository.updateTeamMembersByIds(team.id, [currentUser.id], true);
     }
   }, [currentUser, teamRepository, team]);

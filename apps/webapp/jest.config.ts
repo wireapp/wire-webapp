@@ -43,10 +43,10 @@ const config: Config = {
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
   coverageThreshold: {
     global: {
-      branches: 39,
-      functions: 43,
-      lines: 48,
-      statements: 48,
+      branches: 42,
+      functions: 45,
+      lines: 51,
+      statements: 51,
     },
   },
   moduleDirectories: ['node_modules', __dirname],

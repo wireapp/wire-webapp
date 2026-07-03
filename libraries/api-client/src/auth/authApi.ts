@@ -52,7 +52,7 @@ export class AuthAPI {
       url: AuthAPI.URL.COOKIES,
     };
 
-    if (labels) {
+    if (labels !== null && labels !== undefined) {
       config.params.labels = labels.join(',');
     }
 

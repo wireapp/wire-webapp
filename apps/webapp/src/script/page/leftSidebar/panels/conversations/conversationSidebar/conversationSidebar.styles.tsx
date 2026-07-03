@@ -20,8 +20,8 @@
 import {CSSObject} from '@emotion/react';
 
 export const conversationsSidebarStyles = (mdBreakpoint: Boolean): CSSObject => ({
-  position: mdBreakpoint ? 'absolute' : 'relative',
-  zIndex: mdBreakpoint ? '1000' : 'auto',
+  position: mdBreakpoint !== null && mdBreakpoint !== undefined ? 'absolute' : 'relative',
+  zIndex: mdBreakpoint !== null && mdBreakpoint !== undefined ? '1000' : 'auto',
 });
 
 export const conversationsSidebarHandleStyles = (isSidebarOpen: Boolean): CSSObject => ({
@@ -33,7 +33,7 @@ export const conversationsSidebarHandleStyles = (isSidebarOpen: Boolean): CSSObj
   height: '24px',
   borderWidth: '2px',
   display: 'none',
-  transform: isSidebarOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+  transform: isSidebarOpen !== null && isSidebarOpen !== undefined ? 'rotate(180deg)' : 'rotate(0deg)',
   '&:hover': {
     borderColor: 'var(--accent-color-300)',
     backgroundColor: 'var(--accent-color-50)',

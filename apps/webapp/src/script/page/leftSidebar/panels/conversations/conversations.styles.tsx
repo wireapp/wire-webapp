@@ -20,5 +20,5 @@
 import {CSSObject} from '@emotion/react';
 
 export const conversationsSpacerStyles = (mdBreakpoint: Boolean): CSSObject => ({
-  minWidth: mdBreakpoint ? '64px' : '0',
+  minWidth: mdBreakpoint !== null && mdBreakpoint !== undefined ? '64px' : '0',
 });

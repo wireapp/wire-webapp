@@ -43,7 +43,7 @@ export class MessageTimerUpdateMessage extends SystemMessage {
 }
 
 const getCaption = (messageTimer: number | null, isSelfUser: boolean, translate: Translate) => {
-  if (messageTimer) {
+  if (messageTimer !== null && messageTimer !== undefined && messageTimer !== 0 && !Number.isNaN(messageTimer)) {
     const timeString = formatDuration(messageTimer, translate).text;
     return isSelfUser
       ? translate('conversationUpdatedTimerYou', {time: timeString})

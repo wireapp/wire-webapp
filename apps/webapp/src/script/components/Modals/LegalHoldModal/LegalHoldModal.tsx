@@ -267,7 +267,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       return;
     }
 
-    if (currentConversation) {
+    if (currentConversation !== null && currentConversation !== undefined) {
       await messageRepository.updateAllClients(currentConversation, false);
       const allUsers = await conversationRepository.getAllUsersInConversation(currentConversation);
       const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
@@ -313,7 +313,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       className="legal-hold-modal"
     >
       <div className="modal__header">
-        {userDevices && (
+        {userDevices !== null && userDevices !== undefined && (
           <button
             className="button-reset-default modal__header__button modal__header__button__left"
             type="button"
@@ -362,7 +362,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
               />
             )}
 
-            {requestError && (
+            {requestError.length > 0 && (
               <div className="modal__input__error" data-uie-name="status-error">
                 {requestError}
               </div>
@@ -398,7 +398,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
 
         {!isRequest && (
           <>
-            {!userDevices ? (
+            {userDevices === null || userDevices === undefined ? (
               <>
                 <div className="legal-hold-modal__logo">
                   <LegalHoldDot large dataUieName="status-modal-legal-hold-icon" />

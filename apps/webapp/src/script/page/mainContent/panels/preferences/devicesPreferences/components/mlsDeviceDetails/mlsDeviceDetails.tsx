@@ -41,7 +41,7 @@ export const MLSDeviceDetails = ({
   isSelfUser = false,
 }: MLSDeviceDetailsProps) => {
   const {translate} = useApplicationContext();
-  if (!isCurrentDevice && !identity) {
+  if (isCurrentDevice !== true && (identity === null || identity === undefined)) {
     return null;
   }
 
@@ -50,7 +50,10 @@ export const MLSDeviceDetails = ({
   const showE2EICertificateDetails =
     isE2EIEnabled && (isSelfUser || (!isSelfUser && certificateState !== MLSStatuses.NOT_ACTIVATED));
 
-  if (!showE2EICertificateDetails && !identity?.thumbprint) {
+  if (
+    !showE2EICertificateDetails &&
+    (identity?.thumbprint === null || identity?.thumbprint === undefined || identity.thumbprint.length === 0)
+  ) {
     return null;
   }
 
@@ -60,7 +63,7 @@ export const MLSDeviceDetails = ({
         <h4 className="paragraph-body-3">{translate('mlsSignature', {signature: MLSPublicKeys[cipherSuite]})}</h4>
       )}
 
-      {identity?.thumbprint && (
+      {identity?.thumbprint !== null && identity?.thumbprint !== undefined && identity?.thumbprint.length > 0 && (
         <>
           <p className="label-2 preferences-label preferences-devices-fingerprint-label">
             {translate('mlsThumbprint')}

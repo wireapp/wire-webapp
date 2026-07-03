@@ -56,7 +56,7 @@ interface ModalFocusResult {
  * @returns Object containing document, container, and focus restoration callback creator
  */
 export function captureModalFocusContext(context: ModalFocusContext = {}): ModalFocusResult {
-  const targetDocument = context.targetDocument || document;
+  const targetDocument = context.targetDocument ?? document;
 
   // Capture the currently focused element at the time this function is called
   const previouslyFocusedElement = targetDocument.activeElement as HTMLElement | null;
@@ -66,7 +66,7 @@ export function captureModalFocusContext(context: ModalFocusContext = {}): Modal
     container: context.container,
     createFocusRestorationCallback: (additionalCallback?: () => void) => () => {
       // Execute additional callback if provided
-      if (additionalCallback) {
+      if (additionalCallback !== null && additionalCallback !== undefined) {
         try {
           additionalCallback();
         } catch (error: unknown) {
@@ -75,12 +75,18 @@ export function captureModalFocusContext(context: ModalFocusContext = {}): Modal
       }
 
       // Restore focus to the previously focused element
-      if (previouslyFocusedElement && typeof previouslyFocusedElement.focus === 'function') {
+      if (
+        previouslyFocusedElement !== null &&
+        previouslyFocusedElement !== undefined &&
+        typeof previouslyFocusedElement.focus === 'function'
+      ) {
         try {
           // Check if the element is still in the document before focusing
           if (
             document.contains(previouslyFocusedElement) ||
-            (context.targetDocument && context.targetDocument.contains(previouslyFocusedElement))
+            (context.targetDocument !== null &&
+              context.targetDocument !== undefined &&
+              context.targetDocument.contains(previouslyFocusedElement))
           ) {
             previouslyFocusedElement.focus();
           }

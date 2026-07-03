@@ -108,7 +108,7 @@ export class TransientStore extends EventEmitter {
     const bundle: TransientBundle = this.createTransientBundle(record, ttl);
 
     const cachedBundle = await this.getFromCache(primaryKey);
-    if (cachedBundle) {
+    if (cachedBundle !== null && cachedBundle !== undefined) {
       const message = `Record with primary key "${primaryKey}" already exists in table "${this.tableName}" of database "${this.engine.storeName}".`;
       throw new RecordAlreadyExistsError(message);
     } else {
@@ -180,7 +180,7 @@ export class TransientStore extends EventEmitter {
   private async startTimer(cacheKey: string): Promise<TransientBundle> {
     const primaryKey = this.constructPrimaryKey(cacheKey);
     let bundle = await this.get(primaryKey);
-    if (!bundle) {
+    if (bundle === null || bundle === undefined) {
       bundle = new TransientBundle();
       bundle.expires = 0;
       bundle.payload = undefined;

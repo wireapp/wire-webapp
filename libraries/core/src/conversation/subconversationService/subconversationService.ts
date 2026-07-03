@@ -54,7 +54,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
   }
 
   get mlsService(): MLSService {
-    if (!this._mlsService) {
+    if (this._mlsService === null || this._mlsService === undefined) {
       throw new Error('MLSService was not initialised!');
     }
     return this._mlsService;
@@ -268,7 +268,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       if (groupId !== subconversationGroupId) {
         // if the epoch update did not happen in the subconversation directly, check if it happened in the parent conversation
         const parentConversationId = findConversationByGroupId(groupId);
-        if (!parentConversationId) {
+        if (parentConversationId === null || parentConversationId === undefined) {
           this.logger.debug('Ignoring NEW_EPOCH event: could not map to parent conversation');
           return;
         }
@@ -294,7 +294,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
         parentConversationGroupId,
       );
 
-      if (!subconversationEpochInfo) {
+      if (subconversationEpochInfo === null || subconversationEpochInfo === undefined) {
         this.logger.debug('No subconversation epoch info available; skipping callback', {
           parentConversationId,
           parentConversationGroupId,

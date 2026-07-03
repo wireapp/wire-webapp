@@ -25,11 +25,16 @@ import {Locales, SupportedLocale} from './supportedLocales';
 const DEFAULT_LANGUAGE: SupportedLocale = 'en-US';
 
 function getLocale(): SupportedLocale {
-  return mapLanguage(navigator.languages?.length ? navigator.languages[0] : navigator.language);
+  return mapLanguage(
+    navigator.languages !== undefined && navigator.languages.length !== 0 && !Number.isNaN(navigator.languages.length)
+      ? navigator.languages[0]
+      : navigator.language,
+  );
 }
 
 export function currentLanguage(): SupportedLocale {
-  return mapLanguage(UrlUtil.getURLParameter(QUERY_KEY.LANGUAGE) || getLocale());
+  const languageParameter = UrlUtil.getURLParameter(QUERY_KEY.LANGUAGE);
+  return mapLanguage(languageParameter.length > 0 ? languageParameter : getLocale());
 }
 
 export function normalizeLanguage(language: string = DEFAULT_LANGUAGE): string {
@@ -43,5 +48,5 @@ export function findLanguage(language: string = DEFAULT_LANGUAGE): SupportedLoca
 }
 
 export function mapLanguage(language: string = DEFAULT_LANGUAGE): SupportedLocale {
-  return findLanguage(language) || DEFAULT_LANGUAGE;
+  return findLanguage(language);
 }

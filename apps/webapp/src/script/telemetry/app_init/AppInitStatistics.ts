@@ -45,8 +45,15 @@ export class AppInitStatistics {
   }
 
   add(statistic: AppInitStatisticsValue, value: string | number, bucket_size?: number): void {
-    if (bucket_size && typeof value === 'number') {
-      const buckets = Math.floor(value / bucket_size) + (value % bucket_size ? 1 : 0);
+    if (
+      bucket_size !== null &&
+      bucket_size !== undefined &&
+      bucket_size !== 0 &&
+      !Number.isNaN(bucket_size) &&
+      typeof value === 'number'
+    ) {
+      const buckets =
+        Math.floor(value / bucket_size) + (value % bucket_size !== 0 && !Number.isNaN(value % bucket_size) ? 1 : 0);
 
       this.statistics[statistic] = value === 0 ? 0 : bucket_size * buckets;
     } else {

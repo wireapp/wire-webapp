@@ -57,7 +57,7 @@ interface CellsTableHeaderCellProps {
 
 const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
-  const ariaSort = isSortingEnabled && sortField ? toAriaSort(getDirectionFor(sortField)) : undefined;
+  const ariaSort = isSortingEnabled && sortField.length > 0 ? toAriaSort(getDirectionFor(sortField)) : undefined;
 
   return (
     <th

@@ -227,7 +227,7 @@ export function getScrollParent(element: HTMLElement, includeHidden: boolean): H
   if (style.position === 'fixed') {
     return document.body;
   }
-  for (let parent: HTMLElement | null = element; (parent = parent.parentElement);) {
+  for (let parent: HTMLElement | null = element.parentElement; parent !== null; parent = parent.parentElement) {
     style = getComputedStyle(parent);
     if (excludeStaticParent && style.position === 'static') {
       continue;
@@ -391,7 +391,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         KEY_ARROW_DOWN_COMMAND,
         payload => {
           const event = payload;
-          if (options !== null && options.length && selectedIndex !== null) {
+          if (options !== null && options.length !== 0 && !Number.isNaN(options.length) && selectedIndex !== null) {
             const newSelectedIndex = (selectedIndex + 1) % options.length;
             updateSelectedIndex(newSelectedIndex);
             event.preventDefault();
@@ -405,7 +405,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         KEY_ARROW_UP_COMMAND,
         payload => {
           const event = payload;
-          if (options !== null && options.length && selectedIndex !== null) {
+          if (options !== null && options.length !== 0 && !Number.isNaN(options.length) && selectedIndex !== null) {
             const newSelectedIndex = selectedIndex > 0 ? selectedIndex - 1 : options.length - 1;
             updateSelectedIndex(newSelectedIndex);
             event.preventDefault();
@@ -471,10 +471,15 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   const menu = menuRenderFn(anchorElementRef, listItemProps, resolution.match.matchingString);
 
   useLayoutEffect(() => {
-    if (onMenuVisibilityChange && menu !== null && !menuVisible) {
+    if (onMenuVisibilityChange !== null && onMenuVisibilityChange !== undefined && menu !== null && !menuVisible) {
       onMenuVisibilityChange(true);
       setMenuVisible(true);
-    } else if (onMenuVisibilityChange && menu === null && menuVisible) {
+    } else if (
+      onMenuVisibilityChange !== null &&
+      onMenuVisibilityChange !== undefined &&
+      menu === null &&
+      menuVisible
+    ) {
       onMenuVisibilityChange(false);
       setMenuVisible(false);
     }
@@ -641,7 +646,7 @@ export function TypeaheadMenuPlugin<TOption extends TypeaheadOption>({
           return;
         }
         const match = triggerFn(text, editor);
-        onQueryChange(match ? match.matchingString : null);
+        onQueryChange(match !== null && match !== undefined ? match.matchingString : null);
 
         if (match !== null && !isSelectionOnEntityBoundary(editor, match.leadOffset)) {
           const isRangePositioned = tryToPositionRange(match.leadOffset, range);

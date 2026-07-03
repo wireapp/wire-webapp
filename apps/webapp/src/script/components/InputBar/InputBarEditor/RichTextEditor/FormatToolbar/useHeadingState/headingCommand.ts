@@ -31,7 +31,7 @@ export const headingCommand = () => {
     const node = selection.anchor.getNode();
     const parent = node.getParent();
 
-    if (!parent || parent.getType() === 'root') {
+    if (parent === null || parent === undefined || parent.getType() === 'root') {
       return false;
     }
 

@@ -40,14 +40,15 @@ export const ReadIndicator = ({
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
   if (is1to1Conversation) {
-    const readReceiptText = readReceipts.length ? formatTimeShort(readReceipts[0].time) : '';
+    const readReceiptText =
+      readReceipts.length !== 0 && !Number.isNaN(readReceipts.length) ? formatTimeShort(readReceipts[0].time) : '';
 
     return (
       <div css={ReadIndicatorContainer} className="read-indicator-wrapper">
         <span css={ReadIndicatorStyles(showIconOnly)} data-uie-name="status-message-read-receipts">
-          {showIconOnly && readReceiptText && <Icon.ReadIcon />}
+          {showIconOnly && readReceiptText.length > 0 && <Icon.ReadIcon />}
 
-          {!showIconOnly && !!readReceiptText && (
+          {!showIconOnly && readReceiptText.length !== 0 && (
             <div css={ReadReceiptText} data-uie-name="status-message-read-receipt-text">
               <Icon.ReadIcon /> {readReceiptText}
             </div>

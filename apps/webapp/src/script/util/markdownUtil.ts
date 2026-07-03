@@ -69,7 +69,7 @@ const MARKDOWN_PATTERNS = [
  * Checks if the given text string contains markdown.
  */
 export const isMarkdownText = (text: string): boolean => {
-  if (!text) {
+  if (text.length === 0) {
     return false;
   }
 
@@ -84,7 +84,7 @@ export const isMarkdownText = (text: string): boolean => {
  * Removes all markdown formatting from a given string.
  */
 export const sanitizeMarkdown = (text: string): string => {
-  if (!text) {
+  if (text.length === 0) {
     return '';
   }
 
@@ -180,7 +180,7 @@ const markdownSanitizers: MarkdownSanitizer[] = [
       }
       return line
         .split('|')
-        .filter(cell => cell.trim())
+        .filter(cell => cell.trim().length > 0)
         .map(cell => cell.trim())
         .join(' ');
     },

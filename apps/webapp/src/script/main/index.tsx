@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const appContainer = document.getElementById('wire-app');
 
-  if (!appContainer) {
+  if (appContainer === null || appContainer === undefined) {
     throw new Error('container for application does not exist in the DOM');
   }
 

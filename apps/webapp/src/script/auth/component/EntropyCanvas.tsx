@@ -73,7 +73,7 @@ const EntropyCanvas = (props: CanvasProps) => {
   };
 
   const draw = (ctx: CanvasRenderingContext2D) => {
-    if (!previousPoint || !lastPoint) {
+    if (previousPoint === null || previousPoint === undefined || lastPoint === null || lastPoint === undefined) {
       return;
     }
     ctx.beginPath();
@@ -88,11 +88,11 @@ const EntropyCanvas = (props: CanvasProps) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {
+    if (canvas === null || canvas === undefined) {
       return;
     }
     const context = canvas.getContext('2d');
-    if (!context) {
+    if (context === null || context === undefined) {
       return;
     }
     draw(context);

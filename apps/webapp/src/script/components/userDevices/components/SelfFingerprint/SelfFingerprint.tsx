@@ -54,7 +54,7 @@ export const SelfFingerprint = ({
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {currentClient && <DeviceCard device={currentClient} />}
+      {currentClient !== null && currentClient !== undefined && <DeviceCard device={currentClient} />}
       <div className="participant-devices__fingerprint">
         <FormattedId idSlices={splitFingerprint(localFingerprint)} smallPadding />
       </div>

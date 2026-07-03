@@ -52,9 +52,12 @@ const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state, iconSize
         '&::before': {
           ...CSS_ICON(icons[state], iconSize),
         },
-        backgroundColor: backgroundColor[state] || defaultBackgroundColor,
+        backgroundColor:
+          backgroundColor[state] !== undefined && backgroundColor[state].length > 0
+            ? backgroundColor[state]
+            : defaultBackgroundColor,
         borderRadius: '50%',
-        color: color[state] || defaultColor,
+        color: color[state] !== undefined && color[state].length > 0 ? color[state] : defaultColor,
       }}
       data-uie-name="element-avatar-user-badge-icon"
       data-uie-value={state}

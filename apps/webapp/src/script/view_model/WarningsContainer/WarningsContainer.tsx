@@ -51,7 +51,7 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
     const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
 
     const app = document.querySelector('#app');
-    if (app) {
+    if (app !== null && app !== undefined) {
       app.classList.toggle('app--small-offset', hasOffset && isMiniMode);
       app.classList.toggle('app--large-offset', hasOffset && !isMiniMode);
     }

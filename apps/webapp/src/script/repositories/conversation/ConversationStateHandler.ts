@@ -81,7 +81,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             let messageString: string;
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
 
-            if (featureInfo.isAvailable) {
+            if (featureInfo.isAvailable === true) {
               messageString = this.translate(
                 `modalConversationOptionsAllow${featureName as 'Guest' | 'Service'}Message`,
               );

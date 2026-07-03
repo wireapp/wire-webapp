@@ -49,7 +49,7 @@ export const getUsersFromNodes = async ({
   nodes: RestNode[];
   userRepository: UserRepository;
 }) => {
-  if (!nodes?.length) {
+  if (nodes?.length === 0 || Number.isNaN(nodes?.length)) {
     return [];
   }
 

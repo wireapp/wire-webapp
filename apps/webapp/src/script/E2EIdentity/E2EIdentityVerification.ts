@@ -36,7 +36,7 @@ export type WireIdentity = Omit<DeviceIdentity, 'status'> & {
 
 export function getE2EIdentityService() {
   const e2eIdentityService = container.resolve(Core).service?.e2eIdentity;
-  if (!e2eIdentityService) {
+  if (e2eIdentityService === null || e2eIdentityService === undefined) {
     throw new Error('trying to query E2EIdentity data in an non-e2eidentity environment');
   }
   return e2eIdentityService;
@@ -44,7 +44,7 @@ export function getE2EIdentityService() {
 
 export function getCoreConversationService() {
   const conversationService = container.resolve(Core).service?.conversation;
-  if (!conversationService) {
+  if (conversationService === null || conversationService === undefined) {
     throw new Error('Conversation service not available');
   }
   return conversationService;
@@ -93,7 +93,7 @@ const getSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
 
   const userIdentities = await getAllGroupUsersIdentities(selfMLSConversationGroupId);
 
-  if (!userIdentities) {
+  if (userIdentities === null || userIdentities === undefined) {
     return undefined;
   }
 
@@ -119,7 +119,7 @@ export async function hasActiveCertificate(): Promise<boolean> {
 export async function getActiveWireIdentity(): Promise<WireIdentity | undefined> {
   const selfDeviceIdentity = await getSelfDeviceIdentity();
 
-  if (!selfDeviceIdentity) {
+  if (selfDeviceIdentity === null || selfDeviceIdentity === undefined) {
     return undefined;
   }
 

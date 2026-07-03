@@ -39,10 +39,10 @@ const DEV_ENVIRONMENT_IDENTIFIERS = {
   STAGING: 'staging',
 } as const;
 
-const getElectronVersion = (userAgent: string): string => {
+const getElectronVersion = (userAgent: string): string | undefined => {
   // [match, version]
-  const [, electronVersion] = /Wire(?:Internal)?\/(\S+)/i.exec(userAgent) || [];
-  return electronVersion;
+  const match = /Wire(?:Internal)?\/(\S+)/i.exec(userAgent);
+  return match !== null ? match[1] : undefined;
 };
 
 const isLocalhost = (): boolean => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);

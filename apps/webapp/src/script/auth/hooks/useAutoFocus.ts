@@ -42,7 +42,7 @@ export const useAutoFocus = ({
       const element = elementRef.current;
 
       // Check if element exists at animation frame time
-      if (!element) {
+      if (element === null || element === undefined) {
         return;
       }
 

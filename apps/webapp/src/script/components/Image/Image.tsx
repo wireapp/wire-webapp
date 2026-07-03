@@ -81,7 +81,7 @@ export const Image = ({
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
 
   useEffect(() => {
-    if (!imageUrl && isInViewport && isFileSharingReceivingEnabled) {
+    if ((imageUrl === null || imageUrl === undefined) && isInViewport && isFileSharingReceivingEnabled) {
       void (async () => {
         try {
           const allowedImageTypes = [
@@ -114,12 +114,12 @@ export const Image = ({
 
   const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${imageSizes?.width}' height='${imageSizes?.height}'></svg>`;
   const assetUrl = imageUrl?.url ?? dummyImageUrl;
-  const isLoading = !imageUrl;
+  const isLoading = imageUrl === null || imageUrl === undefined;
 
   return (
     <InViewport
       onVisible={() => setIsInViewport(true)}
-      css={getWrapperStyles(!!onClick)}
+      css={getWrapperStyles(onClick !== null && onClick !== undefined)}
       className={cx(className, {'loading-dots image-asset--no-image': isLoading})}
       onClick={event => {
         if (!isLoading) {

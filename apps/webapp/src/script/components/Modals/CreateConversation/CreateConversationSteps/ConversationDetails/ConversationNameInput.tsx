@@ -37,7 +37,7 @@ export const ConversationNameInput = () => {
 
     const trimmedNameInput = value.trim();
     const nameTooLong = trimmedNameInput.length > maxNameLength;
-    const nameTooShort = !trimmedNameInput.length;
+    const nameTooShort = trimmedNameInput.length === 0 || Number.isNaN(trimmedNameInput.length);
 
     setConversationName(value);
     if (nameTooLong) {
@@ -55,7 +55,7 @@ export const ConversationNameInput = () => {
   const clickOnNext = (): void => {
     const nameTooLong = groupNameLength > maxNameLength;
 
-    if (groupNameLength && !nameTooLong) {
+    if (groupNameLength !== 0 && !Number.isNaN(groupNameLength) && !nameTooLong) {
       gotoNextStep();
     }
   };

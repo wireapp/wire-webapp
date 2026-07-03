@@ -124,7 +124,7 @@ export class WebSocketClient extends EventEmitter {
   }
 
   private readonly onMessage = (data: string) => {
-    if (!data) {
+    if (data.length === 0) {
       this.logger.warn('Received empty message from WebSocket');
       return;
     }
@@ -190,7 +190,7 @@ export class WebSocketClient extends EventEmitter {
     this.socket.setOnLongRunningRetry(this.onLongRunningRetry);
     this.socket.setOnOpen(() => {
       this.onOpen();
-      if (onConnect) {
+      if (onConnect !== null && onConnect !== undefined) {
         this.abortHandler = new AbortController();
         void onConnect(this.abortHandler);
       }
@@ -353,7 +353,7 @@ export class WebSocketClient extends EventEmitter {
       this.logger.warn('Reconnecting WebSocket with unset token');
     }
 
-    if (!this.versionPrefix) {
+    if (this.versionPrefix.length === 0) {
       throw new Error('Missing backend API version: cannot establish WebSocket connection');
     }
 

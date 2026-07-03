@@ -43,7 +43,9 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
       <div css={wrapper} className="empty-conversations-list">
         <div>
           <p css={paragraph}>
-            {searchValue ? translate('searchConversationsNoResult') : translate('conversationAllWelcomeMessage')}
+            {searchValue.length > 0
+              ? translate('searchConversationsNoResult')
+              : translate('conversationAllWelcomeMessage')}
           </p>
 
           <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
@@ -68,7 +70,9 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
       <div css={wrapper} className="empty-conversations-list">
         <div>
           <p css={paragraph}>
-            {searchValue ? translate('searchConversationsNoResult') : translate('conversationFavoritesTabEmptyMessage')}
+            {searchValue.length > 0
+              ? translate('searchConversationsNoResult')
+              : translate('conversationFavoritesTabEmptyMessage')}
           </p>
 
           <Link
@@ -89,7 +93,9 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
       <div css={wrapper} className="empty-conversations-list">
         <div>
           <p css={paragraph}>
-            {searchValue ? translate('searchConversationsNoResult') : translate('conversationGroupEmptyMessage')}
+            {searchValue.length > 0
+              ? translate('searchConversationsNoResult')
+              : translate('conversationGroupEmptyMessage')}
           </p>
 
           <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
@@ -132,7 +138,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
       <div css={wrapper} className="empty-conversations-list">
         <div>
           <p css={paragraph}>
-            {searchValue
+            {searchValue.length > 0
               ? translate('searchConversationsNoResult')
               : translate('conversationDirectEmptyMessage', {brandName: Config.getConfig().BRAND_NAME})}
           </p>
@@ -147,9 +153,9 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
     return (
       <div css={wrapper} className="empty-conversations-list">
         <div>
-          {searchValue && <p css={paragraph}>{translate('searchConversationsNoResult')}</p>}
+          {searchValue.length > 0 && <p css={paragraph}>{translate('searchConversationsNoResult')}</p>}
 
-          {!searchValue && (
+          {searchValue.length === 0 && (
             <div>
               <p css={paragraphBold}>{translate('conversationsNothingArchived')}</p>
               <p css={paragraphGray}>{translate('conversationsNothingArchivedTip')}</p>

@@ -28,7 +28,10 @@ export function validateEvent(
   source: EventSource,
   lastEventDateString?: string,
 ): EventValidation {
-  const lastEventDate = lastEventDateString ? new Date(lastEventDateString) : undefined;
+  const lastEventDate =
+    lastEventDateString !== null && lastEventDateString !== undefined && lastEventDateString.length > 0
+      ? new Date(lastEventDateString)
+      : undefined;
 
   if (isOutdatedNotificationStreamEvent(event, source, lastEventDate)) {
     return EventValidation.OUTDATED_TIMESTAMP;

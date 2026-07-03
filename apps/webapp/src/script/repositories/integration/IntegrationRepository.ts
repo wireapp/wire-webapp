@@ -72,10 +72,10 @@ export class IntegrationRepository {
    * @param entity Service or user to add provider name to
    */
   async addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User | ProviderEntity> {
-    if (entity.providerId) {
+    if (entity.providerId !== null && entity.providerId !== undefined && entity.providerId.length > 0) {
       const providerEntity = await this.getProviderById(entity.providerId);
 
-      if (providerEntity) {
+      if (providerEntity !== null && providerEntity !== undefined) {
         entity.providerName(providerEntity.name);
       }
     }
@@ -94,7 +94,14 @@ export class IntegrationRepository {
 
     const {providerId, serviceId} = entity;
 
-    if (!providerId || !serviceId) {
+    if (
+      providerId === null ||
+      providerId === undefined ||
+      providerId.length === 0 ||
+      serviceId === null ||
+      serviceId === undefined ||
+      serviceId.length === 0
+    ) {
       return undefined;
     }
 
@@ -153,7 +160,7 @@ export class IntegrationRepository {
       }
 
       const [userEntity] = conversationEntity.participating_user_ets();
-      if (!userEntity) {
+      if (userEntity === null || userEntity === undefined) {
         // Disregard conversations with no user entities
         return false;
       }
@@ -169,17 +176,21 @@ export class IntegrationRepository {
       return isExpectedServiceId && isExpectedProviderId;
     });
 
-    return matchingConversationEntity || this.create1to1ConversationWithService(serviceEntity);
+    return matchingConversationEntity !== null && matchingConversationEntity !== undefined
+      ? matchingConversationEntity
+      : this.create1to1ConversationWithService(serviceEntity);
   }
 
   async getProviderById(providerId: string): Promise<ProviderEntity | undefined> {
     const providerData = await this.integrationService.getProvider(providerId);
-    return providerData ? IntegrationMapper.mapProviderFromObject(providerData) : undefined;
+    return providerData !== null && providerData !== undefined
+      ? IntegrationMapper.mapProviderFromObject(providerData)
+      : undefined;
   }
 
   async getServiceById(providerId: string, serviceId: string, domain: string): Promise<ServiceEntity | undefined> {
     const serviceData = await this.integrationService.getService(providerId, serviceId);
-    if (serviceData) {
+    if (serviceData !== null && serviceData !== undefined) {
       return IntegrationMapper.mapServiceFromObject(serviceData, domain);
     }
     return undefined;
@@ -206,13 +217,15 @@ export class IntegrationRepository {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
     const teamId = this.teamState.team().id;
-    if (!teamId) {
+    if (teamId === null || teamId === undefined || teamId.length === 0) {
       return undefined;
     }
     try {
       let serviceEntities = await this.teamRepository.getWhitelistedServices(teamId, this.teamState.teamDomain() ?? '');
       const isCurrentQuery =
-        !queryObservable || normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
+        queryObservable === null ||
+        queryObservable === undefined ||
+        normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
       if (isCurrentQuery) {
         serviceEntities = serviceEntities
           .filter(serviceEntity => compareTransliteration(serviceEntity.name(), normalizedQuery))

@@ -142,7 +142,7 @@ export const exportCPBHistoryFromDatabase = async ({
   });
 
   eventRecords.forEach((record, index) => {
-    if (record.ephemeral_expires) {
+    if (record.ephemeral_expires !== null && record.ephemeral_expires !== undefined) {
       CPBLogger.warn('Ephemeral events are not supported in backups');
       return;
     }
@@ -150,7 +150,7 @@ export const exportCPBHistoryFromDatabase = async ({
     if (success) {
       const {edited_time, from, from_client_id, id, qualified_conversation, qualified_from, primary_key, time, type} =
         eventData;
-      if (!id) {
+      if (id === null || id === undefined || id.length === 0) {
         CPBLogger.log('Event without id', eventData);
         return;
       }
@@ -167,7 +167,10 @@ export const exportCPBHistoryFromDatabase = async ({
       );
       const senderClientId = from_client_id ?? '';
       const creationDate = new BackupDateTime(new Date(time));
-      const lastEditTime = edited_time ? new BackupDateTime(new Date(edited_time)) : null;
+      const lastEditTime =
+        edited_time !== null && edited_time !== undefined && edited_time.length > 0
+          ? new BackupDateTime(new Date(edited_time))
+          : null;
       // for debugging purposes
       const webPrimaryKey = primary_key;
 
@@ -211,7 +214,7 @@ export const exportCPBHistoryFromDatabase = async ({
         );
       }
 
-      if (isMessageAddEvent(type) && eventData.data?.content) {
+      if (isMessageAddEvent(type) && eventData.data?.content !== null && eventData.data?.content !== undefined) {
         const text = new BackupMessageContent.Text(eventData.data.content);
         backupExporter.addMessage(
           new BackupMessage(

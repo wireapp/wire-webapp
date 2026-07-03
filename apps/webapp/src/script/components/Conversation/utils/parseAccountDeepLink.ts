@@ -35,7 +35,7 @@ const parseQualifiedUserId = (value: string): ParsedQualifiedId => {
 
   return {
     id: value.slice(0, atIndex),
-    domain: value.slice(atIndex + 1) || undefined,
+    domain: value.slice(atIndex + 1).length > 0 ? value.slice(atIndex + 1) : undefined,
   };
 };
 

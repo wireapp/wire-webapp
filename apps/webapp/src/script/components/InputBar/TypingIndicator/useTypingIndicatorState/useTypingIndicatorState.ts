@@ -43,7 +43,10 @@ export const useTypingIndicatorState = create<TypingIndicatorState>((set, get) =
       if (
         state.typingUsers.find(
           typingUser => typingUser.conversationId === conversationId && typingUser.user.id === user.id,
-        )
+        ) !== null &&
+        state.typingUsers.find(
+          typingUser => typingUser.conversationId === conversationId && typingUser.user.id === user.id,
+        ) !== undefined
       ) {
         return state;
       }

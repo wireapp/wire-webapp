@@ -60,7 +60,7 @@ export const mockStoreFactory = (
   },
 ) => {
   const {actions, apiClient, core, getConfig, localStorage} = parameters;
-  if (core) {
+  if (core !== null && core !== undefined) {
     (core as any).apiClient = apiClient;
   }
   return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
@@ -68,7 +68,7 @@ export const mockStoreFactory = (
       actions,
       apiClient,
       core,
-      getConfig: getConfig || defaultGetConfig,
+      getConfig: getConfig ?? defaultGetConfig,
       localStorage,
     }) as any,
   ]);

@@ -139,7 +139,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
 
     dismissExport();
 
-    if (archiveBlob) {
+    if (archiveBlob !== null && archiveBlob !== undefined) {
       downloadBlob(archiveBlob, filename, 'application/octet-stream');
     }
   };
@@ -171,7 +171,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
         setNumberOfRecords(numberOfRecords);
         setNumberOfProcessedRecords(0);
 
-        if (clientState.currentClient) {
+        if (clientState.currentClient !== null && clientState.currentClient !== undefined) {
           const archiveBlob = await backupRepository.generateHistory(
             user,
             clientState.currentClient.id,
@@ -183,7 +183,8 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
             [Segmentation.BACKUP_CREATION.CREATION_DURATION]: Math.ceil(
               (Date.now() - startTime) / MILLISECONDS_PER_SECOND,
             ),
-            [Segmentation.BACKUP_CREATION.PASSWORD]: password ? Segmentation.GENERAL.YES : Segmentation.GENERAL.NO,
+            [Segmentation.BACKUP_CREATION.PASSWORD]:
+              password.length > 0 ? Segmentation.GENERAL.YES : Segmentation.GENERAL.NO,
             [Segmentation.BACKUP_CREATION.PASSWORD_MULTIPLE_ATTEMPTS]: hasMultipleAttempts
               ? Segmentation.GENERAL.YES
               : Segmentation.GENERAL.NO,

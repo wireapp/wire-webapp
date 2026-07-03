@@ -87,13 +87,13 @@ export const ParticipantItemContent = ({
               <div css={[userName, ellipsis]} data-uie-name="status-name">
                 {name}
 
-                {selfString && <span css={selfIndicator}>{selfString}</span>}
+                {selfString.length > 0 && <span css={selfIndicator}>{selfString}</span>}
               </div>
             </>
           )}
         </div>
 
-        {shortDescription && (
+        {shortDescription.length > 0 && (
           <div css={contentInfoWrapper}>
             <span
               css={[contentInfoText(hasUsernameInfo), ellipsis]}

@@ -116,6 +116,35 @@ describe('User', () => {
     });
   });
 
+  describe('hasActivatedIdentity', () => {
+    it('is false when the user has no email and is not using SSO', () => {
+      const user = new User('', '', translateForTest);
+
+      expect(user.hasActivatedIdentity()).toBe(false);
+    });
+
+    it('is false when the user has an empty email and is not using SSO', () => {
+      const user = new User('', '', translateForTest);
+      user.email('');
+
+      expect(user.hasActivatedIdentity()).toBe(false);
+    });
+
+    it('is true when the user has an email', () => {
+      const user = new User('', '', translateForTest);
+      user.email('user@example.com');
+
+      expect(user.hasActivatedIdentity()).toBe(true);
+    });
+
+    it('is true when the user uses SSO without an email', () => {
+      const user = new User('', '', translateForTest);
+      user.isSingleSignOn = true;
+
+      expect(user.hasActivatedIdentity()).toBe(true);
+    });
+  });
+
   describe('translation injection', () => {
     it('uses the injected translate function for temporary guest expiration text', () => {
       const translate = jest.fn((translationKey: string, replacements?: {time: number}) => {

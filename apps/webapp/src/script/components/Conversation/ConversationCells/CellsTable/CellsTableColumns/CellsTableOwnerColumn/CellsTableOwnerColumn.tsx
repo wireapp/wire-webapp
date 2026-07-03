@@ -29,7 +29,7 @@ interface CellsTableOwnerColumnProps {
 }
 
 export const CellsTableOwnerColumn = ({owner, user}: CellsTableOwnerColumnProps) => {
-  if (!user) {
+  if (user === null || user === undefined) {
     return <span css={textStyles}>{owner}</span>;
   }
 

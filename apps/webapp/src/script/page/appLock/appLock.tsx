@@ -102,7 +102,7 @@ const AppLock = ({
   const {current: modalObserver} = useRef(
     new MutationObserver(() => {
       const modalInDOM = document.querySelector('[data-uie-name="applock-modal"]');
-      if (!modalInDOM) {
+      if (modalInDOM === null || modalInDOM === undefined) {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
       }
     }),
@@ -163,13 +163,13 @@ const AppLock = ({
 
     if (isVisible) {
       const wireMain = document.querySelector('#wire-main');
-      if (wireMain) {
+      if (wireMain !== null && wireMain !== undefined) {
         modalObserver.observe(wireMain, {
           childList: true,
         });
       }
       const appElement = document.querySelector('#app');
-      if (appElement) {
+      if (appElement !== null && appElement !== undefined) {
         appObserver.observe(appElement, {attributes: true});
       }
     }
@@ -235,7 +235,7 @@ const AppLock = ({
   const onGoBack = () => setLocalAppLockState(APPLOCK_STATE.LOCKED);
   const onClickForgot = () => setLocalAppLockState(APPLOCK_STATE.FORGOT);
   const onClickLogout = async () => {
-    if (isTemporaryClient) {
+    if (isTemporaryClient === true) {
       await clientRepository.logoutClient();
     } else {
       setLocalAppLockState(APPLOCK_STATE.LOGOUT);
@@ -456,7 +456,7 @@ const AppLock = ({
               data-uie-name="input-applock-unlock"
               autoComplete="current-password"
               aria-invalid={Boolean(unlockError)}
-              error={unlockError ? <ErrorMessage message={unlockError} /> : undefined}
+              error={unlockError.length > 0 ? <ErrorMessage message={unlockError} /> : undefined}
             />
 
             <Button block type="submit" data-uie-name="do-action" css={applockStyles.unlockButtonStyle}>

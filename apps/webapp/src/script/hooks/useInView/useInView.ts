@@ -35,7 +35,7 @@ export const useInView = <Element extends HTMLElement = HTMLDivElement>(options:
 
   useEffect(() => {
     const element = elementRef.current;
-    if (!element) {
+    if (element === null || element === undefined) {
       return undefined;
     }
 

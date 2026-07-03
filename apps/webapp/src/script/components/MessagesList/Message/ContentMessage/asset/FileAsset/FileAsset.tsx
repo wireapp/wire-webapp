@@ -67,7 +67,8 @@ const FileAsset = ({
   // uploaded completely we have to check if there is upload progress to
   // transition into the `AssetTransferState.UPLOADING` state.
   const assetStatus =
-    uploadProgress &&
+    uploadProgress !== 0 &&
+    !Number.isNaN(uploadProgress) &&
     (uploadProgress > 0 && uploadProgress < uploadProgressCompletePercentage
       ? AssetTransferState.UPLOADING
       : transferState);
@@ -122,7 +123,12 @@ const FileAsset = ({
                 <AssetLoader loadProgress={downloadProgress ?? 0} onCancel={() => asset.cancelDownload()} />
               )}
 
-              {isUploading && <AssetLoader loadProgress={uploadProgress || 0} onCancel={() => cancelUpload()} />}
+              {isUploading && (
+                <AssetLoader
+                  loadProgress={uploadProgress !== 0 && !Number.isNaN(uploadProgress) ? uploadProgress : 0}
+                  onCancel={() => cancelUpload()}
+                />
+              )}
 
               {(isFailedUpload || isFailedDownloadingDecrypt || isFailedDownloadingHash) && (
                 <div className="media-button media-button-error" />
@@ -137,7 +143,7 @@ const FileAsset = ({
                     {formattedFileSize}
                   </li>
 
-                  {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
+                  {fileExtension.length > 0 && <li data-uie-name="file-type">{fileExtension}</li>}
 
                   {isUploading && <li data-uie-name="file-status">{translate('conversationAssetUploading')}</li>}
 

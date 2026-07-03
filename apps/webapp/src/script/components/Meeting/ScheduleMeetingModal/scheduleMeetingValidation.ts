@@ -38,7 +38,7 @@ export const validateScheduleMeetingForm = ({
   const errors: ScheduleMeetingFormErrors = {};
   const currentTimestampInMilliseconds = wallClock.currentTimestampInMilliseconds;
 
-  if (!title.trim()) {
+  if (title.trim().length === 0) {
     errors.title = 'meetings.scheduleModal.error.titleRequired';
   }
 
@@ -50,7 +50,7 @@ export const validateScheduleMeetingForm = ({
     errors.endInPast = 'meetings.schedule.errors.endInPast';
   }
 
-  if (start.isJust && end.isJust && !errors.endInPast && end.value.getTime() <= start.value.getTime()) {
+  if (start.isJust && end.isJust && errors.endInPast === undefined && end.value.getTime() <= start.value.getTime()) {
     errors.endBeforeStart = 'meetings.scheduleModal.error.endBeforeStart';
   }
 
@@ -58,4 +58,7 @@ export const validateScheduleMeetingForm = ({
 };
 
 export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors): boolean =>
-  Boolean(errors.title || errors.startInPast || errors.endInPast || errors.endBeforeStart);
+  errors.title !== undefined ||
+  errors.startInPast !== undefined ||
+  errors.endInPast !== undefined ||
+  errors.endBeforeStart !== undefined;

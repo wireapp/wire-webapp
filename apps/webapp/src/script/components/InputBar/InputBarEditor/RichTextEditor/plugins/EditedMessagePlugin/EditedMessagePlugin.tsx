@@ -41,7 +41,7 @@ export function EditedMessagePlugin({message, showMarkdownPreview}: Props): null
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    if (message) {
+    if (message !== null && message !== undefined) {
       // Need to timeout to be sure the editor is in a state to receive the new message (could cause problems with cursor position)
       setTimeout(() => {
         editor.update(() => {

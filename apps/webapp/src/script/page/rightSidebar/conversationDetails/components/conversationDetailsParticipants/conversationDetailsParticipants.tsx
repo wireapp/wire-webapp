@@ -53,7 +53,7 @@ export const ConversationDetailsParticipants = ({
 
   return (
     <div className="conversation-details__participants">
-      {!!userParticipants.length && (
+      {userParticipants.length !== 0 && !Number.isNaN(userParticipants.length) && (
         <>
           <div className="user-list-wrapper" data-uie-name="list-users">
             <UserList
@@ -91,7 +91,7 @@ export const ConversationDetailsParticipants = ({
         </>
       )}
 
-      {!!serviceParticipants.length && (
+      {serviceParticipants.length !== 0 && !Number.isNaN(serviceParticipants.length) && (
         <div className="service-list-wrapper">
           <h3 className="conversation-details__list-head" data-uie-name="label-conversation-services">
             {translate('conversationDetailsServices')}

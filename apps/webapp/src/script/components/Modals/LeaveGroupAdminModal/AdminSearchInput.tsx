@@ -59,7 +59,10 @@ export const AdminSearchInput = ({
   onUserSelect,
 }: AdminSearchInputProps) => {
   const options: Option[] = eligibleUsers.map(user => ({value: user.id, label: user.name()}));
-  const selectedOption = selectedUser ? (options.find(opt => opt.value === selectedUser.id) ?? null) : null;
+  const selectedOption =
+    selectedUser !== null && selectedUser !== undefined
+      ? (options.find(opt => opt.value === selectedUser.id) ?? null)
+      : null;
 
   const handleChange = (option: Option | null) => {
     if (is.nullOrUndefined(option)) {
@@ -74,7 +77,7 @@ export const AdminSearchInput = ({
 
   const formatOptionLabel = (option: Option, meta: FormatOptionLabelMeta<Option>) => {
     const user = eligibleUsers.find(usr => usr.id === option.value);
-    if (!user || meta.context === 'value') {
+    if (user === null || user === undefined || meta.context === 'value') {
       return <span>{option.label}</span>;
     }
 

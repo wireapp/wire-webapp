@@ -50,7 +50,7 @@ const EphemeralTimer = ({message}: EphemeralTimerProps) => {
     >
       <circle css={ephemeralTimerBackgroundStyle} cx={4} cy={4} r={3.5} />
       <circle
-        css={ephemeralTimerDialStyle(remaining / duration || 0)}
+        css={ephemeralTimerDialStyle(Number.isNaN(remaining / duration) ? 0 : remaining / duration)}
         data-uie-name="ephemeral-timer-circle"
         cx={4}
         cy={4}

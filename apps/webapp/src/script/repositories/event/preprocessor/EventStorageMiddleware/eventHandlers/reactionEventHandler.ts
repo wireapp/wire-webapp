@@ -33,7 +33,8 @@ function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reactionEvent
     qualified_from,
     from,
   } = reactionEvent;
-  const reactionMap = target.reactions ? userReactionMapToReactionMap(target.reactions) : [];
+  const reactionMap =
+    target.reactions !== null && target.reactions !== undefined ? userReactionMapToReactionMap(target.reactions) : [];
   return {
     primary_key: target.primary_key,
     reactions: addReaction(reactionMap, reaction, qualified_from ?? {id: from, domain: ''}),
@@ -46,7 +47,7 @@ export const handleReactionEvent: EventHandler = async (event, {findEvent}) => {
     return undefined;
   }
   const targetEvent = (await findEvent(event.data.message_id)) as StoredEvent<MessageAddEvent>;
-  if (!targetEvent) {
+  if (targetEvent === null || targetEvent === undefined) {
     throw new EventValidationError('Reaction event to a non-existing message');
   }
   return {

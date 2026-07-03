@@ -113,7 +113,7 @@ export const VideoControlsSelect = ({
       {showHeader === true && (
         <div css={videoOptionsSheetHeaderStyles}>
           <span css={videoOptionsSheetTitleStyles}>{translate('videoCallMenuMoreVideoSettings')}</span>
-          {onClose && (
+          {onClose !== null && onClose !== undefined && (
             <button
               className="icon-button"
               type="button"

@@ -28,7 +28,7 @@ import {AssetRemoteData} from './assetRemoteData';
 export type MappedAsset = Record<string, AssetRemoteData>;
 
 export const mapProfileAssets = (userId: QualifiedId, assets: APIClientUserAsset[]): MappedAsset => {
-  const sizeMap: {[index: string]: string} = {
+  const sizeMap: Record<string, string | undefined> = {
     complete: 'medium',
     preview: 'preview',
   };
@@ -38,16 +38,19 @@ export const mapProfileAssets = (userId: QualifiedId, assets: APIClientUserAsset
     .reduce((mappedAssets, asset) => {
       const domain = asset.domain ?? userId.domain;
       const assetRemoteData = new AssetRemoteData({assetKey: asset.key, assetDomain: domain, otrKey: new Uint8Array()});
-      return !sizeMap[asset.size] ? mappedAssets : {...mappedAssets, [sizeMap[asset.size]]: assetRemoteData};
+      const mappedSize = sizeMap[asset.size];
+      return mappedSize !== undefined && mappedSize.length > 0
+        ? {...mappedAssets, [mappedSize]: assetRemoteData}
+        : mappedAssets;
     }, {});
 };
 
 export const updateUserEntityAssets = (userEntity: User | ServiceEntity, mappedAssets: MappedAsset = {}) => {
   const {preview, medium} = mappedAssets;
-  if (preview) {
+  if (preview !== null && preview !== undefined) {
     userEntity.previewPictureResource(preview);
   }
-  if (medium) {
+  if (medium !== null && medium !== undefined) {
     userEntity.mediumPictureResource(medium);
   }
 };

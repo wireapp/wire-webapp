@@ -70,7 +70,7 @@ export const VirtualizedMessageListWrapper = ({
         </div>
       )}
 
-      {parentRef.current && (
+      {parentRef.current !== null && parentRef.current !== undefined && (
         <VirtualizedMessagesList
           parentElement={parentRef.current}
           conversationLastReadTimestamp={conversationLastReadTimestamp}

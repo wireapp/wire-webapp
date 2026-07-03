@@ -37,7 +37,7 @@ async function addGeoIP(req: Request) {
 
     const lookup = await maxmind.open<CountryResponse>(countryDatabasePath);
     const result = lookup.get(ipAddress);
-    if (result) {
+    if (result !== null && result !== undefined) {
       countryCode = result.country?.iso_code ?? '';
     }
   } catch {

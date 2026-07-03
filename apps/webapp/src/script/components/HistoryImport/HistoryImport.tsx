@@ -73,9 +73,10 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
   const [numberOfProcessedRecords, setNumberOfProcessedRecords] = useState<number>(0);
   const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * PERCENTAGE_MULTIPLIER);
 
-  const isPreparing = !error && historyImportState === HistoryImportState.PREPARING;
-  const isImporting = !error && historyImportState === HistoryImportState.IMPORTING;
-  const isDone = !error && historyImportState === HistoryImportState.DONE;
+  const hasError = error !== null && error !== undefined;
+  const isPreparing = !hasError && historyImportState === HistoryImportState.PREPARING;
+  const isImporting = !hasError && historyImportState === HistoryImportState.IMPORTING;
+  const isDone = !hasError && historyImportState === HistoryImportState.DONE;
 
   const replacements = {
     processed: numberOfProcessedRecords.toString(),
@@ -207,7 +208,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
       if (isEncrypted) {
         const password = await getBackUpPassword();
 
-        if (password) {
+        if (password.length > 0) {
           await processHistoryImport(file, password);
         }
       } else {
@@ -224,7 +225,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
+    if (file !== null && file !== undefined) {
       setError(null);
       await importHistory(file);
     }
@@ -256,7 +257,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
           </div>
         )}
 
-        {error && (
+        {error !== null && error !== undefined && (
           <div className="history-message">
             <h2 className="history-message__headline" data-uie-name="status-history-import-error-headline">
               {errorHeadline}

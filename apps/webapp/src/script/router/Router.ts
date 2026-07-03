@@ -32,10 +32,11 @@ let routes: Routes = {};
  * Matches the current URL path against configured routes and triggers the appropriate handler.
  */
 const parseRoute = () => {
-  const currentPath = window.location.hash.replace('#', '') || '/';
+  const currentHashPath = window.location.hash.replace('#', '');
+  const currentPath = currentHashPath.length > 0 ? currentHashPath : '/';
 
   const exactMatch = routes[currentPath];
-  if (exactMatch) {
+  if (exactMatch !== null && exactMatch !== undefined) {
     return exactMatch();
   }
 
@@ -48,7 +49,7 @@ const parseRoute = () => {
       const matcher = match(pattern, {decode: decodeURIComponent});
       const result = matcher(currentPath);
 
-      if (!result || !handler) {
+      if (result === false || handler === null || handler === undefined) {
         continue;
       }
 
@@ -58,7 +59,7 @@ const parseRoute = () => {
       // Handle wildcard parameter
       if (paramNames.some(name => name.startsWith('*'))) {
         const wildcardName = paramNames.find(name => name.startsWith('*'));
-        if (wildcardName) {
+        if (wildcardName !== null && wildcardName !== undefined && wildcardName.length > 0) {
           const segments = params[wildcardName];
           return handler(...Object.values(params).filter(param => param !== segments), segments);
         }

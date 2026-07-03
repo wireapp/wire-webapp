@@ -79,6 +79,12 @@ const ListWrapper = memo(
     setConversationListRef,
   }: LeftListWrapperProps) => {
     const {translate} = useApplicationContext();
+    const hasHeaderElement =
+      headerElement !== null &&
+      headerElement !== undefined &&
+      headerElement !== false &&
+      headerElement !== '' &&
+      (typeof headerElement !== 'number' || (headerElement !== 0 && !Number.isNaN(headerElement)));
     const calculateBorders = throttle((element: HTMLElement) => {
       window.requestAnimationFrame(() => {
         if (element.offsetHeight <= 0 || !isScrollable(element)) {
@@ -92,7 +98,7 @@ const ListWrapper = memo(
     }, BORDER_RECALCULATION_THROTTLE_MILLISECONDS);
 
     function initBorderedScroll(element: HTMLElement | null) {
-      if (!element) {
+      if (element === null || element === undefined) {
         return;
       }
 
@@ -120,13 +126,15 @@ const ListWrapper = memo(
                   </p>
                 )}
                 <div className="left-list-header-title-wrapper">
-                  {headerElement || (
+                  {hasHeaderElement ? (
+                    headerElement
+                  ) : (
                     <>
                       <h2 className="left-list-header-text" data-uie-name={headerUieName}>
                         {header}
                       </h2>
 
-                      {onClose && (
+                      {onClose !== null && onClose !== undefined && (
                         <button
                           type="button"
                           className="left-list-header-close-button button-icon-large"

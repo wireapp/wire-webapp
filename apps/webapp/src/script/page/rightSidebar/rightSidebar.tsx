@@ -124,12 +124,18 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const lastItem = rightSidebar.history.length - 1;
   const currentState = rightSidebar.history[lastItem];
 
-  const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
-  const userServiceEntity = currentEntity && isUserAppOrServiceEntity(currentEntity) ? currentEntity : null;
-  const messageEntity = currentEntity && isReadableMessage(currentEntity) ? currentEntity : null;
-  const serviceEntity = currentEntity && isAppOrServiceEntity(currentEntity) ? currentEntity : null;
+  const userEntity =
+    currentEntity !== null && currentEntity !== undefined && isUserEntity(currentEntity) ? currentEntity : null;
+  const userServiceEntity =
+    currentEntity !== null && currentEntity !== undefined && isUserAppOrServiceEntity(currentEntity)
+      ? currentEntity
+      : null;
+  const messageEntity =
+    currentEntity !== null && currentEntity !== undefined && isReadableMessage(currentEntity) ? currentEntity : null;
+  const serviceEntity =
+    currentEntity !== null && currentEntity !== undefined && isAppOrServiceEntity(currentEntity) ? currentEntity : null;
 
-  const goToRoot = () => rightSidebar.goToRoot(activeConversation || null);
+  const goToRoot = () => rightSidebar.goToRoot(activeConversation ?? null);
 
   const closePanel = () => rightSidebar.close();
 
@@ -138,9 +144,9 @@ const RightSidebar: FC<RightSidebarProps> = ({
     rightSidebar.goTo(newState, {entity, isAddMode});
   };
 
-  const onBackClick = (entity: PanelEntity | null = activeConversation || null) => {
+  const onBackClick = (entity: PanelEntity | null = activeConversation ?? null) => {
     const previousHistory = rightSidebar.history.slice(0, -1);
-    const hasPreviousHistory = !!previousHistory.length;
+    const hasPreviousHistory = previousHistory.length !== 0 && !Number.isNaN(previousHistory.length);
     setAnimatePanelToLeft(false);
 
     if (hasPreviousHistory && previousHistory.length === 1 && previousHistory[0] === PanelState.MESSAGE_DETAILS) {
@@ -166,7 +172,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const switchContent = (newContentState: string) => {
     const isCollectionState = newContentState === ContentState.COLLECTION;
 
-    if (isCollectionState && currentState) {
+    if (isCollectionState && currentState !== null && currentState !== undefined) {
       closePanel();
     }
   };
@@ -183,7 +189,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const containerRef = useCallback((element: HTMLDivElement | null) => element?.focus(), [currentState]);
 
-  if (!activeConversation) {
+  if (activeConversation === null || activeConversation === undefined) {
     return null;
   }
 
@@ -217,7 +223,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
 
-          {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
+          {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity !== null && userEntity !== undefined && (
             <GroupParticipantUser
               key={userEntity.id}
               onBack={onBackClick}
@@ -244,7 +250,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
 
-          {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
+          {currentState === PanelState.PARTICIPANT_DEVICES && userEntity !== null && userEntity !== undefined && (
             <ParticipantDevices
               groupId={activeConversation.groupId}
               repositories={repositories}
@@ -277,22 +283,26 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
 
-          {currentState === PanelState.GROUP_PARTICIPANT_SERVICE && serviceEntity && userServiceEntity && (
-            <GroupParticipantService
-              activeConversation={activeConversation}
-              actionsViewModel={actionsViewModel}
-              integrationRepository={integrationRepository}
-              conversationRepository={conversationRepository}
-              teamRepository={teamRepository}
-              enableRemove={conversationRoleRepository.canRemoveParticipants(activeConversation)}
-              goToRoot={goToRoot}
-              onBack={onBackClick}
-              onClose={closePanel}
-              serviceEntity={serviceEntity}
-              selfUser={selfUser}
-              isAddMode={rightSidebar.isAddMode}
-            />
-          )}
+          {currentState === PanelState.GROUP_PARTICIPANT_SERVICE &&
+            serviceEntity !== null &&
+            serviceEntity !== undefined &&
+            userServiceEntity !== null &&
+            userServiceEntity !== undefined && (
+              <GroupParticipantService
+                activeConversation={activeConversation}
+                actionsViewModel={actionsViewModel}
+                integrationRepository={integrationRepository}
+                conversationRepository={conversationRepository}
+                teamRepository={teamRepository}
+                enableRemove={conversationRoleRepository.canRemoveParticipants(activeConversation)}
+                goToRoot={goToRoot}
+                onBack={onBackClick}
+                onClose={closePanel}
+                serviceEntity={serviceEntity}
+                selfUser={selfUser}
+                isAddMode={rightSidebar.isAddMode}
+              />
+            )}
 
           {currentState === PanelState.ADD_PARTICIPANTS && (
             <AddParticipants
@@ -310,7 +320,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
 
-          {currentState === PanelState.MESSAGE_DETAILS && messageEntity && (
+          {currentState === PanelState.MESSAGE_DETAILS && messageEntity !== null && messageEntity !== undefined && (
             <MessageDetails
               activeConversation={activeConversation}
               selfUser={selfUser}
@@ -330,7 +340,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               searchRepository={searchRepository}
               teamRepository={teamRepository}
               togglePanel={togglePanel}
-              highlightedUsers={rightSidebar.highlightedUsers || []}
+              highlightedUsers={rightSidebar.highlightedUsers ?? []}
               onBack={onBackClick}
               onClose={closePanel}
             />

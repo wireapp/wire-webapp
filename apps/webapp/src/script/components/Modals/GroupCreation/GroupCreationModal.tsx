@@ -322,7 +322,7 @@ const GroupCreationModal = ({
 
     const trimmedNameInput = value.trim();
     const nameTooLong = trimmedNameInput.length > maxNameLength;
-    const nameTooShort = !trimmedNameInput.length;
+    const nameTooShort = trimmedNameInput.length === 0 || Number.isNaN(trimmedNameInput.length);
 
     setGroupName(value);
     if (nameTooLong) {
@@ -357,7 +357,7 @@ const GroupCreationModal = ({
   const clickOnNext = (): void => {
     const nameTooLong = groupNameLength > maxNameLength;
 
-    if (groupNameLength && !nameTooLong) {
+    if (groupNameLength !== 0 && !Number.isNaN(groupNameLength) && !nameTooLong) {
       setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
     }
   };
@@ -372,10 +372,13 @@ const GroupCreationModal = ({
     setGroupCreationState(GroupCreationModalState.PREFERENCES);
   };
 
-  const participantsActionText = selectedContacts.length
-    ? translate('groupCreationParticipantsActionCreate')
-    : translate('groupCreationParticipantsActionSkip');
-  const isInputValid = groupNameLength && !nameError.length;
+  const participantsActionText =
+    selectedContacts.length !== 0 && !Number.isNaN(selectedContacts.length)
+      ? translate('groupCreationParticipantsActionCreate')
+      : translate('groupCreationParticipantsActionSkip');
+  const isInputValid =
+    (groupNameLength !== 0 && !Number.isNaN(groupNameLength) && nameError.length === 0) ||
+    Number.isNaN(nameError.length);
 
   return (
     <ModalComponent
@@ -401,7 +404,7 @@ const GroupCreationModal = ({
             </button>
 
             <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
-              {selectedContacts.length
+              {selectedContacts.length !== 0 && !Number.isNaN(selectedContacts.length)
                 ? translate('groupCreationParticipantsHeaderWithCounter', {number: selectedContacts.length})
                 : translate('groupCreationParticipantsHeader')}
             </h2>

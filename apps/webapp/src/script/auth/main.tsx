@@ -77,7 +77,7 @@ const store = configureStore({
 
 const render = (Component: FC<{translate: Translate}>): void => {
   const container = document.getElementById(mainId);
-  if (!container) {
+  if (container === null || container === undefined) {
     throw new Error(`No container '${mainId}' found to render application`);
   }
   createRoot(container).render(

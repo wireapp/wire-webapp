@@ -46,7 +46,14 @@ export const getE2EIConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLSE
     return undefined;
   }
   // Check if E2EIdentity feature has a server discoveryUrl
-  if (!e2eiConfig.config || !e2eiConfig.config.acmeDiscoveryUrl || e2eiConfig.config.acmeDiscoveryUrl.length <= 0) {
+  if (
+    e2eiConfig.config === null ||
+    e2eiConfig.config === undefined ||
+    e2eiConfig.config.acmeDiscoveryUrl === null ||
+    e2eiConfig.config.acmeDiscoveryUrl === undefined ||
+    e2eiConfig.config.acmeDiscoveryUrl.length === 0 ||
+    e2eiConfig.config.acmeDiscoveryUrl.length <= 0
+  ) {
     return undefined;
   }
   return e2eiConfig;
@@ -55,7 +62,7 @@ export const getE2EIConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLSE
 export const configureE2EI = (config: FeatureList): undefined | Promise<E2EIHandler> => {
   // Either get the current E2EIdentity handler instance or create a new one
   const e2eiConfig = getE2EIConfig(config);
-  if (!e2eiConfig) {
+  if (e2eiConfig === null || e2eiConfig === undefined) {
     return undefined;
   }
   return E2EIHandler.getInstance().initialize({

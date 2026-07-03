@@ -79,21 +79,21 @@ export const getChatHistorySharingUnitOptions = (translate: Translate, historySh
     {
       value: HistorySharingUnit.Days,
       label:
-        historySharingQuantity && historySharingQuantity > 1
+        historySharingQuantity !== 0 && !Number.isNaN(historySharingQuantity) && historySharingQuantity > 1
           ? translate('conversationHistoryModalOptionDays')
           : translate('conversationHistoryModalOptionDay'),
     },
     {
       value: HistorySharingUnit.Weeks,
       label:
-        historySharingQuantity && historySharingQuantity > 1
+        historySharingQuantity !== 0 && !Number.isNaN(historySharingQuantity) && historySharingQuantity > 1
           ? translate('conversationHistoryModalOptionWeeks')
           : translate('conversationHistoryModalOptionWeek'),
     },
     {
       value: HistorySharingUnit.Months,
       label:
-        historySharingQuantity && historySharingQuantity > 1
+        historySharingQuantity !== 0 && !Number.isNaN(historySharingQuantity) && historySharingQuantity > 1
           ? translate('conversationHistoryModalOptionMonths')
           : translate('conversationHistoryModalOptionMonth'),
     },
@@ -139,7 +139,7 @@ export const getChatHistoryOptions = (
   if (enableCustomHistory === true || teamState.isConferenceCallingEnabled()) {
     chatHistoryOptions.push({
       value: ChatHistory.Custom,
-      label: `${translate('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
+      label: `${translate('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity !== 0 && !Number.isNaN(historySharingQuantity) ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
     });
   }
 

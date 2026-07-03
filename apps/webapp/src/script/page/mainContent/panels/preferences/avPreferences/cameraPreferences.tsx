@@ -63,13 +63,13 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
       // we should be able to change camera from preferences page in middle of the call
       if (hasActiveCameraStream) {
         const refreshedStream = await refreshStream();
-        if (!refreshedStream) {
+        if (refreshedStream === null || refreshedStream === undefined) {
           throw new Error('No stream returned');
         }
         setStream(refreshedStream);
       } else {
         const stream = await streamHandler.requestMediaStream(false, true, false, false);
-        if (!stream) {
+        if (stream === null || stream === undefined) {
           throw new Error('No stream returned');
         }
         setStream(stream);
@@ -88,7 +88,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   const debouncedRequestStream = useDebouncedCallback(requestStream, DEBOUNCE_TIMEOUT);
 
   const cleanUpVideoSrc = () => {
-    if (videoElement.current) {
+    if (videoElement.current !== null && videoElement.current !== undefined) {
       videoElement.current.srcObject = null;
     }
   };
@@ -98,7 +98,12 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   }, [videoInputDeviceId, videoInputDevices.length, debouncedRequestStream]);
 
   useEffect(() => {
-    if (videoElement.current && stream) {
+    if (
+      videoElement.current !== null &&
+      videoElement.current !== undefined &&
+      stream !== null &&
+      stream !== undefined
+    ) {
       cleanUpVideoSrc();
 
       // Attach the new stream (autoPlay attribute handles playback)
@@ -113,7 +118,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
 
   useEffect(
     () => () => {
-      if (stream && !hasActiveCameraStream) {
+      if (stream !== null && stream !== undefined && !hasActiveCameraStream) {
         streamHandler.releaseTracksFromStream(stream);
       }
     },
@@ -122,13 +127,14 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
 
   return (
     <PreferencesSection title={translate('preferencesAVCamera')}>
-      {!stream && !isRequesting && (
-        <div className="preferences-av-detail">
-          <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
-            {translate('preferencesAVPermissionDetail')}
-          </a>
-        </div>
-      )}
+      {stream === null ||
+        (stream === undefined && !isRequesting && (
+          <div className="preferences-av-detail">
+            <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
+              {translate('preferencesAVPermissionDetail')}
+            </a>
+          </div>
+        ))}
       <DeviceSelect
         uieName="enter-camera"
         devices={videoInputDevices}
@@ -146,7 +152,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
         </div>
       ) : (
         <>
-          {stream ? (
+          {stream !== null && stream !== undefined ? (
             <video className="preferences-av-video mirror" autoPlay playsInline muted ref={videoElement} />
           ) : (
             <div className="preferences-av-video-disabled">

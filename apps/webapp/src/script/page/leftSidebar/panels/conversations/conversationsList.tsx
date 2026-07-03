@@ -126,7 +126,7 @@ export const ConversationsList = ({
         matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
       );
 
-      return !!call && !conversation.isSelfUserRemoved();
+      return call !== null && call !== undefined && !conversation.isSelfUserRemoved();
     },
     [joinableCalls],
   );
@@ -138,11 +138,14 @@ export const ConversationsList = ({
 
   const isFolderView = currentTab === SidebarTabs.FOLDER;
   const filteredConversations =
-    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
+    isFolderView && currentFolder !== undefined
+      ? currentFolder.conversations().filter(conversationSearchFilter(conversationsFilter))
+      : [];
 
-  const conversationsToDisplay = filteredConversations.length
-    ? filteredConversations
-    : getConversationsWithHeadings(conversations, conversationsFilter, currentTab);
+  const conversationsToDisplay =
+    filteredConversations.length !== 0 && !Number.isNaN(filteredConversations.length)
+      ? filteredConversations
+      : getConversationsWithHeadings(conversations, conversationsFilter, currentTab);
 
   const parentRef = useRef(null);
 
@@ -188,7 +191,9 @@ export const ConversationsList = ({
 
   const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
     isFocused:
-      document.activeElement !== searchInputRef.current && !conversationsFilter && currentFocus === conversation.id,
+      document.activeElement !== searchInputRef.current &&
+      conversationsFilter.length === 0 &&
+      currentFocus === conversation.id,
     handleArrowKeyDown: handleArrowKeyDown(index),
     resetConversationFocus,
     dataUieName: 'item-conversation',
@@ -201,7 +206,12 @@ export const ConversationsList = ({
   });
 
   useEffect(() => {
-    if (!conversationsFilter && clickedFilteredConversationId) {
+    if (
+      conversationsFilter.length === 0 &&
+      clickedFilteredConversationId !== null &&
+      clickedFilteredConversationId !== undefined &&
+      clickedFilteredConversationId.length > 0
+    ) {
       const conversationIndex = conversationsToDisplay
         .filter(conv => isConversationEntity(conv))
         .findIndex(conv => conv.id === clickedFilteredConversationId);
@@ -248,7 +258,7 @@ export const ConversationsList = ({
             // in the future
             const isHeading = 'isHeader' in conversation && 'heading' in conversation;
 
-            if (!isConversationEntity(conversation) && conversationsFilter && !isEmpty && isHeading) {
+            if (!isConversationEntity(conversation) && conversationsFilter.length > 0 && !isEmpty && isHeading) {
               const translationKey = conversation.heading as 'searchConversationNames' | 'searchGroupParticipants';
               return (
                 <div

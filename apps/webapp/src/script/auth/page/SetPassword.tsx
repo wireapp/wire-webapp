@@ -69,7 +69,7 @@ const SetPasswordComponent = ({
     }
     setIsValidPassword(currentInputNode.validity.valid);
     try {
-      if (validationError) {
+      if (validationError !== null && validationError !== undefined) {
         throw validationError;
       }
       await doSetPassword({new_password: password});
@@ -117,7 +117,7 @@ const SetPasswordComponent = ({
           />
           <Small
             style={{
-              display: error ? 'none' : 'block',
+              display: error !== null && error !== undefined ? 'none' : 'block',
               padding: '0 16px',
             }}
             data-uie-name="element-password-help"
@@ -126,11 +126,11 @@ const SetPasswordComponent = ({
               minPasswordLength: String(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
             })}
           </Small>
-          {!error ? <>&nbsp;</> : <Exception errors={[error]} />}
+          {error === null || error === undefined ? <>&nbsp;</> : <Exception errors={[error]} />}
           <Button
             block
             showLoading={isFetching}
-            disabled={isFetching || !password}
+            disabled={isFetching || password.length === 0}
             formNoValidate
             type="submit"
             data-uie-name="do-set-password"

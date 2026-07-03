@@ -84,7 +84,7 @@ function FullSearch(props: FullSearchProps) {
     const parent = element?.closest('.collection-list') as HTMLDivElement;
     const onScroll = () => {
       const showAdditionalMessages = isScrolledBottom(parent) && messages.length;
-      if (showAdditionalMessages) {
+      if (showAdditionalMessages !== null && showAdditionalMessages !== undefined) {
         setMessageCount(currentCount => {
           return currentCount + MAX_VISIBLE_MESSAGES;
         });
@@ -97,7 +97,7 @@ function FullSearch(props: FullSearchProps) {
   }, [element, messages, setMessageCount]);
 
   useEffect(() => {
-    if (inputRef.current) {
+    if (inputRef.current !== null && inputRef.current !== undefined) {
       inputRef.current.focus();
     }
   }, []);
@@ -110,7 +110,12 @@ function FullSearch(props: FullSearchProps) {
       const matches = [...text.matchAll(regex)];
       const firstIndex = matches[0]?.index;
       let firstPart = text.substring(0, firstIndex ?? text.length);
-      if (firstIndex && firstIndex > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
+      if (
+        firstIndex !== 0 &&
+        !Number.isNaN(firstIndex) &&
+        firstIndex > MAX_OFFSET_INDEX &&
+        text.length > MAX_TEXT_LENGTH
+      ) {
         let splitOffset = firstIndex - 1;
         const firstSpace = firstPart.indexOf(' ', splitOffset - PRE_MARKED_OFFSET);
         splitOffset = firstSpace > -1 ? firstSpace : splitOffset;
@@ -148,7 +153,7 @@ function FullSearch(props: FullSearchProps) {
             data-uie-name="full-search-header-input"
           />
 
-          {searchValue && (
+          {searchValue.length > 0 && (
             <CloseIcon
               css={{cursor: 'pointer'}}
               data-uie-name="full-search-dismiss"

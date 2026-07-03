@@ -99,7 +99,7 @@ export class ConversationState {
           // We filter out 1 on 1 conversation with unavailable users that don't have messages
           (!conversation.is1to1() ||
             conversation.hasContentMessages() ||
-            conversation.firstUserEntity()?.isAvailable()),
+            conversation.firstUserEntity()?.isAvailable() === true),
       );
     });
     this.unreadConversations = ko.pureComputed(() => {
@@ -125,7 +125,8 @@ export class ConversationState {
     this.directConversations = ko.pureComputed(() => {
       return this.sortedConversations().filter(
         conversation =>
-          conversation.is1to1() && (conversation.firstUserEntity()?.isAvailable() || conversation.hasContentMessages()),
+          conversation.is1to1() &&
+          (conversation.firstUserEntity()?.isAvailable() === true || conversation.hasContentMessages()),
       );
     });
 
@@ -188,7 +189,8 @@ export class ConversationState {
    */
   isVisible(conversation?: Conversation): conversation is Conversation {
     return (
-      !!conversation &&
+      conversation !== null &&
+      conversation !== undefined &&
       this.visibleConversations().some(conv => matchQualifiedIds(conv.qualifiedId, conversation.qualifiedId))
     );
   }
@@ -219,7 +221,7 @@ export class ConversationState {
   upsertConversation(conversationEntity: Conversation): void {
     const existingConversation = this.findConversation(conversationEntity.qualifiedId);
 
-    if (existingConversation) {
+    if (existingConversation !== null && existingConversation !== undefined) {
       this.conversations.replace(existingConversation, conversationEntity);
     } else {
       this.conversations.push(conversationEntity);
@@ -252,22 +254,22 @@ export class ConversationState {
    */
   findMLS1to1Conversation(userId: QualifiedId): MLSConversation | null {
     const mlsConversation = this.conversations().find(isMLS1to1ConversationWithUser(userId));
-    return mlsConversation || null;
+    return mlsConversation ?? null;
   }
 
   has1to1ConversationWithUser(userId: QualifiedId): boolean {
     const foundMLSConversation = this.findMLS1to1Conversation(userId);
-    if (foundMLSConversation) {
+    if (foundMLSConversation !== null && foundMLSConversation !== undefined) {
       return true;
     }
 
     const foundProteusConversations = this.findProteus1to1Conversations(userId);
-    return !!foundProteusConversations && foundProteusConversations.length > 0;
+    return foundProteusConversations !== null && foundProteusConversations.length > 0;
   }
 
   isSelfConversation(conversationId: QualifiedId): boolean {
     const selfConversationIds: QualifiedId[] = [this.selfProteusConversation(), this.selfMLSConversation()]
-      .filter((conversation): conversation is Conversation => !!conversation)
+      .filter((conversation): conversation is Conversation => conversation !== null && conversation !== undefined)
       .map(conversation => conversation.qualifiedId);
 
     return selfConversationIds.some(selfConversation => matchQualifiedIds(selfConversation, conversationId));
@@ -281,11 +283,15 @@ export class ConversationState {
    * Check whether conversation is currently displayed.
    */
   isActiveConversation(conversationEntity?: Conversation): boolean {
-    if (!conversationEntity) {
+    if (conversationEntity === null || conversationEntity === undefined) {
       return false;
     }
 
     const activeConversation = this.activeConversation();
-    return !!activeConversation && !!conversationEntity && matchQualifiedIds(activeConversation, conversationEntity);
+    return (
+      activeConversation !== null &&
+      activeConversation !== undefined &&
+      matchQualifiedIds(activeConversation, conversationEntity)
+    );
   }
 }

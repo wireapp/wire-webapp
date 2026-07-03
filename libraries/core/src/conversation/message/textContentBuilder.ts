@@ -54,7 +54,7 @@ export class TextContentBuilder<T extends TextContent | EditedTextContent> {
   }
 
   withQuote(quote?: QuoteContent) {
-    if (quote) {
+    if (quote !== null && quote !== undefined) {
       this.content.quote = quote as QuoteContent;
     }
 

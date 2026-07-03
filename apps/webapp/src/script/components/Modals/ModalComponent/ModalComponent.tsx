@@ -75,7 +75,8 @@ const ModalComponent = ({
 
   useEffect(() => {
     // Get the correct document based on the container
-    const targetDocument = container ? ((container as HTMLElement).ownerDocument ?? document) : document;
+    const targetDocument =
+      container !== null && container !== undefined ? ((container as HTMLElement).ownerDocument ?? document) : document;
 
     const trapFocus = (event: KeyboardEvent) => preventFocusOutside(event, trapId, targetDocument);
 
@@ -117,7 +118,7 @@ const ModalComponent = ({
     return null;
   }
 
-  const portalTarget = container || document.body;
+  const portalTarget = container ?? document.body;
   const targetDocument = (portalTarget as HTMLElement).ownerDocument ?? document;
   const isForeignDocument = targetDocument !== document;
 
@@ -141,7 +142,9 @@ const ModalComponent = ({
           id={trapId}
           onClick={event => event.stopPropagation()}
           tabIndex={TabIndex.UNFOCUSABLE}
-          onKeyDown={event => (onKeyDown ? onKeyDown(event) : event.stopPropagation())}
+          onKeyDown={event =>
+            onKeyDown !== null && onKeyDown !== undefined ? onKeyDown(event) : event.stopPropagation()
+          }
           css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
         >
           {hasVisibleClass ? children : null}

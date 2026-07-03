@@ -37,7 +37,7 @@ function shouldStickToBottomFromPrev(
 ) {
   const scrollElement = virtualizer.options.getScrollElement?.();
 
-  if (!scrollElement) {
+  if (scrollElement === null || scrollElement === undefined) {
     return false;
   }
 

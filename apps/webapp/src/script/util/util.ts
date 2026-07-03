@@ -42,7 +42,7 @@ export const checkIndexedDb = (): Promise<void> => {
     try {
       dbOpenRequest = window.indexedDB.open('test');
       dbOpenRequest.onerror = event => {
-        if (dbOpenRequest.error) {
+        if (dbOpenRequest.error !== null && dbOpenRequest.error !== undefined) {
           event.preventDefault();
           return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
         }
@@ -386,7 +386,8 @@ export const setContextMenuPosition = (event: React.KeyboardEvent) => {
   });
 };
 
-const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCrypto;
+const supportsSecretStorage = () =>
+  !Runtime.isDesktopApp() || (window.systemCrypto !== null && window.systemCrypto !== undefined);
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
 export const supportsMLS = () => supportsSecretStorage();
@@ -394,7 +395,7 @@ export const supportsMLS = () => supportsSecretStorage();
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
 export const removeAnimationsClass = (element: HTMLElement | null) => {
-  if (element) {
+  if (element !== null && element !== undefined) {
     element.addEventListener('animationend', () => {
       if (element.classList.contains(incomingCssClass)) {
         element.classList.remove(incomingCssClass);

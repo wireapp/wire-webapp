@@ -22,7 +22,7 @@ import {ElementNode, TextNode} from 'lexical';
 type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
 export const isHeadingNode = (node: TextNode | ElementNode | null, headingTag: HeadingTag = 'h1'): boolean => {
-  if (!node) {
+  if (node === null || node === undefined) {
     return false;
   }
 

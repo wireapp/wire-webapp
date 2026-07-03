@@ -30,14 +30,14 @@ let core: Core | undefined = undefined;
 export const updateRemoteConfigLogger = getLogger('updateRemoteConfigs');
 
 export const scheduleRecurringTask = async (params: TaskParams) => {
-  if (!core) {
+  if (core === null || core === undefined) {
     core = container.resolve(Core);
   }
   return core.recurringTaskScheduler.registerTask(params);
 };
 
 export const updateApiVersion = async () => {
-  if (!core) {
+  if (core === null || core === undefined) {
     core = container.resolve(Core);
   }
   const {

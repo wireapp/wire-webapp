@@ -84,7 +84,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
 
   private get selfUser() {
     const selfUser = this.userState.self();
-    if (!selfUser) {
+    if (selfUser === null || selfUser === undefined) {
       throw new Error('Self user is not available');
     }
     return selfUser;
@@ -195,7 +195,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       previousSupportedProtocols,
     );
 
-    if (!localSupportedProtocols) {
+    if (localSupportedProtocols === null || localSupportedProtocols === undefined) {
       await this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
       return refreshedSupportedProtocols;
     }
@@ -231,7 +231,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
   public getSelfSupportedProtocols = async (): Promise<CONVERSATION_PROTOCOL[]> => {
     const localSupportedProtocols = this.selfUser.supportedProtocols();
 
-    if (localSupportedProtocols) {
+    if (localSupportedProtocols !== null && localSupportedProtocols !== undefined) {
       return localSupportedProtocols;
     }
 

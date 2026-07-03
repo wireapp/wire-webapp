@@ -50,7 +50,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
   };
 
   const handleDelete = () => {
-    if (file.preview) {
+    if (file.preview.length > 0) {
       URL.revokeObjectURL(file.preview);
     }
 

@@ -74,7 +74,9 @@ const BaseToggle = ({
             className="button-label"
             aria-pressed={isChecked}
             type="button"
-            onClick={() => inputRef.current && setIsChecked(inputRef.current.checked)}
+            onClick={() =>
+              inputRef.current !== null && inputRef.current !== undefined && setIsChecked(inputRef.current.checked)
+            }
             data-uie-name={`do-allow-${toggleId}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           >

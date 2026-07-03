@@ -47,7 +47,8 @@ const MESSAGE_STATES = {
   RECEIPTS_OFF: 'receipts-off',
 };
 
-const formatUserCount = (users: User[]): string => (users.length ? ` (${users.length})` : '');
+const formatUserCount = (users: User[]): string =>
+  users.length !== 0 && !Number.isNaN(users.length) ? ` (${users.length})` : '';
 
 const sortUsers = (userA: User, userB: User): number =>
   userA.name().localeCompare(userB.name(), undefined, {sensitivity: 'base'});
@@ -88,10 +89,15 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   const totalNbReactions = reactions.reduce((acc, [, users]) => acc + users.length, 0);
 
   const teamId = activeConversation.teamId;
-  const supportsReceipts = messageSender.isMe && teamId;
+  const supportsReceipts = messageSender.isMe && teamId !== null && teamId !== undefined && teamId.length > 0;
 
   const receiptUsers = userRepository
-    .findUsersByIds(readReceipts.map(({userId, domain}) => ({domain: domain || '', id: userId})))
+    .findUsersByIds(
+      readReceipts.map(({userId, domain}) => ({
+        domain: domain !== null && domain !== undefined && domain.length > 0 ? domain : '',
+        id: userId,
+      })),
+    )
     .toSorted(sortUsers);
 
   const supportsReactions = useMemo(() => {
@@ -102,12 +108,14 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   }, [messageEntity]);
 
   const messageState = useMemo(() => {
-    if (supportsReceipts && isReceiptsOpen) {
+    if (supportsReceipts === true && isReceiptsOpen) {
       if (!messageEntity.expectsReadConfirmation) {
         return MESSAGE_STATES.RECEIPTS_OFF;
       }
 
-      return receiptUsers.length ? MESSAGE_STATES.RECEIPTS : MESSAGE_STATES.NO_RECEIPTS;
+      return receiptUsers.length !== 0 && !Number.isNaN(receiptUsers.length)
+        ? MESSAGE_STATES.RECEIPTS
+        : MESSAGE_STATES.NO_RECEIPTS;
     }
 
     return reactions.length > 0 ? MESSAGE_STATES.REACTIONS : MESSAGE_STATES.NO_REACTIONS;
@@ -120,7 +128,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     }, {});
   }, [readReceipts]);
 
-  const sentFooter = timestamp ? formatTime(timestamp) : '';
+  const sentFooter = timestamp !== 0 && !Number.isNaN(timestamp) ? formatTime(timestamp) : '';
 
   const receiptsTitle = translate('messageDetailsTitleReceipts', {
     count: messageEntity?.expectsReadConfirmation ? formatUserCount(receiptUsers) : '',
@@ -130,7 +138,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   });
 
   const panelTitle = useMemo(() => {
-    if (!supportsReceipts) {
+    if (supportsReceipts !== true) {
       return reactionsTitle;
     }
 
@@ -141,9 +149,12 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     return translate('messageDetailsTitle');
   }, [supportsReceipts, supportsReactions, reactionsTitle, receiptsTitle, translate]);
 
-  const showTabs = supportsReceipts && supportsReactions;
+  const showTabs = supportsReceipts === true && supportsReactions;
 
-  const editedFooter = editedTimestamp ? formatTime(editedTimestamp) : '';
+  const editedFooter =
+    editedTimestamp !== null && editedTimestamp !== undefined && editedTimestamp !== 0 && !Number.isNaN(editedTimestamp)
+      ? formatTime(editedTimestamp)
+      : '';
 
   const onReceipts = () => setIsReceiptsOpen(true);
 
@@ -160,7 +171,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         titleDataUieName="message-details-title"
       />
 
-      {showTabs && (
+      {showTabs !== null && showTabs !== undefined && (
         <div className="panel__tabs">
           <button
             className={cx('panel__tab button-reset-default', {'panel__tab--active': !isReceiptsOpen})}
@@ -230,7 +241,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
           {translate('messageDetailsSent', {sent: sentFooter})}
         </p>
 
-        {editedFooter && (
+        {editedFooter.length > 0 && (
           <p className="panel__footer__info" data-uie-name="status-message-details-edited">
             {translate('messageDetailsEdited', {edited: editedFooter})}
           </p>

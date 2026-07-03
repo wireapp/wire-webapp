@@ -58,9 +58,9 @@ const useWindowTitle = (translate: Translate) => {
     (unreadCount: number) => {
       setUnreadMessagesCount(unreadCount);
 
-      const iconBadge = unreadCount ? '-badge' : '';
+      const iconBadge = unreadCount !== 0 && !Number.isNaN(unreadCount) ? '-badge' : '';
       const link: HTMLLinkElement =
-        document.querySelector("link[rel*='shortcut icon']") || document.createElement('link');
+        document.querySelector<HTMLLinkElement>("link[rel*='shortcut icon']") ?? document.createElement('link');
       link.type = 'image/x-icon';
       link.rel = 'shortcut icon';
       link.href = `/image/favicon${iconBadge}.ico`;
@@ -105,7 +105,7 @@ const useWindowTitle = (translate: Translate) => {
         }
 
         case ContentState.CONVERSATION: {
-          if (activeConversation) {
+          if (activeConversation !== null && activeConversation !== undefined) {
             specificTitle += activeConversation.display_name();
           }
           break;

@@ -56,7 +56,7 @@ let buffers: {
  */
 export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: VideoDimensions) {
   const gl = canvas.getContext('webgl2');
-  if (!gl) {
+  if (gl === null || gl === undefined) {
     throw new Error('WebGL not supported');
   }
 

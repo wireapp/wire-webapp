@@ -48,7 +48,7 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
   const {isOpen, params, selectedUser, clearContent, isLoading, hide, setSelectedUser, setClearContent, setIsLoading} =
     useLeaveGroupAdminModalStore();
 
-  if (!params) {
+  if (params === null || params === undefined) {
     return null;
   }
 

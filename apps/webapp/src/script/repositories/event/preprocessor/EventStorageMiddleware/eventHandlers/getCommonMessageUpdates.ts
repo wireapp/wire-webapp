@@ -44,8 +44,14 @@ export function getCommonMessageUpdates(
 ): EditableEvent {
   const commonProps = {
     edited_time: originalEvent.edited_time,
-    read_receipts: !newEvent.read_receipts ? originalEvent.read_receipts : newEvent.read_receipts,
-    status: !newEvent.status || newEvent.status < originalEvent.status ? originalEvent.status : newEvent.status,
+    read_receipts:
+      newEvent.read_receipts === null || newEvent.read_receipts === undefined
+        ? originalEvent.read_receipts
+        : newEvent.read_receipts,
+    status:
+      newEvent.status === undefined || newEvent.status === 0 || newEvent.status < originalEvent.status
+        ? originalEvent.status
+        : newEvent.status,
     time: originalEvent.time,
   };
 

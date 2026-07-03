@@ -114,7 +114,13 @@ export class LifeCycleRepository {
     const isTemporaryGuestUser = currentUser?.isTemporaryGuest();
 
     // Redirect temporary guests to main website instead of login page
-    if (isTemporaryGuestSignOut && isTemporaryGuestUser && externalUrl.website) {
+    if (
+      isTemporaryGuestSignOut &&
+      isTemporaryGuestUser &&
+      externalUrl.website !== null &&
+      externalUrl.website !== undefined &&
+      externalUrl.website.length > 0
+    ) {
       this.logger.info('User is a temporary guest. Redirecting to main website instead of login page.');
       return replaceBrowserLocation(externalUrl.website);
     }
@@ -203,7 +209,7 @@ export class LifeCycleRepository {
     const activeConversation = this.dependencies.conversationRepository.getActiveConversation();
 
     // Send typing stop notification for active conversation
-    if (activeConversation) {
+    if (activeConversation !== null && activeConversation !== undefined) {
       try {
         await this.dependencies.conversationRepository.sendTypingStop(activeConversation);
         this.logger.debug('Sent typing stop notification for active conversation during logout.');
@@ -243,7 +249,7 @@ export class LifeCycleRepository {
 
     // Handle cookie label preservation
     const currentUser = this.dependencies.userRepository['userState'].self();
-    if (currentUser) {
+    if (currentUser !== null && currentUser !== undefined) {
       const cookieLabelsToPreserve = this.determineCookieLabelsToPreserve(currentUser, shouldClearAllData);
       storageKeysToPreserve.push(...cookieLabelsToPreserve);
 

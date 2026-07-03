@@ -43,7 +43,7 @@ const $shouldIndentListItem = (selection: RangeSelection): boolean => {
   return nodes.every(node => {
     // Traverse up to find if the node is inside a list item
     let currentNode: ElementNode | LexicalNode | null = node;
-    while (currentNode) {
+    while (currentNode !== null && currentNode !== undefined) {
       if ($isListItemNode(currentNode)) {
         return true;
       }

@@ -27,7 +27,9 @@ export class ConversationFilter {
 
   static showCallControls(conversationEntity: Conversation, hasCall: boolean): boolean {
     const isSupportedConversation = conversationEntity.isGroupOrChannel() || conversationEntity.is1to1();
-    const hasParticipants = !!conversationEntity.participating_user_ids().length;
+    const hasParticipants =
+      conversationEntity.participating_user_ids().length !== 0 &&
+      !Number.isNaN(conversationEntity.participating_user_ids().length);
     const isActiveConversation = hasParticipants && !conversationEntity.isSelfUserRemoved();
     return !hasCall && isSupportedConversation && isActiveConversation;
   }

@@ -38,7 +38,7 @@ const valueFromType = (availabilityType: Availability.Type): string => {
   };
 
   const value = TYPE_VALUES[availabilityType];
-  if (value) {
+  if (value.length > 0) {
     return value;
   }
   throw new UserError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);

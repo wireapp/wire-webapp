@@ -49,7 +49,7 @@ const onIntersect: IntersectionObserverCallback = entries => {
 
     const isVisible = isIntersecting && (requireFullyInView !== true || isFullyInView || isBiggerThanRoot());
 
-    if (onVisibilityChange) {
+    if (onVisibilityChange !== null && onVisibilityChange !== undefined) {
       onVisibilityChange(!!isVisible, isIntersecting);
     } else if (isVisible) {
       removeElement(element);

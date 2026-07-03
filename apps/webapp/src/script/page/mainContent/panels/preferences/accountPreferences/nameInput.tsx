@@ -40,7 +40,7 @@ const NameInput = ({name, userRepository, canEditProfile}: NameInputProps) => {
       return;
     }
 
-    if (newName.length) {
+    if (newName.length !== 0 && !Number.isNaN(newName.length)) {
       try {
         await userRepository.changeName(newName);
         nameInputDone.done();

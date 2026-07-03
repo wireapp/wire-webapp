@@ -149,7 +149,7 @@ export class BackupRepository {
     }
     files[Filename.METADATA] = encodedMetadata;
 
-    if (password) {
+    if (password.length > 0) {
       return this.createEncryptedBackup(files, user, password);
     }
 
@@ -260,7 +260,7 @@ export class BackupRepository {
       archiveVersion = cpbData.archiveVersion;
     } else {
       // Decrypt and unzip the legacy backup
-      if (password) {
+      if (password !== null && password !== undefined && password.length > 0) {
         files = await this.createDecryptedBackup(data, user, password);
       } else {
         files = await this.worker.post<Record<string, Uint8Array>>({
@@ -304,7 +304,7 @@ export class BackupRepository {
     const {decodingError, decodedHeader, headerSize} = await backupCoder.decodeHeader(dataArray);
 
     // error decoding the header
-    if (decodingError) {
+    if (decodingError !== null && decodingError !== undefined && decodingError.length > 0) {
       this.mapDecodingError(decodingError);
     }
     // We need to read the ChaCha20 generated header prior to the encrypted backup file data to run some sanity checks
@@ -396,7 +396,7 @@ export class BackupRepository {
 
   private async importUsers(users: UserRecord[], progressCallback: ProgressCallback) {
     /* we want to remove users that don't have qualified ids (has we cannot generate primary keys for them) */
-    const qualifiedUsers = users.filter(user => !!user.qualified_id);
+    const qualifiedUsers = users.filter(user => user.qualified_id !== null && user.qualified_id !== undefined);
 
     const importEventChunk = async (usersChunk: UserRecord[]) => {
       const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.USERS, usersChunk, {
@@ -433,10 +433,10 @@ export class BackupRepository {
 
   private prepareEvents(entity: EventRecord) {
     const data = entity.data as any;
-    if (data) {
+    if (data !== null && data !== undefined) {
       UINT8ARRAY_FIELDS.forEach(field => {
         const dataField = data[field];
-        if (dataField) {
+        if (dataField !== null && dataField !== undefined) {
           data[field] = new Uint8Array(Object.values(dataField));
         }
       });

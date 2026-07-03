@@ -46,7 +46,7 @@ export const DetachedWindow = ({children, callState = container.resolve(CallStat
 
   useActiveWindow(detachedWindow);
 
-  if (!detachedWindow) {
+  if (detachedWindow === null || detachedWindow === undefined) {
     return null;
   }
 

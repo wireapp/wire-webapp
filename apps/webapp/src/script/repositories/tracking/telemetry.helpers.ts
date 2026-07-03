@@ -53,8 +53,12 @@ export function isTelemetryEnabledAtCurrentEnvironment(): boolean {
 
   const {COUNTLY_API_KEY, COUNTLY_ALLOWED_BACKEND, BACKEND_REST} = Config.getConfig();
 
-  const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND?.split(',').map(url => url.trim()) || [];
-  const isEnabled = !!COUNTLY_API_KEY && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
+  const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND?.split(',').map(url => url.trim()) ?? [];
+  const isEnabled =
+    COUNTLY_API_KEY !== undefined &&
+    COUNTLY_API_KEY.length > 0 &&
+    allowedBackendUrls.length > 0 &&
+    allowedBackendUrls.includes(BACKEND_REST);
 
   return isEnabled;
 }

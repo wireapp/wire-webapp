@@ -121,12 +121,12 @@ const convertEventToError = (event: any): MediaError => {
   let error = event;
 
   // Chrome v60
-  if (event.path?.[0]) {
+  if (event.path?.[0] !== null && event.path?.[0] !== undefined) {
     error = event.path[0].error;
   }
 
   // Firefox v55
-  if (event.originalTarget) {
+  if (event.originalTarget !== null && event.originalTarget !== undefined) {
     error = error.originalTarget.error;
   }
 

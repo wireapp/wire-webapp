@@ -24,7 +24,9 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {isKey, isTabKey, KEY} from 'Util/keyboardUtil';
 
 function useConversationFocus(conversations: Conversation[]) {
-  const [currentFocus, setCurrentFocus] = useState(conversations[0]?.id || '');
+  const [currentFocus, setCurrentFocus] = useState(
+    conversations[0]?.id !== undefined && conversations[0]?.id.length > 0 ? conversations[0]?.id : '',
+  );
 
   const handleKeyDown = useCallback(
     (index: number) => (event: ReactKeyboardEvent | KeyboardEvent) => {
@@ -32,12 +34,20 @@ function useConversationFocus(conversations: Conversation[]) {
         event.preventDefault();
         const nextConversation = conversations?.[index + 1];
 
-        setCurrentFocus(nextConversation?.id || conversations[0].id);
+        setCurrentFocus(
+          nextConversation?.id !== undefined && nextConversation.id.length > 0
+            ? nextConversation.id
+            : conversations[0].id,
+        );
       } else if (isKey(event, KEY.ARROW_UP)) {
         event.preventDefault();
         const prevConversation = conversations?.[index - 1];
 
-        setCurrentFocus(prevConversation?.id || conversations[conversations.length - 1].id);
+        setCurrentFocus(
+          prevConversation?.id !== undefined && prevConversation.id.length > 0
+            ? prevConversation.id
+            : conversations[conversations.length - 1].id,
+        );
       } else if (isTabKey(event) || (event.shiftKey && isTabKey(event))) {
         setCurrentFocus(conversations[0].id);
       }
@@ -45,7 +55,13 @@ function useConversationFocus(conversations: Conversation[]) {
     [conversations],
   );
 
-  const resetConversationFocus = useCallback(() => setCurrentFocus(conversations[0]?.id || ''), [conversations]);
+  const resetConversationFocus = useCallback(
+    () =>
+      setCurrentFocus(
+        conversations[0]?.id !== undefined && conversations[0]?.id.length > 0 ? conversations[0]?.id : '',
+      ),
+    [conversations],
+  );
 
   useEffect(() => {
     if (currentFocus === conversations[0]?.id) {

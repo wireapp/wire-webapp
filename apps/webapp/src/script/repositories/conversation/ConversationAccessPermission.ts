@@ -72,7 +72,7 @@ export function teamPermissionsForAccessState(state: ACCESS_STATE): number {
 
 export function hasAccessToFeature(feature: number, state: ACCESS_STATE): boolean {
   const permissions = teamPermissionsForAccessState(state);
-  return !!(feature & permissions);
+  return (feature & permissions) !== 0;
 }
 
 export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STATE, current: ACCESS_STATE) {
@@ -83,9 +83,8 @@ export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_
   if (prevState === current) {
     return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};
   }
-  const featureEntry = Object.entries(ACCESS).find(
-    ([, bitmask]) => bitmask & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
-  );
+  const changedPermissions = teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current);
+  const featureEntry = Object.entries(ACCESS).find(([, bitmask]) => (bitmask & changedPermissions) !== 0);
   if (featureEntry === undefined) {
     return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};
   }

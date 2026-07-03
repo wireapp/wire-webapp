@@ -49,13 +49,16 @@ export class EventStorageMiddleware implements EventMiddleware {
     if (!shouldSaveEvent) {
       return event;
     }
-    const eventId = 'id' in event && event.id;
+    const eventId = 'id' in event ? event.id : undefined;
     /* We try to load a potential duplicate of the event (same ID, same conversation in the DB). There are multiple valid cases for duplicates:
      * - The event is a retry of a previously failed event
      * - The event is a link preview of a text message previously sent
      * - The event is an asset upload success of a metadata asset message
      */
-    const duplicateEvent = eventId ? await this.eventService.loadEvent(event.conversation, eventId) : undefined;
+    const duplicateEvent =
+      eventId !== null && eventId !== undefined && eventId.length > 0
+        ? await this.eventService.loadEvent(event.conversation, eventId)
+        : undefined;
 
     // We first validate that the event is valid
     this.validateEvent(event, source, duplicateEvent);
@@ -73,7 +76,7 @@ export class EventStorageMiddleware implements EventMiddleware {
         selfUserId: this.selfUser.id,
         findEvent: eventId => this.eventService.loadEvent(event.conversation, eventId),
       });
-      if (operation) {
+      if (operation !== null && operation !== undefined) {
         return operation;
       }
     }
@@ -89,14 +92,19 @@ export class EventStorageMiddleware implements EventMiddleware {
         of the conversation, then we can throw a validation error
         (that means the user was already removed by another member-leave event)
       */
-      if (!event.qualified_conversation) {
+      if (event.qualified_conversation === null || event.qualified_conversation === undefined) {
         return;
       }
       const conversation = this.conversationState.findConversation(event.qualified_conversation);
 
       const qualifiedUserIds = event.data.qualified_user_ids;
 
-      if (!conversation || !qualifiedUserIds) {
+      if (
+        conversation === null ||
+        conversation === undefined ||
+        qualifiedUserIds === null ||
+        qualifiedUserIds === undefined
+      ) {
         return;
       }
 
@@ -107,7 +115,7 @@ export class EventStorageMiddleware implements EventMiddleware {
 
         const isParticipant = UserFilter.isParticipant(conversation, qualifiedUserId);
 
-        return acc || isDeleted || !isParticipant;
+        return acc || isDeleted === true || !isParticipant;
       }, false);
 
       if (usersNotPartofConversation) {
@@ -115,7 +123,7 @@ export class EventStorageMiddleware implements EventMiddleware {
       }
     }
 
-    if (!duplicateEvent) {
+    if (duplicateEvent === null || duplicateEvent === undefined) {
       return;
     }
 
@@ -128,10 +136,16 @@ export class EventStorageMiddleware implements EventMiddleware {
     }
 
     if (event.type === CONVERSATION.MESSAGE_ADD && duplicateEvent.type === CONVERSATION.MESSAGE_ADD) {
-      const isValidUpdate = !!event.data.previews?.length || event.data.replacing_message_id;
+      const hasPreviews =
+        event.data.previews !== null && event.data.previews !== undefined && event.data.previews.length > 0;
+      const hasReplacingMessageId =
+        event.data.replacing_message_id !== null &&
+        event.data.replacing_message_id !== undefined &&
+        event.data.replacing_message_id.length > 0;
+      const isValidUpdate = hasPreviews || hasReplacingMessageId;
       const isRetryAttempt = isEventRecordFailed(duplicateEvent) || isEventRecordWithFederationError(duplicateEvent);
 
-      if (!isValidUpdate && !isRetryAttempt) {
+      if (isValidUpdate !== true && !isRetryAttempt) {
         throw new EventValidationError('ID already used for a successfully sent message');
       }
     }

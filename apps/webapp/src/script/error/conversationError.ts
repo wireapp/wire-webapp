@@ -39,7 +39,7 @@ enum CONVERSATION_ERROR_TYPE {
 export class ConversationError extends BaseError {
   constructor(type: CONVERSATION_ERROR_TYPE | BASE_ERROR_TYPE, message: string, error?: Error) {
     super(type, message);
-    if (error) {
+    if (error !== null && error !== undefined) {
       this.stack = `${this.stack}\n${error.stack}`;
     }
   }

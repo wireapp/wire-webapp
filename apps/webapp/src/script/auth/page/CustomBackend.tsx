@@ -43,7 +43,7 @@ export const CustomBackend = () => {
   };
 
   const onConnect = () => {
-    if (url) {
+    if (url.length > 0) {
       const welcomeUrl = pathWithParams(url, {[QUERY_KEY.SSO_AUTO_LOGIN]: true});
       navigateTo(
         `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${

@@ -36,7 +36,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
   readonly readable: ReadableStream;
 
   constructor({track}: {track: MediaStreamTrack}) {
-    if (!track) {
+    if (track === null || track === undefined) {
       throw new Error('MediaStreamTrack is required');
     }
     if (track.kind !== 'video') {
@@ -50,7 +50,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
     video.srcObject = new MediaStream([track]);
     const canvas = new OffscreenCanvas(1, 1);
     const ctx = canvas.getContext('2d');
-    if (!ctx) {
+    if (ctx === null || ctx === undefined) {
       throw new Error('Failed to get 2D context from OffscreenCanvas');
     }
     let timestamp = 0;
@@ -65,7 +65,13 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
         await this.startVideo(video);
         const configuredFrameRate = track.getSettings().frameRate;
 
-        if (configuredFrameRate && configuredFrameRate > 0) {
+        if (
+          configuredFrameRate !== null &&
+          configuredFrameRate !== undefined &&
+          configuredFrameRate !== 0 &&
+          !Number.isNaN(configuredFrameRate) &&
+          configuredFrameRate > 0
+        ) {
           frameDuration = 1000 / configuredFrameRate;
         }
         timestamp = performance.now();

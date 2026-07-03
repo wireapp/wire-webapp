@@ -40,7 +40,7 @@ function validateEditEvent(
   originalEvent: HandledEvents | undefined,
   editEvent: EditableEvent,
 ): originalEvent is StoredEvent<EditableEvent> {
-  if (!originalEvent) {
+  if (originalEvent === null || originalEvent === undefined) {
     throwValidationError('Edit event without original event');
   }
 
@@ -87,7 +87,7 @@ export const handleEditEvent: EventHandler = async (event, {findEvent}) => {
     return undefined;
   }
   const editedEventId = event.data.replacing_message_id;
-  if (!editedEventId) {
+  if (editedEventId === null || editedEventId === undefined || editedEventId.length === 0) {
     return undefined;
   }
   const originalEvent = await findEvent(editedEventId);

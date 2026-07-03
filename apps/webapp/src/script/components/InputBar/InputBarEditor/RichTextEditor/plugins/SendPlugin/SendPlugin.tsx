@@ -35,7 +35,7 @@ export function SendPlugin({onSend}: Props): null {
     return editor.registerCommand(
       KEY_ENTER_COMMAND,
       event => {
-        if (!event) {
+        if (event === null || event === undefined) {
           return false;
         }
 

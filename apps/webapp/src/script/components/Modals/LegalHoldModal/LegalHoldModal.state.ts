@@ -90,7 +90,7 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
     return set(state => ({
       ...state,
       fingerprint: formattedFingerprint,
-      isOpen: !!formattedFingerprint,
+      isOpen: formattedFingerprint.length !== 0,
     }));
   },
   setIsLoading: isLoading =>
@@ -126,7 +126,7 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
       fingerprint: formattedFingerprint,
       isInitialized: initialize,
       isLoading: showLoading,
-      isOpen: showLoading || !!formattedFingerprint,
+      isOpen: showLoading || formattedFingerprint.length !== 0,
       type: LegalHoldModalType.REQUEST,
     }));
   },

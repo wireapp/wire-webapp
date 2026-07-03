@@ -101,7 +101,12 @@ async function buildMessageRepository(
   const dependencies = {
     conversationRepository: () => ({}) as ConversationRepository,
     cryptographyRepository: new CryptographyRepository({} as any),
-    eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
+    eventRepository: new EventRepository(
+      new EventService({deleteEventInConversation: jest.fn().mockResolvedValue(1)} as any),
+      {} as any,
+      {} as any,
+      {} as any,
+    ),
     propertiesRepository: new PropertiesRepository({} as any, {} as any, translate),
     serverTimeHandler: serverTimeHandler,
     userRepository: {

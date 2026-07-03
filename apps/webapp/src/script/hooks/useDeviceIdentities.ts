@@ -34,7 +34,13 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
   };
 
   const refreshDeviceIdentities = useCallback(async () => {
-    if (!groupId || !core.isMLSActiveForClient()) {
+    if (
+      groupId === null ||
+      groupId === undefined ||
+      groupId.length === 0 ||
+      core.isMLSActiveForClient() === null ||
+      core.isMLSActiveForClient() === undefined
+    ) {
       return;
     }
 
@@ -51,7 +57,7 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
   }, [refreshDeviceIdentities]);
 
   useEffect(() => {
-    if (!updateAfterEnrollment) {
+    if (updateAfterEnrollment !== true) {
       return () => {};
     }
     E2EIHandler.getInstance().on('deviceStatusUpdated', refreshDeviceIdentities);
@@ -62,11 +68,12 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
 
   return {
     deviceIdentities,
-    status: !deviceIdentities
-      ? undefined
-      : deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
-        ? MLSStatuses.VALID
-        : MLSStatuses.NOT_ACTIVATED,
+    status:
+      deviceIdentities === null || deviceIdentities === undefined
+        ? undefined
+        : deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
+          ? MLSStatuses.VALID
+          : MLSStatuses.NOT_ACTIVATED,
     getDeviceIdentity,
   };
 };

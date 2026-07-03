@@ -23,7 +23,7 @@
  * Thanks to that, we can differentiate them from the rest of the text, and render them as MentionNodes.
  */
 export const wrapMentionsWithTags = (text: string, allMentions: string[]): string => {
-  if (!allMentions.length) {
+  if (allMentions.length === 0 || Number.isNaN(allMentions.length)) {
     return text;
   }
 

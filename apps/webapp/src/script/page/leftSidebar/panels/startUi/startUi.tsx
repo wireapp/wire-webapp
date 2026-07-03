@@ -104,7 +104,7 @@ const StartUI = ({
   const peopleSearchResults = useRef<SearchResultsData | undefined>(undefined);
 
   const openFirstConversation = async (): Promise<void> => {
-    if (peopleSearchResults.current) {
+    if (peopleSearchResults.current !== null && peopleSearchResults.current !== undefined) {
       const {contacts} = peopleSearchResults.current;
       if (contacts.length > 0) {
         return openContact(contacts[0]);
@@ -113,7 +113,14 @@ const StartUI = ({
   };
 
   const openContact = async (user: User) => {
-    const isSameTeam = user.teamId && selfUser.teamId && user.teamId === selfUser.teamId;
+    const isSameTeam =
+      user.teamId !== null &&
+      user.teamId !== undefined &&
+      user.teamId.length > 0 &&
+      selfUser.teamId !== null &&
+      selfUser.teamId !== undefined &&
+      selfUser.teamId.length > 0 &&
+      user.teamId === selfUser.teamId;
     const has1to1Conversation = conversationState.has1to1ConversationWithUser(user.qualifiedId);
 
     if (isSameTeam && !has1to1Conversation) {

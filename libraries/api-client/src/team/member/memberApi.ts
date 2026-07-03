@@ -127,7 +127,7 @@ export class MemberAPI {
   ): Promise<MemberData[]> {
     const {ids} = parameters;
 
-    if (ids.length) {
+    if (ids.length !== 0 && !Number.isNaN(ids.length)) {
       const uniqueIds = ArrayUtil.removeDuplicates(ids);
       const idChunks = ArrayUtil.chunk(uniqueIds, limit);
       const resolvedTasks = await Promise.all(

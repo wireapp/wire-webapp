@@ -40,5 +40,5 @@ export const isInRecycleBin = () => {
 export const getNodeRootParentPath = ({nodePath}: {nodePath: string}) => {
   const segments = nodePath.split('/');
   const recycleBinIndex = segments.indexOf(RECYCLE_BIN_PATH);
-  return segments[recycleBinIndex + 1] || '';
+  return segments[recycleBinIndex + 1].length > 0 ? segments[recycleBinIndex + 1] : '';
 };

@@ -46,7 +46,12 @@ export class Multipart extends Asset {
     this.mentions = ko.observableArray();
     this.previews = ko.observableArray();
 
-    if (attachments?.length) {
+    if (
+      attachments?.length !== null &&
+      attachments?.length !== undefined &&
+      attachments?.length !== 0 &&
+      !Number.isNaN(attachments?.length)
+    ) {
       this.attachments = ko.observableArray(attachments);
     }
 
@@ -62,7 +67,9 @@ export class Multipart extends Asset {
   // Process text before rendering it
   render(selfId: QualifiedId, themeColor?: string): string {
     const message = renderMessage(this.text, selfId, this.mentions());
-    return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
+    return this.previews().length === 0 || Number.isNaN(this.previews().length)
+      ? mediaParser.renderMediaEmbeds(message, themeColor)
+      : message;
   }
 
   isUserMentioned(userId: QualifiedId): boolean {
@@ -72,12 +79,14 @@ export class Multipart extends Asset {
   getCellAssets(): Array<ICellAsset> {
     const attachments = this.attachments?.();
 
-    if (!attachments) {
+    if (attachments === null || attachments === undefined) {
       return [];
     }
 
     return attachments
-      .map(attachment => (attachment.cellAsset ? {...attachment.cellAsset} : null))
+      .map(attachment =>
+        attachment.cellAsset !== null && attachment.cellAsset !== undefined ? {...attachment.cellAsset} : null,
+      )
       .filter(Boolean) as Array<ICellAsset>;
   }
 }

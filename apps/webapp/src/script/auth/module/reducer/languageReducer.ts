@@ -31,8 +31,9 @@ export const initialLanguageState: LanguageState = {
 export function languageReducer(state: LanguageState = initialLanguageState, action: AppActions): LanguageState {
   switch (action.type) {
     case LANGUAGE_ACTION.SWITCH_LANGUAGE_SUCCESS:
+      const language = findLanguage(action.payload);
       return {
-        language: findLanguage(action.payload) || state.language,
+        language: language.length > 0 ? language : state.language,
       };
     default:
       return state;

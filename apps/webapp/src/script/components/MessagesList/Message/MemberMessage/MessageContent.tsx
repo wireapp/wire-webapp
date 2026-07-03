@@ -86,11 +86,11 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
 
   switch (message.memberMessageType) {
     case SystemMessageType.CONVERSATION_CREATE: {
-      if (message.name().length) {
+      if (message.name().length !== 0 && !Number.isNaN(message.name().length)) {
         const exceedsMaxTeam = targetedUsers.length > CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
-        if (message.allTeamMembers && exceedsMaxTeam) {
+        if (message.allTeamMembers !== null && message.allTeamMembers !== undefined && exceedsMaxTeam) {
           const guestCount = targetedUsers.filter(userEntity => userEntity.isGuest()).length;
-          if (!guestCount) {
+          if (guestCount === 0 || Number.isNaN(guestCount)) {
             return translate('conversationCreateTeam');
           }
 
@@ -199,7 +199,7 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
       }
 
       const allUsers = generateNames(targetedUsers, translate);
-      if (!actor.id) {
+      if (actor.id.length === 0) {
         return translate('conversationMemberWereRemoved', {users: allUsers}, {}, true);
       }
       return actor.isMe

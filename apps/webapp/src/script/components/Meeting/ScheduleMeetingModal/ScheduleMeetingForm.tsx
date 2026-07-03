@@ -223,7 +223,7 @@ export const ScheduleMeetingForm = ({
           options={recurrenceSelectOptions}
           value={selectedRecurrenceOption}
           onChange={option => {
-            if (option) {
+            if (option !== null && option !== undefined) {
               onRecurrenceChange(option.value as ScheduleMeetingRecurrenceOption);
             }
           }}

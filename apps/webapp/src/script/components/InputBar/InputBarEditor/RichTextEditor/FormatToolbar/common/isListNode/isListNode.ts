@@ -20,7 +20,7 @@
 import {ElementNode, TextNode} from 'lexical';
 
 export const isListNode = (node: TextNode | ElementNode | null, listType: 'ordered' | 'unordered'): boolean => {
-  if (!node) {
+  if (node === null || node === undefined) {
     return false;
   }
 

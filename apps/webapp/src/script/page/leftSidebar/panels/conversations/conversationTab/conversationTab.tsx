@@ -66,7 +66,9 @@ export const ConversationTab = ({
             data-uie-name={showNotificationsBadge ? 'notification-badge' : 'unread-badge'}
           />
         )}
-        <span className="conversations-sidebar-btn--text">{label || title}</span>
+        <span className="conversations-sidebar-btn--text">
+          {label !== null && label !== undefined && label.length > 0 ? label : title}
+        </span>
       </span>
     </button>
   );

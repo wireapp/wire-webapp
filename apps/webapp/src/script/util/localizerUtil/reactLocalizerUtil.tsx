@@ -56,15 +56,17 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
     return [html];
   }
 
-  const componentsSplitRegexpStr = componentReplacements.length
-    ? `(${componentReplacements
-        .map(replacement => `${sanitizeRegexp(replacement.start)}.+?${sanitizeRegexp(replacement.end)}`)
-        .join('|')})`
-    : null;
+  const componentsSplitRegexpStr =
+    componentReplacements.length !== 0 && !Number.isNaN(componentReplacements.length)
+      ? `(${componentReplacements
+          .map(replacement => `${sanitizeRegexp(replacement.start)}.+?${sanitizeRegexp(replacement.end)}`)
+          .join('|')})`
+      : null;
 
-  const stringSplitRegexpStr = stringReplacements.length
-    ? `(${stringReplacements.map(replacement => sanitizeRegexp(replacement.exactMatch)).join('|')})`
-    : null;
+  const stringSplitRegexpStr =
+    stringReplacements.length !== 0 && !Number.isNaN(stringReplacements.length)
+      ? `(${stringReplacements.map(replacement => sanitizeRegexp(replacement.exactMatch)).join('|')})`
+      : null;
 
   const regexpStr = [componentsSplitRegexpStr, stringSplitRegexpStr].filter(Boolean).join('|');
 
@@ -80,7 +82,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
         replacement => node.startsWith(replacement.start) && node.endsWith(replacement.end),
       );
 
-      if (componentsReplacementMatch) {
+      if (componentsReplacementMatch !== null && componentsReplacementMatch !== undefined) {
         const text = node.substring(
           componentsReplacementMatch.start.length,
           node.length - componentsReplacementMatch.end.length,
@@ -93,7 +95,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
           return split
             .map(node => {
               const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.exactMatch);
-              if (stringReplacementMatch) {
+              if (stringReplacementMatch !== null && stringReplacementMatch !== undefined) {
                 return stringReplacementMatch.render();
               }
               return componentsReplacementMatch.render(node);
@@ -107,7 +109,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
 
       const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.exactMatch);
 
-      if (stringReplacementMatch) {
+      if (stringReplacementMatch !== null && stringReplacementMatch !== undefined) {
         return stringReplacementMatch.render();
       }
 

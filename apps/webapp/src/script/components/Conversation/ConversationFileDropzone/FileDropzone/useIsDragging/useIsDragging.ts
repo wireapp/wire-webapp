@@ -31,7 +31,7 @@ export const useIsDragging = () => {
   useEffect(() => {
     const element = wrapperRef.current;
 
-    if (!element) {
+    if (element === null || element === undefined) {
       return undefined;
     }
 

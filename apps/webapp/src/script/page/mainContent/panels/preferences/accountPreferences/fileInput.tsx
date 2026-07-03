@@ -34,7 +34,7 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
         type="file"
         accept={fileTypes.join(',')}
         onChange={({target}) => {
-          if (target.files && target.files.length > 0) {
+          if (target.files !== null && target.files !== undefined && target.files.length > 0) {
             onFileChange?.(target.files);
             window.setTimeout(() => {
               target.value = '';

@@ -148,13 +148,14 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
-  const headerText = selectedContacts.length
-    ? translate('addParticipantsHeaderWithCounter', {number: selectedContacts.length})
-    : translate('addParticipantsHeader');
+  const headerText =
+    selectedContacts.length !== 0 && !Number.isNaN(selectedContacts.length)
+      ? translate('addParticipantsHeaderWithCounter', {number: selectedContacts.length})
+      : translate('addParticipantsHeader');
 
   const showIntegrations = useMemo(() => {
     const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
-    const isService = !!firstUserEntity?.isService;
+    const isService = firstUserEntity?.isService === true;
     const allowIntegrations = isGroupOrChannel || isService;
 
     // Don't allow new apps to be added if the feature has been disabled
@@ -196,7 +197,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   };
 
   const openManageServices = () => {
-    if (manageServicesUrl) {
+    if (manageServicesUrl !== null && manageServicesUrl !== undefined && manageServicesUrl.length > 0) {
       safeWindowOpen(manageServicesUrl);
     }
   };
@@ -305,7 +306,10 @@ const AddParticipants: FC<AddParticipantsProps> = ({
             <>
               {is.nonEmptyArray(servicesList) && (
                 <>
-                  {canManageServices() && !!manageServicesUrl && (
+                  {canManageServices() &&
+                  manageServicesUrl !== null &&
+                  manageServicesUrl !== undefined &&
+                  manageServicesUrl.length > 0 ? (
                     <ul className="panel-manage-services left-list-items">
                       <li
                         role="presentation"
@@ -328,17 +332,20 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         <div className="column-center">{translate('addParticipantsManageServices')}</div>
                       </li>
                     </ul>
-                  )}
+                  ) : null}
 
                   <ServiceList services={servicesList} onServiceClick={onServiceSelect} isSearching={isSearching} />
                 </>
               )}
 
-              {!servicesList.length && !isInitialServiceSearch && (
+              {servicesList.length === 0 && !isInitialServiceSearch ? (
                 <div className="search__no-services">
                   <Icon.ServiceIcon className="search__no-services__icon" />
 
-                  {canManageServices() && !!manageServicesUrl && (
+                  {canManageServices() &&
+                  manageServicesUrl !== null &&
+                  manageServicesUrl !== undefined &&
+                  manageServicesUrl.length > 0 ? (
                     <>
                       <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
                         {translate('addParticipantsNoServicesManager')}
@@ -362,7 +369,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         {translate('addParticipantsManageServicesNoResults')}
                       </Button>
                     </>
-                  )}
+                  ) : null}
 
                   {!canManageServices() && (
                     <div className="search__no-services__info" data-uie-name="label-no-services-enabled">
@@ -370,7 +377,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     </div>
                   )}
                 </div>
-              )}
+              ) : null}
             </>
           )}
         </FadingScrollbar>

@@ -38,7 +38,7 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
-    if (!message) {
+    if (message === null || message === undefined) {
       return () => {};
     }
     const progressSubscribable = assetRepository.getUploadProgress(message?.id);
@@ -53,7 +53,7 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
   const transferState = uploadProgress > -1 ? AssetTransferState.UPLOADING : status;
 
   return {
-    cancelUpload: () => message && assetRepository.cancelUpload(message?.id),
+    cancelUpload: () => message !== null && message !== undefined && assetRepository.cancelUpload(message?.id),
     downloadAsset: (asset: FileAsset) => assetRepository.downloadFile(asset),
     isDownloading: transferState === AssetTransferState.DOWNLOADING,
     isPendingUpload: transferState === AssetTransferState.UPLOAD_PENDING,
@@ -61,10 +61,10 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
     isUploading: transferState === AssetTransferState.UPLOADING,
     getAssetUrl: async (resource: AssetRemoteData, acceptedMimeTypes?: string[]): Promise<AssetUrl> => {
       const blob = await assetRepository.load(resource);
-      if (!blob) {
+      if (blob === null || blob === undefined) {
         throw new Error(`Asset could not be loaded`);
       }
-      if (acceptedMimeTypes && !acceptedMimeTypes?.includes(blob.type)) {
+      if (acceptedMimeTypes !== null && acceptedMimeTypes !== undefined && !acceptedMimeTypes?.includes(blob.type)) {
         throw new Error(`Mime type not accepted "${blob.type}"`);
       }
       const url = URL.createObjectURL(blob);

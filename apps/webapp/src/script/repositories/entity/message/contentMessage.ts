@@ -106,7 +106,7 @@ export class ContentMessage extends Message {
    * @returns `true` if the user was mentioned or quoted, `false` otherwise.
    */
   isUserTargeted(userId: QualifiedId): boolean {
-    return userId && (this.isUserMentioned(userId) || this.isUserQuoted(userId.id));
+    return userId !== null && userId !== undefined && (this.isUserMentioned(userId) || this.isUserQuoted(userId.id));
   }
 
   /**
@@ -131,12 +131,12 @@ export class ContentMessage extends Message {
     const asset_et = this.getFirstAsset() as FileAsset;
     let {file_name} = asset_et;
 
-    if (!file_name) {
+    if (file_name === null || file_name === undefined || file_name.length === 0) {
       const date = this.timestamp();
       file_name = `Wire ${formatLocale(date, 'yyyy-MM-dd')} at ${formatTimeShort(date)}`;
     }
 
-    if (asset_et.file_type) {
+    if (asset_et.file_type !== null && asset_et.file_type !== undefined && asset_et.file_type.length > 0) {
       const file_extension = asset_et.file_type.split('/').pop();
       file_name = `${file_name}.${file_extension}`;
     }

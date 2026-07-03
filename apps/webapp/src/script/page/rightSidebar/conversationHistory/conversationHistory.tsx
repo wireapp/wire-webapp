@@ -82,7 +82,9 @@ export const ConversationHistory = ({onGoBack, onClose}: AccessProps) => {
           <FlexBox css={conversationHistoryCustomCss}>
             <Input
               wrapperCSS={customHistorySharingInputCss}
-              value={historySharingQuantity || ''}
+              value={
+                historySharingQuantity !== 0 && !Number.isNaN(historySharingQuantity) ? historySharingQuantity : ''
+              }
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 setHistorySharingQuantity(Number(event.target.value))
               }

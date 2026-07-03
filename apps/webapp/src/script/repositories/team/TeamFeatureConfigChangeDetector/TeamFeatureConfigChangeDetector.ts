@@ -62,9 +62,9 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
 ): FeatureUpdate<Key> => {
   const newFeature = newFeatureList?.[key];
 
-  if (!prevFeatureList) {
+  if (prevFeatureList === null || prevFeatureList === undefined) {
     // Feature was added and is enabled
-    if (newFeature && newFeature.status === FEATURE_STATUS.ENABLED) {
+    if (newFeature !== null && newFeature !== undefined && newFeature.status === FEATURE_STATUS.ENABLED) {
       return {type: FeatureUpdateType.ENABLED, next: newFeature};
     }
 
@@ -74,9 +74,10 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
 
   const prevFeature = prevFeatureList[key];
 
-  const wasFeatureAdded = !prevFeature && newFeature;
+  const wasFeatureAdded =
+    (prevFeature === null || prevFeature === undefined) && newFeature !== null && newFeature !== undefined;
 
-  if (wasFeatureAdded) {
+  if (wasFeatureAdded === true) {
     // Feature was added and is enabled
     if (newFeature.status === FEATURE_STATUS.ENABLED) {
       return {type: FeatureUpdateType.ENABLED, next: newFeature};
@@ -86,7 +87,8 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
     return {type: FeatureUpdateType.UNCHANGED, next: newFeature};
   }
 
-  const wasFeatureRemoved = prevFeature && !newFeature;
+  const wasFeatureRemoved =
+    prevFeature !== null && prevFeature !== undefined && (newFeature === null || newFeature === undefined);
 
   if (wasFeatureRemoved) {
     // Feature was removed
@@ -94,11 +96,11 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
   }
 
   // This feature was never there;
-  if (!prevFeature && !newFeature) {
+  if ((prevFeature === null || prevFeature === undefined) && (newFeature === null || newFeature === undefined)) {
     return {type: FeatureUpdateType.UNCHANGED};
   }
 
-  if (!prevFeature || !newFeature) {
+  if (prevFeature === null || prevFeature === undefined || newFeature === null || newFeature === undefined) {
     throw new Error('This should never happen');
   }
 

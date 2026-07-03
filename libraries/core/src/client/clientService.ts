@@ -167,7 +167,7 @@ export class ClientService {
     {prekeys, lastPrekey}: InitialPrekeys,
     useLegacyNotificationStream: boolean = true,
   ): Promise<RegisteredClient> {
-    if (!this.apiClient.context) {
+    if (this.apiClient.context === null || this.apiClient.context === undefined) {
       throw new Error('Context is not set.');
     }
 

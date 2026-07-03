@@ -100,12 +100,12 @@ const useAppMainState = create<AppMainState>((set, get) => ({
           ...state,
           rightSidebar: {
             ...state.rightSidebar,
-            entity: params?.entity || null,
+            entity: params?.entity ?? null,
             lastViewedMessageDetailsEntity,
-            highlightedUsers: params?.highlighted || [],
+            highlightedUsers: params?.highlighted ?? [],
             history: [...replacedNewState, panel],
-            showReactions: !!params?.showReactions,
-            isAddMode: !!params?.isAddMode,
+            showReactions: params?.showReactions === true,
+            isAddMode: params?.isAddMode === true,
           },
         };
       });

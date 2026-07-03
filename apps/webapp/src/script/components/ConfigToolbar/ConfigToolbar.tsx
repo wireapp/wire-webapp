@@ -109,7 +109,7 @@ export function ConfigToolbar() {
       const conversationState = container.resolve(ConversationState);
       const activeConversation = conversationState?.activeConversation();
 
-      if (!activeConversation) {
+      if (activeConversation === null || activeConversation === undefined) {
         if (isActive) {
           const MS_IN_SEC = 1000;
           timeoutId = window.setTimeout(sendMessage, messageDelaySec * MS_IN_SEC);
@@ -205,7 +205,7 @@ export function ConfigToolbar() {
     const entries = Object.entries(configObj);
 
     return entries.map(([key, value]) => {
-      const path = parentPath ? `${parentPath}.${key}` : key;
+      const path = parentPath.length > 0 ? `${parentPath}.${key}` : key;
       return (
         <div key={path} style={{marginBottom: '10px'}}>
           <label style={{display: 'block', fontWeight: 'bold'}}>{key.split('_').join(' ')}</label>

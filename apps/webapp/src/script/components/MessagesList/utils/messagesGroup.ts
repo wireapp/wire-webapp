@@ -45,7 +45,7 @@ function getMessageMarkerType(
   lastReadTimestamp: number,
   previousMessage?: Message,
 ): Marker['type'] | undefined {
-  if (!previousMessage || message.isCall()) {
+  if (previousMessage === null || previousMessage === undefined || message.isCall()) {
     return undefined;
   }
 
@@ -116,7 +116,7 @@ export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimest
 
     const marker = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
-    if (marker) {
+    if (marker !== undefined) {
       // if there is a marker to insert, we insert it before the current message
       acc.push({type: marker, timestamp: message.timestamp()});
     }
@@ -128,7 +128,8 @@ export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimest
 
     if (
       areContentMessages &&
-      lastGroupInfo &&
+      lastGroupInfo !== null &&
+      lastGroupInfo !== undefined &&
       lastGroupInfo.sender === message.from &&
       shouldGroupMessagesByTimestamp(
         lastGroupInfo.firstMessageTimestamp,

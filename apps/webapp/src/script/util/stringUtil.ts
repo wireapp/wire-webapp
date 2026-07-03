@@ -120,7 +120,7 @@ export const sortByPriority = (stringA: string = '', stringB: string = '', query
   stringB = stringB.toLowerCase();
   query = query.toLowerCase();
 
-  if (query) {
+  if (query.length > 0) {
     if (stringA.startsWith(query) && !stringB.startsWith(query)) {
       return -1;
     } else if (stringB.startsWith(query) && !stringA.startsWith(query)) {

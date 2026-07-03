@@ -39,7 +39,9 @@ export const parseMentions = (editor: LexicalEditor, textValue: string, mentions
     const mentionOption = mentions.find(user => user.name() === mention);
 
     position = mentionPosition;
-    return mentionOption ? [createMentionEntity(mentionOption, mentionPosition)] : [];
+    return mentionOption !== null && mentionOption !== undefined
+      ? [createMentionEntity(mentionOption, mentionPosition)]
+      : [];
   });
 };
 

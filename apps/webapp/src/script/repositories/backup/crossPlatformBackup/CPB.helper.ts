@@ -62,7 +62,7 @@ export const peekCrossPlatformData = async (
     throw new IncompatibleBackupError('Incompatible cross-platform backup');
   }
   if (result instanceof BackupPeekResult.Success) {
-    const isUserBackup = userId ? await isCreatedBySameUser(result, userId) : false;
+    const isUserBackup = userId !== null && userId !== undefined ? await isCreatedBySameUser(result, userId) : false;
 
     CPBLogger.log(`Backup version: ${result.version}`);
     return {

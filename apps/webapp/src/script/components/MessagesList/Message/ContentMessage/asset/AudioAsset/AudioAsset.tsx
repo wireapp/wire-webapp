@@ -89,7 +89,7 @@ export const AudioAsset = ({
   };
 
   useEffect(() => {
-    if (audioSrc && audioElement) {
+    if (audioSrc !== null && audioSrc !== undefined && audioElement !== null && audioElement !== undefined) {
       const playPromise = audioElement.play();
 
       playPromise?.catch((error: unknown) => {
@@ -129,23 +129,29 @@ export const AudioAsset = ({
                     isFocusable={isFocusable}
                   />
 
-                  {transferState !== AssetTransferState.UPLOADING && audioElement && (
-                    <>
-                      <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
-                        {formatSeconds(audioTime)}
-                      </span>
-                      {showLoudnessPreview ? (
-                        <AudioSeekBar audioElement={audioElement} asset={asset} disabled={!audioSrc} />
-                      ) : (
-                        <SeekBar
-                          dark
-                          mediaElement={audioElement}
-                          disabled={!audioSrc}
-                          data-uie-name="status-audio-seekbar"
-                        />
-                      )}
-                    </>
-                  )}
+                  {transferState !== AssetTransferState.UPLOADING &&
+                    audioElement !== null &&
+                    audioElement !== undefined && (
+                      <>
+                        <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
+                          {formatSeconds(audioTime)}
+                        </span>
+                        {showLoudnessPreview ? (
+                          <AudioSeekBar
+                            audioElement={audioElement}
+                            asset={asset}
+                            disabled={audioSrc === null || audioSrc === undefined}
+                          />
+                        ) : (
+                          <SeekBar
+                            dark
+                            mediaElement={audioElement}
+                            disabled={audioSrc === null || audioSrc === undefined}
+                            data-uie-name="status-audio-seekbar"
+                          />
+                        )}
+                      </>
+                    )}
                 </div>
               )}
             </>

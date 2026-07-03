@@ -40,9 +40,10 @@ const {BRAND_NAME: brandName} = Config.getConfig();
 const InviteModal = ({translate, selfUser, onClose}: InviteModalProps) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const userName = selfUser.username();
-  const inviteMessage = userName
-    ? translate('inviteMessage', {brandName: brandName, username: `@${userName}`})
-    : translate('inviteMessageNoEmail', {brandName});
+  const inviteMessage =
+    userName.length > 0
+      ? translate('inviteMessage', {brandName: brandName, username: `@${userName}`})
+      : translate('inviteMessageNoEmail', {brandName});
 
   const metaKey = Runtime.isMacOS() ? translate('inviteMetaKeyMac') : translate('inviteMetaKeyPc');
   const inviteHint = isInviteMessageSelected

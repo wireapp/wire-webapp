@@ -87,7 +87,7 @@ export function createSuggestions(name: string): string[] {
   const randomName = getRandomWordCombination();
   let suggestions: string[] = [];
 
-  if (normalizedName) {
+  if (normalizedName.length > 0) {
     suggestions.push(normalizedName);
     const normalizedNameVariations = generateHandleVariations(normalizedName);
     suggestions = suggestions.concat(normalizedNameVariations);

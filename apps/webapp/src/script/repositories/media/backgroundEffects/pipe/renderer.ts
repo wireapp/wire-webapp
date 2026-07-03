@@ -86,7 +86,7 @@ export class WebGLRenderer {
       antialias: false,
       desynchronized: true,
     });
-    if (!gl) {
+    if (gl === null || gl === undefined) {
       throw new Error('WebGL2 not supported');
     }
     this.gl = gl;
@@ -301,13 +301,13 @@ export class WebGLRenderer {
     const vs = this.createShader(this.gl.VERTEX_SHADER, vsSource);
     const fs = this.createShader(this.gl.FRAGMENT_SHADER, fsSource);
     const prog = this.gl.createProgram();
-    if (!prog) {
+    if (prog === null || prog === undefined) {
       throw new Error('Failed to create program');
     }
     this.gl.attachShader(prog, vs);
     this.gl.attachShader(prog, fs);
     this.gl.linkProgram(prog);
-    if (!this.gl.getProgramParameter(prog, this.gl.LINK_STATUS)) {
+    if (this.gl.getProgramParameter(prog, this.gl.LINK_STATUS) !== true) {
       this.logger.error('Program link error:', this.gl.getProgramInfoLog(prog));
       this.gl.deleteProgram(prog);
       throw new Error('Link fail');
@@ -321,12 +321,12 @@ export class WebGLRenderer {
 
   private createShader(type: number, source: string): WebGLShader {
     const shader = this.gl.createShader(type);
-    if (!shader) {
+    if (shader === null || shader === undefined) {
       throw new Error(`Failed to create shader type: ${type}`);
     }
     this.gl.shaderSource(shader, source);
     this.gl.compileShader(shader);
-    if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+    if (this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS) !== true) {
       this.logger.error('Shader compile error:', this.gl.getShaderInfoLog(shader));
       this.gl.deleteShader(shader);
       throw new Error('Failed to compile shader');
@@ -341,7 +341,7 @@ export class WebGLRenderer {
     a: number,
   ): {texture: WebGLTexture; color: readonly [number, number, number, number]} {
     const texture = this.gl.createTexture();
-    if (!texture) {
+    if (texture === null || texture === undefined) {
       throw new Error('Failed to create texture for color');
     }
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
@@ -359,24 +359,28 @@ export class WebGLRenderer {
     const gl = this.gl;
     let newIdentifier: string;
 
-    if (!newSource) {
+    if (newSource === null || newSource === undefined) {
       const [r, g, b, a] = WebGLRenderer.DEFAULT_BG_COLOR;
       newIdentifier = `color(${r},${g},${b},${a})`;
     } else {
       newIdentifier = newSource.url;
     }
 
-    if (newIdentifier === this.activeBackgroundSourceIdentifier && this.backgroundRenderInfo) {
+    if (
+      newIdentifier === this.activeBackgroundSourceIdentifier &&
+      this.backgroundRenderInfo !== null &&
+      this.backgroundRenderInfo !== undefined
+    ) {
       return;
     }
 
-    if (this.backgroundRenderInfo) {
+    if (this.backgroundRenderInfo !== null && this.backgroundRenderInfo !== undefined) {
       gl.deleteTexture(this.backgroundRenderInfo.texture);
       this.backgroundRenderInfo = null;
     }
     this.activeBackgroundSourceIdentifier = newIdentifier;
 
-    if (!newSource) {
+    if (newSource === null || newSource === undefined) {
       const [r, g, b, a] = WebGLRenderer.DEFAULT_BG_COLOR;
       const colorTexData = this.createColorTexture(r, g, b, a);
       this.backgroundRenderInfo = {
@@ -388,7 +392,7 @@ export class WebGLRenderer {
     } else if (newSource.type === 'image') {
       const {media, url} = newSource as {media: ImageBitmap; url: string};
       const texture = this.gl.createTexture();
-      if (!texture) {
+      if (texture === null || texture === undefined) {
         throw new Error('Failed to create texture object for image.');
       }
       this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
@@ -408,7 +412,7 @@ export class WebGLRenderer {
       };
     }
 
-    if (!this.backgroundRenderInfo) {
+    if (this.backgroundRenderInfo === null || this.backgroundRenderInfo === undefined) {
       this.logger.error('Critical: backgroundRenderInfo is null after processing new source. Setting default color.');
       const [r, g, b, a] = WebGLRenderer.DEFAULT_BG_COLOR;
       const colorTexData = this.createColorTexture(r, g, b, a);
@@ -444,7 +448,12 @@ export class WebGLRenderer {
     const width = this.canvas.width;
     const height = this.canvas.height;
 
-    if (!categoryTexture || !confidenceTexture) {
+    if (
+      categoryTexture === null ||
+      categoryTexture === undefined ||
+      confidenceTexture === null ||
+      confidenceTexture === undefined
+    ) {
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
       gl.useProgram(blendProgram);
 
@@ -511,7 +520,7 @@ export class WebGLRenderer {
     gl.uniform1f(stateUpdateLocations.smoothstepMax, options.smoothstepMax);
 
     // Set selfie model flag
-    gl.uniform1i(stateUpdateLocations.selfieModel, useSelfieModel ? 1 : 0);
+    gl.uniform1i(stateUpdateLocations.selfieModel, useSelfieModel === true ? 1 : 0);
 
     // Set vertex attributes
     gl.enableVertexAttribArray(stateUpdateLocations.position);
@@ -551,7 +560,7 @@ export class WebGLRenderer {
     gl.uniform1i(blendLocations.currentStateTexture, 1);
 
     // Bind Background Texture (Unit 2)
-    if (this.backgroundRenderInfo) {
+    if (this.backgroundRenderInfo !== null && this.backgroundRenderInfo !== undefined) {
       gl.activeTexture(gl.TEXTURE2);
       gl.bindTexture(gl.TEXTURE_2D, this.backgroundRenderInfo.texture);
 
@@ -607,12 +616,12 @@ export class WebGLRenderer {
     gl.deleteBuffer(this.positionBuffer);
     gl.deleteBuffer(this.texCoordBuffer);
     this.storedStateTextures.forEach(texture => {
-      if (texture) {
+      if (texture !== null && texture !== undefined) {
         gl.deleteTexture(texture);
       }
     });
     this.storedStateTextures = this.storedStateTextures.toSpliced(0, this.storedStateTextures.length);
-    if (this.backgroundRenderInfo?.texture) {
+    if (this.backgroundRenderInfo?.texture !== null && this.backgroundRenderInfo?.texture !== undefined) {
       gl.deleteTexture(this.backgroundRenderInfo.texture);
       this.backgroundRenderInfo = null;
     }

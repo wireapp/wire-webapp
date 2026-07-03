@@ -43,12 +43,12 @@ export class TeamEntity {
     let hasIcon = false;
 
     try {
-      hasIcon = !!this.icon && isValidAsset(this.icon);
+      hasIcon = this.icon.length !== 0 && isValidAsset(this.icon);
     } catch (error: unknown) {
       // ignore error
     }
 
-    if (hasIcon && teamDomain) {
+    if (hasIcon && teamDomain !== null && teamDomain !== undefined && teamDomain.length > 0) {
       return new AssetRemoteData({assetKey: this.icon, assetDomain: teamDomain});
     }
   }

@@ -37,7 +37,7 @@ export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUpl
   const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {files} = event.target;
 
-    if (!files) {
+    if (files === null || files === undefined) {
       return;
     }
 

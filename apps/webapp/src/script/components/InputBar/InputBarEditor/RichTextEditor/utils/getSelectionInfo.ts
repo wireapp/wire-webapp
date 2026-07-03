@@ -64,7 +64,7 @@ type SelectionInfo = {
 export function getSelectionInfo(triggers: string[]): SelectionInfo | undefined {
   const selection = $getSelection();
 
-  if (!selection || !$isRangeSelection(selection)) {
+  if (selection === null || selection === undefined || !$isRangeSelection(selection)) {
     return undefined;
   }
 

@@ -41,7 +41,7 @@ export const useElementSize = <Element extends HTMLElement = HTMLDivElement>(): 
     }
 
     const entry = entries[0];
-    if (entry) {
+    if (entry !== null && entry !== undefined) {
       const {width: newWidth, height: newHeight} = entry.contentRect;
       setWidth(newWidth);
       setHeight(newHeight);
@@ -49,7 +49,7 @@ export const useElementSize = <Element extends HTMLElement = HTMLDivElement>(): 
   }, []);
 
   useEffect(() => {
-    if (!ref.current) {
+    if (ref.current === null || ref.current === undefined) {
       return undefined;
     }
 

@@ -30,10 +30,10 @@ import {ObfuscationUtil} from '../../obfuscation';
 const logger = LogFactory.getLogger('@wireapp/api-client/shims/node/cookie');
 
 export const retrieveCookie = async <T>(response: AxiosResponse<T>): Promise<T> => {
-  if (response.headers?.['set-cookie']) {
+  if (response.headers?.['set-cookie'] !== null && response.headers?.['set-cookie'] !== undefined) {
     const cookies: ToughCookie[] = response.headers['set-cookie'].flatMap(cookieString => {
       const cookie = ToughCookie.parse(cookieString);
-      return cookie ? [cookie] : [];
+      return cookie !== null && cookie !== undefined ? [cookie] : [];
     });
     for (const cookie of cookies) {
       const cookieString = cookie.expires.toString();
@@ -56,7 +56,7 @@ export const sendRequestWithCookie = async <T>(
   config: AxiosRequestConfig,
 ): Promise<AxiosResponse<T>> => {
   const cookie = CookieStore.getCookie();
-  if (cookie && !cookie.isExpired) {
+  if (cookie !== null && cookie !== undefined && !cookie.isExpired) {
     config.headers = new AxiosHeaders(config.headers as AxiosHeaders);
     config.headers.set('Cookie', `zuid=${cookie.zuid}`);
     config.withCredentials = true;

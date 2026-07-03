@@ -72,7 +72,7 @@ export const CustomHistoryModal = () => {
       <FlexBox css={customHistorySharingFormContainerCss}>
         <Input
           wrapperCSS={customHistorySharingInputCss}
-          value={historySharingQuantity || ''}
+          value={historySharingQuantity !== 0 && !Number.isNaN(historySharingQuantity) ? historySharingQuantity : ''}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             setHistorySharingQuantity(Number(event.target.value))
           }
@@ -101,7 +101,7 @@ export const CustomHistoryModal = () => {
         </Button>
         <Button
           css={customHistorySharingButtonCss}
-          disabled={!historySharingQuantity || historySharingQuantity < 1}
+          disabled={historySharingQuantity === 0 || Number.isNaN(historySharingQuantity) || historySharingQuantity < 1}
           type="button"
           onClick={onSubmit}
           data-uie-name="do-submit"

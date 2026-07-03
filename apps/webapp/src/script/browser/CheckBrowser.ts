@@ -93,7 +93,7 @@ const supportsIndexDB = (): Promise<boolean> =>
 
     dbOpenRequest.onerror = event => {
       clearTimeout(connectionTimeout);
-      if (dbOpenRequest.error) {
+      if (dbOpenRequest.error !== null && dbOpenRequest.error !== undefined) {
         event.preventDefault();
         return resolve(false);
       }

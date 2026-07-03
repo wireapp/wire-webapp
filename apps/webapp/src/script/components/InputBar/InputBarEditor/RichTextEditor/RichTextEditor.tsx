@@ -112,7 +112,7 @@ export const RichTextEditor = ({
 
   const handleChange = (editorState: EditorState) => {
     editorState.read(() => {
-      if (!editorRef.current) {
+      if (editorRef.current === null || editorRef.current === undefined) {
         return;
       }
 
@@ -129,7 +129,7 @@ export const RichTextEditor = ({
     });
   };
 
-  const isEditing = !!editedMessage;
+  const isEditing = editedMessage !== null && editedMessage !== undefined;
 
   return (
     <LexicalComposer initialConfig={editorConfig}>

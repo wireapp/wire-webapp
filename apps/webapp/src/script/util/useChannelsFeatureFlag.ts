@@ -41,7 +41,7 @@ const useChannelFeature = () => {
   const {teamFeatures} = useKoSubscribableChildren(teamState as any, ['teamFeatures']) as {
     teamFeatures?: Record<string, any>;
   };
-  return teamFeatures ? teamFeatures[FEATURE_KEY.CHANNELS] : null;
+  return teamFeatures !== null && teamFeatures !== undefined ? teamFeatures[FEATURE_KEY.CHANNELS] : null;
 };
 
 const useCanCreateChannels = () => {

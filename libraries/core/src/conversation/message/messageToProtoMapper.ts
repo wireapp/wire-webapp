@@ -35,7 +35,7 @@ export class MessageToProtoMapper {
         urlOffset: linkPreview.urlOffset,
       });
 
-      if (linkPreview.tweet) {
+      if (linkPreview.tweet !== null && linkPreview.tweet !== undefined) {
         linkPreviewMessage.tweet = Tweet.create({
           author: linkPreview.tweet.author,
           username: linkPreview.tweet.username,
@@ -43,7 +43,7 @@ export class MessageToProtoMapper {
         linkPreviewMessage.metaData = 'tweet';
       }
 
-      if (linkPreview.imageUploaded) {
+      if (linkPreview.imageUploaded !== null && linkPreview.imageUploaded !== undefined) {
         const {asset, image} = linkPreview.imageUploaded;
 
         const imageMetadata = Asset.ImageMetaData.create({
@@ -103,7 +103,7 @@ export class MessageToProtoMapper {
       textMessage.mentions = mentions.map(mention => Mention.create(mention));
     }
 
-    if (quote) {
+    if (quote !== null && quote !== undefined) {
       textMessage.quote = Quote.create({
         quotedMessageId: quote.quotedMessageId,
         quotedMessageSha256: quote.quotedMessageSha256,

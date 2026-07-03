@@ -47,14 +47,15 @@ export const showLabelContextMenu = (
   };
 
   const conversationLabel = labelRepository.getConversationCustomLabel(conversation);
-  const labels = labelRepository.getLabels().filter(label => !!labelRepository.getLabelConversations(label).length);
-  const namedLabels: ContextMenuEntry[] = labels.length
-    ? labels.map(label => ({
-        click: () => labelRepository.addConversationToLabel(label, conversation),
-        isChecked: label === conversationLabel,
-        label: label.name,
-      }))
-    : [noLabels];
+  const labels = labelRepository.getLabels().filter(label => labelRepository.getLabelConversations(label).length !== 0);
+  const namedLabels: ContextMenuEntry[] =
+    labels.length !== 0 && !Number.isNaN(labels.length)
+      ? labels.map(label => ({
+          click: () => labelRepository.addConversationToLabel(label, conversation),
+          isChecked: label === conversationLabel,
+          label: label.name,
+        }))
+      : [noLabels];
 
   const entries: ContextMenuEntry[] = [newLabel, separator, ...namedLabels];
   showContextMenu({event, entries, identifier: 'conversation-label-context-menu'});

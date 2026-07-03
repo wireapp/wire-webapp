@@ -114,7 +114,7 @@ export class Call {
   }
 
   get hasWorkingAudioInput(): boolean {
-    return !!this.selfParticipant.audioStream();
+    return this.selfParticipant.audioStream() !== null && this.selfParticipant.audioStream() !== undefined;
   }
 
   getSelfParticipant(): Participant {
@@ -129,7 +129,7 @@ export class Call {
   removeAudio(audioId: string) {
     this.releaseStream(this.audios[audioId]?.stream);
     const audioElement = this.audios[audioId]?.audioElement;
-    if (audioElement) {
+    if (audioElement !== null && audioElement !== undefined) {
       audioElement.remove();
       audioElement.srcObject = null;
     }
@@ -143,7 +143,7 @@ export class Call {
   }
 
   private releaseStream(mediaStream?: MediaStream): void {
-    if (!mediaStream) {
+    if (mediaStream === null || mediaStream === undefined) {
       return;
     }
 
@@ -158,7 +158,7 @@ export class Call {
       if ((audio.audioElement?.srcObject as MediaStream)?.active) {
         return;
       }
-      if (audio.audioElement?.srcObject) {
+      if (audio.audioElement?.srcObject !== null && audio.audioElement?.srcObject !== undefined) {
         audio.audioElement.remove();
         audio.audioElement.srcObject = null;
       }
@@ -174,7 +174,7 @@ export class Call {
 
   updateAudioStreamsSink() {
     const outputDeviceId = mediaDevicesStore.getState().audio.output.selectedId;
-    if (!outputDeviceId) {
+    if (outputDeviceId.length === 0) {
       return;
     }
 
@@ -259,6 +259,6 @@ export class Call {
     if (!conversationName.includes('Sync - Calling')) {
       return false;
     }
-    return !!window.wire?.app?.debug?.isEnabledAvsRustSFT();
+    return window.wire?.app?.debug?.isEnabledAvsRustSFT() === true;
   }
 }

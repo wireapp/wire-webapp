@@ -47,14 +47,14 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
   } = useKoSubscribableChildren(conversation, ['readOnlyState', 'is1to1', 'participating_user_ets']);
 
   const user = is1to1 ? participatingUserEts[0] : null;
-  const {isBlocked: isUserBlocked} = useKoSubscribableChildren(user || userPlaceholder, ['isBlocked']);
+  const {isBlocked: isUserBlocked} = useKoSubscribableChildren(user ?? userPlaceholder, ['isBlocked']);
 
-  if (!user) {
+  if (user === null || user === undefined) {
     // This should never happen for 1:1 conversations
     return null;
   }
 
-  if (isUserBlocked) {
+  if (isUserBlocked === true) {
     return (
       <ReadOnlyConversationMessageBase>
         <span>{translate('conversationWithBlockedUser')}</span>

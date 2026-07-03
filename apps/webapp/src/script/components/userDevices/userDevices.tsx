@@ -91,7 +91,11 @@ export const UserDevices = ({
           }
         }
       } catch (error: unknown) {
-        logger.error(`Unable to retrieve clients for user '${user.id}': ${(error as Error).message || error}`);
+        logger.error(
+          `Unable to retrieve clients for user '${user.id}': ${
+            (error as Error).message.length > 0 ? (error as Error).message : error
+          }`,
+        );
       }
     })();
   }, [clientRepository, logger, user]);
@@ -118,7 +122,7 @@ export const UserDevices = ({
 
       {showDeviceList && deviceMode === FIND_MODE.NOT_FOUND && <NoDevicesFound {...{noPadding, user}} />}
 
-      {current.state === UserDevicesState.DEVICE_DETAILS && selectedClient && (
+      {current.state === UserDevicesState.DEVICE_DETAILS && selectedClient !== null && selectedClient !== undefined && (
         <DeviceDetails
           {...{
             getDeviceIdentity,

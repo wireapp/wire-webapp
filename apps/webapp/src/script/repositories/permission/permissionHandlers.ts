@@ -53,7 +53,7 @@ export const getPermissionStates = (permissionTypes: PermissionType[]): Permissi
 export const queryBrowserPermission = async (
   permissionType: PermissionType,
 ): Promise<BrowserPermissionStatus | null> => {
-  if (!navigator.permissions) {
+  if (navigator.permissions === null || navigator.permissions === undefined) {
     logger.debug('Permissions API not available');
     return null;
   }
@@ -75,7 +75,7 @@ export const setupPermissionListener = async (
   permissionType: PermissionType,
   onStateChange: (state: BrowserPermissionStatus) => void,
 ): Promise<PermissionStatus | null> => {
-  if (!navigator.permissions) {
+  if (navigator.permissions === null || navigator.permissions === undefined) {
     return null;
   }
 
@@ -101,7 +101,7 @@ export const setupPermissionListener = async (
 export const initializePermissions = async (
   permissions: PermissionType[] = Object.values(PermissionType),
 ): Promise<void> => {
-  if (!navigator.permissions) {
+  if (navigator.permissions === null || navigator.permissions === undefined) {
     logger.debug('Permissions API not available, keeping default states');
     return;
   }
@@ -110,7 +110,7 @@ export const initializePermissions = async (
     try {
       // Query initial state
       const initialState = await queryBrowserPermission(permissionType);
-      if (initialState) {
+      if (initialState !== null && initialState !== undefined) {
         setPermissionState(permissionType, initialState);
       }
 

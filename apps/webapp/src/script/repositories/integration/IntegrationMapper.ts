@@ -27,26 +27,26 @@ import {ServiceData, ServiceEntity} from './ServiceEntity';
 
 export const IntegrationMapper = {
   mapProviderFromObject: (providerData: ProviderData, providerEntity = new ProviderEntity()) => {
-    if (providerData) {
+    if (providerData !== null && providerData !== undefined) {
       const {description, email, id, name, url} = providerData;
 
-      if (id) {
+      if (id !== null && id !== undefined && id.length > 0) {
         providerEntity.id = id;
       }
 
-      if (description) {
+      if (description !== null && description !== undefined && description.length > 0) {
         providerEntity.description = description;
       }
 
-      if (email) {
+      if (email !== null && email !== undefined && email.length > 0) {
         providerEntity.email = email;
       }
 
-      if (name) {
+      if (name !== null && name !== undefined && name.length > 0) {
         providerEntity.name = name;
       }
 
-      if (url) {
+      if (url !== null && url !== undefined && url.length > 0) {
         providerEntity.url = url;
       }
     }
@@ -56,35 +56,40 @@ export const IntegrationMapper = {
 
   mapServiceFromObject: (serviceData: ServiceData, domain: string) => {
     const serviceEntity = new ServiceEntity();
-    if (serviceData) {
+    if (serviceData !== null && serviceData !== undefined) {
       const {assets, description, id, name, provider: providerId, summary, tags} = serviceData;
 
-      if (id) {
+      if (id !== null && id !== undefined && id.length > 0) {
         serviceEntity.id = id;
       }
 
-      if (assets?.length) {
+      if (
+        assets?.length !== null &&
+        assets?.length !== undefined &&
+        assets?.length !== 0 &&
+        !Number.isNaN(assets?.length)
+      ) {
         const mappedAssets = mapProfileAssets({domain, id: serviceEntity.id}, assets);
         updateUserEntityAssets(serviceEntity, mappedAssets);
       }
 
-      if (description) {
+      if (description !== null && description !== undefined && description.length > 0) {
         serviceEntity.description = description;
       }
 
-      if (name) {
+      if (name !== null && name !== undefined && name.length > 0) {
         serviceEntity.name(name);
       }
 
-      if (providerId) {
+      if (providerId !== null && providerId !== undefined && providerId.length > 0) {
         serviceEntity.providerId = providerId;
       }
 
-      if (summary) {
+      if (summary !== null && summary !== undefined && summary.length > 0) {
         serviceEntity.summary = summary;
       }
 
-      if (tags) {
+      if (tags !== null && tags !== undefined) {
         serviceEntity.tags = tags;
       }
     }
@@ -115,7 +120,7 @@ export const IntegrationMapper = {
 
   mapServicesFromArray: (servicesData: ServiceData[] = [], domain: string) => {
     return servicesData
-      .filter(serviceData => serviceData.enabled)
+      .filter(serviceData => serviceData.enabled === true)
       .map(serviceData => IntegrationMapper.mapServiceFromObject(serviceData, domain));
   },
 };

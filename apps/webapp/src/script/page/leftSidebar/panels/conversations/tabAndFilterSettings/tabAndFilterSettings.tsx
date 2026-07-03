@@ -94,14 +94,16 @@ export const TabAndFilterSettings = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!event.target) {
+      if (event.target === null || event.target === undefined) {
         return;
       }
 
       if (
-        dropdownRef.current &&
+        dropdownRef.current !== null &&
+        dropdownRef.current !== undefined &&
         !dropdownRef.current.contains(event.target as Node) &&
-        buttonRef.current &&
+        buttonRef.current !== null &&
+        buttonRef.current !== undefined &&
         !buttonRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
@@ -129,7 +131,7 @@ export const TabAndFilterSettings = () => {
 
   // Focus the item when focusedIndex changes
   useEffect(() => {
-    if (isOpen && itemRefs.current[focusedIndex]) {
+    if (isOpen && itemRefs.current[focusedIndex] !== null && itemRefs.current[focusedIndex] !== undefined) {
       itemRefs.current[focusedIndex]?.focus();
     }
   }, [isOpen, focusedIndex]);

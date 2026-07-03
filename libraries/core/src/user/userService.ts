@@ -41,7 +41,7 @@ export class UserService {
   }
 
   public async getUsers(userIds: QualifiedId[]): Promise<User[] | UsersResponse> {
-    if (!userIds.length) {
+    if (userIds.length === 0 || Number.isNaN(userIds.length)) {
       return [];
     }
     return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
