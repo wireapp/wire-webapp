@@ -20,7 +20,7 @@
 import {useCallback, useState} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {result, type Maybe, type Result} from 'true-myth';
+import {task, type Maybe, type Task} from 'true-myth';
 
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
@@ -56,8 +56,8 @@ type SubmitMeetingParams = {
   editingMeetingId: Maybe<QualifiedId>;
   qualifiedConversation: Maybe<QualifiedId>;
   originalSelectedUsers: User[];
-  scheduleMeeting: (formState: ScheduleMeetingFormState) => Promise<Result<MeetingSubmitSuccess, MeetingSubmitErrors>>;
-  updateMeeting: (params: UpdateMeetingParams) => Promise<Result<MeetingSubmitSuccess, MeetingSubmitErrors>>;
+  scheduleMeeting: (formState: ScheduleMeetingFormState) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 
 const submitMeeting = ({
@@ -68,13 +68,13 @@ const submitMeeting = ({
   originalSelectedUsers,
   scheduleMeeting,
   updateMeeting,
-}: SubmitMeetingParams): Promise<Result<MeetingSubmitSuccess, MeetingSubmitErrors>> => {
+}: SubmitMeetingParams): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
   if (mode === 'create') {
     return scheduleMeeting(formState);
   }
 
   if (editingMeetingId.isNothing) {
-    return Promise.resolve(result.err(meetingSubmitErrors.editMeetingIdMissing));
+    return task.reject(meetingSubmitErrors.editMeetingIdMissing);
   }
 
   return updateMeeting({

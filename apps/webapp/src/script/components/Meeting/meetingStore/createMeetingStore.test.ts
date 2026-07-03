@@ -91,13 +91,13 @@ describe('createMeetingStore', () => {
     expect(getMeetingsList).toHaveBeenCalledTimes(1);
     expect(store.getState()).toMatchObject({
       isLoading: false,
-      errorKey: undefined,
+      hasLoadError: false,
     });
     expect(store.getState().meetings).toHaveLength(1);
     expect(store.getState().meetings[0]?.title).toBe('Weekly sync');
   });
 
-  it('sets errorKey when loading meetings fails', async () => {
+  it('sets hasLoadError when loading meetings fails', async () => {
     const getMeetingsList = jest.fn().mockReturnValue(task.reject(new Error('network error')));
     const store = createMeetingStore(createDeps({getMeetingsList}));
 
@@ -107,7 +107,7 @@ describe('createMeetingStore', () => {
     expect(store.getState()).toMatchObject({
       meetings: [],
       isLoading: false,
-      errorKey: 'meetings.list.loadError',
+      hasLoadError: true,
     });
   });
 

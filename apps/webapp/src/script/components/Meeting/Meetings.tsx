@@ -31,7 +31,7 @@ const MeetingsContent = () => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const meetings = useMeetingStore(state => state.meetings);
   const isLoading = useMeetingStore(state => state.isLoading);
-  const errorKey = useMeetingStore(state => state.errorKey);
+  const hasLoadError = useMeetingStore(state => state.hasLoadError);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const MeetingsContent = () => {
     <>
       <MeetingHeader />
       <div css={contentStyles}>
-        <MeetingList meetings={meetings} isLoading={isLoading} errorKey={errorKey} />
+        <MeetingList meetings={meetings} isLoading={isLoading} hasLoadError={hasLoadError} />
       </div>
       <ScheduleMeetingModal />
     </>

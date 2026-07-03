@@ -17,10 +17,10 @@
  *
  */
 
-import {Result, result} from 'true-myth';
+import {task, type Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import {loadMeetingsList, type MeetingsListErrorKey} from 'Components/Meeting/loadMeetingsList';
+import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
 import {mapMeetingToScheduleFormState} from 'Components/Meeting/mapMeetingToScheduleFormState';
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
@@ -44,88 +44,57 @@ export type EditMeetingData = {
 export type MeetingStoreState = {
   meetings: Meeting[];
   isLoading: boolean;
-  errorKey: MeetingsListErrorKey | undefined;
+  hasLoadError: boolean;
   loadMeetings: () => Promise<void>;
-  scheduleMeeting: (formState: ScheduleMeetingFormState) => Promise<Result<MeetingSubmitSuccess, MeetingSubmitErrors>>;
-  updateMeeting: (params: UpdateMeetingParams) => Promise<Result<MeetingSubmitSuccess, MeetingSubmitErrors>>;
-  loadMeetingForEdit: (meeting: Meeting) => Promise<Result<EditMeetingData, MeetingSubmitErrors>>;
+  scheduleMeeting: (formState: ScheduleMeetingFormState) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  loadMeetingForEdit: (meeting: Meeting) => Task<EditMeetingData, MeetingSubmitErrors>;
 };
 
 export type MeetingStore = StoreApi<MeetingStoreState>;
 
-type MeetingStoreInitialState = Partial<Pick<MeetingStoreState, 'meetings' | 'isLoading' | 'errorKey'>>;
+type MeetingStoreInitialState = Partial<Pick<MeetingStoreState, 'meetings' | 'isLoading' | 'hasLoadError'>>;
 
-const refreshMeetingsAfterSubmit = async (
+const refreshMeetingsAfterSubmit = (
   loadMeetings: () => Promise<void>,
-  getErrorKey: () => MeetingsListErrorKey | undefined,
-): Promise<Result<void, MeetingSubmitErrors>> => {
-  await loadMeetings();
-
-  if (getErrorKey() !== undefined) {
-    return result.err(meetingSubmitErrors.refreshFailed);
-  }
-
-  return result.ok(undefined);
-};
+  getHasLoadError: () => boolean,
+): Task<void, MeetingSubmitErrors> =>
+  task
+    .tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings)
+    .andThen(() => (getHasLoadError() ? task.reject(meetingSubmitErrors.refreshFailed) : task.resolve(undefined)));
 
 export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: MeetingStoreInitialState): MeetingStore =>
   createStore<MeetingStoreState>((set, get) => ({
     meetings: initialState?.meetings ?? [],
     isLoading: initialState?.isLoading ?? false,
-    errorKey: initialState?.errorKey,
+    hasLoadError: initialState?.hasLoadError ?? false,
     loadMeetings: async () => {
-      set({isLoading: true, errorKey: undefined});
+      set({isLoading: true, hasLoadError: false});
 
       const listResult = await loadMeetingsList(deps.meetingsRepository);
 
-      set({meetings: listResult.meetings, errorKey: listResult.errorKey, isLoading: false});
+      set({meetings: listResult.meetings, hasLoadError: listResult.hasLoadError, isLoading: false});
     },
-    scheduleMeeting: async formState => {
-      const submitResult = await scheduleMeetingTask(formState, deps);
+    scheduleMeeting: formState =>
+      scheduleMeetingTask(formState, deps).andThen(submitSuccess =>
+        refreshMeetingsAfterSubmit(get().loadMeetings, () => get().hasLoadError).map(() => submitSuccess),
+      ),
+    updateMeeting: params =>
+      updateMeetingTask(params, deps).andThen(submitSuccess =>
+        refreshMeetingsAfterSubmit(get().loadMeetings, () => get().hasLoadError).map(() => submitSuccess),
+      ),
+    loadMeetingForEdit: meeting =>
+      deps.conversationRepository
+        .safeGetConversationById(meeting.qualified_conversation)
+        .mapRejected(() => meetingSubmitErrors.updateFailed)
+        .map(conversation => {
+          const selectedUsers = [...conversation.participating_user_ets()];
+          const formState = mapMeetingToScheduleFormState(meeting, selectedUsers);
 
-      if (submitResult.isErr) {
-        return result.err(submitResult.error);
-      }
-
-      const refreshResult = await refreshMeetingsAfterSubmit(get().loadMeetings, () => get().errorKey);
-
-      if (refreshResult.isErr) {
-        return result.err(refreshResult.error);
-      }
-
-      return result.ok(submitResult.value);
-    },
-    updateMeeting: async params => {
-      const submitResult = await updateMeetingTask(params, deps);
-
-      if (submitResult.isErr) {
-        return result.err(submitResult.error);
-      }
-
-      const refreshResult = await refreshMeetingsAfterSubmit(get().loadMeetings, () => get().errorKey);
-
-      if (refreshResult.isErr) {
-        return result.err(refreshResult.error);
-      }
-
-      return result.ok(submitResult.value);
-    },
-    loadMeetingForEdit: async meeting => {
-      const conversationResult = await deps.conversationRepository.safeGetConversationById(
-        meeting.qualified_conversation,
-      );
-
-      if (conversationResult.isErr) {
-        return result.err(meetingSubmitErrors.updateFailed);
-      }
-
-      const selectedUsers = [...conversationResult.value.participating_user_ets()];
-      const formState = mapMeetingToScheduleFormState(meeting, selectedUsers);
-
-      return result.ok({
-        formState,
-        qualifiedConversation: meeting.qualified_conversation,
-        originalSelectedUsers: selectedUsers,
-      });
-    },
+          return {
+            formState,
+            qualifiedConversation: meeting.qualified_conversation,
+            originalSelectedUsers: selectedUsers,
+          };
+        }),
   }));
