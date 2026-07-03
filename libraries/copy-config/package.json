@@ -17,7 +17,7 @@
     "axios": "1.18.1",
     "copy": "0.3.2",
     "cosmiconfig": "9.0.2",
-    "fs-extra": "11.3.5",
+    "fs-extra": "11.3.6",
     "jszip": "3.10.1",
     "logdown": "3.3.1",
     "rimraf": "6.1.3"
