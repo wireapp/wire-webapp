@@ -301,6 +301,9 @@ jobs:
           restore-keys: |
             lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
 
+      - name: Build libraries for lint import resolution
+        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
+
       - name: Lint (PR)
         if: ${{ github.event_name == 'pull_request' }}
         env:
