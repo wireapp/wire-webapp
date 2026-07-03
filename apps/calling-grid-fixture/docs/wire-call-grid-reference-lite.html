@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wire · Grid view prototype</title>
+  <style>
+    :root {
+      --gray-10: #FAFAFA;
+      --gray-40: #DCE0E3;
+      --gray-60: #9FA1A7;
+      --gray-90: #34373D;
+      /* camera-off tile bg */
+      --black: #000000;
+      --white: #FFFFFF;
+      --blue: #0667C8;
+      --blue-50: #E7F0FA;
+      --blue-border: #6AA4DE;
+      --red: #C20013;
+      --stage: #000000;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --tile-radius: 6px;
+      --gap: 8px;
+      --panel-bg: #ffffff;
+      --panel-line: #e7e9ee;
+      --ink: #1f232b;
+      --ink-dim: #6b7280;
+      --flip-ease: cubic-bezier(.2, .7, .2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--font);
+      background: #eceef2;
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      min-height: 100%;
+    }
+
+    /* ---------------- layout shell ---------------- */
+    .app {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .stage-wrap {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      min-width: 0;
+    }
+
+    /* ---------------- the call window ---------------- */
+    .window {
+      width: min(1100px, 100%);
+      aspect-ratio: 1100 / 760;
+      background: var(--gray-10);
+      border: 1px solid var(--gray-60);
+      border-radius: 12px;
+      box-shadow: 0 18px 50px -12px rgba(0, 0, 0, .40), 0 4px 8px rgba(0, 0, 0, .18);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .titlebar {
+      height: 30px;
+      flex: 0 0 auto;
+      background: #f3f4f6;
+      border-bottom: 1px solid #e3e5ea;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+    }
+
+    .lights {
+      display: flex;
+      gap: 8px;
+    }
+
+    .lights i {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .lights .r {
+      background: #ff5f57;
+    }
+
+    .lights .y {
+      background: #febc2e;
+    }
+
+    .lights .g {
+      background: #28c840;
+    }
+
+    .header {
+      flex: 0 0 auto;
+      height: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--gray-10);
+      border-bottom: 1px solid #eef0f3;
+    }
+
+    .header .conv {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111;
+    }
+
+    .header .time {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .5px;
+      color: #3a3f47;
+      margin-top: 1px;
+    }
+
+    /* ---------------- stage ---------------- */
+    .stage {
+      flex: 1 1 auto;
+      background: var(--stage);
+      padding: var(--gap);
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+      min-height: 0;
+      position: relative;
+    }
+
+    .row {
+      flex: 1 1 0;
+      display: flex;
+      gap: var(--gap);
+      min-height: 0;
+      justify-content: center;
+    }
+
+    .tile {
+      flex: 1 1 0;
+      min-width: 0;
+      position: relative;
+      border-radius: var(--tile-radius);
+      overflow: hidden;
+      background: var(--gray-90);
+      max-width: 640px;
+      will-change: transform;
+    }
+
+    /* active-speaker ring — drawn as an overlay ABOVE the video so a full-bleed
+     camera feed can't cover it; coupled with the blue pill via the same .speaking state */
+    .ring {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      box-shadow: inset 0 0 0 3px var(--blue), inset 0 0 0 6px var(--white);
+    }
+
+    .tile.speaking .ring {
+      opacity: 1;
+      animation: ringPulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes ringPulse {
+
+      0%,
+      100% {
+        box-shadow: inset 0 0 0 3px var(--blue), inset 0 0 0 6px var(--white);
+      }
+
+      50% {
+        box-shadow: inset 0 0 0 3px #3a8be0, inset 0 0 0 6px var(--white);
+      }
+    }
+
+    /* camera ON */
+    .feed {
+      position: absolute;
+      inset: 0;
+      background: #222;
+    }
+
+    .feed .cam {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .feed .mono {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(28px, 9vw, 120px);
+      font-weight: 700;
+      color: rgba(255, 255, 255, .10);
+      letter-spacing: 2px;
+      user-select: none;
+    }
+
+    .feed.grad::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(120% 90% at 30% 18%, rgba(255, 255, 255, .20), rgba(255, 255, 255, 0) 55%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, .28));
+    }
+
+    /* camera OFF */
+    .avatar-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar {
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* name pill */
+    .pill {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--black);
+      color: #fff;
+      font-size: 11px;
+      line-height: 12px;
+      font-weight: 500;
+      letter-spacing: .4px;
+      padding: 4px 6px;
+      border-radius: 3px;
+      max-width: calc(100% - 16px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    .tile.speaking .pill,
+    .lt-cell.speaking .pill {
+      background: var(--blue);
+    }
+
+    /* mute badge */
+    .mute {
+      position: absolute;
+      bottom: 6px;
+      left: 6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mute svg {
+      width: 14px;
+      height: 14px;
+      color: var(--red);
+    }
+
+    /* last tile internals */
+    .lasttile {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: transparent;
+      overflow: visible;
+    }
+
+    .lt-row {
+      flex: 1 1 0;
+      display: flex;
+      gap: 4px;
+      min-height: 0;
+    }
+
+    .lt-cell {
+      flex: 1 1 0;
+      min-width: 0;
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--gray-90);
+    }
+
+    .lt-cell .ring {
+      box-shadow: inset 0 0 0 2px var(--blue), inset 0 0 0 4px var(--white);
+    }
+
+    .lt-cell.speaking .ring {
+      opacity: 1;
+    }
+
+    .lt-cell .pill {
+      font-size: 10px;
+      padding: 3px 5px;
+      bottom: 4px;
+    }
+
+    .lt-cell .mute {
+      width: 18px;
+      height: 18px;
+      bottom: 4px;
+      left: 4px;
+    }
+
+    .lt-cell .mute svg {
+      width: 11px;
+      height: 11px;
+    }
+
+    .lt-cell .feed .mono {
+      font-size: clamp(16px, 4vw, 48px);
+    }
+
+    .overflow {
+      background: var(--gray-90);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+
+    .overflow:hover {
+      background: #3d4046;
+    }
+
+    .overflow .stack {
+      display: flex;
+    }
+
+    .overflow .stack .avatar {
+      border: 2px solid var(--gray-90);
+    }
+
+    .overflow .stack .avatar:not(:first-child) {
+      margin-left: -12px;
+    }
+
+    .overflow .more {
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .3px;
+    }
+
+    /* ---------------- in-call participant list (right of stage) ---------------- */
+    .stage-area {
+      flex: 1 1 auto;
+      display: flex;
+      min-height: 0;
+    }
+
+    .plist {
+      flex: 0 0 auto;
+      width: 300px;
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      background: #fff;
+      transition: max-width .3s var(--flip-ease), opacity .2s ease;
+    }
+
+    .window.list-open .plist {
+      max-width: 300px;
+      opacity: 1;
+    }
+
+    .plist-list {
+      width: 300px;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .plist-row {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px 0 12px;
+      border-bottom: 1px solid #f1f2f5;
+    }
+
+    .plist-row .av {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .plist-row .nm {
+      flex: 1 1 auto;
+      min-width: 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1d22;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .plist-row .icons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .li-ic {
+      width: 16px;
+      height: 16px;
+      color: #1d1f24;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .li-ic svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .li-ic.off {
+      color: #9aa1ab;
+    }
+
+    .li-ic.spk {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .li-ic.spk svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ---------------- control bar ---------------- */
+    .controlbar {
+      flex: 0 0 auto;
+      height: 56px;
+      background: var(--gray-10);
+      border-top: 1px solid #eef0f3;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 8px;
+    }
+
+    .cb-left,
+    .cb-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1 1 0;
+    }
+
+    .cb-right {
+      justify-content: flex-end;
+    }
+
+    .cb-center {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .cbtn {
+      height: 32px;
+      min-width: 40px;
+      padding: 0 10px;
+      border: 1px solid var(--gray-40);
+      background: #fff;
+      color: #1c1f24;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .cbtn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .cbtn.round {
+      border-radius: 100px;
+      height: 32px;
+      padding: 0 20px;
+    }
+
+    .cbtn.on {
+      background: var(--black);
+      color: #fff;
+      border-color: var(--black);
+    }
+
+    .cbtn.danger {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    .cbtn.accent {
+      background: var(--blue-50);
+      border-color: var(--blue-border);
+      color: var(--blue);
+    }
+
+    .cbtn:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+    }
+
+    .chev {
+      display: inline-flex;
+      flex-direction: column;
+      line-height: 0;
+      margin-left: 2px;
+    }
+
+    .chev svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    /* ---------------- operator panel ---------------- */
+    .panel {
+      flex: 0 0 360px;
+      width: 360px;
+      background: var(--panel-bg);
+      border-left: 1px solid var(--panel-line);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: width .3s var(--flip-ease), flex-basis .3s var(--flip-ease), opacity .22s ease;
+    }
+
+    .app.panel-hidden .panel {
+      flex-basis: 0;
+      width: 0;
+      opacity: 0;
+      pointer-events: none;
+      border-left-color: transparent;
+    }
+
+    .panel header {
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid var(--panel-line);
+      position: relative;
+    }
+
+    .panel header h1 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+
+    .panel header p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--ink-dim);
+      line-height: 1.45;
+    }
+
+    .panel .scroll {
+      overflow-y: auto;
+      padding: 14px 18px 28px;
+      min-width: 324px;
+    }
+
+    .group {
+      margin-bottom: 20px;
+    }
+
+    .group>.gh {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      color: var(--ink-dim);
+      font-weight: 700;
+      margin: 0 0 10px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .field label .val {
+      color: var(--blue);
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--ink-dim);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex: 0 0 auto;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch span {
+      position: absolute;
+      inset: 0;
+      background: #cfd4dc;
+      border-radius: 100px;
+      transition: .15s;
+      cursor: pointer;
+    }
+
+    .switch span::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 2px;
+      top: 2px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .15s;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+    }
+
+    .switch input:checked+span {
+      background: var(--blue);
+    }
+
+    .switch input:checked+span::before {
+      transform: translateX(18px);
+    }
+
+    .switch input:focus-visible+span {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+    }
+
+    .roster {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .pr {
+      border: 1px solid var(--panel-line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      background: #fcfcfd;
+    }
+
+    .pr .top {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .pr .av {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .pr .nm {
+      font-size: 13px;
+      font-weight: 600;
+      flex: 1 1 auto;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pr .self {
+      font-size: 10px;
+      color: var(--blue);
+      font-weight: 700;
+      border: 1px solid var(--blue-border);
+      background: var(--blue-50);
+      padding: 1px 5px;
+      border-radius: 6px;
+    }
+
+    .pr .status {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .2px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .pr .status.front {
+      background: #e8f7ee;
+      color: #137a3e;
+    }
+
+    .pr .status.last {
+      background: #f1f2f5;
+      color: #6b7280;
+    }
+
+    .pr .status.spk {
+      background: var(--blue-50);
+      color: var(--blue);
+    }
+
+    .pr .ctrls {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid var(--panel-line);
+      background: #fff;
+      color: #42474f;
+      border-radius: 8px;
+      padding: 4px 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .chip svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .chip[aria-pressed="true"] {
+      background: #eef4fc;
+      border-color: var(--blue-border);
+      color: var(--blue);
+    }
+
+    .chip.talk[aria-pressed="true"] {
+      background: #fdeef0;
+      border-color: #e7a3ab;
+      color: var(--red);
+    }
+
+    .chip:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+    }
+
+    .resbar {
+      height: 4px;
+      border-radius: 3px;
+      background: #e9ecf1;
+      overflow: hidden;
+    }
+
+    .resbar i {
+      display: block;
+      height: 100%;
+      background: var(--blue);
+      width: 0;
+      transition: width .12s linear;
+    }
+
+    .legend {
+      font-size: 11px;
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+
+    .legend b {
+      color: var(--ink);
+    }
+
+    /* sidebar toggle buttons */
+    .iconbtn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid var(--panel-line);
+      background: #fff;
+      color: #5b616b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .iconbtn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .iconbtn:hover {
+      background: #f3f4f6;
+    }
+
+    .iconbtn:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+    }
+
+    .panel-show {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 40;
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1px solid var(--panel-line);
+      background: #fff;
+      color: #2a2f37;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 4px 14px -4px rgba(0, 0, 0, .25);
+    }
+
+    .panel-show svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .app.panel-hidden~.panel-show,
+    .panel-show.show {
+      display: inline-flex;
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        flex-direction: column;
+      }
+
+      .panel {
+        flex: 1 1 auto;
+        max-width: none;
+        width: auto;
+        border-left: none;
+        border-top: 1px solid var(--panel-line);
+      }
+
+      .app.panel-hidden .panel {
+        flex-basis: 0;
+        height: 0;
+      }
+
+      .stage-wrap {
+        padding: 16px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tile.speaking .ring {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app" id="app">
+    <div class="stage-wrap">
+      <div class="window" id="window">
+        <div class="titlebar">
+          <div class="lights"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        </div>
+        <div class="header">
+          <div class="conv">Marketing Team</div>
+          <div class="time" id="clock">10:24</div>
+        </div>
+        <div class="stage-area">
+          <div class="stage" id="stage"></div>
+          <aside class="plist" id="plist">
+            <div class="plist-list" id="plist-list"></div>
+          </aside>
+        </div>
+        <div class="controlbar">
+          <div class="cb-left">
+            <button class="cbtn" title="Dock window" aria-label="Dock window" id="ic-dock"></button>
+          </div>
+          <div class="cb-center">
+            <button class="cbtn round" id="self-mic" title="Microphone"><span class="i"></span><span class="chev"
+                id="mic-chev"></span></button>
+            <button class="cbtn round on" id="self-cam" title="Camera"><span class="i"></span><span class="chev"
+                id="cam-chev"></span></button>
+            <button class="cbtn round" id="self-share" title="Share screen"><span class="i"></span></button>
+            <button class="cbtn round danger" id="hangup" title="Leave call"><span class="i"></span></button>
+          </div>
+          <div class="cb-right">
+            <button class="cbtn" id="ic-grid" title="Grid view (current)"></button>
+            <button class="cbtn" id="ic-people" title="Participants"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="panel" id="panel">
+      <header>
+        <button class="iconbtn" id="panel-hide" title="Hide controls" aria-label="Hide controls"></button>
+        <h1>Grid view prototype</h1>
+        <p>Tiles go to whoever is <b>in focus</b> — camera on and recently talking. Everyone else is collected into one
+          equal-sized <b>last tile</b>. Drive it below or let it simulate a conversation.</p>
+      </header>
+      <div class="scroll">
+        <div class="group">
+          <div class="gh">Call</div>
+          <div class="field">
+            <label>Participants <span class="val" id="count-val">16</span></label>
+            <input type="range" id="count" min="2" max="20" value="16" />
+          </div>
+          <div class="field">
+            <label>Tiles on screen (first page) <span class="val" id="cap-val">9</span></label>
+            <input type="range" id="cap" min="4" max="12" value="9" />
+            <div class="hint">Lower this (or raise participants) to push more people into the last tile and trigger its
+              “+N more” overflow.</div>
+          </div>
+          <div class="field toggle-row">
+            <span>Simulate conversation</span>
+            <label class="switch"><input type="checkbox" id="sim" checked /><span></span></label>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="gh">Timing logic</div>
+          <div class="field">
+            <label>Promotion delay <span class="val"><span id="talk-val">1.5</span>s</span></label>
+            <input type="range" id="talkth" min="0.5" max="4" step="0.1" value="1.5" />
+            <div class="hint">How long someone must talk continuously before they earn a front-page tile.</div>
+          </div>
+          <div class="field">
+            <label>Front-page hold <span class="val"><span id="res-val">12</span>s</span></label>
+            <input type="range" id="resth" min="3" max="30" step="1" value="12" />
+            <div class="hint">After being promoted, a speaker keeps their tile at least this long — prevents flicker.
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="gh">Participants</div>
+          <div class="roster" id="roster"></div>
+        </div>
+
+        <div class="group">
+          <div class="gh">Reading the tiles</div>
+          <div class="legend">
+            <b>Blue ring + blue label</b> — speaking now.<br />
+            <b>Mic badge</b> (bottom-left) — muted.<br />
+            <b>Grey tile + avatar</b> — camera off.<br />
+            <b>Green “On screen”</b> — own tile. <b>“Last tile”</b> — collected. <b>Blue “Speaker”</b> — holding a
+            flexible front-page tile.
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <button class="panel-show" id="panel-show" title="Show controls"></button>
+
+  <script>
+    /* ============================================================
+       Icons
+       ============================================================ */
+    const SVG = {
+      mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/></svg>',
+      micOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="3" x2="21" y2="21"/><path d="M15 9.34V5a3 3 0 0 0-5.94-.6"/><path d="M9 9v3a3 3 0 0 0 4.6 2.54"/><path d="M5 10v1a7 7 0 0 0 10.4 6.13"/><path d="M19 10v1a7 7 0 0 1-.11 1.23"/><line x1="12" y1="18" x2="12" y2="22"/></svg>',
+      video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
+      videoOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2"/><path d="M9 6h5a2 2 0 0 1 2 2v3l1 1 4-3v9"/><line x1="2" y1="2" x2="22" y2="22"/></svg>',
+      share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+      hangup: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85a.96.96 0 0 1-1.32-.02L.29 13.08a.96.96 0 0 1 0-1.36C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.72a.96.96 0 0 1 0 1.36l-2.57 2.42a.96.96 0 0 1-1.32.02 11.27 11.27 0 0 0-2.66-1.85.998.998 0 0 1-.56-.9v-3.1A15.6 15.6 0 0 0 12 9z"/></svg>',
+      grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+      people: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+      dock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/></svg>',
+      chevUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>',
+      chevRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+      sliders: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>'
+    };
+
+    /* ============================================================
+       People  (portraits from randomuser.me — free placeholder set;
+                graceful fallback to gradient + initials if unreachable)
+       ============================================================ */
+    const NAMES = [
+      ["You", 210, true, "men/32"],
+      ["Amara Okafor", 280, false, "women/44"],
+      ["Bjorn Lindqvist", 18, false, "men/75"],
+      ["Chen Wei", 150, false, "women/68"],
+      ["Daniela Rossi", 338, false, "women/12"],
+      ["Ewan Murray", 198, false, "men/4"],
+      ["Fatima Zahra", 48, false, "women/19"],
+      ["Goran Petrovic", 108, false, "men/53"],
+      ["Hana Kim", 318, false, "women/90"],
+      ["Idris Bello", 8, false, "men/64"],
+      ["Julia Novak", 250, false, "women/27"],
+      ["Kenji Tanaka", 170, false, "men/61"],
+      ["Leila Haddad", 32, false, "women/8"],
+      ["Mateo Alvarez", 92, false, "men/22"],
+      ["Nadia Petrova", 265, false, "women/65"],
+      ["Omar Haddad", 35, false, "men/40"],
+      ["Priya Sharma", 300, false, "women/33"],
+      ["Quentin Dubois", 205, false, "men/85"],
+      ["Rosa Mendez", 350, false, "women/50"],
+      ["Sven Eriksson", 215, false, "men/3"]
+    ];
+    const photoUrl = slug => `https://randomuser.me/api/portraits/${slug}.jpg`;
+
+    /* ── Set this to any image URL (or a data: URI) you have the rights to use,
+          and the "You" tile will use it for both the avatar and the camera feed.
+          Leave it empty ("") to keep the default placeholder portrait. ── */
+
+    function initials(name) {
+      if (name === "You") return "Y";
+      const p = name.split(" ");
+      return (p[0][0] + (p[1] ? p[1][0] : "")).toUpperCase();
+    }
+    function avatarGrad(h) { return `linear-gradient(135deg, hsl(${h} 55% 56%), hsl(${(h + 28) % 360} 58% 40%))`; }
+    function feedGrad(h) { return `linear-gradient(150deg, hsl(${h} 42% 40%), hsl(${(h + 330) % 360} 38% 22%))`; }
+
+    const DEFAULT_CAM = { 0: true, 1: true, 2: false, 3: true, 4: false, 5: true, 6: false, 7: true, 8: false, 9: false, 10: true, 11: false, 12: false, 13: false, 14: true, 15: false, 16: true, 17: false, 18: false, 19: true };
+    const DEFAULT_MIC = { 0: true, 1: true, 2: true, 3: false, 4: true, 5: true, 6: true, 7: true, 8: false, 9: true, 10: false, 11: true, 12: true, 13: true, 14: true, 15: true, 16: false, 17: true, 18: true, 19: false };
+
+    const people = NAMES.map((n, i) => ({
+      id: i, name: n[0], hue: n[1], isSelf: !!n[2], initials: initials(n[0]),
+      photo: photoUrl(n[3]), imgOk: false,
+      cameraOn: DEFAULT_CAM[i] ?? false,
+      micOn: DEFAULT_MIC[i] ?? true,
+      screenSharing: false, talking: false, talkingSince: null, promoted: false, reservedUntil: 0
+    }));
+    const byId = id => people.find(p => p.id === id);
+
+    /* preload portraits; flip to photo once each loads */
+    people.forEach(p => {
+      const im = new Image();
+      im.onload = () => { p.imgOk = true; lastSig = ""; rosterSig = ""; };
+      im.onerror = () => { p.imgOk = false; };
+      im.src = p.photo;
+    });
+
+    /* ============================================================
+       Config
+       ============================================================ */
+    const CONFIG = { count: 16, firstPageTileCount: 9, isTalking: 1500, reserve: 12000, sim: true };
+    const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let queue = [];
+    function active() { return people.slice(0, CONFIG.count); }
+    function byName(a, b) { return a.name.localeCompare(b.name); }
+
+    /* ============================================================
+       Promotion / reservation / fair-replacement engine
+       ============================================================ */
+    function tickPromotions(now) {
+      const act = active();
+      const actIds = new Set(act.map(p => p.id));
+      queue = queue.filter(id => actIds.has(id) && !byId(id).isSelf && !byId(id).screenSharing);
+      people.forEach(p => { if (!actIds.has(p.id)) { p.promoted = false; p.talking = false; p.talkingSince = null; } });
+
+      const screenShares = act.filter(p => p.screenSharing && !p.isSelf).length;
+      const availFlex = Math.max(0, CONFIG.firstPageTileCount - 1 - screenShares);
+
+      while (queue.length > availFlex) {
+        let idx = queue.findIndex(id => byId(id).reservedUntil <= now);
+        if (idx < 0) idx = 0;
+        const [rid] = queue.splice(idx, 1);
+        byId(rid).promoted = false;
+      }
+
+      for (const u of act) {
+        if (u.isSelf || u.screenSharing) { u.talkingSince = u.talking ? (u.talkingSince || now) : null; continue; }
+        if (!u.talking) { u.talkingSince = null; continue; }
+        if (u.talkingSince === null) u.talkingSince = now;
+        if (now - u.talkingSince < CONFIG.isTalking) continue;
+
+        if (u.promoted) {
+          u.reservedUntil = now + CONFIG.reserve;
+          queue = queue.filter(id => id !== u.id); queue.push(u.id);
+        } else if (queue.length < availFlex) {
+          u.promoted = true; u.reservedUntil = now + CONFIG.reserve; queue.push(u.id);
+        } else {
+          const vIdx = queue.findIndex(id => byId(id).reservedUntil <= now);
+          if (vIdx >= 0) {
+            const [vid] = queue.splice(vIdx, 1); byId(vid).promoted = false;
+            u.promoted = true; u.reservedUntil = now + CONFIG.reserve; queue.push(u.id);
+          }
+        }
+      }
+    }
+
+    /* ============================================================
+       Ordering / layout
+       ============================================================ */
+    function orderedList() {
+      const act = active();
+      const self = act.find(p => p.isSelf);
+      const others = act.filter(p => !p.isSelf);
+      const used = new Set();
+      const share = others.filter(p => p.screenSharing).sort(byName); share.forEach(p => used.add(p.id));
+      const flex = others.filter(p => !used.has(p.id) && p.promoted).sort(byName); flex.forEach(p => used.add(p.id));
+      const camOn = others.filter(p => !used.has(p.id) && p.cameraOn).sort(byName); camOn.forEach(p => used.add(p.id));
+      const camOff = others.filter(p => !used.has(p.id)).sort(byName);
+      return [self, ...share, ...flex, ...camOn, ...camOff].filter(Boolean);
+    }
+    function computeLayout() {
+      const order = orderedList();
+      const cap = CONFIG.firstPageTileCount;
+      if (order.length <= cap) return { individual: order, last: [] };
+      return { individual: order.slice(0, cap - 1), last: order.slice(cap - 1) };
+    }
+    /* balanced rows — used for the last tile's INTERNAL mini-layout (1, 2, 1+2, 2+2 …) */
+    function gridRows(n) {
+      if (n <= 1) return n === 1 ? [1] : [];
+      const cols = Math.ceil(Math.sqrt(n));
+      const rows = Math.ceil(n / cols);
+      const base = Math.floor(n / rows), extra = n % rows;
+      const out = [];
+      for (let i = 0; i < rows; i++) out.push(base + (i >= rows - extra ? 1 : 0));
+      return out;
+    }
+
+    /* uniform grid — every cell the SAME size; the last (partial) row is centered.
+       Used for the OUTER stage so all in-focus tiles AND the last tile match. */
+    function uniformGrid(n) {
+      if (n <= 0) return { cols: 1, rows: [] };
+      if (n === 1) return { cols: 1, rows: [1] };
+      const cols = Math.ceil(Math.sqrt(n));
+      const rows = [];
+      let rem = n;
+      while (rem > 0) { const c = Math.min(cols, rem); rows.push(c); rem -= c; }
+      return { cols, rows };
+    }
+
+    /* ============================================================
+       Tile inner markup
+       ============================================================ */
+    function cellInner(p, mini) {
+      let html;
+      if (p.cameraOn) {
+        html = p.imgOk
+          ? `<div class="feed"><img class="cam" src="${p.photo}" alt=""></div>`
+          : `<div class="feed grad" style="background:${feedGrad(p.hue)}"><div class="mono">${p.initials}</div></div>`;
+      } else {
+        const sz = mini ? 46 : 84;
+        html = p.imgOk
+          ? `<div class="avatar-wrap"><div class="avatar" style="width:${sz}px;height:${sz}px;background-image:url('${p.photo}')"></div></div>`
+          : `<div class="avatar-wrap"><div class="avatar" style="width:${sz}px;height:${sz}px;font-size:${sz * 0.4}px;background:${avatarGrad(p.hue)}">${p.initials}</div></div>`;
+      }
+      const ring = `<div class="ring"></div>`;
+      const mute = p.micOn ? "" : `<div class="mute">${SVG.micOff}</div>`;
+      const pill = `<div class="pill">${p.name}</div>`;
+      return html + ring + mute + pill;
+    }
+    function lastInner(members) {
+      const K = members.length;
+      const cells = K <= 6 ? K : 6;
+      const rows = gridRows(cells);
+      const overflow = K > 6;
+      const shown = overflow ? 5 : K;
+      let cellEls = [];
+      for (let i = 0; i < shown; i++) {
+        const p = members[i];
+        cellEls.push(`<div class="lt-cell${p.talking ? ' speaking' : ''}">${cellInner(p, true)}</div>`);
+      }
+      if (overflow) {
+        const hidden = members.slice(5);
+        const stack = hidden.slice(0, 3).map(p => p.imgOk
+          ? `<div class="avatar" style="width:30px;height:30px;background-image:url('${p.photo}')"></div>`
+          : `<div class="avatar" style="width:30px;height:30px;font-size:12px;background:${avatarGrad(p.hue)}">${p.initials}</div>`).join("");
+        cellEls.push(`<div class="lt-cell overflow"><div class="stack">${stack}</div><div class="more">+${hidden.length} more</div></div>`);
+      }
+      let idx = 0, rowEls = [];
+      for (const c of rows) { rowEls.push(`<div class="lt-row">${cellEls.slice(idx, idx + c).join("")}</div>`); idx += c; }
+      return rowEls.join("");
+    }
+
+    /* ============================================================
+       FLIP rendering — persistent nodes keyed by participant
+       ============================================================ */
+    const stageEl = document.getElementById('stage');
+    const tileNodes = new Map();          // key -> element  ('p<id>' or 'last')
+    let lastSig = "";
+
+    function structSig(p) { return (p.cameraOn ? '1' : '0') + (p.micOn ? '1' : '0') + (p.imgOk ? '1' : '0'); }
+    function tileSig(p) { return structSig(p) + (p.talking ? '1' : '0'); }
+
+    function paintIndividual(el, p) {
+      const struct = structSig(p);
+      if (el._struct !== struct || el._key !== ('p' + p.id)) {
+        el.innerHTML = cellInner(p, false);   // rebuild only when camera/mic change → no needless <img> reloads
+        el._struct = struct;
+      }
+      el.className = 'tile' + (p.talking ? ' speaking' : '');
+      el._sig = tileSig(p);
+    }
+    function paintLast(el, members) {
+      el.className = 'tile lasttile';
+      el.innerHTML = lastInner(members);
+    }
+
+    function layoutSignature(layout) {
+      const part = p => `${p.id}:${tileSig(p)}`;
+      return JSON.stringify({ ind: layout.individual.map(part), last: layout.last.map(part), cap: CONFIG.firstPageTileCount });
+    }
+
+    function renderStage() {
+      const layout = computeLayout();
+      const sig = layoutSignature(layout);
+      if (sig === lastSig) return;
+      lastSig = sig;
+
+      // target tiles
+      const targets = layout.individual.map(p => ({ key: 'p' + p.id, type: 'p', p }));
+      if (layout.last.length) targets.push({ key: 'last', type: 'last', members: layout.last });
+      const targetKeys = new Set(targets.map(t => t.key));
+
+      // FIRST — measure current positions
+      const first = new Map();
+      tileNodes.forEach((el, key) => { if (el.isConnected) first.set(key, el.getBoundingClientRect()); });
+
+      // ensure/refresh nodes
+      const entering = new Set();
+      targets.forEach(t => {
+        let el = tileNodes.get(t.key);
+        if (!el) { el = document.createElement('div'); tileNodes.set(t.key, el); entering.add(t.key); el._key = t.key; }
+        if (t.type === 'p') {
+          if (el._sig !== tileSig(t.p) || entering.has(t.key)) paintIndividual(el, t.p);
+          el._key = t.key;
+        } else {
+          const ms = 'last:' + t.members.map(m => m.id + tileSig(m)).join(',');
+          if (el._sig !== ms || entering.has(t.key)) { paintLast(el, t.members); el._sig = ms; }
+        }
+      });
+
+      // rebuild row structure (keep any in-flight fading nodes that are absolutely positioned)
+      [...stageEl.children].forEach(ch => { if (ch.classList.contains('row')) ch.remove(); });
+      const { cols, rows } = uniformGrid(targets.length);
+      const basis = `calc((100% - ${(cols - 1) * 8}px) / ${cols})`; // equal cell width regardless of tiles-in-row
+      let idx = 0;
+      for (const c of rows) {
+        const row = document.createElement('div'); row.className = 'row';
+        for (let i = 0; i < c; i++) {
+          const t = targets[idx++]; if (!t) break;
+          const el = tileNodes.get(t.key);
+          el.style.flex = `0 0 ${basis}`;   // fixed size → partial last row stays centered, tiles never widen
+          row.appendChild(el);
+        }
+        stageEl.appendChild(row);
+      }
+
+      // removed nodes — fade them out in place
+      const stageRect = stageEl.getBoundingClientRect();
+      [...tileNodes.keys()].forEach(key => {
+        if (targetKeys.has(key)) return;
+        const el = tileNodes.get(key);
+        const a = first.get(key);
+        tileNodes.delete(key);
+        if (a && !REDUCED) {
+          el.style.position = 'absolute'; el.style.margin = '0';
+          el.style.left = (a.left - stageRect.left) + 'px'; el.style.top = (a.top - stageRect.top) + 'px';
+          el.style.width = a.width + 'px'; el.style.height = a.height + 'px';
+          el.style.transition = 'none'; el.style.transform = ''; el.style.opacity = '1';
+          stageEl.appendChild(el);
+          requestAnimationFrame(() => {
+            el.style.transition = 'opacity .2s ease, transform .24s var(--flip-ease)';
+            el.style.opacity = '0'; el.style.transform = 'scale(.94)';
+          });
+          setTimeout(() => el.remove(), 300);
+        } else { el.remove(); }
+      });
+
+      if (REDUCED) return; // no motion
+
+      // LAST — measure new positions
+      const lastR = new Map();
+      targets.forEach(t => { lastR.set(t.key, tileNodes.get(t.key).getBoundingClientRect()); });
+
+      // INVERT + PLAY
+      targets.forEach(t => {
+        const el = tileNodes.get(t.key);
+        const a = first.get(t.key), b = lastR.get(t.key);
+        if (a && b) {
+          const dx = a.left - b.left, dy = a.top - b.top, sx = b.width ? a.width / b.width : 1, sy = b.height ? a.height / b.height : 1;
+          if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5 || Math.abs(sx - 1) > 0.01 || Math.abs(sy - 1) > 0.01) {
+            el.style.transformOrigin = 'top left';
+            el.style.transition = 'none';
+            el.style.transform = `translate(${dx}px,${dy}px) scale(${sx},${sy})`;
+            el.getBoundingClientRect(); // reflow
+            requestAnimationFrame(() => { el.style.transition = 'transform .28s var(--flip-ease)'; el.style.transform = ''; });
+          }
+        } else if (entering.has(t.key)) {
+          el.style.transition = 'none'; el.style.opacity = '0'; el.style.transform = 'scale(.965)';
+          el.getBoundingClientRect();
+          requestAnimationFrame(() => {
+            el.style.transition = 'opacity .24s ease, transform .28s var(--flip-ease)';
+            el.style.opacity = '1'; el.style.transform = '';
+          });
+        }
+      });
+    }
+
+    /* ============================================================
+       Roster
+       ============================================================ */
+    const rosterEl = document.getElementById('roster');
+    let rosterSig = "";
+    function rosterStatus(p, layout) {
+      if (layout.individual.includes(p)) {
+        return p.promoted ? `<span class="status spk">Speaker</span>` : `<span class="status front">On screen</span>`;
+      }
+      return `<span class="status last">Last tile</span>`;
+    }
+    function renderRoster() {
+      const layout = computeLayout();
+      const act = active();
+      const sig = act.map(p => `${p.id}${tileSig(p)}${p.screenSharing ? 1 : 0}${p.promoted ? 1 : 0}${p.imgOk ? 1 : 0}${layout.individual.includes(p) ? 'F' : 'L'}`).join("|");
+      if (sig === rosterSig) return;
+      rosterSig = sig;
+      rosterEl.innerHTML = act.map(p => {
+        const avStyle = p.imgOk ? `background-image:url('${p.photo}')` : `background:${avatarGrad(p.hue)}`;
+        const avText = p.imgOk ? '' : p.initials;
+        return `
+    <div class="pr" data-id="${p.id}">
+      <div class="top">
+        <div class="av" style="${avStyle}">${avText}</div>
+        <div class="nm">${p.name}</div>
+        ${p.isSelf ? '<span class="self">YOU</span>' : ''}
+        ${rosterStatus(p, layout)}
+      </div>
+      <div class="resbar" data-res="${p.id}"><i></i></div>
+      <div class="ctrls">
+        <button class="chip" data-act="cam" aria-pressed="${p.cameraOn ? 'true' : 'false'}">${p.cameraOn ? SVG.video : SVG.videoOff}${p.cameraOn ? 'Camera' : 'Cam off'}</button>
+        <button class="chip" data-act="mic" aria-pressed="${p.micOn ? 'false' : 'true'}">${p.micOn ? SVG.mic : SVG.micOff}${p.micOn ? 'Mic on' : 'Muted'}</button>
+        <button class="chip" data-act="share" aria-pressed="${p.screenSharing ? 'true' : 'false'}">${SVG.share}Share</button>
+        ${p.isSelf ? '' : `<button class="chip talk" data-act="talk" aria-pressed="${p.talking ? 'true' : 'false'}">${SVG.mic}${p.talking ? 'Talking…' : 'Talk'}</button>`}
+      </div>
+    </div>`;
+      }).join("");
+    }
+
+    /* ---------------- in-call participant list (opens from the overflow tile) ---------------- */
+    const plistList = document.getElementById('plist-list');
+    const windowEl = document.getElementById('window');
+    let listOpen = false;
+    let listSig = "";
+
+    function listRow(p) {
+      const avStyle = p.imgOk ? `background-image:url('${p.photo}')` : `background:${avatarGrad(p.hue)}`;
+      const avText = p.imgOk ? '' : p.initials;
+      const cam = p.cameraOn ? `<span class="li-ic">${SVG.video}</span>` : '';
+      let mic;
+      if (!p.micOn) mic = `<span class="li-ic off">${SVG.micOff}</span>`;
+      else if (p.talking) mic = `<span class="li-ic spk">${SVG.mic}</span>`;
+      else mic = `<span class="li-ic">${SVG.mic}</span>`;
+      return `<div class="plist-row">
+    <div class="av" style="${avStyle}">${avText}</div>
+    <div class="nm">${p.name}${p.isSelf ? ' (you)' : ''}</div>
+    <div class="icons">${cam}${mic}</div>
+  </div>`;
+    }
+    function listOrder() {
+      const act = active();
+      const self = act.find(p => p.isSelf);
+      return [self, ...act.filter(p => !p.isSelf).sort(byName)].filter(Boolean);
+    }
+    function renderList() {
+      if (!listOpen) return;
+      const ordered = listOrder();
+      const sig = ordered.map(p => `${p.id}${p.cameraOn ? 1 : 0}${p.micOn ? 1 : 0}${p.talking ? 1 : 0}${p.imgOk ? 1 : 0}`).join("|");
+      if (sig === listSig) return;
+      listSig = sig;
+      plistList.innerHTML = ordered.map(listRow).join("");
+    }
+    function setList(open) {
+      listOpen = open;
+      windowEl.classList.toggle('list-open', open);
+      document.getElementById('ic-people').classList.toggle('accent', open);
+      if (open) { listSig = ""; renderList(); }
+    }
+
+    function updateResBars(now) {
+      document.querySelectorAll('[data-res]').forEach(el => {
+        const p = byId(+el.getAttribute('data-res'));
+        const bar = el.firstElementChild;
+        if (p && p.promoted && p.reservedUntil > now) {
+          el.style.opacity = 1;
+          bar.style.width = (Math.max(0, Math.min(1, (p.reservedUntil - now) / CONFIG.reserve)) * 100) + "%";
+        } else { el.style.opacity = .25; bar.style.width = "0%"; }
+      });
+    }
+
+    /* ============================================================
+       Conversation simulation
+       ============================================================ */
+    let speakers = [];
+    let nextSpeakTime = 0;
+    function simulate(now) {
+      if (!CONFIG.sim) return;
+      speakers = speakers.filter(s => {
+        if (now >= s.until) { const p = byId(s.id); if (p) p.talking = false; return false; }
+        return true;
+      });
+      if (now >= nextSpeakTime) {
+        nextSpeakTime = now + 700 + Math.random() * 1600;
+        const candidates = active().filter(p => !p.isSelf && !p.talking && p.micOn);
+        if (candidates.length && speakers.length < 3 && Math.random() < 0.8) {
+          const p = candidates[Math.floor(Math.random() * candidates.length)];
+          p.talking = true;
+          speakers.push({ id: p.id, until: now + 2200 + Math.random() * 6000 });
+        }
+      }
+    }
+
+    /* ============================================================
+       Main loop
+       ============================================================ */
+    function loop() {
+      const now = performance.now();
+      simulate(now);
+      tickPromotions(now);
+      renderStage();
+      renderRoster();
+      renderList();
+      updateResBars(now);
+      requestAnimationFrame(loop);
+    }
+    function tickClock() {
+      const d = new Date();
+      document.getElementById('clock').textContent = String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
+    }
+    setInterval(tickClock, 10000); tickClock();
+
+    /* ============================================================
+       Controls
+       ============================================================ */
+    function refreshSelfBar() {
+      const self = byId(0);
+      const micBtn = document.getElementById('self-mic'), camBtn = document.getElementById('self-cam'), shBtn = document.getElementById('self-share');
+      micBtn.querySelector('.i').innerHTML = self.micOn ? SVG.mic : SVG.micOff;
+      micBtn.classList.toggle('danger', !self.micOn);
+      camBtn.querySelector('.i').innerHTML = self.cameraOn ? SVG.video : SVG.videoOff;
+      camBtn.classList.toggle('on', self.cameraOn);
+      shBtn.querySelector('.i').innerHTML = SVG.share;
+      shBtn.classList.toggle('on', self.screenSharing);
+    }
+    document.getElementById('mic-chev').innerHTML = SVG.chevUp;
+    document.getElementById('cam-chev').innerHTML = SVG.chevUp;
+    document.getElementById('ic-dock').innerHTML = SVG.dock;
+    document.getElementById('hangup').querySelector('.i').innerHTML = SVG.hangup;
+    document.getElementById('ic-grid').innerHTML = SVG.grid;
+    document.getElementById('ic-people').innerHTML = SVG.people;
+    document.getElementById('panel-hide').innerHTML = SVG.chevRight;
+    document.getElementById('panel-show').innerHTML = SVG.sliders + 'Controls';
+
+    const bind = (id, fn) => document.getElementById(id).addEventListener('input', fn);
+    bind('count', e => {
+      CONFIG.count = +e.target.value; document.getElementById('count-val').textContent = CONFIG.count;
+      document.getElementById('cap').max = Math.min(12, Math.max(4, CONFIG.count)); rosterSig = "";
+    });
+    bind('cap', e => { CONFIG.firstPageTileCount = +e.target.value; document.getElementById('cap-val').textContent = CONFIG.firstPageTileCount; });
+    bind('talkth', e => { CONFIG.isTalking = +e.target.value * 1000; document.getElementById('talk-val').textContent = (+e.target.value).toFixed(1); });
+    bind('resth', e => { CONFIG.reserve = +e.target.value * 1000; document.getElementById('res-val').textContent = e.target.value; });
+    document.getElementById('sim').addEventListener('change', e => {
+      CONFIG.sim = e.target.checked;
+      if (!CONFIG.sim) { speakers.forEach(s => { const p = byId(s.id); if (p) p.talking = false; }); speakers = []; }
+    });
+
+    document.getElementById('self-mic').addEventListener('click', () => { const s = byId(0); s.micOn = !s.micOn; refreshSelfBar(); rosterSig = ""; });
+    document.getElementById('self-cam').addEventListener('click', () => { const s = byId(0); s.cameraOn = !s.cameraOn; refreshSelfBar(); rosterSig = ""; });
+    document.getElementById('self-share').addEventListener('click', () => { const s = byId(0); s.screenSharing = !s.screenSharing; refreshSelfBar(); rosterSig = ""; });
+    document.getElementById('hangup').addEventListener('click', () => { document.getElementById('hangup').animate([{ transform: 'scale(1)' }, { transform: 'scale(.9)' }, { transform: 'scale(1)' }], { duration: 180 }); });
+
+    /* participant list: open by clicking the "+N more" overflow tile, toggle/close with the participants button */
+    document.getElementById('ic-people').addEventListener('click', () => setList(!listOpen));
+    stageEl.addEventListener('click', e => { if (e.target.closest('.overflow')) setList(true); });
+
+    /* sidebar show/hide */
+    const appEl = document.getElementById('app');
+    const showBtn = document.getElementById('panel-show');
+    function setPanel(hidden) {
+      appEl.classList.toggle('panel-hidden', hidden);
+      showBtn.classList.toggle('show', hidden);
+    }
+    document.getElementById('panel-hide').addEventListener('click', () => setPanel(true));
+    showBtn.addEventListener('click', () => setPanel(false));
+
+    /* roster chips */
+    rosterEl.addEventListener('click', e => {
+      const btn = e.target.closest('.chip'); if (!btn) return;
+      const p = byId(+btn.closest('.pr').getAttribute('data-id')); if (!p) return;
+      const act = btn.getAttribute('data-act');
+      if (act === 'cam') p.cameraOn = !p.cameraOn;
+      else if (act === 'mic') { p.micOn = !p.micOn; if (!p.micOn) p.talking = false; }
+      else if (act === 'share') p.screenSharing = !p.screenSharing;
+      else if (act === 'talk') { p.talking = !p.talking; if (p.talking) p.micOn = true; }
+      if (p.isSelf) refreshSelfBar();
+      rosterSig = "";
+    });
+
+    refreshSelfBar();
+    requestAnimationFrame(loop);
+  </script>
+</body>
+
+</html>

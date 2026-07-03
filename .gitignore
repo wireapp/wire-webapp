@@ -35,6 +35,7 @@ yalc.lock
 /blob-report/
 /playwright/.cache/
 /test/e2e_tests/.env
+.playwright-mcp
 
 # Nx
 .nx/
@@ -45,3 +46,4 @@ lib/
 storybook-static/
 
 plans/
+apps/calling-grid-fixture/tmp

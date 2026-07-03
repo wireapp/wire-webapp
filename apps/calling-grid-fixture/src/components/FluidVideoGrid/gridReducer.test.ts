@@ -195,61 +195,58 @@ describe('UPDATE_PARTICIPANT — tier upgrade', () => {
     expect(fullTiles(upgraded).map(t => t.participant.id)).toContain('lazy');
   });
 
-  it('upgrading to active-camera with higher now puts the upgraded participant before the older one', () => {
-    // a1 was added with now=0 (lower activatedAt); p1 upgrades with now=999 (higher activatedAt)
-    // → p1 should get lower slot than a1 (more recently active = higher priority)
+  it('upgrading a full-tile participant to active-camera does not displace the existing full-tile holder', () => {
+    // Both a1 and p1 have full tiles (large container — no eviction needed)
+    // p1 upgrades to active-camera; a1 already has a seat and should keep it
     const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),  // activatedAt = 0
+      makeParticipant('a1', 'active-camera'),
       makeParticipant('p1', 'passive-no-camera'),
     ], 0);
+    const slotA1 = state.slotMap['a1'];
     const upgraded = reducer(state, {
       type: 'UPDATE_PARTICIPANT',
       id: 'p1',
       changes: {tier: 'active-camera'},
       now: 999,
     });
-    // p1 (activatedAt=999) should have lower slot than a1 (activatedAt=0)
-    expect(upgraded.slotMap['p1']).toBeLessThan(upgraded.slotMap['a1']);
+    // a1 already has a full tile — no eviction needed — its slot should not change
+    expect(upgraded.slotMap['a1']).toBe(slotA1);
   });
 });
 
 // ── UPDATE_PARTICIPANT — tier downgrade ────────────────────────────────────────
 
 describe('UPDATE_PARTICIPANT — tier downgrade', () => {
-  it('screen-sharing→passive-no-camera: no longer gets a priority slot', () => {
+  it('tier downgrade does not move participant from their full tile when no capacity pressure', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('screener', 'screen-sharing'),
       makeParticipant('cam', 'active-camera'),
     ]);
+    const slotBefore = state.slotMap['screener'];
     const next = reducer(state, {
       type: 'UPDATE_PARTICIPANT',
       id: 'screener',
       changes: {tier: 'passive-no-camera'},
     });
-    // cam (active-camera) now has higher priority than screener (passive-no-camera)
-    expect(next.slotMap['cam']).toBeLessThan(next.slotMap['screener']);
+    // Both participants still have full tiles — screener's seat should not change
+    expect(fullTiles(next).map(t => t.participant.id)).toContain('screener');
+    expect(next.slotMap['screener']).toBe(slotBefore);
   });
 
-  it('downgrading a participant to passive moves it behind active-tier participants in subtiles', () => {
-    // smallContainer capacity=3; 4 participants trigger fractional (2 full + 2 subtile)
-    const state = addAllSmall([
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('a2', 'active-camera'),
-      makeParticipant('a3', 'active-camera'),
-      makeParticipant('a4', 'active-camera'),
-    ]);
-    // a1,a2 in full tiles; a3,a4 in subtiles (all same activatedAt=0, stable order)
-    expect(subtileIds(state)).toEqual(['a3', 'a4']);
-
-    // Downgrade a3 to passive-no-camera → a3 now behind a4 (active) in priority
+  it('participant does not lose their full tile when tier changes to passive with no new pressure', () => {
+    // Two active-camera participants; a2 has higher activatedAt → lower slot initially
+    let state = createInitialState(container1280x720);
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a1', 'active-camera'), now: 100});
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a2', 'active-camera'), now: 200});
+    const slotA2 = state.slotMap['a2'];
     const next = reducer(state, {
       type: 'UPDATE_PARTICIPANT',
-      id: 'a3',
+      id: 'a2',
       changes: {tier: 'passive-no-camera'},
     });
-    const ids = subtileIds(next);
-    // a4 (active-camera) should appear before a3 (passive-no-camera) in subtile order
-    expect(ids.indexOf('a4')).toBeLessThan(ids.indexOf('a3'));
+    // No new participants — a2 keeps their full tile and their seat number
+    expect(fullTiles(next).map(t => t.participant.id)).toContain('a2');
+    expect(next.slotMap['a2']).toBe(slotA2);
   });
 });
 
@@ -359,7 +356,7 @@ describe('unified priority queue', () => {
     expect(fractionalTile(state)).toBeUndefined();
   });
 
-  it('passive-camera has higher priority than passive-no-camera', () => {
+  it('passive-camera has higher initial priority than passive-no-camera for seat allocation', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('pc', 'passive-camera'),
       makeParticipant('pn', 'passive-no-camera'),
@@ -367,7 +364,32 @@ describe('unified priority queue', () => {
     expect(state.slotMap['pc']).toBeLessThan(state.slotMap['pn']);
   });
 
-  it('tier priority order: you < screen-sharing < active-camera < active-no-camera < passive-camera < passive-no-camera', () => {
+  it('subtile participant turning camera on stays in subtile — all subtile seats are equally valuable', () => {
+    // smallContainer: a1 in full tile, p1 in full tile, p2/p3 in subtile
+    const state = addAllSmall([
+      makeParticipant('a1', 'active-camera'),
+      makeParticipant('p1', 'passive-no-camera'),
+      makeParticipant('p2', 'passive-no-camera'),
+      makeParticipant('p3', 'passive-no-camera'),
+    ]);
+    const slotP1 = state.slotMap['p1'];
+    expect(fullTiles(state).map(t => t.participant.id)).toContain('p1');
+    expect(subtileIds(state)).toContain('p3');
+
+    // p3 turns camera on → passive-camera (higher priority than passive-no-camera)
+    const next = reducer(state, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'p3',
+      changes: {tier: 'passive-camera'},
+    });
+    // p3 was in subtile — seat type does not change on camera toggle
+    expect(subtileIds(next)).toContain('p3');
+    // p1 keeps their full tile — not displaced by p3's camera toggle
+    expect(fullTiles(next).map(t => t.participant.id)).toContain('p1');
+    expect(next.slotMap['p1']).toBe(slotP1);
+  });
+
+  it('initial seat assignment follows tier priority order: you < screen-sharing < active-camera < active-no-camera < passive-camera < passive-no-camera', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('pn', 'passive-no-camera'),
       makeParticipant('pc', 'passive-camera'),
@@ -384,58 +406,71 @@ describe('unified priority queue', () => {
     expect(slotMap['pc']).toBeLessThan(slotMap['pn']);
   });
 
-  it('full tile layout renders participants in slot order', () => {
+  it('full tile render order does not change when a participant upgrades tier but no eviction occurs', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('pn', 'passive-no-camera'),
       makeParticipant('ac', 'active-camera'),
       makeParticipant('ss', 'screen-sharing'),
     ]);
-    const ids = fullTiles(state).map(t => t.participant.id);
-    expect(ids).toEqual(['ss', 'ac', 'pn']);
+    const idsBefore = fullTiles(state).map(t => t.participant.id);
+    // ac upgrades to screen-sharing — all 3 still fit in full tiles, no eviction
+    const next = reducer(state, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'ac',
+      changes: {tier: 'screen-sharing'},
+      now: 999,
+    });
+    // All seats remain — render order should be stable
+    expect(fullTiles(next).map(t => t.participant.id)).toEqual(idsBefore);
   });
 });
 
 // ── Recency ordering within active tiers ─────────────────────────────────────
 
 describe('recency ordering within active tiers', () => {
-  it('most recently activated active-camera participant gets the lower slot', () => {
+  it('first added active-camera participant gets the first available seat', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('old', 'active-camera'),  // activatedAt auto-set to now=0
-      makeParticipant('new', 'active-camera'),  // also now=0, but added after
+      makeParticipant('new', 'active-camera'),  // also now=0, added after
     ]);
-    // Both now=0, so tiebreak by prevSlotMap: 'old' was assigned first → lower slot
+    // Both now=0; 'old' arrived first and should have the lower slot
     expect(state.slotMap['old']).toBeLessThan(state.slotMap['new']);
   });
 
-  it('participant added with higher now gets a lower slot than earlier participant', () => {
+  it('participant added with higher now gets their own new seat without displacing the earlier holder', () => {
     let state = createInitialState(container1280x720);
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('early', 'active-camera'), now: 100});
+    const slotEarly = state.slotMap['early'];
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('late', 'active-camera'), now: 200});
-    // 'late' has activatedAt=200 > 100 → lower slot (higher recency priority)
-    expect(state.slotMap['late']).toBeLessThan(state.slotMap['early']);
+    // 'early' already has a seat — it should not be displaced by 'late's higher recency
+    expect(state.slotMap['early']).toBe(slotEarly);
+    expect(state.slotMap['late']).not.toBe(slotEarly);
   });
 
-  it('passive tier does NOT use recency — stable (add) order is preserved', () => {
+  it('passive participants are seated in arrival order — first arrival keeps the earlier seat number', () => {
     let state = createInitialState(container1280x720);
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('p1', 'passive-no-camera'), now: 100});
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('p2', 'passive-no-camera'), now: 200});
-    // p1 was added first → lower slot (stable/add order, NOT recency)
+    // p1 arrived first → lower slot; recency does not apply to passive tier
     expect(state.slotMap['p1']).toBeLessThan(state.slotMap['p2']);
   });
 
-  it('updating tier to active sets activatedAt and moves participant to recency slot', () => {
+  it('updating tier to active promotes participant and sets activatedAt; existing full-tile holder keeps their seat', () => {
     let state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a_old', 'active-camera'),  // activatedAt=0
+      makeParticipant('a_old', 'active-camera'),
       makeParticipant('lazy', 'passive-no-camera'),
     ]);
+    const slotOld = state.slotMap['a_old'];
     const upgraded = reducer(state, {
       type: 'UPDATE_PARTICIPANT',
       id: 'lazy',
       changes: {tier: 'active-camera'},
       now: 999,
     });
-    // lazy has activatedAt=999, a_old has activatedAt=0 → lazy is lower slot
-    expect(upgraded.slotMap['lazy']).toBeLessThan(upgraded.slotMap['a_old']);
+    // lazy gets activatedAt=999 and a full tile seat; a_old already has a seat — it should not move
+    expect(upgraded.slotMap['a_old']).toBe(slotOld);
+    expect(fullTiles(upgraded).map(t => t.participant.id)).toContain('lazy');
+    expect(fullTiles(upgraded).map(t => t.participant.id)).toContain('a_old');
   });
 
   it('updating non-tier field does not change activatedAt', () => {
@@ -735,7 +770,7 @@ describe('stable slot assignment', () => {
     expect(next.slotMap['b']).toBe(slotB);
   });
 
-  it('passive tier preserves add-order when a new passive is added', () => {
+  it('passive participants keep their seats when a new participant is added', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('p1', 'passive-no-camera'),
       makeParticipant('p2', 'passive-no-camera'),
@@ -760,7 +795,7 @@ describe('stable slot assignment', () => {
 // ── passive-camera priority over passive-no-camera ────────────────────────────
 
 describe('passive tier ordering', () => {
-  it('passive-camera participants always have lower slots than passive-no-camera', () => {
+  it('passive-camera gets lower initial slots than passive-no-camera on first seat allocation', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('pn1', 'passive-no-camera'),
       makeParticipant('pn2', 'passive-no-camera'),
@@ -773,22 +808,21 @@ describe('passive tier ordering', () => {
     expect(state.slotMap['pc2']).toBeLessThan(state.slotMap['pn2']);
   });
 
-  it('turning camera on promotes passive participant above passive-no-camera peers', () => {
+  it('turning camera on does not change seat when participant already has a full tile', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('p1', 'passive-no-camera'),
       makeParticipant('p2', 'passive-no-camera'),
     ]);
-    const slotP1before = state.slotMap['p1'];
-    const slotP2before = state.slotMap['p2'];
+    const slotP1 = state.slotMap['p1'];
+    const slotP2 = state.slotMap['p2'];
     const next = reducer(state, {
       type: 'UPDATE_PARTICIPANT',
       id: 'p2',
       changes: {tier: 'passive-camera'},
     });
-    // p2 now in passive-camera group → lower slot than p1 (passive-no-camera)
-    expect(next.slotMap['p2']).toBeLessThan(next.slotMap['p1']);
-    // p1 slot is re-indexed but still reflects passive-no-camera
-    expect(next.slotMap['p1']).toBeGreaterThan(next.slotMap['p2']);
+    // p2 turns camera on but both already have full tiles — neither seat changes
+    expect(next.slotMap['p1']).toBe(slotP1);
+    expect(next.slotMap['p2']).toBe(slotP2);
   });
 
   it('in overflow scenario, passive-camera participant is visible over passive-no-camera', () => {
@@ -845,7 +879,7 @@ describe('_computeLayout internal', () => {
 // ── _updateSlotMap internal ───────────────────────────────────────────────────
 
 describe('_updateSlotMap internal', () => {
-  it('assigns monotonically increasing slots in tier priority order', () => {
+  it('assigns initial slots in tier priority order when there is no previous seat assignment', () => {
     const participants: GridParticipant[] = [
       makeParticipant('passive1', 'passive-no-camera'),
       makeParticipant('active1', 'active-camera'),
@@ -879,12 +913,25 @@ describe('_updateSlotMap internal', () => {
     expect(newMap['p3']).toBeGreaterThan(newMap['p2']);
   });
 
-  it('active tier: higher activatedAt → lower slot', () => {
+  it('active tier: higher activatedAt → lower slot in initial assignment (no prevSlotMap)', () => {
     const participants: GridParticipant[] = [
       makeParticipant('old', 'active-camera', 0, 100),
       makeParticipant('new', 'active-camera', 0, 200),
     ];
     const slotMap = _updateSlotMap(participants, {});
     expect(slotMap['new']).toBeLessThan(slotMap['old']);
+  });
+
+  it('existing slots are preserved when called with a prevSlotMap, even if recency would reorder', () => {
+    // old has prevSlot=0, new has prevSlot=1; new has higher activatedAt
+    // Stability rule: prevSlots should be preserved since both are already seated
+    const prevMap = {old: 0, new: 1};
+    const participants: GridParticipant[] = [
+      makeParticipant('old', 'active-camera', 0, 100),
+      makeParticipant('new', 'active-camera', 0, 200),
+    ];
+    const slotMap = _updateSlotMap(participants, prevMap);
+    expect(slotMap['old']).toBe(0);
+    expect(slotMap['new']).toBe(1);
   });
 });
