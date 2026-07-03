@@ -219,7 +219,8 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
 
   useEffect(() => {
     void importHistory(file);
-  }, [file, importHistory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
