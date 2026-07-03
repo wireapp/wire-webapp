@@ -191,7 +191,6 @@ jobs:
       - name: Check out wire-builds
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          persist-credentials: false
           repository: wireapp/wire-builds
           token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
           ref: ${{matrix.target_branch}}
