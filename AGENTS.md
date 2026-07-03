@@ -38,6 +38,16 @@ Library Nx project names end with `-lib`, such as `core-lib` or `api-client-lib`
 - `yarn nx run core-lib:test --testFile=src/util/numberToHex.test.ts`
 - `yarn nx run core-lib:test --testFile=src/util/numberToHex.test.ts --testNamePattern="should convert a number to a hex string"`
 
+## Running ESLint
+
+For investigation, run ESLint once with JSON to `/tmp`, then analyze with `jq`, `rg`, or `node` — do not re-run ESLint for each query.
+
+```bash
+yarn eslint --config eslint.config.ts --no-cache -f json -o /tmp/eslint-output.json apps/webapp/src
+```
+
+Per-file checks: pass a single file path as the last argument, not `yarn nx run webapp:lint`.
+
 ## TypeScript and JavaScript
 
 - Do not introduce new `class` usage in new TypeScript or JavaScript code.
@@ -47,6 +57,7 @@ Library Nx project names end with `-lib`, such as `core-lib` or `api-client-lib`
 ## Git
 
 - Commit messages must include a concise subject and a description body explaining what changed and why.
+- When changes are ready to commit, prompt the user to run checks first: `yarn type-check`, `BASE_REF=dev yarn lint:affected` (includes `yarn prettier` via `lint:other`), and relevant `yarn nx run <project>:test` for touched projects.
 
 ## Webapp code rules
 
