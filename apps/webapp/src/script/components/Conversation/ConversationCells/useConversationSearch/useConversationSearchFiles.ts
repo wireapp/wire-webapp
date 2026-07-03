@@ -92,6 +92,7 @@ export const useConversationSearchFiles = ({
 
   const searchParams = useMemo(() => toConversationDriveSearchParams(filters), [filters]);
   const hasActiveParams = hasActiveSearchParams(searchParams);
+  const hasSearchOrActiveParams = searchQuery.trim().length > 0 || hasActiveParams;
   const hadActiveSearchParamsRef = useRef(hasActiveParams);
 
   const {id, domain} = conversationQualifiedId;
@@ -308,7 +309,6 @@ export const useConversationSearchFiles = ({
 
     // Re-run search whenever typing has triggered it, a query is present,
     // or the mapped search params carry any filter.
-    const hasSearchOrActiveParams = searchQuery.trim().length > 0 || hasActiveParams;
     if (!shouldPerformSearch.current && !hasSearchOrActiveParams) {
       return;
     }
@@ -316,7 +316,7 @@ export const useConversationSearchFiles = ({
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await searchNodes({query: normalizeSearchQuery(searchQuery), filters});
     });
-  }, [searchNodes, searchQuery, enabled, filters, hasActiveParams, fireAndForgetInvoker]);
+  }, [searchNodes, searchQuery, enabled, filters, hasSearchOrActiveParams, fireAndForgetInvoker]);
 
   // Fire an initial unfiltered fetch when the hook becomes enabled (search view opens) so
   // the load-more dataset is populated even before the user types or selects a filter.
@@ -338,9 +338,9 @@ export const useConversationSearchFiles = ({
   // When the search params transition from "active" to "none" with no search query,
   // restore the default unfiltered file list.
   useEffect(() => {
-    const hasNoSearchQuery = normalizeSearchQuery(searchValue).length === 0;
+    const hasNoSearchInput = normalizeSearchQuery(searchValue).length === 0;
 
-    if (hadActiveSearchParamsRef.current === true && hasActiveParams === false && hasNoSearchQuery === true) {
+    if (hadActiveSearchParamsRef.current === true && hasActiveParams === false && hasNoSearchInput === true) {
       if (canSearchOwnResults() === true) {
         fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
           await searchNodes({query: '', filters});
@@ -352,29 +352,25 @@ export const useConversationSearchFiles = ({
     hadActiveSearchParamsRef.current = hasActiveParams;
   }, [canSearchOwnResults, filters, fireAndForgetInvoker, hasActiveParams, onClear, searchNodes, searchValue]);
 
-  // Re-run the search whenever the sort changes. The main search effect above already
-  // refetches when a query/filter is active (it depends on the sort-aware searchNodes), so
-  // this only needs to cover the empty search view, which that effect bails out of.
-  const hasInitialisedSortRef = useRef(false);
+  // The main search effect above refetches active query/filter searches when `searchNodes`
+  // changes with the selected sort. Empty search has no query/filter, so it needs this
+  // explicit sort-change fetch.
+  const previousSortRef = useRef(sort);
   useEffect(() => {
-    if (!enabled) {
-      hasInitialisedSortRef.current = false;
+    const previousSort = previousSortRef.current;
+    previousSortRef.current = sort;
+
+    if (!enabled || previousSort === sort) {
       return;
     }
-    if (!hasInitialisedSortRef.current) {
-      hasInitialisedSortRef.current = true;
-      return;
-    }
-    const hasSearchOrActiveParams = searchQuery.trim().length > 0 || hasActiveParams;
+
     if (hasSearchOrActiveParams) {
       return;
     }
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await searchNodes({query: '', filters});
     });
-    // searchQuery/filters are read at fire time; only sort (and enable state) should trigger this.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sort, enabled]);
+  }, [enabled, filters, fireAndForgetInvoker, hasSearchOrActiveParams, searchNodes, sort]);
 
   const loadMore = useCallback(
     async (offset: number): Promise<void> => {
