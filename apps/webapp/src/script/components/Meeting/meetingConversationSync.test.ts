@@ -96,7 +96,7 @@ describe('syncMeetingConversationParticipants', () => {
     expect(safeAddUsers).not.toHaveBeenCalled();
   });
 
-  it('establishes with selected users on create and avoids double-add via safeAddUsers', async () => {
+  it('establishes with selected users on create without calling safeAddUsers', async () => {
     const alice = createUser('1');
     const bob = createUser('2');
     const establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
@@ -139,7 +139,7 @@ describe('syncMeetingConversationParticipants', () => {
     expect(result.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual(failedToAdd);
   });
 
-  it('removes members before adding on update', async () => {
+  it('adds members before removing on update', async () => {
     const alice = createUser('1');
     const charlie = createUser('3');
     const establishedConversation = createConversation(1);
@@ -162,12 +162,12 @@ describe('syncMeetingConversationParticipants', () => {
     });
 
     expect(result.isOk).toBe(true);
-    expect(safeRemoveMembers).toHaveBeenCalledWith(establishedConversation, [alice.qualifiedId]);
     expect(safeAddUsers).toHaveBeenCalledWith(establishedConversation, [charlie]);
+    expect(safeRemoveMembers).toHaveBeenCalledWith(establishedConversation, [alice.qualifiedId]);
     expect(establishMeetingConversation).not.toHaveBeenCalled();
   });
 
-  it('establishes unestablished conversations on update when adding users', async () => {
+  it('adds users via safeAddUsers on update without establishing the conversation', async () => {
     const charlie = createUser('3');
     const unestablishedConversation = createConversation(0);
     const establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
@@ -187,12 +187,26 @@ describe('syncMeetingConversationParticipants', () => {
     });
 
     expect(result.isOk).toBe(true);
-    expect(establishMeetingConversation).toHaveBeenCalledWith({
-      groupId,
-      userIdsToAdd: [charlie.qualifiedId],
-      conversationQualifiedId: qualifiedConversationId,
+    expect(safeAddUsers).toHaveBeenCalledWith(unestablishedConversation, [charlie]);
+    expect(establishMeetingConversation).not.toHaveBeenCalled();
+  });
+
+  it('returns addFailed when safeAddUsers rejects on update', async () => {
+    const charlie = createUser('3');
+    const conversationRepository = createRepository({
+      safeAddUsers: jest.fn().mockReturnValue(task.reject(new Error('add failed'))),
     });
-    expect(safeAddUsers).not.toHaveBeenCalled();
+
+    const result = await syncMeetingConversationParticipants(conversationRepository, {
+      qualifiedConversationId,
+      selectedUsers: [charlie],
+      usersToAdd: [charlie],
+      userIdsToRemove: [],
+      isCreate: false,
+    });
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(meetingConversationSyncErrors.addFailed);
   });
 
   it('returns removeFailed when safeRemoveMembers rejects', async () => {

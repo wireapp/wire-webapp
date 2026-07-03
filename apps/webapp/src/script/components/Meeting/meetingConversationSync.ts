@@ -25,7 +25,6 @@ import {Task, task} from 'true-myth';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export const meetingConversationSyncErrors = {
   conversationNotFound: 'conversationNotFound',
@@ -46,105 +45,68 @@ type SyncMeetingConversationParticipantsParams = {
   isCreate?: boolean;
 };
 
-const isConversationEstablished = (conversation: Conversation): boolean => conversation.epoch > 0;
-
-const requireGroupId = (conversation: Conversation): Task<string, MeetingConversationSyncError> => {
-  const {groupId} = conversation;
-
-  if (!is.nonEmptyString(groupId)) {
-    return task.reject(meetingConversationSyncErrors.groupIdMissing);
-  }
-
-  return task.resolve(groupId);
-};
-
-const usersNotIncludedInEstablish = (usersToAdd: User[], userIdsForEstablish: QualifiedId[]): User[] =>
-  usersToAdd.filter(user => !userIdsForEstablish.some(userId => matchQualifiedIds(userId, user.qualifiedId)));
-
-const addRemainingUsers = (
+const addUsers = (
   conversationRepository: ConversationRepository,
   conversation: Conversation,
   users: User[],
-  failedToAdd: AddUsersFailure[],
 ): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> => {
   if (users.length === 0) {
-    return task.resolve({failedToAdd});
+    return task.resolve({failedToAdd: []});
   }
 
   return conversationRepository
     .safeAddUsers(conversation, users)
     .mapRejected(() => meetingConversationSyncErrors.addFailed)
-    .map(() => ({failedToAdd}));
+    .map(() => ({failedToAdd: []}));
 };
 
 const establishWithUsers = (
   conversationRepository: ConversationRepository,
   conversation: Conversation,
   userIdsToAdd: QualifiedId[],
-): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> =>
-  requireGroupId(conversation).andThen(groupId =>
-    conversationRepository
-      .establishMeetingConversation({
-        groupId,
-        userIdsToAdd,
-        conversationQualifiedId: conversation.qualifiedId,
-      })
-      .mapRejected(() => meetingConversationSyncErrors.establishFailed),
-  );
+): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> => {
+  const {groupId} = conversation;
+
+  if (!is.nonEmptyString(groupId)) {
+    return task.reject(meetingConversationSyncErrors.groupIdMissing);
+  }
+
+  return conversationRepository
+    .establishMeetingConversation({
+      groupId,
+      userIdsToAdd,
+      conversationQualifiedId: conversation.qualifiedId,
+    })
+    .mapRejected(() => meetingConversationSyncErrors.establishFailed);
+};
 
 const syncCreateParticipants = (
   conversationRepository: ConversationRepository,
   conversation: Conversation,
   usersToAdd: User[],
-): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> => {
-  const userIdsForEstablish = usersToAdd.map(user => user.qualifiedId);
-
-  return establishWithUsers(conversationRepository, conversation, userIdsForEstablish).andThen(({failedToAdd}) =>
-    addRemainingUsers(
-      conversationRepository,
-      conversation,
-      usersNotIncludedInEstablish(usersToAdd, userIdsForEstablish),
-      failedToAdd,
-    ),
+): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> =>
+  establishWithUsers(
+    conversationRepository,
+    conversation,
+    usersToAdd.map(user => user.qualifiedId),
   );
-};
 
 const syncUpdateParticipants = (
   conversationRepository: ConversationRepository,
   conversation: Conversation,
   usersToAdd: User[],
   userIdsToRemove: QualifiedId[],
-): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> => {
-  const removeTask =
-    userIdsToRemove.length > 0
-      ? conversationRepository
-          .safeRemoveMembers(conversation, userIdsToRemove)
-          .mapRejected(() => meetingConversationSyncErrors.removeFailed)
-          .map(() => conversation)
-      : task.resolve(conversation);
-
-  return removeTask.andThen(updatedConversation => {
-    if (usersToAdd.length === 0) {
-      return task.resolve({failedToAdd: []});
+): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> =>
+  addUsers(conversationRepository, conversation, usersToAdd).andThen(addResult => {
+    if (userIdsToRemove.length === 0) {
+      return task.resolve(addResult);
     }
 
-    if (isConversationEstablished(updatedConversation)) {
-      return addRemainingUsers(conversationRepository, updatedConversation, usersToAdd, []);
-    }
-
-    const userIdsForEstablish = usersToAdd.map(user => user.qualifiedId);
-
-    return establishWithUsers(conversationRepository, updatedConversation, userIdsForEstablish).andThen(
-      ({failedToAdd}) =>
-        addRemainingUsers(
-          conversationRepository,
-          updatedConversation,
-          usersNotIncludedInEstablish(usersToAdd, userIdsForEstablish),
-          failedToAdd,
-        ),
-    );
+    return conversationRepository
+      .safeRemoveMembers(conversation, userIdsToRemove)
+      .mapRejected(() => meetingConversationSyncErrors.removeFailed)
+      .map(() => addResult);
   });
-};
 
 export const syncMeetingConversationParticipants = (
   conversationRepository: ConversationRepository,
