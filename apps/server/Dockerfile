@@ -20,6 +20,7 @@ COPY libraries/config/lib ./libraries/config/lib
 # Copy built server artifacts and runtime files
 COPY apps/server/dist /dist
 COPY run.sh .env.defaults ./
+COPY .env.defaults /dist/.env.defaults
 
 ENV NODE_PATH=/app/node_modules
 ENV PATH=/app/node_modules/.bin:$PATH

@@ -46,6 +46,13 @@ const dockerRegistryDomain = 'quay.io';
 const repository = `${dockerRegistryDomain}/wire/webapp`;
 
 const tags = [];
+const requiredEnvironmentDefaultKeys = ['BACKEND_NAME', 'BRAND_NAME', 'URL_ACCOUNT_BASE', 'BACKEND_REST', 'BACKEND_WS'];
+const environmentDefaultsSmokeCheckCommand = [
+  'test -s /dist/.env.defaults',
+  ...requiredEnvironmentDefaultKeys.map(requiredEnvironmentDefaultKey => {
+    return `grep -q "^${requiredEnvironmentDefaultKey}=" /dist/.env.defaults`;
+  }),
+].join(' && ');
 
 /** One Docker image can have multiple tags, e.g. "production" (links always to the latest production build) & "2021-08-30-production.0-v0.28.25-0-1240cfd" (links to a fixed production build) */
 tags.push(`${repository}:${versionTag}`);
@@ -65,6 +72,7 @@ tags.push(`${repository}:${uniqueTag}`);
 const dockerCommands = [
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
   `docker build . --file apps/server/Dockerfile --tag ${commitShortSha}`,
+  `docker run --rm --entrypoint sh ${commitShortSha} -c ${JSON.stringify(environmentDefaultsSmokeCheckCommand)}`,
   `if [ "${uniqueTagOut}" != "" ]; then echo -n "${uniqueTag}" > "${uniqueTagOut}"; fi`,
 ];
 
