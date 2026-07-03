@@ -22,3 +22,5 @@ import type {Translate} from 'Util/localizerUtil';
 export function translateForTest(translationKey: Parameters<Translate>[0]): string {
   return translationKey;
 }
+
+export const translateWithPrefixForTest: Translate = translationKey => `translated:${translationKey}`;
