@@ -248,6 +248,27 @@ jobs:
               exit 1
           fi
 
+  notify_wire_builds_failure:
+    name: 'Notify wire-builds bump failure to Deployoholics'
+    runs-on: ubuntu-24.04
+    needs: [build, publish_wire_builds]
+    if: ${{ always() && needs.publish_wire_builds.result == 'failure' }}
+
+    steps:
+      - name: Announce wire-builds bump failure
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+        with:
+          status: failure
+          text: |
+            ❌ wire-builds chart bump failed for ${{ needs.build.outputs.release_name }} ❌
+            **Triggered by:** ${{ github.actor }}
+            **Ref:** ${{ github.ref_name }}
+            **Chart version:** ${{ needs.build.outputs.chart_version }}
+            **Image tag:** ${{ needs.build.outputs.image_tag }}
+            **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
   set_deployment_targets:
     name: 'Set deployment targets'
     runs-on: ubuntu-24.04
