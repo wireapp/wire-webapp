@@ -232,7 +232,8 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
 
   useEffect(() => {
     showBackupModal();
-  }, [showBackupModal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div id="history-export">
