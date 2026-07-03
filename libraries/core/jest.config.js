@@ -46,5 +46,8 @@ module.exports = {
   coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
   testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
+  moduleNameMapper: {
+    '^bazinga64$': '<rootDir>/../bazinga64/src/index.ts',
+  },
   reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
 };

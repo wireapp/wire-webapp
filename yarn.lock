@@ -12100,6 +12100,7 @@ __metadata:
     babel-loader: "npm:10.1.1"
     babel-plugin-transform-import-meta: "npm:2.3.3"
     baseline-browser-mapping: "npm:2.10.40"
+    bazinga64: "workspace:^"
     beautiful-react-hooks: "npm:5.0.3"
     browserslist: "npm:4.28.4"
     classnames: "npm:2.5.1"

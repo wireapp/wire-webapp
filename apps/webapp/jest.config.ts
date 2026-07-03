@@ -59,6 +59,7 @@ const config: Config = {
     'Repositories/(.*)': '<rootDir>/src/script/repositories/$1',
     'Resource/(.*)': '<rootDir>/resource/$1',
     'Util/(.*)': '<rootDir>/src/script/util/$1',
+    '^bazinga64$': '<rootDir>/../../libraries/bazinga64/src/index.ts',
     '^react(.*)$': '<rootDir>/../../node_modules/react$1',
     '.*\\.glsl': 'jest-transform-stub',
   },

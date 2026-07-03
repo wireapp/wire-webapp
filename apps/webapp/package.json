@@ -47,6 +47,7 @@
     "@wireapp/telemetry": "workspace:^",
     "@wireapp/webapp-events": "workspace:^",
     "amplify": "https://github.com/wireapp/amplify#head=master",
+    "bazinga64": "workspace:^",
     "beautiful-react-hooks": "5.0.3",
     "classnames": "2.5.1",
     "copy-webpack-plugin": "13.0.1",

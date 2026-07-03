@@ -18,7 +18,8 @@
       "@wireapp/store-engine-dexie": ["libraries/store-engine-dexie/src/index.ts"],
       "@wireapp/config": ["libraries/config/src/index.ts"],
       "@wireapp/telemetry": ["libraries/telemetry/src/index.ts"],
-      "@wireapp/promise-queue": ["libraries/promise-queue/src/index.ts"]
+      "@wireapp/promise-queue": ["libraries/promise-queue/src/index.ts"],
+      "bazinga64": ["libraries/bazinga64/src/index.ts"]
     }
   },
   "include": [
