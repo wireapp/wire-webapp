@@ -17,7 +17,7 @@
  *
  */
 
-import {task, type Task} from 'true-myth';
+import type {Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
@@ -55,16 +55,8 @@ export type MeetingStore = StoreApi<MeetingStoreState>;
 
 type MeetingStoreInitialState = Partial<Pick<MeetingStoreState, 'meetings' | 'isLoading' | 'hasLoadError'>>;
 
-const refreshMeetingsAfterSubmit = (
-  loadMeetings: () => Promise<void>,
-  getHasLoadError: () => boolean,
-): Task<void, MeetingSubmitErrors> =>
-  task
-    .tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings)
-    .andThen(() => (getHasLoadError() ? task.reject(meetingSubmitErrors.refreshFailed) : task.resolve(undefined)));
-
 export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: MeetingStoreInitialState): MeetingStore =>
-  createStore<MeetingStoreState>((set, get) => ({
+  createStore<MeetingStoreState>(set => ({
     meetings: initialState?.meetings ?? [],
     isLoading: initialState?.isLoading ?? false,
     hasLoadError: initialState?.hasLoadError ?? false,
@@ -75,14 +67,8 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
 
       set({meetings: listResult.meetings, hasLoadError: listResult.hasLoadError, isLoading: false});
     },
-    scheduleMeeting: formState =>
-      scheduleMeetingTask(formState, deps).andThen(submitSuccess =>
-        refreshMeetingsAfterSubmit(get().loadMeetings, () => get().hasLoadError).map(() => submitSuccess),
-      ),
-    updateMeeting: params =>
-      updateMeetingTask(params, deps).andThen(submitSuccess =>
-        refreshMeetingsAfterSubmit(get().loadMeetings, () => get().hasLoadError).map(() => submitSuccess),
-      ),
+    scheduleMeeting: formState => scheduleMeetingTask(formState, deps),
+    updateMeeting: params => updateMeetingTask(params, deps),
     loadMeetingForEdit: meeting =>
       deps.conversationRepository
         .safeGetConversationById(meeting.qualified_conversation)

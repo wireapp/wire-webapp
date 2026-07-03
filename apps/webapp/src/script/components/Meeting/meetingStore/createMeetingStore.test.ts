@@ -21,12 +21,10 @@ import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 
-import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import {translateForTest} from 'Util/test/translateForTest';
-import {unwrapErr} from 'Util/test/resultTestSupport';
 
 import {createMeetingStore} from './createMeetingStore';
 import type {MeetingStoreDeps} from './meetingStoreDeps';
@@ -111,7 +109,7 @@ describe('createMeetingStore', () => {
     });
   });
 
-  it('refreshes the list after scheduleMeeting succeeds', async () => {
+  it('schedules a meeting without refreshing the meetings list', async () => {
     mockedScheduleMeetingTask.mockReturnValue(task.resolve({failedToAdd: []}));
     const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
     const store = createMeetingStore(createDeps({getMeetingsList}));
@@ -127,25 +125,7 @@ describe('createMeetingStore', () => {
 
     expect(result.isOk).toBe(true);
     expect(mockedScheduleMeetingTask).toHaveBeenCalled();
-    expect(getMeetingsList).toHaveBeenCalledTimes(1);
-  });
-
-  it('returns refreshFailed when list refresh fails after a successful schedule', async () => {
-    mockedScheduleMeetingTask.mockReturnValue(task.resolve({failedToAdd: []}));
-    const getMeetingsList = jest.fn().mockReturnValue(task.reject(new Error('network error')));
-    const store = createMeetingStore(createDeps({getMeetingsList}));
-
-    const result = await store.getState().scheduleMeeting({
-      title: 'Weekly sync',
-      start: maybe.just(new Date('2026-06-16T10:00:00.000Z')),
-      end: maybe.just(new Date('2026-06-16T11:00:00.000Z')),
-      recurrence: 'doesNotRepeat',
-      selectedUsers: [],
-      participantsFilter: '',
-    });
-
-    expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe(meetingSubmitErrors.refreshFailed);
+    expect(getMeetingsList).not.toHaveBeenCalled();
   });
 
   it('loads meeting data for edit via safeGetConversationById', async () => {

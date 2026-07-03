@@ -90,6 +90,7 @@ export const useScheduleMeetingSubmit = () => {
   const {translate} = useApplicationContext();
   const scheduleMeeting = useMeetingStore(state => state.scheduleMeeting);
   const updateMeeting = useMeetingStore(state => state.updateMeeting);
+  const loadMeetings = useMeetingStore(state => state.loadMeetings);
   const mode = useScheduleMeetingModal(state => state.mode);
   const editingMeetingId = useScheduleMeetingModal(state => state.editingMeetingId);
   const qualifiedConversation = useScheduleMeetingModal(state => state.qualifiedConversation);
@@ -109,9 +110,8 @@ export const useScheduleMeetingSubmit = () => {
         updateMeeting,
       });
 
-      setIsSubmitting(false);
-
       if (submitResult.isErr) {
+        setIsSubmitting(false);
         showMeetingSubmitError(translate, submitResult.error);
         return false;
       }
@@ -124,9 +124,22 @@ export const useScheduleMeetingSubmit = () => {
         });
       }
 
+      await task.tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings);
+
+      setIsSubmitting(false);
+
       return true;
     },
-    [editingMeetingId, mode, originalSelectedUsers, qualifiedConversation, scheduleMeeting, translate, updateMeeting],
+    [
+      editingMeetingId,
+      loadMeetings,
+      mode,
+      originalSelectedUsers,
+      qualifiedConversation,
+      scheduleMeeting,
+      translate,
+      updateMeeting,
+    ],
   );
 
   return {isSubmitting, submit};
