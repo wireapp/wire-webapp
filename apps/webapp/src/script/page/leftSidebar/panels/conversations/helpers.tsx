@@ -18,6 +18,7 @@
  */
 
 import {Conversation} from 'Repositories/entity/Conversation';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {replaceAccents} from 'Util/stringUtil';
 
 import {SidebarTabs} from './useSidebarStore';
@@ -97,14 +98,29 @@ export function getTabConversations({
     }
 
     const filterWord = replaceAccents(conversationsFilter.toLowerCase());
-    const filteredGroupConversations = groupConversations.filter(group => {
-      return group.participating_user_ets().some(user => {
+    const filteredConversations = conversations.filter(conversationSearchFilter);
+
+    function isGroupConversationAlreadyFiltered(groupConversation: Conversation): boolean {
+      return filteredConversations.some(conversation => {
+        return matchQualifiedIds(conversation.qualifiedId, groupConversation.qualifiedId);
+      });
+    }
+
+    function groupConversationHasMatchingParticipant(groupConversation: Conversation): boolean {
+      return groupConversation.participating_user_ets().some(user => {
         const conversationDisplayName = replaceAccents(user.name().toLowerCase());
         return conversationDisplayName.includes(filterWord);
       });
+    }
+
+    const filteredGroupConversations = groupConversations.filter(groupConversation => {
+      if (isGroupConversationAlreadyFiltered(groupConversation)) {
+        return false;
+      }
+
+      return groupConversationHasMatchingParticipant(groupConversation);
     });
 
-    const filteredConversations = conversations.filter(conversationSearchFilter);
     const combinedConversations = [...filteredConversations, ...filteredGroupConversations];
 
     return {
