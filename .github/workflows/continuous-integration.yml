@@ -1,0 +1,439 @@
+---
+name: Continuous integration
+
+on:
+  pull_request:
+    # we want to run the CI on every PR targetting those branches
+    branches: [master, dev, release/*]
+
+  merge_group:
+    branches: [master, dev, release/*]
+
+  push:
+    # We also run CI on dev in order to update the coverage monitoring
+    branches: [dev]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  workflow-security:
+    runs-on: ubuntu-24.04
+    name: Workflow security analysis
+    permissions:
+      actions: read # required by zizmor online audits in private repositories
+      contents: read # required for actions/checkout to read the workflow source
+      security-events: write # required by zizmor-action to upload SARIF to code scanning
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        id: zizmor
+        uses: zizmorcore/zizmor-action@192e21d79ab29983730a13d1382995c2307fbcaa # v0.5.7
+        with:
+          inputs: .github/workflows/continuous-integration.yml
+          version: 1.25.2
+          persona: pedantic
+          min-severity: informational
+          min-confidence: low
+          config: .github/zizmor.yml
+
+      - name: Fail if zizmor reported findings
+        env:
+          sarifFilePath: ${{ steps.zizmor.outputs.output-file }}
+        run: |
+          findingsCount="$(jq '[.runs[].results[]] | length' "$sarifFilePath")"
+          echo "zizmor findings: $findingsCount"
+          test "$findingsCount" -eq 0
+
+  generated-artifacts:
+    runs-on: ubuntu-24.04
+    name: generated artifacts check
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          # Uses the head commit, not the merge commit.
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Restore Nx and ESLint caches
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            .nx/cache
+            node_modules/.cache/eslint
+          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
+
+      - name: Verify generated i18n artifacts are committed
+        run: |
+          ./bin/yarn nx run webapp:translate-merge
+
+          if ! test -z "$(git status --porcelain)"; then
+            echo "Repository is not clean after generation. Run generation locally and commit the changes."
+            git status
+            exit 1
+          fi
+
+  build-libraries:
+    runs-on: ubuntu-24.04
+    name: build libraries
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          # Uses the head commit, not the merge commit.
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Restore Nx and ESLint caches
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            .nx/cache
+            node_modules/.cache/eslint
+          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
+
+      - name: Build libraries
+        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
+
+  type-check:
+    runs-on: ubuntu-24.04
+    name: type check
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          # Uses the head commit, not the merge commit.
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Restore Nx and ESLint caches
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            .nx/cache
+            node_modules/.cache/eslint
+          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
+
+      - name: Type check
+        run: ./bin/yarn type-check
+
+  lint-file-names:
+    runs-on: ubuntu-24.04
+    name: lint file names
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          # Uses the head commit, not the merge commit.
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Restore Nx and ESLint caches
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            .nx/cache
+            node_modules/.cache/eslint
+          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
+
+      - name: Lint file names
+        run: ./bin/yarn lint:fileNames
+
+  lint:
+    runs-on: ubuntu-24.04
+    name: lint
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          # Uses the head commit, not the merge commit.
+          # Keep this shallow. Nx gets the base branch explicitly in the next step.
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Fetch base branch for Nx checks
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch --no-tags --depth=1 origin \
+            "${BASE_REF}:refs/remotes/origin/${BASE_REF}" \
+            "${BASE_REF}:${BASE_REF}"
+
+      - name: Checkout (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Restore Nx and ESLint caches
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            .nx/cache
+            node_modules/.cache/eslint
+          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
+
+      - name: Lint (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: ./bin/yarn lint:affected
+
+      - name: Lint (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: ./bin/yarn lint
+
+  unit-tests:
+    runs-on: ubuntu-24.04
+    name: unit tests
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          # Uses the head commit, not the merge commit.
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Restore Nx and ESLint caches
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            .nx/cache
+            node_modules/.cache/eslint
+          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
+
+      - name: Test
+        run: ./bin/run-with-network-isolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-reports
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            apps/webapp/coverage
+            apps/server/coverage
+            coverage/libraries/core
+            coverage/libraries/api-client
+
+  pr-package-docker-image:
+    runs-on: ubuntu-24.04
+    name: PR package / Docker image publishing
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+    needs:
+      - generated-artifacts
+      - build-libraries
+      - type-check
+      - lint-file-names
+      - lint
+      - unit-tests
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (pull_request)
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          # Uses the head commit, not the merge commit.
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Restore Nx and ESLint caches
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            .nx/cache
+            node_modules/.cache/eslint
+          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
+
+      - name: Build and package
+        run: ./bin/yarn nx run server:package
+
+      - name: Verify Quay credentials availability
+        env:
+          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+        run: |
+          if [[ -z "${DOCKER_USERNAME}" || -z "${DOCKER_PASSWORD}" ]]; then
+            echo "Missing Quay credentials. Configure WEBTEAM_QUAY_USERNAME and WEBTEAM_QUAY_PASSWORD for pull request image publishing."
+            exit 1
+          fi
+
+      - name: Push PR Docker image
+        env:
+          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+          PR_TAG: pr-${{ github.event.pull_request.number }}
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
+        # The third and fourth positional parameters are uniqueTagOut and commitSha; they are intentionally left empty here.
+        run: ./bin/yarn docker "$PR_TAG" "" "" --pr
