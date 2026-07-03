@@ -92,7 +92,7 @@ export const ConversationCells = memo(
     const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
     const isCellsStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
 
-    const {sort, getDirectionFor, toggleSort, resetSort} = useCellsSorting();
+    const {sort, setSort, getDirectionFor, toggleSort} = useCellsSorting();
 
     const {refresh, setOffset} = useGetAllCellsNodes({
       cellsRepository,
@@ -152,16 +152,16 @@ export const ConversationCells = memo(
     // Sort is per-view: switching conversation or toggling between search and browse
     // returns to the default (unsorted) order.
     useEffect(() => {
-      resetSort();
-    }, [conversationId, isSearchViewOpen, resetSort]);
+      setSort(null);
+    }, [conversationId, isSearchViewOpen, setSort]);
 
     // Navigating into a folder or the recycle bin happens via the URL hash without
     // remounting; reset the sort on those transitions too.
     useEffect(() => {
-      const handleHashChange = (): void => resetSort();
+      const handleHashChange = (): void => setSort(null);
       window.addEventListener('hashchange', handleHashChange);
       return () => window.removeEventListener('hashchange', handleHashChange);
-    }, [resetSort]);
+    }, [setSort]);
 
     const handleRefresh = useCallback((): void => {
       if (isInSearchMode) {

@@ -76,7 +76,5 @@ export const useCellsSorting = () => {
     [sort],
   );
 
-  const resetSort = () => setSort(null);
-
-  return {sort, toggleSort, resetSort, getDirectionFor};
+  return {sort, setSort, toggleSort, getDirectionFor};
 };
