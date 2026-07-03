@@ -210,12 +210,13 @@ jobs:
           push_succeeded=false
 
           for retry in $(seq 3); do
-            if (
-              set -e
+            if (( retry > 1 )); then
+              echo "Retrying..."
+            fi
 
-              if (( retry > 1 )); then
-                echo "Retrying..."
-              fi
+            set +e
+            (
+              set -eo pipefail
 
               git fetch --depth 1 origin "${{ matrix.target_branch }}"
               git checkout "${{ matrix.target_branch }}"
@@ -234,7 +235,11 @@ jobs:
               git add build.json
               git commit -m "Bump webapp to $chart_version"
               git push origin "${{ matrix.target_branch }}"
-            ); then
+            )
+            attempt_exit_code=$?
+            set -e
+
+            if [[ "$attempt_exit_code" -eq 0 ]]; then
               echo "pushing to wire-builds succeeded"
               push_succeeded=true
               break
@@ -244,8 +249,8 @@ jobs:
           done
 
           if [[ "$push_succeeded" != "true" ]]; then
-              echo "Retrying didn't help. Failing the step."
-              exit 1
+            echo "Retrying didn't help. Failing the step."
+            exit 1
           fi
 
   notify_wire_builds_failure:
