@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {createFactory} from '@enormora/objectory';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {
@@ -45,6 +46,45 @@ const searchInputPlaceholders = {
   searchDraftsConversations: 'searchDraftsConversations',
   searchPingsConversations: 'searchPingsConversations',
 };
+
+type RecentConversationSearchInputOptions = {
+  conversation: Conversation;
+  conversationsFilter: string;
+};
+
+type GetTabConversationsInput = Parameters<typeof getTabConversations>[0];
+
+const recentConversationSearchInputFactory = createFactory<GetTabConversationsInput>(() => {
+  return {
+    currentTab: SidebarTabs.RECENT,
+    conversations: [],
+    groupConversations: [],
+    directConversations: [],
+    favoriteConversations: [],
+    archivedConversations: [],
+    conversationsFilter: '',
+    channelAndGroupConversations: [],
+    channelConversations: [],
+    isChannelsEnabled: false,
+    draftConversations: [],
+    searchInputPlaceholders,
+  };
+});
+
+function createRecentConversationSearchInput(options: RecentConversationSearchInputOptions): GetTabConversationsInput {
+  const {conversation, conversationsFilter} = options;
+
+  const recentConversationSearchInput = recentConversationSearchInputFactory.build({
+    conversationsFilter,
+  });
+
+  return {
+    ...recentConversationSearchInput,
+    conversations: [conversation],
+    groupConversations: [conversation],
+    channelAndGroupConversations: [conversation],
+  };
+}
 
 describe('conversationFilters', () => {
   it('detects mentions, replies, pings, and archived state', () => {
@@ -291,20 +331,12 @@ describe('getTabConversations', () => {
       users: [generateUser(undefined, {name: 'Florian'})],
     });
 
-    const {conversations: filteredConversations} = getTabConversations({
-      currentTab: SidebarTabs.RECENT,
-      conversations: [florianSupportConversation],
-      groupConversations: [florianSupportConversation],
-      directConversations: [],
-      favoriteConversations: [],
-      archivedConversations: [],
-      conversationsFilter: 'Florian',
-      channelAndGroupConversations: [florianSupportConversation],
-      channelConversations: [],
-      isChannelsEnabled: false,
-      draftConversations: [],
-      searchInputPlaceholders,
-    });
+    const {conversations: filteredConversations} = getTabConversations(
+      createRecentConversationSearchInput({
+        conversation: florianSupportConversation,
+        conversationsFilter: 'Florian',
+      }),
+    );
 
     expect(filteredConversations).toEqual([florianSupportConversation]);
   });
@@ -316,20 +348,12 @@ describe('getTabConversations', () => {
       users: [generateUser(undefined, {name: 'Florian'})],
     });
 
-    const {conversations: filteredConversations} = getTabConversations({
-      currentTab: SidebarTabs.RECENT,
-      conversations: [supportRoomConversation],
-      groupConversations: [supportRoomConversation],
-      directConversations: [],
-      favoriteConversations: [],
-      archivedConversations: [],
-      conversationsFilter: 'Florian',
-      channelAndGroupConversations: [supportRoomConversation],
-      channelConversations: [],
-      isChannelsEnabled: false,
-      draftConversations: [],
-      searchInputPlaceholders,
-    });
+    const {conversations: filteredConversations} = getTabConversations(
+      createRecentConversationSearchInput({
+        conversation: supportRoomConversation,
+        conversationsFilter: 'Florian',
+      }),
+    );
 
     expect(filteredConversations).toEqual([supportRoomConversation]);
   });
