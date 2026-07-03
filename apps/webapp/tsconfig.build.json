@@ -11,8 +11,7 @@
       "Repositories/*": ["./src/script/repositories/*"],
       "Resource/*": ["./resource/*"],
       "Util/*": ["./src/script/util/*"],
-      "apps/*": ["apps/*"],
-      "bazinga64": ["../../libraries/bazinga64/src/index.ts"]
+      "apps/*": ["apps/*"]
     }
   },
   "exclude": [
