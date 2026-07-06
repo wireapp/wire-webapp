@@ -42,7 +42,7 @@ export class BroadcastAPI {
     sendingClientId: string,
     messageData: ProtobufOTR.QualifiedNewOtrMessage,
   ): Promise<MessageSendingStatus> {
-    if (!sendingClientId) {
+    if (!Boolean(sendingClientId)) {
       throw new ValidationError('Unable to send OTR message without client ID.');
     }
 
