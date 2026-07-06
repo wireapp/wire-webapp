@@ -37,6 +37,7 @@ echo ""
 FILES=()
 while IFS= read -r file; do
   [[ -z "$file" ]] && continue
+  [[ -f "$file" ]] || continue
   FILES+=("$file")
   echo "::error file=${file}::Not formatted with Prettier. Run: yarn nx format:write --files=${file}"
 done < "$OUTPUT"
