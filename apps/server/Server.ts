@@ -177,7 +177,7 @@ class Server {
     // Scope clipboard delegation to self and the configured Collabora origin only.
     // Falls back to self-only when CELLS_PYDIO_URL is not configured.
     const collaboraOrigin = this.clientConfig.CELLS_PYDIO_URL;
-    const clipboardAllowlist = collaboraOrigin ? `(self "${collaboraOrigin}")` : '(self)';
+    const clipboardAllowlist = Boolean(collaboraOrigin) ? `(self "${collaboraOrigin}")` : '(self)';
     this.app.use((_req, res, next) => {
       res.setHeader(
         'Permissions-Policy',
@@ -237,7 +237,7 @@ class Server {
   }
 
   private initSiteMap(config: ServerConfig) {
-    if (config.APP_BASE) {
+    if (Boolean(config.APP_BASE)) {
       const pages = () => [
         {
           changeFreq: 'weekly',
@@ -254,9 +254,9 @@ class Server {
 
   start(): Promise<number> {
     return new Promise((resolve, reject) => {
-      if (this.server) {
+      if (this.server !== undefined) {
         reject('Server is already running.');
-      } else if (this.config.PORT_HTTP) {
+      } else if (Boolean(this.config.PORT_HTTP)) {
         if (this.config.DEVELOPMENT && this.config.DEVELOPMENT_ENABLE_TLS) {
           const options = {
             cert: fs.readFileSync(this.config.SSL_CERTIFICATE_PATH),
@@ -275,7 +275,7 @@ class Server {
   }
 
   async stop(): Promise<void> {
-    if (this.server) {
+    if (this.server !== undefined) {
       this.server.close();
       this.server = undefined;
     } else {

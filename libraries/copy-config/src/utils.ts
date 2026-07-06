@@ -36,7 +36,7 @@ export async function copyAsync(source: string, destination: string): Promise<Fi
   }
 
   return new Promise((resolve, reject) =>
-    copy(source, destination, (error, files = []) => (error ? reject(error) : resolve(files))),
+    copy(source, destination, (error, files = []) => (Boolean(error) ? reject(error) : resolve(files))),
   );
 }
 
