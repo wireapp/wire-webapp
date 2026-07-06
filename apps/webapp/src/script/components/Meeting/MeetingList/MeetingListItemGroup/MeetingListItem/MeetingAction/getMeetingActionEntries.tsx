@@ -24,7 +24,7 @@ import {
   contextMenuDangerItemIconStyles,
   contextMenuDangerItemStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
-import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
+import {canEditMeeting, isMeetingHost} from 'Components/Meeting/utils/canEditMeeting';
 import type {User} from 'Repositories/entity/User';
 import type {ContextMenuEntry} from 'src/script/ui/contextMenu';
 import type {Translate} from 'Util/localizerUtil';
@@ -50,6 +50,20 @@ export const getMeetingActionEntries = ({
     click: onEdit,
   };
 
+  const deleteForMeEntry: ContextMenuEntry = {
+    css: contextMenuDangerItemStyles,
+    icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
+    label: translate('meetings.action.deleteMeetingForMe'),
+  };
+
+  const deleteForAllEntry: ContextMenuEntry = {
+    css: contextMenuDangerItemStyles,
+    icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
+    label: translate('meetings.action.deleteMeetingForAll'),
+  };
+
+  const isHost = isMeetingHost(meeting, selfUser);
+
   return [
     {
       icon: () => <CallIcon />,
@@ -60,15 +74,6 @@ export const getMeetingActionEntries = ({
       label: translate('meetings.action.createConversation'),
     },
     ...(canEditMeeting(meeting, selfUser, nowMs) ? [editEntry] : []),
-    {
-      css: contextMenuDangerItemStyles,
-      icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
-      label: translate('meetings.action.deleteMeetingForMe'),
-    },
-    {
-      css: contextMenuDangerItemStyles,
-      icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
-      label: translate('meetings.action.deleteMeetingForAll'),
-    },
+    ...(isHost ? [deleteForAllEntry] : [deleteForMeEntry]),
   ];
 };

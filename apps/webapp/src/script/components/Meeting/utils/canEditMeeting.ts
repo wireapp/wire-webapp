@@ -21,9 +21,11 @@ import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import type {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
+export const isMeetingHost = (meeting: Meeting, selfUser: User): boolean =>
+  matchQualifiedIds(meeting.qualified_creator, selfUser.qualifiedId);
+
 export const canEditMeeting = (meeting: Meeting, selfUser: User, nowMs: number): boolean => {
-  const isHost = matchQualifiedIds(meeting.qualified_creator, selfUser.qualifiedId);
   const hasNotStarted = nowMs < new Date(meeting.start_date).getTime();
 
-  return isHost && hasNotStarted;
+  return isMeetingHost(meeting, selfUser) && hasNotStarted;
 };

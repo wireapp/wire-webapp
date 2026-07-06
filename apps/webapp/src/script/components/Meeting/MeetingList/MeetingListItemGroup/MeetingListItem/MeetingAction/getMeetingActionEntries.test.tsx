@@ -45,6 +45,12 @@ const translate = (key: string) => key;
 const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
   entries.find(entry => entry.label === 'meetings.action.editMeeting');
 
+const getDeleteForMeEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
+  entries.find(entry => entry.label === 'meetings.action.deleteMeetingForMe');
+
+const getDeleteForAllEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
+  entries.find(entry => entry.label === 'meetings.action.deleteMeetingForAll');
+
 describe('getMeetingActionEntries', () => {
   it('includes Edit meeting for an eligible host', () => {
     const entries = getMeetingActionEntries({
@@ -92,5 +98,31 @@ describe('getMeetingActionEntries', () => {
     });
 
     expect(getEditEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('includes Delete meeting for everyone for the host', () => {
+    const entries = getMeetingActionEntries({
+      meeting: createMeeting(),
+      selfUser: createSelfUser(),
+      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      translate,
+      onEdit: jest.fn(),
+    });
+
+    expect(getDeleteForAllEntryLabel(entries)).toBeDefined();
+    expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('includes Delete meeting for me for a participant', () => {
+    const entries = getMeetingActionEntries({
+      meeting: createMeeting(),
+      selfUser: createSelfUser('invitee-id'),
+      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      translate,
+      onEdit: jest.fn(),
+    });
+
+    expect(getDeleteForMeEntryLabel(entries)).toBeDefined();
+    expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
   });
 });
