@@ -19,53 +19,96 @@
 
 import {useEffect, useRef, useState} from 'react';
 
-import Cookies from 'js-cookie';
-
+import is from '@sindresorhus/is';
 import {Runtime} from '@wireapp/commons';
+import {Maybe, result} from 'true-myth';
 
+import {BrowserStorage, createBrowserStorage} from 'src/script/browser/storage/browserStorage';
+import {getStorage} from 'Util/localStorage';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {createUuid} from 'Util/uuid';
 
 const CONFIG = {
-  COOKIE_NAME: 'app_opened',
   INTERVAL: TIME_IN_MILLIS.SECOND,
+  STORAGE_KEY: 'app_opened',
 };
 
-function isRunningInstance(instanceId?: string) {
+const browserStorage = createBrowserStorage(Maybe.of(getStorage()));
+
+function getStoredInstanceId(storage: BrowserStorage): Maybe<string> {
+  const storedInstance = storage.getItem(CONFIG.STORAGE_KEY);
+
+  return storedInstance.match({
+    Just: storedInstanceValue => {
+      const parsedInstanceResult = result.tryOrElse(
+        error => {
+          return error instanceof Error ? error : new Error('Failed to parse stored single-instance marker');
+        },
+        () => {
+          return JSON.parse(storedInstanceValue) as unknown;
+        },
+      );
+
+      if (result.isErr(parsedInstanceResult)) {
+        storage.removeItem(CONFIG.STORAGE_KEY);
+        return Maybe.nothing();
+      }
+
+      const parsedInstance = parsedInstanceResult.value;
+
+      if (is.object(parsedInstance) && 'appInstanceId' in parsedInstance && is.string(parsedInstance.appInstanceId)) {
+        return Maybe.just(parsedInstance.appInstanceId);
+      }
+
+      storage.removeItem(CONFIG.STORAGE_KEY);
+      return Maybe.nothing();
+    },
+    Nothing: () => {
+      return Maybe.nothing();
+    },
+  });
+}
+
+function isRunningInstance(instanceId: Maybe<string>) {
   if (Runtime.isDesktopApp()) {
     return true;
   }
-  const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
-  const otherInstanceId = cookieValue ? JSON.parse(cookieValue).appInstanceId : cookieValue;
-  return otherInstanceId === instanceId;
+
+  const otherInstanceId = getStoredInstanceId(browserStorage);
+  return otherInstanceId.equals(instanceId);
 }
 
-function poll(instanceIdRef: {current: string | undefined}, onNewInstance: () => void) {
+function poll(instanceIdRef: {current: Maybe<string>}, onNewInstance: () => void) {
   const checkSingleInstance = (): void => {
     if (!isRunningInstance(instanceIdRef.current)) {
       onNewInstance();
     }
   };
   const interval = window.setInterval(checkSingleInstance, CONFIG.INTERVAL);
-  return () => window.clearInterval(interval);
+  return () => {
+    return window.clearInterval(interval);
+  };
 }
 
 function killCurrentInstance() {
-  return Cookies.remove(CONFIG.COOKIE_NAME);
+  browserStorage.removeItem(CONFIG.STORAGE_KEY);
 }
 
 function register(instanceId: string) {
-  Cookies.set(CONFIG.COOKIE_NAME, JSON.stringify({appInstanceId: instanceId}), {sameSite: 'Lax'});
-  return () => killCurrentInstance();
+  browserStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({appInstanceId: instanceId}));
+  return () => {
+    return killCurrentInstance();
+  };
 }
 
 export function useSingleInstance() {
-  const instanceId = useRef<string | undefined>(undefined);
+  const instanceId = useRef<Maybe<string>>(Maybe.nothing());
   const [hasOtherInstance, setHasOtherInstance] = useState(!isRunningInstance(instanceId.current));
 
   const registerInstance = () => {
-    instanceId.current = createUuid();
-    return register(instanceId.current);
+    const nextInstanceId = createUuid();
+    instanceId.current = Maybe.just(nextInstanceId);
+    return register(nextInstanceId);
   };
 
   const killRunningInstance = () => {
@@ -73,7 +116,11 @@ export function useSingleInstance() {
     setHasOtherInstance(false);
   };
 
-  useEffect(() => poll(instanceId, () => setHasOtherInstance(true)));
+  useEffect(() => {
+    return poll(instanceId, () => {
+      return setHasOtherInstance(true);
+    });
+  });
 
   return {hasOtherInstance, killRunningInstance, registerInstance};
 }

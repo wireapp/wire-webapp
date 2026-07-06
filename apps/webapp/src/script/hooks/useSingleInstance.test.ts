@@ -25,52 +25,83 @@ import {useSingleInstance} from './useSingleInstance';
 describe('useSingleInstance', () => {
   beforeEach(() => {
     jest.useFakeTimers();
+    window.localStorage.clear();
+  });
+
+  afterEach(() => {
+    window.localStorage.clear();
+    jest.useRealTimers();
   });
 
   it('can create multiple new instance listeners', () => {
     const {
-      result: {current: firstIntance},
-    } = renderHook(() => useSingleInstance());
-    expect(firstIntance.hasOtherInstance).toBeFalsy();
+      result: {current: firstInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+    expect(firstInstance.hasOtherInstance).toBeFalsy();
 
     const {
       result: {current: secondInstance},
-    } = renderHook(() => useSingleInstance());
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
     expect(secondInstance.hasOtherInstance).toBeFalsy();
   });
 
   it('only allows a single registered instance', () => {
     const {
-      result: {current: firstIntance},
-    } = renderHook(() => useSingleInstance());
-    expect(firstIntance.hasOtherInstance).toBeFalsy();
+      result: {current: firstInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+    expect(firstInstance.hasOtherInstance).toBeFalsy();
 
-    firstIntance.registerInstance();
+    firstInstance.registerInstance();
 
     const {
       result: {current: secondInstance},
-    } = renderHook(() => useSingleInstance());
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
     expect(secondInstance.hasOtherInstance).toBeTruthy();
 
-    firstIntance.killRunningInstance();
+    firstInstance.killRunningInstance();
   });
 
   it('detects a new instance that has started', () => {
     const {
-      result: {current: firstIntance},
-    } = renderHook(() => useSingleInstance());
-    expect(firstIntance.hasOtherInstance).toBeFalsy();
+      result: {current: firstInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+    expect(firstInstance.hasOtherInstance).toBeFalsy();
 
-    const {result: secondInstance} = renderHook(() => useSingleInstance());
+    const {result: secondInstance} = renderHook(() => {
+      return useSingleInstance();
+    });
     expect(secondInstance.current.hasOtherInstance).toBeFalsy();
 
-    firstIntance.registerInstance();
+    firstInstance.registerInstance();
 
     act(() => {
       jest.advanceTimersByTime(1001);
     });
     expect(secondInstance.current.hasOtherInstance).toBeTruthy();
 
-    firstIntance.killRunningInstance();
+    firstInstance.killRunningInstance();
+  });
+
+  it('does not crash when stored instance data is malformed', () => {
+    window.localStorage.setItem('app_opened', 'not-json');
+
+    const {
+      result: {current: currentInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+
+    expect(currentInstance.hasOtherInstance).toBeFalsy();
+    expect(window.localStorage.getItem('app_opened')).toBeNull();
   });
 });
