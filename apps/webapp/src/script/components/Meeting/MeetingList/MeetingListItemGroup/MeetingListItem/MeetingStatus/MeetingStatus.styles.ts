@@ -27,12 +27,6 @@ export const participatingStatusStyles = {
   alignItems: 'center',
 };
 
-export const startingSoonStatusStyles: CSSObject = {
-  color: 'var(--accent-color)',
-  textTransform: 'uppercase',
-  fontWeight: 'var(--font-weight-semibold)',
-};
-
 export const participatingStatusIconStyles = {
   marginRight: '8px',
   fill: 'var(--accent-color)',

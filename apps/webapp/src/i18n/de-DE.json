@@ -1272,7 +1272,6 @@
   "meetings.list.tomorrow": "Morgen",
   "meetings.meetingStatus.participating": "Anwesend",
   "meetings.meetingStatus.startedAt": "Begann {time}",
-  "meetings.meetingStatus.startingIn": "Beginnt in {countdown}",
   "meetings.navigation.label": "Meetings",
   "meetings.navigation.parent.label": "Meetings",
   "meetings.navigation.title": "Meetings",
