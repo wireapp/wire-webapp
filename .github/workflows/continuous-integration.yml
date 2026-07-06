@@ -304,15 +304,33 @@ jobs:
       - name: Build libraries for lint import resolution
         run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
 
-      - name: Lint (PR)
+      - name: Lint affected projects (ESLint)
         if: ${{ github.event_name == 'pull_request' }}
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: ./bin/yarn lint:affected
+        run: ./bin/yarn nx affected -t lint --base="origin/${BASE_REF}"
 
-      - name: Lint (non-PR)
+      - name: Check formatting (Prettier)
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: ./bin/yarn lint:format
+
+      - name: Stylelint
+        if: ${{ github.event_name == 'pull_request' }}
+        run: ./bin/yarn stylelint
+
+      - name: Lint all projects (ESLint)
         if: ${{ github.event_name != 'pull_request' }}
-        run: ./bin/yarn lint
+        run: ./bin/yarn lint:projects
+
+      - name: Check formatting (Prettier)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: ./bin/yarn lint:format
+
+      - name: Stylelint
+        if: ${{ github.event_name != 'pull_request' }}
+        run: ./bin/yarn stylelint
 
   unit-tests:
     runs-on: ubuntu-24.04
