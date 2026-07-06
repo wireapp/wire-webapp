@@ -12040,7 +12040,7 @@ __metadata:
     webrtc-adapter: "npm:9.0.6"
     workbox-webpack-plugin: "npm:7.4.1"
     worker-timers: "npm:8.0.33"
-    xstate: "npm:5.32.2"
+    xstate: "npm:5.32.4"
     zustand: "npm:4.5.7"
   languageName: unknown
   linkType: soft
@@ -32822,10 +32822,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xstate@npm:5.32.2":
-  version: 5.32.2
-  resolution: "xstate@npm:5.32.2"
-  checksum: 10/e2459c4dca044fc3a2d633b973d3673c33ff585d0a77e82d25db9aa4cdf9d345aad120eb5efb5022bb2283abb2f91c7af2e1fe2468273cfcf191adabbbef5fb6
+"xstate@npm:5.32.4":
+  version: 5.32.4
+  resolution: "xstate@npm:5.32.4"
+  checksum: 10/9a9ab82382b624bb424f34303a83a0c841f02601309ed6699ea16afeb37c56f21d0a82548563dcb8e92f9af4c6e2295d6f0dec7e29dd3b4eb51cc0d81d0f8d07
   languageName: node
   linkType: hard
 
