@@ -95,9 +95,7 @@ describe('useScheduleMeetingSubmit', () => {
 
   it('refreshes meetings after a partial create failure', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
-    const scheduleMeeting = jest
-      .fn()
-      .mockReturnValue(task.reject(meetingSubmitErrors.addParticipantsFailed));
+    const scheduleMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.addParticipantsFailed));
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
 
     const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
@@ -113,21 +111,19 @@ describe('useScheduleMeetingSubmit', () => {
 
   it('refreshes meetings after a partial update failure', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
-    const updateMeeting = jest
-      .fn()
-      .mockReturnValue(task.reject(meetingSubmitErrors.removeParticipantsFailed));
+    const updateMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.removeParticipantsFailed));
     const store = createMeetingStore({loadMeetings, updateMeeting});
 
     useScheduleMeetingModal.getState().openEdit(
       {
         title: formState.title,
-        qualified_id: { id: 'meeting-id', domain: 'example.com' },
-        qualified_creator: { id: 'creator-id', domain: 'example.com' },
-        qualified_conversation: { id: 'conversation-id', domain: 'example.com' },
+        qualified_id: {id: 'meeting-id', domain: 'example.com'},
+        qualified_creator: {id: 'creator-id', domain: 'example.com'},
+        qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
         start_date: '',
         end_date: '',
         recurrence: 'doesNotRepeat',
-        conversation_id: ''
+        conversation_id: '',
       },
       formState,
       {id: 'conversation-id', domain: 'example.com'},
