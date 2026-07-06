@@ -68,17 +68,26 @@ export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
     textTransform = 'none',
     truncate = false,
   },
-) => ({
-  color: muted ? COLOR.GRAY : color,
-  display: block ? 'block' : 'inline',
-  fontSize: fontSize,
-  fontWeight: bold ? 600 : light ? 200 : 400,
-  overflow: truncate ? 'hidden' : undefined,
-  textAlign: center ? 'center' : 'left',
-  textOverflow: truncate ? 'ellipsis' : undefined,
-  textTransform: textTransform,
-  whiteSpace: noWrap ? 'nowrap' : undefined,
-});
+) => {
+  let fontWeight = 400;
+  if (bold) {
+    fontWeight = 600;
+  } else if (light) {
+    fontWeight = 200;
+  }
+
+  return {
+    color: muted ? COLOR.GRAY : color,
+    display: block ? 'block' : 'inline',
+    fontSize: fontSize,
+    fontWeight,
+    overflow: truncate ? 'hidden' : undefined,
+    textAlign: center ? 'center' : 'left',
+    textOverflow: truncate ? 'ellipsis' : undefined,
+    textTransform: textTransform,
+    whiteSpace: noWrap ? 'nowrap' : undefined,
+  };
+};
 
 export const Text = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
   <span ref={ref} css={(theme: Theme) => textStyle(theme, props)} {...filterTextProps(props)} />

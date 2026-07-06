@@ -33,34 +33,41 @@ export const controlStyles = ({
   isDisabled: boolean;
   isOpen: boolean;
   markInvalid: boolean;
-}): CSSObject => ({
-  alignItems: 'center',
-  appearance: 'none',
-  backgroundColor: isDisabled ? 'var(--background-fadeout)' : 'var(--text-input-background)',
-  border: markInvalid
-    ? '1px solid var(--danger-color)'
-    : isOpen
-      ? '1px solid var(--accent-color)'
-      : '1px solid var(--border-color)',
-  borderRadius: '12px',
-  boxShadow: 'none',
-  cursor: isDisabled ? 'default' : 'text',
-  display: 'flex',
-  gap: '8px',
-  minHeight: '48px',
-  outline: 'none',
-  padding: '0 8px 0 16px',
-  textAlign: 'left',
-  width: '100%',
-  '&[data-disabled="true"]': {
-    backgroundColor: 'var(--background-fadeout)',
-    color: 'var(--text-input-placeholder)',
-    cursor: 'default',
-  },
-  '&:focus-within': {
-    border: markInvalid ? '1px solid var(--danger-color)' : '1px solid var(--accent-color)',
-  },
-});
+}): CSSObject => {
+  let border: string;
+  if (markInvalid) {
+    border = '1px solid var(--danger-color)';
+  } else if (isOpen) {
+    border = '1px solid var(--accent-color)';
+  } else {
+    border = '1px solid var(--border-color)';
+  }
+
+  return {
+    alignItems: 'center',
+    appearance: 'none',
+    backgroundColor: isDisabled ? 'var(--background-fadeout)' : 'var(--text-input-background)',
+    border,
+    borderRadius: '12px',
+    boxShadow: 'none',
+    cursor: isDisabled ? 'default' : 'text',
+    display: 'flex',
+    gap: '8px',
+    minHeight: '48px',
+    outline: 'none',
+    padding: '0 8px 0 16px',
+    textAlign: 'left',
+    width: '100%',
+    '&[data-disabled="true"]': {
+      backgroundColor: 'var(--background-fadeout)',
+      color: 'var(--text-input-placeholder)',
+      cursor: 'default',
+    },
+    '&:focus-within': {
+      border: markInvalid ? '1px solid var(--danger-color)' : '1px solid var(--accent-color)',
+    },
+  };
+};
 
 export const searchIconStyles: CSSObject = {
   color: 'var(--text-input-placeholder)',

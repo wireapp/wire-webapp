@@ -204,14 +204,22 @@ const createFeatureNotifications = (
       if (!hasFeatureChanged) {
         return undefined;
       }
+
+      let htmlMessage: string;
+      if (isFeatureEnabled) {
+        if (isEnforced) {
+          htmlMessage = translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
+            timeout: formatDuration(newTimeout, translate).text,
+          });
+        } else {
+          htmlMessage = translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled');
+        }
+      } else {
+        htmlMessage = translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled');
+      }
+
       return {
-        htmlMessage: isFeatureEnabled
-          ? isEnforced
-            ? translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
-                timeout: formatDuration(newTimeout, translate).text,
-              })
-            : translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled')
-          : translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled'),
+        htmlMessage,
         title: 'featureConfigChangeModalSelfDeletingMessagesHeadline',
       };
     },
