@@ -1274,7 +1274,6 @@
   "meetings.list.tomorrow": "Завтра",
   "meetings.meetingStatus.participating": "Участвует",
   "meetings.meetingStatus.startedAt": "Начата в {time}",
-  "meetings.meetingStatus.startingIn": "Начало в {countdown}",
   "meetings.navigation.label": "Встречи",
   "meetings.navigation.parent.label": "Встречи",
   "meetings.navigation.title": "Встречи",

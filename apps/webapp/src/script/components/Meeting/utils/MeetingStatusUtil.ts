@@ -18,25 +18,13 @@
  */
 
 import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 export enum MeetingStatuses {
   ON_GOING = 'on_going',
-  STARTING_SOON = 'starting_soon',
   PARTICIPATING = 'participating',
   UPCOMING = 'upcoming',
   PAST = 'past',
 }
-
-/**
- * Threshold in minutes to determine if a meeting is starting soon.
- */
-const STARTING_SOON_THRESHOLD_MINUTES = 5;
-
-/**
- * Threshold in milliseconds to determine if a meeting is starting soon.
- */
-export const STARTING_SOON_THRESHOLD_MS = STARTING_SOON_THRESHOLD_MINUTES * TIME_IN_MILLIS.MINUTE;
 
 /**
  * Filters the list of meetings to return only those that are ongoing at the specified time.
@@ -78,21 +66,5 @@ export const getMeetingStatusAt = (
     return attending ? MeetingStatuses.PARTICIPATING : MeetingStatuses.ON_GOING;
   }
 
-  if (startMs <= nowMs + STARTING_SOON_THRESHOLD_MS) {
-    return MeetingStatuses.STARTING_SOON;
-  }
-
   return MeetingStatuses.UPCOMING;
-};
-
-/**
- * Calculates the countdown in seconds until a meeting starts.
- *
- * @param {number} nowMs - The current time in milliseconds.
- * @param {string} start_date - The start date of the meeting in ISO format.
- * @returns {number} - The countdown in seconds, or 0 if the meeting has already started.
- */
-export const getCountdownSeconds = (nowMs: number, start_date: string): number => {
-  const startMs = new Date(start_date).getTime();
-  return Math.max(0, Math.ceil((startMs - nowMs) / TIME_IN_MILLIS.SECOND));
 };
