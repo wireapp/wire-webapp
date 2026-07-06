@@ -32,6 +32,7 @@ import type {Translate} from 'Util/localizerUtil';
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
 import type {MeetingSubmitSuccess, UpdateMeetingParams} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
+import {shouldRefreshMeetingsListAfterSubmitError} from './shouldRefreshMeetingsListAfterSubmitError';
 import {showMeetingPartialAddFailureModal} from './showMeetingPartialAddFailureModal';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
@@ -111,6 +112,10 @@ export const useScheduleMeetingSubmit = () => {
       });
 
       if (submitResult.isErr) {
+        if (shouldRefreshMeetingsListAfterSubmitError(submitResult.error)) {
+          await task.tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings);
+        }
+
         setIsSubmitting(false);
         showMeetingSubmitError(translate, submitResult.error);
         return false;

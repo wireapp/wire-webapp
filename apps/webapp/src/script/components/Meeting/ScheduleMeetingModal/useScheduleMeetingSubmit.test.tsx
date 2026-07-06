@@ -51,14 +51,15 @@ const RootProviderWrapper = createRootProviderWrapperForTest(
 const createMeetingStore = ({
   loadMeetings = jest.fn().mockResolvedValue(undefined),
   scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'scheduleMeeting'>> = {}) =>
+  updateMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'scheduleMeeting' | 'updateMeeting'>> = {}) =>
   createStore<MeetingStoreState>(() => ({
     meetings: [],
     isLoading: false,
     hasLoadError: false,
     loadMeetings,
     scheduleMeeting,
-    updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    updateMeeting,
     loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
   }));
 
@@ -90,5 +91,74 @@ describe('useScheduleMeetingSubmit', () => {
     expect(submitResult).toBe(true);
     expect(scheduleMeeting).toHaveBeenCalledWith(formState);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshes meetings after a partial create failure', async () => {
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const scheduleMeeting = jest
+      .fn()
+      .mockReturnValue(task.reject(meetingSubmitErrors.addParticipantsFailed));
+    const store = createMeetingStore({loadMeetings, scheduleMeeting});
+
+    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+
+    let submitResult = false;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    expect(submitResult).toBe(false);
+    expect(loadMeetings).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshes meetings after a partial update failure', async () => {
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const updateMeeting = jest
+      .fn()
+      .mockReturnValue(task.reject(meetingSubmitErrors.removeParticipantsFailed));
+    const store = createMeetingStore({loadMeetings, updateMeeting});
+
+    useScheduleMeetingModal.getState().openEdit(
+      {
+        title: formState.title,
+        qualified_id: { id: 'meeting-id', domain: 'example.com' },
+        qualified_creator: { id: 'creator-id', domain: 'example.com' },
+        qualified_conversation: { id: 'conversation-id', domain: 'example.com' },
+        start_date: '',
+        end_date: '',
+        recurrence: 'doesNotRepeat',
+        conversation_id: ''
+      },
+      formState,
+      {id: 'conversation-id', domain: 'example.com'},
+      [],
+    );
+
+    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+
+    let submitResult = false;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    expect(submitResult).toBe(false);
+    expect(updateMeeting).toHaveBeenCalled();
+    expect(loadMeetings).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not refresh meetings when create fails before server state changes', async () => {
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const scheduleMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed));
+    const store = createMeetingStore({loadMeetings, scheduleMeeting});
+
+    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+
+    let submitResult = false;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    expect(submitResult).toBe(false);
+    expect(loadMeetings).not.toHaveBeenCalled();
   });
 });

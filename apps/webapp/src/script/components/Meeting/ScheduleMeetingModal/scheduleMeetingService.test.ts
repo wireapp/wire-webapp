@@ -369,4 +369,28 @@ describe('updateMeeting', () => {
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.addParticipantsFailed);
     expect(safeAddUsers).toHaveBeenCalled();
   });
+
+  it('returns addParticipantsFailed when the conversation id is missing after metadata update', async () => {
+    const alice = createUser('1');
+    const bob = createUser('2');
+    const {deps, updateMeetingMock, safeGetConversationById} = createDeps();
+
+    const result = await updateMeeting(
+      {
+        meetingId,
+        formState: {
+          ...formState,
+          selectedUsers: [bob],
+        },
+        qualifiedConversation: maybe.nothing(),
+        originalSelectedUsers: [alice],
+      },
+      deps,
+    );
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.addParticipantsFailed);
+    expect(updateMeetingMock).toHaveBeenCalled();
+    expect(safeGetConversationById).not.toHaveBeenCalled();
+  });
 });

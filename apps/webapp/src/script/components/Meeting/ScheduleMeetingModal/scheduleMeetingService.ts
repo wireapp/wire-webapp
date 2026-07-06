@@ -53,7 +53,7 @@ const mapSyncErrorToSubmitError = (error: MeetingConversationSyncError): Meeting
       return meetingSubmitErrors.addParticipantsFailed;
     case meetingConversationSyncErrors.conversationNotFound:
     case meetingConversationSyncErrors.groupIdMissing:
-      return meetingSubmitErrors.updateFailed;
+      return meetingSubmitErrors.addParticipantsFailed;
     default:
       return meetingSubmitErrors.addParticipantsFailed;
   }
@@ -110,7 +110,7 @@ export const updateMeeting = (
       }
 
       if (qualifiedConversation.isNothing) {
-        return task.reject(meetingSubmitErrors.updateFailed);
+        return task.reject(meetingSubmitErrors.addParticipantsFailed);
       }
 
       return syncMeetingConversationParticipants(deps.conversationRepository, {
