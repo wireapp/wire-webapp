@@ -2,11 +2,6 @@ name: Generate test reports
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Git branch to generate the test report for'
-        required: true
-        type: string
 
 jobs:
   generate_test_report:
@@ -21,7 +16,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          ref: refs/heads/${{ inputs.branch }}
+          ref: ${{ github.ref }}
 
       - name: Capture checked out commit SHA
         run: echo "TESTED_COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
@@ -57,7 +52,7 @@ jobs:
         id: package_unit_test_reports
         continue-on-error: true
         env:
-          BRANCH: ${{ inputs.branch }}
+          BRANCH: ${{ github.ref_name }}
         run: ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/generateUnitTestReports.ts
 
       - name: Generate app unit test report
@@ -72,7 +67,7 @@ jobs:
             cd ./apps/webapp
             node ../../node_modules/jest/bin/jest.js --config jest.report.config.cjs --coverage --coverageReporters=lcov --verbose
           ) 2>&1 | tee -a ${{ env.UNIT_TEST_REPORT_FILE }}
-          echo -e "BRANCH = ${{ inputs.branch }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "BRANCH = ${{ github.ref_name }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
           echo -e "COMMIT SHA = ${TESTED_COMMIT_SHA}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
           echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{ env.UNIT_TEST_REPORT_FILE }}
 
