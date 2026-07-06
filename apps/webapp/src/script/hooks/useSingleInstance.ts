@@ -19,6 +19,8 @@
 
 import {useEffect, useRef, useState} from 'react';
 
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import is from '@sindresorhus/is';
 import {Runtime} from '@wireapp/commons';
 import {Maybe, result} from 'true-myth';
@@ -36,6 +38,7 @@ const CONFIG = {
 
 interface UseSingleInstanceDependencies {
   singleInstanceStorage: StringKeyValueStorage;
+  wallClock: WallClock;
 }
 
 interface UseSingleInstanceResult {
@@ -46,6 +49,7 @@ interface UseSingleInstanceResult {
 
 const defaultUseSingleInstanceDependencies: UseSingleInstanceDependencies = {
   singleInstanceStorage: createStringKeyValueStorageFromWebStorage(Maybe.of(getStorage())),
+  wallClock: createWallClock(),
 };
 
 function getStoredInstanceId(storage: StringKeyValueStorage): Maybe<string> {
@@ -95,15 +99,16 @@ function startSingleInstancePolling(
   getCurrentInstanceId: () => Maybe<string>,
   onNewInstance: () => void,
   storage: StringKeyValueStorage,
+  wallClock: WallClock,
 ): () => void {
   const checkSingleInstance = (): void => {
     if (!isRunningInstance(getCurrentInstanceId(), storage)) {
       onNewInstance();
     }
   };
-  const interval = window.setInterval(checkSingleInstance, CONFIG.INTERVAL);
+  const interval = wallClock.setInterval(checkSingleInstance, CONFIG.INTERVAL);
   return () => {
-    return window.clearInterval(interval);
+    return wallClock.clearInterval(interval);
   };
 }
 
@@ -119,7 +124,7 @@ function register(instanceId: string, storage: StringKeyValueStorage): () => voi
 }
 
 export function createUseSingleInstance(dependencies: UseSingleInstanceDependencies): () => UseSingleInstanceResult {
-  const {singleInstanceStorage} = dependencies;
+  const {singleInstanceStorage, wallClock} = dependencies;
 
   return function useSingleInstanceWithDependencies(): UseSingleInstanceResult {
     const instanceId = useRef<Maybe<string>>(Maybe.nothing());
@@ -147,6 +152,7 @@ export function createUseSingleInstance(dependencies: UseSingleInstanceDependenc
           return setHasOtherInstance(true);
         },
         singleInstanceStorage,
+        wallClock,
       );
     });
 

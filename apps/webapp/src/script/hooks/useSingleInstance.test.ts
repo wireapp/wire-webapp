@@ -18,6 +18,8 @@
  */
 
 import {renderHook} from '@testing-library/react';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import type {DeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {act} from 'react';
 import {Maybe, maybe} from 'true-myth';
 
@@ -56,18 +58,13 @@ function createInMemoryStringKeyValueStorage(): StringKeyValueStorage {
 
 describe('useSingleInstance', () => {
   let singleInstanceStorage: StringKeyValueStorage;
+  let wallClock: DeterministicWallClock;
   let useSingleInstance: ReturnType<typeof createUseSingleInstance>;
 
   beforeEach(() => {
-    jest.useFakeTimers();
-    window.localStorage.clear();
     singleInstanceStorage = createInMemoryStringKeyValueStorage();
-    useSingleInstance = createUseSingleInstance({singleInstanceStorage});
-  });
-
-  afterEach(() => {
-    window.localStorage.clear();
-    jest.useRealTimers();
+    wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    useSingleInstance = createUseSingleInstance({singleInstanceStorage, wallClock});
   });
 
   it('can create multiple new instance listeners', () => {
@@ -122,7 +119,7 @@ describe('useSingleInstance', () => {
     firstInstance.registerInstance();
 
     act(() => {
-      jest.advanceTimersByTime(1001);
+      wallClock.advanceByMilliseconds(1001);
     });
     expect(secondInstance.current.hasOtherInstance).toBeTruthy();
 
