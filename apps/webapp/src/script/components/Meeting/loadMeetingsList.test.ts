@@ -43,7 +43,7 @@ describe('loadMeetingsList', () => {
     const result = await loadMeetingsList(createRepository(getMeetingsList));
 
     expect(getMeetingsList).toHaveBeenCalledTimes(1);
-    expect(result).toEqual({meetings: []});
+    expect(result).toEqual({meetings: [], hasLoadError: false});
   });
 
   it('maps successful API meetings to list meetings', async () => {
