@@ -40,17 +40,17 @@ const storedSingleInstanceSchema = z.object({
   appInstanceId: z.string(),
 });
 
-interface UseSingleInstanceDependencies {
+type UseSingleInstanceDependencies = {
   createInstanceId: () => string;
   singleInstanceStorage: StringKeyValueStorage;
   wallClock: WallClock;
-}
+};
 
-interface UseSingleInstanceResult {
+type UseSingleInstanceResult = {
   hasOtherInstance: boolean;
   killRunningInstance: () => void;
   registerInstance: () => () => void;
-}
+};
 
 const defaultUseSingleInstanceDependencies: UseSingleInstanceDependencies = {
   createInstanceId: createUuid,

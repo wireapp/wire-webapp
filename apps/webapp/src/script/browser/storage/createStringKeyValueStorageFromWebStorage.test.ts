@@ -19,8 +19,15 @@
 
 import {Maybe} from 'true-myth';
 
-export type StringKeyValueStorage = {
-  getItem: (key: string) => Maybe<string>;
-  removeItem: (key: string) => void;
-  setItem: (key: string, value: string) => void;
-};
+import {createStringKeyValueStorageFromWebStorage} from './createStringKeyValueStorageFromWebStorage';
+
+describe('createStringKeyValueStorageFromWebStorage', () => {
+  it('treats unavailable storage as empty no-op storage', () => {
+    const stringKeyValueStorage = createStringKeyValueStorageFromWebStorage(Maybe.nothing());
+
+    stringKeyValueStorage.setItem('app_opened', 'stored-value');
+    stringKeyValueStorage.removeItem('app_opened');
+
+    expect(stringKeyValueStorage.getItem('app_opened')).toStrictEqual(Maybe.nothing());
+  });
+});

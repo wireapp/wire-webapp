@@ -146,4 +146,30 @@ describe('useSingleInstance', () => {
     expect(currentInstance.hasOtherInstance).toBeFalsy();
     expect(singleInstanceStorage.getItem('app_opened')).toStrictEqual(Maybe.nothing());
   });
+
+  it('removes stored instance data with an invalid shape', () => {
+    singleInstanceStorage.setItem('app_opened', JSON.stringify({appInstanceId: 42}));
+
+    const {
+      result: {current: currentInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+
+    expect(currentInstance.hasOtherInstance).toBeFalsy();
+    expect(singleInstanceStorage.getItem('app_opened')).toStrictEqual(Maybe.nothing());
+  });
+
+  it('removes stored instance data without an instance id', () => {
+    singleInstanceStorage.setItem('app_opened', JSON.stringify({}));
+
+    const {
+      result: {current: currentInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+
+    expect(currentInstance.hasOtherInstance).toBeFalsy();
+    expect(singleInstanceStorage.getItem('app_opened')).toStrictEqual(Maybe.nothing());
+  });
 });
