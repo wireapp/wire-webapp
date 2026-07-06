@@ -34,7 +34,19 @@ const CONFIG = {
   STORAGE_KEY: 'app_opened',
 };
 
-const singleInstanceStorage = createStringKeyValueStorageFromWebStorage(Maybe.of(getStorage()));
+interface UseSingleInstanceDependencies {
+  singleInstanceStorage: StringKeyValueStorage;
+}
+
+interface UseSingleInstanceResult {
+  hasOtherInstance: boolean;
+  killRunningInstance: () => void;
+  registerInstance: () => () => void;
+}
+
+const defaultUseSingleInstanceDependencies: UseSingleInstanceDependencies = {
+  singleInstanceStorage: createStringKeyValueStorageFromWebStorage(Maybe.of(getStorage())),
+};
 
 function getStoredInstanceId(storage: StringKeyValueStorage): Maybe<string> {
   const storedInstance = storage.getItem(CONFIG.STORAGE_KEY);
@@ -70,18 +82,22 @@ function getStoredInstanceId(storage: StringKeyValueStorage): Maybe<string> {
   });
 }
 
-function isRunningInstance(instanceId: Maybe<string>) {
+function isRunningInstance(instanceId: Maybe<string>, storage: StringKeyValueStorage): boolean {
   if (Runtime.isDesktopApp()) {
     return true;
   }
 
-  const otherInstanceId = getStoredInstanceId(singleInstanceStorage);
+  const otherInstanceId = getStoredInstanceId(storage);
   return otherInstanceId.equals(instanceId);
 }
 
-function poll(instanceIdRef: {current: Maybe<string>}, onNewInstance: () => void) {
+function poll(
+  instanceIdRef: {current: Maybe<string>},
+  onNewInstance: () => void,
+  storage: StringKeyValueStorage,
+): () => void {
   const checkSingleInstance = (): void => {
-    if (!isRunningInstance(instanceIdRef.current)) {
+    if (!isRunningInstance(instanceIdRef.current, storage)) {
       onNewInstance();
     }
   };
@@ -91,37 +107,49 @@ function poll(instanceIdRef: {current: Maybe<string>}, onNewInstance: () => void
   };
 }
 
-function killCurrentInstance() {
-  singleInstanceStorage.removeItem(CONFIG.STORAGE_KEY);
+function killCurrentInstance(storage: StringKeyValueStorage): void {
+  storage.removeItem(CONFIG.STORAGE_KEY);
 }
 
-function register(instanceId: string) {
-  singleInstanceStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({appInstanceId: instanceId}));
+function register(instanceId: string, storage: StringKeyValueStorage): () => void {
+  storage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({appInstanceId: instanceId}));
   return () => {
-    return killCurrentInstance();
+    return killCurrentInstance(storage);
   };
 }
 
-export function useSingleInstance() {
-  const instanceId = useRef<Maybe<string>>(Maybe.nothing());
-  const [hasOtherInstance, setHasOtherInstance] = useState(!isRunningInstance(instanceId.current));
+export function createUseSingleInstance(dependencies: UseSingleInstanceDependencies): () => UseSingleInstanceResult {
+  const {singleInstanceStorage} = dependencies;
 
-  const registerInstance = () => {
-    const nextInstanceId = createUuid();
-    instanceId.current = Maybe.just(nextInstanceId);
-    return register(nextInstanceId);
-  };
+  return function useSingleInstanceWithDependencies(): UseSingleInstanceResult {
+    const instanceId = useRef<Maybe<string>>(Maybe.nothing());
+    const [hasOtherInstance, setHasOtherInstance] = useState(
+      !isRunningInstance(instanceId.current, singleInstanceStorage),
+    );
 
-  const killRunningInstance = () => {
-    killCurrentInstance();
-    setHasOtherInstance(false);
-  };
+    const registerInstance = (): (() => void) => {
+      const nextInstanceId = createUuid();
+      instanceId.current = Maybe.just(nextInstanceId);
+      return register(nextInstanceId, singleInstanceStorage);
+    };
 
-  useEffect(() => {
-    return poll(instanceId, () => {
-      return setHasOtherInstance(true);
+    const killRunningInstance = (): void => {
+      killCurrentInstance(singleInstanceStorage);
+      setHasOtherInstance(false);
+    };
+
+    useEffect(() => {
+      return poll(
+        instanceId,
+        () => {
+          return setHasOtherInstance(true);
+        },
+        singleInstanceStorage,
+      );
     });
-  });
 
-  return {hasOtherInstance, killRunningInstance, registerInstance};
+    return {hasOtherInstance, killRunningInstance, registerInstance};
+  };
 }
+
+export const useSingleInstance = createUseSingleInstance(defaultUseSingleInstanceDependencies);

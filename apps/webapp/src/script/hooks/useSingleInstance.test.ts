@@ -19,13 +19,50 @@
 
 import {renderHook} from '@testing-library/react';
 import {act} from 'react';
+import {Maybe, maybe} from 'true-myth';
 
-import {useSingleInstance} from './useSingleInstance';
+import {StringKeyValueStorage} from 'src/script/storage/StringKeyValueStorage';
+
+import {createUseSingleInstance} from './useSingleInstance';
+
+function createInMemoryStringKeyValueStorage(): StringKeyValueStorage {
+  const storedValues: Array<{key: string; value: string}> = [];
+
+  const storage: StringKeyValueStorage = {
+    getItem: key => {
+      return maybe.find(item => {
+        return item.key === key;
+      }, storedValues).map(item => {
+        return item.value;
+      });
+    },
+    removeItem: key => {
+      const storedValueIndex = storedValues.findIndex(item => {
+        return item.key === key;
+      });
+
+      if (storedValueIndex >= 0) {
+        storedValues.splice(storedValueIndex, 1);
+      }
+    },
+    setItem: (key, value) => {
+      storage.removeItem(key);
+      storedValues.push({key, value});
+    },
+  };
+
+  return storage;
+}
 
 describe('useSingleInstance', () => {
+  let singleInstanceStorage: StringKeyValueStorage;
+  let useSingleInstance: ReturnType<typeof createUseSingleInstance>;
+
   beforeEach(() => {
     jest.useFakeTimers();
     window.localStorage.clear();
+    singleInstanceStorage = createInMemoryStringKeyValueStorage();
+    useSingleInstance = createUseSingleInstance({singleInstanceStorage});
   });
 
   afterEach(() => {
@@ -93,7 +130,7 @@ describe('useSingleInstance', () => {
   });
 
   it('does not crash when stored instance data is malformed', () => {
-    window.localStorage.setItem('app_opened', 'not-json');
+    singleInstanceStorage.setItem('app_opened', 'not-json');
 
     const {
       result: {current: currentInstance},
@@ -102,6 +139,6 @@ describe('useSingleInstance', () => {
     });
 
     expect(currentInstance.hasOtherInstance).toBeFalsy();
-    expect(window.localStorage.getItem('app_opened')).toBeNull();
+    expect(singleInstanceStorage.getItem('app_opened')).toStrictEqual(Maybe.nothing());
   });
 });
