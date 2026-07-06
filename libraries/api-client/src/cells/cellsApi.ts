@@ -170,7 +170,7 @@ export class CellsAPI {
 
     let filePath = `${path}`.normalize('NFC');
 
-    const result = await this.client!.createCheck(
+    const result = await this.client.createCheck(
       {
         Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
         FindAvailablePath: true,
@@ -190,7 +190,7 @@ export class CellsAPI {
       'Create-Version-Id': versionId,
     };
 
-    await this.storageService!.putObject({path: filePath, file, metadata, progressCallback, abortController});
+    await this.storageService.putObject({path: filePath, file, metadata, progressCallback, abortController});
 
     return result.data;
   }
@@ -210,7 +210,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.createCheck({
+    const result = await this.client.createCheck({
       Inputs: [{Type: type, Locator: {Path: path.normalize('NFC'), Uuid: uuid}, VersionId: versionId}],
       FindAvailablePath: false,
     });
@@ -223,7 +223,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.promoteVersion(uuid, versionId, {Publish: true});
+    const result = await this.client.promoteVersion(uuid, versionId, {Publish: true});
 
     return result.data;
   }
@@ -233,7 +233,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.deleteVersion(uuid, versionId);
+    const result = await this.client.deleteVersion(uuid, versionId);
 
     return result.data;
   }
@@ -249,7 +249,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.performAction('delete', {
+    const result = await this.client.performAction('delete', {
       Nodes: [{Uuid: uuid}],
       DeleteOptions: {PermanentDelete: permanently},
     });
@@ -268,7 +268,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.performAction('move', {
+    const result = await this.client.performAction('move', {
       Nodes: [{Path: currentPath}],
       CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
       AwaitStatus: 'Finished',
@@ -283,7 +283,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.performAction('restore', {Nodes: [{Uuid: uuid}]});
+    const result = await this.client.performAction('restore', {Nodes: [{Uuid: uuid}]});
 
     return result.data;
   }
@@ -296,7 +296,7 @@ export class CellsAPI {
     const basePath = currentPath.split('/').slice(0, -1).join('/');
     const newPath = `${basePath}/${newName}`;
 
-    const result = await this.client!.performAction('move', {
+    const result = await this.client.performAction('move', {
       Nodes: [{Path: currentPath}],
       CopyMoveOptions: {TargetIsParent: false, TargetPath: newPath},
       AwaitStatus: 'Finished',
@@ -311,7 +311,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.lookup({
+    const result = await this.client.lookup({
       Scope: {Nodes: [{Path: path}]},
       Flags: ['WithPreSignedURLs'],
     });
@@ -330,7 +330,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.lookup({
+    const result = await this.client.lookup({
       Scope: {Nodes: [{Uuid: uuid}]},
       Flags: ['WithPreSignedURLs'],
     });
@@ -349,7 +349,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.nodeVersions(uuid, {FilterBy: 'VersionsAll', Flags: flags});
+    const result = await this.client.nodeVersions(uuid, {FilterBy: 'VersionsAll', Flags: flags});
 
     const validation = RestNodeVersionsSchema.safeParse(result.data.Versions);
 
@@ -365,7 +365,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.getByUuid(id, flags);
+    const result = await this.client.getByUuid(id, flags);
 
     const validation = RestNodeSchema.safeParse(result.data);
 
@@ -412,7 +412,7 @@ export class CellsAPI {
       SortDirDesc: Boolean(sortDirection) ? sortDirection === 'desc' : undefined,
     };
 
-    const result = await this.client!.lookup(request);
+    const result = await this.client.lookup(request);
 
     return result.data;
   }
@@ -486,7 +486,7 @@ export class CellsAPI {
       SortDirDesc: sortDirection !== undefined ? sortDirection === 'desc' : undefined,
     };
 
-    const result = await this.client!.lookup(request);
+    const result = await this.client.lookup(request);
 
     return result.data;
   }
@@ -508,7 +508,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const response = await this.client!.create({
+    const response = await this.client.create({
       Inputs: [
         {
           Type: type,
@@ -562,7 +562,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.deletePublicLink(uuid);
+    const result = await this.client.deletePublicLink(uuid);
 
     return result.data;
   }
@@ -609,7 +609,7 @@ export class CellsAPI {
       requestBody.PasswordEnabled = passwordEnabled;
     }
 
-    const result = await this.client!.createPublicLink(uuid, requestBody);
+    const result = await this.client.createPublicLink(uuid, requestBody);
 
     return result.data;
   }
@@ -619,7 +619,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.getPublicLink(uuid);
+    const result = await this.client.getPublicLink(uuid);
 
     return result.data;
   }
@@ -673,7 +673,7 @@ export class CellsAPI {
       requestBody.UpdatePassword = updatePassword;
     }
 
-    const result = await this.client!.updatePublicLink(linkUuid, requestBody);
+    const result = await this.client.updatePublicLink(linkUuid, requestBody);
 
     return result.data;
   }
@@ -683,7 +683,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.listNamespaceValues(USER_META_TAGS_NAMESPACE);
+    const result = await this.client.listNamespaceValues(USER_META_TAGS_NAMESPACE);
 
     return result.data;
   }
@@ -693,7 +693,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client!.patchNode(uuid, {
+    const result = await this.client.patchNode(uuid, {
       MetaUpdates: [
         {
           Operation: tags.length > 0 ? 'PUT' : 'DELETE',
