@@ -91,13 +91,13 @@ function isRunningInstance(instanceId: Maybe<string>, storage: StringKeyValueSto
   return otherInstanceId.equals(instanceId);
 }
 
-function poll(
-  instanceIdRef: {current: Maybe<string>},
+function startSingleInstancePolling(
+  getCurrentInstanceId: () => Maybe<string>,
   onNewInstance: () => void,
   storage: StringKeyValueStorage,
 ): () => void {
   const checkSingleInstance = (): void => {
-    if (!isRunningInstance(instanceIdRef.current, storage)) {
+    if (!isRunningInstance(getCurrentInstanceId(), storage)) {
       onNewInstance();
     }
   };
@@ -139,8 +139,10 @@ export function createUseSingleInstance(dependencies: UseSingleInstanceDependenc
     };
 
     useEffect(() => {
-      return poll(
-        instanceId,
+      return startSingleInstancePolling(
+        () => {
+          return instanceId.current;
+        },
         () => {
           return setHasOtherInstance(true);
         },
