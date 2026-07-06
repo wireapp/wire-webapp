@@ -2676,8 +2676,6 @@ export class ConversationRepository {
    * @param userEntities Users to be added to the conversation
    * @returns Resolves when members were added
    *
-   * @deprecated Use {@link safeAddUsers} instead. This method may throw or swallow errors
-   * inconsistently. Prefer the `Task`-returning variant.
    */
   async addUsers(conversation: Conversation, userEntities: Pick<User, 'qualifiedId'>[]) {
     /**
@@ -2739,16 +2737,46 @@ export class ConversationRepository {
   }
 
   /**
-   * Add users to a conversation with explicit error handling.
+   * Add users to an established MLS conversation with explicit error handling.
    *
-   * Returns a `Task` so failures are captured in the error channel instead of surfacing
-   * as an uncaught exception. Prefer to compose async work with `Task`/`Result` and use this
-   * method to handle errors explicitly.
+   * Returns a `Task` resolving to `{failedToAdd}` on success (partial add failures are
+   * included in the value, not the error channel). Hard failures (network, MLS commit,
+   * missing group id) are captured in the Task error channel.
+   *
+   * Does not inject conversation events — meeting conversations are hidden from the main
+   * conversation list; partial add failures are surfaced via meetings UI (e.g. modal).
    */
-  safeAddUsers(conversation: Conversation, userEntities: Pick<User, 'qualifiedId'>[]): Task<void, unknown> {
+  safeAddUsers(
+    conversation: Conversation,
+    userEntities: Pick<User, 'qualifiedId'>[],
+  ): Task<{failedToAdd: AddUsersFailure[]}, unknown> {
     return task.tryOrElse(
       error => error,
-      () => this.addUsers(conversation, userEntities),
+      async () => {
+        const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
+
+        if (qualifiedUsers.length === 0) {
+          return {failedToAdd: []};
+        }
+
+        const {groupId} = conversation;
+
+        if (!is.nonEmptyString(groupId)) {
+          throw new Error('Cannot add users to MLS conversation without group id');
+        }
+
+        if (!this.core.service) {
+          throw new Error('Cannot add users to MLS conversation without core service');
+        }
+
+        const {failedToAdd = []} = await this.core.service.conversation.addUsersToMLSConversation({
+          conversationId: conversation.qualifiedId,
+          groupId,
+          qualifiedUsers,
+        });
+
+        return {failedToAdd};
+      },
     );
   }
 

@@ -97,4 +97,70 @@ describe('ConversationRepository safe* wrappers', () => {
       expect(settled.match({Ok: () => null, Err: value => value})).toBe(error);
     });
   });
+
+  describe('safeAddUsers', () => {
+    it('resolves to Ok with failedToAdd when adding users succeeds', async () => {
+      const conversation = _generateConversation();
+      conversation.groupId = 'group-id';
+      const user = generateUser();
+      const failedToAdd = [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}];
+      const conversationRepository = testFactory.conversation_repository!;
+      conversationRepository['core'].service!.conversation.addUsersToMLSConversation = jest
+        .fn()
+        .mockResolvedValue({failedToAdd});
+
+      const settled = await conversationRepository.safeAddUsers(conversation, [user]);
+
+      expect(settled.isOk).toBe(true);
+      expect(settled.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual(failedToAdd);
+      expect(conversationRepository['core'].service!.conversation.addUsersToMLSConversation).toHaveBeenCalledWith({
+        conversationId: conversation.qualifiedId,
+        groupId: conversation.groupId,
+        qualifiedUsers: [user.qualifiedId],
+      });
+    });
+
+    it('resolves to Ok with empty failedToAdd when no users are provided', async () => {
+      const conversation = _generateConversation();
+      conversation.groupId = 'group-id';
+      const conversationRepository = testFactory.conversation_repository!;
+      conversationRepository['core'].service!.conversation.addUsersToMLSConversation = jest.fn();
+
+      const settled = await conversationRepository.safeAddUsers(conversation, []);
+
+      expect(settled.isOk).toBe(true);
+      expect(settled.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual([]);
+      expect(conversationRepository['core'].service!.conversation.addUsersToMLSConversation).not.toHaveBeenCalled();
+    });
+
+    it('resolves to Err when adding users throws', async () => {
+      const conversation = _generateConversation();
+      conversation.groupId = 'group-id';
+      const user = generateUser();
+      const error = new Error('MLS commit failed');
+      const conversationRepository = testFactory.conversation_repository!;
+      conversationRepository['core'].service!.conversation.addUsersToMLSConversation = jest
+        .fn()
+        .mockRejectedValue(error);
+
+      const settled = await conversationRepository.safeAddUsers(conversation, [user]);
+
+      expect(settled.isErr).toBe(true);
+      expect(settled.match({Ok: () => null, Err: value => value})).toBe(error);
+    });
+
+    it('resolves to Err when the conversation has no group id', async () => {
+      const conversation = _generateConversation();
+      conversation.groupId = undefined;
+      const user = generateUser();
+      const conversationRepository = testFactory.conversation_repository!;
+
+      const settled = await conversationRepository.safeAddUsers(conversation, [user]);
+
+      expect(settled.isErr).toBe(true);
+      expect(settled.match({Ok: () => null, Err: value => (value as Error).message})).toBe(
+        'Cannot add users to MLS conversation without group id',
+      );
+    });
+  });
 });

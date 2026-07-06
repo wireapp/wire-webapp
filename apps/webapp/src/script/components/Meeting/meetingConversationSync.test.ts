@@ -57,7 +57,7 @@ describe('syncMeetingConversationParticipants', () => {
   const createRepository = ({
     conversation = createConversation(),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    safeAddUsers = jest.fn().mockReturnValue(task.resolve(undefined)),
+    safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     safeRemoveMembers = jest.fn().mockReturnValue(task.resolve(undefined)),
     safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation)),
   }: {
@@ -76,7 +76,7 @@ describe('syncMeetingConversationParticipants', () => {
 
   it('establishes the meeting conversation on create even with zero participants', async () => {
     const establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
-    const safeAddUsers = jest.fn().mockReturnValue(task.resolve(undefined));
+    const safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const conversationRepository = createRepository({establishMeetingConversation, safeAddUsers});
 
     const result = await syncMeetingConversationParticipants(conversationRepository, {
@@ -100,7 +100,7 @@ describe('syncMeetingConversationParticipants', () => {
     const alice = createUser('1');
     const bob = createUser('2');
     const establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
-    const safeAddUsers = jest.fn().mockReturnValue(task.resolve(undefined));
+    const safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const conversationRepository = createRepository({establishMeetingConversation, safeAddUsers});
 
     const result = await syncMeetingConversationParticipants(conversationRepository, {
@@ -144,7 +144,7 @@ describe('syncMeetingConversationParticipants', () => {
     const charlie = createUser('3');
     const establishedConversation = createConversation(1);
     const safeRemoveMembers = jest.fn().mockReturnValue(task.resolve(undefined));
-    const safeAddUsers = jest.fn().mockReturnValue(task.resolve(undefined));
+    const safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const conversationRepository = createRepository({
       conversation: establishedConversation,
@@ -171,7 +171,7 @@ describe('syncMeetingConversationParticipants', () => {
     const charlie = createUser('3');
     const unestablishedConversation = createConversation(0);
     const establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
-    const safeAddUsers = jest.fn().mockReturnValue(task.resolve(undefined));
+    const safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const conversationRepository = createRepository({
       conversation: unestablishedConversation,
       establishMeetingConversation,
@@ -189,6 +189,25 @@ describe('syncMeetingConversationParticipants', () => {
     expect(result.isOk).toBe(true);
     expect(safeAddUsers).toHaveBeenCalledWith(unestablishedConversation, [charlie]);
     expect(establishMeetingConversation).not.toHaveBeenCalled();
+  });
+
+  it('returns partial failedToAdd from safeAddUsers on update', async () => {
+    const charlie = createUser('3');
+    const failedToAdd = [{users: [charlie.qualifiedId], backends: [], reason: 'UNREACHABLE_BACKENDS'}];
+    const conversationRepository = createRepository({
+      safeAddUsers: jest.fn().mockReturnValue(task.resolve({failedToAdd})),
+    });
+
+    const result = await syncMeetingConversationParticipants(conversationRepository, {
+      qualifiedConversationId,
+      selectedUsers: [charlie],
+      usersToAdd: [charlie],
+      userIdsToRemove: [],
+      isCreate: false,
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(result.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual(failedToAdd);
   });
 
   it('returns addFailed when safeAddUsers rejects on update', async () => {

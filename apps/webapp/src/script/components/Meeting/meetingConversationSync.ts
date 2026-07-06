@@ -56,8 +56,7 @@ const addUsers = (
 
   return conversationRepository
     .safeAddUsers(conversation, users)
-    .mapRejected(() => meetingConversationSyncErrors.addFailed)
-    .map(() => ({failedToAdd: []}));
+    .mapRejected(() => meetingConversationSyncErrors.addFailed);
 };
 
 const establishWithUsers = (

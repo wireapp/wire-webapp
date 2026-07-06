@@ -82,7 +82,7 @@ describe('scheduleMeeting', () => {
     ),
     safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation())),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    safeAddUsers = jest.fn().mockReturnValue(task.resolve(undefined)),
+    safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
   }: {
     createMeetingMock?: jest.Mock;
     safeGetConversationById?: jest.Mock;
@@ -190,7 +190,7 @@ describe('updateMeeting', () => {
   const createDeps = ({
     updateMeetingMock = jest.fn().mockReturnValue(task.resolve({})),
     safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation(1))),
-    safeAddUsers = jest.fn().mockReturnValue(task.resolve(undefined)),
+    safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     safeRemoveMembers = jest.fn().mockReturnValue(task.resolve(undefined)),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
   }: {
