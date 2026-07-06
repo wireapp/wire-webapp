@@ -42,6 +42,7 @@ const storedSingleInstanceSchema = z.object({
 
 type UseSingleInstanceDependencies = {
   createInstanceId: () => string;
+  isDesktopApp: () => boolean;
   singleInstanceStorage: StringKeyValueStorage;
   wallClock: WallClock;
 };
@@ -54,6 +55,7 @@ type UseSingleInstanceResult = {
 
 const defaultUseSingleInstanceDependencies: UseSingleInstanceDependencies = {
   createInstanceId: createUuid,
+  isDesktopApp: Runtime.isDesktopApp,
   singleInstanceStorage: createStringKeyValueStorageFromWebStorage(Maybe.of(getStorage())),
   wallClock: createWallClock(),
 };
@@ -93,8 +95,12 @@ function getStoredInstanceId(storage: StringKeyValueStorage): Maybe<string> {
   });
 }
 
-function isRunningInstance(instanceId: Maybe<string>, storage: StringKeyValueStorage): boolean {
-  if (Runtime.isDesktopApp()) {
+function isRunningInstance(
+  instanceId: Maybe<string>,
+  isDesktopApp: () => boolean,
+  storage: StringKeyValueStorage,
+): boolean {
+  if (isDesktopApp()) {
     return true;
   }
 
@@ -104,12 +110,13 @@ function isRunningInstance(instanceId: Maybe<string>, storage: StringKeyValueSto
 
 function startSingleInstancePolling(
   getCurrentInstanceId: () => Maybe<string>,
+  isDesktopApp: () => boolean,
   onNewInstance: () => void,
   storage: StringKeyValueStorage,
   wallClock: WallClock,
 ): () => void {
   const checkSingleInstance = (): void => {
-    if (!isRunningInstance(getCurrentInstanceId(), storage)) {
+    if (!isRunningInstance(getCurrentInstanceId(), isDesktopApp, storage)) {
       onNewInstance();
     }
   };
@@ -131,12 +138,12 @@ function register(instanceId: string, storage: StringKeyValueStorage): () => voi
 }
 
 export function createUseSingleInstance(dependencies: UseSingleInstanceDependencies): () => UseSingleInstanceResult {
-  const {createInstanceId, singleInstanceStorage, wallClock} = dependencies;
+  const {createInstanceId, isDesktopApp, singleInstanceStorage, wallClock} = dependencies;
 
   return function useSingleInstanceWithDependencies(): UseSingleInstanceResult {
     const instanceId = useRef<Maybe<string>>(Maybe.nothing());
     const [hasOtherInstance, setHasOtherInstance] = useState(
-      !isRunningInstance(instanceId.current, singleInstanceStorage),
+      !isRunningInstance(instanceId.current, isDesktopApp, singleInstanceStorage),
     );
 
     const registerInstance = (): (() => void) => {
@@ -155,6 +162,7 @@ export function createUseSingleInstance(dependencies: UseSingleInstanceDependenc
         () => {
           return instanceId.current;
         },
+        isDesktopApp,
         () => {
           return setHasOtherInstance(true);
         },

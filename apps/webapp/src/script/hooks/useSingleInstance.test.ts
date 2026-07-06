@@ -58,6 +58,7 @@ function createInMemoryStringKeyValueStorage(): StringKeyValueStorage {
 
 describe('useSingleInstance', () => {
   let createInstanceId: jest.Mock<string, []>;
+  let isDesktopApp: jest.Mock<boolean, []>;
   let singleInstanceStorage: StringKeyValueStorage;
   let wallClock: DeterministicWallClock;
   let useSingleInstance: ReturnType<typeof createUseSingleInstance>;
@@ -66,9 +67,12 @@ describe('useSingleInstance', () => {
     createInstanceId = jest.fn(() => {
       return 'first-instance-id';
     });
+    isDesktopApp = jest.fn(() => {
+      return false;
+    });
     singleInstanceStorage = createInMemoryStringKeyValueStorage();
     wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
-    useSingleInstance = createUseSingleInstance({createInstanceId, singleInstanceStorage, wallClock});
+    useSingleInstance = createUseSingleInstance({createInstanceId, isDesktopApp, singleInstanceStorage, wallClock});
   });
 
   it('can create multiple new instance listeners', () => {
@@ -132,6 +136,23 @@ describe('useSingleInstance', () => {
     expect(secondInstance.current.hasOtherInstance).toBeTruthy();
 
     firstInstance.killRunningInstance();
+  });
+
+  it('allows desktop app instances regardless of stored instance data', () => {
+    isDesktopApp.mockReturnValue(true);
+    singleInstanceStorage.setItem('app_opened', JSON.stringify({appInstanceId: 'other-instance-id'}));
+
+    const {result: currentInstance} = renderHook(() => {
+      return useSingleInstance();
+    });
+
+    expect(currentInstance.current.hasOtherInstance).toBeFalsy();
+
+    act(() => {
+      wallClock.advanceByMilliseconds(1001);
+    });
+
+    expect(currentInstance.current.hasOtherInstance).toBeFalsy();
   });
 
   it('does not crash when stored instance data is malformed', () => {
