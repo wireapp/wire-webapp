@@ -19,11 +19,11 @@
 
 import {useEffect, useRef, useState} from 'react';
 
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
-import {Runtime} from '@wireapp/commons';
+import {createWallClock, type WallClock} from '@enormora/wall-clock/wall-clock';
 import {Maybe, result} from 'true-myth';
 import {z} from 'zod';
+
+import {Runtime} from '@wireapp/commons';
 
 import {createStringKeyValueStorageFromWebStorage} from 'src/script/browser/storage/createStringKeyValueStorageFromWebStorage';
 import {StringKeyValueStorage} from 'src/script/storage/StringKeyValueStorage';
