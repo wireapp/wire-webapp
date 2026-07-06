@@ -400,7 +400,7 @@ describe('BackgroundEffectsHandler', () => {
     expect(preferredEffectWrites).toHaveLength(0);
   });
 
-  it('keeps feature disabled when background effects feature is enabled', () => {
+  it('enables feature when background effects feature is enabled', () => {
     const features: Partial<FeatureList> = {
       backgroundEffects: {
         status: FEATURE_STATUS.ENABLED,
@@ -411,11 +411,11 @@ describe('BackgroundEffectsHandler', () => {
 
     new BackgroundEffectsHandler(mockController, teamState);
 
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(false);
+    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
     expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
   });
 
-  it('keeps feature disabled from TeamState even when storage flag is false', () => {
+  it('enables feature from TeamState even when storage flag is false', () => {
     mockStorage.getItem.mockImplementation((key: string) => {
       if (key === VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY) {
         return 'false';
@@ -433,7 +433,7 @@ describe('BackgroundEffectsHandler', () => {
 
     new BackgroundEffectsHandler(mockController, teamState);
 
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(false);
+    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
     expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
   });
 
@@ -469,7 +469,7 @@ describe('BackgroundEffectsHandler', () => {
     expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
   });
 
-  it('keeps feature disabled when TeamState background effects feature changes', () => {
+  it('updates feature enabled state when TeamState background effects feature changes', () => {
     teamState.teamFeatures(undefined);
 
     new BackgroundEffectsHandler(mockController, teamState);
@@ -485,7 +485,7 @@ describe('BackgroundEffectsHandler', () => {
 
     teamState.teamFeatures(features);
 
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(false);
+    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
     expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
   });
 });
