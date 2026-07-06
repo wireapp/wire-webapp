@@ -17,7 +17,7 @@
  *
  */
 
-import {Maybe} from 'true-myth';
+import {Maybe, result} from 'true-myth';
 
 import {StringKeyValueStorage} from 'src/script/storage/StringKeyValueStorage';
 
@@ -25,17 +25,44 @@ export function createStringKeyValueStorageFromWebStorage(webStorage: Maybe<Stor
   return {
     getItem: key => {
       return webStorage.andThen(storage => {
-        return Maybe.of(storage.getItem(key));
+        const storedValue = result.tryOrElse(
+          error => {
+            return error;
+          },
+          () => {
+            return storage.getItem(key);
+          },
+        );
+
+        if (result.isErr(storedValue)) {
+          return Maybe.nothing();
+        }
+
+        return Maybe.of(storedValue.value);
       });
     },
     removeItem: key => {
       return webStorage.inspect(storage => {
-        return storage.removeItem(key);
+        result.tryOrElse(
+          error => {
+            return error;
+          },
+          () => {
+            return storage.removeItem(key);
+          },
+        );
       });
     },
     setItem: (key, value) => {
       return webStorage.inspect(storage => {
-        return storage.setItem(key, value);
+        result.tryOrElse(
+          error => {
+            return error;
+          },
+          () => {
+            return storage.setItem(key, value);
+          },
+        );
       });
     },
   };

@@ -32,11 +32,13 @@ function createInMemoryStringKeyValueStorage(): StringKeyValueStorage {
 
   const storage: StringKeyValueStorage = {
     getItem: key => {
-      return maybe.find(item => {
-        return item.key === key;
-      }, storedValues).map(item => {
-        return item.value;
-      });
+      return maybe
+        .find(item => {
+          return item.key === key;
+        }, storedValues)
+        .map(item => {
+          return item.value;
+        });
     },
     removeItem: key => {
       const storedValueIndex = storedValues.findIndex(item => {
@@ -150,7 +152,8 @@ describe('useSingleInstance', () => {
   });
 
   it('allows desktop app instances regardless of stored instance data', () => {
-    const {isDesktopApp, singleInstanceStorage, useSingleInstance, wallClock} = createUseSingleInstanceTestEnvironment();
+    const {isDesktopApp, singleInstanceStorage, useSingleInstance, wallClock} =
+      createUseSingleInstanceTestEnvironment();
 
     isDesktopApp.mockReturnValue(true);
     singleInstanceStorage.setItem('app_opened', JSON.stringify({appInstanceId: 'other-instance-id'}));
