@@ -52,16 +52,17 @@ const containerStyle: (props: ContainerProps) => CSSObject = ({
   verticalCenter = false,
 }) => ({
   margin: verticalCenter ? 'auto' : '0 auto',
-  maxWidth: level ? `${LEVEL[level]}px` : undefined,
+  maxWidth: level !== undefined && Boolean(level) ? `${LEVEL[level]}px` : undefined,
   position: 'relative',
   textAlign: centerText ? 'center' : 'left',
   width: '100%',
-  [media[QueryKeys.DESKTOP]]: level
-    ? undefined
-    : {
-        padding: 0,
-        width: `${WIDTH.DESKTOP_MIN - GUTTER * 2}px`,
-      },
+  [media[QueryKeys.DESKTOP]]:
+    level !== undefined && Boolean(level)
+      ? undefined
+      : {
+          padding: 0,
+          width: `${WIDTH.DESKTOP_MIN - GUTTER * 2}px`,
+        },
 });
 
 export const Container: FC<ContainerProps> = forwardRef<HTMLDivElement, ContainerProps>(

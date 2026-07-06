@@ -26,13 +26,13 @@ import {CopyConfig, CopyConfigOptions} from './';
 (async () => {
   const configExplorer = cosmiconfig('copyconfig');
   const configFile = await configExplorer.search();
-  const config: CopyConfigOptions | undefined = configFile ? configFile.config : undefined;
+  const config: CopyConfigOptions | undefined = configFile !== null ? configFile.config : undefined;
 
   const logLevel = config?.logLevel ?? 'info';
   const logger = logLevel !== 'silent' ? logdown('@wireapp/copy-config', {markdown: false}) : undefined;
-  if (logger) {
+  if (logger !== undefined) {
     logger.state.isEnabled = true;
-    if (configFile) {
+    if (configFile !== null) {
       logger.info(`Found configuration file "${configFile.filepath}".`);
     }
     if (logLevel !== 'verbose') {
@@ -42,7 +42,7 @@ import {CopyConfig, CopyConfigOptions} from './';
   }
 
   const copiedFiles = await new CopyConfig(config, logger).copy();
-  const copyMessage = copiedFiles.length ? `Copied ${copiedFiles.length}` : "Didn't copy any";
+  const copyMessage = Boolean(copiedFiles.length) ? `Copied ${copiedFiles.length}` : "Didn't copy any";
   logger?.info(`${copyMessage} file${copiedFiles.length === 1 ? '' : 's'}.`);
 })().catch((error: unknown) => {
   console.error(error);

@@ -49,7 +49,7 @@ export class Runtime {
   }
 
   public static getOSFamily(): OperatingSystem {
-    const family = Runtime.getOS().family?.toLowerCase() || '';
+    const family = Boolean(Runtime.getOS().family?.toLowerCase()) ? Runtime.getOS().family?.toLowerCase() : '';
     if (family.includes('windows')) {
       return OperatingSystem.WINDOWS;
     }
