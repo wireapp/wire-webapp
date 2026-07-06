@@ -27,10 +27,7 @@ import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
-import {
-  meetingConversationSyncErrors,
-  syncMeetingConversationParticipants,
-} from './meetingConversationSync';
+import {meetingConversationSyncErrors, syncMeetingConversationParticipants} from './meetingConversationSync';
 
 const qualifiedConversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
 const groupId = 'group-id';

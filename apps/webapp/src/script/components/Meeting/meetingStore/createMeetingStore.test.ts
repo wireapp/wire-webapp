@@ -34,7 +34,10 @@ jest.mock('Components/Meeting/ScheduleMeetingModal/scheduleMeetingService', () =
   updateMeeting: jest.fn(),
 }));
 
-import {scheduleMeeting as scheduleMeetingTask, updateMeeting as updateMeetingTask} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
+import {
+  scheduleMeeting as scheduleMeetingTask,
+  updateMeeting as updateMeetingTask,
+} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
 
 const mockedScheduleMeetingTask = scheduleMeetingTask as jest.MockedFunction<typeof scheduleMeetingTask>;
 const mockedUpdateMeetingTask = updateMeetingTask as jest.MockedFunction<typeof updateMeetingTask>;
