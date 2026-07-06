@@ -31,7 +31,14 @@ interface CreateLinkParams {
 
 export const createNewLink = ({selection, url, text}: CreateLinkParams) => {
   const selectedText = selection.getTextContent();
-  const textContent = is.nonEmptyString(text) ? text : is.nonEmptyString(selectedText) ? selectedText : url;
+  let textContent: string;
+  if (is.nonEmptyString(text)) {
+    textContent = text;
+  } else if (is.nonEmptyString(selectedText)) {
+    textContent = selectedText;
+  } else {
+    textContent = url;
+  }
   const textNode = $createTextNode(textContent);
   const linkNode = $createLinkNode(sanitizeUrl(url));
   linkNode.append(textNode);

@@ -314,11 +314,12 @@ const LoginComponent = ({
           case BackendErrorLabel.CODE_AUTHENTICATION_REQUIRED: {
             await resetAuthError();
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-            const twoFactorTarget = is.nonEmptyString(login.email)
-              ? login.email
-              : is.nonEmptyString(login.handle)
-                ? login.handle
-                : undefined;
+            let twoFactorTarget: string | undefined;
+            if (is.nonEmptyString(login.email)) {
+              twoFactorTarget = login.email;
+            } else if (is.nonEmptyString(login.handle)) {
+              twoFactorTarget = login.handle;
+            }
             if (twoFactorTarget !== undefined) {
               await doSendTwoFactorCode(twoFactorTarget);
               setTwoFactorLoginData(login);

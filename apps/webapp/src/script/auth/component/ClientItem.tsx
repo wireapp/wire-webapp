@@ -143,16 +143,19 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         })
       : '?';
 
-  const formatName = (model: string, clazz: string): string | JSX.Element =>
-    is.nonEmptyString(model) ? (
-      model
-    ) : is.nonEmptyString(clazz) ? (
-      <Text bold textTransform={'capitalize'}>
-        {clazz}
-      </Text>
-    ) : (
-      '?'
-    );
+  const formatName = (model: string, clazz: string): string | JSX.Element => {
+    if (is.nonEmptyString(model)) {
+      return model;
+    }
+    if (is.nonEmptyString(clazz)) {
+      return (
+        <Text bold textTransform={'capitalize'}>
+          {clazz}
+        </Text>
+      );
+    }
+    return '?';
+  };
 
   const resetState = () => {
     setAnimationStep(selected ? animationSteps : 0);
@@ -231,6 +234,22 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const animationPosition = animationStep / animationSteps;
   const smoothHeight = animationPosition * inputContainerHeightPixels;
   const smoothMarginTop = animationPosition * cardHorizontalSpacingPixels;
+
+  const renderErrorMessage = (): JSX.Element | null => {
+    if (validationError && selected) {
+      return (
+        <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
+      );
+    }
+    if (clientError && selected) {
+      return (
+        <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}} data-uie-name="error-message">
+          {parseError(clientError)}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <ContainerXS>
@@ -344,13 +363,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           </ContainerXS>
         )}
       </ContainerXS>
-      {validationError && selected ? (
-        <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
-      ) : clientError && selected ? (
-        <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}} data-uie-name="error-message">
-          {parseError(clientError)}
-        </div>
-      ) : null}
+      {renderErrorMessage()}
     </ContainerXS>
   );
 };

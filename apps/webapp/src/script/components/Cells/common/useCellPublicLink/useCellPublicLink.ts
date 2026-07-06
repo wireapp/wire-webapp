@@ -180,11 +180,20 @@ export const useCellPublicLink = ({
           updatedLink.AccessEnd = accessEnd;
         }
 
+        let passwordOptions = {};
+        if (shouldSetPassword) {
+          if (hasExistingPassword) {
+            passwordOptions = {updatePassword: password};
+          } else {
+            passwordOptions = {createPassword: password};
+          }
+        }
+
         await cellsRepository.updatePublicLink({
           linkUuid: node.publicLink.uuid,
           link: updatedLink,
           // Use createPassword if no password exists, updatePassword if it does
-          ...(shouldSetPassword ? (hasExistingPassword ? {updatePassword: password} : {createPassword: password}) : {}),
+          ...passwordOptions,
           passwordEnabled,
         });
 
@@ -193,11 +202,19 @@ export const useCellPublicLink = ({
           if (previousLinkData === null) {
             return previousLinkData;
           }
+          let accessEndValue: typeof previousLinkData.AccessEnd;
+          if (accessEnd === null) {
+            accessEndValue = undefined;
+          } else if (accessEnd !== undefined) {
+            accessEndValue = accessEnd;
+          } else {
+            accessEndValue = previousLinkData.AccessEnd;
+          }
+
           return {
             ...previousLinkData,
             PasswordRequired: passwordEnabled,
-            AccessEnd:
-              accessEnd === null ? undefined : accessEnd !== undefined ? accessEnd : previousLinkData.AccessEnd,
+            AccessEnd: accessEndValue,
           };
         });
 
