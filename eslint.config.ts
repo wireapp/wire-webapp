@@ -253,6 +253,7 @@ const config: Linter.Config[] = [
       'libraries/api-client/**/*.{ts,tsx}',
       'libraries/commons/**/*.{ts,tsx}',
       'libraries/certificate-check/**/*.{ts,tsx}',
+      'libraries/core/**/*.{ts,tsx}',
       'libraries/copy-config/**/*.{ts,tsx}',
       'libraries/license-collector/**/*.{ts,tsx}',
       'libraries/store-engine/**/*.{ts,tsx}',

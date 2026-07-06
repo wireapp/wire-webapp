@@ -24,7 +24,7 @@ import {DoWireDpopChallengeParams, GetClientNonceParams} from './dpopChallenge.t
 const getClientNonce = async ({apiClient, clientId}: GetClientNonceParams) => {
   try {
     const nonce = await apiClient.api.client.getNonce(clientId);
-    if (nonce) {
+    if (nonce.length > 0) {
       return nonce;
     }
     throw new Error('No client-nonce received');
