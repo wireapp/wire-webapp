@@ -56,26 +56,33 @@ function createInMemoryStringKeyValueStorage(): StringKeyValueStorage {
   return storage;
 }
 
-describe('useSingleInstance', () => {
-  let createInstanceId: jest.Mock<string, []>;
-  let isDesktopApp: jest.Mock<boolean, []>;
-  let singleInstanceStorage: StringKeyValueStorage;
-  let wallClock: DeterministicWallClock;
-  let useSingleInstance: ReturnType<typeof createUseSingleInstance>;
+type UseSingleInstanceTestEnvironment = {
+  isDesktopApp: jest.Mock<boolean, []>;
+  singleInstanceStorage: StringKeyValueStorage;
+  useSingleInstance: ReturnType<typeof createUseSingleInstance>;
+  wallClock: DeterministicWallClock;
+};
 
-  beforeEach(() => {
-    createInstanceId = jest.fn(() => {
-      return 'first-instance-id';
-    });
-    isDesktopApp = jest.fn(() => {
-      return false;
-    });
-    singleInstanceStorage = createInMemoryStringKeyValueStorage();
-    wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
-    useSingleInstance = createUseSingleInstance({createInstanceId, isDesktopApp, singleInstanceStorage, wallClock});
+function createUseSingleInstanceTestEnvironment(): UseSingleInstanceTestEnvironment {
+  const createInstanceId = jest.fn(() => {
+    return 'first-instance-id';
   });
 
+  const isDesktopApp = jest.fn(() => {
+    return false;
+  });
+
+  const singleInstanceStorage = createInMemoryStringKeyValueStorage();
+  const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+  const useSingleInstance = createUseSingleInstance({createInstanceId, isDesktopApp, singleInstanceStorage, wallClock});
+
+  return {isDesktopApp, singleInstanceStorage, useSingleInstance, wallClock};
+}
+
+describe('useSingleInstance', () => {
   it('can create multiple new instance listeners', () => {
+    const {useSingleInstance} = createUseSingleInstanceTestEnvironment();
+
     const {
       result: {current: firstInstance},
     } = renderHook(() => {
@@ -92,6 +99,8 @@ describe('useSingleInstance', () => {
   });
 
   it('only allows a single registered instance', () => {
+    const {singleInstanceStorage, useSingleInstance} = createUseSingleInstanceTestEnvironment();
+
     const {
       result: {current: firstInstance},
     } = renderHook(() => {
@@ -116,6 +125,8 @@ describe('useSingleInstance', () => {
   });
 
   it('detects a new instance that has started', () => {
+    const {useSingleInstance, wallClock} = createUseSingleInstanceTestEnvironment();
+
     const {
       result: {current: firstInstance},
     } = renderHook(() => {
@@ -139,6 +150,8 @@ describe('useSingleInstance', () => {
   });
 
   it('allows desktop app instances regardless of stored instance data', () => {
+    const {isDesktopApp, singleInstanceStorage, useSingleInstance, wallClock} = createUseSingleInstanceTestEnvironment();
+
     isDesktopApp.mockReturnValue(true);
     singleInstanceStorage.setItem('app_opened', JSON.stringify({appInstanceId: 'other-instance-id'}));
 
@@ -156,6 +169,8 @@ describe('useSingleInstance', () => {
   });
 
   it('does not crash when stored instance data is malformed', () => {
+    const {singleInstanceStorage, useSingleInstance} = createUseSingleInstanceTestEnvironment();
+
     singleInstanceStorage.setItem('app_opened', 'not-json');
 
     const {
@@ -169,6 +184,8 @@ describe('useSingleInstance', () => {
   });
 
   it('removes stored instance data with an invalid shape', () => {
+    const {singleInstanceStorage, useSingleInstance} = createUseSingleInstanceTestEnvironment();
+
     singleInstanceStorage.setItem('app_opened', JSON.stringify({appInstanceId: 42}));
 
     const {
@@ -182,6 +199,8 @@ describe('useSingleInstance', () => {
   });
 
   it('removes stored instance data without an instance id', () => {
+    const {singleInstanceStorage, useSingleInstance} = createUseSingleInstanceTestEnvironment();
+
     singleInstanceStorage.setItem('app_opened', JSON.stringify({}));
 
     const {
