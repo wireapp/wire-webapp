@@ -57,14 +57,18 @@ function createInMemoryStringKeyValueStorage(): StringKeyValueStorage {
 }
 
 describe('useSingleInstance', () => {
+  let createInstanceId: jest.Mock<string, []>;
   let singleInstanceStorage: StringKeyValueStorage;
   let wallClock: DeterministicWallClock;
   let useSingleInstance: ReturnType<typeof createUseSingleInstance>;
 
   beforeEach(() => {
+    createInstanceId = jest.fn(() => {
+      return 'first-instance-id';
+    });
     singleInstanceStorage = createInMemoryStringKeyValueStorage();
     wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
-    useSingleInstance = createUseSingleInstance({singleInstanceStorage, wallClock});
+    useSingleInstance = createUseSingleInstance({createInstanceId, singleInstanceStorage, wallClock});
   });
 
   it('can create multiple new instance listeners', () => {
@@ -92,6 +96,10 @@ describe('useSingleInstance', () => {
     expect(firstInstance.hasOtherInstance).toBeFalsy();
 
     firstInstance.registerInstance();
+
+    expect(singleInstanceStorage.getItem('app_opened')).toStrictEqual(
+      Maybe.just(JSON.stringify({appInstanceId: 'first-instance-id'})),
+    );
 
     const {
       result: {current: secondInstance},

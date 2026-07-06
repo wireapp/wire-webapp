@@ -21,9 +21,9 @@ import {useEffect, useRef, useState} from 'react';
 
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
-import is from '@sindresorhus/is';
 import {Runtime} from '@wireapp/commons';
 import {Maybe, result} from 'true-myth';
+import {z} from 'zod';
 
 import {createStringKeyValueStorageFromWebStorage} from 'src/script/browser/storage/createStringKeyValueStorageFromWebStorage';
 import {StringKeyValueStorage} from 'src/script/storage/StringKeyValueStorage';
@@ -36,7 +36,12 @@ const CONFIG = {
   STORAGE_KEY: 'app_opened',
 };
 
+const storedSingleInstanceSchema = z.object({
+  appInstanceId: z.string(),
+});
+
 interface UseSingleInstanceDependencies {
+  createInstanceId: () => string;
   singleInstanceStorage: StringKeyValueStorage;
   wallClock: WallClock;
 }
@@ -48,6 +53,7 @@ interface UseSingleInstanceResult {
 }
 
 const defaultUseSingleInstanceDependencies: UseSingleInstanceDependencies = {
+  createInstanceId: createUuid,
   singleInstanceStorage: createStringKeyValueStorageFromWebStorage(Maybe.of(getStorage())),
   wallClock: createWallClock(),
 };
@@ -72,9 +78,10 @@ function getStoredInstanceId(storage: StringKeyValueStorage): Maybe<string> {
       }
 
       const parsedInstance = parsedInstanceResult.value;
+      const validatedInstance = storedSingleInstanceSchema.safeParse(parsedInstance);
 
-      if (is.object(parsedInstance) && 'appInstanceId' in parsedInstance && is.string(parsedInstance.appInstanceId)) {
-        return Maybe.just(parsedInstance.appInstanceId);
+      if (validatedInstance.success) {
+        return Maybe.just(validatedInstance.data.appInstanceId);
       }
 
       storage.removeItem(CONFIG.STORAGE_KEY);
@@ -124,7 +131,7 @@ function register(instanceId: string, storage: StringKeyValueStorage): () => voi
 }
 
 export function createUseSingleInstance(dependencies: UseSingleInstanceDependencies): () => UseSingleInstanceResult {
-  const {singleInstanceStorage, wallClock} = dependencies;
+  const {createInstanceId, singleInstanceStorage, wallClock} = dependencies;
 
   return function useSingleInstanceWithDependencies(): UseSingleInstanceResult {
     const instanceId = useRef<Maybe<string>>(Maybe.nothing());
@@ -133,7 +140,7 @@ export function createUseSingleInstance(dependencies: UseSingleInstanceDependenc
     );
 
     const registerInstance = (): (() => void) => {
-      const nextInstanceId = createUuid();
+      const nextInstanceId = createInstanceId();
       instanceId.current = Maybe.just(nextInstanceId);
       return register(nextInstanceId, singleInstanceStorage);
     };
