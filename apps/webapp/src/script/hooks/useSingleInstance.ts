@@ -20,6 +20,7 @@
 import {useEffect, useRef, useState} from 'react';
 
 import {createWallClock, type WallClock} from '@enormora/wall-clock/wall-clock';
+import is from '@sindresorhus/is';
 import {Maybe, result} from 'true-myth';
 import {z} from 'zod';
 
@@ -67,7 +68,7 @@ function getStoredInstanceId(storage: StringKeyValueStorage): Maybe<string> {
     Just: storedInstanceValue => {
       const parsedInstanceResult = result.tryOrElse(
         error => {
-          return error instanceof Error ? error : new Error('Failed to parse stored single-instance marker');
+          return is.error(error) ? error : new Error('Failed to parse stored single-instance marker');
         },
         () => {
           return JSON.parse(storedInstanceValue) as unknown;
