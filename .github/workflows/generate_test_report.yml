@@ -14,6 +14,7 @@ jobs:
 
     env:
       UNIT_TEST_REPORT_FILE: './unit-tests.log'
+      UNIT_TEST_REPORTS_DIRECTORY: './unit-test-reports'
 
     steps:
       - name: Checkout
@@ -52,7 +53,14 @@ jobs:
       - name: Install JS dependencies
         run: ./bin/yarn --immutable
 
-      - name: Test
+      - name: Generate package unit test reports
+        id: package_unit_test_reports
+        continue-on-error: true
+        env:
+          BRANCH: ${{ inputs.branch }}
+        run: ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/generateUnitTestReports.ts
+
+      - name: Generate app unit test report
         run: |
           set -euo pipefail
           : > ${{ env.UNIT_TEST_REPORT_FILE }}
@@ -76,3 +84,23 @@ jobs:
         run: |
           TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
           aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://wire-webapp/unit-tests-${TIMESTAMP}-${TESTED_COMMIT_SHA}.log
+
+      - name: Upload package unit test reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: package-unit-test-reports
+          path: ${{ env.UNIT_TEST_REPORTS_DIRECTORY }}/*.log
+          if-no-files-found: error
+
+      - name: Upload app unit test report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: app-unit-test-report
+          path: ${{ env.UNIT_TEST_REPORT_FILE }}
+          if-no-files-found: error
+
+      - name: Fail when package unit tests failed
+        if: always() && steps.package_unit_test_reports.outcome == 'failure'
+        run: exit 1
