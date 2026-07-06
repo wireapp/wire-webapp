@@ -56,7 +56,7 @@ const StyledAppContainer = (props: React.HTMLProps<HTMLDivElement> & BackgroundC
 );
 
 export const StyledApp: React.FC<StyledAppProps> = ({themeId = THEME_ID.LIGHT, theme, children, ...props}) => (
-  <ThemeProvider theme={theme ? theme : themes[themeId]}>
+  <ThemeProvider theme={Boolean(theme) ? theme : themes[themeId]}>
     <StyledAppContainer {...props}>
       <GlobalStyle />
       {children}

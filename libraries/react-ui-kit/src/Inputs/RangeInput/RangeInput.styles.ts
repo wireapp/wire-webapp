@@ -39,7 +39,7 @@ export const getImageCropZoomInputStyles = (theme: Theme, backgroundSize: `${num
   background: COLOR_V2.GRAY_60,
   borderRadius: '4px',
   backgroundImage: `linear-gradient(${theme.general.primaryColor}, ${theme.general.primaryColor})`,
-  backgroundSize: backgroundSize || '0% 100%',
+  backgroundSize: Boolean(backgroundSize) ? backgroundSize : '0% 100%',
   backgroundRepeat: 'no-repeat',
 
   ...manySelectors(thumbSelectors, {

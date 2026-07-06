@@ -25,7 +25,7 @@ const useLongTouch = (element: HTMLElement | null, onLongTouch: () => void, touc
   const {startTimeout, removeTimeout} = useTimeout(onLongTouch, touchDuration);
 
   useEffect(() => {
-    if (!element) {
+    if (element === null) {
       return () => {};
     }
 
