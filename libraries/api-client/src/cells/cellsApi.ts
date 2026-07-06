@@ -101,14 +101,15 @@ export class CellsAPI {
     httpClient?: HttpClient;
     storageService?: CellsStorage;
   }) {
-    const http = httpClient || this.getHttpClient({cellsConfig});
+    const http = httpClient !== undefined ? httpClient : this.getHttpClient({cellsConfig});
 
     this.storageService =
-      storageService ||
-      new S3Service({
-        config: cellsConfig.s3,
-        accessTokenStore: this.accessTokenStore,
-      });
+      storageService !== undefined
+        ? storageService
+        : new S3Service({
+            config: cellsConfig.s3,
+            accessTokenStore: this.accessTokenStore,
+          });
     this.client = new NodeServiceApi(undefined, undefined, http.client);
   }
 
@@ -163,13 +164,13 @@ export class CellsAPI {
     progressCallback?: (progress: number) => void;
     abortController?: AbortController;
   }): Promise<RestCreateCheckResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
     let filePath = `${path}`.normalize('NFC');
 
-    const result = await this.client.createCheck(
+    const result = await this.client!.createCheck(
       {
         Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
         FindAvailablePath: true,
@@ -189,7 +190,7 @@ export class CellsAPI {
       'Create-Version-Id': versionId,
     };
 
-    await this.storageService.putObject({path: filePath, file, metadata, progressCallback, abortController});
+    await this.storageService!.putObject({path: filePath, file, metadata, progressCallback, abortController});
 
     return result.data;
   }
@@ -205,11 +206,11 @@ export class CellsAPI {
     versionId: string;
     type: RestIncomingNode['Type'];
   }): Promise<RestCreateCheckResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.createCheck({
+    const result = await this.client!.createCheck({
       Inputs: [{Type: type, Locator: {Path: path.normalize('NFC'), Uuid: uuid}, VersionId: versionId}],
       FindAvailablePath: false,
     });
@@ -218,21 +219,21 @@ export class CellsAPI {
   }
 
   async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestPromoteVersionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.promoteVersion(uuid, versionId, {Publish: true});
+    const result = await this.client!.promoteVersion(uuid, versionId, {Publish: true});
 
     return result.data;
   }
 
   async deleteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestDeleteVersionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.deleteVersion(uuid, versionId);
+    const result = await this.client!.deleteVersion(uuid, versionId);
 
     return result.data;
   }
@@ -244,11 +245,11 @@ export class CellsAPI {
     uuid: string;
     permanently?: boolean;
   }): Promise<RestPerformActionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.performAction('delete', {
+    const result = await this.client!.performAction('delete', {
       Nodes: [{Uuid: uuid}],
       DeleteOptions: {PermanentDelete: permanently},
     });
@@ -263,11 +264,11 @@ export class CellsAPI {
     currentPath: RestNodeLocator['Path'];
     targetPath: RestActionOptionsCopyMove['TargetPath'];
   }): Promise<RestPerformActionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.performAction('move', {
+    const result = await this.client!.performAction('move', {
       Nodes: [{Path: currentPath}],
       CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
       AwaitStatus: 'Finished',
@@ -278,24 +279,24 @@ export class CellsAPI {
   }
 
   async restoreNode({uuid}: {uuid: string}): Promise<RestPerformActionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.performAction('restore', {Nodes: [{Uuid: uuid}]});
+    const result = await this.client!.performAction('restore', {Nodes: [{Uuid: uuid}]});
 
     return result.data;
   }
 
   async renameNode({currentPath, newName}: {currentPath: string; newName: string}): Promise<RestPerformActionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
     const basePath = currentPath.split('/').slice(0, -1).join('/');
     const newPath = `${basePath}/${newName}`;
 
-    const result = await this.client.performAction('move', {
+    const result = await this.client!.performAction('move', {
       Nodes: [{Path: currentPath}],
       CopyMoveOptions: {TargetIsParent: false, TargetPath: newPath},
       AwaitStatus: 'Finished',
@@ -306,18 +307,18 @@ export class CellsAPI {
   }
 
   async lookupNodeByPath({path}: {path: string}): Promise<RestNode | undefined> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.lookup({
+    const result = await this.client!.lookup({
       Scope: {Nodes: [{Path: path}]},
       Flags: ['WithPreSignedURLs'],
     });
 
     const node = result.data.Nodes?.[0];
 
-    if (!node) {
+    if (!Boolean(node)) {
       throw new Error(`File not found: ${path}`);
     }
 
@@ -325,18 +326,18 @@ export class CellsAPI {
   }
 
   async lookupNodeByUuid({uuid}: {uuid: string}): Promise<RestNode | undefined> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.lookup({
+    const result = await this.client!.lookup({
       Scope: {Nodes: [{Uuid: uuid}]},
       Flags: ['WithPreSignedURLs'],
     });
 
     const node = result.data.Nodes?.[0];
 
-    if (!node) {
+    if (!Boolean(node)) {
       throw new Error(`File not found: ${uuid}`);
     }
 
@@ -344,11 +345,11 @@ export class CellsAPI {
   }
 
   async getNodeVersions({uuid, flags}: {uuid: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<NodeVersions> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.nodeVersions(uuid, {FilterBy: 'VersionsAll', Flags: flags});
+    const result = await this.client!.nodeVersions(uuid, {FilterBy: 'VersionsAll', Flags: flags});
 
     const validation = RestNodeVersionsSchema.safeParse(result.data.Versions);
 
@@ -356,15 +357,15 @@ export class CellsAPI {
       this.logger.warn('Get node versions response validation failed:', validation.error);
     }
 
-    return result.data.Versions || [];
+    return result.data.Versions !== undefined ? result.data.Versions : [];
   }
 
   async getNode({id, flags}: {id: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<Node> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.getByUuid(id, flags);
+    const result = await this.client!.getByUuid(id, flags);
 
     const validation = RestNodeSchema.safeParse(result.data);
 
@@ -392,7 +393,7 @@ export class CellsAPI {
     type?: RestIncomingNode['Type'];
     deleted?: boolean;
   }): Promise<RestNodeCollection> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -408,10 +409,10 @@ export class CellsAPI {
         },
       },
       SortField: sortBy,
-      SortDirDesc: sortDirection ? sortDirection === 'desc' : undefined,
+      SortDirDesc: Boolean(sortDirection) ? sortDirection === 'desc' : undefined,
     };
 
-    const result = await this.client.lookup(request);
+    const result = await this.client!.lookup(request);
 
     return result.data;
   }
@@ -445,7 +446,7 @@ export class CellsAPI {
     creatorIds?: string[];
     deleted?: boolean;
   }): Promise<RestNodeCollection> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -461,7 +462,7 @@ export class CellsAPI {
       Scope: {Root: {Path: path}, Recursive: isRecursive},
       Filters: {
         ...(hasPhrase ? {Text: {SearchIn: 'BaseName', Term: phrase}} : {}),
-        Type: type || 'UNKNOWN',
+        Type: Boolean(type) ? type : 'UNKNOWN',
         Status: {
           Deleted: deleted ? 'Only' : 'Not',
           ...(hasPublicLink !== undefined ? {HasPublicLink: hasPublicLink} : {}),
@@ -485,7 +486,7 @@ export class CellsAPI {
       SortDirDesc: sortDirection !== undefined ? sortDirection === 'desc' : undefined,
     };
 
-    const result = await this.client.lookup(request);
+    const result = await this.client!.lookup(request);
 
     return result.data;
   }
@@ -503,11 +504,11 @@ export class CellsAPI {
     versionId?: RestIncomingNode['VersionId'];
     templateUuid?: NonNullable<RestIncomingNode['TemplateUuid']>;
   }): Promise<RestNodeCollection> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const response = await this.client.create({
+    const response = await this.client!.create({
       Inputs: [
         {
           Type: type,
@@ -557,11 +558,11 @@ export class CellsAPI {
   }
 
   async deleteNodePublicLink({uuid}: {uuid: string}): Promise<RestPublicLinkDeleteSuccess> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.deletePublicLink(uuid);
+    const result = await this.client!.deletePublicLink(uuid);
 
     return result.data;
   }
@@ -587,7 +588,7 @@ export class CellsAPI {
     createPassword?: string;
     passwordEnabled?: boolean;
   }): Promise<RestShareLink> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -608,17 +609,17 @@ export class CellsAPI {
       requestBody.PasswordEnabled = passwordEnabled;
     }
 
-    const result = await this.client.createPublicLink(uuid, requestBody);
+    const result = await this.client!.createPublicLink(uuid, requestBody);
 
     return result.data;
   }
 
   async getNodePublicLink({uuid}: {uuid: string}): Promise<RestShareLink> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.getPublicLink(uuid);
+    const result = await this.client!.getPublicLink(uuid);
 
     return result.data;
   }
@@ -646,7 +647,7 @@ export class CellsAPI {
     updatePassword?: string;
     passwordEnabled?: boolean;
   }): Promise<RestShareLink> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -672,27 +673,27 @@ export class CellsAPI {
       requestBody.UpdatePassword = updatePassword;
     }
 
-    const result = await this.client.updatePublicLink(linkUuid, requestBody);
+    const result = await this.client!.updatePublicLink(linkUuid, requestBody);
 
     return result.data;
   }
 
   async getAllTags(): Promise<RestNamespaceValuesResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.listNamespaceValues(USER_META_TAGS_NAMESPACE);
+    const result = await this.client!.listNamespaceValues(USER_META_TAGS_NAMESPACE);
 
     return result.data;
   }
 
   async setNodeTags({uuid, tags}: {uuid: string; tags: string[]}): Promise<RestNode> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.patchNode(uuid, {
+    const result = await this.client!.patchNode(uuid, {
       MetaUpdates: [
         {
           Operation: tags.length > 0 ? 'PUT' : 'DELETE',
