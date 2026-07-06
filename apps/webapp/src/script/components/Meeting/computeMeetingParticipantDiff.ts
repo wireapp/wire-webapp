@@ -17,17 +17,26 @@
  *
  */
 
-import {maybe} from 'true-myth';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import {User} from 'Repositories/entity/User';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
-export const mapMeetingToScheduleFormState = (meeting: Meeting, selectedUsers: User[]): ScheduleMeetingFormState => ({
-  title: meeting.title,
-  start: maybe.just(new Date(meeting.start_date)),
-  end: maybe.just(new Date(meeting.end_date)),
-  recurrence: meeting.recurrence,
-  selectedUsers,
-  participantsFilter: '',
-});
+export const computeParticipantDiff = (
+  originalUsers: User[],
+  selectedUsers: User[],
+): {usersToAdd: User[]; userIdsToRemove: QualifiedId[]} => {
+  const usersToAdd = selectedUsers.filter(
+    selectedUser =>
+      !originalUsers.some(originalUser => matchQualifiedIds(originalUser.qualifiedId, selectedUser.qualifiedId)),
+  );
+
+  const userIdsToRemove = originalUsers
+    .filter(
+      originalUser =>
+        !selectedUsers.some(selectedUser => matchQualifiedIds(originalUser.qualifiedId, selectedUser.qualifiedId)),
+    )
+    .map(user => user.qualifiedId);
+
+  return {usersToAdd, userIdsToRemove};
+};

@@ -26,7 +26,6 @@ import {Loading} from '@wireapp/react-ui-kit';
 
 import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
 import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeetingList';
-import type {MeetingsListErrorKey} from 'Components/Meeting/loadMeetingsList';
 import {meetingListContainerStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
 import {MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
 import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOngoingSection/TodayAndOngoingSection';
@@ -41,10 +40,10 @@ export interface Meeting {
   end_date: string;
   recurrence: ScheduleMeetingRecurrenceOption;
   conversation_id: string;
+  qualified_conversation: QualifiedId;
   title: string;
   qualified_id: QualifiedId;
   qualified_creator: QualifiedId;
-  invited_emails: string[];
   // TODO: Ask iOS and Android about how to identify this status
   attending?: boolean;
 }
@@ -58,10 +57,10 @@ export interface TodayAndOngoingSectionProps {
 export interface MeetingListProps {
   meetings: Meeting[];
   isLoading: boolean;
-  errorKey?: MeetingsListErrorKey;
+  hasLoadError: boolean;
 }
 
-export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) => {
+export const MeetingList = ({meetings, isLoading, hasLoadError}: MeetingListProps) => {
   const {translate, wallClock} = useApplicationContext();
   const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
 
@@ -92,10 +91,10 @@ export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) =
     );
   }
 
-  if (!is.nullOrUndefined(errorKey) && is.nonEmptyArray(meetings)) {
+  if (hasLoadError) {
     return (
       <div css={meetingListContainerStyles} data-uie-name="meetings-list-error">
-        {translate(errorKey)}
+        {translate('meetings.list.loadError')}
       </div>
     );
   }

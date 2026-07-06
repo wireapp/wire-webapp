@@ -19,7 +19,7 @@
 
 import type {User} from 'Repositories/entity/User';
 
-export const filterUsersByQuery = (users: User[], query: string): User[] => {
+export const searchUsersByQuery = (users: User[], query: string): User[] => {
   const normalizedQuery = query.trim().toLowerCase();
 
   if (normalizedQuery === '') {
@@ -28,7 +28,7 @@ export const filterUsersByQuery = (users: User[], query: string): User[] => {
 
   return users.filter(user => {
     const name = user.name().toLowerCase();
-    const handle = user.handle?.toLowerCase() ?? '';
+    const handle = user.username().toLowerCase();
 
     return name.includes(normalizedQuery) || handle.includes(normalizedQuery);
   });

@@ -35,7 +35,7 @@ const createMeeting = (overrides: Partial<Meeting> = {}): Meeting => ({
   title: 'Weekly sync',
   qualified_id: {id: 'meeting-id', domain: 'example.com'},
   qualified_creator: {id: 'host-id', domain: 'example.com'},
-  invited_emails: [],
+  qualified_conversation: {id: 'conv-id', domain: 'example.com'},
   ...overrides,
 });
 

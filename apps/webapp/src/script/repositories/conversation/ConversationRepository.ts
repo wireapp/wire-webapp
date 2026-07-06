@@ -53,10 +53,11 @@ import type {BackendError} from '@wireapp/api-client/lib/http/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
+import {AddUsersFailure, BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
 
@@ -1277,6 +1278,10 @@ export class ConversationRepository {
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    * TODO(Federation): Remove "optional" from "domain"
+   *
+   * @deprecated Use {@link safeGetConversationById} instead. This method throws on any
+   * lookup failure, leaking errors out of the caller's data model. Prefer the `Task`-returning
+   * variant so failures become a first-class case.
    */
   async getConversationById(conversation_id: QualifiedId, searchInLocalDB = false): Promise<Conversation> {
     if (typeof conversation_id.id !== 'string') {
@@ -1310,6 +1315,20 @@ export class ConversationRepository {
 
       throw error;
     }
+  }
+
+  /**
+   * Look up a conversation with explicit error handling.
+   *
+   * Returns a `Task` so failures (missing ID, not found, network errors) are modeled in the
+   * type instead of surfacing as an uncaught exception. Prefer to compose async work
+   * with `Task`/`Result` and use this method to handle errors explicitly.
+   */
+  safeGetConversationById(conversationId: QualifiedId, searchInLocalDB = false): Task<Conversation, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.getConversationById(conversationId, searchInLocalDB),
+    );
   }
 
   /**
@@ -2291,6 +2310,9 @@ export class ConversationRepository {
    *
    * @param param0 conversationId and groupId
    * @returns void
+   *
+   * @deprecated Use {@link safeEnsureConversationExists} instead. This method throws on failure.
+   * Prefer the `Task`-returning variant.
    */
   public ensureConversationExists = async ({
     conversationId,
@@ -2308,6 +2330,70 @@ export class ConversationRepository {
       conversationState: this.conversationState,
     });
   };
+
+  /**
+   * Ensure an MLS group conversation exists with explicit error handling.
+   * Reconciles local MLS state with the backend MLS shell.
+   *
+   * Returns a `Task` so establishment/join failures are captured in the error channel
+   * instead of surfacing as an uncaught exception. Prefer to compose async work
+   * with `Task`/`Result` and use this method to handle errors explicitly.
+   */
+  safeEnsureConversationExists({
+    conversationId,
+    groupId,
+    core = this.core,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    core?: Account;
+  }): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.ensureConversationExists({conversationId, groupId, core}),
+    );
+  }
+
+  /**
+   * Establish a meeting MLS group with explicit error handling.
+   *
+   * Returns a `Task` resolving to `{failedToAdd}` on success (partial add failures are
+   * included in the value, not the error channel). Hard failures (network, MLS commit,
+   * missing self user) are captured in the Task error channel. Use after `POST /meetings`
+   * when the backend conversation shell is at epoch 0.
+   *
+   * Does not inject conversation events — meeting conversations are hidden from the main
+   * conversation list; partial add failures are surfaced via meetings UI (e.g. modal).
+   */
+  establishMeetingConversation({
+    groupId,
+    userIdsToAdd,
+    conversationQualifiedId,
+  }: {
+    groupId: string;
+    userIdsToAdd: QualifiedId[];
+    conversationQualifiedId: QualifiedId;
+  }): Task<{failedToAdd: AddUsersFailure[]}, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        const selfUser = this.userState.self();
+        if (selfUser === undefined) {
+          throw new Error('Cannot establish meeting conversation before self user is available');
+        }
+
+        const {failedToAdd = []} = await this.core.service!.conversation.establishMLSGroupConversation(
+          groupId,
+          userIdsToAdd,
+          selfUser.qualifiedId,
+          this.core.clientId,
+          conversationQualifiedId,
+        );
+
+        return {failedToAdd};
+      },
+    );
+  }
 
   /**
    * will locally delete conversations that no longer exist on backend side
@@ -2589,6 +2675,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to add users to
    * @param userEntities Users to be added to the conversation
    * @returns Resolves when members were added
+   *
    */
   async addUsers(conversation: Conversation, userEntities: Pick<User, 'qualifiedId'>[]) {
     /**
@@ -2647,6 +2734,50 @@ export class ConversationRepository {
         this.handleAddToConversationError(error, conversation, qualifiedUsers);
       }
     }
+  }
+
+  /**
+   * Add users to an established MLS conversation with explicit error handling.
+   *
+   * Returns a `Task` resolving to `{failedToAdd}` on success (partial add failures are
+   * included in the value, not the error channel). Hard failures (network, MLS commit,
+   * missing group id) are captured in the Task error channel.
+   *
+   * Does not inject conversation events — meeting conversations are hidden from the main
+   * conversation list; partial add failures are surfaced via meetings UI (e.g. modal).
+   */
+  safeAddUsers(
+    conversation: Conversation,
+    userEntities: Pick<User, 'qualifiedId'>[],
+  ): Task<{failedToAdd: AddUsersFailure[]}, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
+
+        if (qualifiedUsers.length === 0) {
+          return {failedToAdd: []};
+        }
+
+        const {groupId} = conversation;
+
+        if (!is.nonEmptyString(groupId)) {
+          throw new Error('Cannot add users to MLS conversation without group id');
+        }
+
+        if (!this.core.service) {
+          throw new Error('Cannot add users to MLS conversation without core service');
+        }
+
+        const {failedToAdd = []} = await this.core.service.conversation.addUsersToMLSConversation({
+          conversationId: conversation.qualifiedId,
+          groupId,
+          qualifiedUsers,
+        });
+
+        return {failedToAdd};
+      },
+    );
   }
 
   addMissingMember(conversationEntity: Conversation, users: QualifiedId[], timestamp: number) {
@@ -2894,6 +3025,9 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when member was removed from the conversation
+   *
+   * @deprecated Use {@link safeRemoveMembers} instead. This method throws on failure.
+   * Prefer the `Task`-returning variant.
    */
   public async removeMembers(conversationEntity: Conversation, userIds: QualifiedId[]) {
     if (isMLSConversation(conversationEntity)) {
@@ -2902,6 +3036,20 @@ export class ConversationRepository {
       const events = await this.removeMembersFromConversation(conversationEntity, userIds);
       await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
+  }
+
+  /**
+   * Remove members from a conversation with explicit error handling.
+   *
+   * Returns a `Task` so failures are captured in the error channel instead of surfacing
+   * as an uncaught exception. Prefer to compose async work with `Task`/`Result` and use this
+   * method to handle errors explicitly.
+   */
+  safeRemoveMembers(conversationEntity: Conversation, userIds: QualifiedId[]): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.removeMembers(conversationEntity, userIds),
+    );
   }
 
   /**

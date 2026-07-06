@@ -21,12 +21,11 @@ import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 import {result, Result} from 'true-myth';
 
-import {getInvitedEmailsFromSelectedUsers} from 'Components/Meeting/getInvitedEmailsFromSelectedUsers';
 import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 
-import {ScheduleFormErrors, scheduleFormErrors} from './ScheduleFormErrors';
+import {ScheduleFormErrors} from './ScheduleFormErrors';
 
 export const mapScheduleFormToCreateMeeting = (
   formState: ScheduleMeetingFormState,
@@ -39,20 +38,12 @@ export const mapScheduleFormToCreateMeeting = (
   }
 
   const {start, end} = timesResult.value;
-
-  const invitedEmails = getInvitedEmailsFromSelectedUsers(formState.selectedUsers);
-
-  if (invitedEmails.isNothing) {
-    return result.err(scheduleFormErrors.participantMissingEmail);
-  }
-
   const recurrence = mapRecurrenceOptionToMeetingRecurrence(formState.recurrence);
 
   return result.ok({
     title: formState.title.trim(),
     start_time: start.toISOString(),
     end_time: end.toISOString(),
-    ...(invitedEmails.value.length > 0 && {invited_emails: invitedEmails.value}),
     ...(recurrence !== undefined && {recurrence}),
   });
 };

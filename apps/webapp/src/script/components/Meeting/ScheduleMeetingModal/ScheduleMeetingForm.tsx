@@ -94,9 +94,14 @@ export const ScheduleMeetingForm = ({
   onParticipantsFilterChange,
   selfUser,
 }: ScheduleMeetingFormProps) => {
-  const {translate, wallClock} = useApplicationContext();
+  const {mainViewModel, translate, wallClock} = useApplicationContext();
   const {users} = useScheduleMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
+
+  const contentViewModel = mainViewModel.content;
+  const conversationRepository = contentViewModel.repositories.conversation;
+  const searchRepository = contentViewModel.repositories.search;
+  const teamRepository = contentViewModel.repositories.team;
 
   const recurrenceSelectOptions = useMemo(
     () =>
@@ -178,6 +183,9 @@ export const ScheduleMeetingForm = ({
             filter={formState.participantsFilter}
             onFilterChange={onParticipantsFilterChange}
             selfUser={selfUser}
+            searchRepository={searchRepository}
+            teamRepository={teamRepository}
+            conversationRepository={conversationRepository}
             label={translate('meetings.scheduleModal.participantsLabel')}
             placeholder={translate('meetings.scheduleModal.participantsPlaceholder')}
             popoverPortalContainer={portalContainer}

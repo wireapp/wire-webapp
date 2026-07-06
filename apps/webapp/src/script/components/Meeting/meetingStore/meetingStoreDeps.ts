@@ -17,21 +17,13 @@
  *
  */
 
-import is from '@sindresorhus/is';
-import {Maybe, maybe} from 'true-myth';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 
-import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 
-export const getInvitedEmailsFromSelectedUsers = (
-  selectedUsers: ScheduleMeetingFormState['selectedUsers'],
-): Maybe<string[]> => {
-  const emails = selectedUsers.map(user => user.email()).filter((email): email is string => is.nonEmptyString(email));
-
-  const hasMissingEmail = selectedUsers.some(user => !is.nonEmptyString(user.email()));
-
-  if (hasMissingEmail) {
-    return maybe.nothing();
-  }
-
-  return maybe.just(emails);
+export type MeetingStoreDeps = {
+  meetingsRepository: MeetingsRepository;
+  conversationRepository: ConversationRepository;
+  wallClock: WallClock;
 };

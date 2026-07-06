@@ -21,7 +21,6 @@ import {AxiosRequestConfig} from 'axios';
 
 import {CreateMeeting} from './createMeeting';
 import {Meeting} from './meeting';
-import {MeetingEmailsInvitation} from './meetingEmailsInvitation';
 import {UpdateMeeting} from './updateMeeting';
 
 import {HttpClient} from '../http';
@@ -33,8 +32,6 @@ export class MeetingsAPI {
   public static readonly URL = {
     MEETINGS: '/meetings',
     LIST: '/meetings/list',
-    INVITATIONS: 'invitations',
-    INVITATIONS_DELETE: 'invitations/delete',
   } as const;
 
   private generateMeetingUrl(meetingId: QualifiedId): string {
@@ -106,31 +103,5 @@ export class MeetingsAPI {
 
     const response = await this.client.sendJSON<Meeting>(config);
     return response.data;
-  }
-
-  /**
-   * Add emails to the invited emails of a meeting.
-   */
-  public async addMeetingInvitation(meetingId: QualifiedId, invitation: MeetingEmailsInvitation): Promise<void> {
-    const config: AxiosRequestConfig = {
-      data: invitation,
-      method: 'post',
-      url: `${this.generateMeetingUrl(meetingId)}/${MeetingsAPI.URL.INVITATIONS}`,
-    };
-
-    await this.client.sendJSON<void>(config);
-  }
-
-  /**
-   * Remove emails from the invited emails of a meeting.
-   */
-  public async removeMeetingInvitation(meetingId: QualifiedId, invitation: MeetingEmailsInvitation): Promise<void> {
-    const config: AxiosRequestConfig = {
-      data: invitation,
-      method: 'post',
-      url: `${this.generateMeetingUrl(meetingId)}/${MeetingsAPI.URL.INVITATIONS_DELETE}`,
-    };
-
-    await this.client.sendJSON<void>(config);
   }
 }

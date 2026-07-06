@@ -35,12 +35,4 @@ export class MeetingsApiDataSource implements MeetingsDataSource {
   updateMeeting(...args: Parameters<MeetingsDataSource['updateMeeting']>) {
     return this.meetingsApi.updateMeeting(...args);
   }
-
-  addMeetingInvitation(meetingId: Parameters<MeetingsDataSource['addMeetingInvitation']>[0], emails: string[]) {
-    return this.meetingsApi.addMeetingInvitation(meetingId, {emails});
-  }
-
-  removeMeetingInvitation(meetingId: Parameters<MeetingsDataSource['removeMeetingInvitation']>[0], emails: string[]) {
-    return this.meetingsApi.removeMeetingInvitation(meetingId, {emails});
-  }
 }

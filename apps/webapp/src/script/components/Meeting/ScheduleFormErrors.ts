@@ -21,7 +21,8 @@ export const scheduleFormErrors = {
   missingTimes: 'missingTimes',
   startInPast: 'startInPast',
   endInPast: 'endInPast',
-  participantMissingEmail: 'participantMissingEmail',
 } as const;
 
-export type ScheduleFormErrors = (typeof scheduleFormErrors)[keyof typeof scheduleFormErrors];
+export type ScheduleFormErrorCode = (typeof scheduleFormErrors)[keyof typeof scheduleFormErrors];
+
+export type ScheduleFormErrors = ScheduleFormErrorCode;

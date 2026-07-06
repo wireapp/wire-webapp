@@ -54,6 +54,8 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   /** will do an extra request to the server when user types in (otherwise will only lookup given local users) */
   allowRemoteSearch?: boolean;
   filterRemoteTeamUsers?: boolean;
+  /** When true, show every user from `users` after local search — skip conversation/connection visibility gate. */
+  showAllProvidedUsers?: boolean;
 };
 
 const SEARCH_MEMBERS_DEBOUNCE_MILLISECONDS = 300;
@@ -61,6 +63,7 @@ const SEARCH_MEMBERS_DEBOUNCE_MILLISECONDS = 300;
 export const UserSearchableList = ({
   onUpdateSelectedUsers,
   filterRemoteTeamUsers = false,
+  showAllProvidedUsers = false,
   dataUieName = '',
   filter = '',
   highlightedUsers,
@@ -120,15 +123,16 @@ export const UserSearchableList = ({
     };
 
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
-    const results = searchRepository
-      .searchUserInSet(filter, users)
-      .filter(
-        user =>
-          user.isMe ||
-          conversationState.hasConversationWith(user) ||
-          teamRepository.isSelfConnectedTo(user.id) ||
-          user.username() === normalizedQuery,
-      );
+    const searchResults = searchRepository.searchUserInSet(filter, users);
+    const results = showAllProvidedUsers
+      ? searchResults
+      : searchResults.filter(
+          user =>
+            user.isMe ||
+            conversationState.hasConversationWith(user) ||
+            teamRepository.isSelfConnectedTo(user.id) ||
+            user.username() === normalizedQuery,
+        );
 
     if (is.nonEmptyString(normalizedQuery) && selfInTeam && allowRemoteSearch === true) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
@@ -160,6 +164,7 @@ export const UserSearchableList = ({
     searchRepository,
     selfFirst,
     selfInTeam,
+    showAllProvidedUsers,
     teamRepository,
     users,
   ]);

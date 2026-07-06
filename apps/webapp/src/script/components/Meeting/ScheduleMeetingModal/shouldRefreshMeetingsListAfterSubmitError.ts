@@ -17,6 +17,18 @@
  *
  */
 
-export interface MeetingEmailsInvitation {
-  emails: string[];
-}
+import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+
+/**
+ * Returns whether the meetings list should be refreshed after a failed submit.
+ * Partial failures mean meeting metadata was already persisted and the UI should recover.
+ */
+export const shouldRefreshMeetingsListAfterSubmitError = (error: MeetingSubmitErrors): boolean => {
+  switch (error) {
+    case meetingSubmitErrors.addParticipantsFailed:
+    case meetingSubmitErrors.removeParticipantsFailed:
+      return true;
+    default:
+      return false;
+  }
+};
