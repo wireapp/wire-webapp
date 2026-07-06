@@ -1268,7 +1268,6 @@
   "meetings.action.editMeeting": "Изменить встречу",
   "meetings.action.meetNow": "Встречи сейчас",
   "meetings.action.scheduleMeeting": "Запланировать встречу",
-  "meetings.action.startMeeting": "Начать встречу",
   "meetings.list.loadError": "Не удалось загрузить встречи. Попробуйте еще раз.",
   "meetings.list.today": "Сегодня",
   "meetings.list.tomorrow": "Завтра",

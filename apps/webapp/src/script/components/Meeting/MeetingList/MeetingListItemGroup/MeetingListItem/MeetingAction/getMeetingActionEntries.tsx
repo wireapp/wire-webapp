@@ -17,7 +17,7 @@
  *
  */
 
-import {CallIcon, CirclePlusIcon, CloseIcon, EditIcon, ShareLinkIcon, TrashIcon} from '@wireapp/react-ui-kit';
+import {CirclePlusIcon, CloseIcon, EditIcon, ShareLinkIcon, TrashIcon} from '@wireapp/react-ui-kit';
 
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {
@@ -51,10 +51,6 @@ export const getMeetingActionEntries = ({
   };
 
   return [
-    {
-      icon: () => <CallIcon />,
-      label: translate('meetings.action.startMeeting'),
-    },
     {
       icon: () => <CirclePlusIcon />,
       label: translate('meetings.action.createConversation'),
