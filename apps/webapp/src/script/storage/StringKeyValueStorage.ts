@@ -19,28 +19,8 @@
 
 import {Maybe} from 'true-myth';
 
-export interface BrowserStorage {
+export interface StringKeyValueStorage {
   getItem: (key: string) => Maybe<string>;
   removeItem: (key: string) => void;
   setItem: (key: string, value: string) => void;
-}
-
-export function createBrowserStorage(storage: Maybe<Storage>): BrowserStorage {
-  return {
-    getItem: key => {
-      return storage.andThen(browserStorage => {
-        return Maybe.of(browserStorage.getItem(key));
-      });
-    },
-    removeItem: key => {
-      return storage.inspect(browserStorage => {
-        return browserStorage.removeItem(key);
-      });
-    },
-    setItem: (key, value) => {
-      return storage.inspect(browserStorage => {
-        return browserStorage.setItem(key, value);
-      });
-    },
-  };
 }

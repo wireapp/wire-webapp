@@ -23,7 +23,8 @@ import is from '@sindresorhus/is';
 import {Runtime} from '@wireapp/commons';
 import {Maybe, result} from 'true-myth';
 
-import {BrowserStorage, createBrowserStorage} from 'src/script/browser/storage/browserStorage';
+import {createStringKeyValueStorageFromWebStorage} from 'src/script/browser/storage/createStringKeyValueStorageFromWebStorage';
+import {StringKeyValueStorage} from 'src/script/storage/StringKeyValueStorage';
 import {getStorage} from 'Util/localStorage';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {createUuid} from 'Util/uuid';
@@ -33,9 +34,9 @@ const CONFIG = {
   STORAGE_KEY: 'app_opened',
 };
 
-const browserStorage = createBrowserStorage(Maybe.of(getStorage()));
+const singleInstanceStorage = createStringKeyValueStorageFromWebStorage(Maybe.of(getStorage()));
 
-function getStoredInstanceId(storage: BrowserStorage): Maybe<string> {
+function getStoredInstanceId(storage: StringKeyValueStorage): Maybe<string> {
   const storedInstance = storage.getItem(CONFIG.STORAGE_KEY);
 
   return storedInstance.match({
@@ -74,7 +75,7 @@ function isRunningInstance(instanceId: Maybe<string>) {
     return true;
   }
 
-  const otherInstanceId = getStoredInstanceId(browserStorage);
+  const otherInstanceId = getStoredInstanceId(singleInstanceStorage);
   return otherInstanceId.equals(instanceId);
 }
 
@@ -91,11 +92,11 @@ function poll(instanceIdRef: {current: Maybe<string>}, onNewInstance: () => void
 }
 
 function killCurrentInstance() {
-  browserStorage.removeItem(CONFIG.STORAGE_KEY);
+  singleInstanceStorage.removeItem(CONFIG.STORAGE_KEY);
 }
 
 function register(instanceId: string) {
-  browserStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({appInstanceId: instanceId}));
+  singleInstanceStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({appInstanceId: instanceId}));
   return () => {
     return killCurrentInstance();
   };
