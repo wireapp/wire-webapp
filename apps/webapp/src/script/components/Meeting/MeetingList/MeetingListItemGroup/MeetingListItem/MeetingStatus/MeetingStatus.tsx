@@ -27,11 +27,9 @@ import {
   joinButtonStyles,
   participatingStatusIconStyles,
   participatingStatusStyles,
-  startingSoonStatusStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus.styles';
-import {getCountdownSeconds, getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
+import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {formatSeconds} from 'Util/timeUtil';
 
 export interface MeetingStatusProps {
   start_date: string;
@@ -65,15 +63,6 @@ const MeetingStatusComponent = ({start_date, end_date, attending, nowMs}: Meetin
         </Button>
       </div>
     );
-  }
-
-  if (meetingStatus === MeetingStatuses.STARTING_SOON) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const countdown = useMemo(() => {
-      const seconds = getCountdownSeconds(timestamp, start_date);
-      return formatSeconds(seconds);
-    }, [timestamp, start_date]);
-    return <div css={startingSoonStatusStyles}>{translate('meetings.meetingStatus.startingIn', {countdown})}</div>;
   }
 
   return null;

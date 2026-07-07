@@ -20,7 +20,6 @@
 import type {TranslationKey} from 'Util/localizerUtil';
 
 export const MEETING_ACTION_TRANSLATION_KEYS = {
-  createConversation: 'meetings.action.createConversation',
   deleteMeetingForAll: 'meetings.action.deleteMeetingForAll',
   deleteMeetingForMe: 'meetings.action.deleteMeetingForMe',
   editMeeting: 'meetings.action.editMeeting',
