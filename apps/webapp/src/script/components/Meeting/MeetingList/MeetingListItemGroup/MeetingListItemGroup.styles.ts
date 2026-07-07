@@ -28,3 +28,8 @@ export const sectionHeaderStyles: CSSObject = {
   color: 'var(--main-color)',
   fontWeight: 'var(--font-weight-semibold)',
 };
+
+export const listStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+};

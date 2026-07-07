@@ -22,6 +22,7 @@ import {memo} from 'react';
 import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingListItem} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem';
 import {
+  listStyles,
   sectionHeaderStyles,
   sectionStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup.styles';
@@ -36,10 +37,11 @@ interface MeetingListItemGroupProps {
 const MeetingListItemGroupComponent = ({header, groupedMeetings, nowMs}: MeetingListItemGroupProps) => {
   const {translate} = useApplicationContext();
 
-  // Sort by hour key
+  // Sort by hour key, then flatten so adjacent items share one continuous border.
   const groups = Object.entries(groupedMeetings).toSorted(([meetingA], [meetingB]) => +meetingA - +meetingB);
   const nonEmptyGroups = groups.filter(([, items]) => items?.length);
-  const isEmpty = nonEmptyGroups.length === 0;
+  const meetings = nonEmptyGroups.flatMap(([, items]) => items);
+  const isEmpty = meetings.length === 0;
 
   if (isEmpty) {
     return (
@@ -54,13 +56,11 @@ const MeetingListItemGroupComponent = ({header, groupedMeetings, nowMs}: Meeting
     <section css={sectionStyles}>
       {header !== undefined && header !== '' && <div css={sectionHeaderStyles}>{header}</div>}
 
-      {nonEmptyGroups.map(([key, items]) => (
-        <div key={`meeting-list-item-group-${key}`}>
-          {items.map(item => (
-            <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
-          ))}
-        </div>
-      ))}
+      <div css={listStyles}>
+        {meetings.map(item => (
+          <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
+        ))}
+      </div>
     </section>
   );
 };
