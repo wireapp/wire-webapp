@@ -19,6 +19,7 @@
 
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/getMeetingActionEntries';
+import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingActionTranslationKeys';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
@@ -43,13 +44,13 @@ const createSelfUser = (id = 'host-id') => {
 const translate = (key: string) => key;
 
 const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.find(entry => entry.label === 'meetings.action.editMeeting');
+  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.editMeeting);
 
 const getDeleteForMeEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.find(entry => entry.label === 'meetings.action.deleteMeetingForMe');
+  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForMe);
 
 const getDeleteForAllEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.find(entry => entry.label === 'meetings.action.deleteMeetingForAll');
+  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll);
 
 describe('getMeetingActionEntries', () => {
   it('includes Edit meeting for an eligible host', () => {

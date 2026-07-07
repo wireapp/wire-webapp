@@ -24,6 +24,7 @@ import {
   contextMenuDangerItemIconStyles,
   contextMenuDangerItemStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
+import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingActionTranslationKeys';
 import {canEditMeeting, isMeetingHost} from 'Components/Meeting/utils/canEditMeeting';
 import type {User} from 'Repositories/entity/User';
 import type {ContextMenuEntry} from 'src/script/ui/contextMenu';
@@ -46,20 +47,20 @@ export const getMeetingActionEntries = ({
 }: GetMeetingActionEntriesParams): ContextMenuEntry[] => {
   const editEntry: ContextMenuEntry = {
     icon: () => <EditIcon />,
-    label: translate('meetings.action.editMeeting'),
+    label: translate(MEETING_ACTION_TRANSLATION_KEYS.editMeeting),
     click: onEdit,
   };
 
   const deleteForMeEntry: ContextMenuEntry = {
     css: contextMenuDangerItemStyles,
     icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
-    label: translate('meetings.action.deleteMeetingForMe'),
+    label: translate(MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForMe),
   };
 
   const deleteForAllEntry: ContextMenuEntry = {
     css: contextMenuDangerItemStyles,
     icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
-    label: translate('meetings.action.deleteMeetingForAll'),
+    label: translate(MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll),
   };
 
   const isHost = isMeetingHost(meeting, selfUser);
@@ -67,11 +68,11 @@ export const getMeetingActionEntries = ({
   return [
     {
       icon: () => <CallIcon />,
-      label: translate('meetings.action.startMeeting'),
+      label: translate(MEETING_ACTION_TRANSLATION_KEYS.startMeeting),
     },
     {
       icon: () => <CirclePlusIcon />,
-      label: translate('meetings.action.createConversation'),
+      label: translate(MEETING_ACTION_TRANSLATION_KEYS.createConversation),
     },
     ...(canEditMeeting(meeting, selfUser, nowMs) ? [editEntry] : []),
     ...(isHost ? [deleteForAllEntry] : [deleteForMeEntry]),
