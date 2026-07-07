@@ -17,11 +17,12 @@
  *
  */
 
-import {Avatar, AVATAR_SIZE} from '../avatar';
 import type {User} from 'Repositories/entity/User';
 
 import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
 import {avatarItemStyles, overflowCountStyles, wrapperStyles} from './stackedAvatars.styles';
+
+import {Avatar, AVATAR_SIZE} from '../avatar';
 
 interface StackedAvatarsProps {
   participants: User[];
