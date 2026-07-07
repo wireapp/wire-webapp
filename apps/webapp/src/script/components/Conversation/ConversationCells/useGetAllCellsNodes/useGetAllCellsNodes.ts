@@ -45,6 +45,11 @@ interface UseGetAllCellsNodesProps {
   sort: CellsSort | null;
 }
 
+interface CellsQueryState {
+  offset: number;
+  sort: CellsSort | null;
+}
+
 export const useGetAllCellsNodes = ({
   cellsRepository,
   userRepository,
@@ -54,7 +59,23 @@ export const useGetAllCellsNodes = ({
   sort,
 }: UseGetAllCellsNodesProps) => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
-  const [offset, setOffset] = useState(0);
+  const [queryState, setQueryState] = useState<CellsQueryState>({offset: 0, sort});
+
+  // Sort changes must reset pagination before fetchNodes is created so requests
+  // never run with the new sort and the previous page offset.
+  if (queryState.sort !== sort) {
+    setQueryState({offset: 0, sort});
+  }
+
+  const offset = queryState.sort === sort ? queryState.offset : 0;
+
+  const setOffset = useCallback(
+    (nextOffset: number) => {
+      setQueryState({offset: nextOffset, sort});
+    },
+    [sort],
+  );
+
   const requestVersionGate = useRef(createRequestVersionGate());
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
@@ -127,12 +148,6 @@ export const useGetAllCellsNodes = ({
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [domain, id, isCurrentFetchRequest, offset, pageSize, sort, setError, setNodes, setPagination, setStatus]);
-
-  // A new sort criterion re-pages from the top; the fetch effect below then refetches
-  // because fetchNodes depends on both offset and sort.
-  useEffect(() => {
-    setOffset(0);
-  }, [sort]);
 
   const handleHashChange = useCallback((): void => {
     if (enabled !== true) {

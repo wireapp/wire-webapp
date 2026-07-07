@@ -139,6 +139,31 @@ describe('useGetAllCellsNodes', () => {
     );
   });
 
+  it('resets to the first page before fetching when sort changes', async () => {
+    const cellsRepository = createFakeCellsRepository();
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+
+    const {result, rerender} = renderGetAllNodesHook({cellsRepository, fireAndForgetInvoker});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    act(() => result.current.setOffset(50));
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.getAllNodes).toHaveBeenLastCalledWith(expect.objectContaining({offset: 50}));
+
+    act(() => rerender({enabled: true, sort: {field: 'name', direction: 'asc'}}));
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(3);
+    expect(cellsRepository.getAllNodes).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        offset: 0,
+        sortBy: 'name',
+        sortDirection: 'asc',
+      }),
+    );
+  });
+
   it('does not let an older response overwrite a newer fetch', async () => {
     const firstFetch = createDeferred<RestNodeCollection>();
     const secondFetch = createDeferred<RestNodeCollection>();
