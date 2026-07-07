@@ -17,7 +17,6 @@
  *
  */
 
-
 export enum MeetingStatuses {
   ON_GOING = 'on_going',
   PARTICIPATING = 'participating',
