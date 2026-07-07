@@ -72,7 +72,7 @@ export const rightStyles: CSSObject = {
   gap: 12,
 };
 
-export const callingIconStyles: CSSObject = {
+export const calendarIconStyles: CSSObject = {
   padding: '7px',
   background: 'var(--app-bg)',
   color: 'var(--main-color)',

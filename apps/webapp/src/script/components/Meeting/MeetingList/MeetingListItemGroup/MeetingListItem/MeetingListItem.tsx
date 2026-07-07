@@ -19,13 +19,13 @@
 
 import {memo, useMemo} from 'react';
 
-import {CallIcon} from '@wireapp/react-ui-kit';
+import {CalendarIcon} from '@wireapp/react-ui-kit';
 
 import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction';
 import {
   badgeWrapperStyles,
-  callingIconStyles,
+  calendarIconStyles,
   itemStyles,
   leftStyles,
   metaStyles,
@@ -85,8 +85,8 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
   return (
     <div css={[itemStyles, isOngoing && onGoingMeetingStyles]}>
       <div css={leftStyles}>
-        <div css={callingIconStyles}>
-          <CallIcon />
+        <div css={calendarIconStyles}>
+          <CalendarIcon />
         </div>
         <div>
           <div css={titleStyles}>{title}</div>
