@@ -19,12 +19,9 @@
 
 import {memo} from 'react';
 
-import {set} from 'date-fns';
-
 import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingListItem} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem';
 import {
-  hourLabelStyles,
   sectionHeaderStyles,
   sectionStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup.styles';
@@ -38,11 +35,6 @@ interface MeetingListItemGroupProps {
 
 const MeetingListItemGroupComponent = ({header, groupedMeetings, nowMs}: MeetingListItemGroupProps) => {
   const {translate} = useApplicationContext();
-  const formatHourLabel = (date: string) =>
-    set(new Date(date), {minutes: 0, seconds: 0, milliseconds: 0}).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
 
   // Sort by hour key
   const groups = Object.entries(groupedMeetings).toSorted(([meetingA], [meetingB]) => +meetingA - +meetingB);
@@ -63,15 +55,10 @@ const MeetingListItemGroupComponent = ({header, groupedMeetings, nowMs}: Meeting
       {header !== undefined && header !== '' && <div css={sectionHeaderStyles}>{header}</div>}
 
       {nonEmptyGroups.map(([key, items]) => (
-        <div key={`meeting-list-item-group-header-${key}`}>
-          <div css={hourLabelStyles}>
-            <time>{formatHourLabel(items[0].start_date)}</time>
-          </div>
-          <div>
-            {items.map(item => (
-              <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
-            ))}
-          </div>
+        <div key={`meeting-list-item-group-${key}`}>
+          {items.map(item => (
+            <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
+          ))}
         </div>
       ))}
     </section>

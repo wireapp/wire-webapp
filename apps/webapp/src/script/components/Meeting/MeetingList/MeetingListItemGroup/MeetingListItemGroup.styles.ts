@@ -28,10 +28,3 @@ export const sectionHeaderStyles: CSSObject = {
   color: 'var(--main-color)',
   fontWeight: 'var(--font-weight-semibold)',
 };
-
-export const hourLabelStyles: CSSObject = {
-  color: 'var(--secondary-text-color)',
-  fontSize: '12px',
-  marginTop: 12,
-  marginBottom: 8,
-};
