@@ -56,7 +56,7 @@ export const getAuthorizationChallenges = async ({
   const {challenge: oidcChallenge} = challenges.find(challenge => challenge.type.includes('oidc')) ?? {};
   const {challenge: dpopChallenge} = challenges.find(challenge => challenge.type.includes('dpop')) ?? {};
 
-  if (!dpopChallenge || !oidcChallenge) {
+  if (dpopChallenge === undefined || oidcChallenge === undefined) {
     throw new Error('missing dpop or oidc challenge');
   }
   // manual copy of the wasm data because of a problem while cloning it

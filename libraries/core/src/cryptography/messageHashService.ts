@@ -63,7 +63,7 @@ export class MessageHashService {
   }
 
   private getAssetBytes(content: AssetContent): Buffer {
-    if (content.uploaded) {
+    if (content.uploaded !== undefined) {
       const assetId = content.uploaded.assetId;
       return this.convertToUtf16BE(assetId);
     }
