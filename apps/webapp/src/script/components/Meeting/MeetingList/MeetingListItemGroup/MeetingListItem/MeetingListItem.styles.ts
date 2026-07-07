@@ -26,13 +26,14 @@ export const itemStyles: CSSObject = {
   justifyContent: 'space-between',
   background: 'var(--text-input-background)',
   padding: '12px 14px',
-  border: '1px solid var(--border-color)',
+  borderWidth: '1px',
+  borderStyle: 'solid',
+  borderColor: 'var(--border-color)',
+  borderTop: 'none',
   borderRadius: 0,
-  '&:not(:first-of-type)': {
-    marginTop: -1,
-  },
 
   '&:first-of-type': {
+    borderTop: '1px solid var(--border-color)',
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
@@ -45,7 +46,18 @@ export const itemStyles: CSSObject = {
 
 export const onGoingMeetingStyles: CSSObject = {
   background: 'var(--accent-color-highlight)',
-  border: '1px solid var(--accent-color)',
+  borderLeftColor: 'var(--accent-color)',
+  borderRightColor: 'var(--accent-color)',
+  borderBottomColor: 'var(--accent-color)',
+
+  '&:first-of-type': {
+    borderTopColor: 'var(--accent-color)',
+  },
+
+  // Keep a visible divider where ongoing items meet upcoming items below.
+  '&[data-is-ongoing]:has(+ :not([data-is-ongoing]))': {
+    borderBottomColor: 'var(--border-color)',
+  },
 };
 
 export const leftStyles: CSSObject = {

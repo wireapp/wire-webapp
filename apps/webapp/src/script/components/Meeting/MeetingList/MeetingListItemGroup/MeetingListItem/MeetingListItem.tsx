@@ -83,7 +83,7 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
   const isOngoing = meetingStatus === MeetingStatuses.ON_GOING || meetingStatus === MeetingStatuses.PARTICIPATING;
 
   return (
-    <div css={[itemStyles, isOngoing && onGoingMeetingStyles]}>
+    <div css={[itemStyles, isOngoing && onGoingMeetingStyles]} {...(isOngoing ? {'data-is-ongoing': true} : {})}>
       <div css={leftStyles}>
         <div css={calendarIconStyles}>
           <CalendarIcon />
