@@ -19,23 +19,24 @@
 
 import {memo, useMemo} from 'react';
 
-import {CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
+import {CalendarIcon} from '@wireapp/react-ui-kit';
 
 import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction';
 import {
   badgeWrapperStyles,
-  callingIconStyles,
+  calendarIconStyles,
   itemStyles,
   leftStyles,
   metaStyles,
   onGoingMeetingStyles,
   rightStyles,
   titleStyles,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem.styles';
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingListItem.styles';
+import {MeetingParticipants} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingParticipants/meetingParticipants';
 import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
 import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
-import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
+import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
 
@@ -48,7 +49,7 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
   const {translate} = useApplicationContext();
   const timestamp = nowMs ?? Date.now();
 
-  const {time, showCalendarIcon} = useMemo(() => {
+  const time = useMemo(() => {
     const start = new Date(start_date);
     const end = new Date(end_date);
     const startMs = start.getTime();
@@ -60,29 +61,19 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
       const dayOfWeek = formatLocale(start, 'EEEE');
       const month = formatLocale(start, 'MMMM');
       const day = formatLocale(start, 'd');
-      const time = formatLocale(start, 'h:mm a');
-      return {
-        time: `${dayOfWeek}, ${month} ${day} • ${translate('meetings.meetingStatus.startedAt', {time})}`,
-        showCalendarIcon: false,
-      };
+      const startedAtTime = formatLocale(start, 'h:mm a');
+      return `${dayOfWeek}, ${month} ${day} • ${translate('meetings.meetingStatus.startedAt', {time: startedAtTime})}`;
     }
 
     if (isOngoing) {
-      const time = formatLocale(start, 'h:mm a');
-      return {
-        time: translate('meetings.meetingStatus.startedAt', {time}),
-        showCalendarIcon: false,
-      };
+      const startedAtTime = formatLocale(start, 'h:mm a');
+      return translate('meetings.meetingStatus.startedAt', {time: startedAtTime});
     }
 
     const sameMeridiem = formatLocale(start, 'a') === formatLocale(end, 'a');
-    const timeRange = sameMeridiem
+    return sameMeridiem
       ? `${formatLocale(start, 'h:mm')} – ${formatLocale(end, 'h:mm a')}`
       : `${formatLocale(start, 'h:mm a')} – ${formatLocale(end, 'h:mm a')}`;
-    return {
-      time: timeRange,
-      showCalendarIcon: true,
-    };
   }, [end_date, start_date, timestamp, translate]);
 
   const meetingStatus = useMemo(
@@ -95,13 +86,12 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
   return (
     <div css={[itemStyles, isOngoing && onGoingMeetingStyles]}>
       <div css={leftStyles}>
-        <div css={callingIconStyles}>
-          <CallIcon />
+        <div css={calendarIconStyles}>
+          <CalendarIcon />
         </div>
         <div>
           <div css={titleStyles}>{title}</div>
           <div css={metaStyles}>
-            {showCalendarIcon && <CalendarIcon css={{marginRight: '4px'}} height={12} />}
             {time}
             {recurrence !== 'doesNotRepeat' && (
               <div css={badgeWrapperStyles}>
@@ -112,6 +102,7 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
         </div>
       </div>
       <div css={rightStyles}>
+        <MeetingParticipants qualifiedConversation={meeting.qualified_conversation} isOngoing={isOngoing} />
         <MeetingStatus start_date={start_date} end_date={end_date} attending={attending} nowMs={timestamp} />
         <MeetingAction meeting={meeting} />
       </div>

@@ -19,35 +19,25 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const participatingStatusStyles = {
-  color: 'var(--accent-color)',
-  fontSize: '14px',
-  fontWeight: 'var(--font-weight-semibold)',
+export const AVATAR_OVERLAP_OFFSET = 8;
+
+export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
 };
 
-export const participatingStatusIconStyles = {
-  marginRight: '8px',
-  fill: 'var(--accent-color)',
-};
-
-export const joinButtonContainerStyles = {
+export const avatarItemStyles = (index: number, avatarRingColor: string): CSSObject => ({
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
+  marginLeft: index > 0 ? -AVATAR_OVERLAP_OFFSET : 0,
+  zIndex: index + 1,
+  borderRadius: '50%',
+  boxShadow: `0 0 0 1px ${avatarRingColor}`,
+});
 
-export const joinButtonStyles = {
-  height: '32px',
-  borderRadius: '8px',
-  fontSize: '14px',
+export const overflowCountStyles: CSSObject = {
+  marginLeft: 8,
+  color: 'var(--secondary-text-color)',
+  fontSize: 12,
   fontWeight: 'var(--font-weight-semibold)',
-  minWidth: '83px',
-  color: 'var(--white)',
-};
-
-export const joinButtonIconStyles: CSSObject = {
-  marginRight: '8px',
-  fill: 'var(--white)',
+  whiteSpace: 'nowrap',
 };

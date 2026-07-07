@@ -17,28 +17,12 @@
  *
  */
 
-import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-
 export enum MeetingStatuses {
   ON_GOING = 'on_going',
   PARTICIPATING = 'participating',
   UPCOMING = 'upcoming',
   PAST = 'past',
 }
-
-/**
- * Filters the list of meetings to return only those that are ongoing at the specified time.
- *
- * @param {Meeting[]} meetings - The list of meetings to filter.
- * @param {number} nowMs - The current time in milliseconds.
- * @returns {Meeting[]} - The list of ongoing meetings.
- */
-export const getOnGoingMeetingsAt = (meetings: Meeting[], nowMs: number): Meeting[] =>
-  meetings.filter(meeting => {
-    const startMs = new Date(meeting.start_date).getTime();
-    const endMs = new Date(meeting.end_date).getTime();
-    return nowMs >= startMs && nowMs < endMs;
-  });
 
 /**
  * Determines the status of a meeting at a specific time.

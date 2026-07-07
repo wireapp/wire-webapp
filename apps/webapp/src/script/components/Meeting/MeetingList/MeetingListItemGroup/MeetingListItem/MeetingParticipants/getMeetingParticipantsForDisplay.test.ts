@@ -17,24 +17,22 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
-
-import {
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {MeetingList} from './MeetingList';
+import {getMeetingParticipantsForDisplay} from './getMeetingParticipantsForDisplay';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
+const createUser = (id: string, name: string) => {
+  const user = new User(id, 'example.com', translateForTest);
+  user.name(name);
+  return user;
+};
 
-describe('MeetingList', () => {
-  it('shows the load error when the first load fails before any meetings are available', () => {
-    render(<MeetingList meetings={[]} isLoading={false} hasLoadError />, {wrapper: rootProviderWrapper});
+describe('getMeetingParticipantsForDisplay', () => {
+  it('excludes the self user from the displayed participants', () => {
+    const selfUser = createUser('self', 'Kim Organizer');
+    const otherUser = createUser('other', 'Jaqueline Olaho');
 
-    expect(screen.getByText('meetings.list.loadError')).toBeInTheDocument();
+    expect(getMeetingParticipantsForDisplay([selfUser, otherUser], selfUser)).toEqual([otherUser]);
   });
 });
