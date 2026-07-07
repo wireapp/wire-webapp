@@ -45,7 +45,29 @@ const translate = (key: string) => key;
 const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
   entries.find(entry => entry.label === 'meetings.action.editMeeting');
 
+const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) =>
+  entries.map(entry => entry.label);
+
 describe('getMeetingActionEntries', () => {
+  it('returns the expected action labels without Start meeting', () => {
+    const entries = getMeetingActionEntries({
+      meeting: createMeeting(),
+      selfUser: createSelfUser(),
+      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      translate,
+      onEdit: jest.fn(),
+    });
+
+    expect(getEntryLabels(entries)).toEqual([
+      'meetings.action.createConversation',
+      'meetings.action.copyLink',
+      'meetings.action.editMeeting',
+      'meetings.action.deleteMeetingForMe',
+      'meetings.action.deleteMeetingForAll',
+    ]);
+    expect(getEntryLabels(entries)).not.toContain('meetings.action.startMeeting');
+  });
+
   it('includes Edit meeting for an eligible host', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
