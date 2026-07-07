@@ -374,6 +374,30 @@ export class CallingRepository {
     return this.backgroundEffectsHandler;
   }
 
+  private async applyCurrentBackgroundEffectOnSelfParticipantR(
+    stream: MediaStream,
+    changeAvsSendingMediaSource = false,
+  ): Promise<MediaStream | void> {
+    const activeCall = this.callState.joinedCall();
+    if (!activeCall) {
+      // There is no call even there is no self-participant!
+      this.logger.warn('There is no call even there is no self-participant to apply background effects');
+      return;
+    }
+
+    // Read self-Participant state to change
+    const selfParticipant = activeCall.getSelfParticipant();
+    const hasActiveVideo = selfParticipant.hasActiveVideo();
+    const sharesScreen = selfParticipant.sharesScreen();
+
+    if (sharesScreen) {
+      this.logger.error('The application allows to apply background effects in case of screen shares');
+      return;
+    }
+
+    this.logger.info('Apply background effects to self participant');
+  }
+
   private async applyCurrentBackgroundEffectOnSelfParticipant(
     changeAvsSendingMediaSource = false,
   ): Promise<MediaStream | void> {
@@ -2002,16 +2026,19 @@ export class CallingRepository {
 
   public async refreshVideoInput() {
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
+
     this.stopMediaSource(MediaType.VIDEO);
-    let clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
+
     const activeCall = this.callState.joinedCall();
+
     if (activeCall && this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
-      const processedStream = await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
+      const processedStream = await this.applyCurrentBackgroundEffectOnSelfParticipantR(stream, true);
       if (processedStream) {
-        clonedMediaStream = processedStream;
+        return processedStream;
       }
     }
-    return clonedMediaStream;
+
+    return this.changeMediaSource(stream, MediaType.VIDEO);
   }
 
   public async refreshAudioInput() {

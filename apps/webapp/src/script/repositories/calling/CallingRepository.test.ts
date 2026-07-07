@@ -53,6 +53,8 @@ import {Core} from '../../service/coreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
 import {translateForTest} from 'Util/test/translateForTest';
+import {BackgroundEffectsHandler, ReleasableMediaStream} from "Repositories/media/backgroundEffectsHandler";
+import {MediaStreamHandler} from "Repositories/media/MediaStreamHandler";
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
@@ -805,7 +807,7 @@ describe('CallingRepository ISO', () => {
           toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
         } as any, // ServerTimeHandler
         {} as any, // BackgroundEffectsHandler
-        undefined,
+        {} as any,
         {} as any, // APIClient
         {
           findConversation: jest.fn().mockImplementation(() => conversation),
@@ -930,7 +932,7 @@ describe.skip('E2E audio call', () => {
     {} as any,
     {} as any,
     {} as any,
-    undefined,
+    {} as any,
   );
   const user = new User('user-1', '', translateForTest);
   let remoteWuser: number;
@@ -1074,7 +1076,7 @@ describe('NotificationHandlingState', () => {
     mediaDevicesHandler,
     {} as any,
     {} as any,
-    undefined,
+    {} as any,
   );
   const user = new User('user-1', '', translateForTest);
   let wCall: Wcall;
@@ -1136,7 +1138,7 @@ describe('init AVS state', () => {
     mediaDevicesHandler,
     {} as any,
     {} as any,
-    undefined,
+    {} as any,
   );
   const user = new User('user-1', '', translateForTest);
   beforeEach(() => {
@@ -1257,6 +1259,184 @@ describe('setupDetachedWindowExternalLinksClick', () => {
     link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
 
     expect(openerWindow.open).not.toHaveBeenCalled();
+  });
+});
+
+describe('set background effekt', () => {
+  let activeCall: Call;
+  let callState: CallState;
+  let mediaStreamHandler: MediaStreamHandler;
+  let backgroundEffectsHandler: BackgroundEffectsHandler;
+  let callingRepository: CallingRepository;
+  let selfParticipant: Participant
+
+  beforeEach(() => {
+    mediaStreamHandler = {
+      requestMediaStream: (audio: boolean, video: boolean, screen: boolean, isGroup: boolean) => Promise.resolve(new MediaStream()),
+    } as any;
+
+    backgroundEffectsHandler = {
+      isBackgroundEffectEnabled: jest.fn(() => true),
+      applyBackgroundEffect: jest.fn().mockReturnValue({
+        applied: true,
+        media: null,
+      }),
+    } as any;
+
+    selfParticipant = {
+      hasActiveVideo: jest.fn(() => true),
+      sharesScreen: jest.fn(() => false),
+      audioStream: jest.fn(() => undefined),
+      videoStream: jest.fn(() => undefined),
+      processedVideoStream: jest.fn(),
+      releaseProcessedVideoStream: jest.fn(),
+      getMediaStream: jest.fn(),
+      updateMediaStream: jest.fn(),
+      videoState: jest.fn(() => VIDEO_STATE.STARTED),
+      releaseVideoStream: jest.fn(),
+    } as any;
+
+    activeCall = {
+      participants: jest.fn().mockReturnValue([]),
+      getSelfParticipant: jest.fn( () => selfParticipant),
+      isGroupOrConference: false,
+    } as any;
+
+    callState = {
+      joinedCall:() => undefined
+    } as any;
+
+    callingRepository = new CallingRepository(
+      {} as any,
+      {} as any,
+      {} as any,
+      mediaStreamHandler,
+      {} as any,
+      {} as any,
+      backgroundEffectsHandler,
+      {} as any,
+      {} as any,
+      {} as any,
+      callState
+    );
+    callingRepository['changeMediaSource'] = jest.fn();
+    callingRepository['stopMediaSource'] = jest.fn();
+    jest.spyOn(callingRepository as any, 'parseQualifiedId').mockReturnValue('parsed-conv-id');
+    jest.spyOn(callingRepository as any, 'findCall').mockReturnValue(activeCall);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  describe(' on refreshVideoInput', () => {
+    it('on active call while sending video set bge', async () => {
+      const processedStream = {id: 'processedStream'} as MediaStream;
+      const originalStream = {id: 'originalStream'} as MediaStream;
+
+      jest.spyOn(mediaStreamHandler, 'requestMediaStream').mockResolvedValue(originalStream);
+      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(backgroundEffectsHandler, 'applyBackgroundEffect').mockResolvedValue(
+        { 'applied': true, media: new ReleasableMediaStream(processedStream) }
+      );
+
+      await callingRepository.refreshVideoInput();
+      expect(callingRepository['stopMediaSource']).toHaveBeenCalledWith(MediaType.VIDEO);
+      expect(callingRepository['changeMediaSource']).toHaveBeenCalledWith(processedStream, MediaType.VIDEO);
+      expect(callingRepository['changeMediaSource']).not.toHaveBeenCalledWith(originalStream, MediaType.VIDEO);
+    });
+
+    it('if no call pass by BGE', async () => {
+      const processedStream = {id: 'processedStream'} as MediaStream;
+      const originalStream = {id: 'originalStream'} as MediaStream;
+
+      jest.spyOn(mediaStreamHandler, 'requestMediaStream').mockResolvedValue(originalStream);
+      jest.spyOn(callState, 'joinedCall').mockReturnValue(undefined as any);
+      jest.spyOn(backgroundEffectsHandler, 'applyBackgroundEffect').mockResolvedValue(
+        { 'applied': true, media: new ReleasableMediaStream(processedStream) }
+      );
+
+      await callingRepository.refreshVideoInput();
+      expect(callingRepository['stopMediaSource']).toHaveBeenCalledWith(MediaType.VIDEO);
+      expect(callingRepository['changeMediaSource']).not.toHaveBeenCalledWith(processedStream, MediaType.VIDEO);
+      expect(callingRepository['changeMediaSource']).toHaveBeenCalledWith(originalStream, MediaType.VIDEO);
+    });
+  });
+
+  describe(' on getCallMediaStream', () => {
+    it('applies BGE getting on missing camera stream when BGE is enabled', async () => {
+      const mediaStream = {id: 'mediaStream'} as MediaStream;
+      jest.spyOn(selfParticipant, 'getMediaStream').mockReturnValue(mediaStream);
+      jest.spyOn(callingRepository as any, 'getMediaStream').mockResolvedValue(mediaStream);
+
+      const applySpy = jest
+        .spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant')
+        .mockResolvedValue(undefined);
+
+      const result = await (callingRepository as any).getCallMediaStream('conv-id', false, true, false);
+
+      expect(result).toBe(mediaStream);
+      expect((callingRepository as any).getMediaStream).toHaveBeenCalledWith({camera: true}, false);
+      expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(mediaStream, true);
+      expect(applySpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('not applies BGE getting on missing camera stream when BGE is disabled', async () => {
+      const mediaStream = {id: 'mediaStream'} as MediaStream;
+      jest.spyOn(selfParticipant, 'getMediaStream').mockReturnValue(mediaStream);
+      jest.spyOn(callingRepository as any, 'getMediaStream').mockResolvedValue(mediaStream);
+      backgroundEffectsHandler.isBackgroundEffectEnabled = jest.fn(() => false);
+
+      const applySpy = jest
+        .spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant')
+        .mockResolvedValue(undefined);
+
+      const result = await (callingRepository as any).getCallMediaStream('conv-id', false, true, false);
+
+      expect(result).toBe(mediaStream);
+      expect((callingRepository as any).getMediaStream).toHaveBeenCalledWith({camera: true}, false);
+      expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(mediaStream, true);
+      expect(applySpy).toHaveBeenCalledTimes(0);
+    });
+  })
+
+  describe(' on warmupMediaStreams', () => {
+
+
+  })
+
+  describe(' on switchVideoBackgroundEffect', () => {
+
+
+  })
+
+  describe(' on apply to participants stream', () => {
+    it('applies background effects only in active calls', async () => {
+      const inputStream = {id: 'inputStream'} as MediaStream;
+      const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipantR'](
+        inputStream,
+        true,
+      );
+
+      expect(backgroundEffectsHandler.applyBackgroundEffect).not.toHaveBeenCalled();
+      expect(selfParticipant.processedVideoStream).not.toHaveBeenCalled();
+      expect(callingRepository['changeMediaSource']).not.toHaveBeenCalled();
+      expect(result).toBeUndefined();
+    });
+
+    it('applies background effects not on screen share', async () => {
+      const inputStream = {id: 'inputStream'} as MediaStream;
+      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(true as any);
+      const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipantR'](
+        inputStream,
+        true,
+      );
+
+      expect(backgroundEffectsHandler.applyBackgroundEffect).not.toHaveBeenCalled();
+      expect(selfParticipant.processedVideoStream).not.toHaveBeenCalled();
+      expect(callingRepository['changeMediaSource']).not.toHaveBeenCalled();
+      expect(result).toBeUndefined();
+    })
   });
 });
 
