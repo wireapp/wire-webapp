@@ -27,8 +27,8 @@ import {
   joinButtonStyles,
   participatingStatusIconStyles,
   participatingStatusStyles,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus.styles';
-import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/meetingStatus.styles';
+import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export interface MeetingStatusProps {

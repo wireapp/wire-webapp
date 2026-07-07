@@ -20,12 +20,12 @@
 import {memo} from 'react';
 
 import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import {MeetingListItem} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem';
+import {MeetingListItem} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingListItem';
 import {
   listStyles,
   sectionHeaderStyles,
   sectionStyles,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup.styles';
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/meetingListItemGroup.styles';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface MeetingListItemGroupProps {

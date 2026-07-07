@@ -23,7 +23,7 @@ import {Avatar, AVATAR_SIZE, StackedAvatars} from 'Components/avatar';
 import {UserName} from 'Components/UserName';
 import type {Conversation} from 'Repositories/entity/Conversation';
 
-import {participantNameStyles, singleParticipantStyles, wrapperStyles} from './MeetingParticipants.styles';
+import {participantNameStyles, singleParticipantStyles, wrapperStyles} from './meetingParticipants.styles';
 import {useMeetingConversation} from './useMeetingConversation';
 import {useMeetingParticipants} from './useMeetingParticipants';
 

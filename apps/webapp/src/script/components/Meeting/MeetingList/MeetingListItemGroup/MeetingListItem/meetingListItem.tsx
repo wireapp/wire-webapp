@@ -32,11 +32,11 @@ import {
   onGoingMeetingStyles,
   rightStyles,
   titleStyles,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem.styles';
-import {MeetingParticipants} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingParticipants/MeetingParticipants';
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingListItem.styles';
+import {MeetingParticipants} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingParticipants/meetingParticipants';
 import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
 import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
-import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
+import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
 

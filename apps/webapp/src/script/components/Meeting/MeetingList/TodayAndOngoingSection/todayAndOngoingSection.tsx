@@ -20,7 +20,7 @@
 import {memo, useMemo} from 'react';
 
 import {TodayAndOngoingSectionProps} from 'Components/Meeting/MeetingList/MeetingList';
-import {MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
+import {MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/meetingListItemGroup';
 import {groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
 
 const TodayAndOngoingSectionComponent = ({meetingsToday, headerForToday, nowMs}: TodayAndOngoingSectionProps) => {
