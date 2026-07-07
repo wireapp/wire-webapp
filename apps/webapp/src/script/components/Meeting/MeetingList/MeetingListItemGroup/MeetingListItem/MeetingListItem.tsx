@@ -19,7 +19,7 @@
 
 import {memo, useMemo} from 'react';
 
-import {CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
+import {CallIcon} from '@wireapp/react-ui-kit';
 
 import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction';
@@ -48,7 +48,7 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
   const {translate} = useApplicationContext();
   const timestamp = nowMs ?? Date.now();
 
-  const {time, showCalendarIcon} = useMemo(() => {
+  const time = useMemo(() => {
     const start = new Date(start_date);
     const end = new Date(end_date);
     const startMs = start.getTime();
@@ -60,29 +60,19 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
       const dayOfWeek = formatLocale(start, 'EEEE');
       const month = formatLocale(start, 'MMMM');
       const day = formatLocale(start, 'd');
-      const time = formatLocale(start, 'h:mm a');
-      return {
-        time: `${dayOfWeek}, ${month} ${day} • ${translate('meetings.meetingStatus.startedAt', {time})}`,
-        showCalendarIcon: false,
-      };
+      const startedAtTime = formatLocale(start, 'h:mm a');
+      return `${dayOfWeek}, ${month} ${day} • ${translate('meetings.meetingStatus.startedAt', {time: startedAtTime})}`;
     }
 
     if (isOngoing) {
-      const time = formatLocale(start, 'h:mm a');
-      return {
-        time: translate('meetings.meetingStatus.startedAt', {time}),
-        showCalendarIcon: false,
-      };
+      const startedAtTime = formatLocale(start, 'h:mm a');
+      return translate('meetings.meetingStatus.startedAt', {time: startedAtTime});
     }
 
     const sameMeridiem = formatLocale(start, 'a') === formatLocale(end, 'a');
-    const timeRange = sameMeridiem
+    return sameMeridiem
       ? `${formatLocale(start, 'h:mm')} – ${formatLocale(end, 'h:mm a')}`
       : `${formatLocale(start, 'h:mm a')} – ${formatLocale(end, 'h:mm a')}`;
-    return {
-      time: timeRange,
-      showCalendarIcon: true,
-    };
   }, [end_date, start_date, timestamp, translate]);
 
   const meetingStatus = useMemo(
@@ -101,7 +91,6 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
         <div>
           <div css={titleStyles}>{title}</div>
           <div css={metaStyles}>
-            {showCalendarIcon && <CalendarIcon css={{marginRight: '4px'}} height={12} />}
             {time}
             {recurrence !== 'doesNotRepeat' && (
               <div css={badgeWrapperStyles}>
