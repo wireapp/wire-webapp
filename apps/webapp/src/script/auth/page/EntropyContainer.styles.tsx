@@ -27,6 +27,7 @@ const container: CSSProperties = {
   flexDirection: 'column',
   justifyContent: 'space-around',
   minHeight: 428,
+  maxWidth: 645,
 };
 
 const headline: CSSObject = {
