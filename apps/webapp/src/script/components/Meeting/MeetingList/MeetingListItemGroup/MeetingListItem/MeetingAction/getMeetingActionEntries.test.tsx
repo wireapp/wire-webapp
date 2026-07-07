@@ -19,8 +19,24 @@
 
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/getMeetingActionEntries';
+import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingActionTranslationKeys';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+
+const fixedFutureNow = new Date('2026-06-15T13:00:00.000Z');
+const fixedOngoingNow = new Date('2026-06-15T14:30:00.000Z');
+const fixedPastNow = new Date('2026-06-15T16:00:00.000Z');
+
+const futureWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: fixedFutureNow.getTime(),
+});
+const ongoingWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: fixedOngoingNow.getTime(),
+});
+const pastWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: fixedPastNow.getTime(),
+});
 
 const createMeeting = (overrides: Partial<Meeting> = {}): Meeting => ({
   start_date: '2026-06-15T14:00:00.000Z',
@@ -43,7 +59,13 @@ const createSelfUser = (id = 'host-id') => {
 const translate = (key: string) => key;
 
 const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.find(entry => entry.label === 'meetings.action.editMeeting');
+  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.editMeeting);
+
+const getDeleteForMeEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
+  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForMe);
+
+const getDeleteForAllEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
+  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll);
 
 const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) =>
   entries.map(entry => entry.label);
@@ -53,15 +75,14 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      nowMs: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
 
     expect(getEntryLabels(entries)).toEqual([
-      'meetings.action.editMeeting',
-      'meetings.action.deleteMeetingForMe',
-      'meetings.action.deleteMeetingForAll',
+      MEETING_ACTION_TRANSLATION_KEYS.editMeeting,
+      MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll,
     ]);
     expect(getEntryLabels(entries)).not.toContain('meetings.action.startMeeting');
   });
@@ -70,7 +91,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      nowMs: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -82,7 +103,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser('invitee-id'),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      nowMs: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -94,7 +115,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T14:30:00.000Z').getTime(),
+      nowMs: ongoingWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -106,11 +127,37 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T16:00:00.000Z').getTime(),
+      nowMs: pastWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
 
     expect(getEditEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('includes Delete meeting for everyone for the host', () => {
+    const entries = getMeetingActionEntries({
+      meeting: createMeeting(),
+      selfUser: createSelfUser(),
+      nowMs: futureWallClock.currentTimestampInMilliseconds,
+      translate,
+      onEdit: jest.fn(),
+    });
+
+    expect(getDeleteForAllEntryLabel(entries)).toBeDefined();
+    expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('includes Delete meeting for me for a participant', () => {
+    const entries = getMeetingActionEntries({
+      meeting: createMeeting(),
+      selfUser: createSelfUser('invitee-id'),
+      nowMs: futureWallClock.currentTimestampInMilliseconds,
+      translate,
+      onEdit: jest.fn(),
+    });
+
+    expect(getDeleteForMeEntryLabel(entries)).toBeDefined();
+    expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
   });
 });
