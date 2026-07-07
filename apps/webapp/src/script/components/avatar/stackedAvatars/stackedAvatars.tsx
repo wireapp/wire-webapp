@@ -48,7 +48,7 @@ export const StackedAvatars = ({
   return (
     <div css={wrapperStyles} className={className} data-uie-name={dataUieName}>
       {visibleParticipants.map((participant, index) => (
-        <div key={participant.id} css={avatarItemStyles(index, avatarRingColor)}>
+        <div key={`${participant.id}-${participant.domain}`} css={avatarItemStyles(index, avatarRingColor)}>
           <Avatar
             participant={participant}
             avatarSize={avatarSize}
