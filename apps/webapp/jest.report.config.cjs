@@ -24,6 +24,7 @@ module.exports = {
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
   moduleDirectories: ['node_modules', __dirname],
   moduleNameMapper: {
+    '^@enormora/wall-clock/(.*)$': '<rootDir>/../../node_modules/@enormora/wall-clock/$1.js',
     'Components/(.*)': '<rootDir>/src/script/components/$1',
     'Hooks/(.*)': '<rootDir>/src/script/hooks/$1',
     'I18n/(.*)': '<rootDir>/src/i18n/$1',
@@ -34,14 +35,17 @@ module.exports = {
     '.*\\.glsl': 'jest-transform-stub',
   },
   reporters: ['default'],
+  resolver: '<rootDir>/jest.resolver.cjs',
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
-    customExportConditions: ['node', 'node-addons'],
+    customExportConditions: ['node', 'node-addons', 'require', 'import', 'default'],
   },
   testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc', '<rootDir>/test/e2e_tests'],
   testRunner: 'jest-jasmine2',
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|noop-esm|uuid|@enormora/objectory)/)'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!(true-myth|p-timeout|p-cancelable|noop-esm|uuid|@enormora/objectory|@enormora/wall-clock)/)',
+  ],
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
