@@ -53,11 +53,6 @@ export const onGoingMeetingStyles: CSSObject = {
   '&:first-of-type': {
     borderTopColor: 'var(--accent-color)',
   },
-
-  // Keep a visible divider where ongoing items meet upcoming items below.
-  '&[data-is-ongoing]:has(+ :not([data-is-ongoing]))': {
-    borderBottomColor: 'var(--border-color)',
-  },
 };
 
 export const leftStyles: CSSObject = {

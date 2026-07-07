@@ -33,6 +33,7 @@ import {
   rightStyles,
   titleStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem.styles';
+import {MeetingParticipants} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingParticipants/MeetingParticipants';
 import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
 import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
@@ -83,7 +84,7 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
   const isOngoing = meetingStatus === MeetingStatuses.ON_GOING || meetingStatus === MeetingStatuses.PARTICIPATING;
 
   return (
-    <div css={[itemStyles, isOngoing && onGoingMeetingStyles]} {...(isOngoing ? {'data-is-ongoing': true} : {})}>
+    <div css={[itemStyles, isOngoing && onGoingMeetingStyles]}>
       <div css={leftStyles}>
         <div css={calendarIconStyles}>
           <CalendarIcon />
@@ -101,6 +102,7 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
         </div>
       </div>
       <div css={rightStyles}>
+        <MeetingParticipants qualifiedConversation={meeting.qualified_conversation} isOngoing={isOngoing} />
         <MeetingStatus start_date={start_date} end_date={end_date} attending={attending} nowMs={timestamp} />
         <MeetingAction meeting={meeting} />
       </div>

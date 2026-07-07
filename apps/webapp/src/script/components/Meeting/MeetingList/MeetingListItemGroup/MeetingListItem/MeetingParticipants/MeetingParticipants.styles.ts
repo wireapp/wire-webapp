@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,26 @@
  *
  */
 
-export * from './avatar';
-export * from './channelAvatar';
-export * from './groupAvatar';
-export * from './stackedAvatars';
+import {CSSObject} from '@emotion/react';
+
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  minWidth: 0,
+};
+
+export const singleParticipantStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  minWidth: 0,
+};
+
+export const participantNameStyles: CSSObject = {
+  color: 'var(--main-color)',
+  fontSize: 14,
+  fontWeight: 'var(--font-weight-regular)',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+};

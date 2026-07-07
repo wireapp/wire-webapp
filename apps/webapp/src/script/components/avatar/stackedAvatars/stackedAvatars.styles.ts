@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,27 @@
  *
  */
 
-export * from './avatar';
-export * from './channelAvatar';
-export * from './groupAvatar';
-export * from './stackedAvatars';
+import {CSSObject} from '@emotion/react';
+
+export const AVATAR_OVERLAP_OFFSET = 8;
+
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+};
+
+export const avatarItemStyles = (index: number, avatarRingColor: string): CSSObject => ({
+  display: 'flex',
+  marginLeft: index > 0 ? -AVATAR_OVERLAP_OFFSET : 0,
+  zIndex: index + 1,
+  borderRadius: '50%',
+  boxShadow: `0 0 0 1px ${avatarRingColor}`,
+});
+
+export const overflowCountStyles: CSSObject = {
+  marginLeft: 8,
+  color: 'var(--secondary-text-color)',
+  fontSize: 12,
+  fontWeight: 'var(--font-weight-semibold)',
+  whiteSpace: 'nowrap',
+};

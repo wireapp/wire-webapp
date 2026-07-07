@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,16 @@
  *
  */
 
-export * from './avatar';
-export * from './channelAvatar';
-export * from './groupAvatar';
-export * from './stackedAvatars';
+import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
+
+describe('getStackedAvatarDisplay', () => {
+  it('shows all avatars for up to four participants', () => {
+    expect(getStackedAvatarDisplay(1)).toEqual({visibleCount: 1, overflowCount: 0});
+    expect(getStackedAvatarDisplay(4)).toEqual({visibleCount: 4, overflowCount: 0});
+  });
+
+  it('shows four avatars and overflow for more than four participants', () => {
+    expect(getStackedAvatarDisplay(5)).toEqual({visibleCount: 4, overflowCount: 1});
+    expect(getStackedAvatarDisplay(17)).toEqual({visibleCount: 4, overflowCount: 13});
+  });
+});
