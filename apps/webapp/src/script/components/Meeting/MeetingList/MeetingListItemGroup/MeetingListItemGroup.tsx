@@ -33,21 +33,10 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 interface MeetingListItemGroupProps {
   header?: string;
   groupedMeetings: Record<number, Meeting[]>;
-  groupBy?: MeetingGroupBy;
   nowMs?: number;
 }
 
-export enum MeetingGroupBy {
-  NONE = 'none',
-  HOUR = 'hour',
-}
-
-const MeetingListItemGroupComponent = ({
-  header,
-  groupedMeetings,
-  groupBy = MeetingGroupBy.HOUR,
-  nowMs,
-}: MeetingListItemGroupProps) => {
+const MeetingListItemGroupComponent = ({header, groupedMeetings, nowMs}: MeetingListItemGroupProps) => {
   const {translate} = useApplicationContext();
   const formatHourLabel = (date: string) =>
     set(new Date(date), {minutes: 0, seconds: 0, milliseconds: 0}).toLocaleTimeString([], {
@@ -73,29 +62,18 @@ const MeetingListItemGroupComponent = ({
     <section css={sectionStyles}>
       {header !== undefined && header !== '' && <div css={sectionHeaderStyles}>{header}</div>}
 
-      {groupBy === MeetingGroupBy.NONE && (
-        <div>
-          {nonEmptyGroups.flatMap(([, items]) =>
-            items.map(item => (
-              <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
-            )),
-          )}
-        </div>
-      )}
-
-      {groupBy === MeetingGroupBy.HOUR &&
-        nonEmptyGroups.map(([key, items]) => (
-          <div key={`meeting-list-item-group-header-${key}`}>
-            <div css={hourLabelStyles}>
-              <time>{formatHourLabel(items[0].start_date)}</time>
-            </div>
-            <div>
-              {items.map(item => (
-                <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
-              ))}
-            </div>
+      {nonEmptyGroups.map(([key, items]) => (
+        <div key={`meeting-list-item-group-header-${key}`}>
+          <div css={hourLabelStyles}>
+            <time>{formatHourLabel(items[0].start_date)}</time>
           </div>
-        ))}
+          <div>
+            {items.map(item => (
+              <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
+            ))}
+          </div>
+        </div>
+      ))}
     </section>
   );
 };
