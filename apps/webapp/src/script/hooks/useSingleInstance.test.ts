@@ -23,7 +23,7 @@ import type {DeterministicWallClock} from '@enormora/wall-clock/deterministic-wa
 import {act} from 'react';
 import {Maybe, maybe} from 'true-myth';
 
-import {StringKeyValueStorage} from 'src/script/storage/StringKeyValueStorage';
+import {StringKeyValueStorage} from 'src/script/storage/stringKeyValueStorageTypes';
 
 import {createUseSingleInstance} from './useSingleInstance';
 

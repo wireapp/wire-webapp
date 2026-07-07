@@ -19,7 +19,7 @@
 
 import {Maybe, result} from 'true-myth';
 
-import {StringKeyValueStorage} from 'src/script/storage/StringKeyValueStorage';
+import {StringKeyValueStorage} from 'src/script/storage/stringKeyValueStorageTypes';
 
 export function createStringKeyValueStorageFromWebStorage(webStorage: Maybe<Storage>): StringKeyValueStorage {
   return {
