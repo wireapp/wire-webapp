@@ -58,7 +58,7 @@
     "dexie-encrypted": "2.0.0",
     "dotenv-extended": "2.9.0",
     "emoji-picker-react": "4.16.1",
-    "immer": "11.1.9",
+    "immer": "11.1.11",
     "jimp": "0.22.12",
     "js-cookie": "3.0.8",
     "jszip": "3.10.1",

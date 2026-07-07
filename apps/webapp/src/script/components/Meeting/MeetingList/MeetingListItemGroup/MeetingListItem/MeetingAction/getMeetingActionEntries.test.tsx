@@ -59,8 +59,6 @@ describe('getMeetingActionEntries', () => {
     });
 
     expect(getEntryLabels(entries)).toEqual([
-      'meetings.action.createConversation',
-      'meetings.action.copyLink',
       'meetings.action.editMeeting',
       'meetings.action.deleteMeetingForMe',
       'meetings.action.deleteMeetingForAll',
