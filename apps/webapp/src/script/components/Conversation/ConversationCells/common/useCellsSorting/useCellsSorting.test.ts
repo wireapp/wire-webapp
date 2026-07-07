@@ -82,6 +82,30 @@ describe('useCellsSorting', () => {
     expect(result.current.getDirectionFor('size')).toBeUndefined();
   });
 
+  it('derives an unsorted state immediately when the sorting scope changes', () => {
+    const {result, rerender} = renderHook(({scopeKey}: {scopeKey: string}) => useCellsSorting(scopeKey), {
+      initialProps: {scopeKey: 'conversation-a:browse'},
+    });
+
+    act(() => result.current.toggleSort('name'));
+    expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
+
+    rerender({scopeKey: 'conversation-a:search'});
+
+    expect(result.current.sort).toBeNull();
+    expect(result.current.getDirectionFor('name')).toBeUndefined();
+
+    act(() => result.current.toggleSort('name'));
+
+    expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
+
+    rerender({scopeKey: 'conversation-a:browse'});
+    rerender({scopeKey: 'conversation-a:search'});
+
+    expect(result.current.sort).toBeNull();
+    expect(result.current.getDirectionFor('name')).toBeUndefined();
+  });
+
   it('keeps setSort stable across sort changes', () => {
     const {result} = renderHook(() => useCellsSorting());
     const setSort = result.current.setSort;
