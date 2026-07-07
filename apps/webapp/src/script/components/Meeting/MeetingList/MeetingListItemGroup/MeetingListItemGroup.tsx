@@ -57,8 +57,12 @@ const MeetingListItemGroupComponent = ({header, groupedMeetings, nowMs}: Meeting
       {header !== undefined && header !== '' && <div css={sectionHeaderStyles}>{header}</div>}
 
       <div css={listStyles}>
-        {meetings.map(item => (
-          <MeetingListItem key={`meeting-list-item-${item.conversation_id}`} nowMs={nowMs} {...item} />
+        {meetings.map(meeting => (
+          <MeetingListItem
+            key={`meeting-list-item-${meeting.qualified_id.id}-${meeting.qualified_id.domain}`}
+            nowMs={nowMs}
+            {...meeting}
+          />
         ))}
       </div>
     </section>
