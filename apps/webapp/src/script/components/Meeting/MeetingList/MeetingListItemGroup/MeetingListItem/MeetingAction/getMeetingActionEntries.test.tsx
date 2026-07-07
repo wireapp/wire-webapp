@@ -22,6 +22,21 @@ import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingLis
 import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingActionTranslationKeys';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+
+const fixedFutureNow = new Date('2026-06-15T13:00:00.000Z');
+const fixedOngoingNow = new Date('2026-06-15T14:30:00.000Z');
+const fixedPastNow = new Date('2026-06-15T16:00:00.000Z');
+
+const futureWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: fixedFutureNow.getTime(),
+});
+const ongoingWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: fixedOngoingNow.getTime(),
+});
+const pastWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: fixedPastNow.getTime(),
+});
 
 const createMeeting = (overrides: Partial<Meeting> = {}): Meeting => ({
   start_date: '2026-06-15T14:00:00.000Z',
@@ -57,7 +72,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      nowMs: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -69,7 +84,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser('invitee-id'),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      nowMs: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -81,7 +96,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T14:30:00.000Z').getTime(),
+      nowMs: ongoingWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -93,7 +108,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T16:00:00.000Z').getTime(),
+      nowMs: pastWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -105,7 +120,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      nowMs: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -118,7 +133,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),
       selfUser: createSelfUser('invitee-id'),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      nowMs: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
