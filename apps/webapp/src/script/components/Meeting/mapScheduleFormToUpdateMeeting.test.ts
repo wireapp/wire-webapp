@@ -52,13 +52,14 @@ const baseFormState = (): ScheduleMeetingFormState => ({
 });
 
 describe('mapScheduleFormToUpdateMeeting', () => {
-  it('maps title, times, and recurrence metadata only', () => {
+  it('maps title, times, and changed recurrence metadata', () => {
     const result = mapScheduleFormToUpdateMeeting(
       {
         ...baseFormState(),
         selectedUsers: [createUser('1'), createUser('3')],
       },
       wallClock,
+      'doesNotRepeat',
     );
 
     expect(result.isOk).toBe(true);
@@ -70,6 +71,24 @@ describe('mapScheduleFormToUpdateMeeting', () => {
     });
   });
 
+  it('omits recurrence when unchanged', () => {
+    const result = mapScheduleFormToUpdateMeeting(
+      {
+        ...baseFormState(),
+        recurrence: 'doesNotRepeat',
+      },
+      wallClock,
+      'doesNotRepeat',
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(unwrap(result).payload).toEqual({
+      title: 'Weekly sync',
+      start_time: futureStartIso,
+      end_time: futureEndIso,
+    });
+  });
+
   it('returns missingTimes when start or end is missing', () => {
     const result = mapScheduleFormToUpdateMeeting(
       {
@@ -77,6 +96,7 @@ describe('mapScheduleFormToUpdateMeeting', () => {
         end: maybe.nothing(),
       },
       wallClock,
+      'weekly',
     );
 
     expect(result.isErr).toBe(true);
@@ -90,6 +110,7 @@ describe('mapScheduleFormToUpdateMeeting', () => {
         recurrence: 'doesNotRepeat',
       },
       wallClock,
+      'weekly',
     );
 
     expect(result.isOk).toBe(true);

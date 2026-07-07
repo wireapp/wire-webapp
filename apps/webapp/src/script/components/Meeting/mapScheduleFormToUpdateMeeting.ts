@@ -22,8 +22,11 @@ import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting
 import {Result, result} from 'true-myth';
 
 import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
-import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
-import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import {buildUpdateMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
+import type {
+  ScheduleMeetingFormState,
+  ScheduleMeetingRecurrenceOption,
+} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 
 import {ScheduleFormErrors} from './ScheduleFormErrors';
 
@@ -34,6 +37,7 @@ export type MapScheduleFormToUpdateMeetingResult = {
 export const mapScheduleFormToUpdateMeeting = (
   formState: ScheduleMeetingFormState,
   wallClock: WallClock,
+  originalRecurrence: ScheduleMeetingRecurrenceOption,
 ): Result<MapScheduleFormToUpdateMeetingResult, ScheduleFormErrors> => {
   const timesResult = requireScheduleMeetingTimes(formState, wallClock);
   if (timesResult.isErr) {
@@ -41,14 +45,12 @@ export const mapScheduleFormToUpdateMeeting = (
   }
   const {start, end} = timesResult.value;
 
-  const recurrence = mapRecurrenceOptionToMeetingRecurrence(formState.recurrence);
-
   return result.ok({
     payload: {
       title: formState.title.trim(),
       start_time: start.toISOString(),
       end_time: end.toISOString(),
-      recurrence: recurrence ?? null,
+      ...buildUpdateMeetingRecurrence(formState.recurrence, originalRecurrence),
     },
   });
 };

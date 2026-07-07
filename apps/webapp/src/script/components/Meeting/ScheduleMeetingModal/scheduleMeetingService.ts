@@ -33,7 +33,7 @@ import type {MeetingStoreDeps} from 'Components/Meeting/meetingStore/meetingStor
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {User} from 'Repositories/entity/User';
 
-import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+import type {ScheduleMeetingFormState, ScheduleMeetingRecurrenceOption} from './scheduleMeetingTypes';
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 
@@ -41,6 +41,7 @@ export type UpdateMeetingParams = {
   meetingId: QualifiedId;
   formState: ScheduleMeetingFormState;
   qualifiedConversation: Maybe<QualifiedId>;
+  originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
 };
 
@@ -90,10 +91,10 @@ export const scheduleMeeting = (
  * Updates meeting metadata and syncs conversation participants.
  */
 export const updateMeeting = (
-  {meetingId, formState, qualifiedConversation, originalSelectedUsers}: UpdateMeetingParams,
+  {meetingId, formState, qualifiedConversation, originalRecurrence, originalSelectedUsers}: UpdateMeetingParams,
   deps: MeetingStoreDeps,
 ): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
-  const mappingResult = mapScheduleFormToUpdateMeeting(formState, deps.wallClock);
+  const mappingResult = mapScheduleFormToUpdateMeeting(formState, deps.wallClock, originalRecurrence);
 
   if (mappingResult.isErr) {
     return task.reject(mappingResult.error);
