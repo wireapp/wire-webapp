@@ -71,6 +71,7 @@ type ScheduleMeetingModalState = {
   errors: ScheduleMeetingFormErrors;
   editingMeetingId: Maybe<QualifiedId>;
   qualifiedConversation: Maybe<QualifiedId>;
+  originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
   openCreate: () => void;
   openEdit: (
@@ -98,6 +99,7 @@ const initialState = {
   errors: {} as ScheduleMeetingFormErrors,
   editingMeetingId: Maybe.nothing<QualifiedId>(),
   qualifiedConversation: Maybe.nothing<QualifiedId>(),
+  originalRecurrence: 'doesNotRepeat' as ScheduleMeetingRecurrenceOption,
   originalSelectedUsers: [] as User[],
 };
 
@@ -111,6 +113,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       errors: {},
       editingMeetingId: Maybe.nothing(),
       qualifiedConversation: Maybe.nothing(),
+      originalRecurrence: 'doesNotRepeat',
       originalSelectedUsers: [],
     }),
   openEdit: (
@@ -126,12 +129,14 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       errors: {},
       editingMeetingId: maybe.just(meeting.qualified_id),
       qualifiedConversation: maybe.just(qualifiedConversation),
+      originalRecurrence: formState.recurrence,
       originalSelectedUsers,
     }),
   close: () =>
     set({
       isOpen: false,
       qualifiedConversation: Maybe.nothing(),
+      originalRecurrence: 'doesNotRepeat',
       originalSelectedUsers: [],
     }),
   reset: () => set({...initialState, formState: getDefaultScheduleMeetingFormState()}),

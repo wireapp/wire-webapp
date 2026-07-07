@@ -56,6 +56,7 @@ type SubmitMeetingParams = {
   mode: ScheduleMeetingMode;
   editingMeetingId: Maybe<QualifiedId>;
   qualifiedConversation: Maybe<QualifiedId>;
+  originalRecurrence: UpdateMeetingParams['originalRecurrence'];
   originalSelectedUsers: User[];
   scheduleMeeting: (formState: ScheduleMeetingFormState) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
@@ -66,6 +67,7 @@ const submitMeeting = ({
   mode,
   editingMeetingId,
   qualifiedConversation,
+  originalRecurrence,
   originalSelectedUsers,
   scheduleMeeting,
   updateMeeting,
@@ -82,6 +84,7 @@ const submitMeeting = ({
     meetingId: editingMeetingId.value,
     formState,
     qualifiedConversation,
+    originalRecurrence,
     originalSelectedUsers,
   });
 };
@@ -95,6 +98,7 @@ export const useScheduleMeetingSubmit = () => {
   const mode = useScheduleMeetingModal(state => state.mode);
   const editingMeetingId = useScheduleMeetingModal(state => state.editingMeetingId);
   const qualifiedConversation = useScheduleMeetingModal(state => state.qualifiedConversation);
+  const originalRecurrence = useScheduleMeetingModal(state => state.originalRecurrence);
   const originalSelectedUsers = useScheduleMeetingModal(state => state.originalSelectedUsers);
 
   const submit = useCallback(
@@ -106,6 +110,7 @@ export const useScheduleMeetingSubmit = () => {
         mode,
         editingMeetingId,
         qualifiedConversation,
+        originalRecurrence,
         originalSelectedUsers,
         scheduleMeeting,
         updateMeeting,
@@ -139,6 +144,7 @@ export const useScheduleMeetingSubmit = () => {
       editingMeetingId,
       loadMeetings,
       mode,
+      originalRecurrence,
       originalSelectedUsers,
       qualifiedConversation,
       scheduleMeeting,
