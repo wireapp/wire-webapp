@@ -67,8 +67,7 @@ const getDeleteForMeEntryLabel = (entries: ReturnType<typeof getMeetingActionEnt
 const getDeleteForAllEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
   entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll);
 
-const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.map(entry => entry.label);
+const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) => entries.map(entry => entry.label);
 
 describe('getMeetingActionEntries', () => {
   it('returns the expected action labels without Start meeting', () => {
