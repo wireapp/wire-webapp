@@ -67,7 +67,25 @@ const getDeleteForMeEntryLabel = (entries: ReturnType<typeof getMeetingActionEnt
 const getDeleteForAllEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
   entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll);
 
+const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) => entries.map(entry => entry.label);
+
 describe('getMeetingActionEntries', () => {
+  it('returns the expected action labels without Start meeting', () => {
+    const entries = getMeetingActionEntries({
+      meeting: createMeeting(),
+      selfUser: createSelfUser(),
+      nowMs: futureWallClock.currentTimestampInMilliseconds,
+      translate,
+      onEdit: jest.fn(),
+    });
+
+    expect(getEntryLabels(entries)).toEqual([
+      MEETING_ACTION_TRANSLATION_KEYS.editMeeting,
+      MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll,
+    ]);
+    expect(getEntryLabels(entries)).not.toContain('meetings.action.startMeeting');
+  });
+
   it('includes Edit meeting for an eligible host', () => {
     const entries = getMeetingActionEntries({
       meeting: createMeeting(),

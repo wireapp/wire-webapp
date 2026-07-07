@@ -17,7 +17,7 @@
  *
  */
 
-import {CallIcon, CloseIcon, EditIcon, TrashIcon} from '@wireapp/react-ui-kit';
+import {CloseIcon, EditIcon, TrashIcon} from '@wireapp/react-ui-kit';
 
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {
@@ -66,10 +66,6 @@ export const getMeetingActionEntries = ({
   const isHost = isMeetingHost(meeting, selfUser);
 
   return [
-    {
-      icon: () => <CallIcon />,
-      label: translate(MEETING_ACTION_TRANSLATION_KEYS.startMeeting),
-    },
     ...(canEditMeeting(meeting, selfUser, nowMs) ? [editEntry] : []),
     ...(isHost ? [deleteForAllEntry] : [deleteForMeEntry]),
   ];

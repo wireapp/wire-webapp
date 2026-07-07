@@ -1266,7 +1266,6 @@
   "meetings.action.editMeeting": "Edit meeting",
   "meetings.action.meetNow": "Meet Now",
   "meetings.action.scheduleMeeting": "Schedule Meeting",
-  "meetings.action.startMeeting": "Start meeting",
   "meetings.list.loadError": "Could not load meetings. Please try again.",
   "meetings.list.today": "Today",
   "meetings.list.tomorrow": "Tomorrow",
