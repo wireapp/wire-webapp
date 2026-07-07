@@ -17,15 +17,11 @@
  *
  */
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import type {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import type {TranslationKey} from 'Util/localizerUtil';
 
-export const isMeetingHost = (meeting: Meeting, selfUser: User): boolean =>
-  matchQualifiedIds(meeting.qualified_creator, selfUser.qualifiedId);
-
-export const canEditMeeting = (meeting: Meeting, selfUser: User, nowMs: number): boolean => {
-  const hasNotStarted = nowMs < new Date(meeting.start_date).getTime();
-
-  return isMeetingHost(meeting, selfUser) && hasNotStarted;
-};
+export const MEETING_ACTION_TRANSLATION_KEYS = {
+  deleteMeetingForAll: 'meetings.action.deleteMeetingForAll',
+  deleteMeetingForMe: 'meetings.action.deleteMeetingForMe',
+  editMeeting: 'meetings.action.editMeeting',
+  startMeeting: 'meetings.action.startMeeting',
+} as const satisfies Record<string, TranslationKey>;
