@@ -40,6 +40,8 @@ export const joinButtonContainerStyles = {
 
 export const joinButtonStyles = {
   height: '32px',
+  lineHeight: '32px',
+  marginBottom: 0,
   borderRadius: '8px',
   fontSize: '14px',
   fontWeight: 'var(--font-weight-semibold)',

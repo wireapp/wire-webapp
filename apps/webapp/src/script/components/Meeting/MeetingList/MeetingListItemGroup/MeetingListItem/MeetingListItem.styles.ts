@@ -24,7 +24,7 @@ export const itemStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  background: 'var(--background-foreground)',
+  background: 'var(--text-input-background)',
   padding: '12px 14px',
   border: '1px solid var(--border-color)',
   borderRadius: 0,
@@ -73,6 +73,10 @@ export const rightStyles: CSSObject = {
 };
 
 export const calendarIconStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
   padding: '7px',
   background: 'var(--app-bg)',
   color: 'var(--main-color)',
