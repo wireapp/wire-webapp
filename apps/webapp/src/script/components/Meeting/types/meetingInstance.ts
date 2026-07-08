@@ -19,7 +19,8 @@
 
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 
-export type MeetingOccurrence = {
+/** One concrete time slot for a series — a single row in the meeting list. */
+export type MeetingInstance = {
   series: MeetingSeries;
   start: Date;
   end: Date;
