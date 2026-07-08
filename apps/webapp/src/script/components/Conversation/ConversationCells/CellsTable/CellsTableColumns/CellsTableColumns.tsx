@@ -81,8 +81,8 @@ export const getCellsTableColumns = ({
       ? () => (
           <CellsTableSortableHeader
             label={labels.name}
-            direction={getDirectionFor('name_ci')}
-            onClick={() => onToggleSort('name_ci')}
+            direction={getDirectionFor('name')}
+            onClick={() => onToggleSort('name')}
           />
         )
       : labels.name,

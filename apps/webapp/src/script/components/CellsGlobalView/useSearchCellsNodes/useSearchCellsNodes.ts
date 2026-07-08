@@ -28,6 +28,7 @@ import {
   GlobalDriveFiltersState,
   toGlobalDriveSearchParams,
 } from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
+import {CellsSort} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -45,6 +46,7 @@ interface UseSearchCellsNodesProps {
   conversationRepository: ConversationRepository;
   fireAndForgetInvoker: FireAndForgetInvoker;
   filters: GlobalDriveFiltersState;
+  sort: CellsSort | null;
 }
 
 type SearchNodesProperties = {
@@ -69,7 +71,7 @@ const DEBOUNCE_TIME = 300;
 const FETCH_ALL_QUERY = '*';
 
 export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSearchCellsNodesResult => {
-  const {cellsRepository, userRepository, conversationRepository, fireAndForgetInvoker, filters} = properties;
+  const {cellsRepository, userRepository, conversationRepository, fireAndForgetInvoker, filters, sort} = properties;
   const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -84,15 +86,14 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
       try {
         setStatus(status);
 
-        const shouldSort = query.length === 0 || query === FETCH_ALL_QUERY;
         const searchParams = toGlobalDriveSearchParams(filters);
 
         const result = await cellsRepository.searchNodes({
           query,
           limit,
           ...searchParams,
-          sortBy: shouldSort ? 'mtime' : undefined,
-          sortDirection: shouldSort ? 'desc' : undefined,
+          sortBy: sort?.field ?? 'mtime',
+          sortDirection: sort?.direction ?? 'desc',
           type: 'file',
         });
 
@@ -142,7 +143,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pageSize, setNodes, setPagination, setStatus, filters],
+    [pageSize, setNodes, setPagination, setStatus, filters, sort],
   );
 
   const searchNodesDebounced = useDebouncedCallback(async (value: string): Promise<void> => {

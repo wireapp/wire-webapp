@@ -39,6 +39,7 @@ import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {LOAD_MORE_INCREMENT, LOAD_MORE_INITIAL_SIZE} from '../common/loadMorePagination/loadMorePagination';
 import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
+import {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from '../useGetAllCellsNodes/transformDataToCellsNodes';
@@ -52,6 +53,7 @@ interface UseConversationSearchFilesProps {
   fireAndForgetInvoker: FireAndForgetInvoker;
   filters: ConversationDriveFiltersState;
   onClear?: () => void;
+  sort: CellsSort | null;
 }
 
 type ClearSearchRefreshOptions = {
@@ -72,6 +74,7 @@ export const useConversationSearchFiles = ({
   fireAndForgetInvoker,
   filters,
   onClear,
+  sort,
 }: UseConversationSearchFilesProps) => {
   const {setNodes, appendNodes, setStatus, setPagination, setError, clearAll} = useCellsStore();
 
@@ -89,6 +92,7 @@ export const useConversationSearchFiles = ({
 
   const searchParams = useMemo(() => toConversationDriveSearchParams(filters), [filters]);
   const hasActiveParams = hasActiveSearchParams(searchParams);
+  const hasSearchOrActiveParams = searchQuery.trim().length > 0 || hasActiveParams;
   const hadActiveSearchParamsRef = useRef(hasActiveParams);
 
   const {id, domain} = conversationQualifiedId;
@@ -146,9 +150,6 @@ export const useConversationSearchFiles = ({
         const isRecycleBin = getCellsFilesPath() === RECYCLE_BIN_PATH;
         const isSearchingOrFiltering = hasQuery || hasFilters;
 
-        // recency sort for searches inside the recycle bin only
-        const forceRecencySort = isRecycleBin && hasQuery;
-
         // search scopes to the folder the user is browsing
         const searchRootPath = getCellsApiPath({conversationQualifiedId: {id, domain}});
 
@@ -158,8 +159,10 @@ export const useConversationSearchFiles = ({
           limit: append ? LOAD_MORE_INCREMENT : LOAD_MORE_INITIAL_SIZE,
           offset,
           path: searchRootPath,
-          sortBy: forceRecencySort ? 'mtime' : undefined,
-          sortDirection: forceRecencySort ? 'desc' : undefined,
+          // A user-selected sort always wins; for active searches/filters fall back to recency;
+          // the empty view (no query, no filters) sends no sort to preserve browse/folders-first order.
+          sortBy: sort?.field ?? (isSearchingOrFiltering ? 'mtime' : undefined),
+          sortDirection: sort?.direction ?? (isSearchingOrFiltering ? 'desc' : undefined),
           deleted: isRecycleBin,
           ...searchParams,
         });
@@ -217,7 +220,7 @@ export const useConversationSearchFiles = ({
     },
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain, isValidSearchRequest],
+    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain, isValidSearchRequest, sort],
   );
 
   useLayoutEffect(() => {
@@ -306,7 +309,6 @@ export const useConversationSearchFiles = ({
 
     // Re-run search whenever typing has triggered it, a query is present,
     // or the mapped search params carry any filter.
-    const hasSearchOrActiveParams = searchQuery.trim().length > 0 || hasActiveParams;
     if (!shouldPerformSearch.current && !hasSearchOrActiveParams) {
       return;
     }
@@ -314,7 +316,7 @@ export const useConversationSearchFiles = ({
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await searchNodes({query: normalizeSearchQuery(searchQuery), filters});
     });
-  }, [searchNodes, searchQuery, enabled, filters, hasActiveParams, fireAndForgetInvoker]);
+  }, [searchNodes, searchQuery, enabled, filters, hasSearchOrActiveParams, fireAndForgetInvoker]);
 
   // Fire an initial unfiltered fetch when the hook becomes enabled (search view opens) so
   // the load-more dataset is populated even before the user types or selects a filter.
@@ -336,9 +338,9 @@ export const useConversationSearchFiles = ({
   // When the search params transition from "active" to "none" with no search query,
   // restore the default unfiltered file list.
   useEffect(() => {
-    const hasNoSearchQuery = normalizeSearchQuery(searchValue).length === 0;
+    const hasNoSearchInput = normalizeSearchQuery(searchValue).length === 0;
 
-    if (hadActiveSearchParamsRef.current === true && hasActiveParams === false && hasNoSearchQuery === true) {
+    if (hadActiveSearchParamsRef.current === true && hasActiveParams === false && hasNoSearchInput === true) {
       if (canSearchOwnResults() === true) {
         fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
           await searchNodes({query: '', filters});
@@ -349,6 +351,26 @@ export const useConversationSearchFiles = ({
     }
     hadActiveSearchParamsRef.current = hasActiveParams;
   }, [canSearchOwnResults, filters, fireAndForgetInvoker, hasActiveParams, onClear, searchNodes, searchValue]);
+
+  // The main search effect above refetches active query/filter searches when `searchNodes`
+  // changes with the selected sort. Empty search has no query/filter, so it needs this
+  // explicit sort-change fetch.
+  const previousSortRef = useRef(sort);
+  useEffect(() => {
+    const previousSort = previousSortRef.current;
+    previousSortRef.current = sort;
+
+    if (!enabled || previousSort === sort) {
+      return;
+    }
+
+    if (hasSearchOrActiveParams) {
+      return;
+    }
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await searchNodes({query: '', filters});
+    });
+  }, [enabled, filters, fireAndForgetInvoker, hasSearchOrActiveParams, searchNodes, sort]);
 
   const loadMore = useCallback(
     async (offset: number): Promise<void> => {
