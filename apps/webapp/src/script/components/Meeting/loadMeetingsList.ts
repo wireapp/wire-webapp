@@ -22,10 +22,7 @@ import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import {getLogger} from 'Util/logger';
 
-export type MeetingsListErrorKey = 'meetings.list.loadError';
-
-export type LoadMeetingsListResult =
-  {meetings: Meeting[]; errorKey?: undefined} | {meetings: Meeting[]; errorKey: MeetingsListErrorKey};
+export type LoadMeetingsListResult = {meetings: Meeting[]; hasLoadError: boolean};
 
 const logger = getLogger('loadMeetingsList');
 
@@ -34,8 +31,8 @@ export const loadMeetingsList = async (meetingsRepository: MeetingsRepository): 
 
   if (listResult.isErr) {
     logger.warn('Failed to load meetings list', listResult.error);
-    return {meetings: [], errorKey: 'meetings.list.loadError'};
+    return {meetings: [], hasLoadError: true};
   }
 
-  return {meetings: listResult.value.map(mapApiMeetingToListMeeting)};
+  return {meetings: listResult.value.map(mapApiMeetingToListMeeting), hasLoadError: false};
 };

@@ -60,13 +60,18 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
     };
   }, [refreshDeviceIdentities, updateAfterEnrollment]);
 
+  let status: MLSStatuses | undefined;
+  if (!deviceIdentities) {
+    status = undefined;
+  } else if (deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)) {
+    status = MLSStatuses.VALID;
+  } else {
+    status = MLSStatuses.NOT_ACTIVATED;
+  }
+
   return {
     deviceIdentities,
-    status: !deviceIdentities
-      ? undefined
-      : deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
-        ? MLSStatuses.VALID
-        : MLSStatuses.NOT_ACTIVATED,
+    status,
     getDeviceIdentity,
   };
 };

@@ -70,9 +70,16 @@ type ScheduleMeetingModalState = {
   formState: ScheduleMeetingFormState;
   errors: ScheduleMeetingFormErrors;
   editingMeetingId: Maybe<QualifiedId>;
-  originalInvitedEmails: string[];
+  qualifiedConversation: Maybe<QualifiedId>;
+  originalRecurrence: ScheduleMeetingRecurrenceOption;
+  originalSelectedUsers: User[];
   openCreate: () => void;
-  openEdit: (meeting: Meeting, formState: ScheduleMeetingFormState) => void;
+  openEdit: (
+    meeting: Meeting,
+    formState: ScheduleMeetingFormState,
+    qualifiedConversation: QualifiedId,
+    originalSelectedUsers: User[],
+  ) => void;
   close: () => void;
   reset: () => void;
   setTitle: (title: string) => void;
@@ -91,7 +98,9 @@ const initialState = {
   formState: getDefaultScheduleMeetingFormState(),
   errors: {} as ScheduleMeetingFormErrors,
   editingMeetingId: Maybe.nothing<QualifiedId>(),
-  originalInvitedEmails: [] as string[],
+  qualifiedConversation: Maybe.nothing<QualifiedId>(),
+  originalRecurrence: 'doesNotRepeat' as ScheduleMeetingRecurrenceOption,
+  originalSelectedUsers: [] as User[],
 };
 
 export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, get) => ({
@@ -103,18 +112,33 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       formState: getDefaultScheduleMeetingFormState(),
       errors: {},
       editingMeetingId: Maybe.nothing(),
-      originalInvitedEmails: [],
+      qualifiedConversation: Maybe.nothing(),
+      originalRecurrence: 'doesNotRepeat',
+      originalSelectedUsers: [],
     }),
-  openEdit: (meeting: Meeting, formState: ScheduleMeetingFormState) =>
+  openEdit: (
+    meeting: Meeting,
+    formState: ScheduleMeetingFormState,
+    qualifiedConversation: QualifiedId,
+    originalSelectedUsers: User[],
+  ) =>
     set({
       isOpen: true,
       mode: 'edit',
       formState,
       errors: {},
       editingMeetingId: maybe.just(meeting.qualified_id),
-      originalInvitedEmails: meeting.invited_emails,
+      qualifiedConversation: maybe.just(qualifiedConversation),
+      originalRecurrence: formState.recurrence,
+      originalSelectedUsers,
     }),
-  close: () => set({isOpen: false}),
+  close: () =>
+    set({
+      isOpen: false,
+      qualifiedConversation: Maybe.nothing(),
+      originalRecurrence: 'doesNotRepeat',
+      originalSelectedUsers: [],
+    }),
   reset: () => set({...initialState, formState: getDefaultScheduleMeetingFormState()}),
   setTitle: title =>
     set(state => ({

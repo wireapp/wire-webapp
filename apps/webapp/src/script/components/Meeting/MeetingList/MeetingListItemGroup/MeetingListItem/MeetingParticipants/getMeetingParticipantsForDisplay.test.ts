@@ -17,6 +17,22 @@
  *
  */
 
-export interface MeetingEmailsInvitation {
-  emails: string[];
-}
+import {User} from 'Repositories/entity/User';
+import {translateForTest} from 'Util/test/translateForTest';
+
+import {getMeetingParticipantsForDisplay} from './getMeetingParticipantsForDisplay';
+
+const createUser = (id: string, name: string) => {
+  const user = new User(id, 'example.com', translateForTest);
+  user.name(name);
+  return user;
+};
+
+describe('getMeetingParticipantsForDisplay', () => {
+  it('excludes the self user from the displayed participants', () => {
+    const selfUser = createUser('self', 'Kim Organizer');
+    const otherUser = createUser('other', 'Jaqueline Olaho');
+
+    expect(getMeetingParticipantsForDisplay([selfUser, otherUser], selfUser)).toEqual([otherUser]);
+  });
+});

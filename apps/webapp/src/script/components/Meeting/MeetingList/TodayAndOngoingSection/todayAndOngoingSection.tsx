@@ -20,32 +20,13 @@
 import {memo, useMemo} from 'react';
 
 import {TodayAndOngoingSectionProps} from 'Components/Meeting/MeetingList/MeetingList';
-import {
-  MeetingGroupBy,
-  MeetingListItemGroup,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
+import {MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/meetingListItemGroup';
 import {groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
-import {getOnGoingMeetingsAt} from 'Components/Meeting/utils/MeetingStatusUtil';
 
 const TodayAndOngoingSectionComponent = ({meetingsToday, headerForToday, nowMs}: TodayAndOngoingSectionProps) => {
-  const onGoingMeetings = useMemo(() => getOnGoingMeetingsAt(meetingsToday, nowMs), [meetingsToday, nowMs]);
-  const ongoingIds = useMemo(() => new Set(onGoingMeetings.map(meeting => meeting.conversation_id)), [onGoingMeetings]);
+  const groupedMeetingsToday = useMemo(() => groupByStartHour(meetingsToday), [meetingsToday]);
 
-  // Exclude ongoing items from today's grouped list
-  const todayNotOngoing = useMemo(
-    () => meetingsToday.filter(meeting => !ongoingIds.has(meeting.conversation_id)),
-    [meetingsToday, ongoingIds],
-  );
-  const groupedMeetingsToday = useMemo(() => groupByStartHour(todayNotOngoing), [todayNotOngoing]);
-
-  return (
-    <>
-      {onGoingMeetings.length > 0 && (
-        <MeetingListItemGroup groupBy={MeetingGroupBy.NONE} groupedMeetings={{0: onGoingMeetings}} nowMs={nowMs} />
-      )}
-      <MeetingListItemGroup header={headerForToday} groupedMeetings={groupedMeetingsToday} nowMs={nowMs} />
-    </>
-  );
+  return <MeetingListItemGroup header={headerForToday} groupedMeetings={groupedMeetingsToday} nowMs={nowMs} />;
 };
 
 export const TodayAndOngoingSection = memo(TodayAndOngoingSectionComponent);

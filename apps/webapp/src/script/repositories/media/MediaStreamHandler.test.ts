@@ -24,6 +24,11 @@ import {MediaStreamHandler} from './MediaStreamHandler';
 
 describe('MediaStreamHandler', () => {
   let streamHandler: MediaStreamHandler;
+  const enhancedAudioConstraints = {
+    autoGainControl: true,
+    echoCancellation: true,
+    noiseSuppression: true,
+  };
 
   const userState = {
     self: () => ({id: ''}),
@@ -42,7 +47,7 @@ describe('MediaStreamHandler', () => {
       await streamHandler.requestMediaStream(true, false, false, true);
 
       expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-        jasmine.objectContaining({audio: {autoGainControl: false}, video: undefined}),
+        jasmine.objectContaining({audio: enhancedAudioConstraints, video: undefined}),
       );
     });
 
@@ -62,7 +67,7 @@ describe('MediaStreamHandler', () => {
       await streamHandler.requestMediaStream(true, true, false, true);
 
       expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-        jasmine.objectContaining({audio: {autoGainControl: false}, video: jasmine.any(Object)}),
+        jasmine.objectContaining({audio: enhancedAudioConstraints, video: jasmine.any(Object)}),
       );
     });
   });

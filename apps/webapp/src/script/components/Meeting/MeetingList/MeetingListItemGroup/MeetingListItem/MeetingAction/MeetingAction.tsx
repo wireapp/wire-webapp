@@ -41,7 +41,7 @@ interface MeetingActionProps {
 }
 
 export const MeetingAction = ({meeting}: MeetingActionProps) => {
-  const {translate, wallClock} = useApplicationContext();
+  const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const selfUser = container.resolve(UserState).self();
 
@@ -57,7 +57,7 @@ export const MeetingAction = ({meeting}: MeetingActionProps) => {
         translate,
         onEdit: () => {
           if (canEditMeeting(meeting, selfUser, wallClock.currentTimestampInMilliseconds)) {
-            editMeeting(meeting);
+            fireAndForgetInvoker.fireAndForget(() => editMeeting(meeting));
           }
         },
       }),

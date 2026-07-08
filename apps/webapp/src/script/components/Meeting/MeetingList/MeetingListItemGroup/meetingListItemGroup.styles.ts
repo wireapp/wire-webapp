@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,19 @@
  *
  */
 
-import {Locator} from '@playwright/test';
+import {CSSObject} from '@emotion/react';
 
-export async function isLocatorVisible(locator: Locator): Promise<boolean> {
-  try {
-    return await locator.isVisible();
-  } catch {
-    return false;
-  }
-}
+export const sectionStyles: CSSObject = {
+  padding: '16px 16px 0',
+};
 
-export async function waitForVisible(locator: Locator, timeout: number): Promise<boolean> {
-  try {
-    await locator.waitFor({state: 'visible', timeout});
-    return true;
-  } catch {
-    return false;
-  }
-}
+export const sectionHeaderStyles: CSSObject = {
+  marginBottom: 8,
+  color: 'var(--main-color)',
+  fontWeight: 'var(--font-weight-semibold)',
+};
+
+export const listStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+};

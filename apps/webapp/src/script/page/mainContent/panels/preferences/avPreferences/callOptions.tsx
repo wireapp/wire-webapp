@@ -39,7 +39,6 @@ const logger = getLogger('CallOptions');
 interface CallOptionsProps {
   constraintsHandler: MediaConstraintsHandler;
   hasActiveCall: () => boolean;
-  isEnhancedCallAudioProcessingEnabled: boolean;
   propertiesRepository: PropertiesRepository;
   refreshAudioInput: () => Promise<MediaStream>;
 }
@@ -47,7 +46,6 @@ interface CallOptionsProps {
 const CallOptions = ({
   constraintsHandler,
   hasActiveCall,
-  isEnhancedCallAudioProcessingEnabled,
   propertiesRepository,
   refreshAudioInput,
 }: CallOptionsProps) => {
@@ -96,7 +94,7 @@ const CallOptions = ({
       constraintsHandler.setAgcPreference(isChecked);
       setAgcEnabled(isChecked);
 
-      if (isEnhancedCallAudioProcessingEnabled && hasActiveCall()) {
+      if (hasActiveCall()) {
         try {
           await refreshAudioInput();
         } catch (error: unknown) {
@@ -106,7 +104,7 @@ const CallOptions = ({
         }
       }
     },
-    [constraintsHandler, hasActiveCall, isEnhancedCallAudioProcessingEnabled, refreshAudioInput],
+    [constraintsHandler, hasActiveCall, refreshAudioInput],
   );
 
   const handleSoundlessCallsChange = useCallback(

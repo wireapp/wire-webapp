@@ -101,7 +101,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
   ...props
 }: SelectProps<IsMulti, Group>) => {
   const theme = useTheme();
-  const hasError = !!error;
+  const hasError = !!Boolean(error);
 
   return (
     <div

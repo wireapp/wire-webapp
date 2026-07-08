@@ -24,7 +24,7 @@ import {
 } from './startupFeatureToggles';
 import {
   applockRefactoredFeatureToggleName,
-  enhancedCallAudioProcessingFeatureToggleName,
+  improvedVideoQualityFeatureToggleName,
   meetingsFeatureToggleName,
   sharedDriveSearchAndFiltersFeatureToggleName,
   startupFeatureToggleNames,
@@ -34,7 +34,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
   sharedDriveSearchAndFiltersFeatureToggleName,
   meetingsFeatureToggleName,
-  enhancedCallAudioProcessingFeatureToggleName,
+  improvedVideoQualityFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -103,21 +103,12 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(meetingsFeatureToggleName)).toBe(true);
   });
 
-  it('enables the enhanced call audio processing feature toggle when present in the query parameter', () => {
+  it('enables the improved video quality feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${enhancedCallAudioProcessingFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${improvedVideoQualityFeatureToggleName}`,
     );
 
-    expect(startupFeatureToggles.isFeatureToggleEnabled(enhancedCallAudioProcessingFeatureToggleName)).toBe(true);
-  });
-
-  it('enables the enhanced call audio processing feature toggle together with other startup feature toggles', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName},${enhancedCallAudioProcessingFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(meetingsFeatureToggleName)).toBe(true);
-    expect(startupFeatureToggles.isFeatureToggleEnabled(enhancedCallAudioProcessingFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(improvedVideoQualityFeatureToggleName)).toBe(true);
   });
 
   it('trims whitespace around feature toggle names', () => {
@@ -161,7 +152,7 @@ describe('startupFeatureToggles', function () {
       applockRefactoredFeatureToggleName,
       sharedDriveSearchAndFiltersFeatureToggleName,
       meetingsFeatureToggleName,
-      enhancedCallAudioProcessingFeatureToggleName,
+      improvedVideoQualityFeatureToggleName,
     ]);
   });
 

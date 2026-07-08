@@ -56,12 +56,12 @@ export const onBackFromSleep = ({
 
     lastTime = currentTime;
 
-    if (isDisconnectedCallback && isDisconnectedCallback()) {
+    if (isDisconnectedCallback !== undefined && isDisconnectedCallback()) {
       wasDisconnected = true;
     }
 
     if (wasAsleep) {
-      if (!isDisconnectedCallback || wasDisconnected) {
+      if (!Boolean(isDisconnectedCallback) || wasDisconnected) {
         wasDisconnected = false;
         callback();
       }

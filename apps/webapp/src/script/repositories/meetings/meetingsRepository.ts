@@ -48,18 +48,4 @@ export class MeetingsRepository {
       () => this.dataSource.updateMeeting(meetingId, payload),
     );
   }
-
-  addMeetingInvitation(meetingId: QualifiedId, emails: string[]): Task<void, unknown> {
-    return task.tryOrElse(
-      error => error,
-      () => this.dataSource.addMeetingInvitation(meetingId, emails),
-    );
-  }
-
-  removeMeetingInvitation(meetingId: QualifiedId, emails: string[]): Task<void, unknown> {
-    return task.tryOrElse(
-      error => error,
-      () => this.dataSource.removeMeetingInvitation(meetingId, emails),
-    );
-  }
 }

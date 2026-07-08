@@ -56,7 +56,7 @@ const getGenericMessageParams = async ({
   apiClient,
 }: GetGenericMessageParamsParams): GetGenericMessageParamsReturnType => {
   const plainText = GenericMessage.encode(genericMessage).finish();
-  if (targetMode !== MessageTargetMode.NONE && !userIds) {
+  if (targetMode !== MessageTargetMode.NONE && userIds === undefined) {
     throw new Error('Cannot send targetted message when no userIds are given');
   }
 

@@ -17,22 +17,55 @@
  *
  */
 
+import {useEffect, useMemo} from 'react';
+
 import {contentStyles} from 'Components/Meeting/Meeting.styles';
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
+import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingStore';
+import {MeetingStoreProvider, useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useMeetingsList} from 'Components/Meeting/useMeetingsList';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const Meetings = () => {
-  const meetingsList = useMeetingsList();
+const MeetingsContent = () => {
+  const {fireAndForgetInvoker} = useApplicationContext();
+  const meetings = useMeetingStore(state => state.meetings);
+  const isLoading = useMeetingStore(state => state.isLoading);
+  const hasLoadError = useMeetingStore(state => state.hasLoadError);
+  const loadMeetings = useMeetingStore(state => state.loadMeetings);
+
+  useEffect(() => {
+    fireAndForgetInvoker.fireAndForget(loadMeetings);
+  }, [loadMeetings, fireAndForgetInvoker]);
 
   return (
     <>
       <MeetingHeader />
       <div css={contentStyles}>
-        <MeetingList {...meetingsList} />
+        <MeetingList meetings={meetings} isLoading={isLoading} hasLoadError={hasLoadError} />
       </div>
-      <ScheduleMeetingModal onMeetingScheduled={meetingsList.fetchMeetings} />
+      <ScheduleMeetingModal />
     </>
+  );
+};
+
+export const Meetings = () => {
+  const {mainViewModel, wallClock} = useApplicationContext();
+  const {meetings: meetingsRepository, conversation: conversationRepository} = mainViewModel.content.repositories;
+
+  const store = useMemo(
+    () =>
+      createMeetingStore({
+        meetingsRepository,
+        conversationRepository,
+        wallClock,
+      }),
+    [meetingsRepository, conversationRepository, wallClock],
+  );
+
+  return (
+    <MeetingStoreProvider store={store}>
+      <MeetingsContent />
+    </MeetingStoreProvider>
   );
 };

@@ -25,7 +25,7 @@ import path from 'path';
 import {generateClientConfig, generateServerConfig, Env} from '@wireapp/config';
 
 const versionData = readFileSync(path.resolve(__dirname, './version.json'), 'utf8');
-const version = versionData ? JSON.parse(versionData) : {version: 'unknown', commit: 'unknown'};
+const version = Boolean(versionData) ? JSON.parse(versionData) : {version: 'unknown', commit: 'unknown'};
 const dotenvConfigurationIndentationSpaces = 2;
 
 // Determine the correct root path based on the directory structure
@@ -54,13 +54,13 @@ console.info('[Config] dotenv config:', JSON.stringify(dotenvConfig, null, doten
 
 const env = dotenv.load(dotenvConfig) as Env;
 
-console.info('[Config] Environment loaded. APP_BASE:', env.APP_BASE ? 'SET' : 'NOT SET');
+console.info('[Config] Environment loaded. APP_BASE:', Boolean(env.APP_BASE) ? 'SET' : 'NOT SET');
 
 function generateUrls() {
   const federation = env.FEDERATION;
 
-  if (!federation) {
-    if (!env.APP_BASE || !env.BACKEND_REST || !env.BACKEND_WS) {
+  if (!Boolean(federation)) {
+    if (!Boolean(env.APP_BASE) || !Boolean(env.BACKEND_REST) || !Boolean(env.BACKEND_WS)) {
       console.error('[Config] Missing required environment variables!');
       console.error('[Config] APP_BASE:', env.APP_BASE);
       console.error('[Config] BACKEND_REST:', env.BACKEND_REST);
@@ -86,7 +86,7 @@ function generateUrls() {
 const commonConfig = {
   commit: version.commit,
   version: version.version,
-  env: env.NODE_ENV || 'production',
+  env: Boolean(env.NODE_ENV) ? env.NODE_ENV : 'production',
   urls: generateUrls(),
 };
 

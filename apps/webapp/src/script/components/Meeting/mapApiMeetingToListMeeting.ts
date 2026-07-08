@@ -26,9 +26,9 @@ export const mapApiMeetingToListMeeting = (apiMeeting: ApiMeeting): Meeting => (
   start_date: apiMeeting.start_time,
   end_date: apiMeeting.end_time,
   conversation_id: apiMeeting.qualified_conversation.id,
+  qualified_conversation: apiMeeting.qualified_conversation,
   title: apiMeeting.title,
   recurrence: mapMeetingRecurrenceToOption(apiMeeting.recurrence),
   qualified_id: apiMeeting.qualified_id,
   qualified_creator: apiMeeting.qualified_creator,
-  invited_emails: apiMeeting.invited_emails,
 });

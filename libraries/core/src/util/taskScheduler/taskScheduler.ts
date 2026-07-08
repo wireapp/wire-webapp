@@ -47,7 +47,7 @@ const addTask = ({task, firingDate, key, persist = false}: ScheduleTaskParams) =
   if (TaskSchedulerStore.has(key)) {
     TaskSchedulerStore.remove(key);
   }
-  if (activeTimeouts[key]) {
+  if (activeTimeouts[key] !== undefined) {
     cancelTask(key);
   }
 
@@ -77,7 +77,7 @@ const addTask = ({task, firingDate, key, persist = false}: ScheduleTaskParams) =
  */
 const cancelTask = (key: string) => {
   const timeout = activeTimeouts[key];
-  if (timeout) {
+  if (timeout !== undefined) {
     clearTimeout(timeout);
     delete activeTimeouts[key];
     logger.info(`Scheduled task with key "${key}" prematurely cleared`);

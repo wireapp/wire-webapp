@@ -97,7 +97,14 @@ const parseTimeLabel = (value: string | number) => {
   const hour = Number(hourPart);
   const minutes = Number(minutePart);
   const isPm = (periodPart || '').toUpperCase() === 'PM';
-  const hour24 = Number.isFinite(hour) ? (isPm ? (hour % 12) + 12 : hour % 12) : 0;
+  let hour24 = 0;
+  if (Number.isFinite(hour)) {
+    if (isPm) {
+      hour24 = (hour % 12) + 12;
+    } else {
+      hour24 = hour % 12;
+    }
+  }
   const safeMinutes = Number.isFinite(minutes) ? minutes : 0;
 
   return {hour24, minutes: safeMinutes};

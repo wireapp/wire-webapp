@@ -24,15 +24,16 @@ export const itemStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  background: 'var(--background-foreground)',
+  background: 'var(--text-input-background)',
   padding: '12px 14px',
-  border: '1px solid var(--border-color)',
+  borderWidth: '1px',
+  borderStyle: 'solid',
+  borderColor: 'var(--border-color)',
+  borderTop: 'none',
   borderRadius: 0,
-  '&:not(:first-of-type)': {
-    marginTop: -1,
-  },
 
   '&:first-of-type': {
+    borderTop: '1px solid var(--border-color)',
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
@@ -45,7 +46,13 @@ export const itemStyles: CSSObject = {
 
 export const onGoingMeetingStyles: CSSObject = {
   background: 'var(--accent-color-highlight)',
-  border: '1px solid var(--accent-color)',
+  borderLeftColor: 'var(--accent-color)',
+  borderRightColor: 'var(--accent-color)',
+  borderBottomColor: 'var(--accent-color)',
+
+  '&:first-of-type': {
+    borderTopColor: 'var(--accent-color)',
+  },
 };
 
 export const leftStyles: CSSObject = {
@@ -72,7 +79,11 @@ export const rightStyles: CSSObject = {
   gap: 12,
 };
 
-export const callingIconStyles: CSSObject = {
+export const calendarIconStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
   padding: '7px',
   background: 'var(--app-bg)',
   color: 'var(--main-color)',

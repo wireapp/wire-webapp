@@ -17,21 +17,16 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
 
-export const sectionStyles: CSSObject = {
-  padding: '16px 16px 0',
-};
+describe('getStackedAvatarDisplay', () => {
+  it('shows all avatars for up to four participants', () => {
+    expect(getStackedAvatarDisplay(1)).toEqual({visibleCount: 1, overflowCount: 0});
+    expect(getStackedAvatarDisplay(4)).toEqual({visibleCount: 4, overflowCount: 0});
+  });
 
-export const sectionHeaderStyles: CSSObject = {
-  marginBottom: 8,
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-};
-
-export const hourLabelStyles: CSSObject = {
-  color: 'var(--secondary-text-color)',
-  fontSize: '12px',
-  marginTop: 12,
-  marginBottom: 8,
-};
+  it('shows four avatars and overflow for more than four participants', () => {
+    expect(getStackedAvatarDisplay(5)).toEqual({visibleCount: 4, overflowCount: 1});
+    expect(getStackedAvatarDisplay(17)).toEqual({visibleCount: 4, overflowCount: 13});
+  });
+});

@@ -741,6 +741,47 @@ describe('CallingRepository', () => {
       });
     });
 
+    describe('refreshVideoInput', () => {
+      it('uses the active group or conference call context when refreshing video input', async () => {
+        const mediaStream = new MediaStream();
+        call.state(CALL_STATE.MEDIA_ESTAB);
+        spyOn(callingRepository['callState'], 'joinedCall').and.returnValues(call, undefined);
+        spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
+          Promise.resolve(mediaStream),
+        );
+        spyOn(callingRepository, 'stopMediaSource').and.returnValue(true);
+        spyOn(callingRepository, 'changeMediaSource').and.returnValue(mediaStream);
+
+        await callingRepository.refreshVideoInput();
+
+        expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledWith(
+          false,
+          true,
+          false,
+          true,
+        );
+      });
+
+      it('keeps the non-group default when refreshing video input without an active call', async () => {
+        const mediaStream = new MediaStream();
+        callingRepository['callState'].calls([]);
+        spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
+          Promise.resolve(mediaStream),
+        );
+        spyOn(callingRepository, 'stopMediaSource').and.returnValue(false);
+        spyOn(callingRepository, 'changeMediaSource').and.returnValue(undefined);
+
+        await callingRepository.refreshVideoInput();
+
+        expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledWith(
+          false,
+          true,
+          false,
+          false,
+        );
+      });
+    });
+
     describe.skip('on not supported call state', () => {
       it('ANSWERED, toggle will be failing', async () => {
         selfParticipant.videoState(VIDEO_STATE.STOPPED);

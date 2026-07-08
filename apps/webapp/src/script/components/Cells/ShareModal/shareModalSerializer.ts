@@ -48,11 +48,14 @@ export const serializeShareModalInput = ({
   const trimmedPassword = passwordValue.trim();
   const hasValidExpiration = !expirationEnabled || (expirationDateTime && !expirationInvalid);
 
-  const accessEnd = expirationEnabled
-    ? expirationDateTime && !expirationInvalid
-      ? Math.floor(expirationDateTime.getTime() / 1000).toString()
-      : undefined
-    : null;
+  let accessEnd: string | null | undefined;
+  if (!expirationEnabled) {
+    accessEnd = null;
+  } else if (expirationDateTime && !expirationInvalid) {
+    accessEnd = Math.floor(expirationDateTime.getTime() / 1000).toString();
+  } else {
+    accessEnd = undefined;
+  }
 
   const {isPasswordValid, updatePassword} = getPasswordValidationResult({
     passwordEnabled,

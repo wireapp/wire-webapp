@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {Article, Asset, LinkPreview, Mention, Quote, Text, Tweet} from '@wireapp/protocol-messaging';
 
 import {EditedTextContent, LinkPreviewUploadedContent, TextContent} from '../content';
@@ -35,7 +37,7 @@ export class MessageToProtoMapper {
         urlOffset: linkPreview.urlOffset,
       });
 
-      if (linkPreview.tweet) {
+      if (!is.nullOrUndefined(linkPreview.tweet)) {
         linkPreviewMessage.tweet = Tweet.create({
           author: linkPreview.tweet.author,
           username: linkPreview.tweet.username,
@@ -43,7 +45,7 @@ export class MessageToProtoMapper {
         linkPreviewMessage.metaData = 'tweet';
       }
 
-      if (linkPreview.imageUploaded) {
+      if (linkPreview.imageUploaded !== undefined) {
         const {asset, image} = linkPreview.imageUploaded;
 
         const imageMetadata = Asset.ImageMetaData.create({
@@ -103,7 +105,7 @@ export class MessageToProtoMapper {
       textMessage.mentions = mentions.map(mention => Mention.create(mention));
     }
 
-    if (quote) {
+    if (quote !== undefined) {
       textMessage.quote = Quote.create({
         quotedMessageId: quote.quotedMessageId,
         quotedMessageSha256: quote.quotedMessageSha256,

@@ -47,11 +47,11 @@ export class CopyConfig {
     this.options = {...defaultOptions, ...options};
     this.readEnvVars();
 
-    if (!this.options.repositoryUrl && !this.options.externalDir) {
+    if (!Boolean(this.options.repositoryUrl) && !Boolean(this.options.externalDir)) {
       throw new Error('Option "repositoryUrl" or "externalDir" required');
     }
 
-    if (this.options.externalDir) {
+    if (Boolean(this.options.externalDir)) {
       this.noClone = true;
       this.noCleanup = true;
       this.options.baseDir = this.options.externalDir;
@@ -101,7 +101,7 @@ export class CopyConfig {
 
   private resolveFiles(): void {
     const filesArray = Object.keys(this.options.files);
-    if (!filesArray.length) {
+    if (!Boolean(filesArray.length)) {
       throw new Error('No source files or directories specified.');
     }
 
@@ -174,11 +174,11 @@ export class CopyConfig {
       await this.removeBasedir();
     }
 
-    if (stderrVersion) {
+    if (Boolean(stderrVersion)) {
       this.logger?.error(`No git installation found: (error: "${stderrVersion}"). Trying to download the zip file...`);
     }
 
-    if (stderrVersion || this.options.forceDownload) {
+    if (Boolean(stderrVersion) || this.options.forceDownload) {
       if (bareUrl.startsWith('git')) {
         const gitProtocolRegex = new RegExp('^git(?::\\/\\/([^@]+@)?|@)([^:]+):(.*)(?:\\.git)?');
         bareUrl = bareUrl.replace(gitProtocolRegex, 'https://$1$2/$3');

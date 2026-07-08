@@ -17,21 +17,18 @@
  *
  */
 
-import is from '@sindresorhus/is';
-import {Maybe, maybe} from 'true-myth';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 
-import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
-
-export const getInvitedEmailsFromSelectedUsers = (
-  selectedUsers: ScheduleMeetingFormState['selectedUsers'],
-): Maybe<string[]> => {
-  const emails = selectedUsers.map(user => user.email()).filter((email): email is string => is.nonEmptyString(email));
-
-  const hasMissingEmail = selectedUsers.some(user => !is.nonEmptyString(user.email()));
-
-  if (hasMissingEmail) {
-    return maybe.nothing();
+/**
+ * Returns whether the meetings list should be refreshed after a failed submit.
+ * Partial failures mean meeting metadata was already persisted and the UI should recover.
+ */
+export const shouldRefreshMeetingsListAfterSubmitError = (error: MeetingSubmitErrors): boolean => {
+  switch (error) {
+    case meetingSubmitErrors.addParticipantsFailed:
+    case meetingSubmitErrors.removeParticipantsFailed:
+      return true;
+    default:
+      return false;
   }
-
-  return maybe.just(emails);
 };

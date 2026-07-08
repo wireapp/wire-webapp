@@ -23,6 +23,7 @@ import {UserState} from 'Repositories/user/userState';
 import {createUuid} from 'Util/uuid';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
+import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 import {translateForTest} from 'Util/test/translateForTest';
 
 interface SelectedDeviceId {
@@ -39,6 +40,10 @@ interface ExtendedMediaTrackConstraints extends MediaTrackConstraints {
   video: {
     facingMode?: string;
     deviceId?: SelectedDeviceId;
+    frameRate?: ConstrainDouble;
+    height?: ConstrainULong;
+    resizeMode?: string;
+    width?: ConstrainULong;
   };
 }
 
@@ -76,13 +81,18 @@ describe('MediaConstraintsHandler', () => {
     createAvailableDevices();
   };
 
-  const createConstraintsHandler = (selfUserId = createUuid(), isEnhancedCallAudioProcessingEnabled = false) => {
+  const createConstraintsHandler = (
+    selfUserId = createUuid(),
+    featureToggles = {
+      isImprovedVideoQualityEnabled: false,
+    },
+  ) => {
     const userState = {
       self: () => {
         return new User(selfUserId, '', translateForTest);
       },
     };
-    return new MediaConstraintsHandler(userState as UserState, isEnhancedCallAudioProcessingEnabled);
+    return new MediaConstraintsHandler(userState as UserState, featureToggles);
   };
 
   const defaultId = MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
@@ -122,7 +132,11 @@ describe('MediaConstraintsHandler', () => {
       ) as ExtendedMediaTrackConstraints;
 
       expect(constraints.audio.deviceId).toBeUndefined();
-      expect(constraints.audio).toEqual({autoGainControl: false});
+      expect(constraints.audio).toEqual({
+        autoGainControl: true,
+        echoCancellation: true,
+        noiseSuppression: true,
+      });
       expect(constraints.video.deviceId).toBeUndefined();
       expect(constraints.video).toEqual(
         expect.objectContaining({
@@ -135,18 +149,9 @@ describe('MediaConstraintsHandler', () => {
     });
 
     describe('Audio Constraints', () => {
-      it('keeps legacy audio constraints when enhanced call audio processing is disabled and no AGC preference is stored', () => {
+      it('uses enhanced audio constraints when no AGC preference is stored', () => {
         createAvailableDevices({audio: defaultId});
-        const constraintsHandler = createConstraintsHandler(createUuid(), false);
-
-        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
-
-        expect(constraints.audio).toEqual({autoGainControl: false});
-      });
-
-      it('applies enhanced audio constraints when enhanced call audio processing is enabled and no AGC preference is stored', () => {
-        createAvailableDevices({audio: defaultId});
-        const constraintsHandler = createConstraintsHandler(createUuid(), true);
+        const constraintsHandler = createConstraintsHandler();
 
         const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
 
@@ -157,10 +162,10 @@ describe('MediaConstraintsHandler', () => {
         });
       });
 
-      it('respects a stored disabled AGC preference when enhanced call audio processing is enabled', () => {
+      it('respects a stored disabled AGC preference', () => {
         createAvailableDevices({audio: defaultId});
         const selfUserId = createUuid();
-        const constraintsHandler = createConstraintsHandler(selfUserId, true);
+        const constraintsHandler = createConstraintsHandler(selfUserId);
         localStorage.setItem(`agc_enabled_${selfUserId}`, 'false');
 
         const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
@@ -172,10 +177,10 @@ describe('MediaConstraintsHandler', () => {
         });
       });
 
-      it('respects a stored enabled AGC preference when enhanced call audio processing is enabled', () => {
+      it('respects a stored enabled AGC preference', () => {
         createAvailableDevices({audio: defaultId});
         const selfUserId = createUuid();
-        const constraintsHandler = createConstraintsHandler(selfUserId, true);
+        const constraintsHandler = createConstraintsHandler(selfUserId);
         localStorage.setItem(`agc_enabled_${selfUserId}`, 'true');
 
         const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
@@ -187,10 +192,10 @@ describe('MediaConstraintsHandler', () => {
         });
       });
 
-      it('treats a stored non-boolean AGC preference as missing when enhanced call audio processing is enabled', () => {
+      it('treats a stored non-boolean AGC preference as missing', () => {
         createAvailableDevices({audio: defaultId});
         const selfUserId = createUuid();
-        const constraintsHandler = createConstraintsHandler(selfUserId, true);
+        const constraintsHandler = createConstraintsHandler(selfUserId);
         localStorage.setItem(`agc_enabled_${selfUserId}`, '"not-a-boolean"');
 
         const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
@@ -202,10 +207,10 @@ describe('MediaConstraintsHandler', () => {
         });
       });
 
-      it('treats a malformed stored AGC preference as missing when enhanced call audio processing is enabled', () => {
+      it('treats a malformed stored AGC preference as missing', () => {
         createAvailableDevices({audio: defaultId});
         const selfUserId = createUuid();
-        const constraintsHandler = createConstraintsHandler(selfUserId, true);
+        const constraintsHandler = createConstraintsHandler(selfUserId);
         localStorage.setItem(`agc_enabled_${selfUserId}`, 'not-json');
 
         const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
@@ -237,9 +242,9 @@ describe('MediaConstraintsHandler', () => {
         expect(constraints.audio.deviceId.exact).toBe('specific-mic-id');
       });
 
-      it('keeps exact deviceId when enhanced call audio processing is enabled', () => {
+      it('keeps exact deviceId with enhanced audio constraints', () => {
         createAvailableDevices({audio: 'specific-mic-id'});
-        const constraintsHandler = createConstraintsHandler(createUuid(), true);
+        const constraintsHandler = createConstraintsHandler();
 
         const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
 
@@ -262,6 +267,63 @@ describe('MediaConstraintsHandler', () => {
     });
 
     describe('Video Constraints', () => {
+      it('preserves the current one-to-one video constraints when improved video quality is disabled', () => {
+        createAvailableDevices({video: defaultId});
+        const constraintsHandler = createConstraintsHandler();
+        const existingOneToOneVideoConstraints =
+          MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[VIDEO_QUALITY_MODE.MOBILE];
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(
+          false,
+          true,
+          false,
+        ) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.video).toEqual({
+          ...existingOneToOneVideoConstraints,
+          facingMode: MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE,
+        });
+      });
+
+      it('uses the improved one-to-one video constraints when improved video quality is enabled', () => {
+        createAvailableDevices({video: defaultId});
+        const constraintsHandler = createConstraintsHandler(createUuid(), {
+          isImprovedVideoQualityEnabled: true,
+        });
+        const improvedOneToOneVideoConstraints =
+          MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE];
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(
+          false,
+          true,
+          false,
+        ) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.video).toEqual({
+          ...improvedOneToOneVideoConstraints,
+          facingMode: MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE,
+        });
+      });
+
+      it('keeps group video constraints unchanged when improved video quality is enabled', () => {
+        createAvailableDevices({video: defaultId});
+        const constraintsHandler = createConstraintsHandler(createUuid(), {
+          isImprovedVideoQualityEnabled: true,
+        });
+        const groupVideoConstraints = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[VIDEO_QUALITY_MODE.GROUP];
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(
+          false,
+          true,
+          true,
+        ) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.video).toEqual({
+          ...groupVideoConstraints,
+          facingMode: MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE,
+        });
+      });
+
       it('should apply facingMode: user ONLY when no specific video device is selected', () => {
         createAvailableDevices({video: defaultId});
         const constraintsHandler = createConstraintsHandler();
@@ -354,30 +416,37 @@ describe('MediaConstraintsHandler', () => {
       expect(getItemSpy).toHaveBeenCalledWith(expect.stringContaining(selfUserId));
     });
 
-    it('defaults AGC to disabled when enhanced call audio processing is disabled and no AGC preference is stored', () => {
+    it('defaults AGC to enabled when no AGC preference is stored', () => {
       spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue(null);
-      const constraintsHandler = createConstraintsHandler(createUuid(), false);
-
-      expect(constraintsHandler.getAgcPreference()).toEqual(false);
-    });
-
-    it('defaults AGC to enabled when enhanced call audio processing is enabled and no AGC preference is stored', () => {
-      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue(null);
-      const constraintsHandler = createConstraintsHandler(createUuid(), true);
+      const constraintsHandler = createConstraintsHandler();
 
       expect(constraintsHandler.getAgcPreference()).toEqual(true);
     });
 
-    it('keeps AGC disabled when enhanced call audio processing is enabled and AGC is stored as disabled', () => {
+    it('keeps AGC disabled when AGC is stored as disabled', () => {
       spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('false');
-      const constraintsHandler = createConstraintsHandler(createUuid(), true);
+      const constraintsHandler = createConstraintsHandler();
 
       expect(constraintsHandler.getAgcPreference()).toEqual(false);
     });
 
-    it('keeps AGC enabled when enhanced call audio processing is enabled and AGC is stored as enabled', () => {
+    it('keeps AGC enabled when AGC is stored as enabled', () => {
       spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('true');
-      const constraintsHandler = createConstraintsHandler(createUuid(), true);
+      const constraintsHandler = createConstraintsHandler();
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
+    });
+
+    it('defaults AGC to enabled when the stored AGC preference is malformed', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('not-json');
+      const constraintsHandler = createConstraintsHandler();
+
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
+    });
+
+    it('defaults AGC to enabled when the stored AGC preference is not boolean', () => {
+      spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('"not-a-boolean"');
+      const constraintsHandler = createConstraintsHandler();
 
       expect(constraintsHandler.getAgcPreference()).toEqual(true);
     });
