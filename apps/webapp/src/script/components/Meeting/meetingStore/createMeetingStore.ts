@@ -31,6 +31,7 @@ import {
   type UpdateMeetingParams,
 } from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 
 import type {MeetingStoreDeps} from './meetingStoreDeps';
@@ -42,7 +43,7 @@ export type EditMeetingData = {
 };
 
 export type MeetingStoreState = {
-  meetings: Meeting[];
+  meetingSeries: MeetingSeries[];
   isLoading: boolean;
   hasLoadError: boolean;
   loadMeetings: () => Promise<void>;
@@ -53,11 +54,11 @@ export type MeetingStoreState = {
 
 export type MeetingStore = StoreApi<MeetingStoreState>;
 
-type MeetingStoreInitialState = Partial<Pick<MeetingStoreState, 'meetings' | 'isLoading' | 'hasLoadError'>>;
+type MeetingStoreInitialState = Partial<Pick<MeetingStoreState, 'meetingSeries' | 'isLoading' | 'hasLoadError'>>;
 
 export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: MeetingStoreInitialState): MeetingStore =>
   createStore<MeetingStoreState>(set => ({
-    meetings: initialState?.meetings ?? [],
+    meetingSeries: initialState?.meetingSeries ?? [],
     isLoading: initialState?.isLoading ?? false,
     hasLoadError: initialState?.hasLoadError ?? false,
     loadMeetings: async () => {
@@ -65,7 +66,7 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
 
       const listResult = await loadMeetingsList(deps.meetingsRepository);
 
-      set({meetings: listResult.meetings, hasLoadError: listResult.hasLoadError, isLoading: false});
+      set({meetingSeries: listResult.meetingSeries, hasLoadError: listResult.hasLoadError, isLoading: false});
     },
     scheduleMeeting: formState => scheduleMeetingTask(formState, deps),
     updateMeeting: params => updateMeetingTask(params, deps),

@@ -48,7 +48,7 @@ const createMeeting = (start: string, end: string, title: string): Meeting => ({
 
 const createMeetingStoreForTest = () =>
   createStore<MeetingStoreState>(() => ({
-    meetings: [],
+    meetingSeries: [],
     isLoading: false,
     hasLoadError: false,
     loadMeetings: jest.fn(),

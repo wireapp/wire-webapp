@@ -17,12 +17,20 @@
  *
  */
 
-import type {Meeting as ApiMeeting} from '@wireapp/api-client/lib/meetings/meeting';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {mapApiMeetingToSeries} from 'Components/Meeting/mapApiMeetingToSeries';
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import {seriesToLegacyMeetingFields} from 'Components/Meeting/seriesToLegacyMeetingFields';
+import type {ScheduleMeetingRecurrenceOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 
-/** @deprecated Prefer mapApiMeetingToSeries; kept for legacy list UI bridge during Phase 1. */
-export const mapApiMeetingToListMeeting = (apiMeeting: ApiMeeting): Meeting =>
-  seriesToLegacyMeetingFields(mapApiMeetingToSeries(apiMeeting));
+export type MeetingSeries = {
+  series_start_date: string;
+  series_end_date: string;
+  duration_ms: number;
+  recurrence: ScheduleMeetingRecurrenceOption;
+  recurrence_until?: string;
+  conversation_id: string;
+  qualified_conversation: QualifiedId;
+  qualified_id: QualifiedId;
+  qualified_creator: QualifiedId;
+  title: string;
+  attending?: boolean;
+};

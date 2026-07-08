@@ -54,7 +54,7 @@ const createMeetingStore = ({
   updateMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
 }: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'scheduleMeeting' | 'updateMeeting'>> = {}) =>
   createStore<MeetingStoreState>(() => ({
-    meetings: [],
+    meetingSeries: [],
     isLoading: false,
     hasLoadError: false,
     loadMeetings,

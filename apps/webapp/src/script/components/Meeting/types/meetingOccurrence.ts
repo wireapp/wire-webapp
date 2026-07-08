@@ -17,22 +17,10 @@
  *
  */
 
-import {mapApiMeetingToSeries} from 'Components/Meeting/mapApiMeetingToSeries';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-import {getLogger} from 'Util/logger';
 
-export type LoadMeetingsListResult = {meetingSeries: MeetingSeries[]; hasLoadError: boolean};
-
-const logger = getLogger('loadMeetingsList');
-
-export const loadMeetingsList = async (meetingsRepository: MeetingsRepository): Promise<LoadMeetingsListResult> => {
-  const listResult = await meetingsRepository.getMeetingsList();
-
-  if (listResult.isErr) {
-    logger.warn('Failed to load meetings list', listResult.error);
-    return {meetingSeries: [], hasLoadError: true};
-  }
-
-  return {meetingSeries: listResult.value.map(mapApiMeetingToSeries), hasLoadError: false};
+export type MeetingOccurrence = {
+  series: MeetingSeries;
+  start: Date;
+  end: Date;
 };

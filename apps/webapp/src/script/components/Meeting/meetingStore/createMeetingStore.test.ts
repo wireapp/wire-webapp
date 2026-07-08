@@ -66,6 +66,18 @@ describe('createMeetingStore', () => {
     recurrence: 'doesNotRepeat' as const,
   };
 
+  const meetingSeriesEntry = {
+    title: 'Weekly sync',
+    series_start_date: '2026-06-16T10:00:00.000Z',
+    series_end_date: '2026-06-16T11:00:00.000Z',
+    duration_ms: 3_600_000,
+    conversation_id: 'conversation-id',
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    recurrence: 'doesNotRepeat' as const,
+  };
+
   const createDeps = ({
     getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting])),
     safeGetConversationById = jest.fn(),
@@ -94,8 +106,9 @@ describe('createMeetingStore', () => {
       isLoading: false,
       hasLoadError: false,
     });
-    expect(store.getState().meetings).toHaveLength(1);
-    expect(store.getState().meetings[0]?.title).toBe('Weekly sync');
+    expect(store.getState().meetingSeries).toHaveLength(1);
+    expect(store.getState().meetingSeries[0]?.title).toBe('Weekly sync');
+    expect(store.getState().meetingSeries[0]).toMatchObject(meetingSeriesEntry);
   });
 
   it('sets hasLoadError when loading meetings fails', async () => {
@@ -106,7 +119,7 @@ describe('createMeetingStore', () => {
 
     expect(getMeetingsList).toHaveBeenCalledTimes(1);
     expect(store.getState()).toMatchObject({
-      meetings: [],
+      meetingSeries: [],
       isLoading: false,
       hasLoadError: true,
     });

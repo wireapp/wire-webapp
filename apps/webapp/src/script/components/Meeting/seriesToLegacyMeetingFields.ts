@@ -17,22 +17,17 @@
  *
  */
 
-import {mapApiMeetingToSeries} from 'Components/Meeting/mapApiMeetingToSeries';
+import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-import {getLogger} from 'Util/logger';
 
-export type LoadMeetingsListResult = {meetingSeries: MeetingSeries[]; hasLoadError: boolean};
-
-const logger = getLogger('loadMeetingsList');
-
-export const loadMeetingsList = async (meetingsRepository: MeetingsRepository): Promise<LoadMeetingsListResult> => {
-  const listResult = await meetingsRepository.getMeetingsList();
-
-  if (listResult.isErr) {
-    logger.warn('Failed to load meetings list', listResult.error);
-    return {meetingSeries: [], hasLoadError: true};
-  }
-
-  return {meetingSeries: listResult.value.map(mapApiMeetingToSeries), hasLoadError: false};
-};
+export const seriesToLegacyMeetingFields = (series: MeetingSeries): Meeting => ({
+  start_date: series.series_start_date,
+  end_date: series.series_end_date,
+  conversation_id: series.conversation_id,
+  qualified_conversation: series.qualified_conversation,
+  title: series.title,
+  recurrence: series.recurrence,
+  qualified_id: series.qualified_id,
+  qualified_creator: series.qualified_creator,
+  attending: series.attending,
+});

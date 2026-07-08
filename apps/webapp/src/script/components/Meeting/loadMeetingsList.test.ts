@@ -43,14 +43,16 @@ describe('loadMeetingsList', () => {
     const result = await loadMeetingsList(createRepository(getMeetingsList));
 
     expect(getMeetingsList).toHaveBeenCalledTimes(1);
-    expect(result).toEqual({meetings: [], hasLoadError: false});
+    expect(result).toEqual({meetingSeries: [], hasLoadError: false});
   });
 
-  it('maps successful API meetings to list meetings', async () => {
+  it('maps successful API meetings to meeting series', async () => {
     const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
     const result = await loadMeetingsList(createRepository(getMeetingsList));
 
-    expect(result.meetings).toHaveLength(1);
-    expect(result.meetings[0]?.title).toBe('Weekly sync');
+    expect(result.meetingSeries).toHaveLength(1);
+    expect(result.meetingSeries[0]?.title).toBe('Weekly sync');
+    expect(result.meetingSeries[0]?.series_start_date).toBe('2026-06-16T10:00:00.000Z');
+    expect(result.meetingSeries[0]?.duration_ms).toBe(3_600_000);
   });
 });
