@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 
 import {contentStyles} from 'Components/Meeting/Meeting.styles';
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
@@ -29,6 +29,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const MeetingsContent = () => {
   const {fireAndForgetInvoker} = useApplicationContext();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const meetingSeries = useMeetingStore(state => state.meetingSeries);
   const isLoading = useMeetingStore(state => state.isLoading);
   const hasLoadError = useMeetingStore(state => state.hasLoadError);
@@ -41,8 +42,13 @@ const MeetingsContent = () => {
   return (
     <>
       <MeetingHeader />
-      <div css={contentStyles}>
-        <MeetingList meetingSeries={meetingSeries} isLoading={isLoading} hasLoadError={hasLoadError} />
+      <div css={contentStyles} ref={scrollContainerRef}>
+        <MeetingList
+          meetingSeries={meetingSeries}
+          isLoading={isLoading}
+          hasLoadError={hasLoadError}
+          scrollElementRef={scrollContainerRef}
+        />
       </div>
       <ScheduleMeetingModal />
     </>

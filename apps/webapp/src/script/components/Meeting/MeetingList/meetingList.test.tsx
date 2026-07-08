@@ -17,14 +17,16 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import {useMemo} from 'react';
 
 import {render, screen, within} from '@testing-library/react';
+import type {Virtualizer} from '@tanstack/react-virtual';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {createStore} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import type {UseMeetingDayGroupVirtualizer} from 'Components/Meeting/MeetingList/useMeetingDayGroupVirtualizer';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
@@ -33,7 +35,38 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {MeetingList} from './MeetingList';
+import {MeetingList, type MeetingListProps} from './MeetingList';
+
+const createMeetingDayGroupVirtualizerForTest = (
+  visibleDayGroupCount: number,
+  getEstimatedDayGroupHeight: (dayGroupIndex: number) => number,
+): Virtualizer<HTMLElement, Element> => {
+  let startOffset = 0;
+  const virtualItems = Array.from({length: visibleDayGroupCount}, (_unused, index) => {
+    const size = getEstimatedDayGroupHeight(index);
+    const start = startOffset;
+    startOffset += size;
+
+    return {index, key: index, size, start};
+  });
+
+  return {
+    getVirtualItems: () => virtualItems,
+    getTotalSize: () => startOffset,
+    measure: () => undefined,
+    measureElement: () => undefined,
+    scrollToIndex: () => undefined,
+    scrollElement: null,
+  } as unknown as Virtualizer<HTMLElement, Element>;
+};
+
+const createUseMeetingDayGroupVirtualizerForTest = (): UseMeetingDayGroupVirtualizer => {
+  return ({visibleDayGroupCount, getEstimatedDayGroupHeight}) =>
+    useMemo(
+      () => createMeetingDayGroupVirtualizerForTest(visibleDayGroupCount, getEstimatedDayGroupHeight),
+      [visibleDayGroupCount, getEstimatedDayGroupHeight],
+    );
+};
 
 const createMeetingSeries = (start: string, end: string, title: string): MeetingSeries => ({
   series_start_date: start,
@@ -58,7 +91,10 @@ const createMeetingStoreForTest = () =>
     loadMeetingForEdit: jest.fn(),
   }));
 
-const renderMeetingList = (ui: ReactNode, wallClock = createDeterministicWallClock()) => {
+const renderMeetingList = (
+  props: Omit<MeetingListProps, 'useMeetingDayGroupVirtualizer'>,
+  wallClock = createDeterministicWallClock(),
+) => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest, wallClock}),
   );
@@ -66,7 +102,12 @@ const renderMeetingList = (ui: ReactNode, wallClock = createDeterministicWallClo
 
   return render(
     withThemeAndRootContext(
-      <MeetingStoreProvider store={meetingStore}>{ui}</MeetingStoreProvider>,
+      <MeetingStoreProvider store={meetingStore}>
+        <MeetingList
+          {...props}
+          useMeetingDayGroupVirtualizer={createUseMeetingDayGroupVirtualizerForTest()}
+        />
+      </MeetingStoreProvider>,
       rootProviderWrapper,
     ),
   );
@@ -74,7 +115,7 @@ const renderMeetingList = (ui: ReactNode, wallClock = createDeterministicWallClo
 
 describe('MeetingList', () => {
   it('shows the load error when the first load fails before any meetings are available', () => {
-    renderMeetingList(<MeetingList meetingSeries={[]} isLoading={false} hasLoadError />);
+    renderMeetingList({meetingSeries: [], isLoading: false, hasLoadError: true});
 
     expect(screen.getByText('meetings.list.loadError')).toBeInTheDocument();
   });
@@ -99,12 +140,28 @@ describe('MeetingList', () => {
       createRelativeSeries(16, 17, 'Upcoming meeting'),
     ];
 
-    renderMeetingList(<MeetingList meetingSeries={meetingSeries} isLoading={false} hasLoadError={false} />, wallClock);
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock);
 
     const todaySection = screen.getByText(/meetings\.list\.today/).closest('section');
     expect(todaySection).not.toBeNull();
     expect(within(todaySection!).getByText('Ongoing meeting')).toBeInTheDocument();
     expect(within(todaySection!).getByText('Upcoming meeting')).toBeInTheDocument();
     expect(document.querySelectorAll('section')).toHaveLength(1);
+  });
+
+  it('does not render meetings outside the initial visible day window', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: new Date('2026-06-15T12:00:00.000Z').getTime(),
+    });
+
+    const meetingSeries = [
+      createMeetingSeries('2026-06-15T14:00:00.000Z', '2026-06-15T15:00:00.000Z', 'Today meeting'),
+      createMeetingSeries('2026-07-10T10:00:00.000Z', '2026-07-10T11:00:00.000Z', 'Far future meeting'),
+    ];
+
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock);
+
+    expect(screen.getByText('Today meeting')).toBeInTheDocument();
+    expect(screen.queryByText('Far future meeting')).not.toBeInTheDocument();
   });
 });

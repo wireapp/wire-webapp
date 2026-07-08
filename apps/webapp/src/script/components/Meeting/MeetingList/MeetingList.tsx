@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState, type RefObject} from 'react';
 
 import is from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -26,18 +26,24 @@ import {Loading} from '@wireapp/react-ui-kit';
 
 import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
 import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeetingList';
+import {estimateMeetingDayGroupHeight} from 'Components/Meeting/MeetingList/estimateMeetingDayGroupHeight';
 import {meetingListContainerStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
+import {INITIAL_VISIBLE_DAY_COUNT} from 'Components/Meeting/MeetingList/meetingListConstants';
 import {MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/meetingListItemGroup';
+import {useLoadMoreMeetingListDays} from 'Components/Meeting/MeetingList/useLoadMoreMeetingListDays';
+import {
+  useMeetingDayGroupVirtualizer,
+  type UseMeetingDayGroupVirtualizer,
+} from 'Components/Meeting/MeetingList/useMeetingDayGroupVirtualizer';
 import type {ScheduleMeetingRecurrenceOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import {getMeetingInstances} from 'Components/Meeting/selectors/getMeetingInstances';
 import {getVisibleTimeWindow} from 'Components/Meeting/selectors/getVisibleTimeWindow';
 import {groupMeetingInstancesByDay} from 'Components/Meeting/selectors/groupMeetingInstancesByDay';
+import type {MeetingInstancesByDay} from 'Components/Meeting/selectors/groupMeetingInstancesByDay';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {getDaySectionHeader} from 'Components/Meeting/utils/getDaySectionHeader';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
-const VISIBLE_DAY_COUNT = 14;
 
 export interface Meeting {
   start_date: string;
@@ -56,31 +62,72 @@ export interface MeetingListProps {
   meetingSeries: MeetingSeries[];
   isLoading: boolean;
   hasLoadError: boolean;
+  scrollElementRef?: RefObject<HTMLElement | null>;
+  useMeetingDayGroupVirtualizer?: UseMeetingDayGroupVirtualizer;
 }
 
-export const MeetingList = ({meetingSeries, isLoading, hasLoadError}: MeetingListProps) => {
+const getVisibleDayGroups = (meetingInstancesByDay: MeetingInstancesByDay[]): MeetingInstancesByDay[] =>
+  meetingInstancesByDay.filter(dayGroup => is.nonEmptyArray(dayGroup.meetingInstances));
+
+export const MeetingList = ({
+  meetingSeries,
+  isLoading,
+  hasLoadError,
+  scrollElementRef,
+  useMeetingDayGroupVirtualizer: useMeetingDayGroupVirtualizerDependency = useMeetingDayGroupVirtualizer,
+}: MeetingListProps) => {
   const {translate, wallClock} = useApplicationContext();
   const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
+  const [visibleDayCount, setVisibleDayCount] = useState(INITIAL_VISIBLE_DAY_COUNT);
 
   useEffect(() => {
     const id = wallClock.setInterval(() => setNowMs(wallClock.currentTimestampInMilliseconds), TIME_IN_MILLIS.SECOND);
     return () => wallClock.clearInterval(id);
   }, [wallClock]);
 
-  const now = wallClock.currentDate;
+  const now = useMemo(() => new Date(nowMs), [nowMs]);
 
   const meetingInstancesByDay = useMemo(() => {
-    const {from, to} = getVisibleTimeWindow(now, {dayCount: VISIBLE_DAY_COUNT});
+    const {from, to} = getVisibleTimeWindow(now, {dayCount: visibleDayCount});
     const meetingInstances = getMeetingInstances(meetingSeries, from, to).filter(
       meetingInstance => meetingInstance.end.getTime() >= nowMs,
     );
 
     return groupMeetingInstancesByDay(meetingInstances);
-  }, [meetingSeries, now, nowMs]);
+  }, [meetingSeries, now, nowMs, visibleDayCount]);
 
-  const hasVisibleMeetingInstances = meetingInstancesByDay.some(dayGroup =>
-    is.nonEmptyArray(dayGroup.meetingInstances),
+  const visibleDayGroups = useMemo(() => getVisibleDayGroups(meetingInstancesByDay), [meetingInstancesByDay]);
+
+  const getScrollElement = useCallback(() => scrollElementRef?.current ?? null, [scrollElementRef]);
+
+  const dayGroupInstanceCounts = useMemo(
+    () => visibleDayGroups.map(dayGroup => dayGroup.meetingInstances.length),
+    [visibleDayGroups],
   );
+
+  const getEstimatedDayGroupHeight = useCallback(
+    (dayGroupIndex: number) => estimateMeetingDayGroupHeight(dayGroupInstanceCounts[dayGroupIndex] ?? 1),
+    [dayGroupInstanceCounts],
+  );
+
+  const dayGroupVirtualizer = useMeetingDayGroupVirtualizerDependency({
+    visibleDayGroupCount: visibleDayGroups.length,
+    getScrollElement,
+    getEstimatedDayGroupHeight,
+  });
+
+  useLoadMoreMeetingListDays({
+    scrollElementRef,
+    virtualizer: dayGroupVirtualizer,
+    visibleDayGroupCount: visibleDayGroups.length,
+    visibleDayCount,
+    setVisibleDayCount,
+    meetingSeries,
+    now,
+    wallClock,
+  });
+
+  const hasVisibleMeetingInstances = visibleDayGroups.length > 0;
 
   if (isLoading && is.nonEmptyArray(meetingSeries)) {
     return (
@@ -107,21 +154,38 @@ export const MeetingList = ({meetingSeries, isLoading, hasLoadError}: MeetingLis
   }
 
   return (
-    <div css={meetingListContainerStyles}>
-      {meetingInstancesByDay.map(dayGroup => {
-        if (!is.nonEmptyArray(dayGroup.meetingInstances)) {
-          return null;
-        }
+    <div css={meetingListContainerStyles} data-uie-name="meetings-list">
+      <div
+        style={{
+          height: `${dayGroupVirtualizer.getTotalSize()}px`,
+          width: '100%',
+          position: 'relative',
+        }}
+      >
+        {dayGroupVirtualizer.getVirtualItems().map(virtualItem => {
+          const dayGroup = visibleDayGroups[virtualItem.index];
 
-        return (
-          <MeetingListItemGroup
-            key={dayGroup.day.toISOString()}
-            header={getDaySectionHeader(dayGroup.day, now, translate)}
-            meetingInstances={dayGroup.meetingInstances}
-            nowMs={nowMs}
-          />
-        );
-      })}
+          return (
+            <div
+              key={virtualItem.key}
+              data-index={virtualItem.index}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualItem.start}px)`,
+              }}
+            >
+              <MeetingListItemGroup
+                header={getDaySectionHeader(dayGroup.day, now, translate)}
+                meetingInstances={dayGroup.meetingInstances}
+                nowMs={nowMs}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
