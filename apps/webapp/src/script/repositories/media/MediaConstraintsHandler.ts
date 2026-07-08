@@ -57,7 +57,7 @@ const defaultMediaConstraintsFeatureToggles: MediaConstraintsFeatureToggles = {
 };
 
 const defaultOneToOneVideoQualityMode = VIDEO_QUALITY_MODE.MOBILE;
-const improvedOneToOneVideoQualityMode = VIDEO_QUALITY_MODE.FULL_HD;
+const improvedOneToOneVideoQualityMode = VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE;
 
 export class MediaConstraintsHandler {
   private readonly logger: Logger;
@@ -95,6 +95,12 @@ export class MediaConstraintsHandler {
           },
           [VIDEO_QUALITY_MODE.HD]: {
             frameRate: {ideal: 15},
+            height: {ideal: 720},
+            width: {ideal: 1280},
+            resizeMode: 'none',
+          },
+          [VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE]: {
+            frameRate: {ideal: 30},
             height: {ideal: 720},
             width: {ideal: 1280},
             resizeMode: 'none',

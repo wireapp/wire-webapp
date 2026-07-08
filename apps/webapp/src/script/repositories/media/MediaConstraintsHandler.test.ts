@@ -291,7 +291,7 @@ describe('MediaConstraintsHandler', () => {
           isImprovedVideoQualityEnabled: true,
         });
         const improvedOneToOneVideoConstraints =
-          MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[VIDEO_QUALITY_MODE.FULL_HD];
+          MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE];
 
         const constraints = constraintsHandler.getMediaStreamConstraints(
           false,
