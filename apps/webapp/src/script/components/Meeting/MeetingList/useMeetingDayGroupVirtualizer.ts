@@ -25,6 +25,7 @@ export type UseMeetingDayGroupVirtualizerParams = {
   visibleDayGroupCount: number;
   getScrollElement: () => HTMLElement | null;
   getEstimatedDayGroupHeight: (dayGroupIndex: number) => number;
+  getDayGroupKey: (dayGroupIndex: number) => string;
 };
 
 export type UseMeetingDayGroupVirtualizer = (
@@ -35,10 +36,13 @@ export const useMeetingDayGroupVirtualizer: UseMeetingDayGroupVirtualizer = ({
   visibleDayGroupCount,
   getScrollElement,
   getEstimatedDayGroupHeight,
+  getDayGroupKey,
 }) =>
   useVirtualizer({
     count: visibleDayGroupCount,
     getScrollElement,
     estimateSize: dayGroupIndex => getEstimatedDayGroupHeight(dayGroupIndex),
+    getItemKey: dayGroupIndex => getDayGroupKey(dayGroupIndex),
+    measureElement: element => element.getBoundingClientRect().height,
     overscan: MEETING_LIST_OVERSCAN,
   });

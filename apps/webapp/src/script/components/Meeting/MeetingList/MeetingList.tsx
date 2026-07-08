@@ -110,10 +110,16 @@ export const MeetingList = ({
     [dayGroupInstanceCounts],
   );
 
+  const getDayGroupKey = useCallback(
+    (dayGroupIndex: number) => visibleDayGroups[dayGroupIndex]?.day.toISOString() ?? String(dayGroupIndex),
+    [visibleDayGroups],
+  );
+
   const dayGroupVirtualizer = useMeetingDayGroupVirtualizerDependency({
     visibleDayGroupCount: visibleDayGroups.length,
     getScrollElement,
     getEstimatedDayGroupHeight,
+    getDayGroupKey,
   });
 
   useLoadMoreMeetingListDays({
@@ -169,6 +175,7 @@ export const MeetingList = ({
             <div
               key={virtualItem.key}
               data-index={virtualItem.index}
+              ref={dayGroupVirtualizer.measureElement}
               style={{
                 position: 'absolute',
                 top: 0,
