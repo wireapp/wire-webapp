@@ -2045,7 +2045,9 @@ export class CallingRepository {
   }
 
   public async refreshVideoInput() {
-    const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
+    const activeCallBeforeRefresh = this.callState.joinedCall();
+    const isGroupOrConference = activeCallBeforeRefresh?.isGroupOrConference ?? false;
+    const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, isGroupOrConference);
     this.stopMediaSource(MediaType.VIDEO);
     let clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
     const activeCall = this.callState.joinedCall();

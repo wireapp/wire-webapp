@@ -48,6 +48,17 @@ export enum ScreensharingMethods {
   NONE = 3,
 }
 
+export type MediaConstraintsFeatureToggles = {
+  readonly isImprovedVideoQualityEnabled: boolean;
+};
+
+const defaultMediaConstraintsFeatureToggles: MediaConstraintsFeatureToggles = {
+  isImprovedVideoQualityEnabled: false,
+};
+
+const defaultOneToOneVideoQualityMode = VIDEO_QUALITY_MODE.MOBILE;
+const improvedOneToOneVideoQualityMode = VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE;
+
 export class MediaConstraintsHandler {
   private readonly logger: Logger;
 
@@ -88,6 +99,12 @@ export class MediaConstraintsHandler {
             width: {ideal: 1280},
             resizeMode: 'none',
           },
+          [VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE]: {
+            frameRate: {ideal: 30},
+            height: {ideal: 720},
+            width: {ideal: 1280},
+            resizeMode: 'none',
+          },
           [VIDEO_QUALITY_MODE.MOBILE]: {
             frameRate: {ideal: 15},
             height: {ideal: 720},
@@ -101,7 +118,10 @@ export class MediaConstraintsHandler {
     };
   }
 
-  constructor(private readonly userState = container.resolve(UserState)) {
+  constructor(
+    private readonly userState = container.resolve(UserState),
+    private readonly featureToggles: MediaConstraintsFeatureToggles = defaultMediaConstraintsFeatureToggles,
+  ) {
     this.logger = getLogger('MediaConstraintsHandler');
   }
 
@@ -130,7 +150,7 @@ export class MediaConstraintsHandler {
         input: {selectedId: videoInputDeviceId},
       },
     } = mediaDevicesStore.getState();
-    const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
+    const mode = this.getVideoQualityMode(isGroup);
 
     return {
       audio: requestAudio ? this.getAudioStreamConstraints(audioInputDeviceId) : undefined,
@@ -202,6 +222,20 @@ export class MediaConstraintsHandler {
     }
 
     return parseSerializedAgcPreference(storedValue);
+  }
+
+  private getVideoQualityMode(isGroup: boolean): VIDEO_QUALITY_MODE {
+    if (isGroup) {
+      return VIDEO_QUALITY_MODE.GROUP;
+    }
+
+    const isUsingExistingOneToOneVideoQuality = !this.featureToggles.isImprovedVideoQualityEnabled;
+
+    if (isUsingExistingOneToOneVideoQuality) {
+      return defaultOneToOneVideoQualityMode;
+    }
+
+    return improvedOneToOneVideoQualityMode;
   }
 
   private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints & {autoGainControl: boolean} {
