@@ -31,7 +31,7 @@ import {
   getConversationVerificationState,
   MLSStatuses,
   WireIdentity,
-} from 'src/script/E2EIdentity';
+} from 'src/script/e2eIdentity';
 import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
 import {Core} from 'src/script/service/coreSingleton';
 import {Logger, getLogger} from 'Util/logger';

@@ -24,7 +24,7 @@ import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
 import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationMessage';
 import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {VerificationMessageType} from 'src/script/message/verificationMessageType';
 
 import {VerificationMessage} from './VerificationMessage';

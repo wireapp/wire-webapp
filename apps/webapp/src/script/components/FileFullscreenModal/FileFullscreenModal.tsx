@@ -23,7 +23,7 @@ import {Maybe} from 'true-myth';
 
 import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
-import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
+import {FullscreenModal} from 'Components/fullscreenModal/fullscreenModal';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {getBestPreviewSource} from 'Util/imageUtil';

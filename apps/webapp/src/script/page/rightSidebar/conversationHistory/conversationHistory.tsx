@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 
 import {FlexBox, Input, Select} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {customHistorySharingInputCss} from 'Components/Modals/CreateConversation/CreateConversationSteps/CreateConversationSteps.styles';
 import {ChatHistory, HistorySharingUnit} from 'Components/Modals/CreateConversation/types';
 import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/Modals/CreateConversation/utils';

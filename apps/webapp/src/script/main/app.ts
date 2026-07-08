@@ -102,10 +102,10 @@ import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from '
 import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {Config, Configuration} from '../Config';
-import {E2EIHandler} from '../E2EIdentity';
-import {getModalOptions, ModalType} from '../E2EIdentity/modals';
+import {E2EIHandler} from '../e2eIdentity';
+import {getModalOptions, ModalType} from '../e2eIdentity/modals';
 import {AccessTokenError} from '../error/accessTokenError';
 import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';

@@ -27,9 +27,9 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
+import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
+import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

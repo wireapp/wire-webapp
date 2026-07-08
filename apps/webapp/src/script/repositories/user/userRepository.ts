@@ -75,7 +75,7 @@ import {UserMapper} from './userMapper';
 import type {UserService} from './userService';
 import {UserState} from './userState';
 
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';

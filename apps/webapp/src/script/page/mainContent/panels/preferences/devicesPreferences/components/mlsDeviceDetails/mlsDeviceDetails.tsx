@@ -18,7 +18,7 @@
  */
 
 import {isKnownSignature, MLSPublicKeys} from 'Repositories/client';
-import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {splitFingerprint} from 'Util/stringUtil';
 

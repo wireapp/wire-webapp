@@ -39,7 +39,7 @@ import {createUuid} from 'Util/uuid';
 
 import {CallingCell, CallingCellProps} from './CallingCell';
 
-import {buildMediaDevicesHandler} from '../../../auth/util/test/TestUtil';
+import {buildMediaDevicesHandler} from '../../../auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -52,7 +52,7 @@ jest.mock('Components/calling/useCallAlertState', () => ({
   useCallAlertState: jest.fn(() => mockCallAlertState),
 }));
 
-jest.mock('Components/InViewport', () => ({
+jest.mock('Components/inViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: ReactNode}) => {
     require('react').useEffect(() => {
       onVisible();

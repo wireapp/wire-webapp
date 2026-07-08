@@ -29,7 +29,7 @@ import {LinkPreview} from 'Repositories/entity/message/linkPreview';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {MessageCategory} from 'src/script/message/messageCategory';
 import {
   createRootContextValueForTest,

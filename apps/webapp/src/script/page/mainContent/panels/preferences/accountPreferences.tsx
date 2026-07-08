@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 
 import {UserVerificationBadges} from 'Components/badge';
-import {ErrorFallback} from 'Components/ErrorFallback';
+import {ErrorFallback} from 'Components/errorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/enrichedFields';
 import {ClientRepository} from 'Repositories/client';

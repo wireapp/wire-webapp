@@ -38,12 +38,12 @@ import {isBackendError} from 'Util/typePredicateUtil';
 import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, requiresPasswordModal} from './util';
 
 import {Config} from '../../../Config';
-import {JoinGuestLinkPasswordModal} from '../../component/JoinGuestLinkPasswordModal';
+import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
-import {ValidationError} from '../../module/action/ValidationError';
+import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
-import * as AuthSelector from '../../module/selector/AuthSelector';
-import * as ConversationSelector from '../../module/selector/ConversationSelector';
+import * as AuthSelector from '../../module/selector/authSelector';
+import * as ConversationSelector from '../../module/selector/conversationSelector';
 import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';

@@ -24,7 +24,7 @@ import {MenuOption as _MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/r
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {User} from 'Repositories/entity/User';
 

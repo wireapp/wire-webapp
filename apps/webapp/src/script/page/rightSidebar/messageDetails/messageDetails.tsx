@@ -21,7 +21,7 @@ import {FC, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {UserList} from 'Components/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

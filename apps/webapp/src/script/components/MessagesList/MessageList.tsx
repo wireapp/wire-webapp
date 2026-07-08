@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {AssetRepository} from 'Repositories/assets/assetRepository';

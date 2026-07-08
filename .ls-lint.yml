@@ -24,8 +24,149 @@ ls:
   apps/webapp/src/script/util/test/mock:
     .ts: camelCase
     .mock.ts: camelCase
+  apps/webapp/src/script/e2eIdentity:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .store.ts: camelCase
+  apps/webapp/src/script/applicationPeriodicChecks:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/auth:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+    .styles.tsx: camelCase
+  apps/webapp/src/script/browser:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/cleanupStack:
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/clock:
+    .ts: camelCase
+    .test.ts: camelCase
   apps/webapp/src/script/components/icon.tsx:
     .tsx: camelCase
+  apps/webapp/src/script/components/appContainer:
+    .dir: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/appLoader:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/appNotification:
+    .tsx: camelCase
+  apps/webapp/src/script/components/availabilityIcon:
+    .tsx: camelCase
+    .styles.tsx: camelCase
+  apps/webapp/src/script/components/bannerPortal:
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/cells:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/components/cellsSearchInput:
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/cellsGlobalView:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/classifiedBar:
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/components/configToolbar:
+    .tsx: camelCase
+    .styles.tsx: camelCase
+  apps/webapp/src/script/components/connectRequests:
+    .tsx: camelCase
+  apps/webapp/src/script/components/copyToClipboardButton:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/draggableClickWrapper:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/dropFileArea:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/emojiPicker:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/errorFallback:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/fadingScrollbar:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/fullscreenModal:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/giphy:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/historyExport:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/historyImport:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/image:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/inViewport:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
   apps/webapp/src/script/components/panel:
     .dir: camelCase
     .ts: camelCase

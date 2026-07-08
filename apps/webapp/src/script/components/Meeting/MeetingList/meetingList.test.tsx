@@ -26,7 +26,7 @@ import {createStore} from 'zustand/vanilla';
 import type {MeetingStoreState} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/TestUtil';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

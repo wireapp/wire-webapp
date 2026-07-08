@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {useAppNotification} from 'Components/AppNotification/AppNotification';
+import {useAppNotification} from 'Components/appNotification/appNotification';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {
   isInRecycleBin,

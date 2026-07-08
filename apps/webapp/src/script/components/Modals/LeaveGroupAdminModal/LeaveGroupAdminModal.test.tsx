@@ -23,7 +23,7 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {generateConversation} from 'test/helper/ConversationGenerator';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

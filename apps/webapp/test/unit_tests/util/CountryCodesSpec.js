@@ -17,7 +17,7 @@
  *
  */
 
-import {getCountryCode, getCountryByCode} from 'src/script/util/CountryCodes';
+import {getCountryCode, getCountryByCode} from 'src/script/util/countryCodes';
 
 describe('CountryCodes', () => {
   describe('getCountryCode', () => {

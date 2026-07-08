@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {DeviceVerificationBadges} from 'Components/badge';
 import * as Icon from 'Components/icon';
 import {ClientEntity} from 'Repositories/client';
-import {WireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/e2eIdentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
