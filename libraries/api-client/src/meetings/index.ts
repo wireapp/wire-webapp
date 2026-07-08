@@ -18,6 +18,7 @@
  */
 
 export * from './meeting';
+export * from './meeting.schema';
 export * from './meetingRecurrence';
 export * from './meetingsApi';
 export * from './createMeeting';
