@@ -17,11 +17,11 @@
  *
  */
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {mapMeetingToScheduleFormState} from './mapMeetingToScheduleFormState';
+import {mapSeriesToScheduleFormState} from './mapSeriesToScheduleFormState';
 
 const createUser = (id: string) => {
   const user = new User(id, 'example.com', translateForTest);
@@ -29,9 +29,10 @@ const createUser = (id: string) => {
   return user;
 };
 
-const createMeeting = (): Meeting => ({
-  start_date: '2026-06-15T10:00:00.000Z',
-  end_date: '2026-06-15T11:00:00.000Z',
+const createSeries = (): MeetingSeries => ({
+  series_start_date: '2026-06-15T10:00:00.000Z',
+  series_end_date: '2026-06-15T11:00:00.000Z',
+  duration_ms: 3_600_000,
   recurrence: 'weekly',
   conversation_id: 'conv-id',
   qualified_conversation: {id: 'conv-id', domain: 'example.com'},
@@ -40,11 +41,11 @@ const createMeeting = (): Meeting => ({
   qualified_creator: {id: 'creator-id', domain: 'example.com'},
 });
 
-describe('mapMeetingToScheduleFormState', () => {
-  it('maps meeting fields to schedule form state', () => {
+describe('mapSeriesToScheduleFormState', () => {
+  it('maps series anchor dates to schedule form state', () => {
     const selectedUsers = [createUser('1'), createUser('2')];
 
-    const result = mapMeetingToScheduleFormState(createMeeting(), selectedUsers);
+    const result = mapSeriesToScheduleFormState(createSeries(), selectedUsers);
 
     expect(result.title).toBe('Weekly sync');
     expect(result.start.isJust).toBe(true);
@@ -61,7 +62,7 @@ describe('mapMeetingToScheduleFormState', () => {
     const bob = createUser('2');
     const selectedUsers = [alice, bob];
 
-    const result = mapMeetingToScheduleFormState(createMeeting(), selectedUsers);
+    const result = mapSeriesToScheduleFormState(createSeries(), selectedUsers);
 
     expect(result.selectedUsers).toHaveLength(2);
     expect(result.selectedUsers[0]).toBe(alice);

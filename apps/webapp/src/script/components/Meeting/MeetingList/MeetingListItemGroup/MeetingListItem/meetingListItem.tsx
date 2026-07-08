@@ -21,7 +21,6 @@ import {memo, useMemo} from 'react';
 
 import {CalendarIcon} from '@wireapp/react-ui-kit';
 
-import {meetingInstanceToLegacyMeeting} from 'Components/Meeting/meetingInstanceToLegacyMeeting';
 import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction';
 import {
   badgeWrapperStyles,
@@ -42,13 +41,13 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
 
 interface MeetingListItemProps {
-  instance: MeetingInstance;
+  meetingInstance: MeetingInstance;
   nowMs?: number;
 }
 
-const MeetingListItemComponent = ({instance, nowMs}: MeetingListItemProps) => {
-  const {series, start, end} = instance;
-  const {title, recurrence, attending} = series;
+const MeetingListItemComponent = ({meetingInstance, nowMs}: MeetingListItemProps) => {
+  const {meetingSeries, start, end} = meetingInstance;
+  const {title, recurrence, attending} = meetingSeries;
   const {translate, wallClock} = useApplicationContext();
   const timestamp = nowMs ?? wallClock.currentTimestampInMilliseconds;
 
@@ -86,7 +85,6 @@ const MeetingListItemComponent = ({instance, nowMs}: MeetingListItemProps) => {
   );
 
   const isOngoing = meetingStatus === MeetingStatuses.ON_GOING || meetingStatus === MeetingStatuses.PARTICIPATING;
-  const meeting = useMemo(() => meetingInstanceToLegacyMeeting(instance), [instance]);
 
   return (
     <div css={[itemStyles, isOngoing && onGoingMeetingStyles]}>
@@ -107,9 +105,9 @@ const MeetingListItemComponent = ({instance, nowMs}: MeetingListItemProps) => {
         </div>
       </div>
       <div css={rightStyles}>
-        <MeetingParticipants qualifiedConversation={series.qualified_conversation} isOngoing={isOngoing} />
+        <MeetingParticipants qualifiedConversation={meetingSeries.qualified_conversation} isOngoing={isOngoing} />
         <MeetingStatus start_date={startDateIso} end_date={endDateIso} attending={attending} nowMs={timestamp} />
-        <MeetingAction meeting={meeting} />
+        <MeetingAction meetingInstance={meetingInstance} />
       </div>
     </div>
   );

@@ -19,15 +19,18 @@
 
 import {maybe} from 'true-myth';
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {User} from 'Repositories/entity/User';
 
-export const mapMeetingToScheduleFormState = (meeting: Meeting, selectedUsers: User[]): ScheduleMeetingFormState => ({
-  title: meeting.title,
-  start: maybe.just(new Date(meeting.start_date)),
-  end: maybe.just(new Date(meeting.end_date)),
-  recurrence: meeting.recurrence,
+export const mapSeriesToScheduleFormState = (
+  meetingSeries: MeetingSeries,
+  selectedUsers: User[],
+): ScheduleMeetingFormState => ({
+  title: meetingSeries.title,
+  start: maybe.just(new Date(meetingSeries.series_start_date)),
+  end: maybe.just(new Date(meetingSeries.series_end_date)),
+  recurrence: meetingSeries.recurrence,
   selectedUsers,
   participantsFilter: '',
 });

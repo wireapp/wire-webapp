@@ -24,7 +24,7 @@ import {create} from 'zustand';
 
 import {getNextHourDateTime} from '@wireapp/react-ui-kit';
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 
 import type {
@@ -75,7 +75,7 @@ type ScheduleMeetingModalState = {
   originalSelectedUsers: User[];
   openCreate: () => void;
   openEdit: (
-    meeting: Meeting,
+    meetingSeries: MeetingSeries,
     formState: ScheduleMeetingFormState,
     qualifiedConversation: QualifiedId,
     originalSelectedUsers: User[],
@@ -117,7 +117,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       originalSelectedUsers: [],
     }),
   openEdit: (
-    meeting: Meeting,
+    meetingSeries: MeetingSeries,
     formState: ScheduleMeetingFormState,
     qualifiedConversation: QualifiedId,
     originalSelectedUsers: User[],
@@ -127,7 +127,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       mode: 'edit',
       formState,
       errors: {},
-      editingMeetingId: maybe.just(meeting.qualified_id),
+      editingMeetingId: maybe.just(meetingSeries.qualified_id),
       qualifiedConversation: maybe.just(qualifiedConversation),
       originalRecurrence: formState.recurrence,
       originalSelectedUsers,

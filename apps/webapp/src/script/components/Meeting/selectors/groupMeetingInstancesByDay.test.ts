@@ -22,7 +22,7 @@ import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 
 import {groupMeetingInstancesByDay} from './groupMeetingInstancesByDay';
 
-const createSeries = (title: string): MeetingSeries => ({
+const createMeetingSeries = (title: string): MeetingSeries => ({
   series_start_date: '2026-06-15T10:00:00.000Z',
   series_end_date: '2026-06-15T11:00:00.000Z',
   duration_ms: 3_600_000,
@@ -34,29 +34,32 @@ const createSeries = (title: string): MeetingSeries => ({
   title,
 });
 
-const createInstance = (title: string, start: string, end: string): MeetingInstance => ({
-  series: createSeries(title),
+const createMeetingInstance = (title: string, start: string, end: string): MeetingInstance => ({
+  meetingSeries: createMeetingSeries(title),
   start: new Date(start),
   end: new Date(end),
 });
 
 describe('groupMeetingInstancesByDay', () => {
   it('groups instances by calendar day in chronological order', () => {
-    const instances = [
-      createInstance('later-tomorrow', '2026-06-16T15:00:00.000Z', '2026-06-16T16:00:00.000Z'),
-      createInstance('today-late', '2026-06-15T16:00:00.000Z', '2026-06-15T17:00:00.000Z'),
-      createInstance('today-early', '2026-06-15T09:00:00.000Z', '2026-06-15T10:00:00.000Z'),
-      createInstance('tomorrow-early', '2026-06-16T08:00:00.000Z', '2026-06-16T09:00:00.000Z'),
+    const meetingInstances = [
+      createMeetingInstance('later-tomorrow', '2026-06-16T15:00:00.000Z', '2026-06-16T16:00:00.000Z'),
+      createMeetingInstance('today-late', '2026-06-15T16:00:00.000Z', '2026-06-15T17:00:00.000Z'),
+      createMeetingInstance('today-early', '2026-06-15T09:00:00.000Z', '2026-06-15T10:00:00.000Z'),
+      createMeetingInstance('tomorrow-early', '2026-06-16T08:00:00.000Z', '2026-06-16T09:00:00.000Z'),
     ];
 
-    const grouped = groupMeetingInstancesByDay(instances);
+    const grouped = groupMeetingInstancesByDay(meetingInstances);
 
     expect(grouped.map(group => group.day.toISOString())).toEqual([
       '2026-06-15T00:00:00.000Z',
       '2026-06-16T00:00:00.000Z',
     ]);
-    expect(grouped[0]?.instances.map(instance => instance.series.title)).toEqual(['today-early', 'today-late']);
-    expect(grouped[1]?.instances.map(instance => instance.series.title)).toEqual([
+    expect(grouped[0]?.meetingInstances.map(meetingInstance => meetingInstance.meetingSeries.title)).toEqual([
+      'today-early',
+      'today-late',
+    ]);
+    expect(grouped[1]?.meetingInstances.map(meetingInstance => meetingInstance.meetingSeries.title)).toEqual([
       'tomorrow-early',
       'later-tomorrow',
     ]);

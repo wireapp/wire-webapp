@@ -17,7 +17,7 @@
  *
  */
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
@@ -27,9 +27,10 @@ const FUTURE_MEETING_TIMESTAMP = Date.parse('2026-06-15T13:00:00.000Z');
 const ONGOING_MEETING_TIMESTAMP = Date.parse('2026-06-15T14:30:00.000Z');
 const PAST_MEETING_TIMESTAMP = Date.parse('2026-06-15T16:00:00.000Z');
 
-const createMeeting = (overrides: Partial<Meeting> = {}): Meeting => ({
-  start_date: '2026-06-15T14:00:00.000Z',
-  end_date: '2026-06-15T15:00:00.000Z',
+const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
+  series_start_date: '2026-06-15T14:00:00.000Z',
+  series_end_date: '2026-06-15T15:00:00.000Z',
+  duration_ms: 3_600_000,
   recurrence: 'doesNotRepeat',
   conversation_id: 'conv-id',
   title: 'Weekly sync',
@@ -46,31 +47,42 @@ const createSelfUser = (id = 'host-id') => {
 };
 
 describe('canEditMeeting', () => {
-  it('returns true for the host of an upcoming meeting', () => {
-    const meeting = createMeeting();
+  it('returns true for the host of an upcoming series', () => {
+    const meetingSeries = createSeries();
     const selfUser = createSelfUser();
 
-    expect(canEditMeeting(meeting, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(true);
+    expect(canEditMeeting(meetingSeries, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(true);
   });
 
   it('returns false for a non-host', () => {
-    const meeting = createMeeting();
+    const meetingSeries = createSeries();
     const selfUser = createSelfUser('other-user');
 
-    expect(canEditMeeting(meeting, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(false);
+    expect(canEditMeeting(meetingSeries, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(false);
   });
 
-  it('returns false for an ongoing meeting', () => {
-    const meeting = createMeeting();
+  it('returns false when the series anchor has started', () => {
+    const meetingSeries = createSeries();
     const selfUser = createSelfUser();
 
-    expect(canEditMeeting(meeting, selfUser, ONGOING_MEETING_TIMESTAMP)).toBe(false);
+    expect(canEditMeeting(meetingSeries, selfUser, ONGOING_MEETING_TIMESTAMP)).toBe(false);
   });
 
-  it('returns false for a past meeting', () => {
-    const meeting = createMeeting();
+  it('returns false when the series anchor is in the past', () => {
+    const meetingSeries = createSeries();
     const selfUser = createSelfUser();
 
-    expect(canEditMeeting(meeting, selfUser, PAST_MEETING_TIMESTAMP)).toBe(false);
+    expect(canEditMeeting(meetingSeries, selfUser, PAST_MEETING_TIMESTAMP)).toBe(false);
+  });
+
+  it('returns false for a recurring series whose anchor has started even when a future instance exists', () => {
+    const meetingSeries = createSeries({
+      series_start_date: '2026-06-01T10:00:00.000Z',
+      series_end_date: '2026-06-01T11:00:00.000Z',
+      recurrence: 'weekly',
+    });
+    const selfUser = createSelfUser();
+
+    expect(canEditMeeting(meetingSeries, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(false);
   });
 });

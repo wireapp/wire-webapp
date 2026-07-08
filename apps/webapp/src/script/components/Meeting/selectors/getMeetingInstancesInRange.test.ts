@@ -21,7 +21,7 @@ import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 
 import {getMeetingInstancesInRange} from './getMeetingInstancesInRange';
 
-const createSeries = (overrides: Partial<MeetingSeries> & Pick<MeetingSeries, 'recurrence'>): MeetingSeries => ({
+const createMeetingSeries = (overrides: Partial<MeetingSeries> & Pick<MeetingSeries, 'recurrence'>): MeetingSeries => ({
   series_start_date: '2026-06-01T10:00:00.000Z',
   series_end_date: '2026-06-01T11:00:00.000Z',
   duration_ms: 3_600_000,
@@ -38,25 +38,25 @@ describe('getMeetingInstancesInRange', () => {
   const to = new Date('2026-06-29T00:00:00.000Z');
 
   it('expands weekly series with a past anchor into the visible window', () => {
-    const series = createSeries({recurrence: 'weekly'});
+    const meetingSeries = createMeetingSeries({recurrence: 'weekly'});
 
-    const instances = getMeetingInstancesInRange(series, from, to);
+    const meetingInstances = getMeetingInstancesInRange(meetingSeries, from, to);
 
-    expect(instances.map(instance => instance.start.toISOString())).toEqual([
+    expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
       '2026-06-15T10:00:00.000Z',
       '2026-06-22T10:00:00.000Z',
     ]);
   });
 
   it('excludes ended non-recurring meetings and includes future ones', () => {
-    const pastSeries = createSeries({
+    const pastMeetingSeries = createMeetingSeries({
       recurrence: 'doesNotRepeat',
       series_start_date: '2026-06-14T10:00:00.000Z',
       series_end_date: '2026-06-14T11:00:00.000Z',
       qualified_id: {id: 'past-meeting', domain: 'example.com'},
       title: 'Past one-off',
     });
-    const futureSeries = createSeries({
+    const futureMeetingSeries = createMeetingSeries({
       recurrence: 'doesNotRepeat',
       series_start_date: '2026-06-16T10:00:00.000Z',
       series_end_date: '2026-06-16T11:00:00.000Z',
@@ -64,19 +64,19 @@ describe('getMeetingInstancesInRange', () => {
       title: 'Future one-off',
     });
 
-    expect(getMeetingInstancesInRange(pastSeries, from, to)).toEqual([]);
-    expect(getMeetingInstancesInRange(futureSeries, from, to)).toHaveLength(1);
-    expect(getMeetingInstancesInRange(futureSeries, from, to)[0]?.series.title).toBe('Future one-off');
+    expect(getMeetingInstancesInRange(pastMeetingSeries, from, to)).toEqual([]);
+    expect(getMeetingInstancesInRange(futureMeetingSeries, from, to)).toHaveLength(1);
+    expect(getMeetingInstancesInRange(futureMeetingSeries, from, to)[0]?.meetingSeries.title).toBe('Future one-off');
   });
 
   it('respects everyTwoWeeks spacing', () => {
-    const series = createSeries({recurrence: 'everyTwoWeeks'});
+    const meetingSeries = createMeetingSeries({recurrence: 'everyTwoWeeks'});
     const windowStart = new Date('2026-06-01T00:00:00.000Z');
     const windowEnd = new Date('2026-07-01T00:00:00.000Z');
 
-    const instances = getMeetingInstancesInRange(series, windowStart, windowEnd);
+    const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
-    expect(instances.map(instance => instance.start.toISOString())).toEqual([
+    expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
       '2026-06-01T10:00:00.000Z',
       '2026-06-15T10:00:00.000Z',
       '2026-06-29T10:00:00.000Z',
@@ -84,26 +84,28 @@ describe('getMeetingInstancesInRange', () => {
   });
 
   it('stops generating instances after recurrence_until', () => {
-    const series = createSeries({
+    const meetingSeries = createMeetingSeries({
       recurrence: 'weekly',
       recurrence_until: '2026-06-16T23:59:59.000Z',
     });
 
-    const instances = getMeetingInstancesInRange(series, from, to);
+    const meetingInstances = getMeetingInstancesInRange(meetingSeries, from, to);
 
-    expect(instances.map(instance => instance.start.toISOString())).toEqual(['2026-06-15T10:00:00.000Z']);
+    expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
+      '2026-06-15T10:00:00.000Z',
+    ]);
   });
 
   it('sets instance end from series duration', () => {
-    const series = createSeries({
+    const meetingSeries = createMeetingSeries({
       recurrence: 'doesNotRepeat',
       series_start_date: '2026-06-16T10:00:00.000Z',
       series_end_date: '2026-06-16T11:30:00.000Z',
       duration_ms: 5_400_000,
     });
 
-    const [instance] = getMeetingInstancesInRange(series, from, to);
+    const [meetingInstance] = getMeetingInstancesInRange(meetingSeries, from, to);
 
-    expect(instance?.end.toISOString()).toBe('2026-06-16T11:30:00.000Z');
+    expect(meetingInstance?.end.toISOString()).toBe('2026-06-16T11:30:00.000Z');
   });
 });

@@ -69,14 +69,18 @@ export const MeetingList = ({meetingSeries, isLoading, hasLoadError}: MeetingLis
 
   const now = wallClock.currentDate;
 
-  const instancesByDay = useMemo(() => {
+  const meetingInstancesByDay = useMemo(() => {
     const {from, to} = getVisibleTimeWindow(now, {dayCount: VISIBLE_DAY_COUNT});
-    const instances = getMeetingInstances(meetingSeries, from, to).filter(instance => instance.end.getTime() >= nowMs);
+    const meetingInstances = getMeetingInstances(meetingSeries, from, to).filter(
+      meetingInstance => meetingInstance.end.getTime() >= nowMs,
+    );
 
-    return groupMeetingInstancesByDay(instances);
+    return groupMeetingInstancesByDay(meetingInstances);
   }, [meetingSeries, now, nowMs]);
 
-  const hasVisibleInstances = instancesByDay.some(dayGroup => is.nonEmptyArray(dayGroup.instances));
+  const hasVisibleMeetingInstances = meetingInstancesByDay.some(dayGroup =>
+    is.nonEmptyArray(dayGroup.meetingInstances),
+  );
 
   if (isLoading && is.nonEmptyArray(meetingSeries)) {
     return (
@@ -94,7 +98,7 @@ export const MeetingList = ({meetingSeries, isLoading, hasLoadError}: MeetingLis
     );
   }
 
-  if (!hasVisibleInstances) {
+  if (!hasVisibleMeetingInstances) {
     return (
       <div css={emptyListContainerStyles}>
         <EmptyMeetingList />
@@ -104,8 +108,8 @@ export const MeetingList = ({meetingSeries, isLoading, hasLoadError}: MeetingLis
 
   return (
     <div css={meetingListContainerStyles}>
-      {instancesByDay.map(dayGroup => {
-        if (!is.nonEmptyArray(dayGroup.instances)) {
+      {meetingInstancesByDay.map(dayGroup => {
+        if (!is.nonEmptyArray(dayGroup.meetingInstances)) {
           return null;
         }
 
@@ -113,7 +117,7 @@ export const MeetingList = ({meetingSeries, isLoading, hasLoadError}: MeetingLis
           <MeetingListItemGroup
             key={dayGroup.day.toISOString()}
             header={getDaySectionHeader(dayGroup.day, now, translate)}
-            instances={dayGroup.instances}
+            meetingInstances={dayGroup.meetingInstances}
             nowMs={nowMs}
           />
         );

@@ -23,32 +23,34 @@ import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 
 export type MeetingInstancesByDay = {
   day: Date;
-  instances: MeetingInstance[];
+  meetingInstances: MeetingInstance[];
 };
 
 /**
  * Groups a flat instance list into day sections for list rendering (day header + rows).
  *
- * Instances must be sortable by start; output days are in chronological order. Each group's `day`
+ * Meeting instances must be sortable by start; output days are in chronological order. Each group's `day`
  * is the start of the calendar day of the instance's `start`.
  *
- * @param instances - Flat list from {@link getMeetingInstances}.
+ * @param meetingInstances - Flat list from {@link getMeetingInstances}.
  * @returns Day buckets ready for one `MeetingListItemGroup` per entry.
  */
-export const groupMeetingInstancesByDay = (instances: MeetingInstance[]): MeetingInstancesByDay[] => {
-  const sortedInstances = [...instances].toSorted((left, right) => left.start.getTime() - right.start.getTime());
+export const groupMeetingInstancesByDay = (meetingInstances: MeetingInstance[]): MeetingInstancesByDay[] => {
+  const sortedMeetingInstances = [...meetingInstances].toSorted(
+    (left, right) => left.start.getTime() - right.start.getTime(),
+  );
   const groups: MeetingInstancesByDay[] = [];
 
-  for (const instance of sortedInstances) {
-    const day = startOfDay(instance.start);
+  for (const meetingInstance of sortedMeetingInstances) {
+    const day = startOfDay(meetingInstance.start);
     const lastGroup = groups.at(-1);
 
     if (lastGroup !== undefined && isSameDay(lastGroup.day, day)) {
-      lastGroup.instances.push(instance);
+      lastGroup.meetingInstances.push(meetingInstance);
       continue;
     }
 
-    groups.push({day, instances: [instance]});
+    groups.push({day, meetingInstances: [meetingInstance]});
   }
 
   return groups;

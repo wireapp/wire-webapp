@@ -30,13 +30,13 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface MeetingListItemGroupProps {
   header?: string;
-  instances: MeetingInstance[];
+  meetingInstances: MeetingInstance[];
   nowMs?: number;
 }
 
-const MeetingListItemGroupComponent = ({header, instances, nowMs}: MeetingListItemGroupProps) => {
+const MeetingListItemGroupComponent = ({header, meetingInstances, nowMs}: MeetingListItemGroupProps) => {
   const {translate} = useApplicationContext();
-  const isEmpty = instances.length === 0;
+  const isEmpty = meetingInstances.length === 0;
 
   if (isEmpty) {
     return (
@@ -52,10 +52,10 @@ const MeetingListItemGroupComponent = ({header, instances, nowMs}: MeetingListIt
       {header !== undefined && header !== '' && <div css={sectionHeaderStyles}>{header}</div>}
 
       <div css={listStyles}>
-        {instances.map(instance => (
+        {meetingInstances.map(meetingInstance => (
           <MeetingListItem
-            key={`meeting-list-item-${instance.series.qualified_id.id}-${instance.series.qualified_id.domain}-${instance.start.getTime()}`}
-            instance={instance}
+            key={`meeting-list-item-${meetingInstance.meetingSeries.qualified_id.id}-${meetingInstance.meetingSeries.qualified_id.domain}-${meetingInstance.start.getTime()}`}
+            meetingInstance={meetingInstance}
             nowMs={nowMs}
           />
         ))}

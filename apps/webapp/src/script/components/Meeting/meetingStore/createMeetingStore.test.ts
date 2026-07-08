@@ -55,17 +55,6 @@ describe('createMeetingStore', () => {
     trial: false,
   };
 
-  const listMeeting = {
-    title: 'Weekly sync',
-    start_date: '2026-06-16T10:00:00.000Z',
-    end_date: '2026-06-16T11:00:00.000Z',
-    conversation_id: 'conversation-id',
-    qualified_id: {id: 'meeting-id', domain: 'example.com'},
-    qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
-    qualified_creator: {id: 'creator-id', domain: 'example.com'},
-    recurrence: 'doesNotRepeat' as const,
-  };
-
   const meetingSeriesEntry = {
     title: 'Weekly sync',
     series_start_date: '2026-06-16T10:00:00.000Z',
@@ -76,6 +65,12 @@ describe('createMeetingStore', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     recurrence: 'doesNotRepeat' as const,
+  };
+
+  const listMeetingInstance = {
+    meetingSeries: meetingSeriesEntry,
+    start: new Date('2026-06-16T10:00:00.000Z'),
+    end: new Date('2026-06-16T11:00:00.000Z'),
   };
 
   const createDeps = ({
@@ -154,9 +149,11 @@ describe('createMeetingStore', () => {
     const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
     const store = createMeetingStore(createDeps({safeGetConversationById}));
 
-    const result = await store.getState().loadMeetingForEdit(listMeeting);
+    const result = await store.getState().loadMeetingForEdit(listMeetingInstance);
 
     expect(result.isOk).toBe(true);
-    expect(safeGetConversationById).toHaveBeenCalledWith(listMeeting.qualified_conversation);
+    expect(safeGetConversationById).toHaveBeenCalledWith(listMeetingInstance.meetingSeries.qualified_conversation);
+    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T10:00:00.000Z'));
+    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 });

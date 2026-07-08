@@ -26,16 +26,16 @@ import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 const daysPerWeek = 7;
 const daysPerBiweeklyPeriod = 14;
 
-const createInstance = (series: MeetingSeries, start: Date): MeetingInstance => ({
-  series,
+const createMeetingInstance = (meetingSeries: MeetingSeries, start: Date): MeetingInstance => ({
+  meetingSeries,
   start,
-  end: new Date(start.getTime() + series.duration_ms),
+  end: new Date(start.getTime() + meetingSeries.duration_ms),
 });
 
-const isInstanceInRange = (instance: MeetingInstance, from: Date, to: Date): boolean =>
-  instance.end.getTime() >= from.getTime() &&
-  instance.start.getTime() >= from.getTime() &&
-  instance.start.getTime() < to.getTime();
+const isMeetingInstanceInRange = (meetingInstance: MeetingInstance, from: Date, to: Date): boolean =>
+  meetingInstance.end.getTime() >= from.getTime() &&
+  meetingInstance.start.getTime() >= from.getTime() &&
+  meetingInstance.start.getTime() < to.getTime();
 
 const isAfterRecurrenceUntil = (start: Date, recurrenceUntil?: string): boolean =>
   recurrenceUntil !== undefined && start.getTime() > Date.parse(recurrenceUntil);
@@ -76,26 +76,26 @@ const advanceToFirstInstanceOnOrAfter = (
   return current;
 };
 
-const getRecurringInstancesInRange = (series: MeetingSeries, from: Date, to: Date): MeetingInstance[] => {
-  const anchor = new Date(series.series_start_date);
-  const instances: MeetingInstance[] = [];
-  let current = advanceToFirstInstanceOnOrAfter(anchor, from, series.recurrence);
+const getRecurringMeetingInstancesInRange = (meetingSeries: MeetingSeries, from: Date, to: Date): MeetingInstance[] => {
+  const anchor = new Date(meetingSeries.series_start_date);
+  const meetingInstances: MeetingInstance[] = [];
+  let current = advanceToFirstInstanceOnOrAfter(anchor, from, meetingSeries.recurrence);
 
   while (current.getTime() < to.getTime()) {
-    if (isAfterRecurrenceUntil(current, series.recurrence_until)) {
+    if (isAfterRecurrenceUntil(current, meetingSeries.recurrence_until)) {
       break;
     }
 
-    const instance = createInstance(series, current);
+    const meetingInstance = createMeetingInstance(meetingSeries, current);
 
-    if (isInstanceInRange(instance, from, to)) {
-      instances.push(instance);
+    if (isMeetingInstanceInRange(meetingInstance, from, to)) {
+      meetingInstances.push(meetingInstance);
     }
 
-    current = advanceInstanceStart(current, series.recurrence);
+    current = advanceInstanceStart(current, meetingSeries.recurrence);
   }
 
-  return instances;
+  return meetingInstances;
 };
 
 /**
@@ -104,17 +104,17 @@ const getRecurringInstancesInRange = (series: MeetingSeries, from: Date, to: Dat
  * Uses the series anchor (`series_start_date`) and recurrence rule. For repeating series, skips past
  * instances before `from`, then emits each step until `to`. Non-repeating series yield zero or one row.
  *
- * @param series - A single meeting definition from the store (one backend record).
+ * @param meetingSeries - A single meeting definition from the store (one backend record).
  * @param from - Inclusive start of the visible window (usually start of today).
  * @param to - Exclusive end of the visible window.
- * @returns Instances for this series only, in chronological order.
+ * @returns Meeting instances for this series only, in chronological order.
  */
-export const getMeetingInstancesInRange = (series: MeetingSeries, from: Date, to: Date): MeetingInstance[] => {
-  if (series.recurrence === 'doesNotRepeat') {
-    const instance = createInstance(series, new Date(series.series_start_date));
+export const getMeetingInstancesInRange = (meetingSeries: MeetingSeries, from: Date, to: Date): MeetingInstance[] => {
+  if (meetingSeries.recurrence === 'doesNotRepeat') {
+    const meetingInstance = createMeetingInstance(meetingSeries, new Date(meetingSeries.series_start_date));
 
-    return isInstanceInRange(instance, from, to) ? [instance] : [];
+    return isMeetingInstanceInRange(meetingInstance, from, to) ? [meetingInstance] : [];
   }
 
-  return getRecurringInstancesInRange(series, from, to);
+  return getRecurringMeetingInstancesInRange(meetingSeries, from, to);
 };

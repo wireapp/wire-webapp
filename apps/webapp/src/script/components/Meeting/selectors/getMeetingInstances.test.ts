@@ -46,11 +46,11 @@ describe('getMeetingInstances', () => {
       createSeries('future-one-off', 'doesNotRepeat', '2026-06-20T14:00:00.000Z'),
     ];
 
-    const instances = getMeetingInstances(meetingSeries, from, to);
+    const meetingInstances = getMeetingInstances(meetingSeries, from, to);
 
-    expect(instances.map(instance => ({
-      title: instance.series.title,
-      start: instance.start.toISOString(),
+    expect(meetingInstances.map(meetingInstance => ({
+      title: meetingInstance.meetingSeries.title,
+      start: meetingInstance.start.toISOString(),
     }))).toEqual([
       {title: 'weekly-sync', start: '2026-06-15T10:00:00.000Z'},
       {title: 'future-one-off', start: '2026-06-20T14:00:00.000Z'},

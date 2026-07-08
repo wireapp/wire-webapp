@@ -28,12 +28,12 @@ import {getMeetingInstancesInRange} from './getMeetingInstancesInRange';
  * This is what the meeting list calls: one flat timeline of rows to group by day. Delegates per-series
  * expansion to {@link getMeetingInstancesInRange}.
  *
- * @param meetingSeries - Full list from Zustand (one entry per backend meeting / recurrence rule).
+ * @param meetingSeriesList - Full list from Zustand (one entry per backend meeting / recurrence rule).
  * @param from - Inclusive start of the visible window.
  * @param to - Exclusive end of the visible window.
  * @returns All instances across all series, sorted earliest first.
  */
-export const getMeetingInstances = (meetingSeries: MeetingSeries[], from: Date, to: Date): MeetingInstance[] =>
-  meetingSeries
-    .flatMap(series => getMeetingInstancesInRange(series, from, to))
+export const getMeetingInstances = (meetingSeriesList: MeetingSeries[], from: Date, to: Date): MeetingInstance[] =>
+  meetingSeriesList
+    .flatMap(meetingSeries => getMeetingInstancesInRange(meetingSeries, from, to))
     .toSorted((left, right) => left.start.getTime() - right.start.getTime());

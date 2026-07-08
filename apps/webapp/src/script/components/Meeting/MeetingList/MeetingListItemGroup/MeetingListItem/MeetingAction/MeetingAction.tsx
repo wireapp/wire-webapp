@@ -23,12 +23,12 @@ import {container} from 'tsyringe';
 
 import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/getMeetingActionEntries';
 import {
   iconContainerStyle,
   iconStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {useEditMeeting} from 'Components/Meeting/useEditMeeting';
 import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
 import {UserState} from 'Repositories/user/userState';
@@ -37,10 +37,10 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {showContextMenu} from '../../../../../../ui/contextMenu';
 
 interface MeetingActionProps {
-  meeting: Meeting;
+  meetingInstance: MeetingInstance;
 }
 
-export const MeetingAction = ({meeting}: MeetingActionProps) => {
+export const MeetingAction = ({meetingInstance}: MeetingActionProps) => {
   const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const selfUser = container.resolve(UserState).self();
@@ -51,13 +51,13 @@ export const MeetingAction = ({meeting}: MeetingActionProps) => {
     showContextMenu({
       event,
       entries: getMeetingActionEntries({
-        meeting,
+        meetingInstance,
         selfUser,
         nowMs,
         translate,
         onEdit: () => {
-          if (canEditMeeting(meeting, selfUser, wallClock.currentTimestampInMilliseconds)) {
-            fireAndForgetInvoker.fireAndForget(() => editMeeting(meeting));
+          if (canEditMeeting(meetingInstance.meetingSeries, selfUser, wallClock.currentTimestampInMilliseconds)) {
+            fireAndForgetInvoker.fireAndForget(() => editMeeting(meetingInstance));
           }
         },
       }),
