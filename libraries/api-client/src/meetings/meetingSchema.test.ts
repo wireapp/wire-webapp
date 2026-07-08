@@ -45,6 +45,12 @@ describe('meetingSchema', () => {
     });
 
     expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error('Expected meeting schema parse to succeed');
+    }
+
+    expect(result.data.invited_emails).toEqual(['guest@example.com']);
   });
 
   it('rejects meetings missing required fields', () => {
