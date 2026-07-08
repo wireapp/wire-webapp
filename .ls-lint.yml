@@ -1,4 +1,8 @@
 ls:
+  bin/verifyPublicProductionBundle.ts:
+    .ts: camelCase
+  bin/verifyPublicProductionBundle.test.ts:
+    .test.ts: camelCase
   libraries/config/src:
     .dir: camelCase
     .ts: camelCase
