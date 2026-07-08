@@ -53,6 +53,16 @@ describe('meetingSchema', () => {
     expect(meetingSchema.safeParse(meetingWithoutTitle).success).toBe(false);
   });
 
+  it('rejects invalid datetime fields', () => {
+    expect(meetingSchema.safeParse({...validMeeting, start_time: 'foo'}).success).toBe(false);
+    expect(
+      meetingSchema.safeParse({
+        ...validMeeting,
+        recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY, until: 'foo'},
+      }).success,
+    ).toBe(false);
+  });
+
   it('validates meetings list responses', () => {
     expect(meetingsListResponseSchema.safeParse([validMeeting]).success).toBe(true);
     expect(meetingsListResponseSchema.safeParse([{title: 'invalid'}]).success).toBe(false);
