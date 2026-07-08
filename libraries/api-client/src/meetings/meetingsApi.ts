@@ -21,6 +21,7 @@ import {AxiosRequestConfig} from 'axios';
 
 import {CreateMeeting} from './createMeeting';
 import {Meeting} from './meeting';
+import {meetingSchema, meetingsListResponseSchema} from './meetingSchema';
 import {UpdateMeeting} from './updateMeeting';
 
 import {HttpClient} from '../http';
@@ -38,6 +39,14 @@ export class MeetingsAPI {
     return `${MeetingsAPI.URL.MEETINGS}/${meetingId.domain}/${meetingId.id}`;
   }
 
+  private parseMeetingResponse(data: unknown): Meeting {
+    return meetingSchema.parse(data);
+  }
+
+  private parseMeetingsListResponse(data: unknown): Meeting[] {
+    return meetingsListResponseSchema.parse(data);
+  }
+
   /**
    * Create a new meeting.
    */
@@ -49,7 +58,7 @@ export class MeetingsAPI {
     };
 
     const response = await this.client.sendJSON<Meeting>(config);
-    return response.data;
+    return this.parseMeetingResponse(response.data);
   }
 
   /**
@@ -63,7 +72,7 @@ export class MeetingsAPI {
     };
 
     const response = await this.client.sendJSON<Meeting[]>(config);
-    return response.data;
+    return this.parseMeetingsListResponse(response.data);
   }
 
   /**
@@ -88,7 +97,7 @@ export class MeetingsAPI {
     };
 
     const response = await this.client.sendJSON<Meeting>(config);
-    return response.data;
+    return this.parseMeetingResponse(response.data);
   }
 
   /**
@@ -102,6 +111,6 @@ export class MeetingsAPI {
     };
 
     const response = await this.client.sendJSON<Meeting>(config);
-    return response.data;
+    return this.parseMeetingResponse(response.data);
   }
 }
