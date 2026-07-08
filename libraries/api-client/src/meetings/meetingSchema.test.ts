@@ -18,9 +18,9 @@
  */
 
 import {MeetingRecurrenceFrequency} from './meetingRecurrence';
-import {meetingSchema, meetingsListResponseSchema} from './meeting.schema';
+import {meetingSchema, meetingsListResponseSchema} from './meetingSchema';
 
-describe('meeting.schema', () => {
+describe('meetingSchema', () => {
   const validMeeting = {
     created_at: '2026-06-15T09:00:00.000Z',
     updated_at: '2026-06-15T09:00:00.000Z',

@@ -21,7 +21,7 @@ import {AxiosRequestConfig} from 'axios';
 
 import {CreateMeeting} from './createMeeting';
 import {Meeting} from './meeting';
-import {meetingSchema, meetingsListResponseSchema} from './meeting.schema';
+import {meetingSchema, meetingsListResponseSchema} from './meetingSchema';
 import {UpdateMeeting} from './updateMeeting';
 
 import {HttpClient} from '../http';
