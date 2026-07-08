@@ -8,6 +8,7 @@
     "build": "nx build webapp",
     "build:dev": "webpack --config webpack.config.dev.js --progress",
     "build:prod": "webpack --config webpack.config.js",
+    "build:prod:public": "webpack --config webpack.config.public.js",
     "test": "nx test webapp",
     "test:verbose": "nx test webapp --verbose",
     "test:watch": "nx test webapp --watch",

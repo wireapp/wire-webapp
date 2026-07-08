@@ -31,6 +31,15 @@
         "parallel": false
       }
     },
+    "package-public": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist/s3"],
+      "options": {
+        "commands": ["rimraf {projectRoot}/dist", "nx run server:build", "nx run webapp:build:production-public", "yarn verify:bundle:prod:public", "node bin/zip.js"],
+        "parallel": false
+      }
+    },
     "serve": {
       "continuous": true,
       "dependsOn": ["config-lib:build", "webapp:build-libs", "webapp:watch-deps-dynamic"],
