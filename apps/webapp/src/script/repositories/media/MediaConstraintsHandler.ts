@@ -57,6 +57,7 @@ const defaultMediaConstraintsFeatureToggles: MediaConstraintsFeatureToggles = {
 };
 
 const defaultOneToOneVideoQualityMode = VIDEO_QUALITY_MODE.MOBILE;
+const improvedOneToOneVideoQualityMode = VIDEO_QUALITY_MODE.FULL_HD;
 
 export class MediaConstraintsHandler {
   private readonly logger: Logger;
@@ -228,7 +229,7 @@ export class MediaConstraintsHandler {
       return defaultOneToOneVideoQualityMode;
     }
 
-    return defaultOneToOneVideoQualityMode;
+    return improvedOneToOneVideoQualityMode;
   }
 
   private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints & {autoGainControl: boolean} {
