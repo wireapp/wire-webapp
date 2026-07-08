@@ -37,7 +37,7 @@ describe('meetingSchema', () => {
     expect(meetingSchema.safeParse(validMeeting).success).toBe(true);
   });
 
-  it('accepts optional recurrence and unknown backend fields', () => {
+  it('accepts optional recurrence and strips unknown backend fields', () => {
     const result = meetingSchema.safeParse({
       ...validMeeting,
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY, interval: 2},
@@ -50,7 +50,11 @@ describe('meetingSchema', () => {
       throw new Error('Expected meeting schema parse to succeed');
     }
 
-    expect(result.data.invited_emails).toEqual(['guest@example.com']);
+    expect(result.data).toEqual({
+      ...validMeeting,
+      recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY, interval: 2},
+    });
+    expect(result.data).not.toHaveProperty('invited_emails');
   });
 
   it('rejects meetings missing required fields', () => {

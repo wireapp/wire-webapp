@@ -41,20 +41,18 @@ const meetingRecurrenceSchema = z.object({
   until: utcTimeSchema.optional(),
 });
 
-export const meetingSchema = z
-  .object({
-    created_at: utcTimeSchema,
-    end_time: utcTimeSchema,
-    qualified_conversation: qualifiedIdSchema,
-    qualified_creator: qualifiedIdSchema,
-    qualified_id: qualifiedIdSchema,
-    recurrence: meetingRecurrenceSchema.optional(),
-    start_time: utcTimeSchema,
-    title: z.string().min(1).max(256),
-    trial: z.boolean(),
-    updated_at: utcTimeSchema,
-  })
-  .passthrough();
+export const meetingSchema = z.object({
+  created_at: utcTimeSchema,
+  end_time: utcTimeSchema,
+  qualified_conversation: qualifiedIdSchema,
+  qualified_creator: qualifiedIdSchema,
+  qualified_id: qualifiedIdSchema,
+  recurrence: meetingRecurrenceSchema.optional(),
+  start_time: utcTimeSchema,
+  title: z.string().min(1).max(256),
+  trial: z.boolean(),
+  updated_at: utcTimeSchema,
+});
 
 export const meetingsListResponseSchema = z.array(meetingSchema);
 
