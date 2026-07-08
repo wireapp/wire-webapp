@@ -21,11 +21,7 @@ import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 
 import {getMeetingInstances} from './getMeetingInstances';
 
-const createSeries = (
-  id: string,
-  recurrence: MeetingSeries['recurrence'],
-  seriesStartDate: string,
-): MeetingSeries => ({
+const createSeries = (id: string, recurrence: MeetingSeries['recurrence'], seriesStartDate: string): MeetingSeries => ({
   series_start_date: seriesStartDate,
   series_end_date: seriesStartDate.replace('T10:', 'T11:'),
   duration_ms: 3_600_000,
@@ -48,10 +44,12 @@ describe('getMeetingInstances', () => {
 
     const meetingInstances = getMeetingInstances(meetingSeries, from, to);
 
-    expect(meetingInstances.map(meetingInstance => ({
-      title: meetingInstance.meetingSeries.title,
-      start: meetingInstance.start.toISOString(),
-    }))).toEqual([
+    expect(
+      meetingInstances.map(meetingInstance => ({
+        title: meetingInstance.meetingSeries.title,
+        start: meetingInstance.start.toISOString(),
+      })),
+    ).toEqual([
       {title: 'weekly-sync', start: '2026-06-15T10:00:00.000Z'},
       {title: 'future-one-off', start: '2026-06-20T14:00:00.000Z'},
       {title: 'weekly-sync', start: '2026-06-22T10:00:00.000Z'},

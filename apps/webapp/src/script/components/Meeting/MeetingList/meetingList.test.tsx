@@ -103,10 +103,7 @@ const renderMeetingList = (
   return render(
     withThemeAndRootContext(
       <MeetingStoreProvider store={meetingStore}>
-        <MeetingList
-          {...props}
-          useMeetingDayGroupVirtualizer={createUseMeetingDayGroupVirtualizerForTest()}
-        />
+        <MeetingList {...props} useMeetingDayGroupVirtualizer={createUseMeetingDayGroupVirtualizerForTest()} />
       </MeetingStoreProvider>,
       rootProviderWrapper,
     ),
