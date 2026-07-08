@@ -68,7 +68,7 @@ export const getMeetingActionEntries = ({
   const isHost = isMeetingHost(meetingSeries, selfUser);
 
   return [
-    ...(canEditMeeting(meetingSeries, selfUser, nowMs) ? [editEntry] : []),
+    ...(canEditMeeting(meetingInstance, selfUser, nowMs) ? [editEntry] : []),
     ...(isHost ? [deleteForAllEntry] : [deleteForMeEntry]),
   ];
 };

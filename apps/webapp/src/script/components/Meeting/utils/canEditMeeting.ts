@@ -17,6 +17,7 @@
  *
  */
 
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -24,8 +25,8 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 export const isMeetingHost = (meetingSeries: MeetingSeries, selfUser: User): boolean =>
   matchQualifiedIds(meetingSeries.qualified_creator, selfUser.qualifiedId);
 
-export const canEditMeeting = (meetingSeries: MeetingSeries, selfUser: User, nowMs: number): boolean => {
-  const seriesHasNotStarted = nowMs < new Date(meetingSeries.series_start_date).getTime();
+export const canEditMeeting = (meetingInstance: MeetingInstance, selfUser: User, nowMs: number): boolean => {
+  const instanceHasNotStarted = nowMs < meetingInstance.start.getTime();
 
-  return isMeetingHost(meetingSeries, selfUser) && seriesHasNotStarted;
+  return isMeetingHost(meetingInstance.meetingSeries, selfUser) && instanceHasNotStarted;
 };

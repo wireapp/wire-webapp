@@ -122,7 +122,7 @@ describe('getMeetingActionEntries', () => {
     expect(getEditEntryLabel(entries)).toBeUndefined();
   });
 
-  it('omits Edit meeting when the series anchor has started', () => {
+  it('omits Edit meeting when the instance has started', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
@@ -134,7 +134,7 @@ describe('getMeetingActionEntries', () => {
     expect(getEditEntryLabel(entries)).toBeUndefined();
   });
 
-  it('omits Edit meeting when the series anchor is in the past', () => {
+  it('omits Edit meeting when the instance is in the past', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
@@ -146,7 +146,7 @@ describe('getMeetingActionEntries', () => {
     expect(getEditEntryLabel(entries)).toBeUndefined();
   });
 
-  it('omits Edit meeting for a recurring series whose anchor has started even when the instance is upcoming', () => {
+  it('includes Edit meeting for a recurring series whose anchor has started when the instance is upcoming', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: {
         meetingSeries: createSeries({
@@ -163,7 +163,7 @@ describe('getMeetingActionEntries', () => {
       onEdit: jest.fn(),
     });
 
-    expect(getEditEntryLabel(entries)).toBeUndefined();
+    expect(getEditEntryLabel(entries)).toBeDefined();
   });
 
   it('includes Delete meeting for everyone for the host', () => {

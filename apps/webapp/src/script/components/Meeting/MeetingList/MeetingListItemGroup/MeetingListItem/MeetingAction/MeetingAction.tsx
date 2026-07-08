@@ -56,7 +56,7 @@ export const MeetingAction = ({meetingInstance}: MeetingActionProps) => {
         nowMs,
         translate,
         onEdit: () => {
-          if (canEditMeeting(meetingInstance.meetingSeries, selfUser, wallClock.currentTimestampInMilliseconds)) {
+          if (canEditMeeting(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
             fireAndForgetInvoker.fireAndForget(() => editMeeting(meetingInstance));
           }
         },
