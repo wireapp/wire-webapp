@@ -25,7 +25,6 @@ import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
 import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider, useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {seriesToLegacyMeetingFields} from 'Components/Meeting/seriesToLegacyMeetingFields';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const MeetingsContent = () => {
@@ -34,7 +33,6 @@ const MeetingsContent = () => {
   const isLoading = useMeetingStore(state => state.isLoading);
   const hasLoadError = useMeetingStore(state => state.hasLoadError);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
-  const meetings = useMemo(() => meetingSeries.map(seriesToLegacyMeetingFields), [meetingSeries]);
 
   useEffect(() => {
     fireAndForgetInvoker.fireAndForget(loadMeetings);
@@ -44,7 +42,7 @@ const MeetingsContent = () => {
     <>
       <MeetingHeader />
       <div css={contentStyles}>
-        <MeetingList meetings={meetings} isLoading={isLoading} hasLoadError={hasLoadError} />
+        <MeetingList meetingSeries={meetingSeries} isLoading={isLoading} hasLoadError={hasLoadError} />
       </div>
       <ScheduleMeetingModal />
     </>

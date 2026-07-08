@@ -28,12 +28,16 @@ import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/Empt
 import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeetingList';
 import {meetingListContainerStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
 import {MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/meetingListItemGroup';
-import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOngoingSection/todayAndOngoingSection';
-import {partitionMeetingsByDay} from 'Components/Meeting/partitionMeetingsByDay';
 import type {ScheduleMeetingRecurrenceOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
-import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
+import {getMeetingInstances} from 'Components/Meeting/selectors/getMeetingInstances';
+import {getVisibleTimeWindow} from 'Components/Meeting/selectors/getVisibleTimeWindow';
+import {groupMeetingInstancesByDay} from 'Components/Meeting/selectors/groupMeetingInstancesByDay';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
+import {getDaySectionHeader} from 'Components/Meeting/utils/getDaySectionHeader';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
+
+const VISIBLE_DAY_COUNT = 14;
 
 export interface Meeting {
   start_date: string;
@@ -48,19 +52,13 @@ export interface Meeting {
   attending?: boolean;
 }
 
-export interface TodayAndOngoingSectionProps {
-  meetingsToday: Meeting[];
-  headerForToday: string;
-  nowMs: number;
-}
-
 export interface MeetingListProps {
-  meetings: Meeting[];
+  meetingSeries: MeetingSeries[];
   isLoading: boolean;
   hasLoadError: boolean;
 }
 
-export const MeetingList = ({meetings, isLoading, hasLoadError}: MeetingListProps) => {
+export const MeetingList = ({meetingSeries, isLoading, hasLoadError}: MeetingListProps) => {
   const {translate, wallClock} = useApplicationContext();
   const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
 
@@ -69,21 +67,18 @@ export const MeetingList = ({meetings, isLoading, hasLoadError}: MeetingListProp
     return () => wallClock.clearInterval(id);
   }, [wallClock]);
 
-  const {today, tomorrow} = getTodayTomorrowLabels();
-  const headerForToday = `${translate('meetings.list.today')} (${today})`;
-  const headerForTomorrow = `${translate('meetings.list.tomorrow')} (${tomorrow})`;
+  const now = wallClock.currentDate;
 
-  const {today: meetingsToday, tomorrow: meetingsTomorrow} = useMemo(
-    () => partitionMeetingsByDay(meetings, wallClock),
-    [meetings, wallClock],
-  );
+  const instancesByDay = useMemo(() => {
+    const {from, to} = getVisibleTimeWindow(now, {dayCount: VISIBLE_DAY_COUNT});
+    const instances = getMeetingInstances(meetingSeries, from, to).filter(instance => instance.end.getTime() >= nowMs);
 
-  const groupedMeetingsTomorrow = groupByStartHour(meetingsTomorrow);
+    return groupMeetingInstancesByDay(instances);
+  }, [meetingSeries, now, nowMs]);
 
-  const hasMeetingsToday = is.nonEmptyArray(meetingsToday);
-  const hasMeetingsTomorrow = is.nonEmptyArray(meetingsTomorrow);
+  const hasVisibleInstances = instancesByDay.some(dayGroup => is.nonEmptyArray(dayGroup.instances));
 
-  if (isLoading && is.nonEmptyArray(meetings)) {
+  if (isLoading && is.nonEmptyArray(meetingSeries)) {
     return (
       <div css={emptyListContainerStyles} data-uie-name="meetings-list-loading">
         <Loading data-uie-name="status-loading" />
@@ -99,7 +94,7 @@ export const MeetingList = ({meetings, isLoading, hasLoadError}: MeetingListProp
     );
   }
 
-  if (!hasMeetingsToday && !hasMeetingsTomorrow) {
+  if (!hasVisibleInstances) {
     return (
       <div css={emptyListContainerStyles}>
         <EmptyMeetingList />
@@ -109,15 +104,20 @@ export const MeetingList = ({meetings, isLoading, hasLoadError}: MeetingListProp
 
   return (
     <div css={meetingListContainerStyles}>
-      <>
-        {hasMeetingsToday && (
-          <TodayAndOngoingSection meetingsToday={meetingsToday} headerForToday={headerForToday} nowMs={nowMs} />
-        )}
+      {instancesByDay.map(dayGroup => {
+        if (!is.nonEmptyArray(dayGroup.instances)) {
+          return null;
+        }
 
-        {hasMeetingsTomorrow && (
-          <MeetingListItemGroup header={headerForTomorrow} groupedMeetings={groupedMeetingsTomorrow} />
-        )}
-      </>
+        return (
+          <MeetingListItemGroup
+            key={dayGroup.day.toISOString()}
+            header={getDaySectionHeader(dayGroup.day, now, translate)}
+            instances={dayGroup.instances}
+            nowMs={nowMs}
+          />
+        );
+      })}
     </div>
   );
 };

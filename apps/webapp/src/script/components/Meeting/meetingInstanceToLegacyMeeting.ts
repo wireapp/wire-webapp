@@ -17,12 +17,14 @@
  *
  */
 
-import type {Meeting as ApiMeeting} from '@wireapp/api-client/lib/meetings/meeting';
-
-import {mapApiMeetingToSeries} from 'Components/Meeting/mapApiMeetingToSeries';
 import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import {seriesToLegacyMeetingFields} from 'Components/Meeting/seriesToLegacyMeetingFields';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 
-/** @deprecated Prefer mapApiMeetingToSeries; kept for legacy list UI bridge during Phase 1. */
-export const mapApiMeetingToListMeeting = (apiMeeting: ApiMeeting): Meeting =>
-  seriesToLegacyMeetingFields(mapApiMeetingToSeries(apiMeeting));
+import {seriesToLegacyMeetingFields} from './seriesToLegacyMeetingFields';
+
+/** Maps a list row instance to the legacy Meeting shape still used by edit actions (Phase 4). */
+export const meetingInstanceToLegacyMeeting = (instance: MeetingInstance): Meeting => ({
+  ...seriesToLegacyMeetingFields(instance.series),
+  start_date: instance.start.toISOString(),
+  end_date: instance.end.toISOString(),
+});

@@ -19,29 +19,24 @@
 
 import {memo} from 'react';
 
-import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingListItem} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingListItem';
 import {
   listStyles,
   sectionHeaderStyles,
   sectionStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/meetingListItemGroup.styles';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface MeetingListItemGroupProps {
   header?: string;
-  groupedMeetings: Record<number, Meeting[]>;
+  instances: MeetingInstance[];
   nowMs?: number;
 }
 
-const MeetingListItemGroupComponent = ({header, groupedMeetings, nowMs}: MeetingListItemGroupProps) => {
+const MeetingListItemGroupComponent = ({header, instances, nowMs}: MeetingListItemGroupProps) => {
   const {translate} = useApplicationContext();
-
-  // Sort by hour key, then flatten so adjacent items share one continuous border.
-  const groups = Object.entries(groupedMeetings).toSorted(([meetingA], [meetingB]) => +meetingA - +meetingB);
-  const nonEmptyGroups = groups.filter(([, items]) => items?.length);
-  const meetings = nonEmptyGroups.flatMap(([, items]) => items);
-  const isEmpty = meetings.length === 0;
+  const isEmpty = instances.length === 0;
 
   if (isEmpty) {
     return (
@@ -57,11 +52,11 @@ const MeetingListItemGroupComponent = ({header, groupedMeetings, nowMs}: Meeting
       {header !== undefined && header !== '' && <div css={sectionHeaderStyles}>{header}</div>}
 
       <div css={listStyles}>
-        {meetings.map(meeting => (
+        {instances.map(instance => (
           <MeetingListItem
-            key={`meeting-list-item-${meeting.qualified_id.id}-${meeting.qualified_id.domain}`}
+            key={`meeting-list-item-${instance.series.qualified_id.id}-${instance.series.qualified_id.domain}-${instance.start.getTime()}`}
+            instance={instance}
             nowMs={nowMs}
-            {...meeting}
           />
         ))}
       </div>

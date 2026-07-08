@@ -25,7 +25,7 @@ import {createStore} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -35,9 +35,10 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {MeetingList} from './MeetingList';
 
-const createMeeting = (start: string, end: string, title: string): Meeting => ({
-  start_date: start,
-  end_date: end,
+const createMeetingSeries = (start: string, end: string, title: string): MeetingSeries => ({
+  series_start_date: start,
+  series_end_date: end,
+  duration_ms: new Date(end).getTime() - new Date(start).getTime(),
   recurrence: 'doesNotRepeat',
   conversation_id: title,
   title,
@@ -73,7 +74,7 @@ const renderMeetingList = (ui: ReactNode, wallClock = createDeterministicWallClo
 
 describe('MeetingList', () => {
   it('shows the load error when the first load fails before any meetings are available', () => {
-    renderMeetingList(<MeetingList meetings={[]} isLoading={false} hasLoadError />);
+    renderMeetingList(<MeetingList meetingSeries={[]} isLoading={false} hasLoadError />);
 
     expect(screen.getByText('meetings.list.loadError')).toBeInTheDocument();
   });
@@ -83,22 +84,22 @@ describe('MeetingList', () => {
       initialCurrentTimestampInMilliseconds: new Date('2026-06-15T14:30:00.000Z').getTime(),
     });
 
-    const createRelativeMeeting = (startHour: number, endHour: number, title: string): Meeting => {
+    const createRelativeSeries = (startHour: number, endHour: number, title: string): MeetingSeries => {
       const start = new Date(wallClock.currentDate);
       start.setHours(startHour, 0, 0, 0);
 
       const end = new Date(start);
       end.setHours(endHour, 0, 0, 0);
 
-      return createMeeting(start.toISOString(), end.toISOString(), title);
+      return createMeetingSeries(start.toISOString(), end.toISOString(), title);
     };
 
-    const meetings = [
-      createRelativeMeeting(14, 15, 'Ongoing meeting'),
-      createRelativeMeeting(16, 17, 'Upcoming meeting'),
+    const meetingSeries = [
+      createRelativeSeries(14, 15, 'Ongoing meeting'),
+      createRelativeSeries(16, 17, 'Upcoming meeting'),
     ];
 
-    renderMeetingList(<MeetingList meetings={meetings} isLoading={false} hasLoadError={false} />, wallClock);
+    renderMeetingList(<MeetingList meetingSeries={meetingSeries} isLoading={false} hasLoadError={false} />, wallClock);
 
     const todaySection = screen.getByText(/meetings\.list\.today/).closest('section');
     expect(todaySection).not.toBeNull();
