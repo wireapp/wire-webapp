@@ -23,11 +23,11 @@ import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import {CellsGlobalView} from 'Components/CellsGlobalView/CellsGlobalView';
-import {ConnectRequests} from 'Components/ConnectRequests';
+import {CellsGlobalView} from 'Components/cellsGlobalView/cellsGlobalView';
+import {ConnectRequests} from 'Components/connectRequests/index';
 import {Conversation} from 'Components/Conversation';
-import {HistoryExport} from 'Components/HistoryExport';
-import {HistoryImport} from 'Components/HistoryImport';
+import {HistoryExport} from 'Components/historyExport';
+import {HistoryImport} from 'Components/historyImport';
 import * as Icon from 'Components/icon';
 import {Meetings} from 'Components/Meeting/Meetings';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';

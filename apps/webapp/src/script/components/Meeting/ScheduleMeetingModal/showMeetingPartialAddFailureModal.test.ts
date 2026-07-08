@@ -22,7 +22,7 @@ import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import en from 'I18n/en-US.json';
 import {User} from 'Repositories/entity/User';
-import {generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
+import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
 import {setStrings, translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 

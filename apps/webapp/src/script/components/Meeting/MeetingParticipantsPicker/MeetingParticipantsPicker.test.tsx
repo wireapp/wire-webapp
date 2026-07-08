@@ -33,7 +33,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/TestUtil';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {setStrings, translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 

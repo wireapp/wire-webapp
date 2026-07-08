@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
-import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../E2EIdentity';
+import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../e2eIdentity';
 import {Core} from '../service/coreSingleton';
 
 export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {

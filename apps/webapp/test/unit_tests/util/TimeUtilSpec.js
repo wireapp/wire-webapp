@@ -31,7 +31,7 @@ import {
   isToday,
   setDateLocale,
   weeksPassedSinceDate,
-} from 'Util/TimeUtil';
+} from 'Util/timeUtil';
 
 describe('TimeUtil', () => {
   const ONE_SECOND_IN_MILLIS = 1000;

@@ -19,7 +19,7 @@
 
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';

@@ -67,7 +67,7 @@ import {TIME_IN_MILLIS} from './timeUtil';
 import {downloadBlob} from './util';
 import {createUuid} from './uuid';
 
-import {E2EIHandler} from '../E2EIdentity';
+import {E2EIHandler} from '../e2eIdentity';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';

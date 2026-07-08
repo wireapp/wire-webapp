@@ -20,7 +20,7 @@
 import {render, screen, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {withThemeAndRootContext} from 'src/script/auth/util/test/TestUtil';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

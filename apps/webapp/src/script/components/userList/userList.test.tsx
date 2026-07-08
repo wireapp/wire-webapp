@@ -31,7 +31,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {withTheme} from '../../auth/util/test/TestUtil';
+import {withTheme} from '../../auth/util/test/testUtil';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;

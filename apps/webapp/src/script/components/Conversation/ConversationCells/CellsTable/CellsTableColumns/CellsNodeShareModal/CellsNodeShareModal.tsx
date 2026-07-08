@@ -21,10 +21,10 @@ import {useEffect, useRef, useState} from 'react';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {CellsShareModalContent} from 'Components/Cells/ShareModal/CellsShareModalContent';
-import {serializeShareModalInput} from 'Components/Cells/ShareModal/shareModalSerializer';
-import {useCellExpirationToggle} from 'Components/Cells/ShareModal/useCellExpirationToggle';
-import {useCellPasswordToggle} from 'Components/Cells/ShareModal/useCellPasswordToggle';
+import {CellsShareModalContent} from 'Components/cells/shareModal/cellsShareModalContent';
+import {serializeShareModalInput} from 'Components/cells/shareModal/shareModalSerializer';
+import {useCellExpirationToggle} from 'Components/cells/shareModal/useCellExpirationToggle';
+import {useCellPasswordToggle} from 'Components/cells/shareModal/useCellPasswordToggle';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';

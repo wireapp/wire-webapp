@@ -24,7 +24,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {PasswordGeneratorButton} from './PasswordGeneratorButton';
 
-import {withTheme} from '../../auth/util/test/TestUtil';
+import {withTheme} from '../../auth/util/test/testUtil';
 
 describe('PasswordGeneratorButton', () => {
   it('calls onGeneratePassword prop with a random password when clicked', () => {

@@ -127,7 +127,7 @@ export class BackgroundEffectsController {
 
     if (resolved.useWorker) {
       if (this.worker === null) {
-        this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker.ts', import.meta.url));
+        this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker', import.meta.url));
       }
       const {options: workerOptions, transferables} = getWorkerOptions(resolved);
 

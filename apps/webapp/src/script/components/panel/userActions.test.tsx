@@ -34,7 +34,7 @@ import {User} from 'Repositories/entity/User';
 import {TeamEntity} from 'Repositories/team/TeamEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

@@ -45,7 +45,7 @@ import {
 } from './telemetry.helpers';
 import {UserData} from './userData';
 
-import {URLParameter} from '../../auth/URLParameter';
+import {URLParameter} from '../../auth/urlParameter';
 import {Config} from '../../Config';
 import {APIClient} from '../../service/apiClientSingleton';
 

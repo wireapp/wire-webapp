@@ -23,7 +23,7 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import * as Icon from 'Components/icon';
-import {InViewport} from 'Components/InViewport';
+import {InViewport} from 'Components/inViewport';
 import {collapseButton, collapseIcon} from 'Components/userList/userList.styles';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';

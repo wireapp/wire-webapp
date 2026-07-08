@@ -41,7 +41,7 @@ import {checkUserHandle} from 'Repositories/conversation/ConversationVerificatio
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
-import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
+import {MLSStatuses, WireIdentity} from 'src/script/e2eIdentity/e2eIdentityVerification';
 import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {waitFor} from 'Util/waitFor';

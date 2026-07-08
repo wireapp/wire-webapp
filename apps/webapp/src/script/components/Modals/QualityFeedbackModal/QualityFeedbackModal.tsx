@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
-import {useAppNotification} from 'Components/AppNotification';
+import {useAppNotification} from 'Components/appNotification/index';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';

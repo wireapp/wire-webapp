@@ -33,8 +33,8 @@ import type {UserRepository} from 'Repositories/user/userRepository';
 
 import {LifeCycleRepository, doSimpleRedirect, type LifeCycleDependencies} from './LifeCycleRepository';
 
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import {URLParameter} from '../../auth/URLParameter';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {URLParameter} from '../../auth/urlParameter';
 import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';

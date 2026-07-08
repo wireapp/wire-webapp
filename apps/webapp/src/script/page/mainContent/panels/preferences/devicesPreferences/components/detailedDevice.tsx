@@ -19,7 +19,7 @@
 
 import {DeviceVerificationBadges} from 'Components/badge';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {E2EIHandler, WireIdentity} from 'src/script/E2EIdentity';
+import {E2EIHandler, WireIdentity} from 'src/script/e2eIdentity';
 
 import {MLSDeviceDetails} from './mlsDeviceDetails';
 import {ProteusDeviceDetails} from './proteusDeviceDetails';

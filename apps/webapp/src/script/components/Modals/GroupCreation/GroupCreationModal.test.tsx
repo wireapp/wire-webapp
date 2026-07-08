@@ -7,7 +7,7 @@ import {UserState} from 'Repositories/user/userState';
 import {User} from 'Repositories/entity/User';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {mountComponent} from '../../../auth/util/test/TestUtil';
+import {mountComponent} from '../../../auth/util/test/testUtil';
 import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';
 import {TypeUtil} from '@wireapp/commons';

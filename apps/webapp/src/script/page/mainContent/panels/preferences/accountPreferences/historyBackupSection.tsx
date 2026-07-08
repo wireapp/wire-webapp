@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {BackupFileUpload} from 'Components/HistoryImport/BackupFileUpload';
+import {BackupFileUpload} from 'Components/historyImport/backupFileUpload';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';

@@ -34,8 +34,8 @@ import {getLogger, Logger} from 'Util/logger';
 import {includesString} from 'Util/stringUtil';
 import {appendParameter} from 'Util/urlUtil';
 
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import {URLParameter} from '../../auth/URLParameter';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {URLParameter} from '../../auth/urlParameter';
 import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';

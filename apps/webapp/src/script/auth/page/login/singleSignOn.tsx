@@ -54,13 +54,13 @@ import {getLogger} from 'Util/logger';
 import {SingleSignOnForm} from './singleSignOnForm';
 
 import {Config} from '../../../Config';
-import {AppAlreadyOpen} from '../../component/AppAlreadyOpen';
-import {BackButton} from '../../component/BackButton';
+import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
+import {BackButton} from '../../component/backButton';
 import {RootState, bindActionCreators} from '../../module/reducer';
-import * as AuthSelector from '../../module/selector/AuthSelector';
-import {srOnlyStyle} from '../../util/a11y';
+import * as AuthSelector from '../../module/selector/authSelector';
+import {srOnlyStyle} from '../../util/a11Y';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
-import {Page} from '../Page';
+import {Page} from '../page';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
 

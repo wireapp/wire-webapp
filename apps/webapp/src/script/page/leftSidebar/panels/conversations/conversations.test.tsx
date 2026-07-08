@@ -26,7 +26,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {ListState} from 'src/script/page/useAppState';
 import {TestFactory} from 'test/helper/TestFactory';
 
