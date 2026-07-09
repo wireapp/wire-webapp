@@ -377,9 +377,7 @@ export class BackgroundEffectsHandler {
   }
 
   private prefetch(url: string) {
-    const existingPrefetchLink = document.head.querySelector<HTMLLinkElement>(
-      `link[rel="prefetch"][href="${url}"]`,
-    );
+    const existingPrefetchLink = document.head.querySelector<HTMLLinkElement>(`link[rel="prefetch"][href="${url}"]`);
 
     if (existingPrefetchLink !== null) {
       return;
