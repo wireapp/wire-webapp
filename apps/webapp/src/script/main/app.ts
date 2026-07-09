@@ -33,6 +33,7 @@ import {pdfjs} from 'react-pdf';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
+import {createFireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -478,6 +479,7 @@ export class App {
         self: selfRepository,
         cells: cellsRepository,
       } = this.repository;
+      const bgEffectsHandler = callingRepository.getBackgroundEffectsHandler();
       await checkIndexedDb();
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
@@ -593,6 +595,16 @@ export class App {
       eventLogger.log(AppInitializationStep.ConversationsLoaded);
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
+
+      const fireAndForgetInvoker = createFireAndForgetInvoker({
+        logger: this.logger,
+      });
+
+      fireAndForgetInvoker.fireAndForget(() =>
+        bgEffectsHandler.preloadResources().catch((error: unknown) => {
+          this.logger.warn('[virtual-background] preload failed, starting without resources', error);
+        }),
+      );
 
       if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
