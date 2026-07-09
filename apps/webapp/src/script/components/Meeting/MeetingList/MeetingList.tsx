@@ -20,7 +20,6 @@
 import {useCallback, useEffect, useMemo, useState, type RefObject} from 'react';
 
 import is from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Loading} from '@wireapp/react-ui-kit';
 
@@ -35,7 +34,6 @@ import {
   useMeetingDayGroupVirtualizer,
   type UseMeetingDayGroupVirtualizer,
 } from 'Components/Meeting/MeetingList/useMeetingDayGroupVirtualizer';
-import type {ScheduleMeetingRecurrenceOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import {getMeetingInstances} from 'Components/Meeting/selectors/getMeetingInstances';
 import {getVisibleTimeWindow} from 'Components/Meeting/selectors/getVisibleTimeWindow';
 import {groupMeetingInstancesByDay} from 'Components/Meeting/selectors/groupMeetingInstancesByDay';
@@ -44,19 +42,6 @@ import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {getDaySectionHeader} from 'Components/Meeting/utils/getDaySectionHeader';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
-export interface Meeting {
-  start_date: string;
-  end_date: string;
-  recurrence: ScheduleMeetingRecurrenceOption;
-  conversation_id: string;
-  qualified_conversation: QualifiedId;
-  title: string;
-  qualified_id: QualifiedId;
-  qualified_creator: QualifiedId;
-  // TODO: Ask iOS and Android about how to identify this status
-  attending?: boolean;
-}
 
 export interface MeetingListProps {
   meetingSeries: MeetingSeries[];
