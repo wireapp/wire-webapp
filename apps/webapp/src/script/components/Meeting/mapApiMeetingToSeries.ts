@@ -18,18 +18,41 @@
  */
 
 import type {Meeting as ApiMeeting} from '@wireapp/api-client/lib/meetings/meeting';
+import {differenceInMilliseconds, isAfter, isValid, parseISO} from 'date-fns';
+import {result, Result} from 'true-myth';
 
 import {mapMeetingRecurrenceToOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 
-export const mapApiMeetingToSeries = (apiMeeting: ApiMeeting): MeetingSeries => {
-  const durationMs = Date.parse(apiMeeting.end_time) - Date.parse(apiMeeting.start_time);
+export type MapApiMeetingToSeriesError =
+  'invalidStartTime' | 'invalidEndTime' | 'endNotAfterStart' | 'invalidRecurrenceUntil';
+
+export const mapApiMeetingToSeries = (apiMeeting: ApiMeeting): Result<MeetingSeries, MapApiMeetingToSeriesError> => {
+  const start = parseISO(apiMeeting.start_time);
+  const end = parseISO(apiMeeting.end_time);
+
+  if (!isValid(start)) {
+    return result.err('invalidStartTime');
+  }
+
+  if (!isValid(end)) {
+    return result.err('invalidEndTime');
+  }
+
+  if (!isAfter(end, start)) {
+    return result.err('endNotAfterStart');
+  }
+
   const recurrenceUntil = apiMeeting.recurrence?.until;
 
-  return {
+  if (recurrenceUntil !== undefined && !isValid(parseISO(recurrenceUntil))) {
+    return result.err('invalidRecurrenceUntil');
+  }
+
+  return result.ok({
     series_start_date: apiMeeting.start_time,
     series_end_date: apiMeeting.end_time,
-    duration_ms: durationMs,
+    duration_ms: differenceInMilliseconds(end, start),
     recurrence: mapMeetingRecurrenceToOption(apiMeeting.recurrence),
     ...(recurrenceUntil !== undefined && {recurrence_until: recurrenceUntil}),
     conversation_id: apiMeeting.qualified_conversation.id,
@@ -37,5 +60,5 @@ export const mapApiMeetingToSeries = (apiMeeting: ApiMeeting): MeetingSeries => 
     qualified_id: apiMeeting.qualified_id,
     qualified_creator: apiMeeting.qualified_creator,
     title: apiMeeting.title,
-  };
+  });
 };

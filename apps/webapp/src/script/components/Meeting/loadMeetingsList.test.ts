@@ -55,4 +55,29 @@ describe('loadMeetingsList', () => {
     expect(result.meetingSeries[0]?.series_start_date).toBe('2026-06-16T10:00:00.000Z');
     expect(result.meetingSeries[0]?.duration_ms).toBe(3_600_000);
   });
+
+  it('drops invalid meetings from a successful response without failing the load', async () => {
+    const getMeetingsList = jest.fn().mockReturnValue(
+      task.resolve([
+        apiMeeting,
+        {
+          ...apiMeeting,
+          qualified_id: {id: 'invalid-meeting', domain: 'example.com'},
+          start_time: '2026-06-16T11:00:00.000Z',
+          end_time: '2026-06-16T10:00:00.000Z',
+        },
+      ]),
+    );
+    const result = await loadMeetingsList(createRepository(getMeetingsList));
+
+    expect(result).toEqual({
+      meetingSeries: [
+        expect.objectContaining({
+          title: 'Weekly sync',
+          qualified_id: {id: 'meeting-id', domain: 'example.com'},
+        }),
+      ],
+      hasLoadError: false,
+    });
+  });
 });

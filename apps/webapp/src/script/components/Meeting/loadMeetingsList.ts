@@ -34,5 +34,19 @@ export const loadMeetingsList = async (meetingsRepository: MeetingsRepository): 
     return {meetingSeries: [], hasLoadError: true};
   }
 
-  return {meetingSeries: listResult.value.map(mapApiMeetingToSeries), hasLoadError: false};
+  const meetingSeries = listResult.value.flatMap(apiMeeting => {
+    const mapResult = mapApiMeetingToSeries(apiMeeting);
+
+    if (mapResult.isErr) {
+      logger.warn('Skipping invalid meeting from API response', {
+        error: mapResult.error,
+        qualifiedId: apiMeeting.qualified_id,
+      });
+      return [];
+    }
+
+    return [mapResult.value];
+  });
+
+  return {meetingSeries, hasLoadError: false};
 };
