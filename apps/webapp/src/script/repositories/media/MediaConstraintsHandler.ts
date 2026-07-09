@@ -48,17 +48,6 @@ export enum ScreensharingMethods {
   NONE = 3,
 }
 
-export type MediaConstraintsFeatureToggles = {
-  readonly isImprovedVideoQualityEnabled: boolean;
-};
-
-const defaultMediaConstraintsFeatureToggles: MediaConstraintsFeatureToggles = {
-  isImprovedVideoQualityEnabled: false,
-};
-
-const defaultOneToOneVideoQualityMode = VIDEO_QUALITY_MODE.MOBILE;
-const improvedOneToOneVideoQualityMode = VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE;
-
 export class MediaConstraintsHandler {
   private readonly logger: Logger;
 
@@ -118,10 +107,7 @@ export class MediaConstraintsHandler {
     };
   }
 
-  constructor(
-    private readonly userState = container.resolve(UserState),
-    private readonly featureToggles: MediaConstraintsFeatureToggles = defaultMediaConstraintsFeatureToggles,
-  ) {
+  constructor(private readonly userState = container.resolve(UserState)) {
     this.logger = getLogger('MediaConstraintsHandler');
   }
 
@@ -229,13 +215,7 @@ export class MediaConstraintsHandler {
       return VIDEO_QUALITY_MODE.GROUP;
     }
 
-    const isUsingExistingOneToOneVideoQuality = !this.featureToggles.isImprovedVideoQualityEnabled;
-
-    if (isUsingExistingOneToOneVideoQuality) {
-      return defaultOneToOneVideoQualityMode;
-    }
-
-    return improvedOneToOneVideoQualityMode;
+    return VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE;
   }
 
   private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints & {autoGainControl: boolean} {

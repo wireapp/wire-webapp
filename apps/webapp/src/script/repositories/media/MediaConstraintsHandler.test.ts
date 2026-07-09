@@ -81,18 +81,13 @@ describe('MediaConstraintsHandler', () => {
     createAvailableDevices();
   };
 
-  const createConstraintsHandler = (
-    selfUserId = createUuid(),
-    featureToggles = {
-      isImprovedVideoQualityEnabled: false,
-    },
-  ) => {
+  const createConstraintsHandler = (selfUserId = createUuid()) => {
     const userState = {
       self: () => {
         return new User(selfUserId, '', translateForTest);
       },
     };
-    return new MediaConstraintsHandler(userState as UserState, featureToggles);
+    return new MediaConstraintsHandler(userState as UserState);
   };
 
   const defaultId = MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
@@ -267,29 +262,9 @@ describe('MediaConstraintsHandler', () => {
     });
 
     describe('Video Constraints', () => {
-      it('preserves the current one-to-one video constraints when improved video quality is disabled', () => {
+      it('uses the improved one-to-one video constraints by default', () => {
         createAvailableDevices({video: defaultId});
         const constraintsHandler = createConstraintsHandler();
-        const existingOneToOneVideoConstraints =
-          MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[VIDEO_QUALITY_MODE.MOBILE];
-
-        const constraints = constraintsHandler.getMediaStreamConstraints(
-          false,
-          true,
-          false,
-        ) as ExtendedMediaTrackConstraints;
-
-        expect(constraints.video).toEqual({
-          ...existingOneToOneVideoConstraints,
-          facingMode: MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE,
-        });
-      });
-
-      it('uses the improved one-to-one video constraints when improved video quality is enabled', () => {
-        createAvailableDevices({video: defaultId});
-        const constraintsHandler = createConstraintsHandler(createUuid(), {
-          isImprovedVideoQualityEnabled: true,
-        });
         const improvedOneToOneVideoConstraints =
           MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE];
 
@@ -305,11 +280,9 @@ describe('MediaConstraintsHandler', () => {
         });
       });
 
-      it('keeps group video constraints unchanged when improved video quality is enabled', () => {
+      it('keeps group video constraints unchanged', () => {
         createAvailableDevices({video: defaultId});
-        const constraintsHandler = createConstraintsHandler(createUuid(), {
-          isImprovedVideoQualityEnabled: true,
-        });
+        const constraintsHandler = createConstraintsHandler();
         const groupVideoConstraints = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[VIDEO_QUALITY_MODE.GROUP];
 
         const constraints = constraintsHandler.getMediaStreamConstraints(
