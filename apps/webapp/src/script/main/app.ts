@@ -154,10 +154,6 @@ type ApplicationStartupInput = {
   readonly timing: ApplicationStartupTimingInput;
 };
 
-type StartupFeatureToggleDecisions = {
-  readonly isImprovedVideoQualityEnabled: boolean;
-};
-
 export async function waitUntilAllMessagesAreProcessed(dependencies: WaitUntilAllMessagesAreProcessedDependencies) {
   const {eventRepository} = dependencies;
 
@@ -201,7 +197,6 @@ export class App {
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
     private readonly translate: Translate,
-    private readonly startupFeatureToggleDecisions: StartupFeatureToggleDecisions,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -240,9 +235,7 @@ export class App {
     // Initialize permissions
     void initializePermissions();
 
-    const mediaConstraintsHandler = new MediaConstraintsHandler(container.resolve(UserState), {
-      isImprovedVideoQualityEnabled: this.startupFeatureToggleDecisions.isImprovedVideoQualityEnabled,
-    });
+    const mediaConstraintsHandler = new MediaConstraintsHandler(container.resolve(UserState));
 
     const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
     const mediaDevicesHandler = new MediaDevicesHandler();
