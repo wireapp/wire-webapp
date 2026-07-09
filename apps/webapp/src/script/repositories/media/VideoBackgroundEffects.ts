@@ -47,15 +47,20 @@ export type BackgroundSource = {
  */
 export const DEFAULT_BACKGROUND_EFFECT: BackgroundEffectSelection = {type: 'none'};
 
+export interface BgStrength {
+  bgBlur: number;
+  bgBlurRadius: number;
+}
+
 /**
  * Blur strength values mapped to blur levels.
  *
  * Values range from 0.0 (no blur) to 1.0 (maximum blur). These are passed
  * directly to the background effects controller's blur strength parameter.
  */
-export const BLUR_STRENGTHS: Record<BlurLevel, number> = {
-  low: 0.7,
-  high: 1.0,
+export const BLUR_STRENGTHS: Record<BlurLevel, BgStrength> = {
+  low: {bgBlur: 0.75, bgBlurRadius: 5},
+  high: {bgBlur: 1.0, bgBlurRadius: 30},
 };
 
 type BuiltinBackgroundLabelKey =
