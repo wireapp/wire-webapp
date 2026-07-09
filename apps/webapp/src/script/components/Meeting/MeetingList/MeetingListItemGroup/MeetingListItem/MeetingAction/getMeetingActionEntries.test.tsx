@@ -86,7 +86,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
-      nowMs: futureWallClock.currentTimestampInMilliseconds,
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -102,7 +102,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
-      nowMs: futureWallClock.currentTimestampInMilliseconds,
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -114,7 +114,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser('invitee-id'),
-      nowMs: futureWallClock.currentTimestampInMilliseconds,
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -126,7 +126,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
-      nowMs: ongoingWallClock.currentTimestampInMilliseconds,
+      nowMilliseconds: ongoingWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -138,7 +138,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
-      nowMs: pastWallClock.currentTimestampInMilliseconds,
+      nowMilliseconds: pastWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -158,7 +158,7 @@ describe('getMeetingActionEntries', () => {
         end: new Date('2026-06-22T11:00:00.000Z'),
       },
       selfUser: createSelfUser(),
-      nowMs: futureWallClock.currentTimestampInMilliseconds,
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -170,7 +170,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
-      nowMs: futureWallClock.currentTimestampInMilliseconds,
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -183,7 +183,7 @@ describe('getMeetingActionEntries', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser('invitee-id'),
-      nowMs: futureWallClock.currentTimestampInMilliseconds,
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });

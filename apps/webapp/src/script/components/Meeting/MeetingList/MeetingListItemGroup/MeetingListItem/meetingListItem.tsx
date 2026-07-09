@@ -42,14 +42,14 @@ import {formatLocale} from 'Util/timeUtil';
 
 interface MeetingListItemProps {
   meetingInstance: MeetingInstance;
-  nowMs?: number;
+  nowMilliseconds?: number;
 }
 
-const MeetingListItemComponent = ({meetingInstance, nowMs}: MeetingListItemProps) => {
+const MeetingListItemComponent = ({meetingInstance, nowMilliseconds: providedNowMilliseconds}: MeetingListItemProps) => {
   const {meetingSeries, start, end} = meetingInstance;
   const {title, recurrence, attending} = meetingSeries;
   const {translate, wallClock} = useApplicationContext();
-  const timestamp = nowMs ?? wallClock.currentTimestampInMilliseconds;
+  const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
 
   const startDateIso = start.toISOString();
   const endDateIso = end.toISOString();
@@ -57,8 +57,8 @@ const MeetingListItemComponent = ({meetingInstance, nowMs}: MeetingListItemProps
   const time = useMemo(() => {
     const startMs = start.getTime();
     const endMs = end.getTime();
-    const isPast = timestamp > endMs;
-    const isOngoing = timestamp >= startMs && timestamp < endMs;
+    const isPast = nowMilliseconds > endMs;
+    const isOngoing = nowMilliseconds >= startMs && nowMilliseconds < endMs;
 
     if (isPast) {
       const dayOfWeek = formatLocale(start, 'EEEE');
@@ -77,11 +77,11 @@ const MeetingListItemComponent = ({meetingInstance, nowMs}: MeetingListItemProps
     return sameMeridiem
       ? `${formatLocale(start, 'h:mm')} – ${formatLocale(end, 'h:mm a')}`
       : `${formatLocale(start, 'h:mm a')} – ${formatLocale(end, 'h:mm a')}`;
-  }, [end, start, timestamp, translate]);
+  }, [end, start, nowMilliseconds, translate]);
 
   const meetingStatus = useMemo(
-    () => getMeetingStatusAt(timestamp, startDateIso, endDateIso, attending),
-    [timestamp, startDateIso, endDateIso, attending],
+    () => getMeetingStatusAt(nowMilliseconds, startDateIso, endDateIso, attending),
+    [nowMilliseconds, startDateIso, endDateIso, attending],
   );
 
   const isOngoing = meetingStatus === MeetingStatuses.ON_GOING || meetingStatus === MeetingStatuses.PARTICIPATING;
@@ -106,7 +106,7 @@ const MeetingListItemComponent = ({meetingInstance, nowMs}: MeetingListItemProps
       </div>
       <div css={rightStyles}>
         <MeetingParticipants qualifiedConversation={meetingSeries.qualified_conversation} isOngoing={isOngoing} />
-        <MeetingStatus start_date={startDateIso} end_date={endDateIso} attending={attending} nowMs={timestamp} />
+        <MeetingStatus start_date={startDateIso} end_date={endDateIso} attending={attending} nowMilliseconds={nowMilliseconds} />
         <MeetingAction meetingInstance={meetingInstance} />
       </div>
     </div>

@@ -62,24 +62,24 @@ export const MeetingList = ({
   useMeetingDayGroupVirtualizer: useMeetingDayGroupVirtualizerDependency = useMeetingDayGroupVirtualizer,
 }: MeetingListProps) => {
   const {translate, wallClock} = useApplicationContext();
-  const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
+  const [nowMilliseconds, setNowMilliseconds] = useState(() => wallClock.currentTimestampInMilliseconds);
   const [visibleDayCount, setVisibleDayCount] = useState(INITIAL_VISIBLE_DAY_COUNT);
 
   useEffect(() => {
-    const id = wallClock.setInterval(() => setNowMs(wallClock.currentTimestampInMilliseconds), TIME_IN_MILLIS.SECOND);
+    const id = wallClock.setInterval(() => setNowMilliseconds(wallClock.currentTimestampInMilliseconds), TIME_IN_MILLIS.SECOND);
     return () => wallClock.clearInterval(id);
   }, [wallClock]);
 
-  const now = useMemo(() => new Date(nowMs), [nowMs]);
+  const now = useMemo(() => new Date(nowMilliseconds), [nowMilliseconds]);
 
   const meetingInstancesByDay = useMemo(() => {
     const {from, to} = getVisibleTimeWindow(now, {dayCount: visibleDayCount});
     const meetingInstances = getMeetingInstances(meetingSeries, from, to).filter(
-      meetingInstance => meetingInstance.end.getTime() >= nowMs,
+      meetingInstance => meetingInstance.end.getTime() >= nowMilliseconds,
     );
 
     return groupMeetingInstancesByDay(meetingInstances);
-  }, [meetingSeries, now, nowMs, visibleDayCount]);
+  }, [meetingSeries, now, nowMilliseconds, visibleDayCount]);
 
   const visibleDayGroups = useMemo(() => getVisibleDayGroups(meetingInstancesByDay), [meetingInstancesByDay]);
 
@@ -172,7 +172,7 @@ export const MeetingList = ({
               <MeetingListItemGroup
                 header={getDaySectionHeader(dayGroup.day, now, translate)}
                 meetingInstances={dayGroup.meetingInstances}
-                nowMs={nowMs}
+                nowMilliseconds={nowMilliseconds}
               />
             </div>
           );

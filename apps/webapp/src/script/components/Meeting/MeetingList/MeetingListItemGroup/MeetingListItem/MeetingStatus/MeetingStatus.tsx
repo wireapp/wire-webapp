@@ -35,16 +35,16 @@ export interface MeetingStatusProps {
   start_date: string;
   end_date: string;
   attending?: boolean;
-  nowMs?: number;
+  nowMilliseconds?: number;
 }
 
-const MeetingStatusComponent = ({start_date, end_date, attending, nowMs}: MeetingStatusProps) => {
+const MeetingStatusComponent = ({start_date, end_date, attending, nowMilliseconds: providedNowMilliseconds}: MeetingStatusProps) => {
   const {translate} = useApplicationContext();
-  const timestamp = nowMs ?? Date.now();
+  const nowMilliseconds = providedNowMilliseconds ?? Date.now();
 
   const meetingStatus = useMemo(
-    () => getMeetingStatusAt(timestamp, start_date, end_date, attending),
-    [timestamp, start_date, end_date, attending],
+    () => getMeetingStatusAt(nowMilliseconds, start_date, end_date, attending),
+    [nowMilliseconds, start_date, end_date, attending],
   );
 
   if (meetingStatus === MeetingStatuses.PARTICIPATING) {

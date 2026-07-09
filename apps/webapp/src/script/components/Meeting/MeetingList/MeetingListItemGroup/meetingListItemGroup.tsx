@@ -31,10 +31,10 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 interface MeetingListItemGroupProps {
   header?: string;
   meetingInstances: MeetingInstance[];
-  nowMs?: number;
+  nowMilliseconds?: number;
 }
 
-const MeetingListItemGroupComponent = ({header, meetingInstances, nowMs}: MeetingListItemGroupProps) => {
+const MeetingListItemGroupComponent = ({header, meetingInstances, nowMilliseconds}: MeetingListItemGroupProps) => {
   const {translate} = useApplicationContext();
   const isEmpty = meetingInstances.length === 0;
 
@@ -56,7 +56,7 @@ const MeetingListItemGroupComponent = ({header, meetingInstances, nowMs}: Meetin
           <MeetingListItem
             key={`meeting-list-item-${meetingInstance.meetingSeries.qualified_id.id}-${meetingInstance.meetingSeries.qualified_id.domain}-${meetingInstance.start.getTime()}`}
             meetingInstance={meetingInstance}
-            nowMs={nowMs}
+            nowMilliseconds={nowMilliseconds}
           />
         ))}
       </div>

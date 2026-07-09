@@ -46,14 +46,14 @@ export const MeetingAction = ({meetingInstance}: MeetingActionProps) => {
   const selfUser = container.resolve(UserState).self();
 
   const handleActionButton = (event: MouseEvent<HTMLElement>) => {
-    const nowMs = wallClock.currentTimestampInMilliseconds;
+    const nowMilliseconds = wallClock.currentTimestampInMilliseconds;
 
     showContextMenu({
       event,
       entries: getMeetingActionEntries({
         meetingInstance,
         selfUser,
-        nowMs,
+        nowMilliseconds,
         translate,
         onEdit: () => {
           if (canEditMeeting(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {

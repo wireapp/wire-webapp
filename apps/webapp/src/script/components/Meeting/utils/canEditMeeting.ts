@@ -31,8 +31,8 @@ export const isMeetingHost = (meetingSeries: MeetingSeries, selfUser: User): boo
  * The edit form is prefilled from the same instance's start/end
  * ({@link mapMeetingInstanceToScheduleFormState}); the series `qualified_id` is used for the update.
  */
-export const canEditMeeting = (meetingInstance: MeetingInstance, selfUser: User, nowMs: number): boolean => {
-  const instanceHasNotStarted = nowMs < meetingInstance.start.getTime();
+export const canEditMeeting = (meetingInstance: MeetingInstance, selfUser: User, nowMilliseconds: number): boolean => {
+  const instanceHasNotStarted = nowMilliseconds < meetingInstance.start.getTime();
 
   return isMeetingHost(meetingInstance.meetingSeries, selfUser) && instanceHasNotStarted;
 };

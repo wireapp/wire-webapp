@@ -33,7 +33,7 @@ import type {Translate} from 'Util/localizerUtil';
 type GetMeetingActionEntriesParams = {
   meetingInstance: MeetingInstance;
   selfUser: User;
-  nowMs: number;
+  nowMilliseconds: number;
   translate: Translate;
   onEdit: () => void;
 };
@@ -41,7 +41,7 @@ type GetMeetingActionEntriesParams = {
 export const getMeetingActionEntries = ({
   meetingInstance,
   selfUser,
-  nowMs,
+  nowMilliseconds,
   translate,
   onEdit,
 }: GetMeetingActionEntriesParams): ContextMenuEntry[] => {
@@ -68,7 +68,7 @@ export const getMeetingActionEntries = ({
   const isHost = isMeetingHost(meetingSeries, selfUser);
 
   return [
-    ...(canEditMeeting(meetingInstance, selfUser, nowMs) ? [editEntry] : []),
+    ...(canEditMeeting(meetingInstance, selfUser, nowMilliseconds) ? [editEntry] : []),
     ...(isHost ? [deleteForAllEntry] : [deleteForMeEntry]),
   ];
 };
