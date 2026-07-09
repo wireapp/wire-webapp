@@ -57,6 +57,21 @@ const shouldLoadMoreMeetingListDays = (
   return lastVirtualItem !== undefined && lastVirtualItem.index >= visibleDayGroupCount - 1;
 };
 
+const loadMoreMeetingListDaysOnDebouncedScroll = (
+  scrollElement: HTMLElement,
+  virtualizer: Virtualizer<HTMLElement, Element>,
+  visibleDayGroupCount: number,
+  setVisibleDayCount: UseLoadMoreMeetingListDaysParams['setVisibleDayCount'],
+): void => {
+  if (!isScrolledNearBottom(scrollElement)) {
+    return;
+  }
+
+  if (shouldLoadMoreMeetingListDays(virtualizer, visibleDayGroupCount)) {
+    setVisibleDayCount(previousVisibleDayCount => previousVisibleDayCount + LOAD_MORE_DAY_COUNT);
+  }
+};
+
 export const useLoadMoreMeetingListDays = ({
   scrollElementRef,
   virtualizer,
@@ -89,15 +104,16 @@ export const useLoadMoreMeetingListDays = ({
         wallClock.clearTimeout(timeoutId);
       }
 
-      timeoutId = wallClock.setTimeout(() => {
-        if (!isScrolledNearBottom(scrollElement)) {
-          return;
-        }
-
-        if (shouldLoadMoreMeetingListDays(virtualizerRef.current, visibleDayGroupCount)) {
-          setVisibleDayCount(previousVisibleDayCount => previousVisibleDayCount + LOAD_MORE_DAY_COUNT);
-        }
-      }, LOAD_MORE_DEBOUNCE_MS);
+      timeoutId = wallClock.setTimeout(
+        () =>
+          loadMoreMeetingListDaysOnDebouncedScroll(
+            scrollElement,
+            virtualizerRef.current,
+            visibleDayGroupCount,
+            setVisibleDayCount,
+          ),
+        LOAD_MORE_DEBOUNCE_MS,
+      );
     };
 
     scrollElement.addEventListener('scroll', handleScroll, {passive: true});
