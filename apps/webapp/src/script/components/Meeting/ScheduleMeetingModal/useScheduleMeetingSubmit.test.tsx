@@ -54,7 +54,7 @@ const createMeetingStore = ({
   updateMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
 }: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'scheduleMeeting' | 'updateMeeting'>> = {}) =>
   createStore<MeetingStoreState>(() => ({
-    meetings: [],
+    meetingSeries: [],
     isLoading: false,
     hasLoadError: false,
     loadMeetings,
@@ -120,10 +120,11 @@ describe('useScheduleMeetingSubmit', () => {
         qualified_id: {id: 'meeting-id', domain: 'example.com'},
         qualified_creator: {id: 'creator-id', domain: 'example.com'},
         qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
-        start_date: '',
-        end_date: '',
+        series_start_date: '2026-06-16T10:00:00.000Z',
+        series_end_date: '2026-06-16T11:00:00.000Z',
+        duration_ms: 3_600_000,
         recurrence: 'doesNotRepeat',
-        conversation_id: '',
+        conversation_id: 'conversation-id',
       },
       formState,
       {id: 'conversation-id', domain: 'example.com'},

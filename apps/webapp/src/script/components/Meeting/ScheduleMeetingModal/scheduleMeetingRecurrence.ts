@@ -45,7 +45,14 @@ export const buildUpdateMeetingRecurrence = (
   originalRecurrence: ScheduleMeetingRecurrenceOption,
 ): Pick<UpdateMeeting, 'recurrence'> | Record<string, never> => {
   if (recurrence === originalRecurrence) {
-    return {};
+    // Omit for non-repeating meetings: the backend rejects `recurrence: null` on update.
+    if (recurrence === 'doesNotRepeat') {
+      return {};
+    }
+
+    // Re-send unchanged recurrence so edits to other fields do not clear the series rule.
+    const mappedRecurrence = mapRecurrenceOptionToMeetingRecurrence(recurrence);
+    return mappedRecurrence === undefined ? {} : {recurrence: mappedRecurrence};
   }
 
   const mappedRecurrence = mapRecurrenceOptionToMeetingRecurrence(recurrence);

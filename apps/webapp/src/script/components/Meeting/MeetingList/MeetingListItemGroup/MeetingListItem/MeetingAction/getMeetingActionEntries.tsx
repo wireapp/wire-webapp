@@ -19,32 +19,34 @@
 
 import {CloseIcon, EditIcon, TrashIcon} from '@wireapp/react-ui-kit';
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {
   contextMenuDangerItemIconStyles,
   contextMenuDangerItemStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
 import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingActionTranslationKeys';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {canEditMeeting, isMeetingHost} from 'Components/Meeting/utils/canEditMeeting';
 import type {User} from 'Repositories/entity/User';
 import type {ContextMenuEntry} from 'src/script/ui/contextMenu';
 import type {Translate} from 'Util/localizerUtil';
 
 type GetMeetingActionEntriesParams = {
-  meeting: Meeting;
+  meetingInstance: MeetingInstance;
   selfUser: User;
-  nowMs: number;
+  nowMilliseconds: number;
   translate: Translate;
   onEdit: () => void;
 };
 
 export const getMeetingActionEntries = ({
-  meeting,
+  meetingInstance,
   selfUser,
-  nowMs,
+  nowMilliseconds,
   translate,
   onEdit,
 }: GetMeetingActionEntriesParams): ContextMenuEntry[] => {
+  const {meetingSeries} = meetingInstance;
+
   const editEntry: ContextMenuEntry = {
     icon: () => <EditIcon />,
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.editMeeting),
@@ -63,10 +65,10 @@ export const getMeetingActionEntries = ({
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll),
   };
 
-  const isHost = isMeetingHost(meeting, selfUser);
+  const isHost = isMeetingHost(meetingSeries, selfUser);
 
   return [
-    ...(canEditMeeting(meeting, selfUser, nowMs) ? [editEntry] : []),
+    ...(canEditMeeting(meetingInstance, selfUser, nowMilliseconds) ? [editEntry] : []),
     ...(isHost ? [deleteForAllEntry] : [deleteForMeEntry]),
   ];
 };

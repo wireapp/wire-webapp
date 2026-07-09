@@ -21,7 +21,6 @@ import {memo, useMemo} from 'react';
 
 import {CalendarIcon} from '@wireapp/react-ui-kit';
 
-import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction';
 import {
   badgeWrapperStyles,
@@ -36,26 +35,33 @@ import {
 import {MeetingParticipants} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingParticipants/meetingParticipants';
 import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
 import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
 
-interface MeetingListItemProps extends Meeting {
-  nowMs?: number;
+interface MeetingListItemProps {
+  meetingInstance: MeetingInstance;
+  nowMilliseconds?: number;
 }
 
-const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => {
-  const {title, start_date, end_date, recurrence, attending} = meeting;
-  const {translate} = useApplicationContext();
-  const timestamp = nowMs ?? Date.now();
+const MeetingListItemComponent = ({
+  meetingInstance,
+  nowMilliseconds: providedNowMilliseconds,
+}: MeetingListItemProps) => {
+  const {meetingSeries, start, end} = meetingInstance;
+  const {title, recurrence, attending} = meetingSeries;
+  const {translate, wallClock} = useApplicationContext();
+  const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
+
+  const startDateIso = start.toISOString();
+  const endDateIso = end.toISOString();
 
   const time = useMemo(() => {
-    const start = new Date(start_date);
-    const end = new Date(end_date);
     const startMs = start.getTime();
     const endMs = end.getTime();
-    const isPast = timestamp > endMs;
-    const isOngoing = timestamp >= startMs && timestamp < endMs;
+    const isPast = nowMilliseconds > endMs;
+    const isOngoing = nowMilliseconds >= startMs && nowMilliseconds < endMs;
 
     if (isPast) {
       const dayOfWeek = formatLocale(start, 'EEEE');
@@ -74,11 +80,11 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
     return sameMeridiem
       ? `${formatLocale(start, 'h:mm')} – ${formatLocale(end, 'h:mm a')}`
       : `${formatLocale(start, 'h:mm a')} – ${formatLocale(end, 'h:mm a')}`;
-  }, [end_date, start_date, timestamp, translate]);
+  }, [end, start, nowMilliseconds, translate]);
 
   const meetingStatus = useMemo(
-    () => getMeetingStatusAt(timestamp, start_date, end_date, attending),
-    [timestamp, start_date, end_date, attending],
+    () => getMeetingStatusAt(nowMilliseconds, startDateIso, endDateIso, attending),
+    [nowMilliseconds, startDateIso, endDateIso, attending],
   );
 
   const isOngoing = meetingStatus === MeetingStatuses.ON_GOING || meetingStatus === MeetingStatuses.PARTICIPATING;
@@ -102,9 +108,14 @@ const MeetingListItemComponent = ({nowMs, ...meeting}: MeetingListItemProps) => 
         </div>
       </div>
       <div css={rightStyles}>
-        <MeetingParticipants qualifiedConversation={meeting.qualified_conversation} isOngoing={isOngoing} />
-        <MeetingStatus start_date={start_date} end_date={end_date} attending={attending} nowMs={timestamp} />
-        <MeetingAction meeting={meeting} />
+        <MeetingParticipants qualifiedConversation={meetingSeries.qualified_conversation} isOngoing={isOngoing} />
+        <MeetingStatus
+          start_date={startDateIso}
+          end_date={endDateIso}
+          attending={attending}
+          nowMilliseconds={nowMilliseconds}
+        />
+        <MeetingAction meetingInstance={meetingInstance} />
       </div>
     </div>
   );

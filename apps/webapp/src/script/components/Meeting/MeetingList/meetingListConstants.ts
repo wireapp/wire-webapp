@@ -17,17 +17,9 @@
  *
  */
 
-import {maybe} from 'true-myth';
-
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
-import {User} from 'Repositories/entity/User';
-
-export const mapMeetingToScheduleFormState = (meeting: Meeting, selectedUsers: User[]): ScheduleMeetingFormState => ({
-  title: meeting.title,
-  start: maybe.just(new Date(meeting.start_date)),
-  end: maybe.just(new Date(meeting.end_date)),
-  recurrence: meeting.recurrence,
-  selectedUsers,
-  participantsFilter: '',
-});
+export const INITIAL_VISIBLE_DAY_COUNT = 14;
+export const LOAD_MORE_DAY_COUNT = 14;
+export const MEETING_LIST_ITEM_HEIGHT = 75;
+export const MEETING_DAY_GROUP_SECTION_TOP_PADDING = 16;
+export const MEETING_DAY_GROUP_HEADER_HEIGHT = 28;
+export const MEETING_LIST_OVERSCAN = 3;

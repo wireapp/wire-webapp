@@ -21,8 +21,7 @@ import type {Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
-import {mapMeetingToScheduleFormState} from 'Components/Meeting/mapMeetingToScheduleFormState';
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeetingInstanceToScheduleFormState';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import {
   scheduleMeeting as scheduleMeetingTask,
@@ -31,33 +30,35 @@ import {
   type UpdateMeetingParams,
 } from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 
 import type {MeetingStoreDeps} from './meetingStoreDeps';
 
 export type EditMeetingData = {
   formState: ScheduleMeetingFormState;
-  qualifiedConversation: Meeting['qualified_conversation'];
+  qualifiedConversation: MeetingSeries['qualified_conversation'];
   originalSelectedUsers: User[];
 };
 
 export type MeetingStoreState = {
-  meetings: Meeting[];
+  meetingSeries: MeetingSeries[];
   isLoading: boolean;
   hasLoadError: boolean;
   loadMeetings: () => Promise<void>;
   scheduleMeeting: (formState: ScheduleMeetingFormState) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
-  loadMeetingForEdit: (meeting: Meeting) => Task<EditMeetingData, MeetingSubmitErrors>;
+  loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
 };
 
 export type MeetingStore = StoreApi<MeetingStoreState>;
 
-type MeetingStoreInitialState = Partial<Pick<MeetingStoreState, 'meetings' | 'isLoading' | 'hasLoadError'>>;
+type MeetingStoreInitialState = Partial<Pick<MeetingStoreState, 'meetingSeries' | 'isLoading' | 'hasLoadError'>>;
 
 export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: MeetingStoreInitialState): MeetingStore =>
   createStore<MeetingStoreState>(set => ({
-    meetings: initialState?.meetings ?? [],
+    meetingSeries: initialState?.meetingSeries ?? [],
     isLoading: initialState?.isLoading ?? false,
     hasLoadError: initialState?.hasLoadError ?? false,
     loadMeetings: async () => {
@@ -65,22 +66,25 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
 
       const listResult = await loadMeetingsList(deps.meetingsRepository);
 
-      set({meetings: listResult.meetings, hasLoadError: listResult.hasLoadError, isLoading: false});
+      set({meetingSeries: listResult.meetingSeries, hasLoadError: listResult.hasLoadError, isLoading: false});
     },
     scheduleMeeting: formState => scheduleMeetingTask(formState, deps),
     updateMeeting: params => updateMeetingTask(params, deps),
-    loadMeetingForEdit: meeting =>
-      deps.conversationRepository
-        .safeGetConversationById(meeting.qualified_conversation)
+    loadMeetingForEdit: meetingInstance => {
+      const {meetingSeries} = meetingInstance;
+
+      return deps.conversationRepository
+        .safeGetConversationById(meetingSeries.qualified_conversation)
         .mapRejected(() => meetingSubmitErrors.updateFailed)
         .map(conversation => {
           const selectedUsers = [...conversation.participating_user_ets()];
-          const formState = mapMeetingToScheduleFormState(meeting, selectedUsers);
+          const formState = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, deps.wallClock);
 
           return {
             formState,
-            qualifiedConversation: meeting.qualified_conversation,
+            qualifiedConversation: meetingSeries.qualified_conversation,
             originalSelectedUsers: selectedUsers,
           };
-        }),
+        });
+    },
   }));
