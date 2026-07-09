@@ -141,6 +141,50 @@ export const test = baseTest.extend<Fixtures>({
 /** Max time the login is allowed to take before the application needs to be useable */
 export const LOGIN_TIMEOUT = 40_000;
 
+type LoginCompletionResult = 'sidebar' | 'entropy';
+type LoginCompletionWaitResult =
+  | {type: 'success'; loginCompletionResult: LoginCompletionResult}
+  | {type: 'failure'; loginCompletionResult: LoginCompletionResult};
+
+async function waitForLoginCompletion(pageManager: PageManager): Promise<LoginCompletionResult> {
+  const waitForSidebar = waitForLoginCompletionSignal('sidebar', () => {
+    return pageManager.webapp.components
+      .conversationSidebar()
+      .sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+  });
+
+  const waitForEntropy = waitForLoginCompletionSignal('entropy', () => {
+    return pageManager.webapp.pages.login().entropyCanvas.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+  });
+
+  const firstLoginCompletionWaitResult = await Promise.race([waitForSidebar, waitForEntropy]);
+
+  if (firstLoginCompletionWaitResult.type === 'success') {
+    return firstLoginCompletionWaitResult.loginCompletionResult;
+  }
+
+  const secondLoginCompletionWaitResult =
+    firstLoginCompletionWaitResult.loginCompletionResult === 'sidebar' ? await waitForEntropy : await waitForSidebar;
+
+  if (secondLoginCompletionWaitResult.type === 'success') {
+    return secondLoginCompletionWaitResult.loginCompletionResult;
+  }
+
+  throw new Error('Login did not reach either the conversation sidebar or the entropy screen');
+}
+
+async function waitForLoginCompletionSignal(
+  loginCompletionResult: LoginCompletionResult,
+  waitForLoginCompletionSignalToAppear: () => Promise<void>,
+): Promise<LoginCompletionWaitResult> {
+  try {
+    await waitForLoginCompletionSignalToAppear();
+
+    return {type: 'success', loginCompletionResult};
+  } catch {
+    return {type: 'failure', loginCompletionResult};
+  }
+}
 /** PagePlugin to log in as the given user */
 export const withLogin =
   (user: User | Promise<User>, options?: {baseUrl?: string; confirmNewHistory?: boolean}): PagePlugin =>
@@ -157,6 +201,14 @@ export const withLogin =
      * Since the login may take up to 40s we manually wait for it to finish here instead of increasing the timeout on all actions / assertions after this util
      * This is an exception to the general best practice of using playwrights web assertions. (See: https://playwright.dev/docs/best-practices#use-web-first-assertions)
      */
+    const loginCompletionResult = await waitForLoginCompletion(pageManager);
+
+    if (loginCompletionResult === 'sidebar') {
+      return;
+    }
+
+    await pageManager.webapp.pages.login().completeEntropyCollection();
+
     await pageManager.webapp.components
       .conversationSidebar()
       .sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
