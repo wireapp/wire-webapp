@@ -23,11 +23,13 @@ import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
 import {mapApiMeetingToSeries} from './mapApiMeetingToSeries';
 
-const createApiMeeting = (overrides: {
-  start_time?: string;
-  end_time?: string;
-  recurrence?: {frequency: MeetingRecurrenceFrequency; until?: string};
-} = {}) => ({
+const createApiMeeting = (
+  overrides: {
+    start_time?: string;
+    end_time?: string;
+    recurrence?: {frequency: MeetingRecurrenceFrequency; until?: string};
+  } = {},
+) => ({
   created_at: '2026-06-15T09:00:00.000Z',
   updated_at: '2026-06-15T09:00:00.000Z',
   start_time: '2026-06-15T10:00:00.000Z',

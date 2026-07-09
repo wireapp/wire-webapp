@@ -45,7 +45,10 @@ interface MeetingListItemProps {
   nowMilliseconds?: number;
 }
 
-const MeetingListItemComponent = ({meetingInstance, nowMilliseconds: providedNowMilliseconds}: MeetingListItemProps) => {
+const MeetingListItemComponent = ({
+  meetingInstance,
+  nowMilliseconds: providedNowMilliseconds,
+}: MeetingListItemProps) => {
   const {meetingSeries, start, end} = meetingInstance;
   const {title, recurrence, attending} = meetingSeries;
   const {translate, wallClock} = useApplicationContext();
@@ -106,7 +109,12 @@ const MeetingListItemComponent = ({meetingInstance, nowMilliseconds: providedNow
       </div>
       <div css={rightStyles}>
         <MeetingParticipants qualifiedConversation={meetingSeries.qualified_conversation} isOngoing={isOngoing} />
-        <MeetingStatus start_date={startDateIso} end_date={endDateIso} attending={attending} nowMilliseconds={nowMilliseconds} />
+        <MeetingStatus
+          start_date={startDateIso}
+          end_date={endDateIso}
+          attending={attending}
+          nowMilliseconds={nowMilliseconds}
+        />
         <MeetingAction meetingInstance={meetingInstance} />
       </div>
     </div>

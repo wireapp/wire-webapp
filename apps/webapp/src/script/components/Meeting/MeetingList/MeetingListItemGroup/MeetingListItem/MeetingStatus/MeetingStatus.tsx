@@ -38,7 +38,12 @@ export interface MeetingStatusProps {
   nowMilliseconds?: number;
 }
 
-const MeetingStatusComponent = ({start_date, end_date, attending, nowMilliseconds: providedNowMilliseconds}: MeetingStatusProps) => {
+const MeetingStatusComponent = ({
+  start_date,
+  end_date,
+  attending,
+  nowMilliseconds: providedNowMilliseconds,
+}: MeetingStatusProps) => {
   const {translate} = useApplicationContext();
   const nowMilliseconds = providedNowMilliseconds ?? Date.now();
 
