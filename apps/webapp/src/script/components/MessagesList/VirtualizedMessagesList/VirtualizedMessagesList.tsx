@@ -19,7 +19,6 @@
 
 import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
@@ -33,11 +32,7 @@ import {verticallyCenterMessage} from 'Components/MessagesList/utils/helpers';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {useLoadConversation} from 'Components/MessagesList/utils/useLoadConversation';
 import {useScrollToLastUnreadMessage} from 'Components/MessagesList/utils/useScrollToLastUnreadMessage';
-import {
-  getVirtualizedMessagesGroupItemKey,
-  groupMessagesBySenderAndTime,
-  isMarker,
-} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
+import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
 import {useLoadMessages} from 'Components/MessagesList/VirtualizedMessagesList/useLoadMessages';
 import {useScrollMessages} from 'Components/MessagesList/VirtualizedMessagesList/useScrollMessages';
 import {useRoveFocus} from 'Hooks/useRoveFocus';
@@ -142,18 +137,7 @@ export const VirtualizedMessagesList = ({
 
   const shouldShowInvitePeople = isActiveParticipant && inTeam && (isGuestRoom || isGuestAndServicesRoom);
 
-  const getItemKey = useCallback(
-    (index: number) => {
-      const item = groupedMessages[index];
-
-      if (is.undefined(item)) {
-        return `missing-message-list-item-${index}`;
-      }
-
-      return getVirtualizedMessagesGroupItemKey(item);
-    },
-    [groupedMessages],
-  );
+  const getItemKey = useCallback((index: number) => index, [groupedMessages]);
 
   const virtualizer = useVirtualizer({
     count: groupedMessages.length,
