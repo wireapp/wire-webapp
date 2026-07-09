@@ -91,7 +91,7 @@ export const MeetingParticipantsPicker = ({
   disabled = false,
   markInvalid = false,
   required = false,
-  noUnderline = true,
+  noUnderline = false,
   popoverPortalContainer,
 }: MeetingParticipantsPickerProps) => {
   const {translate} = useApplicationContext();
@@ -211,9 +211,9 @@ export const MeetingParticipantsPicker = ({
         >
           <ChevronDownIcon
             aria-hidden="true"
-            width={12}
-            height={12}
-            css={[chevronIconStyles, isOpen && {transform: 'rotate(180deg)'}]}
+            width={16}
+            height={16}
+            css={[chevronIconStyles, isOpen ? {transform: 'rotateX(180deg)', marginTop: 2} : {marginTop: 4}]}
           />
         </Button>
       </div>

@@ -27,9 +27,6 @@ export const listWrapper = ({isHighlighted = false, noUnderline = false, noInter
 
   '&:hover, &:focus, &:focus-visible': {
     background: 'var(--app-bg-secondary)',
-    '&::after': {
-      borderBottom: 'none',
-    },
   },
 
   '&:hover [data-hover-class="chevron-icon"], &:focus, &:focus-visible [data-hover-class="chevron-icon"]': {
