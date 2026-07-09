@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -77,16 +77,42 @@ const VideoAsset = ({
   const hideControlsCallback = useCallback(() => setHideControls(true), []);
   const {removeTimeout, startTimeout} = useTimeout(hideControlsCallback, hideControlsDelayMilliseconds);
 
+  const videoPreviewRef = useRef<AssetUrl>();
+  const videoSrcRef = useRef<AssetUrl>();
+
+  videoPreviewRef.current = videoPreview;
+  videoSrcRef.current = videoSrc;
+
   useEffect(() => {
-    if (assetPreviewResource !== undefined && isFileSharingReceivingEnabled) {
-      void getAssetUrl(assetPreviewResource).then(setVideoPreview);
+    return () => {
+      videoPreviewRef.current?.dispose();
+      videoSrcRef.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (assetPreviewResource === undefined || !isFileSharingReceivingEnabled) {
+      return;
     }
 
+    let cancelled = false;
+
+    void getAssetUrl(assetPreviewResource).then(url => {
+      if (cancelled) {
+        url.dispose();
+        return;
+      }
+
+      setVideoPreview(previous => {
+        previous?.dispose();
+        return url;
+      });
+    });
+
     return () => {
-      videoPreview?.dispose();
-      videoSrc?.dispose();
+      cancelled = true;
     };
-  }, [assetPreviewResource, getAssetUrl, isFileSharingReceivingEnabled, videoPreview, videoSrc]);
+  }, [assetPreviewResource, getAssetUrl, isFileSharingReceivingEnabled]);
 
   // Initial check if video is supported with `canPlayType` method, which checks for MIME type, e.g. 'video/mp4' or 'video/mov'.
   // It's not 100% reliable (e.g. doesn't check codecs), but it's synchorous, which is helpful for initial rendering.
@@ -140,11 +166,15 @@ const VideoAsset = ({
             // ToDo: This needs to be revisited
             // amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
             // amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNPLAYABLE_ERROR);
+            assetUrl.dispose();
             setVideoPlaybackError(true);
             return;
           }
 
-          setVideoSrc(assetUrl);
+          setVideoSrc(previous => {
+            previous?.dispose();
+            return assetUrl;
+          });
           setIsVideoLoaded(true);
           // ToDo: This needs to be revisited
           //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);

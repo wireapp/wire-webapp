@@ -90,6 +90,17 @@ describe('useAssetTransfer', () => {
       assetUrl.dispose();
       expect(window.URL.revokeObjectURL).toHaveBeenCalledWith('assetUrl');
     });
+
+    it('should keep a stable getAssetUrl reference between re-renders', () => {
+      const {result, rerender} = renderHook(() => useAssetTransfer(message, assetRepository));
+
+      const initialGetAssetUrl = result.current.getAssetUrl;
+
+      rerender();
+      rerender();
+
+      expect(result.current.getAssetUrl).toBe(initialGetAssetUrl);
+    });
   });
 
   describe('upload progress', () => {
