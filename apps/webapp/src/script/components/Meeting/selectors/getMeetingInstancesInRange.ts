@@ -32,10 +32,8 @@ const createMeetingInstance = (meetingSeries: MeetingSeries, start: Date): Meeti
   end: new Date(start.getTime() + meetingSeries.duration_ms),
 });
 
-const isMeetingInstanceInRange = (meetingInstance: MeetingInstance, from: Date, to: Date): boolean =>
-  meetingInstance.end.getTime() >= from.getTime() &&
-  meetingInstance.start.getTime() >= from.getTime() &&
-  meetingInstance.start.getTime() < to.getTime();
+const isMeetingInstanceStartInRange = (meetingInstance: MeetingInstance, from: Date, to: Date): boolean =>
+  meetingInstance.start.getTime() >= from.getTime() && meetingInstance.start.getTime() < to.getTime();
 
 const isAfterRecurrenceUntil = (start: Date, recurrenceUntil?: string): boolean =>
   recurrenceUntil !== undefined && start.getTime() > Date.parse(recurrenceUntil);
@@ -88,7 +86,7 @@ const getRecurringMeetingInstancesInRange = (meetingSeries: MeetingSeries, from:
 
     const meetingInstance = createMeetingInstance(meetingSeries, current);
 
-    if (isMeetingInstanceInRange(meetingInstance, from, to)) {
+    if (isMeetingInstanceStartInRange(meetingInstance, from, to)) {
       meetingInstances.push(meetingInstance);
     }
 
@@ -113,7 +111,7 @@ export const getMeetingInstancesInRange = (meetingSeries: MeetingSeries, from: D
   if (meetingSeries.recurrence === 'doesNotRepeat') {
     const meetingInstance = createMeetingInstance(meetingSeries, new Date(meetingSeries.series_start_date));
 
-    return isMeetingInstanceInRange(meetingInstance, from, to) ? [meetingInstance] : [];
+    return isMeetingInstanceStartInRange(meetingInstance, from, to) ? [meetingInstance] : [];
   }
 
   return getRecurringMeetingInstancesInRange(meetingSeries, from, to);

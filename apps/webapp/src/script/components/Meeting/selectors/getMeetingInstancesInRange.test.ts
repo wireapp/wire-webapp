@@ -48,6 +48,28 @@ describe('getMeetingInstancesInRange', () => {
     ]);
   });
 
+  it('includes only instances whose start falls in [from, to)', () => {
+    const midnightSpanningMeeting = createMeetingSeries({
+      recurrence: 'doesNotRepeat',
+      series_start_date: '2026-06-14T23:00:00.000Z',
+      series_end_date: '2026-06-15T01:00:00.000Z',
+      duration_ms: 2 * 3_600_000,
+      qualified_id: {id: 'midnight-meeting', domain: 'example.com'},
+      title: 'Late night sync',
+    });
+    const startsOnWindowBoundary = createMeetingSeries({
+      recurrence: 'doesNotRepeat',
+      series_start_date: '2026-06-15T00:00:00.000Z',
+      series_end_date: '2026-06-15T01:00:00.000Z',
+      duration_ms: 3_600_000,
+      qualified_id: {id: 'boundary-meeting', domain: 'example.com'},
+      title: 'Midnight start',
+    });
+
+    expect(getMeetingInstancesInRange(midnightSpanningMeeting, from, to)).toEqual([]);
+    expect(getMeetingInstancesInRange(startsOnWindowBoundary, from, to)).toHaveLength(1);
+  });
+
   it('excludes ended non-recurring meetings and includes future ones', () => {
     const pastMeetingSeries = createMeetingSeries({
       recurrence: 'doesNotRepeat',
