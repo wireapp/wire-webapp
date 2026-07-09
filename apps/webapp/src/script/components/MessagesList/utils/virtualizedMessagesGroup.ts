@@ -75,14 +75,6 @@ export function isMarker(object: any): object is Marker {
   return object?.messageType === 'marker';
 }
 
-export function getVirtualizedMessagesGroupItemKey(item: Marker | GroupedMessage): string {
-  if (isMarker(item)) {
-    return `marker-${item.type}-${item.timestamp}-${item.firstMessageTimestamp}-${item.lastMessageTimestamp}`;
-  }
-
-  return `message-${item.message.id}`;
-}
-
 /**
  * Determines whether a message should be grouped with a previous one based on timestamp,
  * a message should be grouped if it's sent within the same minute on the clock than the first message in the group
