@@ -74,6 +74,21 @@ const advanceToFirstInstanceOnOrAfter = (
   return current;
 };
 
+/**
+ * First instance start on or after `now`, walking forward from the series anchor.
+ *
+ * Used when prefilling the edit form for recurring meetings so updates do not move
+ * the series anchor to a later selected occurrence and wipe earlier instances.
+ */
+export const getUpcomingMeetingInstanceStart = (meetingSeries: MeetingSeries, now: Date): Date => {
+  if (meetingSeries.recurrence === 'doesNotRepeat') {
+    return new Date(meetingSeries.series_start_date);
+  }
+
+  const anchor = new Date(meetingSeries.series_start_date);
+  return advanceToFirstInstanceOnOrAfter(anchor, now, meetingSeries.recurrence);
+};
+
 const getRecurringMeetingInstancesInRange = (meetingSeries: MeetingSeries, from: Date, to: Date): MeetingInstance[] => {
   const anchor = new Date(meetingSeries.series_start_date);
   const meetingInstances: MeetingInstance[] = [];

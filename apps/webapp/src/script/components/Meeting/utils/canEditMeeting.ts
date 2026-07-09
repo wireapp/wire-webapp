@@ -28,7 +28,7 @@ export const isMeetingHost = (meetingSeries: MeetingSeries, selfUser: User): boo
 /**
  * Edit is allowed per list row: the host may edit an instance until it starts.
  *
- * The edit form is prefilled from the same instance's start/end
+ * The edit form is prefilled from the upcoming instance start/end for recurring series
  * ({@link mapMeetingInstanceToScheduleFormState}); the series `qualified_id` is used for the update.
  */
 export const canEditMeeting = (meetingInstance: MeetingInstance, selfUser: User, nowMilliseconds: number): boolean => {

@@ -17,6 +17,8 @@
  *
  */
 
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {User} from 'Repositories/entity/User';
@@ -51,24 +53,28 @@ const createMeetingInstance = (
   end: new Date(end),
 });
 
-describe('mapMeetingInstanceToScheduleFormState', () => {
-  it('maps the selected instance start/end to schedule form state', () => {
-    const selectedUsers = [createUser('1'), createUser('2')];
-    const meetingInstance = createMeetingInstance({}, '2026-06-22T10:00:00.000Z', '2026-06-22T11:00:00.000Z');
+const wallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+});
 
-    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers);
+describe('mapMeetingInstanceToScheduleFormState', () => {
+  it('maps the upcoming instance start/end for recurring meetings', () => {
+    const selectedUsers = [createUser('1'), createUser('2')];
+    const meetingInstance = createMeetingInstance({}, '2026-06-29T10:00:00.000Z', '2026-06-29T11:00:00.000Z');
+
+    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, wallClock);
 
     expect(result.title).toBe('Weekly sync');
     expect(result.start.isJust).toBe(true);
-    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T10:00:00.000Z'));
+    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T10:00:00.000Z'));
     expect(result.end.isJust).toBe(true);
-    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T11:00:00.000Z'));
+    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T11:00:00.000Z'));
     expect(result.recurrence).toBe('weekly');
     expect(result.participantsFilter).toBe('');
     expect(result.selectedUsers).toBe(selectedUsers);
   });
 
-  it('uses instance times rather than the series anchor for recurring meetings', () => {
+  it('does not use a later selected instance start/end for recurring meetings', () => {
     const meetingInstance = createMeetingInstance(
       {
         series_start_date: '2026-06-01T10:00:00.000Z',
@@ -78,10 +84,27 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
       '2026-06-29T11:00:00.000Z',
     );
 
-    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, []);
+    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
 
-    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-29T10:00:00.000Z'));
-    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-29T11:00:00.000Z'));
+    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T11:00:00.000Z'));
+  });
+
+  it('uses the series anchor for non-repeating meetings', () => {
+    const meetingInstance = createMeetingInstance(
+      {
+        recurrence: 'doesNotRepeat',
+        series_start_date: '2026-06-16T10:00:00.000Z',
+        series_end_date: '2026-06-16T11:00:00.000Z',
+      },
+      '2026-06-16T10:00:00.000Z',
+      '2026-06-16T11:00:00.000Z',
+    );
+
+    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
+
+    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T10:00:00.000Z'));
+    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 
   it('uses selectedUsers passed by the caller', () => {
@@ -89,7 +112,7 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
     const bob = createUser('2');
     const selectedUsers = [alice, bob];
 
-    const result = mapMeetingInstanceToScheduleFormState(createMeetingInstance(), selectedUsers);
+    const result = mapMeetingInstanceToScheduleFormState(createMeetingInstance(), selectedUsers, wallClock);
 
     expect(result.selectedUsers).toHaveLength(2);
     expect(result.selectedUsers[0]).toBe(alice);

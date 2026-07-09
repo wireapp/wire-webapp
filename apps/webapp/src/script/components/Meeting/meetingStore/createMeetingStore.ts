@@ -78,7 +78,7 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
         .mapRejected(() => meetingSubmitErrors.updateFailed)
         .map(conversation => {
           const selectedUsers = [...conversation.participating_user_ets()];
-          const formState = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers);
+          const formState = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, deps.wallClock);
 
           return {
             formState,

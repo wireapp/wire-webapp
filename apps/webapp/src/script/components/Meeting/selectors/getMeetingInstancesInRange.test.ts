@@ -19,7 +19,7 @@
 
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 
-import {getMeetingInstancesInRange} from './getMeetingInstancesInRange';
+import {getMeetingInstancesInRange, getUpcomingMeetingInstanceStart} from './getMeetingInstancesInRange';
 
 const createMeetingSeries = (overrides: Partial<MeetingSeries> & Pick<MeetingSeries, 'recurrence'>): MeetingSeries => ({
   series_start_date: '2026-06-01T10:00:00.000Z',
@@ -203,5 +203,27 @@ describe('getMeetingInstancesInRange', () => {
         '2026-07-15T10:00:00.000Z',
       ]);
     });
+  });
+});
+
+describe('getUpcomingMeetingInstanceStart', () => {
+  it('returns the series anchor for non-repeating meetings', () => {
+    const meetingSeries = createMeetingSeries({
+      recurrence: 'doesNotRepeat',
+      series_start_date: '2026-06-16T10:00:00.000Z',
+      series_end_date: '2026-06-16T11:00:00.000Z',
+    });
+
+    expect(getUpcomingMeetingInstanceStart(meetingSeries, new Date('2026-06-10T12:00:00.000Z')).toISOString()).toBe(
+      '2026-06-16T10:00:00.000Z',
+    );
+  });
+
+  it('returns the first recurring instance on or after now', () => {
+    const meetingSeries = createMeetingSeries({recurrence: 'weekly'});
+
+    expect(getUpcomingMeetingInstanceStart(meetingSeries, new Date('2026-06-10T12:00:00.000Z')).toISOString()).toBe(
+      '2026-06-15T10:00:00.000Z',
+    );
   });
 });

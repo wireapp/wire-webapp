@@ -17,7 +17,7 @@
  *
  */
 
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 
@@ -73,6 +73,10 @@ describe('createMeetingStore', () => {
     end: new Date('2026-06-16T11:00:00.000Z'),
   };
 
+  const wallClock = createDeterministicWallClock({
+    initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+  });
+
   const createDeps = ({
     getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting])),
     safeGetConversationById = jest.fn(),
@@ -82,7 +86,7 @@ describe('createMeetingStore', () => {
   } = {}): MeetingStoreDeps => ({
     meetingsRepository: {getMeetingsList} as unknown as MeetingsRepository,
     conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
-    wallClock: createWallClock(),
+    wallClock,
   });
 
   beforeEach(() => {
@@ -157,7 +161,7 @@ describe('createMeetingStore', () => {
     expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 
-  it('prefills edit form with the selected instance times for recurring meetings', async () => {
+  it('prefills edit form with the upcoming instance times for recurring meetings', async () => {
     const conversation = new Conversation(
       'conversation-id',
       'example.com',
@@ -173,8 +177,8 @@ describe('createMeetingStore', () => {
         series_end_date: '2026-06-01T11:00:00.000Z',
         recurrence: 'weekly' as const,
       },
-      start: new Date('2026-06-22T10:00:00.000Z'),
-      end: new Date('2026-06-22T11:00:00.000Z'),
+      start: new Date('2026-06-29T10:00:00.000Z'),
+      end: new Date('2026-06-29T11:00:00.000Z'),
     };
 
     const result = await store.getState().loadMeetingForEdit(recurringMeetingInstance);
