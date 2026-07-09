@@ -45,10 +45,7 @@ describe('VideoAsset', () => {
 
   const previewDispose = jest.fn();
   const videoSrcDispose = jest.fn();
-  const mockGetAssetUrl = jest.fn<
-    Promise<AssetUrl>,
-    [resource: AssetRemoteData, acceptedMimeTypes?: string[]]
-  >();
+  const mockGetAssetUrl = jest.fn<Promise<AssetUrl>, [resource: AssetRemoteData, acceptedMimeTypes?: string[]]>();
 
   const teamState = {
     isFileSharingReceivingEnabled: ko.pureComputed(() => true),
