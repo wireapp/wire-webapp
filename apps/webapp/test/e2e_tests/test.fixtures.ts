@@ -141,50 +141,73 @@ export const test = baseTest.extend<Fixtures>({
 /** Max time the login is allowed to take before the application needs to be useable */
 export const LOGIN_TIMEOUT = 40_000;
 
-type LoginCompletionResult = 'sidebar' | 'entropy';
-type LoginCompletionWaitResult =
-  | {type: 'success'; loginCompletionResult: LoginCompletionResult}
-  | {type: 'failure'; loginCompletionResult: LoginCompletionResult};
+type LoginStep = 'sidebar' | 'entropy' | 'historyInfo';
+type LoginStepWaitResult = {type: 'success'; loginStep: LoginStep} | {type: 'failure'; loginStep: LoginStep};
 
-async function waitForLoginCompletion(pageManager: PageManager): Promise<LoginCompletionResult> {
-  const waitForSidebar = waitForLoginCompletionSignal('sidebar', () => {
-    return pageManager.webapp.components
-      .conversationSidebar()
-      .sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-  });
+async function waitForLoginStep(pageManager: PageManager, options: {confirmNewHistory: boolean}): Promise<LoginStep> {
+  const loginStepWaits = [
+    waitForLoginStepSignal('sidebar', () => {
+      return pageManager.webapp.components
+        .conversationSidebar()
+        .sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+    }),
+    waitForLoginStepSignal('entropy', () => {
+      return pageManager.webapp.pages.login().entropyCanvas.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+    }),
+  ];
 
-  const waitForEntropy = waitForLoginCompletionSignal('entropy', () => {
-    return pageManager.webapp.pages.login().entropyCanvas.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-  });
-
-  const firstLoginCompletionWaitResult = await Promise.race([waitForSidebar, waitForEntropy]);
-
-  if (firstLoginCompletionWaitResult.type === 'success') {
-    return firstLoginCompletionWaitResult.loginCompletionResult;
+  if (options.confirmNewHistory === true) {
+    loginStepWaits.push(
+      waitForLoginStepSignal('historyInfo', () => {
+        return pageManager.webapp.pages.historyInfo().waitForConfirmButton(LOGIN_TIMEOUT);
+      }),
+    );
   }
 
-  const secondLoginCompletionWaitResult =
-    firstLoginCompletionWaitResult.loginCompletionResult === 'sidebar' ? await waitForEntropy : await waitForSidebar;
-
-  if (secondLoginCompletionWaitResult.type === 'success') {
-    return secondLoginCompletionWaitResult.loginCompletionResult;
-  }
-
-  throw new Error('Login did not reach either the conversation sidebar or the entropy screen');
+  return waitForFirstSuccessfulLoginStep(loginStepWaits);
 }
 
-async function waitForLoginCompletionSignal(
-  loginCompletionResult: LoginCompletionResult,
-  waitForLoginCompletionSignalToAppear: () => Promise<void>,
-): Promise<LoginCompletionWaitResult> {
+async function waitForFirstSuccessfulLoginStep(loginStepWaits: Promise<LoginStepWaitResult>[]): Promise<LoginStep> {
+  const pendingLoginStepWaits = [...loginStepWaits];
+
+  while (pendingLoginStepWaits.length > 0) {
+    const nextLoginStepWaitResult = await waitForNextLoginStepResult(pendingLoginStepWaits);
+
+    pendingLoginStepWaits.splice(nextLoginStepWaitResult.index, 1);
+
+    if (nextLoginStepWaitResult.result.type === 'success') {
+      return nextLoginStepWaitResult.result.loginStep;
+    }
+  }
+
+  throw new Error('Login did not reach the conversation sidebar, entropy screen, or history info confirmation');
+}
+
+async function waitForNextLoginStepResult(
+  pendingLoginStepWaits: Promise<LoginStepWaitResult>[],
+): Promise<{index: number; result: LoginStepWaitResult}> {
+  return Promise.race(
+    pendingLoginStepWaits.map(async (loginStepWait, index) => {
+      const result = await loginStepWait;
+
+      return {index, result};
+    }),
+  );
+}
+
+async function waitForLoginStepSignal(
+  loginStep: LoginStep,
+  waitForLoginStepSignalToAppear: () => Promise<void>,
+): Promise<LoginStepWaitResult> {
   try {
-    await waitForLoginCompletionSignalToAppear();
+    await waitForLoginStepSignalToAppear();
 
-    return {type: 'success', loginCompletionResult};
+    return {type: 'success', loginStep};
   } catch {
-    return {type: 'failure', loginCompletionResult};
+    return {type: 'failure', loginStep};
   }
 }
+
 /** PagePlugin to log in as the given user */
 export const withLogin =
   (user: User | Promise<User>, options?: {baseUrl?: string; confirmNewHistory?: boolean}): PagePlugin =>
@@ -193,25 +216,31 @@ export const withLogin =
     await pageManager.openLoginPage(options?.baseUrl);
     await pageManager.webapp.pages.login().login(await user);
 
-    if (options?.confirmNewHistory) {
-      await pageManager.webapp.pages.historyInfo().clickConfirmButton();
-    }
-
     /**
      * Since the login may take up to 40s we manually wait for it to finish here instead of increasing the timeout on all actions / assertions after this util
      * This is an exception to the general best practice of using playwrights web assertions. (See: https://playwright.dev/docs/best-practices#use-web-first-assertions)
      */
-    const loginCompletionResult = await waitForLoginCompletion(pageManager);
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const loginStep = await waitForLoginStep(pageManager, {
+        confirmNewHistory: options?.confirmNewHistory === true,
+      });
 
-    if (loginCompletionResult === 'sidebar') {
-      return;
+      if (loginStep === 'sidebar') {
+        return;
+      }
+
+      if (loginStep === 'entropy') {
+        await pageManager.webapp.pages.login().completeEntropyCollection();
+        continue;
+      }
+
+      if (loginStep === 'historyInfo') {
+        await pageManager.webapp.pages.historyInfo().clickConfirmButton();
+        continue;
+      }
     }
 
-    await pageManager.webapp.pages.login().completeEntropyCollection();
-
-    await pageManager.webapp.components
-      .conversationSidebar()
-      .sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+    throw new Error('Login did not reach the conversation sidebar after handling entropy/history info steps');
   };
 
 /** PagePlugin to open a guest user link and join the group chat as temporary member */

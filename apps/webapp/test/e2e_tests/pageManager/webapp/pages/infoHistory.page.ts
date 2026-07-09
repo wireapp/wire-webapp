@@ -27,6 +27,11 @@ export class HistoryInfoPage {
     this.page = page;
     this.continueButton = this.page.getByTestId('do-history-confirm');
   }
+
+  async waitForConfirmButton(timeoutMilliseconds: number): Promise<void> {
+    await this.continueButton.waitFor({state: 'visible', timeout: timeoutMilliseconds});
+  }
+
   async isButtonVisible(timeout = 3_000) {
     try {
       await this.continueButton.waitFor({state: 'visible', timeout});
