@@ -88,7 +88,7 @@ export class MediaConstraintsHandler {
             width: {ideal: 1280},
             resizeMode: 'none',
           },
-          [VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE]: {
+          [VIDEO_QUALITY_MODE.ONE_TO_ONE]: {
             frameRate: {ideal: 30},
             height: {ideal: 720},
             width: {ideal: 1280},
@@ -215,7 +215,7 @@ export class MediaConstraintsHandler {
       return VIDEO_QUALITY_MODE.GROUP;
     }
 
-    return VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE;
+    return VIDEO_QUALITY_MODE.ONE_TO_ONE;
   }
 
   private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints & {autoGainControl: boolean} {

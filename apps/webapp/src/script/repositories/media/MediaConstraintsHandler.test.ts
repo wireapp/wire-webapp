@@ -262,11 +262,11 @@ describe('MediaConstraintsHandler', () => {
     });
 
     describe('Video Constraints', () => {
-      it('uses the improved one-to-one video constraints by default', () => {
+      it('uses the one-to-one video constraints by default', () => {
         createAvailableDevices({video: defaultId});
         const constraintsHandler = createConstraintsHandler();
-        const improvedOneToOneVideoConstraints =
-          MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[VIDEO_QUALITY_MODE.IMPROVED_ONE_TO_ONE];
+        const oneToOneVideoConstraints =
+          MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[VIDEO_QUALITY_MODE.ONE_TO_ONE];
 
         const constraints = constraintsHandler.getMediaStreamConstraints(
           false,
@@ -275,7 +275,7 @@ describe('MediaConstraintsHandler', () => {
         ) as ExtendedMediaTrackConstraints;
 
         expect(constraints.video).toEqual({
-          ...improvedOneToOneVideoConstraints,
+          ...oneToOneVideoConstraints,
           facingMode: MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE,
         });
       });
