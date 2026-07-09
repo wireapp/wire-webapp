@@ -25,6 +25,12 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 export const isMeetingHost = (meetingSeries: MeetingSeries, selfUser: User): boolean =>
   matchQualifiedIds(meetingSeries.qualified_creator, selfUser.qualifiedId);
 
+/**
+ * Edit is allowed per list row: the host may edit an instance until it starts.
+ *
+ * The edit form is prefilled from the same instance's start/end
+ * ({@link mapMeetingInstanceToScheduleFormState}); the series `qualified_id` is used for the update.
+ */
 export const canEditMeeting = (meetingInstance: MeetingInstance, selfUser: User, nowMs: number): boolean => {
   const instanceHasNotStarted = nowMs < meetingInstance.start.getTime();
 

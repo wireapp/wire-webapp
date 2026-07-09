@@ -21,7 +21,7 @@ import type {Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
-import {mapSeriesToScheduleFormState} from 'Components/Meeting/mapSeriesToScheduleFormState';
+import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeetingInstanceToScheduleFormState';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import {
   scheduleMeeting as scheduleMeetingTask,
@@ -78,7 +78,7 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
         .mapRejected(() => meetingSubmitErrors.updateFailed)
         .map(conversation => {
           const selectedUsers = [...conversation.participating_user_ets()];
-          const formState = mapSeriesToScheduleFormState(meetingSeries, selectedUsers);
+          const formState = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers);
 
           return {
             formState,

@@ -156,4 +156,31 @@ describe('createMeetingStore', () => {
     expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T10:00:00.000Z'));
     expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
+
+  it('prefills edit form with the selected instance times for recurring meetings', async () => {
+    const conversation = new Conversation(
+      'conversation-id',
+      'example.com',
+      CONVERSATION_PROTOCOL.MLS,
+      translateForTest,
+    );
+    const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
+    const store = createMeetingStore(createDeps({safeGetConversationById}));
+    const recurringMeetingInstance = {
+      meetingSeries: {
+        ...meetingSeriesEntry,
+        series_start_date: '2026-06-01T10:00:00.000Z',
+        series_end_date: '2026-06-01T11:00:00.000Z',
+        recurrence: 'weekly' as const,
+      },
+      start: new Date('2026-06-22T10:00:00.000Z'),
+      end: new Date('2026-06-22T11:00:00.000Z'),
+    };
+
+    const result = await store.getState().loadMeetingForEdit(recurringMeetingInstance);
+
+    expect(result.isOk).toBe(true);
+    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T10:00:00.000Z'));
+    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T11:00:00.000Z'));
+  });
 });

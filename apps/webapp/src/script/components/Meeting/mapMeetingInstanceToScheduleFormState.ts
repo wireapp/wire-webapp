@@ -20,17 +20,27 @@
 import {maybe} from 'true-myth';
 
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
-import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
-import {User} from 'Repositories/entity/User';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import type {User} from 'Repositories/entity/User';
 
-export const mapSeriesToScheduleFormState = (
-  meetingSeries: MeetingSeries,
+/**
+ * Builds edit-form state from the selected list row.
+ *
+ * Uses the instance start/end so recurring series with a past anchor still open with the
+ * occurrence the user chose. Series metadata (title, recurrence, id) comes from `meetingSeries`.
+ */
+export const mapMeetingInstanceToScheduleFormState = (
+  meetingInstance: MeetingInstance,
   selectedUsers: User[],
-): ScheduleMeetingFormState => ({
-  title: meetingSeries.title,
-  start: maybe.just(new Date(meetingSeries.series_start_date)),
-  end: maybe.just(new Date(meetingSeries.series_end_date)),
-  recurrence: meetingSeries.recurrence,
-  selectedUsers,
-  participantsFilter: '',
-});
+): ScheduleMeetingFormState => {
+  const {meetingSeries, start, end} = meetingInstance;
+
+  return {
+    title: meetingSeries.title,
+    start: maybe.just(start),
+    end: maybe.just(end),
+    recurrence: meetingSeries.recurrence,
+    selectedUsers,
+    participantsFilter: '',
+  };
+};
