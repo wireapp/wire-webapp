@@ -20,6 +20,7 @@
 import {useCallback, useEffect, useMemo, useState, type RefObject} from 'react';
 
 import is from '@sindresorhus/is';
+import {formatISO9075, startOfDay} from 'date-fns';
 
 import {Loading} from '@wireapp/react-ui-kit';
 
@@ -51,6 +52,22 @@ export interface MeetingListProps {
   useMeetingDayGroupVirtualizer?: UseMeetingDayGroupVirtualizer;
 }
 
+const getCalendarDayKey = (timestampInMilliseconds: number): string =>
+  formatISO9075(startOfDay(new Date(timestampInMilliseconds)), {representation: 'date'});
+
+const filterNotEndedMeetingInstances = (
+  meetingInstancesByDay: MeetingInstancesByDay[],
+  nowMilliseconds: number,
+): MeetingInstancesByDay[] =>
+  meetingInstancesByDay
+    .map(dayGroup => ({
+      ...dayGroup,
+      meetingInstances: dayGroup.meetingInstances.filter(
+        meetingInstance => meetingInstance.end.getTime() >= nowMilliseconds,
+      ),
+    }))
+    .filter(dayGroup => is.nonEmptyArray(dayGroup.meetingInstances));
+
 const getVisibleDayGroups = (meetingInstancesByDay: MeetingInstancesByDay[]): MeetingInstancesByDay[] =>
   meetingInstancesByDay.filter(dayGroup => is.nonEmptyArray(dayGroup.meetingInstances));
 
@@ -66,20 +83,28 @@ export const MeetingList = ({
   const [visibleDayCount, setVisibleDayCount] = useState(INITIAL_VISIBLE_DAY_COUNT);
 
   useEffect(() => {
-    const id = wallClock.setInterval(() => setNowMilliseconds(wallClock.currentTimestampInMilliseconds), TIME_IN_MILLIS.SECOND);
+    const id = wallClock.setInterval(
+      () => setNowMilliseconds(wallClock.currentTimestampInMilliseconds),
+      TIME_IN_MILLIS.SECOND,
+    );
     return () => wallClock.clearInterval(id);
   }, [wallClock]);
 
-  const now = useMemo(() => new Date(nowMilliseconds), [nowMilliseconds]);
+  const visibleDayKey = getCalendarDayKey(nowMilliseconds);
 
-  const meetingInstancesByDay = useMemo(() => {
-    const {from, to} = getVisibleTimeWindow(now, {dayCount: visibleDayCount});
-    const meetingInstances = getMeetingInstances(meetingSeries, from, to).filter(
-      meetingInstance => meetingInstance.end.getTime() >= nowMilliseconds,
-    );
+  const visibleDayStart = useMemo(() => startOfDay(new Date(nowMilliseconds)), [visibleDayKey]);
+
+  const expandedMeetingInstancesByDay = useMemo(() => {
+    const {from, to} = getVisibleTimeWindow(visibleDayStart, {dayCount: visibleDayCount});
+    const meetingInstances = getMeetingInstances(meetingSeries, from, to);
 
     return groupMeetingInstancesByDay(meetingInstances);
-  }, [meetingSeries, now, nowMilliseconds, visibleDayCount]);
+  }, [meetingSeries, visibleDayCount, visibleDayStart]);
+
+  const meetingInstancesByDay = useMemo(
+    () => filterNotEndedMeetingInstances(expandedMeetingInstancesByDay, nowMilliseconds),
+    [expandedMeetingInstancesByDay, nowMilliseconds],
+  );
 
   const visibleDayGroups = useMemo(() => getVisibleDayGroups(meetingInstancesByDay), [meetingInstancesByDay]);
 
@@ -114,11 +139,12 @@ export const MeetingList = ({
     visibleDayCount,
     setVisibleDayCount,
     meetingSeries,
-    now,
+    visibleDayStart,
     wallClock,
   });
 
   const hasVisibleMeetingInstances = visibleDayGroups.length > 0;
+  const now = new Date(nowMilliseconds);
 
   if (isLoading && is.nonEmptyArray(meetingSeries)) {
     return (

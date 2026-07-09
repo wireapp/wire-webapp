@@ -34,7 +34,7 @@ type UseLoadMoreMeetingListDaysParams = {
   visibleDayCount: number;
   setVisibleDayCount: (updateVisibleDayCount: (previousVisibleDayCount: number) => number) => void;
   meetingSeries: MeetingSeries[];
-  now: Date;
+  visibleDayStart: Date;
   wallClock: WallClock;
 };
 
@@ -79,10 +79,14 @@ export const useLoadMoreMeetingListDays = ({
   visibleDayCount,
   setVisibleDayCount,
   meetingSeries,
-  now,
+  visibleDayStart,
   wallClock,
 }: UseLoadMoreMeetingListDaysParams): void => {
-  const hasMeetingInstancesBeyondWindow = getHasMeetingInstancesBeyondWindow(meetingSeries, now, visibleDayCount);
+  const hasMeetingInstancesBeyondWindow = getHasMeetingInstancesBeyondWindow(
+    meetingSeries,
+    visibleDayStart,
+    visibleDayCount,
+  );
   const virtualizerRef = useRef(virtualizer);
   virtualizerRef.current = virtualizer;
 
