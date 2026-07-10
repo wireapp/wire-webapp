@@ -213,7 +213,7 @@ export const MeetingParticipantsPicker = ({
             aria-hidden="true"
             width={16}
             height={16}
-            css={[chevronIconStyles, isOpen ? {transform: 'rotateX(180deg)', marginTop: 2} : {marginTop: 4}]}
+            css={chevronIconStyles(isOpen)}
           />
         </Button>
       </div>
