@@ -581,9 +581,9 @@ test.describe('Guestroom', () => {
   );
 
   const ssoUser = getUser({
-    email: process.env.SCIM_USER_SSO_CODE,
-    username: process.env.SCIM_USER_EMAIL,
-    password: process.env.SCIM_USER_PASSWORD,
+    email: process.env.SSO_CLAIMED_USER_EMAIL,
+    username: process.env.SSO_CLAIMED_USER_EMAIL,
+    password: process.env.SSO_CLAIMED_USER_PASSWORD,
   });
 
   test(
