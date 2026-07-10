@@ -173,6 +173,8 @@ describe('Account', () => {
         domain: 'zinfra.io',
       });
 
+    nock(MOCK_BACKEND.rest).get(`/v${MINIMUM_API_VERSION}${AuthAPI.URL.COOKIES}`).reply(HTTP_STATUS.OK, {}).persist();
+
     nock(MOCK_BACKEND.rest)
       .get(NotificationAPI.URL.NOTIFICATION)
       .query({client: CLIENT_ID, size: 10000})
