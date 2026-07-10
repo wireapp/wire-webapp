@@ -244,4 +244,53 @@ describe('VideoAsset', () => {
     expect(previewDispose).toHaveBeenCalledTimes(1);
     expect(videoSrcDispose).toHaveBeenCalledTimes(1);
   });
+
+  it('revokes the object URL when unmounted before play finishes loading', async () => {
+    let resolveGetAssetUrl: (value: AssetUrl) => void = () => {};
+    const deferredGetAssetUrl = new Promise<AssetUrl>(resolve => {
+      resolveGetAssetUrl = resolve;
+    });
+
+    mockGetAssetUrl.mockReset();
+    previewDispose.mockReset();
+    videoSrcDispose.mockReset();
+
+    mockGetAssetUrl
+      .mockResolvedValueOnce({url: 'blob:mock-preview', dispose: previewDispose})
+      .mockImplementationOnce(() => deferredGetAssetUrl);
+
+    mockedUseAssetTransfer.mockReturnValue({
+      cancelUpload: jest.fn(),
+      downloadAsset: jest.fn(),
+      getAssetUrl: mockGetAssetUrl,
+      isDownloading: false,
+      isPendingUpload: false,
+      isUploaded: true,
+      isUploading: false,
+      transferState: AssetTransferState.UPLOADED,
+      uploadProgress: -1,
+    });
+
+    const message = createVideoMessage();
+    const {unmount} = render(<VideoAsset message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+
+    await waitFor(() => {
+      expect(mockGetAssetUrl).toHaveBeenCalledTimes(1);
+    });
+
+    fireEvent.click(screen.getByTestId('do-play-media'));
+
+    await waitFor(() => {
+      expect(mockGetAssetUrl).toHaveBeenCalledTimes(2);
+    });
+
+    unmount();
+
+    const deferredDispose = jest.fn();
+    resolveGetAssetUrl({url: 'blob:mock-deferred-video', dispose: deferredDispose});
+
+    await waitFor(() => {
+      expect(deferredDispose).toHaveBeenCalledTimes(1);
+    });
+  });
 });

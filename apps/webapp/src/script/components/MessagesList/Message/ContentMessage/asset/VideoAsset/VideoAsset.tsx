@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -76,6 +76,16 @@ const VideoAsset = ({
   const [hideControls, setHideControls] = useState(false);
   const hideControlsCallback = useCallback(() => setHideControls(true), []);
   const {removeTimeout, startTimeout} = useTimeout(hideControlsCallback, hideControlsDelayMilliseconds);
+
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     return () => videoPreview?.dispose();
@@ -153,7 +163,18 @@ const VideoAsset = ({
 
         try {
           const assetUrl = await getAssetUrl(asset.original_resource());
+
+          if (!isMountedRef.current) {
+            assetUrl.dispose();
+            return;
+          }
+
           const playable = await isVideoPlayable(assetUrl.url);
+
+          if (!isMountedRef.current) {
+            assetUrl.dispose();
+            return;
+          }
 
           if (!playable) {
             // ToDo: This needs to be revisited
@@ -169,6 +190,10 @@ const VideoAsset = ({
           // ToDo: This needs to be revisited
           //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);
         } catch (error: unknown) {
+          if (!isMountedRef.current) {
+            return;
+          }
+
           if (error instanceof Error) {
             if (error.name !== AssetError.CANCEL_ERROR) {
               setVideoPlaybackError(true);
@@ -179,7 +204,9 @@ const VideoAsset = ({
           console.error('Failed to load video asset ', error);
         }
 
-        asset.status(AssetTransferState.UPLOADED);
+        if (isMountedRef.current) {
+          asset.status(AssetTransferState.UPLOADED);
+        }
       }
     }
   };
