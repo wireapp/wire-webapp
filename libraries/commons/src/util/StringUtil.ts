@@ -41,6 +41,15 @@ const maxSize = 10_000;
 const maximumSafeLogMessageLength = 200;
 const maximumSafeErrorNameLength = 100;
 const redactedValue = '[REDACTED]';
+const loggableUrlPattern = /\b(?:wss?|https?):\/\/[^\s"'<>]+/giu;
+const sensitiveQueryParameterPattern =
+  /\b(access_token|sync_marker|marker_token|token|client|client_id)=([^&\s"']*)/giu;
+const bearerCredentialPattern = /\b(authorization\s*:\s*)?bearer\s+[^\s,;]+/giu;
+const cookieHeaderPattern = /\b(?:set-cookie|cookie)\s*:\s*[^;\s]*(?:;[^\r\n]*)?/giu;
+const jsonWebTokenPattern = /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gu;
+const safeErrorNamePattern = /^[A-Za-z0-9_.:-]+$/u;
+const newlinePattern = /[\r\n]+/gu;
+
 export function serializeArgs(args: any[]): any[] {
   return args.map(arg => {
     let result: any;
@@ -120,23 +129,23 @@ function sanitizeUrlForLog(urlValue: string): string {
 }
 
 function redactSensitiveString(value: string): string {
-  const valueWithSanitizedUrls = value.replace(/\b(?:wss?|https?):\/\/[^\s"'<>]+/giu, sanitizeUrlForLog);
+  const valueWithSanitizedUrls = value.replace(loggableUrlPattern, sanitizeUrlForLog);
   const valueWithSanitizedQueryParameters = valueWithSanitizedUrls.replace(
-    /\b(access_token|sync_marker|marker_token|token|client|client_id)=([^&\s"']*)/giu,
+    sensitiveQueryParameterPattern,
     `$1=${redactedValue}`,
   );
   const valueWithSanitizedHeaders = valueWithSanitizedQueryParameters
     .replace(
-      /\b(authorization\s*:\s*)?bearer\s+[^\s,;]+/giu,
+      bearerCredentialPattern,
       (_matchedValue, authorizationPrefix: string | undefined) => `${authorizationPrefix ?? ''}Bearer ${redactedValue}`,
     )
-    .replace(/\b(?:set-cookie|cookie)\s*:\s*[^;\s]*(?:;[^\r\n]*)?/giu, `Cookie: ${redactedValue}`);
+    .replace(cookieHeaderPattern, `Cookie: ${redactedValue}`);
 
-  return valueWithSanitizedHeaders.replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gu, redactedValue);
+  return valueWithSanitizedHeaders.replace(jsonWebTokenPattern, redactedValue);
 }
 
 export function sanitizeLogMessage(message: string): string {
-  return redactSensitiveString(message.replace(/[\r\n]+/gu, ' ')).slice(0, maximumSafeLogMessageLength);
+  return redactSensitiveString(message.replace(newlinePattern, ' ')).slice(0, maximumSafeLogMessageLength);
 }
 
 export function formatSafeLogValue(value: string): string {
@@ -144,8 +153,7 @@ export function formatSafeLogValue(value: string): string {
 }
 
 function sanitizeErrorName(errorName: string): string {
-  const isSafeErrorName =
-    errorName.length > 0 && errorName.length <= maximumSafeErrorNameLength && /^[A-Za-z0-9_.:-]+$/u.test(errorName);
+  const isSafeErrorName = errorName.length <= maximumSafeErrorNameLength && safeErrorNamePattern.test(errorName);
 
   return isSafeErrorName ? errorName : 'UnknownError';
 }
