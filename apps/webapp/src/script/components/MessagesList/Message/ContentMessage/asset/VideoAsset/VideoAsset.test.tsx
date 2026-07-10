@@ -180,6 +180,12 @@ describe('VideoAsset', () => {
       expect(assetRepository.load).toHaveBeenCalledTimes(2);
     });
 
+    const videoElement = document.querySelector('[data-uie-name="video-asset"] video') as HTMLVideoElement;
+
+    await waitFor(() => {
+      expect(videoElement.getAttribute('src')).toBe('blob:mock-video-src');
+    });
+
     for (const uploadProgress of [25, 50, 75]) {
       act(() => {
         progressObservable(uploadProgress);
