@@ -67,7 +67,7 @@ export class AppLockState {
     this.isAppLockEnabled = ko.pureComputed(() => {
       const isMdmAppLockDisabled =
         Config.getConfig().FEATURE.ENABLE_MDM_CONFIG &&
-        Boolean(Config.getDesktopConfig()?.managedConfig?.applockOverride);
+        Config.getDesktopConfig()?.managedConfig?.applockOverride === true;
       if (isMdmAppLockDisabled) {
         return false;
       }

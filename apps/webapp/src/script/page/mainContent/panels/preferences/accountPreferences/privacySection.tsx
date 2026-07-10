@@ -56,7 +56,7 @@ const PrivacySection = ({
     ]);
 
   const enableMdmConfig = Config.getConfig().FEATURE.ENABLE_MDM_CONFIG;
-  const appLockOverride = Boolean(Config.getDesktopConfig()?.managedConfig?.applockOverride);
+  const appLockOverride = Config.getDesktopConfig()?.managedConfig?.applockOverride === true;
   const isMdmAppLockDisabled = enableMdmConfig && appLockOverride;
 
   const {receiptMode, typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, [
