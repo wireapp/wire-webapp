@@ -586,7 +586,8 @@ test.describe('Guestroom', () => {
     password: process.env.SSO_CLAIMED_USER_PASSWORD,
   });
 
-  test(
+  // Todo: This test is skipped because of disabled Okta account [WPB-26999]
+  test.skip(
     'I want to join guestroom invite with enterprise login',
     {tag: ['@TC-3477', '@regression']},
     async ({context, createPage}) => {
