@@ -34,7 +34,7 @@ import {
   WEBSOCKET_STATE,
 } from './reconnectingWebsocket';
 
-import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
+import {AuthAPI, InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
 import {MINIMUM_API_VERSION} from '../config';
 import {HttpClient, NetworkError} from '../http/';
 import {Notification} from '../notification';
@@ -151,6 +151,7 @@ export class WebSocketClient extends EventEmitter {
 
   private readonly onReconnect = async () => {
     await this.waitForValidAccessTokenBeforeReconnect();
+    await this.verifyAuthenticatedSessionBeforeReconnect();
 
     return this.buildWebSocketUrl();
   };
@@ -250,6 +251,17 @@ export class WebSocketClient extends EventEmitter {
       );
       await this.waitForNextAccessTokenRefreshRetry(nextRetryDelayInMilliseconds);
     }
+  }
+
+  private async verifyAuthenticatedSessionBeforeReconnect(): Promise<void> {
+    this.logger.info('Verifying authenticated HTTP session before WebSocket reconnect');
+
+    await this.client.sendRequest({
+      method: 'get',
+      url: AuthAPI.URL.COOKIES,
+    });
+
+    this.logger.info('Authenticated HTTP session verified before WebSocket reconnect');
   }
 
   private isInvalidSessionError(error: unknown): boolean {

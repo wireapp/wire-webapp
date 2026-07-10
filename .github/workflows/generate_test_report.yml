@@ -48,28 +48,12 @@ jobs:
       - name: Install JS dependencies
         run: ./bin/yarn --immutable
 
-      - name: Generate package unit test reports
-        id: package_unit_test_reports
+      - name: Generate unit test reports
+        id: unit_test_reports
         continue-on-error: true
         env:
           BRANCH: ${{ github.ref_name }}
         run: ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/generateUnitTestReports.ts
-
-      - name: Generate app unit test report
-        run: |
-          set -euo pipefail
-          : > ${{ env.UNIT_TEST_REPORT_FILE }}
-          (
-            cd ./apps/server
-            node ../../node_modules/jest/bin/jest.js --config jest.config.js --coverage --coverageReporters=lcov
-          ) 2>&1 | tee -a ${{ env.UNIT_TEST_REPORT_FILE }}
-          (
-            cd ./apps/webapp
-            node ../../node_modules/jest/bin/jest.js --config jest.report.config.cjs --coverage --coverageReporters=lcov --verbose
-          ) 2>&1 | tee -a ${{ env.UNIT_TEST_REPORT_FILE }}
-          echo -e "BRANCH = ${{ github.ref_name }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
-          echo -e "COMMIT SHA = ${TESTED_COMMIT_SHA}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
-          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{ env.UNIT_TEST_REPORT_FILE }}
 
       - name: Upload unit-tests.log to S3
         env:
@@ -80,22 +64,23 @@ jobs:
           TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
           aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://wire-webapp/unit-tests-${TIMESTAMP}-${TESTED_COMMIT_SHA}.log
 
-      - name: Upload package unit test reports
+      - name: Upload complete unit test reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: package-unit-test-reports
-          path: ${{ env.UNIT_TEST_REPORTS_DIRECTORY }}/*.log
+          name: unit-test-reports
+          path: |
+            ${{ env.UNIT_TEST_REPORT_FILE }}
+            ${{ env.UNIT_TEST_REPORTS_DIRECTORY }}/manifest.json
+            ${{ env.UNIT_TEST_REPORTS_DIRECTORY }}/*.log
           if-no-files-found: error
 
-      - name: Upload app unit test report
+      - name: Fail when manifest contains failed projects
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: app-unit-test-report
-          path: ${{ env.UNIT_TEST_REPORT_FILE }}
-          if-no-files-found: error
-
-      - name: Fail when package unit tests failed
-        if: always() && steps.package_unit_test_reports.outcome == 'failure'
-        run: exit 1
+        run: |
+          node -e '
+            const manifest = require("./unit-test-reports/manifest.json");
+            if (manifest.overallStatus !== "passed") {
+              process.exit(1);
+            }
+          '

@@ -59,6 +59,14 @@ flowchart LR
 
 We will adopt a trunk-based, GitHub-driven release process with automatic beta deployments from release branches, explicit quality assurance approval before production, and post-deployment production tagging.
 
+### Environment audiences and stability expectations
+
+Edge is the Web team's immediate dogfooding environment. Every eligible change merged to `main` may appear on Edge. Because Edge continuously follows trunk, it provides no stability guarantee and may include incomplete, experimental, or recently merged changes protected by feature flags. It is not intended to be stable enough for broader company-wide daily use.
+
+Beta is the logical release stage for company-wide internal release-candidate validation. It follows an active release branch rather than trunk and should be stable enough for broader daily internal use. Beta represents the current candidate for the next Production release. During the transition, the existing `wire-webapp-staging` environment may continue to serve as Beta's physical target.
+
+A Beta candidate may be promoted when validation is complete and no known release-blocking issues remain. Production receives only the exact artifact validated on Beta. Production promotion remains an explicit decision through GitHub Environment approval; the absence of reported issues does not automatically deploy Beta to Production.
+
 The branch model is:
 
 - `master` will be renamed to `main`.

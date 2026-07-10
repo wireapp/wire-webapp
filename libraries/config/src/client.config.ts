@@ -54,6 +54,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       APPLOCK_SCHEDULED_TIMEOUT: env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT
         ? Number(env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT)
         : null,
+      ENABLE_MDM_CONFIG: env.FEATURE_ENABLE_MDM_CONFIG == 'true',
       ENABLE_CELLS: env.FEATURE_ENABLE_CELLS == 'true',
       CELLS_INIT_WITH_ZAUTH_TOKEN: env.FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN == 'true',
       CHECK_CONSENT: env.FEATURE_CHECK_CONSENT != 'false',
