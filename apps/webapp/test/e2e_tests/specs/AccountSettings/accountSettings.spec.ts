@@ -225,7 +225,6 @@ test.describe('account settings', () => {
     await expect(userA2DeviceComponents.conversationSidebar().personalUserName).toContainText(newUserName);
   });
 
-
   test(
     'Verify autogeneration of a username for a user',
     {tag: ['@TC-1939', '@regression']},
