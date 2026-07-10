@@ -498,6 +498,7 @@ export function ConfigToolbar() {
         Reset MLS Conversation
       </Button>
       <Button onClick={() => window.wire?.app?.debug?.refreshE2EIRevocationData()}>Force CRL expiry</Button>
+      <Button onClick={() => {}}>Migrate convo to MLS</Button>
 
       <hr />
 
