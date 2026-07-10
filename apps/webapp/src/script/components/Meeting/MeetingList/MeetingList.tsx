@@ -17,59 +17,152 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState, type RefObject} from 'react';
+
+import is from '@sindresorhus/is';
+import {formatISO9075, startOfDay} from 'date-fns';
+
+import {Loading} from '@wireapp/react-ui-kit';
 
 import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
 import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeetingList';
+import {estimateMeetingDayGroupHeight} from 'Components/Meeting/MeetingList/estimateMeetingDayGroupHeight';
 import {meetingListContainerStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
+import {INITIAL_VISIBLE_DAY_COUNT} from 'Components/Meeting/MeetingList/meetingListConstants';
+import {MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/meetingListItemGroup';
+import {useLoadMoreMeetingListDays} from 'Components/Meeting/MeetingList/useLoadMoreMeetingListDays';
 import {
-  MeetingGroupBy,
-  MeetingListItemGroup,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
-import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOngoingSection/TodayAndOngoingSection';
-import {MEETINGS_PAST, MEETINGS_TODAY, MEETINGS_TOMORROW} from 'Components/Meeting/mocks/MeetingMocks';
-import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
-import {useApplicationContext} from 'src/script/page/RootProvider';
-import {t} from 'Util/localizerUtil';
+  useMeetingDayGroupVirtualizer,
+  type UseMeetingDayGroupVirtualizer,
+} from 'Components/Meeting/MeetingList/useMeetingDayGroupVirtualizer';
+import {getMeetingInstances} from 'Components/Meeting/selectors/getMeetingInstances';
+import {getVisibleTimeWindow} from 'Components/Meeting/selectors/getVisibleTimeWindow';
+import {groupMeetingInstancesByDay} from 'Components/Meeting/selectors/groupMeetingInstancesByDay';
+import type {MeetingInstancesByDay} from 'Components/Meeting/selectors/groupMeetingInstancesByDay';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
+import {getDaySectionHeader} from 'Components/Meeting/utils/getDaySectionHeader';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-export interface Meeting {
-  start_date: string;
-  end_date: string;
-  schedule: string;
-  conversation_id: string;
-  title: string;
-  // TODO: Ask iOS and Android about how to identify this status
-  attending?: boolean;
+export interface MeetingListProps {
+  meetingSeries: MeetingSeries[];
+  isLoading: boolean;
+  hasLoadError: boolean;
+  scrollElementRef?: RefObject<HTMLElement | null>;
+  useMeetingDayGroupVirtualizer?: UseMeetingDayGroupVirtualizer;
 }
 
-export interface TodayAndOngoingSectionProps {
-  meetingsToday: Meeting[];
-  headerForToday: string;
-  nowMs: number;
-}
+const getCalendarDayKey = (timestampInMilliseconds: number): string =>
+  formatISO9075(startOfDay(new Date(timestampInMilliseconds)), {representation: 'date'});
 
-export const MeetingList = () => {
-  const {wallClock} = useApplicationContext();
-  const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
+const filterNotEndedMeetingInstances = (
+  meetingInstancesByDay: MeetingInstancesByDay[],
+  nowMilliseconds: number,
+): MeetingInstancesByDay[] =>
+  meetingInstancesByDay
+    .map(dayGroup => ({
+      ...dayGroup,
+      meetingInstances: dayGroup.meetingInstances.filter(
+        meetingInstance => meetingInstance.end.getTime() >= nowMilliseconds,
+      ),
+    }))
+    .filter(dayGroup => is.nonEmptyArray(dayGroup.meetingInstances));
+
+const getVisibleDayGroups = (meetingInstancesByDay: MeetingInstancesByDay[]): MeetingInstancesByDay[] =>
+  meetingInstancesByDay.filter(dayGroup => is.nonEmptyArray(dayGroup.meetingInstances));
+
+export const MeetingList = ({
+  meetingSeries,
+  isLoading,
+  hasLoadError,
+  scrollElementRef,
+  useMeetingDayGroupVirtualizer: useMeetingDayGroupVirtualizerDependency = useMeetingDayGroupVirtualizer,
+}: MeetingListProps) => {
+  const {translate, wallClock} = useApplicationContext();
+  const [nowMilliseconds, setNowMilliseconds] = useState(() => wallClock.currentTimestampInMilliseconds);
+  const [visibleDayCount, setVisibleDayCount] = useState(INITIAL_VISIBLE_DAY_COUNT);
 
   useEffect(() => {
-    const id = wallClock.setInterval(() => setNowMs(wallClock.currentTimestampInMilliseconds), TIME_IN_MILLIS.SECOND);
+    const id = wallClock.setInterval(
+      () => setNowMilliseconds(wallClock.currentTimestampInMilliseconds),
+      TIME_IN_MILLIS.SECOND,
+    );
     return () => wallClock.clearInterval(id);
   }, [wallClock]);
 
-  const {today, tomorrow} = getTodayTomorrowLabels();
-  const headerForToday = `${t('meetings.list.today')} (${today})`;
-  const headerForTomorrow = `${t('meetings.list.tomorrow')} (${tomorrow})`;
+  const visibleDayKey = getCalendarDayKey(nowMilliseconds);
 
-  const groupedMeetingsTomorrow = groupByStartHour(MEETINGS_TOMORROW);
-  const groupedMeetingsPast = groupByStartHour(MEETINGS_PAST);
+  const visibleDayStart = useMemo(() => startOfDay(new Date(nowMilliseconds)), [visibleDayKey]);
 
-  const hasMeetingsToday = MEETINGS_TODAY.length > 0;
-  const hasMeetingsTomorrow = MEETINGS_TOMORROW.length > 0;
-  const hasMeetingsPast = MEETINGS_PAST.length > 0;
+  const expandedMeetingInstancesByDay = useMemo(() => {
+    const {from, to} = getVisibleTimeWindow(visibleDayStart, {dayCount: visibleDayCount});
+    const meetingInstances = getMeetingInstances(meetingSeries, from, to);
 
-  if (!hasMeetingsToday && !hasMeetingsTomorrow && !hasMeetingsPast) {
+    return groupMeetingInstancesByDay(meetingInstances);
+  }, [meetingSeries, visibleDayCount, visibleDayStart]);
+
+  const meetingInstancesByDay = useMemo(
+    () => filterNotEndedMeetingInstances(expandedMeetingInstancesByDay, nowMilliseconds),
+    [expandedMeetingInstancesByDay, nowMilliseconds],
+  );
+
+  const visibleDayGroups = useMemo(() => getVisibleDayGroups(meetingInstancesByDay), [meetingInstancesByDay]);
+
+  const getScrollElement = useCallback(() => scrollElementRef?.current ?? null, [scrollElementRef]);
+
+  const dayGroupInstanceCounts = useMemo(
+    () => visibleDayGroups.map(dayGroup => dayGroup.meetingInstances.length),
+    [visibleDayGroups],
+  );
+
+  const getEstimatedDayGroupHeight = useCallback(
+    (dayGroupIndex: number) => estimateMeetingDayGroupHeight(dayGroupInstanceCounts[dayGroupIndex] ?? 1),
+    [dayGroupInstanceCounts],
+  );
+
+  const getDayGroupKey = useCallback(
+    (dayGroupIndex: number) => visibleDayGroups[dayGroupIndex]?.day.toISOString() ?? String(dayGroupIndex),
+    [visibleDayGroups],
+  );
+
+  const dayGroupVirtualizer = useMeetingDayGroupVirtualizerDependency({
+    visibleDayGroupCount: visibleDayGroups.length,
+    getScrollElement,
+    getEstimatedDayGroupHeight,
+    getDayGroupKey,
+  });
+
+  useLoadMoreMeetingListDays({
+    scrollElementRef,
+    virtualizer: dayGroupVirtualizer,
+    visibleDayGroupCount: visibleDayGroups.length,
+    visibleDayCount,
+    setVisibleDayCount,
+    meetingSeries,
+    visibleDayStart,
+    wallClock,
+  });
+
+  const hasVisibleMeetingInstances = visibleDayGroups.length > 0;
+  const now = new Date(nowMilliseconds);
+
+  if (isLoading && is.nonEmptyArray(meetingSeries)) {
+    return (
+      <div css={emptyListContainerStyles} data-uie-name="meetings-list-loading">
+        <Loading data-uie-name="status-loading" />
+      </div>
+    );
+  }
+
+  if (hasLoadError) {
+    return (
+      <div css={meetingListContainerStyles} data-uie-name="meetings-list-error">
+        {translate('meetings.list.loadError')}
+      </div>
+    );
+  }
+
+  if (!hasVisibleMeetingInstances) {
     return (
       <div css={emptyListContainerStyles}>
         <EmptyMeetingList />
@@ -78,20 +171,39 @@ export const MeetingList = () => {
   }
 
   return (
-    <div css={meetingListContainerStyles}>
-      <>
-        {hasMeetingsToday && (
-          <TodayAndOngoingSection meetingsToday={MEETINGS_TODAY} headerForToday={headerForToday} nowMs={nowMs} />
-        )}
+    <div css={meetingListContainerStyles} data-uie-name="meetings-list">
+      <div
+        style={{
+          height: `${dayGroupVirtualizer.getTotalSize()}px`,
+          width: '100%',
+          position: 'relative',
+        }}
+      >
+        {dayGroupVirtualizer.getVirtualItems().map(virtualItem => {
+          const dayGroup = visibleDayGroups[virtualItem.index];
 
-        {hasMeetingsTomorrow && (
-          <MeetingListItemGroup header={headerForTomorrow} groupedMeetings={groupedMeetingsTomorrow} />
-        )}
-
-        {hasMeetingsPast && (
-          <MeetingListItemGroup groupedMeetings={groupedMeetingsPast} groupBy={MeetingGroupBy.NONE} nowMs={nowMs} />
-        )}
-      </>
+          return (
+            <div
+              key={virtualItem.key}
+              data-index={virtualItem.index}
+              ref={dayGroupVirtualizer.measureElement}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualItem.start}px)`,
+              }}
+            >
+              <MeetingListItemGroup
+                header={getDaySectionHeader(dayGroup.day, now, translate)}
+                meetingInstances={dayGroup.meetingInstances}
+                nowMilliseconds={nowMilliseconds}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

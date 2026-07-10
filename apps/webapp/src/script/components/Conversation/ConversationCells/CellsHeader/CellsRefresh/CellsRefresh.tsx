@@ -19,7 +19,7 @@
 
 import {IconButton, IconButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles} from './CellsRefresh.styles';
 
@@ -28,12 +28,13 @@ interface CellsRefreshProps {
 }
 
 export const CellsRefresh = ({onRefresh}: CellsRefreshProps) => {
+  const {translate} = useApplicationContext();
   return (
     <IconButton
       variant={IconButtonVariant.PRIMARY}
       onClick={onRefresh}
       css={buttonStyles}
-      aria-label={t('cells.refreshButton')}
+      aria-label={translate('cells.refreshButton')}
     >
       <ReloadIcon />
     </IconButton>

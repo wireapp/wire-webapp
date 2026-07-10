@@ -22,10 +22,12 @@ import {useEffect, useState} from 'react';
 import cx from 'classnames';
 
 import {ReadIcon} from 'Components/icon';
-import {Message} from 'Repositories/entity/message/Message';
+import {Message} from 'Repositories/entity/message/message';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {formatTimeShort} from 'Util/timeUtil';
+
+const DECIMAL_NUMBER_BASE = 10;
 
 interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
@@ -34,15 +36,18 @@ interface ReadReceiptStatusProps {
 }
 
 export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}: ReadReceiptStatusProps) => {
+  const {translate} = useApplicationContext();
   const [readReceiptText, setReadReceiptText] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
   useEffect(() => {
     if (message.expectsReadConfirmation && readReceipts.length) {
-      const text = is1to1Conversation ? formatTimeShort(readReceipts[0].time) : readReceipts.length.toString(10);
+      const text = is1to1Conversation
+        ? formatTimeShort(readReceipts[0].time)
+        : readReceipts.length.toString(DECIMAL_NUMBER_BASE);
       setReadReceiptText(text);
     }
-  }, [is1to1Conversation, readReceipts]);
+  }, [is1to1Conversation, message.expectsReadConfirmation, readReceipts]);
 
   const showEyeIndicator = !!readReceiptText;
 
@@ -58,7 +63,7 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
         !!onClickDetails && 'message-status-read__clickable',
       )}
       data-uie-name="status-message-read-receipts"
-      aria-label={t('accessibility.messageDetailsReadReceipts', {readReceiptText})}
+      aria-label={translate('accessibility.messageDetailsReadReceipts', {readReceiptText})}
       {...(!is1to1Conversation && {
         onClick: () => {
           onClickDetails?.(message);

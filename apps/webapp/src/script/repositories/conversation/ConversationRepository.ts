@@ -53,10 +53,11 @@ import type {BackendError} from '@wireapp/api-client/lib/http/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
+import {AddUsersFailure, BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
 
@@ -73,11 +74,11 @@ import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConnectionState} from 'Repositories/connection/connectionState';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {DeleteConversationMessage} from 'Repositories/entity/message/DeleteConversationMessage';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import {Message} from 'Repositories/entity/message/Message';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {DeleteConversationMessage} from 'Repositories/entity/message/deleteConversationMessage';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import {Message} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from 'Repositories/event/Client';
 import {EventRepository} from 'Repositories/event/EventRepository';
@@ -95,7 +96,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {getNextItem} from 'Util/arrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {type Translate, replaceLink} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
@@ -167,8 +168,8 @@ import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';
 import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
 import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
-import {MessageCategory} from '../../message/MessageCategory';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {MessageCategory} from '../../message/messageCategory';
+import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
@@ -234,6 +235,7 @@ export class ConversationRepository {
     private readonly propertyRepository: PropertiesRepository,
     private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -325,7 +327,7 @@ export class ConversationRepository {
 
     this.logger = getLogger('ConversationRepository');
 
-    this.event_mapper = new EventMapper();
+    this.event_mapper = new EventMapper(undefined, this.translate);
 
     // we register and store a handler, that we can manually trigger for incoming events from proteus and mixed conversations
     this.proteusVerificationStateHandler = new ProteusConversationVerificationStateHandler(
@@ -340,7 +342,7 @@ export class ConversationRepository {
 
     this.initSubscriptions();
 
-    this.stateHandler = new ConversationStateHandler(this.conversationService);
+    this.stateHandler = new ConversationStateHandler(this.conversationService, this.translate);
     this.ephemeralHandler = new ConversationEphemeralHandler(this.eventService, {
       onMessageTimeout: this.handleMessageExpiration,
     });
@@ -349,6 +351,7 @@ export class ConversationRepository {
       this.conversationState.conversations,
       this.conversationState.visibleConversations,
       propertyRepository.propertiesService,
+      this.translate,
     );
 
     this.conversationRoleRepository = new ConversationRoleRepository(this.teamRepository, this.conversationService);
@@ -609,7 +612,7 @@ export class ConversationRepository {
    * Create a guest room.
    */
   public createGuestRoom(): Promise<Conversation | undefined> {
-    const groupName = t('guestRoomConversationName');
+    const groupName = this.translate('guestRoomConversationName');
     return this.createGroupConversation([], groupName, ACCESS_STATE.TEAM.GUESTS_SERVICES);
   }
 
@@ -1097,12 +1100,13 @@ export class ConversationRepository {
   public async searchInConversation(
     conversationEntity: Conversation,
     query: string,
+    abortSignal?: AbortSignal,
   ): Promise<{messageEntities: Message[]; query: string}> {
     if (!conversationEntity || !query.length) {
       return {messageEntities: [], query};
     }
 
-    const events = await this.conversationService.searchInConversation(conversationEntity.id, query);
+    const events = await this.conversationService.searchInConversation(conversationEntity.id, query, abortSignal);
     const mappedMessages = this.event_mapper.mapJsonEvents(events, conversationEntity);
     const messageEntities = await this.updateMessagesUserEntities(mappedMessages);
     return {messageEntities, query};
@@ -1220,12 +1224,17 @@ export class ConversationRepository {
         return this.deleteConversationLocally(conversationEntity, true);
       }
 
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          message: t('modalConversationDeleteErrorMessage', {name: conversationEntity.name()}),
-          title: t('modalConversationDeleteErrorHeadline'),
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message: this.translate('modalConversationDeleteErrorMessage', {name: conversationEntity.name()}),
+            title: this.translate('modalConversationDeleteErrorHeadline'),
+          },
         },
-      });
+        undefined,
+        this.translate,
+      );
     }
   }
 
@@ -1242,7 +1251,7 @@ export class ConversationRepository {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation, {});
     }
     if (!skipNotification) {
-      const deletionMessage = new DeleteConversationMessage(conversationEntity);
+      const deletionMessage = new DeleteConversationMessage(conversationEntity, this.translate);
       amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, deletionMessage);
     }
     if (this.conversationLabelRepository.getConversationCustomLabel(conversationEntity, true)) {
@@ -1269,6 +1278,10 @@ export class ConversationRepository {
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    * TODO(Federation): Remove "optional" from "domain"
+   *
+   * @deprecated Use {@link safeGetConversationById} instead. This method throws on any
+   * lookup failure, leaking errors out of the caller's data model. Prefer the `Task`-returning
+   * variant so failures become a first-class case.
    */
   async getConversationById(conversation_id: QualifiedId, searchInLocalDB = false): Promise<Conversation> {
     if (typeof conversation_id.id !== 'string') {
@@ -1302,6 +1315,20 @@ export class ConversationRepository {
 
       throw error;
     }
+  }
+
+  /**
+   * Look up a conversation with explicit error handling.
+   *
+   * Returns a `Task` so failures (missing ID, not found, network errors) are modeled in the
+   * type instead of surfacing as an uncaught exception. Prefer to compose async work
+   * with `Task`/`Result` and use this method to handle errors explicitly.
+   */
+  safeGetConversationById(conversationId: QualifiedId, searchInLocalDB = false): Task<Conversation, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.getConversationById(conversationId, searchInLocalDB),
+    );
   }
 
   /**
@@ -1566,13 +1593,13 @@ export class ConversationRepository {
     const resolvedDomain = domain ?? this.userState.self()?.domain ?? 'wire.com';
 
     const showNoConversationModal = () => {
-      const titleText = t('modalConversationJoinNotFoundHeadline');
-      const messageText = t('modalConversationJoinNotFoundMessage');
+      const titleText = this.translate('modalConversationJoinNotFoundHeadline');
+      const messageText = this.translate('modalConversationJoinNotFoundMessage');
       this.showModal(messageText, titleText);
     };
     const showTooManyMembersModal = () => {
-      const titleText = t('modalConversationJoinFullHeadline');
-      const messageText = t('modalConversationJoinFullMessage');
+      const titleText = this.translate('modalConversationJoinFullHeadline');
+      const messageText = this.translate('modalConversationJoinFullMessage');
       this.showModal(messageText, titleText);
     };
 
@@ -1590,55 +1617,60 @@ export class ConversationRepository {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
       }
-      PrimaryModal.show(hasPassword ? PrimaryModal.type.JOIN_GUEST_LINK_PASSWORD : PrimaryModal.type.CONFIRM, {
-        preventClose: false,
-        primaryAction: {
-          action: async (password?: string) => {
-            try {
-              const response = await this.conversationService.postConversationJoin(key, code, password);
-              const conversationEntity = await this.getConversationById({
-                domain: resolvedDomain,
-                id: conversationId,
-              });
-              if (response) {
-                await this.onMemberJoin(conversationEntity, response);
-                await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
-                amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
-              }
-            } catch (error: unknown) {
-              if (!isBackendError(error)) {
-                throw error;
-              }
-
-              switch (error.label) {
-                case BackendErrorLabel.ACCESS_DENIED:
-                case BackendErrorLabel.NO_CONVERSATION:
-                case BackendErrorLabel.NO_CONVERSATION_CODE: {
-                  showNoConversationModal();
-                  break;
+      PrimaryModal.show(
+        hasPassword ? PrimaryModal.type.JOIN_GUEST_LINK_PASSWORD : PrimaryModal.type.CONFIRM,
+        {
+          preventClose: false,
+          primaryAction: {
+            action: async (password?: string) => {
+              try {
+                const response = await this.conversationService.postConversationJoin(key, code, password);
+                const conversationEntity = await this.getConversationById({
+                  domain: resolvedDomain,
+                  id: conversationId,
+                });
+                if (response) {
+                  await this.onMemberJoin(conversationEntity, response);
+                  await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
+                  amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
                 }
-                case BackendErrorLabel.TOO_MANY_MEMBERS: {
-                  showTooManyMembersModal();
-                  break;
-                }
-
-                default: {
+              } catch (error: unknown) {
+                if (!isBackendError(error)) {
                   throw error;
                 }
+
+                switch (error.label) {
+                  case BackendErrorLabel.ACCESS_DENIED:
+                  case BackendErrorLabel.NO_CONVERSATION:
+                  case BackendErrorLabel.NO_CONVERSATION_CODE: {
+                    showNoConversationModal();
+                    break;
+                  }
+                  case BackendErrorLabel.TOO_MANY_MEMBERS: {
+                    showTooManyMembersModal();
+                    break;
+                  }
+
+                  default: {
+                    throw error;
+                  }
+                }
               }
-            }
+            },
+            text: this.translate('guestLinkPasswordModal.joinConversation'),
           },
-          text: t('guestLinkPasswordModal.joinConversation'),
+          text: {
+            message: hasPassword
+              ? this.translate('guestLinkPasswordModal.conversationPasswordProtected')
+              : this.translate('modalConversationJoinMessage', {conversationName}),
+            title: hasPassword
+              ? this.translate('guestLinkPasswordModal.headline', {conversationName})
+              : this.translate('modalConversationJoinHeadline'),
+          },
         },
-        text: {
-          message: hasPassword
-            ? t('guestLinkPasswordModal.conversationPasswordProtected')
-            : t('modalConversationJoinMessage', {conversationName}),
-          title: hasPassword
-            ? t('guestLinkPasswordModal.headline', {conversationName})
-            : t('modalConversationJoinHeadline'),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     } catch (error: unknown) {
       if (!isBackendError(error)) {
         throw error;
@@ -2278,6 +2310,9 @@ export class ConversationRepository {
    *
    * @param param0 conversationId and groupId
    * @returns void
+   *
+   * @deprecated Use {@link safeEnsureConversationExists} instead. This method throws on failure.
+   * Prefer the `Task`-returning variant.
    */
   public ensureConversationExists = async ({
     conversationId,
@@ -2295,6 +2330,70 @@ export class ConversationRepository {
       conversationState: this.conversationState,
     });
   };
+
+  /**
+   * Ensure an MLS group conversation exists with explicit error handling.
+   * Reconciles local MLS state with the backend MLS shell.
+   *
+   * Returns a `Task` so establishment/join failures are captured in the error channel
+   * instead of surfacing as an uncaught exception. Prefer to compose async work
+   * with `Task`/`Result` and use this method to handle errors explicitly.
+   */
+  safeEnsureConversationExists({
+    conversationId,
+    groupId,
+    core = this.core,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    core?: Account;
+  }): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.ensureConversationExists({conversationId, groupId, core}),
+    );
+  }
+
+  /**
+   * Establish a meeting MLS group with explicit error handling.
+   *
+   * Returns a `Task` resolving to `{failedToAdd}` on success (partial add failures are
+   * included in the value, not the error channel). Hard failures (network, MLS commit,
+   * missing self user) are captured in the Task error channel. Use after `POST /meetings`
+   * when the backend conversation shell is at epoch 0.
+   *
+   * Does not inject conversation events — meeting conversations are hidden from the main
+   * conversation list; partial add failures are surfaced via meetings UI (e.g. modal).
+   */
+  establishMeetingConversation({
+    groupId,
+    userIdsToAdd,
+    conversationQualifiedId,
+  }: {
+    groupId: string;
+    userIdsToAdd: QualifiedId[];
+    conversationQualifiedId: QualifiedId;
+  }): Task<{failedToAdd: AddUsersFailure[]}, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        const selfUser = this.userState.self();
+        if (selfUser === undefined) {
+          throw new Error('Cannot establish meeting conversation before self user is available');
+        }
+
+        const {failedToAdd = []} = await this.core.service!.conversation.establishMLSGroupConversation(
+          groupId,
+          userIdsToAdd,
+          selfUser.qualifiedId,
+          this.core.clientId,
+          conversationQualifiedId,
+        );
+
+        return {failedToAdd};
+      },
+    );
+  }
 
   /**
    * will locally delete conversations that no longer exist on backend side
@@ -2398,7 +2497,11 @@ export class ConversationRepository {
     payload: (BackendConversation | ConversationDatabaseData)[],
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
-    const entities = ConversationMapper.mapConversations(payload as ConversationDatabaseData[], initialTimestamp);
+    const entities = ConversationMapper.mapConversations(
+      payload as ConversationDatabaseData[],
+      initialTimestamp,
+      this.translate,
+    );
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.userState.self());
@@ -2545,7 +2648,7 @@ export class ConversationRepository {
   private onConversationVerificationStateChange: OnConversationVerificationStateChange = async ({
     conversationEntity,
     conversationVerificationState,
-    verificationMessageType,
+    VerificationMessageType,
     userIds = [],
   }) => {
     switch (conversationVerificationState) {
@@ -2554,11 +2657,11 @@ export class ConversationRepository {
         await this.eventRepository.injectEvent(allVerifiedEvent);
         break;
       case ConversationVerificationState.DEGRADED:
-        if (verificationMessageType) {
-          const event = EventBuilder.buildDegraded(conversationEntity, userIds, verificationMessageType);
+        if (VerificationMessageType) {
+          const event = EventBuilder.buildDegraded(conversationEntity, userIds, VerificationMessageType);
           await this.eventRepository.injectEvent(event);
         } else {
-          this.logger.error('onConversationVerificationStateChange: Missing verificationMessageType while degrading');
+          this.logger.error('onConversationVerificationStateChange: Missing VerificationMessageType while degrading');
         }
         break;
       default:
@@ -2572,6 +2675,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to add users to
    * @param userEntities Users to be added to the conversation
    * @returns Resolves when members were added
+   *
    */
   async addUsers(conversation: Conversation, userEntities: Pick<User, 'qualifiedId'>[]) {
     /**
@@ -2632,6 +2736,50 @@ export class ConversationRepository {
     }
   }
 
+  /**
+   * Add users to an established MLS conversation with explicit error handling.
+   *
+   * Returns a `Task` resolving to `{failedToAdd}` on success (partial add failures are
+   * included in the value, not the error channel). Hard failures (network, MLS commit,
+   * missing group id) are captured in the Task error channel.
+   *
+   * Does not inject conversation events — meeting conversations are hidden from the main
+   * conversation list; partial add failures are surfaced via meetings UI (e.g. modal).
+   */
+  safeAddUsers(
+    conversation: Conversation,
+    userEntities: Pick<User, 'qualifiedId'>[],
+  ): Task<{failedToAdd: AddUsersFailure[]}, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
+
+        if (qualifiedUsers.length === 0) {
+          return {failedToAdd: []};
+        }
+
+        const {groupId} = conversation;
+
+        if (!is.nonEmptyString(groupId)) {
+          throw new Error('Cannot add users to MLS conversation without group id');
+        }
+
+        if (!this.core.service) {
+          throw new Error('Cannot add users to MLS conversation without core service');
+        }
+
+        const {failedToAdd = []} = await this.core.service.conversation.addUsersToMLSConversation({
+          conversationId: conversation.qualifiedId,
+          groupId,
+          qualifiedUsers,
+        });
+
+        return {failedToAdd};
+      },
+    );
+  }
+
   addMissingMember(conversationEntity: Conversation, users: QualifiedId[], timestamp: number) {
     const [sender] = users;
     const event = EventBuilder.buildMemberJoin(conversationEntity, sender, users, timestamp);
@@ -2668,12 +2816,17 @@ export class ConversationRepository {
         throw error;
       }
     } catch (error: unknown) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          message: t('modalIntegrationUnavailableMessage'),
-          title: t('modalIntegrationUnavailableHeadline'),
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message: this.translate('modalIntegrationUnavailableMessage'),
+            title: this.translate('modalIntegrationUnavailableHeadline'),
+          },
         },
-      });
+        undefined,
+        this.translate,
+      );
       throw error;
     }
   }
@@ -2744,8 +2897,8 @@ export class ConversationRepository {
       case BackendErrorLabel.SERVER_ERROR:
       case BackendErrorLabel.SERVICE_DISABLED:
       case BackendErrorLabel.TOO_MANY_SERVICES: {
-        const messageText = t('modalServiceUnavailableMessage');
-        const titleText = t('modalServiceUnavailableHeadline');
+        const messageText = this.translate('modalServiceUnavailableMessage');
+        const titleText = this.translate('modalServiceUnavailableHeadline');
 
         this.showModal(messageText, titleText);
         break;
@@ -2872,6 +3025,9 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when member was removed from the conversation
+   *
+   * @deprecated Use {@link safeRemoveMembers} instead. This method throws on failure.
+   * Prefer the `Task`-returning variant.
    */
   public async removeMembers(conversationEntity: Conversation, userIds: QualifiedId[]) {
     if (isMLSConversation(conversationEntity)) {
@@ -2880,6 +3036,20 @@ export class ConversationRepository {
       const events = await this.removeMembersFromConversation(conversationEntity, userIds);
       await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
+  }
+
+  /**
+   * Remove members from a conversation with explicit error handling.
+   *
+   * Returns a `Task` so failures are captured in the error channel instead of surfacing
+   * as an uncaught exception. Prefer to compose async work with `Task`/`Result` and use this
+   * method to handle errors explicitly.
+   */
+  safeRemoveMembers(conversationEntity: Conversation, userIds: QualifiedId[]): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.removeMembers(conversationEntity, userIds),
+    );
   }
 
   /**
@@ -3251,30 +3421,35 @@ export class ConversationRepository {
       number2: Math.max(0, openSpots).toString(10),
     };
 
-    const messageText = t('modalConversationTooManyMembersMessage', substitutions);
-    const titleText = t('modalConversationTooManyMembersHeadline');
+    const messageText = this.translate('modalConversationTooManyMembersMessage', substitutions);
+    const titleText = this.translate('modalConversationTooManyMembersHeadline');
     this.showModal(messageText, titleText);
   }
 
   private async handleUsersNotConnected(userIds: QualifiedId[] = []): Promise<void> {
-    const titleText = t('modalConversationNotConnectedHeadline');
+    const titleText = this.translate('modalConversationNotConnectedHeadline');
 
     if (userIds.length > 1) {
-      this.showModal(t('modalConversationNotConnectedMessageMany'), titleText);
+      this.showModal(this.translate('modalConversationNotConnectedMessageMany'), titleText);
     } else {
       // TODO(Federation): Update code once connections are implemented on the backend
       const userEntity = await this.userRepository.getUserById(userIds[0]);
-      this.showModal(t('modalConversationNotConnectedMessageOne', {name: userEntity.name()}), titleText);
+      this.showModal(this.translate('modalConversationNotConnectedMessageOne', {name: userEntity.name()}), titleText);
     }
   }
 
   private showModal(messageText: string, titleText: string) {
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {
-        message: messageText,
-        title: titleText,
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          message: messageText,
+          title: titleText,
+        },
       },
-    });
+      undefined,
+      this.translate,
+    );
   }
 
   private showLegalHoldConsentError() {
@@ -3284,15 +3459,24 @@ export class ConversationRepository {
       'read-more-legal-hold',
     );
 
-    const messageText = t('modalLegalHoldConversationMissingConsentMessage', undefined, replaceLinkLegalHold);
-    const titleText = t('modalUserCannotBeAddedHeadline');
+    const messageText = this.translate(
+      'modalLegalHoldConversationMissingConsentMessage',
+      undefined,
+      replaceLinkLegalHold,
+    );
+    const titleText = this.translate('modalUserCannotBeAddedHeadline');
 
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {
-        htmlMessage: messageText,
-        title: titleText,
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          htmlMessage: messageText,
+          title: titleText,
+        },
       },
-    });
+      undefined,
+      this.translate,
+    );
   }
 
   //##############################################################################
@@ -3720,6 +3904,7 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
+      case ClientEvent.CONVERSATION.MEMBER_ROLE_UPDATE:
       case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
@@ -4152,18 +4337,8 @@ export class ConversationRepository {
     const {conversation, data: eventData, from} = eventJson;
     const conversationId = {domain: '', id: conversation ?? '' /* TODO(federation) add domain on the sender side */};
 
-    const isConversationRoleUpdate = eventData.conversation_role !== undefined;
-    if (isConversationRoleUpdate) {
-      const {target, qualified_target, conversation_role} = eventData;
-      const userId = qualified_target ?? {domain: '', id: target};
-      const conversation = this.conversationState
-        .conversations()
-        .find(conversation => matchQualifiedIds(conversation, conversationId));
-      if (conversation !== undefined && userId.id !== undefined && conversation_role !== undefined) {
-        const roles = conversation.roles();
-        roles[userId.id] = conversation_role;
-        conversation.roles(roles);
-      }
+    if (eventData.conversation_role) {
+      await this.onConversationMemberRoleUpdated(conversationId, eventData, from);
       return;
     }
 
@@ -4200,6 +4375,44 @@ export class ConversationRepository {
 
     if (isActiveConversation && conversationEntity.is_archived()) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
+    }
+  }
+
+  /**
+   * A member's conversation role was updated.
+   *
+   * @param conversationId Qualified id of the conversation the role update happened in
+   * @param eventData Data of the 'conversation.member-update' event
+   * @param from Id of the user who triggered the role update
+   */
+  private async onConversationMemberRoleUpdated(
+    conversationId: QualifiedId,
+    eventData: ConversationMemberUpdateEvent['data'],
+    from: string,
+  ) {
+    const {target, qualified_target, conversation_role} = eventData;
+    const userId = qualified_target ?? (target ? {domain: '', id: target} : undefined);
+    const conversation = this.conversationState
+      .conversations()
+      .find(conversation => matchQualifiedIds(conversation, conversationId));
+
+    if (is.nullOrUndefined(conversation) || is.nullOrUndefined(userId) || is.nullOrUndefined(conversation_role)) {
+      return;
+    }
+
+    let roles = conversation.roles();
+    const previousRole = roles[userId.id];
+    roles = {...roles, [userId.id]: conversation_role};
+    conversation.roles(roles);
+
+    // Show a system message to the user who just got promoted to group admin.
+    // Only the promoted user receives this message (by design).
+    const selfUser = this.userState.self();
+    const isSelfTarget = selfUser && matchQualifiedIds(userId, selfUser.qualifiedId);
+    const isPromotedToAdmin = conversation_role === DefaultRole.WIRE_ADMIN && previousRole !== DefaultRole.WIRE_ADMIN;
+    if (isSelfTarget && isPromotedToAdmin) {
+      const roleUpdateEvent = EventBuilder.buildMemberRoleUpdate(conversation, conversation_role, userId, from);
+      await this.eventRepository.injectEvent(roleUpdateEvent, EventRepository.SOURCE.INJECTED);
     }
   }
 

@@ -21,7 +21,7 @@ import {MutableRefObject} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {User} from 'Repositories/entity/User';
 
 import {RichTextEditor} from './RichTextEditor';

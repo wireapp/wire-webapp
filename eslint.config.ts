@@ -42,6 +42,7 @@ const ignores = [
   'apps/webapp/*.config.*',
   'apps/webapp/src/sw.js',
   'apps/server/bin/',
+  'apps/server/coverage/',
   'apps/server/dist/',
   'apps/server/node_modules/',
   'apps/webapp/src/ext/',
@@ -54,7 +55,6 @@ const ignores = [
   '**/storybook-static/',
   '**/.storybook/',
   '*.js',
-  'apps/webapp/src/types/i18n.d.ts',
   'apps/webapp/playwright-report/',
   'libraries/core/lib/',
   'libraries/api-client/lib/',
@@ -103,6 +103,20 @@ const webappImportOrderRule: Linter.RuleEntry = [
       caseInsensitive: true,
     },
     warnOnUnassignedImports: true,
+  },
+];
+
+const strictBooleanExpressionsRule: Linter.RuleEntry = [
+  'error',
+  {
+    allowAny: false,
+    allowNullableBoolean: false,
+    allowNullableEnum: false,
+    allowNullableNumber: false,
+    allowNullableObject: false,
+    allowNullableString: false,
+    allowNumber: false,
+    allowString: false,
   },
 ];
 
@@ -205,7 +219,6 @@ const config: Linter.Config[] = [
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/strict-boolean-expressions': 'error',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -232,6 +245,23 @@ const config: Linter.Config[] = [
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
       },
+    },
+  },
+  {
+    files: [
+      'apps/server/**/*.{ts,tsx}',
+      'libraries/api-client/**/*.{ts,tsx}',
+      'libraries/commons/**/*.{ts,tsx}',
+      'libraries/certificate-check/**/*.{ts,tsx}',
+      'libraries/core/**/*.{ts,tsx}',
+      'libraries/copy-config/**/*.{ts,tsx}',
+      'libraries/license-collector/**/*.{ts,tsx}',
+      'libraries/store-engine/**/*.{ts,tsx}',
+      'libraries/store-engine-dexie/**/*.{ts,tsx}',
+      'libraries/react-ui-kit/**/*.{ts,tsx}',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
     },
   },
   {
@@ -295,9 +325,49 @@ const config: Linter.Config[] = [
     },
   },
   {
-    files: ['apps/webapp/src/script/components/**/*.{ts,tsx}'],
+    files: [
+      'apps/webapp/src/script/components/Modals/PrimaryModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/LeaveGroupAdminModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/QualityFeedbackModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/DetailViewModal/**/*.{ts,tsx}',
+    ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'src/script/page/RootProvider',
+              importNames: ['useApplicationContext'],
+              message: 'This modal is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/page/components/WindowTitleUpdater.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'src/script/page/RootProvider',
+              importNames: ['useApplicationContext'],
+              message:
+                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+            {
+              name: '../RootProvider',
+              importNames: ['useApplicationContext'],
+              message:
+                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+          ],
+        },
+      ],
     },
   },
   {

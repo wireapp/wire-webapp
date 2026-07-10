@@ -20,9 +20,9 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {VerificationMessageType} from 'src/script/message/verificationMessageType';
 
-import {E2EIVerificationMessageType} from '../../../../../message/E2EIVerificationMessageType';
+import {E2EIVerificationMessageType} from '../../../../../message/e2eiVerificationMessageType';
 import {ConversationVerificationState} from '../../../ConversationVerificationState';
 
 interface CommonOnConversationVerificationStateChangeParams {
@@ -32,11 +32,11 @@ interface CommonOnConversationVerificationStateChangeParams {
 }
 
 interface OnConversationVerificationStateChangeParams extends CommonOnConversationVerificationStateChangeParams {
-  verificationMessageType?: VerificationMessageType;
+  VerificationMessageType?: VerificationMessageType;
 }
 
 interface OnConversationE2EIVerificationStateChangeParams extends CommonOnConversationVerificationStateChangeParams {
-  verificationMessageType?: E2EIVerificationMessageType;
+  VerificationMessageType?: E2EIVerificationMessageType;
 }
 
 export type OnConversationVerificationStateChange = (params: OnConversationVerificationStateChangeParams) => void;

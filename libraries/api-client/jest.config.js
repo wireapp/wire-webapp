@@ -17,6 +17,8 @@
  *
  */
 
+const isContinuousIntegrationEnvironment = process.env.CI === 'true';
+
 module.exports = {
   displayName: 'api-client-lib',
   testEnvironment: 'node',
@@ -25,7 +27,7 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|uuid)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|uuid|noop-esm)/)'],
   coverageDirectory: '../../coverage/libraries/api-client',
   coverageThreshold: {
     global: {
@@ -35,6 +37,8 @@ module.exports = {
       statements: 53,
     },
   },
+  coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
   testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
+  reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
 };

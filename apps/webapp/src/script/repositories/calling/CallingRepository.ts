@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
@@ -30,6 +31,7 @@ import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQuali
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
 import {z} from 'zod';
@@ -87,7 +89,7 @@ import type {UserRepository} from 'Repositories/user/userRepository';
 import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
 import {roundLogarithmic} from 'Util/numberUtil';
@@ -153,6 +155,19 @@ type SubconversationData = {
   members: SubconversationEpochInfoMember[];
 };
 
+export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, openerWindow: Window): (() => void) => {
+  const handleClick = (event: MouseEvent) => {
+    const anchor = (event.target as HTMLElement).closest('a');
+    if (anchor?.target === '_blank' && anchor.href) {
+      event.preventDefault();
+      openerWindow.open(anchor.href);
+    }
+  };
+
+  detachedWindow.document.addEventListener('click', handleClick, true);
+  return () => detachedWindow.document.removeEventListener('click', handleClick, true);
+};
+
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
@@ -195,6 +210,7 @@ export class CallingRepository {
     private readonly mediaDevicesHandler: MediaDevicesHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly backgroundEffectsHandler: BackgroundEffectsHandler,
+    private readonly translate: Translate,
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
@@ -246,17 +262,22 @@ export class CallingRepository {
 
         const modalOptions = {
           primaryAction: {
-            text: t('conversation.E2EIOk'),
+            text: this.translate('conversation.E2EIOk'),
           },
           text: {
-            message: t('conversation.E2EIGroupCallDisconnected'),
-            title: t('conversation.E2EIConversationNoLongerVerified'),
+            message: this.translate('conversation.E2EIGroupCallDisconnected'),
+            title: this.translate('conversation.E2EIConversationNoLongerVerified'),
           },
           close: restoreFocusCallback(),
           container,
         };
 
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, `degraded-${activeConversation.id}`);
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          modalOptions,
+          `degraded-${activeConversation.id}`,
+          this.translate,
+        );
       }
     });
 
@@ -814,16 +835,17 @@ export class CallingRepository {
           PrimaryModal.type.ACKNOWLEDGE,
           {
             primaryAction: {
-              text: t('callDegradationAction'),
+              text: this.translate('callDegradationAction'),
             },
             text: {
-              message: t('callDegradationDescription', {username: participant.user.name()}),
-              title: t('callDegradationTitle'),
+              message: this.translate('callDegradationDescription', {username: participant.user.name()}),
+              title: this.translate('callDegradationTitle'),
             },
             close: restoreFocusCallback(),
             container,
           },
           `degraded-${conversation.qualifiedId}`,
+          this.translate,
         );
       }
     }
@@ -851,12 +873,13 @@ export class CallingRepository {
       {
         close: restoreFocusCallback(() => this.acceptVersionWarning(conversationId)),
         text: {
-          message: t('modalCallUpdateClientMessage', {brandName}),
-          title: t('modalCallUpdateClientHeadline', {brandName}),
+          message: this.translate('modalCallUpdateClientMessage', {brandName}),
+          title: this.translate('modalCallUpdateClientHeadline', {brandName}),
         },
         container,
       },
       'update-client-warning',
+      this.translate,
     );
   }
 
@@ -948,7 +971,7 @@ export class CallingRepository {
         window.dispatchEvent(
           new CustomEvent(WebAppEvents.CALL.REMOTE_MUTED, {
             detail: {
-              notificationMessage: t('muteStateRemoteMute'),
+              notificationMessage: this.translate('muteStateRemoteMute'),
             },
           }),
         );
@@ -981,7 +1004,7 @@ export class CallingRepository {
             id: `${Date.now()}-${id}`,
             emoji,
             left: Math.random() * 500,
-            from: isSelf ? t('conversationYouAccusative') : (senderParticipant?.user.name() ?? ''),
+            from: isSelf ? this.translate('conversationYouAccusative') : (senderParticipant?.user.name() ?? ''),
           };
         });
 
@@ -1028,8 +1051,8 @@ export class CallingRepository {
 
         const name = participant.user.name();
         const handUpMessage = isSelf
-          ? t('videoCallParticipantRaisedSelfHandUp')
-          : t('videoCallParticipantRaisedTheirHandUp', {name});
+          ? this.translate('videoCallParticipantRaisedSelfHandUp')
+          : this.translate('videoCallParticipantRaisedTheirHandUp', {name});
 
         window.dispatchEvent(
           new CustomEvent(WebAppEvents.CALL.HAND_RAISED, {
@@ -1492,11 +1515,15 @@ export class CallingRepository {
     // New window is not opened on the same domain (it's about:blank), so we cannot use any of the dom loaded events to copy the styles.
     setTimeout(() => copyStyles(window.document, detachedWindow.document), 0);
 
-    detachedWindow.document.title = t('callingPopOutWindowTitle', {brandName: Config.getConfig().BRAND_NAME});
+    detachedWindow.document.title = this.translate('callingPopOutWindowTitle', {
+      brandName: Config.getConfig().BRAND_NAME,
+    });
 
     detachedWindow.addEventListener('beforeunload', this.closeDetachedWindow);
     detachedWindow.addEventListener('pagehide', this.closeDetachedWindow);
     window.addEventListener('pagehide', this.onPageHide);
+
+    setupDetachedWindowExternalLinksClick(detachedWindow, window);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
 
@@ -1525,25 +1552,30 @@ export class CallingRepository {
         const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
         userConsentWithDegradation = await new Promise(resolve =>
-          PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-            primaryAction: {
-              action: () => {
-                conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-                resolve(true);
+          PrimaryModal.show(
+            PrimaryModal.type.CONFIRM,
+            {
+              primaryAction: {
+                action: () => {
+                  conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+                  resolve(true);
+                },
+                text: this.translate('conversation.E2EIJoinAnyway'),
               },
-              text: t('conversation.E2EIJoinAnyway'),
+              secondaryAction: {
+                action: () => resolve(false),
+                text: this.translate('conversation.E2EICancel'),
+              },
+              text: {
+                message: this.translate('conversation.E2EIDegradedJoinCall'),
+                title: this.translate('conversation.E2EIConversationNoLongerVerified'),
+              },
+              close: restoreFocusCallback(),
+              container,
             },
-            secondaryAction: {
-              action: () => resolve(false),
-              text: t('conversation.E2EICancel'),
-            },
-            text: {
-              message: t('conversation.E2EIDegradedJoinCall'),
-              title: t('conversation.E2EIConversationNoLongerVerified'),
-            },
-            close: restoreFocusCallback(),
-            container,
-          }),
+            undefined,
+            this.translate,
+          ),
         );
       }
       const shouldContinueCall = userConsentWithDegradation && (await this.pushClients(call, true));
@@ -1895,51 +1927,93 @@ export class CallingRepository {
     this.avsVersion = version;
   };
 
-  private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
-    return this.mediaStreamHandler
-      .requestMediaStream(audio, camera, screen, isGroup)
-      .then(stream => {
-        if (!stream) {
-          throw new Error('Failed to get media stream');
+  private async getMediaStream(
+    {audio = false, camera = false, screen = false}: MediaStreamQuery,
+    isGroup: boolean,
+  ): Promise<MediaStream> {
+    try {
+      const stream = await this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
+      if (is.nullOrUndefined(stream)) {
+        throw new Error('Failed to get media stream');
+      }
+
+      // For camera streams, verify we have video tracks
+      if (camera === true) {
+        const videoTracks = stream.getVideoTracks();
+        if (videoTracks.length === 0) {
+          throw new Error('No video tracks found in camera stream');
         }
 
-        // For camera streams, verify we have video tracks
-        if (camera) {
-          const videoTracks = stream.getVideoTracks();
-          if (!videoTracks.length) {
-            throw new Error('No video tracks found in camera stream');
-          }
-
-          const videoTrack = videoTracks[0];
-          if (videoTrack.readyState !== 'live') {
-            throw new Error(`Camera track not live. State: ${videoTrack.readyState}`);
-          }
-
-          // Log camera track details for debugging
-          this.logger.info('Camera track details:', {
-            enabled: videoTrack.enabled,
-            muted: videoTrack.muted,
-            readyState: videoTrack.readyState,
-            settings: videoTrack.getSettings(),
-            constraints: videoTrack.getConstraints(),
-            capabilities: videoTrack.getCapabilities(),
-          });
+        const videoTrack = videoTracks[0];
+        if (is.undefined(videoTrack)) {
+          throw new Error('No video tracks found in camera stream');
         }
 
-        return this.mediaDevicesHandler
-          .initializeMediaDevices(camera, false)
-          .then(() => {
-            return stream;
-          })
-          .catch((error: unknown) => {
-            this.logger.warn('Failed to initialize media devices:', error);
-            return stream;
+        if (videoTrack.readyState !== 'live') {
+          throw new Error(`Camera track not live. State: ${videoTrack.readyState}`);
+        }
+
+        // Log camera track details for debugging
+        this.logger.info('Camera track details:', {
+          enabled: videoTrack.enabled,
+          muted: videoTrack.muted,
+          readyState: videoTrack.readyState,
+          settings: this.getMediaTrackSettings(videoTrack).unwrapOr(undefined),
+          constraints: this.getMediaTrackConstraints(videoTrack).unwrapOr(undefined),
+          capabilities: this.getMediaTrackCapabilities(videoTrack).unwrapOr(undefined),
+        });
+      }
+
+      if (audio === true) {
+        const audioTrack = stream.getAudioTracks()[0];
+
+        if (is.undefined(audioTrack) === false) {
+          this.logger.info('Audio track details:', {
+            enabled: audioTrack.enabled,
+            muted: audioTrack.muted,
+            readyState: audioTrack.readyState,
+            settings: this.getMediaTrackSettings(audioTrack).unwrapOr(undefined),
+            constraints: this.getMediaTrackConstraints(audioTrack).unwrapOr(undefined),
+            capabilities: this.getMediaTrackCapabilities(audioTrack).unwrapOr(undefined),
           });
-      })
-      .catch((error: unknown) => {
-        this.logger.error('Failed to get media stream:', error);
-        throw error;
-      });
+        }
+      }
+
+      try {
+        await this.mediaDevicesHandler.initializeMediaDevices(camera === true, false);
+      } catch (error: unknown) {
+        this.logger.warn('Failed to initialize media devices:', error);
+      }
+
+      return stream;
+    } catch (error: unknown) {
+      this.logger.error('Failed to get media stream:', error);
+      throw error;
+    }
+  }
+
+  private getMediaTrackSettings(mediaTrack: MediaStreamTrack): Maybe<MediaTrackSettings> {
+    if (is.function_(mediaTrack.getSettings) === false) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.of(mediaTrack.getSettings());
+  }
+
+  private getMediaTrackConstraints(mediaTrack: MediaStreamTrack): Maybe<MediaTrackConstraints> {
+    if (is.function_(mediaTrack.getConstraints) === false) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.of(mediaTrack.getConstraints());
+  }
+
+  private getMediaTrackCapabilities(mediaTrack: MediaStreamTrack): Maybe<MediaTrackCapabilities> {
+    if (is.function_(mediaTrack.getCapabilities) === false) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.of(mediaTrack.getCapabilities());
   }
 
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error | unknown): void {
@@ -1971,7 +2045,9 @@ export class CallingRepository {
   }
 
   public async refreshVideoInput() {
-    const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
+    const activeCallBeforeRefresh = this.callState.joinedCall();
+    const isGroupOrConference = activeCallBeforeRefresh?.isGroupOrConference ?? false;
+    const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, isGroupOrConference);
     this.stopMediaSource(MediaType.VIDEO);
     let clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
     const activeCall = this.callState.joinedCall();
@@ -2880,21 +2956,21 @@ export class CallingRepository {
 
     const modalOptions = {
       primaryAction: {
-        text: t('modalAcknowledgeAction'),
+        text: this.translate('modalAcknowledgeAction'),
       },
       secondaryAction: {
         action: () => amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV),
-        text: t('modalNoAudioInputAction'),
+        text: this.translate('modalNoAudioInputAction'),
       },
       text: {
-        closeBtnLabel: t('modalNoAudioCloseBtn'),
-        message: t('modalNoAudioInputMessage'),
-        title: t('modalNoAudioInputTitle'),
+        closeBtnLabel: this.translate('modalNoAudioCloseBtn'),
+        message: this.translate('modalNoAudioInputMessage'),
+        title: this.translate('modalNoAudioInputTitle'),
       },
       close: restoreFocusCallback(),
       container,
     };
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions, undefined, this.translate);
   }
 
   private showNoCameraModal(): void {
@@ -2902,8 +2978,8 @@ export class CallingRepository {
 
     const modalOptions = {
       text: {
-        closeBtnLabel: t('modalNoCameraCloseBtn'),
-        htmlMessage: t(
+        closeBtnLabel: this.translate('modalNoCameraCloseBtn'),
+        htmlMessage: this.translate(
           'modalNoCameraMessage',
           {brandName: Config.getConfig().BRAND_NAME},
           {
@@ -2914,12 +2990,12 @@ export class CallingRepository {
             }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
           },
         ),
-        title: t('modalNoCameraTitle'),
+        title: this.translate('modalNoCameraTitle'),
       },
       close: restoreFocusCallback(),
       container,
     };
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, this.translate);
   }
 
   /**

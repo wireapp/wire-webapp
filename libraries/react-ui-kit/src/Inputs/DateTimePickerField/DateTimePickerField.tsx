@@ -58,6 +58,7 @@ export interface DateTimePickerFieldProps {
   menuPortalTarget?: HTMLElement;
   popoverPortalContainer?: HTMLElement;
   errorText?: string;
+  minValue?: DateValue;
 }
 
 export const DateTimePickerField = ({
@@ -74,10 +75,11 @@ export const DateTimePickerField = ({
   menuPortalTarget,
   popoverPortalContainer,
   errorText,
+  minValue,
 }: DateTimePickerFieldProps) => {
   const labelId = `${dataUieName}-label`;
-  const selectedDate = useMemo(() => (value ? dateValueFromDate(value) : null), [value]);
-  const selectedTime = useMemo(() => (value ? nearestTimeOptionFromDate(value) : null), [value]);
+  const selectedDate = useMemo(() => (value !== null ? dateValueFromDate(value) : null), [value]);
+  const selectedTime = useMemo(() => (value !== null ? nearestTimeOptionFromDate(value) : null), [value]);
 
   const handleDateChange = useCallback(
     (nextDate: DateValue | null) => {
@@ -117,6 +119,7 @@ export const DateTimePickerField = ({
           markInvalid={markInvalid}
           disabled={disabled}
           popoverPortalContainer={popoverPortalContainer}
+          minValue={minValue}
           wrapperCSS={dateTimePickerDateFieldWrapperStyles}
         />
         <TimePickerField

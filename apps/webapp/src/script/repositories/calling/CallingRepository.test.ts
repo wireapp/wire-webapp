@@ -28,6 +28,7 @@ import {CALL_TYPE, CONV_TYPE, QUALITY, REASON, STATE as CALL_STATE, VIDEO_STATE,
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CallingEvent} from 'Repositories/event/CallingEvent';
@@ -41,23 +42,24 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {Call} from './Call';
-import {CallingRepository} from './CallingRepository';
+import {CallingRepository, setupDetachedWindowExternalLinksClick} from './CallingRepository';
 import {CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
 
-import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/TestUtil';
+import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository: CallingRepository;
   let wCall: Wcall;
   let wUser: number;
-  const selfUser = new User(createUuid());
+  const selfUser = new User(createUuid(), '', translateForTest);
   selfUser.isMe = true;
   const clientId = createUuid();
 
@@ -369,6 +371,41 @@ describe('CallingRepository', () => {
     });
   });
 
+  describe('showNoAudioInputModal', () => {
+    it('uses the injected translate function', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const isolatedCallingRepository = new CallingRepository(
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        translate,
+      );
+
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined as never);
+
+      isolatedCallingRepository['showNoAudioInputModal']();
+
+      expect(showModal).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          primaryAction: expect.objectContaining({text: 'translated:modalAcknowledgeAction'}),
+          secondaryAction: expect.objectContaining({text: 'translated:modalNoAudioInputAction'}),
+          text: expect.objectContaining({
+            closeBtnLabel: 'translated:modalNoAudioCloseBtn',
+            message: 'translated:modalNoAudioInputMessage',
+            title: 'translated:modalNoAudioInputTitle',
+          }),
+        }),
+        undefined,
+        translate,
+      );
+    });
+  });
+
   describe('joinedCall', () => {
     it('only exposes the current active call', () => {
       const selfParticipant = createSelfParticipant();
@@ -497,7 +534,7 @@ describe('CallingRepository', () => {
 
       const selfParticipant = createSelfParticipant();
 
-      const user = new User(userId);
+      const user = new User(userId, '', translateForTest);
 
       const remoteParticipant = new Participant(user, remoteClientId);
 
@@ -704,6 +741,47 @@ describe('CallingRepository', () => {
       });
     });
 
+    describe('refreshVideoInput', () => {
+      it('uses the active group or conference call context when refreshing video input', async () => {
+        const mediaStream = new MediaStream();
+        call.state(CALL_STATE.MEDIA_ESTAB);
+        spyOn(callingRepository['callState'], 'joinedCall').and.returnValues(call, undefined);
+        spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
+          Promise.resolve(mediaStream),
+        );
+        spyOn(callingRepository, 'stopMediaSource').and.returnValue(true);
+        spyOn(callingRepository, 'changeMediaSource').and.returnValue(mediaStream);
+
+        await callingRepository.refreshVideoInput();
+
+        expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledWith(
+          false,
+          true,
+          false,
+          true,
+        );
+      });
+
+      it('keeps the non-group default when refreshing video input without an active call', async () => {
+        const mediaStream = new MediaStream();
+        callingRepository['callState'].calls([]);
+        spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
+          Promise.resolve(mediaStream),
+        );
+        spyOn(callingRepository, 'stopMediaSource').and.returnValue(false);
+        spyOn(callingRepository, 'changeMediaSource').and.returnValue(undefined);
+
+        await callingRepository.refreshVideoInput();
+
+        expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledWith(
+          false,
+          true,
+          false,
+          false,
+        );
+      });
+    });
+
     describe.skip('on not supported call state', () => {
       it('ANSWERED, toggle will be failing', async () => {
         selfParticipant.videoState(VIDEO_STATE.STOPPED);
@@ -749,10 +827,10 @@ describe('CallingRepository ISO', () => {
     });
 
     it('creates and stores a new call when an incoming call arrives', async () => {
-      const selfUser = new User(createUuid());
+      const selfUser = new User(createUuid(), '', translateForTest);
       selfUser.isMe = true;
 
-      const conversation = new Conversation(createUuid());
+      const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       const callingRepo = new CallingRepository(
         {
@@ -768,6 +846,7 @@ describe('CallingRepository ISO', () => {
           toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
         } as any, // ServerTimeHandler
         {} as any, // BackgroundEffectsHandler
+        undefined,
         {} as any, // APIClient
         {
           findConversation: jest.fn().mockImplementation(() => conversation),
@@ -892,8 +971,9 @@ describe.skip('E2E audio call', () => {
     {} as any,
     {} as any,
     {} as any,
+    undefined,
   );
-  const user = new User('user-1');
+  const user = new User('user-1', '', translateForTest);
   let remoteWuser: number;
   let wCall: Wcall;
 
@@ -1035,8 +1115,9 @@ describe('NotificationHandlingState', () => {
     mediaDevicesHandler,
     {} as any,
     {} as any,
+    undefined,
   );
-  const user = new User('user-1');
+  const user = new User('user-1', '', translateForTest);
   let wCall: Wcall;
   let wUserNumber: number;
   //
@@ -1096,8 +1177,9 @@ describe('init AVS state', () => {
     mediaDevicesHandler,
     {} as any,
     {} as any,
+    undefined,
   );
-  const user = new User('user-1');
+  const user = new User('user-1', '', translateForTest);
   beforeEach(() => {
     jest.useFakeTimers();
     jest.spyOn(Date, 'now');
@@ -1155,6 +1237,67 @@ describe('init AVS state', () => {
       expect(wCallInstance.setBackground).toThrow('AVS set background fails');
       done();
     });
+  });
+});
+
+describe('setupDetachedWindowExternalLinksClick', () => {
+  let detachedWindow: Window;
+  let openerWindow: Window;
+
+  beforeEach(() => {
+    detachedWindow = {
+      document: document.implementation.createHTMLDocument('detached-window'),
+    } as Window;
+
+    openerWindow = {
+      open: jest.fn(),
+    } as unknown as Window;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('opens _blank links in the opener window', () => {
+    detachedWindow.document.body.innerHTML = `
+      <a href="https://wire.com" target="_blank">Wire</a>
+    `;
+
+    const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
+    const link = detachedWindow.document.querySelector('a')!;
+
+    link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+
+    expect(openerWindow.open).toHaveBeenCalledWith('https://wire.com/');
+    cleanup();
+  });
+
+  it('does not handle non _blank links', () => {
+    detachedWindow.document.body.innerHTML = `
+      <a href="https://wire.com" target="_self">Wire</a>
+    `;
+
+    const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
+    const link = detachedWindow.document.querySelector('a')!;
+
+    link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+
+    expect(openerWindow.open).not.toHaveBeenCalled();
+    cleanup();
+  });
+
+  it('removes the click listener on cleanup', () => {
+    detachedWindow.document.body.innerHTML = `
+      <a href="https://wire.com" target="_blank">Wire</a>
+    `;
+
+    const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
+    cleanup();
+
+    const link = detachedWindow.document.querySelector('a')!;
+    link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+
+    expect(openerWindow.open).not.toHaveBeenCalled();
   });
 });
 

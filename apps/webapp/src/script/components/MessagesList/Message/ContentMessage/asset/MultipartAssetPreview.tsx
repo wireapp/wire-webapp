@@ -89,47 +89,56 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
   // Determine what text to show: file name for single file, count for multiple files
   const displayText = hasMultipleFiles ? attachmentsCountCopy : fileName;
 
+  let attachmentIcon;
+  if (shouldDisplayImagePreview) {
+    attachmentIcon = (
+      <div
+        className="message-quote__preview-thumbnail"
+        onClick={() => setIsModalOpen(true)}
+        style={{cursor: 'pointer'}}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsModalOpen(true);
+          }
+        }}
+      >
+        {previewUrl !== undefined ? (
+          <>
+            <img src={previewUrl} alt="" />
+            {isVideo === true && (
+              <div className="message-quote__preview-overlay" aria-hidden="true">
+                <PlayIcon width={16} height={16} />
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="message-quote__preview-loading" />
+        )}
+      </div>
+    );
+  } else if (hasMultipleFiles) {
+    attachmentIcon = (
+      <MultipleFilesIcon className="message-quote__files-icon" width={16} height={16} aria-hidden="true" />
+    );
+  } else {
+    attachmentIcon = (
+      <span
+        className="message-quote__filetype-icon"
+        role="img"
+        aria-label={fileExtension !== '' ? `${fileExtension.toUpperCase()} file` : 'File attachment'}
+      >
+        <FileTypeIcon extension={fileExtension} size={16} />
+      </span>
+    );
+  }
+
   return (
     <>
       <div className="message-quote__attachments" data-uie-name="media-attachments-quote">
-        {shouldDisplayImagePreview ? (
-          <div
-            className="message-quote__preview-thumbnail"
-            onClick={() => setIsModalOpen(true)}
-            style={{cursor: 'pointer'}}
-            role="button"
-            tabIndex={0}
-            onKeyDown={e => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setIsModalOpen(true);
-              }
-            }}
-          >
-            {previewUrl !== undefined ? (
-              <>
-                <img src={previewUrl} alt="" />
-                {isVideo === true && (
-                  <div className="message-quote__preview-overlay" aria-hidden="true">
-                    <PlayIcon width={16} height={16} />
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="message-quote__preview-loading" />
-            )}
-          </div>
-        ) : hasMultipleFiles ? (
-          <MultipleFilesIcon className="message-quote__files-icon" width={16} height={16} aria-hidden="true" />
-        ) : (
-          <span
-            className="message-quote__filetype-icon"
-            role="img"
-            aria-label={fileExtension !== '' ? `${fileExtension.toUpperCase()} file` : 'File attachment'}
-          >
-            <FileTypeIcon extension={fileExtension} size={16} />
-          </span>
-        )}
+        {attachmentIcon}
         {showText === true && <span>{displayText}</span>}
       </div>
 

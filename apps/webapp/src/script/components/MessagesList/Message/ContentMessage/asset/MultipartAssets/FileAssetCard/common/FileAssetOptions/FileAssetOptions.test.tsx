@@ -17,9 +17,15 @@
  *
  */
 
+import type {ComponentProps} from 'react';
+
 import {render, screen} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {isFileEditable} from 'Util/fileTypeUtil';
 
 import {FileAssetOptions} from './FileAssetOptions';
@@ -30,6 +36,18 @@ jest.mock('Util/util', () => ({
 }));
 
 jest.unmock('Util/fileTypeUtil');
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({
+    translate: key => {
+      return key;
+    },
+  }),
+);
+
+const renderFileAssetOptions = (properties: ComponentProps<typeof FileAssetOptions>) => {
+  return render(withTheme(<FileAssetOptions {...properties} />), {wrapper: rootProviderWrapper});
+};
 
 describe('FileAssetOptions', () => {
   const mockOnOpen = jest.fn();
@@ -46,74 +64,74 @@ describe('FileAssetOptions', () => {
   });
 
   it('renders the options button', () => {
-    render(withTheme(<FileAssetOptions {...defaultProps} />));
+    renderFileAssetOptions(defaultProps);
     const button = screen.getByLabelText('cells.options.label');
     expect(button).toBeInTheDocument();
   });
 
   describe('isFileEditable integration', () => {
     it('correctly identifies non-editable PDF files', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="pdf" />));
+      renderFileAssetOptions({...defaultProps, extension: 'pdf'});
       expect(isFileEditable('pdf')).toBe(false);
     });
 
     it('correctly identifies editable docx files', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="docx" />));
+      renderFileAssetOptions({...defaultProps, extension: 'docx'});
       expect(isFileEditable('docx')).toBe(true);
     });
 
     it('correctly identifies editable xlsx files', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="xlsx" />));
+      renderFileAssetOptions({...defaultProps, extension: 'xlsx'});
       expect(isFileEditable('xlsx')).toBe(true);
     });
 
     it('correctly identifies editable pptx files', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="pptx" />));
+      renderFileAssetOptions({...defaultProps, extension: 'pptx'});
       expect(isFileEditable('pptx')).toBe(true);
     });
 
     it('correctly identifies editable odf files', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="odf" />));
+      renderFileAssetOptions({...defaultProps, extension: 'odf'});
       expect(isFileEditable('odf')).toBe(true);
     });
 
     it('handles case-insensitive editable file extensions', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="DOCX" />));
+      renderFileAssetOptions({...defaultProps, extension: 'DOCX'});
       expect(isFileEditable('DOCX')).toBe(true);
     });
 
     it('correctly identifies non-editable image files', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="jpg" />));
+      renderFileAssetOptions({...defaultProps, extension: 'jpg'});
       expect(isFileEditable('jpg')).toBe(false);
     });
 
     it('correctly identifies older Office formats as editable', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="doc" />));
+      renderFileAssetOptions({...defaultProps, extension: 'doc'});
       expect(isFileEditable('doc')).toBe(true);
     });
   });
 
   describe('component behavior with different file types', () => {
     it('renders for non-editable files with src', () => {
-      const {container} = render(withTheme(<FileAssetOptions {...defaultProps} extension="pdf" />));
+      const {container} = renderFileAssetOptions({...defaultProps, extension: 'pdf'});
       expect(container).toBeInTheDocument();
       expect(isFileEditable('pdf')).toBe(false);
     });
 
     it('renders for editable files with src', () => {
-      const {container} = render(withTheme(<FileAssetOptions {...defaultProps} extension="docx" />));
+      const {container} = renderFileAssetOptions({...defaultProps, extension: 'docx'});
       expect(container).toBeInTheDocument();
       expect(isFileEditable('docx')).toBe(true);
     });
 
     it('renders for editable files without src', () => {
-      const {container} = render(withTheme(<FileAssetOptions {...defaultProps} extension="docx" src={undefined} />));
+      const {container} = renderFileAssetOptions({...defaultProps, extension: 'docx', src: undefined});
       expect(container).toBeInTheDocument();
       expect(isFileEditable('docx')).toBe(true);
     });
 
     it('renders for non-editable files without src', () => {
-      const {container} = render(withTheme(<FileAssetOptions {...defaultProps} extension="pdf" src={undefined} />));
+      const {container} = renderFileAssetOptions({...defaultProps, extension: 'pdf', src: undefined});
       expect(container).toBeInTheDocument();
       expect(isFileEditable('pdf')).toBe(false);
     });
@@ -121,12 +139,12 @@ describe('FileAssetOptions', () => {
 
   describe('onOpen callback prop', () => {
     it('accepts onOpen callback for standard open action', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} />));
+      renderFileAssetOptions(defaultProps);
       expect(mockOnOpen).toBeDefined();
     });
 
     it('accepts onOpen callback for edit action on editable files', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="docx" />));
+      renderFileAssetOptions({...defaultProps, extension: 'docx'});
       expect(mockOnOpen).toBeDefined();
       expect(isFileEditable('docx')).toBe(true);
     });
@@ -134,17 +152,17 @@ describe('FileAssetOptions', () => {
 
   describe('file extension handling', () => {
     it('handles lowercase extensions', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="docx" />));
+      renderFileAssetOptions({...defaultProps, extension: 'docx'});
       expect(isFileEditable('docx')).toBe(true);
     });
 
     it('handles uppercase extensions', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="DOCX" />));
+      renderFileAssetOptions({...defaultProps, extension: 'DOCX'});
       expect(isFileEditable('DOCX')).toBe(true);
     });
 
     it('handles mixed case extensions', () => {
-      render(withTheme(<FileAssetOptions {...defaultProps} extension="DocX" />));
+      renderFileAssetOptions({...defaultProps, extension: 'DocX'});
       expect(isFileEditable('DocX')).toBe(true);
     });
   });

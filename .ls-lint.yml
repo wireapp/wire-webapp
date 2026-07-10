@@ -1,4 +1,8 @@
 ls:
+  bin/verifyPublicProductionBundle.ts:
+    .ts: camelCase
+  bin/verifyPublicProductionBundle.test.ts:
+    .test.ts: camelCase
   libraries/config/src:
     .dir: camelCase
     .ts: camelCase
@@ -24,61 +28,200 @@ ls:
   apps/webapp/src/script/util/test/mock:
     .ts: camelCase
     .mock.ts: camelCase
+  apps/webapp/src/script/e2eIdentity:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .store.ts: camelCase
+  apps/webapp/src/script/applicationPeriodicChecks:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/auth:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+    .styles.tsx: camelCase
+  apps/webapp/src/script/browser:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/cleanupStack:
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/clock:
+    .ts: camelCase
+    .test.ts: camelCase
   apps/webapp/src/script/components/icon.tsx:
     .tsx: camelCase
-  apps/webapp/src/script/page/appLock:
+  apps/webapp/src/script/components/appContainer:
+    .dir: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/appLoader:
     .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
     .test.tsx: camelCase
     .styles.ts: camelCase
-  apps/webapp/src/script/page/RightSidebar/access:
+  apps/webapp/src/script/components/appNotification:
+    .tsx: camelCase
+  apps/webapp/src/script/components/availabilityIcon:
+    .tsx: camelCase
+    .styles.tsx: camelCase
+  apps/webapp/src/script/components/bannerPortal:
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
-  apps/webapp/src/script/page/RightSidebar/addParticipants:
+  apps/webapp/src/script/components/cells:
+    .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
-  apps/webapp/src/script/page/RightSidebar/conversationParticipants:
-    .ts: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/components/cellsSearchInput:
     .tsx: camelCase
-  apps/webapp/src/script/page/RightSidebar/groupParticipantService:
-    .ts: camelCase
-    .tsx: camelCase
-  apps/webapp/src/script/page/RightSidebar/groupParticipantUser:
-    .ts: camelCase
-    .tsx: camelCase
-  apps/webapp/src/script/page/RightSidebar/participantDevices:
-    .ts: camelCase
-    .tsx: camelCase
-  apps/webapp/src/script/page/RightSidebar/timedMessages:
-    .ts: camelCase
-    .tsx: camelCase
-  apps/webapp/src/script/page/RightSidebar/panelHeader:
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/cellsGlobalView:
+    .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
     .test.tsx: camelCase
-  apps/webapp/src/script/page/RightSidebar/notifications:
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/classifiedBar:
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/components/configToolbar:
+    .tsx: camelCase
+    .styles.tsx: camelCase
+  apps/webapp/src/script/components/connectRequests:
+    .tsx: camelCase
+  apps/webapp/src/script/components/copyToClipboardButton:
+    .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
     .test.tsx: camelCase
-  apps/webapp/src/script/page/RightSidebar/messageDetails:
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/draggableClickWrapper:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/dropFileArea:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/emojiPicker:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/errorFallback:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/fadingScrollbar:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/fullscreenModal:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/giphy:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/historyExport:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/historyImport:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/image:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/inViewport:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/panel:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/panel/conversationProtocolDetails:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/components/panel/panelActions:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/panel/singleAction:
+    .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
-    .test.tsx: camelCase
-  apps/webapp/src/script/page/RightSidebar/conversationHistory:
+  apps/webapp/src/script/ui:
+    .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/message:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/entity/message:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/badge:
+    .dir: camelCase
+  apps/webapp/src/script/components/userList:
+    .dir: camelCase
+  apps/webapp/src/script/components/participantItemContent:
+    .dir: camelCase
+  apps/webapp/src/script/components/titleBar:
+    .dir: camelCase
+  apps/webapp/src/script/components/conversationListCell:
+    .dir: camelCase
+  apps/webapp/src/script/page:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
     .styles.ts: camelCase
-  apps/webapp/src/script/page/RightSidebar/conversationDetails:
-    .ts: camelCase
-    .tsx: camelCase
-    .test.tsx: camelCase
-  apps/webapp/src/script/page/RightSidebar/guestServicesOptions:
-    .ts: camelCase
-    .tsx: camelCase
-    .test.tsx: camelCase
   apps/webapp/src/script/repositories/media/backgroundEffects:
     .dir: camelCase
     .ts: camelCase

@@ -18,6 +18,7 @@
  */
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
@@ -27,6 +28,7 @@ import {createUuid} from 'Util/uuid';
 import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ConversationRoleRepository', () => {
   const testFactory = new TestFactory();
@@ -73,8 +75,8 @@ describe('ConversationRoleRepository', () => {
 
   describe('canAddParticipants', () => {
     it('checks if a user can add participants to a group', async () => {
-      const conversationEntity = new Conversation(createUuid());
-      const userEntity = new User(createUuid(), null);
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const userEntity = new User(createUuid(), null, translateForTest);
       conversationEntity.participating_user_ets.push(userEntity);
 
       let canAddParticipants = roleRepository.canAddParticipants(conversationEntity, userEntity);

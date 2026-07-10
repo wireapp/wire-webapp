@@ -19,59 +19,48 @@
 
 import {MouseEvent} from 'react';
 
-import {
-  CallIcon,
-  CirclePlusIcon,
-  CloseIcon,
-  EditIcon,
-  IconButton,
-  MoreIcon,
-  ShareLinkIcon,
-  TrashIcon,
-} from '@wireapp/react-ui-kit';
+import {container} from 'tsyringe';
 
+import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
+
+import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/getMeetingActionEntries';
 import {
-  contextMenuDangerItemIconStyles,
-  contextMenuDangerItemStyles,
   iconContainerStyle,
   iconStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
-import {t} from 'Util/localizerUtil';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import {useEditMeeting} from 'Components/Meeting/useEditMeeting';
+import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
+import {UserState} from 'Repositories/user/userState';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {showContextMenu} from '../../../../../../ui/ContextMenu';
+import {showContextMenu} from '../../../../../../ui/contextMenu';
 
-export const MeetingAction = () => {
+interface MeetingActionProps {
+  meetingInstance: MeetingInstance;
+}
+
+export const MeetingAction = ({meetingInstance}: MeetingActionProps) => {
+  const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
+  const {editMeeting} = useEditMeeting();
+  const selfUser = container.resolve(UserState).self();
+
   const handleActionButton = (event: MouseEvent<HTMLElement>) => {
+    const nowMilliseconds = wallClock.currentTimestampInMilliseconds;
+
     showContextMenu({
       event,
-      entries: [
-        {
-          icon: () => <CallIcon />,
-          label: t('meetings.action.startMeeting'),
+      entries: getMeetingActionEntries({
+        meetingInstance,
+        selfUser,
+        nowMilliseconds,
+        translate,
+        onEdit: () => {
+          if (canEditMeeting(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
+            fireAndForgetInvoker.fireAndForget(() => editMeeting(meetingInstance));
+          }
         },
-        {
-          icon: () => <CirclePlusIcon />,
-          label: t('meetings.action.createConversation'),
-        },
-        {
-          icon: () => <ShareLinkIcon />,
-          label: t('meetings.action.copyLink'),
-        },
-        {
-          icon: () => <EditIcon />,
-          label: t('meetings.action.editMeeting'),
-        },
-        {
-          css: contextMenuDangerItemStyles,
-          icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
-          label: t('meetings.action.deleteMeetingForMe'),
-        },
-        {
-          css: contextMenuDangerItemStyles,
-          icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
-          label: t('meetings.action.deleteMeetingForAll'),
-        },
-      ],
+      }),
       identifier: 'message-options-menu',
     });
   };

@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {clearAllButtonStyles, filterGroupStyles, toggleFilterButtonStyles} from './CellsFiltersBar.styles';
 import type {FilterConfig} from './filterConfig';
@@ -40,6 +40,7 @@ const clearFilter = (filter: FilterConfig): void => {
 };
 
 export const CellsFiltersBar = ({filters}: CellsFiltersBarProps) => {
+  const {translate} = useApplicationContext();
   const hasActiveFilters = filters.some(isFilterActive);
   const clearAll = () => filters.forEach(clearFilter);
 
@@ -77,7 +78,7 @@ export const CellsFiltersBar = ({filters}: CellsFiltersBarProps) => {
       )}
       {hasActiveFilters && (
         <button type="button" css={clearAllButtonStyles} onClick={clearAll} data-uie-name="filters-clear-all">
-          {t('cells.clearFilters.button')}
+          {translate('cells.clearFilters.button')}
         </button>
       )}
     </div>

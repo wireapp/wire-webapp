@@ -20,15 +20,20 @@
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {Translate} from 'Util/localizerUtil';
 import {generateRandomPassword} from 'Util/stringUtil';
 
 interface PasswordGeneratorButtonProps {
+  translate: Translate;
   passwordLength?: number;
   onGeneratePassword: (password: string) => void;
 }
 
-export const PasswordGeneratorButton = ({passwordLength = 8, onGeneratePassword}: PasswordGeneratorButtonProps) => {
+export const PasswordGeneratorButton = ({
+  translate,
+  passwordLength = 8,
+  onGeneratePassword,
+}: PasswordGeneratorButtonProps) => {
   const generatePassword = () => {
     const password = generateRandomPassword(passwordLength);
     onGeneratePassword(password);
@@ -37,7 +42,7 @@ export const PasswordGeneratorButton = ({passwordLength = 8, onGeneratePassword}
   return (
     <Button variant={ButtonVariant.TERTIARY} onClick={generatePassword} data-uie-name="do-generate-password">
       <Icon.ShieldIcon data-uie-name="generate-password-icon" width="16" height="16" css={{marginRight: '10px'}} />
-      {t('generatePassword')}
+      {translate('generatePassword')}
     </Button>
   );
 };

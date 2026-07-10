@@ -21,14 +21,19 @@ import {render, fireEvent, within} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {ReactionMap} from 'Repositories/storage';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
 
-const user1 = new User();
-const user2 = new User();
-const user3 = new User();
+const user1 = new User('', '', translateForTest);
+const user2 = new User('', '', translateForTest);
+const user3 = new User('', '', translateForTest);
 const reactions: ReactionMap = [
   ['😇', [user1.qualifiedId, user2.qualifiedId, user3.qualifiedId]],
   ['😊', [user1.qualifiedId, user2.qualifiedId]],
@@ -37,6 +42,7 @@ const reactions: ReactionMap = [
 ];
 
 const defaultProps: MessageReactionsListProps = {
+  translate: translateForTest,
   reactions: reactions,
   handleReactionClick: jest.fn(),
   onTooltipReactionCountClick: jest.fn(),
@@ -46,6 +52,9 @@ const defaultProps: MessageReactionsListProps = {
   selfUserId: generateQualifiedId(),
   users: [user1, user2, user3],
 };
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('MessageReactionsList', () => {
   afterEach(() => {
@@ -53,7 +62,9 @@ describe('MessageReactionsList', () => {
   });
 
   test('renders a button for each reaction and user count', () => {
-    const {getAllByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
+    const {getAllByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />), {
+      wrapper: rootProviderWrapper,
+    });
 
     const winkButton = getAllByTitle('wink');
     const smileyFace1 = getAllByTitle('innocent');
@@ -79,7 +90,9 @@ describe('MessageReactionsList', () => {
   });
 
   test('handles click on reaction button', () => {
-    const {getByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
+    const {getByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />), {
+      wrapper: rootProviderWrapper,
+    });
 
     fireEvent.click(getByTitle('+1'));
     const {handleReactionClick} = defaultProps;

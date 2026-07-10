@@ -1,0 +1,470 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {useCallback, useEffect, useMemo, useRef} from 'react';
+
+import {amplify} from 'amplify';
+import cx from 'classnames';
+import {container} from 'tsyringe';
+
+import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {ConversationVerificationBadges} from 'Components/badge';
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import * as Icon from 'Components/icon';
+import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {useConversationCall} from 'Hooks/useConversationCall';
+import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {CallState} from 'Repositories/calling/CallState';
+import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {RightSidebarParams} from 'src/script/page/appMain';
+import {PanelState} from 'src/script/page/rightSidebar';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useAppMainState, ViewType} from 'src/script/page/state';
+import {ContentState} from 'src/script/page/useAppState';
+import {CallActions} from 'src/script/view_model/CallingViewModel';
+import {ViewModelRepositories} from 'src/script/view_model/MainViewModel';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+
+interface TitleBarProps {
+  callActions: CallActions;
+  conversation: Conversation;
+  openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
+  repositories: ViewModelRepositories;
+  selfUser: User;
+  teamState: TeamState;
+  isRightSidebarOpen?: boolean;
+  callState?: CallState;
+  isReadOnlyConversation?: boolean;
+  withBottomDivider: boolean;
+  isSharedDriveSearchViewOpen?: boolean;
+  onCloseSharedDriveSearchView?: () => void;
+}
+
+export const TitleBar = ({
+  repositories,
+  conversation,
+  callActions,
+  selfUser,
+  openRightSidebar,
+  isRightSidebarOpen = false,
+  callState = container.resolve(CallState),
+  teamState = container.resolve(TeamState),
+  isReadOnlyConversation = false,
+  withBottomDivider,
+  isSharedDriveSearchViewOpen = false,
+  onCloseSharedDriveSearchView,
+}: TitleBarProps) => {
+  const {translate} = useApplicationContext();
+  const {
+    is1to1,
+    isRequest,
+    isActiveParticipant,
+    isGroupOrChannel,
+    hasExternal,
+    hasDirectGuest,
+    hasService,
+    hasApps,
+    hasFederatedUsers,
+    firstUserEntity,
+    hasLegalHold,
+    display_name: displayName,
+  } = useKoSubscribableChildren(conversation, [
+    'is1to1',
+    'isRequest',
+    'isActiveParticipant',
+    'isGroupOrChannel',
+    'hasExternal',
+    'hasDirectGuest',
+    'hasService',
+    'hasApps',
+    'hasFederatedUsers',
+    'firstUserEntity',
+    'hasLegalHold',
+    'display_name',
+  ]);
+
+  const guardCall = useNoInternetCallGuard({
+    description: translate('callNotEstablishedDescription'),
+    descriptionPoints: [
+      translate('callNotEstablishedDescriptionPoint1'),
+      translate('callNotEstablishedDescriptionPoint2'),
+      translate('callNotEstablishedDescriptionPoint3'),
+    ],
+    title: translate('callNotEstablishedTitle'),
+    translate,
+  });
+  const {isCallConnecting, isCallActive} = useConversationCall(conversation);
+
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
+  const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);
+
+  const currentFocusedElementRef = useRef<HTMLButtonElement | null>(null);
+
+  // using ref for immediate double-click protection
+  const isStartingCallRef = useRef(false);
+
+  // Reset local state when a call becomes active or cleared
+  if (isStartingCallRef.current && (isCallActive || activeCalls.length === 0)) {
+    isStartingCallRef.current = false;
+  }
+
+  // Button is disabled if starting, connecting, or already active
+  const isCallButtonDisabled = isReadOnlyConversation || isStartingCallRef.current || isCallConnecting || isCallActive;
+
+  const badgeLabelCopy = useMemo(() => {
+    if (is1to1 && isRequest) {
+      return '';
+    }
+
+    const translationKey = generateWarningBadgeKey({
+      hasExternal,
+      hasFederated: hasFederatedUsers,
+      hasGuest: hasDirectGuest,
+      hasService: hasService || hasApps,
+    });
+
+    if (translationKey) {
+      return translate(translationKey);
+    }
+
+    return '';
+  }, [hasApps, hasDirectGuest, hasExternal, hasFederatedUsers, hasService, is1to1, isRequest, translate]);
+
+  const hasCall = useMemo(() => {
+    const hasEntities = !!joinedCall;
+    return hasEntities && matchQualifiedIds(conversation.qualifiedId, joinedCall.conversation.qualifiedId);
+  }, [conversation, joinedCall]);
+
+  const showCallControls = ConversationFilter.showCallControls(conversation, hasCall);
+
+  const conversationSubtitle = is1to1 && firstUserEntity?.isFederated === true ? (firstUserEntity?.handle ?? '') : '';
+
+  const conversationDetailsTooltip = translate('tooltipConversationPeople', {displayName});
+
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const mdBreakpoint = useMatchMedia('max-width: 1000px');
+  const smBreakpoint = useMatchMedia(QUERY.tabletSMDown);
+
+  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
+
+  const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
+
+  const setLeftSidebar = () => {
+    setView(ViewType.MOBILE_LEFT_SIDEBAR);
+    closeRightSidebar();
+  };
+
+  const showDetails = useCallback(
+    (addParticipants: boolean): void => {
+      const panelId = addParticipants ? PanelState.ADD_PARTICIPANTS : PanelState.CONVERSATION_DETAILS;
+
+      openRightSidebar(panelId, {entity: conversation});
+    },
+    [conversation, openRightSidebar],
+  );
+
+  const showAddParticipant = useCallback(() => {
+    if (is1to1) {
+      return;
+    }
+
+    if (!isActiveParticipant) {
+      return showDetails(false);
+    }
+
+    if (isGroupOrChannel) {
+      showDetails(true);
+    } else {
+      amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', firstUserEntity);
+    }
+  }, [firstUserEntity, isActiveParticipant, isGroupOrChannel, showDetails, is1to1]);
+
+  useEffect(() => {
+    // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
+    window.setTimeout(() => document.querySelector('.titlebar')?.remove(), TIME_IN_MILLIS.SECOND);
+
+    amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => showDetails(false));
+    amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
+      if (isActivatedAccount) {
+        showAddParticipant();
+      }
+    });
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PEOPLE);
+      amplify.unsubscribeAll(WebAppEvents.SHORTCUT.ADD_PEOPLE);
+    };
+  }, [isActivatedAccount, showAddParticipant, showDetails]);
+
+  const onClickCollectionButton = () => amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
+
+  const onClickDetails = () => showDetails(false);
+
+  const startCallAndShowAlert = () => {
+    if (isStartingCallRef.current || isCallButtonDisabled) {
+      return;
+    }
+
+    isStartingCallRef.current = true;
+
+    guardCall(async () => {
+      try {
+        await callActions.startAudio(conversation);
+        isStartingCallRef.current = false;
+        showStartedCallAlert(isGroupOrChannel);
+      } catch (error: unknown) {
+        // Re-enable on error
+        isStartingCallRef.current = false;
+      }
+    });
+  };
+
+  const onClickStartAudio = () => {
+    startCallAndShowAlert();
+
+    if (smBreakpoint) {
+      setLeftSidebar();
+    }
+  };
+
+  useEffect(() => {
+    if (!activeCalls.length && currentFocusedElementRef.current) {
+      currentFocusedElementRef.current.focus();
+      currentFocusedElementRef.current = null;
+    }
+  }, [activeCalls.length]);
+
+  const {showStartedCallAlert} = useCallAlertState();
+
+  return (
+    <ul
+      id="conversation-title-bar"
+      className={cx('conversation-title-bar', {
+        'is-right-panel-open': isRightSidebarOpen,
+        'conversation-title-bar--with-bottom-divider': withBottomDivider,
+      })}
+    >
+      <li className="conversation-title-bar-library">
+        {smBreakpoint && (
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            className="conversation-title-bar-icon icon-back"
+            css={{marginBottom: 0}}
+            onClick={setLeftSidebar}
+            aria-label={translate('index.goBack')}
+          />
+        )}
+
+        {isSharedDriveSearchViewOpen && (
+          <button
+            className="conversation-title-bar-icon conversation-title-bar-icon--borderless"
+            type="button"
+            title={translate('fullsearchCancelLabel')}
+            aria-label={translate('fullsearchCancelLabel')}
+            onClick={onCloseSharedDriveSearchView}
+            data-uie-name="do-close-shared-drive-search"
+          >
+            <Icon.CloseIcon />
+          </button>
+        )}
+
+        {isActivatedAccount && !mdBreakpoint && !isSharedDriveSearchViewOpen && (
+          <button
+            className="conversation-title-bar-icon icon-search"
+            type="button"
+            title={translate('tooltipConversationSearch')}
+            aria-label={translate('tooltipConversationSearch')}
+            onClick={onClickCollectionButton}
+            data-uie-name="do-collections"
+          >
+            <span className="visually-hidden">{translate('tooltipConversationSearch')}</span>
+          </button>
+        )}
+      </li>
+
+      <li className="conversation-title-bar-name">
+        <div
+          id="show-participants"
+          onClick={onClickDetails}
+          title={conversationDetailsTooltip}
+          aria-label={conversationDetailsTooltip}
+          onKeyDown={event =>
+            handleKeyDown({
+              event,
+              callback: onClickDetails,
+              keys: [KEY.ENTER, KEY.SPACE],
+            })
+          }
+          data-placement="bottom"
+          role="button"
+          tabIndex={TabIndex.FOCUSABLE}
+          data-uie-name="do-participants"
+        >
+          <div className="conversation-title-bar-name-label--wrapper">
+            {hasLegalHold && (
+              <LegalHoldDot
+                dataUieName="status-legal-hold-conversation"
+                className="conversation-title-bar-legal-hold"
+                conversation={conversation}
+                isInteractive
+              />
+            )}
+
+            <span className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
+              {displayName}
+            </span>
+
+            <ConversationVerificationBadges conversation={conversation} />
+          </div>
+
+          {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
+        </div>
+      </li>
+
+      <li className="conversation-title-bar-icons">
+        {!isSharedDriveSearchViewOpen && (
+          <>
+            {showCallControls && !mdBreakpoint && (
+              <button
+                type="button"
+                className="conversation-title-bar-icon"
+                title={translate('tooltipConversationCall')}
+                aria-label={translate('tooltipConversationCall')}
+                onClick={event => {
+                  currentFocusedElementRef.current = event.currentTarget;
+                  startCallAndShowAlert();
+                }}
+                data-uie-name="do-call"
+                disabled={isCallButtonDisabled}
+              >
+                <CallIcon />
+              </button>
+            )}
+
+            {mdBreakpoint ? (
+              <>
+                <IconButton
+                  className="icon-search"
+                  css={{marginBottom: 0}}
+                  title={translate('tooltipConversationSearch')}
+                  aria-label={translate('tooltipConversationSearch')}
+                  onClick={onClickCollectionButton}
+                  data-uie-name="do-collections"
+                >
+                  <span className="visually-hidden">{translate('tooltipConversationSearch')}</span>
+                </IconButton>
+                {showCallControls && (
+                  <IconButton
+                    title={translate('tooltipConversationCall')}
+                    aria-label={translate('tooltipConversationCall')}
+                    css={{marginBottom: 0}}
+                    onClick={onClickStartAudio}
+                    data-uie-name="do-call"
+                    disabled={isCallButtonDisabled}
+                  >
+                    <CallIcon />
+                  </IconButton>
+                )}
+              </>
+            ) : (
+              <button
+                type="button"
+                title={translate('tooltipConversationInfo')}
+                aria-label={translate('tooltipConversationInfo')}
+                onClick={onClickDetails}
+                className={cx('conversation-title-bar-icon', {active: isRightSidebarOpen})}
+                data-uie-name="do-open-info"
+              >
+                <Icon.InfoIcon />
+              </button>
+            )}
+          </>
+        )}
+      </li>
+
+      {badgeLabelCopy && (
+        <li
+          className="conversation-title-bar-indication-badge"
+          data-uie-name="status-indication-badge"
+          dangerouslySetInnerHTML={{__html: badgeLabelCopy}}
+        />
+      )}
+    </ul>
+  );
+};
+
+type BadgeKeys =
+  | 'External'
+  | 'ExternalAndGuest'
+  | 'ExternalAndGuestAndService'
+  | 'ExternalAndService'
+  | 'Federated'
+  | 'FederatedAndExternal'
+  | 'FederatedAndExternalAndGuest'
+  | 'FederatedAndExternalAndGuestAndService'
+  | 'FederatedAndExternalAndService'
+  | 'FederatedAndGuest'
+  | 'FederatedAndGuestAndService'
+  | 'FederatedAndService'
+  | 'GuestAndService'
+  | 'Service';
+
+type WarningBadgeKey = '' | 'guestRoomConversationBadge' | `${'guestRoomConversationBadge'}${BadgeKeys}`;
+
+export function generateWarningBadgeKey({
+  hasFederated,
+  hasExternal,
+  hasGuest,
+  hasService,
+}: {
+  hasExternal?: boolean;
+  hasFederated?: boolean;
+  hasGuest?: boolean;
+  hasService?: boolean;
+}): WarningBadgeKey {
+  const baseKey = 'guestRoomConversationBadge';
+  const extras = [];
+  if (hasGuest === true && hasExternal !== true && hasService !== true && hasFederated !== true) {
+    return baseKey;
+  }
+  if (hasFederated === true) {
+    extras.push('Federated');
+  }
+  if (hasExternal === true) {
+    extras.push('External');
+  }
+  if (hasGuest === true) {
+    extras.push('Guest');
+  }
+  if (hasService === true) {
+    extras.push('Service');
+  }
+  if (extras.length === 0) {
+    return '';
+  }
+  return `${baseKey}${extras.join('And')}` as WarningBadgeKey;
+}

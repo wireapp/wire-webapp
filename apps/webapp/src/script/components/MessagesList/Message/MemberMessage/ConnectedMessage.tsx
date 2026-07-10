@@ -19,12 +19,12 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {UserClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {E2eEncryptionMessage} from '../E2eEncryptionMessage/E2eEncryptionMessage';
 
@@ -41,6 +41,7 @@ export const ConnectedMessage = ({
   showServicesWarning = false,
   classifiedDomains,
 }: ConnectedMessageProps) => {
+  const {translate} = useApplicationContext();
   const {name, providerName, isOutgoingRequest} = useKoSubscribableChildren(user, [
     'name',
     'providerName',
@@ -77,14 +78,14 @@ export const ConnectedMessage = ({
           </div>
 
           <Button variant={ButtonVariant.SECONDARY} onClick={onClickCancelRequest} data-uie-name="do-cancel-request">
-            {t('conversationConnectionCancelRequest')}
+            {translate('conversationConnectionCancelRequest')}
           </Button>
         </>
       )}
 
       {showServicesWarning && (
         <div className="message-services-warning" data-uie-name="label-services-warning">
-          {t('conversationServicesWarning')}
+          {translate('conversationServicesWarning')}
         </div>
       )}
 

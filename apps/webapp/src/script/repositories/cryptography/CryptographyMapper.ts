@@ -66,7 +66,7 @@ import {base64ToArray, arrayToBase64} from 'Util/util';
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
 import {CryptographyError} from '../../error/cryptographyError';
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 
 export interface MappedText {
@@ -393,18 +393,16 @@ export class CryptographyMapper {
 
     if (preview !== null && preview !== undefined) {
       const remote = preview.remote;
-      if (remote === null || remote === undefined) {
-        return {data, type: ClientEvent.CONVERSATION.ASSET_ADD};
+      if (remote !== null && remote !== undefined) {
+        data = {
+          ...data,
+          preview_domain: remote.assetDomain ?? undefined,
+          preview_key: remote.assetId ?? undefined,
+          preview_otr_key: new Uint8Array(remote.otrKey),
+          preview_sha256: new Uint8Array(remote.sha256),
+          preview_token: remote.assetToken ?? undefined,
+        };
       }
-
-      data = {
-        ...data,
-        preview_domain: remote.assetDomain ?? undefined,
-        preview_key: remote.assetId ?? undefined,
-        preview_otr_key: new Uint8Array(remote.otrKey),
-        preview_sha256: new Uint8Array(remote.sha256),
-        preview_token: remote.assetToken ?? undefined,
-      };
     }
 
     const isImage =

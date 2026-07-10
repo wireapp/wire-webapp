@@ -23,9 +23,9 @@ import cx from 'classnames';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {FileAsset} from 'Repositories/entity/message/FileAsset';
+import type {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {noop} from 'Util/util';
 
 import {AssetLoader} from '../AssetLoader/AssetLoader';
@@ -53,6 +53,7 @@ const MediaButton = ({
   cancel = noop,
   isFocusable = true,
 }: MediaButtonProps) => {
+  const {translate} = useApplicationContext();
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const onPlay = () => setIsPlaying(true);
   const onPause = () => setIsPlaying(false);
@@ -88,7 +89,7 @@ const MediaButton = ({
           className="button-reset-default media-button media-button-play icon-play"
           onClick={play}
           data-uie-name="do-play-media"
-          aria-label={t('mediaBtnPlay')}
+          aria-label={translate('mediaBtnPlay')}
           tabIndex={messageFocusedTabIndex}
         />
       )}
@@ -98,7 +99,7 @@ const MediaButton = ({
           className="button-reset-default media-button media-button-pause icon-pause"
           onClick={pause}
           data-uie-name="do-pause-media"
-          aria-label={t('mediaBtnPause')}
+          aria-label={translate('mediaBtnPause')}
           tabIndex={messageFocusedTabIndex}
         />
       )}

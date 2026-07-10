@@ -48,6 +48,7 @@ import {Backend} from './env/backend';
 import {GenericAPI} from './generic/genericApi';
 import {GiphyAPI} from './giphy/giphyApi';
 import {BackendError, HttpClient} from './http/';
+import {MeetingsAPI} from './meetings/meetingsApi';
 import {NotificationAPI} from './notification/';
 import {OAuthAPI} from './oauth/oAuthApi';
 import {ObfuscationUtil} from './obfuscation';
@@ -121,6 +122,7 @@ type Apis = {
   connection: ConnectionAPI;
   conversation: ConversationAPI;
   giphy: GiphyAPI;
+  meetings: MeetingsAPI;
   notification: NotificationAPI;
   oauth: OAuthAPI;
   self: SelfAPI;
@@ -234,7 +236,7 @@ export class APIClient extends EventEmitter {
     const assetAPI = new AssetAPI(this.transport.http);
 
     // Prevents the CellsAPI from being initialized multiple times
-    if (!this.cellsApi) {
+    if (this.cellsApi === null) {
       this.cellsApi = new CellsAPI({
         httpClientConfig: this.config,
         accessTokenStore: this.accessTokenStore,
@@ -252,6 +254,7 @@ export class APIClient extends EventEmitter {
       connection: new ConnectionAPI(this.transport.http),
       conversation: new ConversationAPI(this.transport.http, backendFeatures),
       giphy: new GiphyAPI(this.transport.http),
+      meetings: new MeetingsAPI(this.transport.http),
       notification: new NotificationAPI(this.transport.http),
       oauth: new OAuthAPI(this.transport.http),
       self: new SelfAPI(this.transport.http),
@@ -356,7 +359,7 @@ export class APIClient extends EventEmitter {
   }
 
   public async login(loginData: LoginData): Promise<Context> {
-    if (this.context) {
+    if (Boolean(this.context)) {
       await this.logout();
     }
 
@@ -388,7 +391,7 @@ export class APIClient extends EventEmitter {
   }
 
   public async register(userAccount: RegisterData, clientType: ClientType = ClientType.PERMANENT): Promise<Context> {
-    if (this.context) {
+    if (Boolean(this.context)) {
       await this.logout();
     }
 
@@ -427,16 +430,17 @@ export class APIClient extends EventEmitter {
       this.logger.warn('Could not get self user', (error as BackendError).message);
     }
 
-    this.context = this.context
-      ? {...this.context, clientType, domain: selfDomain}
-      : {clientType, userId, domain: selfDomain};
+    this.context =
+      this.context !== undefined
+        ? {...this.context, clientType, domain: selfDomain}
+        : {clientType, userId, domain: selfDomain};
     return this.context;
   }
 
   public disconnect(reason?: string): void {
     this.transport.ws.disconnect(reason);
     // Remove the cookie refresh listener to prevent memory leaks
-    if (this.cookieRefreshListener) {
+    if (this.cookieRefreshListener !== undefined) {
       CookieStore.emitter.off(CookieStore.TOPIC.COOKIE_REFRESH, this.cookieRefreshListener);
     }
   }

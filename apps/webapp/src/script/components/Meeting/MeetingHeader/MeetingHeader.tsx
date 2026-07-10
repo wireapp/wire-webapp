@@ -18,14 +18,18 @@
  */
 
 import {actionsStyles, headingStyles, wrapperStyles} from 'Components/Meeting/MeetingHeader/MeetingHeader.styles';
-import {MeetNowMultiActionButton} from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton';
-import {t} from 'Util/localizerUtil';
+import {MeetingMultiActionButton} from 'Components/Meeting/MeetingMultiActionButton/MeetingMultiActionButton';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const MeetingHeader = () => (
-  <header css={wrapperStyles}>
-    <h2 css={headingStyles}>{t('meetings.navigation.title')}</h2>
-    <div css={actionsStyles}>
-      <MeetNowMultiActionButton />
-    </div>
-  </header>
-);
+export const MeetingHeader = () => {
+  const {translate} = useApplicationContext();
+
+  return (
+    <header css={wrapperStyles}>
+      <h2 css={headingStyles}>{translate('meetings.navigation.title')}</h2>
+      <div css={actionsStyles}>
+        <MeetingMultiActionButton />
+      </div>
+    </header>
+  );
+};

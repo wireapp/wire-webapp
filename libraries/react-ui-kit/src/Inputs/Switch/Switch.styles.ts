@@ -64,36 +64,36 @@ export const switchStyles = ({
   activatedColor,
   deactivatedColor,
   disabledColor,
-}: SwitchStylesProps): CSSObject => ({
-  '&:after': {
-    content: '" "',
-    paddingRight: '10px',
-    textAlign: 'right',
-  },
-  '&:before': {
-    content: '" "',
-    paddingLeft: '10px',
-  },
-  '&:before, &:after': {
-    backgroundColor:
-      disabled || showLoading
-        ? (disabledColor ?? COLOR.tint(checked ? activatedColor : deactivatedColor, 0.4))
-        : checked
-          ? activatedColor
-          : deactivatedColor,
-    boxSizing: 'border-box',
+}: SwitchStylesProps): CSSObject => {
+  const baseColor = checked ? activatedColor : deactivatedColor;
+  const backgroundColor = disabled || showLoading ? (disabledColor ?? COLOR.tint(baseColor, 0.4)) : baseColor;
+
+  return {
+    '&:after': {
+      content: '" "',
+      paddingRight: '10px',
+      textAlign: 'right',
+    },
+    '&:before': {
+      content: '" "',
+      paddingLeft: '10px',
+    },
+    '&:before, &:after': {
+      backgroundColor,
+      boxSizing: 'border-box',
+      display: 'block',
+      float: 'left',
+      height: '25px',
+      lineHeight: '1.5625rem',
+      padding: 0,
+      width: '50%',
+    },
     display: 'block',
-    float: 'left',
-    height: '25px',
-    lineHeight: '1.5625rem',
-    padding: 0,
-    width: '50%',
-  },
-  display: 'block',
-  marginLeft: checked ? 0 : '-100%',
-  transition: 'margin 0.1s ease-in 0s',
-  width: '200%',
-});
+    marginLeft: checked ? 0 : '-100%',
+    transition: 'margin 0.1s ease-in 0s',
+    width: '200%',
+  };
+};
 
 export const loadingStyles: CSSObject = {
   display: 'block',

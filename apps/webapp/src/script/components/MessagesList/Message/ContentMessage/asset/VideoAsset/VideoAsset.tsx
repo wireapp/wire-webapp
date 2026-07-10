@@ -28,11 +28,11 @@ import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {AssetError} from 'Repositories/assets/assetError';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
+import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {formatSeconds} from 'Util/timeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
@@ -49,12 +49,15 @@ interface VideoAssetProps {
   isFocusable?: boolean;
 }
 
+const hideControlsDelayMilliseconds = 2000;
+
 const VideoAsset = ({
   message,
   isQuote,
   teamState = container.resolve(TeamState),
   isFocusable = true,
 }: VideoAssetProps) => {
+  const {translate} = useApplicationContext();
   const asset = message.getFirstAsset() as FileAssetType;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {preview_resource: assetPreviewResource} = useKoSubscribableChildren(asset, ['preview_resource']);
@@ -72,18 +75,18 @@ const VideoAsset = ({
 
   const [hideControls, setHideControls] = useState(false);
   const hideControlsCallback = useCallback(() => setHideControls(true), []);
-  const {removeTimeout, startTimeout} = useTimeout(hideControlsCallback, 2000);
+  const {removeTimeout, startTimeout} = useTimeout(hideControlsCallback, hideControlsDelayMilliseconds);
 
   useEffect(() => {
     if (assetPreviewResource !== undefined && isFileSharingReceivingEnabled) {
-      getAssetUrl(assetPreviewResource).then(setVideoPreview);
+      void getAssetUrl(assetPreviewResource).then(setVideoPreview);
     }
 
     return () => {
       videoPreview?.dispose();
       videoSrc?.dispose();
     };
-  }, []);
+  }, [assetPreviewResource, getAssetUrl, isFileSharingReceivingEnabled, videoPreview, videoSrc]);
 
   // Initial check if video is supported with `canPlayType` method, which checks for MIME type, e.g. 'video/mp4' or 'video/mov'.
   // It's not 100% reliable (e.g. doesn't check codecs), but it's synchorous, which is helpful for initial rendering.
@@ -125,7 +128,7 @@ const VideoAsset = ({
       setDisplaySmall(false);
 
       if (videoSrc && videoElement) {
-        videoElement.play();
+        void videoElement.play();
       } else {
         asset.status(AssetTransferState.DOWNLOADING);
 
@@ -230,9 +233,9 @@ const VideoAsset = ({
             />
             {videoPlaybackError ? (
               <div className="video-asset__playback-error">
-                <p className="label-medium">{t('conversationPlaybackError')}</p>
+                <p className="label-medium">{translate('conversationPlaybackError')}</p>
                 <Button variant={ButtonVariant.TERTIARY} onClick={() => downloadAsset(asset)}>
-                  {t('conversationPlaybackErrorDownload')}
+                  {translate('conversationPlaybackErrorDownload')}
                 </Button>
               </div>
             ) : (

@@ -22,12 +22,19 @@ import {components, ContainerProps, GroupBase} from 'react-select';
 import {TabIndex} from '../../../utils/enums';
 import {Option} from '../Select';
 
+const selectContainerInnerStyles = {
+  minWidth: 0,
+  width: '100%',
+};
+
 export const SelectContainer = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
   props: ContainerProps<Option, IsMulti, Group>,
 ) => {
   return (
     <components.SelectContainer {...props}>
-      <div tabIndex={TabIndex.FOCUSABLE}>{props.children}</div>
+      <div tabIndex={TabIndex.FOCUSABLE} css={selectContainerInnerStyles}>
+        {props.children}
+      </div>
     </components.SelectContainer>
   );
 };

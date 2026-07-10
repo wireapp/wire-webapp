@@ -17,7 +17,7 @@
  *
  */
 
-import {Message} from 'Repositories/entity/message/Message';
+import {Message} from 'Repositories/entity/message/message';
 import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 export type Marker = {
@@ -73,6 +73,14 @@ function getMessageMarkerType(
 
 export function isMarker(object: any): object is Marker {
   return object?.messageType === 'marker';
+}
+
+export function getVirtualizedMessagesGroupItemKey(item: Marker | GroupedMessage): string {
+  if (isMarker(item)) {
+    return `marker-${item.type}-${item.timestamp}-${item.firstMessageTimestamp}-${item.lastMessageTimestamp}`;
+  }
+
+  return `message-${item.message.id}`;
 }
 
 /**

@@ -21,16 +21,16 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
 import {AssetType} from 'Repositories/assets/assetType';
-import {Asset} from 'Repositories/entity/message/Asset';
-import {Button} from 'Repositories/entity/message/Button';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
-import type {Location} from 'Repositories/entity/message/Location';
-import type {MediumImage} from 'Repositories/entity/message/MediumImage';
-import {Multipart} from 'Repositories/entity/message/Multipart';
-import {Text} from 'Repositories/entity/message/Text';
-import {StatusType} from 'src/script/message/StatusType';
+import {Asset} from 'Repositories/entity/message/asset';
+import {Button} from 'Repositories/entity/message/button';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
+import type {Location} from 'Repositories/entity/message/location';
+import type {MediumImage} from 'Repositories/entity/message/mediumImage';
+import {Multipart} from 'Repositories/entity/message/multipart';
+import {Text} from 'Repositories/entity/message/text';
+import {StatusType} from 'src/script/message/statusType';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
 
@@ -189,9 +189,12 @@ const ContentAsset = ({
 
     case AssetType.BUTTON:
       const assetId = asset.id;
-      if (
-        !(message instanceof CompositeMessage && asset instanceof Button && assetId !== undefined && assetId !== '')
-      ) {
+      if (!(
+        message instanceof CompositeMessage &&
+        asset instanceof Button &&
+        assetId !== undefined &&
+        assetId !== ''
+      )) {
         return null;
       }
 

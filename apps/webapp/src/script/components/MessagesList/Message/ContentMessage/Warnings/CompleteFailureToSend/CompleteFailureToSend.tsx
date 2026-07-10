@@ -21,7 +21,7 @@ import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {backendErrorLink, button, warning, wrapper} from '../Warnings.styles';
 
@@ -34,6 +34,7 @@ type Props = {
 const config = Config.getConfig();
 
 export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreachableDomain}: Props) => {
+  const {translate} = useApplicationContext();
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   return (
     <div css={wrapper}>
@@ -42,7 +43,7 @@ export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreach
           <span
             css={warning}
             dangerouslySetInnerHTML={{
-              __html: t('messageCouldNotBeSentBackEndOffline', {domain: unreachableDomain}),
+              __html: translate('messageCouldNotBeSentBackEndOffline', {domain: unreachableDomain}),
             }}
           />{' '}
           <Link
@@ -53,11 +54,11 @@ export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreach
             data-uie-name="go-offline-backend"
             css={backendErrorLink}
           >
-            {t('offlineBackendLearnMore')}
+            {translate('offlineBackendLearnMore')}
           </Link>
         </p>
       ) : (
-        <p css={warning}>{t('messageCouldNotBeSentConnectivityIssues')}</p>
+        <p css={warning}>{translate('messageCouldNotBeSentConnectivityIssues')}</p>
       )}
       <div css={{display: 'flex'}}>
         <Button
@@ -67,7 +68,7 @@ export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreach
           variant={ButtonVariant.TERTIARY}
           onClick={onRetry}
         >
-          {t('messageCouldNotBeSentRetry')}
+          {translate('messageCouldNotBeSentRetry')}
         </Button>
       </div>
     </div>

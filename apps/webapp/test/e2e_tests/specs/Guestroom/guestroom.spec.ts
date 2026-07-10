@@ -55,11 +55,8 @@ test.describe('Guestroom', () => {
         await guestPages.conversationJoin().joinBrowserButton.click();
         await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
-        // Allow the login to be retried if the modal doesn't show up automatically, this is a workaround since the login mask for guest links is out of our control
-        await expect(async () => {
-          await guestPages.login().login(guestUser);
-          await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible();
-        }).toPass({timeout: LOGIN_TIMEOUT});
+        await guestPages.login().login(guestUser);
+        await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible();
 
         await guestBModals.joinGuestLinkPassword().joinConversation('WrongPassword');
         await expect(guestBModals.joinGuestLinkPassword().joinForm).toContainText(
@@ -584,15 +581,17 @@ test.describe('Guestroom', () => {
   );
 
   const ssoUser = getUser({
-    email: process.env.SCIM_USER_SSO_CODE,
-    username: process.env.SCIM_USER_EMAIL,
-    password: process.env.SCIM_USER_PASSWORD,
+    email: process.env.SSO_CLAIMED_USER_EMAIL,
+    username: process.env.SSO_CLAIMED_USER_EMAIL,
+    password: process.env.SSO_CLAIMED_USER_PASSWORD,
   });
 
-  test(
+  // Todo: This test is skipped because of disabled Okta account [WPB-26999]
+  test.skip(
     'I want to join guestroom invite with enterprise login',
     {tag: ['@TC-3477', '@regression']},
     async ({context, createPage}) => {
+      test.setTimeout(150_000); // Due to the two logins this test can sometimes take a bit longer
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage(context)]);
 
       const userAPageManager = PageManager.from(userAPage).webapp;
@@ -623,11 +622,9 @@ test.describe('Guestroom', () => {
       // // We will also always be prompted to confirm the new history on this device
       await guestPages.historyInfo().clickConfirmButton();
 
-      await expect(guestComponents.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible(
-        {
-          timeout: LOGIN_TIMEOUT,
-        },
-      );
+      await expect(guestComponents.conversationSidebar().sidebar, 'Login took more than 60s').toBeVisible({
+        timeout: 60_000, // The login for this user may take some time since it's persisted and checking for messages takes extra time
+      });
 
       await expect(guestPages.conversationList().getConversation(groupName)).toBeVisible();
     },

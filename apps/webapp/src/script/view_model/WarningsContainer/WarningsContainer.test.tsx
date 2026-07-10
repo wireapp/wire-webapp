@@ -17,21 +17,44 @@
  *
  */
 
-import {act, fireEvent, render} from '@testing-library/react';
+import {act, cleanup, fireEvent, render} from '@testing-library/react';
+
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {WarningsContainer} from './WarningsContainer';
+import {useWarningsState} from './WarningsState';
 
 import {Warnings} from '.';
 
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
+
 describe('WarningsContainer', () => {
+  beforeEach(() => {
+    useWarningsState.setState({name: '', warnings: []});
+  });
+
+  afterEach(() => {
+    cleanup();
+    act(() => {
+      useWarningsState.setState({name: '', warnings: []});
+    });
+    jest.restoreAllMocks();
+  });
+
   it('does not render when no warning is in the queue', async () => {
-    const {container} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
 
     expect(container.firstChild).toBeFalsy();
   });
 
   it('correctly renders warning of type request_camera', async () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.REQUEST_CAMERA);
     });
@@ -40,7 +63,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type denied_camera', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.DENIED_CAMERA);
     });
@@ -49,7 +72,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type request_microphone', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.REQUEST_MICROPHONE);
     });
@@ -58,7 +81,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type denied_microphone', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.DENIED_MICROPHONE);
     });
@@ -67,7 +90,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type request_screen', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.REQUEST_SCREEN);
     });
@@ -76,7 +99,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type denied_screen', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.DENIED_SCREEN);
     });
@@ -85,7 +108,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type not_found_camera', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.NOT_FOUND_CAMERA);
     });
@@ -94,7 +117,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type not_found_microphone', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.NOT_FOUND_MICROPHONE);
     });
@@ -103,7 +126,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type request_notification', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
     });
@@ -112,7 +135,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type unsupported_incoming_call', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.UNSUPPORTED_INCOMING_CALL);
     });
@@ -121,7 +144,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type unsupported_outgoing_call', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.UNSUPPORTED_OUTGOING_CALL);
     });
@@ -130,16 +153,16 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type connectivity_reconnect', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
     });
-    const WarningElement = getByTestId('connectivity-reconnect');
-    expect(WarningElement).toBeTruthy();
+    expect(getByTestId('connectivity-reconnect')).toBeTruthy();
+    expect(getByTestId('status-loading')).toBeTruthy();
   });
 
   it('correctly renders warning of type call_quality_poor', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     });
@@ -148,7 +171,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type connectivity_recovery', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECOVERY);
     });
@@ -157,7 +180,7 @@ describe('WarningsContainer', () => {
   });
 
   it('correctly renders warning of type no_internet', () => {
-    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
     });
@@ -167,7 +190,7 @@ describe('WarningsContainer', () => {
 
   it('correctly renders warning of type lifecycle_update', () => {
     const refresh = jest.fn();
-    const {getByTestId} = render(<WarningsContainer onRefresh={refresh} />);
+    const {getByTestId} = render(<WarningsContainer onRefresh={refresh} />, {wrapper: rootProviderWrapper});
     act(() => {
       Warnings.showWarning(Warnings.TYPE.LIFECYCLE_UPDATE);
     });

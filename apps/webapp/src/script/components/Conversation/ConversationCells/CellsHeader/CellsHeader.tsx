@@ -19,9 +19,9 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsSearchInput} from 'Components/CellsSearchInput/CellsSearchInput';
+import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   actionsStyles,
@@ -67,9 +67,11 @@ export const CellsHeader = ({
   onSearchClear,
   filters,
 }: CellsHeaderProps) => {
+  const {translate} = useApplicationContext();
   const breadcrumbs = getBreadcrumbsFromPath({
-    baseCrumb: t('cells.breadcrumb.files', {conversationName}),
+    baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
     currentPath: getCellsFilesPath(),
+    recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
   const isRootLevel = breadcrumbs.length === 1;
 
@@ -79,11 +81,11 @@ export const CellsHeader = ({
         <div css={searchWrapperStyles}>
           <CellsSearchInput
             value={searchValue}
-            placeholder={t('cells.search.placeholder')}
+            placeholder={translate('cells.search.placeholder')}
             onChange={onSearchChange}
             onClear={onSearchClear}
             onFocus={onOpenSearchView}
-            clearAriaLabel={t('fullsearchCancelCloseBtn')}
+            clearAriaLabel={translate('fullsearchCancelCloseBtn')}
             uieName="full-search-header-input"
           />
         </div>

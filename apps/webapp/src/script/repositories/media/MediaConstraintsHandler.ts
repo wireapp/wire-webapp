@@ -17,12 +17,14 @@
  *
  */
 
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {UserState} from 'Repositories/user/userState';
 import {getLogger, Logger} from 'Util/logger';
 
+import {parseSerializedAgcPreference} from './agcPreferenceStorage';
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 
 interface Config {
@@ -86,6 +88,12 @@ export class MediaConstraintsHandler {
             width: {ideal: 1280},
             resizeMode: 'none',
           },
+          [VIDEO_QUALITY_MODE.ONE_TO_ONE]: {
+            frameRate: {ideal: 30},
+            height: {ideal: 720},
+            width: {ideal: 1280},
+            resizeMode: 'none',
+          },
           [VIDEO_QUALITY_MODE.MOBILE]: {
             frameRate: {ideal: 15},
             height: {ideal: 720},
@@ -112,8 +120,7 @@ export class MediaConstraintsHandler {
   }
 
   getAgcPreference(): boolean {
-    const storedValue = window.localStorage.getItem(this.agcStorageKey);
-    return storedValue !== null ? (JSON.parse(storedValue) ?? false) : false;
+    return this.getStoredAgcPreference().unwrapOr(true);
   }
 
   getMediaStreamConstraints(
@@ -129,7 +136,7 @@ export class MediaConstraintsHandler {
         input: {selectedId: videoInputDeviceId},
       },
     } = mediaDevicesStore.getState();
-    const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
+    const mode = this.getVideoQualityMode(isGroup);
 
     return {
       audio: requestAudio ? this.getAudioStreamConstraints(audioInputDeviceId) : undefined,
@@ -193,9 +200,31 @@ export class MediaConstraintsHandler {
     return hasMediaDevice ? {deviceId: {exact: mediaDeviceId}} : {};
   }
 
+  private getStoredAgcPreference(): Maybe<boolean> {
+    const storedValue = window.localStorage.getItem(this.agcStorageKey);
+
+    if (storedValue === null) {
+      return Maybe.nothing<boolean>();
+    }
+
+    return parseSerializedAgcPreference(storedValue);
+  }
+
+  private getVideoQualityMode(isGroup: boolean): VIDEO_QUALITY_MODE {
+    if (isGroup) {
+      return VIDEO_QUALITY_MODE.GROUP;
+    }
+
+    return VIDEO_QUALITY_MODE.ONE_TO_ONE;
+  }
+
   private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints & {autoGainControl: boolean} {
+    const autoGainControl = this.getStoredAgcPreference().unwrapOr(true);
+
     return {
-      autoGainControl: this.getAgcPreference(),
+      autoGainControl,
+      echoCancellation: true,
+      noiseSuppression: true,
       ...this.getDeviceConstraint(mediaDeviceId),
     };
   }

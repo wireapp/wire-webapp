@@ -21,7 +21,7 @@ import {container} from 'tsyringe';
 
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 /**
  * higher order function to check if file sharing is enabled.
@@ -30,7 +30,10 @@ import {t} from 'Util/localizerUtil';
  * @param callback - function to be called if file sharing is enabled
  */
 
-export const checkFileSharingPermission = <T extends (...args: any[]) => void>(callback: T): T | (() => void) => {
+export const checkFileSharingPermission = <T extends (...args: any[]) => void>(
+  callback: T,
+  translate: Translate,
+): T | (() => void) => {
   const teamState = container.resolve(TeamState);
 
   if (teamState.isFileSharingSendingEnabled()) {
@@ -38,8 +41,9 @@ export const checkFileSharingPermission = <T extends (...args: any[]) => void>(c
   }
   return () => {
     showWarningModal(
-      t('conversationModalRestrictedFileSharingHeadline'),
-      t('conversationModalRestrictedFileSharingDescription'),
+      translate('conversationModalRestrictedFileSharingHeadline'),
+      translate('conversationModalRestrictedFileSharingDescription'),
+      translate,
     );
   };
 };

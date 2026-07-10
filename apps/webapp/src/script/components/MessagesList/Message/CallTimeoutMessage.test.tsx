@@ -22,9 +22,18 @@ import ko from 'knockout';
 
 import {REASON} from '@wireapp/avs';
 
-import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'Repositories/entity/message/CallingTimeoutMessage';
+import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'Repositories/entity/message/callingTimeoutMessage';
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {CallTimeoutMessage} from './CallTimeoutMessage';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const createCallTimeoutMessage = (partialCallTimeoutMessage: Partial<CallTimeoutMessageEntity>) => {
   const callMessage: Partial<CallTimeoutMessageEntity> = {
@@ -43,7 +52,7 @@ describe('CallTimeoutMessage', () => {
       reason: REASON.NOONE_JOINED,
     });
 
-    const {getByTestId} = render(<CallTimeoutMessage message={message} />);
+    const {getByTestId} = render(<CallTimeoutMessage message={message} />, {wrapper: rootProviderWrapper});
 
     const elementMessageCall = getByTestId('element-message-call');
     expect(elementMessageCall.getAttribute('data-uie-value')).toEqual('no-one-joined');
@@ -54,7 +63,7 @@ describe('CallTimeoutMessage', () => {
       reason: REASON.EVERYONE_LEFT,
     });
 
-    const {getByTestId} = render(<CallTimeoutMessage message={message} />);
+    const {getByTestId} = render(<CallTimeoutMessage message={message} />, {wrapper: rootProviderWrapper});
 
     const elementMessageCall = getByTestId('element-message-call');
     expect(elementMessageCall.getAttribute('data-uie-value')).toEqual('everyone-left');

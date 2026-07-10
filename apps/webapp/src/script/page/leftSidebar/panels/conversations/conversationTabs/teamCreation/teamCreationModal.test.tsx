@@ -1,0 +1,198 @@
+/*
+ * Wire
+ * Copyright (C) 2024 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {act} from 'react';
+
+import {render, fireEvent, waitFor} from '@testing-library/react';
+
+import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+
+import {TeamCreationModal} from './teamCreationModal';
+import {useTeamCreationModal} from './useTeamCreationModal';
+import {translateForTest} from 'Util/test/translateForTest';
+
+jest.mock('Repositories/team/TeamService');
+jest.mock('@wireapp/react-ui-kit', () => {
+  const actualModule = jest.requireActual('@wireapp/react-ui-kit');
+
+  return {
+    ...actualModule,
+    Loading: () => null,
+  };
+});
+
+const testIdentifiers = {
+  doContinue: 'do-continue',
+  doGoBack: 'do-go-back',
+  enterTeamName: 'enter-team-name',
+  doAcceptMigration: 'do-accept-migration',
+  doAcceptTerms: 'do-accept-terms',
+  doCreateTeam: 'do-create-team',
+  doClose: 'do-close',
+  enterPassword: 'enter-password',
+};
+
+describe('TeamCreationModal', () => {
+  const onCloseMock = jest.fn();
+  const onSuccessMock = jest.fn();
+  const userName = 'testUser';
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+
+  const renderTeamCreationModal = () => {
+    useTeamCreationModal.setState({isModalOpen: true});
+    return render(
+      withTheme(<TeamCreationModal onClose={onCloseMock} onSuccess={onSuccessMock} userName={userName} />),
+      {
+        wrapper: rootProviderWrapper,
+      },
+    );
+  };
+
+  beforeEach(() => {
+    onCloseMock.mockClear();
+    onSuccessMock.mockClear();
+  });
+
+  it('renders the introduction step initially', () => {
+    const {getByText} = renderTeamCreationModal();
+    expect(getByText('teamCreationStep')).toBeTruthy();
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
+  });
+
+  it('navigates to the form step when clicking continue', () => {
+    const {getByTestId, getByText} = renderTeamCreationModal();
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
+  });
+
+  it('navigates back to the introduction step', () => {
+    const {getByTestId, getByText} = renderTeamCreationModal();
+
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
+
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doGoBack));
+    });
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
+  });
+
+  it('navigates to confirm page after providing team name', () => {
+    const {getByTestId, getByText} = renderTeamCreationModal();
+
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
+
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
+    act(() => {
+      fireEvent.change(getByTestId(testIdentifiers.enterTeamName), {target: {value: 'New Team'}});
+    });
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
+
+    expect(getByText('teamCreationConfirmTitle')).toBeTruthy();
+  });
+
+  it('calls onSuccess when closed from last page (success)', async () => {
+    const {getByTestId, getByText} = renderTeamCreationModal();
+
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
+
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
+    act(() => {
+      fireEvent.change(getByTestId(testIdentifiers.enterTeamName), {target: {value: 'New Team'}});
+    });
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
+
+    expect(getByText('teamCreationConfirmTitle')).toBeTruthy();
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doAcceptTerms));
+    });
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doAcceptMigration));
+    });
+
+    await act(async () => {
+      fireEvent.click(getByTestId(testIdentifiers.doCreateTeam));
+    });
+
+    await waitFor(() => {
+      expect(getByText('teamCreationSuccessTitle')).toBeTruthy();
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doClose));
+    });
+    expect(onSuccessMock).toHaveBeenCalled();
+  });
+
+  it('calls onClose when closing from any other step', () => {
+    const {getByTestId} = renderTeamCreationModal();
+
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doClose));
+    });
+    expect(onCloseMock).toHaveBeenCalled();
+  });
+
+  it('disables Continue button for empty or whitespace-only team names', () => {
+    const {getByTestId} = renderTeamCreationModal();
+
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
+
+    const continueButton = getByTestId(testIdentifiers.doContinue);
+    const teamNameInput = getByTestId(testIdentifiers.enterTeamName);
+
+    expect(continueButton).toBeDisabled();
+
+    act(() => {
+      fireEvent.change(teamNameInput, {target: {value: '   '}});
+    });
+    expect(continueButton).toBeDisabled();
+
+    act(() => {
+      fireEvent.change(teamNameInput, {target: {value: ''}});
+    });
+    expect(continueButton).toBeDisabled();
+
+    act(() => {
+      fireEvent.change(teamNameInput, {target: {value: 'Valid Team'}});
+    });
+    expect(continueButton).not.toBeDisabled();
+  });
+});

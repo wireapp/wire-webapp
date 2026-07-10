@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface ShowMoreButtonProps {
   active: boolean;
@@ -35,6 +35,7 @@ export const ShowMoreButton: FC<ShowMoreButtonProps & HTMLProps<HTMLButtonElemen
   isFocusable,
   ...props
 }) => {
+  const {translate} = useApplicationContext();
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
   return (
     <button
@@ -44,7 +45,7 @@ export const ShowMoreButton: FC<ShowMoreButtonProps & HTMLProps<HTMLButtonElemen
       {...props}
       type="button"
     >
-      <span>{active ? t('replyQuoteShowLess') : t('replyQuoteShowMore')}</span>
+      <span>{active ? translate('replyQuoteShowLess') : translate('replyQuoteShowMore')}</span>
       <Icon.DiscloseIcon
         className={cx('disclose-icon', {
           'upside-down': active,

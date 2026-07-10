@@ -20,7 +20,7 @@
 import {container} from 'tsyringe';
 
 import {UserState} from 'Repositories/user/userState';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {ChannelSettings} from './ChannelSettings';
 import {groupsNotAllowedSectionCss} from './ConversationDetails.styles';
@@ -31,15 +31,16 @@ import {ConversationType} from '../../types';
 import {Preference} from '../Preference';
 
 export const ConversationDetails = () => {
+  const {translate} = useApplicationContext();
   const {conversationType} = useCreateConversationModal();
   const userState = container.resolve(UserState);
   const selfUser = userState.self();
 
   return selfUser?.isExternal() && conversationType === ConversationType.Group ? (
     <div css={groupsNotAllowedSectionCss}>
-      <p className="heading-h3">{t('createConversationGroupNotAllowedHeader')}</p>
-      <p className="subline">{t('createConversationGroupNotAllowedContent1')}</p>
-      <p className="subline">{t('createConversationGroupNotAllowedContent2')}</p>
+      <p className="heading-h3">{translate('createConversationGroupNotAllowedHeader')}</p>
+      <p className="subline">{translate('createConversationGroupNotAllowedContent1')}</p>
+      <p className="subline">{translate('createConversationGroupNotAllowedContent2')}</p>
     </div>
   ) : (
     <>

@@ -25,9 +25,10 @@ import {createUuid} from 'Util/uuid';
 import {SearchRepository} from './searchRepository';
 
 import {randomInt} from '../../auth/util/randomUtil';
-import {generateUsers} from '../../auth/util/test/TestUtil';
+import {generateUsers} from '../../auth/util/test/testUtil';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import {translateForTest} from 'Util/test/translateForTest';
 
 function buildSearchRepository() {
   const userRepository = {getUsersById: jest.fn((): User[] => [])} as unknown as jest.Mocked<UserRepository>;
@@ -259,7 +260,7 @@ describe('SearchRepository', () => {
 });
 
 function createUser(handle: string | undefined, name: string | undefined) {
-  const user = new User();
+  const user = new User('', '', translateForTest);
   if (handle) {
     user.username(handle);
   }

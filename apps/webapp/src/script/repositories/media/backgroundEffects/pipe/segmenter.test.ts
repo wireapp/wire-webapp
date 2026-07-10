@@ -24,7 +24,7 @@ import {
 } from 'Repositories/media/backgroundEffects/pipe/segmenter';
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
 
-jest.mock('../../../../clock/wallClock', () => ({
+jest.mock('@enormora/wall-clock/wall-clock', () => ({
   createWallClock: jest.fn(() => ({
     setTimeout: jest.fn((callback: () => void) => {
       callback();
@@ -211,7 +211,7 @@ describe('segmenter tests', () => {
       );
 
       const {WebGLRenderer} = await import('./renderer');
-      const {createWallClock} = await import('../../../../clock/wallClock');
+      const {createWallClock} = await import('@enormora/wall-clock/wall-clock');
 
       const firstRenderer = (WebGLRenderer as unknown as jest.Mock).mock.results[0].value;
 

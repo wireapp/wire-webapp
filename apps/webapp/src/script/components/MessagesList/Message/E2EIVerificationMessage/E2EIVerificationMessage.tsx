@@ -21,17 +21,18 @@ import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/E2EIVerificationMessage';
+import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {replaceLink} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {MessageIcon, IconInfo, Link as LinkStyles} from './E2EIVerificationMessage.styles';
 
 import {Config} from '../../../../Config';
-import {E2EIHandler} from '../../../../E2EIdentity';
-import {E2EIVerificationMessageType} from '../../../../message/E2EIVerificationMessageType';
+import {E2EIHandler} from '../../../../e2eIdentity';
+import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';
 
 const logger = getLogger('E2EIVerificationMessage');
 
@@ -59,6 +60,7 @@ interface E2EIVerificationMessageProps {
 }
 
 export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificationMessageProps) => {
+  const {translate} = useApplicationContext();
   const {messageType, userIds = []} = message;
 
   const {participating_user_ets: participatingUserEts, selfUser} = useKoSubscribableChildren(conversation, [
@@ -111,7 +113,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         {isVerified && (
           <span
             dangerouslySetInnerHTML={{
-              __html: t('conversation.AllE2EIDevicesVerified', undefined, learnMoreReplacement),
+              __html: translate('conversation.AllE2EIDevicesVerified', undefined, learnMoreReplacement),
             }}
           />
         )}
@@ -120,17 +122,17 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           (isSelfUser === false ? (
             <span
               dangerouslySetInnerHTML={{
-                __html: t('conversation.E2EICertificateExpired', {user: usersName}),
+                __html: translate('conversation.E2EICertificateExpired', {user: usersName}),
               }}
             />
           ) : (
             <span>
-              {t('conversation.E2EISelfUserCertificateExpired')}
+              {translate('conversation.E2EISelfUserCertificateExpired')}
 
               <LinkText
                 onClick={getCertificate}
                 dataUieName="update-certificate"
-                label={t('conversation.E2EIUpdateCertificate')}
+                label={translate('conversation.E2EIUpdateCertificate')}
               />
             </span>
           ))}
@@ -139,17 +141,17 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           (isSelfUser === false ? (
             <span
               dangerouslySetInnerHTML={{
-                __html: t('conversation.E2EINewDeviceAdded', {user: usersName}),
+                __html: translate('conversation.E2EINewDeviceAdded', {user: usersName}),
               }}
             />
           ) : (
             <span>
-              {t('conversation.E2EISelfUserUnverifiedDeviceAdded')}
+              {translate('conversation.E2EISelfUserUnverifiedDeviceAdded')}
 
               <LinkText
                 onClick={getCertificate}
                 dataUieName="get-certificate"
-                label={t('conversation.E2EIUGetCertificate')}
+                label={translate('conversation.E2EIUGetCertificate')}
               />
             </span>
           ))}
@@ -158,17 +160,17 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           (isSelfUser === false ? (
             <span
               dangerouslySetInnerHTML={{
-                __html: t('conversation.E2EINewUserAdded', {user: usersName}),
+                __html: translate('conversation.E2EINewUserAdded', {user: usersName}),
               }}
             />
           ) : (
             <span>
-              {t('conversation.E2EISelfUserUnverifiedUserAdded')}
+              {translate('conversation.E2EISelfUserUnverifiedUserAdded')}
 
               <LinkText
                 onClick={getCertificate}
                 dataUieName="get-certificate"
-                label={t('conversation.E2EIUGetCertificate')}
+                label={translate('conversation.E2EIUGetCertificate')}
               />
             </span>
           ))}
@@ -177,13 +179,13 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           (isSelfUser === false ? (
             <span
               dangerouslySetInnerHTML={{
-                __html: t('conversation.E2EICertificateRevoked', {user: usersName}, learnMoreReplacement),
+                __html: translate('conversation.E2EICertificateRevoked', {user: usersName}, learnMoreReplacement),
               }}
             />
           ) : (
             <span
               dangerouslySetInnerHTML={{
-                __html: t('conversation.E2EISelfUserCertificateRevoked', undefined, learnMoreReplacement),
+                __html: translate('conversation.E2EISelfUserCertificateRevoked', undefined, learnMoreReplacement),
               }}
             />
           ))}
@@ -191,7 +193,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         {isNoLongerVerified && (
           <span
             dangerouslySetInnerHTML={{
-              __html: t('conversation.E2EICertificateNoLongerVerifiedGeneric', undefined, learnMoreReplacement),
+              __html: translate('conversation.E2EICertificateNoLongerVerifiedGeneric', undefined, learnMoreReplacement),
             }}
           />
         )}

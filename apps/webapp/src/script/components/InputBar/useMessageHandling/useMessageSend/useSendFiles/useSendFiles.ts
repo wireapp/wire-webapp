@@ -19,10 +19,9 @@
 
 import {useCallback, useState} from 'react';
 
-import {useAppNotification} from 'Components/AppNotification';
+import {useAppNotification} from 'Components/appNotification/index';
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
 
 type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -31,13 +30,20 @@ interface UseSendFilesProps {
   cellsRepository: CellsRepository;
   clearAllFiles: ({conversationId}: {conversationId: string}) => void;
   conversationId: string;
+  sendFilesErrorMessage: string;
 }
 
-export const useSendFiles = ({files, clearAllFiles, cellsRepository, conversationId}: UseSendFilesProps) => {
+export const useSendFiles = ({
+  files,
+  clearAllFiles,
+  cellsRepository,
+  conversationId,
+  sendFilesErrorMessage,
+}: UseSendFilesProps) => {
   const [status, setStatus] = useState<SendFilesStatus>('idle');
 
   const errorNotification = useAppNotification({
-    message: t('conversationSendFilesError'),
+    message: sendFilesErrorMessage,
   });
 
   const sendFile = useCallback(async (file: FileWithPreview) => {

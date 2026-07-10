@@ -20,13 +20,15 @@
 import {render} from '@testing-library/react';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/E2EIVerificationMessage';
+import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {User} from 'Repositories/entity/User';
-import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
+import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
 
 import {E2EIVerificationMessage} from './E2EIVerificationMessage';
 
-import {withTheme} from '../../../../auth/util/test/TestUtil';
+import {withTheme} from '../../../../auth/util/test/testUtil';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const createVerificationMessage = (partialVerificationMessage: Partial<VerificationMessageEntity>) => {
   const verificationMessage: Partial<VerificationMessageEntity> = {
@@ -36,7 +38,7 @@ const createVerificationMessage = (partialVerificationMessage: Partial<Verificat
 };
 
 describe('E2EIVerificationMessage', () => {
-  const conversation = new Conversation();
+  const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
   describe('with verified message', () => {
     it('shows verified icon when message is verified', async () => {
@@ -54,7 +56,7 @@ describe('E2EIVerificationMessage', () => {
   });
 
   describe('with degraded message', () => {
-    const user = new User('user1');
+    const user = new User('user1', '', translateForTest);
 
     it('show new unverified device added', async () => {
       const message = createVerificationMessage({

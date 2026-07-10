@@ -236,7 +236,7 @@ test.describe('Clear Conversation Content', () => {
         const messageWithImage = userAPages
           .conversation()
           .getMessage({sender: userB})
-          .filter({has: userAPage.getByRole('img')});
+          .filter({has: userAPage.getByTestId('image-asset')});
         await expect(messageWithImage).toBeVisible();
 
         // 5.4 Files

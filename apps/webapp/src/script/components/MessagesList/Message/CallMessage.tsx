@@ -18,7 +18,7 @@
  */
 
 import * as Icon from 'Components/icon';
-import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/CallMessage';
+import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/callMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {MessageTime} from './MessageTime';

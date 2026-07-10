@@ -25,10 +25,11 @@ import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {Dispatch, UnknownAction} from 'redux';
 import {match, P} from 'ts-pattern';
 
+import {Config} from 'src/script/Config';
 import {APIClient} from 'src/script/service/apiClientSingleton';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
-import {ValidationError} from '../../module/action/ValidationError';
+import {ValidationError} from '../../module/action/validationError';
 import {ConversationState} from '../../module/reducer/conversationReducer';
 import {QUERY_KEY, ROUTE} from '../../route';
 
@@ -122,7 +123,9 @@ export const handleEnterpriseLogin = async ({
       res => {
         dispatch(
           ROOT_ACTIONS.authAction.pushAccountRegistrationData({
-            accountCreationEnabled: res.domain_redirect !== DomainRedirect.NO_REGISTRATION,
+            accountCreationEnabled:
+              res.domain_redirect !== DomainRedirect.NO_REGISTRATION &&
+              Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION,
             shouldDisplayWarning: res.domain_redirect === DomainRedirect.NO_REGISTRATION && res.due_to_existing_account,
           }) as unknown as UnknownAction,
         );

@@ -23,8 +23,10 @@ import ko from 'knockout';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {useAssetTransfer} from './useAssetTransfer';
@@ -37,7 +39,7 @@ const assetRepository = {
 } as unknown as jest.Mocked<AssetRepository>;
 
 describe('useAssetTransfer', () => {
-  const message = new ContentMessage(createUuid());
+  const message = new ContentMessage(createUuid(), translateForTest);
   const asset = new AssetRemoteData({
     assetKey: 'assetKey',
     assetDomain: 'domain',

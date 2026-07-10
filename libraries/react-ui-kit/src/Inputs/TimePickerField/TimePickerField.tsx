@@ -24,6 +24,7 @@ import is from '@sindresorhus/is';
 
 import {
   timePickerWrapperStyles,
+  timeSelectContainerStyles,
   timeSelectLabelVisuallyHiddenStyles,
   timeSelectMenuPortalStyles,
   timeSelectMenuStyles,
@@ -99,17 +100,19 @@ export const TimePickerField = ({
         value={value ?? undefined}
         isDisabled={disabled}
         markInvalid={markInvalid}
-        selectContainerCSS={timeSelectStyles}
+        menuMatchControlWidth
+        wrapperCSS={{marginBottom: 0}}
+        selectContainerCSS={timeSelectContainerStyles}
         selectControlCSS={timeSelectStyles}
         selectMenuCSS={timeSelectMenuStyles}
         menuPlacement={menuPlacement}
         maxMenuHeight={maxMenuHeight}
-        {...(portalTarget ? {menuPortalTarget: portalTarget} : {})}
+        {...(Boolean(portalTarget) ? {menuPortalTarget: portalTarget} : {})}
         menuPosition="fixed"
         menuShouldScrollIntoView={false}
         selectMenuPortalCSS={timeSelectMenuPortalStyles}
         onChange={option => {
-          onChange(option ? (option as Option) : null);
+          onChange(Boolean(option) ? (option as Option) : null);
         }}
       />
     </div>

@@ -1,0 +1,149 @@
+---
+name: Deploy Edge
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Optional reason for manually deploying to Edge'
+        required: false
+        type: string
+      confirm_edge_deploy:
+        description: 'Confirm that this will deploy the selected ref to wire-webapp-edge'
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: deploy-edge-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: eu-central-1
+  BUILD_ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
+  EDGE_ENVIRONMENT_NAME: wire-webapp-edge
+
+jobs:
+  validate_request:
+    name: Validate Edge deploy request
+    runs-on: ubuntu-24.04
+    permissions: {}
+
+    steps:
+      - name: Validate manual dispatch confirmation
+        env:
+          CONFIRM_EDGE_DEPLOY: ${{ inputs.confirm_edge_deploy }}
+          WORKFLOW_DISPATCH_REASON: ${{ inputs.reason }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo '## Edge deployment request'
+            echo "- Requested ref: ${GITHUB_REF}"
+            echo "- Commit SHA: ${GITHUB_SHA}"
+            echo "- Target environment: ${EDGE_ENVIRONMENT_NAME}"
+            echo "- Workflow run URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+            if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' && -n "${WORKFLOW_DISPATCH_REASON}" ]]; then
+              echo "- Manual reason: ${WORKFLOW_DISPATCH_REASON}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' && "${CONFIRM_EDGE_DEPLOY}" != 'true' ]]; then
+            echo 'Edge deployment was not confirmed. Aborting.' >&2
+            exit 1
+          fi
+
+  build_artifact:
+    name: Build Edge artifact
+    runs-on: ubuntu-24.04
+    needs: validate_request
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Update configuration
+        run: ./bin/yarn nx run webapp:configure
+
+      - name: Build and package application
+        run: ./bin/yarn build:prod
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: edge-build-artifact-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.BUILD_ARTIFACT_PATH }}
+
+  deploy_to_edge:
+    name: Deploy to Edge
+    runs-on: ubuntu-24.04
+    needs: [validate_request, build_artifact]
+    permissions: {}
+    # ADR 0002 requires Edge to deploy without an approval gate, so the
+    # wire-webapp-edge repository environment must not require reviewers.
+    environment: wire-webapp-edge
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: edge-build-artifact-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
+        with:
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to wire-webapp-edge
+        id: deploy
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: ${{ env.EDGE_ENVIRONMENT_NAME }}
+          version-label: ${{ github.run_id }}-${{ github.run_attempt }}-edge
+          deployment-package-path: ebs.zip
+          wait-for-deployment: true
+          wait-for-environment-recovery: true
+          deployment-timeout: 150
+          use-existing-application-version-if-available: true
+
+      - name: Summarize Edge deployment
+        env:
+          WORKFLOW_DISPATCH_REASON: ${{ inputs.reason }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo '## Edge deployment'
+            echo "- Deployed ref: ${GITHUB_REF}"
+            echo "- Commit SHA: ${GITHUB_SHA}"
+            echo "- Target environment: ${EDGE_ENVIRONMENT_NAME}"
+            echo "- Workflow run URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+            if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' && -n "${WORKFLOW_DISPATCH_REASON}" ]]; then
+              echo "- Manual reason: ${WORKFLOW_DISPATCH_REASON}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

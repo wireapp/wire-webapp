@@ -34,7 +34,7 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
 import {StorageKey} from 'Repositories/storage/storageKey';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {loadValue} from 'Util/storageUtil';
@@ -48,7 +48,7 @@ import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
 import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
 
@@ -72,11 +72,12 @@ export class ClientRepository {
   constructor(
     public readonly clientService: ClientService,
     public readonly cryptographyRepository: CryptographyRepository,
+    private readonly translate: Translate,
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),
   ) {
     this.cryptographyRepository = cryptographyRepository;
-    this.selfUser = ko.observable(new User('', ''));
+    this.selfUser = ko.observable(new User('', '', this.translate));
     this.logger = getLogger('ClientRepository');
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient);
@@ -312,19 +313,24 @@ export class ClientRepository {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
-        PrimaryModal.show(PrimaryModal.type.OPTION, {
-          preventClose: true,
-          primaryAction: {
-            action: (clearData: boolean) => {
-              return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
+        PrimaryModal.show(
+          PrimaryModal.type.OPTION,
+          {
+            preventClose: true,
+            primaryAction: {
+              action: (clearData: boolean) => {
+                return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
+              },
+              text: this.translate('modalAccountLogoutAction'),
             },
-            text: t('modalAccountLogoutAction'),
+            text: {
+              option: this.translate('modalAccountLogoutOption'),
+              title: this.translate('modalAccountLogoutHeadline'),
+            },
           },
-          text: {
-            option: t('modalAccountLogoutOption'),
-            title: t('modalAccountLogoutHeadline'),
-          },
-        });
+          undefined,
+          this.translate,
+        );
       }
     }
   };
@@ -594,11 +600,12 @@ export class ClientRepository {
         PrimaryModal.type.ACKNOWLEDGE,
         {
           text: {
-            message: t('modalLegalHoldDeactivatedMessage'),
-            title: t('modalLegalHoldDeactivatedTitle'),
+            message: this.translate('modalLegalHoldDeactivatedMessage'),
+            title: this.translate('modalLegalHoldDeactivatedTitle'),
           },
         },
         'legalHoldDeactivated',
+        this.translate,
       );
     }
     amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().qualifiedId, clientId, source);

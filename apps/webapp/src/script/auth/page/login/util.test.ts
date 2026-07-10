@@ -24,7 +24,7 @@ import {StatusCodes} from 'http-status-codes';
 import {Dispatch} from 'redux';
 
 import {APIClient} from 'src/script/service/apiClientSingleton';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ROUTE} from '../../route';

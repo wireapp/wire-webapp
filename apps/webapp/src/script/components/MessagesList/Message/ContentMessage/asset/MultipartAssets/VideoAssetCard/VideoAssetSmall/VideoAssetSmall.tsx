@@ -20,7 +20,7 @@
 import {useState} from 'react';
 
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {iconWrapperStyles, videoStyles} from './VideoAssetSmall.styles';
 
@@ -49,20 +49,21 @@ export const VideoAssetSmall = ({
   timestamp,
   id,
 }: VideoAssetSmallProps) => {
+  const {translate} = useApplicationContext();
   const [isOpen, setIsOpen] = useState(false);
   const hasSource = src !== undefined && src !== '';
 
   return (
     <>
       <MediaFilePreviewCard
-        label={hasSource ? t('conversationFileVideoPreviewLabel', {src}) : ''}
+        label={hasSource ? translate('conversationFileVideoPreviewLabel', {src}) : ''}
         isLoading={isLoading}
         isError={isError}
       >
         <button
           css={hollowWrapperButtonStyles}
           onClick={() => setIsOpen(true)}
-          aria-label={t('accessibility.conversationAssetImageAlt', {
+          aria-label={translate('accessibility.conversationAssetImageAlt', {
             username: senderName,
             messageDate: timestamp,
           })}

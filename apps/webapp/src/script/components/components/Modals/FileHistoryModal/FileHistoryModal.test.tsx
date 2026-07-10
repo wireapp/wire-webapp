@@ -19,7 +19,7 @@
 
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
 import {FileHistoryModal} from './FileHistoryModal';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
@@ -49,9 +49,6 @@ jest.mock('./FileHistoryContent', () => ({
 }));
 jest.mock('Components/FileFullscreenModal/FileLoader/FileLoader', () => ({
   FileLoader: () => <div data-uie-name="file-loader">Loading...</div>,
-}));
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
 }));
 
 const mockedUseFileHistoryModal = jest.mocked(useFileHistoryModal);

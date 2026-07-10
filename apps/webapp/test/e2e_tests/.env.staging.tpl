@@ -30,10 +30,6 @@ CALLING_SERVICE_INSTANCE_VERSION=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/
 
 ENV_NAME=staging
 
-# SCIM user for e2e tests
-SCIM_USER_EMAIL=op://Test Automation/Staging SCIM user/okta username
-SCIM_USER_PASSWORD="{{ op://Test Automation/Staging SCIM user/okta password }}"
-SCIM_USER_SSO_CODE=op://Test Automation/Staging SCIM user/SSO code
 
 SSO_CLAIMED_USER_EMAIL=op://Test Automation/Staging Claimed Domain User/email
 SSO_CLAIMED_USER_PASSWORD=op://Test Automation/Staging Claimed Domain User/password

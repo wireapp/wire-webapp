@@ -19,7 +19,7 @@
 
 import {useState} from 'react';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {containerStyles, imageStyles} from './ImageAssetSmall.styles';
 
@@ -49,6 +49,7 @@ export const ImageAssetSmall = ({
   senderName,
   timestamp,
 }: ImageAssetSmallProps) => {
+  const {translate} = useApplicationContext();
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasLoadError, setHasLoadError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -60,7 +61,7 @@ export const ImageAssetSmall = ({
       <button
         css={containerStyles}
         onClick={() => setIsOpen(true)}
-        aria-label={t('accessibility.conversationAssetImageAlt', {
+        aria-label={translate('accessibility.conversationAssetImageAlt', {
           username: senderName,
           messageDate: timestamp,
         })}
@@ -70,7 +71,7 @@ export const ImageAssetSmall = ({
         disabled={isUnavailable}
       >
         <MediaFilePreviewCard
-          label={hasFilePreviewUrl ? t('conversationFileImagePreviewLabel', {src: filePreviewUrl}) : ''}
+          label={hasFilePreviewUrl ? translate('conversationFileImagePreviewLabel', {src: filePreviewUrl}) : ''}
           isLoading={!isLoaded}
           isError={isUnavailable}
         >

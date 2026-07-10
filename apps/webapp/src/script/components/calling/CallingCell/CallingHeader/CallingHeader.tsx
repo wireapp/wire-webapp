@@ -19,12 +19,12 @@
 
 import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/avatar';
 import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/icon';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/localizerUtil';
 
 import {
   callAvatar,
@@ -80,6 +80,25 @@ export const CallingHeader = ({
   isDetachedWindow,
   conversationID,
 }: CallingHeaderProps) => {
+  const {translate} = useApplicationContext();
+
+  let ariaLabel: string;
+  if (showAlert) {
+    ariaLabel = callStartedAlert;
+  } else {
+    const ongoingPrefix = isOngoing ? `${ongoingCallAlert} ` : '';
+    ariaLabel = `${ongoingPrefix}${translate('accessibility.openConversation', {name: conversationName})}`;
+  }
+
+  let avatarContent;
+  if (isChannel) {
+    avatarContent = <ChannelAvatar conversationID={conversationID} />;
+  } else if (isGroup) {
+    avatarContent = <GroupAvatar conversationID={conversationID} />;
+  } else if (conversationParticipants.length > 0) {
+    avatarContent = <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />;
+  }
+
   return (
     <div css={callingHeaderContainer}>
       <div
@@ -98,25 +117,9 @@ export const CallingHeader = ({
         onKeyDown={createNavigateKeyboard(conversationUrl)}
         tabIndex={TabIndex.FOCUSABLE}
         role="button"
-        aria-label={
-          showAlert
-            ? callStartedAlert
-            : `${isOngoing ? `${ongoingCallAlert} ` : ''}${t('accessibility.openConversation', {name: conversationName})}`
-        }
+        aria-label={ariaLabel}
       >
-        {isDetachedWindow && !isTemporaryUser && (
-          <div css={callAvatar}>
-            {isChannel ? (
-              <ChannelAvatar conversationID={conversationID} />
-            ) : isGroup ? (
-              <GroupAvatar conversationID={conversationID} />
-            ) : (
-              conversationParticipants.length > 0 && (
-                <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
-              )
-            )}
-          </div>
-        )}
+        {isDetachedWindow && !isTemporaryUser && <div css={callAvatar}>{avatarContent}</div>}
 
         <h2 css={callDetails}>
           <div css={conversationCallName}>{conversationName}</div>
@@ -130,19 +133,19 @@ export const CallingHeader = ({
           {isOngoing && startedAt != null && (
             <div css={callDescription}>
               {isDetachedWindow ? (
-                <span data-uie-name="call-lead" aria-label={t('viewingInAnotherWindow')}>
-                  {t('viewingInAnotherWindow')}
+                <span data-uie-name="call-lead" aria-label={translate('viewingInAnotherWindow')}>
+                  {translate('viewingInAnotherWindow')}
                 </span>
               ) : (
-                <span data-uie-name="call-duration" aria-label={t('callDurationLabel')}>
+                <span data-uie-name="call-duration" aria-label={translate('callDurationLabel')}>
                   <Duration {...{startedAt}} />
                 </span>
               )}
 
               {isCbrEnabled && (
                 <span
-                  title={t('callStateCbr')}
-                  aria-label={t('callStateCbr')}
+                  title={translate('callStateCbr')}
+                  aria-label={translate('callStateCbr')}
                   data-uie-name="call-cbr"
                   css={cbrCallState}
                 >
@@ -158,7 +161,7 @@ export const CallingHeader = ({
         <div>
           <IconButton
             variant={IconButtonVariant.SECONDARY}
-            title={t('videoCallOverlayOpenPopupWindow')}
+            title={translate('videoCallOverlayOpenPopupWindow')}
             css={detachedWindowButton}
             onClick={toggleDetachedWindow}
           >

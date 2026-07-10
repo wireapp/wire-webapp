@@ -21,7 +21,7 @@ import {AxiosRequestConfig} from 'axios';
 
 import {CreateMeeting} from './createMeeting';
 import {Meeting} from './meeting';
-import {MeetingEmailsInvitation} from './meetingEmailsInvitation';
+import {meetingSchema, meetingsListResponseSchema} from './meetingSchema';
 import {UpdateMeeting} from './updateMeeting';
 
 import {HttpClient} from '../http';
@@ -33,12 +33,18 @@ export class MeetingsAPI {
   public static readonly URL = {
     MEETINGS: '/meetings',
     LIST: '/meetings/list',
-    INVITATIONS: 'invitations',
-    INVITATIONS_DELETE: 'invitations/delete',
   } as const;
 
   private generateMeetingUrl(meetingId: QualifiedId): string {
     return `${MeetingsAPI.URL.MEETINGS}/${meetingId.domain}/${meetingId.id}`;
+  }
+
+  private parseMeetingResponse(data: unknown): Meeting {
+    return meetingSchema.parse(data);
+  }
+
+  private parseMeetingsListResponse(data: unknown): Meeting[] {
+    return meetingsListResponseSchema.parse(data);
   }
 
   /**
@@ -52,11 +58,12 @@ export class MeetingsAPI {
     };
 
     const response = await this.client.sendJSON<Meeting>(config);
-    return response.data;
+    return this.parseMeetingResponse(response.data);
   }
 
   /**
    * List all meetings for the authenticated user.
+   * @see https://staging-nginz-https.zinfra.io/v16/api/swagger-ui/#/default/get_meetings_list
    */
   public async getMeetingsList(): Promise<Meeting[]> {
     const config: AxiosRequestConfig = {
@@ -65,7 +72,7 @@ export class MeetingsAPI {
     };
 
     const response = await this.client.sendJSON<Meeting[]>(config);
-    return response.data;
+    return this.parseMeetingsListResponse(response.data);
   }
 
   /**
@@ -90,7 +97,7 @@ export class MeetingsAPI {
     };
 
     const response = await this.client.sendJSON<Meeting>(config);
-    return response.data;
+    return this.parseMeetingResponse(response.data);
   }
 
   /**
@@ -104,32 +111,6 @@ export class MeetingsAPI {
     };
 
     const response = await this.client.sendJSON<Meeting>(config);
-    return response.data;
-  }
-
-  /**
-   * Add emails to the invited emails of a meeting.
-   */
-  public async addMeetingInvitation(meetingId: QualifiedId, invitation: MeetingEmailsInvitation): Promise<void> {
-    const config: AxiosRequestConfig = {
-      data: invitation,
-      method: 'post',
-      url: `${this.generateMeetingUrl(meetingId)}/${MeetingsAPI.URL.INVITATIONS}`,
-    };
-
-    await this.client.sendJSON<void>(config);
-  }
-
-  /**
-   * Remove emails from the invited emails of a meeting.
-   */
-  public async removeMeetingInvitation(meetingId: QualifiedId, invitation: MeetingEmailsInvitation): Promise<void> {
-    const config: AxiosRequestConfig = {
-      data: invitation,
-      method: 'post',
-      url: `${this.generateMeetingUrl(meetingId)}/${MeetingsAPI.URL.INVITATIONS_DELETE}`,
-    };
-
-    await this.client.sendJSON<void>(config);
+    return this.parseMeetingResponse(response.data);
   }
 }

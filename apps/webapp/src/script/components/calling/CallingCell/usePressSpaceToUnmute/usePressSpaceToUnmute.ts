@@ -21,25 +21,31 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/AppNotification';
+import {useAppNotification} from 'Components/appNotification/index';
 import {MicOnIcon} from 'Components/icon';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
 import {useKeyPressAndHold} from 'Hooks/useKeyPressAndHold/useKeyPressAndHold';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 interface UsePressSpaceToUnmuteParams {
   callState: CallState;
   toggleMute: (shouldMute: boolean) => void;
   isMuted: () => boolean;
   enabled: boolean;
+  notificationMessage: string;
 }
 
 const HOLD_DELAY_MS = 200;
 
-export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}: UsePressSpaceToUnmuteParams) => {
+export const usePressSpaceToUnmute = ({
+  callState,
+  toggleMute,
+  isMuted,
+  enabled,
+  notificationMessage,
+}: UsePressSpaceToUnmuteParams) => {
   const isInCallAndViewMode = checkUserInCallAndViewMode(callState);
 
   const {detachedWindow, viewMode} = callState;
@@ -47,7 +53,7 @@ export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}:
   const activeWindow = viewMode() === CallingViewMode.DETACHED_WINDOW ? detachedWindow()! : window;
 
   const micOnNotification = useAppNotification({
-    message: t('videoCallParticipantPressSpaceToUnmuteNotification'),
+    message: notificationMessage,
     icon: MicOnIcon,
     activeWindow,
     withCloseButton: false,

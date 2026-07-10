@@ -49,21 +49,21 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {truncate} from 'Util/stringUtil';
 
-import {CallMessage} from './message/CallMessage';
-import type {ContentMessage} from './message/ContentMessage';
-import type {Message} from './message/Message';
-import {PingMessage} from './message/PingMessage';
+import {CallMessage} from './message/callMessage';
+import type {ContentMessage} from './message/contentMessage';
+import type {Message} from './message/message';
+import {PingMessage} from './message/pingMessage';
 import type {User} from './User';
 
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
 
 export interface UnreadState {
@@ -144,6 +144,7 @@ export class Conversation {
   public readonly isCreatedBySelf: ko.PureComputed<boolean>;
   public readonly isGroup: ko.PureComputed<boolean>;
   public readonly isChannel: ko.PureComputed<boolean>;
+  public readonly isMeeting: ko.PureComputed<boolean>;
   public readonly isGroupOrChannel: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isGuestRoom: ko.PureComputed<boolean>;
@@ -179,6 +180,7 @@ export class Conversation {
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
+  public readonly protocol: CONVERSATION_PROTOCOL;
   public status: ko.Observable<ConversationStatus>;
   public teamId: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
@@ -200,15 +202,17 @@ export class Conversation {
   }
 
   constructor(
-    conversation_id: string = '',
-    domain: string = '',
-    public readonly protocol = CONVERSATION_PROTOCOL.PROTEUS,
+    conversation_id: string,
+    domain: string,
+    protocol: CONVERSATION_PROTOCOL,
+    private readonly translate: Translate,
     teamState = container.resolve(TeamState),
   ) {
     this.teamState = teamState;
     this.id = conversation_id;
 
     this.domain = domain;
+    this.protocol = protocol;
 
     this.logger = getLogger(`Conversation (${this.id})`);
     this.initialProtocol = this.protocol;
@@ -291,6 +295,10 @@ export class Conversation {
 
     this.isChannel = ko.pureComputed(() => {
       return this.groupConversationType() === GROUP_CONVERSATION_TYPE.CHANNEL;
+    });
+
+    this.isMeeting = ko.pureComputed(() => {
+      return this.groupConversationType() === GROUP_CONVERSATION_TYPE.MEETING;
     });
 
     this.isGroupOrChannel = ko.pureComputed(() => {
@@ -587,7 +595,7 @@ export class Conversation {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName || t('unavailableUser');
+        return userName || this.translate('unavailableUser');
       }
 
       if (this.isGroupOrChannel()) {
@@ -609,7 +617,7 @@ export class Conversation {
 
         const hasUserIds = !!this.participating_user_ids().length;
         if (!hasUserIds) {
-          return t('conversationsEmptyConversation');
+          return this.translate('conversationsEmptyConversation');
         }
       }
 

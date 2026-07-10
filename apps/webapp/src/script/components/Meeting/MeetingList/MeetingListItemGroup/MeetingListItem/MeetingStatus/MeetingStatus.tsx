@@ -27,31 +27,35 @@ import {
   joinButtonStyles,
   participatingStatusIconStyles,
   participatingStatusStyles,
-  startingSoonStatusStyles,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus.styles';
-import {getCountdownSeconds, getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
-import {t} from 'Util/localizerUtil';
-import {formatSeconds} from 'Util/timeUtil';
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/meetingStatus.styles';
+import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export interface MeetingStatusProps {
   start_date: string;
   end_date: string;
   attending?: boolean;
-  nowMs?: number;
+  nowMilliseconds?: number;
 }
 
-const MeetingStatusComponent = ({start_date, end_date, attending, nowMs}: MeetingStatusProps) => {
-  const timestamp = nowMs ?? Date.now();
+const MeetingStatusComponent = ({
+  start_date,
+  end_date,
+  attending,
+  nowMilliseconds: providedNowMilliseconds,
+}: MeetingStatusProps) => {
+  const {translate} = useApplicationContext();
+  const nowMilliseconds = providedNowMilliseconds ?? Date.now();
 
   const meetingStatus = useMemo(
-    () => getMeetingStatusAt(timestamp, start_date, end_date, attending),
-    [timestamp, start_date, end_date, attending],
+    () => getMeetingStatusAt(nowMilliseconds, start_date, end_date, attending),
+    [nowMilliseconds, start_date, end_date, attending],
   );
 
   if (meetingStatus === MeetingStatuses.PARTICIPATING) {
     return (
       <div css={participatingStatusStyles}>
-        <CallIcon css={participatingStatusIconStyles} /> {t('meetings.meetingStatus.participating')}
+        <CallIcon css={participatingStatusIconStyles} /> {translate('meetings.meetingStatus.participating')}
       </div>
     );
   }
@@ -60,19 +64,10 @@ const MeetingStatusComponent = ({start_date, end_date, attending, nowMs}: Meetin
     return (
       <div css={joinButtonContainerStyles}>
         <Button css={joinButtonStyles} variant={ButtonVariant.PRIMARY}>
-          <CallIcon css={joinButtonIconStyles} /> {t('callJoin')}
+          <CallIcon css={joinButtonIconStyles} /> {translate('callJoin')}
         </Button>
       </div>
     );
-  }
-
-  if (meetingStatus === MeetingStatuses.STARTING_SOON) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const countdown = useMemo(() => {
-      const seconds = getCountdownSeconds(timestamp, start_date);
-      return formatSeconds(seconds);
-    }, [timestamp, start_date]);
-    return <div css={startingSoonStatusStyles}>{t('meetings.meetingStatus.startingIn', {countdown})}</div>;
   }
 
   return null;

@@ -25,6 +25,13 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useCellsNewFolderForm} from './useCellsNewFolderForm';
 
 describe('useCellsNewFolderForm', () => {
+  const validationCopy = {
+    genericError: 'cells.newItemMenuModalForm.genericError',
+    alreadyExistsError: 'cells.newItemMenuModalForm.alreadyExistsError',
+    invalidCharactersError: 'cells.newItemMenuModalForm.invalidCharactersError',
+    maxLengthError: 'cells.newItemMenuModalForm.maxLengthError',
+    nameRequired: 'cells.newItemMenuModalForm.nameRequired',
+  };
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
 
@@ -47,6 +54,7 @@ describe('useCellsNewFolderForm', () => {
         onSuccess,
         currentPath: '/wire-cells-web/path',
         isOpen: true,
+        validationCopy,
       }),
     );
 

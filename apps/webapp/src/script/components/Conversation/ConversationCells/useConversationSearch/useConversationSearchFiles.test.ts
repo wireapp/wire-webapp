@@ -28,6 +28,7 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {useConversationSearchFiles} from './useConversationSearchFiles';
 
 import type {ConversationDriveFiltersState} from '../common/driveFilters/driveFilters';
+import type {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 const CONV_ID = 'conv-abc';
@@ -87,6 +88,7 @@ function renderSearchHook({
   onClear = jest.fn(),
   fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
   filters = emptyFilters,
+  sort = null,
 }: {
   cellsRepository?: FakeCellsRepository;
   userRepository?: FakeUserRepository;
@@ -95,6 +97,7 @@ function renderSearchHook({
   onClear?: () => void;
   fireAndForgetInvoker?: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
   filters?: ConversationDriveFiltersState;
+  sort?: CellsSort | null;
 } = {}) {
   return {
     fireAndForgetInvoker,
@@ -109,6 +112,7 @@ function renderSearchHook({
         fireAndForgetInvoker,
         filters,
         onClear,
+        sort,
       }),
     ),
   };
@@ -170,6 +174,42 @@ describe('useConversationSearchFiles', () => {
     );
   });
 
+  it('reloads the empty search view when the selected sort changes', async () => {
+    const cellsRepository = createFakeCellsRepository();
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const {rerender} = renderHook(
+      ({sort}: {sort: CellsSort | null}) =>
+        useConversationSearchFiles({
+          cellsRepository: cellsRepository as unknown as CellsRepository,
+          userRepository: createFakeUserRepository() as unknown as UserRepository,
+          conversationQualifiedId: QUALIFIED_ID,
+          enabled: true,
+          fireAndForgetInvoker,
+          filters: emptyFilters,
+          onClear: jest.fn(),
+          sort,
+        }),
+      {initialProps: {sort: null}},
+    );
+
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    const searchCallCountBeforeSorting = cellsRepository.searchNodes.mock.calls.length;
+
+    act(() => rerender({sort: {field: 'size', direction: 'asc'}}));
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(searchCallCountBeforeSorting + 1);
+    expect(cellsRepository.searchNodes).toHaveBeenNthCalledWith(
+      searchCallCountBeforeSorting + 1,
+      expect.objectContaining({
+        query: '',
+        recursive: false,
+        sortBy: 'size',
+        sortDirection: 'asc',
+      }),
+    );
+  });
+
   it('loads recycle-bin contents when opening search from the recycle bin', async () => {
     window.location.hash = `#/conversation/${CONV_ID}/${DOMAIN}/files/recycle_bin`;
     const cellsRepository = createFakeCellsRepository();
@@ -190,11 +230,13 @@ describe('useConversationSearchFiles', () => {
     const cellsRepository = {searchNodes: jest.fn().mockReturnValue(search.promise)} as FakeCellsRepository;
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
-    useCellsStore.getState().setNodes({
-      conversationId: CONV_ID,
-      nodes: [staleFolderNode],
+    act(() => {
+      useCellsStore.getState().setNodes({
+        conversationId: CONV_ID,
+        nodes: [staleFolderNode],
+      });
+      useCellsStore.getState().setStatus('success');
     });
-    useCellsStore.getState().setStatus('success');
 
     renderSearchHook({cellsRepository, fireAndForgetInvoker});
 
@@ -203,6 +245,32 @@ describe('useConversationSearchFiles', () => {
 
     act(() => {
       search.resolve({Nodes: []});
+    });
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+  });
+
+  it('shows loading when reloading search results', async () => {
+    const reloadSearch = createDeferred<RestNodeCollection>();
+    const cellsRepository = createFakeCellsRepository();
+    cellsRepository.searchNodes.mockResolvedValueOnce({Nodes: []});
+    cellsRepository.searchNodes.mockReturnValueOnce(reloadSearch.promise);
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+
+    const {result} = renderSearchHook({cellsRepository, fireAndForgetInvoker});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    act(() => {
+      useCellsStore.getState().setStatus('success');
+    });
+
+    act(() => {
+      void result.current.handleReload();
+    });
+
+    expect(useCellsStore.getState().status).toBe('loading');
+
+    act(() => {
+      reloadSearch.resolve({Nodes: []});
     });
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
   });
@@ -222,6 +290,7 @@ describe('useConversationSearchFiles', () => {
           fireAndForgetInvoker,
           filters: emptyFilters,
           onClear: jest.fn(),
+          sort: null,
         }),
       {initialProps: {enabled: true}},
     );
@@ -252,6 +321,8 @@ describe('useConversationSearchFiles', () => {
           query: 'doc',
           recursive: true,
           path: `${CONV_ID}@${DOMAIN}/Arjita`,
+          sortBy: 'mtime',
+          sortDirection: 'desc',
         }),
       ),
     );
@@ -275,22 +346,104 @@ describe('useConversationSearchFiles', () => {
     expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
       expect.objectContaining({
         recursive: true,
+        sortBy: 'mtime',
+        sortDirection: 'desc',
       }),
     );
   });
 
-  it('calls onClear when the search input is emptied', async () => {
+  it('lets the selected sort override the active search default', async () => {
+    const cellsRepository = createFakeCellsRepository();
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const {result} = renderSearchHook({
+      cellsRepository,
+      fireAndForgetInvoker,
+      sort: {field: 'name', direction: 'asc'},
+    });
+
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    act(() => result.current.handleSearch('doc'));
+
+    await waitFor(() =>
+      expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
+        expect.objectContaining({
+          query: 'doc',
+          recursive: true,
+          sortBy: 'name',
+          sortDirection: 'asc',
+        }),
+      ),
+    );
+  });
+
+  it('reloads the unfiltered search list when all filters are cleared with no query', async () => {
     const onClear = jest.fn();
-    const {result, fireAndForgetInvoker} = renderSearchHook({onClear});
+    const cellsRepository = createFakeCellsRepository({
+      Nodes: [createRestNode('all-files.pdf')],
+    });
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const {rerender} = renderHook(
+      ({filters}: {filters: ConversationDriveFiltersState}) =>
+        useConversationSearchFiles({
+          cellsRepository: cellsRepository as unknown as CellsRepository,
+          userRepository: createFakeUserRepository() as unknown as UserRepository,
+          conversationQualifiedId: QUALIFIED_ID,
+          enabled: true,
+          fireAndForgetInvoker,
+          filters,
+          onClear,
+          sort: null,
+        }),
+      {
+        initialProps: {
+          filters: {
+            ...emptyFilters,
+            selectedFileTypeIds: ['pictures'],
+          },
+        },
+      },
+    );
+
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    const searchCallCountBeforeClearingFilters = cellsRepository.searchNodes.mock.calls.length;
+
+    act(() => rerender({filters: emptyFilters}));
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(searchCallCountBeforeClearingFilters + 1);
+    expect(cellsRepository.searchNodes).toHaveBeenNthCalledWith(
+      searchCallCountBeforeClearingFilters + 1,
+      expect.objectContaining({query: '', recursive: false}),
+    );
+    expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('all-files.pdf');
+    expect(onClear).not.toHaveBeenCalled();
+  });
+
+  it('reloads the unfiltered search list when the search input is emptied while search is open', async () => {
+    const onClear = jest.fn();
+    const cellsRepository = createFakeCellsRepository({
+      Nodes: [createRestNode('all-files.pdf')],
+    });
+    const {result, fireAndForgetInvoker} = renderSearchHook({cellsRepository, onClear});
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
     act(() => result.current.handleSearch('test'));
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
+    const searchCallCountBeforeClearingInput = cellsRepository.searchNodes.mock.calls.length;
+
     act(() => result.current.handleSearch(''));
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(onClear).toHaveBeenCalled();
+    expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(searchCallCountBeforeClearingInput + 1);
+    expect(cellsRepository.searchNodes).toHaveBeenNthCalledWith(
+      searchCallCountBeforeClearingInput + 1,
+      expect.objectContaining({query: '', recursive: false}),
+    );
+    expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('all-files.pdf');
+    expect(onClear).not.toHaveBeenCalled();
   });
 
   it('clears search-owned rows before handing control back to browse mode', async () => {
@@ -298,13 +451,15 @@ describe('useConversationSearchFiles', () => {
     const {result, fireAndForgetInvoker} = renderSearchHook({onClear});
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    useCellsStore.getState().setNodes({
-      conversationId: CONV_ID,
-      nodes: [staleFolderNode],
+    act(() => {
+      useCellsStore.getState().setNodes({
+        conversationId: CONV_ID,
+        nodes: [staleFolderNode],
+      });
+      useCellsStore.getState().setStatus('success');
     });
-    useCellsStore.getState().setStatus('success');
 
-    act(() => result.current.handleSearch(''));
+    act(() => result.current.handleClearSearch({preserveFilters: false}));
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toEqual([]);
     expect(useCellsStore.getState().getPagination({conversationId: CONV_ID})).toBeNull();

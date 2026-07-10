@@ -17,8 +17,8 @@
  *
  */
 
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {t} from 'Util/localizerUtil';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {trimFileExtension} from 'Util/util';
 
 interface RestrictedFileProps {
@@ -26,6 +26,7 @@ interface RestrictedFileProps {
 }
 
 const RestrictedFile = ({asset}: RestrictedFileProps) => {
+  const {translate} = useApplicationContext();
   const fileName =
     asset?.file_name !== undefined && asset.file_name !== '' ? trimFileExtension(asset.file_name) : undefined;
   return (
@@ -40,7 +41,7 @@ const RestrictedFile = ({asset}: RestrictedFileProps) => {
           </div>
         )}
         <ul className="file__desc__meta label-xs text-foreground">
-          <li data-uie-name="file-restrictions">{t('conversationFileAssetRestricted')}</li>
+          <li data-uie-name="file-restrictions">{translate('conversationFileAssetRestricted')}</li>
         </ul>
       </div>
     </div>

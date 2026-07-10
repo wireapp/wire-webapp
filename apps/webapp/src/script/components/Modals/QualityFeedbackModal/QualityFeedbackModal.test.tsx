@@ -24,6 +24,8 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {TestFactory} from 'test/helper/TestFactory';
+
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
@@ -33,10 +35,13 @@ import {User} from 'Repositories/entity/User';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {UserState} from 'Repositories/user/userState';
-import {TestFactory} from 'test/helper/TestFactory';
-import {t} from 'Util/localizerUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {
   buildMediaDevicesHandler,
@@ -44,21 +49,35 @@ import {
   createSelfParticipant,
   withIntl,
   withTheme,
-} from '../../../auth/util/test/TestUtil';
+} from '../../../auth/util/test/testUtil';
 
 jest.mock('Repositories/tracking/telemetry.helpers', () => ({
   isTelemetryEnabledAtCurrentEnvironment: () => true,
 }));
 
 describe('QualityFeedbackModal', () => {
+  function translateQualityFeedbackForTest(translationKey: Parameters<typeof translateForTest>[0]): string {
+    switch (translationKey) {
+      case 'qualityFeedback.skip':
+        return 'Skip';
+      case 'qualityFeedback.doNotAskAgain':
+        return "Don't ask again";
+      default:
+        return translateForTest(translationKey);
+    }
+  }
+
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
   let callingRepository: CallingRepository;
   let call: Call;
   const testFactory = new TestFactory();
-  const user = new User('userId', 'domain');
+  const user = new User('userId', 'domain', translateForTest);
 
   beforeEach(() => {
     jest.clearAllMocks();
-    spyOn(container.resolve(UserState), 'self').and.returnValue(user);
+    jest.spyOn(container.resolve(UserState), 'self').mockReturnValue(user);
   });
 
   beforeAll(() => {
@@ -83,7 +102,16 @@ describe('QualityFeedbackModal', () => {
   });
 
   const renderQualityFeedbackModal = () =>
-    render(withTheme(withIntl(<QualityFeedbackModal callingRepository={callingRepository} />)));
+    render(
+      withTheme(
+        withIntl(
+          <QualityFeedbackModal callingRepository={callingRepository} translate={translateQualityFeedbackForTest} />,
+        ),
+      ),
+      {
+        wrapper: rootProviderWrapper,
+      },
+    );
 
   it('should not render if qualityFeedbackModalShown is false', () => {
     renderQualityFeedbackModal();
@@ -114,15 +142,15 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
-    spyOn(amplify, 'publish').and.returnValue({
+    jest.spyOn(amplify, 'publish').mockReturnValue({
       eventKey: WebAppEvents.ANALYTICS.EVENT,
       type: EventName.CALLING.QUALITY_REVIEW,
       value: {
         [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
       },
-    });
+    } as never);
 
-    fireEvent.click(getByText(t('qualityFeedback.skip')));
+    fireEvent.click(getByText('Skip'));
 
     expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
       [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
@@ -143,13 +171,13 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
-    spyOn(amplify, 'publish').and.returnValue({
+    jest.spyOn(amplify, 'publish').mockReturnValue({
       eventKey: WebAppEvents.ANALYTICS.EVENT,
       type: EventName.CALLING.QUALITY_REVIEW,
       value: {
         [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.ANSWERED,
       },
-    });
+    } as never);
 
     fireEvent.click(getByText('5'));
 
@@ -173,13 +201,14 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
-    const checkbox = getByText(t('qualityFeedback.doNotAskAgain'));
+    const checkbox = getByText("Don't ask again");
     fireEvent.click(checkbox);
     fireEvent.click(getByText('5'));
 
     act(() => {
-      const storedData = JSON.parse(localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY) || '{}');
-      expect(storedData['userId']).toBeNull();
+      const storedQualityFeedbackState = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
+      const storedData = JSON.parse(storedQualityFeedbackState ?? '{}');
+      expect(storedData['userId']).toBeUndefined();
     });
   });
 });

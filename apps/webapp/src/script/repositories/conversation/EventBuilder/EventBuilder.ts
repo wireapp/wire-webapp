@@ -34,7 +34,7 @@ import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/Message';
+import type {Message} from 'Repositories/entity/message/message';
 import type {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {ReactionMap, ReadReceipt, UserReactionMap} from 'Repositories/storage';
@@ -42,9 +42,9 @@ import {createUuid} from 'Util/uuid';
 
 import {BuildMessageAddParams} from './EventBuilder.types';
 
-import {E2EIVerificationMessageType} from '../../../message/E2EIVerificationMessageType';
-import {StatusType} from '../../../message/StatusType';
-import {VerificationMessageType} from '../../../message/VerificationMessageType';
+import {E2EIVerificationMessageType} from '../../../message/e2eiVerificationMessageType';
+import {StatusType} from '../../../message/statusType';
+import {VerificationMessageType} from '../../../message/verificationMessageType';
 
 export interface BaseEvent {
   conversation: string;
@@ -247,6 +247,10 @@ export type FileTypeRestrictedEvent = ConversationEvent<
   CONVERSATION.FILE_TYPE_RESTRICTED,
   {fileExt: string; isIncoming: boolean; name: string}
 >;
+export type MemberRoleUpdateEvent = ConversationEvent<
+  CONVERSATION.MEMBER_ROLE_UPDATE,
+  {conversation_role: string; user_id: QualifiedId}
+>;
 export type CallingTimeoutEvent = ConversationEvent<
   CONVERSATION.CALL_TIME_OUT,
   {reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}
@@ -292,6 +296,7 @@ export type ClientConversationEvent =
   | OneToOneMigratedToMlsEvent
   | VoiceChannelDeactivateEvent
   | FileTypeRestrictedEvent
+  | MemberRoleUpdateEvent
   | CallingTimeoutEvent
   | FailedToAddUsersMessageEvent
   | UnableToDecryptEvent
@@ -490,6 +495,25 @@ export const EventBuilder = {
       id,
       time: conversation.getNextIsoDate(),
       type: ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED,
+    };
+  },
+
+  buildMemberRoleUpdate(
+    conversation: Conversation,
+    conversationRole: string,
+    userId: QualifiedId,
+    fromUserId: string,
+  ): MemberRoleUpdateEvent {
+    return {
+      ...buildQualifiedId(conversation),
+      data: {
+        conversation_role: conversationRole,
+        user_id: userId,
+      },
+      from: fromUserId,
+      id: createUuid(),
+      time: conversation.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.MEMBER_ROLE_UPDATE,
     };
   },
 

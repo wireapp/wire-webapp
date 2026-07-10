@@ -17,15 +17,15 @@
  *
  */
 
-import {useLayoutEffect, useRef} from 'react';
+import {useLayoutEffect, useMemo, useRef} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {ScrollToElement} from 'Components/MessagesList/Message/types';
-import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
-import {t} from 'Util/localizerUtil';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './Marker.styles';
 import {getMessagesGroupLabel} from './Marker.utils';
@@ -46,10 +46,30 @@ interface Props {
 }
 
 export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props) => {
+  const {translate} = useApplicationContext();
   const elementRef = useRef<HTMLDivElement | null>(null);
 
   const isDay = marker.type === 'day';
-  const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, isDay ? getMessagesGroupLabel : undefined);
+  const relativeTimestampFormatter = useMemo(() => {
+    return createRelativeTimestampFormatter({
+      justNow: translate('conversationJustNow'),
+      today: translate('conversationToday'),
+      yesterday: translate('conversationYesterday'),
+    });
+  }, [translate]);
+  const messageGroupLabelFormatter = useMemo(() => {
+    return (timestamp: number, isTimestampDay: boolean) => {
+      if (isTimestampDay) {
+        return getMessagesGroupLabel(timestamp, {
+          today: translate('conversationToday'),
+          yesterday: translate('conversationYesterday'),
+        });
+      }
+
+      return relativeTimestampFormatter(timestamp, false);
+    };
+  }, [relativeTimestampFormatter, translate]);
+  const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, messageGroupLabelFormatter);
 
   const isVirtualizedMessagesListEnabled = Config.getConfig().FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
@@ -61,7 +81,7 @@ export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props
     if (!isVirtualizedMessagesListEnabled && marker.type === 'unread' && elementRef.current) {
       scrollTo?.({element: elementRef.current}, true);
     }
-  }, [isVirtualizedMessagesListEnabled]);
+  }, [isVirtualizedMessagesListEnabled, marker.type, scrollTo]);
 
   return (
     <div
@@ -78,9 +98,9 @@ export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props
           <span
             className="message-unread-dot dot-md"
             role="img"
-            aria-label={t('accessibility.unreadMessagesSeparator')}
+            aria-label={translate('accessibility.unreadMessagesSeparator')}
             tabIndex={TabIndex.FOCUSABLE}
-            title={t('accessibility.unreadMessagesSeparator')}
+            title={translate('accessibility.unreadMessagesSeparator')}
           />
         )}
       </div>

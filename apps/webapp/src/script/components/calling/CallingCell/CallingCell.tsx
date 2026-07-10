@@ -25,13 +25,13 @@ import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/av
 import {TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/AppNotification';
+import {useAppNotification} from 'Components/appNotification/index';
 import {callingContainer} from 'Components/calling/CallingCell/CallingCell.styles';
 import {CallingControls} from 'Components/calling/CallingCell/CallingControls';
 import {CallingHeader} from 'Components/calling/CallingCell/CallingHeader';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
+import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import * as Icon from 'Components/icon';
 import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
@@ -45,11 +45,10 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 
@@ -90,7 +89,7 @@ export const CallingCell = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: CallingCellProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {conversation} = call;
   const {reason, state, isCbrEnabled, startedAt, maximizedParticipant, muteState} = useKoSubscribableChildren(call, [
     'reason',
@@ -118,7 +117,16 @@ export const CallingCell = ({
   ]);
   const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
 
-  const guardCall = useNoInternetCallGuard();
+  const guardCall = useNoInternetCallGuard({
+    description: translate('callNotEstablishedDescription'),
+    descriptionPoints: [
+      translate('callNotEstablishedDescriptionPoint1'),
+      translate('callNotEstablishedDescriptionPoint2'),
+      translate('callNotEstablishedDescriptionPoint3'),
+    ],
+    title: translate('callNotEstablishedTitle'),
+    translate,
+  });
   const {isCallConnecting} = useConversationCall(conversation);
 
   // Ref for immediate synchronous protection from multiple clicks
@@ -161,15 +169,15 @@ export const CallingCell = ({
   const callStatus: Partial<Record<CALL_STATE, CallLabel>> = {
     [CALL_STATE.OUTGOING]: {
       dataUieName: 'call-label-outgoing',
-      text: t('callStateOutgoing'),
+      text: translate('callStateOutgoing'),
     },
     [CALL_STATE.INCOMING]: {
       dataUieName: 'call-label-incoming',
-      text: t('callStateIncoming'),
+      text: translate('callStateIncoming'),
     },
     [CALL_STATE.ANSWERED]: {
       dataUieName: 'call-label-connecting',
-      text: t('callStateConnecting'),
+      text: translate('callStateConnecting'),
     },
   };
 
@@ -202,10 +210,11 @@ export const CallingCell = ({
     toggleMute,
     isMuted: isCurrentlyMuted,
     enabled: isPressSpaceToUnmuteEnabled,
+    notificationMessage: translate('videoCallParticipantPressSpaceToUnmuteNotification'),
   });
 
   const screenSharingEndedNotification = useAppNotification({
-    message: t('videoCallScreenShareEnded'),
+    message: translate('videoCallScreenShareEnded'),
     activeWindow: window,
   });
 
@@ -247,13 +256,11 @@ export const CallingCell = ({
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {showAlert, clearShowAlert} = useCallAlertState();
 
-  const answerCall = () => {
-    // Check ref first for immediate synchronous protection
+  const answerCall = useCallback(() => {
     if (isAnsweringRef.current || isAnswerButtonDisabled) {
       return;
     }
 
-    // Immediately disable synchronously
     isAnsweringRef.current = true;
 
     guardCall(async () => {
@@ -261,12 +268,11 @@ export const CallingCell = ({
         await callActions.answer(call);
         isAnsweringRef.current = false;
         setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
-      } catch (error: unknown) {
-        // Re-enable on error
+      } catch {
         isAnsweringRef.current = false;
       }
     });
-  };
+  }, [call, callActions, guardCall, isAnswerButtonDisabled, setCurrentView]);
 
   const answerOrRejectCall = useCallback(
     (event: KeyboardEvent) => {
@@ -290,7 +296,7 @@ export const CallingCell = ({
         removeEventListener();
       }
     },
-    [call, callActions],
+    [answerCall, call, callActions],
   );
 
   useEffect(() => {
@@ -308,26 +314,32 @@ export const CallingCell = ({
     return () => {
       clearShowAlert();
     };
-  }, [answerOrRejectCall, isIncoming]);
+  }, [answerOrRejectCall, clearShowAlert, isIncoming]);
 
-  const call1To1StartedAlert = t(isOutgoingVideoCall ? 'startedVideoCallingAlert' : 'startedAudioCallingAlert', {
+  const call1To1StartedAlert = translate(
+    isOutgoingVideoCall ? 'startedVideoCallingAlert' : 'startedAudioCallingAlert',
+    {
+      conversationName,
+      cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+    },
+  );
+
+  const onGoingCallAlert = translate(isOutgoingVideoCall ? 'ongoingVideoCall' : 'ongoingAudioCall', {
     conversationName,
-    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+    cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
-  const onGoingCallAlert = t(isOutgoingVideoCall ? 'ongoingVideoCall' : 'ongoingAudioCall', {
-    conversationName,
-    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
-  });
+  const callGroupStartedAlert = translate(
+    isOutgoingVideoCall ? 'startedVideoGroupCallingAlert' : 'startedGroupCallingAlert',
+    {
+      conversationName,
+      cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+    },
+  );
 
-  const callGroupStartedAlert = t(isOutgoingVideoCall ? 'startedVideoGroupCallingAlert' : 'startedGroupCallingAlert', {
+  const onGoingGroupCallAlert = translate(isOutgoingVideoCall ? 'ongoingGroupVideoCall' : 'ongoingGroupAudioCall', {
     conversationName,
-    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
-  });
-
-  const onGoingGroupCallAlert = t(isOutgoingVideoCall ? 'ongoingGroupVideoCall' : 'ongoingGroupAudioCall', {
-    conversationName,
-    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+    cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
   const toggleDetachedWindow = () => {
@@ -350,7 +362,7 @@ export const CallingCell = ({
     <div css={callingContainer}>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
-          {t('callConversationAcceptOrDecline', {conversationName})}
+          {translate('callConversationAcceptOrDecline', {conversationName})}
         </p>
       )}
 
@@ -362,7 +374,7 @@ export const CallingCell = ({
           data-uie-value={conversation.display_name()}
         >
           {muteState === MuteState.REMOTE_MUTED && isFullUi && (
-            <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
+            <div className="conversation-list-calling-cell__info-bar">{translate('muteStateRemoteMute')}</div>
           )}
 
           <CallingHeader
@@ -395,7 +407,7 @@ export const CallingCell = ({
                   onKeyDown={handleMaximizeKeydown}
                   role="button"
                   tabIndex={TabIndex.FOCUSABLE}
-                  aria-label={t('callMaximizeLabel')}
+                  aria-label={translate('callMaximizeLabel')}
                 >
                   <GroupVideoGrid
                     grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
@@ -421,7 +433,7 @@ export const CallingCell = ({
                 className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
                 data-uie-name="label-no-camera-access-preview"
               >
-                {t('callNoCameraAccess')}
+                {translate('callNoCameraAccess')}
               </div>
             )
           )}

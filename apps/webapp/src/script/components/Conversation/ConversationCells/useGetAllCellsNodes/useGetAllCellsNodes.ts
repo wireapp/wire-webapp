@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useCallback, useState} from 'react';
+import {useEffect, useCallback, useRef, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -32,7 +32,9 @@ import {transformDataToCellsNodes, transformToCellPagination} from './transformD
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
+import {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import {createRequestVersionGate} from '../useConversationSearch/requestVersionGate';
 
 interface UseGetAllCellsNodesProps {
   cellsRepository: CellsRepository;
@@ -40,6 +42,12 @@ interface UseGetAllCellsNodesProps {
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
   fireAndForgetInvoker: FireAndForgetInvoker;
+  sort: CellsSort | null;
+}
+
+interface CellsQueryState {
+  offset: number;
+  sort: CellsSort | null;
 }
 
 export const useGetAllCellsNodes = ({
@@ -48,13 +56,43 @@ export const useGetAllCellsNodes = ({
   conversationQualifiedId,
   enabled,
   fireAndForgetInvoker,
+  sort,
 }: UseGetAllCellsNodesProps) => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
-  const [offset, setOffset] = useState(0);
+  const [queryState, setQueryState] = useState<CellsQueryState>({offset: 0, sort});
+
+  // Sort changes must reset pagination before fetchNodes is created so requests
+  // never run with the new sort and the previous page offset.
+  if (queryState.sort !== sort) {
+    setQueryState({offset: 0, sort});
+  }
+
+  const offset = queryState.sort === sort ? queryState.offset : 0;
+
+  const setOffset = useCallback(
+    (nextOffset: number) => {
+      setQueryState({offset: nextOffset, sort});
+    },
+    [sort],
+  );
+
+  const requestVersionGate = useRef(createRequestVersionGate());
+  const enabledRef = useRef(enabled);
+  enabledRef.current = enabled;
 
   const {domain, id} = conversationQualifiedId;
 
+  const isCurrentFetchRequest = useCallback((requestVersion: number): boolean => {
+    return enabledRef.current && !requestVersionGate.current.isStale(requestVersion);
+  }, []);
+
   const fetchNodes = useCallback(async () => {
+    if (!enabledRef.current) {
+      return;
+    }
+
+    const requestVersion = requestVersionGate.current.next();
+
     try {
       setError(null);
       setStatus('loading');
@@ -66,7 +104,13 @@ export const useGetAllCellsNodes = ({
         limit: pageSize,
         offset,
         deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
+        sortBy: sort?.field,
+        sortDirection: sort?.direction,
       });
+
+      if (!isCurrentFetchRequest(requestVersion)) {
+        return;
+      }
 
       if (result.Nodes === undefined || result.Nodes.length === 0) {
         setNodes({conversationId: id, nodes: []});
@@ -76,6 +120,10 @@ export const useGetAllCellsNodes = ({
       }
 
       const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
+
+      if (!isCurrentFetchRequest(requestVersion)) {
+        return;
+      }
 
       // filter out draft nodes from results
       const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
@@ -88,6 +136,10 @@ export const useGetAllCellsNodes = ({
 
       setStatus('success');
     } catch (error: unknown) {
+      if (!isCurrentFetchRequest(requestVersion)) {
+        return;
+      }
+
       setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
       setPagination({conversationId: id, pagination: null});
       setStatus('error');
@@ -95,7 +147,7 @@ export const useGetAllCellsNodes = ({
     }
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, id, offset, pageSize, setError, setNodes, setPagination, setStatus]);
+  }, [domain, id, isCurrentFetchRequest, offset, pageSize, sort, setError, setNodes, setPagination, setStatus]);
 
   const handleHashChange = useCallback((): void => {
     if (enabled !== true) {
@@ -108,6 +160,7 @@ export const useGetAllCellsNodes = ({
 
   useEffect(() => {
     if (enabled !== true) {
+      requestVersionGate.current.invalidate();
       return;
     }
 

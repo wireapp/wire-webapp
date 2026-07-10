@@ -71,6 +71,7 @@ export interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Op
   overlayMenu?: boolean;
   menuListHeading?: string;
   hideControl?: boolean;
+  menuMatchControlWidth?: boolean;
 }
 
 export const Select = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>({
@@ -96,10 +97,11 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
   overlayMenu = true,
   menuListHeading,
   hideControl = false,
+  menuMatchControlWidth = false,
   ...props
 }: SelectProps<IsMulti, Group>) => {
   const theme = useTheme();
-  const hasError = !!error;
+  const hasError = !!Boolean(error);
 
   return (
     <div
@@ -127,6 +129,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
             theme: theme as Theme,
             markInvalid,
             menuPosition: overlayMenu ? 'absolute' : 'relative',
+            menuMatchControlWidth,
             controlCSS: selectControlCSS,
             containerCSS: selectContainerCSS,
             menuCSS: selectMenuCSS,

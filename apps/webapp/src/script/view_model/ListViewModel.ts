@@ -37,7 +37,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {iterateItem} from 'Util/arrayUtil';
 import {isEscapeKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import type {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
@@ -45,14 +45,14 @@ import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import {Config} from '../Config';
-import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {PanelState} from '../page/RightSidebar';
+import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
-import {showContextMenu} from '../ui/ContextMenu';
-import {showLabelContextMenu} from '../ui/LabelContextMenu';
-import {Shortcut} from '../ui/Shortcut';
-import {ShortcutType} from '../ui/ShortcutType';
+import {showContextMenu} from '../ui/contextMenu';
+import {showLabelContextMenu} from '../ui/labelContextMenu';
+import {Shortcut} from '../ui/shortcut';
+import {ShortcutType} from '../ui/shortcutType';
 
 export class ListViewModel {
   private readonly userState: UserState;
@@ -80,7 +80,11 @@ export class ListViewModel {
     return this.mainViewModel.isFederated;
   }
 
-  constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
+  constructor(
+    mainViewModel: MainViewModel,
+    repositories: ViewModelRepositories,
+    private readonly translate: Translate,
+  ) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);
@@ -158,12 +162,19 @@ export class ListViewModel {
     }
 
     if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
-      return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
-          title: t('modalConferenceCallNotSupportedHeadline'),
+      return PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message: `${this.translate('modalConferenceCallNotSupportedMessage')} ${this.translate(
+              'modalConferenceCallNotSupportedJoinMessage',
+            )}`,
+            title: this.translate('modalConferenceCallNotSupportedHeadline'),
+          },
         },
-      });
+        undefined,
+        this.translate,
+      );
     }
 
     return this.callingViewModel.callActions.answer(call);
@@ -304,11 +315,10 @@ export class ListViewModel {
 
   readonly openConversations = (archive = false): void => {
     const {currentTab, setCurrentTab} = useSidebarStore.getState();
-    const newState = this.isActivatedAccount()
-      ? archive
-        ? ListState.ARCHIVE
-        : ListState.CONVERSATIONS
-      : ListState.TEMPORARY_GUEST;
+    let newState = ListState.TEMPORARY_GUEST;
+    if (this.isActivatedAccount()) {
+      newState = archive ? ListState.ARCHIVE : ListState.CONVERSATIONS;
+    }
     this.switchList(newState, false);
     setCurrentTab(archive ? SidebarTabs.ARCHIVES : currentTab);
   };
@@ -357,16 +367,16 @@ export class ListViewModel {
       if (this.isProAccount()) {
         entries.push({
           click: () => this.clickToOpenNotificationSettings(conversationEntity),
-          label: t('conversationsPopoverNotificationSettings'),
-          title: t('tooltipConversationsNotifications', {shortcut: notificationsShortcut}),
+          label: this.translate('conversationsPopoverNotificationSettings'),
+          title: this.translate('tooltipConversationsNotifications', {shortcut: notificationsShortcut}),
         });
       } else {
         const label = conversationEntity.showNotificationsNothing()
-          ? t('conversationsPopoverNotify')
-          : t('conversationsPopoverSilence');
+          ? this.translate('conversationsPopoverNotify')
+          : this.translate('conversationsPopoverSilence');
         const title = conversationEntity.showNotificationsNothing()
-          ? t('tooltipConversationsNotify', {shortcut: notificationsShortcut})
-          : t('tooltipConversationsSilence', {shortcut: notificationsShortcut});
+          ? this.translate('tooltipConversationsNotify', {shortcut: notificationsShortcut})
+          : this.translate('tooltipConversationsSilence', {shortcut: notificationsShortcut});
 
         entries.push({
           click: () => this.clickToToggleMute(conversationEntity),
@@ -384,12 +394,12 @@ export class ListViewModel {
           click: () => {
             conversationLabelRepository.addConversationToFavorites(conversationEntity);
           },
-          label: t('conversationPopoverFavorite'),
+          label: this.translate('conversationPopoverFavorite'),
         });
       } else {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
-          label: t('conversationPopoverUnfavorite'),
+          label: this.translate('conversationPopoverUnfavorite'),
         });
       }
 
@@ -398,42 +408,46 @@ export class ListViewModel {
       if (customLabel) {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
-          label: t('conversationsPopoverRemoveFrom', {name: customLabel.name}, {}, true),
+          label: this.translate('conversationsPopoverRemoveFrom', {name: customLabel.name}, {}, true),
         });
       }
 
       entries.push({
-        click: () => showLabelContextMenu(event, conversationEntity, conversationLabelRepository),
-        label: t('conversationsPopoverMoveTo'),
+        click: () =>
+          showLabelContextMenu(event, conversationEntity, conversationLabelRepository, {
+            newFolder: this.translate('conversationsPopoverNewFolder'),
+            noCustomFolders: this.translate('conversationsPopoverNoCustomFolders'),
+          }),
+        label: this.translate('conversationsPopoverMoveTo'),
       });
     }
 
     if (conversationEntity.is_archived()) {
       entries.push({
         click: () => this.clickToUnarchive(conversationEntity),
-        label: t('conversationsPopoverUnarchive'),
+        label: this.translate('conversationsPopoverUnarchive'),
       });
     } else {
       const shortcut = Shortcut.getShortcutTooltip(ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
-        label: t('conversationsPopoverArchive'),
-        title: t('tooltipConversationsArchive', {shortcut}),
+        label: this.translate('conversationsPopoverArchive'),
+        title: this.translate('tooltipConversationsArchive', {shortcut}),
       });
     }
 
     if (conversationEntity.isRequest()) {
       entries.push({
         click: () => this.clickToCancelRequest(conversationEntity),
-        label: t('conversationsPopoverCancel'),
+        label: this.translate('conversationsPopoverCancel'),
       });
     }
 
     if (conversationEntity.isClearable()) {
       entries.push({
         click: () => this.clickToClear(conversationEntity),
-        label: t('conversationsPopoverClear'),
+        label: this.translate('conversationsPopoverClear'),
       });
     }
 
@@ -445,12 +459,12 @@ export class ListViewModel {
       if (canBlock) {
         entries.push({
           click: () => this.clickToBlock(conversationEntity),
-          label: t('conversationsPopoverBlock'),
+          label: this.translate('conversationsPopoverBlock'),
         });
       } else if (canUnblock) {
         entries.push({
           click: () => this.clickToUnblock(conversationEntity),
-          label: t('conversationsPopoverUnblock'),
+          label: this.translate('conversationsPopoverUnblock'),
         });
       }
     }
@@ -458,7 +472,9 @@ export class ListViewModel {
     if (conversationEntity.isLeavable()) {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
-        label: conversationEntity.isChannel() ? t('channelsPopoverLeave') : t('groupsPopoverLeave'),
+        label: conversationEntity.isChannel()
+          ? this.translate('channelsPopoverLeave')
+          : this.translate('groupsPopoverLeave'),
         identifier: 'conversation-leave',
       });
     }
@@ -470,7 +486,7 @@ export class ListViewModel {
     ) {
       entries.push({
         click: () => this.actionsViewModel.removeConversation(conversationEntity),
-        label: t('conversationsPopoverDeleteForMe'),
+        label: this.translate('conversationsPopoverDeleteForMe'),
       });
     }
 
@@ -479,7 +495,7 @@ export class ListViewModel {
 
   readonly clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {
     if (this.isActivatedAccount() && conversationEntity !== undefined) {
-      this.actionsViewModel.archiveConversation(conversationEntity);
+      void this.actionsViewModel.archiveConversation(conversationEntity);
     }
   };
 
@@ -509,22 +525,22 @@ export class ListViewModel {
     const hideConversation = this.shouldHideConversation(conversationEntity);
     const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
 
-    this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
+    void this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
   };
 
   readonly clickToClear = (conversationEntity = this.conversationState.activeConversation()): void => {
     if (conversationEntity !== undefined) {
-      this.actionsViewModel.clearConversation(conversationEntity);
+      void this.actionsViewModel.clearConversation(conversationEntity);
     }
   };
 
   readonly clickToLeave = (conversationEntity: Conversation): void => {
-    this.actionsViewModel.leaveConversation(conversationEntity);
+    void this.actionsViewModel.leaveConversation(conversationEntity);
   };
 
   readonly clickToToggleMute = (conversationEntity = this.conversationState.activeConversation()): void => {
     if (conversationEntity !== undefined) {
-      this.actionsViewModel.toggleMuteConversation(conversationEntity);
+      void this.actionsViewModel.toggleMuteConversation(conversationEntity);
     }
   };
 
@@ -535,7 +551,7 @@ export class ListViewModel {
   };
 
   readonly clickToUnarchive = (conversationEntity: Conversation): void => {
-    this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
+    void this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
       if (!this.conversationState.archivedConversations().length) {
         this.switchList(ListState.CONVERSATIONS);
       }

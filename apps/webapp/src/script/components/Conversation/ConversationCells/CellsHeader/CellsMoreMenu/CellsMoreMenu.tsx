@@ -21,7 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {DropdownMenu, IconButton, IconButtonVariant, MoreIcon, TrashIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles, itemStyles} from './CellsMoreMenu.styles';
 
@@ -33,6 +33,7 @@ interface CellsMoreMenuProps {
 }
 
 export const CellsMoreMenu = ({conversationQualifiedId}: CellsMoreMenuProps) => {
+  const {translate} = useApplicationContext();
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
@@ -51,7 +52,7 @@ export const CellsMoreMenu = ({conversationQualifiedId}: CellsMoreMenuProps) => 
         >
           <div css={itemStyles}>
             <TrashIcon />
-            {t('cells.recycleBin.moreMenu')}
+            {translate('cells.recycleBin.moreMenu')}
           </div>
         </DropdownMenu.Item>
       </DropdownMenu.Content>

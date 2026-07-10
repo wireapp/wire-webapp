@@ -20,20 +20,30 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
-import {StatusType} from 'src/script/message/StatusType';
+import {StatusType} from 'src/script/message/statusType';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {FileAsset as FileAssetComponent} from './FileAsset';
 
 describe('FileAssetComponent', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
+
   function mockContentMessage(): ContentMessage {
     const asset = new FileAsset();
     asset.file_name = 'test-file.log';
     asset.file_size = 10485760;
 
-    const message = new ContentMessage();
+    const message = new ContentMessage(undefined, translateForTest);
     message.addAsset(asset);
 
     return message;
@@ -49,7 +59,7 @@ describe('FileAssetComponent', () => {
       teamState,
     };
 
-    const {queryByTestId} = render(<FileAssetComponent {...props} />);
+    const {queryByTestId} = render(<FileAssetComponent {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('file')).not.toBeNull();
   });
@@ -64,7 +74,7 @@ describe('FileAssetComponent', () => {
       teamState,
     };
 
-    const {queryByTestId} = render(<FileAssetComponent {...props} />);
+    const {queryByTestId} = render(<FileAssetComponent {...props} />, {wrapper: rootProviderWrapper});
     expect(queryByTestId('file')).toBeNull();
   });
 
@@ -74,7 +84,7 @@ describe('FileAssetComponent', () => {
       teamState,
     };
 
-    const {queryByText} = render(<FileAssetComponent {...props} />);
+    const {queryByText} = render(<FileAssetComponent {...props} />, {wrapper: rootProviderWrapper});
     expect(queryByText('10 MB')).not.toBeNull();
   });
 });

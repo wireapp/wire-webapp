@@ -24,8 +24,8 @@ import is from '@sindresorhus/is';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isTabKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
 
@@ -76,6 +76,7 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
     },
     textInputRef,
   ) => {
+    const {translate} = useApplicationContext();
     const isFilled = is.nonEmptyString(value);
 
     useEffect(() => {
@@ -133,7 +134,7 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
                 textInputRef.current?.focus();
               }
             }}
-            aria-label={t('accessibility.userProfileDeleteEntry')}
+            aria-label={translate('accessibility.userProfileDeleteEntry')}
             onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>): void => {
               if (event.shiftKey && isTabKey(event)) {
                 // shift+tab from clear button should focus on the input field

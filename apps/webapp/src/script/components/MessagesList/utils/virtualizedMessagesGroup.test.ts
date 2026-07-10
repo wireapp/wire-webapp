@@ -21,16 +21,24 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {EventMapper} from 'Repositories/conversation/EventMapper';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/Message';
+import {Message} from 'Repositories/entity/message/message';
 import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
+import {translate} from 'Util/localizerUtil';
 import {getRandomNumber} from 'Util/numberUtil';
 import {createUuid} from 'Util/uuid';
 
-import {GroupedMessage, groupMessagesBySenderAndTime, isMarker} from './virtualizedMessagesGroup';
+import {
+  getVirtualizedMessagesGroupItemKey,
+  GroupedMessage,
+  groupMessagesBySenderAndTime,
+  isMarker,
+} from './virtualizedMessagesGroup';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('MessagesGroup', () => {
-  const eventMapper = new EventMapper();
-  const conversation = new Conversation(createUuid(), 'domain');
+  const eventMapper = new EventMapper(undefined, translate);
+  const conversation = new Conversation(createUuid(), 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
   it('should group messages by sender', () => {
     const sender = 'user1';
@@ -164,5 +172,25 @@ describe('MessagesGroup', () => {
     expect(groupReadMessages).toHaveLength(nbReadMessages);
     expect(isMarker(groupedMessages[firstReadIndex])).toBeTruthy();
     expect(groupUnReadMessages).toHaveLength(nbUnreadMessages);
+  });
+
+  it('uses stable virtualized item keys for messages and markers', () => {
+    const lastReadTimestamp = 10;
+    const readMessageEvent = createMessageAddEvent({overrides: {time: new Date(lastReadTimestamp).toISOString()}});
+    const unreadMessageEvent = createMessageAddEvent({
+      overrides: {time: new Date(lastReadTimestamp + 1).toISOString()},
+    });
+
+    const allMessages = [readMessageEvent, unreadMessageEvent].map(
+      event => eventMapper.mapJsonEvent(event, conversation) as Message,
+    );
+
+    const groupedMessages = groupMessagesBySenderAndTime(allMessages, lastReadTimestamp);
+
+    expect(getVirtualizedMessagesGroupItemKey(groupedMessages[0])).toBe(`message-${allMessages[0].id}`);
+    expect(getVirtualizedMessagesGroupItemKey(groupedMessages[1])).toBe(
+      `marker-unread-${lastReadTimestamp + 1}-${lastReadTimestamp + 1}-${lastReadTimestamp + 1}`,
+    );
+    expect(getVirtualizedMessagesGroupItemKey(groupedMessages[2])).toBe(`message-${allMessages[1].id}`);
   });
 });

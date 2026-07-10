@@ -173,6 +173,8 @@ describe('Account', () => {
         domain: 'zinfra.io',
       });
 
+    nock(MOCK_BACKEND.rest).get(`/v${MINIMUM_API_VERSION}${AuthAPI.URL.COOKIES}`).reply(HTTP_STATUS.OK, {}).persist();
+
     nock(MOCK_BACKEND.rest)
       .get(NotificationAPI.URL.NOTIFICATION)
       .query({client: CLIENT_ID, size: 10000})
@@ -523,6 +525,28 @@ describe('Account', () => {
             onNotificationStreamProgress: onNotificationStreamProgress,
           });
         });
+      });
+
+      it('emits CLOSED without unlocking websocket when legacy notification catch-up fails after websocket open', async () => {
+        const catchUpError = new Error('Legacy catch-up failed');
+        jest
+          .spyOn(dependencies.account.service!.notification, 'legacyProcessNotificationStream')
+          .mockRejectedValue(catchUpError);
+        const unlock = jest.spyOn(dependencies.apiClient.transport.ws, 'unlock');
+        const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
+
+        const disconnect = await dependencies.account.listen({
+          useLegacy: true,
+          onConnectionStateChanged,
+        });
+
+        await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.CLOSED));
+
+        expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.PROCESSING_NOTIFICATIONS);
+        expect(onConnectionStateChanged).not.toHaveBeenCalledWith(ConnectionState.LIVE);
+        expect(unlock).not.toHaveBeenCalled();
+
+        disconnect();
       });
     });
   });

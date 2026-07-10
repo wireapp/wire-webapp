@@ -49,6 +49,54 @@ test.describe('Calling', () => {
   });
 
   test(
+    'Verify incoming call acceptance terminates the active call after user confirmation',
+    {tag: ['@TC-11353', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage, userCPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB)),
+        createPage(withLogin(userC)),
+      ]);
+      await connectWithUser(userAPage, userB);
+      await connectWithUser(userAPage, userC);
+
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+      const {pages: userBPages} = PageManager.from(userBPage).webapp;
+      const {pages: userCPages} = PageManager.from(userCPage).webapp;
+
+      await test.step('User A establishes an active call with User B', async () => {
+        await userAPages.conversationList().getConversation(userB.fullName).open();
+        await userAPages.conversation().clickCallButton();
+        await userBPages.calling().clickAcceptCallButton();
+        await expect(userBPages.calling().callCell).toBeVisible();
+      });
+
+      await test.step('User C calls User A (creating a second incoming call for User A)', async () => {
+        await userCPages.conversationList().getConversation(userA.fullName).open();
+        await userCPages.conversation().clickCallButton();
+      });
+
+      await test.step("User A accepts User C's call and confirms the termination warning", async () => {
+        await expect(userAPages.calling().callCell).toHaveCount(2);
+        const callCellWithUserC = userAPages.calling().callCell.filter({hasText: userC.fullName});
+        await callCellWithUserC.getByRole('button', {name: 'Accept'}).click();
+
+        await expect(userAModals.confirm().modalText).toContainText('Your current call will end.');
+        await userAModals.confirm().clickAction();
+      });
+
+      await test.step('Verify the call with User B is terminated and the call with User C is active', async () => {
+        // The call with user B should be terminated
+        await expect(userBPages.calling().callCell).not.toBeVisible();
+
+        // The call with user C should be established
+        await expect(userAPages.calling().callCell).toHaveCount(1);
+        await expect(userCPages.calling().goFullScreen).toBeVisible();
+      });
+    },
+  );
+
+  test(
     'Verify that current call is terminated if you want to call someone else (as caller)',
     {tag: ['@TC-2802', '@regression']},
     async ({createPage}) => {
@@ -571,6 +619,8 @@ test.describe('Calling', () => {
     'I want to accept a group video call as a personal account guest',
     {tag: ['@TC-2852', '@regression']},
     async ({createPage}) => {
+      test.setTimeout(150_000);
+
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
       const {pages: ownerPages, modals: ownerModals} = PageManager.from(userAPage).webapp;
       const guestPages = PageManager.from(guestPage).webapp.pages;
@@ -602,8 +652,11 @@ test.describe('Calling', () => {
 
         await ownerPages.conversation().toggleGroupInformation();
         await ownerPages.conversation().clickCallButton();
+
         // Warning modal that guest started using a new device
+        await expect(ownerModals.confirm().modalTitle).toContainText('new device');
         await ownerModals.confirm().clickAction();
+
         await expect(ownerPages.calling().callCell).toBeVisible();
       });
 
@@ -836,7 +889,7 @@ test.describe('Calling', () => {
   );
 
   test(
-    'I want to see a group call timing out after 90s if I`m the last one left in the call',
+    "I want to see a group call timing out after 90s if I'm the last one left in the call",
     {tag: ['@TC-2937', '@regression']},
     async ({createPage}, testInfo) => {
       test.setTimeout(testInfo.timeout + 90_000);

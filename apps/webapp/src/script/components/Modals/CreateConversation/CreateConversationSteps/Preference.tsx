@@ -26,13 +26,14 @@ import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNot
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
-import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 
 export const Preference = () => {
+  const {translate} = useApplicationContext();
   const {
     isCellsEnabled,
     isGuestsEnabled,
@@ -70,7 +71,7 @@ export const Preference = () => {
     if (!isAppsFeatureAvailable && isServicesEnabled) {
       setIsServicesEnabled(false);
     }
-  }, [isAppsFeatureAvailable, isServicesEnabled]);
+  }, [isAppsFeatureAvailable, isServicesEnabled, setIsServicesEnabled]);
 
   return (
     <>
@@ -79,18 +80,18 @@ export const Preference = () => {
         isChecked={isGuestsEnabled}
         setIsChecked={setIsGuestsEnabled}
         isDisabled={false}
-        info={t('guestRoomToggleInfoExtended')}
-        name={t('guestOptionsTitle')}
+        info={translate('guestRoomToggleInfoExtended')}
+        name={translate('guestOptionsTitle')}
         dataUieName="read-receipts"
       />
 
       <InfoToggle
         className="modal-style"
         dataUieName="info-toggle-services"
-        info={t('servicesRoomToggleInfoExtended')}
+        info={translate('servicesRoomToggleInfoExtended')}
         setIsChecked={setIsServicesEnabled}
         isDisabled={!isAppsFeatureAvailable}
-        name={t('servicesOptionsTitle')}
+        name={translate('servicesOptionsTitle')}
         isChecked={isServicesEnabled && isAppsFeatureAvailable}
         footer={!isAppsFeatureAvailable && <AppsDisabledNote />}
       />
@@ -99,11 +100,11 @@ export const Preference = () => {
         <InfoToggle
           className="modal-style"
           dataUieName="read-receipts"
-          info={t('readReceiptsToggleInfo')}
+          info={translate('readReceiptsToggleInfo')}
           isChecked={isReadReceiptsEnabled}
           setIsChecked={setIsReadReceiptsEnabled}
           isDisabled={false}
-          name={t('readReceiptsToggleName')}
+          name={translate('readReceiptsToggleName')}
         />
       )}
 
@@ -114,8 +115,8 @@ export const Preference = () => {
           isChecked={isCellsEnabled}
           setIsChecked={setIsCellsEnabled}
           isDisabled={false}
-          name={t('modalCreateGroupCellsToggleHeading')}
-          info={t('modalCreateGroupCellsToggleInfo')}
+          name={translate('modalCreateGroupCellsToggleHeading')}
+          info={translate('modalCreateGroupCellsToggleInfo')}
         />
       )}
     </>

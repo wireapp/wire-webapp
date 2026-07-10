@@ -18,7 +18,7 @@
  */
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface PingButtonProps {
   onClick: () => void;
@@ -26,14 +26,16 @@ interface PingButtonProps {
 }
 
 export const PingButton = ({isDisabled, onClick}: PingButtonProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <button
       className="input-bar-control"
       type="button"
       onClick={onClick}
       disabled={isDisabled}
-      title={t('tooltipConversationPing')}
-      aria-label={t('tooltipConversationPing')}
+      title={translate('tooltipConversationPing')}
+      aria-label={translate('tooltipConversationPing')}
       data-uie-name="do-ping"
     >
       <Icon.PingIcon width={14} height={14} />

@@ -19,15 +19,23 @@
 
 import {render} from '@testing-library/react';
 
-import type {Location} from 'Repositories/entity/message/Location';
+import type {Location} from 'Repositories/entity/message/location';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LocationAsset} from './LocationAsset';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('LocationAsset', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
   const location: Partial<Location> = {latitude: '52.31', longitude: '13.24', name: 'Berlin', zoom: '0'};
 
   it('sets the correct Google Maps link', () => {
-    const {getByTestId} = render(<LocationAsset asset={location as Location} />);
+    const {getByTestId} = render(<LocationAsset asset={location as Location} />, {wrapper: rootProviderWrapper});
 
     const mapsElement = getByTestId('location-asset-link');
 
@@ -36,7 +44,7 @@ describe('LocationAsset', () => {
   });
 
   it('sets the correct location name', () => {
-    const {queryByText} = render(<LocationAsset asset={location as Location} />);
+    const {queryByText} = render(<LocationAsset asset={location as Location} />, {wrapper: rootProviderWrapper});
     expect(queryByText(location.name!)).not.toBeNull();
   });
 });

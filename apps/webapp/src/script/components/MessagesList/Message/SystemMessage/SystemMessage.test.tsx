@@ -19,11 +19,14 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
-import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
+import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
+import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
+import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
+import {RenameMessage} from 'Repositories/entity/message/renameMessage';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {SystemMessage} from './SystemMessage';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
 jest.mock('Components/icon', () => ({
   EditIcon: () => {
@@ -40,7 +43,7 @@ jest.mock('Components/icon', () => ({
 
 describe('SystemMessage', () => {
   it('shows edit icon for RenameMessage', async () => {
-    const message = new RenameMessage('new name');
+    const message = new RenameMessage('new name', undefined, undefined, translateForTest);
 
     render(<SystemMessage message={message} />);
 
@@ -49,7 +52,7 @@ describe('SystemMessage', () => {
   });
 
   it('shows timer icon for MessageTimerUpdateMessage', async () => {
-    const message = new MessageTimerUpdateMessage(0);
+    const message = new MessageTimerUpdateMessage(0, translateForTest);
 
     render(<SystemMessage message={message} />);
 
@@ -57,8 +60,16 @@ describe('SystemMessage', () => {
     expect(screen.queryByTestId('timericon')).not.toBeNull();
   });
 
+  it('shows info icon and promotion caption for MemberRoleUpdateMessage', async () => {
+    const message = new MemberRoleUpdateMessage(translateForTest);
+
+    render(withTheme(<SystemMessage message={message} />));
+
+    expect(screen.queryByTestId('element-message-system')).not.toBeNull();
+  });
+
   it('shows read icon for ReceiptModeUpdateMessage', async () => {
-    const message = new ReceiptModeUpdateMessage(true);
+    const message = new ReceiptModeUpdateMessage(true, translateForTest);
 
     render(<SystemMessage message={message} />);
 

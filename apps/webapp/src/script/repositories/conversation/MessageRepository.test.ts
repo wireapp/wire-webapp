@@ -27,16 +27,17 @@ import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {Button} from 'Repositories/entity/message/Button';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Message} from 'Repositories/entity/message/Message';
-import {Text} from 'Repositories/entity/message/Text';
+import {Button} from 'Repositories/entity/message/button';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Message} from 'Repositories/entity/message/message';
+import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
@@ -47,16 +48,19 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {ConversationError} from 'src/script/error/conversationError';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
+import type {Translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {ServerTimeHandler, serverTimeHandler} from '../../time/serverTimeHandler';
 
-const selfUser = new User('selfid', '');
+const selfUser = new User('selfid', '', translateForTest);
 selfUser.isMe = true;
 
 const commonSendResponse = {
@@ -73,12 +77,15 @@ type MessageRepositoryDependencies = {
   eventRepository: EventRepository;
   propertiesRepository: PropertiesRepository;
   serverTimeHandler: ServerTimeHandler;
+  translate: Translate;
   userRepository: UserRepository;
   userState: UserState;
   conversationState: ConversationState;
 };
 
-async function buildMessageRepository(): Promise<[MessageRepository, MessageRepositoryDependencies]> {
+async function buildMessageRepository(
+  translate: Translate,
+): Promise<[MessageRepository, MessageRepositoryDependencies]> {
   const userState = new UserState();
   userState.self(selfUser);
   const clientState = new ClientState();
@@ -88,14 +95,14 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   const teamState = new TeamState();
 
   const conversationState = new ConversationState(userState);
-  const selfConversation = new Conversation(selfUser.id);
+  const selfConversation = new Conversation(selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   selfConversation.selfUser(selfUser);
   conversationState.conversations([selfConversation]);
   const dependencies = {
     conversationRepository: () => ({}) as ConversationRepository,
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
-    propertiesRepository: new PropertiesRepository({} as any, {} as any),
+    propertiesRepository: new PropertiesRepository({} as any, {} as any, translate),
     serverTimeHandler: serverTimeHandler,
     userRepository: {
       findUserById: jest.fn(),
@@ -103,6 +110,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     } as unknown as UserRepository,
     assetRepository: {} as AssetRepository,
     audioRepository: new AudioRepository(),
+    translate,
     userState,
     clientState,
     conversationState,
@@ -121,7 +129,7 @@ describe('MessageRepository', () => {
     conversation_type = CONVERSATION_TYPE.REGULAR,
     connection_status = ConnectionStatus.ACCEPTED,
   ) => {
-    const conversation = new Conversation(createUuid());
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.type(conversation_type);
 
     const connectionEntity = new ConnectionEntity();
@@ -144,7 +152,7 @@ describe('MessageRepository', () => {
 
   describe('sendPing', () => {
     it('sends a ping', async () => {
-      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
       const conversation = generateConversation();
@@ -161,13 +169,40 @@ describe('MessageRepository', () => {
     });
   });
 
+  describe('requestUserSendingPermission', () => {
+    it('uses injected translate for degraded conversation modal copy', async () => {
+      const translate = ((translationKey: string) => `translated:${translationKey}`) as Translate;
+      const [messageRepository] = await buildMessageRepository(translate);
+      const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
+      const conversation = generateConversation();
+      const unverifiedUser = new User(createUuid(), '', translateForTest);
+
+      unverifiedUser.name('Alice');
+      conversation.getUsersWithUnverifiedClients = () => [unverifiedUser];
+      conversation.verification_state(ConversationVerificationState.DEGRADED);
+
+      const permissionPromise = messageRepository.requestUserSendingPermission(conversation, false);
+
+      expect(showModalSpy).toHaveBeenCalledTimes(1);
+
+      const [, modalOptions] = showModalSpy.mock.calls[0];
+      expect(modalOptions.primaryAction.text).toBe('translated:modalConversationNewDeviceAction');
+      expect(modalOptions.text.message).toBe('translated:modalConversationNewDeviceMessage');
+      expect(modalOptions.text.title).toBe('translated:modalConversationNewDeviceHeadlineOne');
+
+      modalOptions.close();
+
+      await expect(permissionPromise).resolves.toBe(false);
+    });
+  });
+
   describe('sendMessageEdit', () => {
     it('sends an edit message if original message exists', async () => {
-      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
-      const originalMessage = new ContentMessage(createUuid());
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
       originalMessage.assets.push(new Text(createUuid(), 'old text'));
       const conversation = generateConversation();
       conversation.addMessage(originalMessage);
@@ -189,13 +224,13 @@ describe('MessageRepository', () => {
     });
 
     it('sends an edit multipart message if original message has multipart asset', async () => {
-      const {Multipart} = await import('Repositories/entity/message/Multipart');
+      const {Multipart} = await import('Repositories/entity/message/multipart');
 
-      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
-      const originalMessage = new ContentMessage(createUuid());
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
       const attachments = [{cellAsset: {uuid: 'test-cell-id', contentType: 'application/vnd.wire-cells'}}];
       const multipartAsset = new Multipart({id: createUuid(), text: 'old text', attachments});
       originalMessage.assets.push(multipartAsset);
@@ -224,9 +259,9 @@ describe('MessageRepository', () => {
     });
 
     it('preserves attachments when editing multipart message', async () => {
-      const {Multipart} = await import('Repositories/entity/message/Multipart');
+      const {Multipart} = await import('Repositories/entity/message/multipart');
 
-      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
@@ -237,7 +272,7 @@ describe('MessageRepository', () => {
         {cellAsset: {uuid: cellId2, contentType: 'application/vnd.wire-cells'}},
       ];
 
-      const originalMessage = new ContentMessage(createUuid());
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
       const multipartAsset = new Multipart({id: createUuid(), text: 'original text', attachments});
       originalMessage.assets.push(multipartAsset);
 
@@ -262,13 +297,13 @@ describe('MessageRepository', () => {
     });
 
     it('handles empty attachments array when editing multipart message', async () => {
-      const {Multipart} = await import('Repositories/entity/message/Multipart');
+      const {Multipart} = await import('Repositories/entity/message/multipart');
 
-      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
-      const originalMessage = new ContentMessage(createUuid());
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
       const multipartAsset = new Multipart({id: createUuid(), text: 'original text', attachments: []});
       originalMessage.assets.push(multipartAsset);
 
@@ -295,9 +330,9 @@ describe('MessageRepository', () => {
     });
 
     it('filters out falsy attachments when editing multipart message', async () => {
-      const {Multipart} = await import('Repositories/entity/message/Multipart');
+      const {Multipart} = await import('Repositories/entity/message/multipart');
 
-      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
@@ -309,7 +344,7 @@ describe('MessageRepository', () => {
         {cellAsset: {uuid: 'another-cell-id', contentType: 'application/vnd.wire-cells'}},
       ] as any;
 
-      const originalMessage = new ContentMessage(createUuid());
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
       const multipartAsset = new Multipart({id: createUuid(), text: 'original text', attachments});
       originalMessage.assets.push(multipartAsset);
 
@@ -340,7 +375,7 @@ describe('MessageRepository', () => {
   describe('given a button action confirmation message', () => {
     it('when the message is sent, then should send without targeted parameters and update local state of button', async () => {
       // given
-      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
@@ -350,7 +385,7 @@ describe('MessageRepository', () => {
         .mockResolvedValue(undefined);
 
       // Create a mock message entity with primary_key for updateEventSequentially
-      const mockMessageEntity = new CompositeMessage(createUuid());
+      const mockMessageEntity = new CompositeMessage(createUuid(), translateForTest);
       mockMessageEntity.primary_key = 'test-primary-key';
 
       const getMessageInConversationIdSpy = jest
@@ -364,7 +399,7 @@ describe('MessageRepository', () => {
 
       const buttonId = createUuid();
       const theNewButton = [new Button(buttonId, 'Button 1')];
-      const originalMessage = new CompositeMessage(createUuid());
+      const originalMessage = new CompositeMessage(createUuid(), translateForTest);
 
       // Set the sender properly, as sendButtonAction expects the message to have a senderId check
       originalMessage.user(selfUser);
@@ -409,7 +444,7 @@ describe('MessageRepository', () => {
 
     it('when no changes are returned, then no update should be called', async () => {
       // given
-      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
@@ -419,7 +454,7 @@ describe('MessageRepository', () => {
         .mockResolvedValue(undefined);
 
       // Create a mock message entity with primary_key for updateEventSequentially
-      const mockMessageEntity = new CompositeMessage(createUuid());
+      const mockMessageEntity = new CompositeMessage(createUuid(), translateForTest);
       mockMessageEntity.primary_key = 'test-primary-key';
 
       jest.spyOn(messageRepository as any, 'getMessageInConversationById').mockResolvedValue(mockMessageEntity);
@@ -431,7 +466,7 @@ describe('MessageRepository', () => {
 
       const buttonId = createUuid();
       const theNewButton = [new Button(buttonId, 'Button 1')];
-      const originalMessage = new CompositeMessage(createUuid());
+      const originalMessage = new CompositeMessage(createUuid(), translateForTest);
 
       // Set the sender properly, as sendButtonAction expects the message to have a senderId check
       originalMessage.user(selfUser);
@@ -457,7 +492,8 @@ describe('MessageRepository', () => {
 
   describe('sendTextWithLinkPreview', () => {
     it('sends a text message', async () => {
-      const [messageRepository, {eventRepository, core, propertiesRepository}] = await buildMessageRepository();
+      const [messageRepository, {eventRepository, core, propertiesRepository}] =
+        await buildMessageRepository(translateForTest);
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository, 'injectEvent').and.returnValue(Promise.resolve());
@@ -477,12 +513,12 @@ describe('MessageRepository', () => {
   describe('deleteMessageForEveryone', () => {
     it('should not delete other users messages', async () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
-      const sender = new User('', '');
+      const sender = new User('', '', translateForTest);
       sender.isMe = false;
-      const msgToDelete = new Message(createUuid());
+      const msgToDelete = new Message(createUuid(), undefined, translateForTest);
       msgToDelete.user(sender);
       conversation.addMessage(msgToDelete);
-      const [messageRepository, {core}] = await buildMessageRepository();
+      const [messageRepository, {core}] = await buildMessageRepository(translateForTest);
       spyOn(core.service!.conversation, 'send').and.returnValue(
         Promise.resolve({state: MessageSendingState.OUTGOING_SENT, sentAt: new Date().toISOString()}),
       );
@@ -495,13 +531,13 @@ describe('MessageRepository', () => {
 
     it('should send delete and deletes message for own messages', async () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
-      conversation.participating_user_ets.push(new User('user1'));
+      conversation.participating_user_ets.push(new User('user1', '', translateForTest));
 
-      const messageToDelete = new Message(createUuid());
+      const messageToDelete = new Message(createUuid(), undefined, translateForTest);
       messageToDelete.user(selfUser);
       conversation.addMessage(messageToDelete);
 
-      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
 
@@ -516,14 +552,14 @@ describe('MessageRepository', () => {
 
     it('should send delete and deletes message for own pending/gray messages', async () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
-      conversation.participating_user_ets.push(new User('user1'));
+      conversation.participating_user_ets.push(new User('user1', '', translateForTest));
 
-      const messageToDelete = new Message(createUuid());
+      const messageToDelete = new Message(createUuid(), undefined, translateForTest);
       messageToDelete.user(selfUser);
       messageToDelete.status(StatusType.SENDING);
       conversation.addMessage(messageToDelete);
 
-      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
       spyOn(messageRepository, 'deleteMessageById');
@@ -536,7 +572,7 @@ describe('MessageRepository', () => {
 
   describe('resetSession', () => {
     it('resets the session with another device', async () => {
-      const [messageRepository, {cryptographyRepository, core}] = await buildMessageRepository();
+      const [messageRepository, {cryptographyRepository, core}] = await buildMessageRepository(translateForTest);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(cryptographyRepository, 'getRemoteFingerprint').mockResolvedValue('first');
       spyOn(cryptographyRepository, 'deleteSession');
@@ -550,8 +586,9 @@ describe('MessageRepository', () => {
     });
 
     it('unverifies device if fingerprint has changed', async () => {
-      const [messageRepository, {cryptographyRepository, userRepository, core}] = await buildMessageRepository();
-      const user = new User();
+      const [messageRepository, {cryptographyRepository, userRepository, core}] =
+        await buildMessageRepository(translateForTest);
+      const user = new User('', '', translateForTest);
       const clientId = 'client1';
 
       const device = new ClientEntity(false, 'domain', clientId);
@@ -580,7 +617,7 @@ describe('MessageRepository', () => {
 
   describe('updateUserReactions', () => {
     it("should add reaction if it doesn't exist", async () => {
-      const [messageRepository] = await buildMessageRepository();
+      const [messageRepository] = await buildMessageRepository(translateForTest);
       const userId = generateQualifiedId();
       const reactions: ReactionMap = [
         ['like', [userId]],
@@ -595,7 +632,7 @@ describe('MessageRepository', () => {
     });
 
     it('should set the reaction for the user for the first time', async () => {
-      const [messageRepository] = await buildMessageRepository();
+      const [messageRepository] = await buildMessageRepository(translateForTest);
       const userId = generateQualifiedId();
       const reactions: ReactionMap = [
         ['sad', [{id: 'user2', domain: ''}]],
@@ -608,7 +645,7 @@ describe('MessageRepository', () => {
     });
 
     it('should delete reaction if it exists', async () => {
-      const [messageRepository] = await buildMessageRepository();
+      const [messageRepository] = await buildMessageRepository(translateForTest);
       const userId = generateQualifiedId();
       const reactions: ReactionMap = [
         ['like', [userId]],
@@ -624,7 +661,7 @@ describe('MessageRepository', () => {
     });
 
     it('should return an empty string if no reactions for a user', async () => {
-      const [messageRepository] = await buildMessageRepository();
+      const [messageRepository] = await buildMessageRepository(translateForTest);
       const userId = generateQualifiedId();
       const reactions: ReactionMap = [['like', [userId]]];
       const reaction = 'like';

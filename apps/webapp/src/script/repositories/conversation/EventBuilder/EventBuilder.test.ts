@@ -20,16 +20,19 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
+import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
-import {SuperType} from 'src/script/message/SuperType';
-import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {SuperType} from 'src/script/message/superType';
+import {VerificationMessageType} from 'src/script/message/verificationMessageType';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {EventBuilder} from './EventBuilder';
 
 import {EventMapper} from '../EventMapper';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('EventBuilder', () => {
   let event_mapper: EventMapper = undefined;
@@ -37,13 +40,13 @@ describe('EventBuilder', () => {
   let self_user_et: User = undefined;
 
   beforeEach(() => {
-    self_user_et = new User(createUuid(), null);
+    self_user_et = new User(createUuid(), null, translateForTest);
     self_user_et.isMe = true;
 
-    conversation_et = new Conversation(createUuid());
+    conversation_et = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation_et.selfUser(self_user_et);
 
-    event_mapper = new EventMapper();
+    event_mapper = new EventMapper(undefined, translate);
   });
 
   it('buildAllVerified', () => {
@@ -51,7 +54,7 @@ describe('EventBuilder', () => {
     const messageEntity = event_mapper.mapJsonEvent(event as any, conversation_et) as VerificationMessage;
     expect(messageEntity).toBeDefined();
     expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
-    expect(messageEntity.verificationMessageType()).toBe(VerificationMessageType.VERIFIED);
+    expect(messageEntity.VerificationMessageType()).toBe(VerificationMessageType.VERIFIED);
     expect(messageEntity.from).toBe(conversation_et.selfUser().id);
     expect(messageEntity.conversation_id).toBe(conversation_et.id);
   });
@@ -62,7 +65,7 @@ describe('EventBuilder', () => {
     const messageEntity = event_mapper.mapJsonEvent(event, conversation_et) as VerificationMessage;
     expect(messageEntity).toBeDefined();
     expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
-    expect(messageEntity.verificationMessageType()).toBe(VerificationMessageType.NEW_DEVICE);
+    expect(messageEntity.VerificationMessageType()).toBe(VerificationMessageType.NEW_DEVICE);
     expect(messageEntity.from).toBe(conversation_et.selfUser().id);
     expect(messageEntity.conversation_id).toBe(conversation_et.id);
     expect(messageEntity.userIds()).toEqual(users);

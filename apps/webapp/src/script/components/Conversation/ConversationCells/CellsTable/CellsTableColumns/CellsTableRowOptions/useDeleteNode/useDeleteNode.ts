@@ -19,21 +19,25 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {useAppNotification} from 'Components/AppNotification';
+import {useAppNotification} from 'Components/appNotification/index';
 import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
 
 interface UseDeleteNodeProps {
   conversationQualifiedId: QualifiedId;
   cellsRepository: CellsRepository;
+  deleteNodeFailedMessage: string;
 }
 
-export const useDeleteNode = ({conversationQualifiedId, cellsRepository}: UseDeleteNodeProps) => {
+export const useDeleteNode = ({
+  conversationQualifiedId,
+  cellsRepository,
+  deleteNodeFailedMessage,
+}: UseDeleteNodeProps) => {
   const {removeNode} = useCellsStore();
 
   const deleteFileFailedNotification = useAppNotification({
-    message: t('cells.deleteModal.error'),
+    message: deleteNodeFailedMessage,
   });
 
   return {

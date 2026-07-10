@@ -24,7 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
-import {t} from 'Util/localizerUtil';
+import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {TYPE} from './WarningsTypes';
@@ -39,13 +39,20 @@ type WarningsState = {
   removeWarning: (warning: TYPE) => void;
 };
 
-const useWarningsState = create<WarningsState>((set, get) => ({
+const useWarningsState = create<WarningsState>(set => ({
   addWarning: type => set(state => ({...state, warnings: [...state.warnings, type]})),
   name: '',
   removeWarning: type => set(state => ({...state, warnings: [...state.warnings.filter(warning => warning !== type)]})),
   setName: newName => set(state => ({...state, name: newName})),
   warnings: [],
 }));
+
+type Translate = (
+  key: TranslationKey,
+  substitutions?: Substitutions,
+  dangerousSubstitutions?: Record<string, string>,
+  skipEscaping?: boolean,
+) => string;
 
 const getVisibleWarning = (): TYPE => {
   const {warnings} = useWarningsState.getState();
@@ -81,7 +88,7 @@ const showWarning = (type: TYPE, info?: {name: string}) => {
  * Close warning.
  * @note Used to close a warning banner by clicking the close button
  */
-const closeWarning = (): void => {
+const closeWarning = (translate: Translate): void => {
   const {warnings, removeWarning} = useWarningsState.getState();
   const visibleWarning = warnings[warnings.length - 1];
   const warningToClose = visibleWarning;
@@ -93,18 +100,23 @@ const closeWarning = (): void => {
 
   switch (warningToClose) {
     case TYPE.REQUEST_MICROPHONE: {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        primaryAction: {
-          action: () => {
-            safeWindowOpen(URL.SUPPORT.MICROPHONE_ACCESS_DENIED);
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          primaryAction: {
+            action: () => {
+              safeWindowOpen(URL.SUPPORT.MICROPHONE_ACCESS_DENIED);
+            },
+            text: translate('modalCallNoMicrophoneAction'),
           },
-          text: t('modalCallNoMicrophoneAction'),
+          text: {
+            message: translate('modalCallNoMicrophoneMessage'),
+            title: translate('modalCallNoMicrophoneHeadline'),
+          },
         },
-        text: {
-          message: t('modalCallNoMicrophoneMessage'),
-          title: t('modalCallNoMicrophoneHeadline'),
-        },
-      });
+        undefined,
+        translate,
+      );
       break;
     }
 

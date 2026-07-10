@@ -23,17 +23,17 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
-import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import {Message as MessageEntity} from 'Repositories/entity/message/Message';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import {Message as MessageEntity} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';

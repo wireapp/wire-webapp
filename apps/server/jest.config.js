@@ -17,6 +17,8 @@
  *
  */
 
+const isContinuousIntegrationEnvironment = process.env.CI === 'true';
+
 module.exports = {
   preset: '../../jest.preset.js',
   collectCoverageFrom: [
@@ -38,7 +40,9 @@ module.exports = {
       statements: 18,
     },
   },
+  coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
   moduleDirectories: ['node_modules', __dirname],
+  reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist'],
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|@sindresorhus/is)/)'],

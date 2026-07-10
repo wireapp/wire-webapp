@@ -29,14 +29,13 @@ import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerif
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Text} from 'Repositories/entity/message/Text';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Text} from 'Repositories/entity/message/text';
 import {TeamState} from 'Repositories/team/TeamState';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {CallMessage} from './CallMessage';
 import {CallTimeoutMessage} from './CallTimeoutMessage';
@@ -53,12 +52,12 @@ import {PingMessage} from './PingMessage';
 import {SystemMessage} from './SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
-import {ContextMenuEntry} from '../../../ui/ContextMenu';
+import {ContextMenuEntry} from '../../../ui/contextMenu';
 
 import {MessageParams} from './index';
 
-const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote => {
-  return quoteEntity.hash !== undefined;
+const isOutgoingQuote = (QuoteEntity: QuoteEntity): QuoteEntity is OutgoingQuote => {
+  return QuoteEntity.hash !== undefined;
 };
 
 export const MessageWrapper = ({
@@ -86,7 +85,7 @@ export const MessageWrapper = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const findMessage = async (conversation: Conversation, messageId: string) => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
     const event =
@@ -116,7 +115,7 @@ export const MessageWrapper = ({
         conversation,
         textMessage: messageText,
         mentions,
-        quoteEntity: quote,
+        QuoteEntity: quote,
         messageId,
         attachments: [],
       });
@@ -149,42 +148,42 @@ export const MessageWrapper = ({
     if (message.isDownloadable() && !isFileShareRestricted) {
       entries.push({
         click: () => message.download(container.resolve(AssetRepository)),
-        label: t('conversationContextMenuDownload'),
+        label: translate('conversationContextMenuDownload'),
       });
     }
 
     if (canEdit) {
       entries.push({
         click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message),
-        label: t('conversationContextMenuEdit'),
+        label: translate('conversationContextMenuEdit'),
       });
     }
 
     if (message.isCopyable() && !isFileShareRestricted) {
       entries.push({
         click: () => message.copy(),
-        label: t('conversationContextMenuCopy'),
+        label: translate('conversationContextMenuCopy'),
       });
     }
 
     if (hasDetails) {
       entries.push({
         click: () => onClickDetails(message),
-        label: t('conversationContextMenuDetails'),
+        label: translate('conversationContextMenuDetails'),
       });
     }
 
     if (message.isDeletable()) {
       entries.push({
         click: () => messageActions.deleteMessage(conversation, message),
-        label: t('conversationContextMenuDelete'),
+        label: translate('conversationContextMenuDelete'),
       });
     }
 
     if (canDelete) {
       entries.push({
         click: () => messageActions.deleteMessageEveryone(conversation, message),
-        label: t('conversationContextMenuDeleteEveryone'),
+        label: translate('conversationContextMenuDeleteEveryone'),
       });
     }
 

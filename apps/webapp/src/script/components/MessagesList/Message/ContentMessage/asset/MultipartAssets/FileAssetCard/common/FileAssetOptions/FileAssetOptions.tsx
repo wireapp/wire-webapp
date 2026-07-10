@@ -20,8 +20,8 @@
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isFileEditable} from 'Util/fileTypeUtil';
-import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './FileAssetOptions.styles';
@@ -35,6 +35,7 @@ interface FileAssetOptionsProps {
 }
 
 export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOptionsProps) => {
+  const {translate} = useApplicationContext();
   const fileNameWithExtension = getFileNameWithExtension(name, extension);
   const isEditable = isFileEditable(extension);
   const {showModal} = useFileHistoryModal();
@@ -42,23 +43,23 @@ export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOp
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
-        <button aria-label={t('cells.options.label')} css={buttonStyles}>
+        <button aria-label={translate('cells.options.label')} css={buttonStyles}>
           <MoreIcon css={iconStyles} />
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={onOpen}>{t('cells.options.open')}</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={onOpen}>{translate('cells.options.open')}</DropdownMenu.Item>
         {isEditable && (
           <>
-            <DropdownMenu.Item onClick={() => onOpen(true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+            <DropdownMenu.Item onClick={() => onOpen(true)}>{translate('cells.options.edit')}</DropdownMenu.Item>
             <DropdownMenu.Item onClick={() => showModal(id, () => onOpen(false))}>
-              {t('cells.options.versionHistory')}
+              {translate('cells.options.versionHistory')}
             </DropdownMenu.Item>
           </>
         )}
         {src !== undefined && src !== '' && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url: src, name: fileNameWithExtension})}>
-            {t('cells.options.download')}
+            {translate('cells.options.download')}
           </DropdownMenu.Item>
         )}
       </DropdownMenu.Content>

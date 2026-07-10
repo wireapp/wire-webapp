@@ -19,61 +19,161 @@
 
 import {useEffect, useRef, useState} from 'react';
 
-import Cookies from 'js-cookie';
+import {createWallClock, type WallClock} from '@enormora/wall-clock/wall-clock';
+import is from '@sindresorhus/is';
+import {Maybe, result} from 'true-myth';
+import {z} from 'zod';
 
 import {Runtime} from '@wireapp/commons';
 
+import {createStringKeyValueStorageFromWebStorage} from 'src/script/browser/storage/createStringKeyValueStorageFromWebStorage';
+import {StringKeyValueStorage} from 'src/script/storage/stringKeyValueStorageTypes';
+import {getStorage} from 'Util/localStorage';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {createUuid} from 'Util/uuid';
 
 const CONFIG = {
-  COOKIE_NAME: 'app_opened',
   INTERVAL: TIME_IN_MILLIS.SECOND,
+  STORAGE_KEY: 'app_opened',
 };
 
-function isRunningInstance(instanceId?: string) {
-  if (Runtime.isDesktopApp()) {
-    return true;
-  }
-  const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
-  const otherInstanceId = cookieValue ? JSON.parse(cookieValue).appInstanceId : cookieValue;
-  return otherInstanceId === instanceId;
+const storedSingleInstanceSchema = z.object({
+  appInstanceId: z.string(),
+});
+
+type UseSingleInstanceDependencies = {
+  createInstanceId: () => string;
+  isDesktopApp: () => boolean;
+  singleInstanceStorage: StringKeyValueStorage;
+  wallClock: WallClock;
+};
+
+type UseSingleInstanceResult = {
+  hasOtherInstance: boolean;
+  killRunningInstance: () => void;
+  registerInstance: () => () => void;
+};
+
+const defaultUseSingleInstanceDependencies: UseSingleInstanceDependencies = {
+  createInstanceId: createUuid,
+  isDesktopApp: Runtime.isDesktopApp,
+  singleInstanceStorage: createStringKeyValueStorageFromWebStorage(Maybe.of(getStorage())),
+  wallClock: createWallClock(),
+};
+
+function getStoredInstanceId(storage: StringKeyValueStorage): Maybe<string> {
+  const storedInstance = storage.getItem(CONFIG.STORAGE_KEY);
+
+  return storedInstance.match({
+    Just: storedInstanceValue => {
+      const parsedInstanceResult = result.tryOrElse(
+        error => {
+          return is.error(error) ? error : new Error('Failed to parse stored single-instance marker');
+        },
+        () => {
+          return JSON.parse(storedInstanceValue) as unknown;
+        },
+      );
+
+      if (result.isErr(parsedInstanceResult)) {
+        storage.removeItem(CONFIG.STORAGE_KEY);
+        return Maybe.nothing();
+      }
+
+      const parsedInstance = parsedInstanceResult.value;
+      const validatedInstance = storedSingleInstanceSchema.safeParse(parsedInstance);
+
+      if (validatedInstance.success) {
+        return Maybe.just(validatedInstance.data.appInstanceId);
+      }
+
+      storage.removeItem(CONFIG.STORAGE_KEY);
+      return Maybe.nothing();
+    },
+    Nothing: () => {
+      return Maybe.nothing();
+    },
+  });
 }
 
-function poll(instanceIdRef: {current: string | undefined}, onNewInstance: () => void) {
+function isRunningInstance(
+  instanceId: Maybe<string>,
+  isDesktopApp: () => boolean,
+  storage: StringKeyValueStorage,
+): boolean {
+  if (isDesktopApp()) {
+    return true;
+  }
+
+  const otherInstanceId = getStoredInstanceId(storage);
+  return otherInstanceId.equals(instanceId);
+}
+
+function startSingleInstancePolling(
+  getCurrentInstanceId: () => Maybe<string>,
+  isDesktopApp: () => boolean,
+  onNewInstance: () => void,
+  storage: StringKeyValueStorage,
+  wallClock: WallClock,
+): () => void {
   const checkSingleInstance = (): void => {
-    if (!isRunningInstance(instanceIdRef.current)) {
+    if (!isRunningInstance(getCurrentInstanceId(), isDesktopApp, storage)) {
       onNewInstance();
     }
   };
-  const interval = window.setInterval(checkSingleInstance, CONFIG.INTERVAL);
-  return () => window.clearInterval(interval);
-}
-
-function killCurrentInstance() {
-  return Cookies.remove(CONFIG.COOKIE_NAME);
-}
-
-function register(instanceId: string) {
-  Cookies.set(CONFIG.COOKIE_NAME, JSON.stringify({appInstanceId: instanceId}), {sameSite: 'Lax'});
-  return () => killCurrentInstance();
-}
-
-export function useSingleInstance() {
-  const instanceId = useRef<string | undefined>(undefined);
-  const [hasOtherInstance, setHasOtherInstance] = useState(!isRunningInstance(instanceId.current));
-
-  const registerInstance = () => {
-    instanceId.current = createUuid();
-    return register(instanceId.current);
+  const interval = wallClock.setInterval(checkSingleInstance, CONFIG.INTERVAL);
+  return () => {
+    return wallClock.clearInterval(interval);
   };
-
-  const killRunningInstance = () => {
-    killCurrentInstance();
-    setHasOtherInstance(false);
-  };
-
-  useEffect(() => poll(instanceId, () => setHasOtherInstance(true)));
-
-  return {hasOtherInstance, killRunningInstance, registerInstance};
 }
+
+function killCurrentInstance(storage: StringKeyValueStorage): void {
+  storage.removeItem(CONFIG.STORAGE_KEY);
+}
+
+function register(instanceId: string, storage: StringKeyValueStorage): () => void {
+  storage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({appInstanceId: instanceId}));
+  return () => {
+    return killCurrentInstance(storage);
+  };
+}
+
+export function createUseSingleInstance(dependencies: UseSingleInstanceDependencies): () => UseSingleInstanceResult {
+  const {createInstanceId, isDesktopApp, singleInstanceStorage, wallClock} = dependencies;
+
+  return function useSingleInstanceWithDependencies(): UseSingleInstanceResult {
+    const instanceId = useRef<Maybe<string>>(Maybe.nothing());
+    const [hasOtherInstance, setHasOtherInstance] = useState(
+      !isRunningInstance(instanceId.current, isDesktopApp, singleInstanceStorage),
+    );
+
+    const registerInstance = (): (() => void) => {
+      const nextInstanceId = createInstanceId();
+      instanceId.current = Maybe.just(nextInstanceId);
+      return register(nextInstanceId, singleInstanceStorage);
+    };
+
+    const killRunningInstance = (): void => {
+      killCurrentInstance(singleInstanceStorage);
+      setHasOtherInstance(false);
+    };
+
+    useEffect(() => {
+      return startSingleInstancePolling(
+        () => {
+          return instanceId.current;
+        },
+        isDesktopApp,
+        () => {
+          return setHasOtherInstance(true);
+        },
+        singleInstanceStorage,
+        wallClock,
+      );
+    });
+
+    return {hasOtherInstance, killRunningInstance, registerInstance};
+  };
+}
+
+export const useSingleInstance = createUseSingleInstance(defaultUseSingleInstanceDependencies);

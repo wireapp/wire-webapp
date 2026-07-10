@@ -5,16 +5,16 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {act, getByRole} from '@testing-library/react';
 import {UserState} from 'Repositories/user/userState';
 import {User} from 'Repositories/entity/User';
-import {RootContext, RootContextValue} from '../../../page/RootProvider';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {mountComponent} from '../../../auth/util/test/TestUtil';
+import {mountComponent} from '../../../auth/util/test/testUtil';
 import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';
-import {t} from 'Util/localizerUtil';
 import {TypeUtil} from '@wireapp/commons';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {RootProvider} from 'src/script/page/rootProvider';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;
@@ -56,7 +56,7 @@ describe('GroupCreationModal', () => {
     'should result in expectedAppsEnabled=$expectedAppsEnabled when { protocol: $defaultProtocol, appsEnabled: $isAppsEnabled, whitelisted: $hasWhitelistedServices, mlsEnabled: $isMLSEnabled }',
     ({isAppsEnabled, isMLSEnabled, defaultProtocol, expectedAppsEnabled}) => {
       // Arrange
-      const mockUser = new User('user-id', 'test-domain.wire.com');
+      const mockUser = new User('user-id', 'test-domain.wire.com', translateForTest);
 
       const mockUserState: UserState = {
         self: ko.observable(mockUser),
@@ -93,17 +93,18 @@ describe('GroupCreationModal', () => {
             },
           },
         },
-      } as RootContextValue;
+      };
       const rootContextValue = createRootContextValueForTest({
+        translate: translateForTest,
         mainViewModel: mockRootContext.mainViewModel,
         wallClock: createDeterministicWallClock(),
       });
 
       // Act
       const {getByTestId} = mountComponent(
-        <RootContext.Provider value={rootContextValue}>
+        <RootProvider value={rootContextValue}>
           <GroupCreationModal userState={mockUserState} teamState={mockTeamState as TeamState} />
-        </RootContext.Provider>,
+        </RootProvider>,
         mockStoreFactory()({
           ...initialRootState,
           authState: {
@@ -126,10 +127,10 @@ describe('GroupCreationModal', () => {
 
       if (expectedAppsEnabled) {
         expect(servicesCheckbox).toBeEnabled();
-        expect(servicesToggleContainer).not.toHaveTextContent(t('servicesNotEnabledNoteTitle'));
+        expect(servicesToggleContainer).not.toHaveTextContent('servicesNotEnabledNoteTitle');
       } else {
         expect(servicesCheckbox).toBeDisabled();
-        expect(servicesToggleContainer).toHaveTextContent(t('servicesNotEnabledNoteTitle'));
+        expect(servicesToggleContainer).toHaveTextContent('servicesNotEnabledNoteTitle');
       }
     },
   );

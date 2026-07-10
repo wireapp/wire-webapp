@@ -26,10 +26,10 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
+import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -45,7 +45,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageContent} from './common/messageContent/messageContent';
@@ -65,7 +64,7 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {useApplicationContext} from '../../page/RootProvider';
+import {useApplicationContext} from '../../page/rootProvider';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -116,7 +115,7 @@ export const InputBar = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: InputBarProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
@@ -163,7 +162,9 @@ export const InputBar = ({
     },
   });
 
-  const inputPlaceholder = messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
+  const inputPlaceholder = messageTimer
+    ? translate('tooltipConversationEphemeral')
+    : translate('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
@@ -206,6 +207,7 @@ export const InputBar = ({
     uploadDroppedFiles,
     uploadImages,
     isFileNameKept: isCellsEnabled,
+    translate,
   });
 
   const showMarkdownPreview = useUserPropertyValue<boolean>(
@@ -238,6 +240,7 @@ export const InputBar = ({
     editorRef,
     pastedFile: fileHandling.pastedFile,
     sendPastedFile: fileHandling.sendPastedFile,
+    translate,
   });
 
   if (fileHandling.pastedFile && !!isCellsEnabled) {
@@ -368,6 +371,7 @@ export const InputBar = ({
       </InputBarContainer>
       {emojiPicker.open ? (
         <EmojiPicker
+          translate={translate}
           posX={emojiPicker.position.x}
           posY={emojiPicker.position.y}
           onKeyPress={emojiPicker.handleClose}

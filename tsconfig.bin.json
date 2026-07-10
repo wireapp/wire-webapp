@@ -8,5 +8,5 @@
     "rootDir": "."
   },
   "include": ["bin/**/*.ts"],
-  "exclude": ["node_modules", "dist", "tmp"]
+  "exclude": ["node_modules", "dist", "tmp", "bin/**/*.test.ts", "bin/jest.config.js"]
 }

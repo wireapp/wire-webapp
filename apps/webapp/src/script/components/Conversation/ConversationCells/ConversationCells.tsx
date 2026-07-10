@@ -27,8 +27,8 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {CellsHeader} from './CellsHeader/CellsHeader';
 import {CellsLoader} from './CellsLoader/CellsLoader';
@@ -37,6 +37,7 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
+import {useCellsSorting} from './common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
 import {
@@ -50,8 +51,6 @@ import {useConversationSearchFiles} from './useConversationSearch/useConversatio
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
-
-import {useApplicationContext} from '../../../page/RootProvider';
 
 interface ConversationCellsProps {
   cellsRepository: CellsRepository;
@@ -75,7 +74,7 @@ export const ConversationCells = memo(
     onOpenSearchView,
     onCloseSearchView,
   }: ConversationCellsProps) => {
-    const {fireAndForgetInvoker} = useApplicationContext();
+    const {fireAndForgetInvoker, translate} = useApplicationContext();
     const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
     const {getNodes, status: nodesStatus, getPagination, error: storeError, clearAll} = useCellsStore();
@@ -93,6 +92,9 @@ export const ConversationCells = memo(
     const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
     const isCellsStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
 
+    const sortScopeKey = `${conversationId}:${isSearchViewOpen ? 'search' : 'browse'}`;
+    const {sort, setSort, getDirectionFor, toggleSort} = useCellsSorting(sortScopeKey);
+
     const {refresh, setOffset} = useGetAllCellsNodes({
       cellsRepository,
       conversationQualifiedId,
@@ -101,11 +103,13 @@ export const ConversationCells = memo(
       enabled: isCellsStateReady && !isSearchViewOpen,
       fireAndForgetInvoker,
       userRepository,
+      sort,
     });
 
     const {filters, filterState, clearAllFilters} = useConversationDriveFilters({
       cellsRepository,
       conversationRepository,
+      translate,
     });
 
     const {
@@ -123,6 +127,7 @@ export const ConversationCells = memo(
       userRepository,
       filters: filterState,
       onClear: refresh,
+      sort,
     });
 
     // Search view open ⇒ load-more UI + search-hook data; closed ⇒ page-nav UI + browse-hook data.
@@ -144,6 +149,14 @@ export const ConversationCells = memo(
       }
       wasSearchViewOpen.current = isSearchViewOpen;
     }, [clearAll, clearAllFilters, clearSearch, conversationId, isSearchViewOpen]);
+
+    // Navigating into a folder or the recycle bin happens via the URL hash without
+    // remounting; reset the sort on those transitions too.
+    useEffect(() => {
+      const handleHashChange = (): void => setSort(null);
+      window.addEventListener('hashchange', handleHashChange);
+      return () => window.removeEventListener('hashchange', handleHashChange);
+    }, [setSort]);
 
     const handleRefresh = useCallback((): void => {
       if (isInSearchMode) {
@@ -221,30 +234,44 @@ export const ConversationCells = memo(
             // opening a folder must close search view and open the browse view
             // with that folder (and breadcrumbs)
             onCloseSearchView={handleSearchViewClosure}
+            getDirectionFor={getDirectionFor}
+            isSortingEnabled={isSharedDriveSearchAndFiltersEnabled}
+            onToggleSort={toggleSort}
           />
         )}
         {isCellsStatePending && !isRefreshing && (
-          <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
+          <CellsStateInfo
+            heading={translate('cells.pending.heading')}
+            description={translate('cells.pending.description')}
+          />
         )}
         {isNoNodesVisible && (
-          <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
+          <CellsStateInfo
+            heading={translate('cells.noNodes.heading')}
+            description={translate('cells.noNodes.description')}
+          />
         )}
-        {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
+        {isEmptyRecycleBin && <CellsStateInfo description={translate('cells.emptyRecycleBin.description')} />}
         {(isLoadingVisible || isRefreshing || isFetchingMoreVisible) && <CellsLoader />}
-        {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
+        {isError && (
+          <CellsStateInfo
+            heading={translate('cells.error.heading')}
+            description={translate('cells.error.description')}
+          />
+        )}
         {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
         {isLoadMoreVisible && (
           <div css={loadMoreWrapperStyles}>
             <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
-              {t('cells.pagination.loadMoreResults')}
+              {translate('cells.pagination.loadMoreResults')}
             </Button>
           </div>
         )}
         {isLoadMoreErrorVisible && (
           <div css={loadMoreErrorWrapperStyles} role="alert">
-            <span css={loadMoreErrorMessageStyles}>{t('cells.pagination.loadMoreError.heading')}</span>
+            <span css={loadMoreErrorMessageStyles}>{translate('cells.pagination.loadMoreError.heading')}</span>
             <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
-              {t('cells.pagination.loadMoreError.retry')}
+              {translate('cells.pagination.loadMoreError.retry')}
             </Button>
           </div>
         )}

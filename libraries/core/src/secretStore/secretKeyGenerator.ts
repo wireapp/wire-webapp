@@ -51,12 +51,12 @@ export async function generateSecretKey({
       await secretsDb.deleteSecretValue(keyId);
       throw new CorruptedKeyError('Could not decrypt key');
     }
-    if (key && key.length !== keySize) {
+    if (key !== undefined && key.length !== keySize) {
       // If the key size is not correct, we have a corrupted key in the DB. This is unrecoverable.
       await secretsDb.deleteSecretValue(keyId);
       throw new CorruptedKeyError('Invalid key');
     }
-    if (!key) {
+    if (key === undefined) {
       key = await crypto.subtle.generateKey(
         {
           name: 'AES-GCM',

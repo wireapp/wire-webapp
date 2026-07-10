@@ -19,9 +19,18 @@
 
 import {render} from '@testing-library/react';
 
-import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/LegalHoldMessage';
+import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/legalHoldMessage';
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LegalHoldMessage} from './LegalHoldMessage';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const createLegalHoldMessage = (partialLegalHoldMessage: Partial<LegalHoldMessageEntity>) => {
   const legalHoldMessage: Partial<LegalHoldMessageEntity> = {
@@ -36,7 +45,7 @@ describe('LegalHoldMessage', () => {
     const message = createLegalHoldMessage({
       isActivationMessage: false,
     });
-    const {queryByTestId} = render(<LegalHoldMessage message={message} />);
+    const {queryByTestId} = render(<LegalHoldMessage message={message} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('status-legalhold-deactivated')).not.toBeNull();
     expect(queryByTestId('status-legalhold-activated')).toBeNull();
@@ -45,7 +54,7 @@ describe('LegalHoldMessage', () => {
     const message = createLegalHoldMessage({
       isActivationMessage: true,
     });
-    const {queryByTestId} = render(<LegalHoldMessage message={message} />);
+    const {queryByTestId} = render(<LegalHoldMessage message={message} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('status-legalhold-deactivated')).toBeNull();
     expect(queryByTestId('status-legalhold-activated')).not.toBeNull();

@@ -19,7 +19,7 @@
 
 import {renderHook} from '@testing-library/react';
 
-import {useAppNotification} from 'Components/AppNotification';
+import {useAppNotification} from 'Components/appNotification/index';
 import {useKeyPressAndHold} from 'Hooks/useKeyPressAndHold/useKeyPressAndHold';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 
@@ -29,7 +29,7 @@ jest.mock('Hooks/useKeyPressAndHold/useKeyPressAndHold', () => ({
   useKeyPressAndHold: jest.fn(),
 }));
 
-jest.mock('Components/AppNotification', () => ({
+jest.mock('Components/appNotification/index', () => ({
   useAppNotification: jest.fn(),
 }));
 
@@ -45,6 +45,7 @@ jest.mock('Hooks/useActiveWindow', () => ({
 }));
 
 describe('usePressSpaceToUnmute', () => {
+  const notificationMessage = 'videoCallParticipantPressSpaceToUnmuteNotification';
   const mockToggleMute = jest.fn();
   const mockIsMuted = jest.fn();
   const mockMicOnNotification = {
@@ -71,6 +72,7 @@ describe('usePressSpaceToUnmute', () => {
         toggleMute: mockToggleMute,
         isMuted: () => true,
         enabled: false,
+        notificationMessage,
       }),
     );
 
@@ -93,6 +95,7 @@ describe('usePressSpaceToUnmute', () => {
         toggleMute: mockToggleMute,
         isMuted: () => true,
         enabled: true,
+        notificationMessage,
       }),
     );
 
@@ -112,6 +115,7 @@ describe('usePressSpaceToUnmute', () => {
         toggleMute: mockToggleMute,
         isMuted: mockIsMuted,
         enabled: true,
+        notificationMessage,
       }),
     );
 
@@ -133,6 +137,7 @@ describe('usePressSpaceToUnmute', () => {
         toggleMute: mockToggleMute,
         isMuted: mockIsMuted,
         enabled: true,
+        notificationMessage,
       }),
     );
 
@@ -152,6 +157,7 @@ describe('usePressSpaceToUnmute', () => {
         toggleMute: mockToggleMute,
         isMuted: () => true,
         enabled: true,
+        notificationMessage,
       }),
     );
 
@@ -182,6 +188,7 @@ describe('usePressSpaceToUnmute', () => {
         toggleMute: mockToggleMute,
         isMuted: () => true,
         enabled: true,
+        notificationMessage,
       }),
     );
 
