@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {parseAccountDeepLink} from 'Components/Conversation/utils/parseAccountDeepLink';
-import {Giphy} from 'Components/Giphy';
+import {Giphy} from 'Components/giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessageListWrapper} from 'Components/MessagesList/MessageListWrapper';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';

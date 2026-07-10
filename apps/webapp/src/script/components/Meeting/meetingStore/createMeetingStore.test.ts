@@ -1,0 +1,190 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {maybe, task} from 'true-myth';
+
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+import {translateForTest} from 'Util/test/translateForTest';
+
+import {createMeetingStore} from './createMeetingStore';
+import type {MeetingStoreDeps} from './meetingStoreDeps';
+
+jest.mock('Components/Meeting/ScheduleMeetingModal/scheduleMeetingService', () => ({
+  scheduleMeeting: jest.fn(),
+  updateMeeting: jest.fn(),
+}));
+
+import {
+  scheduleMeeting as scheduleMeetingTask,
+  updateMeeting as updateMeetingTask,
+} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
+
+const mockedScheduleMeetingTask = scheduleMeetingTask as jest.MockedFunction<typeof scheduleMeetingTask>;
+const mockedUpdateMeetingTask = updateMeetingTask as jest.MockedFunction<typeof updateMeetingTask>;
+
+describe('createMeetingStore', () => {
+  const apiMeeting = {
+    created_at: '2026-06-15T09:00:00.000Z',
+    updated_at: '2026-06-15T09:00:00.000Z',
+    start_time: '2026-06-16T10:00:00.000Z',
+    end_time: '2026-06-16T11:00:00.000Z',
+    title: 'Weekly sync',
+    qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    trial: false,
+  };
+
+  const meetingSeriesEntry = {
+    title: 'Weekly sync',
+    series_start_date: '2026-06-16T10:00:00.000Z',
+    series_end_date: '2026-06-16T11:00:00.000Z',
+    duration_ms: 3_600_000,
+    conversation_id: 'conversation-id',
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    recurrence: 'doesNotRepeat' as const,
+  };
+
+  const listMeetingInstance = {
+    meetingSeries: meetingSeriesEntry,
+    start: new Date('2026-06-16T10:00:00.000Z'),
+    end: new Date('2026-06-16T11:00:00.000Z'),
+  };
+
+  const wallClock = createDeterministicWallClock({
+    initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+  });
+
+  const createDeps = ({
+    getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting])),
+    safeGetConversationById = jest.fn(),
+  }: {
+    getMeetingsList?: jest.Mock;
+    safeGetConversationById?: jest.Mock;
+  } = {}): MeetingStoreDeps => ({
+    meetingsRepository: {getMeetingsList} as unknown as MeetingsRepository,
+    conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
+    wallClock,
+  });
+
+  beforeEach(() => {
+    mockedScheduleMeetingTask.mockReset();
+    mockedUpdateMeetingTask.mockReset();
+  });
+
+  it('loads meetings successfully', async () => {
+    const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
+    const store = createMeetingStore(createDeps({getMeetingsList}));
+
+    await store.getState().loadMeetings();
+
+    expect(getMeetingsList).toHaveBeenCalledTimes(1);
+    expect(store.getState()).toMatchObject({
+      isLoading: false,
+      hasLoadError: false,
+    });
+    expect(store.getState().meetingSeries).toHaveLength(1);
+    expect(store.getState().meetingSeries[0]?.title).toBe('Weekly sync');
+    expect(store.getState().meetingSeries[0]).toMatchObject(meetingSeriesEntry);
+  });
+
+  it('sets hasLoadError when loading meetings fails', async () => {
+    const getMeetingsList = jest.fn().mockReturnValue(task.reject(new Error('network error')));
+    const store = createMeetingStore(createDeps({getMeetingsList}));
+
+    await store.getState().loadMeetings();
+
+    expect(getMeetingsList).toHaveBeenCalledTimes(1);
+    expect(store.getState()).toMatchObject({
+      meetingSeries: [],
+      isLoading: false,
+      hasLoadError: true,
+    });
+  });
+
+  it('schedules a meeting without refreshing the meetings list', async () => {
+    mockedScheduleMeetingTask.mockReturnValue(task.resolve({failedToAdd: []}));
+    const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
+    const store = createMeetingStore(createDeps({getMeetingsList}));
+
+    const result = await store.getState().scheduleMeeting({
+      title: 'Weekly sync',
+      start: maybe.just(new Date('2026-06-16T10:00:00.000Z')),
+      end: maybe.just(new Date('2026-06-16T11:00:00.000Z')),
+      recurrence: 'doesNotRepeat',
+      selectedUsers: [],
+      participantsFilter: '',
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(mockedScheduleMeetingTask).toHaveBeenCalled();
+    expect(getMeetingsList).not.toHaveBeenCalled();
+  });
+
+  it('loads meeting data for edit via safeGetConversationById', async () => {
+    const conversation = new Conversation(
+      'conversation-id',
+      'example.com',
+      CONVERSATION_PROTOCOL.MLS,
+      translateForTest,
+    );
+    const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
+    const store = createMeetingStore(createDeps({safeGetConversationById}));
+
+    const result = await store.getState().loadMeetingForEdit(listMeetingInstance);
+
+    expect(result.isOk).toBe(true);
+    expect(safeGetConversationById).toHaveBeenCalledWith(listMeetingInstance.meetingSeries.qualified_conversation);
+    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T10:00:00.000Z'));
+    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
+  });
+
+  it('prefills edit form with the upcoming instance times for recurring meetings', async () => {
+    const conversation = new Conversation(
+      'conversation-id',
+      'example.com',
+      CONVERSATION_PROTOCOL.MLS,
+      translateForTest,
+    );
+    const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
+    const store = createMeetingStore(createDeps({safeGetConversationById}));
+    const recurringMeetingInstance = {
+      meetingSeries: {
+        ...meetingSeriesEntry,
+        series_start_date: '2026-06-01T10:00:00.000Z',
+        series_end_date: '2026-06-01T11:00:00.000Z',
+        recurrence: 'weekly' as const,
+      },
+      start: new Date('2026-06-29T10:00:00.000Z'),
+      end: new Date('2026-06-29T11:00:00.000Z'),
+    };
+
+    const result = await store.getState().loadMeetingForEdit(recurringMeetingInstance);
+
+    expect(result.isOk).toBe(true);
+    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T10:00:00.000Z'));
+    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T11:00:00.000Z'));
+  });
+});

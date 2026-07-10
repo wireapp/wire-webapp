@@ -19,21 +19,37 @@
 
 import process from 'node:process';
 
-import {createNextBetaTagName, extractReleaseIdentifierFromBranchName} from './releaseMetadata';
+import {
+  createNextBetaTagName,
+  createProductionTagName,
+  createReleaseBranchName,
+  extractReleaseIdentifierFromBranchName,
+  validateProductionTagName,
+} from './releaseMetadata';
 
 type ReleaseMetadataCliDependencies = {
   readonly writeError: (message: string) => void;
   readonly writeOutput: (message: string) => void;
 };
 
+const nodeExecutableAndScriptPathArgumentCount = 2;
+
 const usageText = [
   'Usage:',
   '  releaseMetadataCli.ts release-identifier-from-branch <release/YYYY-MM-DD.N>',
+  '  releaseMetadataCli.ts release-branch <YYYY-MM-DD.N>',
   '  releaseMetadataCli.ts next-beta-tag <YYYY-MM-DD.N> [existing-tag ...]',
+  '  releaseMetadataCli.ts production-tag <YYYY-MM-DD.N>',
+  '  releaseMetadataCli.ts validate-production-tag <YYYY-MM-DD.N-production>',
 ].join('\n');
 
 function writeResult(
-  result: ReturnType<typeof extractReleaseIdentifierFromBranchName> | ReturnType<typeof createNextBetaTagName>,
+  result:
+    | ReturnType<typeof extractReleaseIdentifierFromBranchName>
+    | ReturnType<typeof createReleaseBranchName>
+    | ReturnType<typeof createNextBetaTagName>
+    | ReturnType<typeof createProductionTagName>
+    | ReturnType<typeof validateProductionTagName>,
   dependencies: ReleaseMetadataCliDependencies,
 ): number {
   if (result.isErr) {
@@ -55,8 +71,20 @@ export function runReleaseMetadataCli(
     return writeResult(extractReleaseIdentifierFromBranchName(primaryValue), dependencies);
   }
 
+  if (commandName === 'release-branch' && primaryValue !== undefined) {
+    return writeResult(createReleaseBranchName(primaryValue), dependencies);
+  }
+
   if (commandName === 'next-beta-tag' && primaryValue !== undefined) {
     return writeResult(createNextBetaTagName(primaryValue, remainingValues), dependencies);
+  }
+
+  if (commandName === 'production-tag' && primaryValue !== undefined) {
+    return writeResult(createProductionTagName(primaryValue), dependencies);
+  }
+
+  if (commandName === 'validate-production-tag' && primaryValue !== undefined) {
+    return writeResult(validateProductionTagName(primaryValue), dependencies);
   }
 
   dependencies.writeError(usageText);
@@ -64,7 +92,7 @@ export function runReleaseMetadataCli(
 }
 
 if (require.main === module) {
-  process.exitCode = runReleaseMetadataCli(process.argv.slice(2), {
+  process.exitCode = runReleaseMetadataCli(process.argv.slice(nodeExecutableAndScriptPathArgumentCount), {
     writeError(message): void {
       console.error(message);
     },

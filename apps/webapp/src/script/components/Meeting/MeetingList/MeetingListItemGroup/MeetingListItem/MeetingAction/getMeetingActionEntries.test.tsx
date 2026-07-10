@@ -17,22 +17,50 @@
  *
  */
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/getMeetingActionEntries';
+import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingActionTranslationKeys';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
-const createMeeting = (overrides: Partial<Meeting> = {}): Meeting => ({
-  start_date: '2026-06-15T14:00:00.000Z',
-  end_date: '2026-06-15T15:00:00.000Z',
+const fixedFutureNow = new Date('2026-06-15T13:00:00.000Z');
+const fixedOngoingNow = new Date('2026-06-15T14:30:00.000Z');
+const fixedPastNow = new Date('2026-06-15T16:00:00.000Z');
+
+const futureWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: fixedFutureNow.getTime(),
+});
+const ongoingWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: fixedOngoingNow.getTime(),
+});
+const pastWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: fixedPastNow.getTime(),
+});
+
+const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
+  series_start_date: '2026-06-15T14:00:00.000Z',
+  series_end_date: '2026-06-15T15:00:00.000Z',
+  duration_ms: 3_600_000,
   recurrence: 'weekly',
   conversation_id: 'conv-id',
   title: 'Weekly sync',
   qualified_id: {id: 'meeting-id', domain: 'example.com'},
   qualified_creator: {id: 'host-id', domain: 'example.com'},
-  invited_emails: [],
+  qualified_conversation: {id: 'conv-id', domain: 'example.com'},
   ...overrides,
 });
+
+const createMeetingInstance = (overrides: Partial<MeetingSeries> = {}): MeetingInstance => {
+  const meetingSeries = createSeries(overrides);
+
+  return {
+    meetingSeries,
+    start: new Date(meetingSeries.series_start_date),
+    end: new Date(meetingSeries.series_end_date),
+  };
+};
 
 const createSelfUser = (id = 'host-id') => {
   const user = new User(id, 'example.com', translateForTest);
@@ -43,14 +71,38 @@ const createSelfUser = (id = 'host-id') => {
 const translate = (key: string) => key;
 
 const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.find(entry => entry.label === 'meetings.action.editMeeting');
+  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.editMeeting);
+
+const getDeleteForMeEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
+  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForMe);
+
+const getDeleteForAllEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
+  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll);
+
+const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) => entries.map(entry => entry.label);
 
 describe('getMeetingActionEntries', () => {
+  it('returns the expected action labels without Start meeting', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser(),
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
+      translate,
+      onEdit: jest.fn(),
+    });
+
+    expect(getEntryLabels(entries)).toEqual([
+      MEETING_ACTION_TRANSLATION_KEYS.editMeeting,
+      MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll,
+    ]);
+    expect(getEntryLabels(entries)).not.toContain('meetings.action.startMeeting');
+  });
+
   it('includes Edit meeting for an eligible host', () => {
     const entries = getMeetingActionEntries({
-      meeting: createMeeting(),
+      meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -60,9 +112,9 @@ describe('getMeetingActionEntries', () => {
 
   it('omits Edit meeting for a non-host invitee', () => {
     const entries = getMeetingActionEntries({
-      meeting: createMeeting(),
+      meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser('invitee-id'),
-      nowMs: new Date('2026-06-15T13:00:00.000Z').getTime(),
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -70,11 +122,11 @@ describe('getMeetingActionEntries', () => {
     expect(getEditEntryLabel(entries)).toBeUndefined();
   });
 
-  it('omits Edit meeting for an ongoing meeting', () => {
+  it('omits Edit meeting when the instance has started', () => {
     const entries = getMeetingActionEntries({
-      meeting: createMeeting(),
+      meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T14:30:00.000Z').getTime(),
+      nowMilliseconds: ongoingWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
@@ -82,15 +134,61 @@ describe('getMeetingActionEntries', () => {
     expect(getEditEntryLabel(entries)).toBeUndefined();
   });
 
-  it('omits Edit meeting for a past meeting', () => {
+  it('omits Edit meeting when the instance is in the past', () => {
     const entries = getMeetingActionEntries({
-      meeting: createMeeting(),
+      meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
-      nowMs: new Date('2026-06-15T16:00:00.000Z').getTime(),
+      nowMilliseconds: pastWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
     });
 
     expect(getEditEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('includes Edit meeting for a recurring series whose anchor has started when the instance is upcoming', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: {
+        meetingSeries: createSeries({
+          series_start_date: '2026-06-01T10:00:00.000Z',
+          series_end_date: '2026-06-01T11:00:00.000Z',
+          recurrence: 'weekly',
+        }),
+        start: new Date('2026-06-22T10:00:00.000Z'),
+        end: new Date('2026-06-22T11:00:00.000Z'),
+      },
+      selfUser: createSelfUser(),
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
+      translate,
+      onEdit: jest.fn(),
+    });
+
+    expect(getEditEntryLabel(entries)).toBeDefined();
+  });
+
+  it('includes Delete meeting for everyone for the host', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser(),
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
+      translate,
+      onEdit: jest.fn(),
+    });
+
+    expect(getDeleteForAllEntryLabel(entries)).toBeDefined();
+    expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('includes Delete meeting for me for a participant', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser('invitee-id'),
+      nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
+      translate,
+      onEdit: jest.fn(),
+    });
+
+    expect(getDeleteForMeEntryLabel(entries)).toBeDefined();
+    expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
   });
 });

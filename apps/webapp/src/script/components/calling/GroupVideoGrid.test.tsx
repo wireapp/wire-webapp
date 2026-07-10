@@ -33,7 +33,7 @@ import {translate} from 'Util/localizerUtil';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
-import {buildMediaDevicesHandler} from '../../auth/util/test/TestUtil';
+import {buildMediaDevicesHandler} from '../../auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 

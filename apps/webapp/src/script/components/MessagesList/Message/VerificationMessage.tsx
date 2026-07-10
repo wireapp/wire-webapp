@@ -72,6 +72,16 @@ const VerificationMessage = ({message}: VerificationMessageProps) => {
   const isTypeNewDevice = verificationMessageType === VerificationMessageType.NEW_DEVICE;
   const isTypeNewMember = verificationMessageType === VerificationMessageType.NEW_MEMBER;
 
+  const newDeviceStartedUsingText = (() => {
+    if (hasMultipleUsers) {
+      return translate('conversationDeviceStartedUsingMany');
+    }
+    if (isSelfClient) {
+      return translate('conversationDeviceStartedUsingYou');
+    }
+    return translate('conversationDeviceStartedUsingOne');
+  })();
+
   return (
     <div className="message-header">
       <div className="message-header-icon">
@@ -102,13 +112,7 @@ const VerificationMessage = ({message}: VerificationMessageProps) => {
         {isTypeNewDevice && (
           <>
             <span className="message-header-plain-sender-name">{nameList}</span>
-            <span>
-              {hasMultipleUsers
-                ? translate('conversationDeviceStartedUsingMany')
-                : isSelfClient
-                  ? translate('conversationDeviceStartedUsingYou')
-                  : translate('conversationDeviceStartedUsingOne')}
-            </span>
+            <span>{newDeviceStartedUsingText}</span>
             <button
               type="button"
               className="button-reset-default message-verification-action accent-text"

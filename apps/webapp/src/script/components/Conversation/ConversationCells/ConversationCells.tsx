@@ -92,6 +92,9 @@ export const ConversationCells = memo(
     const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
     const isCellsStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
 
+    const sortScopeKey = `${conversationId}:${isSearchViewOpen ? 'search' : 'browse'}`;
+    const {sort, setSort, getDirectionFor, toggleSort} = useCellsSorting(sortScopeKey);
+
     const {refresh, setOffset} = useGetAllCellsNodes({
       cellsRepository,
       conversationQualifiedId,
@@ -100,6 +103,7 @@ export const ConversationCells = memo(
       enabled: isCellsStateReady && !isSearchViewOpen,
       fireAndForgetInvoker,
       userRepository,
+      sort,
     });
 
     const {filters, filterState, clearAllFilters} = useConversationDriveFilters({
@@ -107,8 +111,6 @@ export const ConversationCells = memo(
       conversationRepository,
       translate,
     });
-
-    const {getDirectionFor, toggleSort} = useCellsSorting();
 
     const {
       searchValue,
@@ -125,6 +127,7 @@ export const ConversationCells = memo(
       userRepository,
       filters: filterState,
       onClear: refresh,
+      sort,
     });
 
     // Search view open ⇒ load-more UI + search-hook data; closed ⇒ page-nav UI + browse-hook data.
@@ -146,6 +149,14 @@ export const ConversationCells = memo(
       }
       wasSearchViewOpen.current = isSearchViewOpen;
     }, [clearAll, clearAllFilters, clearSearch, conversationId, isSearchViewOpen]);
+
+    // Navigating into a folder or the recycle bin happens via the URL hash without
+    // remounting; reset the sort on those transitions too.
+    useEffect(() => {
+      const handleHashChange = (): void => setSort(null);
+      window.addEventListener('hashchange', handleHashChange);
+      return () => window.removeEventListener('hashchange', handleHashChange);
+    }, [setSort]);
 
     const handleRefresh = useCallback((): void => {
       if (isInSearchMode) {

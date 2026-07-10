@@ -253,7 +253,7 @@ export class ReconnectingWebsocket {
 
   private readonly internalOnError = (error: ErrorEvent) => {
     this.logger.warn('WebSocket connection error', error);
-    if (this.onError) {
+    if (this.onError !== undefined) {
       this.onError(error);
     }
   };
@@ -278,10 +278,10 @@ export class ReconnectingWebsocket {
     this.logger.info(`WebSocket opened (reconnect attempt #${this.reconnectAttemptCount})`);
     this.stopConnectingWatchdog();
     this.resetLongRunningRetrySequence();
-    if (this.socket) {
+    if (this.socket !== undefined) {
       this.socket.binaryType = 'arraybuffer';
     }
-    if (this.onOpen) {
+    if (this.onOpen !== undefined) {
       this.onOpen(event);
     }
   };
@@ -290,11 +290,7 @@ export class ReconnectingWebsocket {
     const attempt = this.reconnectAttemptCount + 1;
     this.logger.info(`Connecting to WebSocket (attempt #${attempt})`);
     this.recordReconnectAttempt(this.options.wallClock.currentTimestampInMilliseconds);
-    const socket = this.socket;
-
-    if (!is.undefined(socket)) {
-      this.startConnectingWatchdog(socket);
-    }
+    const reconnectingSocket = this.socket;
 
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
@@ -302,17 +298,29 @@ export class ReconnectingWebsocket {
       this.startPinging();
       this.logger.debug(`Ping started (interval: ${this.PING_INTERVAL}ms)`);
     }
-    return this.onReconnect();
+
+    const websocketUrl = await this.onReconnect();
+    const socket = reconnectingSocket;
+
+    if (this.socket !== socket) {
+      return websocketUrl;
+    }
+
+    if (!is.undefined(socket) && socket.readyState === WEBSOCKET_STATE.CONNECTING) {
+      this.startConnectingWatchdog(socket);
+    }
+
+    return websocketUrl;
   };
 
   private readonly internalOnClose = (event: CloseEvent) => {
     this.logger.info(
-      `WebSocket closed — code: ${event?.code}, reason: "${event?.reason || 'none'}", wasClean: ${event?.wasClean ?? 'unknown'}`,
+      `WebSocket closed — code: ${event?.code}, reason: "${Boolean(event?.reason) ? event?.reason : 'none'}", wasClean: ${event?.wasClean ?? 'unknown'}`,
     );
     this.stopConnectingWatchdog();
     this.stopPinging();
     this.resolvePendingHealthChecks(false);
-    if (this.onClose) {
+    if (this.onClose !== undefined) {
       this.onClose(event);
     }
   };
@@ -324,14 +332,14 @@ export class ReconnectingWebsocket {
   }
 
   private stopPinging(): void {
-    if (this.pingerId) {
+    if (this.pingerId !== undefined) {
       this.options.wallClock.clearInterval(this.pingerId);
       this.pingerId = undefined;
     }
   }
 
   private readonly sendPing = (): void => {
-    if (!this.socket) {
+    if (this.socket === undefined) {
       this.logger.debug('WebSocket instance does not exist, skipping ping');
       return;
     }
@@ -430,7 +438,6 @@ export class ReconnectingWebsocket {
         `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[existingSocket.readyState]} (${existingSocket.readyState}); reconnecting in place`,
       );
       this.reconnectInPlace(existingSocket);
-      this.startConnectingWatchdog(existingSocket);
       return;
     }
 
@@ -449,7 +456,6 @@ export class ReconnectingWebsocket {
     const nextSocket = this.getReconnectingWebsocket();
     this.socket = nextSocket;
     this.bindSocketHandlers(nextSocket);
-    this.startConnectingWatchdog(nextSocket);
   }
 
   private bindSocketHandlers(socket: ReconnectingWebsocketWrapper): void {
@@ -475,7 +481,7 @@ export class ReconnectingWebsocket {
   }
 
   public getState(): WEBSOCKET_STATE {
-    return this.socket ? this.socket.readyState : WEBSOCKET_STATE.CLOSED;
+    return this.socket !== undefined ? this.socket.readyState : WEBSOCKET_STATE.CLOSED;
   }
 
   /**
@@ -540,7 +546,7 @@ export class ReconnectingWebsocket {
 
   public disconnect(reason = 'Closed by client'): void {
     this.resetLongRunningRetrySequence();
-    if (this.socket) {
+    if (this.socket !== undefined) {
       this.logger.info(`Disconnecting from WebSocket (reason: "${reason}")`);
       this.socket.close(CloseEventCode.NORMAL_CLOSURE, reason);
     }

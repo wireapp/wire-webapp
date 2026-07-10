@@ -29,7 +29,7 @@ import {Config} from 'src/script/Config';
 import {APIClient} from 'src/script/service/apiClientSingleton';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
-import {ValidationError} from '../../module/action/ValidationError';
+import {ValidationError} from '../../module/action/validationError';
 import {ConversationState} from '../../module/reducer/conversationReducer';
 import {QUERY_KEY, ROUTE} from '../../route';
 

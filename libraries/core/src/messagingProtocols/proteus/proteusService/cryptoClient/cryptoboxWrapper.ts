@@ -79,7 +79,7 @@ export class CryptoboxWrapper implements CryptoClient {
         }
         return {id: -1, key: ''};
       })
-      .filter(serializedPreKey => serializedPreKey.key);
+      .filter(serializedPreKey => serializedPreKey.key.length > 0);
 
     return {
       prekeys,

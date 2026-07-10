@@ -33,10 +33,6 @@ export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
     titleKey: 'meetings.scheduleModal.error.createFailedTitle',
     messageKey: 'meetings.schedule.errors.endInPast',
   },
-  participantMissingEmail: {
-    titleKey: 'meetings.scheduleModal.error.createFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.participantMissingEmail',
-  },
   createFailed: {
     titleKey: 'meetings.scheduleModal.error.createFailedTitle',
     messageKey: 'meetings.scheduleModal.error.createFailed',
@@ -49,12 +45,16 @@ export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
     titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
     messageKey: 'meetings.scheduleModal.error.editMeetingIdMissing',
   },
-  addInvitationFailed: {
+  addParticipantsFailed: {
     titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.addInvitationFailed',
+    messageKey: 'meetings.scheduleModal.error.addParticipantsFailed',
   },
-  removeInvitationFailed: {
+  removeParticipantsFailed: {
     titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.removeInvitationFailed',
+    messageKey: 'meetings.scheduleModal.error.removeParticipantsFailed',
+  },
+  refreshFailed: {
+    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
+    messageKey: 'meetings.scheduleModal.error.updateFailed',
   },
 } as const satisfies Record<MeetingSubmitErrors, {titleKey: TranslationKey; messageKey: TranslationKey}>;

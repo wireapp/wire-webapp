@@ -19,7 +19,7 @@
 
 import {useState, RefObject, FC, useRef} from 'react';
 
-import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
+import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 

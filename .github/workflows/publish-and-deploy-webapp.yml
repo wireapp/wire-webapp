@@ -74,8 +74,13 @@ jobs:
       - name: Update configuration
         run: ./bin/yarn nx run webapp:configure
 
-      - name: Build and package
-        run: ./bin/yarn nx run server:package
+      - name: Build and package public production
+        if: ${{ github.ref == 'refs/heads/master' || contains(github.ref_name, 'production') }}
+        run: ./bin/yarn build:prod:public
+
+      - name: Build and package internal production
+        if: ${{ github.ref != 'refs/heads/master' && !contains(github.ref_name, 'production') }}
+        run: ./bin/yarn build:prod
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -191,13 +196,12 @@ jobs:
       - name: Check out wire-builds
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          persist-credentials: false
           repository: wireapp/wire-builds
           token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
           ref: ${{matrix.target_branch}}
           fetch-depth: 1
 
-      - name: Create new build in wire-build
+      - name: Create new build in wire-builds
         shell: bash
         run: |
           set -eo pipefail
@@ -208,46 +212,71 @@ jobs:
           git config --global user.email "zebot@users.noreply.github.com"
           git config --global user.name "Zebot"
 
-          for retry in $(seq 3); do
-            set +e
-            (
-            set -e
+          push_succeeded=false
 
+          for retry in $(seq 3); do
             if (( retry > 1 )); then
               echo "Retrying..."
             fi
 
-            git fetch --depth 1 origin "${{ matrix.target_branch }}"
-            git checkout "${{ matrix.target_branch }}"
-            git reset --hard @{upstream}
+            set +e
+            (
+              set -eo pipefail
 
-            build_json=$(cat ./build.json | \
-              ./bin/set-chart-fields webapp \
-              "version=$chart_version" \
-              "repo=https://s3-eu-west-1.amazonaws.com/public.wire.com/charts-webapp" \
-              "meta.appVersion=$image_tag" \
-              "meta.commitURL=${{github.event.head_commit.url}}" \
-              "meta.commit=${{github.event.head_commit.id}}" \
-              | ./bin/bump-prerelease )
-            echo "$build_json" > ./build.json
+              git fetch --depth 1 origin "${{ matrix.target_branch }}"
+              git checkout "${{ matrix.target_branch }}"
+              git reset --hard @{upstream}
 
-            git add build.json
-            git commit -m "Bump webapp to $chart_version"
-            git push origin "${{ matrix.target_branch }}"
+              build_json=$(cat ./build.json | \
+                ./bin/set-chart-fields webapp \
+                "version=$chart_version" \
+                "repo=https://s3-eu-west-1.amazonaws.com/public.wire.com/charts-webapp" \
+                "meta.appVersion=$image_tag" \
+                "meta.commitURL=${{github.event.head_commit.url}}" \
+                "meta.commit=${{github.event.head_commit.id}}" \
+                | ./bin/bump-prerelease )
+              echo "$build_json" > ./build.json
 
+              git add build.json
+              git commit -m "Bump webapp to $chart_version"
+              git push origin "${{ matrix.target_branch }}"
             )
-            if [ $? -eq 0 ]; then
-              echo "pushing to wire-builds succeeded"
-              break
-            else
-              echo "pushing to wire-builds FAILED (in retry $retry)"
-            fi
+            attempt_exit_code=$?
             set -e
+
+            if [[ "$attempt_exit_code" -eq 0 ]]; then
+              echo "pushing to wire-builds succeeded"
+              push_succeeded=true
+              break
+            fi
+
+            echo "pushing to wire-builds FAILED (retry $retry)"
           done
-          if (( $? != 0 )); then
-              echo "Retrying didn't help. Failing the step."
-              exit 1
+
+          if [[ "$push_succeeded" != "true" ]]; then
+            echo "Retrying didn't help. Failing the step."
+            exit 1
           fi
+
+  notify_wire_builds_failure:
+    name: 'Notify wire-builds bump failure to Deployoholics'
+    runs-on: ubuntu-24.04
+    needs: [build, publish_wire_builds]
+    if: ${{ always() && needs.publish_wire_builds.result == 'failure' }}
+
+    steps:
+      - name: Announce wire-builds bump failure
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: failure
+          text: |
+            ❌ wire-builds chart bump failed for ${{ needs.build.outputs.release_name }} ❌
+            **Triggered by:** ${{ github.actor }}
+            **Ref:** ${{ github.ref_name }}
+            **Chart version:** ${{ needs.build.outputs.chart_version }}
+            **Image tag:** ${{ needs.build.outputs.image_tag }}
+            **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
   set_deployment_targets:
     name: 'Set deployment targets'
@@ -364,10 +393,9 @@ jobs:
 
     steps:
       - name: Announce deployment failure
-        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+        uses: ./.github/actions/notify-deployoholics
         with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           status: failure
           text: |
             ❌ Deployment failed for ${{ needs.build.outputs.release_name }} ❌

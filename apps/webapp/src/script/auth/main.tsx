@@ -39,7 +39,7 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import './configureEnvironment';
 import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
-import {Root} from './page/Root';
+import {Root} from './page/root';
 
 // eslint-disable-next-line import/order
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
@@ -104,7 +104,7 @@ async function runApp() {
   setAppLocale();
   if (hotReloadCapableModule.hot !== undefined) {
     hotReloadCapableModule.hot.accept('./page/Root', () => {
-      render(require('./page/Root').Root);
+      render(require('./page/root').Root);
     });
   }
 }

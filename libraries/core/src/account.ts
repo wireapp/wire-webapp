@@ -220,7 +220,7 @@ export class Account extends TypedEventEmitter<Events> {
     });
 
     apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {
-      if (cookie && this.storeEngine) {
+      if (cookie !== undefined && this.storeEngine !== undefined) {
         try {
           await this.persistCookie(this.storeEngine, cookie);
         } catch (error: unknown) {
@@ -293,7 +293,7 @@ export class Account extends TypedEventEmitter<Events> {
     const context = this.apiClient.context;
     const domain = context?.domain ?? '';
 
-    if (!this.currentClient) {
+    if (this.currentClient === undefined) {
       throw new Error('Client has not been initialized - please login first');
     }
 
@@ -376,7 +376,7 @@ export class Account extends TypedEventEmitter<Events> {
     entropyData?: Uint8Array,
     clientInfo: ClientInfo = coreDefaultClient,
   ): Promise<RegisteredClient> => {
-    if (!this.service || !this.apiClient.context || !this.storeEngine) {
+    if (this.service === undefined || this.apiClient.context === undefined || this.storeEngine === undefined) {
       throw new Error('Services are not set or context not initialized.');
     }
 
@@ -414,7 +414,7 @@ export class Account extends TypedEventEmitter<Events> {
    * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
    */
   public initClient = async (client: RegisteredClient, mlsConfig?: InitClientOptions) => {
-    if (!this.service || !this.apiClient.context || !this.storeEngine) {
+    if (this.service === undefined || this.apiClient.context === undefined || this.storeEngine === undefined) {
       throw new Error('Services are not set.');
     }
     this.apiClient.context.clientId = client.id;
@@ -424,7 +424,7 @@ export class Account extends TypedEventEmitter<Events> {
 
     await this.service.proteus.initClient(this.apiClient.context);
 
-    if ((await this.isMLSActiveForClient()) && this.service.mls && mlsConfig) {
+    if ((await this.isMLSActiveForClient()) && this.service.mls !== undefined && mlsConfig !== undefined) {
       const {userId, domain = ''} = this.apiClient.context;
       await this.service.mls.initClient({id: userId, domain}, client, mlsConfig);
 
@@ -486,9 +486,10 @@ export class Account extends TypedEventEmitter<Events> {
 
   private readonly initServices = async (context: Context): Promise<void> => {
     const encryptedStoreName = this.generateEncryptedDbName(context);
-    this.encryptedDb = this.options.systemCrypto
-      ? await createCustomEncryptedStore(encryptedStoreName, this.options.systemCrypto)
-      : await createEncryptedStore(encryptedStoreName);
+    this.encryptedDb =
+      this.options.systemCrypto !== undefined
+        ? await createCustomEncryptedStore(encryptedStoreName, this.options.systemCrypto)
+        : await createEncryptedStore(encryptedStoreName);
     this.db = await openDB(this.generateCoreDbName(context));
     this.storeEngine = await this.initEngine(context, this.encryptedDb);
 
@@ -601,7 +602,7 @@ export class Account extends TypedEventEmitter<Events> {
     }
 
     try {
-      if (this.storeEngine) {
+      if (this.storeEngine !== undefined) {
         await wipeCoreCryptoDb(this.storeEngine);
       }
     } catch (error: unknown) {
@@ -621,7 +622,7 @@ export class Account extends TypedEventEmitter<Events> {
    */
   private readonly wipeAllData = async (): Promise<void> => {
     try {
-      if (this.storeEngine) {
+      if (this.storeEngine !== undefined) {
         await deleteIdentity(this.storeEngine, false);
       }
     } catch (error: unknown) {
@@ -629,7 +630,7 @@ export class Account extends TypedEventEmitter<Events> {
     }
 
     try {
-      if (this.db) {
+      if (this.db !== undefined) {
         await deleteDB(this.db);
       }
     } catch (error: unknown) {
@@ -645,7 +646,7 @@ export class Account extends TypedEventEmitter<Events> {
    */
   private readonly wipeCryptoData = async (): Promise<void> => {
     try {
-      if (this.storeEngine) {
+      if (this.storeEngine !== undefined) {
         await deleteIdentity(this.storeEngine, true);
       }
     } catch (error: unknown) {
@@ -713,7 +714,7 @@ export class Account extends TypedEventEmitter<Events> {
      */
     dryRun?: boolean;
   } = {}): Promise<() => void> => {
-    if (!this.currentClient) {
+    if (this.currentClient === undefined) {
       throw new Error('Client has not been initialized - please login first');
     }
 
@@ -894,9 +895,8 @@ export class Account extends TypedEventEmitter<Events> {
           try {
             const start = Date.now();
             const firstNotificationPayload = notification.payload[0];
-            const notificationTime = firstNotificationPayload
-              ? this.getNotificationEventTime(firstNotificationPayload)
-              : null;
+            const notificationTime =
+              firstNotificationPayload !== undefined ? this.getNotificationEventTime(firstNotificationPayload) : null;
             this.logger.info(`Processing legacy notification "${notification.id}" at ${notificationTime}`);
             this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.getLength()}`);
             this.logger.info(`Total pending proposals queue length: ${getProposalQueueLength()}`);
@@ -1031,7 +1031,8 @@ export class Account extends TypedEventEmitter<Events> {
       const payloads = this.service!.notification.handleNotification(notification.data.event, source);
 
       const firstEventPayload = notification.data.event.payload[0];
-      const notificationTime = firstEventPayload ? this.getNotificationEventTime(firstEventPayload) : null;
+      const notificationTime =
+        firstEventPayload !== undefined ? this.getNotificationEventTime(firstEventPayload) : null;
       if (!this.isConnectionLive() && is.nonEmptyString(notificationTime)) {
         onNotificationStreamProgress(notificationTime);
       }
@@ -1244,7 +1245,7 @@ export class Account extends TypedEventEmitter<Events> {
   };
 
   public getClientCapabilities = () => {
-    return this.currentClient?.capabilities || [];
+    return this.currentClient?.capabilities ?? [];
   };
 
   public static checkIsConsumable = (
@@ -1278,7 +1279,7 @@ export class Account extends TypedEventEmitter<Events> {
     const openDb = async () => {
       const dbKey = await generateSecretKey({keyId: 'db-key', keySize: 32, secretsDb: encryptedStore});
       const initializedDb = await this.options.createStore?.(dbName, dbKey.key);
-      if (initializedDb) {
+      if (initializedDb !== undefined) {
         this.logger.debug(`Initialized store with existing engine "${dbName}".`);
         return initializedDb;
       }
@@ -1289,7 +1290,7 @@ export class Account extends TypedEventEmitter<Events> {
     };
     const storeEngine = await openDb();
     const cookie = CookieStore.getCookie();
-    if (cookie) {
+    if (cookie !== undefined) {
       await this.persistCookie(storeEngine, cookie);
     }
     return storeEngine;

@@ -15,6 +15,7 @@
     },
     "build-dev": {
       "executor": "nx:run-commands",
+      "dependsOn": ["config-lib:build"],
       "outputs": ["{projectRoot}/dist"],
       "options": {
         "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copy_server_assets.js"],
@@ -30,9 +31,18 @@
         "parallel": false
       }
     },
+    "package-public": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist/s3"],
+      "options": {
+        "commands": ["rimraf {projectRoot}/dist", "nx run server:build", "nx run webapp:build:production-public", "yarn verify:bundle:prod:public", "node bin/zip.js"],
+        "parallel": false
+      }
+    },
     "serve": {
       "continuous": true,
-      "dependsOn": ["webapp:build-libs", "webapp:watch-deps-dynamic"],
+      "dependsOn": ["config-lib:build", "webapp:build-libs", "webapp:watch-deps-dynamic"],
       "executor": "@nx/js:node",
       "options": {
         "buildTarget": "server:build-dev",
@@ -71,6 +81,7 @@
     },
     "type-check": {
       "executor": "nx:run-commands",
+      "dependsOn": ["config-lib:build"],
       "options": {
         "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
       }

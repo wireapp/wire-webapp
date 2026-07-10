@@ -55,7 +55,9 @@ export const useScrollMessages = (
   const prevTotalSizeRef = useRef(0);
 
   useLayoutEffect(() => {
-    if (!isConversationLoaded && messages.length === 0) {
+    if (!isConversationLoaded || messages.length === 0) {
+      prevNbMessages.current = messages.length;
+      prevTotalSizeRef.current = virtualizer.getTotalSize();
       return;
     }
 
@@ -68,17 +70,19 @@ export const useScrollMessages = (
     const lastMessage = lastMessageItem?.message;
 
     const shouldStickToBottom = shouldStickToBottomFromPrev(virtualizer, prevTotalSizeRef.current, 100);
+    const nbNewMessages = messages.length - prevNbMessages.current;
+
+    if (prevNbMessages.current === 0 || nbNewMessages <= 0) {
+      prevNbMessages.current = messages.length;
+      prevTotalSizeRef.current = virtualizer.getTotalSize();
+      return;
+    }
 
     if (shouldStickToBottom) {
       // We only want to animate the scroll if there are new messages in the list
-      const nbNewMessages = messages.length - prevNbMessages.current;
-
-      if (nbNewMessages >= 1) {
-        // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
-        requestAnimationFrame(() => {
-          virtualizer.scrollToIndex(messages.length - 1, {align: 'end'});
-        });
-      }
+      requestAnimationFrame(() => {
+        virtualizer.scrollToIndex(messages.length - 1, {align: 'end'});
+      });
     } else if (lastMessage.status() === StatusType.SENDING && lastMessage.user().id === userId) {
       // The self user just sent a message, we scroll straight to the bottom
       const index = messages.findIndex(message => !isMarker(message) && message.message.id === lastMessage.id);

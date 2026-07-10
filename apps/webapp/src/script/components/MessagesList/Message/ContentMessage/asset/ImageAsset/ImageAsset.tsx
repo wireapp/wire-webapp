@@ -22,7 +22,7 @@ import React from 'react';
 import {CSSObject} from '@emotion/react';
 
 import * as Icon from 'Components/icon';
-import {AssetImage} from 'Components/Image';
+import {AssetImage} from 'Components/image';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {useApplicationContext} from 'src/script/page/rootProvider';

@@ -32,8 +32,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {ChooseScreen} from 'Components/calling/ChooseScreen';
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
-import {ConfigToolbar} from 'Components/ConfigToolbar/ConfigToolbar';
-import {ErrorFallback} from 'Components/ErrorFallback';
+import {ConfigToolbar} from 'Components/configToolbar/configToolbar';
+import {ErrorFallback} from 'Components/errorFallback';
 import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
 import {FileHistoryModal} from 'Components/Modals/FileHistoryModal/FileHistoryModal';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
@@ -67,10 +67,7 @@ import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
-import {
-  meetingsFeatureToggleName,
-  websocketConnectivityDiagnosticsFeatureToggleName,
-} from '../featureToggles/startupFeatureToggleNames';
+import {meetingsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -111,9 +108,6 @@ export const AppMain = (properties: AppMainProps) => {
   } = properties;
   const translate = mainView.translate;
   const apiContext = app.getAPIContext();
-  const isWebSocketConnectivityDiagnosticsEnabled = isFeatureToggleEnabled(
-    websocketConnectivityDiagnosticsFeatureToggleName,
-  );
 
   useActiveWindow(window);
 
@@ -358,10 +352,7 @@ export const AppMain = (properties: AppMainProps) => {
         )}
 
         <AppLock appLockRepository={appLockRepository} clientRepository={repositories.client} />
-        <WarningsContainer
-          onRefresh={app.refresh}
-          isWebSocketConnectivityDiagnosticsEnabled={isWebSocketConnectivityDiagnosticsEnabled}
-        />
+        <WarningsContainer onRefresh={app.refresh} />
 
         {!locked && (
           <>

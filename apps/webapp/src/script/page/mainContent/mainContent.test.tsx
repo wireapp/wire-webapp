@@ -27,7 +27,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {MainContent} from './mainContent';
 
-import {withTheme} from '../../auth/util/test/TestUtil';
+import {withTheme} from '../../auth/util/test/testUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {createRootContextValueForTest} from '../testSupport/rootContextTestSupport';

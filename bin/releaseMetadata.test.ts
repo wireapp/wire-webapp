@@ -22,10 +22,12 @@ import assert from 'node:assert';
 import {
   createNextBetaTagName,
   createProductionTagName,
+  createReleaseBranchName,
   extractReleaseIdentifierFromBranchName,
   isReleaseBranchName,
   productionTagExists,
   productionTagPointsToCommit,
+  validateProductionTagName,
 } from './releaseMetadata';
 import type {CommitHash, ReleaseTagMetadata} from './releaseMetadata';
 
@@ -87,6 +89,27 @@ describe('releaseMetadata', () => {
     expect(actualReleaseIdentifier.error.message).toBe('Invalid release branch name: release/2026-06-01');
   });
 
+  it('createReleaseBranchName() creates the release branch name from the release identifier', () => {
+    const releaseIdentifier = '2026-06-19.1';
+
+    const actualReleaseBranchName = createReleaseBranchName(releaseIdentifier);
+
+    assert(actualReleaseBranchName.isOk === true);
+
+    expect(actualReleaseBranchName.value).toBe('release/2026-06-19.1');
+  });
+
+  it.each(['2026-06-19.0', '2026-06-19', '2026-6-19.1', 'release/2026-06-19.1'])(
+    'createReleaseBranchName() rejects invalid release identifier "%s"',
+    invalidReleaseIdentifier => {
+      const actualReleaseBranchName = createReleaseBranchName(invalidReleaseIdentifier);
+
+      assert(actualReleaseBranchName.isErr === true);
+
+      expect(actualReleaseBranchName.error.message).toBe(`Invalid release identifier: ${invalidReleaseIdentifier}`);
+    },
+  );
+
   it('createProductionTagName() creates the production tag name from the release identifier', () => {
     const releaseIdentifier = '2026-06-19.1';
 
@@ -105,6 +128,29 @@ describe('releaseMetadata', () => {
     assert(actualProductionTagName.isErr === true);
 
     expect(actualProductionTagName.error.message).toBe('Invalid release identifier: 2026-06-19');
+  });
+
+  it('validateProductionTagName() accepts a production tag name', () => {
+    const productionTagName = '2026-06-19.1-production';
+
+    const actualProductionTagName = validateProductionTagName(productionTagName);
+
+    assert(actualProductionTagName.isOk === true);
+
+    expect(actualProductionTagName.value).toBe(productionTagName);
+  });
+
+  it.each([
+    '2026-06-19.0-production',
+    '2026-06-19-production.1',
+    '2026-06-19.1-beta.1',
+    'release/2026-06-19.1-production',
+  ])('validateProductionTagName() rejects invalid production tag name "%s"', invalidProductionTagName => {
+    const actualProductionTagName = validateProductionTagName(invalidProductionTagName);
+
+    assert(actualProductionTagName.isErr === true);
+
+    expect(actualProductionTagName.error.message).toBe(`Invalid production tag name: ${invalidProductionTagName}`);
   });
 
   it('createNextBetaTagName() increments the latest beta tag for the release identifier', () => {

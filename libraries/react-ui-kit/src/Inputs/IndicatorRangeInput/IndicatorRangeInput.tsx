@@ -58,7 +58,7 @@ export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeIn
   ) => {
     const minNum = Number(min);
 
-    const isCustomSlider = !!dataListOptions.length;
+    const isCustomSlider = !!Boolean(dataListOptions.length);
 
     const listLength = dataListOptions.length - 1;
     const valueNum = Number(value);

@@ -30,7 +30,6 @@ describe('loadMeetingsList', () => {
     start_time: '2026-06-16T10:00:00.000Z',
     end_time: '2026-06-16T11:00:00.000Z',
     title: 'Weekly sync',
-    invited_emails: [],
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
@@ -44,14 +43,41 @@ describe('loadMeetingsList', () => {
     const result = await loadMeetingsList(createRepository(getMeetingsList));
 
     expect(getMeetingsList).toHaveBeenCalledTimes(1);
-    expect(result).toEqual({meetings: []});
+    expect(result).toEqual({meetingSeries: [], hasLoadError: false});
   });
 
-  it('maps successful API meetings to list meetings', async () => {
+  it('maps successful API meetings to meeting series', async () => {
     const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
     const result = await loadMeetingsList(createRepository(getMeetingsList));
 
-    expect(result.meetings).toHaveLength(1);
-    expect(result.meetings[0]?.title).toBe('Weekly sync');
+    expect(result.meetingSeries).toHaveLength(1);
+    expect(result.meetingSeries[0]?.title).toBe('Weekly sync');
+    expect(result.meetingSeries[0]?.series_start_date).toBe('2026-06-16T10:00:00.000Z');
+    expect(result.meetingSeries[0]?.duration_ms).toBe(3_600_000);
+  });
+
+  it('drops invalid meetings from a successful response without failing the load', async () => {
+    const getMeetingsList = jest.fn().mockReturnValue(
+      task.resolve([
+        apiMeeting,
+        {
+          ...apiMeeting,
+          qualified_id: {id: 'invalid-meeting', domain: 'example.com'},
+          start_time: '2026-06-16T11:00:00.000Z',
+          end_time: '2026-06-16T10:00:00.000Z',
+        },
+      ]),
+    );
+    const result = await loadMeetingsList(createRepository(getMeetingsList));
+
+    expect(result).toEqual({
+      meetingSeries: [
+        expect.objectContaining({
+          title: 'Weekly sync',
+          qualified_id: {id: 'meeting-id', domain: 'example.com'},
+        }),
+      ],
+      hasLoadError: false,
+    });
   });
 });

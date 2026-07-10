@@ -17,11 +17,27 @@
  *
  */
 
+import {ZodError} from 'zod';
+
 import {APIClient} from '../apiClient';
 import {Config, MINIMUM_API_VERSION} from '../config';
+import {MeetingRecurrenceFrequency} from './meetingRecurrence';
 
 describe('MeetingsAPI', () => {
   const testConfig: Config = {urls: {rest: 'https://test.zinfra.io', ws: '', name: 'test'}};
+
+  const validMeeting = {
+    created_at: '2026-06-15T09:00:00.000Z',
+    updated_at: '2026-06-15T09:00:00.000Z',
+    start_time: '2026-06-16T10:00:00.000Z',
+    end_time: '2026-06-16T11:00:00.000Z',
+    title: 'Weekly sync',
+    qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    trial: false,
+    recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
+  };
 
   it('sends meeting requests through the versioned HTTP client', async () => {
     const client = new APIClient(testConfig);
@@ -42,5 +58,33 @@ describe('MeetingsAPI', () => {
         url: '/meetings/list',
       }),
     );
+  });
+
+  it('throws when meeting responses fail schema validation', async () => {
+    const client = new APIClient(testConfig);
+    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
+      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+    } as never);
+
+    await client.useVersion(MINIMUM_API_VERSION, 16);
+
+    jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: [{title: 'invalid'}]} as never);
+
+    await expect(client.api.meetings.getMeetingsList()).rejects.toBeInstanceOf(ZodError);
+  });
+
+  it('returns parsed meeting responses for valid payloads', async () => {
+    const client = new APIClient(testConfig);
+    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
+      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+    } as never);
+
+    await client.useVersion(MINIMUM_API_VERSION, 16);
+
+    jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: validMeeting} as never);
+
+    const meeting = await client.api.meetings.getMeeting({id: 'meeting-id', domain: 'example.com'});
+
+    expect(meeting).toEqual(validMeeting);
   });
 });

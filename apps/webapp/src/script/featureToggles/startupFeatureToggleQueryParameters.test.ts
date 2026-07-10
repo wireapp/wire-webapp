@@ -44,6 +44,18 @@ describe('updateLocationSearchForStartupFeatureToggle', () => {
     expect(updatedLocationSearch).toBe(`?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName}`);
   });
 
+  it('adds a startup feature toggle while preserving other enabled toggles', () => {
+    const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
+      locationSearch: `?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName}`,
+      featureToggleName: applockRefactoredFeatureToggleName,
+      shouldEnableFeatureToggle: true,
+    });
+
+    expect(updatedLocationSearch).toBe(
+      `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}%2C${meetingsFeatureToggleName}`,
+    );
+  });
+
   it('removes only the startup feature parameter when the last feature toggle is disabled', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
       locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}&foo=bar`,

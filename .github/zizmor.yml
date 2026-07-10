@@ -1,6 +1,6 @@
 ---
 # All audits run with defaults; only configurable audits are overridden below.
-# Persona, severity floor, and confidence floor are set in .github/workflows/ci.yml.
+# Persona, severity floor, and confidence floor are set in .github/workflows/continuous-integration.yml.
 rules:
   unpinned-uses:
     config:

@@ -17,147 +17,109 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
-import is from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {Maybe, Result, result, Task, task} from 'true-myth';
+import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
+import {Maybe, Task, task} from 'true-myth';
 
+import {computeParticipantDiff} from 'Components/Meeting/computeMeetingParticipantDiff';
 import {mapScheduleFormToCreateMeeting} from 'Components/Meeting/mapScheduleFormToCreateMeeting';
 import {mapScheduleFormToUpdateMeeting} from 'Components/Meeting/mapScheduleFormToUpdateMeeting';
 import {
-  meetingSubmitErrors,
-  type MeetingSubmitErrors,
-  type ScheduleMeetingErrors,
-  type UpdateMeetingErrors,
-} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+  meetingConversationSyncErrors,
+  syncMeetingConversationParticipants,
+  type MeetingConversationSyncError,
+} from 'Components/Meeting/meetingConversationSync';
+import type {MeetingStoreDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {User} from 'Repositories/entity/User';
 
-import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
+import type {ScheduleMeetingFormState, ScheduleMeetingRecurrenceOption} from './scheduleMeetingTypes';
 
-export type {ScheduleMeetingErrors, UpdateMeetingErrors} from 'Components/Meeting/MeetingSubmitErrors';
+export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 
-export type TryScheduleMeetingDependencies = {
-  meetingsRepository: MeetingsRepository;
-  fetchMeetings: () => Promise<void>;
-  wallClock: WallClock;
-};
-
-export type TryUpdateMeetingDependencies = TryScheduleMeetingDependencies;
-
-export type TryUpdateMeetingParams = {
+export type UpdateMeetingParams = {
   meetingId: QualifiedId;
   formState: ScheduleMeetingFormState;
-  originalInvitedEmails: string[];
-  dependencies: TryUpdateMeetingDependencies;
+  qualifiedConversation: Maybe<QualifiedId>;
+  originalRecurrence: ScheduleMeetingRecurrenceOption;
+  originalSelectedUsers: User[];
 };
 
-export type PerformMeetingSubmitParams = {
-  mode: ScheduleMeetingMode;
-  editingMeetingId: Maybe<QualifiedId>;
-  formState: ScheduleMeetingFormState;
-  originalInvitedEmails: string[];
-  dependencies: TryScheduleMeetingDependencies;
+const mapSyncErrorToSubmitError = (error: MeetingConversationSyncError): MeetingSubmitErrors => {
+  switch (error) {
+    case meetingConversationSyncErrors.removeFailed:
+      return meetingSubmitErrors.removeParticipantsFailed;
+    case meetingConversationSyncErrors.addFailed:
+    case meetingConversationSyncErrors.establishFailed:
+      return meetingSubmitErrors.addParticipantsFailed;
+    case meetingConversationSyncErrors.conversationNotFound:
+    case meetingConversationSyncErrors.groupIdMissing:
+      return meetingSubmitErrors.addParticipantsFailed;
+    default:
+      return meetingSubmitErrors.addParticipantsFailed;
+  }
 };
 
-export async function performMeetingSubmit({
-  mode,
-  editingMeetingId,
-  formState,
-  originalInvitedEmails,
-  dependencies,
-}: PerformMeetingSubmitParams): Promise<Result<void, MeetingSubmitErrors>> {
-  if (mode === 'edit') {
-    if (editingMeetingId.isNothing) {
-      return result.err(meetingSubmitErrors.editMeetingIdMissing);
-    }
+/**
+ * Schedules a meeting and establishes the MLS conversation with selected participants.
+ */
+export const scheduleMeeting = (
+  formState: ScheduleMeetingFormState,
+  deps: MeetingStoreDeps,
+): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+  const mappingResult = mapScheduleFormToCreateMeeting(formState, deps.wallClock);
 
-    return await tryUpdateMeeting({
-      meetingId: editingMeetingId.value,
-      formState,
-      originalInvitedEmails,
-      dependencies,
-    });
+  if (mappingResult.isErr) {
+    return task.reject(mappingResult.error);
   }
 
-  return await tryScheduleMeeting(formState, dependencies);
-}
-
-const resultToTask = <T, E>(run: () => Promise<Result<T, E>>): Task<T, E> =>
-  task.fromPromise(run()).andThen(value => task.fromResult(value)) as Task<T, E>;
-
-/**
- * Tries to schedule a meeting with the given form state.
- * @param formState - The form state to schedule the meeting with.
- * @param deps - Repository and list refresh dependencies.
- * @returns A task that resolves to success or a semantic failure reason.
- */
-export function tryScheduleMeeting(
-  formState: ScheduleMeetingFormState,
-  dependencies: TryScheduleMeetingDependencies,
-): Task<void, ScheduleMeetingErrors> {
-  return resultToTask(async () => {
-    const mappingResult = mapScheduleFormToCreateMeeting(formState, dependencies.wallClock);
-
-    if (mappingResult.isErr) {
-      return result.err(mappingResult.error);
-    }
-
-    const {meetingsRepository, fetchMeetings} = dependencies;
-    const createResult = await meetingsRepository.createMeeting(mappingResult.value);
-
-    if (createResult.isErr) {
-      return result.err(meetingSubmitErrors.createFailed);
-    }
-
-    await fetchMeetings();
-    return result.ok(undefined);
-  });
-}
+  return deps.meetingsRepository
+    .createMeeting(mappingResult.value)
+    .mapRejected(() => meetingSubmitErrors.createFailed)
+    .andThen(createdMeeting =>
+      syncMeetingConversationParticipants(deps.conversationRepository, {
+        qualifiedConversationId: createdMeeting.qualified_conversation,
+        selectedUsers: formState.selectedUsers,
+        usersToAdd: formState.selectedUsers,
+        userIdsToRemove: [],
+        isCreate: true,
+      }).mapRejected(mapSyncErrorToSubmitError),
+    );
+};
 
 /**
- * Tries to update a meeting with the given form state and invitation diff.
+ * Updates meeting metadata and syncs conversation participants.
  */
-export function tryUpdateMeeting({
-  meetingId,
-  formState,
-  originalInvitedEmails,
-  dependencies,
-}: TryUpdateMeetingParams): Task<void, UpdateMeetingErrors> {
-  return resultToTask(async () => {
-    const mappingResult = mapScheduleFormToUpdateMeeting(formState, originalInvitedEmails, dependencies.wallClock);
+export const updateMeeting = (
+  {meetingId, formState, qualifiedConversation, originalRecurrence, originalSelectedUsers}: UpdateMeetingParams,
+  deps: MeetingStoreDeps,
+): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+  const mappingResult = mapScheduleFormToUpdateMeeting(formState, deps.wallClock, originalRecurrence);
 
-    if (mappingResult.isErr) {
-      return result.err(mappingResult.error);
-    }
+  if (mappingResult.isErr) {
+    return task.reject(mappingResult.error);
+  }
 
-    const {payload, addedEmails, removedEmails} = mappingResult.value;
-    const {meetingsRepository, fetchMeetings} = dependencies;
+  const {usersToAdd, userIdsToRemove} = computeParticipantDiff(originalSelectedUsers, formState.selectedUsers);
 
-    const updateResult = await meetingsRepository.updateMeeting(meetingId, payload);
-
-    if (updateResult.isErr) {
-      return result.err(meetingSubmitErrors.updateFailed);
-    }
-
-    if (is.nonEmptyArray(removedEmails)) {
-      const removeResult = await meetingsRepository.removeMeetingInvitation(meetingId, removedEmails);
-
-      if (removeResult.isErr) {
-        await fetchMeetings();
-        return result.err(meetingSubmitErrors.removeInvitationFailed);
+  return deps.meetingsRepository
+    .updateMeeting(meetingId, mappingResult.value.payload)
+    .mapRejected(() => meetingSubmitErrors.updateFailed)
+    .andThen(() => {
+      if (usersToAdd.length === 0 && userIdsToRemove.length === 0) {
+        return task.resolve({failedToAdd: []});
       }
-    }
 
-    if (is.nonEmptyArray(addedEmails)) {
-      const addResult = await meetingsRepository.addMeetingInvitation(meetingId, addedEmails);
-
-      if (addResult.isErr) {
-        await fetchMeetings();
-        return result.err(meetingSubmitErrors.addInvitationFailed);
+      if (qualifiedConversation.isNothing) {
+        return task.reject(meetingSubmitErrors.addParticipantsFailed);
       }
-    }
 
-    await fetchMeetings();
-    return result.ok(undefined);
-  });
-}
+      return syncMeetingConversationParticipants(deps.conversationRepository, {
+        qualifiedConversationId: qualifiedConversation.value,
+        selectedUsers: formState.selectedUsers,
+        usersToAdd,
+        userIdsToRemove,
+        isCreate: false,
+      }).mapRejected(mapSyncErrorToSubmitError);
+    });
+};

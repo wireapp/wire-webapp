@@ -62,28 +62,28 @@ import {isBackendError} from 'Util/typePredicateUtil';
 import {separator} from './login.styles';
 
 import {Config} from '../../../Config';
-import {AccountAlreadyExistsModal} from '../../component/AccountAlreadyExistsModal';
-import {AppAlreadyOpen} from '../../component/AppAlreadyOpen';
-import {BackButton} from '../../component/BackButton';
-import {Exception} from '../../component/Exception';
-import {JoinGuestLinkPasswordModal} from '../../component/JoinGuestLinkPasswordModal';
-import {LoginForm} from '../../component/LoginForm';
+import {AccountAlreadyExistsModal} from '../../component/accountAlreadyExistsModal';
+import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
+import {BackButton} from '../../component/backButton';
+import {Exception} from '../../component/exception';
+import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordModal';
+import {LoginForm} from '../../component/loginForm';
 import {EXTERNAL_ROUTE} from '../../externalRoute';
-import {useRouteA11y} from '../../hooks/useRouteA11y';
+import {useRouteA11y} from '../../hooks/useRouteA11Y';
 import {actionRoot} from '../../module/action';
-import {LabeledError} from '../../module/action/LabeledError';
-import {ValidationError} from '../../module/action/ValidationError';
+import {LabeledError} from '../../module/action/labeledError';
+import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
-import * as AuthSelector from '../../module/selector/AuthSelector';
-import * as ConversationSelector from '../../module/selector/ConversationSelector';
+import * as AuthSelector from '../../module/selector/authSelector';
+import * as ConversationSelector from '../../module/selector/conversationSelector';
 import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
 import {getOAuthQueryString} from '../../util/oauthUtil';
 import {getPrefixedSSOCode} from '../../util/urlUtil';
-import {EntropyContainer} from '../EntropyContainer';
-import {Page} from '../Page';
-import {styles} from '../VerifyEmailCode.styles';
+import {EntropyContainer} from '../entropyContainer';
+import {Page} from '../page';
+import {styles} from '../verifyEmailCode.styles';
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
 };
@@ -314,11 +314,12 @@ const LoginComponent = ({
           case BackendErrorLabel.CODE_AUTHENTICATION_REQUIRED: {
             await resetAuthError();
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-            const twoFactorTarget = is.nonEmptyString(login.email)
-              ? login.email
-              : is.nonEmptyString(login.handle)
-                ? login.handle
-                : undefined;
+            let twoFactorTarget: string | undefined;
+            if (is.nonEmptyString(login.email)) {
+              twoFactorTarget = login.email;
+            } else if (is.nonEmptyString(login.handle)) {
+              twoFactorTarget = login.handle;
+            }
             if (twoFactorTarget !== undefined) {
               await doSendTwoFactorCode(twoFactorTarget);
               setTwoFactorLoginData(login);

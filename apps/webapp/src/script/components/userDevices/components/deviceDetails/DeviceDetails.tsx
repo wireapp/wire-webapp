@@ -30,7 +30,7 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import type {User} from 'Repositories/entity/User';
-import {WireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/e2eIdentity';
 import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

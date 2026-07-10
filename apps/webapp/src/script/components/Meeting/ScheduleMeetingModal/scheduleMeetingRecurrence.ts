@@ -18,6 +18,7 @@
  */
 
 import {MeetingRecurrence, MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
+import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
 
 import type {TranslationKey} from 'Util/localizerUtil';
 
@@ -38,6 +39,26 @@ export const SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS = {
   everyTwoWeeks: 'meetings.scheduleModal.recurrence.everyTwoWeeks',
   monthly: 'meetings.scheduleModal.recurrence.monthly',
 } as const satisfies Record<ScheduleMeetingRecurrenceOption, TranslationKey>;
+
+export const buildUpdateMeetingRecurrence = (
+  recurrence: ScheduleMeetingRecurrenceOption,
+  originalRecurrence: ScheduleMeetingRecurrenceOption,
+): Pick<UpdateMeeting, 'recurrence'> | Record<string, never> => {
+  if (recurrence === originalRecurrence) {
+    // Omit for non-repeating meetings: the backend rejects `recurrence: null` on update.
+    if (recurrence === 'doesNotRepeat') {
+      return {};
+    }
+
+    // Re-send unchanged recurrence so edits to other fields do not clear the series rule.
+    const mappedRecurrence = mapRecurrenceOptionToMeetingRecurrence(recurrence);
+    return mappedRecurrence === undefined ? {} : {recurrence: mappedRecurrence};
+  }
+
+  const mappedRecurrence = mapRecurrenceOptionToMeetingRecurrence(recurrence);
+
+  return mappedRecurrence === undefined ? {recurrence: null} : {recurrence: mappedRecurrence};
+};
 
 export const mapRecurrenceOptionToMeetingRecurrence = (
   option: ScheduleMeetingRecurrenceOption,

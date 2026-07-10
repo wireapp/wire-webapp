@@ -358,6 +358,36 @@ export class BackgroundEffectsHandler {
     const model = modelPath.split('/').pop();
     backgroundEffectsStore.getState().setModel(model);
   };
+
+  public async preloadResources(): Promise<void> {
+    if (backgroundEffectsStore.getState().isFeatureEnabled) {
+      const {wasmLoaderPath, wasmBinaryPath, modelPath} = defaultOpts;
+      // preload media pipe resources
+      this.prefetch(wasmLoaderPath);
+      this.prefetch(wasmBinaryPath);
+      this.prefetch(modelPath);
+      // preload default bg image
+      await loadBackgroundSource(DEFAULT_BUILTIN_BACKGROUND_ID);
+
+      const {preferredEffect} = backgroundEffectsStore.getState();
+      if (preferredEffect.type === 'virtual') {
+        await loadBackgroundSource(preferredEffect.backgroundId);
+      }
+    }
+  }
+
+  private prefetch(url: string) {
+    const existingPrefetchLink = document.head.querySelector<HTMLLinkElement>(`link[rel="prefetch"][href="${url}"]`);
+
+    if (existingPrefetchLink !== null) {
+      return;
+    }
+
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = url;
+    document.head.appendChild(link);
+  }
 }
 
 export class ReleasableMediaStream {

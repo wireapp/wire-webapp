@@ -71,7 +71,7 @@ jobs:
 
     services:
       testservice:
-        image: quay.io/wire/testservice:5ec1c95b75daa7241e38c97f2916a06a2e40ce1b
+        image: quay.io/wire/testservice:80a5c186821531c55ea3da3bdc67cac3c51f5f2c
         ports:
           - 8080:8080
 
@@ -144,7 +144,7 @@ jobs:
     timeout-minutes: 45
     needs: [bootstrap_smoke_test, compute_shards]
     container:
-      image: mcr.microsoft.com/playwright:v1.61.0-noble
+      image: quay.io/wire/mirror-images/playwright:v1.61.1-noble
       options: --ipc=host
 
     strategy:
@@ -156,7 +156,7 @@ jobs:
       # Run the kalium testservice as service container of the current job
       # (The tag specifies the commit in kalium to use for tests, see https://quay.io/repository/wire/testservice?tab=history for the latest version)
       testservice:
-        image: quay.io/wire/testservice:5ec1c95b75daa7241e38c97f2916a06a2e40ce1b
+        image: quay.io/wire/testservice:80a5c186821531c55ea3da3bdc67cac3c51f5f2c
         ports:
           - 8080:8080
 

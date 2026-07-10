@@ -26,7 +26,7 @@ import {RenameMessage} from 'Repositories/entity/message/renameMessage';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {SystemMessage} from './SystemMessage';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
 jest.mock('Components/icon', () => ({
   EditIcon: () => {

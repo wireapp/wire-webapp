@@ -81,7 +81,7 @@ export const Link = ({targetBlank, ...props}: LinkProps) => {
   return (
     <a
       css={(theme: Theme) => linkStyle(theme, props)}
-      target={targetBlank && '_blank'}
+      target={Boolean(targetBlank) ? '_blank' : (targetBlank as unknown as undefined)}
       rel="noopener noreferrer"
       {...filterLinkProps(props)}
     >

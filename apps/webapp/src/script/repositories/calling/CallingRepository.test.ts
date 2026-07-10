@@ -48,7 +48,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
 
-import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/TestUtil';
+import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
@@ -740,6 +740,47 @@ describe('CallingRepository', () => {
         // Screen sharing should be stopped first
         expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(1);
         expect(wCall.setVideoSendState).toHaveBeenCalledWith(wUser, conv.id, VIDEO_STATE.STARTED);
+      });
+    });
+
+    describe('refreshVideoInput', () => {
+      it('uses the active group or conference call context when refreshing video input', async () => {
+        const mediaStream = new MediaStream();
+        call.state(CALL_STATE.MEDIA_ESTAB);
+        spyOn(callingRepository['callState'], 'joinedCall').and.returnValues(call, undefined);
+        spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
+          Promise.resolve(mediaStream),
+        );
+        spyOn(callingRepository, 'stopMediaSource').and.returnValue(true);
+        spyOn(callingRepository, 'changeMediaSource').and.returnValue(mediaStream);
+
+        await callingRepository.refreshVideoInput();
+
+        expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledWith(
+          false,
+          true,
+          false,
+          true,
+        );
+      });
+
+      it('keeps the non-group default when refreshing video input without an active call', async () => {
+        const mediaStream = new MediaStream();
+        callingRepository['callState'].calls([]);
+        spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
+          Promise.resolve(mediaStream),
+        );
+        spyOn(callingRepository, 'stopMediaSource').and.returnValue(false);
+        spyOn(callingRepository, 'changeMediaSource').and.returnValue(undefined);
+
+        await callingRepository.refreshVideoInput();
+
+        expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledWith(
+          false,
+          true,
+          false,
+          false,
+        );
       });
     });
 

@@ -117,7 +117,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     this.messageTimer = new MessageTimer();
 
     // Make MLS recovery orchestrator mandatory in this service
-    if (!this._mlsService) {
+    if (this._mlsService === undefined) {
       throw new Error('MLSService is required to construct ConversationService with MLS capabilities');
     }
 
@@ -147,7 +147,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   get mlsService(): MLSService {
-    if (!this._mlsService) {
+    if (this._mlsService === undefined) {
       throw new Error('Cannot do MLS operations on a non-mls environment');
     }
     return this._mlsService;
@@ -211,7 +211,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   public async getConversations(conversationIds?: QualifiedId[]): Promise<RemoteConversations> {
-    if (!conversationIds) {
+    if (conversationIds === undefined) {
       const conversationIdsToSkip = await this.coreDatabase.getAll('conversationBlacklist');
       return this.apiClient.api.conversation.getConversationList(conversationIdsToSkip);
     }
@@ -471,7 +471,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const sentAt = response.time?.length > 0 ? response.time : new Date().toISOString();
 
     const failedToSend =
-      response?.failed || (response?.failed_to_send ?? []).length > 0
+      response.failed !== undefined || (response.failed_to_send ?? []).length > 0
         ? {
             queued: response?.failed_to_send,
             failed: response?.failed,
@@ -482,7 +482,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       id: payload.messageId,
       sentAt,
       failedToSend,
-      state: sentAt ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELED,
+      state: sentAt.length > 0 ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELED,
     };
   }
 
@@ -642,7 +642,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     const conversation = await this.getConversationByGroupId(groupId);
 
-    if (!conversation) {
+    if (conversation === undefined) {
       this.logger.warn(`No conversation found for group ${groupId}`, {error});
       return;
     }
@@ -799,7 +799,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     //fetch all the mls conversations from backend
     const conversations = await this.apiClient.api.conversation.getConversationList();
-    const foundConversations = conversations.found || [];
+    const foundConversations = conversations.found ?? [];
 
     const mlsConversations = foundConversations.filter(isMLSConversation);
 
@@ -1098,7 +1098,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   private async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent): Promise<HandledEventPayload | null> {
     try {
       const {qualified_conversation: qualifiedConversationId, subconv} = event;
-      if (!qualifiedConversationId) {
+      if (qualifiedConversationId === undefined) {
         throw new Error('Qualified conversation id is missing in the MLS message-add event');
       }
       return await this.MLSRecoveryOrchestrator.execute<HandledEventPayload | null>({
@@ -1226,7 +1226,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   private async isConversationBlacklisted(conversationId: string): Promise<boolean> {
     const foundEntry = await this.coreDatabase.get('conversationBlacklist', conversationId);
-    return !!foundEntry;
+    return foundEntry !== undefined;
   }
 
   /**

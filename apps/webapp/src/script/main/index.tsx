@@ -29,7 +29,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {createFireAndForgetInvoker} from '@wireapp/core';
 
-import {AppContainer} from 'Components/AppContainer/AppContainer';
+import {AppContainer} from 'Components/appContainer/appContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
 import {translate} from 'Util/localizerUtil';
@@ -40,7 +40,7 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import {createApplicationServices} from './createApplicationServices';
 
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {SIGN_OUT_REASON} from '../auth/signOutReason';
 
 // eslint-disable-next-line import/order
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
@@ -48,10 +48,16 @@ import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
+import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
+import {createMonotonicClock} from '../time/monotonicClock';
+
+const applicationMonotonicClock = createMonotonicClock({performance: globalThis.performance});
+const applicationBootstrapStartedAt = applicationMonotonicClock.nowMilliseconds;
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const domContentLoadedAt = applicationMonotonicClock.nowMilliseconds;
   const config = Config.getConfig();
 
   enableLogging(config);
@@ -80,13 +86,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const applicationServices = createApplicationServices({
+    createApplicationObservability() {
+      return createApplicationObservabilityFromConfig(config);
+    },
     createFireAndForgetInvoker: () => {
       return createFireAndForgetInvoker({logger: fireAndForgetInvokerLogger});
     },
     createWallClock,
+    monotonicClock: applicationMonotonicClock,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
-  const {fireAndForgetInvoker, wallClock} = applicationServices;
+  const {applicationObservability, fireAndForgetInvoker, monotonicClock, wallClock} = applicationServices;
   const apiClient = new APIClient({
     wallClock,
   });
@@ -121,8 +131,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     <AppContainer
       config={config}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
+      applicationObservability={applicationObservability}
+      applicationBootstrapStartedAt={applicationBootstrapStartedAt}
+      domContentLoadedAt={domContentLoadedAt}
       fireAndForgetInvoker={fireAndForgetInvoker}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
+      monotonicClock={monotonicClock}
       translate={translate}
       wallClock={wallClock}
     />,

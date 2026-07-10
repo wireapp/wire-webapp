@@ -25,11 +25,11 @@ import {SingleSignOnForm} from './singleSignOnForm';
 
 import {Config, Configuration} from '../../../Config';
 import {actionRoot} from '../../module/action';
-import {ValidationError} from '../../module/action/ValidationError';
+import {ValidationError} from '../../module/action/validationError';
 import {initialRootState} from '../../module/reducer';
 import {ROUTE, QUERY_KEY} from '../../route';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {mountComponent} from '../../util/test/TestUtil';
+import {mountComponent} from '../../util/test/testUtil';
 
 jest.mock('@wireapp/react-ui-kit', () => {
   const actualModule = jest.requireActual('@wireapp/react-ui-kit');

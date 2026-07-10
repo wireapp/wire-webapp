@@ -33,7 +33,7 @@ import {ClientRepository} from 'Repositories/client';
 import {ClientState} from 'Repositories/client/ClientState';
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
-import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
+import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

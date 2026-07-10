@@ -54,7 +54,7 @@ jobs:
 
       - run: ./bin/yarn --immutable
       - run: ./bin/yarn nx run webapp:configure
-      - run: ./bin/yarn nx run server:package
+      - run: ./bin/yarn build:prod
 
       - name: Compute target EB environment
         id: slot

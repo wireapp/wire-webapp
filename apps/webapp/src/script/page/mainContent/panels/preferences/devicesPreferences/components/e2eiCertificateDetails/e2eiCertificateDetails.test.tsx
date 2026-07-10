@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

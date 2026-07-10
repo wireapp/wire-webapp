@@ -55,6 +55,11 @@ globalThis.onmessage = ({data}) => {
       },
     ).catch((err: unknown) => {
       workerLogger.error(`[virtual-background] video error: ${(err as Error).message}`);
+      globalThis.postMessage({
+        name: 'error',
+        reason: 'segmenter-init-failed',
+        message: err instanceof Error ? err.message : String(err),
+      });
     });
   }
 };

@@ -49,7 +49,7 @@ import {
   createSelfParticipant,
   withIntl,
   withTheme,
-} from '../../../auth/util/test/TestUtil';
+} from '../../../auth/util/test/testUtil';
 
 jest.mock('Repositories/tracking/telemetry.helpers', () => ({
   isTelemetryEnabledAtCurrentEnvironment: () => true,

@@ -584,6 +584,13 @@ export const VideoControls = ({
 
   const emojisBarTargetWindow = activeWindow;
 
+  let screenShareButtonStyles = videoControlInActiveStyles;
+  if (!canShareScreen) {
+    screenShareButtonStyles = videoControlDisabledStyles;
+  } else if (selfSharesScreen) {
+    screenShareButtonStyles = videoControlActiveStyles;
+  }
+
   return (
     <ul id="video-controls" className="video-controls" css={videoControlsWrapperStyles}>
       <div
@@ -826,13 +833,7 @@ export const VideoControls = ({
           <button
             className={`video-controls__button ${!canShareScreen ? 'with-tooltip with-tooltip--top' : ''}`}
             data-tooltip={translate('videoCallScreenShareNotSupported')}
-            css={
-              !canShareScreen
-                ? videoControlDisabledStyles
-                : selfSharesScreen
-                  ? videoControlActiveStyles
-                  : videoControlInActiveStyles
-            }
+            css={screenShareButtonStyles}
             onClick={() => toggleScreenshare(call)}
             onKeyDown={event =>
               handleKeyDown({

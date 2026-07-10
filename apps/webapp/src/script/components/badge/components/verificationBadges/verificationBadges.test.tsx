@@ -19,8 +19,8 @@
 
 import {render} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {MLSStatuses} from 'src/script/E2EIdentity';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {MLSStatuses} from 'src/script/e2eIdentity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

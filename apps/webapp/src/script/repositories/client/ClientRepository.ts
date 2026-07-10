@@ -48,7 +48,7 @@ import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
 import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
 

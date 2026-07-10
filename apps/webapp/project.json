@@ -19,6 +19,9 @@
         },
         "production": {
           "command": "yarn build:prod"
+        },
+        "production-public": {
+          "command": "yarn build:prod:public"
         }
       }
     },

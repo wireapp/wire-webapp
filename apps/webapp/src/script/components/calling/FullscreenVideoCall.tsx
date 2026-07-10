@@ -36,10 +36,10 @@ import {
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/AppNotification/AppNotification';
+import {useAppNotification} from 'Components/appNotification/appNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {VideoBackgroundPerformancePanel} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
-import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
+import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import type {Call} from 'Repositories/calling/Call';

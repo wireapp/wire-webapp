@@ -17,16 +17,20 @@
  *
  */
 
-import {useCallback, useEffect, useId, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useId, useRef, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import {Button, Popover} from 'react-aria-components';
 
 import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {UserList} from 'Components/userList';
+import {UserSearchableList} from 'Components/UserSearchableList';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {User} from 'Repositories/entity/User';
+import type {SearchRepository} from 'Repositories/search/searchRepository';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import type {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {formatSelectedSummary} from './formatSelectedSummary';
@@ -35,9 +39,7 @@ import {
   chevronIconStyles,
   controlStyles,
   dialogStyles,
-  emptyStateStyles,
   listContainerStyles,
-  loadingStateStyles,
   popoverOverlayStyles,
   popoverStyles,
   searchIconStyles,
@@ -46,7 +48,6 @@ import {
   valueContainerStyles,
   wrapperStyles,
 } from './MeetingParticipantsPicker.styles';
-import {filterUsersByQuery, toggleUserInSelection} from './participantPickerUtils';
 
 export interface MeetingParticipantsPickerProps {
   id: string;
@@ -57,15 +58,16 @@ export interface MeetingParticipantsPickerProps {
   filter: string;
   onFilterChange: (filter: string) => void;
   selfUser: User;
-  conversationRepository?: ConversationRepository;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  conversationRepository: ConversationRepository;
+  conversationState?: ConversationState;
+  teamState?: TeamState;
   label?: string;
   placeholder?: string;
   disabled?: boolean;
   markInvalid?: boolean;
   required?: boolean;
-  isLoading?: boolean;
-  noOptionsMessage?: string;
-  loadingMessage?: string;
   noUnderline?: boolean;
   popoverPortalContainer?: HTMLElement;
 }
@@ -79,15 +81,16 @@ export const MeetingParticipantsPicker = ({
   filter,
   onFilterChange,
   selfUser,
+  searchRepository,
+  teamRepository,
   conversationRepository,
+  conversationState,
+  teamState,
   label,
   placeholder = 'Enter a name',
   disabled = false,
   markInvalid = false,
   required = false,
-  isLoading = false,
-  noOptionsMessage = 'No participants found',
-  loadingMessage = 'Loading...',
   noUnderline = true,
   popoverPortalContainer,
 }: MeetingParticipantsPickerProps) => {
@@ -98,7 +101,6 @@ export const MeetingParticipantsPicker = ({
   const listboxId = useId();
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
 
-  const filteredUsers = useMemo(() => filterUsersByQuery(users, filter), [filter, users]);
   const selectedSummary = formatSelectedSummary(selectedUsers, translate);
   const hasSelection = selectedUsers.length > 0;
   const showPlaceholder = !hasSelection && filter.length === 0;
@@ -144,36 +146,6 @@ export const MeetingParticipantsPicker = ({
       document.removeEventListener('pointerdown', handlePointerDown, true);
     };
   }, [handleOpenChange, isOpen]);
-
-  const handleUserSelect = useCallback(
-    (user: User) => {
-      onSelectedUsersChange(toggleUserInSelection(selectedUsers, user));
-    },
-    [onSelectedUsersChange, selectedUsers],
-  );
-
-  const listContent = (() => {
-    if (isLoading) {
-      return <div css={loadingStateStyles}>{loadingMessage}</div>;
-    }
-
-    if (filteredUsers.length === 0) {
-      return <div css={emptyStateStyles}>{noOptionsMessage}</div>;
-    }
-
-    return (
-      <UserList
-        conversationRepository={conversationRepository}
-        users={filteredUsers}
-        selectedUsers={selectedUsers}
-        onSelectUser={handleUserSelect}
-        isSelectable
-        noUnderline={noUnderline}
-        selfUser={selfUser}
-        truncate
-      />
-    );
-  })();
 
   return (
     <div css={wrapperStyles} data-uie-name={dataUieName}>
@@ -266,7 +238,25 @@ export const MeetingParticipantsPicker = ({
             role="listbox"
             aria-multiselectable="true"
           >
-            {listContent}
+            <UserSearchableList
+              selfUser={selfUser}
+              users={users}
+              filter={filter}
+              selected={selectedUsers}
+              isSelectable
+              onUpdateSelectedUsers={onSelectedUsersChange}
+              searchRepository={searchRepository}
+              teamRepository={teamRepository}
+              conversationRepository={conversationRepository}
+              conversationState={conversationState}
+              teamState={teamState}
+              noUnderline={noUnderline}
+              allowRemoteSearch
+              filterRemoteTeamUsers
+              showAllProvidedUsers
+              truncate
+              dataUieName={`${dataUieName}-list`}
+            />
           </div>
         </div>
       </Popover>

@@ -78,8 +78,8 @@ export const DateTimePickerField = ({
   minValue,
 }: DateTimePickerFieldProps) => {
   const labelId = `${dataUieName}-label`;
-  const selectedDate = useMemo(() => (value ? dateValueFromDate(value) : null), [value]);
-  const selectedTime = useMemo(() => (value ? nearestTimeOptionFromDate(value) : null), [value]);
+  const selectedDate = useMemo(() => (value !== null ? dateValueFromDate(value) : null), [value]);
+  const selectedTime = useMemo(() => (value !== null ? nearestTimeOptionFromDate(value) : null), [value]);
 
   const handleDateChange = useCallback(
     (nextDate: DateValue | null) => {

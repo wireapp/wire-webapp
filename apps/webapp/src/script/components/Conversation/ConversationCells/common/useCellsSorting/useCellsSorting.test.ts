@@ -26,7 +26,7 @@ describe('useCellsSorting', () => {
     const {result} = renderHook(() => useCellsSorting());
 
     expect(result.current.sort).toBeNull();
-    expect(result.current.getDirectionFor('name_ci')).toBeUndefined();
+    expect(result.current.getDirectionFor('name')).toBeUndefined();
     expect(result.current.getDirectionFor('mtime')).toBeUndefined();
     expect(result.current.getDirectionFor('size')).toBeUndefined();
   });
@@ -34,9 +34,9 @@ describe('useCellsSorting', () => {
   it('applies the default direction when selecting a sort field', () => {
     const {result} = renderHook(() => useCellsSorting());
 
-    act(() => result.current.toggleSort('name_ci'));
-    expect(result.current.sort).toEqual({field: 'name_ci', direction: 'asc'});
-    expect(result.current.getDirectionFor('name_ci')).toBe('asc');
+    act(() => result.current.toggleSort('name'));
+    expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
+    expect(result.current.getDirectionFor('name')).toBe('asc');
 
     act(() => result.current.toggleSort('mtime'));
     expect(result.current.sort).toEqual({field: 'mtime', direction: 'desc'});
@@ -50,14 +50,14 @@ describe('useCellsSorting', () => {
   it('toggles the active sort field between ascending and descending', () => {
     const {result} = renderHook(() => useCellsSorting());
 
-    act(() => result.current.toggleSort('name_ci'));
-    expect(result.current.sort).toEqual({field: 'name_ci', direction: 'asc'});
+    act(() => result.current.toggleSort('name'));
+    expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
 
-    act(() => result.current.toggleSort('name_ci'));
-    expect(result.current.sort).toEqual({field: 'name_ci', direction: 'desc'});
+    act(() => result.current.toggleSort('name'));
+    expect(result.current.sort).toEqual({field: 'name', direction: 'desc'});
 
-    act(() => result.current.toggleSort('name_ci'));
-    expect(result.current.sort).toEqual({field: 'name_ci', direction: 'asc'});
+    act(() => result.current.toggleSort('name'));
+    expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
   });
 
   it('returns a direction only for the active sort field', () => {
@@ -65,7 +65,7 @@ describe('useCellsSorting', () => {
 
     act(() => result.current.toggleSort('mtime'));
 
-    expect(result.current.getDirectionFor('name_ci')).toBeUndefined();
+    expect(result.current.getDirectionFor('name')).toBeUndefined();
     expect(result.current.getDirectionFor('mtime')).toBe('desc');
     expect(result.current.getDirectionFor('size')).toBeUndefined();
   });
@@ -76,9 +76,42 @@ describe('useCellsSorting', () => {
     act(() => result.current.toggleSort('size'));
     expect(result.current.sort).toEqual({field: 'size', direction: 'asc'});
 
-    act(() => result.current.resetSort());
+    act(() => result.current.setSort(null));
 
     expect(result.current.sort).toBeNull();
     expect(result.current.getDirectionFor('size')).toBeUndefined();
+  });
+
+  it('derives an unsorted state immediately when the sorting scope changes', () => {
+    const {result, rerender} = renderHook(({scopeKey}: {scopeKey: string}) => useCellsSorting(scopeKey), {
+      initialProps: {scopeKey: 'conversation-a:browse'},
+    });
+
+    act(() => result.current.toggleSort('name'));
+    expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
+
+    rerender({scopeKey: 'conversation-a:search'});
+
+    expect(result.current.sort).toBeNull();
+    expect(result.current.getDirectionFor('name')).toBeUndefined();
+
+    act(() => result.current.toggleSort('name'));
+
+    expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
+
+    rerender({scopeKey: 'conversation-a:browse'});
+    rerender({scopeKey: 'conversation-a:search'});
+
+    expect(result.current.sort).toBeNull();
+    expect(result.current.getDirectionFor('name')).toBeUndefined();
+  });
+
+  it('keeps setSort stable across sort changes', () => {
+    const {result} = renderHook(() => useCellsSorting());
+    const setSort = result.current.setSort;
+
+    act(() => result.current.toggleSort('name'));
+
+    expect(result.current.setSort).toBe(setSort);
   });
 });
