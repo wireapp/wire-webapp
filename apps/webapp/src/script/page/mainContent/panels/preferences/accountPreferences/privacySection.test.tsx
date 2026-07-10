@@ -36,7 +36,7 @@ import {PrivacySection} from './privacySection';
 const createMockAppLockState = (overrides?: Partial<AppLockState>): AppLockState => {
   const hasPassphrase = ko.observable(false);
   const isActivatedInPreferences = ko.observable(false);
-  
+
   // Create observables for computed values that can be overridden
   const isAppLockEnforcedValue = ko.observable(overrides?.isAppLockEnforced?.() ?? false);
   const isAppLockAvailableValue = ko.observable(overrides?.isAppLockAvailable?.() ?? true);
