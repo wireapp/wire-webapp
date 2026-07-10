@@ -91,7 +91,7 @@ export const MeetingParticipantsPicker = ({
   disabled = false,
   markInvalid = false,
   required = false,
-  noUnderline = true,
+  noUnderline = false,
   popoverPortalContainer,
 }: MeetingParticipantsPickerProps) => {
   const {translate} = useApplicationContext();
@@ -209,12 +209,7 @@ export const MeetingParticipantsPicker = ({
           data-uie-name={`${dataUieName}-toggle`}
           onPress={() => handleOpenChange(!isOpen)}
         >
-          <ChevronDownIcon
-            aria-hidden="true"
-            width={12}
-            height={12}
-            css={[chevronIconStyles, isOpen && {transform: 'rotate(180deg)'}]}
-          />
+          <ChevronDownIcon aria-hidden="true" width={16} height={16} css={chevronIconStyles(isOpen)} />
         </Button>
       </div>
 
