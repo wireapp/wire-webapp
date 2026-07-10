@@ -25,11 +25,12 @@ import {useNavigate} from 'react-router';
 import {UnknownAction} from 'redux';
 import {container} from 'tsyringe';
 
+import {Config} from 'src/script/Config';
+
 import {APIClient} from '../../service/APIClientSingleton';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import {ROUTE} from '../route';
-import {Config} from 'src/script/Config';
 
 export const useEnterpriseLoginV2 = ({
   loginWithSSO,

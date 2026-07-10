@@ -87,7 +87,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   private readonly logger = LogFactory.getLogger('@wireapp/core/ConversationService');
   // Track groups currently undergoing recovery due to key material update failure to prevent duplicate work
   private groupIdConversationMap: Map<string, Conversation> = new Map();
-  private MLSRecoveryOrchestrator: MlsRecoveryOrchestrator;
+  private MLSRecoveryOrchestrator?: MlsRecoveryOrchestrator;
 
   constructor(
     private readonly apiClient: APIClient,
@@ -104,31 +104,29 @@ export class ConversationService extends TypedEventEmitter<Events> {
     super();
     this.messageTimer = new MessageTimer();
 
-    // Make MLS recovery orchestrator mandatory in this service
-    if (!this._mlsService) {
-      throw new Error('MLSService is required to construct ConversationService with MLS capabilities');
+    // Initialize MLS recovery orchestrator only if MLS service is available
+    if (this._mlsService !== undefined) {
+      this._mlsService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, data => {
+        this.emit(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, data);
+      });
+      this._mlsService.on(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, ({error, groupId}) => {
+        this.logger.warn(`Key material update failure for group ${groupId}`, {error});
+        return this.reactToKeyMaterialUpdateFailure({error, groupId});
+      });
+
+      // Initialize MLS recovery orchestrator with default policies and single-flight de-duplication
+      const mapper = createDefaultMlsErrorMapper();
+      this.MLSRecoveryOrchestrator = new MlsRecoveryOrchestratorImpl(mapper, minimalDefaultPolicies, {
+        // Call the low-level API to avoid nested recovery when orchestrator triggers an external commit join
+        joinViaExternalCommit: (conversationId: QualifiedId) => this.performJoinByExternalCommitAPI(conversationId),
+        resetAndReestablish: (conversationId: QualifiedId) => this.handleBrokenMLSConversation(conversationId),
+        recoverFromEpochMismatch: (conversationId: QualifiedId, subconvId?: SUBCONVERSATION_ID) =>
+          this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId),
+        addMissingUsers: (conversationId: QualifiedId, groupId: string, users: QualifiedId[]) =>
+          this.performAddUsersToMLSConversationAPI({conversationId, groupId, qualifiedUsers: users}),
+        wipeMLSConversation: this.wipeMLSConversation,
+      });
     }
-
-    this.mlsService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, data => {
-      this.emit(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, data);
-    });
-    this.mlsService.on(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, ({error, groupId}) => {
-      this.logger.warn(`Key material update failure for group ${groupId}`, {error});
-      return this.reactToKeyMaterialUpdateFailure({error, groupId});
-    });
-
-    // Initialize MLS recovery orchestrator with default policies and single-flight de-duplication
-    const mapper = createDefaultMlsErrorMapper();
-    this.MLSRecoveryOrchestrator = new MlsRecoveryOrchestratorImpl(mapper, minimalDefaultPolicies, {
-      // Call the low-level API to avoid nested recovery when orchestrator triggers an external commit join
-      joinViaExternalCommit: (conversationId: QualifiedId) => this.performJoinByExternalCommitAPI(conversationId),
-      resetAndReestablish: (conversationId: QualifiedId) => this.handleBrokenMLSConversation(conversationId),
-      recoverFromEpochMismatch: (conversationId: QualifiedId, subconvId?: SUBCONVERSATION_ID) =>
-        this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId),
-      addMissingUsers: (conversationId: QualifiedId, groupId: string, users: QualifiedId[]) =>
-        this.performAddUsersToMLSConversationAPI({conversationId, groupId, qualifiedUsers: users}),
-      wipeMLSConversation: this.wipeMLSConversation,
-    });
   }
 
   get mlsService(): MLSService {
@@ -373,7 +371,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
     selfClientId: string,
     conversationQualifiedId: QualifiedId,
   ): Promise<BaseCreateConversationResponse> {
-    return this.MLSRecoveryOrchestrator.execute({
+    if (this._mlsService === undefined) {
+      throw new Error('MLSService is required to establish MLS group conversation');
+    }
+    return this.MLSRecoveryOrchestrator!.execute({
       context: {
         operationName: OperationName.establishGroup,
         qualifiedConversationId: conversationQualifiedId,
@@ -433,7 +434,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
   private async sendMLSMessage(params: SendMlsMessageParams): Promise<SendResult> {
     const {groupId, conversationId} = params;
 
-    return this.MLSRecoveryOrchestrator.execute({
+    if (this._mlsService === undefined) {
+      throw new Error('MLSService is required to send MLS messages');
+    }
+    return this.MLSRecoveryOrchestrator!.execute({
       context: {operationName: OperationName.send, qualifiedConversationId: conversationId, groupId},
       callBack: () => this.performSendMLSMessageAPI(params),
     });
@@ -487,6 +491,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     groupId,
     conversationId,
   }: Required<AddUsersParams> & {shouldRetry?: boolean}): Promise<BaseCreateConversationResponse> {
+    if (this._mlsService === undefined) {
+      throw new Error('MLSService is required to add users to MLS conversation');
+    }
     return this.MLSRecoveryOrchestrator.execute({
       context: {operationName: OperationName.addUsers, qualifiedConversationId: conversationId, groupId},
       callBack: () => this.performAddUsersToMLSConversationAPI({qualifiedUsers, groupId, conversationId}),
@@ -533,7 +540,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
     conversationId,
     qualifiedUserIds,
   }: RemoveUsersParams & {shouldRetry?: boolean}): Promise<Conversation> {
-    return this.MLSRecoveryOrchestrator.execute({
+    if (this._mlsService === undefined) {
+      throw new Error('MLSService is required to remove users from MLS conversation');
+    }
+    return this.MLSRecoveryOrchestrator!.execute({
       context: {operationName: OperationName.removeUsers, qualifiedConversationId: conversationId, groupId},
       callBack: () => this.performRemoveUsersFromMLSConversationAPI({groupId, conversationId, qualifiedUserIds}),
     });
@@ -566,6 +576,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * The join operation itself is not automatically re-run by policy.
    */
   public async joinByExternalCommit(conversationId: QualifiedId): Promise<void> {
+    if (this._mlsService === undefined) {
+      throw new Error('MLSService is required to join MLS conversation');
+    }
     await this.MLSRecoveryOrchestrator.execute({
       context: {operationName: OperationName.joinExternalCommit, qualifiedConversationId: conversationId},
       callBack: () => this.performJoinByExternalCommitAPI(conversationId),
@@ -610,8 +623,13 @@ export class ConversationService extends TypedEventEmitter<Events> {
       return;
     }
 
+    if (this._mlsService === undefined) {
+      this.logger.error('MLSService is not available for key material update recovery');
+      return;
+    }
+
     try {
-      await this.MLSRecoveryOrchestrator.execute({
+      await this.MLSRecoveryOrchestrator!.execute({
         context: {
           operationName: OperationName.keyMaterialUpdate,
           qualifiedConversationId: conversation.qualified_id,
@@ -623,8 +641,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
           throw error;
         },
       });
-    } catch (e) {
-      this.logger.error('Failed to react to key material update failure', {error: e, groupId});
+    } catch (error: unknown) {
+      this.logger.error('Failed to react to key material update failure', {error, groupId});
     }
   };
 
@@ -986,7 +1004,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
       if (!qualifiedConversationId) {
         throw new Error('Qualified conversation id is missing in the MLS message-add event');
       }
-      return await this.MLSRecoveryOrchestrator.execute<HandledEventPayload | null>({
+      if (this._mlsService === undefined) {
+        throw new Error('MLSService is required to handle MLS message-add event');
+      }
+      return await this.MLSRecoveryOrchestrator!.execute<HandledEventPayload | null>({
         context: {
           operationName: OperationName.handleMessageAdd,
           qualifiedConversationId,
@@ -1041,7 +1062,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
    */
   private async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent): Promise<HandledEventPayload | null> {
     this.logger.info('Handling MLS welcome message event (orchestrated)', {event});
-    await this.MLSRecoveryOrchestrator.execute({
+    if (this._mlsService === undefined) {
+      throw new Error('MLSService is required to handle MLS welcome message event');
+    }
+    await this.MLSRecoveryOrchestrator!.execute({
       context: {
         operationName: OperationName.handleWelcome,
         qualifiedConversationId: event.qualified_conversation,
