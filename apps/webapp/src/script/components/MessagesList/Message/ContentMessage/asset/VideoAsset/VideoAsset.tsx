@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -77,21 +77,17 @@ const VideoAsset = ({
   const hideControlsCallback = useCallback(() => setHideControls(true), []);
   const {removeTimeout, startTimeout} = useTimeout(hideControlsCallback, hideControlsDelayMilliseconds);
 
-  const videoPreviewRef = useRef<AssetUrl>();
-  const videoSrcRef = useRef<AssetUrl>();
-
-  videoPreviewRef.current = videoPreview;
-  videoSrcRef.current = videoSrc;
+  useEffect(() => {
+    return () => videoPreview?.dispose();
+  }, [videoPreview]);
 
   useEffect(() => {
-    return () => {
-      videoPreviewRef.current?.dispose();
-      videoSrcRef.current?.dispose();
-    };
-  }, []);
+    return () => videoSrc?.dispose();
+  }, [videoSrc]);
 
   useEffect(() => {
     if (assetPreviewResource === undefined || !isFileSharingReceivingEnabled) {
+      setVideoPreview(undefined);
       return;
     }
 
@@ -103,10 +99,7 @@ const VideoAsset = ({
         return;
       }
 
-      setVideoPreview(previous => {
-        previous?.dispose();
-        return url;
-      });
+      setVideoPreview(url);
     });
 
     return () => {
@@ -171,10 +164,7 @@ const VideoAsset = ({
             return;
           }
 
-          setVideoSrc(previous => {
-            previous?.dispose();
-            return assetUrl;
-          });
+          setVideoSrc(assetUrl);
           setIsVideoLoaded(true);
           // ToDo: This needs to be revisited
           //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);
