@@ -209,12 +209,7 @@ export const MeetingParticipantsPicker = ({
           data-uie-name={`${dataUieName}-toggle`}
           onPress={() => handleOpenChange(!isOpen)}
         >
-          <ChevronDownIcon
-            aria-hidden="true"
-            width={16}
-            height={16}
-            css={chevronIconStyles(isOpen)}
-          />
+          <ChevronDownIcon aria-hidden="true" width={16} height={16} css={chevronIconStyles(isOpen)} />
         </Button>
       </div>
 
