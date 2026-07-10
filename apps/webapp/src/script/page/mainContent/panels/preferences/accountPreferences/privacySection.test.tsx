@@ -61,13 +61,13 @@ const createMockPropertiesRepository = (): PropertiesRepository => {
   return {
     receiptMode: ko.observable(0),
     typingIndicatorMode: ko.observable(0),
-  } as any;
+  };
 };
 
 const createMockAppLockRepository = (): AppLockRepository => {
   return {
     setEnabled: jest.fn(),
-  } as any;
+  };
 };
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -83,7 +83,7 @@ describe('PrivacySection', () => {
       FEATURE: {
         ENABLE_MDM_CONFIG: false,
       },
-    } as any);
+    });
     desktopConfigSpy = jest.spyOn(Config, 'getDesktopConfig').mockReturnValue(undefined);
   });
 
@@ -142,7 +142,7 @@ describe('PrivacySection', () => {
           FEATURE: {
             ENABLE_MDM_CONFIG: true,
           },
-        } as any);
+        });
       });
 
       describe('and MDM override is enabled', () => {
@@ -152,7 +152,7 @@ describe('PrivacySection', () => {
             managedConfig: {
               applockOverride: true,
             },
-          } as any);
+          });
         });
 
         it('should disable the app lock checkbox', () => {
@@ -209,7 +209,7 @@ describe('PrivacySection', () => {
             managedConfig: {
               applockOverride: false,
             },
-          } as any);
+          });
         });
 
         it('should not disable the app lock checkbox', () => {
@@ -240,7 +240,7 @@ describe('PrivacySection', () => {
         beforeEach(() => {
           desktopConfigSpy.mockReturnValue({
             version: '1.0',
-          } as any);
+          });
         });
 
         it('should not disable the app lock checkbox', () => {
@@ -303,7 +303,7 @@ describe('PrivacySection', () => {
           FEATURE: {
             ENABLE_MDM_CONFIG: false,
           },
-        } as any);
+        });
       });
 
       it('should not disable the app lock checkbox even if desktopConfig has applockOverride', () => {
@@ -312,7 +312,7 @@ describe('PrivacySection', () => {
           managedConfig: {
             applockOverride: true,
           },
-        } as any);
+        });
 
         const appLockState = createMockAppLockState({
           isAppLockAvailable: ko.pureComputed(() => true),
@@ -367,13 +367,13 @@ describe('PrivacySection', () => {
           FEATURE: {
             ENABLE_MDM_CONFIG: true,
           },
-        } as any);
+        });
         desktopConfigSpy.mockReturnValue({
           version: '1.0',
           managedConfig: {
             applockOverride: true,
           },
-        } as any);
+        });
 
         const appLockState = createMockAppLockState({
           isAppLockAvailable: ko.pureComputed(() => true),
@@ -405,13 +405,13 @@ describe('PrivacySection', () => {
           FEATURE: {
             ENABLE_MDM_CONFIG: true,
           },
-        } as any);
+        });
         desktopConfigSpy.mockReturnValue({
           version: '1.0',
           managedConfig: {
-            applockOverride: 1 as any, // Invalid: number instead of boolean
+            applockOverride: 1, // Invalid: number instead of boolean
           },
-        } as any);
+        });
 
         const appLockState = createMockAppLockState({
           isAppLockAvailable: ko.pureComputed(() => true),
@@ -441,12 +441,12 @@ describe('PrivacySection', () => {
           FEATURE: {
             ENABLE_MDM_CONFIG: true,
           },
-        } as any);
+        });
         // Old config format without managedConfig
         desktopConfigSpy.mockReturnValue({
           version: '0.5',
           supportsCallingPopoutWindow: true,
-        } as any);
+        });
 
         const appLockState = createMockAppLockState({
           isAppLockAvailable: ko.pureComputed(() => true),
@@ -475,13 +475,13 @@ describe('PrivacySection', () => {
           FEATURE: {
             ENABLE_MDM_CONFIG: true,
           },
-        } as any);
+        });
         desktopConfigSpy.mockReturnValue({
           version: '1.0',
           managedConfig: {
             applockOverride: undefined,
           },
-        } as any);
+        });
 
         const appLockState = createMockAppLockState({
           isAppLockAvailable: ko.pureComputed(() => true),
@@ -510,13 +510,13 @@ describe('PrivacySection', () => {
           FEATURE: {
             ENABLE_MDM_CONFIG: true,
           },
-        } as any);
+        });
         desktopConfigSpy.mockReturnValue({
           version: '1.0',
           managedConfig: {
             applockOverride: null,
           },
-        } as any);
+        });
 
         const appLockState = createMockAppLockState({
           isAppLockAvailable: ko.pureComputed(() => true),
