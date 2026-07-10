@@ -85,7 +85,8 @@ test.describe('account settings', () => {
     password: process.env.SSO_CLAIMED_USER_PASSWORD,
   });
 
-  test(
+  // Todo: This test is skipped because of disabled Okta account [WPB-26999]
+  test.skip(
     'I should not be able to change email of user managed by SCIM',
     {tag: ['@TC-60', '@regression']},
     async ({context, createPage}) => {
@@ -223,6 +224,7 @@ test.describe('account settings', () => {
     // Verify sync on second device
     await expect(userA2DeviceComponents.conversationSidebar().personalUserName).toContainText(newUserName);
   });
+
 
   test(
     'Verify autogeneration of a username for a user',
