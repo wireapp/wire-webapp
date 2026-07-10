@@ -55,6 +55,7 @@ const VideoAsset = ({
   message,
   isQuote,
   teamState = container.resolve(TeamState),
+  assetRepository = container.resolve(AssetRepository),
   isFocusable = true,
 }: VideoAssetProps) => {
   const {translate} = useApplicationContext();
@@ -71,7 +72,7 @@ const VideoAsset = ({
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [displaySmall, setDisplaySmall] = useState(isQuote === true);
   const {transferState, isUploading, isPendingUpload, uploadProgress, cancelUpload, getAssetUrl, downloadAsset} =
-    useAssetTransfer(message);
+    useAssetTransfer(message, assetRepository);
 
   const [hideControls, setHideControls] = useState(false);
   const hideControlsCallback = useCallback(() => setHideControls(true), []);

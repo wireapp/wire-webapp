@@ -17,10 +17,11 @@
  *
  */
 
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {FileAsset} from 'Repositories/entity/message/fileAsset';
@@ -32,20 +33,22 @@ import {
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {VideoAsset} from './VideoAsset';
-import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
-
-jest.mock('../common/useAssetTransfer/useAssetTransfer');
-
-const mockedUseAssetTransfer = jest.mocked(useAssetTransfer);
 
 describe('VideoAsset', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );
 
-  const previewDispose = jest.fn();
-  const videoSrcDispose = jest.fn();
-  const mockGetAssetUrl = jest.fn<Promise<AssetUrl>, [resource: AssetRemoteData, acceptedMimeTypes?: string[]]>();
+  const previewBlob = new Blob([], {type: 'video/mp4'});
+  const videoBlob = new Blob([], {type: 'video/mp4'});
+  const progressObservable = ko.observable(-1);
+
+  const assetRepository = {
+    getUploadProgress: jest.fn().mockReturnValue(ko.pureComputed(() => progressObservable())),
+    load: jest.fn(),
+    cancelUpload: jest.fn(),
+    downloadFile: jest.fn().mockResolvedValue(undefined),
+  } as unknown as jest.Mocked<AssetRepository>;
 
   const teamState = {
     isFileSharingReceivingEnabled: ko.pureComputed(() => true),
@@ -73,27 +76,21 @@ describe('VideoAsset', () => {
     return message;
   };
 
-  const setupAssetTransferMock = (): void => {
-    mockGetAssetUrl.mockReset();
-    previewDispose.mockReset();
-    videoSrcDispose.mockReset();
+  const setupAssetRepository = (): void => {
+    progressObservable(-1);
+    assetRepository.getUploadProgress.mockReturnValue(ko.pureComputed(() => progressObservable()));
+    assetRepository.load.mockReset().mockResolvedValueOnce(previewBlob).mockResolvedValueOnce(videoBlob);
 
-    mockGetAssetUrl
-      .mockResolvedValueOnce({url: 'blob:mock-preview', dispose: previewDispose})
-      .mockResolvedValueOnce({url: 'blob:mock-video-src', dispose: videoSrcDispose});
-
-    mockedUseAssetTransfer.mockReturnValue({
-      cancelUpload: jest.fn(),
-      downloadAsset: jest.fn(),
-      getAssetUrl: mockGetAssetUrl,
-      isDownloading: false,
-      isPendingUpload: false,
-      isUploaded: true,
-      isUploading: false,
-      transferState: AssetTransferState.UPLOADED,
-      uploadProgress: -1,
-    });
+    jest
+      .spyOn(URL, 'createObjectURL')
+      .mockReturnValueOnce('blob:mock-preview')
+      .mockReturnValueOnce('blob:mock-video-src');
   };
+
+  const renderVideoAsset = (message: ContentMessage) =>
+    render(<VideoAsset message={message} teamState={teamState} assetRepository={assetRepository} />, {
+      wrapper: rootProviderWrapper,
+    });
 
   beforeAll(() => {
     HTMLVideoElement.prototype.play = jest.fn().mockResolvedValue(undefined);
@@ -128,26 +125,28 @@ describe('VideoAsset', () => {
 
       return videoElement;
     });
+
+    jest.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
   });
 
   beforeEach(() => {
     jest.clearAllMocks();
-    setupAssetTransferMock();
+    setupAssetRepository();
   });
 
   it('keeps the video blob URL alive while playback time updates trigger re-renders', async () => {
     const message = createVideoMessage();
 
-    render(<VideoAsset message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+    renderVideoAsset(message);
 
     await waitFor(() => {
-      expect(mockGetAssetUrl).toHaveBeenCalledTimes(1);
+      expect(assetRepository.load).toHaveBeenCalledTimes(1);
     });
 
     fireEvent.click(screen.getByTestId('do-play-media'));
 
     await waitFor(() => {
-      expect(mockGetAssetUrl).toHaveBeenCalledTimes(2);
+      expect(assetRepository.load).toHaveBeenCalledTimes(2);
     });
 
     const videoElement = document.querySelector('[data-uie-name="video-asset"] video') as HTMLVideoElement;
@@ -163,74 +162,46 @@ describe('VideoAsset', () => {
       fireEvent.timeUpdate(videoElement);
     }
 
-    expect(videoSrcDispose).not.toHaveBeenCalled();
+    expect(URL.revokeObjectURL).not.toHaveBeenCalledWith('blob:mock-video-src');
   });
 
   it('does not revoke the video blob URL when upload progress updates trigger re-renders', async () => {
     const message = createVideoMessage();
 
-    const renderWithUploadProgress = (uploadProgress: number) => {
-      mockedUseAssetTransfer.mockReturnValue({
-        cancelUpload: jest.fn(),
-        downloadAsset: jest.fn(),
-        getAssetUrl: mockGetAssetUrl,
-        isDownloading: false,
-        isPendingUpload: false,
-        isUploaded: uploadProgress <= -1,
-        isUploading: uploadProgress > -1,
-        transferState: uploadProgress > -1 ? AssetTransferState.UPLOADING : AssetTransferState.UPLOADED,
-        uploadProgress,
-      });
-
-      return render(<VideoAsset message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
-    };
-
-    const view = renderWithUploadProgress(-1);
+    renderVideoAsset(message);
 
     await waitFor(() => {
-      expect(mockGetAssetUrl).toHaveBeenCalledTimes(1);
+      expect(assetRepository.load).toHaveBeenCalledTimes(1);
     });
 
     fireEvent.click(screen.getByTestId('do-play-media'));
 
     await waitFor(() => {
-      expect(mockGetAssetUrl).toHaveBeenCalledTimes(2);
+      expect(assetRepository.load).toHaveBeenCalledTimes(2);
     });
 
     for (const uploadProgress of [25, 50, 75]) {
-      mockedUseAssetTransfer.mockReturnValue({
-        cancelUpload: jest.fn(),
-        downloadAsset: jest.fn(),
-        getAssetUrl: mockGetAssetUrl,
-        isDownloading: false,
-        isPendingUpload: false,
-        isUploaded: false,
-        isUploading: true,
-        transferState: AssetTransferState.UPLOADING,
-        uploadProgress,
+      act(() => {
+        progressObservable(uploadProgress);
       });
-
-      view.rerender(<VideoAsset message={message} teamState={teamState} />);
     }
 
-    expect(videoSrcDispose).not.toHaveBeenCalled();
+    expect(URL.revokeObjectURL).not.toHaveBeenCalledWith('blob:mock-video-src');
   });
 
   it('revokes blob URLs when the component unmounts', async () => {
     const message = createVideoMessage();
 
-    const {unmount} = render(<VideoAsset message={message} teamState={teamState} />, {
-      wrapper: rootProviderWrapper,
-    });
+    const {unmount} = renderVideoAsset(message);
 
     await waitFor(() => {
-      expect(mockGetAssetUrl).toHaveBeenCalledTimes(1);
+      expect(assetRepository.load).toHaveBeenCalledTimes(1);
     });
 
     fireEvent.click(screen.getByTestId('do-play-media'));
 
     await waitFor(() => {
-      expect(mockGetAssetUrl).toHaveBeenCalledTimes(2);
+      expect(assetRepository.load).toHaveBeenCalledTimes(2);
     });
 
     const videoElement = document.querySelector('[data-uie-name="video-asset"] video') as HTMLVideoElement;
@@ -241,56 +212,49 @@ describe('VideoAsset', () => {
 
     unmount();
 
-    expect(previewDispose).toHaveBeenCalledTimes(1);
-    expect(videoSrcDispose).toHaveBeenCalledTimes(1);
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-preview');
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-video-src');
   });
 
   it('revokes the object URL when unmounted before play finishes loading', async () => {
-    let resolveGetAssetUrl: (value: AssetUrl) => void = () => {};
-    const deferredGetAssetUrl = new Promise<AssetUrl>(resolve => {
-      resolveGetAssetUrl = resolve;
+    let resolveLoad: (blob: Blob) => void = () => {};
+    const deferredLoad = new Promise<Blob>(resolve => {
+      resolveLoad = resolve;
     });
 
-    mockGetAssetUrl.mockReset();
-    previewDispose.mockReset();
-    videoSrcDispose.mockReset();
+    assetRepository.load
+      .mockReset()
+      .mockResolvedValueOnce(previewBlob)
+      .mockImplementationOnce(() => deferredLoad);
 
-    mockGetAssetUrl
-      .mockResolvedValueOnce({url: 'blob:mock-preview', dispose: previewDispose})
-      .mockImplementationOnce(() => deferredGetAssetUrl);
-
-    mockedUseAssetTransfer.mockReturnValue({
-      cancelUpload: jest.fn(),
-      downloadAsset: jest.fn(),
-      getAssetUrl: mockGetAssetUrl,
-      isDownloading: false,
-      isPendingUpload: false,
-      isUploaded: true,
-      isUploading: false,
-      transferState: AssetTransferState.UPLOADED,
-      uploadProgress: -1,
-    });
+    jest.mocked(URL.createObjectURL).mockReset();
+    jest
+      .mocked(URL.createObjectURL)
+      .mockReturnValueOnce('blob:mock-preview')
+      .mockReturnValueOnce('blob:mock-deferred-video');
 
     const message = createVideoMessage();
-    const {unmount} = render(<VideoAsset message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+    const {unmount} = renderVideoAsset(message);
 
     await waitFor(() => {
-      expect(mockGetAssetUrl).toHaveBeenCalledTimes(1);
+      expect(assetRepository.load).toHaveBeenCalledTimes(1);
     });
 
     fireEvent.click(screen.getByTestId('do-play-media'));
 
     await waitFor(() => {
-      expect(mockGetAssetUrl).toHaveBeenCalledTimes(2);
+      expect(assetRepository.load).toHaveBeenCalledTimes(2);
     });
 
     unmount();
 
-    const deferredDispose = jest.fn();
-    resolveGetAssetUrl({url: 'blob:mock-deferred-video', dispose: deferredDispose});
+    await act(async () => {
+      resolveLoad(videoBlob);
+      await deferredLoad;
+    });
 
     await waitFor(() => {
-      expect(deferredDispose).toHaveBeenCalledTimes(1);
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-deferred-video');
     });
   });
 });
