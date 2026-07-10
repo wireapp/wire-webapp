@@ -38,6 +38,9 @@ export function bytesToUUID(uuid: Buffer | Uint8Array): string {
 }
 
 const maxSize = 10_000;
+const maximumSafeLogMessageLength = 200;
+const maximumSafeErrorNameLength = 100;
+const redactedValue = '[REDACTED]';
 export function serializeArgs(args: any[]): any[] {
   return args.map(arg => {
     let result: any;
@@ -88,16 +91,82 @@ function safeJsonStringify(obj: any): string {
 
 export function redactSensitiveData(input: any): any {
   if (typeof input === 'string') {
-    return input.replace(/Bearer\s+[\w\-._=]+/g, 'Bearer [REDACTED]');
+    return redactSensitiveString(input);
   }
 
   if (typeof input === 'object' && input !== null) {
     const clone = JSON.parse(JSON.stringify(input));
     if (typeof clone.headers?.Authorization === 'string') {
-      clone.headers.Authorization = clone.headers.Authorization.replace(/Bearer\s+[\w\-._=]+/, 'Bearer [REDACTED]');
+      clone.headers.Authorization = redactSensitiveString(clone.headers.Authorization);
     }
     return clone;
   }
 
   return input;
+}
+
+export type SafeErrorDetails = {
+  readonly errorName: string;
+  readonly errorMessage: string;
+};
+
+function sanitizeUrlForLog(urlValue: string): string {
+  try {
+    const url = new URL(urlValue);
+    return url.search.length > 0 ? `${url.origin}${url.pathname}?${redactedValue}` : `${url.origin}${url.pathname}`;
+  } catch {
+    return urlValue;
+  }
+}
+
+function redactSensitiveString(value: string): string {
+  const valueWithSanitizedUrls = value.replace(/\b(?:wss?|https?):\/\/[^\s"'<>]+/giu, sanitizeUrlForLog);
+  const valueWithSanitizedQueryParameters = valueWithSanitizedUrls.replace(
+    /\b(access_token|sync_marker|marker_token|token|client|client_id)=([^&\s"']*)/giu,
+    `$1=${redactedValue}`,
+  );
+  const valueWithSanitizedHeaders = valueWithSanitizedQueryParameters
+    .replace(
+      /\b(authorization\s*:\s*)?bearer\s+[^\s,;]+/giu,
+      (_matchedValue, authorizationPrefix: string | undefined) => `${authorizationPrefix ?? ''}Bearer ${redactedValue}`,
+    )
+    .replace(/\b(?:set-cookie|cookie)\s*:\s*[^;\s]*(?:;[^\r\n]*)?/giu, `Cookie: ${redactedValue}`);
+
+  return valueWithSanitizedHeaders.replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gu, redactedValue);
+}
+
+export function sanitizeLogMessage(message: string): string {
+  return redactSensitiveString(message.replace(/[\r\n]+/gu, ' ')).slice(0, maximumSafeLogMessageLength);
+}
+
+export function formatSafeLogValue(value: string): string {
+  return JSON.stringify(sanitizeLogMessage(value));
+}
+
+function sanitizeErrorName(errorName: string): string {
+  const isSafeErrorName =
+    errorName.length > 0 && errorName.length <= maximumSafeErrorNameLength && /^[A-Za-z0-9_.:-]+$/u.test(errorName);
+
+  return isSafeErrorName ? errorName : 'UnknownError';
+}
+
+export function getSafeErrorDetails(error: unknown): SafeErrorDetails {
+  if (is.error(error)) {
+    return {
+      errorMessage: formatSafeLogValue(error.message),
+      errorName: sanitizeErrorName(error.name),
+    };
+  }
+
+  if (is.string(error)) {
+    return {
+      errorMessage: formatSafeLogValue(error),
+      errorName: 'UnknownError',
+    };
+  }
+
+  return {
+    errorMessage: formatSafeLogValue('Unknown error'),
+    errorName: 'UnknownError',
+  };
 }

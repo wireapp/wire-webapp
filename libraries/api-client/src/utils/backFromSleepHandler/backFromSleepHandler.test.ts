@@ -60,6 +60,21 @@ describe('onBackFromSleep', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
+  it('reports the observed timer gap and suspension duration', () => {
+    const callback = jest.fn();
+    const stop = onBackFromSleep({callback});
+    stopFunctions.push(stop);
+
+    now += CHECK_INTERVAL * 4;
+    jest.advanceTimersByTime(CHECK_INTERVAL);
+
+    expect(callback).toHaveBeenCalledWith({
+      expectedIntervalMilliseconds: CHECK_INTERVAL,
+      observedIntervalMilliseconds: CHECK_INTERVAL * 4,
+      suspensionDurationMilliseconds: CHECK_INTERVAL * 3,
+    });
+  });
+
   it('should not call the callback for small delays', () => {
     const callback = jest.fn();
     const stop = onBackFromSleep({callback});
