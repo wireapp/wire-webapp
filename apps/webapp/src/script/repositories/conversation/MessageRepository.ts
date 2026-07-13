@@ -153,6 +153,7 @@ type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
 
 type SendAndInjectMessageOptions = MessageSendingOptions & {
   enableEphemeral?: boolean;
+  optimisticMessageEntityHandling?: 'await-created-entity' | 'none';
   silentDegradationWarning?: boolean;
   skipInjection?: boolean;
   skipSelf?: boolean;
@@ -284,7 +285,10 @@ export class MessageRepository {
     });
 
     void this.audioRepository.play(AudioType.OUTGOING_PING);
-    return this.sendAndInjectMessage(ping, conversation, {enableEphemeral: true});
+    return this.sendAndInjectMessage(ping, conversation, {
+      enableEphemeral: true,
+      optimisticMessageEntityHandling: 'await-created-entity',
+    });
   }
 
   /**
@@ -307,7 +311,11 @@ export class MessageRepository {
       messageId,
     );
 
-    return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
+    return this.sendAndInjectMessage(textMessage, conversation, {
+      ...options,
+      enableEphemeral: true,
+      optimisticMessageEntityHandling: 'await-created-entity',
+    });
   }
 
   /**
@@ -328,7 +336,11 @@ export class MessageRepository {
     );
     const textMessage = MessageBuilder.buildMultipartMessage(attachments, text, messageId);
 
-    return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
+    return this.sendAndInjectMessage(textMessage, conversation, {
+      ...options,
+      enableEphemeral: true,
+      optimisticMessageEntityHandling: 'await-created-entity',
+    });
   }
 
   private async sendEdit({
@@ -842,7 +854,10 @@ export class MessageRepository {
           messageId,
         );
 
-    return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true});
+    return this.sendAndInjectMessage(assetMessage, conversation, {
+      enableEphemeral: true,
+      optimisticMessageEntityHandling: 'await-created-entity',
+    });
   }
 
   /**
@@ -946,7 +961,11 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ): Promise<SendAndInjectResult> {
-    if (this.messageRepositoryOptions.isMessageSendingStatusFixEnabled) {
+    const shouldAwaitCreatedOptimisticMessageEntity =
+      this.messageRepositoryOptions.isMessageSendingStatusFixEnabled &&
+      options.optimisticMessageEntityHandling === 'await-created-entity';
+
+    if (shouldAwaitCreatedOptimisticMessageEntity) {
       return this.sendAndInjectMessageWithReliableStatusUpdate(message, conversation, options);
     }
 
