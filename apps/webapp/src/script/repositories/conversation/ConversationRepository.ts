@@ -57,6 +57,7 @@ import {AddUsersFailure, BaseCreateConversationResponse} from '@wireapp/core/lib
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import pDefer, {type DeferredPromise} from 'p-defer';
 import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
@@ -208,6 +209,7 @@ export class ConversationRepository {
   public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
   private mlsConversationVerificationStateHandler?: MLSConversationVerificationStateHandler;
   private initiatingMlsConversationQualifiedIds: QualifiedId[] = [];
+  private readonly injectedMessageEventWaiters = new Map<string, DeferredPromise<Message | undefined>>();
 
   static get CONFIG() {
     return {
@@ -387,6 +389,39 @@ export class ConversationRepository {
 
   checkMessageTimer(messageEntity: ContentMessage): void {
     this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
+  }
+
+  public prepareForInjectedMessageEvent(messageId: string): void {
+    if (this.injectedMessageEventWaiters.has(messageId)) {
+      throw new Error(`A completion waiter already exists for injected message '${messageId}'`);
+    }
+
+    this.injectedMessageEventWaiters.set(messageId, pDefer<Message | undefined>());
+  }
+
+  public async waitForInjectedMessageEvent(messageId: string): Promise<Message | undefined> {
+    const messageEventWaiter = this.injectedMessageEventWaiters.get(messageId);
+    if (is.undefined(messageEventWaiter)) {
+      throw new Error(`No completion waiter exists for injected message '${messageId}'`);
+    }
+
+    try {
+      return await messageEventWaiter.promise;
+    } finally {
+      if (this.injectedMessageEventWaiters.get(messageId) === messageEventWaiter) {
+        this.injectedMessageEventWaiters.delete(messageId);
+      }
+    }
+  }
+
+  public cancelInjectedMessageEventWait(messageId: string): void {
+    const messageEventWaiter = this.injectedMessageEventWaiters.get(messageId);
+    if (is.undefined(messageEventWaiter)) {
+      return;
+    }
+
+    this.injectedMessageEventWaiters.delete(messageId);
+    messageEventWaiter.resolve(undefined);
   }
 
   private initSubscriptions(): void {
@@ -3578,13 +3613,29 @@ export class ConversationRepository {
    * @returns Resolves when event was handled
    */
   private readonly onConversationEvent = async (event: IncomingEvent, source = EventRepository.SOURCE.STREAM) => {
-    const start = performance.now();
-    const handledConversations = await this.handleConversationEvent(event, source);
-    const duration = performance.now() - start;
+    const eventId = 'id' in event ? event.id : undefined;
+    const messageEventWaiter = is.undefined(eventId) ? undefined : this.injectedMessageEventWaiters.get(eventId);
 
-    this.logConversationEvent(event, source, duration);
+    try {
+      const start = performance.now();
+      const handledConversationEvent = await this.handleConversationEvent(event, source);
+      const duration = performance.now() - start;
 
-    return handledConversations;
+      this.logConversationEvent(event, source, duration);
+
+      if (!is.undefined(messageEventWaiter)) {
+        const messageEntity = handledConversationEvent?.messageEntity;
+        if (is.undefined(messageEntity)) {
+          throw new Error(`Injected message '${eventId}' did not produce a message entity`);
+        }
+        messageEventWaiter.resolve(messageEntity);
+      }
+
+      return handledConversationEvent;
+    } catch (error: unknown) {
+      messageEventWaiter?.reject(error);
+      throw error;
+    }
   };
 
   private handleConversationEvent(
@@ -3656,9 +3707,10 @@ export class ConversationRepository {
         conversationEntity =>
           this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as Promise<EntityObject>,
       )
-      .then((entityObject = {} as EntityObject) =>
-        this.handleConversationNotification(entityObject as EntityObject, eventSource, type),
-      )
+      .then(async (entityObject = {} as EntityObject) => {
+        await this.handleConversationNotification(entityObject as EntityObject, eventSource, type);
+        return entityObject;
+      })
       .catch((error: unknown) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,

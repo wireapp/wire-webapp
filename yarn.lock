@@ -12008,6 +12008,7 @@ __metadata:
     noop-esm: "npm:1.1.0"
     oidc-client-ts: "npm:3.5.0"
     os-browserify: "npm:0.3.0"
+    p-defer: "npm:4.0.1"
     p-wait-for: "npm:6.0.0"
     path-browserify: "npm:1.0.1"
     path-to-regexp: "npm:8.4.2"
@@ -24274,6 +24275,13 @@ __metadata:
     object-keys: "npm:^1.1.1"
     safe-push-apply: "npm:^1.0.0"
   checksum: 10/ab4bb3b8636908554fc19bf899e225444195092864cb61503a0d048fdaf662b04be2605b636a4ffeaf6e8811f6fcfa8cbb210ec964c0eb1a41eb853e1d5d2f41
+  languageName: node
+  linkType: hard
+
+"p-defer@npm:4.0.1":
+  version: 4.0.1
+  resolution: "p-defer@npm:4.0.1"
+  checksum: 10/a561e7b581b76e6dce8ae763b4980004dbc795781de327d0b760e5341f035b0fa2c14e892a66d6d8122e2e114815a26f5ad154061374df84f88e75405ea4b0bb
   languageName: node
   linkType: hard
 

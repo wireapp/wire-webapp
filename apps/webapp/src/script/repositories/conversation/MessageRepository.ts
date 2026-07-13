@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {AssetAuditData} from '@wireapp/api-client/lib/asset';
 import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -149,6 +150,22 @@ type TextMessagePayload = {
 };
 type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
 
+type SendAndInjectMessageOptions = MessageSendingOptions & {
+  enableEphemeral?: boolean;
+  silentDegradationWarning?: boolean;
+  skipInjection?: boolean;
+  skipSelf?: boolean;
+  syncTimestamp?: boolean;
+  targetMode?: MessageTargetMode;
+  consentType?: CONSENT_TYPE;
+};
+
+type MessageSendingEventHandling = {
+  readonly prepareForInjectedMessageEvent: (messageId: string) => void;
+  readonly waitForInjectedMessageEvent: (messageId: string) => Promise<StoredMessage | undefined>;
+  readonly cancelInjectedMessageEventWait: (messageId: string) => void;
+};
+
 type MultipartMessagePayload = TextMessagePayload & {
   attachments: MultiPartContent['attachments'];
 };
@@ -186,7 +203,7 @@ export class MessageRepository {
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
     private readonly translate: Translate,
-    public readonly messageRepositoryOptions: MessageRepositoryOptions = {
+    private readonly messageRepositoryOptions: MessageRepositoryOptions = {
       isMessageSendingStatusFixEnabled: false,
     },
     private readonly userState = container.resolve(UserState),
@@ -923,6 +940,58 @@ export class MessageRepository {
   private async sendAndInjectMessage(
     message: GenericMessage,
     conversation: Conversation,
+    options: SendAndInjectMessageOptions = {
+      syncTimestamp: true,
+    },
+  ): Promise<SendAndInjectResult> {
+    if (this.messageRepositoryOptions.isMessageSendingStatusFixEnabled) {
+      return this.sendAndInjectMessageWithReliableStatusUpdate(message, conversation, options);
+    }
+
+    return this.sendAndInjectMessageUsingLegacyFlow(message, conversation, options);
+  }
+
+  private async sendAndInjectMessageUsingLegacyFlow(
+    message: GenericMessage,
+    conversation: Conversation,
+    options: SendAndInjectMessageOptions,
+  ): Promise<SendAndInjectResult> {
+    return this.sendAndInjectMessageUsingFlow(message, conversation, options, {
+      prepareForInjectedMessageEvent() {},
+      async waitForInjectedMessageEvent() {
+        return undefined;
+      },
+      cancelInjectedMessageEventWait() {},
+    });
+  }
+
+  private async sendAndInjectMessageWithReliableStatusUpdate(
+    message: GenericMessage,
+    conversation: Conversation,
+    options: SendAndInjectMessageOptions,
+  ): Promise<SendAndInjectResult> {
+    const conversationRepository = this.conversationRepositoryProvider();
+
+    return this.sendAndInjectMessageUsingFlow(message, conversation, options, {
+      prepareForInjectedMessageEvent: messageId => {
+        conversationRepository.prepareForInjectedMessageEvent(messageId);
+      },
+      waitForInjectedMessageEvent: async messageId => {
+        const messageEntity = await conversationRepository.waitForInjectedMessageEvent(messageId);
+        if (is.undefined(messageEntity) || is.undefined(messageEntity.primary_key)) {
+          throw new Error(`Injected message '${messageId}' did not produce a stored message entity`);
+        }
+        return messageEntity as StoredMessage;
+      },
+      cancelInjectedMessageEventWait: messageId => {
+        conversationRepository.cancelInjectedMessageEventWait(messageId);
+      },
+    });
+  }
+
+  private async sendAndInjectMessageUsingFlow(
+    message: GenericMessage,
+    conversation: Conversation,
     {
       syncTimestamp = true,
       nativePush = true,
@@ -933,20 +1002,12 @@ export class MessageRepository {
       skipInjection,
       silentDegradationWarning,
       consentType = CONSENT_TYPE.MESSAGE,
-    }: MessageSendingOptions & {
-      enableEphemeral?: boolean;
-      silentDegradationWarning?: boolean;
-      skipInjection?: boolean;
-      skipSelf?: boolean;
-      syncTimestamp?: boolean;
-      targetMode?: MessageTargetMode;
-      consentType?: CONSENT_TYPE;
-    } = {
-      syncTimestamp: true,
-    },
+    }: SendAndInjectMessageOptions,
+    messageSendingEventHandling: MessageSendingEventHandling,
   ): Promise<SendAndInjectResult> {
     const messageTimer = conversation.messageTimer();
     const payload = enableEphemeral && messageTimer ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
+    let optimisticMessageEntity: StoredMessage | undefined;
 
     const injectOptimisticEvent = async () => {
       if (!skipInjection) {
@@ -969,7 +1030,14 @@ export class MessageRepository {
           payload,
           optimisticEvent,
         );
-        await this.eventRepository.injectEvent(mappedEvent);
+        messageSendingEventHandling.prepareForInjectedMessageEvent(mappedEvent.id);
+        try {
+          await this.eventRepository.injectEvent(mappedEvent);
+          optimisticMessageEntity = await messageSendingEventHandling.waitForInjectedMessageEvent(mappedEvent.id);
+        } catch (error: unknown) {
+          messageSendingEventHandling.cancelInjectedMessageEventWait(mappedEvent.id);
+          throw error;
+        }
       }
       return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
     };
@@ -986,6 +1054,7 @@ export class MessageRepository {
           payload.messageId,
           syncTimestamp ? sentAt : undefined,
           failedToSend,
+          optimisticMessageEntity,
         );
       }
     };
@@ -1434,9 +1503,11 @@ export class MessageRepository {
     eventId: string,
     isoDate?: string,
     failedToSend?: SendResult['failedToSend'],
+    messageEntityFromOptimisticEvent?: StoredMessage,
   ) {
     try {
-      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
+      const messageEntity =
+        messageEntityFromOptimisticEvent ?? (await this.getMessageInConversationById(conversationEntity, eventId));
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
       const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData'> = {
@@ -1453,7 +1524,7 @@ export class MessageRepository {
           conversationEntity.updateTimestamps(messageEntity);
         }
       }
-      this.conversationRepositoryProvider().checkMessageTimer(messageEntity);
+      this.conversationRepositoryProvider().checkMessageTimer(messageEntity as ContentMessage);
       if ((EventTypeHandling.STORE as string[]).includes(messageEntity.type) || messageEntity.hasAssetImage()) {
         return await this.eventService.updateEvent(messageEntity.primary_key, changes);
       }

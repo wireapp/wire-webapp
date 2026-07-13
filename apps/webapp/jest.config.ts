@@ -35,6 +35,7 @@ const esmPackagesToTransform = [
   'uuid',
   '@enormora/objectory',
   '@enormora/wall-clock',
+  'p-defer',
 ];
 
 const config: Config = {
