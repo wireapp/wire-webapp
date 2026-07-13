@@ -55,6 +55,8 @@ export interface DateTimePickerFieldProps {
   locale?: string;
   markInvalid?: boolean;
   disabled?: boolean;
+  dateDisabled?: boolean;
+  timeDisabled?: boolean;
   menuPortalTarget?: HTMLElement;
   popoverPortalContainer?: HTMLElement;
   errorText?: string;
@@ -72,6 +74,8 @@ export const DateTimePickerField = ({
   locale = 'de-DE',
   markInvalid = false,
   disabled = false,
+  dateDisabled,
+  timeDisabled,
   menuPortalTarget,
   popoverPortalContainer,
   errorText,
@@ -80,6 +84,8 @@ export const DateTimePickerField = ({
   const labelId = `${dataUieName}-label`;
   const selectedDate = useMemo(() => (value !== null ? dateValueFromDate(value) : null), [value]);
   const selectedTime = useMemo(() => (value !== null ? nearestTimeOptionFromDate(value) : null), [value]);
+  const isDateDisabled = dateDisabled ?? disabled;
+  const isTimeDisabled = timeDisabled ?? disabled;
 
   const handleDateChange = useCallback(
     (nextDate: DateValue | null) => {
@@ -117,7 +123,7 @@ export const DateTimePickerField = ({
           labels={labels}
           locale={locale}
           markInvalid={markInvalid}
-          disabled={disabled}
+          disabled={isDateDisabled}
           popoverPortalContainer={popoverPortalContainer}
           minValue={minValue}
           wrapperCSS={dateTimePickerDateFieldWrapperStyles}
@@ -129,7 +135,7 @@ export const DateTimePickerField = ({
           onChange={handleTimeChange}
           ariaLabel={labels.timeAriaLabel}
           markInvalid={markInvalid}
-          disabled={disabled}
+          disabled={isTimeDisabled}
           menuPortalTarget={menuPortalTarget}
           wrapperCSS={dateTimePickerTimeFieldWrapperStyles}
         />

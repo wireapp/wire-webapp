@@ -220,6 +220,7 @@ export const ScheduleMeetingForm = ({
           markInvalid={is.nonEmptyString(endErrorText)}
           errorText={endErrorText}
           minValue={endDateMinValue}
+          dateDisabled
           menuPortalTarget={portalContainer}
           popoverPortalContainer={portalContainer}
         />
