@@ -7,6 +7,9 @@
     "url": "https://github.com/wireapp/wire-webapp",
     "directory": "libraries/commons"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "files": [
     "lib"
   ],
@@ -41,6 +44,5 @@
     "test:coverage": "nx run commons-lib:test:coverage",
     "test:watch": "nx run commons-lib:test --watch"
   },
-  "version": "5.4.13",
-  "private": true
+  "version": "5.4.13"
 }

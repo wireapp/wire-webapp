@@ -7,6 +7,9 @@
     "url": "https://github.com/wireapp/wire-webapp",
     "directory": "libraries/api-client"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "files": [
     "lib"
   ],

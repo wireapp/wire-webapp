@@ -1,4 +1,4 @@
-name: Publish packages to npm
+name: Publish packages to GitHub Packages
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 permissions:
   contents: write
-  id-token: write
+  packages: write
 
 concurrency:
   group: publish-libraries
@@ -98,10 +98,36 @@ jobs:
       - name: Build libraries
         run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
 
-      - name: Publish to npm
+      - name: Configure Node.js for GitHub Packages publishing
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@wireapp'
+
+      - name: Verify external runtime dependencies on GitHub Packages
+        shell: bash
         run: |
-          echo "📦 Publishing release to npm..."
+          set -euo pipefail
+
+          PROTOCOL_MESSAGING_VERSION="$(
+            node -p "require('./libraries/api-client/package.json').dependencies['@wireapp/protocol-messaging']"
+          )"
+
+          if ! npm view \
+            "@wireapp/protocol-messaging@${PROTOCOL_MESSAGING_VERSION}" \
+            version \
+            --registry=https://npm.pkg.github.com; then
+            echo "::error::@wireapp/protocol-messaging@${PROTOCOL_MESSAGING_VERSION} is not available from GitHub Packages or this workflow does not have read access."
+            exit 1
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to GitHub Packages
+        run: |
+          echo "📦 Publishing release to GitHub Packages..."
           ./bin/yarn nx release publish --verbose
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true

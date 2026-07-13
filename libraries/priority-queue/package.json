@@ -7,6 +7,9 @@
     "url": "https://github.com/wireapp/wire-webapp",
     "directory": "libraries/priority-queue"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "files": [
     "lib"
   ],
@@ -33,6 +36,5 @@
     "test:coverage": "nx run priority-queue-lib:test:coverage",
     "test:watch": "nx run priority-queue-lib:test --watch"
   },
-  "version": "2.1.19",
-  "private": true
+  "version": "2.1.19"
 }

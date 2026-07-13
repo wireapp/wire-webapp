@@ -69,7 +69,12 @@
       "options": {
         "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
       }
+    },
+    "nx-release-publish": {
+      "executor": "@nx/js:release-publish",
+      "dependsOn": ["^nx-release-publish"],
+      "options": {}
     }
   },
-  "tags": ["type:lib", "scope:commons"]
+  "tags": ["type:lib", "scope:commons", "npm:public"]
 }

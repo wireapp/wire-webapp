@@ -19,9 +19,20 @@ yarn start
 
 ### Installation
 
+`@wireapp/api-client` is published to GitHub Packages. Configure the `@wireapp` scope in an untracked `.yarnrc.yml`, then install with Yarn:
+
+```yaml
+npmScopes:
+  wireapp:
+    npmRegistryServer: "https://npm.pkg.github.com"
+    npmAuthToken: "${GITHUB_PACKAGES_TOKEN}"
+```
+
 ```bash
 yarn add @wireapp/api-client
 ```
+
+Set `GITHUB_PACKAGES_TOKEN` to a GitHub personal access token (classic) with `read:packages`; the account needs read access to the package. Installation also requires `@wireapp/protocol-messaging` to be available from GitHub Packages; publication is blocked until that cross-repository prerequisite is met.
 
 ### Usage
 
