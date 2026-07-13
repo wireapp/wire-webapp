@@ -24,7 +24,16 @@ import 'jsdom-worker';
 import {Subscription} from 'knockout';
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, CONV_TYPE, QUALITY, REASON, STATE as CALL_STATE, VIDEO_STATE, Wcall} from '@wireapp/avs';
+import {
+  CALL_TYPE,
+  CONV_TYPE,
+  QUALITY,
+  REASON,
+  STATE as CALL_STATE,
+  VIDEO_STATE,
+  Wcall,
+  type WcallAudioCbrChangeHandler,
+} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -37,22 +46,88 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {MediaType} from 'Repositories/media/MediaType';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
+import type {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {Call} from './Call';
 import {CallingRepository, setupDetachedWindowExternalLinksClick} from './CallingRepository';
-import {CallState, MuteState} from './CallState';
+import {CallingViewMode, CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
+import {useActiveWindowState} from 'Hooks/useActiveWindow';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
 import {translateForTest} from 'Util/test/translateForTest';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
+import {APIClient} from '../../service/apiClientSingleton';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Translate} from 'Util/localizerUtil';
+
+type AudioFlowStat = {
+  bytesReceived?: number;
+  bytesSent?: number;
+  id?: string;
+  kind?: string;
+  mediaType?: string;
+};
+
+function createCallingRepositoryForTest({
+  backgroundEffectsHandler = {} as BackgroundEffectsHandler,
+  callState = new CallState(),
+  conversationState = {} as ConversationState,
+  eventRepository = {injectEvent: jest.fn()} as Pick<EventRepository, 'injectEvent'>,
+  mediaDevicesHandler = buildMediaDevicesHandler(),
+  mediaStreamHandler = {} as MediaStreamHandler,
+  messageRepository = {} as MessageRepository,
+  serverTimeHandler = {toServerTimestamp: jest.fn().mockImplementation(() => Date.now())} as Pick<
+    ServerTimeHandler,
+    'toServerTimestamp'
+  >,
+  translate = translateWithPrefixForTest,
+  userRepository = {} as UserRepository,
+  apiClient = {} as APIClient,
+}: {
+  backgroundEffectsHandler?: BackgroundEffectsHandler;
+  callState?: CallState;
+  conversationState?: ConversationState;
+  eventRepository?: Pick<EventRepository, 'injectEvent'>;
+  mediaDevicesHandler?: MediaDevicesHandler;
+  mediaStreamHandler?: MediaStreamHandler;
+  messageRepository?: MessageRepository;
+  serverTimeHandler?: Pick<ServerTimeHandler, 'toServerTimestamp'>;
+  translate?: typeof translateWithPrefixForTest;
+  userRepository?: UserRepository;
+  apiClient?: APIClient;
+} = {}) {
+  return {
+    callState,
+    conversationState,
+    repository: new CallingRepository(
+      messageRepository as unknown as MessageRepository,
+      eventRepository as EventRepository,
+      userRepository,
+      mediaStreamHandler,
+      mediaDevicesHandler,
+      serverTimeHandler as ServerTimeHandler,
+      backgroundEffectsHandler,
+      translate,
+      apiClient,
+      conversationState,
+      callState,
+    ),
+  };
+}
+
+const translateWithPrefixForTest: Translate = (translationKey, _substitutions, _dangerousSubstitutions, _skipEscape) =>
+  `translated:${translationKey}`;
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
@@ -77,7 +152,7 @@ describe('CallingRepository', () => {
     callingRepository['callState'].calls([]);
     callingRepository['conversationState'].conversations([]);
     callingRepository.destroy();
-    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   afterAll(() => {
@@ -106,8 +181,8 @@ describe('CallingRepository', () => {
 
       callingRepository['conversationState'].conversations.push(conversation);
       callingRepository['callState'].calls([call]);
-      spyOn(callingRepository, 'muteCall').and.callThrough();
-      spyOn(wCall, 'recvMsg').and.callThrough();
+      jest.spyOn(callingRepository, 'muteCall');
+      jest.spyOn(wCall, 'recvMsg');
 
       const event: CallingEvent = {
         content: {
@@ -152,8 +227,8 @@ describe('CallingRepository', () => {
 
       callingRepository['conversationState'].conversations.push(conversation);
       callingRepository['callState'].calls([call]);
-      spyOn(callingRepository, 'muteCall').and.callThrough();
-      spyOn(wCall, 'recvMsg').and.callThrough();
+      jest.spyOn(callingRepository, 'muteCall');
+      jest.spyOn(wCall, 'recvMsg');
 
       const event: CallingEvent = {
         content: {
@@ -198,8 +273,8 @@ describe('CallingRepository', () => {
 
       callingRepository['conversationState'].conversations.push(conversation);
       callingRepository['callState'].calls([call]);
-      spyOn(callingRepository, 'muteCall').and.callThrough();
-      spyOn(wCall, 'recvMsg').and.callThrough();
+      jest.spyOn(callingRepository, 'muteCall');
+      jest.spyOn(wCall, 'recvMsg');
 
       const someOtherClientId = 'some-other-client';
 
@@ -227,13 +302,20 @@ describe('CallingRepository', () => {
   });
 
   describe('startCall', () => {
+    beforeEach(() => {
+      const subscribeToEpochUpdates = jest.mocked(
+        container.resolve(Core).service!.subconversation.subscribeToEpochUpdates,
+      );
+      subscribeToEpochUpdates?.mockClear();
+    });
+
     it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS])(
       'starts a ONEONONE call for proteus or MLS 1:1 conversation',
       async protocol => {
         const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, protocol);
         const callType = CALL_TYPE.NORMAL;
         const NO_MEETING = 0;
-        spyOn(wCall, 'start');
+        jest.spyOn(wCall, 'start');
         await callingRepository.startCall(conversation);
         expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.ONEONONE, 0, NO_MEETING);
       },
@@ -244,7 +326,7 @@ describe('CallingRepository', () => {
       const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.PROTEUS);
       const callType = CALL_TYPE.NORMAL;
       const NO_MEETING = 0;
-      spyOn(wCall, 'start');
+      jest.spyOn(wCall, 'start');
       await callingRepository.startCall(conversation);
       expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE, 0, NO_MEETING);
     });
@@ -254,7 +336,7 @@ describe('CallingRepository', () => {
       const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS);
       const callType = CALL_TYPE.NORMAL;
       const NO_MEETING = 0;
-      spyOn(wCall, 'start');
+      jest.spyOn(wCall, 'start');
       await callingRepository.startCall(conversation);
       expect(wCall.start).toHaveBeenCalledWith(
         wUser,
@@ -305,6 +387,13 @@ describe('CallingRepository', () => {
   });
 
   describe('answerCall', () => {
+    beforeEach(() => {
+      const subscribeToEpochUpdates = jest.mocked(
+        container.resolve(Core).service!.subconversation.subscribeToEpochUpdates,
+      );
+      subscribeToEpochUpdates?.mockClear();
+    });
+
     it('subscribes to epoch updates after answering a mls conference call', async () => {
       const conversationId = {domain: 'example.com', id: 'conversation2'};
       const selfParticipant = createSelfParticipant();
@@ -373,17 +462,8 @@ describe('CallingRepository', () => {
 
   describe('showNoAudioInputModal', () => {
     it('uses the injected translate function', () => {
-      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
-      const isolatedCallingRepository = new CallingRepository(
-        {} as any,
-        {} as any,
-        {} as any,
-        {} as any,
-        {} as any,
-        {} as any,
-        {} as any,
-        translate,
-      );
+      const translate = jest.fn(translateWithPrefixForTest);
+      const {repository: isolatedCallingRepository} = createCallingRepositoryForTest({translate});
 
       const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined as never);
 
@@ -403,6 +483,59 @@ describe('CallingRepository', () => {
         undefined,
         translate,
       );
+    });
+  });
+
+  describe('showNoCameraModal', () => {
+    afterEach(() => {
+      useActiveWindowState.getState().setActiveWindow(window);
+    });
+
+    it('renders in the main window when the main window is focused', () => {
+      const translate = jest.fn(translateWithPrefixForTest);
+      const {repository: isolatedCallingRepository} = createCallingRepositoryForTest({translate});
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined as never);
+      const detachedDocument = document.implementation.createHTMLDocument('detached');
+      isolatedCallingRepository['callState'].viewMode(CallingViewMode.DETACHED_WINDOW);
+      isolatedCallingRepository['callState'].detachedWindow({document: detachedDocument} as Window);
+      useActiveWindowState.getState().setActiveWindow(window);
+
+      isolatedCallingRepository['showNoCameraModal']();
+
+      expect(showModal).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          container: undefined,
+        }),
+        undefined,
+        translate,
+      );
+
+      showModal.mockRestore();
+    });
+
+    it('renders in the detached window when the detached window is focused', () => {
+      const translate = jest.fn(translateWithPrefixForTest);
+      const {repository: isolatedCallingRepository} = createCallingRepositoryForTest({translate});
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined as never);
+      const detachedDocument = document.implementation.createHTMLDocument('detached');
+      const detachedWindow = {document: detachedDocument} as Window;
+      isolatedCallingRepository['callState'].viewMode(CallingViewMode.DETACHED_WINDOW);
+      isolatedCallingRepository['callState'].detachedWindow(detachedWindow);
+      useActiveWindowState.getState().setActiveWindow(detachedWindow);
+
+      isolatedCallingRepository['showNoCameraModal']();
+
+      expect(showModal).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          container: detachedDocument.body,
+        }),
+        undefined,
+        translate,
+      );
+
+      showModal.mockRestore();
     });
   });
 
@@ -463,8 +596,8 @@ describe('CallingRepository', () => {
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
       selfParticipant.audioStream(selfMediaStream);
-      spyOn(selfParticipant, 'getMediaStream').and.callThrough();
-      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      jest.spyOn(selfParticipant, 'getMediaStream');
+      jest.spyOn(callingRepository, 'findCall').mockReturnValue(call);
 
       const queries = [1, 2, 3, 4].map(() => {
         return callingRepository['getCallMediaStream']('', true, false, false).then(mediaStream => {
@@ -490,10 +623,10 @@ describe('CallingRepository', () => {
       const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
-      spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
-        Promise.resolve(selfMediaStream),
-      );
-      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      jest
+        .spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream')
+        .mockReturnValue(Promise.resolve(selfMediaStream));
+      jest.spyOn(callingRepository, 'findCall').mockReturnValue(call);
 
       const queries = [1, 2, 3, 4].map(() => {
         return callingRepository['getCallMediaStream']('', true, false, false).then(mediaStream => {
@@ -552,8 +685,8 @@ describe('CallingRepository', () => {
       callingRepository['conversationState'].conversations.push(conversation);
       callingRepository['callState'].calls([call]);
 
-      spyOn(Warnings, 'showWarning');
-      spyOn(Warnings, 'hideWarning');
+      jest.spyOn(Warnings, 'showWarning');
+      jest.spyOn(Warnings, 'hideWarning');
     });
 
     // skipping test for now. Once we have correct stats about network
@@ -596,7 +729,7 @@ describe('CallingRepository', () => {
     });
 
     it('logs warning when JSON parsing fails', () => {
-      spyOn(callingRepository['logger'], 'warn');
+      jest.spyOn(callingRepository['logger'], 'warn');
       const invalidJsonString = '{invalid-json';
 
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidJsonString);
@@ -608,7 +741,7 @@ describe('CallingRepository', () => {
     });
 
     it('logs warning when network quality info schema validation fails', () => {
-      spyOn(callingRepository['logger'], 'warn');
+      jest.spyOn(callingRepository['logger'], 'warn');
 
       const invalidQualityInfo = JSON.stringify({
         quality: 'invalid-quality',
@@ -642,8 +775,8 @@ describe('CallingRepository', () => {
   describe('stopMediaSource', () => {
     it('releases media streams', () => {
       const selfParticipant = createSelfParticipant();
-      spyOn(selfParticipant, 'releaseAudioStream');
-      spyOn(selfParticipant, 'releaseVideoStream');
+      jest.spyOn(selfParticipant, 'releaseAudioStream');
+      jest.spyOn(selfParticipant, 'releaseVideoStream');
 
       const call = new Call(
         {domain: '', id: ''},
@@ -653,7 +786,7 @@ describe('CallingRepository', () => {
         CALL_TYPE.NORMAL,
         buildMediaDevicesHandler(),
       );
-      spyOn(callingRepository['callState'], 'joinedCall').and.returnValue(call);
+      jest.spyOn(callingRepository['callState'], 'joinedCall').mockReturnValue(call);
       callingRepository.stopMediaSource(MediaType.AUDIO);
 
       expect(selfParticipant.releaseAudioStream).toHaveBeenCalledTimes(1);
@@ -686,8 +819,8 @@ describe('CallingRepository', () => {
     describe('on incoming call', () => {
       it('toggle on', async () => {
         selfParticipant.videoState(VIDEO_STATE.STOPPED);
-        spyOn(selfParticipant, 'releaseVideoStream');
-        spyOn(wCall, 'setVideoSendState');
+        jest.spyOn(selfParticipant, 'releaseVideoStream');
+        jest.spyOn(wCall, 'setVideoSendState');
         call.state(CALL_STATE.INCOMING);
         callingRepository.toggleCamera(call);
         expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(0);
@@ -696,8 +829,8 @@ describe('CallingRepository', () => {
 
       it('toggle off', async () => {
         selfParticipant.videoState(VIDEO_STATE.STARTED);
-        spyOn(selfParticipant, 'releaseVideoStream');
-        spyOn(wCall, 'setVideoSendState');
+        jest.spyOn(selfParticipant, 'releaseVideoStream');
+        jest.spyOn(wCall, 'setVideoSendState');
         call.state(CALL_STATE.INCOMING);
         callingRepository.toggleCamera(call);
 
@@ -709,8 +842,8 @@ describe('CallingRepository', () => {
     describe('on running call', () => {
       it('toggle on', async () => {
         selfParticipant.videoState(VIDEO_STATE.STOPPED);
-        spyOn(selfParticipant, 'releaseVideoStream');
-        spyOn(wCall, 'setVideoSendState');
+        jest.spyOn(selfParticipant, 'releaseVideoStream');
+        jest.spyOn(wCall, 'setVideoSendState');
         call.state(CALL_STATE.MEDIA_ESTAB);
         callingRepository.toggleCamera(call);
         expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(0);
@@ -719,8 +852,8 @@ describe('CallingRepository', () => {
 
       it('toggle off', async () => {
         selfParticipant.videoState(VIDEO_STATE.STARTED);
-        spyOn(selfParticipant, 'releaseVideoStream');
-        spyOn(wCall, 'setVideoSendState');
+        jest.spyOn(selfParticipant, 'releaseVideoStream');
+        jest.spyOn(wCall, 'setVideoSendState');
         call.state(CALL_STATE.MEDIA_ESTAB);
         callingRepository.toggleCamera(call);
 
@@ -731,8 +864,8 @@ describe('CallingRepository', () => {
       // This is an edge case. You can toggleCamera on when you have screen share enabled!
       it('toggle on when screen shared', async () => {
         selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
-        spyOn(selfParticipant, 'releaseVideoStream');
-        spyOn(wCall, 'setVideoSendState');
+        jest.spyOn(selfParticipant, 'releaseVideoStream');
+        jest.spyOn(wCall, 'setVideoSendState');
         call.state(CALL_STATE.MEDIA_ESTAB);
         callingRepository.toggleCamera(call);
         // Screen sharing should be stopped first
@@ -832,35 +965,19 @@ describe('CallingRepository ISO', () => {
 
       const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
-      const callingRepo = new CallingRepository(
-        {
-          grantMessage: jest.fn(),
-        } as any, // MessageRepository
-        {
-          injectEvent: jest.fn(),
-        } as any, // EventRepository
-        {} as any, // UserRepository
-        {} as any, // MediaStreamHandler
-        buildMediaDevicesHandler(), // mediaDevicesHandler
-        {
-          toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
-        } as any, // ServerTimeHandler
-        {} as any, // BackgroundEffectsHandler
-        undefined,
-        {} as any, // APIClient
-        {
+      const {repository: callingRepo} = createCallingRepositoryForTest({
+        conversationState: {
           findConversation: jest.fn().mockImplementation(() => conversation),
           participating_user_ets: jest.fn(),
-        } as any, // ConversationState
-        new CallState(),
-      );
+        } as unknown as ConversationState,
+      });
 
       const avs = await callingRepo.initAvs(selfUser, createUuid());
       // provide global handle for cleanup
       avsUser = avs.wUser;
       avsCall = avs.wCall;
 
-      const event: any = {
+      const event: CallingEvent = {
         content: {
           props: {
             audiocbr: 'false',
@@ -958,41 +1075,40 @@ describe('CallingRepository ISO', () => {
 
 // eslint-disable-next-line jest/no-disabled-tests
 describe.skip('E2E audio call', () => {
-  const messageRepository = {
-    grantMessage: () => Promise.resolve(true),
-  } as any;
-  const eventRepository = {injectEvent: () => {}} as any;
+  const {repository: client} = createCallingRepositoryForTest({
+    eventRepository: {injectEvent: () => {}} as unknown as EventRepository,
+  });
+  type E2ECallingRepositorySpies = {
+    checkConcurrentJoinedCall: () => Promise<boolean>;
+    getCallMediaStream: (...args: unknown[]) => Promise<MediaStream>;
+    getMediaStream: (...args: unknown[]) => Promise<MediaStream>;
+    incomingCallCallback: (call: Call) => void;
+    sendMessage: (...args: unknown[]) => void;
+    updateParticipantStream: (...args: unknown[]) => void;
+  };
 
-  const client = new CallingRepository(
-    messageRepository,
-    eventRepository,
-    {} as UserRepository,
-    serverTimeHandler as any,
-    {} as any,
-    {} as any,
-    {} as any,
-    undefined,
-  );
+  const mockedClient = client as CallingRepository & E2ECallingRepositorySpies;
   const user = new User('user-1', '', translateForTest);
   let remoteWuser: number;
   let wCall: Wcall;
 
   beforeAll(() => {
-    spyOn(client, 'fetchConfig').and.returnValue(Promise.resolve({ice_servers: []}));
-    spyOn<any>(client, 'getCallMediaStream').and.returnValue(
-      Promise.resolve(new MediaStream([new window.RTCAudioSource().createTrack()])),
-    );
-    spyOn<any>(client, 'getMediaStream').and.returnValue(
-      Promise.resolve(new MediaStream([new window.RTCAudioSource().createTrack()])),
-    );
-    spyOn(client, 'onCallEvent').and.callThrough();
-    spyOn<any>(client, 'updateParticipantStream').and.callThrough();
-    spyOn<any>(client, 'incomingCallCallback').and.callFake(call => {
+    jest.spyOn(client, 'fetchConfig').mockReturnValue(Promise.resolve({ice_servers: []}));
+    jest
+      .spyOn(mockedClient, 'getCallMediaStream')
+      .mockReturnValue(Promise.resolve(new MediaStream([new window.RTCAudioSource().createTrack()])));
+    jest
+      .spyOn(mockedClient, 'getMediaStream')
+      .mockReturnValue(Promise.resolve(new MediaStream([new window.RTCAudioSource().createTrack()])));
+    jest.spyOn(client, 'onCallEvent');
+    jest.spyOn(mockedClient, 'updateParticipantStream');
+    jest.spyOn(mockedClient, 'incomingCallCallback').mockImplementation(call => {
       client.answerCall(call, CALL_TYPE.NORMAL);
     });
-    spyOn<any>(client, 'checkConcurrentJoinedCall').and.returnValue(Promise.resolve(true));
-    spyOn<any>(client, 'sendMessage').and.callFake(
-      (context, convId, userId, clientid, destUserId, destDeviceId, payload) => {
+    jest.spyOn(mockedClient, 'checkConcurrentJoinedCall').mockReturnValue(Promise.resolve(true));
+    jest
+      .spyOn(mockedClient, 'sendMessage')
+      .mockImplementation((context, convId, userId, clientid, destUserId, destDeviceId, payload) => {
         wCall.recvMsg(
           remoteWuser,
           payload,
@@ -1005,8 +1121,7 @@ describe.skip('E2E audio call', () => {
           CONV_TYPE.CONFERENCE,
           0, // no meeting
         );
-      },
-    );
+      });
     return client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
       remoteWuser = createAutoAnsweringWuser(wCallInstance, client);
       wCall = wCallInstance;
@@ -1096,27 +1211,12 @@ describe.skip('E2E audio call', () => {
 });
 
 describe('NotificationHandlingState', () => {
-  const messageRepository = {
-    grantMessage: () => Promise.resolve(true),
-  } as any;
-  const eventRepository = {
-    injectEvent: () => {},
-  } as any;
-
-  const mediaDevicesHandler = {
-    setOnMediaDevicesRefreshHandler: () => {},
-  } as any;
-
-  const client = new CallingRepository(
-    messageRepository,
-    eventRepository,
-    {} as UserRepository,
-    serverTimeHandler as any,
-    mediaDevicesHandler,
-    {} as any,
-    {} as any,
-    undefined,
-  );
+  const {repository: client} = createCallingRepositoryForTest({
+    eventRepository: {injectEvent: () => {}} as unknown as EventRepository,
+    mediaDevicesHandler: {
+      setOnMediaDevicesRefreshHandler: () => {},
+    } as unknown as MediaDevicesHandler,
+  });
   const user = new User('user-1', '', translateForTest);
   let wCall: Wcall;
   let wUserNumber: number;
@@ -1130,7 +1230,7 @@ describe('NotificationHandlingState', () => {
   });
 
   it('handle STREAM state notification', done => {
-    spyOn(wCall, 'processNotifications').and.callThrough();
+    jest.spyOn(wCall, 'processNotifications');
 
     amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.STREAM);
 
@@ -1139,7 +1239,7 @@ describe('NotificationHandlingState', () => {
   });
 
   it('handle RECOVERY state notification', done => {
-    spyOn(wCall, 'processNotifications').and.callThrough();
+    jest.spyOn(wCall, 'processNotifications');
 
     amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.RECOVERY);
 
@@ -1148,7 +1248,7 @@ describe('NotificationHandlingState', () => {
   });
 
   it('handle WEB_SOCKET state notification', done => {
-    spyOn(wCall, 'processNotifications').and.callThrough();
+    jest.spyOn(wCall, 'processNotifications');
 
     amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
@@ -1158,27 +1258,12 @@ describe('NotificationHandlingState', () => {
 });
 
 describe('init AVS state', () => {
-  const messageRepository = {
-    grantMessage: () => Promise.resolve(true),
-  } as any;
-  const eventRepository = {
-    injectEvent: () => {},
-  } as any;
-
-  const mediaDevicesHandler = {
-    setOnMediaDevicesRefreshHandler: () => {},
-  } as any;
-
-  const client = new CallingRepository(
-    messageRepository,
-    eventRepository,
-    {} as UserRepository,
-    serverTimeHandler as any,
-    mediaDevicesHandler,
-    {} as any,
-    {} as any,
-    undefined,
-  );
+  const {repository: client} = createCallingRepositoryForTest({
+    eventRepository: {injectEvent: () => {}} as unknown as EventRepository,
+    mediaDevicesHandler: {
+      setOnMediaDevicesRefreshHandler: () => {},
+    } as unknown as MediaDevicesHandler,
+  });
   const user = new User('user-1', '', translateForTest);
   beforeEach(() => {
     jest.useFakeTimers();
@@ -1195,8 +1280,8 @@ describe('init AVS state', () => {
     nowMock.mockReturnValue(0);
     client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
       createAutoAnsweringWuser(wCallInstance, client);
-      spyOn(wCallInstance, 'setBackground').and.callThrough();
-      spyOn(wCallInstance, 'poll').and.callThrough();
+      jest.spyOn(wCallInstance, 'setBackground');
+      jest.spyOn(wCallInstance, 'poll');
       nowMock.mockReturnValue(500);
       jest.advanceTimersByTime(500);
 
@@ -1211,8 +1296,8 @@ describe('init AVS state', () => {
     nowMock.mockReturnValue(0);
     client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
       createAutoAnsweringWuser(wCallInstance, client);
-      spyOn(wCallInstance, 'setBackground').and.callThrough();
-      spyOn(wCallInstance, 'poll').and.callThrough();
+      jest.spyOn(wCallInstance, 'setBackground');
+      jest.spyOn(wCallInstance, 'poll');
       nowMock.mockReturnValue(3001);
       jest.advanceTimersByTime(500);
 
@@ -1227,8 +1312,10 @@ describe('init AVS state', () => {
     nowMock.mockReturnValue(0);
     client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
       createAutoAnsweringWuser(wCallInstance, client);
-      spyOn(wCallInstance, 'setBackground').and.throwError('AVS set background fails');
-      spyOn(wCallInstance, 'poll').and.callThrough();
+      jest.spyOn(wCallInstance, 'setBackground').mockImplementation(() => {
+        throw new Error('AVS set background fails');
+      });
+      jest.spyOn(wCallInstance, 'poll');
       nowMock.mockReturnValue(3001);
       jest.advanceTimersByTime(500);
 
@@ -1240,11 +1327,18 @@ describe('init AVS state', () => {
   });
 });
 
+const createLinkInsideDetachedWindow = (detachedWindow: Window, target = '_blank') => {
+  detachedWindow.document.body.innerHTML = `<a href="https://wire.com" target="${target}">Wire</a>`;
+  return detachedWindow.document.querySelector('a')!;
+};
+
 describe('setupDetachedWindowExternalLinksClick', () => {
   let detachedWindow: Window;
   let openerWindow: Window;
 
   beforeEach(() => {
+    jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(true);
+
     detachedWindow = {
       document: document.implementation.createHTMLDocument('detached-window'),
     } as Window;
@@ -1255,16 +1349,13 @@ describe('setupDetachedWindowExternalLinksClick', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('opens _blank links in the opener window', () => {
-    detachedWindow.document.body.innerHTML = `
-      <a href="https://wire.com" target="_blank">Wire</a>
-    `;
+    const link = createLinkInsideDetachedWindow(detachedWindow, '_blank');
 
     const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
-    const link = detachedWindow.document.querySelector('a')!;
 
     link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
 
@@ -1273,12 +1364,22 @@ describe('setupDetachedWindowExternalLinksClick', () => {
   });
 
   it('does not handle non _blank links', () => {
-    detachedWindow.document.body.innerHTML = `
-      <a href="https://wire.com" target="_self">Wire</a>
-    `;
+    const link = createLinkInsideDetachedWindow(detachedWindow, '_self');
 
     const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
-    const link = detachedWindow.document.querySelector('a')!;
+
+    link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+
+    expect(openerWindow.open).not.toHaveBeenCalled();
+    cleanup();
+  });
+
+  it('does not handle links outside the desktop app', () => {
+    jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(false);
+
+    const link = createLinkInsideDetachedWindow(detachedWindow, '_blank');
+
+    const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
 
     link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
 
@@ -1287,28 +1388,26 @@ describe('setupDetachedWindowExternalLinksClick', () => {
   });
 
   it('removes the click listener on cleanup', () => {
-    detachedWindow.document.body.innerHTML = `
-      <a href="https://wire.com" target="_blank">Wire</a>
-    `;
+    const link = createLinkInsideDetachedWindow(detachedWindow, '_blank');
 
     const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
     cleanup();
 
-    const link = detachedWindow.document.querySelector('a')!;
     link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
 
     expect(openerWindow.open).not.toHaveBeenCalled();
   });
 });
 
-function extractAudioStats(stats: any) {
-  const audioStats: any[] = [];
-  stats.forEach((userStats: any) => {
-    userStats.stats.forEach((data: any) => {
-      if (data.kind === 'audio' || data.mediaType === 'audio') {
-        const bytesFlowing = data.bytesReceived || data.bytesSent;
+function extractAudioStats(stats: Array<{stats: RTCStatsReport}>) {
+  const audioStats: Array<{bytesFlowing: number; id: string | undefined}> = [];
+  stats.forEach(userStats => {
+    userStats.stats.forEach(data => {
+      const audioStat = data as AudioFlowStat;
+      if (audioStat.kind === 'audio' || audioStat.mediaType === 'audio') {
+        const bytesFlowing = audioStat.bytesReceived || audioStat.bytesSent;
         if (bytesFlowing !== undefined && bytesFlowing > 0) {
-          audioStats.push({bytesFlowing, id: data.id});
+          audioStats.push({bytesFlowing, id: audioStat.id});
         }
       }
     });
@@ -1328,13 +1427,14 @@ function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: Calling
     _unused: string | null,
     payload: string,
   ) => {
-    const event = {
-      content: JSON.parse(payload),
+    const event: CallingEvent = {
+      content: JSON.parse(payload) as CallingEvent['content'],
       conversation: conversationId,
       from: userId,
       sender: clientId,
-      time: Date.now(),
-    } as any;
+      time: new Date().toISOString(),
+      type: CALL.E_CALL,
+    };
     remoteCallingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
     return 0;
   };
@@ -1361,7 +1461,7 @@ function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: Calling
     () => {}, // `closeh`,
     () => {}, // `metricsh`,
     requestConfig, // `cfg_reqh`,
-    (() => {}) as any, // `acbrh`,
+    (() => {}) as WcallAudioCbrChangeHandler, // `acbrh`,
     () => {}, // `vstateh`,
     0,
   );
