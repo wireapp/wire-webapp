@@ -34,9 +34,11 @@ export async function queueConversationRejoin<T>(groupId: string, rejoinFn: Prom
   if (!queuedJobs.has(groupId)) {
     queuedJobs.add(groupId);
 
-    const result = await sendingQueue.add(rejoinFn);
-    queuedJobs.delete(groupId);
-    return result;
+    try {
+      return await sendingQueue.add(rejoinFn);
+    } finally {
+      queuedJobs.delete(groupId);
+    }
   }
 }
 
