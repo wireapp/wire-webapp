@@ -182,6 +182,7 @@ type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingSta
 /** A message that has already been stored in DB and has a primary key */
 type StoredMessage = Message & {primary_key: string};
 type StoredContentMessage = ContentMessage & {primary_key: string};
+type MessageEntityResolver = () => Promise<StoredMessage>;
 
 export type MessageRepositoryOptions = {
   readonly isMessageSendingStatusFixEnabled: boolean;
@@ -979,10 +980,17 @@ export class MessageRepository {
       },
       waitForInjectedMessageEvent: async messageId => {
         const messageEntity = await conversationRepository.waitForInjectedMessageEvent(messageId);
-        if (messageEntity.isNothing || is.undefined(messageEntity.value.primary_key)) {
-          throw new Error(`Injected message '${messageId}' did not produce a stored message entity`);
-        }
-        return Maybe.just(messageEntity.value as StoredMessage);
+        return messageEntity.match({
+          Just: storedMessage => {
+            if (is.undefined(storedMessage.primary_key)) {
+              throw new Error(`Injected message '${messageId}' did not produce a stored message entity`);
+            }
+            return Maybe.just(storedMessage as StoredMessage);
+          },
+          Nothing: () => {
+            throw new Error(`Injected message '${messageId}' did not produce a stored message entity`);
+          },
+        });
       },
       cancelInjectedMessageEventWait: messageId => {
         conversationRepository.cancelInjectedMessageEventWait(messageId);
@@ -1008,7 +1016,7 @@ export class MessageRepository {
   ): Promise<SendAndInjectResult> {
     const messageTimer = conversation.messageTimer();
     const payload = enableEphemeral && messageTimer ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
-    let optimisticMessageEntity: Maybe<StoredMessage> = Maybe.nothing();
+    let optimisticMessageEntityPromise: Promise<Maybe<StoredMessage>> = Promise.resolve(Maybe.nothing());
 
     const injectOptimisticEvent = async () => {
       if (!skipInjection) {
@@ -1032,11 +1040,12 @@ export class MessageRepository {
           optimisticEvent,
         );
         messageSendingEventHandling.prepareForInjectedMessageEvent(mappedEvent.id);
+        optimisticMessageEntityPromise = messageSendingEventHandling.waitForInjectedMessageEvent(mappedEvent.id);
         try {
           await this.eventRepository.injectEvent(mappedEvent);
-          optimisticMessageEntity = await messageSendingEventHandling.waitForInjectedMessageEvent(mappedEvent.id);
         } catch (error: unknown) {
           messageSendingEventHandling.cancelInjectedMessageEventWait(mappedEvent.id);
+          optimisticMessageEntityPromise = Promise.resolve(Maybe.nothing());
           throw error;
         }
       }
@@ -1050,6 +1059,7 @@ export class MessageRepository {
       // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
       await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
       if (!skipInjection) {
+        const optimisticMessageEntity = await optimisticMessageEntityPromise;
         await this.updateMessageAsSent(
           conversation,
           payload.messageId,
@@ -1083,6 +1093,7 @@ export class MessageRepository {
 
     const shouldProceedSending = await injectOptimisticEvent();
     if (shouldProceedSending === false) {
+      await optimisticMessageEntityPromise;
       this.logger.log('User has canceled sending a message to a degraded conversation.');
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
     }
@@ -1099,10 +1110,13 @@ export class MessageRepository {
 
       if (result.state === MessageSendingState.OUTGOING_SENT) {
         await handleSuccess(result);
+      } else {
+        await optimisticMessageEntityPromise;
       }
       return result;
     } catch (error: unknown) {
-      await this.updateMessageAsFailed(conversation, payload.messageId, error);
+      const optimisticMessageEntity = await optimisticMessageEntityPromise;
+      await this.updateMessageAsFailed(conversation, payload.messageId, error, optimisticMessageEntity);
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
     }
   }
@@ -1507,9 +1521,19 @@ export class MessageRepository {
     messageEntityFromOptimisticEvent: Maybe<StoredMessage> = Maybe.nothing(),
   ) {
     try {
-      const messageEntity = messageEntityFromOptimisticEvent.isJust
-        ? messageEntityFromOptimisticEvent.value
-        : await this.getMessageInConversationById(conversationEntity, eventId);
+      const resolveMessageEntity: MessageEntityResolver = messageEntityFromOptimisticEvent.match({
+        Just: storedMessage => {
+          return () => {
+            return Promise.resolve(storedMessage);
+          };
+        },
+        Nothing: () => {
+          return () => {
+            return this.getMessageInConversationById(conversationEntity, eventId);
+          };
+        },
+      });
+      const messageEntity = await resolveMessageEntity();
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
       const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData'> = {
@@ -1538,9 +1562,26 @@ export class MessageRepository {
     return undefined;
   }
 
-  private async updateMessageAsFailed(conversationEntity: Conversation, eventId: string, error: unknown) {
+  private async updateMessageAsFailed(
+    conversationEntity: Conversation,
+    eventId: string,
+    error: unknown,
+    messageEntityFromOptimisticEvent: Maybe<StoredMessage> = Maybe.nothing(),
+  ) {
     try {
-      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
+      const resolveMessageEntity: MessageEntityResolver = messageEntityFromOptimisticEvent.match({
+        Just: storedMessage => {
+          return () => {
+            return Promise.resolve(storedMessage);
+          };
+        },
+        Nothing: () => {
+          return () => {
+            return this.getMessageInConversationById(conversationEntity, eventId);
+          };
+        },
+      });
+      const messageEntity = await resolveMessageEntity();
       const errorStatus =
         isBackendError(error) &&
         error.label ===

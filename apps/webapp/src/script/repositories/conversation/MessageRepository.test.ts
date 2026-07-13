@@ -21,6 +21,8 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
+import pDefer from 'p-defer';
+import {Maybe} from 'true-myth';
 
 import {Account} from '@wireapp/core';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -40,12 +42,13 @@ import {Message} from 'Repositories/entity/message/message';
 import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
+import {EventService, type IdentifiedUpdatePayload} from 'Repositories/event/EventService';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {ReactionMap} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
+import {ClientEvent} from 'Repositories/event/Client';
 import {ConversationError} from 'src/script/error/conversationError';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 import type {Translate} from 'Util/localizerUtil';
@@ -85,13 +88,20 @@ type MessageRepositoryDependencies = {
   conversationState: ConversationState;
 };
 
+type MessageRepositoryTestOptions = {
+  readonly conversationRepository?: ConversationRepository;
+  readonly isMessageSendingStatusFixEnabled?: boolean;
+  readonly shouldStubMessageStatusUpdate?: boolean;
+};
+
 async function buildMessageRepository(
   translate: Translate,
+  options: MessageRepositoryTestOptions = {},
 ): Promise<[MessageRepository, MessageRepositoryDependencies]> {
   const userState = new UserState();
   userState.self(selfUser);
   const clientState = new ClientState();
-  clientState.currentClient = new ClientEntity(true, '');
+  clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
   const core = new Account();
 
   const teamState = new TeamState();
@@ -101,7 +111,9 @@ async function buildMessageRepository(
   selfConversation.selfUser(selfUser);
   conversationState.conversations([selfConversation]);
   const dependencies = {
-    conversationRepository: () => ({}) as ConversationRepository,
+    conversationRepository: () => {
+      return options.conversationRepository ?? ({} as ConversationRepository);
+    },
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     propertiesRepository: new PropertiesRepository({} as any, {} as any, translate),
@@ -114,7 +126,7 @@ async function buildMessageRepository(
     audioRepository: new AudioRepository(),
     translate,
     messageRepositoryOptions: {
-      isMessageSendingStatusFixEnabled: false,
+      isMessageSendingStatusFixEnabled: options.isMessageSendingStatusFixEnabled ?? false,
     },
     userState,
     clientState,
@@ -125,7 +137,9 @@ async function buildMessageRepository(
 
   const deps = Object.values(dependencies) as ConstructorParameters<typeof MessageRepository>;
   const messageRepository = new MessageRepository(...deps);
-  jest.spyOn(messageRepository as any, 'updateMessageAsSent').mockReturnValue(undefined);
+  if (options.shouldStubMessageStatusUpdate ?? true) {
+    jest.spyOn(messageRepository as any, 'updateMessageAsSent').mockReturnValue(undefined);
+  }
   return [messageRepository, dependencies];
 }
 
@@ -512,6 +526,111 @@ describe('MessageRepository', () => {
         targetMode: undefined,
         userIds: expect.any(Object),
       });
+    });
+
+    it('updates the displayed optimistic entity after delayed event handling when the status fix is enabled', async () => {
+      const optimisticMessageEntity = new ContentMessage(createUuid(), translateForTest);
+      optimisticMessageEntity.primary_key = 'optimistic-message-primary-key';
+      optimisticMessageEntity.type = ClientEvent.CONVERSATION.MESSAGE_ADD;
+      optimisticMessageEntity.from = selfUser.id;
+      optimisticMessageEntity.user(selfUser);
+      optimisticMessageEntity.status(StatusType.SENDING);
+
+      const optimisticEventInjected = pDefer<void>();
+      const injectedMessageEventHandled = pDefer<Maybe<Message>>();
+      const sendStarted = pDefer<void>();
+      const waitForInjectedMessageEvent = jest.fn().mockReturnValue(injectedMessageEventHandled.promise);
+      const conversationRepository = {
+        cancelInjectedMessageEventWait: jest.fn(),
+        checkMessageTimer: jest.fn(),
+        prepareForInjectedMessageEvent: jest.fn(),
+        waitForInjectedMessageEvent,
+      } as unknown as ConversationRepository;
+
+      const [messageRepository, {core, eventRepository, propertiesRepository}] = await buildMessageRepository(
+        translateForTest,
+        {
+          conversationRepository,
+          isMessageSendingStatusFixEnabled: true,
+          shouldStubMessageStatusUpdate: false,
+        },
+      );
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const conversation = generateConversation();
+      const sendSpy = jest.spyOn(core.service!.conversation, 'send').mockImplementation(async () => {
+        sendStarted.resolve();
+        return successPayload;
+      });
+      const persistedEventUpdateSpy = jest
+        .spyOn(eventRepository.eventService, 'updateEvent')
+        .mockResolvedValue({primary_key: optimisticMessageEntity.primary_key} as IdentifiedUpdatePayload);
+      const detachedMessageLookupSpy = jest.spyOn(messageRepository, 'getMessageInConversationById');
+
+      jest.spyOn(eventRepository, 'injectEvent').mockImplementation(async event => {
+        optimisticMessageEntity.id = event.id;
+        optimisticEventInjected.resolve();
+      });
+
+      const sendingPromise = messageRepository.sendTextWithLinkPreview({
+        conversation,
+        mentions: [],
+        textMessage: 'hello there',
+      });
+
+      await optimisticEventInjected.promise;
+
+      expect(optimisticMessageEntity.status()).toBe(StatusType.SENDING);
+      expect(conversationRepository.prepareForInjectedMessageEvent).toHaveBeenCalledWith(optimisticMessageEntity.id);
+      expect(waitForInjectedMessageEvent).toHaveBeenCalledWith(optimisticMessageEntity.id);
+      expect(waitForInjectedMessageEvent).toHaveBeenCalledTimes(1);
+      await sendStarted.promise;
+      expect(sendSpy).toHaveBeenCalledTimes(1);
+      expect(conversation.messages()).not.toContain(optimisticMessageEntity);
+
+      conversation.addMessage(optimisticMessageEntity);
+      const resolvedMessageEntity = Maybe.just(optimisticMessageEntity);
+      injectedMessageEventHandled.resolve(resolvedMessageEntity);
+      await expect(waitForInjectedMessageEvent.mock.results[0].value).resolves.toBe(resolvedMessageEntity);
+      await sendingPromise;
+
+      expect(optimisticMessageEntity.status()).toBe(StatusType.SENT);
+      expect(conversation.getMessage(optimisticMessageEntity.id)).toBe(optimisticMessageEntity);
+      expect(
+        conversation.messages().filter(messageEntity => messageEntity.id === optimisticMessageEntity.id),
+      ).toHaveLength(1);
+      expect(detachedMessageLookupSpy).not.toHaveBeenCalled();
+      expect(persistedEventUpdateSpy).toHaveBeenCalledWith(
+        optimisticMessageEntity.primary_key,
+        expect.objectContaining({status: StatusType.SENT}),
+      );
+    });
+
+    it('uses the legacy flow when the message-sending-status-fix toggle is disabled', async () => {
+      const conversationRepository = {
+        cancelInjectedMessageEventWait: jest.fn(),
+        prepareForInjectedMessageEvent: jest.fn(),
+        waitForInjectedMessageEvent: jest.fn(),
+      } as unknown as ConversationRepository;
+      const [messageRepository, {core, eventRepository, propertiesRepository}] = await buildMessageRepository(
+        translateForTest,
+        {
+          conversationRepository,
+          isMessageSendingStatusFixEnabled: false,
+        },
+      );
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+
+      await messageRepository.sendTextWithLinkPreview({
+        conversation: generateConversation(),
+        mentions: [],
+        textMessage: 'hello there',
+      });
+
+      expect(conversationRepository.prepareForInjectedMessageEvent).not.toHaveBeenCalled();
+      expect(conversationRepository.waitForInjectedMessageEvent).not.toHaveBeenCalled();
+      expect(conversationRepository.cancelInjectedMessageEventWait).not.toHaveBeenCalled();
     });
   });
 
