@@ -53,8 +53,8 @@ import {Core} from '../../service/coreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
 import {translateForTest} from 'Util/test/translateForTest';
-import {BackgroundEffectsHandler, ReleasableMediaStream} from "Repositories/media/backgroundEffectsHandler";
-import {MediaStreamHandler} from "Repositories/media/MediaStreamHandler";
+import {BackgroundEffectsHandler, ReleasableMediaStream} from 'Repositories/media/backgroundEffectsHandler';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
@@ -1459,19 +1459,11 @@ describe('set background effect', () => {
         .spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant')
         .mockResolvedValue(undefined);
 
-      const result = await (callingRepository as any).getCallMediaStream(
-        'conv-id',
-        false,
-        true,
-        false,
-      );
+      const result = await (callingRepository as any).getCallMediaStream('conv-id', false, true, false);
 
       expect(result).toBe(participantStream);
 
-      expect((callingRepository as any).getMediaStream).toHaveBeenCalledWith(
-        {camera: true},
-        false,
-      );
+      expect((callingRepository as any).getMediaStream).toHaveBeenCalledWith({camera: true}, false);
 
       expect(applySpy).toHaveBeenCalledWith(originalStream);
       expect(selfParticipant.updateMediaStream).not.toHaveBeenCalled();
@@ -1518,10 +1510,7 @@ describe('set background effect', () => {
       jest.spyOn(selfParticipant, 'getMediaStream').mockReturnValue(participantStream);
       jest.spyOn(callingRepository as any, 'getMediaStream').mockResolvedValue(audioStream);
 
-      const applySpy = jest.spyOn(
-        callingRepository as any,
-        'applyCurrentBackgroundEffectOnSelfParticipant',
-      );
+      const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
       const result = await (callingRepository as any).getCallMediaStream('conv-id', true, false, false);
 
@@ -1546,7 +1535,7 @@ describe('set background effect', () => {
 
       expect(result).toBe(true);
 
-      expect((callingRepository as any).getMediaStream).toHaveBeenCalledWith({audio: true, camera: true,}, false);
+      expect((callingRepository as any).getMediaStream).toHaveBeenCalledWith({audio: true, camera: true}, false);
 
       expect(applySpy).toHaveBeenCalledWith(originalStream);
       expect(selfParticipant.updateMediaStream).not.toHaveBeenCalled();
@@ -1560,10 +1549,7 @@ describe('set background effect', () => {
       jest.spyOn(backgroundEffectsHandler, 'isBackgroundEffectEnabled').mockReturnValue(false);
       jest.spyOn(callingRepository as any, 'getMediaStream').mockResolvedValue(originalStream);
 
-      const applySpy = jest.spyOn(
-        callingRepository as any,
-        'applyCurrentBackgroundEffectOnSelfParticipant',
-      );
+      const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
       const result = await (callingRepository as any).warmupMediaStreams(activeCall, true, true);
 
@@ -1571,16 +1557,11 @@ describe('set background effect', () => {
 
       expect(applySpy).toHaveBeenCalledWith(originalStream);
 
-      expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(
-        originalStream,
-        true,
-      );
+      expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(originalStream, true);
 
       expect(backgroundEffectsHandler.applyBackgroundEffect).not.toHaveBeenCalled();
 
-      expect(selfParticipant.videoState).toHaveBeenCalledWith(
-        VIDEO_STATE.STARTED,
-      );
+      expect(selfParticipant.videoState).toHaveBeenCalledWith(VIDEO_STATE.STARTED);
     });
 
     it('updates the participant directly for audio-only warmup', async () => {
@@ -1588,10 +1569,7 @@ describe('set background effect', () => {
 
       jest.spyOn(callingRepository as any, 'getMediaStream').mockResolvedValue(audioStream);
 
-      const applySpy = jest.spyOn(
-        callingRepository as any,
-        'applyCurrentBackgroundEffectOnSelfParticipant',
-      );
+      const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
       const result = await (callingRepository as any).warmupMediaStreams(activeCall, true, false);
 
@@ -1608,10 +1586,7 @@ describe('set background effect', () => {
       jest.spyOn(activeCall, 'state').mockReturnValue(CALL_STATE.NONE);
       jest.spyOn(callingRepository as any, 'getMediaStream').mockResolvedValue(originalStream);
 
-      const applySpy = jest.spyOn(
-        callingRepository as any,
-        'applyCurrentBackgroundEffectOnSelfParticipant',
-      );
+      const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
       const result = await (callingRepository as any).warmupMediaStreams(activeCall, false, true);
 
@@ -1622,9 +1597,7 @@ describe('set background effect', () => {
     });
 
     it('returns false when requesting the stream fails', async () => {
-      jest.spyOn(callingRepository as any, 'getMediaStream').mockRejectedValue(
-        new Error('camera failed'),
-      );
+      jest.spyOn(callingRepository as any, 'getMediaStream').mockRejectedValue(new Error('camera failed'));
 
       const result = await (callingRepository as any).warmupMediaStreams(activeCall, false, true);
 
@@ -1637,7 +1610,7 @@ describe('set background effect', () => {
     it('stores the selected effect and reapplies it to the original stream', async () => {
       const originalStream = createMediaStream('originalStream');
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall  as any);
+      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(originalStream);
 
       const applySpy = jest
@@ -1656,10 +1629,7 @@ describe('set background effect', () => {
     it('only stores the selected effect when there is no active call', async () => {
       jest.spyOn(callState, 'joinedCall').mockReturnValue(undefined as any);
 
-      const applySpy = jest.spyOn(
-        callingRepository as any,
-        'applyCurrentBackgroundEffectOnSelfParticipant',
-      );
+      const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
       const effect = 'blur' as any;
 
@@ -1674,10 +1644,7 @@ describe('set background effect', () => {
       jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(undefined);
 
-      const applySpy = jest.spyOn(
-        callingRepository as any,
-        'applyCurrentBackgroundEffectOnSelfParticipant',
-      );
+      const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
       const effect = 'blur' as any;
 
@@ -1695,10 +1662,7 @@ describe('set background effect', () => {
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(originalStream);
       jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(true as any);
 
-      const applySpy = jest.spyOn(
-        callingRepository as any,
-        'applyCurrentBackgroundEffectOnSelfParticipant',
-      );
+      const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
       const effect = 'blur' as any;
 
@@ -1714,9 +1678,7 @@ describe('set background effect', () => {
     it('does not apply background effects without an active call', async () => {
       const inputStream = createMediaStream('inputStream');
 
-      const result = await callingRepository[
-        'applyCurrentBackgroundEffectOnSelfParticipant'
-        ](inputStream, true);
+      const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
 
       expect(backgroundEffectsHandler.applyBackgroundEffect).not.toHaveBeenCalled();
       expect(selfParticipant.processedVideoStream).not.toHaveBeenCalled();
@@ -1730,9 +1692,7 @@ describe('set background effect', () => {
       jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
       jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(true as any);
 
-      const result = await callingRepository[
-        'applyCurrentBackgroundEffectOnSelfParticipant'
-        ](inputStream, true);
+      const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
 
       expect(backgroundEffectsHandler.applyBackgroundEffect).not.toHaveBeenCalled();
       expect(selfParticipant.processedVideoStream).not.toHaveBeenCalled();
@@ -1748,18 +1708,23 @@ describe('set background effect', () => {
       jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(undefined);
 
-      jest.spyOn(backgroundEffectsHandler, 'applyBackgroundEffect').mockResolvedValue({applied: true, media: processedMedia});
+      jest
+        .spyOn(backgroundEffectsHandler, 'applyBackgroundEffect')
+        .mockResolvedValue({applied: true, media: processedMedia});
 
-      const result = await callingRepository[
-        'applyCurrentBackgroundEffectOnSelfParticipant'
-        ](inputStream, true);
+      const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
 
       expect(backgroundEffectsHandler.applyBackgroundEffect).toHaveBeenCalledWith(inputStream);
 
       expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(inputStream, true);
       expect(selfParticipant.processedVideoStream).toHaveBeenCalledWith(processedMedia);
 
-      expect(callingRepository['changeMediaSource']).toHaveBeenCalledWith(processedStream, MediaType.VIDEO, false, activeCall);
+      expect(callingRepository['changeMediaSource']).toHaveBeenCalledWith(
+        processedStream,
+        MediaType.VIDEO,
+        false,
+        activeCall,
+      );
 
       expect(result).toBe(processedStream);
     });
@@ -1777,14 +1742,17 @@ describe('set background effect', () => {
         media: processedMedia,
       });
 
-      const result = await callingRepository[
-        'applyCurrentBackgroundEffectOnSelfParticipant'
-        ](inputStream, true);
+      const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
 
       expect(selfParticipant.updateMediaStream).not.toHaveBeenCalled();
       expect(selfParticipant.processedVideoStream).toHaveBeenCalledWith(processedMedia);
 
-      expect(callingRepository['changeMediaSource']).toHaveBeenCalledWith(processedStream, MediaType.VIDEO, false, activeCall);
+      expect(callingRepository['changeMediaSource']).toHaveBeenCalledWith(
+        processedStream,
+        MediaType.VIDEO,
+        false,
+        activeCall,
+      );
 
       expect(result).toBe(processedStream);
     });
@@ -1795,16 +1763,21 @@ describe('set background effect', () => {
       jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(undefined);
 
-      jest.spyOn(backgroundEffectsHandler, 'applyBackgroundEffect').mockResolvedValue({applied: false, media: undefined} as any);
+      jest
+        .spyOn(backgroundEffectsHandler, 'applyBackgroundEffect')
+        .mockResolvedValue({applied: false, media: undefined} as any);
 
-      const result = await callingRepository[
-        'applyCurrentBackgroundEffectOnSelfParticipant'
-        ](inputStream, true);
+      const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
 
       expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(inputStream, true);
       expect(selfParticipant.processedVideoStream).toHaveBeenCalledWith(undefined);
 
-      expect(callingRepository['changeMediaSource']).toHaveBeenCalledWith(inputStream, MediaType.VIDEO, false, activeCall);
+      expect(callingRepository['changeMediaSource']).toHaveBeenCalledWith(
+        inputStream,
+        MediaType.VIDEO,
+        false,
+        activeCall,
+      );
 
       expect(result).toBe(inputStream);
     });
@@ -1816,15 +1789,18 @@ describe('set background effect', () => {
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(undefined);
       jest.spyOn(backgroundEffectsHandler, 'isBackgroundEffectEnabled').mockReturnValue(false);
 
-      const result = await callingRepository[
-        'applyCurrentBackgroundEffectOnSelfParticipant'
-        ](inputStream, true);
+      const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
 
       expect(backgroundEffectsHandler.applyBackgroundEffect).not.toHaveBeenCalled();
       expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(inputStream, true);
       expect(selfParticipant.processedVideoStream).toHaveBeenCalledWith(undefined);
 
-      expect(callingRepository['changeMediaSource']).toHaveBeenCalledWith(inputStream, MediaType.VIDEO, false, activeCall);
+      expect(callingRepository['changeMediaSource']).toHaveBeenCalledWith(
+        inputStream,
+        MediaType.VIDEO,
+        false,
+        activeCall,
+      );
 
       expect(result).toBe(inputStream);
     });
@@ -1843,12 +1819,11 @@ describe('set background effect', () => {
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(inputStream);
       jest.spyOn(selfParticipant, 'processedVideoStream').mockReturnValue(previousMedia);
 
-      jest.spyOn(backgroundEffectsHandler, 'applyBackgroundEffect').mockResolvedValue({applied: true, media: nextMedia});
+      jest
+        .spyOn(backgroundEffectsHandler, 'applyBackgroundEffect')
+        .mockResolvedValue({applied: true, media: nextMedia});
 
-      await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](
-        inputStream,
-        false,
-      );
+      await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, false);
 
       expect(selfParticipant.processedVideoStream).toHaveBeenCalledWith(nextMedia);
       expect(releaseSpy).toHaveBeenCalledTimes(1);
@@ -1871,10 +1846,7 @@ describe('set background effect', () => {
         media: processedMedia,
       });
 
-      await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](
-        inputStream,
-        false,
-      );
+      await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, false);
 
       expect(releaseSpy).not.toHaveBeenCalled();
     });
@@ -1892,9 +1864,7 @@ describe('set background effect', () => {
         media: processedMedia,
       });
 
-      const result = await callingRepository[
-        'applyCurrentBackgroundEffectOnSelfParticipant'
-        ](inputStream);
+      const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream);
 
       expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(inputStream, true);
       expect(selfParticipant.processedVideoStream).toHaveBeenCalledWith(processedMedia);
