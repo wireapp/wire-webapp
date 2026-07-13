@@ -21,7 +21,7 @@ import {render, screen} from '@testing-library/react';
 
 import {FileFullscreenModal} from './FileFullscreenModal';
 
-jest.mock('Components/FullscreenModal/FullscreenModal', () => ({
+jest.mock('Components/fullscreenModal/fullscreenModal', () => ({
   FullscreenModal: ({children, isOpen}: any) => (isOpen ? <div>{children}</div> : null),
 }));
 

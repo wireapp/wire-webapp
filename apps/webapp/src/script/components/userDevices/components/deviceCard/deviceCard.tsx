@@ -24,7 +24,7 @@ import {DeviceVerificationBadges} from 'Components/badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {type ClientEntity} from 'Repositories/client/ClientEntity';
-import {WireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/e2eIdentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {splitFingerprint} from 'Util/stringUtil';

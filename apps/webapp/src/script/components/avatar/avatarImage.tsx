@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/serialize';
 import {Transition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import {InViewport} from 'Components/InViewport';
+import {InViewport} from 'Components/inViewport';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {CSS_FILL_PARENT} from 'Util/cssMixin';

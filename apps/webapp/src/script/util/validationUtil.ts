@@ -19,7 +19,7 @@
 
 import is from '@sindresorhus/is';
 
-import {ValidationError} from '../auth/module/action/ValidationError';
+import {ValidationError} from '../auth/module/action/validationError';
 
 export class ValidationUtilError extends Error {
   constructor(message = 'Unknown ValidationUtilError') {

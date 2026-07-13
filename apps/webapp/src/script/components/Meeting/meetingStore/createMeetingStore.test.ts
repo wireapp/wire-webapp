@@ -17,7 +17,7 @@
  *
  */
 
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 
@@ -55,16 +55,27 @@ describe('createMeetingStore', () => {
     trial: false,
   };
 
-  const listMeeting = {
+  const meetingSeriesEntry = {
     title: 'Weekly sync',
-    start_date: '2026-06-16T10:00:00.000Z',
-    end_date: '2026-06-16T11:00:00.000Z',
+    series_start_date: '2026-06-16T10:00:00.000Z',
+    series_end_date: '2026-06-16T11:00:00.000Z',
+    duration_ms: 3_600_000,
     conversation_id: 'conversation-id',
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     recurrence: 'doesNotRepeat' as const,
   };
+
+  const listMeetingInstance = {
+    meetingSeries: meetingSeriesEntry,
+    start: new Date('2026-06-16T10:00:00.000Z'),
+    end: new Date('2026-06-16T11:00:00.000Z'),
+  };
+
+  const wallClock = createDeterministicWallClock({
+    initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+  });
 
   const createDeps = ({
     getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting])),
@@ -75,7 +86,7 @@ describe('createMeetingStore', () => {
   } = {}): MeetingStoreDeps => ({
     meetingsRepository: {getMeetingsList} as unknown as MeetingsRepository,
     conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
-    wallClock: createWallClock(),
+    wallClock,
   });
 
   beforeEach(() => {
@@ -94,8 +105,9 @@ describe('createMeetingStore', () => {
       isLoading: false,
       hasLoadError: false,
     });
-    expect(store.getState().meetings).toHaveLength(1);
-    expect(store.getState().meetings[0]?.title).toBe('Weekly sync');
+    expect(store.getState().meetingSeries).toHaveLength(1);
+    expect(store.getState().meetingSeries[0]?.title).toBe('Weekly sync');
+    expect(store.getState().meetingSeries[0]).toMatchObject(meetingSeriesEntry);
   });
 
   it('sets hasLoadError when loading meetings fails', async () => {
@@ -106,7 +118,7 @@ describe('createMeetingStore', () => {
 
     expect(getMeetingsList).toHaveBeenCalledTimes(1);
     expect(store.getState()).toMatchObject({
-      meetings: [],
+      meetingSeries: [],
       isLoading: false,
       hasLoadError: true,
     });
@@ -141,9 +153,38 @@ describe('createMeetingStore', () => {
     const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
     const store = createMeetingStore(createDeps({safeGetConversationById}));
 
-    const result = await store.getState().loadMeetingForEdit(listMeeting);
+    const result = await store.getState().loadMeetingForEdit(listMeetingInstance);
 
     expect(result.isOk).toBe(true);
-    expect(safeGetConversationById).toHaveBeenCalledWith(listMeeting.qualified_conversation);
+    expect(safeGetConversationById).toHaveBeenCalledWith(listMeetingInstance.meetingSeries.qualified_conversation);
+    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T10:00:00.000Z'));
+    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
+  });
+
+  it('prefills edit form with the upcoming instance times for recurring meetings', async () => {
+    const conversation = new Conversation(
+      'conversation-id',
+      'example.com',
+      CONVERSATION_PROTOCOL.MLS,
+      translateForTest,
+    );
+    const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
+    const store = createMeetingStore(createDeps({safeGetConversationById}));
+    const recurringMeetingInstance = {
+      meetingSeries: {
+        ...meetingSeriesEntry,
+        series_start_date: '2026-06-01T10:00:00.000Z',
+        series_end_date: '2026-06-01T11:00:00.000Z',
+        recurrence: 'weekly' as const,
+      },
+      start: new Date('2026-06-29T10:00:00.000Z'),
+      end: new Date('2026-06-29T11:00:00.000Z'),
+    };
+
+    const result = await store.getState().loadMeetingForEdit(recurringMeetingInstance);
+
+    expect(result.isOk).toBe(true);
+    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T10:00:00.000Z'));
+    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T11:00:00.000Z'));
   });
 });

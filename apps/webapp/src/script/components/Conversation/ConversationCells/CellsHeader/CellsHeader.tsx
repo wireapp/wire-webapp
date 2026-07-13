@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsSearchInput} from 'Components/CellsSearchInput/CellsSearchInput';
+import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

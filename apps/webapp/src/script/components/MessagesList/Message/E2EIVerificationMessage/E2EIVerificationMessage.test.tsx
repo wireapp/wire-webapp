@@ -26,7 +26,7 @@ import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMe
 
 import {E2EIVerificationMessage} from './E2EIVerificationMessage';
 
-import {withTheme} from '../../../../auth/util/test/TestUtil';
+import {withTheme} from '../../../../auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 

@@ -26,7 +26,7 @@ import cx from 'classnames';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
-import {AssetImage} from 'Components/Image';
+import {AssetImage} from 'Components/image';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {Multipart} from 'Repositories/entity/message/multipart';

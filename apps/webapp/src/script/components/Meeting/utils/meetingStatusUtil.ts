@@ -27,14 +27,14 @@ export enum MeetingStatuses {
 /**
  * Determines the status of a meeting at a specific time.
  *
- * @param {number} nowMs - The current time in milliseconds.
+ * @param {number} nowMilliseconds - The current time in milliseconds.
  * @param {string} start_date - The start date of the meeting in ISO format.
  * @param {string} end_date - The end date of the meeting in ISO format.
  * @param {boolean} [attending=false] - Whether the user is attending the meeting.
  * @returns {MeetingStatuses} - The status of the meeting.
  */
 export const getMeetingStatusAt = (
-  nowMs: number,
+  nowMilliseconds: number,
   start_date: string,
   end_date: string,
   attending: boolean = false,
@@ -42,11 +42,11 @@ export const getMeetingStatusAt = (
   const startMs = new Date(start_date).getTime();
   const endMs = new Date(end_date).getTime();
 
-  if (nowMs > endMs) {
+  if (nowMilliseconds > endMs) {
     return MeetingStatuses.PAST;
   }
 
-  if (nowMs >= startMs) {
+  if (nowMilliseconds >= startMs) {
     return attending ? MeetingStatuses.PARTICIPATING : MeetingStatuses.ON_GOING;
   }
 

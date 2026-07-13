@@ -19,7 +19,7 @@
 
 import {FC, useState} from 'react';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {toggleFeature} from 'Repositories/conversation/ConversationAccessPermission';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

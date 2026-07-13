@@ -22,7 +22,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import * as Icon from 'Components/icon';
-import {AssetImage} from 'Components/Image';
+import {AssetImage} from 'Components/image';
 import {MultipartAssetPreview} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssetPreview';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';

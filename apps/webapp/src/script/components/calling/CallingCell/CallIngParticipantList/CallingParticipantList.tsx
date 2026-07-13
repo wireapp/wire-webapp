@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {CallParticipantsListItem} from 'Components/calling/callParticipantsListItem';
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';

@@ -17,11 +17,19 @@
  *
  */
 
-import {MutableRefObject, useEffect} from 'react';
+import {MutableRefObject, useLayoutEffect, useRef} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
+import {Maybe} from 'true-myth';
 
 import {GroupedMessage, isMarker, Marker} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
+
+type ScrollAlign = 'start' | 'center' | 'end';
+
+type InitialScrollPosition = {
+  scrollAlign: ScrollAlign;
+  scrollIndex: number;
+};
 
 interface Props {
   isConversationLoaded: boolean;
@@ -29,30 +37,60 @@ interface Props {
   conversationLastReadTimestamp: MutableRefObject<number>;
 }
 
+export function getInitialScrollPosition(
+  groupedMessages: (Marker | GroupedMessage)[],
+  lastReadTimestamp: number,
+): Maybe<InitialScrollPosition> {
+  if (groupedMessages.length === 0) {
+    return Maybe.nothing();
+  }
+
+  const firstUnreadMessageIndex = groupedMessages.findIndex(
+    message => !isMarker(message) && message.timestamp > lastReadTimestamp,
+  );
+
+  if (firstUnreadMessageIndex !== -1) {
+    return Maybe.just({
+      scrollAlign: 'start',
+      scrollIndex: Math.max(0, firstUnreadMessageIndex - 1),
+    });
+  }
+
+  return Maybe.just({
+    scrollAlign: 'end',
+    scrollIndex: groupedMessages.length - 1,
+  });
+}
+
 export const useScrollToLastUnreadMessage = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
   {isConversationLoaded, groupedMessages, conversationLastReadTimestamp}: Props,
 ) => {
-  useEffect(() => {
-    if (isConversationLoaded) {
-      let scrollAlign: 'start' | 'center' | 'end' = 'center';
+  const hasScrolledToInitialPosition = useRef(false);
 
-      const firstUnreadMessageIndex = groupedMessages.findIndex(
-        message => !isMarker(message) && message.timestamp > conversationLastReadTimestamp.current,
-      );
-
-      let nextScrollIndex = groupedMessages.length - 1; // Default to the last message
-
-      if (firstUnreadMessageIndex !== -1) {
-        nextScrollIndex = firstUnreadMessageIndex - 1;
-        scrollAlign = 'start';
-      }
-
-      const scrollIndex = nextScrollIndex;
-
-      requestAnimationFrame(() => {
-        virtualizer.scrollToIndex(scrollIndex, {align: scrollAlign});
-      });
+  useLayoutEffect(() => {
+    if (!isConversationLoaded) {
+      hasScrolledToInitialPosition.current = false;
+      return;
     }
-  }, [isConversationLoaded]);
+
+    if (hasScrolledToInitialPosition.current) {
+      return;
+    }
+
+    const initialScrollPosition = getInitialScrollPosition(groupedMessages, conversationLastReadTimestamp.current);
+
+    if (initialScrollPosition.isNothing) {
+      return;
+    }
+
+    virtualizer.measure();
+    hasScrolledToInitialPosition.current = true;
+    const {scrollAlign, scrollIndex} = initialScrollPosition.value;
+
+    requestAnimationFrame(() => {
+      virtualizer.measure();
+      virtualizer.scrollToIndex(scrollIndex, {align: scrollAlign});
+    });
+  }, [conversationLastReadTimestamp, groupedMessages, isConversationLoaded, virtualizer]);
 };

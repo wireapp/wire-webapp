@@ -20,7 +20,7 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 
 import {translateForTest} from 'Util/test/translateForTest';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/TestUtil';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

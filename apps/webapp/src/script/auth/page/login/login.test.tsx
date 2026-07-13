@@ -31,7 +31,7 @@ import {actionRoot} from '../../module/action';
 import {initialRootState} from '../../module/reducer';
 import {ROUTE} from '../../route';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {mountComponent} from '../../util/test/TestUtil';
+import {mountComponent} from '../../util/test/testUtil';
 
 describe('Login', () => {
   it('successfully logs in with email', async () => {

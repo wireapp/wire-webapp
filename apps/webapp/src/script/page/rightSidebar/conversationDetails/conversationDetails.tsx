@@ -26,7 +26,7 @@ import {UserType} from '@wireapp/api-client/lib/user';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {ConversationProtocolDetails} from 'Components/panel/conversationProtocolDetails/conversationProtocolDetails';
 import {EnrichedFields} from 'Components/panel/enrichedFields';

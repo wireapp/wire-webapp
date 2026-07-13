@@ -46,7 +46,7 @@ import {loadValue, storeValue} from 'Util/storageUtil';
 import {setDateLocale, LocaleType} from 'Util/timeUtil';
 import {getParameter} from 'Util/urlUtil';
 
-import {URLParameter} from '../auth/URLParameter';
+import {URLParameter} from '../auth/urlParameter';
 
 const strings = {
   cs,

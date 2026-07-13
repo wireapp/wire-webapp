@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EnrichedFields} from 'Components/panel/enrichedFields';

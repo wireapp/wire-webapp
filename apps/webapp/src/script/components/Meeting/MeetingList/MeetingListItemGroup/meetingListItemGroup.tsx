@@ -19,29 +19,24 @@
 
 import {memo} from 'react';
 
-import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingListItem} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingListItem';
 import {
   listStyles,
   sectionHeaderStyles,
   sectionStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/meetingListItemGroup.styles';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface MeetingListItemGroupProps {
   header?: string;
-  groupedMeetings: Record<number, Meeting[]>;
-  nowMs?: number;
+  meetingInstances: MeetingInstance[];
+  nowMilliseconds?: number;
 }
 
-const MeetingListItemGroupComponent = ({header, groupedMeetings, nowMs}: MeetingListItemGroupProps) => {
+const MeetingListItemGroupComponent = ({header, meetingInstances, nowMilliseconds}: MeetingListItemGroupProps) => {
   const {translate} = useApplicationContext();
-
-  // Sort by hour key, then flatten so adjacent items share one continuous border.
-  const groups = Object.entries(groupedMeetings).toSorted(([meetingA], [meetingB]) => +meetingA - +meetingB);
-  const nonEmptyGroups = groups.filter(([, items]) => items?.length);
-  const meetings = nonEmptyGroups.flatMap(([, items]) => items);
-  const isEmpty = meetings.length === 0;
+  const isEmpty = meetingInstances.length === 0;
 
   if (isEmpty) {
     return (
@@ -57,11 +52,11 @@ const MeetingListItemGroupComponent = ({header, groupedMeetings, nowMs}: Meeting
       {header !== undefined && header !== '' && <div css={sectionHeaderStyles}>{header}</div>}
 
       <div css={listStyles}>
-        {meetings.map(meeting => (
+        {meetingInstances.map(meetingInstance => (
           <MeetingListItem
-            key={`meeting-list-item-${meeting.qualified_id.id}-${meeting.qualified_id.domain}`}
-            nowMs={nowMs}
-            {...meeting}
+            key={`meeting-list-item-${meetingInstance.meetingSeries.qualified_id.id}-${meetingInstance.meetingSeries.qualified_id.domain}-${meetingInstance.start.getTime()}`}
+            meetingInstance={meetingInstance}
+            nowMilliseconds={nowMilliseconds}
           />
         ))}
       </div>

@@ -18,41 +18,68 @@
  */
 
 import {spawn} from 'node:child_process';
-import {createWriteStream} from 'node:fs';
-import {mkdir, readdir, readFile} from 'node:fs/promises';
+import {mkdir, writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import process from 'node:process';
-import type {WriteStream} from 'node:fs';
+import {createProjectGraphAsync} from '@nx/devkit';
+import type {ProjectGraph} from '@nx/devkit';
 
 const defaultReportsDirectory = 'unit-test-reports';
-const projectJsonFileName = 'project.json';
+const defaultCombinedReportFile = 'unit-tests.log';
 
-type UnknownProjectJson = {
-  readonly name?: unknown;
-  readonly projectType?: unknown;
-  readonly targets?: unknown;
-};
-
-type TestableLibraryProject = {
+export type TestableProject = {
   readonly name: string;
+  readonly root: string;
+  readonly type: string | undefined;
 };
 
-type NxTestCommand = {
+export type NxTestCommand = {
   readonly command: string;
   readonly commandArguments: readonly string[];
 };
 
-type ReportSettings = {
+export type ReportSettings = {
   readonly branchName: string;
   readonly commitSha: string;
+  readonly combinedReportFile: string;
   readonly reportsDirectory: string;
+  readonly runDate: string;
   readonly workspaceRoot: string;
 };
 
-type PackageUnitTestResult = {
+export type ProjectTestResult = {
+  readonly command: NxTestCommand;
   readonly exitCode: number;
-  readonly projectName: string;
+  readonly output: string;
+  readonly project: TestableProject;
+  readonly reportFileName: string;
+  readonly status: 'passed' | 'failed';
 };
+
+export type UnitTestReportManifest = {
+  readonly branch: string;
+  readonly commitSha: string;
+  readonly overallStatus: 'passed' | 'failed';
+  readonly projects: readonly {
+    readonly command: string;
+    readonly exitCode: number;
+    readonly name: string;
+    readonly reportFileName: string;
+    readonly status: 'passed' | 'failed';
+  }[];
+  readonly runDate: string;
+};
+
+type CommandExecutionResult = {
+  readonly exitCode: number;
+  readonly output: string;
+};
+
+type RunCommand = (
+  command: string,
+  commandArguments: readonly string[],
+  workspaceRoot: string,
+) => Promise<CommandExecutionResult>;
 
 export function sanitizeProjectNameForFileName(projectName: string): string {
   return projectName.replaceAll(/[^a-zA-Z0-9._-]/g, '-');
@@ -65,65 +92,31 @@ export function createReportFileName(projectName: string, commitSha: string): st
 export function createNxTestCommand(projectName: string): NxTestCommand {
   return {
     command: './bin/yarn',
-    commandArguments: ['nx', 'run', `${projectName}:test`, '--configuration=ci'],
+    commandArguments: ['nx', 'run', `${projectName}:test`, '--configuration=ci', '--verbose'],
   };
 }
 
-export async function discoverTestableLibraryProjects(
-  workspaceRoot: string,
-): Promise<readonly TestableLibraryProject[]> {
-  const librariesDirectory = join(workspaceRoot, 'libraries');
-  const libraryDirectoryEntries = await readdir(librariesDirectory, {withFileTypes: true});
-  const discoveredProjects: TestableLibraryProject[] = [];
-
-  for (const libraryDirectoryEntry of libraryDirectoryEntries) {
-    if (!libraryDirectoryEntry.isDirectory()) {
-      continue;
-    }
-
-    const projectJsonFilePath = join(librariesDirectory, libraryDirectoryEntry.name, projectJsonFileName);
-    const projectJson = await readProjectJson(projectJsonFilePath);
-
-    if (isTestableLibraryProject(projectJson)) {
-      discoveredProjects.push({
-        name: projectJson.name,
-      });
-    }
-  }
-
-  return discoveredProjects.toSorted((leftProject, rightProject): number => {
-    return leftProject.name.localeCompare(rightProject.name);
-  });
+export function findTestableProjects(projectGraph: ProjectGraph): readonly TestableProject[] {
+  return Object.values(projectGraph.nodes)
+    .filter((projectNode): boolean => {
+      return projectNode.data.targets?.test !== undefined;
+    })
+    .map((projectNode): TestableProject => {
+      return {
+        name: projectNode.name,
+        root: projectNode.data.root,
+        type: projectNode.type,
+      };
+    })
+    .toSorted((leftProject, rightProject): number => {
+      return leftProject.name.localeCompare(rightProject.name);
+    });
 }
 
-async function readProjectJson(projectJsonFilePath: string): Promise<UnknownProjectJson> {
-  try {
-    return JSON.parse(await readFile(projectJsonFilePath, 'utf8')) as UnknownProjectJson;
-  } catch (error: unknown) {
-    if (isMissingFileError(error)) {
-      return {};
-    }
+export async function discoverTestableProjects(): Promise<readonly TestableProject[]> {
+  const projectGraph = await createProjectGraphAsync();
 
-    throw error;
-  }
-}
-
-function isTestableLibraryProject(projectJson: UnknownProjectJson): projectJson is UnknownProjectJson & {
-  readonly name: string;
-  readonly targets: Record<string, unknown>;
-} {
-  return (
-    typeof projectJson.name === 'string' &&
-    projectJson.projectType === 'library' &&
-    typeof projectJson.targets === 'object' &&
-    projectJson.targets !== null &&
-    typeof (projectJson.targets as Record<string, unknown>).test === 'object' &&
-    (projectJson.targets as Record<string, unknown>).test !== null
-  );
-}
-
-function isMissingFileError(error: unknown): error is NodeJS.ErrnoException {
-  return error instanceof Error && 'code' in error && error.code === 'ENOENT';
+  return findTestableProjects(projectGraph);
 }
 
 function readRequiredEnvironmentValue(name: string): string {
@@ -140,95 +133,141 @@ function readReportSettings(): ReportSettings {
   return {
     branchName: readRequiredEnvironmentValue('BRANCH'),
     commitSha: readRequiredEnvironmentValue('TESTED_COMMIT_SHA'),
+    combinedReportFile: process.env.UNIT_TEST_REPORT_FILE ?? defaultCombinedReportFile,
     reportsDirectory: process.env.UNIT_TEST_REPORTS_DIRECTORY ?? defaultReportsDirectory,
+    runDate: new Date().toISOString(),
     workspaceRoot: process.cwd(),
   };
 }
 
-function selectProjects(discoveredProjects: readonly TestableLibraryProject[]): readonly TestableLibraryProject[] {
-  const requestedProjectName = process.env.ONLY_PROJECT;
-
-  if (!requestedProjectName) {
-    return discoveredProjects;
-  }
-
-  const requestedProject = discoveredProjects.find((project): boolean => {
-    return project.name === requestedProjectName;
-  });
-
-  if (!requestedProject) {
-    throw new Error(`No testable library project found for: ${requestedProjectName}`);
-  }
-
-  return [requestedProject];
+export function createCommandText(nxTestCommand: NxTestCommand): string {
+  return [nxTestCommand.command, ...nxTestCommand.commandArguments].join(' ');
 }
 
-async function runPackageUnitTestReports(reportSettings: ReportSettings): Promise<readonly PackageUnitTestResult[]> {
-  const discoveredProjects = await discoverTestableLibraryProjects(reportSettings.workspaceRoot);
-  const selectedProjects = selectProjects(discoveredProjects);
+export function createProjectReport(projectTestResult: ProjectTestResult, reportSettings: ReportSettings): string {
+  const commandText = createCommandText(projectTestResult.command);
 
-  if (selectedProjects.length === 0) {
-    throw new Error('No testable library projects found');
-  }
-
-  if (process.argv.includes('--list-projects')) {
-    for (const project of selectedProjects) {
-      console.log(project.name);
-    }
-
-    return [];
-  }
-
-  await mkdir(reportSettings.reportsDirectory, {recursive: true});
-
-  const testResults: PackageUnitTestResult[] = [];
-
-  for (const project of selectedProjects) {
-    testResults.push(await runPackageUnitTestReport(project, reportSettings));
-  }
-
-  return testResults;
+  return [
+    '===== REPORT METADATA =====',
+    `PROJECT = ${projectTestResult.project.name}`,
+    `PROJECT ROOT = ${projectTestResult.project.root}`,
+    `PROJECT TYPE = ${projectTestResult.project.type ?? 'unknown'}`,
+    `BRANCH = ${reportSettings.branchName}`,
+    `COMMIT SHA = ${reportSettings.commitSha}`,
+    `TEST RUN DATE = ${reportSettings.runDate}`,
+    `COMMAND = ${commandText}`,
+    `EXIT CODE = ${projectTestResult.exitCode}`,
+    `STATUS = ${projectTestResult.status}`,
+    '===== END REPORT METADATA =====',
+    '',
+    projectTestResult.output,
+  ].join('\n');
 }
 
-async function runPackageUnitTestReport(
-  project: TestableLibraryProject,
+export function createManifest(
+  projectTestResults: readonly ProjectTestResult[],
   reportSettings: ReportSettings,
-): Promise<PackageUnitTestResult> {
-  const {command, commandArguments} = createNxTestCommand(project.name);
-  const commandText = [command, ...commandArguments].join(' ');
-  const reportFilePath = join(
-    reportSettings.reportsDirectory,
-    createReportFileName(project.name, reportSettings.commitSha),
-  );
-  const reportWriteStream = createWriteStream(reportFilePath, {flags: 'w'});
-
-  reportWriteStream.write(`PROJECT = ${project.name}\n`);
-  reportWriteStream.write(`BRANCH = ${reportSettings.branchName}\n`);
-  reportWriteStream.write(`COMMIT SHA = ${reportSettings.commitSha}\n`);
-  reportWriteStream.write(`TEST RUN DATE = ${new Date().toISOString()}\n`);
-  reportWriteStream.write(`COMMAND = ${commandText}\n\n`);
-
-  console.log(`\n==> ${commandText}`);
-
-  const exitCode = await runCommand(command, commandArguments, reportWriteStream, reportSettings.workspaceRoot);
-
-  reportWriteStream.write(`\nEXIT CODE = ${exitCode}\n`);
-  await closeWriteStream(reportWriteStream);
-
+): UnitTestReportManifest {
   return {
-    exitCode,
-    projectName: project.name,
+    branch: reportSettings.branchName,
+    commitSha: reportSettings.commitSha,
+    overallStatus: projectTestResults.every((projectTestResult): boolean => {
+      return projectTestResult.status === 'passed';
+    })
+      ? 'passed'
+      : 'failed',
+    projects: sortProjectTestResults(projectTestResults).map(projectTestResult => {
+      return {
+        command: createCommandText(projectTestResult.command),
+        exitCode: projectTestResult.exitCode,
+        name: projectTestResult.project.name,
+        reportFileName: projectTestResult.reportFileName,
+        status: projectTestResult.status,
+      };
+    }),
+    runDate: reportSettings.runDate,
   };
 }
 
-function runCommand(
+export function createCombinedReport(
+  projectTestResults: readonly ProjectTestResult[],
+  reportSettings: ReportSettings,
+): string {
+  return sortProjectTestResults(projectTestResults)
+    .map((projectTestResult): string => {
+      return [
+        `===== BEGIN PROJECT: ${projectTestResult.project.name} =====`,
+        createProjectReport(projectTestResult, reportSettings),
+        `===== END PROJECT: ${projectTestResult.project.name} =====`,
+      ].join('\n');
+    })
+    .join('\n\n');
+}
+
+function sortProjectTestResults(projectTestResults: readonly ProjectTestResult[]): readonly ProjectTestResult[] {
+  return projectTestResults.toSorted((leftProjectTestResult, rightProjectTestResult): number => {
+    return leftProjectTestResult.project.name.localeCompare(rightProjectTestResult.project.name);
+  });
+}
+
+export async function runProjectTestReports(
+  testableProjects: readonly TestableProject[],
+  reportSettings: ReportSettings,
+  runCommand: RunCommand,
+): Promise<readonly ProjectTestResult[]> {
+  const projectTestResults: ProjectTestResult[] = [];
+
+  for (const testableProject of testableProjects) {
+    const nxTestCommand = createNxTestCommand(testableProject.name);
+    console.log(`\n==> ${createCommandText(nxTestCommand)}`);
+    const commandExecutionResult = await runCommand(
+      nxTestCommand.command,
+      nxTestCommand.commandArguments,
+      reportSettings.workspaceRoot,
+    );
+
+    projectTestResults.push({
+      command: nxTestCommand,
+      exitCode: commandExecutionResult.exitCode,
+      output: commandExecutionResult.output,
+      project: testableProject,
+      reportFileName: createReportFileName(testableProject.name, reportSettings.commitSha),
+      status: commandExecutionResult.exitCode === 0 ? 'passed' : 'failed',
+    });
+  }
+
+  return projectTestResults;
+}
+
+async function writeReports(
+  projectTestResults: readonly ProjectTestResult[],
+  reportSettings: ReportSettings,
+): Promise<void> {
+  await mkdir(reportSettings.reportsDirectory, {recursive: true});
+
+  await Promise.all(
+    projectTestResults.map(async (projectTestResult): Promise<void> => {
+      await writeFile(
+        join(reportSettings.reportsDirectory, projectTestResult.reportFileName),
+        createProjectReport(projectTestResult, reportSettings),
+      );
+    }),
+  );
+  await writeFile(
+    join(reportSettings.reportsDirectory, 'manifest.json'),
+    `${JSON.stringify(createManifest(projectTestResults, reportSettings), null, 2)}\n`,
+  );
+  await writeFile(reportSettings.combinedReportFile, createCombinedReport(projectTestResults, reportSettings));
+}
+
+function runCommandAndCaptureOutput(
   command: string,
   commandArguments: readonly string[],
-  reportWriteStream: WriteStream,
   workspaceRoot: string,
-): Promise<number> {
+): Promise<CommandExecutionResult> {
   return new Promise((resolveCommand): void => {
     let commandHasFailedToStart = false;
+    let commandOutput = '';
     const childProcess = spawn(command, commandArguments, {
       cwd: workspaceRoot,
       env: process.env,
@@ -237,50 +276,63 @@ function runCommand(
 
     childProcess.stdout.on('data', (outputChunk: Buffer): void => {
       process.stdout.write(outputChunk);
-      reportWriteStream.write(outputChunk);
+      commandOutput += outputChunk.toString();
     });
 
     childProcess.stderr.on('data', (outputChunk: Buffer): void => {
       process.stderr.write(outputChunk);
-      reportWriteStream.write(outputChunk);
+      commandOutput += outputChunk.toString();
     });
 
     childProcess.on('error', (error: Error): void => {
       commandHasFailedToStart = true;
       const errorMessage = `Failed to start command: ${error.message}\n`;
       process.stderr.write(errorMessage);
-      reportWriteStream.write(errorMessage);
-      resolveCommand(1);
+      commandOutput += errorMessage;
+      resolveCommand({exitCode: 1, output: commandOutput});
     });
 
     childProcess.on('close', (exitCode: number | null): void => {
       if (!commandHasFailedToStart) {
-        resolveCommand(exitCode ?? 1);
+        resolveCommand({exitCode: exitCode ?? 1, output: commandOutput});
       }
     });
   });
 }
 
-function closeWriteStream(reportWriteStream: WriteStream): Promise<void> {
-  return new Promise((resolveClose, rejectClose): void => {
-    reportWriteStream.on('error', rejectClose);
-    reportWriteStream.end(resolveClose);
-  });
-}
-
 async function main(): Promise<void> {
   try {
-    const testResults = await runPackageUnitTestReports(readReportSettings());
-    const failedProjectNames = testResults
-      .filter((testResult): boolean => {
-        return testResult.exitCode !== 0;
+    const reportSettings = readReportSettings();
+    const testableProjects = await discoverTestableProjects();
+
+    if (testableProjects.length === 0) {
+      throw new Error('No Nx projects with a test target found');
+    }
+
+    if (process.argv.includes('--list-projects')) {
+      for (const testableProject of testableProjects) {
+        console.log(testableProject.name);
+      }
+
+      return;
+    }
+
+    const projectTestResults = await runProjectTestReports(
+      testableProjects,
+      reportSettings,
+      runCommandAndCaptureOutput,
+    );
+    await writeReports(projectTestResults, reportSettings);
+    const failedProjectNames = projectTestResults
+      .filter((projectTestResult): boolean => {
+        return projectTestResult.status === 'failed';
       })
-      .map((testResult): string => {
-        return testResult.projectName;
+      .map((projectTestResult): string => {
+        return projectTestResult.project.name;
       });
 
     if (failedProjectNames.length > 0) {
-      console.error(`Package unit test failures: ${failedProjectNames.join(', ')}`);
+      console.error(`Unit test failures: ${failedProjectNames.join(', ')}`);
       process.exitCode = 1;
     }
   } catch (error: unknown) {

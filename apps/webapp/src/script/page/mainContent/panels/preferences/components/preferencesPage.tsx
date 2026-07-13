@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import {IconButton, IconButtonVariant, QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 
 import {buttonsStyle, contentStyle, titleStyle, wrapperStyle} from './preferencesPage.styles';

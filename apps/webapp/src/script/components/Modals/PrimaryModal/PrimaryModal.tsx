@@ -22,8 +22,8 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, use
 import {ValidationUtil} from '@wireapp/commons';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 
-import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {Config} from 'src/script/Config';
 import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';

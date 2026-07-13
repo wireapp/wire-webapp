@@ -19,10 +19,10 @@
 
 import {useCallback} from 'react';
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingErrorKeys';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -34,8 +34,8 @@ export const useEditMeeting = () => {
   const openEdit = useScheduleMeetingModal(state => state.openEdit);
 
   const editMeeting = useCallback(
-    async (meeting: Meeting) => {
-      const loadResult = await loadMeetingForEdit(meeting);
+    async (meetingInstance: MeetingInstance) => {
+      const loadResult = await loadMeetingForEdit(meetingInstance);
 
       if (loadResult.isErr) {
         const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[meetingSubmitErrors.updateFailed];
@@ -54,7 +54,7 @@ export const useEditMeeting = () => {
       }
 
       const {formState, qualifiedConversation, originalSelectedUsers} = loadResult.value;
-      openEdit(meeting, formState, qualifiedConversation, originalSelectedUsers);
+      openEdit(meetingInstance.meetingSeries, formState, qualifiedConversation, originalSelectedUsers);
     },
     [loadMeetingForEdit, openEdit, translate],
   );

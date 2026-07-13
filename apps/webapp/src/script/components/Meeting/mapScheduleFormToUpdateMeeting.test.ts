@@ -71,7 +71,7 @@ describe('mapScheduleFormToUpdateMeeting', () => {
     });
   });
 
-  it('omits recurrence when unchanged', () => {
+  it('omits recurrence when unchanged for non-repeating meetings', () => {
     const result = mapScheduleFormToUpdateMeeting(
       {
         ...baseFormState(),
@@ -86,6 +86,18 @@ describe('mapScheduleFormToUpdateMeeting', () => {
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
+    });
+  });
+
+  it('includes recurrence when unchanged for repeating meetings', () => {
+    const result = mapScheduleFormToUpdateMeeting(baseFormState(), wallClock, 'weekly');
+
+    expect(result.isOk).toBe(true);
+    expect(unwrap(result).payload).toEqual({
+      title: 'Weekly sync',
+      start_time: futureStartIso,
+      end_time: futureEndIso,
+      recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
     });
   });
 

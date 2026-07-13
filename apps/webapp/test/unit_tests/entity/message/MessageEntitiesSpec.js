@@ -17,11 +17,11 @@
  *
  */
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
-import {Text} from 'Repositories/entity/message/Text';
-import {StatusType} from 'src/script/message/StatusType';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
+import {Text} from 'Repositories/entity/message/text';
+import {StatusType} from 'src/script/message/statusType';
 import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 

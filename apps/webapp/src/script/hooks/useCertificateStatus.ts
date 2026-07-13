@@ -23,7 +23,7 @@ import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {E2EIHandler, MLSStatuses, WireIdentity} from '../E2EIdentity';
+import {E2EIHandler, MLSStatuses, WireIdentity} from '../e2eIdentity';
 
 const getCertificateStatus = (identity?: WireIdentity, isSelfWithinGracePeriod: boolean = false) => {
   if (!identity || identity.credentialType === CredentialType.Basic) {

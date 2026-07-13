@@ -22,8 +22,9 @@ import {ChangeEvent, useCallback, useId, useMemo, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import * as Icon from 'Components/icon';
-import {InViewport} from 'Components/InViewport';
+import {ChevronDownIcon} from '@wireapp/react-ui-kit';
+
+import {InViewport} from 'Components/inViewport';
 import {collapseButton, collapseIcon} from 'Components/userList/userList.styles';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -266,6 +267,7 @@ export const UserList = ({
 
     const isSelectedContactsOpen = expandedFolders.includes(UserListSections.SELECTED_CONTACTS);
     const isContactsOpen = expandedFolders.includes(UserListSections.CONTACTS);
+    const unselectedUsers = truncatedUsers.slice(0, maxShownUsers).filter(user => !isSelected(user));
 
     content = (
       <>
@@ -277,7 +279,7 @@ export const UserList = ({
               data-uie-name="do-toggle-selected-search-list"
             >
               <span css={collapseIcon(isSelectedContactsOpen)} aria-hidden="true">
-                <Icon.DiscloseIcon width={16} height={16} />
+                <ChevronDownIcon width={16} height={16} />
               </span>
 
               {translate('userListSelectedContacts', {selectedContacts: selectedUsersCount})}
@@ -305,7 +307,7 @@ export const UserList = ({
             data-uie-name="do-toggle-search-list"
           >
             <span css={collapseIcon(isContactsOpen)} aria-hidden="true">
-              <Icon.DiscloseIcon width={16} height={16} />
+              <ChevronDownIcon width={16} height={16} />
             </span>
 
             {translate('userListContacts')}
@@ -314,10 +316,11 @@ export const UserList = ({
 
         <ul className={cx('search-list', cssClasses)} data-uie-name="search-list">
           {isContactsOpen &&
-            truncatedUsers
-              .slice(0, maxShownUsers)
-              .filter(user => !isSelected(user))
-              .map(user => renderListItem(user))}
+            unselectedUsers.map((user, index) => {
+              const isLastItem = index === unselectedUsers.length - 1;
+
+              return renderListItem(user, isLastItem);
+            })}
         </ul>
       </>
     );

@@ -51,7 +51,7 @@ jobs:
         run: ./bin/yarn --immutable
 
       - name: Build and package
-        run: ./bin/yarn nx run server:package
+        run: ./bin/yarn build:prod
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37

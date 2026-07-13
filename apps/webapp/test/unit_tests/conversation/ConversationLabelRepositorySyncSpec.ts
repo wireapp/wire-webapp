@@ -25,7 +25,7 @@ import {
 } from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 

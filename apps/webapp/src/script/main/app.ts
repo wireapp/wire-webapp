@@ -33,6 +33,7 @@ import {pdfjs} from 'react-pdf';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
+import {createFireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -102,10 +103,10 @@ import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from '
 import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {Config, Configuration} from '../Config';
-import {E2EIHandler} from '../E2EIdentity';
-import {getModalOptions, ModalType} from '../E2EIdentity/modals';
+import {E2EIHandler} from '../e2eIdentity';
+import {getModalOptions, ModalType} from '../e2eIdentity/modals';
 import {AccessTokenError} from '../error/accessTokenError';
 import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';
@@ -153,10 +154,6 @@ type ApplicationStartupInput = {
   readonly timing: ApplicationStartupTimingInput;
 };
 
-type StartupFeatureToggleDecisions = {
-  readonly isImprovedVideoQualityEnabled: boolean;
-};
-
 export async function waitUntilAllMessagesAreProcessed(dependencies: WaitUntilAllMessagesAreProcessedDependencies) {
   const {eventRepository} = dependencies;
 
@@ -200,7 +197,6 @@ export class App {
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
     private readonly translate: Translate,
-    private readonly startupFeatureToggleDecisions: StartupFeatureToggleDecisions,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -239,9 +235,7 @@ export class App {
     // Initialize permissions
     void initializePermissions();
 
-    const mediaConstraintsHandler = new MediaConstraintsHandler(container.resolve(UserState), {
-      isImprovedVideoQualityEnabled: this.startupFeatureToggleDecisions.isImprovedVideoQualityEnabled,
-    });
+    const mediaConstraintsHandler = new MediaConstraintsHandler(container.resolve(UserState));
 
     const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
     const mediaDevicesHandler = new MediaDevicesHandler();
@@ -485,6 +479,7 @@ export class App {
         self: selfRepository,
         cells: cellsRepository,
       } = this.repository;
+      const bgEffectsHandler = callingRepository.getBackgroundEffectsHandler();
       await checkIndexedDb();
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
@@ -600,6 +595,16 @@ export class App {
       eventLogger.log(AppInitializationStep.ConversationsLoaded);
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
+
+      const fireAndForgetInvoker = createFireAndForgetInvoker({
+        logger: this.logger,
+      });
+
+      fireAndForgetInvoker.fireAndForget(() =>
+        bgEffectsHandler.preloadResources().catch((error: unknown) => {
+          this.logger.warn('[virtual-background] preload failed, starting without resources', error);
+        }),
+      );
 
       if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)

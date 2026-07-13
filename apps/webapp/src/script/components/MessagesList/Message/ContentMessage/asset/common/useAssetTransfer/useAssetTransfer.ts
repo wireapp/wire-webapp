@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -52,14 +52,8 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
   const {status} = useKoSubscribableChildren(asset, ['status']);
   const transferState = uploadProgress > -1 ? AssetTransferState.UPLOADING : status;
 
-  return {
-    cancelUpload: () => message && assetRepository.cancelUpload(message?.id),
-    downloadAsset: (asset: FileAsset) => assetRepository.downloadFile(asset),
-    isDownloading: transferState === AssetTransferState.DOWNLOADING,
-    isPendingUpload: transferState === AssetTransferState.UPLOAD_PENDING,
-    isUploaded: transferState === AssetTransferState.UPLOADED,
-    isUploading: transferState === AssetTransferState.UPLOADING,
-    getAssetUrl: async (resource: AssetRemoteData, acceptedMimeTypes?: string[]): Promise<AssetUrl> => {
+  const getAssetUrl = useCallback(
+    async (resource: AssetRemoteData, acceptedMimeTypes?: string[]): Promise<AssetUrl> => {
       const blob = await assetRepository.load(resource);
       if (!blob) {
         throw new Error(`Asset could not be loaded`);
@@ -73,6 +67,27 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
         url,
       };
     },
+    [assetRepository],
+  );
+
+  const cancelUpload = useCallback(
+    () => message && assetRepository.cancelUpload(message?.id),
+    [assetRepository, message],
+  );
+
+  const downloadAsset = useCallback(
+    (fileAsset: FileAsset) => assetRepository.downloadFile(fileAsset),
+    [assetRepository],
+  );
+
+  return {
+    cancelUpload,
+    downloadAsset,
+    isDownloading: transferState === AssetTransferState.DOWNLOADING,
+    isPendingUpload: transferState === AssetTransferState.UPLOAD_PENDING,
+    isUploaded: transferState === AssetTransferState.UPLOADED,
+    isUploading: transferState === AssetTransferState.UPLOADING,
+    getAssetUrl,
     transferState,
     uploadProgress,
   };

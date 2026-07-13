@@ -31,8 +31,8 @@
     "@types/jsdom": "28.0.3",
     "@types/node": "24.13.1",
     "@types/tough-cookie": "4.0.5",
-    "@typescript-eslint/eslint-plugin": "8.62.1",
-    "@typescript-eslint/parser": "8.62.1",
+    "@typescript-eslint/eslint-plugin": "8.63.0",
+    "@typescript-eslint/parser": "8.63.0",
     "@wireapp/copy-config": "workspace:^",
     "@wireapp/eslint-config": "workspace:^",
     "@wireapp/prettier-config": "workspace:^",
@@ -64,7 +64,7 @@
     "nock": "14.0.16",
     "nx": "22.7.6",
     "playwright": "1.61.1",
-    "prettier": "3.9.4",
+    "prettier": "3.9.5",
     "rimraf": "6.1.3",
     "simple-git": "3.36.0",
     "stylelint": "17.14.0",
@@ -94,6 +94,7 @@
     "build:libs": "nx run-many -t build --projects=tag:type:lib",
     "bundle:dev": "nx build webapp --configuration=development",
     "bundle:prod": "nx build webapp --configuration=production",
+    "bundle:prod:public": "nx build webapp --configuration=production-public",
     "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
     "clean:yarn": "find . -name node_modules -type d -prune -exec rm -rf '{}' + && ./bin/yarn cache clean",
     "changelog:production": "nx run workspace-tools:changelog-production 2>&1 | grep -v '\\[dotenv@'",
@@ -125,6 +126,8 @@
     "e2e-test": "nx e2e webapp",
     "e2e-ui": "nx e2e webapp --ui",
     "build:prod": "nx run server:package",
+    "build:prod:public": "nx run server:package-public",
+    "verify:bundle:prod:public": "node bin/verifyPublicProductionBundle.ts",
     "test": "nx run-many -t test --all",
     "type-check": "nx run-many -t type-check --all"
   },
@@ -152,5 +155,5 @@
     }
   },
   "version": "0.27.0",
-  "packageManager": "yarn@4.17.0"
+  "packageManager": "yarn@4.17.1"
 }

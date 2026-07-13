@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
-import {AvailabilityIcon} from 'Components/AvailabilityIcon';
+import {AvailabilityIcon} from 'Components/availabilityIcon/index';
 import {useUserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
