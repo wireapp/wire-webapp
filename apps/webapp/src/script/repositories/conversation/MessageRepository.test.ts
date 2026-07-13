@@ -23,7 +23,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
 
 import {Account} from '@wireapp/core';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
@@ -82,6 +82,10 @@ type MessageRepositoryDependencies = {
   userRepository: UserRepository;
   userState: UserState;
   conversationState: ConversationState;
+};
+
+type MessageRepositoryPrivateMethodsForTest = {
+  sendAndInjectMessage: (message: GenericMessage) => Promise<unknown>;
 };
 
 async function buildMessageRepository(
@@ -383,8 +387,9 @@ describe('MessageRepository', () => {
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       // Spy on the internal method that sendButtonAction actually calls
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
       const sendAndInjectMessageSpy = jest
-        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
         .mockResolvedValue(undefined);
 
       // Create a mock message entity with primary_key for updateEventSequentially
@@ -452,8 +457,9 @@ describe('MessageRepository', () => {
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       // Spy on the internal method that sendButtonAction actually calls
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
       const sendAndInjectMessageSpy = jest
-        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
         .mockResolvedValue(undefined);
 
       // Create a mock message entity with primary_key for updateEventSequentially
@@ -515,12 +521,34 @@ describe('MessageRepository', () => {
     it('does not wait for an added message when the status fix is disabled', async () => {
       const [messageRepository, {propertiesRepository}] = await buildMessageRepository(translateForTest);
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
       const sendAndInjectMessageSpy = jest
-        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
         .mockResolvedValue(successPayload);
       const conversation = generateConversation();
 
       await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
+
+      expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not wait for an added message when an existing message id is provided', async () => {
+      const [messageRepository, {propertiesRepository}] = await buildMessageRepository(translateForTest, {
+        isMessageSendingStatusFixEnabled: true,
+      });
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+
+      await messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+        messageId: createUuid(),
+      });
 
       expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
     });
@@ -530,8 +558,9 @@ describe('MessageRepository', () => {
         isMessageSendingStatusFixEnabled: true,
       });
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
       const sendAndInjectMessageSpy = jest
-        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
         .mockResolvedValue(successPayload);
       const conversation = generateConversation();
       const sendPromise = messageRepository.sendTextWithLinkPreview({
