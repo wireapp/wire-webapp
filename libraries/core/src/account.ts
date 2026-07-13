@@ -89,6 +89,7 @@ import {wipeCoreCryptoDb} from './messagingProtocols/proteus/proteusService/cryp
 import {deleteIdentity} from './messagingProtocols/proteus/proteusService/identityClearer';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
 import {createFlushableQueue, isQueueFlushedError} from './queue/flushableQueue';
+import {sequentialQueueOptions} from './queue/sequentialQueueOptions';
 import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './secretStore/encryptedStore';
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
@@ -174,8 +175,7 @@ export class Account extends TypedEventEmitter<Events> {
 
   private readonly notificationProcessingQueue = createFlushableQueue({
     autoStart: false,
-    concurrency: 1,
-    timeout: 60_000,
+    ...sequentialQueueOptions,
   });
 
   public setMaxCoreCryptoLogLevel: (level: CoreCryptoLogLevel) => void = () => undefined;

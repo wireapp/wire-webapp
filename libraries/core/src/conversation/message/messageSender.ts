@@ -19,9 +19,11 @@
 
 import PromiseQueue from 'p-queue';
 
+import {sequentialQueueOptions} from '../../queue/sequentialQueueOptions';
+
 type PromiseTask<T> = () => Promise<T>;
 
-const sendingQueue = new PromiseQueue({autoStart: false, concurrency: 1, timeout: 60_000});
+const sendingQueue = new PromiseQueue({autoStart: false, ...sequentialQueueOptions});
 
 export function sendMessage<T>(sendingFunction: PromiseTask<T>): Promise<T> {
   return sendingQueue.add(sendingFunction);

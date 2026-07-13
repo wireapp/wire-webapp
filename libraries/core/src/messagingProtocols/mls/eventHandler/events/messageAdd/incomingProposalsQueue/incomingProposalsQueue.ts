@@ -20,10 +20,11 @@
 import {LogFactory} from '@wireapp/commons';
 
 import {createFlushableQueue, type PromiseTask} from '../../../../../../queue/flushableQueue';
+import {sequentialQueueOptions} from '../../../../../../queue/sequentialQueueOptions';
 
 const logger = LogFactory.getLogger('@wireapp/core/mls/IncomingProposalsQueue');
 
-const proposalsQueue = createFlushableQueue({autoStart: false, concurrency: 1, timeout: 60_000});
+const proposalsQueue = createFlushableQueue({autoStart: false, ...sequentialQueueOptions});
 
 export function queueProposal<T>(cb: PromiseTask<T>): Promise<T> {
   logger.info('Queueing proposal for processing');

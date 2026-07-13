@@ -19,9 +19,11 @@
 
 import PromiseQueue from 'p-queue';
 
+import {sequentialQueueOptions} from '../../queue/sequentialQueueOptions';
+
 type PromiseTask<T> = () => Promise<T>;
 
-const sendingQueue = new PromiseQueue({autoStart: true, concurrency: 1, timeout: 60_000});
+const sendingQueue = new PromiseQueue({autoStart: true, ...sequentialQueueOptions});
 
 const queuedJobs = new Set<string>();
 

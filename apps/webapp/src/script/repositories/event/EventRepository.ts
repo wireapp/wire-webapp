@@ -24,6 +24,7 @@ import {
   ConversationMLSMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
 import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
+import {sequentialQueueOptions} from '@wireapp/core/lib/queue/sequentialQueueOptions';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import PromiseQueue from 'p-queue';
@@ -73,7 +74,7 @@ export class EventRepository {
   /** event processors are classes that are able to react and process an incoming event */
   private eventProcessors: EventProcessor[] = [];
 
-  private eventQueue: PromiseQueue = new PromiseQueue({autoStart: true, concurrency: 1, timeout: 60_000});
+  private eventQueue: PromiseQueue = new PromiseQueue({autoStart: true, ...sequentialQueueOptions});
 
   static get CONFIG() {
     return {

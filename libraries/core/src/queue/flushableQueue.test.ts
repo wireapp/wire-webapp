@@ -20,6 +20,7 @@
 import is from '@sindresorhus/is';
 
 import {createFlushableQueue, isQueueFlushedError} from './flushableQueue';
+import {sequentialQueueOptions} from './sequentialQueueOptions';
 
 type DeferredPromise<T> = {
   promise: Promise<T>;
@@ -51,7 +52,7 @@ async function getRejectedError<T>(promise: Promise<T>): Promise<unknown> {
 
 describe('createFlushableQueue', () => {
   it('rejects all waiting tasks without executing them and empties the queue', async () => {
-    const flushableQueue = createFlushableQueue({autoStart: false, concurrency: 1, timeout: 60_000});
+    const flushableQueue = createFlushableQueue({autoStart: false, ...sequentialQueueOptions});
     const firstWaitingTask = jest.fn(() => {
       return Promise.resolve('first');
     });
@@ -74,7 +75,7 @@ describe('createFlushableQueue', () => {
   });
 
   it('preserves the supplied flush error', async () => {
-    const flushableQueue = createFlushableQueue({autoStart: false, concurrency: 1, timeout: 60_000});
+    const flushableQueue = createFlushableQueue({autoStart: false, ...sequentialQueueOptions});
     const suppliedFlushError = new Error('Connection was closed');
     const waitingTaskResult = flushableQueue.add(() => {
       return Promise.resolve();
@@ -86,7 +87,7 @@ describe('createFlushableQueue', () => {
   });
 
   it('does not affect a running task', async () => {
-    const flushableQueue = createFlushableQueue({autoStart: true, concurrency: 1, timeout: 60_000});
+    const flushableQueue = createFlushableQueue({autoStart: true, ...sequentialQueueOptions});
     const taskStarted = createDeferredPromise<void>();
     const completeRunningTask = createDeferredPromise<string>();
     const runningTaskResult = flushableQueue.add(() => {
@@ -111,7 +112,7 @@ describe('createFlushableQueue', () => {
   });
 
   it('executes tasks added after a flush', async () => {
-    const flushableQueue = createFlushableQueue({autoStart: false, concurrency: 1, timeout: 60_000});
+    const flushableQueue = createFlushableQueue({autoStart: false, ...sequentialQueueOptions});
     const flushedTaskResult = flushableQueue.add(() => {
       return Promise.resolve('flushed');
     });
