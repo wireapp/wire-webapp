@@ -147,6 +147,8 @@ describe('Account', () => {
 
     nock(MOCK_BACKEND.rest).post(AuthAPI.URL.ACCESS).reply(HTTP_STATUS.OK, accessTokenData);
 
+    nock(MOCK_BACKEND.rest).get(AuthAPI.URL.COOKIES).reply(HTTP_STATUS.OK, undefined);
+
     nock(MOCK_BACKEND.rest).post(ClientAPI.URL.CLIENTS).reply(HTTP_STATUS.OK, {id: CLIENT_ID});
 
     nock(MOCK_BACKEND.rest)
@@ -344,6 +346,7 @@ describe('Account', () => {
       jest
         .spyOn(dependencies.apiClient.transport.ws, 'buildWebSocketUrl')
         .mockResolvedValue(websocketServerAddress as never);
+      jest.spyOn(dependencies.apiClient.transport.http, 'sendRequest').mockResolvedValue({} as never);
       jest.spyOn(dependencies.account, 'getNotificationEventTime').mockReturnValue('2025-10-01T00:00:00Z');
     });
 
@@ -408,7 +411,11 @@ describe('Account', () => {
                 // Expect all states to have been called in order
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(1, ConnectionState.PROCESSING_NOTIFICATIONS);
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(2, ConnectionState.CONNECTING);
-                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(3, ConnectionState.LIVE);
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(
+                  3,
+                  ConnectionState.LIVE,
+                  expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+                );
                 resolve();
                 break;
             }
@@ -419,7 +426,12 @@ describe('Account', () => {
             onConnectionStateChanged,
           });
 
-          await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE));
+          await waitFor(() =>
+            expect(onConnectionStateChanged).toHaveBeenCalledWith(
+              ConnectionState.LIVE,
+              expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+            ),
+          );
 
           disconnect();
         });
@@ -540,10 +552,20 @@ describe('Account', () => {
           onConnectionStateChanged,
         });
 
-        await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.CLOSED));
+        await waitFor(() =>
+          expect(onConnectionStateChanged).toHaveBeenCalledWith(
+            ConnectionState.CLOSED,
+            expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+          ),
+        );
 
-        expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.PROCESSING_NOTIFICATIONS);
-        expect(onConnectionStateChanged).not.toHaveBeenCalledWith(ConnectionState.LIVE);
+        expect(onConnectionStateChanged).toHaveBeenCalledWith(
+          ConnectionState.PROCESSING_NOTIFICATIONS,
+          expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+        );
+        expect(
+          onConnectionStateChanged.mock.calls.some(([connectionState]) => connectionState === ConnectionState.LIVE),
+        ).toBe(false);
         expect(unlock).not.toHaveBeenCalled();
 
         disconnect();
