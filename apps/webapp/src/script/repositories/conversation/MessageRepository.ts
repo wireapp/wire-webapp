@@ -295,8 +295,10 @@ export class MessageRepository {
       messageId,
     );
 
+    const currentClientId = this.clientState.currentClient?.id;
+    const canInjectOptimisticMessage = is.nonEmptyString(currentClientId);
     const shouldRepairOptimisticMessageStatus =
-      this.messageRepositoryOptions.isMessageSendingStatusFixEnabled && isNewTextMessage;
+      this.messageRepositoryOptions.isMessageSendingStatusFixEnabled && isNewTextMessage && canInjectOptimisticMessage;
 
     if (!shouldRepairOptimisticMessageStatus) {
       return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
