@@ -86,6 +86,7 @@ type MessageRepositoryDependencies = {
 
 async function buildMessageRepository(
   translate: Translate,
+  messageRepositoryOptions: MessageRepositoryOptions = {isMessageSendingStatusFixEnabled: false},
 ): Promise<[MessageRepository, MessageRepositoryDependencies]> {
   const userState = new UserState();
   userState.self(selfUser);
@@ -100,7 +101,7 @@ async function buildMessageRepository(
   selfConversation.selfUser(selfUser);
   conversationState.conversations([selfConversation]);
   const dependencies = {
-    conversationRepository: () => ({}) as ConversationRepository,
+    conversationRepository: () => ({checkMessageTimer: jest.fn()}) as unknown as ConversationRepository,
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     propertiesRepository: new PropertiesRepository({} as any, {} as any, translate),
@@ -112,7 +113,7 @@ async function buildMessageRepository(
     assetRepository: {} as AssetRepository,
     audioRepository: new AudioRepository(),
     translate,
-    messageRepositoryOptions: {isMessageSendingStatusFixEnabled: false},
+    messageRepositoryOptions,
     userState,
     clientState,
     conversationState,
@@ -509,6 +510,48 @@ describe('MessageRepository', () => {
         targetMode: undefined,
         userIds: expect.any(Object),
       });
+    });
+
+    it('does not wait for an added message when the status fix is disabled', async () => {
+      const [messageRepository, {propertiesRepository}] = await buildMessageRepository(translateForTest);
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+
+      await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
+
+      expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('waits for and repairs the exact added message when the status fix is enabled', async () => {
+      const [messageRepository, {propertiesRepository}] = await buildMessageRepository(translateForTest, {
+        isMessageSendingStatusFixEnabled: true,
+      });
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+      const sendPromise = messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+      });
+
+      await Promise.resolve();
+
+      const sentTextMessage = sendAndInjectMessageSpy.mock.calls[0][0];
+      const addedMessageEntity = new Message(sentTextMessage.messageId, undefined, translateForTest);
+      addedMessageEntity.conversation_id = conversation.id;
+      addedMessageEntity.status(StatusType.SENDING);
+      conversation.addMessage(addedMessageEntity);
+
+      await sendPromise;
+
+      expect(addedMessageEntity.status()).toBe(StatusType.SENT);
+      expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
     });
   });
 
