@@ -49,7 +49,7 @@ export const MeetingCallingView = () => {
 
         return (
           <CallingCell
-            key={conversation.id}
+            key={`${conversation.qualifiedId.id}-${conversation.qualifiedId.domain}`}
             classifiedDomains={classifiedDomains}
             call={call}
             callActions={callingViewModel.callActions}
