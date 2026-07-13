@@ -31,9 +31,13 @@ export const useScheduleMeetingParticipants = (): {users: User[]} => {
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
 
-  const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
+  const {isTeam, teamMembers, teamUsers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamMembers', 'teamUsers']);
+  const {connectedUsers} = useKoSubscribableChildren(userState, ['connectedUsers']);
 
-  const users = useMemo(() => getScheduleMeetingParticipantPool(userState, teamState), [isTeam, teamState, userState]);
+  const users = useMemo(
+    () => getScheduleMeetingParticipantPool(userState, teamState),
+    [connectedUsers, isTeam, teamMembers, teamUsers, teamState, userState],
+  );
 
   return {users};
 };

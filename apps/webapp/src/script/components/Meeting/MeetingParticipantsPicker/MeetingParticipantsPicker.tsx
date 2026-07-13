@@ -249,7 +249,6 @@ export const MeetingParticipantsPicker = ({
               allowRemoteSearch
               filterRemoteTeamUsers
               showAllProvidedUsers
-              truncate
               dataUieName={`${dataUieName}-list`}
             />
           </div>

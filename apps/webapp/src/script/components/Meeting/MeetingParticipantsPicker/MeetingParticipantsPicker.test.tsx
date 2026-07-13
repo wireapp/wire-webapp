@@ -178,6 +178,46 @@ describe('MeetingParticipantsPicker', () => {
     });
   });
 
+  it('shows all provided users when there are more than the truncated default', async () => {
+    const manyUsers = Array.from({length: 8}, (_, index) =>
+      createUser(`user-${index}`, `User ${index}`, `user${index}`),
+    );
+    const user = userEvent.setup();
+
+    render(
+      withThemeAndRootContext(
+        <MeetingParticipantsPicker
+          id="meeting-participants-picker"
+          dataUieName="meeting-participants-picker"
+          label="Participants"
+          users={manyUsers}
+          selectedUsers={[]}
+          onSelectedUsersChange={() => undefined}
+          filter=""
+          onFilterChange={() => undefined}
+          selfUser={manyUsers[0]}
+          searchRepository={searchRepositoryDouble as SearchRepository}
+          teamRepository={teamRepositoryDouble as TeamRepository}
+          conversationRepository={
+            {
+              conversationState: conversationStateDouble,
+            } as unknown as import('Repositories/conversation/ConversationRepository').ConversationRepository
+          }
+          conversationState={conversationStateDouble as ConversationState}
+          teamState={teamStateDouble as TeamState}
+        />,
+        rootProviderWrapper,
+      ),
+    );
+
+    await user.click(screen.getByLabelText('Enter a name'));
+
+    await waitFor(() => {
+      expect(screen.getByText('User 0')).toBeInTheDocument();
+      expect(screen.getByText('User 7')).toBeInTheDocument();
+    });
+  });
+
   it('allows typing in the search input to filter users', async () => {
     const user = userEvent.setup();
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
