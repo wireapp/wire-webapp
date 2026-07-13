@@ -250,6 +250,26 @@ describe('MeetingParticipantsPicker', () => {
     expect(screen.getByTestId('meeting-participants-picker-summary')).toHaveTextContent('Alice Anderson');
   });
 
+  it('clears the search filter after selecting a participant', async () => {
+    const user = userEvent.setup();
+    render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
+
+    const input = screen.getByLabelText('Enter a name');
+    await user.click(input);
+    await user.type(input, 'alice');
+
+    expect(input).toHaveValue('alice');
+
+    await waitFor(() => {
+      expect(screen.getByText('Alice Anderson')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText('Alice Anderson'));
+
+    expect(input).toHaveValue('');
+    expect(screen.getByTestId('meeting-participants-picker-summary')).toHaveTextContent('Alice Anderson');
+  });
+
   it('includes remote team search results when filtering', async () => {
     const remoteUser = createUser('remote-1', 'Remote Member', 'remote');
     remoteUser.teamId = users[0].teamId;

@@ -120,6 +120,14 @@ export const MeetingParticipantsPicker = ({
     [disabled, onFilterChange],
   );
 
+  const handleSelectedUsersChange = useCallback(
+    (users: User[]) => {
+      onSelectedUsersChange(users);
+      onFilterChange('');
+    },
+    [onFilterChange, onSelectedUsersChange],
+  );
+
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -239,7 +247,7 @@ export const MeetingParticipantsPicker = ({
               filter={filter}
               selected={selectedUsers}
               isSelectable
-              onUpdateSelectedUsers={onSelectedUsersChange}
+              onUpdateSelectedUsers={handleSelectedUsersChange}
               searchRepository={searchRepository}
               teamRepository={teamRepository}
               conversationRepository={conversationRepository}
