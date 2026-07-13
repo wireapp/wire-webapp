@@ -4024,17 +4024,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@enormora/objectory@npm:0.0.10":
-  version: 0.0.10
-  resolution: "@enormora/objectory@npm:0.0.10"
-  checksum: 10/81a0e62de533fbb90fa624d51b4f09916cb07f3deb38126225e177d2999e2f41988de84d5c1b20643c7b4fd73108f81bbe06534756cb38247d0ece5bdb212ae2
+"@enormora/objectory@npm:0.0.11":
+  version: 0.0.11
+  resolution: "@enormora/objectory@npm:0.0.11"
+  checksum: 10/3bba16bc3ffb78854603a599c8780a08eb592261afeb248e1e5a584ed058c5fc0feb549ef87e8486aacbac9a084b7f245e874e17bdf51adc64c7d965a3b4b162
   languageName: node
   linkType: hard
 
-"@enormora/wall-clock@npm:0.0.2":
-  version: 0.0.2
-  resolution: "@enormora/wall-clock@npm:0.0.2"
-  checksum: 10/a8e8e1459c6043a1cc69291eef94880a31e20b86c33c41e226a45bbe1568da0458a9472a6f13eeee41e0ba2cf07f1ab8da345bec5691fbeab8af74aa200d2236
+"@enormora/wall-clock@npm:0.0.3":
+  version: 0.0.3
+  resolution: "@enormora/wall-clock@npm:0.0.3"
+  checksum: 10/7d6cc95ce9ba154f368e51a3907e864e9c5c32db36e38c3b72c0c41327129961ca0ba965fdbd7e82804391fb8eb4dc9a182063cd08e10cac05371cb970f07edb
   languageName: node
   linkType: hard
 
@@ -11914,7 +11914,7 @@ __metadata:
     "@datadog/browser-rum": "npm:7.5.0"
     "@emotion/eslint-plugin": "npm:11.12.0"
     "@emotion/react": "npm:11.14.0"
-    "@enormora/wall-clock": "npm:0.0.2"
+    "@enormora/wall-clock": "npm:0.0.3"
     "@formatjs/cli": "npm:6.16.12"
     "@formkit/auto-animate": "npm:0.9.0"
     "@lexical/code": "npm:0.27.2"
@@ -32352,7 +32352,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wire-webapp@workspace:."
   dependencies:
-    "@enormora/objectory": "npm:0.0.10"
+    "@enormora/objectory": "npm:0.0.11"
     "@faker-js/faker": "npm:9.9.0"
     "@inquirer/prompts": "npm:8.5.2"
     "@ls-lint/ls-lint": "npm:2.3.1"
