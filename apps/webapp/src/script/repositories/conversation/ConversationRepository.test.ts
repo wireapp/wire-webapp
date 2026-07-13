@@ -2016,9 +2016,13 @@ describe('ConversationRepository', () => {
             type: 0,
           },
           from: '',
-          time: '',
+          time: '1970-01-01T00:00:00.001Z',
           type: CONVERSATION_EVENT.CREATE_MEETING,
         };
+
+        jest
+          .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
+          .mockResolvedValueOnce(createMeetingEvent.data);
 
         return testFactory.conversation_repository['handleConversationEvent'](createMeetingEvent).then(() => {
           expect(testFactory.conversation_repository['onCreate']).toHaveBeenCalled();
