@@ -108,9 +108,9 @@ test.describe('account settings', () => {
       await test.step('Remove an existing device and confirm new history', async () => {
         // Since this test re-uses the same user over and over again we need to always remove one of the previously registered devices
         const removeDeviceButton = page.getByRole('button', {name: 'Remove device'}).first();
-        const isRemoveDeviceButtonVisible = await removeDeviceButton.isVisible({timeout: 3_000}).catch(() => false);
+        const isRemoveDeviceButtonVisible = await removeDeviceButton.waitFor({state: 'visible', timeout: 5_000}).then(() => true).catch(() => false);
         if (isRemoveDeviceButtonVisible) {
-          await removeDeviceButton.click({timeout: LOGIN_TIMEOUT});
+          await removeDeviceButton.click();
         }
         // We will also always be prompted to confirm the new history on this device
         await pages.historyInfo().clickConfirmButton();
