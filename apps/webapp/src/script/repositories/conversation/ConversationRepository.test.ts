@@ -277,9 +277,7 @@ describe('ConversationRepository', () => {
       const conversationRepositoryTestSeam = conversationRepository as unknown as ConversationRepositoryWaiterTestSeam;
       const eventId = createUuid();
       const eventHandlingError = new Error('event handling failed');
-      jest
-        .spyOn(conversationRepositoryTestSeam, 'handleConversationEvent')
-        .mockRejectedValue(eventHandlingError);
+      jest.spyOn(conversationRepositoryTestSeam, 'handleConversationEvent').mockRejectedValue(eventHandlingError);
 
       conversationRepository.prepareForInjectedMessageEvent(eventId);
       const waitingForMessageEntity = conversationRepository.waitForInjectedMessageEvent(eventId);

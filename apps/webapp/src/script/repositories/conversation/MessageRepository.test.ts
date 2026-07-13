@@ -671,6 +671,45 @@ describe('MessageRepository', () => {
       expect(conversationRepository.cancelInjectedMessageEventWait).toHaveBeenCalledWith(optimisticMessageEntity.id);
     });
 
+    it('cancels the waiter when optimistic event injection fails', async () => {
+      const injectedMessageEventHandled = pDefer<Maybe<Message>>();
+      const cancelInjectedMessageEventWait = jest.fn();
+      const prepareForInjectedMessageEvent = jest.fn();
+      const waitForInjectedMessageEvent = jest.fn().mockReturnValue(injectedMessageEventHandled.promise);
+      const conversationRepository = {
+        cancelInjectedMessageEventWait,
+        prepareForInjectedMessageEvent,
+        waitForInjectedMessageEvent,
+      } as unknown as ConversationRepository;
+      const [messageRepository, {core, eventRepository, propertiesRepository}] = await buildMessageRepository(
+        translateForTest,
+        {
+          conversationRepository,
+          isMessageSendingStatusFixEnabled: true,
+        },
+      );
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const conversation = generateConversation();
+      const eventInjectionError = new Error('optimistic injection failed');
+      jest.spyOn(eventRepository, 'injectEvent').mockRejectedValue(eventInjectionError);
+      const backendSendSpy = jest.spyOn(core.service!.conversation, 'send');
+
+      const sendingPromise = messageRepository['sendText']({
+        conversation,
+        mentions: [],
+        message: 'hello there',
+      });
+
+      await expect(sendingPromise).rejects.toThrow(eventInjectionError);
+
+      const injectedMessageEventId = prepareForInjectedMessageEvent.mock.calls[0][0];
+      expect(waitForInjectedMessageEvent).toHaveBeenCalledWith(injectedMessageEventId);
+      expect(cancelInjectedMessageEventWait).toHaveBeenCalledWith(injectedMessageEventId);
+      expect(backendSendSpy).not.toHaveBeenCalled();
+
+      injectedMessageEventHandled.resolve(Maybe.nothing());
+    });
+
     it('uses the legacy flow when the message-sending-status-fix toggle is disabled', async () => {
       const conversationRepository = {
         cancelInjectedMessageEventWait: jest.fn(),
