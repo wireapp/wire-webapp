@@ -125,6 +125,10 @@ export const ConversationListCell = ({
     accessibilityParts.push(translate('accessibility.conversationMuted'));
   }
 
+  accessibilityParts.push(
+    translate(isActive ? 'accessibility.conversationSelected' : 'accessibility.conversationNotSelected'),
+  );
+
   const accessibilityConversationLabel = `${accessibilityParts.join(', ')}. ${translate(
     'accessibility.openConversation',
     {
@@ -225,6 +229,7 @@ export const ConversationListCell = ({
         tabIndex={isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
         aria-label={accessibilityConversationLabel}
         aria-describedby={contextMenuKeyboardShortcut}
+        aria-selected={isActive}
       >
         <span
           id={contextMenuKeyboardShortcut}
