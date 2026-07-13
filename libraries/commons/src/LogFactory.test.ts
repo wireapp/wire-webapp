@@ -23,7 +23,7 @@ import os from 'os';
 import path from 'path';
 
 import {LogFactory} from './LogFactory';
-import {redactSensitiveData} from './util/StringUtil';
+import {getSafeErrorDetails, redactSensitiveData, sanitizeLogMessage} from './util/StringUtil';
 
 describe('LogFactory', () => {
   describe('createLoggerName', () => {
@@ -120,5 +120,37 @@ describe('redactSensitiveData', () => {
     const input = {foo: 'bar'};
     const output = redactSensitiveData(input);
     expect(output).toEqual({foo: 'bar'});
+  });
+});
+
+describe('sanitizeLogMessage', () => {
+  it('redacts query parameters, cookies, and JSON web tokens', () => {
+    const jwtLikeValue = ['eyJhbGciOiJub25lIn0', 'eyJzdWIiOiIxIn0', 'signature'].join('.');
+    const input = `wss://example.com/events?access_token=access-token&sync_marker=sync-marker Cookie: session=cookie-value ${jwtLikeValue}`;
+
+    const actualSanitizedMessage = sanitizeLogMessage(input);
+    const expectedSanitizedMessage = 'wss://example.com/events?[REDACTED] Cookie: [REDACTED] [REDACTED]';
+
+    expect(actualSanitizedMessage).toBe(expectedSanitizedMessage);
+  });
+
+  it('removes newlines and limits the message length', () => {
+    const actualSanitizedMessage = sanitizeLogMessage(`first line\n${'x'.repeat(250)}`);
+
+    expect(actualSanitizedMessage).toHaveLength(200);
+    expect(actualSanitizedMessage).toContain('first line ');
+  });
+});
+
+describe('getSafeErrorDetails', () => {
+  it('returns a safe error name and message', () => {
+    const actualErrorDetails = getSafeErrorDetails(
+      Object.assign(new Error('Bearer secret-token'), {name: 'RequestError'}),
+    );
+
+    expect(actualErrorDetails).toEqual({
+      errorMessage: '"Bearer [REDACTED]"',
+      errorName: 'RequestError',
+    });
   });
 });

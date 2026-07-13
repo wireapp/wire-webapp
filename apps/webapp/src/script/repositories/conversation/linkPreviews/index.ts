@@ -51,7 +51,11 @@ type LinkPreviewContent = {
 declare global {
   interface Window {
     openGraphAsync?: (url: string) => Promise<OpenGraphResult>;
-    desktopAppConfig?: {version: string; supportsCallingPopoutWindow?: boolean};
+    desktopAppConfig?: {
+      version: string;
+      supportsCallingPopoutWindow?: boolean;
+      managedConfig?: {applockOverride: boolean};
+    };
   }
 }
 const logger = getLogger('LinkPreviewRepository');

@@ -49,6 +49,8 @@ enum ExportState {
 
 const MILLISECONDS_PER_SECOND = 1000;
 const PERCENTAGE_MULTIPLIER = 100;
+const HISTORY_EXPORT_MODAL_ID = 'history-export-password-modal';
+const logger = getLogger('HistoryExport');
 
 export const CONFIG = {
   LEGACY_FILE_EXTENSION: 'desktop_wbu',
@@ -62,7 +64,6 @@ interface HistoryExportProps {
 }
 
 const HistoryExport = ({switchContent, user, clientState = container.resolve(ClientState)}: HistoryExportProps) => {
-  const logger = getLogger('HistoryExport');
   const {mainViewModel, translate} = useApplicationContext();
 
   const [historyState, setHistoryState] = useState<ExportState>(ExportState.PREPARING);
@@ -123,7 +124,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
       setHasError(true);
       logger.error(`Failed to export history: ${error.message}`, error);
     },
-    [dismissExport, logger],
+    [dismissExport],
   );
 
   const downloadArchiveFile = () => {
@@ -197,7 +198,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
         onError(error as Error);
       }
     },
-    [backupRepository, clientState.currentClient, logger, onError, onProgress, onSuccess, user],
+    [backupRepository, clientState.currentClient, onError, onProgress, onSuccess, user],
   );
 
   const showBackupModal = useCallback(() => {
@@ -225,15 +226,14 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
           title: translate('backupEncryptionModalTitle'),
         },
       },
-      undefined,
+      HISTORY_EXPORT_MODAL_ID,
       translate,
     );
   }, [exportHistory, onClose, translate]);
 
   useEffect(() => {
     showBackupModal();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [showBackupModal]);
 
   return (
     <div id="history-export">

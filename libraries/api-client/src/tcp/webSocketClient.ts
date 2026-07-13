@@ -24,13 +24,14 @@ import {Maybe} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
-import {LogFactory} from '@wireapp/commons';
+import {LogFactory, StringUtil} from '@wireapp/commons';
 
 import {AcknowledgeType} from './acknowledgeEvent.types';
 import {
   LongRunningRetryDetails,
   ReconnectingWebsocket,
   ReconnectingWebsocketWallClock,
+  WebSocketReconnectContext,
   WEBSOCKET_STATE,
 } from './reconnectingWebsocket';
 
@@ -66,7 +67,7 @@ export interface WebSocketClient {
   on(event: TOPIC.ON_STATE_CHANGE, listener: (state: WEBSOCKET_STATE) => void): this;
 }
 
-export type OnConnect = (abortHandler: AbortController) => void;
+export type OnConnect = (abortHandler: AbortController, reconnectContext: WebSocketReconnectContext) => void;
 
 export type WebSocketClientOptions = {
   readonly wallClock: ReconnectingWebsocketWallClock;
@@ -139,21 +140,24 @@ export class WebSocketClient extends EventEmitter {
     }
   };
 
-  private readonly onError = async (error: ErrorEvent) => {
+  private readonly onError = async (error: ErrorEvent, reconnectContext: WebSocketReconnectContext) => {
     this.onStateChange(this.socket.getState());
     this.emit(WebSocketClient.TOPIC.ON_ERROR, error);
     try {
       await this.refreshAccessToken();
-    } catch {
-      // Refresh failures are already emitted by refreshAccessToken().
+    } catch (refreshError: unknown) {
+      const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(refreshError);
+      this.logger.warn(
+        `[WebSocketLifecycle] event=token-refresh-failure source=socket-error attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} fatal=${this.isInvalidSessionError(refreshError)} errorName=${errorName} errorMessage=${errorMessage}`,
+      );
     }
   };
 
-  private readonly onReconnect = async () => {
-    await this.waitForValidAccessTokenBeforeReconnect();
-    await this.verifyAuthenticatedSessionBeforeReconnect();
+  private readonly onReconnect = async (reconnectContext: WebSocketReconnectContext) => {
+    await this.waitForValidAccessTokenBeforeReconnect(reconnectContext);
+    await this.verifyAuthenticatedSessionBeforeReconnect(reconnectContext);
 
-    return this.buildWebSocketUrl();
+    return this.buildWebSocketUrl(reconnectContext);
   };
 
   private readonly onOpen = () => {
@@ -189,11 +193,11 @@ export class WebSocketClient extends EventEmitter {
     this.socket.setOnMessage(this.onMessage);
     this.socket.setOnError(this.onError);
     this.socket.setOnLongRunningRetry(this.onLongRunningRetry);
-    this.socket.setOnOpen(() => {
+    this.socket.setOnOpen((_event, reconnectContext) => {
       this.onOpen();
       if (onConnect !== undefined) {
         this.abortHandler = new AbortController();
-        void onConnect(this.abortHandler);
+        void onConnect(this.abortHandler, reconnectContext);
       }
     });
     this.socket.setOnClose(this.onClose);
@@ -212,56 +216,89 @@ export class WebSocketClient extends EventEmitter {
     return this.accessTokenRefreshPromise;
   }
 
-  private async waitForValidAccessTokenBeforeReconnect(): Promise<void> {
+  private async waitForValidAccessTokenBeforeReconnect(reconnectContext: WebSocketReconnectContext): Promise<void> {
     let retryCount = 0;
+    const tokenValidationStartTimestampInMilliseconds = this.wallClock.currentTimestampInMilliseconds;
+    const tokenIsValid = this.client.hasValidAccessToken();
+    this.logger.debug(
+      `[WebSocketLifecycle] event=token-validation-start attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} tokenValid=${tokenIsValid} refreshInFlight=${is.promise(this.accessTokenRefreshPromise)}`,
+    );
 
-    while (!this.client.hasValidAccessToken()) {
-      this.logger.info(`WebSocket reconnect waiting for access-token refresh. retry count: ${retryCount}`);
+    if (tokenIsValid) {
+      this.logger.info(
+        `[WebSocketLifecycle] event=token-validation-success attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} refreshed=false durationMs=0`,
+      );
+      return;
+    }
+
+    while (true) {
+      const refreshStartTimestampInMilliseconds = this.wallClock.currentTimestampInMilliseconds;
+      this.logger.debug(
+        `[WebSocketLifecycle] event=token-refresh-start attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} retry=${retryCount}`,
+      );
 
       try {
         await this.refreshAccessToken();
       } catch (error: unknown) {
         if (this.isInvalidSessionError(error)) {
+          const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
           this.logger.warn(
-            'WebSocket reconnect stopped because access-token refresh failed with an invalid session. Logout handling should take over.',
-            error,
+            `[WebSocketLifecycle] event=token-refresh-failure attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} fatal=true errorName=${errorName} errorMessage=${errorMessage}`,
           );
           throw error;
         }
 
         retryCount += 1;
         const nextRetryDelayInMilliseconds = this.getAccessTokenRefreshRetryDelayInMilliseconds(retryCount);
+        const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
         this.logger.warn(
-          `WebSocket reconnect access-token refresh failed transiently. retry count: ${retryCount}, next retry delay: ${nextRetryDelayInMilliseconds}ms`,
-          error,
+          `[WebSocketLifecycle] event=token-refresh-retry attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} retry=${retryCount} nextDelayMs=${nextRetryDelayInMilliseconds} errorName=${errorName} errorMessage=${errorMessage}`,
         );
         await this.waitForNextAccessTokenRefreshRetry(nextRetryDelayInMilliseconds);
         continue;
       }
 
       if (this.client.hasValidAccessToken()) {
-        this.logger.info('WebSocket reconnect access-token refresh succeeded; building WebSocket URL');
+        this.logger.info(
+          `[WebSocketLifecycle] event=token-refresh-success attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} retry=${retryCount} durationMs=${this.wallClock.currentTimestampInMilliseconds - refreshStartTimestampInMilliseconds}`,
+        );
+        this.logger.info(
+          `[WebSocketLifecycle] event=token-validation-success attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} refreshed=true durationMs=${this.wallClock.currentTimestampInMilliseconds - tokenValidationStartTimestampInMilliseconds}`,
+        );
         return;
       }
 
       retryCount += 1;
       const nextRetryDelayInMilliseconds = this.getAccessTokenRefreshRetryDelayInMilliseconds(retryCount);
       this.logger.warn(
-        `WebSocket reconnect access-token refresh completed but token is still invalid. retry count: ${retryCount}, next retry delay: ${nextRetryDelayInMilliseconds}ms`,
+        `[WebSocketLifecycle] event=token-refresh-retry attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} retry=${retryCount} nextDelayMs=${nextRetryDelayInMilliseconds} errorName=InvalidAccessTokenState errorMessage="Token remains invalid after refresh"`,
       );
       await this.waitForNextAccessTokenRefreshRetry(nextRetryDelayInMilliseconds);
     }
   }
 
-  private async verifyAuthenticatedSessionBeforeReconnect(): Promise<void> {
-    this.logger.info('Verifying authenticated HTTP session before WebSocket reconnect');
+  private async verifyAuthenticatedSessionBeforeReconnect(reconnectContext: WebSocketReconnectContext): Promise<void> {
+    const preflightStartTimestampInMilliseconds = this.wallClock.currentTimestampInMilliseconds;
+    this.logger.debug(
+      `[WebSocketLifecycle] event=auth-preflight-start attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} endpoint=cookies`,
+    );
 
-    await this.client.sendRequest({
-      method: 'get',
-      url: AuthAPI.URL.COOKIES,
-    });
+    try {
+      await this.client.sendRequest({
+        method: 'get',
+        url: AuthAPI.URL.COOKIES,
+      });
+    } catch (error: unknown) {
+      const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
+      this.logger.warn(
+        `[WebSocketLifecycle] event=auth-preflight-failure attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} durationMs=${this.wallClock.currentTimestampInMilliseconds - preflightStartTimestampInMilliseconds} errorName=${errorName} errorMessage=${errorMessage}`,
+      );
+      throw error;
+    }
 
-    this.logger.info('Authenticated HTTP session verified before WebSocket reconnect');
+    this.logger.info(
+      `[WebSocketLifecycle] event=auth-preflight-success attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} durationMs=${this.wallClock.currentTimestampInMilliseconds - preflightStartTimestampInMilliseconds}`,
+    );
   }
 
   private isInvalidSessionError(error: unknown): boolean {
@@ -298,20 +335,14 @@ export class WebSocketClient extends EventEmitter {
     try {
       await this.client.refreshAccessToken();
     } catch (error: unknown) {
-      if (error instanceof NetworkError) {
-        this.logger.warn(error);
-      } else if (
+      if (
         error instanceof InvalidTokenError ||
         error instanceof MissingCookieError ||
         error instanceof MissingCookieAndTokenError
       ) {
         // On invalid cookie the application is supposed to logout.
-        this.logger.warn(
-          `[WebSocket] Cannot renew access token because cookie/token is invalid: ${error.message}`,
-          error,
-        );
         this.emit(WebSocketClient.TOPIC.ON_INVALID_TOKEN, error);
-      } else {
+      } else if (!(error instanceof NetworkError)) {
         this.emit(WebSocketClient.TOPIC.ON_ERROR, error);
       }
 
@@ -354,16 +385,13 @@ export class WebSocketClient extends EventEmitter {
     return this.isSocketLocked;
   }
 
-  public buildWebSocketUrl(): string {
+  public buildWebSocketUrl(reconnectContext?: WebSocketReconnectContext): string {
     const {
       accessTokenStore: {getAccessToken, getNextMarkerToken},
     } = this.client;
     const accessToken = getAccessToken?.() ?? '';
     const markerToken = getNextMarkerToken?.() ?? '';
-
-    if (accessToken.length === 0) {
-      this.logger.warn('Reconnecting WebSocket with unset token');
-    }
+    const markerIncluded = !this.useLegacySocket && markerToken.length > 0;
 
     if (!Boolean(this.versionPrefix)) {
       throw new Error('Missing backend API version: cannot establish WebSocket connection');
@@ -373,7 +401,7 @@ export class WebSocketClient extends EventEmitter {
       access_token: accessToken,
     });
 
-    if (markerToken.length > 0 && !this.useLegacySocket) {
+    if (markerIncluded) {
       queryParams.append('sync_marker', markerToken);
     }
 
@@ -391,13 +419,19 @@ export class WebSocketClient extends EventEmitter {
       ? `${this.baseUrl}/await?${queryString}`
       : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
 
-    const redactedQueryParams = new URLSearchParams(queryParams);
-    redactedQueryParams.set('access_token', '[redacted]');
-    const redactedWebsocketAddress = this.useLegacySocket
-      ? `${this.baseUrl}/await?${redactedQueryParams.toString()}`
-      : `${this.baseUrl}${this.versionPrefix}/events?${redactedQueryParams.toString()}`;
-
-    this.logger.info(`WebSocket URL: ${redactedWebsocketAddress}`);
+    const attemptId = reconnectContext?.attemptId ?? 0;
+    const wrapperGeneration = reconnectContext?.wrapperGeneration ?? 0;
+    const endpoint = this.useLegacySocket ? 'legacy-await' : 'async-events';
+    const accessTokenPresent = accessToken.length > 0;
+    const clientPresent = this.clientId !== undefined && this.clientId.length > 0;
+    if (!accessTokenPresent) {
+      this.logger.warn(
+        `[WebSocketLifecycle] event=url-created-without-access-token attemptId=${attemptId} wrapperGeneration=${wrapperGeneration} endpoint=${endpoint} clientPresent=${clientPresent} markerIncluded=${markerIncluded}`,
+      );
+    }
+    this.logger.info(
+      `[WebSocketLifecycle] event=url-created attemptId=${attemptId} wrapperGeneration=${wrapperGeneration} endpoint=${endpoint} accessTokenPresent=${accessTokenPresent} clientPresent=${clientPresent} markerIncluded=${markerIncluded}`,
+    );
 
     return websocketAddress;
   }
