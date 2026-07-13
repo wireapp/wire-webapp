@@ -1007,7 +1007,7 @@ export class MessageRepository {
             return Maybe.just(storedMessage as StoredMessage);
           },
           Nothing: () => {
-            throw new Error(`Injected message '${messageId}' did not produce a stored message entity`);
+            return Maybe.nothing<StoredMessage>();
           },
         });
       },
@@ -1036,6 +1036,16 @@ export class MessageRepository {
     const messageTimer = conversation.messageTimer();
     const payload = enableEphemeral && messageTimer ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
     let optimisticMessageEntityPromise: Promise<Maybe<StoredMessage>> = Promise.resolve(Maybe.nothing());
+    let optimisticMessageEventId: string | undefined;
+
+    const cancelOptimisticMessageEntityWait = () => {
+      if (is.undefined(optimisticMessageEventId)) {
+        return;
+      }
+
+      messageSendingEventHandling.cancelInjectedMessageEventWait(optimisticMessageEventId);
+      optimisticMessageEventId = undefined;
+    };
 
     const injectOptimisticEvent = async () => {
       if (!skipInjection) {
@@ -1058,13 +1068,13 @@ export class MessageRepository {
           payload,
           optimisticEvent,
         );
-        messageSendingEventHandling.prepareForInjectedMessageEvent(mappedEvent.id);
-        optimisticMessageEntityPromise = messageSendingEventHandling.waitForInjectedMessageEvent(mappedEvent.id);
+        optimisticMessageEventId = mappedEvent.id;
+        messageSendingEventHandling.prepareForInjectedMessageEvent(optimisticMessageEventId);
+        optimisticMessageEntityPromise = messageSendingEventHandling.waitForInjectedMessageEvent(optimisticMessageEventId);
         try {
           await this.eventRepository.injectEvent(mappedEvent);
         } catch (error: unknown) {
-          messageSendingEventHandling.cancelInjectedMessageEventWait(mappedEvent.id);
-          optimisticMessageEntityPromise = Promise.resolve(Maybe.nothing());
+          cancelOptimisticMessageEntityWait();
           throw error;
         }
       }
@@ -1112,11 +1122,12 @@ export class MessageRepository {
 
     const shouldProceedSending = await injectOptimisticEvent();
     if (shouldProceedSending === false) {
-      await optimisticMessageEntityPromise;
+      cancelOptimisticMessageEntityWait();
       this.logger.log('User has canceled sending a message to a degraded conversation.');
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
     }
 
+    let result: SendResult;
     try {
       if (isMLSConversation(conversation)) {
         this.logger.info('Sending message to a MLS conversation, ensuring conversation exists');
@@ -1125,19 +1136,23 @@ export class MessageRepository {
           groupId: conversation.groupId,
         });
       }
-      const result = await this.conversationService.send(sendOptions);
-
-      if (result.state === MessageSendingState.OUTGOING_SENT) {
-        await handleSuccess(result);
-      } else {
-        await optimisticMessageEntityPromise;
-      }
-      return result;
+      result = await this.conversationService.send(sendOptions);
     } catch (error: unknown) {
-      const optimisticMessageEntity = await optimisticMessageEntityPromise;
-      await this.updateMessageAsFailed(conversation, payload.messageId, error, optimisticMessageEntity);
+      try {
+        const optimisticMessageEntity = await optimisticMessageEntityPromise;
+        await this.updateMessageAsFailed(conversation, payload.messageId, error, optimisticMessageEntity);
+      } finally {
+        cancelOptimisticMessageEntityWait();
+      }
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
     }
+
+    if (result.state === MessageSendingState.OUTGOING_SENT) {
+      await handleSuccess(result);
+    } else {
+      await optimisticMessageEntityPromise;
+    }
+    return result;
   }
 
   public updateUserReactions(reactions: ReactionMap, userId: QualifiedId, reaction: ReactionType) {
