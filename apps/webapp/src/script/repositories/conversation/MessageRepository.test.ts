@@ -605,6 +605,72 @@ describe('MessageRepository', () => {
       );
     });
 
+    it('updates the displayed optimistic entity as failed after backend send failure when the status fix is enabled', async () => {
+      const optimisticMessageEntity = new ContentMessage(createUuid(), translateForTest);
+      optimisticMessageEntity.primary_key = 'optimistic-message-primary-key';
+      optimisticMessageEntity.type = ClientEvent.CONVERSATION.MESSAGE_ADD;
+      optimisticMessageEntity.from = selfUser.id;
+      optimisticMessageEntity.user(selfUser);
+      optimisticMessageEntity.status(StatusType.SENDING);
+
+      const optimisticEventInjected = pDefer<void>();
+      const injectedMessageEventHandled = pDefer<Maybe<Message>>();
+      const sendStarted = pDefer<void>();
+      const waitForInjectedMessageEvent = jest.fn().mockReturnValue(injectedMessageEventHandled.promise);
+      const conversationRepository = {
+        cancelInjectedMessageEventWait: jest.fn(),
+        checkMessageTimer: jest.fn(),
+        prepareForInjectedMessageEvent: jest.fn(),
+        waitForInjectedMessageEvent,
+      } as unknown as ConversationRepository;
+      const [messageRepository, {core, eventRepository, propertiesRepository}] = await buildMessageRepository(
+        translateForTest,
+        {
+          conversationRepository,
+          isMessageSendingStatusFixEnabled: true,
+          shouldStubMessageStatusUpdate: false,
+        },
+      );
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const conversation = generateConversation();
+      const backendSendError = new Error('backend send failed');
+      jest.spyOn(core.service!.conversation, 'send').mockImplementation(async () => {
+        sendStarted.resolve();
+        throw backendSendError;
+      });
+      const persistedEventUpdateSpy = jest
+        .spyOn(eventRepository.eventService, 'updateEvent')
+        .mockResolvedValue({primary_key: optimisticMessageEntity.primary_key} as IdentifiedUpdatePayload);
+      const detachedMessageLookupSpy = jest.spyOn(messageRepository, 'getMessageInConversationById');
+
+      jest.spyOn(eventRepository, 'injectEvent').mockImplementation(async event => {
+        optimisticMessageEntity.id = event.id;
+        optimisticEventInjected.resolve();
+      });
+
+      const sendingPromise = messageRepository['sendText']({
+        conversation,
+        mentions: [],
+        message: 'hello there',
+      });
+
+      await optimisticEventInjected.promise;
+      await sendStarted.promise;
+
+      conversation.addMessage(optimisticMessageEntity);
+      const resolvedMessageEntity = Maybe.just(optimisticMessageEntity);
+      injectedMessageEventHandled.resolve(resolvedMessageEntity);
+
+      await expect(sendingPromise).resolves.toMatchObject({state: 'FAILED'});
+
+      expect(optimisticMessageEntity.status()).toBe(StatusType.FAILED);
+      expect(detachedMessageLookupSpy).not.toHaveBeenCalled();
+      expect(persistedEventUpdateSpy).toHaveBeenCalledWith(optimisticMessageEntity.primary_key, {
+        status: StatusType.FAILED,
+      });
+      expect(conversationRepository.cancelInjectedMessageEventWait).toHaveBeenCalledWith(optimisticMessageEntity.id);
+    });
+
     it('uses the legacy flow when the message-sending-status-fix toggle is disabled', async () => {
       const conversationRepository = {
         cancelInjectedMessageEventWait: jest.fn(),
