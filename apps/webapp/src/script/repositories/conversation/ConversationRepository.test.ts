@@ -47,6 +47,7 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+import {Maybe} from 'true-myth';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -91,6 +92,7 @@ import {ConversationStatus} from './ConversationStatus';
 import {
   ButtonActionConfirmationEvent,
   ButtonActionEvent,
+  type ClientConversationEvent,
   DeleteEvent,
   EventBuilder,
   MessageHiddenEvent,
@@ -102,7 +104,13 @@ import {entities, payload} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mockHttpServer';
 import {generateUser} from '../../../../test/helper/UserGenerator';
+import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
+
+type ConversationRepositoryWaiterTestSeam = {
+  readonly handleConversationEvent: (event: ClientConversationEvent) => Promise<unknown>;
+  readonly onConversationEvent: (event: ClientConversationEvent) => Promise<unknown>;
+};
 
 function buildConversationRepository(translate: Translate) {
   const teamState = new TeamState();
@@ -227,6 +235,78 @@ describe('ConversationRepository', () => {
   afterEach(() => {
     const conversationRepository = testFactory.conversation_repository!;
     conversationRepository['conversationState'].conversations.removeAll();
+  });
+
+  describe('injected message event waiters', () => {
+    const createMessageAddEvent = (eventId: string): ClientConversationEvent => {
+      return {
+        conversation: createUuid(),
+        data: {content: 'message', sender: createUuid()},
+        from: createUuid(),
+        id: eventId,
+        status: StatusType.SENDING,
+        time: new Date().toISOString(),
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+      };
+    };
+
+    it('resolves with the entity produced by onConversationEvent and removes the waiter', async () => {
+      const [conversationRepository] = buildConversationRepository(translateForTest);
+      const conversationRepositoryTestSeam = conversationRepository as unknown as ConversationRepositoryWaiterTestSeam;
+      const eventId = createUuid();
+      const messageEntity = new Message(eventId, undefined, translateForTest);
+      const conversationEntity = _generateConversation();
+      jest.spyOn(conversationRepositoryTestSeam, 'handleConversationEvent').mockResolvedValue({
+        conversationEntity,
+        messageEntity,
+      });
+
+      conversationRepository.prepareForInjectedMessageEvent(eventId);
+      const waitingForMessageEntity = conversationRepository.waitForInjectedMessageEvent(eventId);
+
+      await conversationRepositoryTestSeam.onConversationEvent(createMessageAddEvent(eventId));
+
+      await expect(waitingForMessageEntity).resolves.toEqual(Maybe.just(messageEntity));
+      await expect(conversationRepository.waitForInjectedMessageEvent(eventId)).rejects.toThrow(
+        `No completion waiter exists for injected message '${eventId}'`,
+      );
+    });
+
+    it('rejects the waiter and removes it when onConversationEvent fails', async () => {
+      const [conversationRepository] = buildConversationRepository(translateForTest);
+      const conversationRepositoryTestSeam = conversationRepository as unknown as ConversationRepositoryWaiterTestSeam;
+      const eventId = createUuid();
+      const eventHandlingError = new Error('event handling failed');
+      jest
+        .spyOn(conversationRepositoryTestSeam, 'handleConversationEvent')
+        .mockRejectedValue(eventHandlingError);
+
+      conversationRepository.prepareForInjectedMessageEvent(eventId);
+      const waitingForMessageEntity = conversationRepository.waitForInjectedMessageEvent(eventId);
+      const waitingForMessageEntityRejection = expect(waitingForMessageEntity).rejects.toThrow(eventHandlingError);
+
+      await expect(conversationRepositoryTestSeam.onConversationEvent(createMessageAddEvent(eventId))).rejects.toThrow(
+        eventHandlingError,
+      );
+      await waitingForMessageEntityRejection;
+      await expect(conversationRepository.waitForInjectedMessageEvent(eventId)).rejects.toThrow(
+        `No completion waiter exists for injected message '${eventId}'`,
+      );
+    });
+
+    it('resolves with Nothing and removes the waiter when canceled', async () => {
+      const [conversationRepository] = buildConversationRepository(translateForTest);
+      const eventId = createUuid();
+
+      conversationRepository.prepareForInjectedMessageEvent(eventId);
+      const waitingForMessageEntity = conversationRepository.waitForInjectedMessageEvent(eventId);
+      conversationRepository.cancelInjectedMessageEventWait(eventId);
+
+      await expect(waitingForMessageEntity).resolves.toEqual(Maybe.nothing());
+      await expect(conversationRepository.waitForInjectedMessageEvent(eventId)).rejects.toThrow(
+        `No completion waiter exists for injected message '${eventId}'`,
+      );
+    });
   });
 
   describe('translation injection', () => {
