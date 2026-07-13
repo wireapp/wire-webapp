@@ -349,20 +349,22 @@ export class MessageRepository {
 
       if (sendResult.state === MessageSendingState.OUTGOING_SENT) {
         const messageEntity = await addedMessageWaiter.messagePromise;
-        const updatedStatus = messageEntity.readReceipts().length > 0 ? StatusType.SEEN : StatusType.SENT;
-        messageEntity.status(updatedStatus);
+        if (messageEntity.status() === StatusType.SENDING) {
+          const updatedStatus = messageEntity.readReceipts().length > 0 ? StatusType.SEEN : StatusType.SENT;
+          messageEntity.status(updatedStatus);
 
-        const shouldSynchronizeTimestamp = is.undefined(options.syncTimestamp) || options.syncTimestamp;
-        if (shouldSynchronizeTimestamp) {
-          const timestamp = new Date(sendResult.sentAt).getTime();
-          if (!isNaN(timestamp)) {
-            messageEntity.timestamp(timestamp);
-            conversation.updateTimestampServer(timestamp, true);
-            conversation.updateTimestamps(messageEntity);
+          const shouldSynchronizeTimestamp = is.undefined(options.syncTimestamp) || options.syncTimestamp;
+          if (shouldSynchronizeTimestamp) {
+            const timestamp = new Date(sendResult.sentAt).getTime();
+            if (!isNaN(timestamp)) {
+              messageEntity.timestamp(timestamp);
+              conversation.updateTimestampServer(timestamp, true);
+              conversation.updateTimestamps(messageEntity);
+            }
           }
-        }
 
-        this.conversationRepositoryProvider().checkMessageTimer(messageEntity as ContentMessage);
+          this.conversationRepositoryProvider().checkMessageTimer(messageEntity as ContentMessage);
+        }
       }
 
       return sendResult;

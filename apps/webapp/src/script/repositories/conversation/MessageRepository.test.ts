@@ -108,8 +108,9 @@ async function buildMessageRepository(
   const selfConversation = new Conversation(selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   selfConversation.selfUser(selfUser);
   conversationState.conversations([selfConversation]);
+  const conversationRepository = {checkMessageTimer: jest.fn()} as unknown as ConversationRepository;
   const dependencies = {
-    conversationRepository: () => ({checkMessageTimer: jest.fn()}) as unknown as ConversationRepository,
+    conversationRepository: () => conversationRepository,
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     propertiesRepository: new PropertiesRepository({} as any, {} as any, translate),
@@ -618,6 +619,46 @@ describe('MessageRepository', () => {
       expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
       expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
       expect(updateEventSpy).not.toHaveBeenCalled();
+    });
+
+    it('does not downgrade an already delivered added message when the status fix is enabled', async () => {
+      const [messageRepository, {conversationRepository, propertiesRepository}] = await buildMessageRepository(
+        translateForTest,
+        {isMessageSendingStatusFixEnabled: true},
+      );
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+      const updateTimestampServerSpy = jest.spyOn(conversation, 'updateTimestampServer');
+      const updateTimestampsSpy = jest.spyOn(conversation, 'updateTimestamps');
+      const checkMessageTimerSpy = jest.spyOn(conversationRepository(), 'checkMessageTimer');
+      const sendPromise = messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+      });
+
+      await Promise.resolve();
+
+      const sentTextMessage = sendAndInjectMessageSpy.mock.calls[0][0];
+      const addedMessageEntity = new Message(sentTextMessage.messageId, undefined, translateForTest);
+      addedMessageEntity.conversation_id = conversation.id;
+      addedMessageEntity.status(StatusType.DELIVERED);
+      const timestampSpy = jest.spyOn(addedMessageEntity, 'timestamp');
+      conversation.addMessage(addedMessageEntity);
+
+      await sendPromise;
+
+      expect(addedMessageEntity.status()).toBe(StatusType.DELIVERED);
+      expect(timestampSpy).not.toHaveBeenCalled();
+      expect(updateTimestampServerSpy).not.toHaveBeenCalled();
+      expect(updateTimestampsSpy).not.toHaveBeenCalled();
+      expect(checkMessageTimerSpy).not.toHaveBeenCalled();
+      expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
     });
 
     it('removes the listener when sending is canceled', async () => {
