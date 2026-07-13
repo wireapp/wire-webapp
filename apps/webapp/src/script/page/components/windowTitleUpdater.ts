@@ -19,7 +19,9 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {amplify} from 'amplify';
+import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -43,10 +45,14 @@ const useWindowTitle = (translate: Translate) => {
   const userState = container.resolve(UserState);
   const conversationState = container.resolve(ConversationState);
 
-  const contentState = useAppState(state => state.contentState);
-  const setUnreadMessagesCount = useAppState(state => state.setUnreadMessagesCount);
+  const contentState = useAppState(state => {
+    return state.contentState;
+  });
+  const setUnreadMessagesCount = useAppState(state => {
+    return state.setUnreadMessagesCount;
+  });
 
-  const [updateWindowTitle, setUpdateWindowTitle] = useState(false);
+  const [shouldUpdateWindowTitle, setShouldUpdateWindowTitle] = useState(true);
 
   const {connectRequests: connectionRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {activeConversation, unreadConversations} = useKoSubscribableChildren(conversationState, [
@@ -59,8 +65,10 @@ const useWindowTitle = (translate: Translate) => {
       setUnreadMessagesCount(unreadCount);
 
       const iconBadge = unreadCount ? '-badge' : '';
-      const link: HTMLLinkElement =
-        document.querySelector("link[rel*='shortcut icon']") || document.createElement('link');
+      const existingIconLink = document.querySelector<HTMLLinkElement>("link[rel*='shortcut icon']");
+      const link: HTMLLinkElement = is.nullOrUndefined(existingIconLink)
+        ? document.createElement('link')
+        : existingIconLink;
       link.type = 'image/x-icon';
       link.rel = 'shortcut icon';
       link.href = `/image/favicon${iconBadge}.ico`;
@@ -69,85 +77,89 @@ const useWindowTitle = (translate: Translate) => {
     [setUnreadMessagesCount],
   );
 
-  const updateNotificationState = useCallback(
-    (handlingNotifications: NOTIFICATION_HANDLING_STATE) => {
-      const shouldUpdateWindowTitle = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
-      const isStateChange = updateWindowTitle !== shouldUpdateWindowTitle;
+  const handleNotificationStateChange = useCallback(
+    (notificationState: NOTIFICATION_HANDLING_STATE) => {
+      const nextShouldUpdateWindowTitle = notificationState === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-      if (isStateChange) {
-        setUpdateWindowTitle(shouldUpdateWindowTitle);
-        windowTitleLogger.debug(`Set window title update state to '${updateWindowTitle}'`);
+      if (shouldUpdateWindowTitle === nextShouldUpdateWindowTitle) {
+        return;
       }
+
+      setShouldUpdateWindowTitle(nextShouldUpdateWindowTitle);
+      windowTitleLogger.debug(`Set window title update state to '${nextShouldUpdateWindowTitle}'`);
     },
-    [updateWindowTitle],
+    [shouldUpdateWindowTitle],
   );
 
-  const initiateTitleUpdates = useCallback(() => {
-    setUpdateWindowTitle(true);
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, handleNotificationStateChange);
 
-    if (updateWindowTitle) {
-      const unreadConversationsCount = unreadConversations.length;
-      const connectionRequestsCount = connectionRequests.length;
-      const unreadCount = connectionRequestsCount + unreadConversationsCount;
-      let specificTitle = unreadCount > MIN_UNREAD_COUNT ? `(${unreadCount}) ` : '';
+    return () => {
+      amplify.unsubscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, handleNotificationStateChange);
+    };
+  }, [handleNotificationStateChange]);
 
-      amplify.publish(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount);
-      updateFavicon(unreadCount);
-
-      switch (contentState) {
-        case ContentState.CONNECTION_REQUESTS: {
-          const multipleRequests = connectionRequestsCount > MIN_CONNECTION_REQUEST_COUNT;
-          const requestsString = multipleRequests
-            ? translate('conversationsConnectionRequestMany', {number: connectionRequestsCount})
-            : translate('conversationsConnectionRequestOne');
-          specificTitle += requestsString;
-          break;
-        }
-
-        case ContentState.CONVERSATION: {
-          if (activeConversation) {
-            specificTitle += activeConversation.display_name();
-          }
-          break;
-        }
-
-        case ContentState.PREFERENCES_ABOUT: {
-          specificTitle += translate('preferencesAbout');
-          break;
-        }
-
-        case ContentState.PREFERENCES_ACCOUNT: {
-          specificTitle += translate('preferencesAccount');
-          break;
-        }
-
-        case ContentState.PREFERENCES_AV: {
-          specificTitle += translate('preferencesAV');
-          break;
-        }
-
-        case ContentState.PREFERENCES_DEVICE_DETAILS: {
-          specificTitle += translate('preferencesDeviceDetails');
-          break;
-        }
-
-        case ContentState.PREFERENCES_DEVICES: {
-          specificTitle += translate('preferencesDevices');
-          break;
-        }
-
-        case ContentState.PREFERENCES_OPTIONS: {
-          specificTitle += translate('preferencesOptions');
-          break;
-        }
-
-        default:
-          break;
-      }
-
-      const isTitleSet = specificTitle !== '' && !specificTitle.endsWith(' ');
-      window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${Config.getConfig().BRAND_NAME}`;
+  useEffect(() => {
+    if (!shouldUpdateWindowTitle) {
+      return;
     }
+
+    const unreadConversationsCount = unreadConversations.length;
+    const connectionRequestsCount = connectionRequests.length;
+    const unreadCount = connectionRequestsCount + unreadConversationsCount;
+    let specificTitle = unreadCount > MIN_UNREAD_COUNT ? `(${unreadCount}) ` : '';
+
+    amplify.publish(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount);
+    updateFavicon(unreadCount);
+
+    const contentSpecificTitle = match(contentState)
+      .with(ContentState.CONNECTION_REQUESTS, () => {
+        const multipleRequests = connectionRequestsCount > MIN_CONNECTION_REQUEST_COUNT;
+        const requestsString = multipleRequests
+          ? translate('conversationsConnectionRequestMany', {number: connectionRequestsCount})
+          : translate('conversationsConnectionRequestOne');
+        return requestsString;
+      })
+
+      .with(ContentState.CONVERSATION, () => {
+        if (!is.nullOrUndefined(activeConversation)) {
+          return activeConversation.display_name();
+        }
+        return '';
+      })
+
+      .with(ContentState.PREFERENCES_ABOUT, () => {
+        return translate('preferencesAbout');
+      })
+
+      .with(ContentState.PREFERENCES_ACCOUNT, () => {
+        return translate('preferencesAccount');
+      })
+
+      .with(ContentState.PREFERENCES_AV, () => {
+        return translate('preferencesAV');
+      })
+
+      .with(ContentState.PREFERENCES_DEVICE_DETAILS, () => {
+        return translate('preferencesDeviceDetails');
+      })
+
+      .with(ContentState.PREFERENCES_DEVICES, () => {
+        return translate('preferencesDevices');
+      })
+
+      .with(ContentState.PREFERENCES_OPTIONS, () => {
+        return translate('preferencesOptions');
+      })
+
+      .otherwise(() => {
+        return '';
+      });
+
+    specificTitle += contentSpecificTitle;
+
+    const isTitleSet = is.nonEmptyString(specificTitle) && !specificTitle.endsWith(' ');
+    window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${Config.getConfig().BRAND_NAME}`;
   }, [
     activeConversation,
     connectionRequests.length,
@@ -155,13 +167,8 @@ const useWindowTitle = (translate: Translate) => {
     translate,
     unreadConversations.length,
     updateFavicon,
-    updateWindowTitle,
+    shouldUpdateWindowTitle,
   ]);
-
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, updateNotificationState);
-    initiateTitleUpdates();
-  }, [initiateTitleUpdates, updateNotificationState]);
 };
 
 type WindowTitleUpdaterProps = {
