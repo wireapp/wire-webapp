@@ -90,6 +90,35 @@ describe('useAssetTransfer', () => {
       assetUrl.dispose();
       expect(window.URL.revokeObjectURL).toHaveBeenCalledWith('assetUrl');
     });
+
+    it('should keep a stable getAssetUrl reference between re-renders', () => {
+      const {result, rerender} = renderHook(() => useAssetTransfer(message, assetRepository));
+
+      const initialGetAssetUrl = result.current.getAssetUrl;
+
+      rerender();
+
+      expect(result.current.getAssetUrl).toBe(initialGetAssetUrl);
+    });
+
+    it('should return a new getAssetUrl reference when assetRepository changes', () => {
+      const otherAssetRepository = {
+        getUploadProgress: jest.fn().mockReturnValue(ko.pureComputed(() => 0)),
+        load: jest.fn().mockResolvedValue(new Blob([], {type: 'image/png'})),
+        cancelUpload: jest.fn(),
+        downloadFile: jest.fn().mockResolvedValue(undefined),
+      } as unknown as jest.Mocked<AssetRepository>;
+
+      const {result, rerender} = renderHook(({repository}) => useAssetTransfer(message, repository), {
+        initialProps: {repository: assetRepository},
+      });
+
+      const initialGetAssetUrl = result.current.getAssetUrl;
+
+      rerender({repository: otherAssetRepository});
+
+      expect(result.current.getAssetUrl).not.toBe(initialGetAssetUrl);
+    });
   });
 
   describe('upload progress', () => {
