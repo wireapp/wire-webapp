@@ -53,6 +53,7 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {OnConversationE2EIVerificationStateChange} from 'Repositories/conversation/ConversationVerificationStateHandler/shared';
 import {EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import type {MessageRepositoryOptions} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
@@ -197,6 +198,9 @@ export class App {
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
     private readonly translate: Translate,
+    private readonly messageRepositoryOptions: MessageRepositoryOptions = {
+      isMessageSendingStatusFixEnabled: false,
+    },
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -298,6 +302,7 @@ export class App {
       repositories.asset,
       repositories.audio,
       this.translate,
+      this.messageRepositoryOptions,
     );
 
     repositories.calling = new CallingRepository(

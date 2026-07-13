@@ -45,6 +45,7 @@ import {useTheme} from './hooks/useTheme';
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {Config, Configuration} from '../../Config';
+import {messageSendingStatusFixFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
@@ -85,9 +86,12 @@ export const AppContainer = (properties: AppProps) => {
     wallClock,
   } = properties;
   setAppLocale();
+  const isMessageSendingStatusFixEnabled = isFeatureToggleEnabled(messageSendingStatusFixFeatureToggleName);
   const app = useMemo(() => {
-    return new App(container.resolve(Core), container.resolve(APIClient), config, translate);
-  }, [config, translate]);
+    return new App(container.resolve(Core), container.resolve(APIClient), config, translate, {
+      isMessageSendingStatusFixEnabled,
+    });
+  }, [config, isMessageSendingStatusFixEnabled, translate]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
 
   // Publishing application on the global scope for debug and testing purposes.

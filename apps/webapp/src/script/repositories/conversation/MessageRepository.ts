@@ -165,6 +165,10 @@ type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingSta
 type StoredMessage = Message & {primary_key: string};
 type StoredContentMessage = ContentMessage & {primary_key: string};
 
+export type MessageRepositoryOptions = {
+  readonly isMessageSendingStatusFixEnabled: boolean;
+};
+
 export class MessageRepository {
   private readonly logger: Logger;
   private readonly eventService: EventService;
@@ -182,6 +186,9 @@ export class MessageRepository {
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
     private readonly translate: Translate,
+    public readonly messageRepositoryOptions: MessageRepositoryOptions = {
+      isMessageSendingStatusFixEnabled: false,
+    },
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
