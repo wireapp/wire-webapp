@@ -55,15 +55,6 @@ jobs:
           BRANCH: ${{ github.ref_name }}
         run: ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/generateUnitTestReports.ts
 
-      - name: Upload unit-tests.log to S3
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-west-1
-        run: |
-          TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
-          aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://wire-webapp/unit-tests-${TIMESTAMP}-${TESTED_COMMIT_SHA}.log
-
       - name: Upload complete unit test reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -74,6 +65,7 @@ jobs:
             ${{ env.UNIT_TEST_REPORTS_DIRECTORY }}/manifest.json
             ${{ env.UNIT_TEST_REPORTS_DIRECTORY }}/*.log
           if-no-files-found: error
+          retention-days: 1
 
       - name: Fail when manifest contains failed projects
         if: always()
