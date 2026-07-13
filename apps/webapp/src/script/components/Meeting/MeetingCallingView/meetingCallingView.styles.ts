@@ -17,13 +17,21 @@
  *
  */
 
-import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
-import type {Meeting, MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
-import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {CSSObject} from '@emotion/react';
 
-export interface MeetingsDataSource {
-  createMeeting(payload: CreateMeeting): Promise<MeetingWithConversation>;
-  getMeetingsList(): Promise<Meeting[]>;
-  updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Promise<MeetingWithConversation>;
-}
+export const meetingCallingViewStyles: CSSObject = {
+  position: 'absolute',
+  bottom: '24px',
+  left: '24px',
+  width: 'min(420px, calc(100% - 48px))',
+  zIndex: 2,
+  pointerEvents: 'auto',
+};
+
+export const meetingsContentWrapperStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  height: '100%',
+  position: 'relative',
+};

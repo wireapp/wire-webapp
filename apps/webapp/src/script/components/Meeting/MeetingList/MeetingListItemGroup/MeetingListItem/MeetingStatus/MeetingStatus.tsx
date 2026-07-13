@@ -54,11 +54,12 @@ const MeetingStatusComponent = ({
   useJoinMeetingCallHook = useJoinMeetingCall,
 }: MeetingStatusProps) => {
   const {translate} = useApplicationContext();
-  const {joinMeeting, isJoinDisabled} = useJoinMeetingCallHook(qualifiedConversation);
+  const {joinMeeting, isJoinDisabled, isCallActive} = useJoinMeetingCallHook(qualifiedConversation);
+  const isAttending = attending ?? isCallActive;
 
   const meetingStatus = useMemo(
-    () => getMeetingStatusAt(nowMilliseconds, start_date, end_date, attending),
-    [nowMilliseconds, start_date, end_date, attending],
+    () => getMeetingStatusAt(nowMilliseconds, start_date, end_date, isAttending),
+    [nowMilliseconds, start_date, end_date, isAttending],
   );
 
   if (meetingStatus === MeetingStatuses.PARTICIPATING) {

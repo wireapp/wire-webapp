@@ -55,7 +55,6 @@ const MeetingListItemComponent = ({
   const {translate, wallClock} = useApplicationContext();
   const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
   const {isCallActive} = useJoinMeetingCall(meetingSeries.qualified_conversation);
-  const attending = isCallActive;
 
   const startDateIso = start.toISOString();
   const endDateIso = end.toISOString();
@@ -86,8 +85,8 @@ const MeetingListItemComponent = ({
   }, [end, start, nowMilliseconds, translate]);
 
   const meetingStatus = useMemo(
-    () => getMeetingStatusAt(nowMilliseconds, startDateIso, endDateIso, attending),
-    [nowMilliseconds, startDateIso, endDateIso, attending],
+    () => getMeetingStatusAt(nowMilliseconds, startDateIso, endDateIso, isCallActive),
+    [nowMilliseconds, startDateIso, endDateIso, isCallActive],
   );
 
   const isOngoing = meetingStatus === MeetingStatuses.ON_GOING || meetingStatus === MeetingStatuses.PARTICIPATING;
@@ -116,7 +115,6 @@ const MeetingListItemComponent = ({
           qualifiedConversation={meetingSeries.qualified_conversation}
           start_date={startDateIso}
           end_date={endDateIso}
-          attending={attending}
           nowMilliseconds={nowMilliseconds}
         />
         <MeetingAction meetingInstance={meetingInstance} />

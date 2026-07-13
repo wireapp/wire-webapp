@@ -29,11 +29,13 @@ import {
   RemoteConversations,
   MLSConversation as BackendMLSConversation,
   CONVERSATION_CELLS_STATE,
+  GROUP_CONVERSATION_TYPE,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {
   ConversationProtocolUpdateEvent,
   ConversationCreateEvent,
+  ConversationCreateMeetingEvent,
   ConversationMemberJoinEvent,
   CONVERSATION_EVENT,
   ConversationMLSWelcomeEvent,
@@ -1961,6 +1963,68 @@ describe('ConversationRepository', () => {
           expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(
             [createEvent.data],
             time.getTime(),
+          );
+        });
+      });
+    });
+
+    describe('conversation.create-meeting', () => {
+      it('should process create-meeting event like conversation.create', () => {
+        spyOn(testFactory.conversation_repository as any, 'onCreate').and.callThrough();
+        spyOn(testFactory.conversation_repository, 'mapConversations').and.returnValue([
+          new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
+        ]);
+        spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
+        spyOn(testFactory.conversation_repository as any, 'saveConversation').and.returnValue(false);
+
+        const createMeetingEvent: ConversationCreateMeetingEvent = {
+          conversation: createUuid(),
+          data: {
+            access: [CONVERSATION_ACCESS.INVITE],
+            access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
+            access_role_v2: [],
+            cells_state: CONVERSATION_CELLS_STATE.DISABLED,
+            creator: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
+            group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+            last_event: '0.0',
+            last_event_time: '1970-01-01T00:00:00.000Z',
+            members: {
+              others: [],
+              self: {
+                conversation_role: 'wire_admin',
+                hidden: false,
+                hidden_ref: null,
+                id: '9dcb21e0-9670-4d05-8590-408f3686c873',
+                otr_archived: false,
+                otr_archived_ref: null,
+                otr_muted_ref: null,
+                otr_muted_status: null,
+                service: null,
+                status_ref: '0.0',
+                status_time: '1970-01-01T00:00:00.000Z',
+              },
+            },
+            message_timer: null,
+            name: 'Weekly sync',
+            protocol: CONVERSATION_PROTOCOL.MLS,
+            qualified_id: {
+              domain: 'bella.wire.link',
+              id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
+            },
+            receipt_mode: null,
+            team: null,
+            type: 0,
+          },
+          from: '',
+          time: '',
+          type: CONVERSATION_EVENT.CREATE_MEETING,
+        };
+
+        return testFactory.conversation_repository['handleConversationEvent'](createMeetingEvent).then(() => {
+          expect(testFactory.conversation_repository['onCreate']).toHaveBeenCalled();
+          expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(
+            [createMeetingEvent.data],
+            1,
           );
         });
       });

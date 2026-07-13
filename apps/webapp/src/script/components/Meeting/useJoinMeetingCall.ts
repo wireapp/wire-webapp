@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
@@ -36,36 +36,43 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 
 const useMeetingConversationCall = (qualifiedConversationId: QualifiedId) => {
   const callState = container.resolve(CallState);
-  const {calls} = useKoSubscribableChildren(callState, ['calls']);
+  const {calls, joinedCall} = useKoSubscribableChildren(callState, ['calls', 'joinedCall']);
+
+  const isCallActive =
+    joinedCall !== undefined && matchQualifiedIds(joinedCall.conversation.qualifiedId, qualifiedConversationId);
 
   const call = useMemo(
     () => calls.find(callInstance => matchQualifiedIds(callInstance.conversation.qualifiedId, qualifiedConversationId)),
     [calls, qualifiedConversationId],
   );
 
-  const [currentCallState, setCurrentCallState] = useState<CALL_STATE | null>(() => call?.state() ?? null);
+  const [connectingCallState, setConnectingCallState] = useState<CALL_STATE | null>(() =>
+    isCallActive ? null : (call?.state() ?? null),
+  );
 
   useEffect(() => {
-    if (!call) {
-      setCurrentCallState(null);
+    if (!call || isCallActive) {
+      setConnectingCallState(null);
       return () => {};
     }
 
-    setCurrentCallState(call.state());
+    setConnectingCallState(call.state());
 
     const subscription = call.state.subscribe(newState => {
-      setCurrentCallState(newState);
+      setConnectingCallState(newState);
     });
 
     return () => {
       subscription.dispose();
     };
-  }, [call]);
+  }, [call, isCallActive]);
 
-  return {
-    isCallConnecting: currentCallState === CALL_STATE.ANSWERED,
-    isCallActive: currentCallState === CALL_STATE.MEDIA_ESTAB,
-  };
+  const isCallConnecting =
+    !isCallActive &&
+    connectingCallState !== null &&
+    (connectingCallState === CALL_STATE.ANSWERED || connectingCallState === CALL_STATE.OUTGOING);
+
+  return {isCallConnecting, isCallActive};
 };
 
 export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
@@ -73,7 +80,7 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
   const {content, calling: callingViewModel} = useMainViewModel();
   const {conversation: conversationRepository, calling: callingRepository} = content.repositories;
   const {isCallConnecting, isCallActive} = useMeetingConversationCall(qualifiedConversationId);
-  const isJoiningCallRef = useRef(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   const guardCall = useNoInternetCallGuard({
     description: translate('callNotEstablishedDescription'),
@@ -111,11 +118,11 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
   }, [translate]);
 
   const joinMeeting = useCallback(() => {
-    if (isJoiningCallRef.current || isCallConnecting || isCallActive) {
+    if (isJoining || isCallConnecting || isCallActive) {
       return;
     }
 
-    isJoiningCallRef.current = true;
+    setIsJoining(true);
 
     guardCall(async () => {
       const result = await joinMeetingCall(deps, qualifiedConversationId);
@@ -124,11 +131,19 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
         showConversationNotFoundModal();
       }
 
-      isJoiningCallRef.current = false;
+      setIsJoining(false);
     });
-  }, [deps, guardCall, isCallActive, isCallConnecting, qualifiedConversationId, showConversationNotFoundModal]);
+  }, [
+    deps,
+    guardCall,
+    isCallActive,
+    isCallConnecting,
+    isJoining,
+    qualifiedConversationId,
+    showConversationNotFoundModal,
+  ]);
 
-  const isJoinDisabled = isJoiningCallRef.current || isCallConnecting || isCallActive;
+  const isJoinDisabled = isJoining || isCallConnecting || isCallActive;
 
   return {joinMeeting, isJoinDisabled, isCallActive};
 };

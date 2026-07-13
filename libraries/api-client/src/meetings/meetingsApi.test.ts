@@ -39,6 +39,39 @@ describe('MeetingsAPI', () => {
     recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
   };
 
+  const validMeetingWithConversation = {
+    ...validMeeting,
+    conversation: {
+      qualified_id: validMeeting.qualified_conversation,
+      creator: validMeeting.qualified_creator.id,
+      type: 0,
+      name: validMeeting.title,
+      group_conv_type: 'meeting',
+      protocol: 'mls',
+      group_id: 'group-id',
+      epoch: 0,
+      cells_state: 'ready',
+      access: ['invite', 'private'],
+      access_role: 'activated',
+      members: {
+        self: {
+          id: validMeeting.qualified_creator.id,
+          conversation_role: 'wire_admin',
+          hidden: false,
+          hidden_ref: null,
+          otr_archived: false,
+          otr_archived_ref: null,
+          otr_muted_ref: null,
+          otr_muted_status: null,
+          service: null,
+          status_ref: '0.0',
+          status_time: '1970-01-01T00:00:00.000Z',
+        },
+        others: [],
+      },
+    },
+  };
+
   it('sends meeting requests through the versioned HTTP client', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
@@ -86,5 +119,24 @@ describe('MeetingsAPI', () => {
     const meeting = await client.api.meetings.getMeeting({id: 'meeting-id', domain: 'example.com'});
 
     expect(meeting).toEqual(validMeeting);
+  });
+
+  it('returns parsed create meeting responses with embedded conversation', async () => {
+    const client = new APIClient(testConfig);
+    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
+      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+    } as never);
+
+    await client.useVersion(MINIMUM_API_VERSION, 16);
+
+    jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: validMeetingWithConversation} as never);
+
+    const meeting = await client.api.meetings.createMeeting({
+      title: validMeeting.title,
+      start_time: validMeeting.start_time,
+      end_time: validMeeting.end_time,
+    });
+
+    expect(meeting).toEqual(validMeetingWithConversation);
   });
 });

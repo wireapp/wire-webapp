@@ -38,6 +38,7 @@ import {
   CONVERSATION_EVENT,
   ConversationAddPermissionUpdateEvent,
   ConversationCreateEvent,
+  ConversationCreateMeetingEvent,
   ConversationEvent,
   ConversationMemberJoinEvent,
   ConversationMemberLeaveEvent,
@@ -1328,6 +1329,20 @@ export class ConversationRepository {
     return task.tryOrElse(
       error => error,
       () => this.getConversationById(conversationId, searchInLocalDB),
+    );
+  }
+
+  /**
+   * Persists a meeting conversation returned by the meetings API or websocket.
+   */
+  saveMeetingConversationFromBackend(conversationData: BackendConversation): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        const [conversationEntity] = this.mapConversations([conversationData]);
+        await this.updateParticipatingUserEntities(conversationEntity);
+        await this.saveConversation(conversationEntity);
+      },
     );
   }
 
@@ -3625,7 +3640,7 @@ export class ConversationRepository {
       }
     }
 
-    const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
+    const isConversationCreate = type === CONVERSATION_EVENT.CREATE || type === CONVERSATION_EVENT.CREATE_MEETING;
     const onEventPromise = isConversationCreate
       ? Promise.resolve(null)
       : this.getConversationById(conversationId, true);
@@ -3799,6 +3814,7 @@ export class ConversationRepository {
   ) {
     switch (eventJson.type) {
       case CONVERSATION_EVENT.CREATE:
+      case CONVERSATION_EVENT.CREATE_MEETING:
         return this.onCreate(eventJson, eventSource);
     }
 
@@ -4081,7 +4097,7 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private async onCreate(
-    eventJson: ConversationCreateEvent,
+    eventJson: ConversationCreateEvent | ConversationCreateMeetingEvent,
     eventSource?: EventSource,
   ): Promise<Conversation | undefined> {
     const {conversation, data: eventData, qualified_conversation, time} = eventJson;
