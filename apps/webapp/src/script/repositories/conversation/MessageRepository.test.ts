@@ -25,7 +25,7 @@ import pDefer from 'p-defer';
 import {Maybe} from 'true-myth';
 
 import {Account} from '@wireapp/core';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
@@ -628,6 +628,47 @@ describe('MessageRepository', () => {
         textMessage: 'hello there',
       });
 
+      expect(conversationRepository.prepareForInjectedMessageEvent).not.toHaveBeenCalled();
+      expect(conversationRepository.waitForInjectedMessageEvent).not.toHaveBeenCalled();
+      expect(conversationRepository.cancelInjectedMessageEventWait).not.toHaveBeenCalled();
+    });
+
+    it('does not register a waiter for edits, reactions, confirmations, or in-call events when the status fix is enabled', async () => {
+      const conversationRepository = {
+        cancelInjectedMessageEventWait: jest.fn(),
+        prepareForInjectedMessageEvent: jest.fn(),
+        waitForInjectedMessageEvent: jest.fn(),
+      } as unknown as ConversationRepository;
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest, {
+        conversationRepository,
+        isMessageSendingStatusFixEnabled: true,
+      });
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+
+      const conversation = generateConversation();
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
+      originalMessage.assets.push(new Text(createUuid(), 'old text'));
+      originalMessage.from = selfUser.id;
+      originalMessage.user(selfUser);
+      originalMessage.type = ClientEvent.CONVERSATION.MESSAGE_ADD;
+      conversation.addMessage(originalMessage);
+
+      const confirmationMessage = new ContentMessage(createUuid(), translateForTest);
+      const otherUser = new User(createUuid(), '', translateForTest);
+      otherUser.isMe = false;
+      confirmationMessage.from = otherUser.id;
+      confirmationMessage.user(otherUser);
+      confirmationMessage.type = ClientEvent.CONVERSATION.MESSAGE_ADD;
+      conversation.addMessage(confirmationMessage);
+
+      await messageRepository.sendMessageEdit(conversation, 'new text', originalMessage, []);
+      await messageRepository.toggleReaction(conversation, originalMessage, '👍', selfUser.qualifiedId);
+      await messageRepository.sendConfirmationStatus(conversation, confirmationMessage, Confirmation.Type.READ);
+      await messageRepository.sendInCallEmoji(conversation, {heart: 1});
+      await messageRepository.sendInCallHandRaised(conversation, true);
+
+      expect(core.service!.conversation.send).toHaveBeenCalledTimes(5);
       expect(conversationRepository.prepareForInjectedMessageEvent).not.toHaveBeenCalled();
       expect(conversationRepository.waitForInjectedMessageEvent).not.toHaveBeenCalled();
       expect(conversationRepository.cancelInjectedMessageEventWait).not.toHaveBeenCalled();

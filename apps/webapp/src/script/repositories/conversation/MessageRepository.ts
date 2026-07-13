@@ -1068,9 +1068,11 @@ export class MessageRepository {
           payload,
           optimisticEvent,
         );
-        optimisticMessageEventId = mappedEvent.id;
-        messageSendingEventHandling.prepareForInjectedMessageEvent(optimisticMessageEventId);
-        optimisticMessageEntityPromise = messageSendingEventHandling.waitForInjectedMessageEvent(optimisticMessageEventId);
+        const injectedMessageEventId = mappedEvent.id;
+        optimisticMessageEventId = injectedMessageEventId;
+        messageSendingEventHandling.prepareForInjectedMessageEvent(injectedMessageEventId);
+        optimisticMessageEntityPromise =
+          messageSendingEventHandling.waitForInjectedMessageEvent(injectedMessageEventId);
         try {
           await this.eventRepository.injectEvent(mappedEvent);
         } catch (error: unknown) {
