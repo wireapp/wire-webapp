@@ -88,6 +88,8 @@ type MessageRepositoryDependencies = {
 
 type MessageRepositoryPrivateMethodsForTest = {
   sendAndInjectMessage: (message: GenericMessage) => Promise<unknown>;
+  updateMessageAsFailed: () => Promise<void>;
+  updateMessageAsSent: () => Promise<void>;
 };
 
 async function buildMessageRepository(
@@ -534,6 +536,32 @@ describe('MessageRepository', () => {
       expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
     });
 
+    it('preserves post-send failure behavior when the status fix is disabled', async () => {
+      const [messageRepository, {core, eventRepository, propertiesRepository}] =
+        await buildMessageRepository(translateForTest);
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const expectedError = new Error('post-send status handling failed');
+      const updateMessageAsFailedSpy = jest
+        .spyOn(messageRepositoryPrivateMethods, 'updateMessageAsFailed')
+        .mockResolvedValue(undefined);
+      jest.spyOn(messageRepositoryPrivateMethods, 'updateMessageAsSent').mockRejectedValue(expectedError);
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const conversation = generateConversation();
+
+      const sendResult = await messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+      });
+
+      expect(sendResult).toBe(MessageSendingState.FAILED);
+      expect(updateMessageAsFailedSpy).toHaveBeenCalledTimes(1);
+      expect(unsubscribeSpy).not.toHaveBeenCalled();
+    });
+
     it('does not wait for an added message when an existing message id is provided', async () => {
       const [messageRepository, {propertiesRepository}] = await buildMessageRepository(translateForTest, {
         isMessageSendingStatusFixEnabled: true,
@@ -607,6 +635,29 @@ describe('MessageRepository', () => {
 
       await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
 
+      expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+    });
+
+    it('removes the listener when the backend send fails', async () => {
+      const [messageRepository, {core, eventRepository, propertiesRepository}] = await buildMessageRepository(
+        translateForTest,
+        {isMessageSendingStatusFixEnabled: true},
+      );
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      jest.spyOn(core.service!.conversation, 'send').mockRejectedValue(new Error('backend send failed'));
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      jest.spyOn(messageRepositoryPrivateMethods, 'updateMessageAsFailed').mockResolvedValue(undefined);
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const conversation = generateConversation();
+
+      const sendResult = await messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+      });
+
+      expect(sendResult).toBe(MessageSendingState.FAILED);
       expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
     });
 
