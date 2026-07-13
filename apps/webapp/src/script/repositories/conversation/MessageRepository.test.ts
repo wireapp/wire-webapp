@@ -21,9 +21,11 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
+import {amplify} from 'amplify';
 
 import {Account} from '@wireapp/core';
 import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
@@ -558,6 +560,7 @@ describe('MessageRepository', () => {
         isMessageSendingStatusFixEnabled: true,
       });
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
       const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
       const sendAndInjectMessageSpy = jest
         .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
@@ -581,6 +584,47 @@ describe('MessageRepository', () => {
 
       expect(addedMessageEntity.status()).toBe(StatusType.SENT);
       expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
+      expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+    });
+
+    it('removes the listener when sending is canceled', async () => {
+      const [messageRepository, {propertiesRepository}] = await buildMessageRepository(translateForTest, {
+        isMessageSendingStatusFixEnabled: true,
+      });
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      jest.spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage').mockResolvedValue({
+        ...successPayload,
+        state: MessageSendingState.CANCELED,
+      });
+      const conversation = generateConversation();
+
+      await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
+
+      expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+    });
+
+    it('removes the listener when the legacy send throws', async () => {
+      const [messageRepository, {propertiesRepository}] = await buildMessageRepository(translateForTest, {
+        isMessageSendingStatusFixEnabled: true,
+      });
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const expectedError = new Error('injection failed');
+      jest.spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage').mockRejectedValue(expectedError);
+      const conversation = generateConversation();
+      let actualError: unknown;
+
+      try {
+        await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
+      } catch (error: unknown) {
+        actualError = error;
+      }
+
+      expect(actualError).toBe(expectedError);
+      expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
     });
 
     it('ignores added messages from another conversation or with another message id', async () => {
