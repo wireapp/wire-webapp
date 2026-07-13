@@ -24,10 +24,11 @@ import cx from 'classnames';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {UserVerificationBadges} from 'Components/badge';
+import {getUserVerificationBadgeLabel, useUserVerificationStatus, UserVerificationBadges} from 'Components/badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {availabilityTranslationKeys} from 'Util/availabilityStatus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import * as styles from './userDetails.styles';
@@ -37,18 +38,21 @@ import {AvailabilityContextMenu} from '../../../ui/availabilityContextMenu';
 interface AvailabilityStateButtonWrapperProps {
   children: React.ReactElement;
   isTeam: boolean;
+  ariaLabel: string;
   showAvailabilityContextMenu: (event: MouseEvent) => void;
 }
 
 const AvailabilityStateButtonWrapper = ({
   children,
   isTeam = false,
+  ariaLabel,
   showAvailabilityContextMenu,
 }: AvailabilityStateButtonWrapperProps) => {
   return isTeam ? (
     <button
       onClick={event => showAvailabilityContextMenu(event.nativeEvent)}
       className="button-reset-default user-details-avatar"
+      aria-label={ariaLabel}
     >
       {children}
     </button>
@@ -69,9 +73,11 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
   const {
     name: userName,
     username: userHandle,
+    availability,
     isOnLegalHold,
     hasPendingLegalHold,
-  } = useKoSubscribableChildren(user, ['hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
+  } = useKoSubscribableChildren(user, ['availability', 'hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
+  const {MLSStatus, isProteusVerified} = useUserVerificationStatus({user, groupId, isSelfUser: isTeam});
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
@@ -84,14 +90,27 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
     });
   };
 
+  const avatarAriaLabel = [
+    userName,
+    userHandle,
+    isTeam ? translate(availabilityTranslationKeys[availability]) : undefined,
+    getUserVerificationBadgeLabel({MLSStatus, isProteusVerified}),
+  ]
+    .filter(Boolean)
+    .join(', ');
+
   return (
     <div css={styles.wrapper(isSideBarOpen)}>
-      <AvailabilityStateButtonWrapper isTeam={isTeam} showAvailabilityContextMenu={showAvailabilityContextMenu}>
+      <AvailabilityStateButtonWrapper
+        isTeam={isTeam}
+        ariaLabel={avatarAriaLabel}
+        showAvailabilityContextMenu={showAvailabilityContextMenu}
+      >
         <Avatar
           className={cx('see-through', {'user-details-avatar': !isTeam})}
           participant={user}
           avatarSize={AVATAR_SIZE.MEDIUM}
-          avatarAlt={translate('selfProfileImageAlt')}
+          avatarAlt={isTeam ? '' : translate('selfProfileImageAlt')}
         />
       </AvailabilityStateButtonWrapper>
 

@@ -44,6 +44,7 @@ import {UserState} from 'Repositories/user/userState';
 import {MLSStatuses, WireIdentity} from 'src/script/e2eIdentity/e2eIdentityVerification';
 import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {translate} from 'Util/localizerUtil';
 import {waitFor} from 'Util/waitFor';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
@@ -98,7 +99,7 @@ const getMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?:
   });
 };
 
-export const UserVerificationBadges = ({
+export const useUserVerificationStatus = ({
   user,
   groupId,
   isSelfUser,
@@ -115,12 +116,52 @@ export const UserVerificationBadges = ({
     user,
   });
 
-  let status: MLSStatuses | undefined = undefined;
+  let MLSStatus: MLSStatuses | undefined = undefined;
   if (mlsStatuses && mlsStatuses.length > 0 && mlsStatuses.every(status => status === MLSStatuses.VALID)) {
-    status = MLSStatuses.VALID;
+    MLSStatus = MLSStatuses.VALID;
   }
 
-  return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={status} />;
+  return {MLSStatus, isProteusVerified};
+};
+
+export const getUserVerificationBadgeLabel = ({
+  MLSStatus,
+  isProteusVerified,
+}: {
+  MLSStatus?: MLSStatuses;
+  isProteusVerified?: boolean;
+}): string | undefined => {
+  switch (MLSStatus) {
+    case MLSStatuses.VALID:
+      return translate('E2EI.userDevicesVerified');
+    case MLSStatuses.EXPIRED:
+    case MLSStatuses.EXPIRES_SOON:
+      return translate('E2EI.certificateExpired');
+    case MLSStatuses.REVOKED:
+      return translate('E2EI.certificateRevoked');
+    default:
+      break;
+  }
+
+  if (isProteusVerified) {
+    return translate('proteusDeviceVerified');
+  }
+
+  return undefined;
+};
+
+export const UserVerificationBadges = ({
+  user,
+  groupId,
+  isSelfUser,
+}: {
+  user: User;
+  groupId?: string;
+  isSelfUser?: boolean;
+}) => {
+  const {MLSStatus, isProteusVerified} = useUserVerificationStatus({user, groupId, isSelfUser});
+
+  return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={MLSStatus} />;
 };
 
 export const DeviceVerificationBadges = ({
