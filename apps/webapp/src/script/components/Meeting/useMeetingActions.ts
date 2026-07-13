@@ -23,7 +23,7 @@ export const useMeetingActions = () => {
   const openCreate = useScheduleMeetingModal(state => state.openCreate);
 
   const handleMeetNow = () => {
-    // add calling functionality here
+    // Meet Now: create instant meeting, then call joinMeetingCall — see joinMeetingCall.ts
   };
 
   const handleScheduleMeeting = () => {

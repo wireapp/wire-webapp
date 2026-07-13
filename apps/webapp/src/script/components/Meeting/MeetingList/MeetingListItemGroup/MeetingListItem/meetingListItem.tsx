@@ -36,6 +36,7 @@ import {MeetingParticipants} from 'Components/Meeting/MeetingList/MeetingListIte
 import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
 import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import {useJoinMeetingCall} from 'Components/Meeting/useJoinMeetingCall';
 import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
@@ -50,9 +51,11 @@ const MeetingListItemComponent = ({
   nowMilliseconds: providedNowMilliseconds,
 }: MeetingListItemProps) => {
   const {meetingSeries, start, end} = meetingInstance;
-  const {title, recurrence, attending} = meetingSeries;
+  const {title, recurrence} = meetingSeries;
   const {translate, wallClock} = useApplicationContext();
   const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
+  const {isCallActive} = useJoinMeetingCall(meetingSeries.qualified_conversation);
+  const attending = isCallActive;
 
   const startDateIso = start.toISOString();
   const endDateIso = end.toISOString();
@@ -110,6 +113,7 @@ const MeetingListItemComponent = ({
       <div css={rightStyles}>
         <MeetingParticipants qualifiedConversation={meetingSeries.qualified_conversation} isOngoing={isOngoing} />
         <MeetingStatus
+          qualifiedConversation={meetingSeries.qualified_conversation}
           start_date={startDateIso}
           end_date={endDateIso}
           attending={attending}

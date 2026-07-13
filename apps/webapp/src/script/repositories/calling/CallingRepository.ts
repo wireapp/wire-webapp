@@ -1108,7 +1108,7 @@ export class CallingRepository {
       this.serializeQualifiedId(userId),
       conversation && isMLSConversation(conversation) ? senderClientId : clientId,
       conversation && this.getConversationType(conversation),
-      0, // if call a meeting 1
+      conversation ? this.getMeetingCallFlag(conversation) : 0,
     );
 
     if (res !== 0) {
@@ -1129,11 +1129,15 @@ export class CallingRepository {
   // Call actions
   //##############################################################################
 
+  private getMeetingCallFlag(conversation: Conversation): 0 | 1 {
+    return conversation.isMeeting() ? 1 : 0;
+  }
+
   private getConversationType(conversation: Conversation): CONV_TYPE {
     const useSFTForOneToOneCalls =
       this.teamState.teamFeatures()?.[FEATURE_KEY.CONFERENCE_CALLING]?.config?.useSFTForOneToOneCalls;
 
-    if (conversation.isGroupOrChannel() || useSFTForOneToOneCalls) {
+    if (conversation.isGroupOrChannel() || conversation.isMeeting() || useSFTForOneToOneCalls) {
       if (isMLSConversation(conversation)) {
         return CONV_TYPE.CONFERENCE_MLS;
       }
@@ -1192,7 +1196,14 @@ export class CallingRepository {
        * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
        */
       this.wCall?.setMute(this.wUser, 0);
-      this.wCall?.start(this.wUser, convId, CALL_TYPE.NORMAL, conversationType, this.callState.cbrEncoding(), 0); // if call a meeting 1
+      this.wCall?.start(
+        this.wUser,
+        convId,
+        CALL_TYPE.NORMAL,
+        conversationType,
+        this.callState.cbrEncoding(),
+        this.getMeetingCallFlag(conversation),
+      );
       if (!!conversation && this.isMLSConference(conversation)) {
         this.setCachedEpochInfos(call);
       }

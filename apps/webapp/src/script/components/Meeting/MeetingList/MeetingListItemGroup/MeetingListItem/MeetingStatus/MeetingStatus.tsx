@@ -19,6 +19,8 @@
 
 import {memo, useMemo} from 'react';
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
 
 import {
@@ -28,24 +30,31 @@ import {
   participatingStatusIconStyles,
   participatingStatusStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/meetingStatus.styles';
+import {useJoinMeetingCall} from 'Components/Meeting/useJoinMeetingCall';
 import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
+export type UseJoinMeetingCallResult = ReturnType<typeof useJoinMeetingCall>;
+
 export interface MeetingStatusProps {
+  qualifiedConversation: QualifiedId;
   start_date: string;
   end_date: string;
   attending?: boolean;
-  nowMilliseconds?: number;
+  nowMilliseconds: number;
+  useJoinMeetingCallHook?: (qualifiedConversationId: QualifiedId) => UseJoinMeetingCallResult;
 }
 
 const MeetingStatusComponent = ({
+  qualifiedConversation,
   start_date,
   end_date,
   attending,
-  nowMilliseconds: providedNowMilliseconds,
+  nowMilliseconds,
+  useJoinMeetingCallHook = useJoinMeetingCall,
 }: MeetingStatusProps) => {
   const {translate} = useApplicationContext();
-  const nowMilliseconds = providedNowMilliseconds ?? Date.now();
+  const {joinMeeting, isJoinDisabled} = useJoinMeetingCallHook(qualifiedConversation);
 
   const meetingStatus = useMemo(
     () => getMeetingStatusAt(nowMilliseconds, start_date, end_date, attending),
@@ -63,7 +72,13 @@ const MeetingStatusComponent = ({
   if (meetingStatus === MeetingStatuses.ON_GOING) {
     return (
       <div css={joinButtonContainerStyles}>
-        <Button css={joinButtonStyles} variant={ButtonVariant.PRIMARY}>
+        <Button
+          css={joinButtonStyles}
+          variant={ButtonVariant.PRIMARY}
+          onClick={joinMeeting}
+          disabled={isJoinDisabled}
+          data-uie-name="join-meeting-call"
+        >
           <CallIcon css={joinButtonIconStyles} /> {translate('callJoin')}
         </Button>
       </div>
