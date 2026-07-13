@@ -556,11 +556,15 @@ describe('MessageRepository', () => {
     });
 
     it('waits for and repairs the exact added message when the status fix is enabled', async () => {
-      const [messageRepository, {propertiesRepository}] = await buildMessageRepository(translateForTest, {
-        isMessageSendingStatusFixEnabled: true,
-      });
+      const [messageRepository, {eventRepository, propertiesRepository}] = await buildMessageRepository(
+        translateForTest,
+        {
+          isMessageSendingStatusFixEnabled: true,
+        },
+      );
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const updateEventSpy = jest.spyOn(eventRepository.eventService, 'updateEvent');
       const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
       const sendAndInjectMessageSpy = jest
         .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
@@ -585,6 +589,7 @@ describe('MessageRepository', () => {
       expect(addedMessageEntity.status()).toBe(StatusType.SENT);
       expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
       expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+      expect(updateEventSpy).not.toHaveBeenCalled();
     });
 
     it('removes the listener when sending is canceled', async () => {

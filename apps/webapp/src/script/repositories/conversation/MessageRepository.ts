@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {AssetAuditData} from '@wireapp/api-client/lib/asset';
 import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -44,7 +45,6 @@ import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/textCon
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
