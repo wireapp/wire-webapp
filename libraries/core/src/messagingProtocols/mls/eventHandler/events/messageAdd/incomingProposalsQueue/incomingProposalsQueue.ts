@@ -18,29 +18,30 @@
  */
 
 import {LogFactory} from '@wireapp/commons';
-import {Task, PromiseQueue} from '@wireapp/promise-queue';
+
+import {createFlushableQueue, type PromiseTask} from '../../../../../../queue/flushableQueue';
 
 const logger = LogFactory.getLogger('@wireapp/core/mls/IncomingProposalsQueue');
 
-const proposalsQueue = new PromiseQueue({name: 'incoming-proposals-queue', paused: true});
+const proposalsQueue = createFlushableQueue({autoStart: false, concurrency: 1, timeout: 60_000});
 
-export function queueProposal<T>(cb: Task<T>): Promise<T> {
+export function queueProposal<T>(cb: PromiseTask<T>): Promise<T> {
   logger.info('Queueing proposal for processing');
-  return proposalsQueue.push(cb);
+  return proposalsQueue.add(cb);
 }
 
 export function resumeProposalProcessing(): void {
   logger.info('Resuming proposal processing');
-  proposalsQueue.resume();
+  proposalsQueue.queue.start();
 }
 
 export function pauseProposalProcessing(): void {
   logger.info('Pausing proposal processing');
-  proposalsQueue.pause();
+  proposalsQueue.queue.pause();
 }
 
-export function getProposalQueueLength() {
-  return proposalsQueue.getLength();
+export function getProposalQueueLength(): number {
+  return proposalsQueue.queue.size;
 }
 
 export function flushProposalsQueue(): void {

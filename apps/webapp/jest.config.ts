@@ -30,6 +30,8 @@ process.env.TZ = 'UTC';
 const esmPackagesToTransform = [
   'true-myth',
   'p-timeout',
+  'p-queue',
+  'eventemitter3',
   'p-cancelable',
   'noop-esm',
   'uuid',

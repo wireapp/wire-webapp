@@ -611,7 +611,7 @@ describe('Account', () => {
       // The legacy processor pushes its "transition to LIVE" task onto a queue that the
       // production code resumes from `connect()`. Since we invoke the factory directly
       // here, we need to resume that queue so the pushed task actually runs.
-      account['notificationProcessingQueue'].resume();
+      account['notificationProcessingQueue'].queue.start();
 
       return {account};
     };

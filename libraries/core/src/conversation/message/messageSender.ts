@@ -17,24 +17,26 @@
  *
  */
 
-import {Task, PromiseQueue} from '@wireapp/promise-queue';
+import PromiseQueue from 'p-queue';
 
-const sendingQueue = new PromiseQueue({name: 'message-sender', paused: true});
+type PromiseTask<T> = () => Promise<T>;
 
-export function sendMessage<T>(sendingFunction: Task<T>): Promise<T> {
-  return sendingQueue.push(sendingFunction);
+const sendingQueue = new PromiseQueue({autoStart: false, concurrency: 1, timeout: 60_000});
+
+export function sendMessage<T>(sendingFunction: PromiseTask<T>): Promise<T> {
+  return sendingQueue.add(sendingFunction);
 }
 
 export function getQueueLength(): number {
-  return sendingQueue.getLength();
+  return sendingQueue.size;
 }
 
 export function isSendingMessage(): boolean {
-  return sendingQueue.hasRunningTasks();
+  return sendingQueue.pending > 0;
 }
 
 export function resumeMessageSending(): void {
-  sendingQueue.resume();
+  sendingQueue.start();
 }
 
 export function pauseMessageSending(): void {
