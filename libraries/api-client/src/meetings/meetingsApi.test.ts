@@ -139,4 +139,49 @@ describe('MeetingsAPI', () => {
 
     expect(meeting).toEqual(validMeetingWithConversation);
   });
+
+  it('returns parsed update meeting responses with embedded conversation', async () => {
+    const client = new APIClient(testConfig);
+    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
+      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+    } as never);
+
+    await client.useVersion(MINIMUM_API_VERSION, 16);
+
+    jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: validMeetingWithConversation} as never);
+
+    const meeting = await client.api.meetings.updateMeeting(
+      {id: 'meeting-id', domain: 'example.com'},
+      {title: 'Updated title'},
+    );
+
+    expect(meeting).toEqual(validMeetingWithConversation);
+    expect(client.transport.http.sendJSON).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: {title: 'Updated title'},
+        method: 'put',
+        url: '/meetings/example.com/meeting-id',
+      }),
+    );
+  });
+
+  it('deletes a meeting by qualified id', async () => {
+    const client = new APIClient(testConfig);
+    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
+      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+    } as never);
+
+    await client.useVersion(MINIMUM_API_VERSION, 16);
+
+    const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: undefined} as never);
+
+    await client.api.meetings.deleteMeeting({id: 'meeting-id', domain: 'example.com'});
+
+    expect(sendJSONSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'delete',
+        url: '/meetings/example.com/meeting-id',
+      }),
+    );
+  });
 });

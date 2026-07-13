@@ -22,8 +22,8 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_CELLS_STATE,
   GROUP_CONVERSATION_TYPE,
-} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+} from '../conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../team';
 import {MeetingRecurrenceFrequency} from './meetingRecurrence';
 import {meetingSchema, meetingWithConversationSchema, meetingsListResponseSchema} from './meetingSchema';
 
