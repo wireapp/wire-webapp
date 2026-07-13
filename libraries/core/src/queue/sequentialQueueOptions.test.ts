@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,5 +17,10 @@
  *
  */
 
-export * from './PromiseQueue';
-export {Task} from './QueueEntry';
+import {sequentialQueueOptions} from './sequentialQueueOptions';
+
+describe('sequentialQueueOptions', () => {
+  it('limits queues to one task with a one-minute timeout', () => {
+    expect(sequentialQueueOptions).toStrictEqual({concurrency: 1, timeout: 60_000});
+  });
+});
