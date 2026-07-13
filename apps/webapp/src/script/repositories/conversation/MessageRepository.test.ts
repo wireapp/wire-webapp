@@ -54,7 +54,7 @@ import {createUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
-import {MessageRepository} from './MessageRepository';
+import {MessageRepository, MessageRepositoryOptions} from './MessageRepository';
 import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {StatusType} from '../../message/statusType';
@@ -75,6 +75,7 @@ type MessageRepositoryDependencies = {
   core: Account;
   cryptographyRepository: CryptographyRepository;
   eventRepository: EventRepository;
+  messageRepositoryOptions: MessageRepositoryOptions;
   propertiesRepository: PropertiesRepository;
   serverTimeHandler: ServerTimeHandler;
   translate: Translate;
@@ -111,6 +112,7 @@ async function buildMessageRepository(
     assetRepository: {} as AssetRepository,
     audioRepository: new AudioRepository(),
     translate,
+    messageRepositoryOptions: {isMessageSendingStatusFixEnabled: false},
     userState,
     clientState,
     conversationState,

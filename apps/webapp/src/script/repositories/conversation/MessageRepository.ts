@@ -121,6 +121,10 @@ export interface MessageSendingOptions {
   recipients?: QualifiedId[] | QualifiedUserClients;
 }
 
+export type MessageRepositoryOptions = {
+  readonly isMessageSendingStatusFixEnabled: boolean;
+};
+
 export enum CONSENT_TYPE {
   INCOMING_CALL = 'incoming_call',
   MESSAGE = 'message',
@@ -182,6 +186,9 @@ export class MessageRepository {
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
     private readonly translate: Translate,
+    private readonly messageRepositoryOptions: MessageRepositoryOptions = {
+      isMessageSendingStatusFixEnabled: false,
+    },
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
