@@ -582,6 +582,45 @@ describe('MessageRepository', () => {
       expect(addedMessageEntity.status()).toBe(StatusType.SENT);
       expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
     });
+
+    it('ignores added messages from another conversation or with another message id', async () => {
+      const [messageRepository, {propertiesRepository}] = await buildMessageRepository(translateForTest, {
+        isMessageSendingStatusFixEnabled: true,
+      });
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+      const otherConversation = generateConversation();
+      const sendPromise = messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+      });
+
+      await Promise.resolve();
+
+      const sentTextMessage = sendAndInjectMessageSpy.mock.calls[0][0];
+      const messageWithAnotherId = new Message(createUuid(), undefined, translateForTest);
+      messageWithAnotherId.conversation_id = conversation.id;
+      conversation.addMessage(messageWithAnotherId);
+      const messageFromAnotherConversation = new Message(sentTextMessage.messageId, undefined, translateForTest);
+      messageFromAnotherConversation.conversation_id = otherConversation.id;
+      otherConversation.addMessage(messageFromAnotherConversation);
+
+      await Promise.resolve();
+
+      const sendStateBeforeMatchingMessage = await Promise.race([sendPromise, Promise.resolve('pending')]);
+      expect(sendStateBeforeMatchingMessage).toBe('pending');
+
+      const matchingMessageEntity = new Message(sentTextMessage.messageId, undefined, translateForTest);
+      matchingMessageEntity.conversation_id = conversation.id;
+      conversation.addMessage(matchingMessageEntity);
+
+      await sendPromise;
+    });
   });
 
   describe('deleteMessageForEveryone', () => {
