@@ -29,7 +29,7 @@ import {
   dateTimePickerFieldsRowStyles,
   dateTimePickerTimeFieldWrapperStyles,
 } from './DateTimePickerField.styles';
-import {combineDateAndTime, dateValueFromDate} from './dateTimeUtils';
+import {combineDateAndTime, dateValueFromDate, isSameLocalCalendarDay} from './dateTimeUtils';
 
 import {Theme} from '../../Identity/Theme';
 import {DatePickerField, DatePickerFieldLabels} from '../DatePickerField';
@@ -61,6 +61,10 @@ export interface DateTimePickerFieldProps {
   popoverPortalContainer?: HTMLElement;
   errorText?: string;
   minValue?: DateValue;
+  /** When set, only time options strictly after this time of day are shown. */
+  minTime?: Date | null;
+  /** When the selected date matches this date, hide past time options. */
+  minTimeForToday?: Date | null;
 }
 
 export const DateTimePickerField = ({
@@ -80,12 +84,25 @@ export const DateTimePickerField = ({
   popoverPortalContainer,
   errorText,
   minValue,
+  minTime = null,
+  minTimeForToday = null,
 }: DateTimePickerFieldProps) => {
   const labelId = `${dataUieName}-label`;
   const selectedDate = useMemo(() => (value !== null ? dateValueFromDate(value) : null), [value]);
   const selectedTime = useMemo(() => (value !== null ? nearestTimeOptionFromDate(value) : null), [value]);
   const isDateDisabled = dateDisabled ?? disabled;
   const isTimeDisabled = timeDisabled ?? disabled;
+  const effectiveMinTime = useMemo(() => {
+    if (minTime !== null) {
+      return minTime;
+    }
+
+    if (minTimeForToday === null || value === null) {
+      return null;
+    }
+
+    return isSameLocalCalendarDay(value, minTimeForToday) ? minTimeForToday : null;
+  }, [minTime, minTimeForToday, value]);
 
   const handleDateChange = useCallback(
     (nextDate: DateValue | null) => {
@@ -136,6 +153,7 @@ export const DateTimePickerField = ({
           ariaLabel={labels.timeAriaLabel}
           markInvalid={markInvalid}
           disabled={isTimeDisabled}
+          minTime={effectiveMinTime}
           menuPortalTarget={menuPortalTarget}
           wrapperCSS={dateTimePickerTimeFieldWrapperStyles}
         />

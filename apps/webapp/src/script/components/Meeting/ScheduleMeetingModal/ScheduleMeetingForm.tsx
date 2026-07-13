@@ -129,6 +129,34 @@ export const ScheduleMeetingForm = ({
   );
 
   const todayValue = dateValueFromDate(wallClock.currentDate);
+  const currentDateTime = useMemo(
+    () => new Date(wallClock.currentTimestampInMilliseconds),
+    [wallClock.currentTimestampInMilliseconds],
+  );
+
+  const getMinTimeForDate = (date: Date | null): Date | null => {
+    if (date === null) {
+      return null;
+    }
+
+    const today = wallClock.currentDate;
+    const isToday =
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate();
+
+    return isToday ? currentDateTime : null;
+  };
+
+  const startMinTime = useMemo(
+    () => getMinTimeForDate(toDateTimePickerValue(formState.start)),
+    [formState.start, currentDateTime, todayValue],
+  );
+
+  const endMinTime = useMemo(
+    () => getMinTimeForDate(toDateTimePickerValue(formState.end)),
+    [formState.end, currentDateTime, todayValue],
+  );
 
   const endDateMinValue = useMemo(() => {
     if (formState.start.isNothing) {
@@ -206,6 +234,7 @@ export const ScheduleMeetingForm = ({
           markInvalid={is.nonEmptyString(startErrorText)}
           errorText={startErrorText}
           minValue={todayValue}
+          minTime={startMinTime}
           menuPortalTarget={portalContainer}
           popoverPortalContainer={portalContainer}
         />
@@ -220,6 +249,7 @@ export const ScheduleMeetingForm = ({
           markInvalid={is.nonEmptyString(endErrorText)}
           errorText={endErrorText}
           minValue={endDateMinValue}
+          minTime={endMinTime}
           dateDisabled
           menuPortalTarget={portalContainer}
           popoverPortalContainer={portalContainer}

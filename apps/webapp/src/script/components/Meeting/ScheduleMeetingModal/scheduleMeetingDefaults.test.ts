@@ -20,11 +20,12 @@
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
 import {
-  alignEndDateToStart,
-  clampMeetingEndDateTime,
+  capEndForStart,
   getDefaultMeetingEndDateTime,
   getDefaultScheduleMeetingStartDateTime,
   getNextHalfHourDateTime,
+  resolveEndChange,
+  resolveStartChange,
 } from './scheduleMeetingDefaults';
 
 describe('scheduleMeetingDefaults', () => {
@@ -58,18 +59,55 @@ describe('scheduleMeetingDefaults', () => {
     expect(getDefaultMeetingEndDateTime(start)).toEqual(new Date(2026, 6, 14, 0, 0, 0, 0));
   });
 
-  it('preserves midnight when aligning the end date to the start date', () => {
+  it('caps end times at midnight for late starts', () => {
     const start = new Date(2026, 6, 13, 23, 15, 0, 0);
     const end = new Date(2026, 6, 14, 0, 0, 0, 0);
 
-    expect(alignEndDateToStart(start, end)).toEqual(new Date(2026, 6, 14, 0, 0, 0, 0));
+    expect(capEndForStart(start, end)).toEqual(new Date(2026, 6, 14, 0, 0, 0, 0));
+  });
+
+  it('shifts the end forward when the start is moved past the current end', () => {
+    const previousStart = new Date(2026, 6, 13, 13, 0, 0, 0);
+    const previousEnd = new Date(2026, 6, 13, 14, 0, 0, 0);
+    const nextStart = new Date(2026, 6, 13, 15, 0, 0, 0);
+
+    expect(resolveStartChange(previousStart, previousEnd, nextStart)).toEqual({
+      start: nextStart,
+      end: new Date(2026, 6, 13, 16, 0, 0, 0),
+    });
+  });
+
+  it('keeps the end unchanged when the start is moved earlier', () => {
+    const previousStart = new Date(2026, 6, 13, 13, 0, 0, 0);
+    const previousEnd = new Date(2026, 6, 13, 14, 0, 0, 0);
+    const nextStart = new Date(2026, 6, 13, 12, 0, 0, 0);
+
+    expect(resolveStartChange(previousStart, previousEnd, nextStart)).toEqual({
+      start: nextStart,
+      end: previousEnd,
+    });
+  });
+
+  it('shifts the start backward when the end is moved before the current start', () => {
+    const previousStart = new Date(2026, 6, 13, 13, 0, 0, 0);
+    const previousEnd = new Date(2026, 6, 13, 14, 0, 0, 0);
+    const nextEnd = new Date(2026, 6, 13, 12, 0, 0, 0);
+
+    expect(resolveEndChange(previousStart, previousEnd, nextEnd)).toEqual({
+      start: new Date(2026, 6, 13, 11, 0, 0, 0),
+      end: nextEnd,
+    });
   });
 
   it('sets the end to midnight when the start is moved to 11:45 PM', () => {
-    const start = new Date(2026, 6, 13, 23, 45, 0, 0);
-    const end = new Date(2026, 6, 13, 23, 45, 0, 0);
+    const previousStart = new Date(2026, 6, 13, 22, 45, 0, 0);
+    const previousEnd = new Date(2026, 6, 13, 23, 45, 0, 0);
+    const nextStart = new Date(2026, 6, 13, 23, 45, 0, 0);
 
-    expect(clampMeetingEndDateTime(start, end)).toEqual(new Date(2026, 6, 14, 0, 0, 0, 0));
+    expect(resolveStartChange(previousStart, previousEnd, nextStart)).toEqual({
+      start: nextStart,
+      end: new Date(2026, 6, 14, 0, 0, 0, 0),
+    });
   });
 
   it('derives defaults from the wall clock', () => {

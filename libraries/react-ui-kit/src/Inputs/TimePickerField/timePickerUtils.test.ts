@@ -17,15 +17,17 @@
  *
  */
 
-export * from './TimePickerField';
-export {
-  buildTimeOptions,
-  filterTimeOptionsAfter,
-  formatTimeLabel,
-  getTimeOptionTotalMinutes,
-  nearestTimeOptionFromDate,
-  parseTimeLabel,
-  timeOptionFromDate,
-  TIME_INTERVAL_MINUTES,
-  TIME_OPTIONS_COUNT,
-} from './timePickerUtils';
+import {buildTimeOptions, filterTimeOptionsAfter, getTimeOptionTotalMinutes} from './timePickerUtils';
+
+describe('timePickerUtils', () => {
+  it('filters out time options at or before the minimum time', () => {
+    const options = buildTimeOptions();
+    const minTime = new Date(2026, 6, 13, 16, 27, 0, 0);
+
+    const filteredOptions = filterTimeOptionsAfter(options, minTime);
+
+    expect(filteredOptions.some(option => option.label === '4:15 PM')).toBe(false);
+    expect(filteredOptions.some(option => option.label === '4:30 PM')).toBe(true);
+    expect(getTimeOptionTotalMinutes(filteredOptions[0]!)).toBeGreaterThan(16 * 60 + 27);
+  });
+});

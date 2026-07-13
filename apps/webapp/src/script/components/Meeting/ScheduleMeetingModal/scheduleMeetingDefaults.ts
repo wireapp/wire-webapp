@@ -66,31 +66,50 @@ export const getDefaultMeetingEndDateTime = (start: Date): Date => {
   return end;
 };
 
-export const alignEndDateToStart = (start: Date, end: Date): Date => {
-  const midnight = getMidnightAfter(start);
-
-  if (end.getTime() >= midnight.getTime()) {
-    return midnight;
-  }
-
+export const alignEndTimeToStartDate = (start: Date, end: Date): Date => {
   const aligned = new Date(end);
   aligned.setFullYear(start.getFullYear(), start.getMonth(), start.getDate());
-
-  if (aligned.getTime() <= start.getTime()) {
-    return getDefaultMeetingEndDateTime(start);
-  }
-
   return aligned;
 };
 
-export const clampMeetingEndDateTime = (start: Date, end: Date): Date => {
-  const alignedEnd = alignEndDateToStart(start, end);
+export const getMeetingDurationMilliseconds = (start: Date, end: Date): number => {
+  const duration = end.getTime() - start.getTime();
+  return duration > 0 ? duration : MEETING_DURATION_MILLISECONDS;
+};
 
-  if (alignedEnd.getTime() <= start.getTime()) {
-    return getDefaultMeetingEndDateTime(start);
+export const capEndForStart = (start: Date, end: Date): Date => {
+  const midnight = getMidnightAfter(start);
+  return end.getTime() > midnight.getTime() ? midnight : end;
+};
+
+export const resolveStartChange = (
+  previousStart: Date,
+  previousEnd: Date,
+  nextStart: Date,
+): {start: Date; end: Date} => {
+  const alignedPreviousEnd = alignEndTimeToStartDate(nextStart, previousEnd);
+
+  if (nextStart.getTime() < alignedPreviousEnd.getTime()) {
+    return {start: nextStart, end: capEndForStart(nextStart, alignedPreviousEnd)};
   }
 
-  return alignedEnd;
+  const duration = getMeetingDurationMilliseconds(previousStart, previousEnd);
+  const nextEnd = capEndForStart(nextStart, new Date(nextStart.getTime() + duration));
+
+  return {start: nextStart, end: nextEnd};
+};
+
+export const resolveEndChange = (previousStart: Date, previousEnd: Date, nextEnd: Date): {start: Date; end: Date} => {
+  const alignedNextEnd = alignEndTimeToStartDate(previousStart, nextEnd);
+
+  if (alignedNextEnd.getTime() > previousStart.getTime()) {
+    return {start: previousStart, end: capEndForStart(previousStart, alignedNextEnd)};
+  }
+
+  const duration = getMeetingDurationMilliseconds(previousStart, previousEnd);
+  const nextStart = new Date(alignedNextEnd.getTime() - duration);
+
+  return {start: nextStart, end: capEndForStart(nextStart, alignedNextEnd)};
 };
 
 export const getDefaultScheduleMeetingStartDateTime = (wallClock: WallClock): Date =>

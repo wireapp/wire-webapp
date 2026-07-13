@@ -26,9 +26,10 @@ import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 
 import {
-  clampMeetingEndDateTime,
   getDefaultMeetingEndDateTime,
   getDefaultScheduleMeetingStartDateTime,
+  resolveEndChange,
+  resolveStartChange,
 } from './scheduleMeetingDefaults';
 import type {
   ScheduleMeetingFormErrors,
@@ -151,11 +152,21 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
     })),
   setStart: start =>
     set(state => {
-      const nextFormState = {...state.formState, start};
+      if (start.isNothing) {
+        return {
+          formState: {...state.formState, start},
+          errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined},
+        };
+      }
 
-      if (start.isJust && state.formState.end.isJust) {
-        nextFormState.end = maybe.just(clampMeetingEndDateTime(start.value, state.formState.end.value));
-      } else if (start.isJust) {
+      const nextFormState = {...state.formState};
+
+      if (state.formState.end.isJust && state.formState.start.isJust) {
+        const resolved = resolveStartChange(state.formState.start.value, state.formState.end.value, start.value);
+        nextFormState.start = maybe.just(resolved.start);
+        nextFormState.end = maybe.just(resolved.end);
+      } else {
+        nextFormState.start = start;
         nextFormState.end = maybe.just(getDefaultMeetingEndDateTime(start.value));
       }
 
@@ -166,14 +177,28 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
     }),
   setEnd: end =>
     set(state => {
-      const nextEnd =
-        end.isJust && state.formState.start.isJust
-          ? maybe.just(clampMeetingEndDateTime(state.formState.start.value, end.value))
-          : end;
+      if (end.isNothing) {
+        return {
+          formState: {...state.formState, end},
+          errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined},
+        };
+      }
+
+      const nextFormState = {...state.formState};
+
+      if (state.formState.start.isJust) {
+        const previousStart = state.formState.start.value;
+        const previousEnd = state.formState.end.unwrapOr(getDefaultMeetingEndDateTime(previousStart));
+        const resolved = resolveEndChange(previousStart, previousEnd, end.value);
+        nextFormState.start = maybe.just(resolved.start);
+        nextFormState.end = maybe.just(resolved.end);
+      } else {
+        nextFormState.end = end;
+      }
 
       return {
-        formState: {...state.formState, end: nextEnd},
-        errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined},
+        formState: nextFormState,
+        errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined, startInPast: undefined},
       };
     }),
   setRecurrence: recurrence => set(state => ({formState: {...state.formState, recurrence}})),
