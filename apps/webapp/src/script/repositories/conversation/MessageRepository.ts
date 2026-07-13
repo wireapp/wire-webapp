@@ -45,6 +45,7 @@ import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/textCon
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
@@ -162,7 +163,7 @@ type SendAndInjectMessageOptions = MessageSendingOptions & {
 
 type MessageSendingEventHandling = {
   readonly prepareForInjectedMessageEvent: (messageId: string) => void;
-  readonly waitForInjectedMessageEvent: (messageId: string) => Promise<StoredMessage | undefined>;
+  readonly waitForInjectedMessageEvent: (messageId: string) => Promise<Maybe<StoredMessage>>;
   readonly cancelInjectedMessageEventWait: (messageId: string) => void;
 };
 
@@ -959,7 +960,7 @@ export class MessageRepository {
     return this.sendAndInjectMessageUsingFlow(message, conversation, options, {
       prepareForInjectedMessageEvent() {},
       async waitForInjectedMessageEvent() {
-        return undefined;
+        return Maybe.nothing<StoredMessage>();
       },
       cancelInjectedMessageEventWait() {},
     });
@@ -978,10 +979,10 @@ export class MessageRepository {
       },
       waitForInjectedMessageEvent: async messageId => {
         const messageEntity = await conversationRepository.waitForInjectedMessageEvent(messageId);
-        if (is.undefined(messageEntity) || is.undefined(messageEntity.primary_key)) {
+        if (messageEntity.isNothing || is.undefined(messageEntity.value.primary_key)) {
           throw new Error(`Injected message '${messageId}' did not produce a stored message entity`);
         }
-        return messageEntity as StoredMessage;
+        return Maybe.just(messageEntity.value as StoredMessage);
       },
       cancelInjectedMessageEventWait: messageId => {
         conversationRepository.cancelInjectedMessageEventWait(messageId);
@@ -1007,7 +1008,7 @@ export class MessageRepository {
   ): Promise<SendAndInjectResult> {
     const messageTimer = conversation.messageTimer();
     const payload = enableEphemeral && messageTimer ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
-    let optimisticMessageEntity: StoredMessage | undefined;
+    let optimisticMessageEntity: Maybe<StoredMessage> = Maybe.nothing();
 
     const injectOptimisticEvent = async () => {
       if (!skipInjection) {
@@ -1503,11 +1504,12 @@ export class MessageRepository {
     eventId: string,
     isoDate?: string,
     failedToSend?: SendResult['failedToSend'],
-    messageEntityFromOptimisticEvent?: StoredMessage,
+    messageEntityFromOptimisticEvent: Maybe<StoredMessage> = Maybe.nothing(),
   ) {
     try {
-      const messageEntity =
-        messageEntityFromOptimisticEvent ?? (await this.getMessageInConversationById(conversationEntity, eventId));
+      const messageEntity = messageEntityFromOptimisticEvent.isJust
+        ? messageEntityFromOptimisticEvent.value
+        : await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
       const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData'> = {

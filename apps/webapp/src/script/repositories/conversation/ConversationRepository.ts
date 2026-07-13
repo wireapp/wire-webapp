@@ -58,7 +58,7 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import pDefer, {type DeferredPromise} from 'p-defer';
-import {Task, task} from 'true-myth';
+import {Maybe, Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
 
@@ -209,7 +209,7 @@ export class ConversationRepository {
   public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
   private mlsConversationVerificationStateHandler?: MLSConversationVerificationStateHandler;
   private initiatingMlsConversationQualifiedIds: QualifiedId[] = [];
-  private readonly injectedMessageEventWaiters = new Map<string, DeferredPromise<Message | undefined>>();
+  private readonly injectedMessageEventWaiters = new Map<string, DeferredPromise<Maybe<Message>>>();
 
   static get CONFIG() {
     return {
@@ -396,10 +396,10 @@ export class ConversationRepository {
       throw new Error(`A completion waiter already exists for injected message '${messageId}'`);
     }
 
-    this.injectedMessageEventWaiters.set(messageId, pDefer<Message | undefined>());
+    this.injectedMessageEventWaiters.set(messageId, pDefer<Maybe<Message>>());
   }
 
-  public async waitForInjectedMessageEvent(messageId: string): Promise<Message | undefined> {
+  public async waitForInjectedMessageEvent(messageId: string): Promise<Maybe<Message>> {
     const messageEventWaiter = this.injectedMessageEventWaiters.get(messageId);
     if (is.undefined(messageEventWaiter)) {
       throw new Error(`No completion waiter exists for injected message '${messageId}'`);
@@ -421,7 +421,7 @@ export class ConversationRepository {
     }
 
     this.injectedMessageEventWaiters.delete(messageId);
-    messageEventWaiter.resolve(undefined);
+    messageEventWaiter.resolve(Maybe.nothing());
   }
 
   private initSubscriptions(): void {
@@ -3628,7 +3628,7 @@ export class ConversationRepository {
         if (is.undefined(messageEntity)) {
           throw new Error(`Injected message '${eventId}' did not produce a message entity`);
         }
-        messageEventWaiter.resolve(messageEntity);
+        messageEventWaiter.resolve(Maybe.just(messageEntity));
       }
 
       return handledConversationEvent;
