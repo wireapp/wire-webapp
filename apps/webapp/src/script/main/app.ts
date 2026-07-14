@@ -100,6 +100,7 @@ import {getLogger, Logger} from 'Util/logger';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
+import {refreshApplication} from './applicationRefresh';
 import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
@@ -924,14 +925,18 @@ export class App {
    * Refresh the web app or desktop wrapper
    */
   readonly refresh = (): void => {
-    if (Runtime.isDesktopApp()) {
-      // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
-      amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
-      return;
-    }
-
-    window.location.reload();
-    window.focus();
+    refreshApplication({
+      isDesktopApplication: Runtime.isDesktopApp,
+      publishLifecycleEvent: lifecycleEventName => {
+        amplify.publish(lifecycleEventName);
+      },
+      reloadWindowLocation: () => {
+        window.location.reload();
+      },
+      focusWindow: () => {
+        window.focus();
+      },
+    });
   };
 
   /**
