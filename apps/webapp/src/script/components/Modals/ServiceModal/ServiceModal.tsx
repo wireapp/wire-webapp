@@ -91,7 +91,7 @@ const ServiceModal = ({
               onClick={onOpenService}
               data-uie-name="do-service-confirm"
             >
-              {translate('searchAppConfirmButton')}
+              {translate('searchAppsConfirmButton')}
             </button>
           </div>
         </>

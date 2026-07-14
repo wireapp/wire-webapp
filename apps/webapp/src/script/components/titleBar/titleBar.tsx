@@ -420,18 +420,18 @@ export const TitleBar = ({
 type BadgeKeys =
   | 'External'
   | 'ExternalAndGuest'
-  | 'ExternalAndGuestAndService'
-  | 'ExternalAndService'
+  | 'ExternalAndGuestAndApps'
+  | 'ExternalAndApps'
   | 'Federated'
   | 'FederatedAndExternal'
   | 'FederatedAndExternalAndGuest'
-  | 'FederatedAndExternalAndGuestAndService'
-  | 'FederatedAndExternalAndService'
+  | 'FederatedAndExternalAndGuestAndApps'
+  | 'FederatedAndExternalAndApps'
   | 'FederatedAndGuest'
-  | 'FederatedAndGuestAndService'
-  | 'FederatedAndService'
-  | 'GuestAndService'
-  | 'Service';
+  | 'FederatedAndGuestAndApps'
+  | 'FederatedAndApps'
+  | 'GuestAndApps'
+  | 'Apps';
 
 type WarningBadgeKey = '' | 'guestRoomConversationBadge' | `${'guestRoomConversationBadge'}${BadgeKeys}`;
 
@@ -461,7 +461,7 @@ export function generateWarningBadgeKey({
     extras.push('Guest');
   }
   if (hasService === true) {
-    extras.push('Service');
+    extras.push('Apps');
   }
   if (extras.length === 0) {
     return '';
