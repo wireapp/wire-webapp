@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import type {Conversation as BackendConversation} from '@wireapp/api-client/lib/conversation';
 import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -130,7 +131,7 @@ export const updateMeeting = (
         updatedMeeting.conversation,
         meetingSubmitErrors.updateFailed,
       ).andThen(() => {
-        if (usersToAdd.length === 0 && userIdsToRemove.length === 0) {
+        if (is.emptyArray(usersToAdd) && is.emptyArray(userIdsToRemove)) {
           return task.resolve({failedToAdd: []});
         }
 
