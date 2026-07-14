@@ -127,7 +127,7 @@ export const MemberMessage = ({
 
       {hasUsers && message.showServicesWarning && (
         <p className="message-services-warning" data-uie-name="label-services-warning">
-          {translate('conversationServicesWarning')}
+          {translate('conversationAppsWarning')}
         </p>
       )}
 

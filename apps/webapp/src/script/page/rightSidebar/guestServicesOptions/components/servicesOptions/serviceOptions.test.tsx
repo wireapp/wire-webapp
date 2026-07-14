@@ -126,10 +126,10 @@ describe('serviceOptions', () => {
 
       // Assert
       if (expectedToggleToBeVisible) {
-        expect(container).not.toHaveTextContent('servicesNotEnabledNoteTitle');
+        expect(container).not.toHaveTextContent('appsNotEnabledNoteTitle');
         expect(queryByRole(container, 'checkbox')).toBeInTheDocument();
       } else {
-        expect(container).toHaveTextContent('servicesNotEnabledNoteTitle');
+        expect(container).toHaveTextContent('appsNotEnabledNoteTitle');
         expect(queryByRole(container, 'checkbox')).not.toBeInTheDocument();
       }
     },

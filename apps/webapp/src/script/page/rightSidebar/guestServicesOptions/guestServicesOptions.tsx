@@ -92,13 +92,13 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
           preventClose: true,
           primaryAction: {
             action: changeAccessState,
-            text: translate('modalConversationRemoveGuestsOrServicesAction'),
+            text: translate('modalConversationRemoveGuestsOrAppsAction'),
           },
           text: {
             message,
             title: isGuest
               ? translate('modalConversationRemoveGuestsHeadline')
-              : translate('modalConversationRemoveServicesHeadline'),
+              : translate('modalConversationRemoveAppsHeadline'),
           },
         },
         undefined,
@@ -113,7 +113,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         onGoBack={onBack}
         goBackUie={isGuest ? 'go-back-guest-options' : 'go-back-services-options'}
         onClose={onClose}
-        title={isGuest ? translate('guestOptionsTitle') : translate('servicesOptionsTitle')}
+        title={isGuest ? translate('guestOptionsTitle') : translate('appsOptionsTitle')}
       />
 
       <FadingScrollbar className="panel__content">
