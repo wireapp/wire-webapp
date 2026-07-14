@@ -36,8 +36,9 @@ env:
   ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
   BETA_ARTIFACT_NAME_PREFIX: release-cloud-ebs
   BETA_BACKEND_URL: https://staging-nginz-https.zinfra.io/
-  # ADR 0002 calls this target Beta. During the transition, Beta maps to the
-  # existing wire-webapp-staging Elastic Beanstalk environment and URL.
+  # ADR 0002 calls this logical release stage Beta. Beta deploys to the existing
+  # wire-webapp-staging GitHub and Elastic Beanstalk environment, while its
+  # canonical company-facing URL is https://wire-webapp-beta.wire.com/.
   BETA_ENVIRONMENT_NAME: wire-webapp-staging
   BETA_WEBAPP_URL: https://wire-webapp-beta.wire.com/
   PRODUCTION_ENVIRONMENT_NAME: wire-webapp-prod
