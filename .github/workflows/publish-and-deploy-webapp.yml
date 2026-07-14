@@ -7,8 +7,8 @@ on:
     tags:
       - '*q1-2024*'
       - '*q2-2025*'
-      - '*staging*'
-      - '*production*'
+      - '*-staging.*'
+      - '*-production.*'
 
 concurrency:
   group: publish-${{ github.ref }}
@@ -17,6 +17,10 @@ concurrency:
 jobs:
   build:
     name: Build Docker image and Helm Chart
+    # ADR Production tags end in -production after the new workflow has already
+    # deployed the Beta-tested artifact. Keep legacy *-production.N tags working
+    # temporarily, but never rebuild and redeploy for ADR Production tags.
+    if: ${{ !(github.ref_type == 'tag' && endsWith(github.ref_name, '-production')) }}
     runs-on: ubuntu-24.04
 
     outputs:
