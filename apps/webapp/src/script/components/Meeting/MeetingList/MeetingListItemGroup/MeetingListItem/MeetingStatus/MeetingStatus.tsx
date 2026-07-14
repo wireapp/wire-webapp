@@ -19,8 +19,6 @@
 
 import {memo, useMemo} from 'react';
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
 
 import {
@@ -30,31 +28,29 @@ import {
   participatingStatusIconStyles,
   participatingStatusStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/meetingStatus.styles';
-import {useJoinMeetingCall} from 'Components/Meeting/useJoinMeetingCall';
 import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export type UseJoinMeetingCallResult = ReturnType<typeof useJoinMeetingCall>;
-
 export interface MeetingStatusProps {
-  qualifiedConversation: QualifiedId;
   start_date: string;
   end_date: string;
-  attending?: boolean;
   nowMilliseconds: number;
-  useJoinMeetingCallHook?: (qualifiedConversationId: QualifiedId) => UseJoinMeetingCallResult;
+  joinMeeting: () => void;
+  isJoinDisabled: boolean;
+  isCallActive: boolean;
+  attending?: boolean;
 }
 
 const MeetingStatusComponent = ({
-  qualifiedConversation,
   start_date,
   end_date,
   attending,
   nowMilliseconds,
-  useJoinMeetingCallHook = useJoinMeetingCall,
+  joinMeeting,
+  isJoinDisabled,
+  isCallActive,
 }: MeetingStatusProps) => {
   const {translate} = useApplicationContext();
-  const {joinMeeting, isJoinDisabled, isCallActive} = useJoinMeetingCallHook(qualifiedConversation);
   const isAttending = attending ?? isCallActive;
 
   const meetingStatus = useMemo(

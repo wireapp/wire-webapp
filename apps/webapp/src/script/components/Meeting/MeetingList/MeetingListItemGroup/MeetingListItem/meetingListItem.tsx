@@ -54,7 +54,7 @@ const MeetingListItemComponent = ({
   const {title, recurrence} = meetingSeries;
   const {translate, wallClock} = useApplicationContext();
   const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
-  const {isCallActive} = useJoinMeetingCall(meetingSeries.qualified_conversation);
+  const {joinMeeting, isJoinDisabled, isCallActive} = useJoinMeetingCall(meetingSeries.qualified_conversation);
 
   const startDateIso = start.toISOString();
   const endDateIso = end.toISOString();
@@ -112,10 +112,12 @@ const MeetingListItemComponent = ({
       <div css={rightStyles}>
         <MeetingParticipants qualifiedConversation={meetingSeries.qualified_conversation} isOngoing={isOngoing} />
         <MeetingStatus
-          qualifiedConversation={meetingSeries.qualified_conversation}
           start_date={startDateIso}
           end_date={endDateIso}
           nowMilliseconds={nowMilliseconds}
+          joinMeeting={joinMeeting}
+          isJoinDisabled={isJoinDisabled}
+          isCallActive={isCallActive}
         />
         <MeetingAction meetingInstance={meetingInstance} />
       </div>

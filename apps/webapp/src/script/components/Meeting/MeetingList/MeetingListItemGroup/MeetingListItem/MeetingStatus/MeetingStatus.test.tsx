@@ -40,22 +40,16 @@ const ongoingWallClock = createDeterministicWallClock({
 const meetingStartIso = new Date(ongoingWallClock.currentTimestampInMilliseconds - THIRTY_MINUTES_MS).toISOString();
 const meetingEndIso = new Date(ongoingWallClock.currentTimestampInMilliseconds + THIRTY_MINUTES_MS).toISOString();
 
-const qualifiedConversation = {domain: 'example.com', id: 'meeting-conversation-id'};
-
 const createTestProps = (): MeetingStatusProps & {joinMeeting: jest.Mock} => {
   const joinMeeting = jest.fn();
 
   return {
-    qualifiedConversation,
     start_date: meetingStartIso,
     end_date: meetingEndIso,
     nowMilliseconds: ongoingWallClock.currentTimestampInMilliseconds,
-    useJoinMeetingCallHook: () => ({
-      joinMeeting,
-      isJoinDisabled: false,
-      isCallActive: false,
-    }),
     joinMeeting,
+    isJoinDisabled: false,
+    isCallActive: false,
   };
 };
 
@@ -66,7 +60,7 @@ describe('MeetingStatus', () => {
   it('calls joinMeeting when the Join button is clicked on an ongoing meeting', () => {
     const {joinMeeting, ...props} = createTestProps();
 
-    render(withThemeAndRootContext(<MeetingStatus {...props} />, rootProviderWrapper));
+    render(withThemeAndRootContext(<MeetingStatus {...props} joinMeeting={joinMeeting} />, rootProviderWrapper));
 
     fireEvent.click(screen.getByRole('button', {name: translateForTest('callJoin')}));
 
@@ -78,15 +72,7 @@ describe('MeetingStatus', () => {
 
     render(
       withThemeAndRootContext(
-        <MeetingStatus
-          {...props}
-          attending
-          useJoinMeetingCallHook={() => ({
-            joinMeeting: jest.fn(),
-            isJoinDisabled: true,
-            isCallActive: true,
-          })}
-        />,
+        <MeetingStatus {...props} joinMeeting={jest.fn()} isJoinDisabled isCallActive />,
         rootProviderWrapper,
       ),
     );
