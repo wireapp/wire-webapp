@@ -604,7 +604,7 @@ export class Conversation {
           return this.name();
         }
 
-        const hasUserEntities = !!this.participating_user_ets().length;
+        const hasUserEntities = is.nonEmptyArray(this.participating_user_ets());
         if (hasUserEntities) {
           const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
           const joinedNames = this.participating_user_ets()
