@@ -33,7 +33,7 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|uuid|noop-esm)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|uuid|noop-esm|p-queue|p-timeout|eventemitter3)/)'],
   coverageDirectory: '../../coverage/libraries/core',
   coverageThreshold: {
     global: {

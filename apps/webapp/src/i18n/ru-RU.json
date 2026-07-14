@@ -2134,7 +2134,7 @@
   "videoCallBackgroundBlurHigh": "Высокий",
   "videoCallBackgroundBlurLow": "Низкий",
   "videoCallBackgroundBlurSectionLabel": "Размытие",
-  "videoCallBackgroundCustom": "Custom Background",
+  "videoCallBackgroundCustom": "Пользовательский фон",
   "videoCallBackgroundEffectsLabel": "Настройки фона",
   "videoCallBackgroundEnableEnhancedQuality": "Повышенное качество",
   "videoCallBackgroundEnableEnhancedQualityHint": "Улучшает четкость контуров, но может повлиять на производительность вашего устройства.",

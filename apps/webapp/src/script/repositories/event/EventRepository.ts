@@ -24,13 +24,14 @@ import {
   ConversationMLSMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
 import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
+import {sequentialQueueOptions} from '@wireapp/core/lib/queue/sequentialQueueOptions';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import PromiseQueue from 'p-queue';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
-import {PromiseQueue} from '@wireapp/promise-queue';
+import {Runtime, StringUtil} from '@wireapp/commons';
+import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
@@ -58,6 +59,13 @@ import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 
+type WebSocketConnectTrigger =
+  'initial' | 'online' | 'focus' | 'visibility' | 'heartbeat-closed' | 'heartbeat-unhealthy';
+
+function getNotificationHandlingStateName(notificationHandlingState: NOTIFICATION_HANDLING_STATE): string {
+  return notificationHandlingState.split('.').at(-1) ?? notificationHandlingState;
+}
+
 export class EventRepository {
   logger: Logger;
   notificationHandlingState = ko.observable(NOTIFICATION_HANDLING_STATE.STREAM);
@@ -66,7 +74,7 @@ export class EventRepository {
   /** event processors are classes that are able to react and process an incoming event */
   private eventProcessors: EventProcessor[] = [];
 
-  private eventQueue: PromiseQueue = new PromiseQueue();
+  private eventQueue: PromiseQueue = new PromiseQueue({autoStart: true, ...sequentialQueueOptions});
 
   static get CONFIG() {
     return {
@@ -168,7 +176,7 @@ export class EventRepository {
    * Processing events should happen sequentially (thus the queue)
    */
   private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
-    return this.eventQueue.push(async () => {
+    return this.eventQueue.add(async () => {
       try {
         await this.handleEvent(payload, source);
       } catch (error: unknown) {
@@ -214,29 +222,58 @@ export class EventRepository {
     let connectionInProgress = false;
     let healthCheckInProgress = false;
     let currentConnectionState: ConnectionState | undefined;
+    let connectCycleId = 0;
 
-    const connect = async () => {
+    const getBrowserConnectionContext = (): string => {
+      return `connectCycleId=${connectCycleId} connectionInProgress=${connectionInProgress} notificationState=${getNotificationHandlingStateName(this.notificationHandlingState())} navigatorOnline=${navigator.onLine} visibility=${document.visibilityState} focused=${document.hasFocus()}`;
+    };
+
+    const connect = async (trigger: WebSocketConnectTrigger) => {
       if (connectionInProgress) {
-        this.logger.info('Connection attempt already in progress, skipping...');
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=connect-skip trigger=${trigger} ${getBrowserConnectionContext()} reason=connection-in-progress`,
+        );
         return;
       }
 
+      connectCycleId += 1;
+      const currentConnectCycleId = connectCycleId;
+      this.logger.info(
+        `[WebSocketLifecycle] layer=event-repository event=connect-start trigger=${trigger} connectCycleId=${currentConnectCycleId} ${getBrowserConnectionContext()}`,
+      );
       connectionInProgress = true;
       actualDisconnect();
       try {
         actualDisconnect = await account.listen({
           useLegacy,
-          onConnectionStateChanged: connectionState => {
+          onConnectionStateChanged: (
+            connectionState: ConnectionState,
+            connectionContext: WebSocketConnectionContext | undefined,
+          ) => {
             currentConnectionState = connectionState;
             this.updateConnectivityStatus(connectionState);
+            const lifecycleConnectionContext =
+              connectionContext === undefined
+                ? ''
+                : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
+            this.logger.info(
+              `[WebSocketLifecycle] layer=event-repository event=connection-state-change connectCycleId=${currentConnectCycleId} state=${connectionState.toUpperCase()}${lifecycleConnectionContext}`,
+            );
           },
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
           onNotificationStreamProgress: onNotificationStreamProgress,
           dryRun,
         });
-      } catch {
+        this.logger.info(
+          `[WebSocketLifecycle] layer=event-repository event=connect-setup-success trigger=${trigger} connectCycleId=${currentConnectCycleId}`,
+        );
+      } catch (error: unknown) {
+        const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
         actualDisconnect = () => {};
+        this.logger.warn(
+          `[WebSocketLifecycle] layer=event-repository event=connect-failure trigger=${trigger} connectCycleId=${currentConnectCycleId} errorName=${errorName} errorMessage=${errorMessage}`,
+        );
       } finally {
         connectionInProgress = false;
       }
@@ -248,16 +285,21 @@ export class EventRepository {
       }
 
       this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      void connect();
+      void connect('online');
     };
 
-    const verifyConnectionHealthAndReconnect = async (reason: 'Focus' | 'Visibility' | 'Heartbeat') => {
+    const verifyConnectionHealthAndReconnect = async (trigger: 'focus' | 'visibility' | 'heartbeat') => {
       if (!navigator.onLine) {
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=offline ${getBrowserConnectionContext()}`,
+        );
         return;
       }
 
       if (connectionInProgress) {
-        this.logger.info(`${reason}: Reconnection already in progress, skipping health verification...`);
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=connection-in-progress ${getBrowserConnectionContext()}`,
+        );
         return;
       }
 
@@ -265,33 +307,53 @@ export class EventRepository {
         currentConnectionState === ConnectionState.CONNECTING ||
         currentConnectionState === ConnectionState.PROCESSING_NOTIFICATIONS;
       if (isTransitioningConnectionState) {
-        this.logger.info(`${reason}: Connection is transitioning, skipping health verification...`);
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=connection-transitioning connectionState=${currentConnectionState?.toUpperCase() ?? 'UNKNOWN'} ${getBrowserConnectionContext()}`,
+        );
         return;
       }
 
       if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.CLOSED) {
-        this.logger.info(`${reason}: Connection is closed and app is online, attempting reconnection...`);
-        await connect();
+        this.logger.info(
+          `[WebSocketLifecycle] layer=event-repository event=reconnect-requested trigger=${trigger === 'heartbeat' ? 'heartbeat-closed' : trigger} connectCycleId=${connectCycleId + 1}`,
+        );
+        await connect(`${trigger === 'heartbeat' ? 'heartbeat-closed' : trigger}`);
         return;
       }
 
       if (healthCheckInProgress) {
-        this.logger.info(`${reason}: Connection health check already in progress, skipping...`);
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=health-check-in-progress ${getBrowserConnectionContext()}`,
+        );
         return;
       }
 
       healthCheckInProgress = true;
       try {
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=health-check-start trigger=${trigger} connectCycleId=${connectCycleId}`,
+        );
         let isHealthy: boolean;
         try {
           isHealthy = await account.isWebsocketHealthy();
         } catch {
-          this.logger.warn(`${reason}: Failed to verify WebSocket health, reconnecting...`);
           isHealthy = false;
         }
+        if (isHealthy) {
+          this.logger.debug(
+            `[WebSocketLifecycle] layer=event-repository event=health-check-result trigger=${trigger} connectCycleId=${connectCycleId} healthy=true`,
+          );
+        } else {
+          this.logger.warn(
+            `[WebSocketLifecycle] layer=event-repository event=health-check-result trigger=${trigger} connectCycleId=${connectCycleId} healthy=false`,
+          );
+        }
         if (!isHealthy) {
-          this.logger.warn(`${reason}: WebSocket appears unhealthy, reconnecting...`);
-          await connect();
+          const reconnectTrigger: WebSocketConnectTrigger = trigger === 'heartbeat' ? 'heartbeat-unhealthy' : trigger;
+          this.logger.info(
+            `[WebSocketLifecycle] layer=event-repository event=reconnect-requested trigger=${reconnectTrigger} connectCycleId=${connectCycleId + 1}`,
+          );
+          await connect(reconnectTrigger);
         }
       } finally {
         healthCheckInProgress = false;
@@ -309,7 +371,7 @@ export class EventRepository {
       const handleFocus = () => {
         if (navigator.onLine) {
           this.logger.info('Window focused, verifying connection...');
-          void verifyConnectionHealthAndReconnect('Focus');
+          void verifyConnectionHealthAndReconnect('focus');
         }
       };
 
@@ -320,7 +382,7 @@ export class EventRepository {
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible' && navigator.onLine) {
           this.logger.info('Tab became visible, verifying connection...');
-          void verifyConnectionHealthAndReconnect('Visibility');
+          void verifyConnectionHealthAndReconnect('visibility');
         }
       };
 
@@ -342,7 +404,7 @@ export class EventRepository {
     // Heartbeat intentionally verifies connection health while online, even when the
     // connection is not CLOSED, to detect stale "open-but-unhealthy" websocket states.
     const heartbeatInterval = window.setInterval(() => {
-      void verifyConnectionHealthAndReconnect('Heartbeat');
+      void verifyConnectionHealthAndReconnect('heartbeat');
     }, EventRepository.CONFIG.HEARTBEAT_INTERVAL);
 
     cleanupHandlers.push(() => {
@@ -350,7 +412,7 @@ export class EventRepository {
     });
 
     // Connect first to get the actual disconnect function
-    await connect();
+    await connect('initial');
 
     // Then override disconnect to include cleanup
     this.disconnectWebSocket = () => {

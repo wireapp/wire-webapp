@@ -18,60 +18,33 @@
  */
 
 import type {Page, Locator} from '@playwright/test';
-import is from '@sindresorhus/is';
-
 import type {User} from 'test/e2e_tests/data/user';
 
 export class LoginPage {
-  private readonly page: Page;
-
   readonly signInButton: Locator;
   readonly emailInput: Locator;
   readonly passwordInput: Locator;
   readonly loginErrorText: Locator;
   readonly publicComputerCheckbox: Locator;
   readonly header: Locator;
-  readonly entropyCanvas: Locator;
-  readonly entropyConfirmButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
     this.signInButton = page.locator('[data-uie-name="do-sign-in"]');
     this.emailInput = page.locator('[data-uie-name="enter-email"]');
     this.passwordInput = page.locator('[data-uie-name="enter-password"]');
     this.loginErrorText = page.locator('[data-uie-name="error-message"]');
     this.publicComputerCheckbox = page.getByText('This is a public computer');
     this.header = page.getByRole('heading');
-    this.entropyCanvas = page.locator('[data-uie-name="element-entropy-canvas"]');
-    this.entropyConfirmButton = page.locator('[data-uie-name="do-entropy-confirm"]');
   }
 
-  async login(user: Pick<User, 'email' | 'password'>, options?: {publicComputer?: boolean}): Promise<void> {
+  async login(user: Pick<User, 'email' | 'password'>, options?: {publicComputer?: boolean}) {
     await this.emailInput.fill(user.email);
     await this.passwordInput.fill(user.password);
 
-    if (options?.publicComputer === true) {
+    if (options?.publicComputer) {
       await this.publicComputerCheckbox.click();
     }
 
     await this.signInButton.click();
-  }
-
-  async completeEntropyCollection(): Promise<void> {
-    const boundingBox = await this.entropyCanvas.boundingBox();
-
-    if (is.nullOrUndefined(boundingBox)) {
-      throw new Error('Entropy canvas is visible but has no bounding box');
-    }
-
-    for (let index = 0; index < 1_500; index += 1) {
-      const x = boundingBox.x + 8 + ((index * 37) % Math.max(1, boundingBox.width - 16));
-      const y = boundingBox.y + 8 + ((index * 53) % Math.max(1, boundingBox.height - 16));
-
-      await this.page.mouse.move(x, y);
-    }
-
-    await this.entropyConfirmButton.waitFor({state: 'visible', timeout: 5_000});
-    await this.entropyConfirmButton.click();
   }
 }

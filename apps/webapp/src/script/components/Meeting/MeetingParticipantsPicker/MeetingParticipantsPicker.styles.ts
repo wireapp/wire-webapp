@@ -116,12 +116,14 @@ export const searchInputStyles: CSSObject = {
   },
 };
 
-export const chevronIconStyles: CSSObject = {
+export const chevronIconStyles = (isOpen: boolean): CSSObject => ({
   flexShrink: 0,
-  height: '12px',
+  height: '16px',
+  marginTop: isOpen ? 2 : 4,
+  transform: isOpen ? 'rotateX(180deg)' : undefined,
   transition: 'transform 0.15s ease',
-  width: '12px',
-};
+  width: '16px',
+});
 
 export const chevronButtonStyles: CSSObject = {
   alignItems: 'center',
@@ -161,9 +163,29 @@ export const dialogStyles: CSSObject = {
   outline: 'none',
 };
 
+const sectionHeaderBorderStyles: CSSObject = {
+  borderBottom: '1px solid var(--gray-40)',
+  'body.theme-dark &': {
+    borderBottomColor: 'var(--gray-90)',
+  },
+};
+
 export const listContainerStyles: CSSObject = {
   flex: 1,
   overflowY: 'auto',
+
+  '[data-uie-name="do-toggle-selected-search-list"]': sectionHeaderBorderStyles,
+
+  '[data-uie-name="do-toggle-search-list"]': {
+    ...sectionHeaderBorderStyles,
+  },
+
+  '[data-uie-name="do-toggle-selected-search-list"] ~ [data-uie-name="do-toggle-search-list"]': {
+    borderTop: '1px solid var(--gray-40)',
+    'body.theme-dark &': {
+      borderTopColor: 'var(--gray-90)',
+    },
+  },
 };
 
 export const emptyStateStyles: CSSObject = {

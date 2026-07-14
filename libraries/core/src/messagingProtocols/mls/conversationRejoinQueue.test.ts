@@ -17,25 +17,84 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {queueConversationRejoin} from './conversationRejoinQueue';
 
+type DeferredPromise<T> = {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+};
+
+function createDeferredPromise<T>(): DeferredPromise<T> {
+  let resolvePromise: ((value: T) => void) | undefined;
+  const promise = new Promise<T>(resolve => {
+    resolvePromise = resolve;
+  });
+
+  if (is.undefined(resolvePromise)) {
+    throw new Error('Deferred promise resolver was not created');
+  }
+
+  return {promise, resolve: resolvePromise};
+}
+
 describe('queueConversationRejoin', () => {
-  it('should queue conversation rejoin', async () => {
-    const rejoinFn = jest.fn(() => Promise.resolve());
-    await queueConversationRejoin('groupId', rejoinFn);
-    expect(rejoinFn).toHaveBeenCalled();
-  });
+  it('suppresses a second rejoin while the first task is pending', async () => {
+    const taskStarted = createDeferredPromise<void>();
+    const completeRejoin = createDeferredPromise<void>();
+    const rejoinFn = jest.fn(() => {
+      taskStarted.resolve(undefined);
+      return completeRejoin.promise;
+    });
 
-  it('should not queue conversation rejoin if already in queue', async () => {
-    const rejoinFn = jest.fn(() => Promise.resolve());
-    await Promise.all([1, 2, 3].map(() => queueConversationRejoin('groupId', rejoinFn)));
+    const firstRejoinResult = queueConversationRejoin('groupId', rejoinFn);
+    await taskStarted.promise;
+    const secondRejoinResult = await queueConversationRejoin('groupId', rejoinFn);
+
+    expect(secondRejoinResult).toBeUndefined();
     expect(rejoinFn).toHaveBeenCalledTimes(1);
+
+    completeRejoin.resolve(undefined);
+    await firstRejoinResult;
   });
 
-  it('should run the function a second time if the task has been executed', async () => {
-    const rejoinFn = jest.fn(() => Promise.resolve());
+  it('queues a new rejoin after the previous task resolves', async () => {
+    const rejoinFn = jest.fn(() => {
+      return Promise.resolve();
+    });
+
     await queueConversationRejoin('groupId', rejoinFn);
     await queueConversationRejoin('groupId', rejoinFn);
+
     expect(rejoinFn).toHaveBeenCalledTimes(2);
+  });
+
+  it('queues a new rejoin after the previous task rejects', async () => {
+    const rejectedRejoinError = new Error('Rejoin failed');
+    let rejoinAttemptCount = 0;
+    const rejoinFn = jest.fn(() => {
+      rejoinAttemptCount += 1;
+
+      if (rejoinAttemptCount === 1) {
+        return Promise.reject(rejectedRejoinError);
+      }
+
+      return Promise.resolve();
+    });
+
+    await expect(queueConversationRejoin('groupId', rejoinFn)).rejects.toBe(rejectedRejoinError);
+    await queueConversationRejoin('groupId', rejoinFn);
+
+    expect(rejoinFn).toHaveBeenCalledTimes(2);
+  });
+
+  it('propagates the original rejoin rejection', async () => {
+    const expectedError = new Error('Rejoin failed');
+    const rejoinFn = jest.fn(() => {
+      return Promise.reject(expectedError);
+    });
+
+    await expect(queueConversationRejoin('groupId', rejoinFn)).rejects.toBe(expectedError);
   });
 });

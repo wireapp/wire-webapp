@@ -21,7 +21,7 @@ import {useEffect} from 'react';
 
 import {create} from 'zustand';
 
-type ActiveWindowState = {
+export type ActiveWindowState = {
   activeWindow: Window;
   setActiveWindow: (newWindow: Window) => void;
 };

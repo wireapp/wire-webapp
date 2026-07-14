@@ -31,8 +31,10 @@ export const collapseButton: CSSObject = {
 };
 
 export const collapseIcon = (isOpen: boolean): CSSObject => ({
-  marginRight: '30px',
-  transform: isOpen ? 'rotate(90deg)' : undefined,
+  display: 'flex',
+  flexShrink: 0,
+  marginRight: '8px',
+  transform: isOpen ? undefined : 'rotate(-90deg)',
 
   '> svg': {
     fill: 'var(--main-color)',

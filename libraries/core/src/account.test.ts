@@ -147,6 +147,8 @@ describe('Account', () => {
 
     nock(MOCK_BACKEND.rest).post(AuthAPI.URL.ACCESS).reply(HTTP_STATUS.OK, accessTokenData);
 
+    nock(MOCK_BACKEND.rest).get(AuthAPI.URL.COOKIES).reply(HTTP_STATUS.OK, undefined);
+
     nock(MOCK_BACKEND.rest).post(ClientAPI.URL.CLIENTS).reply(HTTP_STATUS.OK, {id: CLIENT_ID});
 
     nock(MOCK_BACKEND.rest)
@@ -172,6 +174,8 @@ describe('Account', () => {
         development: [MINIMUM_API_VERSION + 1],
         domain: 'zinfra.io',
       });
+
+    nock(MOCK_BACKEND.rest).get(`/v${MINIMUM_API_VERSION}${AuthAPI.URL.COOKIES}`).reply(HTTP_STATUS.OK, {}).persist();
 
     nock(MOCK_BACKEND.rest)
       .get(NotificationAPI.URL.NOTIFICATION)
@@ -342,6 +346,7 @@ describe('Account', () => {
       jest
         .spyOn(dependencies.apiClient.transport.ws, 'buildWebSocketUrl')
         .mockResolvedValue(websocketServerAddress as never);
+      jest.spyOn(dependencies.apiClient.transport.http, 'sendRequest').mockResolvedValue({} as never);
       jest.spyOn(dependencies.account, 'getNotificationEventTime').mockReturnValue('2025-10-01T00:00:00Z');
     });
 
@@ -406,7 +411,11 @@ describe('Account', () => {
                 // Expect all states to have been called in order
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(1, ConnectionState.PROCESSING_NOTIFICATIONS);
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(2, ConnectionState.CONNECTING);
-                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(3, ConnectionState.LIVE);
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(
+                  3,
+                  ConnectionState.LIVE,
+                  expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+                );
                 resolve();
                 break;
             }
@@ -417,7 +426,12 @@ describe('Account', () => {
             onConnectionStateChanged,
           });
 
-          await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE));
+          await waitFor(() =>
+            expect(onConnectionStateChanged).toHaveBeenCalledWith(
+              ConnectionState.LIVE,
+              expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+            ),
+          );
 
           disconnect();
         });
@@ -538,10 +552,20 @@ describe('Account', () => {
           onConnectionStateChanged,
         });
 
-        await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.CLOSED));
+        await waitFor(() =>
+          expect(onConnectionStateChanged).toHaveBeenCalledWith(
+            ConnectionState.CLOSED,
+            expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+          ),
+        );
 
-        expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.PROCESSING_NOTIFICATIONS);
-        expect(onConnectionStateChanged).not.toHaveBeenCalledWith(ConnectionState.LIVE);
+        expect(onConnectionStateChanged).toHaveBeenCalledWith(
+          ConnectionState.PROCESSING_NOTIFICATIONS,
+          expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+        );
+        expect(
+          onConnectionStateChanged.mock.calls.some(([connectionState]) => connectionState === ConnectionState.LIVE),
+        ).toBe(false);
         expect(unlock).not.toHaveBeenCalled();
 
         disconnect();
@@ -587,7 +611,7 @@ describe('Account', () => {
       // The legacy processor pushes its "transition to LIVE" task onto a queue that the
       // production code resumes from `connect()`. Since we invoke the factory directly
       // here, we need to resume that queue so the pushed task actually runs.
-      account['notificationProcessingQueue'].resume();
+      account['notificationProcessingQueue'].queue.start();
 
       return {account};
     };

@@ -51,7 +51,9 @@ export enum HistoryImportState {
 }
 
 const HISTORY_IMPORT_DISMISS_DELAY_MULTIPLIER = 2;
+const HISTORY_IMPORT_PASSWORD_MODAL_ID = 'history-import-password-modal';
 const PERCENTAGE_MULTIPLIER = 100;
+const logger = getLogger('HistoryImportViewModel');
 
 interface HistoryImportProps {
   readonly backupRepository: BackupRepository;
@@ -61,7 +63,6 @@ interface HistoryImportProps {
 }
 
 const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImportProps) => {
-  const logger = getLogger('HistoryImportViewModel');
   const {translate} = useApplicationContext();
 
   const [historyImportState, setHistoryImportState] = useState(HistoryImportState.PREPARING);
@@ -146,7 +147,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
         setErrorSecondary(translate('backupImportGenericErrorSecondary'));
       }
     },
-    [dismissImport, logger, translate],
+    [dismissImport, translate],
   );
 
   const getBackUpPassword = useCallback((): Promise<string> => {
@@ -177,7 +178,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
             title: translate('backupDecryptionModalTitle'),
           },
         },
-        undefined,
+        HISTORY_IMPORT_PASSWORD_MODAL_ID,
         translate,
       );
     });
@@ -219,8 +220,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
 
   useEffect(() => {
     void importHistory(file);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file]);
+  }, [file, importHistory]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

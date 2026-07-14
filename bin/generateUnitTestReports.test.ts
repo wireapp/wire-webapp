@@ -17,73 +17,93 @@
  *
  */
 
-import {mkdtemp, mkdir, writeFile} from 'node:fs/promises';
-import {join} from 'node:path';
-import {tmpdir as operatingSystemTemporaryDirectory} from 'node:os';
+import type {ProjectGraph} from '@nx/devkit';
 
 import {
+  createCombinedReport,
+  createManifest,
   createNxTestCommand,
+  createProjectReport,
   createReportFileName,
-  discoverTestableLibraryProjects,
+  findTestableProjects,
+  runProjectTestReports,
   sanitizeProjectNameForFileName,
 } from './generateUnitTestReports';
+import type {ProjectTestResult, ReportSettings, TestableProject} from './generateUnitTestReports';
 
-async function createTemporaryWorkspace(): Promise<string> {
-  const temporaryWorkspacePath = await mkdtemp(join(operatingSystemTemporaryDirectory(), 'wire-unit-test-report-'));
+const reportSettings: ReportSettings = {
+  branchName: 'dev',
+  combinedReportFile: 'unit-tests.log',
+  commitSha: 'abc123',
+  reportsDirectory: 'unit-test-reports',
+  runDate: '2026-07-10T12:00:00.000Z',
+  workspaceRoot: '/workspace',
+};
 
-  await mkdir(join(temporaryWorkspacePath, 'libraries'), {recursive: true});
-
-  return temporaryWorkspacePath;
+function createProjectGraph(): ProjectGraph {
+  return {
+    dependencies: {},
+    externalNodes: {},
+    nodes: {
+      webapp: {
+        data: {root: 'apps/webapp', projectType: 'application', targets: {test: {}}},
+        name: 'webapp',
+        type: 'app',
+      },
+      server: {
+        data: {root: 'apps/server', projectType: 'application', targets: {test: {}}},
+        name: 'server',
+        type: 'app',
+      },
+      nestedLibrary: {
+        data: {root: 'libraries/client/nested', projectType: 'library', targets: {test: {}}},
+        name: 'nested-library',
+        type: 'lib',
+      },
+      untestableLibrary: {
+        data: {root: 'libraries/config', projectType: 'library', targets: {build: {}}},
+        name: 'untestable-library',
+        type: 'lib',
+      },
+    },
+  } as ProjectGraph;
 }
 
-async function writeLibraryProjectJson(
-  workspaceRoot: string,
-  libraryDirectoryName: string,
-  projectJson: object,
-): Promise<void> {
-  const libraryDirectoryPath = join(workspaceRoot, 'libraries', libraryDirectoryName);
-
-  await mkdir(libraryDirectoryPath, {recursive: true});
-  await writeFile(join(libraryDirectoryPath, 'project.json'), JSON.stringify(projectJson));
+function createProjectTestResult(project: TestableProject, exitCode: number, output: string): ProjectTestResult {
+  return {
+    command: createNxTestCommand(project.name),
+    exitCode,
+    output,
+    project,
+    reportFileName: createReportFileName(project.name, reportSettings.commitSha),
+    status: exitCode === 0 ? 'passed' : 'failed',
+  };
 }
 
 describe('generate-unit-test-reports', (): void => {
-  it('discovers library projects with test targets from libraries project.json files', async (): Promise<void> => {
-    const temporaryWorkspacePath = await createTemporaryWorkspace();
-    await writeLibraryProjectJson(temporaryWorkspacePath, 'api-client', {
-      name: 'api-client-lib',
-      projectType: 'library',
-      targets: {test: {}},
-    });
-    await writeLibraryProjectJson(temporaryWorkspacePath, 'server', {
-      name: 'server',
-      projectType: 'application',
-      targets: {test: {}},
-    });
-    await writeLibraryProjectJson(temporaryWorkspacePath, 'config', {
-      name: 'config-lib',
-      projectType: 'library',
-      targets: {build: {}},
-    });
+  it('discovers application, library, and nested projects with test targets in deterministic order', (): void => {
+    const actualProjects = findTestableProjects(createProjectGraph());
 
-    const actualProjects = await discoverTestableLibraryProjects(temporaryWorkspacePath);
+    expect(actualProjects).toEqual([
+      {name: 'nested-library', root: 'libraries/client/nested', type: 'lib'},
+      {name: 'server', root: 'apps/server', type: 'app'},
+      {name: 'webapp', root: 'apps/webapp', type: 'app'},
+    ]);
+  });
 
-    expect(actualProjects).toEqual([{name: 'api-client-lib'}]);
+  it('creates the canonical verbose Nx CI test command', (): void => {
+    const actualCommand = createNxTestCommand('webapp');
+
+    expect(actualCommand).toEqual({
+      command: './bin/yarn',
+      commandArguments: ['nx', 'run', 'webapp:test', '--configuration=ci', '--verbose'],
+    });
   });
 
   it('creates stable report file names from sanitized project names and commit SHA values', (): void => {
     const actualFileName = createReportFileName('@wireapp/api client', 'abc123');
 
     expect(actualFileName).toBe('unit-tests--wireapp-api-client-abc123.log');
-  });
-
-  it('creates the required Nx CI test command', (): void => {
-    const actualCommand = createNxTestCommand('api-client-lib');
-
-    expect(actualCommand).toEqual({
-      command: './bin/yarn',
-      commandArguments: ['nx', 'run', 'api-client-lib:test', '--configuration=ci'],
-    });
   });
 
   it.each([
@@ -94,5 +114,82 @@ describe('generate-unit-test-reports', (): void => {
     const actualSanitizedProjectName = sanitizeProjectNameForFileName(projectName);
 
     expect(actualSanitizedProjectName).toBe(expectedSanitizedProjectName);
+  });
+
+  it('writes consistent metadata into project reports and the manifest', (): void => {
+    const projectTestResults = [
+      createProjectTestResult({name: 'server', root: 'apps/server', type: 'app'}, 0, 'server output'),
+      createProjectTestResult({name: 'webapp', root: 'apps/webapp', type: 'app'}, 1, 'webapp output'),
+    ];
+    const actualProjectReport = createProjectReport(projectTestResults[0], reportSettings);
+    const actualManifest = createManifest(projectTestResults, reportSettings);
+
+    expect(actualProjectReport).toContain('BRANCH = dev');
+    expect(actualProjectReport).toContain('COMMIT SHA = abc123');
+    expect(actualProjectReport).toContain('TEST RUN DATE = 2026-07-10T12:00:00.000Z');
+    expect(actualProjectReport).toContain('STATUS = passed');
+    expect(actualManifest).toEqual({
+      branch: 'dev',
+      commitSha: 'abc123',
+      overallStatus: 'failed',
+      projects: [
+        {
+          command: './bin/yarn nx run server:test --configuration=ci --verbose',
+          exitCode: 0,
+          name: 'server',
+          reportFileName: 'unit-tests-server-abc123.log',
+          status: 'passed',
+        },
+        {
+          command: './bin/yarn nx run webapp:test --configuration=ci --verbose',
+          exitCode: 1,
+          name: 'webapp',
+          reportFileName: 'unit-tests-webapp-abc123.log',
+          status: 'failed',
+        },
+      ],
+      runDate: '2026-07-10T12:00:00.000Z',
+    });
+  });
+
+  it('creates a combined report with every project once in sorted order and explicit delimiters', (): void => {
+    const projectTestResults = [
+      createProjectTestResult({name: 'webapp', root: 'apps/webapp', type: 'app'}, 0, 'webapp output'),
+      createProjectTestResult({name: 'server', root: 'apps/server', type: 'app'}, 0, 'server output'),
+    ];
+    const actualCombinedReport = createCombinedReport(projectTestResults, reportSettings);
+
+    expect(actualCombinedReport).toContain('===== BEGIN PROJECT: server =====');
+    expect(actualCombinedReport).toContain('===== END PROJECT: server =====');
+    expect(actualCombinedReport).toContain('===== BEGIN PROJECT: webapp =====');
+    expect(actualCombinedReport.indexOf('BEGIN PROJECT: server')).toBeLessThan(
+      actualCombinedReport.indexOf('BEGIN PROJECT: webapp'),
+    );
+    expect((actualCombinedReport.match(/===== BEGIN PROJECT:/g) ?? []).length).toBe(2);
+  });
+
+  it('continues after failures and returns a failing result for the failed project', async (): Promise<void> => {
+    const testableProjects = [
+      {name: 'first-project', root: 'libraries/first', type: 'lib'},
+      {name: 'second-project', root: 'libraries/second', type: 'lib'},
+    ] satisfies readonly TestableProject[];
+    const executedProjectNames: string[] = [];
+    const projectTestResults = await runProjectTestReports(
+      testableProjects,
+      reportSettings,
+      async (_command, commandArguments) => {
+        const projectName = commandArguments[2].split(':')[0];
+        executedProjectNames.push(projectName);
+
+        return {exitCode: projectName === 'first-project' ? 1 : 0, output: `${projectName} output`};
+      },
+    );
+
+    expect(executedProjectNames).toEqual(['first-project', 'second-project']);
+    expect(projectTestResults.map((projectTestResult): string => projectTestResult.status)).toEqual([
+      'failed',
+      'passed',
+    ]);
+    expect(createManifest(projectTestResults, reportSettings).overallStatus).toBe('failed');
   });
 });
