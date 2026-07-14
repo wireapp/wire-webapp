@@ -18,6 +18,7 @@
  */
 
 import {fireEvent, render, screen} from '@testing-library/react';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
 import {
   MeetingStatus,
@@ -30,6 +31,15 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
+const THIRTY_MINUTES_MS = 30 * 60 * 1_000;
+
+const ongoingWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: 1_000_000_000_000,
+});
+
+const meetingStartIso = new Date(ongoingWallClock.currentTimestampInMilliseconds - THIRTY_MINUTES_MS).toISOString();
+const meetingEndIso = new Date(ongoingWallClock.currentTimestampInMilliseconds + THIRTY_MINUTES_MS).toISOString();
+
 const qualifiedConversation = {domain: 'example.com', id: 'meeting-conversation-id'};
 
 const createTestProps = (): MeetingStatusProps & {joinMeeting: jest.Mock} => {
@@ -37,9 +47,9 @@ const createTestProps = (): MeetingStatusProps & {joinMeeting: jest.Mock} => {
 
   return {
     qualifiedConversation,
-    start_date: '2026-07-13T09:00:00.000Z',
-    end_date: '2026-07-13T10:00:00.000Z',
-    nowMilliseconds: new Date('2026-07-13T09:30:00.000Z').getTime(),
+    start_date: meetingStartIso,
+    end_date: meetingEndIso,
+    nowMilliseconds: ongoingWallClock.currentTimestampInMilliseconds,
     useJoinMeetingCallHook: () => ({
       joinMeeting,
       isJoinDisabled: false,
