@@ -83,11 +83,11 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
             if (featureInfo.isAvailable) {
               messageString = this.translate(
-                `modalConversationOptionsAllow${featureName as 'Guest' | 'Service'}Message`,
+                `modalConversationOptionsAllow${featureName as 'Guest' | 'App'}Message`,
               );
             } else {
               messageString = this.translate(
-                `modalConversationOptionsDisable${featureName as 'Guest' | 'Service'}Message`,
+                `modalConversationOptionsDisable${featureName as 'Guest' | 'App'}Message`,
               );
             }
             this._showModal(messageString);
@@ -97,7 +97,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       }
     }
     const {featureName} = featureFromStateChange(prevAccessState, accessState);
-    this._showModal(this.translate(`modalConversationOptionsToggle${featureName as 'Service' | 'Guest'}Message`));
+    this._showModal(this.translate(`modalConversationOptionsToggle${featureName as 'App' | 'Guest'}Message`));
   }
 
   async getAccessCode(conversationEntity: Conversation): Promise<void> {
