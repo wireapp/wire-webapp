@@ -63,7 +63,6 @@ describe('MeetingsAPI', () => {
           otr_archived_ref: null,
           otr_muted_ref: null,
           otr_muted_status: null,
-          service: null,
           status_ref: '0.0',
           status_time: '1970-01-01T00:00:00.000Z',
         },

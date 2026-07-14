@@ -73,7 +73,6 @@ const conversationMemberSchema = z.object({
   otr_archived_ref: z.string().nullable().optional(),
   otr_muted_ref: z.string().nullable().optional(),
   otr_muted_status: z.number().nullable().optional(),
-  service: z.null().optional(),
   status_ref: z.string().optional(),
   status_time: z.string().optional(),
   qualified_id: qualifiedIdSchema.optional(),
