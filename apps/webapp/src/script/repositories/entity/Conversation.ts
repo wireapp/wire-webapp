@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
@@ -622,7 +623,7 @@ export class Conversation {
       }
 
       if (this.isMeeting()) {
-        if (this.name()) {
+        if (is.nonEmptyString(this.name())) {
           return this.name();
         }
 
