@@ -70,8 +70,8 @@ import {BackgroundEffectsHandler, ReleasableMediaStream} from 'Repositories/medi
 import {APIClient} from '../../service/apiClientSingleton';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Translate} from 'Util/localizerUtil';
-import type {QualifiedId} from "@wireapp/api-client/lib/user";
-import {BackgroundEffectSelection} from "Repositories/media/VideoBackgroundEffects";
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 
 type AudioFlowStat = {
   bytesReceived?: number;
@@ -788,7 +788,9 @@ describe('CallingRepository', () => {
         CALL_TYPE.NORMAL,
         buildMediaDevicesHandler(),
       );
-      jest.spyOn(callingRepository['callState'], 'joinedCall').mockReturnValue(call);
+      jest
+        .spyOn(callingRepository['callState'], 'joinedCall')
+        .mockReturnValue(ko.pureComputed<Call | undefined>(() => call));
       callingRepository.stopMediaSource(MediaType.AUDIO);
 
       expect(selfParticipant.releaseAudioStream).toHaveBeenCalledTimes(1);
@@ -979,6 +981,7 @@ describe('CallingRepository ISO', () => {
       avsUser = avs.wUser;
       avsCall = avs.wCall;
 
+      // @TODO: This type is wrong here! We have to check if its a general issie with the API
       const event: CallingEvent = {
         content: {
           props: {
@@ -1061,7 +1064,7 @@ describe('CallingRepository ISO', () => {
         sender: 'dddb4f5068e8c98b',
         time: new Date().toISOString(),
         type: CALL.E_CALL,
-      };
+      } as any;
 
       expect(callingRepo['callState'].calls().length).toBe(0);
 
@@ -1089,16 +1092,18 @@ describe.skip('E2E audio call', () => {
     updateParticipantStream: (...args: unknown[]) => void;
   };
 
-  const mockedClient = client as CallingRepository & E2ECallingRepositorySpies;
+  type MockedCallingRepository = Omit<CallingRepository, keyof E2ECallingRepositorySpies> & E2ECallingRepositorySpies;
+
+  const mockedClient = client as unknown as MockedCallingRepository;
   const user = new User('user-1', '', translateForTest);
   let remoteWuser: number;
   let wCall: Wcall;
 
   beforeAll(() => {
-    jest.spyOn(client, 'fetchConfig').mockReturnValue(Promise.resolve({ice_servers: []}));
+    jest.spyOn(client, 'fetchConfig').mockResolvedValue({ice_servers: [], ttl: 3600});
     jest
       .spyOn(mockedClient, 'getCallMediaStream')
-      .mockReturnValue(Promise.resolve(new MediaStream([new window.RTCAudioSource().createTrack()])));
+      .mockResolvedValue(new MediaStream([new window.RTCAudioSource().createTrack()]));
     jest
       .spyOn(mockedClient, 'getMediaStream')
       .mockReturnValue(Promise.resolve(new MediaStream([new window.RTCAudioSource().createTrack()])));
@@ -1110,20 +1115,22 @@ describe.skip('E2E audio call', () => {
     jest.spyOn(mockedClient, 'checkConcurrentJoinedCall').mockReturnValue(Promise.resolve(true));
     jest
       .spyOn(mockedClient, 'sendMessage')
-      .mockImplementation((context, convId, userId, clientid, destUserId, destDeviceId, payload) => {
-        wCall.recvMsg(
-          remoteWuser,
-          payload,
-          payload.length,
-          Date.now(),
-          Date.now(),
-          convId,
-          userId,
-          clientid,
-          CONV_TYPE.CONFERENCE,
-          0, // no meeting
-        );
-      });
+      .mockImplementation(
+        (context, convId: string, userId: string, clientid: string, destUserId, destDeviceId, payload: string) => {
+          wCall.recvMsg(
+            remoteWuser,
+            payload,
+            payload.length,
+            Date.now(),
+            Date.now(),
+            convId,
+            userId,
+            clientid,
+            CONV_TYPE.CONFERENCE,
+            0, // no meeting
+          );
+        },
+      );
     return client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
       remoteWuser = createAutoAnsweringWuser(wCallInstance, client);
       wCall = wCallInstance;
