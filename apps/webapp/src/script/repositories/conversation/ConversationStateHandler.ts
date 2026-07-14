@@ -82,13 +82,9 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
 
             if (featureInfo.isAvailable) {
-              messageString = this.translate(
-                `modalConversationOptionsAllow${featureName as 'Guest' | 'App'}Message`,
-              );
+              messageString = this.translate(`modalConversationOptionsAllow${featureName as 'Guest' | 'App'}Message`);
             } else {
-              messageString = this.translate(
-                `modalConversationOptionsDisable${featureName as 'Guest' | 'App'}Message`,
-              );
+              messageString = this.translate(`modalConversationOptionsDisable${featureName as 'Guest' | 'App'}Message`);
             }
             this._showModal(messageString);
           }
