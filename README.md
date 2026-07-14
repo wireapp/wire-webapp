@@ -70,7 +70,7 @@ If you would like your browser to trust the certificate from "local.wire.com"/"l
 
 The application can be configured to connect to different environments by modifying the following environment variables in your `.env` file:
 
-For the full environment variable reference, see [Environment Variables](https://github.com/wireapp/wire-webapp/blob/dev/libraries/config/README.md#environment-variables).
+For the full environment variable reference, see [Environment Variables](https://github.com/wireapp/wire-webapp/blob/main/libraries/config/README.md#environment-variables).
 
 **Staging:**
 
@@ -124,7 +124,7 @@ Other useful tasks:
 
 ## CI Status
 
-[![CI](https://github.com/wireapp/wire-webapp/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/wireapp/wire-webapp/actions/workflows/ci.yml) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![CI](https://github.com/wireapp/wire-webapp/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/wireapp/wire-webapp/actions/workflows/ci.yml) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 ## Translations
 
