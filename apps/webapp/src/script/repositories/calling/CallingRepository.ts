@@ -411,7 +411,7 @@ export class CallingRepository {
       return;
     }
 
-    const hasVideo = stream.getVideoTracks().length > 0;
+    const hasVideo = stream.getVideoTracks().some(track => track.readyState === 'live');
 
     if (!hasVideo) {
       selfParticipant.updateMediaStream(stream, true);
