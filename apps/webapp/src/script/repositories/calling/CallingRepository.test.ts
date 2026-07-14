@@ -21,7 +21,7 @@ import {CONVERSATION_TYPE, DefaultConversationRoleName} from '@wireapp/api-clien
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
 import 'jsdom-worker';
-import {Subscription} from 'knockout';
+import ko, {Subscription} from 'knockout';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE, QUALITY, REASON, STATE as CALL_STATE, VIDEO_STATE, Wcall} from '@wireapp/avs';
@@ -55,6 +55,8 @@ import {z} from 'zod';
 import {translateForTest} from 'Util/test/translateForTest';
 import {BackgroundEffectsHandler, ReleasableMediaStream} from 'Repositories/media/backgroundEffectsHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import type {QualifiedId} from "@wireapp/api-client/lib/user";
+import {BackgroundEffectSelection} from "Repositories/media/VideoBackgroundEffects";
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
@@ -1348,17 +1350,17 @@ describe('set background effect', () => {
   };
 
   beforeEach(() => {
-    mediaStreamHandler = {
+    mediaStreamHandler = Object.assign(Object.create(MediaStreamHandler.prototype) as MediaStreamHandler, {
       requestMediaStream: jest.fn(),
-    } as any;
+    });
 
-    backgroundEffectsHandler = {
+    backgroundEffectsHandler = Object.assign(Object.create(BackgroundEffectsHandler.prototype) as BackgroundEffectsHandler, {
       isBackgroundEffectEnabled: jest.fn(() => true),
       applyBackgroundEffect: jest.fn(),
       setPreferredBackgroundEffect: jest.fn(),
-    } as any;
+    });
 
-    selfParticipant = {
+    selfParticipant = Object.assign(Object.create(Participant.prototype) as Participant, {
       hasActiveVideo: jest.fn(() => true),
       sharesScreen: jest.fn(() => false),
       audioStream: jest.fn(() => undefined),
@@ -1369,18 +1371,16 @@ describe('set background effect', () => {
       updateMediaStream: jest.fn(),
       videoState: jest.fn(() => VIDEO_STATE.STARTED),
       releaseVideoStream: jest.fn(),
-    } as any;
+    });
 
-    activeCall = {
-      participants: jest.fn(() => []),
+    activeCall = Object.assign(Object.create(Call.prototype) as Call, {
+      participants: ko.observableArray<Participant>([]),
       getSelfParticipant: jest.fn(() => selfParticipant),
       isGroupOrConference: false,
-      state: jest.fn(() => CALL_STATE.MEDIA_ESTAB),
-    } as any;
+      state: ko.observable(CALL_STATE.MEDIA_ESTAB),
+    });
 
-    callState = {
-      joinedCall: jest.fn(() => undefined),
-    } as any;
+    callState = new CallState();
 
     callingRepository = new CallingRepository(
       {} as any,
@@ -1398,9 +1398,9 @@ describe('set background effect', () => {
 
     callingRepository['changeMediaSource'] = jest.fn();
     callingRepository['stopMediaSource'] = jest.fn();
+    callingRepository['parseQualifiedId'] = jest.fn((): QualifiedId => ({domain: '', id: 'parsed-conv-id'}));
 
-    jest.spyOn(callingRepository as any, 'parseQualifiedId').mockReturnValue('parsed-conv-id');
-    jest.spyOn(callingRepository as any, 'findCall').mockReturnValue(activeCall);
+    jest.spyOn(callingRepository, 'findCall').mockReturnValue(activeCall);
   });
 
   afterEach(() => {
@@ -1414,7 +1414,7 @@ describe('set background effect', () => {
       const processedMedia = new ReleasableMediaStream(processedStream);
 
       jest.spyOn(mediaStreamHandler, 'requestMediaStream').mockResolvedValue(originalStream);
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
 
       jest.spyOn(backgroundEffectsHandler, 'applyBackgroundEffect').mockResolvedValue({
         applied: true,
@@ -1453,7 +1453,7 @@ describe('set background effect', () => {
       const participantStream = createMediaStream('participantStream');
 
       jest.spyOn(selfParticipant, 'getMediaStream').mockReturnValue(participantStream);
-      jest.spyOn(callingRepository as any, 'getMediaStream').mockResolvedValue(originalStream);
+      callingRepository['getMediaStream'] = jest.fn(() => Promise.resolve(originalStream));
 
       const applySpy = jest
         .spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant')
@@ -1476,7 +1476,7 @@ describe('set background effect', () => {
       const processedMedia = new ReleasableMediaStream(processedStream);
 
       jest.spyOn(mediaStreamHandler, 'requestMediaStream').mockResolvedValue(originalStream);
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(previousOriginalStream);
 
       jest.spyOn(backgroundEffectsHandler, 'applyBackgroundEffect').mockResolvedValue({
@@ -1545,7 +1545,7 @@ describe('set background effect', () => {
     it('updates the participant directly when BGE is disabled', async () => {
       const originalStream = createMediaStream('originalStream');
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(backgroundEffectsHandler, 'isBackgroundEffectEnabled').mockReturnValue(false);
       jest.spyOn(callingRepository as any, 'getMediaStream').mockResolvedValue(originalStream);
 
@@ -1610,14 +1610,14 @@ describe('set background effect', () => {
     it('stores the selected effect and reapplies it to the original stream', async () => {
       const originalStream = createMediaStream('originalStream');
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(originalStream);
 
       const applySpy = jest
         .spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant')
         .mockResolvedValue(originalStream);
 
-      const effect = 'blur' as any;
+      const effect: BackgroundEffectSelection = { type: 'blur', level: 'low' };
 
       await callingRepository.switchVideoBackgroundEffect(effect);
 
@@ -1627,11 +1627,11 @@ describe('set background effect', () => {
     });
 
     it('only stores the selected effect when there is no active call', async () => {
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(undefined as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => undefined));
 
       const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
-      const effect = 'blur' as any;
+      const effect: BackgroundEffectSelection = { type: 'blur', level: 'low' };
 
       await callingRepository.switchVideoBackgroundEffect(effect);
 
@@ -1641,12 +1641,12 @@ describe('set background effect', () => {
     });
 
     it('does not apply the effect when the participant has no original video stream', async () => {
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(undefined);
 
       const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
-      const effect = 'blur' as any;
+      const effect: BackgroundEffectSelection = { type: 'blur', level: 'low' };
 
       await callingRepository.switchVideoBackgroundEffect(effect);
 
@@ -1658,13 +1658,13 @@ describe('set background effect', () => {
     it('does not apply the effect while screen sharing', async () => {
       const originalStream = createMediaStream('originalStream');
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(originalStream);
-      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(true as any);
+      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(ko.pureComputed<boolean>(() => true));
 
       const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
-      const effect = 'blur' as any;
+      const effect: BackgroundEffectSelection = { type: 'blur', level: 'low' };
 
       await callingRepository.switchVideoBackgroundEffect(effect);
 
@@ -1689,8 +1689,8 @@ describe('set background effect', () => {
     it('does not apply background effects while screen sharing', async () => {
       const inputStream = createMediaStream('inputStream');
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
-      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(true as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
+      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(ko.pureComputed<boolean>(() => true));
 
       const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
 
@@ -1705,7 +1705,7 @@ describe('set background effect', () => {
       const processedStream = createMediaStream('processedStream');
       const processedMedia = new ReleasableMediaStream(processedStream);
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(undefined);
 
       jest
@@ -1734,7 +1734,7 @@ describe('set background effect', () => {
       const processedStream = createMediaStream('processedStream');
       const processedMedia = new ReleasableMediaStream(processedStream);
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(inputStream);
 
       jest.spyOn(backgroundEffectsHandler, 'applyBackgroundEffect').mockResolvedValue({
@@ -1760,7 +1760,7 @@ describe('set background effect', () => {
     it('falls back to the original stream when applying BGE fails', async () => {
       const inputStream = createMediaStream('inputStream');
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(undefined);
 
       jest
@@ -1785,7 +1785,7 @@ describe('set background effect', () => {
     it('uses the original stream directly when BGE is disabled', async () => {
       const inputStream = createMediaStream('inputStream');
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(undefined);
       jest.spyOn(backgroundEffectsHandler, 'isBackgroundEffectEnabled').mockReturnValue(false);
 
@@ -1815,7 +1815,7 @@ describe('set background effect', () => {
 
       const releaseSpy = jest.spyOn(previousMedia, 'release');
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(inputStream);
       jest.spyOn(selfParticipant, 'processedVideoStream').mockReturnValue(previousMedia);
 
@@ -1837,7 +1837,7 @@ describe('set background effect', () => {
 
       const releaseSpy = jest.spyOn(processedMedia, 'release');
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(inputStream);
       jest.spyOn(selfParticipant, 'processedVideoStream').mockReturnValue(processedMedia);
 
@@ -1856,7 +1856,7 @@ describe('set background effect', () => {
       const processedStream = createMediaStream('processedStream');
       const processedMedia = new ReleasableMediaStream(processedStream);
 
-      jest.spyOn(callState, 'joinedCall').mockReturnValue(activeCall as any);
+      jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(undefined);
 
       jest.spyOn(backgroundEffectsHandler, 'applyBackgroundEffect').mockResolvedValue({
