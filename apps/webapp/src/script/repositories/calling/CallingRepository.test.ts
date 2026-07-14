@@ -55,8 +55,8 @@ import {z} from 'zod';
 import {translateForTest} from 'Util/test/translateForTest';
 import {BackgroundEffectsHandler, ReleasableMediaStream} from 'Repositories/media/backgroundEffectsHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import type {QualifiedId} from "@wireapp/api-client/lib/user";
-import {BackgroundEffectSelection} from "Repositories/media/VideoBackgroundEffects";
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
@@ -1354,11 +1354,14 @@ describe('set background effect', () => {
       requestMediaStream: jest.fn(),
     });
 
-    backgroundEffectsHandler = Object.assign(Object.create(BackgroundEffectsHandler.prototype) as BackgroundEffectsHandler, {
-      isBackgroundEffectEnabled: jest.fn(() => true),
-      applyBackgroundEffect: jest.fn(),
-      setPreferredBackgroundEffect: jest.fn(),
-    });
+    backgroundEffectsHandler = Object.assign(
+      Object.create(BackgroundEffectsHandler.prototype) as BackgroundEffectsHandler,
+      {
+        isBackgroundEffectEnabled: jest.fn(() => true),
+        applyBackgroundEffect: jest.fn(),
+        setPreferredBackgroundEffect: jest.fn(),
+      },
+    );
 
     selfParticipant = Object.assign(Object.create(Participant.prototype) as Participant, {
       hasActiveVideo: jest.fn(() => true),
@@ -1617,7 +1620,7 @@ describe('set background effect', () => {
         .spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant')
         .mockResolvedValue(originalStream);
 
-      const effect: BackgroundEffectSelection = { type: 'blur', level: 'low' };
+      const effect: BackgroundEffectSelection = {type: 'blur', level: 'low'};
 
       await callingRepository.switchVideoBackgroundEffect(effect);
 
@@ -1631,7 +1634,7 @@ describe('set background effect', () => {
 
       const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
-      const effect: BackgroundEffectSelection = { type: 'blur', level: 'low' };
+      const effect: BackgroundEffectSelection = {type: 'blur', level: 'low'};
 
       await callingRepository.switchVideoBackgroundEffect(effect);
 
@@ -1646,7 +1649,7 @@ describe('set background effect', () => {
 
       const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
-      const effect: BackgroundEffectSelection = { type: 'blur', level: 'low' };
+      const effect: BackgroundEffectSelection = {type: 'blur', level: 'low'};
 
       await callingRepository.switchVideoBackgroundEffect(effect);
 
@@ -1664,7 +1667,7 @@ describe('set background effect', () => {
 
       const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
-      const effect: BackgroundEffectSelection = { type: 'blur', level: 'low' };
+      const effect: BackgroundEffectSelection = {type: 'blur', level: 'low'};
 
       await callingRepository.switchVideoBackgroundEffect(effect);
 
