@@ -35,7 +35,13 @@ export interface TaskParams {
   addTaskOnWindowFocusEvent?: boolean;
 }
 
+const WINDOW_FOCUS_MIN_INTERVAL_MS = 15 * TimeUtil.TimeInMillis.MINUTE;
+
 export class RecurringTaskScheduler {
+  private readonly focusListeners = new Map<string, () => void>();
+  private readonly lastExecutedAt = new Map<string, number>();
+  private readonly windowFocusTaskKeys = new Set<string>();
+
   constructor(private readonly storage: RecurringTaskSchedulerStorage) {}
 
   public readonly registerTask = async ({
@@ -44,20 +50,32 @@ export class RecurringTaskScheduler {
     key,
     addTaskOnWindowFocusEvent = false,
   }: TaskParams): Promise<void> => {
+    if (addTaskOnWindowFocusEvent === true) {
+      this.windowFocusTaskKeys.add(key);
+    }
+
     const firingDate = (await this.storage.get(key)) ?? Date.now() + every;
     await this.storage.set(key, firingDate);
+
+    const executeTask = async () => {
+      await this.storage.delete(key);
+      try {
+        await task();
+      } finally {
+        this.lastExecutedAt.set(key, Date.now());
+        await this.registerTask({
+          every,
+          task,
+          key,
+          addTaskOnWindowFocusEvent: this.windowFocusTaskKeys.has(key),
+        });
+      }
+    };
 
     const taskConfig = {
       firingDate,
       key,
-      task: async () => {
-        await this.storage.delete(key);
-        try {
-          await task();
-        } finally {
-          await this.registerTask({every, task, key});
-        }
-      },
+      task: executeTask,
     };
 
     if (every > TimeUtil.TimeInMillis.DAY * 20) {
@@ -68,14 +86,27 @@ export class RecurringTaskScheduler {
       TaskScheduler.addTask(taskConfig);
     }
 
-    // If the task should be added on window focus event, we add it here
+    if (this.windowFocusTaskKeys.has(key) === true && typeof window !== 'undefined') {
+      this.removeWindowFocusListener(key);
 
-    if (addTaskOnWindowFocusEvent === true && typeof window !== 'undefined') {
-      window.addEventListener('focus', taskConfig.task);
+      const focusHandler = () => {
+        const lastRun = this.lastExecutedAt.get(key);
+        if (lastRun !== undefined && Date.now() - lastRun < WINDOW_FOCUS_MIN_INTERVAL_MS) {
+          return;
+        }
+
+        void executeTask();
+      };
+
+      this.focusListeners.set(key, focusHandler);
+      window.addEventListener('focus', focusHandler);
     }
   };
 
   public readonly cancelTask = async (taskKey: string): Promise<void> => {
+    this.windowFocusTaskKeys.delete(taskKey);
+    this.removeWindowFocusListener(taskKey);
+    this.lastExecutedAt.delete(taskKey);
     await this.storage.delete(taskKey);
     TaskScheduler.cancelTask(taskKey);
     LowPrecisionTaskScheduler.cancelTask({intervalDelay: TimeUtil.TimeInMillis.MINUTE, key: taskKey});
@@ -83,5 +114,15 @@ export class RecurringTaskScheduler {
 
   public readonly hasTask = async (taskKey: string): Promise<boolean> => {
     return (await this.storage.get(taskKey)) !== undefined;
+  };
+
+  private readonly removeWindowFocusListener = (key: string): void => {
+    const handler = this.focusListeners.get(key);
+    if (handler === undefined || typeof window === 'undefined') {
+      return;
+    }
+
+    window.removeEventListener('focus', handler);
+    this.focusListeners.delete(key);
   };
 }
