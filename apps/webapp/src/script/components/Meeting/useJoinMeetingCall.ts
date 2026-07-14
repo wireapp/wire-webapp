@@ -122,16 +122,16 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
       return;
     }
 
-    setIsJoining(true);
-
     guardCall(async () => {
+      setIsJoining(true);
+
       const result = await joinMeetingCall(deps, qualifiedConversationId);
+
+      setIsJoining(false);
 
       if (result.isErr && result.error === joinMeetingCallErrors.conversationNotFound) {
         showConversationNotFoundModal();
       }
-
-      setIsJoining(false);
     });
   }, [
     deps,
