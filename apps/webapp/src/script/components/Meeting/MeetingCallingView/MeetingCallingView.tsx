@@ -44,22 +44,18 @@ export const MeetingCallingView = () => {
 
   return (
     <div css={meetingCallingViewStyles} data-uie-name="meeting-calling-view">
-      {meetingCalls.map(call => {
-        const {conversation} = call;
-
-        return (
-          <CallingCell
-            key={`${conversation.qualifiedId.id}-${conversation.qualifiedId.domain}`}
-            classifiedDomains={classifiedDomains}
-            call={call}
-            callActions={callingViewModel.callActions}
-            callingRepository={callingRepository}
-            propertiesRepository={propertiesRepository}
-            isFullUi
-            hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-          />
-        );
-      })}
+      {meetingCalls.map(call => (
+        <CallingCell
+          key={`${call.conversation.qualifiedId.id}-${call.conversation.qualifiedId.domain}`}
+          classifiedDomains={classifiedDomains}
+          call={call}
+          callActions={callingViewModel.callActions}
+          callingRepository={callingRepository}
+          propertiesRepository={propertiesRepository}
+          isFullUi
+          hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+        />
+      ))}
     </div>
   );
 };
