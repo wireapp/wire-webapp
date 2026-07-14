@@ -790,7 +790,7 @@ describe('CallingRepository', () => {
       );
       jest
         .spyOn(callingRepository['callState'], 'joinedCall')
-        .mockReturnValue(ko.pureComputed<Call | undefined>(() => call));
+        .mockImplementation(ko.pureComputed<Call | undefined>(() => call));
       callingRepository.stopMediaSource(MediaType.AUDIO);
 
       expect(selfParticipant.releaseAudioStream).toHaveBeenCalledTimes(1);
