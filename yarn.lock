@@ -4613,10 +4613,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formkit/auto-animate@npm:0.9.0":
-  version: 0.9.0
-  resolution: "@formkit/auto-animate@npm:0.9.0"
-  checksum: 10/6d44c4b739c9d0e674c2583d6fb0c37529829f2d0e10a8425ab1caadba51816750e28c40a80d19dfc3d22656f822f6813da485299e53b3a38db29118e4185f51
+"@formkit/auto-animate@npm:0.10.0":
+  version: 0.10.0
+  resolution: "@formkit/auto-animate@npm:0.10.0"
+  checksum: 10/7dd1ddd0c75436583d1520819f4772afabc398df0bc9305aa7b17cc17d752828ccbb87360ce48bdb1f4abd3d09953a71435f1a9e894bda704d5ddd266ad2fd69
   languageName: node
   linkType: hard
 
@@ -12092,7 +12092,7 @@ __metadata:
     "@emotion/react": "npm:11.14.0"
     "@enormora/wall-clock": "npm:0.0.3"
     "@formatjs/cli": "npm:6.16.13"
-    "@formkit/auto-animate": "npm:0.9.0"
+    "@formkit/auto-animate": "npm:0.10.0"
     "@lexical/code": "npm:0.27.2"
     "@lexical/history": "npm:0.27.2"
     "@lexical/list": "npm:0.27.2"
