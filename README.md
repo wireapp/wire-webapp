@@ -124,7 +124,7 @@ Other useful tasks:
 
 ## CI Status
 
-[![CI](https://github.com/wireapp/wire-webapp/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/wireapp/wire-webapp/actions/workflows/ci.yml) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![CI](https://github.com/wireapp/wire-webapp/actions/workflows/continuous-integration.yml/badge.svg?branch=main)](https://github.com/wireapp/wire-webapp/actions/workflows/continuous-integration.yml) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 ## Translations
 

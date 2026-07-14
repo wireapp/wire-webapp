@@ -39,7 +39,7 @@ env:
   # ADR 0002 calls this target Beta. During the transition, Beta maps to the
   # existing wire-webapp-staging Elastic Beanstalk environment and URL.
   BETA_ENVIRONMENT_NAME: wire-webapp-staging
-  BETA_WEBAPP_URL: https://wire-webapp-staging.zinfra.io/
+  BETA_WEBAPP_URL: https://wire-webapp-beta.wire.com/
   PRODUCTION_ENVIRONMENT_NAME: wire-webapp-prod
 
 jobs:
@@ -157,7 +157,9 @@ jobs:
     runs-on: ubuntu-24.04
     needs: build_artifact
     permissions: {}
-    environment: wire-webapp-staging
+    environment:
+      name: wire-webapp-staging
+      url: https://wire-webapp-beta.wire.com/
 
     steps:
       - name: Download build artifact
@@ -241,7 +243,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/e2e-tests.yml
     with:
-      webappUrl: https://wire-webapp-staging.zinfra.io/
+      webappUrl: https://wire-webapp-beta.wire.com/
       backendUrl: https://staging-nginz-https.zinfra.io/
       grep: '@regression|@crit-flow-web'
       testinyRunName: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}

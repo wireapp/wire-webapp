@@ -44,6 +44,8 @@ CI/CD PR git actions job can be found [here](/.github/workflows/precommit-crit-f
 
 ### Running the tests
 
+For hosted manual regression runs, use the logical company-facing Beta environment (`https://wire-webapp-beta.wire.com/`) for release-candidate validation or QA (`https://wire-webapp-qa.zinfra.io/`) for QA validation. Nightly trunk testing will return to Edge once its canonical URL and TLS configuration are confirmed.
+
 E2E tests can be run via
 
 1. Executing `yarn e2e-test` in the root folder of the repo. Running it with `--ui` flag will open Playwright app that can be handy for debugging. Providing `--grep "@{TAG_NAME}"` will result in running only tests with @{TAG_NAME}. For example:

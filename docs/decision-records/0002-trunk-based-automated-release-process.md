@@ -63,16 +63,17 @@ We will adopt a trunk-based, GitHub-driven release process with automatic beta d
 
 Edge is the Web team's immediate dogfooding environment. Every eligible change merged to `main` may appear on Edge. Because Edge continuously follows trunk, it provides no stability guarantee and may include incomplete, experimental, or recently merged changes protected by feature flags. It is not intended to be stable enough for broader company-wide daily use.
 
-Beta is the logical release stage for company-wide internal release-candidate validation. It follows an active release branch rather than trunk and should be stable enough for broader daily internal use. Beta represents the current candidate for the next Production release. During the transition, the existing `wire-webapp-staging` environment may continue to serve as Beta's physical target.
+Beta is the logical release stage for company-wide internal release-candidate validation. It follows an active release branch rather than trunk and should be stable enough for broader daily internal use. Beta represents the current candidate for the next Production release. Its canonical company-facing URL is `https://wire-webapp-beta.wire.com/`. Beta continues to deploy physically to the existing `wire-webapp-staging` GitHub and Elastic Beanstalk environment; changing the logical URL does not require renaming that physical environment.
 
 A Beta candidate may be promoted when validation is complete and no known release-blocking issues remain. Production receives only the exact artifact validated on Beta. Production promotion remains an explicit decision through GitHub Environment approval; the absence of reported issues does not automatically deploy Beta to Production.
 
 The branch model is:
 
-- `master` will be renamed to `main`.
-- `dev` will be retired as a long-lived branch after workflows, branch protection rules, documentation, and external integrations are migrated.
 - `main` is the single trunk branch and the source for Edge deployments.
+- During the migration, `main` was established from the active `dev` history because `dev` contained the current development history at cutover time.
+- `dev` and `master` are legacy branches retained temporarily for compatibility and old release-path retirement; normal development no longer targets either branch.
 - Release branches are cut from `main` as `release/YYYY-MM-DD.N`.
+- Removing the legacy branches is a later operational cleanup decision.
 - On-premises maintenance branches are created only when a customer-managed release line needs maintenance after the original production release.
 
 The release identifier uses the release branch name: `YYYY-MM-DD.N`. The full identifier is anchored to the release branch, not to the later deployment date. For example, updates to `release/2026-05-05.1` always create tags in the `2026-05-05.1` family, even if a hotfix is added on a later day.

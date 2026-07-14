@@ -1,10 +1,18 @@
 name: E2E Tests Nightly
 
 on:
+  # Scheduled nightly testing is paused until the canonical Edge URL and TLS
+  # configuration are available. Beta validation continues through release-cloud;
+  # this workflow remains available for manual regression runs.
   workflow_dispatch:
-  schedule:
-    # we want to run this nightly on dev
-    - cron: '0 02 * * 1-5'
+    inputs:
+      webappUrl:
+        description: Choose the canonical Beta URL for release-candidate validation or QA for manual regression
+        required: true
+        type: choice
+        options:
+          - https://wire-webapp-beta.wire.com/
+          - https://wire-webapp-qa.zinfra.io/
 
 # Only allow one instance of this workflow to run per branch at a time
 concurrency:
@@ -16,7 +24,7 @@ jobs:
     name: Run e2e tests
     uses: ./.github/workflows/e2e-tests.yml
     with:
-      webappUrl: https://wire-webapp-dev.zinfra.io/
+      webappUrl: ${{ inputs.webappUrl }}
       backendUrl: https://staging-nginz-https.zinfra.io/
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
