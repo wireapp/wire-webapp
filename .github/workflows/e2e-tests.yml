@@ -7,11 +7,10 @@ on:
     inputs:
       webappUrl:
         type: choice
-        description: Define which stage to run the tests against
+        description: Choose the canonical Beta release-candidate URL or QA
         required: true
         options:
-          - https://wire-webapp-dev.zinfra.io/
-          - https://wire-webapp-master.zinfra.io/
+          - https://wire-webapp-beta.wire.com/
           - https://wire-webapp-qa.zinfra.io/
       backendUrl:
         type: choice
