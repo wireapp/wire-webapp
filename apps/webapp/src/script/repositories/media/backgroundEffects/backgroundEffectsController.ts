@@ -87,6 +87,7 @@ export class BackgroundEffectsController {
   public async start(inputTrack: MediaStreamTrack, options: ProcessVideoTrackOptions): Promise<MediaStreamTrack> {
     this.refcount++;
     const resolved = await resolveOptions(options);
+
     this.options = withoutBitmap(resolved);
     this.onMetrics = options.onMetrics;
 
@@ -127,7 +128,7 @@ export class BackgroundEffectsController {
 
     if (resolved.useWorker) {
       if (this.worker === null) {
-        this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker.ts', import.meta.url));
+        this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker', import.meta.url));
       }
       const {options: workerOptions, transferables} = getWorkerOptions(resolved);
 
@@ -147,6 +148,11 @@ export class BackgroundEffectsController {
         if (name === 'performanceSample' && this.qualityController !== null) {
           const {sample, mode} = data as {sample: PerformanceSample; mode: Mode};
           this.enqueuePerformanceSample(sample, mode);
+        }
+
+        if (name === 'error' && this.qualityController !== null) {
+          const {reason, message} = data as {reason: string; message: string};
+          this.logger.error(`error received, reason: ${reason}, message: ${message}`);
         }
       };
 

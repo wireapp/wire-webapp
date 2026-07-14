@@ -57,7 +57,7 @@ Per-file checks: pass a single file path as the last argument, not `yarn nx run 
 ## Git
 
 - Commit messages must include a concise subject and a description body explaining what changed and why.
-- When changes are ready to commit, prompt the user to run checks first: `yarn type-check`, `BASE_REF=dev yarn lint:affected` (includes `yarn prettier` via `lint:other`), and relevant `yarn nx run <project>:test` for touched projects.
+- When changes are ready to commit, prompt the user to run checks first: `yarn type-check`, `BASE_REF=dev yarn lint:affected` (includes Prettier via `lint:format` and Stylelint), and relevant `yarn nx run <project>:test` for touched projects.
 
 ## Webapp code rules
 

@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {SUBCONVERSATION_ID, Subconversation} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
@@ -54,7 +55,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
   }
 
   get mlsService(): MLSService {
-    if (!this._mlsService) {
+    if (this._mlsService === undefined) {
       throw new Error('MLSService was not initialised!');
     }
     return this._mlsService;
@@ -268,7 +269,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       if (groupId !== subconversationGroupId) {
         // if the epoch update did not happen in the subconversation directly, check if it happened in the parent conversation
         const parentConversationId = findConversationByGroupId(groupId);
-        if (!parentConversationId) {
+        if (parentConversationId === undefined) {
           this.logger.debug('Ignoring NEW_EPOCH event: could not map to parent conversation');
           return;
         }
@@ -294,7 +295,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
         parentConversationGroupId,
       );
 
-      if (!subconversationEpochInfo) {
+      if (is.nullOrUndefined(subconversationEpochInfo)) {
         this.logger.debug('No subconversation epoch info available; skipping callback', {
           parentConversationId,
           parentConversationGroupId,

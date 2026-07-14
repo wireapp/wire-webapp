@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {BannerPortal} from 'Components/BannerPortal/BannerPortal';
+import {BannerPortal} from 'Components/bannerPortal/bannerPortal';
 import * as Icon from 'Components/icon';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';

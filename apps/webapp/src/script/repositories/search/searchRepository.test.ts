@@ -25,7 +25,7 @@ import {createUuid} from 'Util/uuid';
 import {SearchRepository} from './searchRepository';
 
 import {randomInt} from '../../auth/util/randomUtil';
-import {generateUsers} from '../../auth/util/test/TestUtil';
+import {generateUsers} from '../../auth/util/test/testUtil';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import {translateForTest} from 'Util/test/translateForTest';

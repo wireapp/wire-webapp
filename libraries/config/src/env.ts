@@ -169,6 +169,9 @@ export type Env = {
   /** Time in seconds after the last unlock which forces the app to lock */
   FEATURE_APPLOCK_SCHEDULED_TIMEOUT: string;
 
+  /** Feature toggle to enable MDM config support for app lock */
+  FEATURE_ENABLE_MDM_CONFIG: string;
+
   /** Feature toggle to automatically mute when accepting incoming conference calls */
   FEATURE_CONFERENCE_AUTO_MUTE: string;
 

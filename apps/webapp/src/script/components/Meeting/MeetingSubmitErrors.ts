@@ -17,20 +17,17 @@
  *
  */
 
-import type {ScheduleFormErrors} from './ScheduleFormErrors';
+import type {ScheduleFormErrorCode} from './ScheduleFormErrors';
 
 export const meetingSubmitErrors = {
   createFailed: 'createFailed',
   updateFailed: 'updateFailed',
   editMeetingIdMissing: 'editMeetingIdMissing',
-  addInvitationFailed: 'addInvitationFailed',
-  removeInvitationFailed: 'removeInvitationFailed',
+  addParticipantsFailed: 'addParticipantsFailed',
+  removeParticipantsFailed: 'removeParticipantsFailed',
+  refreshFailed: 'refreshFailed',
 } as const;
 
 export type MeetingSubmitErrorCode = (typeof meetingSubmitErrors)[keyof typeof meetingSubmitErrors];
 
-export type ScheduleMeetingErrors = ScheduleFormErrors | Extract<MeetingSubmitErrorCode, 'createFailed'>;
-
-export type UpdateMeetingErrors = ScheduleFormErrors | Exclude<MeetingSubmitErrorCode, 'createFailed'>;
-
-export type MeetingSubmitErrors = ScheduleFormErrors | MeetingSubmitErrorCode;
+export type MeetingSubmitErrors = ScheduleFormErrorCode | MeetingSubmitErrorCode;

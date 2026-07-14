@@ -17,13 +17,22 @@
  *
  */
 
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-export const canEditMeeting = (meeting: Meeting, selfUser: User, nowMs: number): boolean => {
-  const isHost = matchQualifiedIds(meeting.qualified_creator, selfUser.qualifiedId);
-  const hasNotStarted = nowMs < new Date(meeting.start_date).getTime();
+export const isMeetingHost = (meetingSeries: MeetingSeries, selfUser: User): boolean =>
+  matchQualifiedIds(meetingSeries.qualified_creator, selfUser.qualifiedId);
 
-  return isHost && hasNotStarted;
+/**
+ * Edit is allowed per list row: the host may edit an instance until it starts.
+ *
+ * The edit form is prefilled from the upcoming instance start/end for recurring series
+ * ({@link mapMeetingInstanceToScheduleFormState}); the series `qualified_id` is used for the update.
+ */
+export const canEditMeeting = (meetingInstance: MeetingInstance, selfUser: User, nowMilliseconds: number): boolean => {
+  const instanceHasNotStarted = nowMilliseconds < meetingInstance.start.getTime();
+
+  return isMeetingHost(meetingInstance.meetingSeries, selfUser) && instanceHasNotStarted;
 };

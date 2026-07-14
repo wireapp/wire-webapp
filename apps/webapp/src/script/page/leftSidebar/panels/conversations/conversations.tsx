@@ -418,6 +418,64 @@ export const Conversations = ({
     setCurrentTab(SidebarTabs.RECENT);
   }, [switchList, setCurrentTab]);
 
+  let conversationsPanelContent;
+  if (isCells || isMeetings) {
+    conversationsPanelContent = null;
+  } else if (isPreferences) {
+    conversationsPanelContent = (
+      <Preferences
+        onPreferenceItemClick={onClickPreferences}
+        teamRepository={teamRepository}
+        preferenceNotificationRepository={preferenceNotificationRepository}
+        {...(isTemporaryGuest && {
+          onClose: onExitPreferences,
+        })}
+      />
+    );
+  } else {
+    conversationsPanelContent = (
+      <>
+        {currentTab === SidebarTabs.CONNECT && (
+          <StartUI
+            conversationRepository={conversationRepository}
+            searchRepository={searchRepository}
+            teamRepository={teamRepository}
+            integrationRepository={integrationRepository}
+            mainViewModel={listViewModel.mainViewModel}
+            userRepository={userRepository}
+            isFederated={listViewModel.isFederated}
+            selfUser={selfUser}
+          />
+        )}
+
+        {hasEmptyConversationsList && (
+          <EmptyConversationList currentTab={currentTab} onChangeTab={changeTab} searchValue={conversationsFilter} />
+        )}
+
+        {showSearchInput && (
+          <ConversationsList
+            conversationsFilter={conversationsFilter}
+            currentFolder={currentFolder}
+            conversationLabelRepository={conversationLabelRepository}
+            callState={callState}
+            currentFocus={currentFocus}
+            listViewModel={listViewModel}
+            connectRequests={showConnectionRequests ? connectRequests : []}
+            handleArrowKeyDown={handleKeyDown}
+            conversationState={conversationState}
+            conversations={currentTabConversations}
+            resetConversationFocus={resetConversationFocus}
+            clearSearchFilter={clearConversationFilter}
+            isEmpty={hasEmptyConversationsList}
+            groupParticipantsConversations={groupParticipantsConversations}
+            isGroupParticipantsVisible={isGroupParticipantsVisible}
+            searchInputRef={searchInputRef}
+          />
+        )}
+      </>
+    );
+  }
+
   return (
     <div className="conversations-wrapper">
       <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(isScreenLessThanMdBreakpoint)} />
@@ -473,60 +531,7 @@ export const Conversations = ({
           />
         }
       >
-        {isCells || isMeetings ? null : isPreferences ? (
-          <Preferences
-            onPreferenceItemClick={onClickPreferences}
-            teamRepository={teamRepository}
-            preferenceNotificationRepository={preferenceNotificationRepository}
-            {...(isTemporaryGuest && {
-              onClose: onExitPreferences,
-            })}
-          />
-        ) : (
-          <>
-            {currentTab === SidebarTabs.CONNECT && (
-              <StartUI
-                conversationRepository={conversationRepository}
-                searchRepository={searchRepository}
-                teamRepository={teamRepository}
-                integrationRepository={integrationRepository}
-                mainViewModel={listViewModel.mainViewModel}
-                userRepository={userRepository}
-                isFederated={listViewModel.isFederated}
-                selfUser={selfUser}
-              />
-            )}
-
-            {hasEmptyConversationsList && (
-              <EmptyConversationList
-                currentTab={currentTab}
-                onChangeTab={changeTab}
-                searchValue={conversationsFilter}
-              />
-            )}
-
-            {showSearchInput && (
-              <ConversationsList
-                conversationsFilter={conversationsFilter}
-                currentFolder={currentFolder}
-                conversationLabelRepository={conversationLabelRepository}
-                callState={callState}
-                currentFocus={currentFocus}
-                listViewModel={listViewModel}
-                connectRequests={showConnectionRequests ? connectRequests : []}
-                handleArrowKeyDown={handleKeyDown}
-                conversationState={conversationState}
-                conversations={currentTabConversations}
-                resetConversationFocus={resetConversationFocus}
-                clearSearchFilter={clearConversationFilter}
-                isEmpty={hasEmptyConversationsList}
-                groupParticipantsConversations={groupParticipantsConversations}
-                isGroupParticipantsVisible={isGroupParticipantsVisible}
-                searchInputRef={searchInputRef}
-              />
-            )}
-          </>
-        )}
+        {conversationsPanelContent}
       </ListWrapper>
     </div>
   );

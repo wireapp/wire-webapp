@@ -33,6 +33,7 @@ import {pdfjs} from 'react-pdf';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
+import {createFireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -51,7 +52,7 @@ import {ConversationService} from 'Repositories/conversation/ConversationService
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {OnConversationE2EIVerificationStateChange} from 'Repositories/conversation/ConversationVerificationStateHandler/shared';
 import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {MessageRepository, MessageRepositoryOptions} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
@@ -102,10 +103,10 @@ import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from '
 import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {Config, Configuration} from '../Config';
-import {E2EIHandler} from '../E2EIdentity';
-import {getModalOptions, ModalType} from '../E2EIdentity/modals';
+import {E2EIHandler} from '../e2eIdentity';
+import {getModalOptions, ModalType} from '../e2eIdentity/modals';
 import {AccessTokenError} from '../error/accessTokenError';
 import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';
@@ -196,6 +197,9 @@ export class App {
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
     private readonly translate: Translate,
+    private readonly messageRepositoryOptions: MessageRepositoryOptions = {
+      isMessageSendingStatusFixEnabled: false,
+    },
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -297,6 +301,7 @@ export class App {
       repositories.asset,
       repositories.audio,
       this.translate,
+      this.messageRepositoryOptions,
     );
 
     repositories.calling = new CallingRepository(
@@ -478,6 +483,7 @@ export class App {
         self: selfRepository,
         cells: cellsRepository,
       } = this.repository;
+      const bgEffectsHandler = callingRepository.getBackgroundEffectsHandler();
       await checkIndexedDb();
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
@@ -593,6 +599,16 @@ export class App {
       eventLogger.log(AppInitializationStep.ConversationsLoaded);
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
+
+      const fireAndForgetInvoker = createFireAndForgetInvoker({
+        logger: this.logger,
+      });
+
+      fireAndForgetInvoker.fireAndForget(() =>
+        bgEffectsHandler.preloadResources().catch((error: unknown) => {
+          this.logger.warn('[virtual-background] preload failed, starting without resources', error);
+        }),
+      );
 
       if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)

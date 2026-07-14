@@ -21,7 +21,7 @@ import {useCallback, useState} from 'react';
 
 import {CellsSortDirection} from '../CellsSortIcon/CellsSortIcon';
 
-export type CellsSortField = 'name_ci' | 'mtime' | 'size';
+export type CellsSortField = 'name' | 'mtime' | 'size';
 
 export interface CellsSort {
   field: CellsSortField;
@@ -31,7 +31,7 @@ export interface CellsSort {
 // Direction applied the first time a column is selected:
 // name → A→Z, modified → newest first, size → smallest first.
 const DEFAULT_DIRECTION: Record<CellsSortField, CellsSortDirection> = {
-  name_ci: 'asc',
+  name: 'asc',
   mtime: 'desc',
   size: 'asc',
 };
@@ -39,7 +39,7 @@ const DEFAULT_DIRECTION: Record<CellsSortField, CellsSortDirection> = {
 // Maps a table column id (the accessor key) to its backend sort field. Columns absent
 // from this map are not sortable and receive no aria-sort.
 export const SORTABLE_COLUMN_FIELD: Record<string, CellsSortField> = {
-  name: 'name_ci',
+  name: 'name',
   sizeMb: 'size',
   uploadedAtTimestamp: 'mtime',
 };
@@ -56,27 +56,51 @@ export const toAriaSort = (direction: CellsSortDirection | undefined): 'ascendin
   return 'none';
 };
 
-export const useCellsSorting = () => {
-  const [sort, setSort] = useState<CellsSort | null>(null);
+interface CellsSortingState {
+  scopeKey: string;
+  sort: CellsSort | null;
+}
 
-  const toggleSort = useCallback((field: CellsSortField) => {
-    setSort(current => {
-      // Selecting a different column starts at that column's default direction.
-      if (current?.field !== field) {
-        return {field, direction: DEFAULT_DIRECTION[field]};
-      }
-      // Re-selecting the active column flips the direction. The unsorted state is only
-      // reached when entering a new sorting scope, not by clicking the active column.
-      return {field, direction: current.direction === 'asc' ? 'desc' : 'asc'};
-    });
-  }, []);
+const DEFAULT_SCOPE_KEY = 'default';
+
+export const useCellsSorting = (scopeKey = DEFAULT_SCOPE_KEY) => {
+  const [state, setSortState] = useState<CellsSortingState>({scopeKey, sort: null});
+
+  // Scope changes must clear synchronously so request hooks never receive a stale sort.
+  if (state.scopeKey !== scopeKey) {
+    setSortState({scopeKey, sort: null});
+  }
+
+  const sort = state.scopeKey === scopeKey ? state.sort : null;
+
+  const setSort = useCallback(
+    (nextSort: CellsSort | null) => {
+      setSortState({scopeKey, sort: nextSort});
+    },
+    [scopeKey],
+  );
+
+  const toggleSort = useCallback(
+    (field: CellsSortField) => {
+      setSortState(current => {
+        const currentSort = current.scopeKey === scopeKey ? current.sort : null;
+
+        // Selecting a different column starts at that column's default direction.
+        if (currentSort?.field !== field) {
+          return {scopeKey, sort: {field, direction: DEFAULT_DIRECTION[field]}};
+        }
+        // Re-selecting the active column flips the direction. The unsorted state is only
+        // reached when entering a new sorting scope, not by clicking the active column.
+        return {scopeKey, sort: {field, direction: currentSort.direction === 'asc' ? 'desc' : 'asc'}};
+      });
+    },
+    [scopeKey],
+  );
 
   const getDirectionFor = useCallback(
     (field: CellsSortField): CellsSortDirection | undefined => (sort?.field === field ? sort.direction : undefined),
     [sort],
   );
 
-  const resetSort = () => setSort(null);
-
-  return {sort, toggleSort, resetSort, getDirectionFor};
+  return {sort, setSort, toggleSort, getDirectionFor};
 };

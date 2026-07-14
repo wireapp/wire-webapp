@@ -29,7 +29,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';

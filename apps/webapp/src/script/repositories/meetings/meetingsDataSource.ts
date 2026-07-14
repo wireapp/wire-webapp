@@ -26,6 +26,4 @@ export interface MeetingsDataSource {
   createMeeting(payload: CreateMeeting): Promise<Meeting>;
   getMeetingsList(): Promise<Meeting[]>;
   updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Promise<Meeting>;
-  addMeetingInvitation(meetingId: QualifiedId, emails: string[]): Promise<void>;
-  removeMeetingInvitation(meetingId: QualifiedId, emails: string[]): Promise<void>;
 }

@@ -34,7 +34,7 @@ import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {Config} from 'src/script/Config';
 import {translate} from 'Util/localizerUtil';
 import {

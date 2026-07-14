@@ -17,15 +17,12 @@
  *
  */
 
-import {mapApiMeetingToListMeeting} from 'Components/Meeting/mapApiMeetingToListMeeting';
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import {mapApiMeetingToSeries} from 'Components/Meeting/mapApiMeetingToSeries';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import {getLogger} from 'Util/logger';
 
-export type MeetingsListErrorKey = 'meetings.list.loadError';
-
-export type LoadMeetingsListResult =
-  {meetings: Meeting[]; errorKey?: undefined} | {meetings: Meeting[]; errorKey: MeetingsListErrorKey};
+export type LoadMeetingsListResult = {meetingSeries: MeetingSeries[]; hasLoadError: boolean};
 
 const logger = getLogger('loadMeetingsList');
 
@@ -34,8 +31,22 @@ export const loadMeetingsList = async (meetingsRepository: MeetingsRepository): 
 
   if (listResult.isErr) {
     logger.warn('Failed to load meetings list', listResult.error);
-    return {meetings: [], errorKey: 'meetings.list.loadError'};
+    return {meetingSeries: [], hasLoadError: true};
   }
 
-  return {meetings: listResult.value.map(mapApiMeetingToListMeeting)};
+  const meetingSeries = listResult.value.flatMap(apiMeeting => {
+    const mapResult = mapApiMeetingToSeries(apiMeeting);
+
+    if (mapResult.isErr) {
+      logger.warn('Skipping invalid meeting from API response', {
+        error: mapResult.error,
+        qualifiedId: apiMeeting.qualified_id,
+      });
+      return [];
+    }
+
+    return [mapResult.value];
+  });
+
+  return {meetingSeries, hasLoadError: false};
 };

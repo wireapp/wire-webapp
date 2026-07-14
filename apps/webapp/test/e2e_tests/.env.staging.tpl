@@ -30,10 +30,6 @@ CALLING_SERVICE_INSTANCE_VERSION=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/
 
 ENV_NAME=staging
 
-# SCIM user for e2e tests
-SCIM_USER_EMAIL=op://Test Automation/Staging SCIM user/okta username
-SCIM_USER_PASSWORD="{{ op://Test Automation/Staging SCIM user/okta password }}"
-SCIM_USER_SSO_CODE=op://Test Automation/Staging SCIM user/SSO code
 
 SSO_CLAIMED_USER_EMAIL=op://Test Automation/Staging Claimed Domain User/email
 SSO_CLAIMED_USER_PASSWORD=op://Test Automation/Staging Claimed Domain User/password
@@ -47,7 +43,7 @@ WEBAPP_URL=op://Test Automation/BackendConnection staging/webappUrl
 DOMAIN=op://Test Automation/BackendConnection staging/domain
 BASIC_AUTH=op://Test Automation/BackendConnection staging/basicAuth
 
-FEDERATION_BACKEND_URL=op://Test Automation/BackendConnection anta/backendUrl
-FEDERATION_WEBAPP_URL=op://Test Automation/BackendConnection anta/webappUrl
-FEDERATION_DOMAIN=op://Test Automation/BackendConnection anta/domain
-FEDERATION_BASIC_AUTH=op://Test Automation/BackendConnection anta/basicAuth
+FEDERATION_BACKEND_URL=op://Test Automation/BackendConnection qa-federation-a/backendUrl
+FEDERATION_WEBAPP_URL=op://Test Automation/BackendConnection qa-federation-a/webappUrl
+FEDERATION_DOMAIN=op://Test Automation/BackendConnection qa-federation-a/domain
+FEDERATION_BASIC_AUTH=op://Test Automation/BackendConnection qa-federation-a/basicAuth

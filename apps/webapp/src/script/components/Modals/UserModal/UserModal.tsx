@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EnrichedFields} from 'Components/panel/enrichedFields';
@@ -233,6 +233,13 @@ const UserModal = ({
   const replaceLinkLegalHold = replaceLink(Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK, '', 'read-more-legal-hold');
   const blockedForLegalHoldMessageHtml = translate('modalUserBlockedForLegalHold', undefined, replaceLinkLegalHold);
 
+  let modalDataUieName = '';
+  if (user) {
+    modalDataUieName = 'modal-user-profile';
+  } else if (userNotFound) {
+    modalDataUieName = 'modal-cannot-open-profile';
+  }
+
   return (
     <ModalComponent
       isShown={isShown}
@@ -240,7 +247,7 @@ const UserModal = ({
       onClosed={onModalClosed}
       className="user-modal"
       css={userModalStyle}
-      data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
+      data-uie-name={modalDataUieName}
       wrapperCSS={userModalWrapperStyle}
     >
       <div className="modal__header">

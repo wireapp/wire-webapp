@@ -26,6 +26,7 @@ import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSu
 
 import {useGetAllCellsNodes} from './useGetAllCellsNodes';
 
+import type {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 const CONV_ID = 'conv-abc';
@@ -60,24 +61,27 @@ function renderGetAllNodesHook({
   userRepository = createFakeUserRepository(),
   enabled = true,
   fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
+  sort = null,
 }: {
   cellsRepository?: FakeCellsRepository;
   userRepository?: FakeUserRepository;
   enabled?: boolean;
   fireAndForgetInvoker?: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
+  sort?: CellsSort | null;
 } = {}) {
   return {
     fireAndForgetInvoker,
     ...renderHook(
-      ({enabled}: {enabled: boolean}) =>
+      ({enabled, sort}: {enabled: boolean; sort: CellsSort | null}) =>
         useGetAllCellsNodes({
           cellsRepository: cellsRepository as unknown as CellsRepository,
           userRepository: userRepository as unknown as UserRepository,
           conversationQualifiedId: QUALIFIED_ID,
           enabled,
           fireAndForgetInvoker,
+          sort,
         }),
-      {initialProps: {enabled}},
+      {initialProps: {enabled, sort}},
     ),
   };
 }
@@ -96,7 +100,7 @@ describe('useGetAllCellsNodes', () => {
     const {rerender} = renderGetAllNodesHook({cellsRepository, fireAndForgetInvoker});
     await waitFor(() => expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(1));
 
-    act(() => rerender({enabled: false}));
+    act(() => rerender({enabled: false, sort: null}));
 
     act(() => {
       fetch.resolve({Nodes: [createRestNode('stale-file.txt')]});
@@ -104,6 +108,60 @@ describe('useGetAllCellsNodes', () => {
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toHaveLength(0);
+  });
+
+  it('keeps the browse order natural when no sort is selected', async () => {
+    const cellsRepository = createFakeCellsRepository();
+    const {fireAndForgetInvoker} = renderGetAllNodesHook({cellsRepository});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.getAllNodes).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortBy: undefined,
+        sortDirection: undefined,
+      }),
+    );
+  });
+
+  it('passes the selected sort to the browse request', async () => {
+    const cellsRepository = createFakeCellsRepository();
+    const {fireAndForgetInvoker} = renderGetAllNodesHook({
+      cellsRepository,
+      sort: {field: 'mtime', direction: 'desc'},
+    });
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.getAllNodes).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortBy: 'mtime',
+        sortDirection: 'desc',
+      }),
+    );
+  });
+
+  it('resets to the first page before fetching when sort changes', async () => {
+    const cellsRepository = createFakeCellsRepository();
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+
+    const {result, rerender} = renderGetAllNodesHook({cellsRepository, fireAndForgetInvoker});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    act(() => result.current.setOffset(50));
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.getAllNodes).toHaveBeenLastCalledWith(expect.objectContaining({offset: 50}));
+
+    act(() => rerender({enabled: true, sort: {field: 'name', direction: 'asc'}}));
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(3);
+    expect(cellsRepository.getAllNodes).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        offset: 0,
+        sortBy: 'name',
+        sortDirection: 'asc',
+      }),
+    );
   });
 
   it('does not let an older response overwrite a newer fetch', async () => {

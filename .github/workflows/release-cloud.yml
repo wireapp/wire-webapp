@@ -123,8 +123,13 @@ jobs:
       - name: Update configuration
         run: ./bin/yarn nx run webapp:configure
 
-      - name: Build and package
-        run: ./bin/yarn nx run server:package
+      - name: Build and package public production
+        if: ${{ inputs.promote_to_production }}
+        run: ./bin/yarn build:prod:public
+
+      - name: Build and package internal production
+        if: ${{ !inputs.promote_to_production }}
+        run: ./bin/yarn build:prod
 
       - name: Compute artifact metadata
         id: artifact_metadata

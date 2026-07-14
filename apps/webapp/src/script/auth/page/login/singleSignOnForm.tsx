@@ -38,12 +38,12 @@ import {isBackendError} from 'Util/typePredicateUtil';
 import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, requiresPasswordModal} from './util';
 
 import {Config} from '../../../Config';
-import {JoinGuestLinkPasswordModal} from '../../component/JoinGuestLinkPasswordModal';
+import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
-import {ValidationError} from '../../module/action/ValidationError';
+import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
-import * as AuthSelector from '../../module/selector/AuthSelector';
-import * as ConversationSelector from '../../module/selector/ConversationSelector';
+import * as AuthSelector from '../../module/selector/authSelector';
+import * as ConversationSelector from '../../module/selector/conversationSelector';
 import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
@@ -313,6 +313,31 @@ const SingleSignOnFormComponent = ({
     await handleSubmit(undefined, password);
   };
 
+  const renderStatusMessage = () => {
+    if (validationError !== null && validationError !== undefined) {
+      return parseValidationErrors([validationError]);
+    }
+    if (authError !== null && authError !== undefined) {
+      return parseError(authError);
+    }
+    if (ssoError !== null) {
+      return parseError(ssoError);
+    }
+    if (is.nonEmptyString(logoutReason)) {
+      return (
+        <ErrorMessage data-uie-name="status-logout-reason">
+          <FormattedMessage
+            id={logoutReasonStrings[logoutReason]}
+            values={{
+              newline: <br />,
+            }}
+          />
+        </ErrorMessage>
+      );
+    }
+    return null;
+  };
+
   if (isLoading) {
     return <Loading style={{marginTop: '24px'}} />;
   }
@@ -359,22 +384,7 @@ const SingleSignOnFormComponent = ({
         >
           {translate('login.headline')}
         </Button>
-        {validationError !== null && validationError !== undefined
-          ? parseValidationErrors([validationError])
-          : authError !== null && authError !== undefined
-            ? parseError(authError)
-            : ssoError !== null
-              ? parseError(ssoError)
-              : is.nonEmptyString(logoutReason) && (
-                  <ErrorMessage data-uie-name="status-logout-reason">
-                    <FormattedMessage
-                      id={logoutReasonStrings[logoutReason]}
-                      values={{
-                        newline: <br />,
-                      }}
-                    />
-                  </ErrorMessage>
-                )}
+        {renderStatusMessage()}
 
         {!Runtime.isDesktopApp() && (
           <Checkbox

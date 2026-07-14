@@ -18,8 +18,8 @@
     "./lib/shims/node/websocket": "./lib/shims/browser/websocket.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.1076.0",
-    "@aws-sdk/lib-storage": "3.1076.0",
+    "@aws-sdk/client-s3": "3.1085.0",
+    "@aws-sdk/lib-storage": "3.1085.0",
     "@wireapp/commons": "workspace:^",
     "@wireapp/priority-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.56.0",
@@ -43,12 +43,12 @@
     "@wireapp/store-engine": "workspace:^",
     "@wireapp/store-engine-fs": "workspace:^",
     "browser-sync": "3.0.4",
-    "concurrently": "9.2.3",
+    "concurrently": "9.2.4",
     "jest": "30.4.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "ts-node": "10.9.2",
-    "webpack": "5.108.3",
+    "webpack": "5.108.4",
     "ws": "8.21.0"
   },
   "scripts": {

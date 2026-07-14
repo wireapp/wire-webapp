@@ -33,7 +33,7 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {ContentState} from 'src/script/page/useAppState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';

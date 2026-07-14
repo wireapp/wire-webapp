@@ -21,7 +21,7 @@ import {useMemo, useState} from 'react';
 
 import {container} from 'tsyringe';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {TeamState} from 'Repositories/team/TeamState';

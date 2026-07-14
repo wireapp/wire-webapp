@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -55,6 +55,7 @@ const VideoAsset = ({
   message,
   isQuote,
   teamState = container.resolve(TeamState),
+  assetRepository = container.resolve(AssetRepository),
   isFocusable = true,
 }: VideoAssetProps) => {
   const {translate} = useApplicationContext();
@@ -71,22 +72,51 @@ const VideoAsset = ({
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [displaySmall, setDisplaySmall] = useState(isQuote === true);
   const {transferState, isUploading, isPendingUpload, uploadProgress, cancelUpload, getAssetUrl, downloadAsset} =
-    useAssetTransfer(message);
+    useAssetTransfer(message, assetRepository);
 
   const [hideControls, setHideControls] = useState(false);
   const hideControlsCallback = useCallback(() => setHideControls(true), []);
   const {removeTimeout, startTimeout} = useTimeout(hideControlsCallback, hideControlsDelayMilliseconds);
 
+  const isMountedRef = useRef(true);
+
   useEffect(() => {
-    if (assetPreviewResource !== undefined && isFileSharingReceivingEnabled) {
-      void getAssetUrl(assetPreviewResource).then(setVideoPreview);
-    }
+    isMountedRef.current = true;
 
     return () => {
-      videoPreview?.dispose();
-      videoSrc?.dispose();
+      isMountedRef.current = false;
     };
-  }, [assetPreviewResource, getAssetUrl, isFileSharingReceivingEnabled, videoPreview, videoSrc]);
+  }, []);
+
+  useEffect(() => {
+    return () => videoPreview?.dispose();
+  }, [videoPreview]);
+
+  useEffect(() => {
+    return () => videoSrc?.dispose();
+  }, [videoSrc]);
+
+  useEffect(() => {
+    if (assetPreviewResource === undefined || !isFileSharingReceivingEnabled) {
+      setVideoPreview(undefined);
+      return;
+    }
+
+    let cancelled = false;
+
+    void getAssetUrl(assetPreviewResource).then(url => {
+      if (cancelled) {
+        url.dispose();
+        return;
+      }
+
+      setVideoPreview(url);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [assetPreviewResource, getAssetUrl, isFileSharingReceivingEnabled]);
 
   // Initial check if video is supported with `canPlayType` method, which checks for MIME type, e.g. 'video/mp4' or 'video/mov'.
   // It's not 100% reliable (e.g. doesn't check codecs), but it's synchorous, which is helpful for initial rendering.
@@ -134,12 +164,24 @@ const VideoAsset = ({
 
         try {
           const assetUrl = await getAssetUrl(asset.original_resource());
+
+          if (!isMountedRef.current) {
+            assetUrl.dispose();
+            return;
+          }
+
           const playable = await isVideoPlayable(assetUrl.url);
+
+          if (!isMountedRef.current) {
+            assetUrl.dispose();
+            return;
+          }
 
           if (!playable) {
             // ToDo: This needs to be revisited
             // amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
             // amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNPLAYABLE_ERROR);
+            assetUrl.dispose();
             setVideoPlaybackError(true);
             return;
           }
@@ -149,6 +191,10 @@ const VideoAsset = ({
           // ToDo: This needs to be revisited
           //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);
         } catch (error: unknown) {
+          if (!isMountedRef.current) {
+            return;
+          }
+
           if (error instanceof Error) {
             if (error.name !== AssetError.CANCEL_ERROR) {
               setVideoPlaybackError(true);
@@ -159,7 +205,9 @@ const VideoAsset = ({
           console.error('Failed to load video asset ', error);
         }
 
-        asset.status(AssetTransferState.UPLOADED);
+        if (isMountedRef.current) {
+          asset.status(AssetTransferState.UPLOADED);
+        }
       }
     }
   };

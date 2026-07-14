@@ -19,29 +19,44 @@
 
 import {useCallback} from 'react';
 
-import {container} from 'tsyringe';
-
-import {getScheduleMeetingParticipantPool} from 'Components/Meeting/getScheduleMeetingParticipantPool';
-import {mapMeetingToScheduleFormState} from 'Components/Meeting/mapMeetingToScheduleFormState';
-import type {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingErrorKeys';
+import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {useScheduleMeetingModal} from './ScheduleMeetingModal/useScheduleMeetingModal';
 
 export const useEditMeeting = () => {
+  const {translate} = useApplicationContext();
+  const loadMeetingForEdit = useMeetingStore(state => state.loadMeetingForEdit);
   const openEdit = useScheduleMeetingModal(state => state.openEdit);
 
   const editMeeting = useCallback(
-    (meeting: Meeting) => {
-      const userState = container.resolve(UserState);
-      const teamState = container.resolve(TeamState);
-      const availableUsers = getScheduleMeetingParticipantPool(userState, teamState);
-      const formState = mapMeetingToScheduleFormState(meeting, availableUsers);
+    async (meetingInstance: MeetingInstance) => {
+      const loadResult = await loadMeetingForEdit(meetingInstance);
 
-      openEdit(meeting, formState);
+      if (loadResult.isErr) {
+        const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[meetingSubmitErrors.updateFailed];
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            text: {
+              title: translate(titleKey),
+              message: translate(messageKey),
+            },
+          },
+          undefined,
+          translate,
+        );
+        return;
+      }
+
+      const {formState, qualifiedConversation, originalSelectedUsers} = loadResult.value;
+      openEdit(meetingInstance.meetingSeries, formState, qualifiedConversation, originalSelectedUsers);
     },
-    [openEdit],
+    [loadMeetingForEdit, openEdit, translate],
   );
 
   return {editMeeting};

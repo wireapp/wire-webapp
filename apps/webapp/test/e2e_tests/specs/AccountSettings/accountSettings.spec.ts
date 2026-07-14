@@ -80,9 +80,9 @@ test.describe('account settings', () => {
   );
 
   const ssoUser = getUser({
-    email: process.env.SCIM_USER_SSO_CODE,
-    username: process.env.SCIM_USER_EMAIL,
-    password: process.env.SCIM_USER_PASSWORD,
+    email: process.env.SSO_CLAIMED_USER_EMAIL,
+    username: process.env.SSO_CLAIMED_USER_EMAIL,
+    password: process.env.SSO_CLAIMED_USER_PASSWORD,
   });
 
   test(
@@ -107,9 +107,10 @@ test.describe('account settings', () => {
 
       await test.step('Remove an existing device and confirm new history', async () => {
         // Since this test re-uses the same user over and over again we need to always remove one of the previously registered devices
-        await page.getByRole('button', {name: 'Remove device'}).first().click({timeout: LOGIN_TIMEOUT});
+        await page.getByRole('button', {name: 'Remove device'}).first().click({timeout: 10_000});
+
         // We will also always be prompted to confirm the new history on this device
-        await pages.historyInfo().clickConfirmButton();
+        await pages.historyInfo().continueButton.click({timeout: 10_000});
         await expect(components.conversationSidebar().sidebar, 'Login took more than 60s').toBeVisible({
           timeout: 60_000, // The login for this user may take some time since it's persisted and checking for messages takes extra time
         });

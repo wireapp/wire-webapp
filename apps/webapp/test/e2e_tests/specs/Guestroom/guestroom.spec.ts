@@ -581,12 +581,13 @@ test.describe('Guestroom', () => {
   );
 
   const ssoUser = getUser({
-    email: process.env.SCIM_USER_SSO_CODE,
-    username: process.env.SCIM_USER_EMAIL,
-    password: process.env.SCIM_USER_PASSWORD,
+    email: process.env.SSO_CLAIMED_USER_EMAIL,
+    username: process.env.SSO_CLAIMED_USER_EMAIL,
+    password: process.env.SSO_CLAIMED_USER_PASSWORD,
   });
 
-  test(
+  // Todo: This test is skipped because of disabled Okta account [WPB-26999]
+  test.skip(
     'I want to join guestroom invite with enterprise login',
     {tag: ['@TC-3477', '@regression']},
     async ({context, createPage}) => {

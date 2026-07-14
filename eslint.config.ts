@@ -106,6 +106,20 @@ const webappImportOrderRule: Linter.RuleEntry = [
   },
 ];
 
+const strictBooleanExpressionsRule: Linter.RuleEntry = [
+  'error',
+  {
+    allowAny: false,
+    allowNullableBoolean: false,
+    allowNullableEnum: false,
+    allowNullableNumber: false,
+    allowNullableObject: false,
+    allowNullableString: false,
+    allowNumber: false,
+    allowString: false,
+  },
+];
+
 const config: Linter.Config[] = [
   {ignores},
   ...cleanedBase,
@@ -205,7 +219,6 @@ const config: Linter.Config[] = [
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/strict-boolean-expressions': 'error',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -232,6 +245,23 @@ const config: Linter.Config[] = [
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
       },
+    },
+  },
+  {
+    files: [
+      'apps/server/**/*.{ts,tsx}',
+      'libraries/api-client/**/*.{ts,tsx}',
+      'libraries/commons/**/*.{ts,tsx}',
+      'libraries/certificate-check/**/*.{ts,tsx}',
+      'libraries/core/**/*.{ts,tsx}',
+      'libraries/copy-config/**/*.{ts,tsx}',
+      'libraries/license-collector/**/*.{ts,tsx}',
+      'libraries/store-engine/**/*.{ts,tsx}',
+      'libraries/store-engine-dexie/**/*.{ts,tsx}',
+      'libraries/react-ui-kit/**/*.{ts,tsx}',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
     },
   },
   {
@@ -292,12 +322,6 @@ const config: Linter.Config[] = [
     files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
     rules: {
       'import/no-default-export': 'off',
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/components/**/*.{ts,tsx}'],
-    rules: {
-      '@typescript-eslint/strict-boolean-expressions': 'error',
     },
   },
   {

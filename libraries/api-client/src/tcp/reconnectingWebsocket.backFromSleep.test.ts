@@ -26,13 +26,14 @@ import {
   ReconnectingWebsocketWallClock,
   WEBSOCKET_STATE,
 } from './reconnectingWebsocket';
+import {BackFromSleepDetails} from '../utils/backFromSleepHandler/backFromSleepHandler';
 
 type BackFromSleepRegistrationWithoutDisconnectedGate = {
-  readonly callback: () => void;
+  readonly callback: (details: BackFromSleepDetails) => void;
 };
 
 type BackFromSleepRegistrationWithDisconnectedGate = {
-  readonly callback: () => void;
+  readonly callback: (details: BackFromSleepDetails) => void;
   readonly isDisconnected: () => boolean;
 };
 
@@ -58,6 +59,12 @@ type MockSocket = {
 };
 
 type MockWebsocketFactory = jest.Mock<MockSocket, []>;
+
+const backFromSleepDetails: BackFromSleepDetails = {
+  expectedIntervalMilliseconds: 2_000,
+  observedIntervalMilliseconds: 8_000,
+  suspensionDurationMilliseconds: 6_000,
+};
 
 function createTestWallClock(currentTimestampInMilliseconds: number): ReconnectingWebsocketWallClock {
   return {
@@ -162,7 +169,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     websocket.connect();
     websocket['hasUnansweredPing'] = true;
 
-    getLatestBackFromSleepRegistration(registrations).callback();
+    getLatestBackFromSleepRegistration(registrations).callback(backFromSleepDetails);
 
     expect(oldSocket.close).toHaveBeenCalledTimes(1);
     expect(oldSocket.close).toHaveBeenCalledWith(CloseEventCode.NORMAL_CLOSURE, 'Back from sleep');
@@ -171,6 +178,90 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     expect(websocket['socket']).toBe(newSocket);
     expectSocketHandlersToBeBound(newSocket);
     expect(websocket['hasUnansweredPing']).toBe(false);
+  });
+
+  it('increments connection attempts while preserving the wrapper generation', async () => {
+    const socket = createMockSocket(WEBSOCKET_STATE.CONNECTING);
+    const onReconnect = jest.fn().mockResolvedValue('wss://example.test/await');
+    const websocket = new ReconnectingWebsocket(onReconnect, {
+      backFromSleepHandler: Maybe.nothing(),
+      pingInterval: Maybe.nothing(),
+      wallClock: createTestWallClock(0),
+      websocketFactory: Maybe.just(createMockWebsocketFactory(socket)),
+    });
+    websocket.connect();
+
+    await websocket['internalOnReconnect']();
+    await websocket['internalOnReconnect']();
+
+    expect(onReconnect).toHaveBeenNthCalledWith(1, {
+      attemptId: 1,
+      reconnectAttemptCount: 1,
+      reconnectSequenceRetryCount: 0,
+      wrapperGeneration: 1,
+    });
+    expect(onReconnect).toHaveBeenNthCalledWith(2, {
+      attemptId: 2,
+      reconnectAttemptCount: 2,
+      reconnectSequenceRetryCount: 1,
+      wrapperGeneration: 1,
+    });
+    websocket.disconnect();
+  });
+
+  it('passes the active reconnect context to the socket-open callback', async () => {
+    const socket = createMockSocket(WEBSOCKET_STATE.CONNECTING);
+    const websocket = new ReconnectingWebsocket(jest.fn().mockResolvedValue('wss://example.invalid/await'), {
+      backFromSleepHandler: Maybe.nothing(),
+      pingInterval: Maybe.nothing(),
+      wallClock: createTestWallClock(0),
+      websocketFactory: Maybe.just(createMockWebsocketFactory(socket)),
+    });
+    const onOpen = jest.fn();
+    websocket.setOnOpen(onOpen);
+    websocket.connect();
+
+    await websocket['internalOnReconnect']();
+    socket.onopen?.({type: 'open'} as Event);
+
+    expect(onOpen).toHaveBeenCalledWith(expect.anything(), {
+      attemptId: 1,
+      reconnectAttemptCount: 1,
+      reconnectSequenceRetryCount: 0,
+      wrapperGeneration: 1,
+    });
+    websocket.disconnect();
+  });
+
+  it('passes the active reconnect context to the socket-error callback and logs a safe error', async () => {
+    const socket = createMockSocket(WEBSOCKET_STATE.CONNECTING);
+    const websocket = new ReconnectingWebsocket(jest.fn().mockResolvedValue('wss://example.invalid/await'), {
+      backFromSleepHandler: Maybe.nothing(),
+      pingInterval: Maybe.nothing(),
+      wallClock: createTestWallClock(0),
+      websocketFactory: Maybe.just(createMockWebsocketFactory(socket)),
+    });
+    const onError = jest.fn();
+    const lifecycleWarning = jest.spyOn(websocket['logger'], 'warn');
+    websocket.setOnError(onError);
+    websocket.connect();
+    await websocket['internalOnReconnect']();
+
+    socket.onerror?.({
+      error: Object.assign(new Error('Bearer transport-credential'), {name: 'SocketError'}),
+    } as ErrorEvent);
+
+    const expectedReconnectContext = {
+      attemptId: 1,
+      reconnectAttemptCount: 1,
+      reconnectSequenceRetryCount: 0,
+      wrapperGeneration: 1,
+    };
+    expect(onError).toHaveBeenCalledWith(expect.anything(), expectedReconnectContext);
+    expect(lifecycleWarning).toHaveBeenCalledWith(
+      '[WebSocketLifecycle] event=socket-error attemptId=1 wrapperGeneration=1 errorName=SocketError errorMessage="Bearer [REDACTED]"',
+    );
+    websocket.disconnect();
   });
 
   it('replaces the socket wrapper when back from sleep is detected while the socket is CLOSED', () => {
@@ -186,7 +277,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     });
     websocket.connect();
 
-    getLatestBackFromSleepRegistration(registrations).callback();
+    getLatestBackFromSleepRegistration(registrations).callback(backFromSleepDetails);
 
     expect(oldSocket.close).toHaveBeenCalledTimes(1);
     expect(oldSocket.close).toHaveBeenCalledWith(CloseEventCode.NORMAL_CLOSURE, 'Back from sleep');
@@ -212,7 +303,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     });
     websocket.connect();
 
-    expect(() => getLatestBackFromSleepRegistration(registrations).callback()).not.toThrow();
+    expect(() => getLatestBackFromSleepRegistration(registrations).callback(backFromSleepDetails)).not.toThrow();
 
     expect(oldSocket.close).toHaveBeenCalledTimes(1);
     expect(oldSocket.reconnect).not.toHaveBeenCalled();
@@ -240,7 +331,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     websocket.setOnMessage(onMessage);
     websocket.connect();
 
-    getLatestBackFromSleepRegistration(registrations).callback();
+    getLatestBackFromSleepRegistration(registrations).callback(backFromSleepDetails);
     oldSocket.onopen?.(openEvent);
     oldSocket.onmessage?.(staleMessage);
 
@@ -264,7 +355,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
       websocketFactory: Maybe.nothing(),
     });
 
-    expect(() => getLatestBackFromSleepRegistration(registrations).callback()).not.toThrow();
+    expect(() => getLatestBackFromSleepRegistration(registrations).callback(backFromSleepDetails)).not.toThrow();
   });
 
   it('restarts the sleep handler after disconnect and does not register duplicates while active', () => {

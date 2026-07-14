@@ -34,7 +34,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {ImageAsset, ImageAssetProps} from './ImageAsset';
 
-jest.mock('Components/InViewport', () => ({
+jest.mock('Components/inViewport', () => ({
   InViewport: ({onVisible, children, ...props}: {onVisible: () => void; children: any; [key: string]: any}) => {
     setTimeout(onVisible);
     return <div {...props}>{children}</div>;

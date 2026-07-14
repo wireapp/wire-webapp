@@ -2,11 +2,6 @@ name: Generate test reports
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Git branch to generate the test report for'
-        required: true
-        type: string
 
 jobs:
   generate_test_report:
@@ -14,13 +9,14 @@ jobs:
 
     env:
       UNIT_TEST_REPORT_FILE: './unit-tests.log'
+      UNIT_TEST_REPORTS_DIRECTORY: './unit-test-reports'
 
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          ref: refs/heads/${{ inputs.branch }}
+          ref: ${{ github.ref }}
 
       - name: Capture checked out commit SHA
         run: echo "TESTED_COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
@@ -52,27 +48,31 @@ jobs:
       - name: Install JS dependencies
         run: ./bin/yarn --immutable
 
-      - name: Test
-        run: |
-          set -euo pipefail
-          : > ${{ env.UNIT_TEST_REPORT_FILE }}
-          (
-            cd ./apps/server
-            node ../../node_modules/jest/bin/jest.js --config jest.config.js --coverage --coverageReporters=lcov
-          ) 2>&1 | tee -a ${{ env.UNIT_TEST_REPORT_FILE }}
-          (
-            cd ./apps/webapp
-            node ../../node_modules/jest/bin/jest.js --config jest.report.config.cjs --coverage --coverageReporters=lcov --verbose
-          ) 2>&1 | tee -a ${{ env.UNIT_TEST_REPORT_FILE }}
-          echo -e "BRANCH = ${{ inputs.branch }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
-          echo -e "COMMIT SHA = ${TESTED_COMMIT_SHA}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
-          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{ env.UNIT_TEST_REPORT_FILE }}
-
-      - name: Upload unit-tests.log to S3
+      - name: Generate unit test reports
+        id: unit_test_reports
+        continue-on-error: true
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-west-1
+          BRANCH: ${{ github.ref_name }}
+        run: ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/generateUnitTestReports.ts
+
+      - name: Upload complete unit test reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: unit-test-reports
+          path: |
+            ${{ env.UNIT_TEST_REPORT_FILE }}
+            ${{ env.UNIT_TEST_REPORTS_DIRECTORY }}/manifest.json
+            ${{ env.UNIT_TEST_REPORTS_DIRECTORY }}/*.log
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Fail when manifest contains failed projects
+        if: always()
         run: |
-          TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
-          aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://wire-webapp/unit-tests-${TIMESTAMP}-${TESTED_COMMIT_SHA}.log
+          node -e '
+            const manifest = require("./unit-test-reports/manifest.json");
+            if (manifest.overallStatus !== "passed") {
+              process.exit(1);
+            }
+          '

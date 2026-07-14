@@ -81,6 +81,24 @@ export const CallingHeader = ({
   conversationID,
 }: CallingHeaderProps) => {
   const {translate} = useApplicationContext();
+
+  let ariaLabel: string;
+  if (showAlert) {
+    ariaLabel = callStartedAlert;
+  } else {
+    const ongoingPrefix = isOngoing ? `${ongoingCallAlert} ` : '';
+    ariaLabel = `${ongoingPrefix}${translate('accessibility.openConversation', {name: conversationName})}`;
+  }
+
+  let avatarContent;
+  if (isChannel) {
+    avatarContent = <ChannelAvatar conversationID={conversationID} />;
+  } else if (isGroup) {
+    avatarContent = <GroupAvatar conversationID={conversationID} />;
+  } else if (conversationParticipants.length > 0) {
+    avatarContent = <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />;
+  }
+
   return (
     <div css={callingHeaderContainer}>
       <div
@@ -99,25 +117,9 @@ export const CallingHeader = ({
         onKeyDown={createNavigateKeyboard(conversationUrl)}
         tabIndex={TabIndex.FOCUSABLE}
         role="button"
-        aria-label={
-          showAlert
-            ? callStartedAlert
-            : `${isOngoing ? `${ongoingCallAlert} ` : ''}${translate('accessibility.openConversation', {name: conversationName})}`
-        }
+        aria-label={ariaLabel}
       >
-        {isDetachedWindow && !isTemporaryUser && (
-          <div css={callAvatar}>
-            {isChannel ? (
-              <ChannelAvatar conversationID={conversationID} />
-            ) : isGroup ? (
-              <GroupAvatar conversationID={conversationID} />
-            ) : (
-              conversationParticipants.length > 0 && (
-                <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
-              )
-            )}
-          </div>
-        )}
+        {isDetachedWindow && !isTemporaryUser && <div css={callAvatar}>{avatarContent}</div>}
 
         <h2 css={callDetails}>
           <div css={conversationCallName}>{conversationName}</div>

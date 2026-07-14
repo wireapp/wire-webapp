@@ -100,7 +100,7 @@ jobs:
         run: ./bin/yarn nx run webapp:configure
 
       - name: Build and package
-        run: ./bin/yarn nx run server:package
+        run: ./bin/yarn build:prod:public
 
       - name: Upload build artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

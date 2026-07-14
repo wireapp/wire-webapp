@@ -21,7 +21,7 @@ import {UIEvent, useRef} from 'react';
 
 import cx from 'classnames';
 
-import {Image} from 'Components/Image';
+import {Image} from 'Components/image';
 import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import type {Text} from 'Repositories/entity/message/text';
 import {useApplicationContext} from 'src/script/page/rootProvider';

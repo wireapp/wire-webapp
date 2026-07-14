@@ -28,6 +28,7 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
+import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {formatDurationCaption, TIME_IN_MILLIS} from 'Util/timeUtil';
@@ -53,6 +54,10 @@ const PrivacySection = ({
       'isAppLockEnforced',
       'appLockInactivityTimeoutSecs',
     ]);
+
+  const enableMdmConfig = Config.getConfig().FEATURE.ENABLE_MDM_CONFIG;
+  const appLockOverride = Config.getDesktopConfig()?.managedConfig?.applockOverride === true;
+  const isMdmAppLockDisabled = enableMdmConfig && appLockOverride;
 
   const {receiptMode, typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, [
     'receiptMode',
@@ -112,7 +117,6 @@ const PrivacySection = ({
           {translate('preferencesAccountTypingIndicatorsDetail')}
         </p>
       </div>
-
       {isAppLockAvailable && (
         <div className="checkbox-margin">
           <Checkbox
@@ -120,7 +124,7 @@ const PrivacySection = ({
               appLockRepository.setEnabled(event.target.checked);
             }}
             checked={isAppLockEnabled}
-            disabled={isAppLockEnforced}
+            disabled={isAppLockEnforced || isMdmAppLockDisabled}
             data-uie-name="status-preference-applock"
           >
             <CheckboxLabel htmlFor="status-preference-applock">

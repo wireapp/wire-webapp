@@ -144,7 +144,7 @@ jobs:
       # Interim limitation: until durable release artifact storage exists, this
       # workflow rebuilds the deployable artifact from the selected Production tag.
       - name: Build and package
-        run: ./bin/yarn nx run server:package
+        run: ./bin/yarn build:prod:public
 
       - name: Compute artifact metadata
         id: artifact_metadata

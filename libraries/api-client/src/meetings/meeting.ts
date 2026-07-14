@@ -24,7 +24,6 @@ import {QualifiedId} from '../user/qualifiedId';
 export interface Meeting {
   created_at: string;
   end_time: string;
-  invited_emails: string[];
   qualified_conversation: QualifiedId;
   qualified_creator: QualifiedId;
   qualified_id: QualifiedId;

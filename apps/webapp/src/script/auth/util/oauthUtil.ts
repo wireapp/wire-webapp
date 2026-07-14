@@ -19,7 +19,7 @@
 
 import {OAuthBody} from '@wireapp/api-client/lib/oauth/oAuthBody';
 
-import {Scope} from '../page/OAuthPermissions';
+import {Scope} from '../page/oAuthPermissions';
 
 /**
  *  Takes the oauth parameters and returns the oauth object expected by the API.

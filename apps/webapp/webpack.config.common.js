@@ -121,7 +121,7 @@ module.exports = {
   entry: {
     app: path.resolve(srcScript, 'main/index.tsx'),
     auth: path.resolve(auth, 'main.tsx'),
-    checkBrowser: path.resolve(checkBrowser, 'CheckBrowser.ts'),
+    checkBrowser: path.resolve(checkBrowser, 'checkBrowser.ts'),
   },
   externals: {
     'fs-extra': '{}',

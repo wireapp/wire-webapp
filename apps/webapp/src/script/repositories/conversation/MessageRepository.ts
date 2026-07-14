@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {AssetAuditData} from '@wireapp/api-client/lib/asset';
 import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -121,6 +122,15 @@ export interface MessageSendingOptions {
   recipients?: QualifiedId[] | QualifiedUserClients;
 }
 
+export type MessageRepositoryOptions = {
+  readonly isMessageSendingStatusFixEnabled: boolean;
+};
+
+type AddedMessageWaiter = {
+  readonly messagePromise: Promise<Message>;
+  readonly dispose: () => void;
+};
+
 export enum CONSENT_TYPE {
   INCOMING_CALL = 'incoming_call',
   MESSAGE = 'message',
@@ -182,6 +192,9 @@ export class MessageRepository {
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
     private readonly translate: Translate,
+    private readonly messageRepositoryOptions: MessageRepositoryOptions = {
+      isMessageSendingStatusFixEnabled: false,
+    },
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -269,6 +282,7 @@ export class MessageRepository {
   private async sendText(
     {conversation, message, mentions = [], linkPreview, quote, messageId}: TextMessagePayload,
     options?: {syncTimestamp?: boolean},
+    isNewTextMessage = false,
   ) {
     const textMessage = MessageBuilder.buildTextMessage(
       this.decorateTextMessage(
@@ -281,7 +295,84 @@ export class MessageRepository {
       messageId,
     );
 
-    return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
+    const currentClientId = this.clientState.currentClient?.id;
+    const canInjectOptimisticMessage = is.nonEmptyString(currentClientId);
+    const shouldRepairOptimisticMessageStatus =
+      this.messageRepositoryOptions.isMessageSendingStatusFixEnabled && isNewTextMessage && canInjectOptimisticMessage;
+
+    if (!shouldRepairOptimisticMessageStatus) {
+      return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
+    }
+
+    return this.sendNewTextMessageWithReliableInMemoryStatus(textMessage, conversation, {
+      ...options,
+      enableEphemeral: true,
+    });
+  }
+
+  private createAddedMessageWaiter(conversation: Conversation, messageId: string): AddedMessageWaiter {
+    let resolveMessage: ((messageEntity: Message) => void) | undefined;
+    let isDisposed = false;
+
+    const messagePromise = new Promise<Message>((resolve): void => {
+      resolveMessage = resolve;
+    });
+
+    function dispose(): void {
+      if (!isDisposed) {
+        isDisposed = true;
+        amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, onMessageAdded);
+      }
+    }
+
+    function onMessageAdded(messageEntity: Message): void {
+      const isMatchingMessage = messageEntity.id === messageId && messageEntity.conversation_id === conversation.id;
+
+      if (isMatchingMessage && !is.undefined(resolveMessage)) {
+        dispose();
+        resolveMessage(messageEntity);
+      }
+    }
+
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, onMessageAdded);
+
+    return {dispose, messagePromise};
+  }
+
+  private async sendNewTextMessageWithReliableInMemoryStatus(
+    textMessage: GenericMessage,
+    conversation: Conversation,
+    options: MessageSendingOptions & {enableEphemeral: true; syncTimestamp?: boolean},
+  ): Promise<SendAndInjectResult> {
+    const addedMessageWaiter = this.createAddedMessageWaiter(conversation, textMessage.messageId);
+
+    try {
+      const sendResult = await this.sendAndInjectMessage(textMessage, conversation, options);
+
+      if (sendResult.state === MessageSendingState.OUTGOING_SENT) {
+        const messageEntity = await addedMessageWaiter.messagePromise;
+        if (messageEntity.status() === StatusType.SENDING) {
+          const updatedStatus = messageEntity.readReceipts().length > 0 ? StatusType.SEEN : StatusType.SENT;
+          messageEntity.status(updatedStatus);
+
+          const shouldSynchronizeTimestamp = is.undefined(options.syncTimestamp) || options.syncTimestamp;
+          if (shouldSynchronizeTimestamp) {
+            const timestamp = new Date(sendResult.sentAt).getTime();
+            if (!isNaN(timestamp)) {
+              messageEntity.timestamp(timestamp);
+              conversation.updateTimestampServer(timestamp, true);
+              conversation.updateTimestamps(messageEntity);
+            }
+          }
+
+          this.conversationRepositoryProvider().checkMessageTimer(messageEntity as ContentMessage);
+        }
+      }
+
+      return sendResult;
+    } finally {
+      addedMessageWaiter.dispose();
+    }
   }
 
   /**
@@ -422,7 +513,7 @@ export class MessageRepository {
     if (attachments && attachments.length > 0) {
       state = (await this.sendMultipartText({...textPayload, attachments})).state;
     } else {
-      state = (await this.sendText(textPayload)).state;
+      state = (await this.sendText(textPayload, undefined, is.undefined(messageId))).state;
     }
 
     if (state !== MessageSendingState.CANCELED) {

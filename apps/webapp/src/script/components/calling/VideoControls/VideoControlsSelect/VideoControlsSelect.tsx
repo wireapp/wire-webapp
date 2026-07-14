@@ -107,6 +107,10 @@ export const VideoControlsSelect = ({
         ...videoOptionInlineMenuStyles,
       }
     : menuCSS;
+  let wrapperCssWithInlineMenu = wrapperCSS;
+  if (isInlineMenu) {
+    wrapperCssWithInlineMenu = showHeader !== true ? videoOptionsInlineWrapperStyles : undefined;
+  }
 
   return (
     <>
@@ -145,7 +149,7 @@ export const VideoControlsSelect = ({
         overlayMenu={overlayMenu}
         menuCSS={menuCssWithInlineMenu}
         selectGroupHeadingCSS={isInlineMenu ? videoOptionsSelectGroupHeadingStyles : undefined}
-        wrapperCSS={isInlineMenu ? (showHeader !== true ? videoOptionsInlineWrapperStyles : undefined) : wrapperCSS}
+        wrapperCSS={wrapperCssWithInlineMenu}
         hideControl
         selectGroupCSS={selectGroupStyles}
         isOptionSelected={isOptionSelected}

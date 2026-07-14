@@ -74,8 +74,13 @@ jobs:
       - name: Update configuration
         run: ./bin/yarn nx run webapp:configure
 
-      - name: Build and package
-        run: ./bin/yarn nx run server:package
+      - name: Build and package public production
+        if: ${{ github.ref == 'refs/heads/master' || contains(github.ref_name, 'production') }}
+        run: ./bin/yarn build:prod:public
+
+      - name: Build and package internal production
+        if: ${{ github.ref != 'refs/heads/master' && !contains(github.ref_name, 'production') }}
+        run: ./bin/yarn build:prod
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -123,7 +128,7 @@ jobs:
 
       - uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
         with:
-          version: '3.21.2'
+          version: '3.21.3'
 
       - name: Bump helm chart version
         shell: bash

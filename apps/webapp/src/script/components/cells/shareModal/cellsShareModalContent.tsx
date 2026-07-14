@@ -1,0 +1,359 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {ComponentProps} from 'react';
+
+import {CSSObject} from '@emotion/react';
+import is from '@sindresorhus/is';
+
+import {ValidationUtil} from '@wireapp/commons';
+import {
+  BASE_DARK_COLOR,
+  BASE_LIGHT_COLOR,
+  Button,
+  ButtonVariant,
+  COLOR_V2,
+  Input,
+  Label,
+  Switch,
+} from '@wireapp/react-ui-kit';
+
+import {
+  CellsShareExpirationFields,
+  type CellsShareExpirationSelection,
+} from 'Components/cells/shareModal/cellsShareExpirationFields';
+import {CellsTableLoader} from 'Components/Conversation/ConversationCells/common/CellsTableLoader/CellsTableLoader';
+import {CopyToClipboardButton} from 'Components/copyToClipboardButton/copyToClipboardButton';
+import * as Icon from 'Components/icon';
+import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
+import {Config} from 'src/script/Config';
+import {type RootContextValue} from 'src/script/page/rootProvider';
+
+type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
+
+type SwitchColorProps = Pick<
+  ComponentProps<typeof Switch>,
+  | 'activatedColor'
+  | 'activatedColorDark'
+  | 'deactivatedColor'
+  | 'deactivatedColorDark'
+  | 'disabledColor'
+  | 'disabledColorDark'
+>;
+
+interface CellsShareModalContentStyles {
+  wrapperStyles: CSSObject;
+  labelStyles: CSSObject;
+  publicLinkDescriptionStyles: CSSObject;
+  passwordDescriptionStyles: CSSObject;
+  expirationDescriptionStyles: CSSObject;
+  dividerStyles: CSSObject;
+  switchContentStyles: CSSObject;
+  toggleContentStyles: CSSObject;
+  switchContainerStyles: CSSObject;
+  switchWrapperStyles: CSSObject;
+  inputStyles: CSSObject;
+  inputWrapperStyles: CSSObject;
+  passwordContentStyles: CSSObject;
+  passwordInputRowStyles: CSSObject;
+  passwordInputLabelStyles: CSSObject;
+  passwordInputStyles: CSSObject;
+  passwordActionButtonStyles: CSSObject;
+  passwordCopyButtonStyles: CSSObject;
+  loaderWrapperStyles: CSSObject;
+}
+
+interface CellsShareModalContentLabels {
+  enablePublicLink: string;
+  password: string;
+  passwordDescription: string;
+  changePassword: string;
+  expiration: string;
+  expirationDescription: string;
+  expirationExpiresLabel: string;
+  expirationDateAriaLabel: string;
+  expirationTimeAriaLabel: string;
+  expirationOpenCalendarLabel: string;
+  expirationPreviousMonthLabel: string;
+  expirationNextMonthLabel: string;
+  expirationPastDateError: string;
+  generatedPublicLink: string;
+  copyLink: string;
+  linkCopied: string;
+  errorLoadingLink: string;
+  passwordInputLabel: string;
+  passwordInputPlaceholder: string;
+  passwordCopy: string;
+  passwordCopied: string;
+  showTogglePasswordLabel: string;
+  hideTogglePasswordLabel: string;
+}
+
+interface CellsShareModalContentProps {
+  translate: RootContextValue['translate'];
+  publicLinkDescription: string;
+  labels?: Partial<CellsShareModalContentLabels>;
+  publicLink: {
+    status: PublicLinkStatus;
+    link?: string;
+    isEnabled: boolean;
+    onToggle: () => void;
+    disabled?: boolean;
+  };
+  password: {
+    isEnabled: boolean;
+    onToggle: () => void;
+    value: string;
+    onChange: (value: string) => void;
+    onGeneratePassword: (password: string) => void;
+    hasExistingPassword?: boolean;
+    isEditingPassword?: boolean;
+    onChangePasswordClick?: () => void;
+  };
+  expiration: {
+    isEnabled: boolean;
+    onToggle: () => void;
+    dateTime?: Date | null;
+    onChange?: (nextValue: CellsShareExpirationSelection) => void;
+  };
+  isInputDisabled: boolean;
+  styles: CellsShareModalContentStyles;
+  switchColors?: {
+    publicLink?: SwitchColorProps;
+    password?: SwitchColorProps;
+    expiration?: SwitchColorProps;
+  };
+}
+
+const DEFAULT_SWITCH_COLORS: SwitchColorProps = {
+  activatedColor: BASE_LIGHT_COLOR.GREEN,
+  activatedColorDark: BASE_DARK_COLOR.GREEN,
+  deactivatedColor: COLOR_V2.GRAY_70,
+  deactivatedColorDark: COLOR_V2.GRAY_60,
+  disabledColor: COLOR_V2.GRAY_70,
+  disabledColorDark: COLOR_V2.GRAY_60,
+};
+
+const getDefaultLabels = (translate: RootContextValue['translate']): CellsShareModalContentLabels => ({
+  enablePublicLink: translate('cells.shareModal.enablePublicLink'),
+  password: translate('cells.shareModal.password'),
+  passwordDescription: translate('cells.shareModal.password.description'),
+  changePassword: translate('cells.shareModal.changePassword'),
+  expiration: translate('cells.shareModal.expiration'),
+  expirationDescription: translate('cells.shareModal.expiration.description'),
+  expirationExpiresLabel: translate('cells.shareModal.expiration.expiresLabel'),
+  expirationDateAriaLabel: translate('cells.shareModal.expiration.dateAriaLabel'),
+  expirationTimeAriaLabel: translate('cells.shareModal.expiration.timeAriaLabel'),
+  expirationOpenCalendarLabel: translate('cells.shareModal.expiration.openCalendarLabel'),
+  expirationPreviousMonthLabel: translate('cells.shareModal.expiration.previousMonthLabel'),
+  expirationNextMonthLabel: translate('cells.shareModal.expiration.nextMonthLabel'),
+  expirationPastDateError: translate('cells.shareModal.expiration.error.pastDate'),
+  generatedPublicLink: translate('cells.shareModal.generatedPublicLink'),
+  copyLink: translate('cells.shareModal.copyLink'),
+  linkCopied: translate('cells.shareModal.linkCopied'),
+  errorLoadingLink: translate('cells.shareModal.error.loadingLink'),
+  passwordInputLabel: translate('modalGuestLinkJoinLabel'),
+  passwordInputPlaceholder: translate('modalGuestLinkJoinPlaceholder'),
+  passwordCopy: translate('conversationContextMenuCopy'),
+  passwordCopied: translate('guestOptionsPasswordCopyToClipboardSuccess'),
+  showTogglePasswordLabel: translate('showTogglePasswordLabel'),
+  hideTogglePasswordLabel: translate('hideTogglePasswordLabel'),
+});
+
+export const CellsShareModalContent = ({
+  translate,
+  publicLinkDescription,
+  labels,
+  publicLink,
+  password,
+  expiration,
+  isInputDisabled,
+  styles,
+  switchColors,
+}: CellsShareModalContentProps) => {
+  const resolvedLabels = {...getDefaultLabels(translate), ...labels};
+  const hasPublicLink = is.nonEmptyString(publicLink.link);
+  const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && hasPublicLink;
+  const areDependentTogglesDisabled = publicLink.isEnabled !== true;
+  const publicLinkColors = switchColors?.publicLink ?? DEFAULT_SWITCH_COLORS;
+  const passwordColors = switchColors?.password ?? DEFAULT_SWITCH_COLORS;
+  const expirationColors = switchColors?.expiration ?? DEFAULT_SWITCH_COLORS;
+
+  return (
+    <div css={styles.wrapperStyles}>
+      <div css={styles.switchContainerStyles}>
+        <div css={styles.switchContentStyles}>
+          <Label htmlFor="switch-public-link" css={styles.labelStyles}>
+            {resolvedLabels.enablePublicLink}
+          </Label>
+          <p id="switch-public-link-description" css={styles.publicLinkDescriptionStyles}>
+            {publicLinkDescription}
+          </p>
+        </div>
+        <div css={styles.switchWrapperStyles}>
+          <Switch
+            id="switch-public-link"
+            aria-describedby="switch-public-link-description"
+            checked={publicLink.isEnabled}
+            onToggle={publicLink.onToggle}
+            disabled={publicLink.disabled}
+            {...publicLinkColors}
+          />
+        </div>
+      </div>
+      <hr css={styles.dividerStyles} />
+      <div css={styles.switchContainerStyles}>
+        <div css={styles.switchContentStyles}>
+          <Label htmlFor="switch-password" css={styles.labelStyles}>
+            {resolvedLabels.password}
+          </Label>
+          <p id="switch-password-description" css={styles.passwordDescriptionStyles}>
+            {resolvedLabels.passwordDescription}
+          </p>
+        </div>
+        <div css={styles.switchWrapperStyles}>
+          <Switch
+            id="switch-password"
+            aria-describedby="switch-password-description"
+            checked={publicLink.isEnabled && password.isEnabled === true}
+            onToggle={password.onToggle}
+            disabled={areDependentTogglesDisabled}
+            {...passwordColors}
+          />
+        </div>
+      </div>
+      {password.isEnabled && password.hasExistingPassword === true && password.isEditingPassword === false && (
+        <div css={styles.toggleContentStyles} data-uie-name="cells-share-password-view-mode">
+          <div css={styles.passwordActionButtonStyles}>
+            <Button
+              variant={ButtonVariant.TERTIARY}
+              onClick={password.onChangePasswordClick}
+              data-uie-name="do-change-password"
+            >
+              <Icon.EditIcon data-uie-name="change-password-icon" width="16" height="16" css={{marginRight: '10px'}} />
+              {resolvedLabels.changePassword}
+            </Button>
+          </div>
+        </div>
+      )}
+      {password.isEnabled && (password.isEditingPassword === true || password.hasExistingPassword === false) && (
+        <div css={styles.toggleContentStyles} data-uie-name="cells-share-password-content">
+          <div css={styles.passwordContentStyles}>
+            <div css={styles.passwordActionButtonStyles}>
+              <PasswordGeneratorButton
+                translate={translate}
+                passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
+                onGeneratePassword={password.onGeneratePassword}
+              />
+            </div>
+            <div css={styles.passwordInputRowStyles}>
+              <Label htmlFor="cells_share_pswd" css={styles.passwordInputLabelStyles}>
+                {resolvedLabels.passwordInputLabel}
+              </Label>
+              <Input
+                name="cells-share-password"
+                data-uie-name="cells-share-password"
+                placeholder={resolvedLabels.passwordInputPlaceholder}
+                id="cells_share_pswd"
+                type="password"
+                showTogglePasswordLabel={resolvedLabels.showTogglePasswordLabel}
+                hideTogglePasswordLabel={resolvedLabels.hideTogglePasswordLabel}
+                autoComplete="off"
+                value={password.value}
+                onChange={event => password.onChange(event.currentTarget.value)}
+                pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
+                wrapperCSS={styles.passwordInputStyles}
+              />
+              <div css={styles.passwordCopyButtonStyles}>
+                <CopyToClipboardButton
+                  textToCopy={password.value}
+                  displayText={resolvedLabels.passwordCopy}
+                  copySuccessText={resolvedLabels.passwordCopied}
+                  disabled={password.value.length === 0}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      <div css={styles.switchContainerStyles}>
+        <div css={styles.switchContentStyles}>
+          <Label htmlFor="switch-expiration" css={styles.labelStyles}>
+            {resolvedLabels.expiration}
+          </Label>
+          <p id="switch-expiration-description" css={styles.expirationDescriptionStyles}>
+            {resolvedLabels.expirationDescription}
+          </p>
+        </div>
+        <div css={styles.switchWrapperStyles}>
+          <Switch
+            id="switch-expiration"
+            aria-describedby="switch-expiration-description"
+            checked={publicLink.isEnabled && expiration.isEnabled === true}
+            onToggle={expiration.onToggle}
+            disabled={areDependentTogglesDisabled}
+            {...expirationColors}
+          />
+        </div>
+      </div>
+      {expiration.isEnabled && (
+        <div css={styles.toggleContentStyles} data-uie-name="cells-share-expiration-content">
+          <CellsShareExpirationFields
+            labels={{
+              expiresLabel: resolvedLabels.expirationExpiresLabel,
+              dateAriaLabel: resolvedLabels.expirationDateAriaLabel,
+              timeAriaLabel: resolvedLabels.expirationTimeAriaLabel,
+              openCalendarLabel: resolvedLabels.expirationOpenCalendarLabel,
+              previousMonthLabel: resolvedLabels.expirationPreviousMonthLabel,
+              nextMonthLabel: resolvedLabels.expirationNextMonthLabel,
+            }}
+            errorText={resolvedLabels.expirationPastDateError}
+            dateTime={expiration.dateTime}
+            onChange={expiration.onChange}
+          />
+        </div>
+      )}
+      {shouldShowLink && (
+        <div css={styles.inputWrapperStyles}>
+          <label htmlFor="generated-public-link" className="visually-hidden">
+            {resolvedLabels.generatedPublicLink}
+          </label>
+          <Input
+            id="generated-public-link"
+            value={publicLink.link}
+            wrapperCSS={styles.inputStyles}
+            disabled={isInputDisabled}
+            readOnly
+          />
+          <CopyToClipboardButton
+            textToCopy={publicLink.link ?? ''}
+            displayText={resolvedLabels.copyLink}
+            copySuccessText={resolvedLabels.linkCopied}
+          />
+        </div>
+      )}
+      {publicLink.status === 'loading' && (
+        <div css={styles.loaderWrapperStyles}>
+          <CellsTableLoader />
+        </div>
+      )}
+      {publicLink.status === 'error' && <div>{resolvedLabels.errorLoadingLink}</div>}
+    </div>
+  );
+};
