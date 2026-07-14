@@ -11602,7 +11602,7 @@ __metadata:
     axios-retry: "npm:4.5.0"
     browser-sync: "npm:3.0.4"
     cells-sdk-ts: "npm:0.1.1-alpha18"
-    concurrently: "npm:9.2.3"
+    concurrently: "npm:9.2.4"
     http-status-codes: "npm:2.3.0"
     jest: "npm:30.4.2"
     pako: "npm:2.2.0"
@@ -14682,20 +14682,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"concurrently@npm:9.2.3":
-  version: 9.2.3
-  resolution: "concurrently@npm:9.2.3"
+"concurrently@npm:9.2.4":
+  version: 9.2.4
+  resolution: "concurrently@npm:9.2.4"
   dependencies:
     chalk: "npm:4.1.2"
     rxjs: "npm:7.8.2"
-    shell-quote: "npm:1.8.4"
+    shell-quote: "npm:1.9.0"
     supports-color: "npm:8.1.1"
     tree-kill: "npm:1.2.2"
     yargs: "npm:17.7.2"
   bin:
     conc: dist/bin/concurrently.js
     concurrently: dist/bin/concurrently.js
-  checksum: 10/b9a0c12e18fcf18902ff7fb1329342f4c2a4f551eb77e22a6b6743c95349b1482d527110c4e396b09c9736b74c71b1a30ecc6512861d9cb0925e71049bc864df
+  checksum: 10/72354357bb96837bd4d6942682483157981e3599dc2055b402aa7036f2815c44f240a03724bacac71c3a1acc29ace23b4ca1e00e689c62512984ed2cdb263017
   languageName: node
   linkType: hard
 
@@ -28977,7 +28977,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"shell-quote@npm:1.8.4, shell-quote@npm:^1.8.4":
+"shell-quote@npm:1.9.0":
+  version: 1.9.0
+  resolution: "shell-quote@npm:1.9.0"
+  checksum: 10/c3bc91e74a469c4f96b6fd13b0c777fff16bcbda202692a4e5402d3d6b78fc6e02fe92fdf8dc0bddf992a9c6758e43207bfc5bdbefbf8a58190b1c885cbcc171
+  languageName: node
+  linkType: hard
+
+"shell-quote@npm:^1.8.4":
   version: 1.8.4
   resolution: "shell-quote@npm:1.8.4"
   checksum: 10/a3e3796385f2cd5cf0b78207a4439f0c7395c0833fc75b2473084b5d298c109c5c0fa687fcd1c04e4b4484866e5bb8eaae7efae443b80fff71ea7e29baf11f0c
