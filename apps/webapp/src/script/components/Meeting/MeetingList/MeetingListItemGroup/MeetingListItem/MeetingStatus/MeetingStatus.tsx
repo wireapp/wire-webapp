@@ -38,24 +38,21 @@ export interface MeetingStatusProps {
   joinMeeting: () => void;
   isJoinDisabled: boolean;
   isCallActive: boolean;
-  attending?: boolean;
 }
 
 const MeetingStatusComponent = ({
   start_date,
   end_date,
-  attending,
   nowMilliseconds,
   joinMeeting,
   isJoinDisabled,
   isCallActive,
 }: MeetingStatusProps) => {
   const {translate} = useApplicationContext();
-  const isAttending = attending ?? isCallActive;
 
   const meetingStatus = useMemo(
-    () => getMeetingStatusAt(nowMilliseconds, start_date, end_date, isAttending),
-    [nowMilliseconds, start_date, end_date, isAttending],
+    () => getMeetingStatusAt(nowMilliseconds, start_date, end_date, isCallActive),
+    [nowMilliseconds, start_date, end_date, isCallActive],
   );
 
   if (meetingStatus === MeetingStatuses.PARTICIPATING) {
