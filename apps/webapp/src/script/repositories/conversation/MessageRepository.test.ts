@@ -56,7 +56,7 @@ import {createUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
-import {MessageRepository, MessageRepositoryOptions} from './MessageRepository';
+import {MessageRepository} from './MessageRepository';
 import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {StatusType} from '../../message/statusType';
@@ -77,7 +77,6 @@ type MessageRepositoryDependencies = {
   core: Account;
   cryptographyRepository: CryptographyRepository;
   eventRepository: EventRepository;
-  messageRepositoryOptions: MessageRepositoryOptions;
   propertiesRepository: PropertiesRepository;
   serverTimeHandler: ServerTimeHandler;
   translate: Translate;
@@ -94,7 +93,6 @@ type MessageRepositoryPrivateMethodsForTest = {
 
 async function buildMessageRepository(
   translate: Translate,
-  messageRepositoryOptions: MessageRepositoryOptions = {isMessageSendingStatusFixEnabled: false},
 ): Promise<[MessageRepository, MessageRepositoryDependencies]> {
   const userState = new UserState();
   userState.self(selfUser);
@@ -122,7 +120,6 @@ async function buildMessageRepository(
     assetRepository: {} as AssetRepository,
     audioRepository: new AudioRepository(),
     translate,
-    messageRepositoryOptions,
     userState,
     clientState,
     conversationState,
@@ -523,52 +520,8 @@ describe('MessageRepository', () => {
       });
     });
 
-    it('does not wait for an added message when the status fix is disabled', async () => {
-      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
-      clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
-      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
-      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
-      const sendAndInjectMessageSpy = jest
-        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
-        .mockResolvedValue(successPayload);
-      const conversation = generateConversation();
-
-      await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
-
-      expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('preserves post-send failure behavior when the status fix is disabled', async () => {
-      const [messageRepository, {clientState, core, eventRepository, propertiesRepository}] =
-        await buildMessageRepository(translateForTest);
-      clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
-      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
-      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
-      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
-      const expectedError = new Error('post-send status handling failed');
-      const updateMessageAsFailedSpy = jest
-        .spyOn(messageRepositoryPrivateMethods, 'updateMessageAsFailed')
-        .mockResolvedValue(undefined);
-      jest.spyOn(messageRepositoryPrivateMethods, 'updateMessageAsSent').mockRejectedValue(expectedError);
-      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
-      const conversation = generateConversation();
-
-      const sendResult = await messageRepository.sendTextWithLinkPreview({
-        conversation,
-        textMessage: 'hello there',
-        mentions: [],
-      });
-
-      expect(sendResult).toBe(MessageSendingState.FAILED);
-      expect(updateMessageAsFailedSpy).toHaveBeenCalledTimes(1);
-      expect(unsubscribeSpy).not.toHaveBeenCalled();
-    });
-
     it('does not wait for an added message when an existing message id is provided', async () => {
-      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest, {
-        isMessageSendingStatusFixEnabled: true,
-      });
+      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
       clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
@@ -588,9 +541,7 @@ describe('MessageRepository', () => {
     });
 
     it('does not create a message-added waiter when there is no current client id', async () => {
-      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest, {
-        isMessageSendingStatusFixEnabled: true,
-      });
+      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       clientState.currentClient = undefined;
       const subscribeSpy = jest.spyOn(amplify, 'subscribe');
@@ -608,13 +559,9 @@ describe('MessageRepository', () => {
       expect(unsubscribeSpy).not.toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
     });
 
-    it('waits for and repairs the exact added message when the status fix is enabled', async () => {
-      const [messageRepository, {clientState, eventRepository, propertiesRepository}] = await buildMessageRepository(
-        translateForTest,
-        {
-          isMessageSendingStatusFixEnabled: true,
-        },
-      );
+    it('waits for and repairs the exact added message for a new text message', async () => {
+      const [messageRepository, {clientState, eventRepository, propertiesRepository}] =
+        await buildMessageRepository(translateForTest);
       clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       const subscribeSpy = jest.spyOn(amplify, 'subscribe');
@@ -648,9 +595,9 @@ describe('MessageRepository', () => {
       expect(updateEventSpy).not.toHaveBeenCalled();
     });
 
-    it('does not downgrade an already delivered added message when the status fix is enabled', async () => {
+    it('does not downgrade an already delivered added message', async () => {
       const [messageRepository, {clientState, conversationRepository, propertiesRepository}] =
-        await buildMessageRepository(translateForTest, {isMessageSendingStatusFixEnabled: true});
+        await buildMessageRepository(translateForTest);
       clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
@@ -688,9 +635,7 @@ describe('MessageRepository', () => {
     });
 
     it('removes the listener when sending is canceled', async () => {
-      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest, {
-        isMessageSendingStatusFixEnabled: true,
-      });
+      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
       clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
@@ -708,7 +653,7 @@ describe('MessageRepository', () => {
 
     it('removes the listener when the backend send fails', async () => {
       const [messageRepository, {clientState, core, eventRepository, propertiesRepository}] =
-        await buildMessageRepository(translateForTest, {isMessageSendingStatusFixEnabled: true});
+        await buildMessageRepository(translateForTest);
       clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       jest.spyOn(core.service!.conversation, 'send').mockRejectedValue(new Error('backend send failed'));
@@ -728,10 +673,8 @@ describe('MessageRepository', () => {
       expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
     });
 
-    it('removes the listener when the legacy send throws', async () => {
-      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest, {
-        isMessageSendingStatusFixEnabled: true,
-      });
+    it('removes the listener when sending throws', async () => {
+      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
       clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
@@ -752,9 +695,7 @@ describe('MessageRepository', () => {
     });
 
     it('ignores added messages from another conversation or with another message id', async () => {
-      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest, {
-        isMessageSendingStatusFixEnabled: true,
-      });
+      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
       clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
