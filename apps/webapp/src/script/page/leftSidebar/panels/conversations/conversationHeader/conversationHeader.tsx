@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, KeyboardEvent, MutableRefObject, useEffect} from 'react';
+import {forwardRef, KeyboardEvent, MutableRefObject, useCallback, useEffect} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -100,11 +100,11 @@ export const ConversationHeaderComponent = ({
     handleEnterDown(event, () => onSearchEnterClick(event));
   };
 
-  const focusSearchInput = () => {
+  const focusSearchInput = useCallback(() => {
     requestAnimationFrame(() => {
       searchInputRef?.current?.focus();
     });
-  };
+  }, [searchInputRef]);
 
   useEffect(() => {
     const onSearchShortcut = () => {
@@ -118,7 +118,7 @@ export const ConversationHeaderComponent = ({
     return () => {
       amplify.unsubscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
     };
-  }, [searchInputRef, jumpToRecentSearch, onExpandList]);
+  }, [focusSearchInput, jumpToRecentSearch, onExpandList]);
 
   const showCreateConversationModal = () => {
     if (isChannelsEnabled && canCreateChannels) {
