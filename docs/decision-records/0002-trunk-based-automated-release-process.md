@@ -110,8 +110,10 @@ The cloud release process is:
 - Quality assurance owns the go/no-go quality gate.
 - The engineering release captain owns production rollout, observability, and incident response.
 - The production workflow promotes the beta-tested artifact and does not rebuild from source.
-- After Production deployment, the workflow verifies that the live Production endpoint `https://app.wire.com/config.js` exposes the expected artifact version and Production REST and WebSocket backend configuration.
-- A successful deployment operation alone does not create a Production tag. The workflow creates the production tag `YYYY-MM-DD.N-production` only after the live runtime and artifact verification succeeds, so the tag represents a successfully deployed and verified runtime.
+- Live deployment verification uses `/version` to identify the deployed build, `/commit` to identify its source revision, and `/config.js` to verify the active environment-specific REST and WebSocket backend configuration.
+- Build version and source commit are separate evidence: the same source commit can produce different builds, so `/commit` proves the source revision while `/version` identifies the particular build generated and promoted by the current workflow.
+- Backend configuration is runtime state and is not inferred from build identity. Beta, precommit, and Production must each satisfy their expected combination of build version, source commit, REST backend, and WebSocket backend.
+- A successful deployment operation alone does not create a Production tag. The workflow creates the production tag `YYYY-MM-DD.N-production` only after all Production runtime assertions pass, so the tag represents a successfully deployed and verified runtime.
 - If Production runtime verification fails, Production remains untagged, the release workflow fails, Deployoholics receives a failure notification, and the release captain performs incident assessment.
 - If the current release branch commit already has the matching production tag, the release workflow must not redeploy that commit.
 - Production tags are immutable release history and are never moved or deleted.
@@ -131,15 +133,15 @@ flowchart TD
   createReleaseBranch[Create or update release/YYYY-MM-DD.N]
   buildArtifact[Build release artifact once]
   deployToBeta[Deploy artifact to Beta<br/>Production backend]
-  verifyBetaRuntime[Verify Beta runtime backend]
+  verifyBetaRuntime[Verify Beta runtime<br/>Build version, source commit, and Production backends]
   createBetaTag[Create YYYY-MM-DD.N-beta.M]
   deployToE2E[Deploy same artifact to E2E slot<br/>Staging backend]
-  verifyE2ERuntime[Verify E2E runtime backend]
+  verifyE2ERuntime[Verify E2E runtime<br/>Build version, source commit, and Staging backends]
   runEndToEndTests[Run end-to-end tests against E2E slot]
   reportToTestiny[Report result to Testiny]
   productionApproval[GitHub Environment approval<br/>Production]
   deployToProduction[Deploy promoted beta artifact to Production]
-  verifyProductionRuntime[Verify live Production runtime<br/>Artifact version and Production backends]
+  verifyProductionRuntime[Verify live Production runtime<br/>Build version, source commit, and Production backends]
   createProductionTag[Create YYYY-MM-DD.N-production]
   rollbackWorkflow[Rollback Production workflow_dispatch<br/>optional incident action]
   deployKnownGoodArtifact[Deploy previous known-good production artifact]
