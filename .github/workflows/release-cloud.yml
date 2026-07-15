@@ -36,10 +36,10 @@ env:
   ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
   BETA_ARTIFACT_NAME_PREFIX: release-cloud-ebs
   BETA_BACKEND_URL: https://staging-nginz-https.zinfra.io/
-  # ADR 0002 calls this logical release stage Beta. Beta deploys to the existing
-  # wire-webapp-staging GitHub and Elastic Beanstalk environment, while its
-  # canonical company-facing URL is https://wire-webapp-beta.wire.com/.
-  BETA_ENVIRONMENT_NAME: wire-webapp-staging
+  # ADR 0002 calls this logical release stage Beta. Its GitHub Environment and
+  # canonical company-facing URL use wire-webapp-beta, while deployments retain
+  # the existing wire-webapp-staging Elastic Beanstalk environment.
+  BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: wire-webapp-staging
   BETA_WEBAPP_URL: https://wire-webapp-beta.wire.com/
   PRODUCTION_ENVIRONMENT_NAME: wire-webapp-prod
 
@@ -159,7 +159,7 @@ jobs:
     needs: build_artifact
     permissions: {}
     environment:
-      name: wire-webapp-staging
+      name: wire-webapp-beta
       url: https://wire-webapp-beta.wire.com/
 
     steps:
@@ -181,7 +181,7 @@ jobs:
         with:
           aws-region: ${{ env.AWS_REGION }}
           application-name: Webapp
-          environment-name: ${{ env.BETA_ENVIRONMENT_NAME }}
+          environment-name: ${{ env.BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
           version-label: ${{ needs.build_artifact.outputs.release_identifier }}-${{ github.run_id }}-${{ github.run_attempt }}-beta
           deployment-package-path: ebs.zip
           wait-for-deployment: true
@@ -473,6 +473,7 @@ jobs:
         env:
           ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
           ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
+          BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: ${{ env.BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
           E2E_REPORT_URL: ${{ needs.run_e2e.outputs.reportUrl }}
           E2E_RESULT: ${{ needs.run_e2e.result }}
@@ -499,8 +500,9 @@ jobs:
             echo "- Release branch: ${RELEASE_BRANCH}"
             echo "- Release identifier: ${RELEASE_IDENTIFIER}"
             echo "- Commit SHA: ${RELEASE_COMMIT_SHA}"
-            echo "- Beta environment: ${BETA_ENVIRONMENT_NAME}"
-            echo "- Beta URL: ${BETA_WEBAPP_URL}"
+            echo '- GitHub Environment: wire-webapp-beta'
+            echo "- Elastic Beanstalk environment: ${BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
+            echo "- Public Beta URL: ${BETA_WEBAPP_URL}"
             echo "- Artifact name: ${ARTIFACT_NAME}"
             echo "- Artifact checksum: ${ARTIFACT_CHECKSUM}"
             echo "- Beta tag: ${BETA_TAG_NAME}"
