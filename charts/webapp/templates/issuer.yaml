@@ -1,6 +1,6 @@
-{{- if and .Values.tls.enabled .Values.tls.useCertManager .Values.tls.createIssuer .Values.ingress.enabled (empty .Values.tls.existingSecretName) }}
+{{- if and .Values.tls.enabled .Values.tls.useCertManager .Values.tls.createIssuer .Values.routing.enabled (empty .Values.tls.existingSecretName) }}
 {{- include "webapp.validateDomainConfig" . }}
-{{- $solverController := include "webapp.ingressPrimaryController" . -}}
+{{- $solverController := include "webapp.routingPrimaryController" . -}}
 apiVersion: cert-manager.io/v1
 {{- if or (eq .Values.tls.issuer.kind "Issuer") (eq .Values.tls.issuer.kind "ClusterIssuer") }}
 kind: "{{ .Values.tls.issuer.kind }}"
@@ -30,8 +30,8 @@ spec:
       - http01:
           gatewayHTTPRoute:
             parentRefs:
-              - name: {{ required "ingress.gateway.name must be set when ingress.mode is envoy or migration" .Values.ingress.gateway.name | quote }}
-                namespace: {{ default .Release.Namespace .Values.ingress.gateway.namespace | quote }}
+              - name: {{ required "gateway.name must be set when routing.mode is envoy or migration" .Values.gateway.name | quote }}
+                namespace: {{ default .Release.Namespace .Values.gateway.namespace | quote }}
                 kind: Gateway
 {{- else }}
       - http01:

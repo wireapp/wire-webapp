@@ -1,4 +1,4 @@
-{{- if .Values.ingress.enabled }}
+{{- if .Values.routing.enabled }}
 {{- $appName := include "webapp.baseName" . -}}
 apiVersion: v1
 kind: Service

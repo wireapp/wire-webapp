@@ -1,5 +1,5 @@
-{{- $ingressMode := include "webapp.ingressMode" . -}}
-{{- if and .Values.ingress.enabled (or (eq $ingressMode "envoy") (eq $ingressMode "migration")) }}
+{{- $routingMode := include "webapp.routingMode" . -}}
+{{- if and .Values.routing.enabled (or (eq $routingMode "envoy") (eq $routingMode "migration")) }}
 {{- include "webapp.validateDomainConfig" . }}
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -10,9 +10,9 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-  {{- if or .Values.ingress.httpRouteAnnotations (eq $ingressMode "migration") }}
+  {{- if or .Values.gateway.httpRouteAnnotations (eq $routingMode "migration") }}
   annotations:
-    {{- range $key, $val := .Values.ingress.httpRouteAnnotations }}
+    {{- range $key, $val := .Values.gateway.httpRouteAnnotations }}
     {{ $key }}: {{ $val | quote }}
     {{- end }}
     {{- $weight := include "webapp.externalDnsWeight" (dict "ctx" . "kind" "envoy") | trim -}}

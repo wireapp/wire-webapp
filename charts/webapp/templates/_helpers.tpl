@@ -41,43 +41,43 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "webapp.validateDomainConfig" -}}
-  {{- $ingressMode := default "nginx" .Values.ingress.mode | lower -}}
-  {{- if or .Values.ingress.enabled .Values.tls.enabled }}
+  {{- $routingMode := default "nginx" .Values.routing.mode | lower -}}
+  {{- if or .Values.routing.enabled .Values.tls.enabled }}
     {{- if not .Values.webappDomain }}
-      {{- fail "webappDomain must be set when enabling ingress or tls" }}
+      {{- fail "webappDomain must be set when enabling routing or tls" }}
     {{- end }}
   {{- end }}
-  {{- if and (ne $ingressMode "nginx") (ne $ingressMode "envoy") (ne $ingressMode "migration") }}
-    {{- fail "ingress.mode must be one of nginx, envoy, or migration" }}
+  {{- if and (ne $routingMode "nginx") (ne $routingMode "envoy") (ne $routingMode "migration") }}
+    {{- fail "routing.mode must be one of nginx, envoy, or migration" }}
   {{- end }}
-  {{- if and (or (eq $ingressMode "envoy") (eq $ingressMode "migration")) (not .Values.ingress.enabled) }}
-    {{- fail "ingress.enabled must be true when ingress.mode is envoy or migration" }}
+  {{- if and (or (eq $routingMode "envoy") (eq $routingMode "migration")) (not .Values.routing.enabled) }}
+    {{- fail "routing.enabled must be true when routing.mode is envoy or migration" }}
   {{- end }}
-  {{- if and .Values.ingress.enabled (or (eq $ingressMode "envoy") (eq $ingressMode "migration")) (empty .Values.ingress.gateway.name) }}
-    {{- fail "ingress.gateway.name must be set when ingress.mode is envoy or migration" }}
+  {{- if and .Values.routing.enabled (or (eq $routingMode "envoy") (eq $routingMode "migration")) (empty .Values.gateway.name) }}
+    {{- fail "gateway.name must be set when routing.mode is envoy or migration" }}
   {{- end }}
-  {{- if and .Values.ingress.enabled (eq $ingressMode "migration") (and (ne (default "nginx" .Values.ingress.migration.primary | lower) "nginx") (ne (default "nginx" .Values.ingress.migration.primary | lower) "envoy")) }}
-    {{- fail "ingress.migration.primary must be one of nginx or envoy" }}
+  {{- if and .Values.routing.enabled (eq $routingMode "migration") (and (ne (default "nginx" .Values.routing.migration.primary | lower) "nginx") (ne (default "nginx" .Values.routing.migration.primary | lower) "envoy")) }}
+    {{- fail "routing.migration.primary must be one of nginx or envoy" }}
   {{- end }}
-  {{- if and .Values.ingress.renderCSPInIngress (eq $ingressMode "envoy") }}
-    {{- fail "ingress.renderCSPInIngress only works with ingress.mode=nginx or migration" }}
+  {{- if and .Values.ingress.renderCSPInIngress (eq $routingMode "envoy") }}
+    {{- fail "ingress.renderCSPInIngress only works with routing.mode=nginx or migration" }}
   {{- end }}
-  {{- if and .Values.tls.enabled (not .Values.ingress.enabled) }}
-    {{- fail "ingress.enabled must be true when tls.enabled is true" }}
+  {{- if and .Values.tls.enabled (not .Values.routing.enabled) }}
+    {{- fail "routing.enabled must be true when tls.enabled is true" }}
   {{- end }}
   {{- if and .Values.tls.enabled (not .Values.tls.useCertManager) (empty .Values.tls.existingSecretName) }}
     {{- fail "When tls.enabled is true, either tls.useCertManager must be true or tls.existingSecretName must be set" }}
   {{- end }}
 {{- end -}}
 
-{{- define "webapp.ingressMode" -}}
-{{- default "nginx" .Values.ingress.mode | lower -}}
+{{- define "webapp.routingMode" -}}
+{{- default "nginx" .Values.routing.mode | lower -}}
 {{- end -}}
 
-{{- define "webapp.ingressPrimaryController" -}}
-{{- $mode := include "webapp.ingressMode" . -}}
+{{- define "webapp.routingPrimaryController" -}}
+{{- $mode := include "webapp.routingMode" . -}}
 {{- if eq $mode "migration" -}}
-{{- default "nginx" .Values.ingress.migration.primary | lower -}}
+{{- default "nginx" .Values.routing.migration.primary | lower -}}
 {{- else -}}
 {{- $mode -}}
 {{- end -}}
@@ -86,8 +86,8 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- define "webapp.externalDnsWeight" -}}
 {{- $ctx := .ctx -}}
 {{- $kind := .kind -}}
-{{- if eq (include "webapp.ingressMode" $ctx) "migration" -}}
-{{- if eq (include "webapp.ingressPrimaryController" $ctx) $kind -}}
+{{- if eq (include "webapp.routingMode" $ctx) "migration" -}}
+{{- if eq (include "webapp.routingPrimaryController" $ctx) $kind -}}
 100
 {{- else -}}
 0
@@ -100,8 +100,8 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "webapp.listenerName" -}}
-{{- if .Values.ingress.gateway.sectionName -}}
-{{- .Values.ingress.gateway.sectionName -}}
+{{- if .Values.gateway.sectionName -}}
+{{- .Values.gateway.sectionName -}}
 {{- else if .Values.tls.enabled -}}
 https
 {{- else -}}
