@@ -986,8 +986,9 @@ export class ConversationRepository {
       const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage?.isCreation();
       if (checkCreationMessage) {
         const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage?.isGroupCreation();
-        const one2oneConnectionMessageInGroup = conversationEntity.isGroupOrChannel() && firstMessage?.isConnection();
-        const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
+        const one2oneConnectionMessageInGroupLike =
+          (conversationEntity.isGroupOrChannel() || conversationEntity.isMeeting()) && firstMessage?.isConnection();
+        const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroupLike;
 
         if (wrongMessageTypeForConversation) {
           this.messageRepository.deleteMessage(conversationEntity, firstMessage);
@@ -1027,9 +1028,10 @@ export class ConversationRepository {
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
     }
 
-    const creationEvent = conversationEntity.isGroupOrChannel()
-      ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
-      : EventBuilder.build1to1Creation(conversationEntity);
+    const creationEvent =
+      conversationEntity.isGroupOrChannel() || conversationEntity.isMeeting()
+        ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
+        : EventBuilder.build1to1Creation(conversationEntity);
 
     await this.eventRepository.injectEvent(creationEvent, eventSource);
   }
