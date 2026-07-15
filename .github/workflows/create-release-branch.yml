@@ -43,7 +43,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
-          persist-credentials: false
+          persist-credentials: true
           fetch-depth: 1
 
       - name: Add repository Yarn wrapper to PATH
@@ -128,7 +128,6 @@ jobs:
       - name: Create and push release branch
         id: create_release_branch
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_BRANCH: ${{ needs.validate_request.outputs.release_branch }}
           SOURCE_REF: ${{ needs.validate_request.outputs.source_ref }}
         run: |
@@ -150,7 +149,7 @@ jobs:
           fi
 
           git branch "${RELEASE_BRANCH}" "${source_commit_sha}"
-          git -c http.extraheader="AUTHORIZATION: bearer ${GITHUB_TOKEN}" push origin "refs/heads/${RELEASE_BRANCH}:refs/heads/${RELEASE_BRANCH}"
+          git push origin "refs/heads/${RELEASE_BRANCH}:refs/heads/${RELEASE_BRANCH}"
 
           echo "source_commit_sha=${source_commit_sha}" >> "$GITHUB_OUTPUT"
 
