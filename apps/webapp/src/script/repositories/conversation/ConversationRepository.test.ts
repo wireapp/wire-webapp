@@ -2084,81 +2084,90 @@ describe('ConversationRepository', () => {
         const injectEventSpy = jest
           .spyOn(conversationRepository['eventRepository'], 'injectEvent')
           .mockResolvedValue(undefined);
+        const updateParticipatingUserEntitiesSpy = jest
+          .spyOn(conversationRepository, 'updateParticipatingUserEntities')
+          .mockResolvedValue(true);
+        const saveConversationSpy = jest
+          .spyOn(conversationRepository as any, 'saveConversation')
+          .mockResolvedValue(false);
 
-        jest.spyOn(conversationRepository, 'updateParticipatingUserEntities').mockResolvedValue(true);
-        jest.spyOn(conversationRepository as any, 'saveConversation').mockResolvedValue(false);
+        try {
+          const otherUserId = {
+            domain: 'bella.wire.link',
+            id: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
+          };
 
-        const otherUserId = {
-          domain: 'bella.wire.link',
-          id: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
-        };
-
-        const createMeetingEvent: ConversationCreateMeetingEvent = {
-          conversation: createUuid(),
-          data: {
-            access: [CONVERSATION_ACCESS.INVITE],
-            access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
-            access_role_v2: [],
-            cells_state: CONVERSATION_CELLS_STATE.DISABLED,
-            creator: '9dcb21e0-9670-4d05-8590-408f3686c873',
-            epoch: 0,
-            group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
-            group_id: 'meeting-group-id',
-            last_event: '0.0',
-            last_event_time: '1970-01-01T00:00:00.000Z',
-            members: {
-              others: [
-                {
-                  conversation_role: 'wire_member',
-                  id: otherUserId.id,
-                  qualified_id: otherUserId,
-                  status: 0,
+          const createMeetingEvent: ConversationCreateMeetingEvent = {
+            conversation: createUuid(),
+            data: {
+              access: [CONVERSATION_ACCESS.INVITE],
+              access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
+              access_role_v2: [],
+              cells_state: CONVERSATION_CELLS_STATE.DISABLED,
+              creator: '9dcb21e0-9670-4d05-8590-408f3686c873',
+              epoch: 0,
+              group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+              group_id: 'meeting-group-id',
+              last_event: '0.0',
+              last_event_time: '1970-01-01T00:00:00.000Z',
+              members: {
+                others: [
+                  {
+                    conversation_role: 'wire_member',
+                    id: otherUserId.id,
+                    qualified_id: otherUserId,
+                    status: 0,
+                  },
+                ],
+                self: {
+                  conversation_role: 'wire_admin',
+                  hidden: false,
+                  hidden_ref: null,
+                  id: '9dcb21e0-9670-4d05-8590-408f3686c873',
+                  otr_archived: false,
+                  otr_archived_ref: null,
+                  otr_muted_ref: null,
+                  otr_muted_status: null,
+                  service: null,
+                  status_ref: '0.0',
+                  status_time: '1970-01-01T00:00:00.000Z',
                 },
-              ],
-              self: {
-                conversation_role: 'wire_admin',
-                hidden: false,
-                hidden_ref: null,
-                id: '9dcb21e0-9670-4d05-8590-408f3686c873',
-                otr_archived: false,
-                otr_archived_ref: null,
-                otr_muted_ref: null,
-                otr_muted_status: null,
-                service: null,
-                status_ref: '0.0',
-                status_time: '1970-01-01T00:00:00.000Z',
               },
+              message_timer: null,
+              name: 'Weekly sync',
+              protocol: CONVERSATION_PROTOCOL.MLS,
+              qualified_id: {
+                domain: 'bella.wire.link',
+                id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
+              },
+              receipt_mode: null,
+              team: null,
+              type: 0,
             },
-            message_timer: null,
-            name: 'Weekly sync',
-            protocol: CONVERSATION_PROTOCOL.MLS,
-            qualified_id: {
-              domain: 'bella.wire.link',
-              id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
-            },
-            receipt_mode: null,
-            team: null,
-            type: 0,
-          },
-          from: '',
-          time: '1970-01-01T00:00:00.001Z',
-          type: CONVERSATION_EVENT.CREATE_MEETING,
-        };
+            from: '',
+            time: '1970-01-01T00:00:00.001Z',
+            type: CONVERSATION_EVENT.CREATE_MEETING,
+          };
 
-        jest
-          .spyOn(conversationRepository['conversationService'], 'getConversationById')
-          .mockResolvedValueOnce(createMeetingEvent.data);
+          jest
+            .spyOn(conversationRepository['conversationService'], 'getConversationById')
+            .mockResolvedValueOnce(createMeetingEvent.data);
 
-        await conversationRepository['handleConversationEvent'](createMeetingEvent);
+          await conversationRepository['handleConversationEvent'](createMeetingEvent);
 
-        expect(injectEventSpy).toHaveBeenCalledWith(
-          expect.objectContaining({type: CONVERSATION.GROUP_CREATION}),
-          expect.anything(),
-        );
-        expect(injectEventSpy).not.toHaveBeenCalledWith(
-          expect.objectContaining({type: CONVERSATION.ONE2ONE_CREATION}),
-          expect.anything(),
-        );
+          expect(injectEventSpy).toHaveBeenCalledWith(
+            expect.objectContaining({type: CONVERSATION.GROUP_CREATION}),
+            expect.anything(),
+          );
+          expect(injectEventSpy).not.toHaveBeenCalledWith(
+            expect.objectContaining({type: CONVERSATION.ONE2ONE_CREATION}),
+            expect.anything(),
+          );
+        } finally {
+          injectEventSpy.mockRestore();
+          updateParticipatingUserEntitiesSpy.mockRestore();
+          saveConversationSpy.mockRestore();
+        }
       });
     });
 

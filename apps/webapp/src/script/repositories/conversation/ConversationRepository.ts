@@ -1342,7 +1342,8 @@ export class ConversationRepository {
     return task.tryOrElse(
       error => error,
       async () => {
-        const [conversationEntity] = this.mapConversations([conversationData]);
+        // Validated meeting payloads are backend conversations with a narrowed meeting shape.
+        const [conversationEntity] = this.mapConversations([conversationData as BackendConversation]);
         await this.updateParticipatingUserEntities(conversationEntity);
         await this.saveConversation(conversationEntity);
       },
