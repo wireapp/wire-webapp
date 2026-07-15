@@ -252,6 +252,8 @@ jobs:
     name: lint
     permissions:
       contents: read
+    env:
+      ESLINT_QUIET: --quiet
 
     steps:
       - name: Checkout (pull_request)

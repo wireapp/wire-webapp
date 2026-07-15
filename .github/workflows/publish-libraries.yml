@@ -49,6 +49,8 @@ jobs:
         run: ./bin/yarn --immutable
 
       - name: Lint libraries
+        env:
+          ESLINT_QUIET: --quiet
         run: ./bin/yarn nx run-many -t lint --projects=tag:type:lib
 
       - name: Test libraries

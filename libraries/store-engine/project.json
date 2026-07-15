@@ -61,7 +61,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=1289 --cache --cache-location node_modules/.cache/eslint/store-engine --ext .js,.ts,.tsx {projectRoot}/src --ignore-pattern '{projectRoot}/src/test/**'"
+        "command": "eslint --config eslint.config.ts ${ESLINT_QUIET:-} --max-warnings=1289 --cache --cache-location node_modules/.cache/eslint/store-engine --ext .js,.ts,.tsx {projectRoot}/src --ignore-pattern '{projectRoot}/src/test/**'"
       }
     },
     "type-check": {

@@ -61,7 +61,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=1289 --cache --cache-location node_modules/.cache/eslint/commons --ext .js,.ts,.tsx {projectRoot}/src"
+        "command": "eslint --config eslint.config.ts ${ESLINT_QUIET:-} --max-warnings=1289 --cache --cache-location node_modules/.cache/eslint/commons --ext .js,.ts,.tsx {projectRoot}/src"
       }
     },
     "type-check": {
