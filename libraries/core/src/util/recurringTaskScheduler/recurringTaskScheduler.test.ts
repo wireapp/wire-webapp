@@ -217,6 +217,33 @@ describe('RecurringTaskScheduler', () => {
       expect(task).toHaveBeenCalledTimes(2);
     });
 
+    it('does not run a focus task while it is already executing', async () => {
+      let resolveTask: () => void = () => undefined;
+      const task = jest.fn().mockImplementation(
+        () =>
+          new Promise<void>(resolve => {
+            resolveTask = resolve;
+          }),
+      );
+
+      await focusTaskScheduler.registerTask({
+        every: TimeUtil.TimeInMillis.DAY,
+        task,
+        key: 'concurrent-focus-task',
+        addTaskOnWindowFocusEvent: true,
+      });
+
+      const focusHandler = getFocusHandler();
+      focusHandler();
+      await Promise.resolve();
+
+      focusHandler();
+      expect(task).toHaveBeenCalledTimes(1);
+
+      resolveTask();
+      await fireAndForgetInvoker.waitUntilAllSettled();
+    });
+
     it('removes the focus listener when a focus task is cancelled', async () => {
       const task = jest.fn();
       const taskKey = 'cancel-focus-task';

@@ -41,6 +41,7 @@ const WINDOW_FOCUS_MIN_INTERVAL_MS = 15 * TimeUtil.TimeInMillis.MINUTE;
 export class RecurringTaskScheduler {
   private readonly focusListeners = new Map<string, () => void>();
   private readonly lastExecutedAt = new Map<string, number>();
+  private readonly executingTaskKeys = new Set<string>();
   private readonly windowFocusTaskKeys = new Set<string>();
 
   constructor(
@@ -62,10 +63,17 @@ export class RecurringTaskScheduler {
     await this.storage.set(key, firingDate);
 
     const executeTask = async () => {
+      if (this.executingTaskKeys.has(key) === true) {
+        return;
+      }
+
+      this.executingTaskKeys.add(key);
+
       await this.storage.delete(key);
       try {
         await task();
       } finally {
+        this.executingTaskKeys.delete(key);
         this.lastExecutedAt.set(key, Date.now());
         await this.registerTask({
           every,
@@ -94,6 +102,10 @@ export class RecurringTaskScheduler {
       this.removeWindowFocusListener(key);
 
       const focusHandler = () => {
+        if (this.executingTaskKeys.has(key) === true) {
+          return;
+        }
+
         const lastRun = this.lastExecutedAt.get(key);
         if (lastRun !== undefined && Date.now() - lastRun < WINDOW_FOCUS_MIN_INTERVAL_MS) {
           return;
@@ -111,6 +123,7 @@ export class RecurringTaskScheduler {
     this.windowFocusTaskKeys.delete(taskKey);
     this.removeWindowFocusListener(taskKey);
     this.lastExecutedAt.delete(taskKey);
+    this.executingTaskKeys.delete(taskKey);
     await this.storage.delete(taskKey);
     TaskScheduler.cancelTask(taskKey);
     LowPrecisionTaskScheduler.cancelTask({intervalDelay: TimeUtil.TimeInMillis.MINUTE, key: taskKey});
