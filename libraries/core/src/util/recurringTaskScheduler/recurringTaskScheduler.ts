@@ -19,6 +19,7 @@
 
 import {TimeUtil} from '@wireapp/commons';
 
+import {type FireAndForgetInvoker} from '../../taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {LowPrecisionTaskScheduler} from '../lowPrecisionTaskScheduler';
 import {TaskScheduler} from '../taskScheduler';
 
@@ -42,7 +43,10 @@ export class RecurringTaskScheduler {
   private readonly lastExecutedAt = new Map<string, number>();
   private readonly windowFocusTaskKeys = new Set<string>();
 
-  constructor(private readonly storage: RecurringTaskSchedulerStorage) {}
+  constructor(
+    private readonly storage: RecurringTaskSchedulerStorage,
+    private readonly fireAndForgetInvoker: FireAndForgetInvoker,
+  ) {}
 
   public readonly registerTask = async ({
     every,
@@ -95,7 +99,7 @@ export class RecurringTaskScheduler {
           return;
         }
 
-        void executeTask();
+        this.fireAndForgetInvoker.fireAndForget(executeTask);
       };
 
       this.focusListeners.set(key, focusHandler);

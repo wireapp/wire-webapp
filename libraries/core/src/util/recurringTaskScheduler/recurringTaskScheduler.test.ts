@@ -21,6 +21,7 @@ import {advanceJestTimersWithPromise} from '@wireapp/commons/lib/util/testUtils'
 
 import {TimeUtil} from '@wireapp/commons';
 
+import {createFireAndForgetInvoker} from '../../taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {RecurringTaskScheduler} from './recurringTaskScheduler';
 
 const mockedStore = {
@@ -39,7 +40,16 @@ const mockedStore = {
   },
 };
 
-const recurringTaskScheduler = new RecurringTaskScheduler(mockedStore);
+const createRecurringTaskSchedulerForTest = () => {
+  const fireAndForgetInvoker = createFireAndForgetInvoker({logger: {error: jest.fn()}});
+
+  return {
+    fireAndForgetInvoker,
+    recurringTaskScheduler: new RecurringTaskScheduler(mockedStore, fireAndForgetInvoker),
+  };
+};
+
+const {recurringTaskScheduler} = createRecurringTaskSchedulerForTest();
 
 describe('RecurringTaskScheduler', () => {
   beforeEach(() => {
@@ -128,6 +138,7 @@ describe('RecurringTaskScheduler', () => {
 
   describe('window focus tasks', () => {
     let focusTaskScheduler: RecurringTaskScheduler;
+    let fireAndForgetInvoker: ReturnType<typeof createFireAndForgetInvoker>;
     let addEventListenerSpy: jest.Mock;
     let removeEventListenerSpy: jest.Mock;
     let originalWindow: typeof globalThis.window | undefined;
@@ -140,14 +151,14 @@ describe('RecurringTaskScheduler', () => {
 
     const runFocusHandler = async (handler: () => void): Promise<void> => {
       handler();
-      await Promise.resolve();
+      await fireAndForgetInvoker.waitUntilAllSettled();
       await Promise.resolve();
       await Promise.resolve();
     };
 
     beforeEach(async () => {
       await mockedStore.clearAll();
-      focusTaskScheduler = new RecurringTaskScheduler(mockedStore);
+      ({fireAndForgetInvoker, recurringTaskScheduler: focusTaskScheduler} = createRecurringTaskSchedulerForTest());
       addEventListenerSpy = jest.fn();
       removeEventListenerSpy = jest.fn();
       originalWindow = globalThis.window;

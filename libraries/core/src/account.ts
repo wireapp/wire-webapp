@@ -98,6 +98,7 @@ import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';
 import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
+import {createFireAndForgetInvoker} from './taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 
 export type ProcessedEventPayload = HandledEventPayload;
 export type WebSocketConnectionContext = Pick<WebSocketReconnectContext, 'attemptId' | 'wrapperGeneration'>;
@@ -215,18 +216,22 @@ export class Account extends TypedEventEmitter<Events> {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
-    this.recurringTaskScheduler = new RecurringTaskScheduler({
-      get: async key => {
-        const task = await this.db?.get('recurringTasks', key);
-        return task?.firingDate;
+    this.logger = LogFactory.getLogger('@wireapp/core/Account');
+    this.recurringTaskScheduler = new RecurringTaskScheduler(
+      {
+        get: async key => {
+          const task = await this.db?.get('recurringTasks', key);
+          return task?.firingDate;
+        },
+        set: async (key, timestamp) => {
+          await this.db?.put('recurringTasks', {key, firingDate: timestamp}, key);
+        },
+        delete: async key => {
+          await this.db?.delete('recurringTasks', key);
+        },
       },
-      set: async (key, timestamp) => {
-        await this.db?.put('recurringTasks', {key, firingDate: timestamp}, key);
-      },
-      delete: async key => {
-        await this.db?.delete('recurringTasks', key);
-      },
-    });
+      createFireAndForgetInvoker({logger: this.logger}),
+    );
 
     apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {
       if (cookie !== undefined && this.storeEngine !== undefined) {
@@ -238,7 +243,6 @@ export class Account extends TypedEventEmitter<Events> {
       }
     });
 
-    this.logger = LogFactory.getLogger('@wireapp/core/Account');
     this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
   }
 
