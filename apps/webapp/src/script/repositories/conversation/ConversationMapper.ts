@@ -102,6 +102,22 @@ export class ConversationMapper {
     });
   }
 
+  static getUpdatableProperties(conversationEntity: Conversation): Partial<Record<keyof Conversation, unknown>> {
+    const conversationData: Partial<Record<keyof Conversation, unknown>> = {};
+
+    for (const key in conversationEntity) {
+      const value = conversationEntity[key as keyof Conversation];
+
+      if (ko.isWriteableObservable(value)) {
+        conversationData[key as keyof Conversation] = value();
+      } else if (typeof value !== 'function') {
+        conversationData[key as keyof Conversation] = value;
+      }
+    }
+
+    return conversationData;
+  }
+
   static updateProperties(
     conversationEntity: Conversation,
     conversationData: Partial<Record<keyof Conversation, any>>,

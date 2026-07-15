@@ -2554,14 +2554,7 @@ export class ConversationRepository {
     // Look up an existing conversation with the same ID so we can merge if necessary
     const existingConversation = this.conversationState.findConversation(conversationEntity.qualifiedId);
 
-    // Build a plain object copy of the entity, excluding methods
-    const conversationData: Partial<Record<keyof Conversation, unknown>> = {};
-    for (const key in conversationEntity) {
-      const value = conversationEntity[key as keyof Conversation];
-      if (typeof value !== 'function') {
-        conversationData[key as keyof Conversation] = value;
-      }
-    }
+    const conversationData = ConversationMapper.getUpdatableProperties(conversationEntity);
 
     // Merge path: update the existing conversation with new fields
     if (existingConversation) {
@@ -2572,6 +2565,8 @@ export class ConversationRepository {
       // If the old conversation had participants and the new one doesn’t, drop the field
       if (prevParticipantIds.length > 0 && nextParticipantIds.length === 0) {
         delete conversationData.participating_user_ids;
+        delete conversationData.participating_user_ets;
+        delete conversationData.connection;
       }
 
       // Apply merged data and persist the updated conversation

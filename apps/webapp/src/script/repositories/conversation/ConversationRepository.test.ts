@@ -286,6 +286,52 @@ describe('ConversationRepository', () => {
       expect(stored.participating_user_ids()).toHaveLength(1);
       expect(stored.participating_user_ids()[0]).toEqual(user.qualifiedId);
     });
+
+    it('updates observable-backed properties when merging into an existing conversation', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const existing = _generateConversation({name: 'Old title'});
+      await conversationRepository['saveConversation'](existing);
+
+      const updated = _generateConversation({
+        id: existing.qualifiedId,
+        name: 'New title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+      await conversationRepository['saveConversation'](updated);
+
+      const stored = conversationRepository['conversationState'].findConversation(existing.qualifiedId)!;
+      expect(stored.name()).toBe('New title');
+      expect(stored.groupConversationType()).toBe(GROUP_CONVERSATION_TYPE.MEETING);
+      expect(stored.display_name()).toBe('New title');
+    });
+  });
+
+  describe('saveMeetingConversationFromBackend', () => {
+    it('updates the name of an already-loaded meeting conversation', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
+      const existing = _generateConversation({
+        id: qualifiedId,
+        name: 'Old meeting title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+      await conversationRepository['saveConversation'](existing);
+
+      spyOn(conversationRepository, 'updateParticipatingUserEntities').and.returnValue(Promise.resolve());
+
+      const backendConversation = generateAPIConversation({
+        id: qualifiedId,
+        name: 'Updated meeting title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+
+      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+
+      expect(result.isOk).toBe(true);
+      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      expect(stored.name()).toBe('Updated meeting title');
+      expect(stored.display_name()).toBe('Updated meeting title');
+    });
   });
 
   describe('filtered_conversations', () => {
