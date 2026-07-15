@@ -41,6 +41,8 @@ ingress:
   annotations: {}
   # HTTPRoute-specific annotations.
   httpRouteAnnotations: {}
+  # nginx-only override for proxy-side CSP injection. The webapp server already
+  # emits CSP headers itself, so Envoy mode does not need a proxy-side CSP path.
   renderCSPInIngress: false
 
 tls:
