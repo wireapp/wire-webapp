@@ -29,6 +29,7 @@ flowchart LR
   releaseArtifact[Release artifact]
   betaEnvironment[Beta company validation<br/>Production backend]
   e2eEnvironment[E2E validation slot<br/>Staging backend]
+  productionApproval[Quality assurance approval]
   betaTag[YYYY-MM-DD.N-beta.M]
   productionEnvironment[Production]
   productionTag[YYYY-MM-DD.N-production]
@@ -41,7 +42,8 @@ flowchart LR
   releaseArtifact -->|Deploy| betaEnvironment
   betaEnvironment -->|Verify Production runtime| betaTag
   betaTag -->|Deploy same artifact| e2eEnvironment
-  e2eEnvironment -->|E2E and Testiny succeed| productionEnvironment
+  e2eEnvironment -->|E2E and Testiny succeed| productionApproval
+  productionApproval -->|Approve candidate| productionEnvironment
   productionEnvironment -->|Successful production deployment creates| productionTag
   productionTag -->|Create only when needed| maintenanceBranch
   maintenanceBranch -->|Validated maintenance artifact creates| maintenanceTag

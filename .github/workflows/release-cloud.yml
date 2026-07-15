@@ -85,6 +85,7 @@ jobs:
     outputs:
       artifact_checksum: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
       artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
+      artifact_version: ${{ steps.artifact_metadata.outputs.artifact_version }}
       release_branch: ${{ steps.release_metadata.outputs.release_branch }}
       release_commit_sha: ${{ steps.release_metadata.outputs.release_commit_sha }}
       release_identifier: ${{ steps.release_metadata.outputs.release_identifier }}
@@ -145,10 +146,12 @@ jobs:
 
           artifact_name="${BETA_ARTIFACT_NAME_PREFIX}-${RELEASE_IDENTIFIER}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           artifact_checksum="$(sha256sum "${ARTIFACT_PATH}" | awk '{print $1}')"
+          artifact_version="$(unzip -p "${ARTIFACT_PATH}" version.json | jq --raw-output '.version')"
 
           {
             echo "artifact_name=${artifact_name}"
             echo "artifact_checksum=${artifact_checksum}"
+            echo "artifact_version=${artifact_version}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Upload build artifact
@@ -198,6 +201,7 @@ jobs:
           BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
           EXPECTED_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
           EXPECTED_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
+          EXPECTED_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
         run: |
           set -euo pipefail
 
@@ -212,16 +216,17 @@ jobs:
             runtime_config="$(curl --fail --silent --show-error "${BETA_WEBAPP_URL}config.js" || true)"
             actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
             actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
+            actual_version="$(printf '%s' "${runtime_config}" | sed -n 's/.*"VERSION":"\([^"]*\)".*/\1/p')"
 
-            if [[ "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" && "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" ]]; then
+            if [[ "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" && "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" && "${actual_version}" == "${EXPECTED_VERSION}" ]]; then
               exit 0
             fi
 
-            echo "Beta runtime backend does not match Production on attempt ${attempt_number}: REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}." >&2
+            echo "Beta runtime configuration does not match the current artifact and Production backend on attempt ${attempt_number}: REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}, VERSION=${actual_version:-missing}." >&2
             sleep 6
           done
 
-          echo "Beta runtime backend did not match the expected Production endpoints." >&2
+          echo "Beta runtime configuration did not match the expected Production endpoints and artifact version." >&2
           exit 1
 
   create_beta_tag:
@@ -284,6 +289,7 @@ jobs:
       artifact_name: ${{ needs.build_artifact.outputs.artifact_name }}
       expectedBackendRest: https://staging-nginz-https.zinfra.io/
       expectedBackendWs: wss://staging-nginz-ssl.zinfra.io/
+      expectedVersion: ${{ needs.build_artifact.outputs.artifact_version }}
       grep: '@regression|@crit-flow-web'
       testinyRunName: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
     secrets:
