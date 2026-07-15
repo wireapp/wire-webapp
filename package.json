@@ -112,7 +112,7 @@
     "lint:fix": "nx run-many -t lint --all --fix",
     "lint:format": "bash bin/lint-format-check.sh",
     "postinstall": "nx run webapp:configure",
-    "prettier": "nx format:check --base=dev --head=HEAD",
+    "prettier": "nx format:check --base=main --head=HEAD",
     "release:staging": "nx run workspace-tools:release-staging",
     "release:production": "nx run workspace-tools:release-production",
     "release:custom": "nx run workspace-tools:release-custom",

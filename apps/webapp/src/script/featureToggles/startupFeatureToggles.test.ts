@@ -25,7 +25,6 @@ import {
 import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
-  messageSendingStatusFixFeatureToggleName,
   meetingsFeatureToggleName,
   sharedDriveSearchAndFiltersFeatureToggleName,
   startupFeatureToggleNames,
@@ -35,7 +34,6 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
   sharedDriveSearchAndFiltersFeatureToggleName,
   meetingsFeatureToggleName,
-  messageSendingStatusFixFeatureToggleName,
   conversationListCollapseFeatureToggleName,
 ] as const;
 
@@ -105,14 +103,6 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(meetingsFeatureToggleName)).toBe(true);
   });
 
-  it('enables the message sending status fix feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${messageSendingStatusFixFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(messageSendingStatusFixFeatureToggleName)).toBe(true);
-  });
-
   it('enables the conversation list collapse feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${conversationListCollapseFeatureToggleName}`,
@@ -162,7 +152,6 @@ describe('startupFeatureToggles', function () {
       applockRefactoredFeatureToggleName,
       sharedDriveSearchAndFiltersFeatureToggleName,
       meetingsFeatureToggleName,
-      messageSendingStatusFixFeatureToggleName,
       conversationListCollapseFeatureToggleName,
     ]);
   });

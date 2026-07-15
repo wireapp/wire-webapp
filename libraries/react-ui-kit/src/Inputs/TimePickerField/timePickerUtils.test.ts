@@ -17,20 +17,17 @@
  *
  */
 
-import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {buildTimeOptions, filterTimeOptionsAfter, getTimeOptionTotalMinutes} from './timePickerUtils';
 
-export const useMeetingActions = () => {
-  const {wallClock} = useApplicationContext();
-  const openCreate = useScheduleMeetingModal(state => state.openCreate);
+describe('timePickerUtils', () => {
+  it('filters out time options at or before the minimum time', () => {
+    const options = buildTimeOptions();
+    const minTime = new Date(2026, 6, 13, 16, 27, 0, 0);
 
-  const handleMeetNow = () => {
-    // add calling functionality here
-  };
+    const filteredOptions = filterTimeOptionsAfter(options, minTime);
 
-  const handleScheduleMeeting = () => {
-    openCreate(wallClock);
-  };
-
-  return {handleMeetNow, handleScheduleMeeting};
-};
+    expect(filteredOptions.some(option => option.label === '4:15 PM')).toBe(false);
+    expect(filteredOptions.some(option => option.label === '4:30 PM')).toBe(true);
+    expect(getTimeOptionTotalMinutes(filteredOptions[0]!)).toBeGreaterThan(16 * 60 + 27);
+  });
+});

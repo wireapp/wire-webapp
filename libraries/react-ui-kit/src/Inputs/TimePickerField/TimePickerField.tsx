@@ -30,7 +30,7 @@ import {
   timeSelectMenuStyles,
   timeSelectStyles,
 } from './TimePickerField.styles';
-import {buildTimeOptions} from './timePickerUtils';
+import {buildTimeOptions, filterTimeOptionsAfter} from './timePickerUtils';
 
 import {Theme} from '../../Identity/Theme';
 import {InputLabel} from '../InputLabel';
@@ -47,6 +47,8 @@ export interface TimePickerFieldProps {
   ariaLabel?: string;
   markInvalid?: boolean;
   disabled?: boolean;
+  /** When set, only time options strictly after this time of day are shown. */
+  minTime?: Date | null;
   menuPortalTarget?: HTMLElement;
   menuPlacement?: 'top' | 'bottom' | 'auto';
   maxMenuHeight?: number;
@@ -62,12 +64,25 @@ export const TimePickerField = ({
   ariaLabel,
   markInvalid = false,
   disabled = false,
+  minTime = null,
   menuPortalTarget,
   menuPlacement = 'bottom',
   maxMenuHeight = 200,
   wrapperCSS = {},
 }: TimePickerFieldProps) => {
-  const timeOptions = useMemo(() => buildTimeOptions(), []);
+  const timeOptions = useMemo(() => {
+    let options = buildTimeOptions();
+
+    if (minTime !== null) {
+      options = filterTimeOptionsAfter(options, minTime);
+    }
+
+    if (value !== null && !options.some(option => option.value === value.value)) {
+      options = [value, ...options];
+    }
+
+    return options;
+  }, [minTime, value]);
   const portalTarget = menuPortalTarget ?? (typeof document !== 'undefined' ? document.body : undefined);
   const labelId = `${id}-label`;
 
@@ -94,6 +109,7 @@ export const TimePickerField = ({
       )}
 
       <Select
+        key={minTime?.getTime() ?? 'all-times'}
         id={id}
         dataUieName={dataUieName}
         options={timeOptions}

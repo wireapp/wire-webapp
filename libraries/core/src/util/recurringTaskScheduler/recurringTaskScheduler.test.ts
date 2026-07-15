@@ -21,6 +21,7 @@ import {advanceJestTimersWithPromise} from '@wireapp/commons/lib/util/testUtils'
 
 import {TimeUtil} from '@wireapp/commons';
 
+import {createFireAndForgetInvoker} from '../../taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {RecurringTaskScheduler} from './recurringTaskScheduler';
 
 const mockedStore = {
@@ -39,7 +40,16 @@ const mockedStore = {
   },
 };
 
-const recurringTaskScheduler = new RecurringTaskScheduler(mockedStore);
+const createRecurringTaskSchedulerForTest = () => {
+  const fireAndForgetInvoker = createFireAndForgetInvoker({logger: {error: jest.fn()}});
+
+  return {
+    fireAndForgetInvoker,
+    recurringTaskScheduler: new RecurringTaskScheduler(mockedStore, fireAndForgetInvoker),
+  };
+};
+
+const {recurringTaskScheduler} = createRecurringTaskSchedulerForTest();
 
 describe('RecurringTaskScheduler', () => {
   beforeEach(() => {
@@ -124,5 +134,131 @@ describe('RecurringTaskScheduler', () => {
 
     expect(mockedTask1).toHaveBeenCalledTimes(2);
     expect(mockedTask2).toHaveBeenCalledTimes(1);
+  });
+
+  describe('window focus tasks', () => {
+    let focusTaskScheduler: RecurringTaskScheduler;
+    let fireAndForgetInvoker: ReturnType<typeof createFireAndForgetInvoker>;
+    let addEventListenerSpy: jest.Mock;
+    let removeEventListenerSpy: jest.Mock;
+    let originalWindow: typeof globalThis.window | undefined;
+
+    const getFocusHandler = (): (() => void) => {
+      const focusCalls = addEventListenerSpy.mock.calls.filter(([eventName]) => eventName === 'focus');
+      expect(focusCalls.length).toBeGreaterThan(0);
+      return focusCalls[focusCalls.length - 1]?.[1] as () => void;
+    };
+
+    const runFocusHandler = async (handler: () => void): Promise<void> => {
+      handler();
+      await fireAndForgetInvoker.waitUntilAllSettled();
+      await Promise.resolve();
+      await Promise.resolve();
+    };
+
+    beforeEach(async () => {
+      await mockedStore.clearAll();
+      ({fireAndForgetInvoker, recurringTaskScheduler: focusTaskScheduler} = createRecurringTaskSchedulerForTest());
+      addEventListenerSpy = jest.fn();
+      removeEventListenerSpy = jest.fn();
+      originalWindow = globalThis.window;
+      globalThis.window = {
+        addEventListener: addEventListenerSpy,
+        removeEventListener: removeEventListenerSpy,
+      } as unknown as Window & typeof globalThis;
+    });
+
+    afterEach(() => {
+      if (originalWindow === undefined) {
+        // @ts-expect-error restoring test environment without window
+        delete globalThis.window;
+      } else {
+        globalThis.window = originalWindow;
+      }
+    });
+
+    it('replaces the focus listener when a focus task is re-registered', async () => {
+      const task = jest.fn();
+      await focusTaskScheduler.registerTask({
+        every: TimeUtil.TimeInMillis.DAY,
+        task,
+        key: 'focus-task',
+        addTaskOnWindowFocusEvent: true,
+      });
+
+      const initialFocusHandler = getFocusHandler();
+      await runFocusHandler(initialFocusHandler);
+
+      expect(task).toHaveBeenCalledTimes(1);
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('focus', initialFocusHandler);
+
+      const focusAddCalls = addEventListenerSpy.mock.calls.filter(([eventName]) => eventName === 'focus');
+      expect(focusAddCalls).toHaveLength(2);
+    });
+
+    it('does not run a focus task again within the minimum interval', async () => {
+      const task = jest.fn();
+      await focusTaskScheduler.registerTask({
+        every: TimeUtil.TimeInMillis.DAY,
+        task,
+        key: 'throttle-task',
+        addTaskOnWindowFocusEvent: true,
+      });
+
+      await runFocusHandler(getFocusHandler());
+      expect(task).toHaveBeenCalledTimes(1);
+
+      jest.advanceTimersByTime(5 * TimeUtil.TimeInMillis.MINUTE);
+      await runFocusHandler(getFocusHandler());
+      expect(task).toHaveBeenCalledTimes(1);
+
+      jest.advanceTimersByTime(11 * TimeUtil.TimeInMillis.MINUTE);
+      await runFocusHandler(getFocusHandler());
+      expect(task).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not run a focus task while it is already executing', async () => {
+      let resolveTask: () => void = () => undefined;
+      const task = jest.fn().mockImplementation(
+        () =>
+          new Promise<void>(resolve => {
+            resolveTask = resolve;
+          }),
+      );
+
+      await focusTaskScheduler.registerTask({
+        every: TimeUtil.TimeInMillis.DAY,
+        task,
+        key: 'concurrent-focus-task',
+        addTaskOnWindowFocusEvent: true,
+      });
+
+      const focusHandler = getFocusHandler();
+      focusHandler();
+      await Promise.resolve();
+
+      focusHandler();
+      expect(task).toHaveBeenCalledTimes(1);
+
+      resolveTask();
+      await fireAndForgetInvoker.waitUntilAllSettled();
+    });
+
+    it('removes the focus listener when a focus task is cancelled', async () => {
+      const task = jest.fn();
+      const taskKey = 'cancel-focus-task';
+
+      await focusTaskScheduler.registerTask({
+        every: TimeUtil.TimeInMillis.DAY,
+        task,
+        key: taskKey,
+        addTaskOnWindowFocusEvent: true,
+      });
+
+      const focusHandler = getFocusHandler();
+      await focusTaskScheduler.cancelTask(taskKey);
+
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('focus', focusHandler);
+    });
   });
 });
