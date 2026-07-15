@@ -24,13 +24,14 @@ import {
   ConversationMLSMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
 import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
+import {sequentialQueueOptions} from '@wireapp/core/lib/queue/sequentialQueueOptions';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import PromiseQueue from 'p-queue';
 import {container} from 'tsyringe';
 
 import {Runtime, StringUtil} from '@wireapp/commons';
 import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '@wireapp/core';
-import {PromiseQueue} from '@wireapp/promise-queue';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
@@ -73,7 +74,7 @@ export class EventRepository {
   /** event processors are classes that are able to react and process an incoming event */
   private eventProcessors: EventProcessor[] = [];
 
-  private eventQueue: PromiseQueue = new PromiseQueue();
+  private eventQueue: PromiseQueue = new PromiseQueue({autoStart: true, ...sequentialQueueOptions});
 
   static get CONFIG() {
     return {
@@ -175,7 +176,7 @@ export class EventRepository {
    * Processing events should happen sequentially (thus the queue)
    */
   private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
-    return this.eventQueue.push(async () => {
+    return this.eventQueue.add(async () => {
       try {
         await this.handleEvent(payload, source);
       } catch (error: unknown) {

@@ -21,6 +21,7 @@ import {Router} from 'express';
 
 import type {ClientConfig, ServerConfig} from '@wireapp/config';
 
+import {setNonCacheHeaders} from '../../http/setNonCacheHeaders';
 import {replaceHostname} from '../../util/hostnameReplacer';
 
 export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConfig) =>
@@ -30,5 +31,7 @@ export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConf
       ? // In case we want URLs that depends on the the hostname, we need to replace the placeholder with the actual hostname.
         replaceHostname(serializedConfig, request)
       : serializedConfig;
-    res.type('application/javascript').send(payload);
+    const response = setNonCacheHeaders(res);
+
+    return response.type('application/javascript').send(payload);
   });

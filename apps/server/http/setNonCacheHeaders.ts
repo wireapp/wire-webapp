@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,5 +17,13 @@
  *
  */
 
-export * from './PromiseQueue';
-export {Task} from './QueueEntry';
+import type {Response} from 'express';
+
+export function setNonCacheHeaders(response: Response): Response {
+  response.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  response.set('Pragma', 'no-cache');
+  response.set('Expires', '0');
+  response.set('Surrogate-Control', 'no-store');
+
+  return response;
+}

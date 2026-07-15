@@ -28,11 +28,22 @@ CALLING_SERVICE_BASIC_AUTH=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/basicA
 CALLING_SERVICE_BACKEND=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/PREDEFINED_BACKEND
 CALLING_SERVICE_INSTANCE_VERSION=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/CALLING_INSTANCE_TYPE_VERSION
 
-ENV_NAME=imai
-INBUCKET_USERNAME=op://Test Automation/BackendConnection imai/inbucketUsername
-INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection imai/inbucketPassword }}"
-INBUCKET_URL=op://Test Automation/BackendConnection imai/inbucketUrl
-BACKEND_URL=op://Test Automation/BackendConnection imai/backendUrl
-WEBAPP_URL=op://Test Automation/BackendConnection imai/webappUrl
-DOMAIN=op://Test Automation/BackendConnection imai/domain
-BASIC_AUTH=op://Test Automation/BackendConnection imai/basicAuth
+ENV_NAME=staging
+
+
+SSO_CLAIMED_USER_EMAIL=op://Test Automation/Staging Claimed Domain User/email
+SSO_CLAIMED_USER_PASSWORD=op://Test Automation/Staging Claimed Domain User/password
+SSO_CLAIMED_DOMAIN_CODE=op://Test Automation/Staging Claimed Domain User/SSO code
+
+INBUCKET_USERNAME=op://Test Automation/BackendConnection staging/inbucketUsername
+INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection staging/inbucketPassword }}"
+INBUCKET_URL=op://Test Automation/BackendConnection staging/inbucketUrl
+BACKEND_URL=op://Test Automation/BackendConnection staging/backendUrl
+WEBAPP_URL=op://Test Automation/BackendConnection staging/webappUrl
+DOMAIN=op://Test Automation/BackendConnection staging/domain
+BASIC_AUTH=op://Test Automation/BackendConnection staging/basicAuth
+
+FEDERATION_BACKEND_URL=op://Test Automation/BackendConnection qa-federation-a/backendUrl
+FEDERATION_WEBAPP_URL=op://Test Automation/BackendConnection qa-federation-a/webappUrl
+FEDERATION_DOMAIN=op://Test Automation/BackendConnection qa-federation-a/domain
+FEDERATION_BASIC_AUTH=op://Test Automation/BackendConnection qa-federation-a/basicAuth

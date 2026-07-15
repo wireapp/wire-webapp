@@ -21,9 +21,11 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
+import {amplify} from 'amplify';
 
 import {Account} from '@wireapp/core';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
@@ -83,6 +85,12 @@ type MessageRepositoryDependencies = {
   conversationState: ConversationState;
 };
 
+type MessageRepositoryPrivateMethodsForTest = {
+  sendAndInjectMessage: (message: GenericMessage) => Promise<unknown>;
+  updateMessageAsFailed: () => Promise<void>;
+  updateMessageAsSent: () => Promise<void>;
+};
+
 async function buildMessageRepository(
   translate: Translate,
 ): Promise<[MessageRepository, MessageRepositoryDependencies]> {
@@ -98,8 +106,9 @@ async function buildMessageRepository(
   const selfConversation = new Conversation(selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   selfConversation.selfUser(selfUser);
   conversationState.conversations([selfConversation]);
+  const conversationRepository = {checkMessageTimer: jest.fn()} as unknown as ConversationRepository;
   const dependencies = {
-    conversationRepository: () => ({}) as ConversationRepository,
+    conversationRepository: () => conversationRepository,
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     propertiesRepository: new PropertiesRepository({} as any, {} as any, translate),
@@ -380,8 +389,9 @@ describe('MessageRepository', () => {
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       // Spy on the internal method that sendButtonAction actually calls
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
       const sendAndInjectMessageSpy = jest
-        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
         .mockResolvedValue(undefined);
 
       // Create a mock message entity with primary_key for updateEventSequentially
@@ -449,8 +459,9 @@ describe('MessageRepository', () => {
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       // Spy on the internal method that sendButtonAction actually calls
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
       const sendAndInjectMessageSpy = jest
-        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
         .mockResolvedValue(undefined);
 
       // Create a mock message entity with primary_key for updateEventSequentially
@@ -507,6 +518,218 @@ describe('MessageRepository', () => {
         targetMode: undefined,
         userIds: expect.any(Object),
       });
+    });
+
+    it('does not wait for an added message when an existing message id is provided', async () => {
+      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
+      clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+
+      await messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+        messageId: createUuid(),
+      });
+
+      expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not create a message-added waiter when there is no current client id', async () => {
+      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      clientState.currentClient = undefined;
+      const subscribeSpy = jest.spyOn(amplify, 'subscribe');
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+
+      await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
+
+      expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
+      expect(subscribeSpy).not.toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+      expect(unsubscribeSpy).not.toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+    });
+
+    it('waits for and repairs the exact added message for a new text message', async () => {
+      const [messageRepository, {clientState, eventRepository, propertiesRepository}] =
+        await buildMessageRepository(translateForTest);
+      clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const subscribeSpy = jest.spyOn(amplify, 'subscribe');
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const updateEventSpy = jest.spyOn(eventRepository.eventService, 'updateEvent');
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+      const sendPromise = messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+      });
+
+      await Promise.resolve();
+
+      const sentTextMessage = sendAndInjectMessageSpy.mock.calls[0][0];
+      const addedMessageEntity = new Message(sentTextMessage.messageId, undefined, translateForTest);
+      addedMessageEntity.conversation_id = conversation.id;
+      addedMessageEntity.status(StatusType.SENDING);
+      conversation.addMessage(addedMessageEntity);
+
+      await sendPromise;
+
+      expect(addedMessageEntity.status()).toBe(StatusType.SENT);
+      expect(sendAndInjectMessageSpy).toHaveBeenCalledTimes(1);
+      expect(subscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+      expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+      expect(updateEventSpy).not.toHaveBeenCalled();
+    });
+
+    it('does not downgrade an already delivered added message', async () => {
+      const [messageRepository, {clientState, conversationRepository, propertiesRepository}] =
+        await buildMessageRepository(translateForTest);
+      clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+      const sendPromise = messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+      });
+
+      await Promise.resolve();
+
+      const sentTextMessage = sendAndInjectMessageSpy.mock.calls[0][0];
+      const addedMessageEntity = new Message(sentTextMessage.messageId, undefined, translateForTest);
+      addedMessageEntity.conversation_id = conversation.id;
+      addedMessageEntity.status(StatusType.DELIVERED);
+      conversation.addMessage(addedMessageEntity);
+      const timestampSpy = jest.spyOn(addedMessageEntity, 'timestamp');
+      const updateTimestampServerSpy = jest.spyOn(conversation, 'updateTimestampServer');
+      const updateTimestampsSpy = jest.spyOn(conversation, 'updateTimestamps');
+      const checkMessageTimerSpy = jest.spyOn(conversationRepository(), 'checkMessageTimer');
+
+      await sendPromise;
+
+      expect(addedMessageEntity.status()).toBe(StatusType.DELIVERED);
+      expect(timestampSpy).not.toHaveBeenCalled();
+      expect(updateTimestampServerSpy).not.toHaveBeenCalled();
+      expect(updateTimestampsSpy).not.toHaveBeenCalled();
+      expect(checkMessageTimerSpy).not.toHaveBeenCalled();
+      expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+    });
+
+    it('removes the listener when sending is canceled', async () => {
+      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
+      clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      jest.spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage').mockResolvedValue({
+        ...successPayload,
+        state: MessageSendingState.CANCELED,
+      });
+      const conversation = generateConversation();
+
+      await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
+
+      expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+    });
+
+    it('removes the listener when the backend send fails', async () => {
+      const [messageRepository, {clientState, core, eventRepository, propertiesRepository}] =
+        await buildMessageRepository(translateForTest);
+      clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      jest.spyOn(core.service!.conversation, 'send').mockRejectedValue(new Error('backend send failed'));
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      jest.spyOn(messageRepositoryPrivateMethods, 'updateMessageAsFailed').mockResolvedValue(undefined);
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const conversation = generateConversation();
+
+      const sendResult = await messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+      });
+
+      expect(sendResult).toBe(MessageSendingState.FAILED);
+      expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+    });
+
+    it('removes the listener when sending throws', async () => {
+      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
+      clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const expectedError = new Error('injection failed');
+      jest.spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage').mockRejectedValue(expectedError);
+      const conversation = generateConversation();
+      let actualError: unknown;
+
+      try {
+        await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
+      } catch (error: unknown) {
+        actualError = error;
+      }
+
+      expect(actualError).toBe(expectedError);
+      expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
+    });
+
+    it('ignores added messages from another conversation or with another message id', async () => {
+      const [messageRepository, {clientState, propertiesRepository}] = await buildMessageRepository(translateForTest);
+      clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepositoryPrivateMethods, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+      const otherConversation = generateConversation();
+      const sendPromise = messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: 'hello there',
+        mentions: [],
+      });
+
+      await Promise.resolve();
+
+      const sentTextMessage = sendAndInjectMessageSpy.mock.calls[0][0];
+      const messageWithAnotherId = new Message(createUuid(), undefined, translateForTest);
+      messageWithAnotherId.conversation_id = conversation.id;
+      conversation.addMessage(messageWithAnotherId);
+      const messageFromAnotherConversation = new Message(sentTextMessage.messageId, undefined, translateForTest);
+      messageFromAnotherConversation.conversation_id = otherConversation.id;
+      otherConversation.addMessage(messageFromAnotherConversation);
+
+      await Promise.resolve();
+
+      const sendStateBeforeMatchingMessage = await Promise.race([sendPromise, Promise.resolve('pending')]);
+      expect(sendStateBeforeMatchingMessage).toBe('pending');
+
+      const matchingMessageEntity = new Message(sentTextMessage.messageId, undefined, translateForTest);
+      matchingMessageEntity.conversation_id = conversation.id;
+      conversation.addMessage(matchingMessageEntity);
+
+      await sendPromise;
     });
   });
 

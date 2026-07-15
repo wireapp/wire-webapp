@@ -45,6 +45,7 @@ import {InitClientOptions, MLSService} from './mlsService';
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
 import {openDB} from '../../../storage/coreDb';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
+import {createFireAndForgetInvoker} from '../../../taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {TaskScheduler} from '../../../util/taskScheduler';
 import * as Helper from '../e2eIdentityService/helper';
 
@@ -100,13 +101,16 @@ const createMLSService = async () => {
   } as unknown as jest.Mocked<CoreCrypto>;
 
   const mockedDb = await openDB('core-test-db');
-  const recurringTaskScheduler = new RecurringTaskScheduler({
-    delete: key => mockedDb.delete('recurringTasks', key),
-    get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
-    set: async (key, timestamp) => {
-      await mockedDb.put('recurringTasks', {key, firingDate: timestamp}, key);
+  const recurringTaskScheduler = new RecurringTaskScheduler(
+    {
+      delete: key => mockedDb.delete('recurringTasks', key),
+      get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
+      set: async (key, timestamp) => {
+        await mockedDb.put('recurringTasks', {key, firingDate: timestamp}, key);
+      },
     },
-  });
+    createFireAndForgetInvoker({logger: {error: jest.fn()}}),
+  );
 
   const mlsService = new MLSService(apiClient, mockCoreCrypto, mockedDb, recurringTaskScheduler);
 

@@ -28,7 +28,6 @@ const LIBRARIES = [
   {name: 'bazinga64', value: 'bazinga64-lib'},
   {name: 'config', value: 'config-lib'},
   {name: 'copy-config', value: 'copy-config-lib'},
-  {name: 'promise-queue', value: 'promise-queue-lib'},
   {name: 'priority-queue', value: 'priority-queue-lib'},
   {name: 'store-engine', value: 'store-engine-lib'},
   {name: 'store-engine-fs', value: 'store-engine-fs-lib'},

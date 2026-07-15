@@ -17,9 +17,13 @@
  *
  */
 
-import {Task, PromiseQueue} from '@wireapp/promise-queue';
+import PromiseQueue from 'p-queue';
 
-const sendingQueue = new PromiseQueue({name: 'mls-conversation-rejoin', paused: false});
+import {sequentialQueueOptions} from '../../queue/sequentialQueueOptions';
+
+type PromiseTask<T> = () => Promise<T>;
+
+const sendingQueue = new PromiseQueue({autoStart: true, ...sequentialQueueOptions});
 
 const queuedJobs = new Set<string>();
 
@@ -28,18 +32,20 @@ const queuedJobs = new Set<string>();
  * @param groupId the groupId in which we will trigger the rejoin (will be used as ID, in order not to add another rejoin task for the same conversation if it's already in the queue)
  * @param rejoinFn the function to be executed to trigger the rejoin
  */
-export async function queueConversationRejoin<T>(groupId: string, rejoinFn: Task<T>): Promise<T | void> {
+export async function queueConversationRejoin<T>(groupId: string, rejoinFn: PromiseTask<T>): Promise<T | void> {
   if (!queuedJobs.has(groupId)) {
     queuedJobs.add(groupId);
 
-    const result = await sendingQueue.push(rejoinFn);
-    queuedJobs.delete(groupId);
-    return result;
+    try {
+      return await sendingQueue.add(rejoinFn);
+    } finally {
+      queuedJobs.delete(groupId);
+    }
   }
 }
 
 export function resumeRejoiningMLSConversations(): void {
-  sendingQueue.resume();
+  sendingQueue.start();
 }
 
 export function pauseRejoiningMLSConversations(): void {

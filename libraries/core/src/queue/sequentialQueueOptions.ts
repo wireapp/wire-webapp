@@ -17,19 +17,9 @@
  *
  */
 
-module.exports = {
-  displayName: 'promise-queue-lib',
-  testEnvironment: 'node',
-  clearMocks: true,
-  transform: {
-    '^.+\\.(ts|tsx)$': '@swc/jest',
-    '^.+\\.(js|jsx)$': '@swc/jest',
-  },
-  coverageDirectory: '../../coverage/libraries/promise-queue',
-  testMatch: [
-    '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
-    '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
-    '<rootDir>/spec/**/*.[jt]s?(x)',
-  ],
-  moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
+type SequentialQueueOptions = {
+  readonly concurrency: number;
+  readonly timeout: number;
 };
+
+export const sequentialQueueOptions: SequentialQueueOptions = {concurrency: 1, timeout: 60_000};
