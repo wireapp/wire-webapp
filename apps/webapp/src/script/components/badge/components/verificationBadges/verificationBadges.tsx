@@ -144,7 +144,7 @@ export const getUserVerificationBadgeLabel = (
       labels.push(translate('E2EI.certificateRevoked'));
     })
     .with(MLSStatuses.NOT_ACTIVATED, () => {
-      labels.push(translate('E2EI.certificateNotDownloaded'));
+      labels.push(translate('E2EI.certificateNotActivated'));
     })
     .with(undefined, () => {})
     .exhaustive();

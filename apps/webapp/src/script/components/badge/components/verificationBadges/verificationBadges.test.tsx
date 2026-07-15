@@ -139,9 +139,7 @@ describe('getUserVerificationBadgeLabel', () => {
       mlsStatus: MLSStatuses.VALID,
       isProteusVerified: true,
     });
-    expect(label).toBe(
-      `${translateForTest('E2EI.userDevicesVerified')}, ${translateForTest('proteusDeviceVerified')}`,
-    );
+    expect(label).toBe(`${translateForTest('E2EI.userDevicesVerified')}, ${translateForTest('proteusDeviceVerified')}`);
   });
 
   it('returns undefined when neither MLS nor Proteus is verified', () => {
@@ -152,11 +150,11 @@ describe('getUserVerificationBadgeLabel', () => {
     expect(label).toBeUndefined();
   });
 
-  it('handles certificate not downloaded status', () => {
+  it('handles not activated status', () => {
     const label = getUserVerificationBadgeLabel(translateForTest, {
       mlsStatus: MLSStatuses.NOT_ACTIVATED,
       isProteusVerified: false,
     });
-    expect(label).toBe(translateForTest('E2EI.certificateNotDownloaded'));
+    expect(label).toBe(translateForTest('E2EI.certificateNotActivated'));
   });
 });

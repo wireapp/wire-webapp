@@ -19,6 +19,7 @@
 
 import {memo} from 'react';
 
+import is from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -97,7 +98,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
     isTeam ? translate(availabilityTranslationKeys[availability]) : undefined,
     getUserVerificationBadgeLabel(translate, verificationStatus),
   ]
-    .filter((label): label is string => label !== undefined && label.length > 0)
+    .filter((label): label is string => is.nonEmptyString(label))
     .join(', ');
 
   return (
