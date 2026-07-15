@@ -199,11 +199,12 @@ jobs:
           deployment-timeout: 150
           use-existing-application-version-if-available: true
 
-      - name: Verify Beta runtime backend
+      - name: Verify Beta runtime
         env:
           BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
           EXPECTED_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
           EXPECTED_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
+          EXPECTED_COMMIT: ${{ needs.build_artifact.outputs.release_commit_sha }}
           EXPECTED_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
         run: |
           set -euo pipefail
@@ -216,20 +217,38 @@ jobs:
           expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
 
           for attempt_number in {1..10}; do
-            runtime_config="$(curl --fail --silent --show-error "${BETA_WEBAPP_URL}config.js" || true)"
+            version_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${BETA_WEBAPP_URL}version" || true)"
+            commit_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${BETA_WEBAPP_URL}commit" || true)"
+            runtime_config="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${BETA_WEBAPP_URL}config.js" || true)"
+
+            actual_version="$(
+              printf '%s' "${version_response}" |
+                jq --raw-output '.version'
+            )" || actual_version=''
+            actual_commit="$(
+              printf '%s' "${commit_response}" |
+                tr -d '\r\n'
+            )"
             actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
             actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
-            actual_version="$(printf '%s' "${runtime_config}" | sed -n 's/.*"VERSION":"\([^"]*\)".*/\1/p')"
 
-            if [[ "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" && "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" && "${actual_version}" == "${EXPECTED_VERSION}" ]]; then
+            if [[
+              "${actual_version}" == "${EXPECTED_VERSION}" &&
+              "${actual_commit}" == "${EXPECTED_COMMIT}" &&
+              "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" &&
+              "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}"
+            ]]; then
               exit 0
             fi
 
-            echo "Beta runtime configuration does not match the current artifact and Production backend on attempt ${attempt_number}: REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}, VERSION=${actual_version:-missing}." >&2
-            sleep 6
+            echo "Beta runtime verification mismatch on attempt ${attempt_number}: VERSION=${actual_version:-missing}, COMMIT=${actual_commit:-missing}, REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}." >&2
+
+            if [[ "${attempt_number}" -lt 10 ]]; then
+              sleep 6
+            fi
           done
 
-          echo "Beta runtime configuration did not match the expected Production endpoints and artifact version." >&2
+          echo "Beta runtime verification failed after 10 attempts." >&2
           exit 1
 
   create_beta_tag:
@@ -302,6 +321,7 @@ jobs:
       expectedBackendRest: https://staging-nginz-https.zinfra.io/
       expectedBackendWs: wss://staging-nginz-ssl.zinfra.io/
       expectedVersion: ${{ needs.build_artifact.outputs.artifact_version }}
+      expectedCommit: ${{ needs.build_artifact.outputs.release_commit_sha }}
       grep: '@regression|@crit-flow-web'
       testinyRunName: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
     secrets:
@@ -483,6 +503,7 @@ jobs:
         env:
           EXPECTED_BACKEND_REST: ${{ env.PRODUCTION_RUNTIME_BACKEND_REST }}
           EXPECTED_BACKEND_WS: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}
+          EXPECTED_COMMIT: ${{ needs.build_artifact.outputs.release_commit_sha }}
           EXPECTED_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
           PRODUCTION_WEBAPP_URL: ${{ env.PRODUCTION_WEBAPP_URL }}
         run: |
@@ -496,23 +517,34 @@ jobs:
           expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
 
           for attempt_number in {1..10}; do
-            runtime_config=''
-            if ! runtime_config="$(curl --fail --silent --show-error "${PRODUCTION_WEBAPP_URL}config.js")"; then
-              echo "Unable to fetch Production runtime configuration on attempt ${attempt_number}: URL=${PRODUCTION_WEBAPP_URL}config.js." >&2
-            fi
+            version_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${PRODUCTION_WEBAPP_URL}version" || true)"
+            commit_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${PRODUCTION_WEBAPP_URL}commit" || true)"
+            runtime_config="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${PRODUCTION_WEBAPP_URL}config.js" || true)"
 
+            actual_version="$(
+              printf '%s' "${version_response}" |
+                jq --raw-output '.version'
+            )" || actual_version=''
+            actual_commit="$(
+              printf '%s' "${commit_response}" |
+                tr -d '\r\n'
+            )"
             actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
             actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
-            actual_version="$(printf '%s' "${runtime_config}" | sed -n 's/.*"VERSION":"\([^"]*\)".*/\1/p')"
 
-            if [[ "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" && "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" && "${actual_version}" == "${EXPECTED_VERSION}" ]]; then
-              echo "Production runtime verification succeeded on attempt ${attempt_number}: URL=${PRODUCTION_WEBAPP_URL}config.js, VERSION=${actual_version}, REST=$(normalize_url "${actual_backend_rest}"), WS=$(normalize_url "${actual_backend_ws}")."
+            if [[
+              "${actual_version}" == "${EXPECTED_VERSION}" &&
+              "${actual_commit}" == "${EXPECTED_COMMIT}" &&
+              "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" &&
+              "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}"
+            ]]; then
+              echo "Production runtime verification succeeded on attempt ${attempt_number}: VERSION=${actual_version}, COMMIT=${actual_commit}, REST=$(normalize_url "${actual_backend_rest}"), WS=$(normalize_url "${actual_backend_ws}")."
               exit 0
             fi
 
             echo "Production runtime configuration mismatch on attempt ${attempt_number}." >&2
-            echo "Expected: VERSION=${EXPECTED_VERSION}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
-            echo "Observed: VERSION=${actual_version:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
+            echo "Expected: VERSION=${EXPECTED_VERSION}, COMMIT=${EXPECTED_COMMIT}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
+            echo "Observed: VERSION=${actual_version:-missing}, COMMIT=${actual_commit:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
 
             if [[ "${attempt_number}" -lt 10 ]]; then
               sleep 6
@@ -520,8 +552,8 @@ jobs:
           done
 
           echo "Production runtime verification failed after 10 attempts." >&2
-          echo "Expected: VERSION=${EXPECTED_VERSION}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
-          echo "Observed: VERSION=${actual_version:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
+          echo "Expected: VERSION=${EXPECTED_VERSION}, COMMIT=${EXPECTED_COMMIT}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
+          echo "Observed: VERSION=${actual_version:-missing}, COMMIT=${actual_commit:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
           exit 1
 
   create_production_tag:
@@ -628,6 +660,9 @@ jobs:
             echo "- Public Beta URL: ${BETA_WEBAPP_URL}"
             echo "- Beta runtime backend: ${BETA_RUNTIME_BACKEND_REST}"
             echo "- Beta runtime WebSocket backend: ${BETA_RUNTIME_BACKEND_WS}"
+            echo '- Beta artifact version verification: /version'
+            echo '- Beta source commit verification: /commit'
+            echo '- Beta backend verification: /config.js'
             echo "- Artifact name: ${ARTIFACT_NAME}"
             echo "- Artifact checksum: ${ARTIFACT_CHECKSUM}"
             echo "- Beta tag: ${BETA_TAG_NAME}"
@@ -635,6 +670,9 @@ jobs:
             echo "- E2E Elastic Beanstalk environment: ${E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
             echo "- E2E URL: ${E2E_WEBAPP_URL}"
             echo "- E2E backend: ${E2E_BACKEND_URL}"
+            echo '- Precommit artifact version verification: /version'
+            echo '- Precommit source commit verification: /commit'
+            echo '- Precommit backend verification: /config.js'
 
             if [[ -n "${E2E_REPORT_URL}" ]]; then
               echo "- E2E report URL: ${E2E_REPORT_URL}"
@@ -660,7 +698,11 @@ jobs:
             echo "- Production deployment result: ${PRODUCTION_DEPLOYMENT_RESULT}"
             echo "- Production runtime verification result: ${PRODUCTION_RUNTIME_VERIFICATION_RESULT}"
             echo "- Production URL: ${PRODUCTION_WEBAPP_URL}"
+            echo '- Production artifact version verification: /version'
+            echo '- Production source commit verification: /commit'
+            echo '- Production backend verification: /config.js'
             echo "- Expected Production artifact version: ${PRODUCTION_ARTIFACT_VERSION}"
+            echo "- Expected Production release commit: ${RELEASE_COMMIT_SHA}"
             echo "- Expected Production REST backend: ${PRODUCTION_RUNTIME_BACKEND_REST}"
             echo "- Expected Production WebSocket backend: ${PRODUCTION_RUNTIME_BACKEND_WS}"
             echo "- Production tag creation result: ${PRODUCTION_TAG_CREATION_RESULT}"
@@ -719,8 +761,12 @@ jobs:
             Production runtime verification: ${{ needs.verify_production_runtime.result }}
             Production tag: ${{ needs.create_production_tag.result }}
 
+            Production runtime verification result: ${{ needs.verify_production_runtime.result }}
+            Expected Production build version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
+            Expected Production release commit: ${{ needs.build_artifact.outputs.release_commit_sha || 'unavailable' }}
+
             Playwright report: ${{ needs.run_e2e.outputs.reportUrl || 'unavailable' }}
-            Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             ${{ needs.verify_production_runtime.result == 'failure' && 'Production deployment completed, but live runtime verification failed.' || 'Production was blocked because a release gate failed.' }}
             ${{ needs.verify_production_runtime.result == 'failure' && 'No Production tag was created.' || 'Production tag creation was blocked by the failed release gate.' }}
