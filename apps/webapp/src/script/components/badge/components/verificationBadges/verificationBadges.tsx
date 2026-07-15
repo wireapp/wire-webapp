@@ -22,6 +22,7 @@ import {CSSProperties, useEffect, useMemo, useRef, useState} from 'react';
 import {CSSObject} from '@emotion/react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
 
 import {
@@ -44,7 +45,6 @@ import {UserState} from 'Repositories/user/userState';
 import {MLSStatuses, WireIdentity} from 'src/script/e2eIdentity/e2eIdentityVerification';
 import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {translate} from 'Util/localizerUtil';
 import {waitFor} from 'Util/waitFor';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
@@ -116,38 +116,44 @@ export const useUserVerificationStatus = ({
     user,
   });
 
-  let MLSStatus: MLSStatuses | undefined = undefined;
-  if (mlsStatuses && mlsStatuses.length > 0 && mlsStatuses.every(status => status === MLSStatuses.VALID)) {
-    MLSStatus = MLSStatuses.VALID;
-  }
+  const mlsStatus =
+    mlsStatuses && mlsStatuses.length > 0 && mlsStatuses.every(status => status === MLSStatuses.VALID)
+      ? MLSStatuses.VALID
+      : undefined;
 
-  return {MLSStatus, isProteusVerified};
+  return {mlsStatus, isProteusVerified};
 };
 
-export const getUserVerificationBadgeLabel = ({
-  MLSStatus,
-  isProteusVerified,
-}: {
-  MLSStatus?: MLSStatuses;
-  isProteusVerified?: boolean;
-}): string | undefined => {
-  switch (MLSStatus) {
-    case MLSStatuses.VALID:
-      return translate('E2EI.userDevicesVerified');
-    case MLSStatuses.EXPIRED:
-    case MLSStatuses.EXPIRES_SOON:
-      return translate('E2EI.certificateExpired');
-    case MLSStatuses.REVOKED:
-      return translate('E2EI.certificateRevoked');
-    default:
-      break;
-  }
+export const getUserVerificationBadgeLabel = (
+  translate: RootContextValue['translate'],
+  {mlsStatus, isProteusVerified}: {mlsStatus?: MLSStatuses; isProteusVerified?: boolean},
+): string | undefined => {
+  const labels: string[] = [];
+
+  match(mlsStatus)
+    .with(MLSStatuses.VALID, () => {
+      labels.push(translate('E2EI.userDevicesVerified'));
+    })
+    .with(MLSStatuses.EXPIRED, () => {
+      labels.push(translate('E2EI.certificateExpired'));
+    })
+    .with(MLSStatuses.EXPIRES_SOON, () => {
+      labels.push(translate('E2EI.certificateExpiresSoon'));
+    })
+    .with(MLSStatuses.REVOKED, () => {
+      labels.push(translate('E2EI.certificateRevoked'));
+    })
+    .with(MLSStatuses.NOT_ACTIVATED, () => {
+      labels.push(translate('E2EI.certificateNotDownloaded'));
+    })
+    .with(undefined, () => {})
+    .exhaustive();
 
   if (isProteusVerified) {
-    return translate('proteusDeviceVerified');
+    labels.push(translate('proteusDeviceVerified'));
   }
 
-  return undefined;
+  return labels.length > 0 ? labels.join(', ') : undefined;
 };
 
 export const UserVerificationBadges = ({
@@ -159,9 +165,9 @@ export const UserVerificationBadges = ({
   groupId?: string;
   isSelfUser?: boolean;
 }) => {
-  const {MLSStatus, isProteusVerified} = useUserVerificationStatus({user, groupId, isSelfUser});
+  const {mlsStatus, isProteusVerified} = useUserVerificationStatus({user, groupId, isSelfUser});
 
-  return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={MLSStatus} />;
+  return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={mlsStatus} />;
 };
 
 export const DeviceVerificationBadges = ({

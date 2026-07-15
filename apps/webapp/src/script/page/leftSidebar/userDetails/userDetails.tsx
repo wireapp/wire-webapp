@@ -53,6 +53,7 @@ const AvailabilityStateButtonWrapper = ({
       onClick={event => showAvailabilityContextMenu(event.nativeEvent)}
       className="button-reset-default user-details-avatar"
       aria-label={ariaLabel}
+      aria-haspopup="menu"
     >
       {children}
     </button>
@@ -77,7 +78,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
     isOnLegalHold,
     hasPendingLegalHold,
   } = useKoSubscribableChildren(user, ['availability', 'hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
-  const {MLSStatus, isProteusVerified} = useUserVerificationStatus({user, groupId, isSelfUser: isTeam});
+  const verificationStatus = useUserVerificationStatus({user, groupId, isSelfUser: isTeam});
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
@@ -94,9 +95,9 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
     userName,
     userHandle,
     isTeam ? translate(availabilityTranslationKeys[availability]) : undefined,
-    getUserVerificationBadgeLabel({MLSStatus, isProteusVerified}),
+    getUserVerificationBadgeLabel(translate, verificationStatus),
   ]
-    .filter(Boolean)
+    .filter((label): label is string => label !== undefined && label.length > 0)
     .join(', ');
 
   return (
