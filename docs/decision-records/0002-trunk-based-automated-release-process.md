@@ -26,7 +26,9 @@ flowchart LR
   mainBranch[main]
   edgeEnvironment[Edge]
   releaseBranch[release/YYYY-MM-DD.N]
-  betaEnvironment[Beta]
+  releaseArtifact[Release artifact]
+  betaEnvironment[Beta company validation<br/>Production backend]
+  e2eEnvironment[E2E validation slot<br/>Staging backend]
   betaTag[YYYY-MM-DD.N-beta.M]
   productionEnvironment[Production]
   productionTag[YYYY-MM-DD.N-production]
@@ -35,9 +37,11 @@ flowchart LR
 
   mainBranch -->|Every merge deploys| edgeEnvironment
   mainBranch -->|Create release branch| releaseBranch
-  releaseBranch -->|Every update deploys| betaEnvironment
-  betaEnvironment -->|Successful beta deployment creates| betaTag
-  betaEnvironment -->|Quality assurance approves| productionEnvironment
+  releaseBranch -->|Build once| releaseArtifact
+  releaseArtifact -->|Deploy| betaEnvironment
+  betaEnvironment -->|Verify Production runtime| betaTag
+  betaTag -->|Deploy same artifact| e2eEnvironment
+  e2eEnvironment -->|E2E and Testiny succeed| productionEnvironment
   productionEnvironment -->|Successful production deployment creates| productionTag
   productionTag -->|Create only when needed| maintenanceBranch
   maintenanceBranch -->|Validated maintenance artifact creates| maintenanceTag
@@ -65,6 +69,10 @@ Edge is the Web team's immediate dogfooding environment. Every eligible change m
 
 Beta is the logical release stage for company-wide internal release-candidate validation. It follows an active release branch rather than trunk and should be stable enough for broader daily internal use. Beta represents the current candidate for the next Production release. Beta uses the `wire-webapp-beta` GitHub Environment and its canonical company-facing URL is `https://wire-webapp-beta.wire.com/`. Beta continues to deploy physically to the existing `wire-webapp-staging` Elastic Beanstalk environment. The physical AWS environment name is retained temporarily and is separate from the GitHub Environment name.
 
+Beta preserves the previous company-facing Staging release-candidate behavior: it connects to Production backend services, and employees validate it with their normal Production accounts and data. The legacy physical name `wire-webapp-staging` describes infrastructure only; it does not mean that the company-facing Beta frontend uses Staging backend services.
+
+Automated E2E must never run against Production backend services or create test users in Production. The release workflow deploys the exact Beta artifact to the dedicated `wire-webapp-precommit-3` validation environment, verifies that its runtime configuration uses Staging backend services, then runs E2E there with disposable Staging users and test data. Beta, precommit validation, and Production use the same built artifact; their differences are runtime environment configuration, not rebuilt application artifacts.
+
 A Beta candidate may be promoted when validation is complete and no known release-blocking issues remain. Production receives only the exact artifact validated on Beta. Production promotion remains an explicit decision through GitHub Environment approval; the absence of reported issues does not automatically deploy Beta to Production.
 
 The branch model is:
@@ -85,7 +93,8 @@ The cloud release process is:
 - The release workflow deploys the release branch to Beta.
 - After a successful beta deployment, the workflow creates a beta tag such as `YYYY-MM-DD.N-beta.1`, `YYYY-MM-DD.N-beta.2`, and so on.
 - Beta tag numbers are derived from existing beta tags for the release identifier. If concurrent workflows try to create the same tag for different commits, the later workflow must fail and be rerun after fetching the latest tags.
-- The release workflow runs end-to-end tests against Beta and reports the result to Testiny.
+- The release workflow deploys the Beta artifact to a dedicated E2E validation environment connected to Staging backend services, runs E2E there, and reports the result to Testiny.
+- Successful E2E and Testiny reporting are required before Production promotion.
 - The production deployment job waits for GitHub Environment approval on the production environment.
 - GitHub Environment approval means the workflow pauses before using the production environment until configured reviewers approve or reject the deployment in GitHub.
 - Quality assurance owns the go/no-go quality gate.
@@ -108,9 +117,13 @@ flowchart TD
   mergeToMain[Merge to main]
   deployToEdge[Deploy to Edge]
   createReleaseBranch[Create or update release/YYYY-MM-DD.N]
-  deployToBeta[Deploy release branch to Beta]
+  buildArtifact[Build release artifact once]
+  deployToBeta[Deploy artifact to Beta<br/>Production backend]
+  verifyBetaRuntime[Verify Beta runtime backend]
   createBetaTag[Create YYYY-MM-DD.N-beta.M]
-  runEndToEndTests[Run end-to-end tests against Beta]
+  deployToE2E[Deploy same artifact to E2E slot<br/>Staging backend]
+  verifyE2ERuntime[Verify E2E runtime backend]
+  runEndToEndTests[Run end-to-end tests against E2E slot]
   reportToTestiny[Report result to Testiny]
   productionApproval[GitHub Environment approval<br/>Production]
   deployToProduction[Deploy promoted beta artifact to Production]
@@ -119,8 +132,8 @@ flowchart TD
   deployKnownGoodArtifact[Deploy previous known-good production artifact]
 
   mergeToMain --> deployToEdge
-  createReleaseBranch --> deployToBeta --> createBetaTag
-  createBetaTag --> runEndToEndTests --> reportToTestiny
+  createReleaseBranch --> buildArtifact --> deployToBeta --> verifyBetaRuntime --> createBetaTag
+  createBetaTag --> deployToE2E --> verifyE2ERuntime --> runEndToEndTests --> reportToTestiny
   reportToTestiny --> productionApproval --> deployToProduction --> createProductionTag
   createProductionTag -.-> rollbackWorkflow -.-> deployKnownGoodArtifact
 ```

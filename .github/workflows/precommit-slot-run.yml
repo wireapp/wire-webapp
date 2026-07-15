@@ -10,7 +10,20 @@ on:
       backendUrl:
         type: string
         required: true
+      artifact_name:
+        type: string
+        required: false
+        default: build-artifact
+      expectedBackendRest:
+        type: string
+        required: false
+      expectedBackendWs:
+        type: string
+        required: false
       grep:
+        type: string
+        required: false
+      testinyRunName:
         type: string
         required: false
       notify_deployoholics_on_failure:
@@ -25,6 +38,8 @@ on:
       WEBTEAM_AWS_SECRET_ACCESS_KEY:
         required: true
       WIRE_DEPLOYOHOLICS_WEBHOOK_URL:
+        required: false
+      TESTINY_API_KEY:
         required: false
     outputs:
       precommit_url:
@@ -55,7 +70,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: build-artifact
+          name: ${{ inputs.artifact_name }}
 
       - name: Validate precommit environment
         env:
@@ -99,6 +114,38 @@ jobs:
           echo "Resolved precommit URL: https://$ENV_NAME.zinfra.io/"
           echo "url=https://$ENV_NAME.zinfra.io/" >> "$GITHUB_OUTPUT"
 
+      - name: Verify precommit runtime backend
+        if: ${{ inputs.expectedBackendRest && inputs.expectedBackendWs }}
+        env:
+          EXPECTED_BACKEND_REST: ${{ inputs.expectedBackendRest }}
+          EXPECTED_BACKEND_WS: ${{ inputs.expectedBackendWs }}
+          PRECOMMIT_URL: ${{ steps.fetch_url.outputs.url }}
+        run: |
+          set -euo pipefail
+
+          normalize_url() {
+            printf '%s' "${1%/}"
+          }
+
+          expected_backend_rest="$(normalize_url "${EXPECTED_BACKEND_REST}")"
+          expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
+
+          for attempt_number in {1..10}; do
+            runtime_config="$(curl --fail --silent --show-error "${PRECOMMIT_URL}config.js" || true)"
+            actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
+            actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
+
+            if [[ "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" && "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" ]]; then
+              exit 0
+            fi
+
+            echo "Precommit runtime backend does not match Staging on attempt ${attempt_number}: REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}." >&2
+            sleep 6
+          done
+
+          echo "Precommit runtime backend did not match the expected Staging endpoints." >&2
+          exit 1
+
       - name: Deployment Status
         if: ${{ always() }}
         run: |
@@ -117,8 +164,10 @@ jobs:
       webappUrl: ${{ needs.deploy_to_aws.outputs.precommit_url }}
       backendUrl: ${{ inputs.backendUrl }}
       grep: ${{ inputs.grep }}
+      testinyRunName: ${{ inputs.testinyRunName }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
 
   notify_deployoholics:
     name: Notify Deployoholics about failed critical flow

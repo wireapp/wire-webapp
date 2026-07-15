@@ -35,12 +35,16 @@ env:
   AWS_REGION: eu-central-1
   ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
   BETA_ARTIFACT_NAME_PREFIX: release-cloud-ebs
-  BETA_BACKEND_URL: https://staging-nginz-https.zinfra.io/
+  BETA_RUNTIME_BACKEND_REST: https://prod-nginz-https.wire.com
+  BETA_RUNTIME_BACKEND_WS: wss://prod-nginz-ssl.wire.com
   # ADR 0002 calls this logical release stage Beta. Its GitHub Environment and
   # canonical company-facing URL use wire-webapp-beta, while deployments retain
   # the existing wire-webapp-staging Elastic Beanstalk environment.
   BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: wire-webapp-staging
   BETA_WEBAPP_URL: https://wire-webapp-beta.wire.com/
+  E2E_BACKEND_URL: https://staging-nginz-https.zinfra.io/
+  E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: wire-webapp-precommit-3
+  E2E_WEBAPP_URL: https://wire-webapp-precommit-3.zinfra.io/
   PRODUCTION_ENVIRONMENT_NAME: wire-webapp-prod
 
 jobs:
@@ -189,6 +193,37 @@ jobs:
           deployment-timeout: 150
           use-existing-application-version-if-available: true
 
+      - name: Verify Beta runtime backend
+        env:
+          BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
+          EXPECTED_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
+          EXPECTED_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
+        run: |
+          set -euo pipefail
+
+          normalize_url() {
+            printf '%s' "${1%/}"
+          }
+
+          expected_backend_rest="$(normalize_url "${EXPECTED_BACKEND_REST}")"
+          expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
+
+          for attempt_number in {1..10}; do
+            runtime_config="$(curl --fail --silent --show-error "${BETA_WEBAPP_URL}config.js" || true)"
+            actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
+            actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
+
+            if [[ "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" && "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" ]]; then
+              exit 0
+            fi
+
+            echo "Beta runtime backend does not match Production on attempt ${attempt_number}: REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}." >&2
+            sleep 6
+          done
+
+          echo "Beta runtime backend did not match the expected Production endpoints." >&2
+          exit 1
+
   create_beta_tag:
     name: Create Beta tag
     runs-on: ubuntu-24.04
@@ -238,18 +273,23 @@ jobs:
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
 
   run_e2e:
-    name: Run E2E against Beta
+    name: Deploy to precommit and run E2E
     needs: [build_artifact, create_beta_tag]
     permissions:
       contents: read
-    uses: ./.github/workflows/e2e-tests.yml
+    uses: ./.github/workflows/precommit-slot-run.yml
     with:
-      webappUrl: https://wire-webapp-beta.wire.com/
+      env_name: wire-webapp-precommit-3
       backendUrl: https://staging-nginz-https.zinfra.io/
+      artifact_name: ${{ needs.build_artifact.outputs.artifact_name }}
+      expectedBackendRest: https://staging-nginz-https.zinfra.io/
+      expectedBackendWs: wss://staging-nginz-ssl.zinfra.io/
       grep: '@regression|@crit-flow-web'
       testinyRunName: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+      WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
       TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
 
   production_preflight:
@@ -474,9 +514,14 @@ jobs:
           ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
           ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
           BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: ${{ env.BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
+          BETA_RUNTIME_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
+          BETA_RUNTIME_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          E2E_BACKEND_URL: ${{ env.E2E_BACKEND_URL }}
+          E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: ${{ env.E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
           E2E_REPORT_URL: ${{ needs.run_e2e.outputs.reportUrl }}
           E2E_RESULT: ${{ needs.run_e2e.result }}
+          E2E_WEBAPP_URL: ${{ env.E2E_WEBAPP_URL }}
           PRODUCTION_ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
           PRODUCTION_ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
           PRODUCTION_DEPLOYMENT_RESULT: ${{ needs.deploy_to_production.result }}
@@ -503,10 +548,15 @@ jobs:
             echo '- GitHub Environment: wire-webapp-beta'
             echo "- Elastic Beanstalk environment: ${BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
             echo "- Public Beta URL: ${BETA_WEBAPP_URL}"
+            echo "- Beta runtime backend: ${BETA_RUNTIME_BACKEND_REST}"
+            echo "- Beta runtime WebSocket backend: ${BETA_RUNTIME_BACKEND_WS}"
             echo "- Artifact name: ${ARTIFACT_NAME}"
             echo "- Artifact checksum: ${ARTIFACT_CHECKSUM}"
             echo "- Beta tag: ${BETA_TAG_NAME}"
             echo "- E2E result: ${E2E_RESULT}"
+            echo "- E2E Elastic Beanstalk environment: ${E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
+            echo "- E2E URL: ${E2E_WEBAPP_URL}"
+            echo "- E2E backend: ${E2E_BACKEND_URL}"
 
             if [[ -n "${E2E_REPORT_URL}" ]]; then
               echo "- E2E report URL: ${E2E_REPORT_URL}"
