@@ -242,7 +242,8 @@ jobs:
       - name: Checkout release commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
       - name: Add repository Yarn wrapper to PATH
@@ -265,9 +266,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          git fetch --tags origin
-
-          mapfile -t existing_beta_tag_names < <(git tag --list "${RELEASE_IDENTIFIER}-beta.*")
+          mapfile -t existing_beta_tag_names < <(
+            git ls-remote \
+              --tags \
+              --refs \
+              origin \
+              "${RELEASE_IDENTIFIER}-beta.*" |
+              awk '{
+                sub("^refs/tags/", "", $2);
+                print $2;
+              }'
+          )
           beta_tag_name="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts next-beta-tag "${RELEASE_IDENTIFIER}" "${existing_beta_tag_names[@]}")"
 
           git config user.email "zebot@users.noreply.github.com"
