@@ -222,7 +222,9 @@ export const ConversationsList = ({
       <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
 
       {conversations.length === 0 && groupParticipantsConversations.length > 0 && (
-        <p css={noResultsMessage}>{translate('searchConversationsNoResult')}</p>
+        <p className="conversation-list-no-results" css={noResultsMessage}>
+          {translate('searchConversationsNoResult')}
+        </p>
       )}
 
       <ul
@@ -253,6 +255,7 @@ export const ConversationsList = ({
               return (
                 <div
                   key={virtualItem.key}
+                  className="conversation-list-heading"
                   css={[headingTitle, virtualizationStyles]}
                   style={{
                     transform: `translateY(${virtualItem.start}px)`,
@@ -288,7 +291,9 @@ export const ConversationsList = ({
 
       {isGroupParticipantsVisible && (
         <>
-          <h3 css={headingTitle}>{translate('searchGroupParticipants')}</h3>
+          <h3 className="conversation-list-heading" css={headingTitle}>
+            {translate('searchGroupParticipants')}
+          </h3>
           <ul
             css={conversationsList}
             data-uie-name="group-participants-conversations-view"

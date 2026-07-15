@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,13 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {conversationListCollapseFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const conversationsSpacerStyles = (mdBreakpoint: Boolean): CSSObject => ({
-  minWidth: mdBreakpoint ? '64px' : '0',
-});
+export const useConversationListCollapseFeatureFlag = () => {
+  const {isFeatureToggleEnabled} = useApplicationContext();
 
-export const conversationsListHandleStyles: CSSObject = {
-  position: 'absolute',
-  zIndex: 10,
-  top: 0,
-  right: -6,
-  bottom: 0,
-  width: 12,
-  padding: 0,
-  border: 'none',
-  background: 'transparent',
-  cursor: 'col-resize',
+  const isConversationListCollapseEnabled = isFeatureToggleEnabled(conversationListCollapseFeatureToggleName);
+
+  return {isConversationListCollapseEnabled};
 };

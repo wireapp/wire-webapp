@@ -22,13 +22,16 @@ import {useEffect} from 'react';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {User} from 'Repositories/entity/User';
 
 import {Conversations} from './panels/conversations';
+import {ConversationListStatus, isConversationListTab, useSidebarStore} from './panels/conversations/useSidebarStore';
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
+import {useConversationListCollapseFeatureFlag} from '../../util/useConversationListCollapseFeatureFlag';
 import {ListViewModel} from '../../view_model/ListViewModel';
 import {useAppState, ListState} from '../useAppState';
 
@@ -43,6 +46,14 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
   const repositories = listViewModel.contentViewModel.repositories;
 
   const listState = useAppState(state => state.listState);
+  const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
+  const {isConversationListCollapseEnabled} = useConversationListCollapseFeatureFlag();
+  const {currentTab, conversationListStatus} = useSidebarStore();
+  const isConversationListCollapsed =
+    isConversationListCollapseEnabled &&
+    conversationListStatus === ConversationListStatus.CLOSED &&
+    isConversationListTab(currentTab) &&
+    !isScreenLessThanMdBreakpoint;
 
   useEffect(() => {
     function openCreateGroupModal() {
@@ -62,6 +73,7 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
       className={cx('left-column', {
         'left-column--light-theme': !isActivatedAccount,
         'left-column--shrinked': [ListState.CELLS, ListState.MEETINGS].includes(listState),
+        'left-column--conversation-list-collapsed': isConversationListCollapsed,
       })}
     >
       {[

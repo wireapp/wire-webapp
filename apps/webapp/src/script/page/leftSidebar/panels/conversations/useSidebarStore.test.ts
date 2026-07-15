@@ -17,7 +17,16 @@
  *
  */
 
-import {DEFAULT_TABS, FILTER_TABS, isTabVisible, SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
+import {
+  DEFAULT_TABS,
+  FILTER_TABS,
+  ConversationListStatus,
+  isConversationListTab,
+  isTabVisible,
+  SidebarStatus,
+  SidebarTabs,
+  useSidebarStore,
+} from './useSidebarStore';
 
 describe('useSidebarStore', () => {
   beforeEach(() => {
@@ -55,6 +64,17 @@ describe('useSidebarStore', () => {
     useSidebarStore.getState().setStatus(SidebarStatus.CLOSED);
 
     expect(useSidebarStore.getState().status).toBe(SidebarStatus.CLOSED);
+  });
+
+  it('sets conversation list status', () => {
+    useSidebarStore.getState().setConversationListStatus(ConversationListStatus.CLOSED);
+
+    expect(useSidebarStore.getState().conversationListStatus).toBe(ConversationListStatus.CLOSED);
+  });
+
+  it('checks conversation list tab', () => {
+    expect(isConversationListTab(SidebarTabs.RECENT)).toBe(true);
+    expect(isConversationListTab(SidebarTabs.PREFERENCES)).toBe(false);
   });
 
   it('sets visible tabs', () => {

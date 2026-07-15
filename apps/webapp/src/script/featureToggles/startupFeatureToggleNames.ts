@@ -21,12 +21,14 @@ export const applockRefactoredFeatureToggleName = 'applock-refactored';
 export const sharedDriveSearchAndFiltersFeatureToggleName = 'shared-drive-search-and-filters';
 export const meetingsFeatureToggleName = 'meetings';
 export const messageSendingStatusFixFeatureToggleName = 'message-sending-status-fix';
+export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
   sharedDriveSearchAndFiltersFeatureToggleName,
   meetingsFeatureToggleName,
   messageSendingStatusFixFeatureToggleName,
+  conversationListCollapseFeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

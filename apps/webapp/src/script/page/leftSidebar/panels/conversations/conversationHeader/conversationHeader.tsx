@@ -36,6 +36,9 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   button,
+  collapsedHeader,
+  collapsedIconButton,
+  collapsedIconRow,
   header,
   label,
   closeIconStyles,
@@ -55,6 +58,8 @@ interface ConversationHeaderProps {
   onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
   jumpToRecentSearch: () => void;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
+  isListCollapsed?: boolean;
+  onExpandList?: () => void;
 }
 
 export const ConversationHeaderComponent = ({
@@ -68,6 +73,8 @@ export const ConversationHeaderComponent = ({
   onSearchEnterClick,
   jumpToRecentSearch,
   searchInputRef,
+  isListCollapsed = false,
+  onExpandList,
 }: ConversationHeaderProps) => {
   const {translate} = useApplicationContext();
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
@@ -93,10 +100,17 @@ export const ConversationHeaderComponent = ({
     handleEnterDown(event, () => onSearchEnterClick(event));
   };
 
+  const focusSearchInput = () => {
+    requestAnimationFrame(() => {
+      searchInputRef?.current?.focus();
+    });
+  };
+
   useEffect(() => {
     const onSearchShortcut = () => {
+      onExpandList?.();
       jumpToRecentSearch();
-      searchInputRef?.current?.focus();
+      focusSearchInput();
     };
 
     amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
@@ -104,7 +118,7 @@ export const ConversationHeaderComponent = ({
     return () => {
       amplify.unsubscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
     };
-  }, [searchInputRef, jumpToRecentSearch]);
+  }, [searchInputRef, jumpToRecentSearch, onExpandList]);
 
   const showCreateConversationModal = () => {
     if (isChannelsEnabled && canCreateChannels) {
@@ -114,6 +128,46 @@ export const ConversationHeaderComponent = ({
     }
   };
 
+  const handleCollapsedSearchClick = () => {
+    onExpandList?.();
+    focusSearchInput();
+  };
+
+  const showCreateButton =
+    currentTab !== SidebarTabs.ARCHIVES && (canCreateGroupConversation() || canExternalUserCreateChannel);
+
+  if (isListCollapsed) {
+    return (
+      <div css={collapsedHeader}>
+        {showSearchInput && (
+          <div css={collapsedIconRow}>
+            <IconButton
+              onClick={handleCollapsedSearchClick}
+              data-uie-name="search-conversations"
+              css={collapsedIconButton}
+              title={searchInputPlaceholder}
+            >
+              <SearchIcon width={14} height={14} />
+            </IconButton>
+          </div>
+        )}
+
+        {showCreateButton && (
+          <div css={collapsedIconRow}>
+            <IconButton
+              onClick={showCreateConversationModal}
+              data-uie-name="go-create-group"
+              css={collapsedIconButton}
+              title={translate('conversationDetailsActionCreateGroup')}
+            >
+              <Icon.PlusIcon />
+            </IconButton>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <>
       <div css={header}>
@@ -121,7 +175,7 @@ export const ConversationHeaderComponent = ({
           {isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab]}
         </h2>
 
-        {currentTab !== SidebarTabs.ARCHIVES && (canCreateGroupConversation() || canExternalUserCreateChannel) && (
+        {showCreateButton && (
           <IconButton
             onClick={showCreateConversationModal}
             data-uie-name="go-create-group"

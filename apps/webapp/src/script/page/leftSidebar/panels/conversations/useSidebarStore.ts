@@ -81,9 +81,35 @@ export const SidebarStatus = {
 
 export type SidebarStatus = (typeof SidebarStatus)[keyof typeof SidebarStatus];
 
+export const ConversationListStatus = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED',
+} as const;
+
+export type ConversationListStatus = (typeof ConversationListStatus)[keyof typeof ConversationListStatus];
+
+export const CONVERSATION_LIST_TABS: readonly SidebarTabs[] = [
+  SidebarTabs.RECENT,
+  SidebarTabs.FOLDER,
+  SidebarTabs.FAVORITES,
+  SidebarTabs.GROUPS,
+  SidebarTabs.CHANNELS,
+  SidebarTabs.DIRECTS,
+  SidebarTabs.UNREAD,
+  SidebarTabs.MENTIONS,
+  SidebarTabs.REPLIES,
+  SidebarTabs.DRAFTS,
+  SidebarTabs.PINGS,
+  SidebarTabs.ARCHIVES,
+];
+
+export const isConversationListTab = (tab: SidebarTabs): boolean => CONVERSATION_LIST_TABS.includes(tab);
+
 export interface SidebarStore {
   status: SidebarStatus;
   setStatus: (status: SidebarStatus) => void;
+  conversationListStatus: ConversationListStatus;
+  setConversationListStatus: (status: ConversationListStatus) => void;
   currentTab: SidebarTabs;
   setCurrentTab: (tab: SidebarTabs) => void;
   visibleTabs: readonly SidebarTabs[];
@@ -101,6 +127,8 @@ const useSidebarStore = create<SidebarStore>()(
       },
       status: SidebarStatus.OPEN,
       setStatus: status => set({status: status}),
+      conversationListStatus: ConversationListStatus.OPEN,
+      setConversationListStatus: status => set({conversationListStatus: status}),
       visibleTabs: [...DEFAULT_TABS],
       setVisibleTabs: (tabs: SidebarTabs[]) => set({visibleTabs: tabs}),
       resetDisabledFeatureTabs: () =>
@@ -137,6 +165,7 @@ const useSidebarStore = create<SidebarStore>()(
       storage: createJSONStorage(() => localStorage),
       partialize: state => ({
         status: state.status,
+        conversationListStatus: state.conversationListStatus,
         currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(
           state.currentTab,
         )

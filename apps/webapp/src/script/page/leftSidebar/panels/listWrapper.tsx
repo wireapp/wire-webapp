@@ -25,6 +25,7 @@ import {throttle} from 'underscore';
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {useConnectionQuality} from 'src/script/hooks/useConnectionQuality';
+import {conversationsListHandleStyles} from 'src/script/page/leftSidebar/panels/conversations/conversations.styles';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scrollHelpers';
 
@@ -61,6 +62,9 @@ interface LeftListWrapperProps {
   conversationsFilter?: string;
   conversationListRef?: HTMLElement | null;
   setConversationListRef?: (element: HTMLElement) => void;
+  isListCollapsed?: boolean;
+  showListCollapseHandle?: boolean;
+  onToggleListCollapsed?: () => void;
 }
 
 const ListWrapper = memo(
@@ -77,6 +81,9 @@ const ListWrapper = memo(
     headerUieName,
     conversationListRef,
     setConversationListRef,
+    isListCollapsed = false,
+    showListCollapseHandle = false,
+    onToggleListCollapsed,
   }: LeftListWrapperProps) => {
     const {translate} = useApplicationContext();
     const calculateBorders = throttle((element: HTMLElement) => {
@@ -110,7 +117,20 @@ const ListWrapper = memo(
       <>
         {sidebar}
         {children !== null ? (
-          <div id={id} className={`left-list-${id} ${id}`} css={style}>
+          <div id={id} className={`left-list-${id} ${id}`} css={style} data-list-collapsed={isListCollapsed}>
+            {showListCollapseHandle && onToggleListCollapsed && (
+              <button
+                type="button"
+                className="conversations-list-handle"
+                css={conversationsListHandleStyles}
+                onClick={onToggleListCollapsed}
+                aria-label={translate(
+                  isListCollapsed ? 'accessibility.conversationListExpand' : 'accessibility.conversationListCollapse',
+                )}
+                data-uie-name="toggle-conversation-list"
+              />
+            )}
+
             {hasHeader && (
               <header className={`left-list-header left-list-header-${id}`} data-uie-name="conversation-list-header">
                 {isSlow && (
@@ -154,7 +174,7 @@ const ListWrapper = memo(
               {children}
             </FadingScrollbar>
 
-            {footer ?? null}
+            {!isListCollapsed && (footer ?? null)}
           </div>
         ) : null}
       </>

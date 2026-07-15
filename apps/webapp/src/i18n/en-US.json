@@ -105,6 +105,8 @@
   "accessibility.closeNotificationsLabel": "Close notification settings",
   "accessibility.conversation.goBack": "Go back to conversation info",
   "accessibility.conversation.sectionLabel": "Conversation List",
+  "accessibility.conversationListCollapse": "Collapse conversation list",
+  "accessibility.conversationListExpand": "Expand conversation list",
   "accessibility.conversationAssetImageAlt": "Image from {username} from {messageDate}",
   "accessibility.conversationContextMenuOpenLabel": "Open more options",
   "accessibility.conversationDetailsActionDevicesLabel": "Show Devices",
