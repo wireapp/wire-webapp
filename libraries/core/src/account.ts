@@ -46,11 +46,11 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {once} from 'lodash';
 import logdown from 'logdown';
+import {TimeoutError} from 'p-queue';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import {LogFactory, StringUtil, TypedEventEmitter} from '@wireapp/commons';
 import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
-import {PromiseQueue} from '@wireapp/promise-queue';
 import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 
 import {AccountService} from './account/';
@@ -88,10 +88,13 @@ import {CryptoClientType} from './messagingProtocols/proteus/proteusService/cryp
 import {wipeCoreCryptoDb} from './messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
 import {deleteIdentity} from './messagingProtocols/proteus/proteusService/identityClearer';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
+import {createFlushableQueue, isQueueFlushedError} from './queue/flushableQueue';
+import {sequentialQueueOptions} from './queue/sequentialQueueOptions';
 import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './secretStore/encryptedStore';
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
+import {createFireAndForgetInvoker} from './taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';
@@ -171,9 +174,9 @@ export class Account extends TypedEventEmitter<Events> {
    */
   private initialisePendingProposalsTasksOnce: () => Promise<void>;
 
-  private readonly notificationProcessingQueue = new PromiseQueue({
-    name: 'notification-processing-queue',
-    paused: true,
+  private readonly notificationProcessingQueue = createFlushableQueue({
+    autoStart: false,
+    ...sequentialQueueOptions,
   });
 
   public setMaxCoreCryptoLogLevel: (level: CoreCryptoLogLevel) => void = () => undefined;
@@ -213,18 +216,22 @@ export class Account extends TypedEventEmitter<Events> {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
-    this.recurringTaskScheduler = new RecurringTaskScheduler({
-      get: async key => {
-        const task = await this.db?.get('recurringTasks', key);
-        return task?.firingDate;
+    this.logger = LogFactory.getLogger('@wireapp/core/Account');
+    this.recurringTaskScheduler = new RecurringTaskScheduler(
+      {
+        get: async key => {
+          const task = await this.db?.get('recurringTasks', key);
+          return task?.firingDate;
+        },
+        set: async (key, timestamp) => {
+          await this.db?.put('recurringTasks', {key, firingDate: timestamp}, key);
+        },
+        delete: async key => {
+          await this.db?.delete('recurringTasks', key);
+        },
       },
-      set: async (key, timestamp) => {
-        await this.db?.put('recurringTasks', {key, firingDate: timestamp}, key);
-      },
-      delete: async key => {
-        await this.db?.delete('recurringTasks', key);
-      },
-    });
+      createFireAndForgetInvoker({logger: this.logger}),
+    );
 
     apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {
       if (cookie !== undefined && this.storeEngine !== undefined) {
@@ -236,7 +243,6 @@ export class Account extends TypedEventEmitter<Events> {
       }
     });
 
-    this.logger = LogFactory.getLogger('@wireapp/core/Account');
     this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
   }
 
@@ -826,7 +832,7 @@ export class Account extends TypedEventEmitter<Events> {
        * send us the next batch of notifications, currently total size of notifications coming from web socket is limited to 500
        * so we need to acknowledge the notifications to let the backend know we are ready for the next batch
        */
-      this.notificationProcessingQueue.resume();
+      this.notificationProcessingQueue.queue.start();
 
       if (useLegacy) {
         this.logger.info(
@@ -925,14 +931,14 @@ export class Account extends TypedEventEmitter<Events> {
   ) => {
     return async (notification: Notification, source: NotificationSource): Promise<void> => {
       void this.notificationProcessingQueue
-        .push(async () => {
+        .add(async () => {
           try {
             const start = Date.now();
             const firstNotificationPayload = notification.payload[0];
             const notificationTime =
               firstNotificationPayload !== undefined ? this.getNotificationEventTime(firstNotificationPayload) : null;
             this.logger.info(`Processing legacy notification at ${notificationTime}`);
-            this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.getLength()}`);
+            this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.queue.size}`);
             this.logger.info(`Total pending proposals queue length: ${getProposalQueueLength()}`);
             if (notificationTime !== null && notificationTime.length > 0) {
               onNotificationStreamProgress(notificationTime);
@@ -972,7 +978,7 @@ export class Account extends TypedEventEmitter<Events> {
 
         if (notification.type === ConsumableEvent.SYNCHRONIZATION) {
           this.notificationProcessingQueue
-            .push(() =>
+            .add(() =>
               this.handleSynchronizationNotification(
                 notification,
                 onConnectionStateChanged,
@@ -984,7 +990,7 @@ export class Account extends TypedEventEmitter<Events> {
         }
 
         this.notificationProcessingQueue
-          .push(() =>
+          .add(() =>
             this.decryptAckEmitNotification(
               notification,
               handleEvent,
@@ -1008,13 +1014,13 @@ export class Account extends TypedEventEmitter<Events> {
       throw error;
     }
 
-    switch (error.cause) {
-      case PromiseQueue.ERROR_CAUSES.TIMEOUT:
-        this.logger.warn('Notification decryption task timed out', error);
-        break;
-      case PromiseQueue.ERROR_CAUSES.FLUSHED:
-        this.logger.info('Notification processing queue was flushed, ignoring error', error);
-        break;
+    if (error instanceof TimeoutError) {
+      this.logger.warn('Notification decryption task timed out', error);
+      return;
+    }
+
+    if (isQueueFlushedError(error)) {
+      this.logger.info('Notification processing queue was flushed, ignoring error', error);
     }
   };
 
@@ -1194,7 +1200,7 @@ export class Account extends TypedEventEmitter<Events> {
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
       // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
       void this.notificationProcessingQueue
-        .push(async () => {
+        .add(async () => {
           this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
           const connectionContext = getCurrentWebSocketConnectionContext();
           this.logger.info(
@@ -1222,18 +1228,18 @@ export class Account extends TypedEventEmitter<Events> {
    * this is to avoid duplicate decryption of notifications
    */
   private readonly pauseAndFlushNotificationQueue = () => {
-    this.notificationProcessingQueue.pause();
+    this.notificationProcessingQueue.queue.pause();
     this.notificationProcessingQueue.flush();
     this.logger.info('Notification processing queue paused and flushed');
   };
 
   public readonly pauseNotificationQueue = () => {
-    this.notificationProcessingQueue.pause();
+    this.notificationProcessingQueue.queue.pause();
     this.logger.info('Notification processing queue paused');
   };
 
   public readonly resumeNotificationQueue = () => {
-    this.notificationProcessingQueue.resume();
+    this.notificationProcessingQueue.queue.start();
     this.logger.info('Notification processing queue resumed');
   };
 

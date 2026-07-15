@@ -9,9 +9,9 @@ on:
         required: true
         type: string
       source_ref:
-        description: 'Source ref to create the release branch from. During the transition this defaults to dev; after the branch model cutover this should become main.'
+        description: 'Source branch for the release branch. Normally main; release branches may also be based on another valid branch when explicitly requested.'
         required: true
-        default: dev
+        default: main
         type: string
       confirm_create_release_branch:
         description: 'Confirm that this will create and push release/<release_identifier>'
@@ -78,7 +78,7 @@ jobs:
           fi
 
           if [[ "${SOURCE_REF}" == refs/* || "${SOURCE_REF}" == origin/* ]]; then
-            echo "source_ref must be a branch name like dev, main, or release/YYYY-MM-DD.N, not a fully qualified or remote-style ref: ${SOURCE_REF}" >&2
+            echo "source_ref must be a branch name like main or release/YYYY-MM-DD.N, not a fully qualified or remote-style ref: ${SOURCE_REF}" >&2
             exit 1
           fi
 
@@ -122,13 +122,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
-          persist-credentials: false
+          persist-credentials: true
           fetch-depth: 1
 
       - name: Create and push release branch
         id: create_release_branch
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_BRANCH: ${{ needs.validate_request.outputs.release_branch }}
           SOURCE_REF: ${{ needs.validate_request.outputs.source_ref }}
         run: |
@@ -150,7 +149,7 @@ jobs:
           fi
 
           git branch "${RELEASE_BRANCH}" "${source_commit_sha}"
-          git -c http.extraheader="AUTHORIZATION: bearer ${GITHUB_TOKEN}" push origin "refs/heads/${RELEASE_BRANCH}:refs/heads/${RELEASE_BRANCH}"
+          git push origin "refs/heads/${RELEASE_BRANCH}:refs/heads/${RELEASE_BRANCH}"
 
           echo "source_commit_sha=${source_commit_sha}" >> "$GITHUB_OUTPUT"
 

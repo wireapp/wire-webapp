@@ -4,14 +4,14 @@ name: Continuous integration
 on:
   pull_request:
     # we want to run the CI on every PR targetting those branches
-    branches: [master, dev, release/*]
+    branches: [main, release/*]
 
   merge_group:
-    branches: [master, dev, release/*]
+    branches: [main, release/*]
 
   push:
-    # We also run CI on dev in order to update the coverage monitoring
-    branches: [dev]
+    # Push CI on the trunk branch updates coverage monitoring.
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.ref }}

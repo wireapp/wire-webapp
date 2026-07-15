@@ -22,7 +22,7 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-          ref: dev
+          ref: main
           token: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
 
       - name: Add repository Yarn wrapper to PATH
@@ -59,14 +59,14 @@ jobs:
 
       - name: Create version PR
         run: |
-          echo "📦 Creating release PR for dev..."
+          echo "📦 Creating release PR for main..."
           echo "🔍 Auto-detecting version bump from conventional commits..."
 
           # Run nx release version to update versions, commit, and tag
           ./bin/yarn nx release version
 
           # Check if any commits were created
-          COMMITS_AHEAD="$(git rev-list --count "origin/dev..HEAD")"
+          COMMITS_AHEAD="$(git rev-list --count "origin/main..HEAD")"
           if [ "$COMMITS_AHEAD" -eq 0 ]; then
             echo "ℹ️ No new version changes detected. Skipping push and PR creation."
             exit 0
@@ -77,7 +77,7 @@ jobs:
 
           # Create PR using GitHub CLI
           gh pr create \
-            --base dev \
+            --base main \
             --head "$RELEASE_BRANCH" \
             --title "chore(release): publish libraries [WPB-22420]" \
             --label "publish-to-npm" \

@@ -35,11 +35,19 @@ env:
   AWS_REGION: eu-central-1
   ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
   BETA_ARTIFACT_NAME_PREFIX: release-cloud-ebs
-  BETA_BACKEND_URL: https://staging-nginz-https.zinfra.io/
-  # ADR 0002 calls this target Beta. During the transition, Beta maps to the
-  # existing wire-webapp-staging Elastic Beanstalk environment and URL.
-  BETA_ENVIRONMENT_NAME: wire-webapp-staging
-  BETA_WEBAPP_URL: https://wire-webapp-staging.zinfra.io/
+  BETA_RUNTIME_BACKEND_REST: https://prod-nginz-https.wire.com
+  BETA_RUNTIME_BACKEND_WS: wss://prod-nginz-ssl.wire.com
+  PRODUCTION_WEBAPP_URL: https://app.wire.com/
+  PRODUCTION_RUNTIME_BACKEND_REST: https://prod-nginz-https.wire.com
+  PRODUCTION_RUNTIME_BACKEND_WS: wss://prod-nginz-ssl.wire.com
+  # ADR 0002 calls this logical release stage Beta. Its GitHub Environment and
+  # canonical company-facing URL use wire-webapp-beta, while deployments retain
+  # the existing wire-webapp-staging Elastic Beanstalk environment.
+  BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: wire-webapp-staging
+  BETA_WEBAPP_URL: https://wire-webapp-beta.wire.com/
+  E2E_BACKEND_URL: https://staging-nginz-https.zinfra.io/
+  E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: wire-webapp-precommit-3
+  E2E_WEBAPP_URL: https://wire-webapp-precommit-3.zinfra.io/
   PRODUCTION_ENVIRONMENT_NAME: wire-webapp-prod
 
 jobs:
@@ -80,6 +88,7 @@ jobs:
     outputs:
       artifact_checksum: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
       artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
+      artifact_version: ${{ steps.artifact_metadata.outputs.artifact_version }}
       release_branch: ${{ steps.release_metadata.outputs.release_branch }}
       release_commit_sha: ${{ steps.release_metadata.outputs.release_commit_sha }}
       release_identifier: ${{ steps.release_metadata.outputs.release_identifier }}
@@ -140,10 +149,12 @@ jobs:
 
           artifact_name="${BETA_ARTIFACT_NAME_PREFIX}-${RELEASE_IDENTIFIER}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           artifact_checksum="$(sha256sum "${ARTIFACT_PATH}" | awk '{print $1}')"
+          artifact_version="$(unzip -p "${ARTIFACT_PATH}" version.json | jq --raw-output '.version')"
 
           {
             echo "artifact_name=${artifact_name}"
             echo "artifact_checksum=${artifact_checksum}"
+            echo "artifact_version=${artifact_version}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Upload build artifact
@@ -157,7 +168,9 @@ jobs:
     runs-on: ubuntu-24.04
     needs: build_artifact
     permissions: {}
-    environment: wire-webapp-staging
+    environment:
+      name: wire-webapp-beta
+      url: https://wire-webapp-beta.wire.com/
 
     steps:
       - name: Download build artifact
@@ -178,13 +191,46 @@ jobs:
         with:
           aws-region: ${{ env.AWS_REGION }}
           application-name: Webapp
-          environment-name: ${{ env.BETA_ENVIRONMENT_NAME }}
+          environment-name: ${{ env.BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
           version-label: ${{ needs.build_artifact.outputs.release_identifier }}-${{ github.run_id }}-${{ github.run_attempt }}-beta
           deployment-package-path: ebs.zip
           wait-for-deployment: true
           wait-for-environment-recovery: true
           deployment-timeout: 150
           use-existing-application-version-if-available: true
+
+      - name: Verify Beta runtime backend
+        env:
+          BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
+          EXPECTED_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
+          EXPECTED_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
+          EXPECTED_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
+        run: |
+          set -euo pipefail
+
+          normalize_url() {
+            printf '%s' "${1%/}"
+          }
+
+          expected_backend_rest="$(normalize_url "${EXPECTED_BACKEND_REST}")"
+          expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
+
+          for attempt_number in {1..10}; do
+            runtime_config="$(curl --fail --silent --show-error "${BETA_WEBAPP_URL}config.js" || true)"
+            actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
+            actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
+            actual_version="$(printf '%s' "${runtime_config}" | sed -n 's/.*"VERSION":"\([^"]*\)".*/\1/p')"
+
+            if [[ "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" && "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" && "${actual_version}" == "${EXPECTED_VERSION}" ]]; then
+              exit 0
+            fi
+
+            echo "Beta runtime configuration does not match the current artifact and Production backend on attempt ${attempt_number}: REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}, VERSION=${actual_version:-missing}." >&2
+            sleep 6
+          done
+
+          echo "Beta runtime configuration did not match the expected Production endpoints and artifact version." >&2
+          exit 1
 
   create_beta_tag:
     name: Create Beta tag
@@ -199,7 +245,8 @@ jobs:
       - name: Checkout release commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
       - name: Add repository Yarn wrapper to PATH
@@ -222,9 +269,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          git fetch --tags origin
-
-          mapfile -t existing_beta_tag_names < <(git tag --list "${RELEASE_IDENTIFIER}-beta.*")
+          mapfile -t existing_beta_tag_names < <(
+            git ls-remote \
+              --tags \
+              --refs \
+              origin \
+              "${RELEASE_IDENTIFIER}-beta.*" |
+              awk '{
+                sub("^refs/tags/", "", $2);
+                print $2;
+              }'
+          )
           beta_tag_name="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts next-beta-tag "${RELEASE_IDENTIFIER}" "${existing_beta_tag_names[@]}")"
 
           git config user.email "zebot@users.noreply.github.com"
@@ -235,18 +290,24 @@ jobs:
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
 
   run_e2e:
-    name: Run E2E against Beta
+    name: Deploy to precommit and run E2E
     needs: [build_artifact, create_beta_tag]
     permissions:
       contents: read
-    uses: ./.github/workflows/e2e-tests.yml
+    uses: ./.github/workflows/precommit-slot-run.yml
     with:
-      webappUrl: https://wire-webapp-staging.zinfra.io/
+      env_name: wire-webapp-precommit-3
       backendUrl: https://staging-nginz-https.zinfra.io/
+      artifact_name: ${{ needs.build_artifact.outputs.artifact_name }}
+      expectedBackendRest: https://staging-nginz-https.zinfra.io/
+      expectedBackendWs: wss://staging-nginz-ssl.zinfra.io/
+      expectedVersion: ${{ needs.build_artifact.outputs.artifact_version }}
       grep: '@regression|@crit-flow-web'
       testinyRunName: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+      WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
       TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
 
   production_preflight:
@@ -409,11 +470,65 @@ jobs:
           deployment-timeout: 150
           use-existing-application-version-if-available: true
 
+  verify_production_runtime:
+    name: Verify Production runtime
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, deploy_to_production]
+    if: ${{ needs.deploy_to_production.result == 'success' }}
+    permissions: {}
+    timeout-minutes: 2
+
+    steps:
+      - name: Verify live Production runtime
+        env:
+          EXPECTED_BACKEND_REST: ${{ env.PRODUCTION_RUNTIME_BACKEND_REST }}
+          EXPECTED_BACKEND_WS: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}
+          EXPECTED_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
+          PRODUCTION_WEBAPP_URL: ${{ env.PRODUCTION_WEBAPP_URL }}
+        run: |
+          set -euo pipefail
+
+          normalize_url() {
+            printf '%s' "${1%/}"
+          }
+
+          expected_backend_rest="$(normalize_url "${EXPECTED_BACKEND_REST}")"
+          expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
+
+          for attempt_number in {1..10}; do
+            runtime_config=''
+            if ! runtime_config="$(curl --fail --silent --show-error "${PRODUCTION_WEBAPP_URL}config.js")"; then
+              echo "Unable to fetch Production runtime configuration on attempt ${attempt_number}: URL=${PRODUCTION_WEBAPP_URL}config.js." >&2
+            fi
+
+            actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
+            actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
+            actual_version="$(printf '%s' "${runtime_config}" | sed -n 's/.*"VERSION":"\([^"]*\)".*/\1/p')"
+
+            if [[ "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" && "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" && "${actual_version}" == "${EXPECTED_VERSION}" ]]; then
+              echo "Production runtime verification succeeded on attempt ${attempt_number}: URL=${PRODUCTION_WEBAPP_URL}config.js, VERSION=${actual_version}, REST=$(normalize_url "${actual_backend_rest}"), WS=$(normalize_url "${actual_backend_ws}")."
+              exit 0
+            fi
+
+            echo "Production runtime configuration mismatch on attempt ${attempt_number}." >&2
+            echo "Expected: VERSION=${EXPECTED_VERSION}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
+            echo "Observed: VERSION=${actual_version:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
+
+            if [[ "${attempt_number}" -lt 10 ]]; then
+              sleep 6
+            fi
+          done
+
+          echo "Production runtime verification failed after 10 attempts." >&2
+          echo "Expected: VERSION=${EXPECTED_VERSION}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
+          echo "Observed: VERSION=${actual_version:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
+          exit 1
+
   create_production_tag:
     name: Create Production tag
     runs-on: ubuntu-24.04
-    needs: [build_artifact, production_preflight, deploy_to_production]
-    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' && needs.deploy_to_production.result == 'success' }}
+    needs: [build_artifact, production_preflight, deploy_to_production, verify_production_runtime]
+    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' && needs.deploy_to_production.result == 'success' && needs.verify_production_runtime.result == 'success' }}
     permissions:
       contents: write
     outputs:
@@ -460,6 +575,7 @@ jobs:
         run_e2e,
         production_preflight,
         deploy_to_production,
+        verify_production_runtime,
         create_production_tag,
       ]
     if: ${{ always() }}
@@ -470,9 +586,15 @@ jobs:
         env:
           ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
           ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
+          BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: ${{ env.BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
+          BETA_RUNTIME_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
+          BETA_RUNTIME_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          E2E_BACKEND_URL: ${{ env.E2E_BACKEND_URL }}
+          E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: ${{ env.E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
           E2E_REPORT_URL: ${{ needs.run_e2e.outputs.reportUrl }}
           E2E_RESULT: ${{ needs.run_e2e.result }}
+          E2E_WEBAPP_URL: ${{ env.E2E_WEBAPP_URL }}
           PRODUCTION_ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
           PRODUCTION_ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
           PRODUCTION_DEPLOYMENT_RESULT: ${{ needs.deploy_to_production.result }}
@@ -480,6 +602,11 @@ jobs:
           PRODUCTION_ENVIRONMENT_NAME: ${{ env.PRODUCTION_ENVIRONMENT_NAME }}
           PRODUCTION_PREFLIGHT_RESULT: ${{ needs.production_preflight.outputs.production_preflight_result }}
           PRODUCTION_PROMOTION_REQUESTED: ${{ inputs.promote_to_production }}
+          PRODUCTION_RUNTIME_VERIFICATION_RESULT: ${{ needs.verify_production_runtime.result }}
+          PRODUCTION_RUNTIME_BACKEND_REST: ${{ env.PRODUCTION_RUNTIME_BACKEND_REST }}
+          PRODUCTION_RUNTIME_BACKEND_WS: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}
+          PRODUCTION_WEBAPP_URL: ${{ env.PRODUCTION_WEBAPP_URL }}
+          PRODUCTION_ARTIFACT_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
           PRODUCTION_SKIPPED_REASON: ${{ needs.production_preflight.outputs.production_skipped_reason }}
           PRODUCTION_TAG_CREATION_RESULT: ${{ needs.create_production_tag.result }}
           PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
@@ -496,12 +623,18 @@ jobs:
             echo "- Release branch: ${RELEASE_BRANCH}"
             echo "- Release identifier: ${RELEASE_IDENTIFIER}"
             echo "- Commit SHA: ${RELEASE_COMMIT_SHA}"
-            echo "- Beta environment: ${BETA_ENVIRONMENT_NAME}"
-            echo "- Beta URL: ${BETA_WEBAPP_URL}"
+            echo '- GitHub Environment: wire-webapp-beta'
+            echo "- Elastic Beanstalk environment: ${BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
+            echo "- Public Beta URL: ${BETA_WEBAPP_URL}"
+            echo "- Beta runtime backend: ${BETA_RUNTIME_BACKEND_REST}"
+            echo "- Beta runtime WebSocket backend: ${BETA_RUNTIME_BACKEND_WS}"
             echo "- Artifact name: ${ARTIFACT_NAME}"
             echo "- Artifact checksum: ${ARTIFACT_CHECKSUM}"
             echo "- Beta tag: ${BETA_TAG_NAME}"
             echo "- E2E result: ${E2E_RESULT}"
+            echo "- E2E Elastic Beanstalk environment: ${E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
+            echo "- E2E URL: ${E2E_WEBAPP_URL}"
+            echo "- E2E backend: ${E2E_BACKEND_URL}"
 
             if [[ -n "${E2E_REPORT_URL}" ]]; then
               echo "- E2E report URL: ${E2E_REPORT_URL}"
@@ -525,6 +658,11 @@ jobs:
             fi
 
             echo "- Production deployment result: ${PRODUCTION_DEPLOYMENT_RESULT}"
+            echo "- Production runtime verification result: ${PRODUCTION_RUNTIME_VERIFICATION_RESULT}"
+            echo "- Production URL: ${PRODUCTION_WEBAPP_URL}"
+            echo "- Expected Production artifact version: ${PRODUCTION_ARTIFACT_VERSION}"
+            echo "- Expected Production REST backend: ${PRODUCTION_RUNTIME_BACKEND_REST}"
+            echo "- Expected Production WebSocket backend: ${PRODUCTION_RUNTIME_BACKEND_WS}"
             echo "- Production tag creation result: ${PRODUCTION_TAG_CREATION_RESULT}"
             echo "- Production environment: ${PRODUCTION_ENVIRONMENT_NAME}"
             echo "- Production artifact name: ${PRODUCTION_ARTIFACT_NAME}"
@@ -537,24 +675,52 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       [
+        validate_request,
         build_artifact,
         deploy_to_beta,
         create_beta_tag,
         run_e2e,
         production_preflight,
         deploy_to_production,
+        verify_production_runtime,
         create_production_tag,
       ]
     if: ${{ always() && contains(join(needs.*.result, ','), 'failure') }}
-    permissions: {}
+    permissions:
+      contents: read
 
     steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/actions/notify-deployoholics
+
       - name: Announce release failure
         uses: ./.github/actions/notify-deployoholics
         with:
           webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           status: failure
           text: |
-            Release Cloud failed for ${{ needs.build_artifact.outputs.release_branch || inputs.release_branch }} (${{ needs.build_artifact.outputs.release_identifier || needs.build_artifact.outputs.release_branch || inputs.release_branch }})
+            ❌ Release Cloud blocked Production ❌
+
+            Release: ${{ needs.build_artifact.outputs.release_identifier || 'unavailable' }}
+            Branch: ${{ needs.build_artifact.outputs.release_branch || inputs.release_branch || 'unavailable' }}
             Triggered by: ${{ github.actor }}
-            Build log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Request validation: ${{ needs.validate_request.result }}
+            Build: ${{ needs.build_artifact.result }}
+            Beta deployment: ${{ needs.deploy_to_beta.result }}
+            Beta tag: ${{ needs.create_beta_tag.result }}
+            E2E system gate: ${{ needs.run_e2e.result }}
+            Production preflight: ${{ needs.production_preflight.result }}
+            Production deployment: ${{ needs.deploy_to_production.result }}
+            Production runtime verification: ${{ needs.verify_production_runtime.result }}
+            Production tag: ${{ needs.create_production_tag.result }}
+
+            Playwright report: ${{ needs.run_e2e.outputs.reportUrl || 'unavailable' }}
+            Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            ${{ needs.verify_production_runtime.result == 'failure' && 'Production deployment completed, but live runtime verification failed.' || 'Production was blocked because a release gate failed.' }}
+            ${{ needs.verify_production_runtime.result == 'failure' && 'No Production tag was created.' || 'Production tag creation was blocked by the failed release gate.' }}
