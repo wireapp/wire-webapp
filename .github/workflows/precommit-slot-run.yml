@@ -179,8 +179,17 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [deploy_to_aws, e2e_tests]
     if: ${{ always() && inputs.notify_deployoholics_on_failure && needs.e2e_tests.result == 'failure' }}
+    permissions:
+      contents: read
 
     steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/actions/notify-deployoholics
+
       - name: Announce failed critical flow
         uses: ./.github/actions/notify-deployoholics
         with:

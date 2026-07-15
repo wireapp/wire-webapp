@@ -96,7 +96,13 @@ The cloud release process is:
 - After a successful beta deployment, the workflow creates a beta tag such as `YYYY-MM-DD.N-beta.1`, `YYYY-MM-DD.N-beta.2`, and so on.
 - Beta tag numbers are derived from existing beta tags for the release identifier. If concurrent workflows try to create the same tag for different commits, the later workflow must fail and be rerun after fetching the latest tags.
 - The release workflow deploys the Beta artifact to a dedicated E2E validation environment connected to Staging backend services, runs E2E there, and reports the result to Testiny.
+- The complete selected release E2E suite is a blocking full-system Production gate. The suite is not split into blocking and advisory tests, and no selected release E2E test uses `continue-on-error` or a flaky-test quarantine.
+- This gate intentionally validates the complete Wire system: frontend, backend, infrastructure, and integration failures may all block Production because customers consume the whole system.
+- Test implementation defects are fixed as test defects; known instability is not converted into `continue-on-error`.
+- Temporary system outages require investigation and a manual decision on whether to rerun. Failed tests may be manually rerun only after investigation; automatic test reruns are not part of the release decision.
 - Successful E2E and Testiny reporting are required before Production promotion.
+- Production preflight is not allowed after any E2E failure, and QA approval cannot override a technically failed E2E gate in this workflow.
+- Failed release gates notify Deployoholics with stage evidence and Playwright report links when available.
 - The production deployment job waits for GitHub Environment approval on the production environment.
 - GitHub Environment approval means the workflow pauses before using the production environment until configured reviewers approve or reject the deployment in GitHub.
 - Quality assurance owns the go/no-go quality gate.
