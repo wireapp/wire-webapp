@@ -17,7 +17,7 @@
  *
  */
 
-import {memo, useMemo} from 'react';
+import {memo} from 'react';
 
 import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
 
@@ -28,34 +28,20 @@ import {
   participatingStatusIconStyles,
   participatingStatusStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/meetingStatus.styles';
-import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
+import {MeetingTemporalStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export interface MeetingStatusProps {
-  start_date: string;
-  end_date: string;
-  nowMilliseconds: number;
+  temporalStatus: MeetingTemporalStatuses;
   joinMeeting: () => void;
   isJoinDisabled: boolean;
   isCallActive: boolean;
 }
 
-const MeetingStatusComponent = ({
-  start_date,
-  end_date,
-  nowMilliseconds,
-  joinMeeting,
-  isJoinDisabled,
-  isCallActive,
-}: MeetingStatusProps) => {
+const MeetingStatusComponent = ({temporalStatus, joinMeeting, isJoinDisabled, isCallActive}: MeetingStatusProps) => {
   const {translate} = useApplicationContext();
 
-  const meetingStatus = useMemo(
-    () => getMeetingStatusAt(nowMilliseconds, start_date, end_date, isCallActive),
-    [nowMilliseconds, start_date, end_date, isCallActive],
-  );
-
-  if (meetingStatus === MeetingStatuses.PARTICIPATING) {
+  if (isCallActive) {
     return (
       <div css={participatingStatusStyles}>
         <CallIcon css={participatingStatusIconStyles} /> {translate('meetings.meetingStatus.participating')}
@@ -63,7 +49,7 @@ const MeetingStatusComponent = ({
     );
   }
 
-  if (meetingStatus === MeetingStatuses.ON_GOING) {
+  if (temporalStatus === MeetingTemporalStatuses.ON_GOING) {
     return (
       <div css={joinButtonContainerStyles}>
         <Button

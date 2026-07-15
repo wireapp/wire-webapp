@@ -18,12 +18,12 @@
  */
 
 import {fireEvent, render, screen} from '@testing-library/react';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
 import {
   MeetingStatus,
   type MeetingStatusProps,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
+import {MeetingTemporalStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
@@ -31,22 +31,11 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
-const THIRTY_MINUTES_MS = 30 * 60 * 1_000;
-
-const ongoingWallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: 1_000_000_000_000,
-});
-
-const meetingStartIso = new Date(ongoingWallClock.currentTimestampInMilliseconds - THIRTY_MINUTES_MS).toISOString();
-const meetingEndIso = new Date(ongoingWallClock.currentTimestampInMilliseconds + THIRTY_MINUTES_MS).toISOString();
-
 const createTestProps = (): MeetingStatusProps & {joinMeeting: jest.Mock} => {
   const joinMeeting = jest.fn();
 
   return {
-    start_date: meetingStartIso,
-    end_date: meetingEndIso,
-    nowMilliseconds: ongoingWallClock.currentTimestampInMilliseconds,
+    temporalStatus: MeetingTemporalStatuses.ON_GOING,
     joinMeeting,
     isJoinDisabled: false,
     isCallActive: false,
@@ -79,5 +68,24 @@ describe('MeetingStatus', () => {
 
     expect(screen.getByText(translateForTest('meetings.meetingStatus.participating'))).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: translateForTest('callJoin')})).not.toBeInTheDocument();
+  });
+
+  it('shows Participating even when the meeting is outside its scheduled interval', () => {
+    const {joinMeeting: _joinMeeting, ...props} = createTestProps();
+
+    render(
+      withThemeAndRootContext(
+        <MeetingStatus
+          {...props}
+          temporalStatus={MeetingTemporalStatuses.UPCOMING}
+          joinMeeting={jest.fn()}
+          isJoinDisabled
+          isCallActive
+        />,
+        rootProviderWrapper,
+      ),
+    );
+
+    expect(screen.getByText(translateForTest('meetings.meetingStatus.participating'))).toBeInTheDocument();
   });
 });
