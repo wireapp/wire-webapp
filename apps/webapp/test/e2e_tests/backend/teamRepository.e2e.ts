@@ -22,6 +22,7 @@ import {BackendClientE2E} from './backendClient.e2e';
 import {Service} from '../data/serviceInfo';
 import {User} from '../data/user';
 import {Role} from '@wireapp/api-client/lib/team';
+import {faker} from '@faker-js/faker';
 
 export class TeamRepositoryE2E extends BackendClientE2E {
   async inviteUserToTeam(emailOfInvitee: string, teamOwner: User, role: Role = Role.MEMBER): Promise<string> {
@@ -93,9 +94,9 @@ export class TeamRepositoryE2E extends BackendClientE2E {
     await this.axiosInstance.put(
       `/teams/${teamId}/billing/info`,
       {
-        firstname: 'Test',
-        lastname: 'User',
-        company: 'E2E Test Company',
+        firstname: user.firstName,
+        lastname: user.lastName,
+        company: faker.company.name(),
         street: '123 Test Street',
         zip: '12345',
         city: 'Berlin',
