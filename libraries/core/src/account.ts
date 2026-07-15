@@ -94,11 +94,11 @@ import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from '
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
+import {createFireAndForgetInvoker} from './taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';
 import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
-import {createFireAndForgetInvoker} from './taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 
 export type ProcessedEventPayload = HandledEventPayload;
 export type WebSocketConnectionContext = Pick<WebSocketReconnectContext, 'attemptId' | 'wrapperGeneration'>;
