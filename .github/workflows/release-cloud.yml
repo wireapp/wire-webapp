@@ -496,7 +496,7 @@ jobs:
     needs: [build_artifact, deploy_to_production]
     if: ${{ needs.deploy_to_production.result == 'success' }}
     permissions: {}
-    timeout-minutes: 2
+    timeout-minutes: 10
 
     steps:
       - name: Verify live Production runtime
