@@ -21,7 +21,6 @@ import {useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
-import {getScheduleMeetingParticipantPool} from 'Components/Meeting/getScheduleMeetingParticipantPool';
 import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
@@ -31,13 +30,14 @@ export const useScheduleMeetingParticipants = (): {users: User[]} => {
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
 
-  const {isTeam, teamMembers, teamUsers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamMembers', 'teamUsers']);
+  const {isTeam, teamUsers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamUsers']);
   const {connectedUsers} = useKoSubscribableChildren(userState, ['connectedUsers']);
 
-  const users = useMemo(
-    () => getScheduleMeetingParticipantPool(userState, teamState),
-    [connectedUsers, isTeam, teamMembers, teamUsers, teamState, userState],
-  );
+  const users = useMemo(() => {
+    const contacts = isTeam ? teamUsers : connectedUsers;
+
+    return contacts.filter(user => user.isAvailable());
+  }, [connectedUsers, isTeam, teamUsers]);
 
   return {users};
 };

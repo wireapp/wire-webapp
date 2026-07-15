@@ -19,36 +19,41 @@
 
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 
+const MINUTES_PER_HOUR = 60;
+const HOURS_PER_DAY = 24;
+const MILLISECONDS_PER_SECOND = 1000;
+const MINUTES_PER_DAY = HOURS_PER_DAY * MINUTES_PER_HOUR;
+const LAST_HOUR_OF_DAY = 23;
 const HALF_HOUR_MINUTES = 30;
-const MEETING_DURATION_MILLISECONDS = 60 * 60 * 1000;
+const MEETING_DURATION_MILLISECONDS = MINUTES_PER_HOUR * MINUTES_PER_HOUR * MILLISECONDS_PER_SECOND;
 
 const isSameCalendarDay = (left: Date, right: Date): boolean =>
   left.getFullYear() === right.getFullYear() &&
   left.getMonth() === right.getMonth() &&
   left.getDate() === right.getDate();
 
-const isAfter11Pm = (date: Date): boolean => date.getHours() === 23 && date.getMinutes() > 0;
+const isAfter11Pm = (date: Date): boolean => date.getHours() === LAST_HOUR_OF_DAY && date.getMinutes() > 0;
 
 export const getNextHalfHourDateTime = (now: Date): Date => {
-  const totalMinutes = now.getHours() * 60 + now.getMinutes();
+  const totalMinutes = now.getHours() * MINUTES_PER_HOUR + now.getMinutes();
   const ceiledMinutes = Math.ceil(totalMinutes / HALF_HOUR_MINUTES) * HALF_HOUR_MINUTES;
   const result = new Date(now);
 
   result.setSeconds(0, 0);
 
-  if (ceiledMinutes >= 24 * 60) {
+  if (ceiledMinutes >= MINUTES_PER_DAY) {
     result.setDate(result.getDate() + 1);
     result.setHours(0, 0, 0, 0);
     return result;
   }
 
-  result.setHours(Math.floor(ceiledMinutes / 60), ceiledMinutes % 60, 0, 0);
+  result.setHours(Math.floor(ceiledMinutes / MINUTES_PER_HOUR), ceiledMinutes % MINUTES_PER_HOUR, 0, 0);
   return result;
 };
 
 export const getMidnightAfter = (date: Date): Date => {
   const midnight = new Date(date);
-  midnight.setHours(24, 0, 0, 0);
+  midnight.setHours(HOURS_PER_DAY, 0, 0, 0);
   return midnight;
 };
 

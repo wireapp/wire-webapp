@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import is from '@sindresorhus/is';
 import type {Maybe} from 'true-myth';
@@ -134,28 +134,31 @@ export const ScheduleMeetingForm = ({
     [wallClock.currentTimestampInMilliseconds],
   );
 
-  const getMinTimeForDate = (date: Date | null): Date | null => {
-    if (date === null) {
-      return null;
-    }
+  const getMinTimeForDate = useCallback(
+    (date: Date | null): Date | null => {
+      if (date === null) {
+        return null;
+      }
 
-    const today = wallClock.currentDate;
-    const isToday =
-      date.getFullYear() === today.getFullYear() &&
-      date.getMonth() === today.getMonth() &&
-      date.getDate() === today.getDate();
+      const today = wallClock.currentDate;
+      const isToday =
+        date.getFullYear() === today.getFullYear() &&
+        date.getMonth() === today.getMonth() &&
+        date.getDate() === today.getDate();
 
-    return isToday ? currentDateTime : null;
-  };
+      return isToday ? currentDateTime : null;
+    },
+    [currentDateTime, wallClock],
+  );
 
   const startMinTime = useMemo(
     () => getMinTimeForDate(toDateTimePickerValue(formState.start)),
-    [formState.start, currentDateTime, todayValue],
+    [formState.start, getMinTimeForDate],
   );
 
   const endMinTime = useMemo(
     () => getMinTimeForDate(toDateTimePickerValue(formState.end)),
-    [formState.end, currentDateTime, todayValue],
+    [formState.end, getMinTimeForDate],
   );
 
   const endDateMinValue = useMemo(() => {
@@ -165,7 +168,7 @@ export const ScheduleMeetingForm = ({
 
     const startDate = dateValueFromDate(formState.start.value);
     return startDate.compare(todayValue) > 0 ? startDate : todayValue;
-  }, [formState.start, wallClock]);
+  }, [formState.start, todayValue]);
 
   const startErrorText = firstNonEmptyError(errors.startInPast);
   const endErrorText = firstNonEmptyError(errors.endInPast, errors.endBeforeStart);
