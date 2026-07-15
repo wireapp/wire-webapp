@@ -8,7 +8,7 @@ Accepted
 
 The current release process is mostly driven by branch and tag pushes, with production deployment triggered by pre-existing production tags. That creates two main problems:
 
-- Production tags are created before production deployment, which makes the tag represent intent rather than a verified deployment result.
+- A successful Production deployment operation alone is not sufficient evidence for an immutable Production tag; without live verification, the tag can represent intent rather than a verified runtime.
 - The process does not provide a clean and auditable promotion flow from beta validation to production deployment.
 
 We want a release process that is fully executable from GitHub Actions without manual release operations on local developer machines. We also want fewer long-lived branches, fewer synchronization steps, and clearer ownership for quality approval, production rollout, observability, rollback, and customer-specific maintenance releases.
@@ -32,6 +32,7 @@ flowchart LR
   productionApproval[Quality assurance approval]
   betaTag[YYYY-MM-DD.N-beta.M]
   productionEnvironment[Production]
+  productionRuntimeVerification[Verify live Production runtime<br/>Artifact version and Production backends]
   productionTag[YYYY-MM-DD.N-production]
   maintenanceBranch[maintenance/maintenance-line-key]
   maintenanceTag[maintenance-line-key-maintenance.X]
@@ -44,7 +45,8 @@ flowchart LR
   betaTag -->|Deploy same artifact| e2eEnvironment
   e2eEnvironment -->|E2E and Testiny succeed| productionApproval
   productionApproval -->|Approve candidate| productionEnvironment
-  productionEnvironment -->|Successful production deployment creates| productionTag
+  productionEnvironment -->|Deploy promoted artifact| productionRuntimeVerification
+  productionRuntimeVerification -->|Verified runtime creates| productionTag
   productionTag -->|Create only when needed| maintenanceBranch
   maintenanceBranch -->|Validated maintenance artifact creates| maintenanceTag
 
@@ -108,7 +110,9 @@ The cloud release process is:
 - Quality assurance owns the go/no-go quality gate.
 - The engineering release captain owns production rollout, observability, and incident response.
 - The production workflow promotes the beta-tested artifact and does not rebuild from source.
-- After successful production deployment, the workflow creates the production tag `YYYY-MM-DD.N-production`.
+- After Production deployment, the workflow verifies that the live Production endpoint `https://app.wire.com/config.js` exposes the expected artifact version and Production REST and WebSocket backend configuration.
+- A successful deployment operation alone does not create a Production tag. The workflow creates the production tag `YYYY-MM-DD.N-production` only after the live runtime and artifact verification succeeds, so the tag represents a successfully deployed and verified runtime.
+- If Production runtime verification fails, Production remains untagged, the release workflow fails, Deployoholics receives a failure notification, and the release captain performs incident assessment.
 - If the current release branch commit already has the matching production tag, the release workflow must not redeploy that commit.
 - Production tags are immutable release history and are never moved or deleted.
 Release workflows must be serialized:
@@ -135,6 +139,7 @@ flowchart TD
   reportToTestiny[Report result to Testiny]
   productionApproval[GitHub Environment approval<br/>Production]
   deployToProduction[Deploy promoted beta artifact to Production]
+  verifyProductionRuntime[Verify live Production runtime<br/>Artifact version and Production backends]
   createProductionTag[Create YYYY-MM-DD.N-production]
   rollbackWorkflow[Rollback Production workflow_dispatch<br/>optional incident action]
   deployKnownGoodArtifact[Deploy previous known-good production artifact]
@@ -142,7 +147,7 @@ flowchart TD
   mergeToMain --> deployToEdge
   createReleaseBranch --> buildArtifact --> deployToBeta --> verifyBetaRuntime --> createBetaTag
   createBetaTag --> deployToE2E --> verifyE2ERuntime --> runEndToEndTests --> reportToTestiny
-  reportToTestiny --> productionApproval --> deployToProduction --> createProductionTag
+  reportToTestiny --> productionApproval --> deployToProduction --> verifyProductionRuntime --> createProductionTag
   createProductionTag -.-> rollbackWorkflow -.-> deployKnownGoodArtifact
 ```
 
@@ -171,7 +176,7 @@ Branch and tag cleanup follows these rules:
 
 Rollback will be first-class:
 
-- Production rollback is performed through a dedicated GitHub Actions workflow.
+- Production rollback is performed through a dedicated GitHub Actions workflow as a separate explicit operation; runtime verification failure does not automatically roll back.
 - The rollback workflow deploys a previous known-good production tag or artifact.
 - Rollback is owned by engineering release owners, not quality assurance.
 - A rollback requires a reason, a Wire notification, and, when applicable, an incident reference.

@@ -37,6 +37,9 @@ env:
   BETA_ARTIFACT_NAME_PREFIX: release-cloud-ebs
   BETA_RUNTIME_BACKEND_REST: https://prod-nginz-https.wire.com
   BETA_RUNTIME_BACKEND_WS: wss://prod-nginz-ssl.wire.com
+  PRODUCTION_WEBAPP_URL: https://app.wire.com/
+  PRODUCTION_RUNTIME_BACKEND_REST: https://prod-nginz-https.wire.com
+  PRODUCTION_RUNTIME_BACKEND_WS: wss://prod-nginz-ssl.wire.com
   # ADR 0002 calls this logical release stage Beta. Its GitHub Environment and
   # canonical company-facing URL use wire-webapp-beta, while deployments retain
   # the existing wire-webapp-staging Elastic Beanstalk environment.
@@ -467,11 +470,65 @@ jobs:
           deployment-timeout: 150
           use-existing-application-version-if-available: true
 
+  verify_production_runtime:
+    name: Verify Production runtime
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, deploy_to_production]
+    if: ${{ needs.deploy_to_production.result == 'success' }}
+    permissions: {}
+    timeout-minutes: 2
+
+    steps:
+      - name: Verify live Production runtime
+        env:
+          EXPECTED_BACKEND_REST: ${{ env.PRODUCTION_RUNTIME_BACKEND_REST }}
+          EXPECTED_BACKEND_WS: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}
+          EXPECTED_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
+          PRODUCTION_WEBAPP_URL: ${{ env.PRODUCTION_WEBAPP_URL }}
+        run: |
+          set -euo pipefail
+
+          normalize_url() {
+            printf '%s' "${1%/}"
+          }
+
+          expected_backend_rest="$(normalize_url "${EXPECTED_BACKEND_REST}")"
+          expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
+
+          for attempt_number in {1..10}; do
+            runtime_config=''
+            if ! runtime_config="$(curl --fail --silent --show-error "${PRODUCTION_WEBAPP_URL}config.js")"; then
+              echo "Unable to fetch Production runtime configuration on attempt ${attempt_number}: URL=${PRODUCTION_WEBAPP_URL}config.js." >&2
+            fi
+
+            actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
+            actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
+            actual_version="$(printf '%s' "${runtime_config}" | sed -n 's/.*"VERSION":"\([^"]*\)".*/\1/p')"
+
+            if [[ "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" && "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" && "${actual_version}" == "${EXPECTED_VERSION}" ]]; then
+              echo "Production runtime verification succeeded on attempt ${attempt_number}: URL=${PRODUCTION_WEBAPP_URL}config.js, VERSION=${actual_version}, REST=$(normalize_url "${actual_backend_rest}"), WS=$(normalize_url "${actual_backend_ws}")."
+              exit 0
+            fi
+
+            echo "Production runtime configuration mismatch on attempt ${attempt_number}." >&2
+            echo "Expected: VERSION=${EXPECTED_VERSION}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
+            echo "Observed: VERSION=${actual_version:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
+
+            if [[ "${attempt_number}" -lt 10 ]]; then
+              sleep 6
+            fi
+          done
+
+          echo "Production runtime verification failed after 10 attempts." >&2
+          echo "Expected: VERSION=${EXPECTED_VERSION}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
+          echo "Observed: VERSION=${actual_version:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
+          exit 1
+
   create_production_tag:
     name: Create Production tag
     runs-on: ubuntu-24.04
-    needs: [build_artifact, production_preflight, deploy_to_production]
-    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' && needs.deploy_to_production.result == 'success' }}
+    needs: [build_artifact, production_preflight, deploy_to_production, verify_production_runtime]
+    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' && needs.deploy_to_production.result == 'success' && needs.verify_production_runtime.result == 'success' }}
     permissions:
       contents: write
     outputs:
@@ -518,6 +575,7 @@ jobs:
         run_e2e,
         production_preflight,
         deploy_to_production,
+        verify_production_runtime,
         create_production_tag,
       ]
     if: ${{ always() }}
@@ -544,6 +602,11 @@ jobs:
           PRODUCTION_ENVIRONMENT_NAME: ${{ env.PRODUCTION_ENVIRONMENT_NAME }}
           PRODUCTION_PREFLIGHT_RESULT: ${{ needs.production_preflight.outputs.production_preflight_result }}
           PRODUCTION_PROMOTION_REQUESTED: ${{ inputs.promote_to_production }}
+          PRODUCTION_RUNTIME_VERIFICATION_RESULT: ${{ needs.verify_production_runtime.result }}
+          PRODUCTION_RUNTIME_BACKEND_REST: ${{ env.PRODUCTION_RUNTIME_BACKEND_REST }}
+          PRODUCTION_RUNTIME_BACKEND_WS: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}
+          PRODUCTION_WEBAPP_URL: ${{ env.PRODUCTION_WEBAPP_URL }}
+          PRODUCTION_ARTIFACT_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
           PRODUCTION_SKIPPED_REASON: ${{ needs.production_preflight.outputs.production_skipped_reason }}
           PRODUCTION_TAG_CREATION_RESULT: ${{ needs.create_production_tag.result }}
           PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
@@ -595,6 +658,11 @@ jobs:
             fi
 
             echo "- Production deployment result: ${PRODUCTION_DEPLOYMENT_RESULT}"
+            echo "- Production runtime verification result: ${PRODUCTION_RUNTIME_VERIFICATION_RESULT}"
+            echo "- Production URL: ${PRODUCTION_WEBAPP_URL}"
+            echo "- Expected Production artifact version: ${PRODUCTION_ARTIFACT_VERSION}"
+            echo "- Expected Production REST backend: ${PRODUCTION_RUNTIME_BACKEND_REST}"
+            echo "- Expected Production WebSocket backend: ${PRODUCTION_RUNTIME_BACKEND_WS}"
             echo "- Production tag creation result: ${PRODUCTION_TAG_CREATION_RESULT}"
             echo "- Production environment: ${PRODUCTION_ENVIRONMENT_NAME}"
             echo "- Production artifact name: ${PRODUCTION_ARTIFACT_NAME}"
@@ -614,6 +682,7 @@ jobs:
         run_e2e,
         production_preflight,
         deploy_to_production,
+        verify_production_runtime,
         create_production_tag,
       ]
     if: ${{ always() && contains(join(needs.*.result, ','), 'failure') }}
@@ -647,9 +716,11 @@ jobs:
             E2E system gate: ${{ needs.run_e2e.result }}
             Production preflight: ${{ needs.production_preflight.result }}
             Production deployment: ${{ needs.deploy_to_production.result }}
+            Production runtime verification: ${{ needs.verify_production_runtime.result }}
             Production tag: ${{ needs.create_production_tag.result }}
 
             Playwright report: ${{ needs.run_e2e.outputs.reportUrl || 'unavailable' }}
             Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-            Production was blocked because a release gate failed.
+            ${{ needs.verify_production_runtime.result == 'failure' && 'Production deployment completed, but live runtime verification failed.' || 'Production was blocked because a release gate failed.' }}
+            ${{ needs.verify_production_runtime.result == 'failure' && 'No Production tag was created.' || 'Production tag creation was blocked by the failed release gate.' }}
