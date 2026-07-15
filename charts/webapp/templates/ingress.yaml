@@ -1,4 +1,5 @@
-{{- if .Values.ingress.enabled }}
+{{- $ingressMode := include "webapp.ingressMode" . -}}
+{{- if and .Values.ingress.enabled (or (eq $ingressMode "nginx") (eq $ingressMode "migration")) }}
 {{- include "webapp.validateDomainConfig" . }}
 {{- $ingressClass := default "nginx" .Values.ingress.className -}}
 {{- $backendDomain := "" -}}
@@ -17,6 +18,7 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  {{- if or .Values.ingress.annotations .Values.ingress.renderCSPInIngress (eq $ingressMode "migration") }}
   annotations:
     {{- range $key, $val := .Values.ingress.annotations }}
     {{ $key }}: {{ $val | quote }}
@@ -50,6 +52,11 @@ metadata:
         more_set_headers "content-security-policy: $CSP";
       }
     {{- end }}
+    {{- $weight := include "webapp.externalDnsWeight" (dict "ctx" . "kind" "nginx") | trim -}}
+    {{- if $weight }}
+    external-dns.alpha.kubernetes.io/aws-weight: {{ $weight | quote }}
+    {{- end }}
+  {{- end }}
 spec:
   ingressClassName: {{ $ingressClass | quote }}
   {{- if .Values.tls.enabled }}

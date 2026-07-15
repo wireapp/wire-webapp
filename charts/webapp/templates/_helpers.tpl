@@ -41,10 +41,23 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "webapp.validateDomainConfig" -}}
+  {{- $ingressMode := default "nginx" .Values.ingress.mode | lower -}}
   {{- if or .Values.ingress.enabled .Values.tls.enabled }}
     {{- if not .Values.webappDomain }}
       {{- fail "webappDomain must be set when enabling ingress or tls" }}
     {{- end }}
+  {{- end }}
+  {{- if and (ne $ingressMode "nginx") (ne $ingressMode "envoy") (ne $ingressMode "migration") }}
+    {{- fail "ingress.mode must be one of nginx, envoy, or migration" }}
+  {{- end }}
+  {{- if and .Values.ingress.enabled (or (eq $ingressMode "envoy") (eq $ingressMode "migration")) (empty .Values.ingress.gateway.name) }}
+    {{- fail "ingress.gateway.name must be set when ingress.mode is envoy or migration" }}
+  {{- end }}
+  {{- if and .Values.ingress.enabled (eq $ingressMode "migration") (and (ne (default "nginx" .Values.ingress.migration.primary | lower) "nginx") (ne (default "nginx" .Values.ingress.migration.primary | lower) "envoy")) }}
+    {{- fail "ingress.migration.primary must be one of nginx or envoy" }}
+  {{- end }}
+  {{- if and .Values.ingress.renderCSPInIngress (eq $ingressMode "envoy") }}
+    {{- fail "ingress.renderCSPInIngress only works with ingress.mode=nginx or migration" }}
   {{- end }}
   {{- if and .Values.tls.enabled (not .Values.ingress.enabled) }}
     {{- fail "ingress.enabled must be true when tls.enabled is true" }}
@@ -52,6 +65,31 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
   {{- if and .Values.tls.enabled (not .Values.tls.useCertManager) (empty .Values.tls.existingSecretName) }}
     {{- fail "When tls.enabled is true, either tls.useCertManager must be true or tls.existingSecretName must be set" }}
   {{- end }}
+{{- end -}}
+
+{{- define "webapp.ingressMode" -}}
+{{- default "nginx" .Values.ingress.mode | lower -}}
+{{- end -}}
+
+{{- define "webapp.ingressPrimaryController" -}}
+{{- $mode := include "webapp.ingressMode" . -}}
+{{- if eq $mode "migration" -}}
+{{- default "nginx" .Values.ingress.migration.primary | lower -}}
+{{- else -}}
+{{- $mode -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "webapp.externalDnsWeight" -}}
+{{- $ctx := .ctx -}}
+{{- $kind := .kind -}}
+{{- if eq (include "webapp.ingressMode" $ctx) "migration" -}}
+{{- if eq (include "webapp.ingressPrimaryController" $ctx) $kind -}}
+100
+{{- else -}}
+0
+{{- end -}}
+{{- end -}}
 {{- end -}}
 
 {{- define "webapp.certificateSecretName" -}}

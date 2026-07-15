@@ -1,0 +1,44 @@
+{{- $ingressMode := include "webapp.ingressMode" . -}}
+{{- if and .Values.ingress.enabled (or (eq $ingressMode "envoy") (eq $ingressMode "migration")) }}
+{{- include "webapp.validateDomainConfig" . }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "webapp.baseName" . }}
+  labels:
+    app: {{ include "webapp.baseName" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  {{- if or .Values.ingress.httpRouteAnnotations (eq $ingressMode "migration") }}
+  annotations:
+    {{- range $key, $val := .Values.ingress.httpRouteAnnotations }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- $weight := include "webapp.externalDnsWeight" (dict "ctx" . "kind" "envoy") | trim -}}
+    {{- if $weight }}
+    external-dns.alpha.kubernetes.io/aws-weight: {{ $weight | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  parentRefs:
+    - name: {{ required "ingress.gateway.name must be set when ingress.mode is envoy or migration" .Values.ingress.gateway.name | quote }}
+      {{- if .Values.ingress.gateway.namespace }}
+      namespace: {{ .Values.ingress.gateway.namespace | quote }}
+      {{- else }}
+      namespace: {{ .Release.Namespace | quote }}
+      {{- end }}
+      kind: Gateway
+      sectionName: {{ default "https" .Values.ingress.gateway.sectionName | quote }}
+  hostnames:
+    - {{ .Values.webappDomain | quote }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {{ include "webapp.httpServiceName" . }}
+          port: {{ .Values.service.http.port | default .Values.service.http.internalPort }}
+          kind: Service
+{{- end }}

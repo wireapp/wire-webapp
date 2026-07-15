@@ -20,8 +20,27 @@ appendReleaseNameToResources: false
 
 ingress:
   enabled: false
+  # Controller mode for web traffic:
+  # - nginx: render only a Kubernetes Ingress
+  # - envoy: render only a Gateway API HTTPRoute
+  # - migration: render both and split external-dns weights between them
+  mode: nginx
   className: nginx
+  gateway:
+    # Gateway name used when ingress.mode is envoy or migration.
+    name: ""
+    # Optional namespace of the Gateway. Defaults to the release namespace.
+    namespace: ""
+    # Listener section name used by the HTTPRoute parentRef.
+    sectionName: https
+  migration:
+    # Which controller should receive external-dns weight 100 during migration.
+    # The other resource receives weight 0.
+    primary: nginx
+  # Ingress-specific annotations.
   annotations: {}
+  # HTTPRoute-specific annotations.
+  httpRouteAnnotations: {}
   renderCSPInIngress: false
 
 tls:
