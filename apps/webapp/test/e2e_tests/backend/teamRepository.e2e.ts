@@ -88,4 +88,52 @@ export class TeamRepositoryE2E extends BackendClientE2E {
       },
     });
   }
+
+  public async upgradeTeam(teamId: string, user: User) {
+    await this.axiosInstance.put(
+      `/teams/${teamId}/billing/info`,
+      {
+        firstname: 'Test',
+        lastname: 'User',
+        company: 'E2E Test Company',
+        street: '123 Test Street',
+        zip: '12345',
+        city: 'Berlin',
+        country: 'DE',
+      },
+      {headers: {Authorization: `Bearer ${user.token}`}},
+    );
+
+    await this.axiosInstance.put(
+      `/teams/${teamId}/billing/card`,
+      {
+        // tok_visa is a pre-built test token provided by Stripe for test mode environments.
+        // It represents the card number 4242424242424242 (Visa, always succeeds) without needing to go through the Stripe.js card tokenization flow.
+        stripeToken: 'tok_visa',
+      },
+      {headers: {Authorization: `Bearer ${user.token}`}},
+    );
+
+    const plansResponse = await this.axiosInstance.get(`teams/${teamId}/billing/plan/list`, {
+      headers: {Authorization: `Bearer ${user.token}`},
+    });
+    if (!Array.isArray(plansResponse.data) || plansResponse.data.length < 1) {
+      throw new Error('No valid enterprise plans found to upgrade to');
+    }
+
+    const plan = plansResponse.data.find(plan => plan.premium === true);
+
+    await this.axiosInstance.put(
+      `/teams/${teamId}/billing/subscription`,
+      {planId: plan.id},
+      {headers: {Authorization: `Bearer ${user.token}`}},
+    );
+
+    const {data: upgradedTeam} = await this.axiosInstance.get(`teams/${teamId}/billing/team`, {
+      headers: {Authorization: `Bearer ${user.token}`},
+    });
+    if (upgradedTeam.status !== 'active') {
+      throw new Error('Failed to upgrade team');
+    }
+  }
 }
