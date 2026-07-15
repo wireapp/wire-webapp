@@ -21,6 +21,7 @@ import {
   ADD_PERMISSION,
   CONVERSATION_ACCESS,
   CONVERSATION_CELLS_STATE,
+  CONVERSATION_TYPE,
   GROUP_CONVERSATION_TYPE,
 } from '../conversation/conversation';
 import {CONVERSATION_PROTOCOL} from '../team';
@@ -43,7 +44,7 @@ describe('meetingSchema', () => {
   const validMeetingConversation = {
     qualified_id: {id: 'conversation-id', domain: 'example.com'},
     creator: 'creator-id',
-    type: 0,
+    type: CONVERSATION_TYPE.REGULAR,
     access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.PRIVATE],
     access_role: 'activated',
     name: 'Weekly sync',
@@ -75,7 +76,7 @@ describe('meetingSchema', () => {
     conversation: validMeetingConversation,
   };
 
-  it('strips unknown fields from embedded conversation payloads', () => {
+  it('preserves canonical conversation fields and strips unknown meeting fields', () => {
     const result = meetingWithConversationSchema.safeParse({
       ...validMeetingWithConversation,
       conversation: {
@@ -91,9 +92,11 @@ describe('meetingSchema', () => {
       throw new Error('Expected meeting with conversation schema parse to succeed');
     }
 
-    expect(result.data.conversation).toEqual(validMeetingConversation);
+    expect(result.data.conversation).toEqual({
+      ...validMeetingConversation,
+      team: 'team-id',
+    });
     expect(result.data.conversation).not.toHaveProperty('invited_emails');
-    expect(result.data.conversation).not.toHaveProperty('team');
   });
 
   it('accepts meeting create/update payloads with embedded conversation', () => {
@@ -102,6 +105,38 @@ describe('meetingSchema', () => {
 
   it('rejects meeting create/update payloads without embedded conversation', () => {
     expect(meetingWithConversationSchema.safeParse(validMeeting).success).toBe(false);
+  });
+
+  it('rejects embedded conversations that are not MLS meeting conversations', () => {
+    expect(
+      meetingWithConversationSchema.safeParse({
+        ...validMeetingWithConversation,
+        conversation: {
+          ...validMeetingConversation,
+          group_conv_type: GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION,
+        },
+      }).success,
+    ).toBe(false);
+
+    expect(
+      meetingWithConversationSchema.safeParse({
+        ...validMeetingWithConversation,
+        conversation: {
+          ...validMeetingConversation,
+          protocol: CONVERSATION_PROTOCOL.PROTEUS,
+        },
+      }).success,
+    ).toBe(false);
+
+    expect(
+      meetingWithConversationSchema.safeParse({
+        ...validMeetingWithConversation,
+        conversation: {
+          ...validMeetingConversation,
+          group_id: undefined,
+        },
+      }).success,
+    ).toBe(false);
   });
 
   it('accepts a valid meeting payload', () => {

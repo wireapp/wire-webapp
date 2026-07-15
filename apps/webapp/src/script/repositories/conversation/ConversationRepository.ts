@@ -28,6 +28,7 @@ import {
   NewConversation,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
+import type {ValidatedMeetingConversation} from '@wireapp/api-client/lib/conversation/conversationSchema';
 import {
   ConversationReceiptModeUpdateData,
   MemberLeaveReason,
@@ -1335,7 +1336,7 @@ export class ConversationRepository {
   /**
    * Persists a meeting conversation returned by the meetings API or websocket.
    */
-  saveMeetingConversationFromBackend(conversationData: BackendConversation): Task<void, unknown> {
+  saveMeetingConversationFromBackend(conversationData: ValidatedMeetingConversation): Task<void, unknown> {
     return task.tryOrElse(
       error => error,
       async () => {
@@ -2567,6 +2568,11 @@ export class ConversationRepository {
         delete conversationData.participating_user_ids;
         delete conversationData.participating_user_ets;
         delete conversationData.connection;
+      }
+
+      // Preserve team ownership when the incoming payload has no team context.
+      if (!conversationData.teamId && existingConversation.teamId) {
+        delete conversationData.teamId;
       }
 
       // Apply merged data and persist the updated conversation

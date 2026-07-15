@@ -18,8 +18,8 @@
  */
 
 import {MeetingRecurrence} from './meetingRecurrence';
-import type {ValidatedMeetingConversation} from './meetingSchema';
 
+import type {ValidatedMeetingConversation} from '../conversation/conversationSchema';
 import {QualifiedId} from '../user/qualifiedId';
 
 export interface Meeting {

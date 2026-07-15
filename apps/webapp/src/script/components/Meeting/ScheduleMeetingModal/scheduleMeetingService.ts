@@ -18,7 +18,6 @@
  */
 
 import is from '@sindresorhus/is';
-import type {Conversation as BackendConversation} from '@wireapp/api-client/lib/conversation';
 import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
@@ -69,9 +68,7 @@ const saveMeetingConversationFromResponse = (
   onFailure: MeetingSubmitErrors,
 ): Task<void, MeetingSubmitErrors> =>
   conversation
-    ? conversationRepository
-        .saveMeetingConversationFromBackend(conversation as unknown as BackendConversation)
-        .mapRejected(() => onFailure)
+    ? conversationRepository.saveMeetingConversationFromBackend(conversation).mapRejected(() => onFailure)
     : task.resolve(undefined);
 
 /**

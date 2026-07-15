@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {
   CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
@@ -347,7 +348,7 @@ export class ConversationMapper {
 
     // Team ID from database or backend payload
     const teamId = conversationData.team_id ?? conversationData.team;
-    if (teamId !== undefined) {
+    if (is.nonEmptyString(teamId)) {
       conversationEntity.teamId = teamId;
     }
 
