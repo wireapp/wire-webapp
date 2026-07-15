@@ -27,12 +27,39 @@ ingress:
   mode: nginx
   className: nginx
   gateway:
+    # Envoy Gateway / Gateway API expectations when ingress.mode is envoy or migration:
+    # - Envoy Gateway v1.7.0 or newer is required for ListenerSet support.
+    # - ListenerSet is experimental in Envoy Gateway and must be enabled with the
+    #   `XListenerSet` feature flag in the EnvoyGateway configuration.
+    # - A Gateway (gateway.networking.k8s.io/v1) must already exist, or be created separately.
+    # - spec.gatewayClassName must point at the Envoy Gateway GatewayClass.
+    # - spec.allowedListeners must allow ListenerSet attachments from this chart's namespace.
+    #   `namespaces.from: All` is the broadest choice if you want to permit any namespace.
+    # Example:
+    # apiVersion: gateway.networking.k8s.io/v1
+    # kind: Gateway
+    # metadata:
+    #   name: envoy-gateway
+    # spec:
+    #   gatewayClassName: envoy-gateway # use the GatewayClass installed by Envoy Gateway
+    #   allowedListeners:
+    #     namespaces:
+    #       from: All
+    #   listeners:
+    #     - name: http
+    #       protocol: HTTP
+    #       port: 80
+    # - This chart creates a ListenerSet in the release namespace and an HTTPRoute that
+    #   attaches to it.
+    # - If tls.useCertManager=true and you rely on the default HTTP01 solver, the Gateway
+    #   must also expose an HTTP listener on port 80, or you must provide custom solvers.
     # Gateway name used when ingress.mode is envoy or migration.
     name: ""
     # Optional namespace of the Gateway. Defaults to the release namespace.
     namespace: ""
-    # Listener section name used by the HTTPRoute parentRef.
-    sectionName: https
+    # Listener section name used by the ListenerSet and HTTPRoute parentRef.
+    # Defaults to https when tls.enabled=true, otherwise http.
+    sectionName: ""
   migration:
     # Which controller should receive external-dns weight 100 during migration.
     # The other resource receives weight 0.

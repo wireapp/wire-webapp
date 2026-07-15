@@ -22,14 +22,10 @@ metadata:
   {{- end }}
 spec:
   parentRefs:
-    - name: {{ required "ingress.gateway.name must be set when ingress.mode is envoy or migration" .Values.ingress.gateway.name | quote }}
-      {{- if .Values.ingress.gateway.namespace }}
-      namespace: {{ .Values.ingress.gateway.namespace | quote }}
-      {{- else }}
-      namespace: {{ .Release.Namespace | quote }}
-      {{- end }}
-      kind: Gateway
-      sectionName: {{ default "https" .Values.ingress.gateway.sectionName | quote }}
+    - name: {{ include "webapp.listenerSetName" . | quote }}
+      kind: ListenerSet
+      group: gateway.networking.k8s.io
+      sectionName: {{ include "webapp.listenerName" . | quote }}
   hostnames:
     - {{ .Values.webappDomain | quote }}
   rules:

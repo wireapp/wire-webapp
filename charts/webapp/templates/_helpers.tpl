@@ -50,6 +50,9 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
   {{- if and (ne $ingressMode "nginx") (ne $ingressMode "envoy") (ne $ingressMode "migration") }}
     {{- fail "ingress.mode must be one of nginx, envoy, or migration" }}
   {{- end }}
+  {{- if and (or (eq $ingressMode "envoy") (eq $ingressMode "migration")) (not .Values.ingress.enabled) }}
+    {{- fail "ingress.enabled must be true when ingress.mode is envoy or migration" }}
+  {{- end }}
   {{- if and .Values.ingress.enabled (or (eq $ingressMode "envoy") (eq $ingressMode "migration")) (empty .Values.ingress.gateway.name) }}
     {{- fail "ingress.gateway.name must be set when ingress.mode is envoy or migration" }}
   {{- end }}
@@ -89,6 +92,36 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- else -}}
 0
 {{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "webapp.listenerSetName" -}}
+{{- printf "%s-listeners" (include "webapp.baseName" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "webapp.listenerName" -}}
+{{- if .Values.ingress.gateway.sectionName -}}
+{{- .Values.ingress.gateway.sectionName -}}
+{{- else if .Values.tls.enabled -}}
+https
+{{- else -}}
+http
+{{- end -}}
+{{- end -}}
+
+{{- define "webapp.listenerProtocol" -}}
+{{- if .Values.tls.enabled -}}
+HTTPS
+{{- else -}}
+HTTP
+{{- end -}}
+{{- end -}}
+
+{{- define "webapp.listenerPort" -}}
+{{- if .Values.tls.enabled -}}
+443
+{{- else -}}
+80
 {{- end -}}
 {{- end -}}
 
