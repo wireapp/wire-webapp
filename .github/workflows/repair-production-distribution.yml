@@ -1,0 +1,143 @@
+---
+name: Repair Production distribution
+
+on:
+  workflow_dispatch:
+    inputs:
+      production_tag:
+        description: 'Existing verified immutable Production tag to repair'
+        required: true
+        type: string
+      source_run_id:
+        description: 'Release Cloud run containing the distribution artifact'
+        required: true
+        type: string
+      distribution_artifact_name:
+        description: 'Exact distribution context artifact from Release Cloud'
+        required: true
+        type: string
+      confirm_repair:
+        description: 'Confirm repair publication for the existing Production release'
+        required: true
+        default: false
+        type: boolean
+      reason:
+        description: 'Reason for repairing the incomplete distribution'
+        required: true
+        type: string
+
+concurrency:
+  group: release-cloud-production
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  validate_repair:
+    name: Validate Production repair request
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      production_tag: ${{ steps.resolve_tag.outputs.production_tag }}
+      expected_commit_sha: ${{ steps.resolve_tag.outputs.expected_commit_sha }}
+
+    steps:
+      - name: Checkout repository for tag validation
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: main
+
+      - name: Validate repair confirmation and resolve annotated tag
+        id: resolve_tag
+        env:
+          CONFIRM_REPAIR: ${{ inputs.confirm_repair }}
+          PRODUCTION_TAG: ${{ inputs.production_tag }}
+          REASON: ${{ inputs.reason }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${CONFIRM_REPAIR}" != 'true' ]]; then
+            echo 'confirm_repair must be true for a manual distribution repair.' >&2
+            exit 1
+          fi
+
+          if [[ -z "${REASON//[[:space:]]/}" ]]; then
+            echo 'reason must explain the manual distribution repair.' >&2
+            exit 1
+          fi
+
+          if [[ ! "${PRODUCTION_TAG}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*-production$ ]]; then
+            echo "production_tag must match YYYY-MM-DD.N-production: ${PRODUCTION_TAG}" >&2
+            exit 1
+          fi
+
+          git ls-remote --exit-code --tags origin "refs/tags/${PRODUCTION_TAG}" >/dev/null
+          git fetch --no-tags origin "refs/tags/${PRODUCTION_TAG}:refs/tags/${PRODUCTION_TAG}"
+
+          if [[ "$(git cat-file -t "refs/tags/${PRODUCTION_TAG}")" != 'tag' ]]; then
+            echo "Production tag ${PRODUCTION_TAG} is not annotated." >&2
+            exit 1
+          fi
+
+          expected_commit_sha="$(git rev-parse "refs/tags/${PRODUCTION_TAG}^{commit}")"
+          {
+            echo "production_tag=${PRODUCTION_TAG}"
+            echo "expected_commit_sha=${expected_commit_sha}"
+          } >> "${GITHUB_OUTPUT}"
+
+  publish_distribution:
+    name: Publish Production distribution repair
+    needs: validate_repair
+    if: ${{ needs.validate_repair.result == 'success' }}
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/publish-production-distribution.yml
+    with:
+      production_tag: ${{ needs.validate_repair.outputs.production_tag }}
+      expected_commit_sha: ${{ needs.validate_repair.outputs.expected_commit_sha }}
+      source_run_id: ${{ inputs.source_run_id }}
+      distribution_artifact_name: ${{ inputs.distribution_artifact_name }}
+    secrets:
+      WEBTEAM_QUAY_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+      WEBTEAM_QUAY_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+      WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
+
+  notify_repair_failure:
+    name: Notify Production repair failure
+    runs-on: ubuntu-24.04
+    needs: [validate_repair, publish_distribution]
+    if: ${{ always() && (needs.validate_repair.result == 'failure' || needs.publish_distribution.result == 'failure') }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: main
+          sparse-checkout: .github/actions/notify-deployoholics
+
+      - name: Announce Production repair failure
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: failure
+          text: |
+            ❌ Production distribution repair failed ❌
+
+            Production tag: ${{ inputs.production_tag }}
+            Expected release commit: ${{ needs.validate_repair.outputs.expected_commit_sha || 'unresolved' }}
+            Docker image tag: ${{ needs.publish_distribution.outputs.docker_image_tag || 'unavailable' }}
+            Helm chart version: ${{ needs.publish_distribution.outputs.helm_chart_version || 'unavailable' }}
+            wire-builds commit: ${{ needs.publish_distribution.outputs.wire_builds_commit_sha || 'publication failed or unavailable' }}
+            Source workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ inputs.source_run_id }}
+            Repair reason: ${{ inputs.reason }}
+            Workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

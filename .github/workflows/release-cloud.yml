@@ -26,7 +26,7 @@ on:
         type: string
 
 concurrency:
-  group: release-cloud-beta-${{ inputs.release_branch }}
+  group: ${{ inputs.promote_to_production && 'release-cloud-production' || format('release-cloud-beta-{0}', inputs.release_branch) }}
   cancel-in-progress: false
 
 permissions: {}
@@ -89,6 +89,7 @@ jobs:
       artifact_checksum: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
       artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
       artifact_version: ${{ steps.artifact_metadata.outputs.artifact_version }}
+      distribution_artifact_name: ${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
       release_branch: ${{ steps.release_metadata.outputs.release_branch }}
       release_commit_sha: ${{ steps.release_metadata.outputs.release_commit_sha }}
       release_identifier: ${{ steps.release_metadata.outputs.release_identifier }}
@@ -156,6 +157,59 @@ jobs:
             echo "artifact_checksum=${artifact_checksum}"
             echo "artifact_version=${artifact_version}"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Prepare exact public Docker distribution context
+        if: ${{ inputs.promote_to_production }}
+        id: distribution_artifact
+        env:
+          ARTIFACT_CHECKSUM: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
+          ARTIFACT_VERSION: ${{ steps.artifact_metadata.outputs.artifact_version }}
+          RELEASE_COMMIT_SHA: ${{ steps.release_metadata.outputs.release_commit_sha }}
+          RELEASE_IDENTIFIER: ${{ steps.release_metadata.outputs.release_identifier }}
+        run: |
+          set -euo pipefail
+
+          distribution_artifact_name="release-cloud-distribution-context-${RELEASE_IDENTIFIER}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          distribution_context_directory="${RUNNER_TEMP}/${distribution_artifact_name}"
+          mkdir -p \
+            "${distribution_context_directory}/apps/server" \
+            "${distribution_context_directory}/libraries/config" \
+            "${distribution_context_directory}/bin"
+
+          cp -a package.json yarn.lock .yarnrc.yml .npmrc run.sh .env.defaults "${distribution_context_directory}/"
+          cp -a .yarn "${distribution_context_directory}/.yarn"
+          cp -a bin/yarn "${distribution_context_directory}/bin/yarn"
+          cp -a apps/server/Dockerfile apps/server/package.json "${distribution_context_directory}/apps/server/"
+          cp -a apps/server/dist "${distribution_context_directory}/apps/server/dist"
+          cp -a libraries/config/package.json libraries/config/lib "${distribution_context_directory}/libraries/config/"
+
+          jq -n \
+            --arg release_identifier "${RELEASE_IDENTIFIER}" \
+            --arg release_commit_sha "${RELEASE_COMMIT_SHA}" \
+            --arg artifact_version "${ARTIFACT_VERSION}" \
+            --arg cloud_artifact_checksum "${ARTIFACT_CHECKSUM}" \
+            --arg source_run_id "${GITHUB_RUN_ID}" \
+            --arg source_run_attempt "${GITHUB_RUN_ATTEMPT}" \
+            '{
+              productionTag: null,
+              releaseIdentifier: $release_identifier,
+              releaseCommitSha: $release_commit_sha,
+              artifactVersion: $artifact_version,
+              cloudArtifactChecksum: $cloud_artifact_checksum,
+              sourceRunId: $source_run_id,
+              sourceRunAttempt: $source_run_attempt
+            }' > "${distribution_context_directory}/distribution-manifest.json"
+
+          echo "distribution_artifact_name=${distribution_artifact_name}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload exact public Docker distribution context
+        if: ${{ inputs.promote_to_production }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
+          path: ${{ runner.temp }}/${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
+          if-no-files-found: error
+          include-hidden-files: true
 
       - name: Upload build artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -344,7 +398,7 @@ jobs:
 
     steps:
       - name: Checkout release commit
-        if: ${{ inputs.promote_to_production == true }}
+        if: ${{ inputs.promote_to_production }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
@@ -352,18 +406,18 @@ jobs:
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
       - name: Add repository Yarn wrapper to PATH
-        if: ${{ inputs.promote_to_production == true }}
+        if: ${{ inputs.promote_to_production }}
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
 
       - name: Setup Node.js
-        if: ${{ inputs.promote_to_production == true }}
+        if: ${{ inputs.promote_to_production }}
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Install dependencies
-        if: ${{ inputs.promote_to_production == true }}
+        if: ${{ inputs.promote_to_production }}
         run: ./bin/yarn --immutable
 
       - name: Check Production promotion eligibility
@@ -459,10 +513,6 @@ jobs:
     permissions: {}
     # Production approval is enforced by the wire-webapp-prod GitHub Environment settings.
     environment: wire-webapp-prod
-    concurrency:
-      group: release-cloud-production
-      cancel-in-progress: false
-
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
@@ -596,6 +646,26 @@ jobs:
 
           echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "$GITHUB_OUTPUT"
 
+  publish_production_distribution:
+    name: Publish Production distribution
+    needs: [build_artifact, create_production_tag]
+    if: ${{ needs.create_production_tag.result == 'success' && inputs.promote_to_production }}
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/publish-production-distribution.yml
+    with:
+      production_tag: ${{ needs.create_production_tag.outputs.production_tag_name }}
+      expected_commit_sha: ${{ needs.build_artifact.outputs.release_commit_sha }}
+      source_run_id: ${{ github.run_id }}
+      distribution_artifact_name: ${{ needs.build_artifact.outputs.distribution_artifact_name }}
+    secrets:
+      WEBTEAM_QUAY_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+      WEBTEAM_QUAY_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+      WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
+
   summarize_release:
     name: Summarize release
     runs-on: ubuntu-24.04
@@ -609,6 +679,7 @@ jobs:
         deploy_to_production,
         verify_production_runtime,
         create_production_tag,
+        publish_production_distribution,
       ]
     if: ${{ always() }}
     permissions: {}
@@ -639,6 +710,11 @@ jobs:
           PRODUCTION_RUNTIME_BACKEND_WS: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}
           PRODUCTION_WEBAPP_URL: ${{ env.PRODUCTION_WEBAPP_URL }}
           PRODUCTION_ARTIFACT_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
+          PRODUCTION_DISTRIBUTION_RESULT: ${{ needs.publish_production_distribution.outputs.distribution_result }}
+          PRODUCTION_DISTRIBUTION_JOB_RESULT: ${{ needs.publish_production_distribution.result }}
+          PRODUCTION_DOCKER_IMAGE_TAG: ${{ needs.publish_production_distribution.outputs.docker_image_tag }}
+          PRODUCTION_HELM_CHART_VERSION: ${{ needs.publish_production_distribution.outputs.helm_chart_version }}
+          PRODUCTION_WIRE_BUILDS_COMMIT_SHA: ${{ needs.publish_production_distribution.outputs.wire_builds_commit_sha }}
           PRODUCTION_SKIPPED_REASON: ${{ needs.production_preflight.outputs.production_skipped_reason }}
           PRODUCTION_TAG_CREATION_RESULT: ${{ needs.create_production_tag.result }}
           PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
@@ -710,6 +786,11 @@ jobs:
             echo "- Production artifact name: ${PRODUCTION_ARTIFACT_NAME}"
             echo "- Production artifact checksum: ${PRODUCTION_ARTIFACT_CHECKSUM}"
             echo "- Production approval gate: ${PRODUCTION_ENVIRONMENT_NAME} GitHub Environment settings"
+            echo "- Production distribution job result: ${PRODUCTION_DISTRIBUTION_JOB_RESULT}"
+            echo "- Production distribution result: ${PRODUCTION_DISTRIBUTION_RESULT:-not run}"
+            echo "- Production Docker image tag: ${PRODUCTION_DOCKER_IMAGE_TAG:-unavailable}"
+            echo "- Production Helm chart version: ${PRODUCTION_HELM_CHART_VERSION:-unavailable}"
+            echo "- wire-builds/main commit: ${PRODUCTION_WIRE_BUILDS_COMMIT_SHA:-unavailable}"
           } >> "$GITHUB_STEP_SUMMARY"
 
   notify_release_failure:
@@ -726,6 +807,7 @@ jobs:
         deploy_to_production,
         verify_production_runtime,
         create_production_tag,
+        publish_production_distribution,
       ]
     if: ${{ always() && contains(join(needs.*.result, ','), 'failure') }}
     permissions:
@@ -760,13 +842,21 @@ jobs:
             Production deployment: ${{ needs.deploy_to_production.result }}
             Production runtime verification: ${{ needs.verify_production_runtime.result }}
             Production tag: ${{ needs.create_production_tag.result }}
+            Production distribution: ${{ needs.publish_production_distribution.result }}
 
             Production runtime verification result: ${{ needs.verify_production_runtime.result }}
             Expected Production build version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
             Expected Production release commit: ${{ needs.build_artifact.outputs.release_commit_sha || 'unavailable' }}
+            Production tag name: ${{ needs.create_production_tag.outputs.production_tag_name || needs.production_preflight.outputs.production_tag_name || 'unavailable' }}
+            Docker image tag: ${{ needs.publish_production_distribution.outputs.docker_image_tag || 'unavailable' }}
+            Helm chart version: ${{ needs.publish_production_distribution.outputs.helm_chart_version || 'unavailable' }}
+            wire-builds result: ${{ needs.publish_production_distribution.outputs.wire_builds_commit_sha || 'publication failed or unavailable' }}
 
             Playwright report: ${{ needs.run_e2e.outputs.reportUrl || 'unavailable' }}
-            Workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Source workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-            ${{ needs.verify_production_runtime.result == 'failure' && 'Production deployment completed, but live runtime verification failed.' || 'Production was blocked because a release gate failed.' }}
-            ${{ needs.verify_production_runtime.result == 'failure' && 'No Production tag was created.' || 'Production tag creation was blocked by the failed release gate.' }}
+            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'Cloud Production deployment and verification succeeded.' || 'Production was blocked because a release gate failed.' }}
+            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'The Production tag exists.' || 'Production tag creation was blocked by the failed release gate.' }}
+            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'Docker, Helm, or wire-builds publication failed.' || '' }}
+            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'The release is incomplete for on-premises distribution.' || '' }}
+            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'No Production tag was moved or deleted.' || '' }}

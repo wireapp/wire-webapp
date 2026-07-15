@@ -1,0 +1,172 @@
+---
+name: Publish Production distribution
+
+on:
+  workflow_call:
+    inputs:
+      production_tag:
+        description: 'Verified immutable Production tag'
+        required: true
+        type: string
+      expected_commit_sha:
+        description: 'Release commit expected by the Production tag'
+        required: true
+        type: string
+      source_run_id:
+        description: 'Release Cloud run that created the distribution artifact'
+        required: true
+        type: string
+      distribution_artifact_name:
+        description: 'Exact distribution context artifact from Release Cloud'
+        required: true
+        type: string
+    outputs:
+      docker_image_tag:
+        description: 'Immutable Quay image tag'
+        value: ${{ jobs.publish_distribution.outputs.docker_image_tag }}
+      helm_chart_version:
+        description: 'Selected WebApp Helm chart version'
+        value: ${{ jobs.publish_distribution.outputs.helm_chart_version }}
+      wire_builds_commit_sha:
+        description: 'Verified wire-builds/main commit'
+        value: ${{ jobs.publish_distribution.outputs.wire_builds_commit_sha }}
+      distribution_result:
+        description: 'Distribution result'
+        value: ${{ jobs.publish_distribution.outputs.distribution_result }}
+    secrets:
+      WEBTEAM_QUAY_USERNAME:
+        required: true
+      WEBTEAM_QUAY_PASSWORD:
+        required: true
+      CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID:
+        required: true
+      CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY:
+        required: true
+      WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN:
+        required: true
+
+permissions: {}
+
+env:
+  CHART_REPOSITORY_NAME: charts-webapp
+  CHART_REPOSITORY_URL: s3://public.wire.com/charts-webapp
+  DOCKER_REPOSITORY: quay.io/wire/webapp
+  DISTRIBUTION_CONTEXT_PATH: distribution-context
+  WIRE_BUILDS_REPOSITORY: wireapp/wire-builds
+
+jobs:
+  publish_distribution:
+    name: Publish Docker, Helm, and wire-builds distribution
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      docker_image_tag: ${{ steps.publish_docker.outputs.docker_image_tag }}
+      helm_chart_version: ${{ steps.publish_helm.outputs.helm_chart_version }}
+      wire_builds_commit_sha: ${{ steps.update_wire_builds.outputs.wire_builds_commit_sha }}
+      distribution_result: ${{ steps.distribution_result.outputs.distribution_result }}
+
+    steps:
+      - name: Checkout exact Production tag
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ inputs.production_tag }}
+
+      - name: Download exact distribution context
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ inputs.distribution_artifact_name }}
+          path: ${{ env.DISTRIBUTION_CONTEXT_PATH }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_run_id }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install exact release dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Validate Production tag and distribution manifest
+        id: validate_identity
+        env:
+          DISTRIBUTION_CONTEXT_PATH: ${{ env.DISTRIBUTION_CONTEXT_PATH }}
+          EXPECTED_COMMIT_SHA: ${{ inputs.expected_commit_sha }}
+          PRODUCTION_TAG: ${{ inputs.production_tag }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: ./bin/validate-production-distribution.sh
+
+      - name: Setup Helm
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
+        with:
+          version: '3.21.3'
+
+      - name: Publish or reuse Docker image
+        id: publish_docker
+        env:
+          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+          DOCKER_REPOSITORY: ${{ env.DOCKER_REPOSITORY }}
+          PRODUCTION_IMAGE_TAG_OUTPUT_PATH: ${{ runner.temp }}/production-image-tag.txt
+          PRODUCTION_TAG: ${{ inputs.production_tag }}
+          RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
+          WIRE_WEBAPP_DOCKER_CONTEXT_PATH: ${{ env.DISTRIBUTION_CONTEXT_PATH }}
+          WIRE_WEBAPP_RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
+        run: ./bin/publish-production-docker.sh
+
+      - name: Publish or reuse Helm chart
+        id: publish_helm
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          CHART_REPOSITORY_NAME: ${{ env.CHART_REPOSITORY_NAME }}
+          CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
+        run: ./bin/publish-production-helm.sh
+
+      - name: Check out wire-builds main
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: ${{ env.WIRE_BUILDS_REPOSITORY }}
+          token: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
+          ref: main
+          path: wire-builds
+          fetch-depth: 1
+
+      - name: Update wire-builds main idempotently
+        id: update_wire_builds
+        env:
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
+          RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
+        working-directory: wire-builds
+        run: ../bin/update-wire-builds.sh
+
+      - name: Mark distribution complete
+        id: distribution_result
+        env:
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
+          WIRE_BUILDS_COMMIT_SHA: ${{ steps.update_wire_builds.outputs.wire_builds_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo 'distribution_result=success'
+          } >> "${GITHUB_OUTPUT}"
+
+          {
+            echo '## Production distribution'
+            echo "- Docker image: ${DOCKER_IMAGE_TAG}"
+            echo "- Helm chart: ${HELM_CHART_VERSION}"
+            echo "- wire-builds/main commit: ${WIRE_BUILDS_COMMIT_SHA}"
+          } >> "${GITHUB_STEP_SUMMARY}"
