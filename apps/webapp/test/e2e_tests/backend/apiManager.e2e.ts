@@ -33,6 +33,8 @@ import {TestServiceClientE2E} from './testServiceClient.e2e';
 import {UserRepositoryE2E} from './userRepository.e2e';
 
 import {User} from '../data/user';
+import {OktaClient} from './oktaClient.e2e';
+import {IdentityProviderRepository} from './identityProviderRespository.e2e';
 
 const TEST_API_VERSION = `v13`;
 
@@ -48,6 +50,8 @@ export class ApiManagerE2E {
   connection: ConnectionRepositoryE2E;
   callingService: CallingServiceClientE2E;
   properties: PropertiesRepositoryE2E;
+  okta: OktaClient;
+  identityProvider: IdentityProviderRepository;
 
   constructor(config: {backendUrl: string; basicAuth: string}) {
     const backendConfig = {backendUrl: config.backendUrl, apiVersion: TEST_API_VERSION};
@@ -55,6 +59,7 @@ export class ApiManagerE2E {
     this.inbucket = new InbucketClientE2E();
     this.testService = new TestServiceClientE2E();
     this.callingService = new CallingServiceClientE2E();
+    this.okta = new OktaClient();
 
     this.user = new UserRepositoryE2E(backendConfig);
     this.auth = new AuthRepositoryE2E(backendConfig);
@@ -64,6 +69,7 @@ export class ApiManagerE2E {
     this.featureConfig = new FeatureConfigRepositoryE2E(backendConfig);
     this.connection = new ConnectionRepositoryE2E(backendConfig);
     this.properties = new PropertiesRepositoryE2E(backendConfig);
+    this.identityProvider = new IdentityProviderRepository(backendConfig);
   }
 
   async addDevicesToUser(user: User, numberOfDevices: number) {

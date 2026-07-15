@@ -179,4 +179,8 @@ export class BrigRepositoryE2E {
   public async deleteDomainClaim(domain: string) {
     await this.axiosInstance.delete(`i/domain-registration/${domain}`);
   }
+
+  public async enableSSOFeature(teamId: string) {
+    await this.axiosInstance.put(`i/teams/${teamId}/features/sso`, {status: 'enabled'});
+  }
 }

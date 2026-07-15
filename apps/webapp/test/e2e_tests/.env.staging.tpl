@@ -35,6 +35,10 @@ SSO_CLAIMED_USER_EMAIL=op://Test Automation/Staging Claimed Domain User/email
 SSO_CLAIMED_USER_PASSWORD=op://Test Automation/Staging Claimed Domain User/password
 SSO_CLAIMED_DOMAIN_CODE=op://Test Automation/Staging Claimed Domain User/SSO code
 
+# Okta 
+OKTA_API_URL=op://Test Automation/OKTA_API_KEY/url
+OKTA_API_KEY=op://Test Automation/OKTA_API_KEY/password
+
 INBUCKET_USERNAME=op://Test Automation/BackendConnection staging/inbucketUsername
 INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection staging/inbucketPassword }}"
 INBUCKET_URL=op://Test Automation/BackendConnection staging/inbucketUrl
