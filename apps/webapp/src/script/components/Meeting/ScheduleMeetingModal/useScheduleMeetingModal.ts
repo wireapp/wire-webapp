@@ -22,11 +22,15 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, maybe} from 'true-myth';
 import {create} from 'zustand';
 
-import {getNextHourDateTime} from '@wireapp/react-ui-kit';
-
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 
+import {
+  getDefaultMeetingEndDateTime,
+  getDefaultScheduleMeetingStartDateTime,
+  resolveEndChange,
+  resolveStartChange,
+} from './scheduleMeetingDefaults';
 import type {
   ScheduleMeetingFormErrors,
   ScheduleMeetingFormState,
@@ -44,20 +48,12 @@ export type {ScheduleMeetingMode as ScheduleMeetingModalMode} from './scheduleMe
 
 export {hasScheduleMeetingFormErrors, validateScheduleMeetingForm};
 
-const MEETING_DURATION_MINUTES = 30;
-
-const getDefaultEndDateTime = (start: Date): Date => {
-  const end = new Date(start);
-  end.setMinutes(end.getMinutes() + MEETING_DURATION_MINUTES);
-  return end;
-};
-
-export const getDefaultScheduleMeetingFormState = (): ScheduleMeetingFormState => {
-  const start = getNextHourDateTime();
+export const getDefaultScheduleMeetingFormState = (wallClock: WallClock): ScheduleMeetingFormState => {
+  const start = getDefaultScheduleMeetingStartDateTime(wallClock);
   return {
     title: '',
     start: maybe.just(start),
-    end: maybe.just(getDefaultEndDateTime(start)),
+    end: maybe.just(getDefaultMeetingEndDateTime(start)),
     recurrence: 'doesNotRepeat',
     selectedUsers: [],
     participantsFilter: '',
@@ -73,7 +69,7 @@ type ScheduleMeetingModalState = {
   qualifiedConversation: Maybe<QualifiedId>;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
-  openCreate: () => void;
+  openCreate: (wallClock: WallClock) => void;
   openEdit: (
     meetingSeries: MeetingSeries,
     formState: ScheduleMeetingFormState,
@@ -81,7 +77,7 @@ type ScheduleMeetingModalState = {
     originalSelectedUsers: User[],
   ) => void;
   close: () => void;
-  reset: () => void;
+  reset: (wallClock: WallClock) => void;
   setTitle: (title: string) => void;
   setStart: (start: Maybe<Date>) => void;
   setEnd: (end: Maybe<Date>) => void;
@@ -92,10 +88,19 @@ type ScheduleMeetingModalState = {
   clearErrors: () => void;
 };
 
+const emptyFormState: ScheduleMeetingFormState = {
+  title: '',
+  start: maybe.nothing(),
+  end: maybe.nothing(),
+  recurrence: 'doesNotRepeat',
+  selectedUsers: [],
+  participantsFilter: '',
+};
+
 const initialState = {
   isOpen: false,
   mode: 'create' as ScheduleMeetingMode,
-  formState: getDefaultScheduleMeetingFormState(),
+  formState: emptyFormState,
   errors: {} as ScheduleMeetingFormErrors,
   editingMeetingId: Maybe.nothing<QualifiedId>(),
   qualifiedConversation: Maybe.nothing<QualifiedId>(),
@@ -105,11 +110,11 @@ const initialState = {
 
 export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, get) => ({
   ...initialState,
-  openCreate: () =>
+  openCreate: wallClock =>
     set({
       isOpen: true,
       mode: 'create',
-      formState: getDefaultScheduleMeetingFormState(),
+      formState: getDefaultScheduleMeetingFormState(wallClock),
       errors: {},
       editingMeetingId: Maybe.nothing(),
       qualifiedConversation: Maybe.nothing(),
@@ -139,22 +144,63 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       originalRecurrence: 'doesNotRepeat',
       originalSelectedUsers: [],
     }),
-  reset: () => set({...initialState, formState: getDefaultScheduleMeetingFormState()}),
+  reset: wallClock => set({...initialState, formState: getDefaultScheduleMeetingFormState(wallClock)}),
   setTitle: title =>
     set(state => ({
       formState: {...state.formState, title},
       errors: {...state.errors, title: undefined},
     })),
   setStart: start =>
-    set(state => ({
-      formState: {...state.formState, start},
-      errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined},
-    })),
+    set(state => {
+      if (start.isNothing) {
+        return {
+          formState: {...state.formState, start},
+          errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined},
+        };
+      }
+
+      const nextFormState = {...state.formState};
+
+      if (state.formState.end.isJust && state.formState.start.isJust) {
+        const resolved = resolveStartChange(state.formState.start.value, state.formState.end.value, start.value);
+        nextFormState.start = maybe.just(resolved.start);
+        nextFormState.end = maybe.just(resolved.end);
+      } else {
+        nextFormState.start = start;
+        nextFormState.end = maybe.just(getDefaultMeetingEndDateTime(start.value));
+      }
+
+      return {
+        formState: nextFormState,
+        errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined},
+      };
+    }),
   setEnd: end =>
-    set(state => ({
-      formState: {...state.formState, end},
-      errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined},
-    })),
+    set(state => {
+      if (end.isNothing) {
+        return {
+          formState: {...state.formState, end},
+          errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined},
+        };
+      }
+
+      const nextFormState = {...state.formState};
+
+      if (state.formState.start.isJust) {
+        const previousStart = state.formState.start.value;
+        const previousEnd = state.formState.end.unwrapOr(getDefaultMeetingEndDateTime(previousStart));
+        const resolved = resolveEndChange(previousStart, previousEnd, end.value);
+        nextFormState.start = maybe.just(resolved.start);
+        nextFormState.end = maybe.just(resolved.end);
+      } else {
+        nextFormState.end = end;
+      }
+
+      return {
+        formState: nextFormState,
+        errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined, startInPast: undefined},
+      };
+    }),
   setRecurrence: recurrence => set(state => ({formState: {...state.formState, recurrence}})),
   setSelectedUsers: selectedUsers => set(state => ({formState: {...state.formState, selectedUsers}})),
   setParticipantsFilter: participantsFilter => set(state => ({formState: {...state.formState, participantsFilter}})),

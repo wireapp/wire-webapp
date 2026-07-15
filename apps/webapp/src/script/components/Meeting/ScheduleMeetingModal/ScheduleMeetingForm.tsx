@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import is from '@sindresorhus/is';
 import type {Maybe} from 'true-myth';
@@ -129,6 +129,37 @@ export const ScheduleMeetingForm = ({
   );
 
   const todayValue = dateValueFromDate(wallClock.currentDate);
+  const currentDateTime = useMemo(
+    () => new Date(wallClock.currentTimestampInMilliseconds),
+    [wallClock.currentTimestampInMilliseconds],
+  );
+
+  const getMinTimeForDate = useCallback(
+    (date: Date | null): Date | null => {
+      if (date === null) {
+        return null;
+      }
+
+      const today = wallClock.currentDate;
+      const isToday =
+        date.getFullYear() === today.getFullYear() &&
+        date.getMonth() === today.getMonth() &&
+        date.getDate() === today.getDate();
+
+      return isToday ? currentDateTime : null;
+    },
+    [currentDateTime, wallClock],
+  );
+
+  const startMinTime = useMemo(
+    () => getMinTimeForDate(toDateTimePickerValue(formState.start)),
+    [formState.start, getMinTimeForDate],
+  );
+
+  const endMinTime = useMemo(
+    () => getMinTimeForDate(toDateTimePickerValue(formState.end)),
+    [formState.end, getMinTimeForDate],
+  );
 
   const endDateMinValue = useMemo(() => {
     if (formState.start.isNothing) {
@@ -137,7 +168,7 @@ export const ScheduleMeetingForm = ({
 
     const startDate = dateValueFromDate(formState.start.value);
     return startDate.compare(todayValue) > 0 ? startDate : todayValue;
-  }, [formState.start, wallClock]);
+  }, [formState.start, todayValue]);
 
   const startErrorText = firstNonEmptyError(errors.startInPast);
   const endErrorText = firstNonEmptyError(errors.endInPast, errors.endBeforeStart);
@@ -206,6 +237,7 @@ export const ScheduleMeetingForm = ({
           markInvalid={is.nonEmptyString(startErrorText)}
           errorText={startErrorText}
           minValue={todayValue}
+          minTime={startMinTime}
           menuPortalTarget={portalContainer}
           popoverPortalContainer={portalContainer}
         />
@@ -220,6 +252,8 @@ export const ScheduleMeetingForm = ({
           markInvalid={is.nonEmptyString(endErrorText)}
           errorText={endErrorText}
           minValue={endDateMinValue}
+          minTime={endMinTime}
+          dateDisabled
           menuPortalTarget={portalContainer}
           popoverPortalContainer={portalContainer}
         />
