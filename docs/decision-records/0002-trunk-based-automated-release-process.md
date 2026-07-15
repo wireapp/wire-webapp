@@ -34,6 +34,8 @@ flowchart LR
   productionEnvironment[Production]
   productionRuntimeVerification[Verify live Production runtime<br/>Artifact version and Production backends]
   productionTag[YYYY-MM-DD.N-production]
+  productionDistribution[Publish Docker image and Helm chart<br/>Update wire-builds/main]
+  manualDistributionRepair[Manual distribution repair<br/>Validate confirmation, reason, and tag]
   maintenanceBranch[maintenance/maintenance-line-key]
   maintenanceTag[maintenance-line-key-maintenance.X]
 
@@ -47,6 +49,8 @@ flowchart LR
   productionApproval -->|Approve candidate| productionEnvironment
   productionEnvironment -->|Deploy promoted artifact| productionRuntimeVerification
   productionRuntimeVerification -->|Verified runtime creates| productionTag
+  productionTag -->|Explicit reusable workflow| productionDistribution
+  manualDistributionRepair -->|Explicit reusable workflow| productionDistribution
   productionTag -->|Create only when needed| maintenanceBranch
   maintenanceBranch -->|Validated maintenance artifact creates| maintenanceTag
 
@@ -93,7 +97,7 @@ The release identifier uses the release branch name: `YYYY-MM-DD.N`. The full id
 The cloud release process is:
 
 - Every merge to `main` deploys continuously to Edge without an approval gate.
-- Creating or updating `release/YYYY-MM-DD.N` automatically starts the release workflow.
+- The release workflow is explicitly dispatched for `release/YYYY-MM-DD.N`; automatic release-branch triggering remains disabled during the transition.
 - The release workflow deploys the release branch to Beta.
 - After a successful beta deployment, the workflow creates a beta tag such as `YYYY-MM-DD.N-beta.1`, `YYYY-MM-DD.N-beta.2`, and so on.
 - Beta tag numbers are derived from existing beta tags for the release identifier. If concurrent workflows try to create the same tag for different commits, the later workflow must fail and be rerun after fetching the latest tags.
@@ -114,6 +118,16 @@ The cloud release process is:
 - Build version and source commit are separate evidence: the same source commit can produce different builds, so `/commit` proves the source revision while `/version` identifies the particular build generated and promoted by the current workflow.
 - Backend configuration is runtime state and is not inferred from build identity. Beta, precommit, and Production must each satisfy their expected combination of build version, source commit, REST backend, and WebSocket backend.
 - A successful deployment operation alone does not create a Production tag. The workflow creates the production tag `YYYY-MM-DD.N-production` only after all Production runtime assertions pass, so the tag represents a successfully deployed and verified runtime.
+- The cloud EBS artifact is built once and promoted unchanged through Beta, E2E, and Production.
+- A Production-capable run also preserves the exact public build outputs needed by the Dockerfile. The public Docker image is built from those outputs, from the same release commit, without rebuilding the application.
+- Docker and Helm publication starts only after Production deployment and runtime verification succeed and the immutable Production tag has been created.
+- `wire-builds/main` is updated only after the immutable image and Helm chart have been published or reused and verified.
+- A Production tag represents verified cloud deployment. The release is fully distributed only after the `wire-builds/main` update succeeds.
+- A distribution failure does not move or delete the Production tag. The Release Cloud run remains failed and identifies the release as incomplete for on-premises distribution.
+- A dedicated reusable distribution workflow is called explicitly by Release Cloud after the immutable Production tag exists. A separate manual repair workflow validates confirmation, reason, and the existing annotated Production tag before calling the same reusable workflow for a partial distribution failure. Publication is not triggered by a tag listener.
+- Docker, Helm, and `wire-builds/main` publication is retry-safe and idempotent. Existing immutable image and chart identities are reused, and an exact `wire-builds` entry is a no-op.
+- The current WebApp distribution policy is preserved: when no matching chart exists, Helm publication uses the prerelease chart version sequence consumed by `wire-builds/main`.
+- A `wire-builds/main` update may change only the top-level `version` and `helmCharts.webapp`; every other field and chart entry must remain byte-for-byte equivalent after normalized JSON comparison.
 - If Production runtime verification fails, Production remains untagged, the release workflow fails, Deployoholics receives a failure notification, and the release captain performs incident assessment.
 - If the current release branch commit already has the matching production tag, the release workflow must not redeploy that commit.
 - Production tags are immutable release history and are never moved or deleted.
@@ -123,6 +137,7 @@ Release workflows must be serialized:
 - A newer Beta run for the same release branch may cancel an older in-progress Beta run before deployment starts.
 - Only one Production deployment may run at a time for the repository.
 - Production deployments must not be cancelled automatically.
+- The repository-wide Production lock covers deployment, runtime verification, Production tag creation, Docker publication, Helm publication, and the `wire-builds/main` update. Manual distribution repairs use the same lock.
 
 - Release workflow failures and stalled approvals are monitored by the engineering release captain and announced in Wire.
 
@@ -143,6 +158,11 @@ flowchart TD
   deployToProduction[Deploy promoted beta artifact to Production]
   verifyProductionRuntime[Verify live Production runtime<br/>Build version, source commit, and Production backends]
   createProductionTag[Create YYYY-MM-DD.N-production]
+  publishDocker[Publish or reuse immutable Docker image]
+  publishHelm[Publish or reuse Helm chart<br/>Verify appVersion]
+  updateWireBuilds[Update or reuse wire-builds/main<br/>Verify exact WebApp fields]
+  repairDistribution[workflow_dispatch repair<br/>Validate reason, confirmation, and annotated tag]
+  distributionFailure[Distribution failure<br/>Production tag remains immutable]
   rollbackWorkflow[Rollback Production workflow_dispatch<br/>optional incident action]
   deployKnownGoodArtifact[Deploy previous known-good production artifact]
 
@@ -150,6 +170,11 @@ flowchart TD
   createReleaseBranch --> buildArtifact --> deployToBeta --> verifyBetaRuntime --> createBetaTag
   createBetaTag --> deployToE2E --> verifyE2ERuntime --> runEndToEndTests --> reportToTestiny
   reportToTestiny --> productionApproval --> deployToProduction --> verifyProductionRuntime --> createProductionTag
+  createProductionTag --> publishDocker --> publishHelm --> updateWireBuilds
+  repairDistribution -->|same reusable distribution workflow| publishDocker
+  updateWireBuilds -.-> distributionFailure
+  publishDocker -.-> distributionFailure
+  publishHelm -.-> distributionFailure
   createProductionTag -.-> rollbackWorkflow -.-> deployKnownGoodArtifact
 ```
 
