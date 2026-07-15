@@ -27,7 +27,7 @@ const isSameCalendarDay = (left: Date, right: Date): boolean =>
   left.getMonth() === right.getMonth() &&
   left.getDate() === right.getDate();
 
-const isAfter11Pm = (date: Date): boolean => date.getHours() > 23 || (date.getHours() === 23 && date.getMinutes() > 0);
+const isAfter11Pm = (date: Date): boolean => date.getHours() === 23 && date.getMinutes() > 0;
 
 export const getNextHalfHourDateTime = (now: Date): Date => {
   const totalMinutes = now.getHours() * 60 + now.getMinutes();
