@@ -20,19 +20,48 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {Result} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
-import {joinMeetingCall, joinMeetingCallErrors, type JoinMeetingCallDeps} from 'Components/Meeting/joinMeetingCall';
+import {
+  joinMeetingCall,
+  joinMeetingCallErrors,
+  type JoinMeetingCallDeps,
+  type JoinMeetingCallError,
+} from 'Components/Meeting/joinMeetingCall';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {showCallNotEstablishedModal, useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config} from 'src/script/Config';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
+
+type JoinMeetingCallResultHandlers = {
+  showConversationNotFoundModal: () => void;
+  showJoinFailedModal: () => void;
+};
+
+export const handleJoinMeetingCallResult = (
+  result: Result<void, JoinMeetingCallError>,
+  {showConversationNotFoundModal, showJoinFailedModal}: JoinMeetingCallResultHandlers,
+): void => {
+  if (!result.isErr) {
+    return;
+  }
+
+  if (result.error === joinMeetingCallErrors.conversationNotFound) {
+    showConversationNotFoundModal();
+    return;
+  }
+
+  if (result.error === joinMeetingCallErrors.joinFailed) {
+    showJoinFailedModal();
+  }
+};
 
 const useMeetingConversationCall = (qualifiedConversationId: QualifiedId) => {
   const callState = container.resolve(CallState);
@@ -82,16 +111,21 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
   const {isCallConnecting, isCallActive} = useMeetingConversationCall(qualifiedConversationId);
   const [isJoining, setIsJoining] = useState(false);
 
-  const guardCall = useNoInternetCallGuard({
-    description: translate('callNotEstablishedDescription'),
-    descriptionPoints: [
-      translate('callNotEstablishedDescriptionPoint1'),
-      translate('callNotEstablishedDescriptionPoint2'),
-      translate('callNotEstablishedDescriptionPoint3'),
-    ],
-    title: translate('callNotEstablishedTitle'),
-    translate,
-  });
+  const callNotEstablishedCopy = useMemo(
+    () => ({
+      description: translate('callNotEstablishedDescription'),
+      descriptionPoints: [
+        translate('callNotEstablishedDescriptionPoint1'),
+        translate('callNotEstablishedDescriptionPoint2'),
+        translate('callNotEstablishedDescriptionPoint3'),
+      ] as [string, string, string],
+      title: translate('callNotEstablishedTitle'),
+      translate,
+    }),
+    [translate],
+  );
+
+  const guardCall = useNoInternetCallGuard(callNotEstablishedCopy);
 
   const deps = useMemo<JoinMeetingCallDeps>(
     () => ({
@@ -129,11 +163,15 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
 
       setIsJoining(false);
 
-      if (result.isErr && result.error === joinMeetingCallErrors.conversationNotFound) {
-        showConversationNotFoundModal();
+      if (result.isErr) {
+        handleJoinMeetingCallResult(result, {
+          showConversationNotFoundModal,
+          showJoinFailedModal: () => showCallNotEstablishedModal(callNotEstablishedCopy),
+        });
       }
     });
   }, [
+    callNotEstablishedCopy,
     deps,
     guardCall,
     isCallActive,

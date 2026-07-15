@@ -24,6 +24,7 @@ import {task} from 'true-myth';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
 import {joinMeetingCall, joinMeetingCallErrors, type JoinMeetingCallDeps} from 'Components/Meeting/joinMeetingCall';
+import {unwrapErr} from 'Util/test/resultTestSupport';
 import {Call} from 'Repositories/calling/Call';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -55,22 +56,22 @@ const createDeps = (overrides: Partial<JoinMeetingCallDeps> = {}): JoinMeetingCa
 
   const conversationState = {
     findConversation: () => conversation,
-  } as ConversationState;
+  } as unknown as ConversationState;
 
   const conversationRepository = {
     safeGetConversationById: () => task.reject('not found'),
-  } as ConversationRepository;
+  } as unknown as ConversationRepository;
 
   const callingRepository = {
     findCall: () => undefined,
-  } as CallingRepository;
+  } as unknown as CallingRepository;
 
   const callingViewModel = {
     callActions: {
       answer: async () => {},
       startAudio: async () => {},
     },
-  } as CallingViewModel;
+  } as unknown as CallingViewModel;
 
   return {
     conversationState,
@@ -88,7 +89,7 @@ describe('joinMeetingCall', () => {
     const deps = createDeps({
       callingViewModel: {
         callActions: {answer, startAudio},
-      } as CallingViewModel,
+      } as unknown as CallingViewModel,
     });
 
     const result = await joinMeetingCall(deps, qualifiedConversationId);
@@ -107,13 +108,13 @@ describe('joinMeetingCall', () => {
     const deps = createDeps({
       conversationState: {
         findConversation: () => conversation,
-      } as ConversationState,
+      } as unknown as ConversationState,
       callingRepository: {
         findCall: () => incomingCall,
-      } as CallingRepository,
+      } as unknown as CallingRepository,
       callingViewModel: {
         callActions: {answer, startAudio},
-      } as CallingViewModel,
+      } as unknown as CallingViewModel,
     });
 
     const result = await joinMeetingCall(deps, qualifiedConversationId);
@@ -132,13 +133,13 @@ describe('joinMeetingCall', () => {
     const deps = createDeps({
       conversationState: {
         findConversation,
-      } as ConversationState,
+      } as unknown as ConversationState,
       conversationRepository: {
         safeGetConversationById,
-      } as ConversationRepository,
+      } as unknown as ConversationRepository,
       callingViewModel: {
         callActions: {answer: jest.fn(), startAudio},
-      } as CallingViewModel,
+      } as unknown as CallingViewModel,
     });
 
     const result = await joinMeetingCall(deps, qualifiedConversationId);
@@ -153,15 +154,57 @@ describe('joinMeetingCall', () => {
     const deps = createDeps({
       conversationState: {
         findConversation: () => undefined,
-      } as ConversationState,
+      } as unknown as ConversationState,
       conversationRepository: {
         safeGetConversationById: () => task.reject('not found'),
-      } as ConversationRepository,
+      } as unknown as ConversationRepository,
     });
 
     const result = await joinMeetingCall(deps, qualifiedConversationId);
 
     expect(result.isErr).toBe(true);
-    expect(result.error).toBe(joinMeetingCallErrors.conversationNotFound);
+    expect(unwrapErr(result)).toBe(joinMeetingCallErrors.conversationNotFound);
+  });
+
+  it('returns joinFailed when startAudio rejects', async () => {
+    const deps = createDeps({
+      callingViewModel: {
+        callActions: {
+          answer: jest.fn(),
+          startAudio: jest.fn(async () => {
+            throw new Error('start failed');
+          }),
+        },
+      } as unknown as CallingViewModel,
+    });
+
+    const result = await joinMeetingCall(deps, qualifiedConversationId);
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);
+  });
+
+  it('returns joinFailed when answer rejects', async () => {
+    const conversation = createMeetingConversation();
+    const incomingCall = createIncomingCall(conversation);
+
+    const deps = createDeps({
+      callingRepository: {
+        findCall: () => incomingCall,
+      } as unknown as CallingRepository,
+      callingViewModel: {
+        callActions: {
+          answer: jest.fn(async () => {
+            throw new Error('answer failed');
+          }),
+          startAudio: jest.fn(),
+        },
+      } as unknown as CallingViewModel,
+    });
+
+    const result = await joinMeetingCall(deps, qualifiedConversationId);
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);
   });
 });
