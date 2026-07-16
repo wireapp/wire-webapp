@@ -195,19 +195,18 @@ export const Conversations = ({
   // true when screen is smaller than 1000px
   const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
   const isSideBarOpen = sidebarStatus === SidebarStatus.OPEN;
-  const isConversationListCollapsed =
-    isConversationListCollapseEnabled && conversationListStatus === ConversationListStatus.CLOSED;
   const isConversationTab = isConversationListTab(currentTab);
   const canCollapseConversationList =
     isConversationListCollapseEnabled && isConversationTab && !isScreenLessThanMdBreakpoint;
+  const isConversationListCollapsed =
+    canCollapseConversationList && conversationListStatus === ConversationListStatus.CLOSED;
 
   useEffect(() => {
     if (isScreenLessThanMdBreakpoint) {
       setSidebarStatus(SidebarStatus.CLOSED);
-      setConversationListStatus(ConversationListStatus.OPEN);
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.SIDEBAR_COLLAPSE);
     }
-  }, [isScreenLessThanMdBreakpoint, setSidebarStatus, setConversationListStatus]);
+  }, [isScreenLessThanMdBreakpoint, setSidebarStatus]);
 
   // Get conversations with drafts for the draft filter
   const allConversations = [...conversations, ...archivedConversations];
@@ -292,13 +291,13 @@ export const Conversations = ({
   }, [isConversationListCollapsed, setConversationListStatus]);
 
   const toggleConversationList = useCallback(() => {
-    const willCollapse = !isConversationListCollapsed;
+    const willCollapse = conversationListStatus === ConversationListStatus.OPEN;
     setConversationListStatus(willCollapse ? ConversationListStatus.CLOSED : ConversationListStatus.OPEN);
     amplify.publish(
       WebAppEvents.ANALYTICS.EVENT,
       willCollapse ? EventName.UI.CONVERSATION_LIST_COLLAPSE : EventName.UI.CONVERSATION_LIST_UNCOLLAPSE,
     );
-  }, [isConversationListCollapsed, setConversationListStatus]);
+  }, [conversationListStatus, setConversationListStatus]);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
@@ -359,10 +358,6 @@ export const Conversations = ({
         onExitPreferences();
       }
 
-      if (!isConversationListTab(nextTab)) {
-        setConversationListStatus(ConversationListStatus.OPEN);
-      }
-
       if (nextTab === SidebarTabs.CELLS) {
         switchList(ListState.CELLS);
         switchContent(ContentState.CELLS);
@@ -388,7 +383,6 @@ export const Conversations = ({
       isMeetingsEnabled,
       clearConversationFilter,
       setCurrentTab,
-      setConversationListStatus,
     ],
   );
 
@@ -532,14 +526,14 @@ export const Conversations = ({
             onSearchEnterClick={handleEnterSearchClick}
             jumpToRecentSearch={jumpToRecentSearch}
             searchInputRef={searchInputRef}
-            isListCollapsed={isConversationListCollapsed && canCollapseConversationList}
+            isListCollapsed={isConversationListCollapsed}
             onExpandList={expandConversationList}
           />
         }
         conversationListRef={conversationListRef}
         setConversationListRef={setConversationListRef}
         hasHeader={!isPreferences}
-        isListCollapsed={isConversationListCollapsed && canCollapseConversationList}
+        isListCollapsed={isConversationListCollapsed}
         showListCollapseHandle={canCollapseConversationList}
         onToggleListCollapsed={toggleConversationList}
         sidebar={
