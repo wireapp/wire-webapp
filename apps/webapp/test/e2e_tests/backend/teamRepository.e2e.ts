@@ -108,7 +108,11 @@ export class TeamRepositoryE2E extends BackendClientE2E {
       });
       if (res.status !== 412) break;
 
-      console.log(`Failed to upgrade team with id ${teamId}, retrying in ${3_000 * (i + 1)} seconds...`, res.data);
+      if (i === 4) {
+        throw new Error(`Failed to set billing information for team with id ${teamId}`);
+      }
+
+      console.log(`Failed to upgrade team with id ${teamId}, retrying in ${3 * (i + 1)} seconds...`, res.data);
       await new Promise(res => setTimeout(res, 3_000 * (i + 1)));
     }
 
