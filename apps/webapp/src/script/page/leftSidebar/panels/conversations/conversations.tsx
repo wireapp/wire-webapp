@@ -282,13 +282,13 @@ export const Conversations = ({
       return;
     }
 
-    setConversationListStatus(ConversationListStatus.OPEN);
+    setConversationListStatus(ConversationListStatus.EXPANDED);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CONVERSATION_LIST_UNCOLLAPSE);
   }, [isConversationListCollapsed, setConversationListStatus]);
 
   const toggleConversationList = () => {
-    const willCollapse = conversationListStatus === ConversationListStatus.OPEN;
-    setConversationListStatus(willCollapse ? ConversationListStatus.CLOSED : ConversationListStatus.OPEN);
+    const willCollapse = conversationListStatus === ConversationListStatus.EXPANDED;
+    setConversationListStatus(willCollapse ? ConversationListStatus.COLLAPSED : ConversationListStatus.EXPANDED);
     amplify.publish(
       WebAppEvents.ANALYTICS.EVENT,
       willCollapse ? EventName.UI.CONVERSATION_LIST_COLLAPSE : EventName.UI.CONVERSATION_LIST_UNCOLLAPSE,

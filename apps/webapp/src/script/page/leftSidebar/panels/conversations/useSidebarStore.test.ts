@@ -72,13 +72,13 @@ describe('useSidebarStore', () => {
     const setItem = jest.mocked(Storage.prototype.setItem);
     setItem.mockClear();
 
-    useSidebarStore.getState().setConversationListStatus(ConversationListStatus.CLOSED);
+    useSidebarStore.getState().setConversationListStatus(ConversationListStatus.COLLAPSED);
 
     const persistedEntry = setItem.mock.calls.find(([key]) => key === 'sidebar-store');
     expect(persistedEntry).toBeDefined();
 
     const persistedState = JSON.parse(String(persistedEntry?.[1])).state;
-    expect(persistedState.conversationListStatus).toBe(ConversationListStatus.CLOSED);
+    expect(persistedState.conversationListStatus).toBe(ConversationListStatus.COLLAPSED);
   });
 
   describe('conversation list collapse', () => {
@@ -92,7 +92,7 @@ describe('useSidebarStore', () => {
       expect(
         getIsConversationListCollapsed({
           ...desktopCollapseParams,
-          conversationListStatus: ConversationListStatus.CLOSED,
+          conversationListStatus: ConversationListStatus.COLLAPSED,
         }),
       ).toBe(true);
 
@@ -100,15 +100,15 @@ describe('useSidebarStore', () => {
         getIsConversationListCollapsed({
           ...desktopCollapseParams,
           currentTab: SidebarTabs.PREFERENCES,
-          conversationListStatus: ConversationListStatus.CLOSED,
+          conversationListStatus: ConversationListStatus.COLLAPSED,
         }),
       ).toBe(false);
     });
 
     it('keeps stored collapse preference while visiting non-conversation tabs', () => {
-      useSidebarStore.getState().setConversationListStatus(ConversationListStatus.CLOSED);
+      useSidebarStore.getState().setConversationListStatus(ConversationListStatus.COLLAPSED);
 
-      expect(useSidebarStore.getState().conversationListStatus).toBe(ConversationListStatus.CLOSED);
+      expect(useSidebarStore.getState().conversationListStatus).toBe(ConversationListStatus.COLLAPSED);
       expect(
         getIsConversationListCollapsed({
           ...desktopCollapseParams,
@@ -123,7 +123,7 @@ describe('useSidebarStore', () => {
         getIsConversationListCollapsed({
           ...desktopCollapseParams,
           isScreenLessThanMdBreakpoint: true,
-          conversationListStatus: ConversationListStatus.CLOSED,
+          conversationListStatus: ConversationListStatus.COLLAPSED,
         }),
       ).toBe(false);
     });
@@ -133,7 +133,7 @@ describe('useSidebarStore', () => {
         getIsConversationListCollapsed({
           ...desktopCollapseParams,
           isFeatureEnabled: false,
-          conversationListStatus: ConversationListStatus.CLOSED,
+          conversationListStatus: ConversationListStatus.COLLAPSED,
         }),
       ).toBe(false);
       expect(getCanCollapseConversationList(desktopCollapseParams)).toBe(true);

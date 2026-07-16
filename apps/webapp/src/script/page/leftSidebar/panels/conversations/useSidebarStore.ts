@@ -82,8 +82,8 @@ export const SidebarStatus = {
 export type SidebarStatus = (typeof SidebarStatus)[keyof typeof SidebarStatus];
 
 export const ConversationListStatus = {
-  OPEN: 'OPEN',
-  CLOSED: 'CLOSED',
+  EXPANDED: 'EXPANDED',
+  COLLAPSED: 'COLLAPSED',
 } as const;
 
 export type ConversationListStatus = (typeof ConversationListStatus)[keyof typeof ConversationListStatus];
@@ -122,7 +122,7 @@ export const getIsConversationListCollapsed = ({
   conversationListStatus,
   ...params
 }: ConversationListCollapseParams & {conversationListStatus: ConversationListStatus}): boolean =>
-  getCanCollapseConversationList(params) && conversationListStatus === ConversationListStatus.CLOSED;
+  getCanCollapseConversationList(params) && conversationListStatus === ConversationListStatus.COLLAPSED;
 
 export interface SidebarStore {
   status: SidebarStatus;
@@ -146,7 +146,7 @@ const useSidebarStore = create<SidebarStore>()(
       },
       status: SidebarStatus.OPEN,
       setStatus: status => set({status: status}),
-      conversationListStatus: ConversationListStatus.OPEN,
+      conversationListStatus: ConversationListStatus.EXPANDED,
       setConversationListStatus: status => set({conversationListStatus: status}),
       visibleTabs: [...DEFAULT_TABS],
       setVisibleTabs: (tabs: SidebarTabs[]) => set({visibleTabs: tabs}),
