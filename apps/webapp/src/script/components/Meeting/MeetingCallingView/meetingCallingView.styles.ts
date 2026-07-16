@@ -17,24 +17,21 @@
  *
  */
 
-import {MeetingRecurrence} from './meetingRecurrence';
+import {CSSObject} from '@emotion/react';
 
-import type {ValidatedMeetingConversation} from '../conversation/conversationSchema';
-import {QualifiedId} from '../user/qualifiedId';
+export const meetingCallingViewStyles: CSSObject = {
+  position: 'absolute',
+  bottom: '24px',
+  left: '24px',
+  width: 'min(420px, calc(100% - 48px))',
+  zIndex: 2,
+  pointerEvents: 'auto',
+};
 
-export interface Meeting {
-  created_at: string;
-  end_time: string;
-  qualified_conversation: QualifiedId;
-  qualified_creator: QualifiedId;
-  qualified_id: QualifiedId;
-  recurrence?: MeetingRecurrence;
-  start_time: string;
-  title: string;
-  trial: boolean;
-  updated_at: string;
-}
-
-export interface MeetingWithConversation extends Meeting {
-  conversation: ValidatedMeetingConversation;
-}
+export const meetingsContentWrapperStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  height: '100%',
+  position: 'relative',
+};

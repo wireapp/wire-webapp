@@ -17,7 +17,11 @@
  *
  */
 
-import {CONVERSATION_TYPE, DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
+import {
+  CONVERSATION_TYPE,
+  DefaultConversationRoleName,
+  GROUP_CONVERSATION_TYPE,
+} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
 import 'jsdom-worker';
@@ -347,6 +351,24 @@ describe('CallingRepository', () => {
         CONV_TYPE.CONFERENCE_MLS,
         0,
         NO_MEETING,
+      );
+    });
+
+    it('starts a MLS conference call with meeting flag in a meeting conversation', async () => {
+      jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS);
+      conversation.groupConversationType(GROUP_CONVERSATION_TYPE.MEETING);
+      const callType = CALL_TYPE.NORMAL;
+      const MEETING_FLAG = 1;
+      spyOn(wCall, 'start');
+      await callingRepository.startCall(conversation);
+      expect(wCall.start).toHaveBeenCalledWith(
+        wUser,
+        conversation.id,
+        callType,
+        CONV_TYPE.CONFERENCE_MLS,
+        0,
+        MEETING_FLAG,
       );
     });
 

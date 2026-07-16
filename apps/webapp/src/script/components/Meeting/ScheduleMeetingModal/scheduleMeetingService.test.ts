@@ -18,6 +18,7 @@
  */
 
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 
@@ -72,29 +73,69 @@ const createConversation = (epoch = 0) => {
   return conversation;
 };
 
+const meetingConversationResponse = {
+  qualified_id: qualifiedConversation,
+  creator: 'creator-id',
+  type: 0,
+  access: ['invite', 'private'],
+  access_role: 'activated',
+  name: 'Weekly sync',
+  group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+  protocol: CONVERSATION_PROTOCOL.MLS,
+  group_id: groupId,
+  epoch: 0,
+  cells_state: 'ready',
+  add_permission: 'admins',
+  members: {
+    self: {
+      id: 'creator-id',
+      conversation_role: 'wire_admin',
+      hidden: false,
+      hidden_ref: null,
+      otr_archived: false,
+      otr_archived_ref: null,
+      otr_muted_ref: null,
+      otr_muted_status: null,
+      service: null,
+      status_ref: '0.0',
+      status_time: '1970-01-01T00:00:00.000Z',
+    },
+    others: [],
+  },
+};
+
 describe('scheduleMeeting', () => {
   const createDeps = ({
     createMeetingMock = jest.fn().mockReturnValue(
       task.resolve({
         qualified_conversation: qualifiedConversation,
         qualified_id: meetingId,
+        conversation: meetingConversationResponse,
       }),
     ),
+    saveMeetingConversationFromBackend = jest.fn().mockReturnValue(task.resolve(undefined)),
     safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation())),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
   }: {
     createMeetingMock?: jest.Mock;
+    saveMeetingConversationFromBackend?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     establishMeetingConversation?: jest.Mock;
     safeAddUsers?: jest.Mock;
-  } = {}): {deps: MeetingStoreDeps; createMeetingMock: jest.Mock; establishMeetingConversation: jest.Mock} => {
+  } = {}): {
+    deps: MeetingStoreDeps;
+    createMeetingMock: jest.Mock;
+    establishMeetingConversation: jest.Mock;
+    saveMeetingConversationFromBackend: jest.Mock;
+  } => {
     const meetingsRepository = {
       createMeeting: createMeetingMock,
       getMeetingsList: jest.fn(),
     } as unknown as MeetingsRepository;
 
     const conversationRepository = {
+      saveMeetingConversationFromBackend,
       safeGetConversationById,
       establishMeetingConversation,
       safeAddUsers,
@@ -104,11 +145,12 @@ describe('scheduleMeeting', () => {
       deps: {meetingsRepository, conversationRepository, wallClock},
       createMeetingMock,
       establishMeetingConversation,
+      saveMeetingConversationFromBackend,
     };
   };
 
   it('creates a meeting and establishes the MLS conversation without participants', async () => {
-    const {deps, createMeetingMock, establishMeetingConversation} = createDeps();
+    const {deps, createMeetingMock, establishMeetingConversation, saveMeetingConversationFromBackend} = createDeps();
 
     const result = await scheduleMeeting(formState, deps);
 
@@ -119,6 +161,7 @@ describe('scheduleMeeting', () => {
       start_time: futureStartIso,
       end_time: futureEndIso,
     });
+    expect(saveMeetingConversationFromBackend).toHaveBeenCalledWith(meetingConversationResponse);
     expect(establishMeetingConversation).toHaveBeenCalledWith({
       groupId,
       userIdsToAdd: [],
@@ -188,13 +231,21 @@ describe('scheduleMeeting', () => {
 
 describe('updateMeeting', () => {
   const createDeps = ({
-    updateMeetingMock = jest.fn().mockReturnValue(task.resolve({})),
+    updateMeetingMock = jest.fn().mockReturnValue(
+      task.resolve({
+        qualified_conversation: qualifiedConversation,
+        qualified_id: meetingId,
+        conversation: meetingConversationResponse,
+      }),
+    ),
+    saveMeetingConversationFromBackend = jest.fn().mockReturnValue(task.resolve(undefined)),
     safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation(1))),
     safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     safeRemoveMembers = jest.fn().mockReturnValue(task.resolve(undefined)),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
   }: {
     updateMeetingMock?: jest.Mock;
+    saveMeetingConversationFromBackend?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     safeAddUsers?: jest.Mock;
     safeRemoveMembers?: jest.Mock;
@@ -206,6 +257,7 @@ describe('updateMeeting', () => {
     } as unknown as MeetingsRepository;
 
     const conversationRepository = {
+      saveMeetingConversationFromBackend,
       safeGetConversationById,
       safeAddUsers,
       safeRemoveMembers,
@@ -215,6 +267,7 @@ describe('updateMeeting', () => {
     return {
       deps: {meetingsRepository, conversationRepository, wallClock},
       updateMeetingMock,
+      saveMeetingConversationFromBackend,
       safeGetConversationById,
       safeAddUsers,
       safeRemoveMembers,
@@ -227,7 +280,7 @@ describe('updateMeeting', () => {
     const bob = createUser('2');
     const charlie = createUser('3');
     const establishedConversation = createConversation(1);
-    const {deps, updateMeetingMock, safeRemoveMembers, safeAddUsers} = createDeps({
+    const {deps, updateMeetingMock, saveMeetingConversationFromBackend, safeRemoveMembers, safeAddUsers} = createDeps({
       safeGetConversationById: jest.fn().mockReturnValue(task.resolve(establishedConversation)),
     });
 
@@ -251,6 +304,7 @@ describe('updateMeeting', () => {
       start_time: futureStartIso,
       end_time: futureEndIso,
     });
+    expect(saveMeetingConversationFromBackend).toHaveBeenCalledWith(meetingConversationResponse);
     expect(safeRemoveMembers).toHaveBeenCalledWith(establishedConversation, [alice.qualifiedId]);
     expect(safeAddUsers).toHaveBeenCalledWith(establishedConversation, [charlie]);
   });

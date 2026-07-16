@@ -58,6 +58,7 @@ import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
 interface VideoCallProps {
   hasAccessToCamera?: boolean;
   teamState?: TeamState;
+  conversationDisplayName?: string;
 }
 
 interface AnsweringControlsProps {
@@ -83,6 +84,7 @@ export const CallingCell = ({
   callActions,
   isFullUi = false,
   hasAccessToCamera,
+  conversationDisplayName,
   callingRepository,
   propertiesRepository,
   setMaximizedParticipant,
@@ -105,12 +107,14 @@ export const CallingCell = ({
   const {
     isGroupOrChannel,
     isChannel,
+    isMeeting,
     participating_user_ets: userEts,
     selfUser,
     display_name: conversationName,
   } = useKoSubscribableChildren(conversation, [
     'isGroupOrChannel',
     'isChannel',
+    'isMeeting',
     'participating_user_ets',
     'selfUser',
     'display_name',
@@ -187,6 +191,8 @@ export const CallingCell = ({
 
   const videoGrid = useVideoGrid(call);
 
+  const isGroupCall = isGroupOrChannel || isMeeting;
+  const resolvedConversationName = conversationDisplayName ?? conversationName;
   const conversationParticipants = selfUser ? userEts.concat(selfUser) : userEts;
   const conversationUrl = generateConversationUrl(conversation.qualifiedId);
 
@@ -319,26 +325,26 @@ export const CallingCell = ({
   const call1To1StartedAlert = translate(
     isOutgoingVideoCall ? 'startedVideoCallingAlert' : 'startedAudioCallingAlert',
     {
-      conversationName,
+      conversationName: resolvedConversationName,
       cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
     },
   );
 
   const onGoingCallAlert = translate(isOutgoingVideoCall ? 'ongoingVideoCall' : 'ongoingAudioCall', {
-    conversationName,
+    conversationName: resolvedConversationName,
     cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
   const callGroupStartedAlert = translate(
     isOutgoingVideoCall ? 'startedVideoGroupCallingAlert' : 'startedGroupCallingAlert',
     {
-      conversationName,
+      conversationName: resolvedConversationName,
       cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
     },
   );
 
   const onGoingGroupCallAlert = translate(isOutgoingVideoCall ? 'ongoingGroupVideoCall' : 'ongoingGroupAudioCall', {
-    conversationName,
+    conversationName: resolvedConversationName,
     cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
@@ -362,7 +368,7 @@ export const CallingCell = ({
     <div css={callingContainer}>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
-          {translate('callConversationAcceptOrDecline', {conversationName})}
+          {translate('callConversationAcceptOrDecline', {conversationName: resolvedConversationName})}
         </p>
       )}
 
@@ -378,18 +384,18 @@ export const CallingCell = ({
           )}
 
           <CallingHeader
-            isGroup={isGroupOrChannel}
+            isGroupCall={isGroupCall}
             isChannel={isChannel}
             isOngoing={isOngoing}
             showAlert={showAlert}
             isVideoCall={isVideoCall}
             clearShowAlert={clearShowAlert}
             conversationUrl={conversationUrl}
-            callStartedAlert={isGroupOrChannel ? callGroupStartedAlert : call1To1StartedAlert}
-            ongoingCallAlert={isGroupOrChannel ? onGoingGroupCallAlert : onGoingCallAlert}
+            callStartedAlert={isGroupCall ? callGroupStartedAlert : call1To1StartedAlert}
+            ongoingCallAlert={isGroupCall ? onGoingGroupCallAlert : onGoingCallAlert}
             isTemporaryUser={isTemporaryUser === true}
             conversationParticipants={conversationParticipants}
-            conversationName={conversationName}
+            conversationName={resolvedConversationName}
             currentCallStatus={currentCallStatus}
             startedAt={startedAt}
             isCbrEnabled={isCbrEnabled}
@@ -453,7 +459,7 @@ export const CallingCell = ({
             isIncoming={isIncoming}
             isOutgoing={isOutgoing}
             isDeclined={isDeclined}
-            isGroup={isGroupOrChannel}
+            isGroup={isGroupCall}
             isVideoCall={isVideoCall}
             isOngoing={isOngoing}
             selfParticipant={selfParticipant}

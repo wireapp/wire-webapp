@@ -25,7 +25,7 @@ export const useMeetingActions = () => {
   const openCreate = useScheduleMeetingModal(state => state.openCreate);
 
   const handleMeetNow = () => {
-    // add calling functionality here
+    // TODO(Meet Now): create instant meeting, then joinMeetingCall (shared path; not wired yet)
   };
 
   const handleScheduleMeeting = () => {
