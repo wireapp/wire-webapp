@@ -108,7 +108,8 @@ The cloud release process is:
 - Temporary system outages require investigation and a manual decision on whether to rerun. Failed tests may be manually rerun only after investigation; automatic test reruns are not part of the release decision.
 - Successful E2E and Testiny reporting are required before Production promotion.
 - Production preflight is not allowed after any E2E failure, and QA approval cannot override a technically failed E2E gate in this workflow.
-- Failed release gates notify Deployoholics with stage evidence and Playwright report links when available.
+- Failed release gates use the Release Cloud failure notification with stage evidence and Playwright report links when available.
+- After a successful E2E gate and Production preflight, Release Cloud notifies Deployoholics that the candidate passed and reports whether Production is ready for approval, unnecessary because the release is already tagged, or not requested. Notification delivery is informational and does not gate the release. The reusable precommit workflow's optional failure notification remains disabled to prevent duplicate failure messages.
 - The production deployment job waits for GitHub Environment approval on the production environment.
 - GitHub Environment approval means the workflow pauses before using the production environment until configured reviewers approve or reject the deployment in GitHub.
 - Quality assurance owns the go/no-go quality gate.

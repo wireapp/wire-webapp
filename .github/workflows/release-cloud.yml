@@ -362,6 +362,9 @@ jobs:
 
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
 
+  # Release Cloud owns release-specific success and failure notifications.
+  # The reusable workflow's optional failure-only notification is intentionally
+  # not enabled here to prevent duplicate failure messages.
   run_e2e:
     name: Deploy to precommit and run E2E
     needs: [build_artifact, create_beta_tag]
@@ -383,6 +386,62 @@ jobs:
       WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
       WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
       TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+
+  notify_e2e_success:
+    name: Notify successful release E2E gate
+    runs-on: ubuntu-24.04
+    needs:
+      - build_artifact
+      - create_beta_tag
+      - run_e2e
+      - production_preflight
+    if: >-
+      ${{
+        always() &&
+        needs.run_e2e.result == 'success' &&
+        needs.production_preflight.result == 'success'
+      }}
+    continue-on-error: true
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/actions/notify-deployoholics
+
+      - name: Announce successful release E2E gate
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: success
+          text: |
+            ✅ Release E2E system gate passed ✅
+
+            Release: ${{ needs.build_artifact.outputs.release_identifier }}
+            Branch: ${{ needs.build_artifact.outputs.release_branch }}
+            Commit: ${{ needs.build_artifact.outputs.release_commit_sha }}
+            Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+            E2E system gate: ${{ needs.run_e2e.result }}
+            Production promotion requested: ${{ inputs.promote_to_production }}
+            Production preflight: ${{ needs.production_preflight.outputs.production_preflight_result }}
+            Production deployment required: ${{ needs.production_preflight.outputs.should_deploy }}
+            Playwright report: ${{ needs.run_e2e.outputs.reportUrl || 'unavailable' }}
+            Workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            ${{
+              needs.production_preflight.outputs.should_deploy == 'true' &&
+              'Production is ready for approval through the wire-webapp-prod GitHub Environment.' ||
+              inputs.promote_to_production &&
+              format(
+                'Production deployment is not required: {0}',
+                needs.production_preflight.outputs.production_skipped_reason
+              ) ||
+              'This was a Beta-only release run; Production promotion was not requested.'
+            }}
 
   production_preflight:
     name: Production preflight
