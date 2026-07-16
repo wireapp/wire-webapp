@@ -3,16 +3,19 @@ name: Publish and deploy webapp
 
 on:
   push:
-    branches: [master, dev]
+    # Main development publication is owned by publish-main.yml.
+    branches: [master]
     tags:
       - '*q1-2024*'
       - '*q2-2025*'
       - '*-staging.*'
       - '*-production.*'
 
+# Temporary shared lock until this legacy workflow is fully retired.
 concurrency:
-  group: publish-${{ github.ref }}
-  cancel-in-progress: true
+  group: publish-webapp-distribution
+  cancel-in-progress: false
+  queue: max
 
 jobs:
   build:
@@ -174,8 +177,6 @@ jobs:
 
           if [[ "${GITHUB_REF}" == *production* ]]; then
             wire_build_target_branches_json='["main"]'
-          elif [[ "${GITHUB_REF}" == *dev* ]]; then
-            wire_build_target_branches_json='["dev"]'
           elif [[ "${GITHUB_REF}" == *q1-2024* ]]; then
             wire_build_target_branches_json='["q1-2024"]'
           elif [[ "${GITHUB_REF}" == *q2-2025* ]]; then
@@ -305,9 +306,7 @@ jobs:
         run: |
           deployment_targets_json=""
 
-          if [[ "${GITHUB_REF}" == *dev* ]]; then
-            deployment_targets_json='["wire-webapp-dev", "wire-webapp-edge"]'
-          elif [[ "${GITHUB_REF}" == *master* ]]; then
+          if [[ "${GITHUB_REF}" == *master* ]]; then
             deployment_targets_json='["wire-webapp-main"]'
           elif [[ "${GITHUB_REF}" == *production* ]]; then
             deployment_targets_json='["wire-webapp-prod"]'
