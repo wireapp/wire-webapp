@@ -48,14 +48,14 @@
 
     &--conversation-list-collapsed {
       min-width: auto;
-
-      .team-mode & {
-        width: auto;
-      }
     }
 
     .team-mode & {
       width: calc(var(--conversation-list-width) + var(--teams-width));
+
+      &.left-column--conversation-list-collapsed {
+        width: auto;
+      }
     }
   }
 
