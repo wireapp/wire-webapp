@@ -47,6 +47,8 @@ import {
   searchInputWrapperStyles,
 } from './conversationHeader.styles';
 
+export const conversationsPanelHeadingId = 'conversations-heading';
+
 interface ConversationHeaderProps {
   currentTab: SidebarTabs;
   selfUser: User;
@@ -136,43 +138,51 @@ export const ConversationHeaderComponent = ({
   const showCreateButton =
     currentTab !== SidebarTabs.ARCHIVES && (canCreateGroupConversation() || canExternalUserCreateChannel);
 
+  const headerTitle = isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab];
+
   if (isListCollapsed) {
     return (
-      <div css={collapsedHeader}>
-        {showSearchInput && (
-          <div css={collapsedIconRow}>
-            <IconButton
-              onClick={handleCollapsedSearchClick}
-              data-uie-name="search-conversations"
-              css={collapsedIconButton}
-              title={searchInputPlaceholder}
-            >
-              <SearchIcon width={14} height={14} />
-            </IconButton>
-          </div>
-        )}
+      <>
+        <h2 id={conversationsPanelHeadingId} className="visually-hidden">
+          {headerTitle}
+        </h2>
 
-        {showCreateButton && (
-          <div css={collapsedIconRow}>
-            <IconButton
-              onClick={showCreateConversationModal}
-              data-uie-name="go-create-group"
-              css={collapsedIconButton}
-              title={translate('conversationDetailsActionCreateGroup')}
-            >
-              <Icon.PlusIcon />
-            </IconButton>
-          </div>
-        )}
-      </div>
+        <div css={collapsedHeader}>
+          {showSearchInput && (
+            <div css={collapsedIconRow}>
+              <IconButton
+                onClick={handleCollapsedSearchClick}
+                data-uie-name="search-conversations"
+                css={collapsedIconButton}
+                title={searchInputPlaceholder}
+              >
+                <SearchIcon width={14} height={14} />
+              </IconButton>
+            </div>
+          )}
+
+          {showCreateButton && (
+            <div css={collapsedIconRow}>
+              <IconButton
+                onClick={showCreateConversationModal}
+                data-uie-name="go-create-group"
+                css={collapsedIconButton}
+                title={translate('conversationDetailsActionCreateGroup')}
+              >
+                <Icon.PlusIcon />
+              </IconButton>
+            </div>
+          )}
+        </div>
+      </>
     );
   }
 
   return (
     <>
       <div css={header}>
-        <h2 css={label} data-uie-name="conversation-list-header-title">
-          {isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab]}
+        <h2 id={conversationsPanelHeadingId} css={label} data-uie-name="conversation-list-header-title">
+          {headerTitle}
         </h2>
 
         {showCreateButton && (

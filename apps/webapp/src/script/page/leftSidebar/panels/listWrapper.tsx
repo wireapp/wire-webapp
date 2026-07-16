@@ -28,6 +28,8 @@ import {useConnectionQuality} from 'src/script/hooks/useConnectionQuality';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scrollHelpers';
 
+export const getListWrapperHeadingId = (panelId: string): string => `${panelId}-heading`;
+
 const scrollStyle = css`
   flex: 1 1 auto;
   min-height: 150px;
@@ -63,6 +65,8 @@ interface LeftListWrapperProps {
   setConversationListRef?: (element: HTMLElement) => void;
   panelOverlay?: ReactNode;
   hideFooter?: boolean;
+  ariaLabelledBy?: string;
+  ariaLabel?: string;
   panelAttributes?: Record<string, string | boolean | undefined>;
 }
 
@@ -82,9 +86,13 @@ const ListWrapper = memo(
     setConversationListRef,
     panelOverlay,
     hideFooter = false,
+    ariaLabelledBy,
+    ariaLabel,
     panelAttributes,
   }: LeftListWrapperProps) => {
     const {translate} = useApplicationContext();
+    const defaultHeadingId = hasHeader && !headerElement && header ? getListWrapperHeadingId(id) : undefined;
+    const sectionAriaLabelledBy = ariaLabelledBy ?? defaultHeadingId;
     const calculateBorders = throttle((element: HTMLElement) => {
       window.requestAnimationFrame(() => {
         if (element.offsetHeight <= 0 || !isScrollable(element)) {
@@ -116,7 +124,14 @@ const ListWrapper = memo(
       <>
         {sidebar}
         {children !== null ? (
-          <div id={id} className={`left-list-${id} ${id}`} css={style} {...panelAttributes}>
+          <section
+            id={id}
+            className={`left-list-${id} ${id}`}
+            css={style}
+            aria-labelledby={sectionAriaLabelledBy}
+            aria-label={sectionAriaLabelledBy ? undefined : ariaLabel}
+            {...panelAttributes}
+          >
             {panelOverlay}
 
             {hasHeader && (
@@ -130,7 +145,7 @@ const ListWrapper = memo(
                 <div className="left-list-header-title-wrapper">
                   {headerElement || (
                     <>
-                      <h2 className="left-list-header-text" data-uie-name={headerUieName}>
+                      <h2 id={defaultHeadingId} className="left-list-header-text" data-uie-name={headerUieName}>
                         {header}
                       </h2>
 
@@ -163,7 +178,7 @@ const ListWrapper = memo(
             </FadingScrollbar>
 
             {!hideFooter && (footer ?? null)}
-          </div>
+          </section>
         ) : null}
       </>
     );

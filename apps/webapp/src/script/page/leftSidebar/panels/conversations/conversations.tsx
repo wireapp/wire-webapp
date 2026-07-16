@@ -52,7 +52,7 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {ConversationCallingView} from './conversationCallingView/conversationCallingView';
-import {ConversationHeader} from './conversationHeader';
+import {ConversationHeader, conversationsPanelHeadingId} from './conversationHeader';
 import {ConversationListCollapseHandle} from './conversationListCollapseHandle';
 import {conversationsSpacerStyles} from './conversations.styles';
 import {ConversationSidebar} from './conversationSidebar/conversationSidebar';
@@ -544,6 +544,7 @@ export const Conversations = ({
           ) : null
         }
         hideFooter={isConversationListCollapsed}
+        ariaLabelledBy={conversationsPanelHeadingId}
         panelAttributes={{'data-list-collapsed': isConversationListCollapsed}}
         sidebar={
           !isTemporaryGuest && (
