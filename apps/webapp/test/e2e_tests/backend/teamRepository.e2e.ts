@@ -112,8 +112,8 @@ export class TeamRepositoryE2E extends BackendClientE2E {
         throw new Error(`Failed to set billing information for team with id ${teamId}`);
       }
 
-      console.log(`Failed to upgrade team with id ${teamId}, retrying in ${3 * (i + 1)} seconds...`, res.data);
-      await new Promise(res => setTimeout(res, 3_000 * (i + 1)));
+      console.log(`Failed to upgrade team with id ${teamId}, retrying in ${1 * (i + 1)} seconds...`, res.data);
+      await new Promise(res => setTimeout(res, 1_000 * (i + 1)));
     }
 
     await this.axiosInstance.put(
