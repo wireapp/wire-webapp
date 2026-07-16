@@ -3,7 +3,7 @@ name: Publish and deploy webapp
 
 on:
   push:
-    branches: [master, dev, release/*]
+    branches: [master, dev]
     tags:
       - '*q1-2024*'
       - '*q2-2025*'
