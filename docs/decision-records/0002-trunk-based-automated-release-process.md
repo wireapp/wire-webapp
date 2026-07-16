@@ -96,7 +96,15 @@ The release identifier uses the release branch name: `YYYY-MM-DD.N`. The full id
 
 The cloud release process is:
 
-- Every merge to `main` deploys continuously to Edge without an approval gate.
+- `publish-main.yml` owns delivery of every `main` commit. It builds the internal application exactly once, then feeds the exact build outputs to both the Edge deployment and the development distribution.
+- The development distribution retains the external channel name `dev`: it publishes the Docker image and a matching prerelease Helm chart, then updates `wire-builds/dev`.
+- Internal integration environments consume `wire-builds/dev` downstream. The legacy `wire-webapp-dev` deployment is not restored.
+- `wire-builds/main` remains Production-only and is never updated by an ordinary `main` push.
+- Development and Production distributions share the same Helm repository and prerelease version namespace. Their Docker, Helm, and `wire-builds` publications use one shared, non-cancellable distribution lock.
+- Edge verifies that its artifact still belongs to the current `main` commit after acquiring the deployment slot; stale Edge builds skip instead of moving Edge backwards.
+- Development, verified Production, and remaining legacy distribution paths share one non-cancellable queued publication group with `queue: max`, which preserves pending publications until the legacy workflow is deleted.
+- Every merge to `main` deploys continuously to Edge without an approval gate. A newer `main` commit may supersede an in-progress Edge deployment.
+- A stale queued main publication checks the current `main` commit after acquiring the shared distribution lock and skips before external publication instead of regressing the shared `dev` channel.
 - The release workflow is explicitly dispatched for `release/YYYY-MM-DD.N`; automatic release-branch triggering remains disabled during the transition.
 - The release workflow deploys the release branch to Beta.
 - After a successful beta deployment, the workflow creates a beta tag such as `YYYY-MM-DD.N-beta.1`, `YYYY-MM-DD.N-beta.2`, and so on.
@@ -230,5 +238,7 @@ The process removes the `dev` to `master` promotion step and the `master` to `de
 Quality assurance gains a clear quality gate without owning production operations. Engineering keeps ownership of production rollout, observability, incident response, and rollback.
 
 The process depends more strongly on pull request discipline and feature flag usage because `main` continuously deploys to Edge.
+
+The legacy monolithic workflow no longer owns `dev` publication; it remains only for its legacy tag, `master`, and maintenance paths until those responsibilities are retired.
 
 On-premises customers can receive controlled maintenance artifacts without making every production release a long-term-support line or constraining the cloud release cadence.

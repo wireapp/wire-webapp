@@ -61,6 +61,10 @@ jobs:
     permissions:
       actions: read
       contents: read
+    concurrency:
+      group: publish-webapp-distribution
+      cancel-in-progress: false
+      queue: max
     outputs:
       docker_image_tag: ${{ steps.publish_docker.outputs.docker_image_tag }}
       helm_chart_version: ${{ steps.publish_helm.outputs.helm_chart_version }}

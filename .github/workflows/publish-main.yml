@@ -1,0 +1,468 @@
+---
+name: Publish main
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Optional reason for manually publishing the main development channels'
+        required: false
+        type: string
+      confirm_main_publish:
+        description: 'Confirm that this will deploy Edge and publish the dev Docker, Helm, and wire-builds distribution'
+        required: true
+        default: false
+        type: boolean
+
+env:
+  AWS_REGION: eu-central-1
+  BUILD_ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
+  EDGE_ENVIRONMENT_NAME: wire-webapp-edge
+  DOCKER_REPOSITORY: quay.io/wire/webapp
+  CHART_REPOSITORY_NAME: charts-webapp
+  CHART_REPOSITORY_URL: s3://public.wire.com/charts-webapp
+  WIRE_BUILDS_REPOSITORY: wireapp/wire-builds
+
+jobs:
+  validate_request:
+    name: Validate main publication request
+    runs-on: ubuntu-24.04
+    permissions: {}
+
+    steps:
+      - name: Validate request
+        env:
+          CONFIRM_MAIN_PUBLISH: ${{ inputs.confirm_main_publish }}
+          WORKFLOW_DISPATCH_REASON: ${{ inputs.reason }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo '## Main publication request'
+            echo "- Requested ref: ${GITHUB_REF}"
+            echo "- Commit SHA: ${GITHUB_SHA}"
+            echo "- Workflow run URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+            if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' && -n "${WORKFLOW_DISPATCH_REASON}" ]]; then
+              echo "- Manual reason: ${WORKFLOW_DISPATCH_REASON}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' ]]; then
+            if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]; then
+              echo "Manual main publication must run from refs/heads/main, received ${GITHUB_REF}." >&2
+              exit 1
+            fi
+
+            if [[ "${CONFIRM_MAIN_PUBLISH}" != 'true' ]]; then
+              echo 'Main publication was not confirmed. Aborting.' >&2
+              exit 1
+            fi
+          fi
+
+  build_main_artifacts:
+    name: Build main artifacts once
+    runs-on: ubuntu-24.04
+    needs: validate_request
+    permissions:
+      contents: read
+    outputs:
+      edge_artifact_name: ${{ steps.artifact_metadata.outputs.edge_artifact_name }}
+      development_context_artifact_name: ${{ steps.artifact_metadata.outputs.development_context_artifact_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Update configuration
+        run: ./bin/yarn nx run webapp:configure
+
+      - name: Build and package internal application
+        run: ./bin/yarn build:prod
+
+      - name: Prepare exact development Docker context
+        id: artifact_metadata
+        shell: bash
+        env:
+          BUILD_ARTIFACT_PATH: ${{ env.BUILD_ARTIFACT_PATH }}
+        run: |
+          set -euo pipefail
+
+          edge_artifact_name="main-edge-artifact-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          development_context_artifact_name="main-development-context-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          development_context_directory="${RUNNER_TEMP}/${development_context_artifact_name}"
+
+          mkdir -p \
+            "${development_context_directory}/apps/server" \
+            "${development_context_directory}/libraries/config" \
+            "${development_context_directory}/bin"
+
+          cp -a package.json yarn.lock .yarnrc.yml .npmrc run.sh .env.defaults "${development_context_directory}/"
+          cp -a .yarn "${development_context_directory}/.yarn"
+          cp -a bin/yarn "${development_context_directory}/bin/yarn"
+          cp -a apps/server/Dockerfile apps/server/package.json "${development_context_directory}/apps/server/"
+          cp -a apps/server/dist "${development_context_directory}/apps/server/dist"
+          cp -a libraries/config/package.json libraries/config/lib "${development_context_directory}/libraries/config/"
+
+          test -s "${development_context_directory}/package.json"
+          test -s "${development_context_directory}/apps/server/Dockerfile"
+          test -d "${development_context_directory}/apps/server/dist"
+          test -d "${development_context_directory}/libraries/config/lib"
+
+          {
+            echo "edge_artifact_name=${edge_artifact_name}"
+            echo "development_context_artifact_name=${development_context_artifact_name}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Upload Edge artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ${{ steps.artifact_metadata.outputs.edge_artifact_name }}
+          path: ${{ env.BUILD_ARTIFACT_PATH }}
+          if-no-files-found: error
+
+      - name: Upload exact development Docker context
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ${{ steps.artifact_metadata.outputs.development_context_artifact_name }}
+          path: ${{ runner.temp }}/${{ steps.artifact_metadata.outputs.development_context_artifact_name }}
+          if-no-files-found: error
+          include-hidden-files: true
+
+  deploy_to_edge:
+    name: Deploy to Edge
+    runs-on: ubuntu-24.04
+    needs: build_main_artifacts
+    permissions:
+      contents: read
+    concurrency:
+      group: deploy-edge
+      cancel-in-progress: true
+    outputs:
+      superseded: ${{ steps.check_latest_main.outputs.superseded }}
+    # ADR 0002 requires Edge to deploy without an approval gate, so the
+    # wire-webapp-edge repository environment must not require reviewers.
+    environment: wire-webapp-edge
+
+    steps:
+      - name: Check whether this Edge publication is current
+        id: check_latest_main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          latest_main_sha="$(
+            gh api \
+              "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" \
+              --jq '.object.sha'
+          )"
+
+          if [[ -z "${latest_main_sha}" ]]; then
+            echo 'Unable to resolve the current main SHA.' >&2
+            exit 1
+          fi
+
+          if [[ "${GITHUB_SHA}" != "${latest_main_sha}" ]]; then
+            echo "Skipping Edge deployment because ${GITHUB_SHA} was superseded by ${latest_main_sha}."
+
+            {
+              echo '## Edge deployment'
+              echo "- Skipped as superseded: \`${GITHUB_SHA}\`"
+              echo "- Current main commit: \`${latest_main_sha}\`"
+            } >> "${GITHUB_STEP_SUMMARY}"
+
+            echo 'superseded=true' >> "${GITHUB_OUTPUT}"
+            echo 'deploy_allowed=false' >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          echo 'superseded=false' >> "${GITHUB_OUTPUT}"
+          echo 'deploy_allowed=true' >> "${GITHUB_OUTPUT}"
+
+      - name: Download build artifact
+        if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ needs.build_main_artifacts.outputs.edge_artifact_name }}
+          path: edge-artifact
+
+      - name: Configure AWS credentials
+        if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
+        with:
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to wire-webapp-edge
+        id: deploy
+        if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: ${{ env.EDGE_ENVIRONMENT_NAME }}
+          version-label: ${{ github.run_id }}-${{ github.run_attempt }}-edge
+          deployment-package-path: edge-artifact/ebs.zip
+          wait-for-deployment: true
+          wait-for-environment-recovery: true
+          deployment-timeout: 150
+          use-existing-application-version-if-available: true
+
+      - name: Summarize Edge deployment
+        if: always()
+        env:
+          DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
+          SUPERSEDED: ${{ steps.check_latest_main.outputs.superseded }}
+          WORKFLOW_DISPATCH_REASON: ${{ inputs.reason }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${SUPERSEDED:-false}" == 'true' ]]; then
+            edge_result='skipped as superseded'
+          elif [[ "${DEPLOY_OUTCOME:-}" == 'success' ]]; then
+            edge_result='deployed successfully'
+          else
+            edge_result='failed'
+          fi
+
+          {
+            echo '## Edge deployment'
+            echo "- Result: ${edge_result}"
+            echo "- Deployed ref: ${GITHUB_REF}"
+            echo "- Commit SHA: ${GITHUB_SHA}"
+            echo "- Target environment: ${EDGE_ENVIRONMENT_NAME}"
+            echo "- Workflow run URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+            if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' && -n "${WORKFLOW_DISPATCH_REASON}" ]]; then
+              echo "- Manual reason: ${WORKFLOW_DISPATCH_REASON}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish_development_distribution:
+    name: Publish development distribution
+    runs-on: ubuntu-24.04
+    needs: build_main_artifacts
+    permissions:
+      actions: read
+      contents: read
+    concurrency:
+      group: publish-webapp-distribution
+      cancel-in-progress: false
+      queue: max
+    outputs:
+      docker_image_tag: ${{ steps.publish_docker.outputs.docker_image_tag }}
+      helm_chart_version: ${{ steps.publish_helm.outputs.helm_chart_version }}
+      wire_builds_commit_sha: ${{ steps.update_wire_builds.outputs.wire_builds_commit_sha }}
+      superseded: ${{ steps.check_latest_main.outputs.superseded }}
+
+    steps:
+      - name: Checkout exact main commit
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      - name: Download exact development Docker context
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ needs.build_main_artifacts.outputs.development_context_artifact_name }}
+          path: main-development-context
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install exact repository dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Setup Helm
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
+        with:
+          version: '3.21.3'
+
+      - name: Check whether this main publication is current
+        id: check_latest_main
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          latest_main_sha="$(git ls-remote origin refs/heads/main | awk '{print $1}')"
+          if [[ -z "${latest_main_sha}" ]]; then
+            echo 'Unable to resolve the current origin/main SHA.' >&2
+            exit 1
+          fi
+
+          if [[ "${GITHUB_SHA}" != "${latest_main_sha}" ]]; then
+            echo "Skipping development publication because ${GITHUB_SHA} was superseded by ${latest_main_sha}."
+            {
+              echo '### Development publication'
+              echo "- Skipped as superseded: \`${GITHUB_SHA}\`"
+              echo "- Current origin/main: \`${latest_main_sha}\`"
+            } >> "${GITHUB_STEP_SUMMARY}"
+            echo 'superseded=true' >> "$GITHUB_OUTPUT"
+            echo 'publish_allowed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo 'superseded=false' >> "$GITHUB_OUTPUT"
+          echo 'publish_allowed=true' >> "$GITHUB_OUTPUT"
+
+      - name: Publish or reuse dev Docker image
+        id: publish_docker
+        if: ${{ steps.check_latest_main.outputs.publish_allowed == 'true' }}
+        env:
+          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+          DOCKER_REPOSITORY: ${{ env.DOCKER_REPOSITORY }}
+          DOCKER_IMAGE_TAG_OUTPUT_PATH: ${{ runner.temp }}/main-development-image-tag.txt
+          WIRE_WEBAPP_RELEASE_COMMIT_SHA: ${{ github.sha }}
+          WIRE_WEBAPP_DOCKER_CONTEXT_PATH: ${{ github.workspace }}/main-development-context
+        run: ./bin/publish-development-docker.sh
+
+      - name: Publish or reuse dev Helm chart
+        id: publish_helm
+        if: ${{ steps.check_latest_main.outputs.publish_allowed == 'true' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          CHART_REPOSITORY_NAME: ${{ env.CHART_REPOSITORY_NAME }}
+          CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
+        run: ./bin/publish-development-helm.sh
+
+      - name: Check out wire-builds dev
+        if: ${{ steps.check_latest_main.outputs.publish_allowed == 'true' }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: ${{ env.WIRE_BUILDS_REPOSITORY }}
+          token: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
+          ref: dev
+          path: wire-builds
+          fetch-depth: 1
+
+      - name: Update wire-builds dev idempotently
+        id: update_wire_builds
+        if: ${{ steps.check_latest_main.outputs.publish_allowed == 'true' }}
+        env:
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
+          RELEASE_COMMIT_SHA: ${{ github.sha }}
+        working-directory: wire-builds
+        run: ../bin/update-development-wire-builds.sh
+
+      - name: Summarize development publication
+        if: always()
+        env:
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
+          WIRE_BUILDS_COMMIT_SHA: ${{ steps.update_wire_builds.outputs.wire_builds_commit_sha }}
+          SUPERSEDED: ${{ steps.check_latest_main.outputs.superseded }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo '## Development publication'
+            echo "- Main commit SHA: ${GITHUB_SHA}"
+            echo "- Superseded: ${SUPERSEDED:-false}"
+            echo "- Docker image: ${DOCKER_IMAGE_TAG:-not published}"
+            echo "- Helm chart: ${HELM_CHART_VERSION:-not published}"
+            echo "- wire-builds/dev commit: ${WIRE_BUILDS_COMMIT_SHA:-not updated}"
+            echo "- Workflow run URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  notify_development_distribution_failure:
+    name: Notify development distribution failure to Deployoholics
+    runs-on: ubuntu-24.04
+    needs: [build_main_artifacts, publish_development_distribution]
+    if: ${{ always() && needs.publish_development_distribution.result == 'failure' }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/actions/notify-deployoholics
+
+      - name: Announce development distribution failure
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: failure
+          text: |
+            ❌ Main development distribution failed ❌
+            **Main commit:** ${{ github.sha }}
+            **Docker result:** ${{ needs.publish_development_distribution.outputs.docker_image_tag || 'failed or not published' }}
+            **Helm result:** ${{ needs.publish_development_distribution.outputs.helm_chart_version || 'failed or not published' }}
+            **wire-builds/dev result:** ${{ needs.publish_development_distribution.outputs.wire_builds_commit_sha || 'failed or not updated' }}
+            **Workflow:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  summarize_main_publication:
+    name: Summarize main publication
+    runs-on: ubuntu-24.04
+    needs:
+      [build_main_artifacts, deploy_to_edge, publish_development_distribution, notify_development_distribution_failure]
+    if: always()
+    permissions: {}
+
+    steps:
+      - name: Write main publication summary
+        env:
+          EDGE_RESULT: ${{ needs.deploy_to_edge.result }}
+          EDGE_SUPERSEDED: ${{ needs.deploy_to_edge.outputs.superseded }}
+          DOCKER_IMAGE_TAG: ${{ needs.publish_development_distribution.outputs.docker_image_tag }}
+          HELM_CHART_VERSION: ${{ needs.publish_development_distribution.outputs.helm_chart_version }}
+          WIRE_BUILDS_COMMIT_SHA: ${{ needs.publish_development_distribution.outputs.wire_builds_commit_sha }}
+          SUPERSEDED: ${{ needs.publish_development_distribution.outputs.superseded }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${EDGE_SUPERSEDED:-false}" == 'true' ]]; then
+            edge_result='Edge skipped as superseded'
+          elif [[ "${EDGE_RESULT}" == 'success' ]]; then
+            edge_result='Edge deployed successfully'
+          elif [[ "${EDGE_RESULT}" == 'skipped' ]]; then
+            edge_result='Edge did not run'
+          else
+            edge_result='Edge failed'
+          fi
+
+          {
+            echo '## Main publication'
+            echo "- Main commit SHA: ${GITHUB_SHA}"
+            echo "- Edge result: ${edge_result}"
+            echo "- Immutable dev Docker image: ${DOCKER_IMAGE_TAG:-not published}"
+            echo "- Helm chart version: ${HELM_CHART_VERSION:-not published}"
+            echo "- wire-builds/dev commit SHA: ${WIRE_BUILDS_COMMIT_SHA:-not updated}"
+            echo "- Development publication skipped as superseded: ${SUPERSEDED:-false}"
+            echo "- Workflow URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } >> "$GITHUB_STEP_SUMMARY"

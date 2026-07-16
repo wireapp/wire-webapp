@@ -76,6 +76,18 @@ describe('push_docker metadata', () => {
     assert.equal(actualImageTag, expectedImageTag);
   });
 
+  it('generates the expected immutable dev image tag', () => {
+    const actualImageTag = createUniqueImageTag({
+      versionTag: 'dev',
+      configurationVersion: 'v0.34.9-0',
+      releaseCommitSha: '1234567890abcdef',
+    });
+
+    const expectedImageTag = 'dev-v0.34.9-0-1234567';
+
+    assert.equal(actualImageTag, expectedImageTag);
+  });
+
   it('uses the working directory when no custom Docker context is configured', () => {
     const workingDirectory = '/workspace/wire-webapp';
 

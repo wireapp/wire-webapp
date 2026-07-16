@@ -7,6 +7,15 @@ set -euo pipefail
 : "${RELEASE_COMMIT_SHA:?RELEASE_COMMIT_SHA is required}"
 
 webapp_repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+wire_builds_target_branch="${WIRE_BUILDS_TARGET_BRANCH:-main}"
+case "${wire_builds_target_branch}" in
+  main | dev)
+    ;;
+  *)
+    echo "Unsupported wire-builds target branch: ${wire_builds_target_branch}" >&2
+    exit 1
+    ;;
+esac
 chart_repository='https://s3-eu-west-1.amazonaws.com/public.wire.com/charts-webapp'
 commit_url="https://github.com/wireapp/wire-webapp/commit/${RELEASE_COMMIT_SHA}"
 wire_builds_field_options=(
@@ -47,15 +56,15 @@ fi
 push_succeeded=false
 for retry_number in 1 2 3; do
   if [[ "${retry_number}" -gt 1 ]]; then
-    echo 'Retrying wire-builds/main update.'
+    echo "Retrying wire-builds/${wire_builds_target_branch} update."
   fi
 
   set +e
   (
     set -euo pipefail
 
-    git fetch --depth 1 origin main
-    git reset --hard origin/main
+    git fetch --depth 1 origin "${wire_builds_target_branch}"
+    git reset --hard "origin/${wire_builds_target_branch}"
 
     build_version_before="$(jq --raw-output '.version' build.json)"
     if wire_builds_fields_match; then
@@ -101,7 +110,7 @@ for retry_number in 1 2 3; do
     git config user.name 'Zebot'
     git add build.json
     git commit -m "Bump webapp to ${HELM_CHART_VERSION}"
-    git push origin main
+    git push origin "${wire_builds_target_branch}"
   )
   attempt_exit_code=$?
   set -e
@@ -111,18 +120,18 @@ for retry_number in 1 2 3; do
     break
   fi
 
-  echo "wire-builds/main update failed on attempt ${retry_number}." >&2
+  echo "wire-builds/${wire_builds_target_branch} update failed on attempt ${retry_number}." >&2
 done
 
 if [[ "${push_succeeded}" != 'true' ]]; then
-  echo 'Unable to update wire-builds/main after three attempts.' >&2
+  echo "Unable to update wire-builds/${wire_builds_target_branch} after three attempts." >&2
   exit 1
 fi
 
-git fetch --depth 1 origin main
-git reset --hard origin/main
+git fetch --depth 1 origin "${wire_builds_target_branch}"
+git reset --hard "origin/${wire_builds_target_branch}"
 if ! wire_builds_fields_match; then
-  echo 'wire-builds/main does not contain the expected final WebApp fields.' >&2
+  echo "wire-builds/${wire_builds_target_branch} does not contain the expected final WebApp fields." >&2
   exit 1
 fi
 
