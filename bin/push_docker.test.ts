@@ -18,6 +18,7 @@
  */
 
 import assert from 'node:assert';
+import {readFileSync} from 'node:fs';
 import path from 'node:path';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -86,6 +87,16 @@ describe('push_docker metadata', () => {
     const expectedImageTag = 'dev-v0.34.9-0-1234567';
 
     assert.equal(actualImageTag, expectedImageTag);
+  });
+
+  it('makes the Yarn wrapper executable after artifact download before invoking it', () => {
+    const dockerfilePath = path.join(process.cwd(), 'apps/server/Dockerfile');
+    const dockerfileContents = readFileSync(dockerfilePath, 'utf8');
+
+    assert.match(
+      dockerfileContents,
+      /RUN chmod \+x \.\/bin\/yarn && \.\/bin\/yarn workspaces focus @wireapp\/server --production/,
+    );
   });
 
   it('uses the working directory when no custom Docker context is configured', () => {
