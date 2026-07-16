@@ -52,7 +52,8 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {ConversationCallingView} from './conversationCallingView/conversationCallingView';
-import {ConversationHeader} from './conversationHeader';
+import {ConversationHeader, conversationsPanelHeadingId} from './conversationHeader';
+import {ConversationListCollapseHandle} from './conversationListCollapseHandle';
 import {conversationsSpacerStyles} from './conversations.styles';
 import {ConversationSidebar} from './conversationSidebar/conversationSidebar';
 import {ConversationsList} from './conversationsList';
@@ -61,7 +62,15 @@ import {getGroupParticipantsConversations} from './getGroupParticipantsConversat
 import {getTabConversations, scrollToConversation} from './helpers';
 import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
-import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
+import {
+  SidebarStatus,
+  ConversationListStatus,
+  SidebarTabs,
+  useSidebarStore,
+  getCanCollapseConversationList,
+  getIsConversationListCollapsed,
+  isConversationListTab,
+} from './useSidebarStore';
 
 import {Config} from '../../../../Config';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
@@ -84,6 +93,7 @@ type ConversationsProps = {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   userRepository: UserRepository;
+  isConversationListCollapseEnabled: boolean;
 };
 
 export const Conversations = ({
@@ -100,6 +110,7 @@ export const Conversations = ({
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
   selfUser,
+  isConversationListCollapseEnabled,
 }: ConversationsProps) => {
   const {translate} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
@@ -109,6 +120,8 @@ export const Conversations = ({
     currentTab,
     status: sidebarStatus,
     setStatus: setSidebarStatus,
+    conversationListStatus,
+    setConversationListStatus,
     setCurrentTab,
     resetDisabledFeatureTabs,
   } = useSidebarStore(useShallow(state => state));
@@ -160,20 +173,7 @@ export const Conversations = ({
   const isCells = currentTab === SidebarTabs.CELLS;
   const isMeetings = currentTab === SidebarTabs.MEETINGS;
 
-  const showSearchInput = [
-    SidebarTabs.RECENT,
-    SidebarTabs.FOLDER,
-    SidebarTabs.FAVORITES,
-    SidebarTabs.GROUPS,
-    SidebarTabs.CHANNELS,
-    SidebarTabs.DIRECTS,
-    SidebarTabs.UNREAD,
-    SidebarTabs.MENTIONS,
-    SidebarTabs.REPLIES,
-    SidebarTabs.DRAFTS,
-    SidebarTabs.PINGS,
-    SidebarTabs.ARCHIVES,
-  ].includes(currentTab);
+  const showSearchInput = isConversationListTab(currentTab);
 
   const {setCurrentView} = useAppMainState(useShallow(state => state.responsiveView));
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore(
@@ -185,6 +185,17 @@ export const Conversations = ({
   // true when screen is smaller than 1000px
   const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
   const isSideBarOpen = sidebarStatus === SidebarStatus.OPEN;
+  const canCollapseConversationList = getCanCollapseConversationList({
+    isFeatureEnabled: isConversationListCollapseEnabled,
+    currentTab,
+    isScreenLessThanMdBreakpoint,
+  });
+  const isConversationListCollapsed = getIsConversationListCollapsed({
+    isFeatureEnabled: isConversationListCollapseEnabled,
+    currentTab,
+    isScreenLessThanMdBreakpoint,
+    conversationListStatus,
+  });
 
   useEffect(() => {
     if (isScreenLessThanMdBreakpoint) {
@@ -265,6 +276,24 @@ export const Conversations = ({
       isSideBarOpen ? EventName.UI.SIDEBAR_COLLAPSE : EventName.UI.SIDEBAR_UNCOLLAPSE,
     );
   }, [isFoldersTabOpen, isSideBarOpen, setSidebarStatus, toggleFoldersTab]);
+
+  const expandConversationList = useCallback(() => {
+    if (!isConversationListCollapsed) {
+      return;
+    }
+
+    setConversationListStatus(ConversationListStatus.EXPANDED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CONVERSATION_LIST_UNCOLLAPSE);
+  }, [isConversationListCollapsed, setConversationListStatus]);
+
+  const toggleConversationList = () => {
+    const willCollapse = conversationListStatus === ConversationListStatus.EXPANDED;
+    setConversationListStatus(willCollapse ? ConversationListStatus.COLLAPSED : ConversationListStatus.EXPANDED);
+    amplify.publish(
+      WebAppEvents.ANALYTICS.EVENT,
+      willCollapse ? EventName.UI.CONVERSATION_LIST_COLLAPSE : EventName.UI.CONVERSATION_LIST_UNCOLLAPSE,
+    );
+  };
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
@@ -493,11 +522,25 @@ export const Conversations = ({
             onSearchEnterClick={handleEnterSearchClick}
             jumpToRecentSearch={jumpToRecentSearch}
             searchInputRef={searchInputRef}
+            isListCollapsed={isConversationListCollapsed}
+            onExpandList={expandConversationList}
           />
         }
         conversationListRef={conversationListRef}
         setConversationListRef={setConversationListRef}
         hasHeader={!isPreferences}
+        panelOverlay={
+          canCollapseConversationList ? (
+            <ConversationListCollapseHandle
+              isCollapsed={isConversationListCollapsed}
+              panelId="conversations"
+              onToggle={toggleConversationList}
+            />
+          ) : null
+        }
+        hideFooter={isConversationListCollapsed}
+        ariaLabelledBy={conversationsPanelHeadingId}
+        panelAttributes={{'data-list-collapsed': isConversationListCollapsed}}
         sidebar={
           !isTemporaryGuest && (
             <ConversationSidebar

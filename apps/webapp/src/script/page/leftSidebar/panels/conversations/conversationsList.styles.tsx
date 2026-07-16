@@ -50,3 +50,11 @@ export const virtualizationStyles: CSSObject = {
   left: 0,
   width: '100%',
 };
+
+export const virtualizationSpacerStyles: CSSObject = {
+  padding: 0,
+  margin: 0,
+  border: 'none',
+  visibility: 'hidden',
+  pointerEvents: 'none',
+};

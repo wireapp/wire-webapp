@@ -65,6 +65,7 @@ const defaultParams: Omit<React.ComponentProps<typeof Conversations>, 'conversat
   integrationRepository: {integrations: observable([])} as any,
   teamRepository: {getTeam: jest.fn()} as any,
   userRepository: {users: observable([])} as any,
+  isConversationListCollapseEnabled: false,
 };
 
 describe('Conversations', () => {
