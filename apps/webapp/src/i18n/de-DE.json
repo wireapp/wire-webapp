@@ -111,6 +111,8 @@
   "accessibility.conversationDetailsActionGroupAdminLabel": "Als Gruppen-Admin festlegen",
   "accessibility.conversationDetailsActionNotificationsLabel": "Einstellungen für Benachrichtigungen anzeigen",
   "accessibility.conversationDetailsCloseLabel": "Detailansicht des Bildes schließen",
+  "accessibility.conversationListCollapse": "Unterhaltungsliste ausblenden",
+  "accessibility.conversationListExpand": "Unterhaltungsliste erweitern",
   "accessibility.conversationMuted": "Stummgeschaltet",
   "accessibility.conversationOptionsMenu": "Unterhaltungsoptionen öffnen",
   "accessibility.conversationOptionsMenuAccessKey": "Verwenden Sie die rechte Pfeiltaste, um das Menü mit den Unterhaltungsoptionen aufzurufen.",

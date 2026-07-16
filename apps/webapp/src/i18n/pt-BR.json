@@ -111,6 +111,8 @@
   "accessibility.conversationDetailsActionGroupAdminLabel": "Definir administrador do grupo",
   "accessibility.conversationDetailsActionNotificationsLabel": "Mostrar configurações de notificações",
   "accessibility.conversationDetailsCloseLabel": "Fechar visualização de detalhes da imagem",
+  "accessibility.conversationListCollapse": "Collapse conversation list",
+  "accessibility.conversationListExpand": "Expand conversation list",
   "accessibility.conversationMuted": "Muted",
   "accessibility.conversationOptionsMenu": "Abrir opções da conversa",
   "accessibility.conversationOptionsMenuAccessKey": "Use a tecla seta para a direita para focar no menu de opções de conversa",

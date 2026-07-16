@@ -111,6 +111,8 @@
   "accessibility.conversationDetailsActionGroupAdminLabel": "Задать администратора группы",
   "accessibility.conversationDetailsActionNotificationsLabel": "Показать настройки уведомлений",
   "accessibility.conversationDetailsCloseLabel": "Закрыть просмотр сведений об изображении",
+  "accessibility.conversationListCollapse": "Свернуть список бесед",
+  "accessibility.conversationListExpand": "Развернуть список бесед",
   "accessibility.conversationMuted": "Без звука",
   "accessibility.conversationOptionsMenu": "Открыть параметры беседы",
   "accessibility.conversationOptionsMenuAccessKey": "Используйте клавишу курсора вправо, чтобы перейти в меню параметров беседы.",
