@@ -91,19 +91,15 @@ export class TeamRepositoryE2E extends BackendClientE2E {
   }
 
   public async upgradeTeam(teamId: string, user: User) {
-    await this.axiosInstance.put(
-      `/teams/${teamId}/billing/info`,
-      {
-        firstname: user.firstName,
-        lastname: user.lastName,
-        company: faker.company.name(),
-        street: '123 Test Street',
-        zip: '12345',
-        city: 'Berlin',
-        country: 'DE',
-      },
-      {headers: {Authorization: `Bearer ${user.token}`}},
-    );
+    for (let i = 0; i < 5; i++) {
+      const res = await this.axiosInstance.put(`/teams/${teamId}/billing/info`, billingInfo, {
+        headers: {Authorization: `Bearer ${user.token}`},
+      });
+      if (res.status !== 412) break;
+
+      console.log(`Failed to upgrade team with id ${teamId}, retrying in ${3_000 * (i + 1)} seconds...`, res.data);
+      await new Promise(res => setTimeout(res, 3_000 * (i + 1)));
+    }
 
     await this.axiosInstance.put(
       `/teams/${teamId}/billing/card`,
