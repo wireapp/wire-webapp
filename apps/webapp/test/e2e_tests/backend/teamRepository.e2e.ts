@@ -104,6 +104,7 @@ export class TeamRepositoryE2E extends BackendClientE2E {
     for (let i = 0; i < 5; i++) {
       const res = await this.axiosInstance.put(`/teams/${teamId}/billing/info`, billingInfo, {
         headers: {Authorization: `Bearer ${user.token}`},
+        validateStatus: _status => true,
       });
       if (res.status !== 412) break;
 
