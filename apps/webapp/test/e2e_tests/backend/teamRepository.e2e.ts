@@ -91,6 +91,16 @@ export class TeamRepositoryE2E extends BackendClientE2E {
   }
 
   public async upgradeTeam(teamId: string, user: User) {
+    const billingInfo = {
+      firstname: user.firstName,
+      lastname: user.lastName,
+      company: faker.company.name(),
+      street: '123 Test Street',
+      zip: '12345',
+      city: 'Berlin',
+      country: 'DE',
+    };
+
     for (let i = 0; i < 5; i++) {
       const res = await this.axiosInstance.put(`/teams/${teamId}/billing/info`, billingInfo, {
         headers: {Authorization: `Bearer ${user.token}`},
