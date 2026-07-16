@@ -127,6 +127,8 @@ const ListWrapper = memo(
                 aria-label={translate(
                   isListCollapsed ? 'accessibility.conversationListExpand' : 'accessibility.conversationListCollapse',
                 )}
+                aria-expanded={!isListCollapsed}
+                aria-controls={id}
                 data-uie-name="toggle-conversation-list"
               />
             )}
