@@ -49,7 +49,6 @@ import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {useConversationListCollapseFeatureFlag} from 'Util/useConversationListCollapseFeatureFlag';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {ConversationCallingView} from './conversationCallingView/conversationCallingView';
@@ -92,6 +91,7 @@ type ConversationsProps = {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   userRepository: UserRepository;
+  isConversationListCollapseEnabled: boolean;
 };
 
 export const Conversations = ({
@@ -108,6 +108,7 @@ export const Conversations = ({
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
   selfUser,
+  isConversationListCollapseEnabled,
 }: ConversationsProps) => {
   const {translate} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
@@ -126,7 +127,6 @@ export const Conversations = ({
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
-  const {isConversationListCollapseEnabled} = useConversationListCollapseFeatureFlag();
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 

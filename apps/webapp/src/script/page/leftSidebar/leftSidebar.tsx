@@ -26,12 +26,13 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {User} from 'Repositories/entity/User';
+import {conversationListCollapseFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Conversations} from './panels/conversations';
 import {ConversationListStatus, isConversationListTab, useSidebarStore} from './panels/conversations/useSidebarStore';
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
-import {useConversationListCollapseFeatureFlag} from '../../util/useConversationListCollapseFeatureFlag';
 import {ListViewModel} from '../../view_model/ListViewModel';
 import {useAppState, ListState} from '../useAppState';
 
@@ -47,7 +48,8 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
 
   const listState = useAppState(state => state.listState);
   const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
-  const {isConversationListCollapseEnabled} = useConversationListCollapseFeatureFlag();
+  const {isFeatureToggleEnabled} = useApplicationContext();
+  const isConversationListCollapseEnabled = isFeatureToggleEnabled(conversationListCollapseFeatureToggleName);
   const {currentTab, conversationListStatus} = useSidebarStore();
   const isConversationListCollapsed =
     isConversationListCollapseEnabled &&
@@ -85,6 +87,7 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
         ListState.MEETINGS,
       ].includes(listState) && (
         <Conversations
+          isConversationListCollapseEnabled={isConversationListCollapseEnabled}
           selfUser={selfUser}
           listViewModel={listViewModel}
           searchRepository={repositories.search}
