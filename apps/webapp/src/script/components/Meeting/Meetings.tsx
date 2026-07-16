@@ -20,7 +20,7 @@
 import {useEffect, useMemo, useRef} from 'react';
 
 import {contentStyles} from 'Components/Meeting/Meeting.styles';
-import {MeetingCallingView} from 'Components/Meeting/MeetingCallingView/MeetingCallingView';
+import {MeetingCallingView} from 'Components/Meeting/MeetingCallingView/meetingCallingView';
 import {meetingsContentWrapperStyles} from 'Components/Meeting/MeetingCallingView/meetingCallingView.styles';
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
