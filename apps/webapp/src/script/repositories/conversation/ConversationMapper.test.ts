@@ -205,6 +205,7 @@ describe('ConversationMapper', () => {
       expect(updatableProperties).not.toHaveProperty('archivedState');
       expect(updatableProperties).not.toHaveProperty('readOnlyState');
       expect(updatableProperties).not.toHaveProperty('last_read_timestamp');
+      expect(updatableProperties).not.toHaveProperty('isGuest');
     });
   });
 

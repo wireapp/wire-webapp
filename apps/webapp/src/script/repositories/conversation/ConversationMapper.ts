@@ -103,7 +103,6 @@ const BACKEND_UPDATABLE_CONVERSATION_PROPERTY_KEYS = [
   'groupConversationType',
   'groupId',
   'initialProtocol',
-  'isGuest',
   'name',
   'participating_user_ids',
   'receiptMode',
