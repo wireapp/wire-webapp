@@ -33,5 +33,5 @@ export const conversationsListHandleStyles: CSSObject = {
   padding: 0,
   border: 'none',
   background: 'transparent',
-  cursor: 'col-resize',
+  cursor: 'pointer',
 };
