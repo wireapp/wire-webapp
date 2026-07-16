@@ -232,6 +232,7 @@ export const createTeam = async (
   }
 
   if (options?.features && Object.values(options.features).some(Boolean)) {
+    await new Promise(res => setTimeout(res, 5_000));
     await api.team.upgradeTeam(teamId, owner);
 
     if (options.features.conferenceCalling) {
