@@ -54,6 +54,7 @@ import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {ConversationCallingView} from './conversationCallingView/conversationCallingView';
 import {ConversationHeader} from './conversationHeader';
+import {ConversationListCollapseHandle} from './conversationListCollapseHandle';
 import {conversationsSpacerStyles} from './conversations.styles';
 import {ConversationSidebar} from './conversationSidebar/conversationSidebar';
 import {ConversationsList} from './conversationsList';
@@ -533,9 +534,17 @@ export const Conversations = ({
         conversationListRef={conversationListRef}
         setConversationListRef={setConversationListRef}
         hasHeader={!isPreferences}
-        isListCollapsed={isConversationListCollapsed}
-        showListCollapseHandle={canCollapseConversationList}
-        onToggleListCollapsed={toggleConversationList}
+        panelOverlay={
+          canCollapseConversationList ? (
+            <ConversationListCollapseHandle
+              isCollapsed={isConversationListCollapsed}
+              panelId="conversations"
+              onToggle={toggleConversationList}
+            />
+          ) : null
+        }
+        hideFooter={isConversationListCollapsed}
+        panelAttributes={{'data-list-collapsed': isConversationListCollapsed}}
         sidebar={
           !isTemporaryGuest && (
             <ConversationSidebar
