@@ -1344,7 +1344,10 @@ export class ConversationRepository {
       async () => {
         const [conversationEntity] = this.mapConversations([conversationData]);
         await this.updateParticipatingUserEntities(conversationEntity);
-        await this.saveConversation(conversationEntity);
+        await this.saveConversation(
+          conversationEntity,
+          ConversationMapper.getUpdatablePropertiesFromBackend(conversationData),
+        );
       },
     );
   }
@@ -2553,11 +2556,14 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to be saved in the repository
    * @returns Resolves when conversation was saved
    */
-  saveConversation(conversationEntity: Conversation) {
+  saveConversation(
+    conversationEntity: Conversation,
+    conversationData: Partial<Record<keyof Conversation, unknown>> = ConversationMapper.getUpdatableProperties(
+      conversationEntity,
+    ),
+  ) {
     // Look up an existing conversation with the same ID so we can merge if necessary
     const existingConversation = this.conversationState.findConversation(conversationEntity.qualifiedId);
-
-    const conversationData = ConversationMapper.getUpdatableProperties(conversationEntity);
 
     // Merge path: update the existing conversation with new fields
     if (existingConversation) {

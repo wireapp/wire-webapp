@@ -22,6 +22,7 @@ import {waitFor} from '@testing-library/react';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {
+  ADD_PERMISSION,
   Conversation as BackendConversation,
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
@@ -421,6 +422,37 @@ describe('ConversationRepository', () => {
       expect(stored.last_read_timestamp()).toBe(987654321);
       expect(stored.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(stored.readOnlyState()).toBe(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS);
+    });
+
+    it('preserves existing title and add permission when the update payload omits those fields', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
+      const existing = _generateConversation({
+        id: qualifiedId,
+        name: 'Existing meeting title',
+        overwites: {
+          group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+          add_permission: ADD_PERMISSION.EVERYONE,
+        },
+      });
+      existing.conversationModerator(ADD_PERMISSION.EVERYONE);
+      await conversationRepository['saveConversation'](existing);
+
+      spyOn(conversationRepository, 'updateParticipatingUserEntities').and.returnValue(Promise.resolve());
+
+      const backendConversation = generateAPIConversation({
+        id: qualifiedId,
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+      delete backendConversation.name;
+      delete backendConversation.add_permission;
+
+      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+
+      expect(result.isOk).toBe(true);
+      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      expect(stored.name()).toBe('Existing meeting title');
+      expect(stored.conversationModerator()).toBe(ADD_PERMISSION.EVERYONE);
     });
   });
 

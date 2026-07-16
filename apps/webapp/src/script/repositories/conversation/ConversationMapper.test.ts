@@ -18,11 +18,14 @@
  */
 
 import {
+  ADD_PERMISSION,
   CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
   CONVERSATION_ACCESS,
+  CONVERSATION_CELLS_STATE,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
+  GROUP_CONVERSATION_TYPE,
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
   DefaultConversationRoleName,
@@ -206,6 +209,63 @@ describe('ConversationMapper', () => {
       expect(updatableProperties).not.toHaveProperty('readOnlyState');
       expect(updatableProperties).not.toHaveProperty('last_read_timestamp');
       expect(updatableProperties).not.toHaveProperty('isGuest');
+    });
+  });
+
+  describe('getUpdatablePropertiesFromBackend', () => {
+    it('keeps omitted optional fields out of the update object', () => {
+      const conversationData = {
+        qualified_id: {id: createUuid(), domain: 'example.com'},
+        creator: createUuid(),
+        type: CONVERSATION_TYPE.REGULAR,
+        access: [],
+        access_role: CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        cells_state: CONVERSATION_CELLS_STATE.DISABLED,
+        group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        group_id: 'group-id',
+        epoch: 0,
+        members: {others: [], self: {id: createUuid(), status_ref: '0.0', status_time: '1970-01-01T00:00:00.000Z'}},
+      };
+
+      const updatableProperties = ConversationMapper.getUpdatablePropertiesFromBackend(conversationData);
+
+      expect(updatableProperties).not.toHaveProperty('name');
+      expect(updatableProperties).not.toHaveProperty('conversationModerator');
+      expect(updatableProperties).toEqual(
+        expect.objectContaining({
+          groupConversationType: GROUP_CONVERSATION_TYPE.MEETING,
+          groupId: 'group-id',
+          epoch: 0,
+        }),
+      );
+    });
+
+    it('includes optional fields when present in the payload', () => {
+      const conversationData = {
+        qualified_id: {id: createUuid(), domain: 'example.com'},
+        creator: createUuid(),
+        type: CONVERSATION_TYPE.REGULAR,
+        access: [],
+        access_role: CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        cells_state: CONVERSATION_CELLS_STATE.DISABLED,
+        group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        group_id: 'group-id',
+        epoch: 0,
+        name: 'Weekly sync',
+        add_permission: ADD_PERMISSION.EVERYONE,
+        members: {others: [], self: {id: createUuid(), status_ref: '0.0', status_time: '1970-01-01T00:00:00.000Z'}},
+      };
+
+      const updatableProperties = ConversationMapper.getUpdatablePropertiesFromBackend(conversationData);
+
+      expect(updatableProperties).toEqual(
+        expect.objectContaining({
+          name: 'Weekly sync',
+          conversationModerator: ADD_PERMISSION.EVERYONE,
+        }),
+      );
     });
   });
 
