@@ -67,7 +67,8 @@ import {
   ConversationListStatus,
   SidebarTabs,
   useSidebarStore,
-  isConversationListTab,
+  getCanCollapseConversationList,
+  getIsConversationListCollapsed,
 } from './useSidebarStore';
 
 import {Config} from '../../../../Config';
@@ -196,11 +197,17 @@ export const Conversations = ({
   // true when screen is smaller than 1000px
   const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
   const isSideBarOpen = sidebarStatus === SidebarStatus.OPEN;
-  const isConversationTab = isConversationListTab(currentTab);
-  const canCollapseConversationList =
-    isConversationListCollapseEnabled && isConversationTab && !isScreenLessThanMdBreakpoint;
-  const isConversationListCollapsed =
-    canCollapseConversationList && conversationListStatus === ConversationListStatus.CLOSED;
+  const canCollapseConversationList = getCanCollapseConversationList({
+    isFeatureEnabled: isConversationListCollapseEnabled,
+    currentTab,
+    isScreenLessThanMdBreakpoint,
+  });
+  const isConversationListCollapsed = getIsConversationListCollapsed({
+    isFeatureEnabled: isConversationListCollapseEnabled,
+    currentTab,
+    isScreenLessThanMdBreakpoint,
+    conversationListStatus,
+  });
 
   useEffect(() => {
     if (isScreenLessThanMdBreakpoint) {

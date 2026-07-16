@@ -30,7 +30,7 @@ import {conversationListCollapseFeatureToggleName} from 'src/script/featureToggl
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Conversations} from './panels/conversations';
-import {ConversationListStatus, isConversationListTab, useSidebarStore} from './panels/conversations/useSidebarStore';
+import {getIsConversationListCollapsed, useSidebarStore} from './panels/conversations/useSidebarStore';
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
 import {ListViewModel} from '../../view_model/ListViewModel';
@@ -51,11 +51,12 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
   const {isFeatureToggleEnabled} = useApplicationContext();
   const isConversationListCollapseEnabled = isFeatureToggleEnabled(conversationListCollapseFeatureToggleName);
   const {currentTab, conversationListStatus} = useSidebarStore();
-  const isConversationListCollapsed =
-    isConversationListCollapseEnabled &&
-    conversationListStatus === ConversationListStatus.CLOSED &&
-    isConversationListTab(currentTab) &&
-    !isScreenLessThanMdBreakpoint;
+  const isConversationListCollapsed = getIsConversationListCollapsed({
+    isFeatureEnabled: isConversationListCollapseEnabled,
+    currentTab,
+    isScreenLessThanMdBreakpoint,
+    conversationListStatus,
+  });
 
   useEffect(() => {
     function openCreateGroupModal() {

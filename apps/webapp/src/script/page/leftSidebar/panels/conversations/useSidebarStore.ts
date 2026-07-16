@@ -105,6 +105,25 @@ export const CONVERSATION_LIST_TABS: readonly SidebarTabs[] = [
 
 export const isConversationListTab = (tab: SidebarTabs): boolean => CONVERSATION_LIST_TABS.includes(tab);
 
+type ConversationListCollapseParams = {
+  isFeatureEnabled: boolean;
+  currentTab: SidebarTabs;
+  isScreenLessThanMdBreakpoint: boolean;
+};
+
+export const getCanCollapseConversationList = ({
+  isFeatureEnabled,
+  currentTab,
+  isScreenLessThanMdBreakpoint,
+}: ConversationListCollapseParams): boolean =>
+  isFeatureEnabled && isConversationListTab(currentTab) && !isScreenLessThanMdBreakpoint;
+
+export const getIsConversationListCollapsed = ({
+  conversationListStatus,
+  ...params
+}: ConversationListCollapseParams & {conversationListStatus: ConversationListStatus}): boolean =>
+  getCanCollapseConversationList(params) && conversationListStatus === ConversationListStatus.CLOSED;
+
 export interface SidebarStore {
   status: SidebarStatus;
   setStatus: (status: SidebarStatus) => void;
