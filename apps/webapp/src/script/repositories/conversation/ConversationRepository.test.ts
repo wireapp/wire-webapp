@@ -59,6 +59,7 @@ import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {Message} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
@@ -90,6 +91,7 @@ import {CONVERSATION_READONLY_STATE, ConversationRepository} from './Conversatio
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStatus} from './ConversationStatus';
+import {ConversationVerificationState} from './ConversationVerificationState';
 import {
   ButtonActionConfirmationEvent,
   ButtonActionEvent,
@@ -331,6 +333,49 @@ describe('ConversationRepository', () => {
       const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
       expect(stored.name()).toBe('Updated meeting title');
       expect(stored.display_name()).toBe('Updated meeting title');
+    });
+
+    it('preserves loaded messages and local state when updating the meeting title', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
+      const message = new ContentMessage(createUuid(), translateForTest);
+      message.id = createUuid();
+
+      const existing = _generateConversation({
+        id: qualifiedId,
+        name: 'Old meeting title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+      existing.addMessage(message);
+      existing.archivedState(true);
+      existing.archivedTimestamp(123456789);
+      existing.last_read_timestamp(987654321);
+      existing.verification_state(ConversationVerificationState.VERIFIED);
+      existing.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS);
+
+      await conversationRepository['saveConversation'](existing);
+
+      spyOn(conversationRepository, 'updateParticipatingUserEntities').and.returnValue(Promise.resolve());
+
+      const backendConversation = generateAPIConversation({
+        id: qualifiedId,
+        name: 'Updated meeting title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+
+      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+
+      expect(result.isOk).toBe(true);
+      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      expect(stored.name()).toBe('Updated meeting title');
+      expect(stored.display_name()).toBe('Updated meeting title');
+      expect(stored.messages_unordered()).toHaveLength(1);
+      expect(stored.messages_unordered()[0].id).toBe(message.id);
+      expect(stored.archivedState()).toBe(true);
+      expect(stored.archivedTimestamp()).toBe(123456789);
+      expect(stored.last_read_timestamp()).toBe(987654321);
+      expect(stored.verification_state()).toBe(ConversationVerificationState.VERIFIED);
+      expect(stored.readOnlyState()).toBe(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS);
     });
   });
 

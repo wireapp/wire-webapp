@@ -86,6 +86,32 @@ export type ConversationDatabaseData = ConversationRecord &
     team_id: string;
   };
 
+/**
+ * Backend-owned conversation fields that may be merged into an existing entity.
+ * Client-only state such as loaded messages or archive/read timestamps must stay excluded.
+ */
+const BACKEND_UPDATABLE_CONVERSATION_PROPERTY_KEYS = [
+  'accessModes',
+  'accessRole',
+  'cellsState',
+  'cipherSuite',
+  'conversationModerator',
+  'creator',
+  'domain',
+  'epoch',
+  'globalMessageTimer',
+  'groupConversationType',
+  'groupId',
+  'initialProtocol',
+  'isGuest',
+  'name',
+  'participating_user_ids',
+  'receiptMode',
+  'roles',
+  'teamId',
+  'type',
+] as const satisfies readonly (keyof Conversation)[];
+
 export class ConversationMapper {
   static mapConversations(
     conversationsData: ConversationDatabaseData[],
@@ -106,13 +132,13 @@ export class ConversationMapper {
   static getUpdatableProperties(conversationEntity: Conversation): Partial<Record<keyof Conversation, unknown>> {
     const conversationData: Partial<Record<keyof Conversation, unknown>> = {};
 
-    for (const key in conversationEntity) {
-      const value = conversationEntity[key as keyof Conversation];
+    for (const key of BACKEND_UPDATABLE_CONVERSATION_PROPERTY_KEYS) {
+      const value = conversationEntity[key];
 
       if (ko.isWriteableObservable(value)) {
-        conversationData[key as keyof Conversation] = value();
+        conversationData[key] = value();
       } else if (typeof value !== 'function') {
-        conversationData[key as keyof Conversation] = value;
+        conversationData[key] = value;
       }
     }
 

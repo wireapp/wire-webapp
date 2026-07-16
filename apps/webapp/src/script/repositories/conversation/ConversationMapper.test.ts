@@ -34,12 +34,14 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {BaseError} from 'src/script/error/baseError';
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './ConversationMapper';
+import {CONVERSATION_READONLY_STATE} from './ConversationRepository';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
@@ -184,6 +186,25 @@ describe('ConversationMapper', () => {
 
       expect(conversationEntity.name()).toBe(payload.name);
       expect(conversationEntity.teamId).toBe(payload.team);
+    });
+  });
+
+  describe('getUpdatableProperties', () => {
+    it('returns backend-owned fields only', () => {
+      const conversationEntity = new Conversation(createUuid(), 'example.com', CONVERSATION_PROTOCOL.MLS, translate);
+      conversationEntity.name('Weekly sync');
+      conversationEntity.addMessage(new ContentMessage(createUuid(), translateForTest));
+      conversationEntity.archivedState(true);
+      conversationEntity.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS);
+      conversationEntity.last_read_timestamp(987654321);
+
+      const updatableProperties = ConversationMapper.getUpdatableProperties(conversationEntity);
+
+      expect(updatableProperties).toEqual(expect.objectContaining({name: 'Weekly sync', domain: 'example.com'}));
+      expect(updatableProperties).not.toHaveProperty('messages_unordered');
+      expect(updatableProperties).not.toHaveProperty('archivedState');
+      expect(updatableProperties).not.toHaveProperty('readOnlyState');
+      expect(updatableProperties).not.toHaveProperty('last_read_timestamp');
     });
   });
 
