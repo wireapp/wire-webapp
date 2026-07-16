@@ -23,7 +23,9 @@ import {
   CONVERSATION_CELLS_STATE,
   CONVERSATION_TYPE,
   GROUP_CONVERSATION_TYPE,
+  Conversation as BackendConversation,
 } from '../conversation/conversation';
+import type {ValidatedMeetingConversation} from '../conversation/conversationSchema';
 import {CONVERSATION_PROTOCOL} from '../team';
 import {MeetingRecurrenceFrequency} from './meetingRecurrence';
 import {meetingSchema, meetingWithConversationSchema, meetingsListResponseSchema} from './meetingSchema';
@@ -64,6 +66,7 @@ describe('meetingSchema', () => {
         otr_archived_ref: null,
         otr_muted_ref: null,
         otr_muted_status: null,
+        service: null,
         status_ref: '0.0',
         status_time: '1970-01-01T00:00:00.000Z',
       },
@@ -101,6 +104,59 @@ describe('meetingSchema', () => {
 
   it('accepts meeting create/update payloads with embedded conversation', () => {
     expect(meetingWithConversationSchema.safeParse(validMeetingWithConversation).success).toBe(true);
+  });
+
+  it('normalizes member fields to match backend conversation types', () => {
+    const result = meetingWithConversationSchema.safeParse({
+      ...validMeetingWithConversation,
+      conversation: {
+        ...validMeetingConversation,
+        members: {
+          self: {
+            id: 'creator-id',
+            status_ref: '0.0',
+            status_time: '1970-01-01T00:00:00.000Z',
+          },
+          others: [
+            {
+              id: 'other-user-id',
+              service: null,
+            },
+          ],
+        },
+      },
+    });
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error('Expected meeting with conversation schema parse to succeed');
+    }
+
+    expect(result.data.conversation.members.self).toEqual({
+      id: 'creator-id',
+      hidden_ref: null,
+      otr_archived_ref: null,
+      otr_muted_ref: null,
+      otr_muted_status: null,
+      service: null,
+      status_ref: '0.0',
+      status_time: '1970-01-01T00:00:00.000Z',
+    });
+    expect(result.data.conversation.members.others[0].service).toBeUndefined();
+  });
+
+  it('validated meeting conversations are assignable to backend conversations', () => {
+    const assertBackendConversation = (conversation: BackendConversation): BackendConversation => conversation;
+    const result = meetingWithConversationSchema.safeParse(validMeetingWithConversation);
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error('Expected meeting with conversation schema parse to succeed');
+    }
+
+    assertBackendConversation(result.data.conversation satisfies ValidatedMeetingConversation);
   });
 
   it('rejects meeting create/update payloads without embedded conversation', () => {

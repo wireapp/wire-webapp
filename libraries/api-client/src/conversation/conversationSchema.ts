@@ -29,6 +29,7 @@ import {
   GROUP_CONVERSATION_TYPE,
 } from './conversation';
 import {RECEIPT_MODE} from './data/conversationReceiptModeUpdateData';
+import {SERVICE_MEMBER_STATUS} from './otherMember';
 
 import {CONVERSATION_PROTOCOL} from '../team';
 
@@ -42,7 +43,34 @@ const serviceRefSchema = z.object({
   provider: z.string(),
 });
 
-const conversationMemberSchema = z.object({
+const conversationSelfMemberSchema = z.object({
+  id: z.string(),
+  conversation_role: z.string().optional(),
+  hidden: z.boolean().optional(),
+  hidden_ref: z
+    .string()
+    .nullish()
+    .transform(value => value ?? null),
+  otr_archived: z.boolean().optional(),
+  otr_archived_ref: z
+    .string()
+    .nullish()
+    .transform(value => value ?? null),
+  otr_muted_ref: z
+    .string()
+    .nullish()
+    .transform(value => value ?? null),
+  otr_muted_status: z
+    .number()
+    .nullish()
+    .transform(value => value ?? null),
+  service: serviceRefSchema.nullish().transform(value => value ?? null),
+  status_ref: z.string(),
+  status_time: z.string(),
+  qualified_id: qualifiedIdSchema.optional(),
+});
+
+const conversationOtherMemberSchema = z.object({
   id: z.string(),
   conversation_role: z.string().optional(),
   hidden: z.boolean().optional(),
@@ -51,18 +79,18 @@ const conversationMemberSchema = z.object({
   otr_archived_ref: z.string().nullable().optional(),
   otr_muted_ref: z.string().nullable().optional(),
   otr_muted_status: z.number().nullable().optional(),
-  service: serviceRefSchema.nullable().optional(),
+  service: serviceRefSchema
+    .nullable()
+    .optional()
+    .transform(service => service ?? undefined),
   status_ref: z.string().optional(),
   status_time: z.string().optional(),
   qualified_id: qualifiedIdSchema.optional(),
-});
-
-const conversationOtherMemberSchema = conversationMemberSchema.extend({
-  status: z.number().optional(),
+  status: z.nativeEnum(SERVICE_MEMBER_STATUS).default(SERVICE_MEMBER_STATUS.REGULAR_MEMBER),
 });
 
 export const conversationMembersSchema = z.object({
-  self: conversationMemberSchema.optional(),
+  self: conversationSelfMemberSchema.optional(),
   others: z.array(conversationOtherMemberSchema),
 });
 

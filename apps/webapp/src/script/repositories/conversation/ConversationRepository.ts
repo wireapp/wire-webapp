@@ -1342,8 +1342,7 @@ export class ConversationRepository {
     return task.tryOrElse(
       error => error,
       async () => {
-        // Validated meeting payloads are backend conversations with a narrowed meeting shape.
-        const [conversationEntity] = this.mapConversations([conversationData as BackendConversation]);
+        const [conversationEntity] = this.mapConversations([conversationData]);
         await this.updateParticipatingUserEntities(conversationEntity);
         await this.saveConversation(conversationEntity);
       },
@@ -2513,7 +2512,7 @@ export class ConversationRepository {
    * @returns Mapped conversation/s
    */
   mapConversations(
-    payload: (BackendConversation | ConversationDatabaseData)[],
+    payload: (BackendConversation | ValidatedMeetingConversation | ConversationDatabaseData)[],
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
     const entities = ConversationMapper.mapConversations(
