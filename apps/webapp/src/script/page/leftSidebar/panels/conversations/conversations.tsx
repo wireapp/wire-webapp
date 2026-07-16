@@ -69,6 +69,7 @@ import {
   useSidebarStore,
   getCanCollapseConversationList,
   getIsConversationListCollapsed,
+  isConversationListTab,
 } from './useSidebarStore';
 
 import {Config} from '../../../../Config';
@@ -172,20 +173,7 @@ export const Conversations = ({
   const isCells = currentTab === SidebarTabs.CELLS;
   const isMeetings = currentTab === SidebarTabs.MEETINGS;
 
-  const showSearchInput = [
-    SidebarTabs.RECENT,
-    SidebarTabs.FOLDER,
-    SidebarTabs.FAVORITES,
-    SidebarTabs.GROUPS,
-    SidebarTabs.CHANNELS,
-    SidebarTabs.DIRECTS,
-    SidebarTabs.UNREAD,
-    SidebarTabs.MENTIONS,
-    SidebarTabs.REPLIES,
-    SidebarTabs.DRAFTS,
-    SidebarTabs.PINGS,
-    SidebarTabs.ARCHIVES,
-  ].includes(currentTab);
+  const showSearchInput = isConversationListTab(currentTab);
 
   const {setCurrentView} = useAppMainState(useShallow(state => state.responsiveView));
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore(
