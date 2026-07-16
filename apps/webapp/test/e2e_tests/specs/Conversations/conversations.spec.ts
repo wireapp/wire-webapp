@@ -140,7 +140,7 @@ test.describe('Conversations', () => {
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
-      await expect(adminPages.conversationList().getConversation(guestUser.fullName)).toBeAttached();
+      await expect(adminPages.conversationList().getConversation(guestUser.fullName, {protocol: 'mls'})).toBeAttached();
 
       await createGroup(adminPages, groupName, [userB, guestUser]);
 
@@ -169,7 +169,7 @@ test.describe('Conversations', () => {
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
-      await expect(adminPages.conversationList().getConversation(guestUser.fullName)).toBeAttached();
+      await expect(adminPages.conversationList().getConversation(guestUser.fullName, {protocol: 'mls'})).toBeAttached();
 
       await createGroup(adminPages, groupName, [userB, guestUser]);
 
