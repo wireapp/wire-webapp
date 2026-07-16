@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, KeyboardEvent, MutableRefObject, useCallback, useEffect} from 'react';
+import {forwardRef, KeyboardEvent, MutableRefObject, useEffect} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -48,6 +48,12 @@ import {
 } from './conversationHeader.styles';
 
 export const conversationsPanelHeadingId = 'conversations-heading';
+
+const focusSearchInputRef = (searchInputRef: MutableRefObject<HTMLInputElement | null>) => {
+  requestAnimationFrame(() => {
+    searchInputRef.current?.focus();
+  });
+};
 
 interface ConversationHeaderProps {
   currentTab: SidebarTabs;
@@ -102,17 +108,11 @@ export const ConversationHeaderComponent = ({
     handleEnterDown(event, () => onSearchEnterClick(event));
   };
 
-  const focusSearchInput = useCallback(() => {
-    requestAnimationFrame(() => {
-      searchInputRef?.current?.focus();
-    });
-  }, [searchInputRef]);
-
   useEffect(() => {
     const onSearchShortcut = () => {
       onExpandList?.();
       jumpToRecentSearch();
-      focusSearchInput();
+      focusSearchInputRef(searchInputRef);
     };
 
     amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
@@ -120,7 +120,7 @@ export const ConversationHeaderComponent = ({
     return () => {
       amplify.unsubscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
     };
-  }, [focusSearchInput, jumpToRecentSearch, onExpandList]);
+  }, [jumpToRecentSearch, onExpandList, searchInputRef]);
 
   const showCreateConversationModal = () => {
     if (isChannelsEnabled && canCreateChannels) {
@@ -132,7 +132,7 @@ export const ConversationHeaderComponent = ({
 
   const handleCollapsedSearchClick = () => {
     onExpandList?.();
-    focusSearchInput();
+    focusSearchInputRef(searchInputRef);
   };
 
   const showCreateButton =

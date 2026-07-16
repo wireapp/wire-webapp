@@ -291,14 +291,14 @@ export const Conversations = ({
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CONVERSATION_LIST_UNCOLLAPSE);
   }, [isConversationListCollapsed, setConversationListStatus]);
 
-  const toggleConversationList = useCallback(() => {
+  const toggleConversationList = () => {
     const willCollapse = conversationListStatus === ConversationListStatus.OPEN;
     setConversationListStatus(willCollapse ? ConversationListStatus.CLOSED : ConversationListStatus.OPEN);
     amplify.publish(
       WebAppEvents.ANALYTICS.EVENT,
       willCollapse ? EventName.UI.CONVERSATION_LIST_COLLAPSE : EventName.UI.CONVERSATION_LIST_UNCOLLAPSE,
     );
-  }, [conversationListStatus, setConversationListStatus]);
+  };
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
