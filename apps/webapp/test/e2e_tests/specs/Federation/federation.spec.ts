@@ -20,7 +20,8 @@ test.describe('Federation', () => {
 
   test.beforeEach(async ({api}) => {
     normalUser = (await createTeam(api, 'Normal Team', {features: {conferenceCalling: true, mls: true}})).owner;
-    federatedUser = (await createTeam(federationApiManager, 'Federated Team', {features: {mls: true}})).owner;
+    // The federation environment has mls enabled and set as default protocol by default, no need to manually unlock it or attempt to upgrade the team
+    federatedUser = (await createTeam(federationApiManager, 'Federated Team')).owner;
   });
 
   test.afterEach(async ({api}) => {
