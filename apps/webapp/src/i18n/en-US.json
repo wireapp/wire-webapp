@@ -111,8 +111,6 @@
   "accessibility.conversationDetailsActionGroupAdminLabel": "Set group admin",
   "accessibility.conversationDetailsActionNotificationsLabel": "Show notifications settings",
   "accessibility.conversationDetailsCloseLabel": "Close image details view",
-  "accessibility.conversationListCollapse": "Collapse conversation list",
-  "accessibility.conversationListExpand": "Expand conversation list",
   "accessibility.conversationMuted": "Muted",
   "accessibility.conversationOptionsMenu": "Open conversation options",
   "accessibility.conversationOptionsMenuAccessKey": "Use right arrow key to focus on the conversation options menu",
