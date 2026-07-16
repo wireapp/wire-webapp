@@ -20,7 +20,7 @@ test.describe('Federation', () => {
 
   test.beforeEach(async ({api}) => {
     normalUser = (await createTeam(api, 'Normal Team', {features: {conferenceCalling: true, mls: true}})).owner;
-    federatedUser = (await createTeam(federationApiManager, 'Federated Team', {features: {mls: true}})).owner;
+    federatedUser = (await createTeam(federationApiManager, 'Federated Team')).owner;
   });
 
   test.afterEach(async ({api}) => {
