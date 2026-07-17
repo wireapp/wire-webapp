@@ -3040,6 +3040,12 @@ export class CallingRepository {
     PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions, undefined, this.translate);
   }
 
+  // 1. Create pure typed option creation function X
+  // 2. Pass translate function to the modal option creation function X
+  // 3. Pass config values(brandName, faqLink url) to function X
+  // 4. Pass focusRestore callback to function X
+  // 5. Pass the HTMLElement container to function X
+
   private showNoCameraModal(): void {
     const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
