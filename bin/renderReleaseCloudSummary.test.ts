@@ -17,255 +17,268 @@
  *
  */
 
-import assert from 'node:assert';
-import {spawnSync} from 'node:child_process';
+import {readReleaseCloudSummaryInput, renderReleaseCloudSummary} from './renderReleaseCloudSummary.ts';
+import type {ReleaseCloudSummaryInput} from './renderReleaseCloudSummary.ts';
 
-type ReleaseCloudEnvironment = Readonly<Record<string, string>>;
-
-type ReleaseCloudSummaryRendererResult = Readonly<{
-  exitCode: number | null;
-  standardOutput: string;
-  standardError: string;
-}>;
-
-const baselineReleaseCloudEnvironment: ReleaseCloudEnvironment = {
-  ARTIFACT_CHECKSUM: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-  ARTIFACT_NAME: 'wire-webapp-release-2026-07-17.1',
-  ARTIFACT_VERSION: '2026.07.17.1',
-  BETA_RESULT: 'success',
-  BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: 'wire-webapp-beta',
-  BETA_RUNTIME_BACKEND_REST: 'https://beta-backend.example.com',
-  BETA_RUNTIME_BACKEND_WS: 'wss://beta-backend.example.com',
-  BETA_TAG_CREATION_RESULT: 'success',
-  BETA_TAG_NAME: '2026-07-17.1-beta.1',
-  BETA_WEBAPP_URL: 'https://beta.example.com',
-  CHART_REPOSITORY_URL: 'https://charts.example.com/webapp',
-  DOCKER_REPOSITORY: 'quay.io/wire/webapp',
-  E2E_RUNTIME_BACKEND_REST: 'https://e2e-backend.example.com',
-  E2E_RUNTIME_BACKEND_WS: 'wss://e2e-backend.example.com',
-  E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: 'wire-webapp-e2e',
-  E2E_REPORT_URL: 'https://e2e.example.com/report/123',
-  E2E_RESULT: 'success',
-  E2E_WEBAPP_URL: 'https://e2e.example.com',
-  PRODUCTION_DEPLOYMENT_RESULT: 'skipped',
-  PRODUCTION_DISTRIBUTION_JOB_RESULT: 'skipped',
-  PRODUCTION_DISTRIBUTION_RESULT: 'skipped',
-  PRODUCTION_ENVIRONMENT_NAME: 'wire-webapp-production',
-  PRODUCTION_PREFLIGHT_JOB_RESULT: 'skipped',
-  PRODUCTION_PREFLIGHT_RESULT: 'skipped',
-  PRODUCTION_PROMOTION_REQUESTED: 'false',
-  PRODUCTION_RUNTIME_VERIFICATION_RESULT: 'skipped',
-  PRODUCTION_RUNTIME_BACKEND_REST: 'https://production-backend.example.com',
-  PRODUCTION_RUNTIME_BACKEND_WS: 'wss://production-backend.example.com',
-  PRODUCTION_WEBAPP_URL: 'https://production.example.com',
-  PRODUCTION_DOCKER_IMAGE_TAG: '',
-  PRODUCTION_HELM_CHART_VERSION: '',
-  PRODUCTION_SKIPPED_REASON: '',
-  PRODUCTION_TAG_CREATION_RESULT: 'skipped',
-  CREATED_PRODUCTION_TAG_NAME: '',
-  PLANNED_PRODUCTION_TAG_NAME: '2026-07-17.1-production',
-  PRODUCTION_WIRE_BUILDS_COMMIT_SHA: '',
-  RELEASE_BRANCH: 'release/2026-07-17.1',
-  RELEASE_COMMIT_SHA: '1234567890abcdef1234567890abcdef12345678',
-  RELEASE_IDENTIFIER: '2026-07-17.1',
-  RELEASE_REASON: '',
-  TESTINY_RUN_NAME: 'Release 2026-07-17.1 2026-07-17.1-beta.1',
-  GITHUB_SERVER_URL: 'https://github.com',
-  GITHUB_REPOSITORY: 'wireapp/wire-webapp',
-  GITHUB_RUN_ID: '123456789',
-  WIRE_BUILDS_REPOSITORY: 'wireapp/wire-builds',
+const baselineReleaseCloudSummaryInput: ReleaseCloudSummaryInput = {
+  beta: {
+    deploymentResult: 'success',
+    environmentName: 'wire-webapp-beta',
+    runtimeBackendRest: 'https://beta-backend.example.com',
+    runtimeBackendWebSocket: 'wss://beta-backend.example.com',
+    tagCreationResult: 'success',
+    tagName: '2026-07-17.1-beta.1',
+    webappUrl: 'https://beta.example.com',
+  },
+  distribution: {
+    chartRepositoryUrl: 'https://charts.example.com/webapp',
+    dockerImageTag: undefined,
+    dockerRepository: 'quay.io/wire/webapp',
+    distributionJobResult: 'skipped',
+    distributionResult: 'skipped',
+    helmChartVersion: undefined,
+    wireBuildsCommitSha: undefined,
+  },
+  e2e: {
+    environmentName: 'wire-webapp-e2e',
+    reportUrl: 'https://e2e.example.com/report/123',
+    result: 'success',
+    runtimeBackendRest: 'https://e2e-backend.example.com',
+    runtimeBackendWebSocket: 'wss://e2e-backend.example.com',
+    testinyRunName: 'Release 2026-07-17.1 2026-07-17.1-beta.1',
+    webappUrl: 'https://e2e.example.com',
+  },
+  github: {
+    repository: 'wireapp/wire-webapp',
+    runId: '123456789',
+    serverUrl: 'https://github.com',
+    wireBuildsRepository: 'wireapp/wire-builds',
+  },
+  production: {
+    createdTagName: undefined,
+    deploymentResult: 'skipped',
+    environmentName: 'wire-webapp-production',
+    plannedTagName: '2026-07-17.1-production',
+    preflightJobResult: 'skipped',
+    preflightResult: 'skipped',
+    promotionRequested: false,
+    runtimeBackendRest: 'https://production-backend.example.com',
+    runtimeBackendWebSocket: 'wss://production-backend.example.com',
+    runtimeVerificationResult: 'skipped',
+    skippedReason: undefined,
+    tagCreationResult: 'skipped',
+    webappUrl: 'https://production.example.com',
+  },
+  release: {
+    artifactChecksum: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    artifactName: 'wire-webapp-release-2026-07-17.1',
+    artifactVersion: '2026.07.17.1',
+    branch: 'release/2026-07-17.1',
+    commitSha: '1234567890abcdef1234567890abcdef12345678',
+    identifier: '2026-07-17.1',
+    manualReason: undefined,
+  },
 };
 
-function runReleaseCloudSummaryRenderer(
-  environmentOverrides: Readonly<Partial<Record<string, string>>> = {},
-): ReleaseCloudSummaryRendererResult {
-  const rendererEnvironment: ReleaseCloudEnvironment = {
-    PATH: process.env.PATH ?? '',
-    ...baselineReleaseCloudEnvironment,
-    ...environmentOverrides,
-  };
-  const rendererProcess = spawnSync('bash', ['.github/scripts/render-release-cloud-summary.sh'], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: rendererEnvironment,
-  });
-
-  return {
-    exitCode: rendererProcess.status,
-    standardOutput: rendererProcess.stdout,
-    standardError: rendererProcess.stderr,
-  };
-}
-
-function assertSuccessfulRendererRun(result: ReleaseCloudSummaryRendererResult): void {
-  assert.strictEqual(result.exitCode, 0);
-  assert.strictEqual(result.standardError, '');
-  assert.doesNotMatch(result.standardOutput, /\]\(\)/);
-  assert.doesNotMatch(result.standardOutput, /\/releases\/tag\//);
-}
-
-function assertSummarySectionHeadings(summaryMarkdown: string): void {
-  assert.match(summaryMarkdown, /^## Release Cloud$/m);
-  assert.match(summaryMarkdown, /^### Beta deployment$/m);
-  assert.match(summaryMarkdown, /^### E2E system gate$/m);
-  assert.match(summaryMarkdown, /^### Production deployment$/m);
-  assert.match(summaryMarkdown, /^### Production distribution$/m);
+function assertSummaryContract(summary: string): void {
+  expect(summary).toMatch(/\n$/);
+  expect(summary).toMatch(/^## Release Cloud$/m);
+  expect(summary).toMatch(/^### Beta deployment$/m);
+  expect(summary).toMatch(/^### E2E system gate$/m);
+  expect(summary).toMatch(/^### Production deployment$/m);
+  expect(summary).toMatch(/^### Production distribution$/m);
+  expect(summary).not.toMatch(/\]\(\)/);
+  expect(summary).not.toMatch(/\/releases\/tag\//);
+  expect(summary).not.toMatch(/undefined/);
+  expect(summary).not.toMatch(/null/);
 }
 
 test('renders a successful Beta-only release', () => {
-  const result = runReleaseCloudSummaryRenderer();
+  const summary = renderReleaseCloudSummary(baselineReleaseCloudSummaryInput);
 
-  assertSuccessfulRendererRun(result);
-  assertSummarySectionHeadings(result.standardOutput);
-  assert.match(result.standardOutput, /^- Result: deployed and verified successfully$/m);
-  assert.match(result.standardOutput, /^- Result: passed successfully$/m);
-  assert.match(result.standardOutput, /### Production deployment[\s\S]*?- Result: not requested/m);
-  assert.match(
-    result.standardOutput,
-    /^- Beta tag: \[2026-07-17\.1-beta\.1\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/tree\/2026-07-17\.1-beta\.1\)$/m,
+  assertSummaryContract(summary);
+  expect(summary).toMatch(/### Beta deployment[\s\S]*?- Result: deployed and verified successfully/m);
+  expect(summary).toMatch(/### E2E system gate[\s\S]*?- Result: passed successfully/m);
+  expect(summary).toMatch(/### Production deployment[\s\S]*?- Result: not requested/m);
+  expect(summary).toMatch(/### Production distribution[\s\S]*?- Result: not requested/m);
+  expect(summary).toMatch(
+    /- Beta tag: \[2026-07-17\.1-beta\.1\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/tree\/2026-07-17\.1-beta\.1\)/,
   );
-  assert.match(result.standardOutput, /^- Production tag: not requested$/m);
-  assert.match(result.standardOutput, /^- Production tag creation result: not requested$/m);
-  assert.match(result.standardOutput, /### Production distribution[\s\S]*?- Result: not requested/m);
-  assert.doesNotMatch(result.standardOutput, /^- Production tag: \[/m);
+  expect(summary).toMatch(/- Production tag: not requested/);
+  expect(summary).not.toMatch(/### Production deployment[\s\S]*?- Production tag: \[/m);
 });
 
 test('renders a successful Production release with distribution metadata', () => {
   const productionTagName = '2026-07-17.1-production';
   const productionImageTag = `${productionTagName}-v0.34.9-0-1234567`;
   const wireBuildsCommitSha = 'abcdefabcdefabcdefabcdefabcdefabcdefabcd';
-  const result = runReleaseCloudSummaryRenderer({
-    PRODUCTION_PROMOTION_REQUESTED: 'true',
-    PRODUCTION_PREFLIGHT_JOB_RESULT: 'success',
-    PRODUCTION_PREFLIGHT_RESULT: 'ready',
-    PRODUCTION_DEPLOYMENT_RESULT: 'success',
-    PRODUCTION_RUNTIME_VERIFICATION_RESULT: 'success',
-    PRODUCTION_TAG_CREATION_RESULT: 'success',
-    CREATED_PRODUCTION_TAG_NAME: productionTagName,
-    PRODUCTION_DISTRIBUTION_JOB_RESULT: 'success',
-    PRODUCTION_DISTRIBUTION_RESULT: 'success',
-    PRODUCTION_DOCKER_IMAGE_TAG: productionImageTag,
-    PRODUCTION_HELM_CHART_VERSION: '0.8.0-pre.3175',
-    PRODUCTION_WIRE_BUILDS_COMMIT_SHA: wireBuildsCommitSha,
-  });
+  const input: ReleaseCloudSummaryInput = {
+    ...baselineReleaseCloudSummaryInput,
+    distribution: {
+      ...baselineReleaseCloudSummaryInput.distribution,
+      dockerImageTag: productionImageTag,
+      distributionJobResult: 'success',
+      distributionResult: 'success',
+      helmChartVersion: '0.8.0-pre.3175',
+      wireBuildsCommitSha,
+    },
+    production: {
+      ...baselineReleaseCloudSummaryInput.production,
+      createdTagName: productionTagName,
+      deploymentResult: 'success',
+      preflightJobResult: 'success',
+      preflightResult: 'ready',
+      promotionRequested: true,
+      runtimeVerificationResult: 'success',
+      tagCreationResult: 'success',
+    },
+  };
+  const summary = renderReleaseCloudSummary(input);
 
-  assertSuccessfulRendererRun(result);
-  assert.match(result.standardOutput, /^- Result: deployed, verified, and tagged successfully$/m);
-  assert.match(result.standardOutput, /^- Runtime verification result: verified successfully$/m);
-  assert.match(
-    result.standardOutput,
-    new RegExp(
-      `^- Production tag: \\[${productionTagName}\\]\\(https://github\\.com/wireapp/wire-webapp/tree/${productionTagName}\\)$`,
-      'm',
-    ),
+  assertSummaryContract(summary);
+  expect(summary).toMatch(/### Production deployment[\s\S]*?- Result: deployed, verified, and tagged successfully/m);
+  expect(summary).toMatch(/### Production deployment[\s\S]*?- Runtime verification result: verified successfully/m);
+  expect(summary).toMatch(
+    /- Production tag: \[2026-07-17\.1-production\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/tree\/2026-07-17\.1-production\)/,
   );
-  assert.match(result.standardOutput, /^- Production tag creation result: created successfully$/m);
-  assert.match(result.standardOutput, new RegExp(`^- Docker image: quay\\.io/wire/webapp:${productionImageTag}$`, 'm'));
-  assert.match(result.standardOutput, /^- Helm chart repository: https:\/\/charts\.example\.com\/webapp$/m);
-  assert.match(result.standardOutput, /^- Helm chart version: 0\.8\.0-pre\.3175$/m);
-  assert.match(
-    result.standardOutput,
-    new RegExp(
-      `^- wire-builds/main commit: \\[${wireBuildsCommitSha}\\]\\(https://github\\.com/wireapp/wire-builds/commit/${wireBuildsCommitSha}\\)$`,
-      'm',
-    ),
+  expect(summary).toMatch(/- Docker image: quay\.io\/wire\/webapp:2026-07-17\.1-production-v0\.34\.9-0-1234567/);
+  expect(summary).toMatch(/- Helm chart repository: https:\/\/charts\.example\.com\/webapp/);
+  expect(summary).toMatch(/- Helm chart version: 0\.8\.0-pre\.3175/);
+  expect(summary).toMatch(
+    /- wire-builds\/main commit: \[abcdefabcdefabcdefabcdefabcdefabcdefabcd\]\(https:\/\/github\.com\/wireapp\/wire-builds\/commit\/abcdefabcdefabcdefabcdefabcdefabcdefabcd\)/,
   );
-  assert.match(result.standardOutput, /^- Approval gate: wire-webapp-production GitHub Environment settings$/m);
+  expect(summary).toMatch(/- Approval gate: wire-webapp-production GitHub Environment settings/);
 });
 
 test('renders a Production release that is already tagged', () => {
   const plannedProductionTagName = '2026-07-17.1-production';
-  const result = runReleaseCloudSummaryRenderer({
-    PRODUCTION_PROMOTION_REQUESTED: 'true',
-    PRODUCTION_PREFLIGHT_JOB_RESULT: 'success',
-    PRODUCTION_PREFLIGHT_RESULT: 'already_tagged',
-    PRODUCTION_DEPLOYMENT_RESULT: 'skipped',
-    PRODUCTION_TAG_CREATION_RESULT: 'skipped',
-    PLANNED_PRODUCTION_TAG_NAME: plannedProductionTagName,
-    CREATED_PRODUCTION_TAG_NAME: 'created-production-tag',
-    PRODUCTION_DISTRIBUTION_JOB_RESULT: 'skipped',
-    PRODUCTION_DISTRIBUTION_RESULT: 'skipped',
-  });
+  const input: ReleaseCloudSummaryInput = {
+    ...baselineReleaseCloudSummaryInput,
+    production: {
+      ...baselineReleaseCloudSummaryInput.production,
+      createdTagName: 'created-production-tag',
+      deploymentResult: 'skipped',
+      preflightJobResult: 'success',
+      preflightResult: 'already_tagged',
+      promotionRequested: true,
+      tagCreationResult: 'skipped',
+    },
+  };
+  const summary = renderReleaseCloudSummary(input);
 
-  assertSuccessfulRendererRun(result);
-  assert.match(result.standardOutput, /^- Result: already tagged; deployment not required$/m);
-  assert.match(result.standardOutput, /^- Production preflight result: already tagged$/m);
-  assert.match(
-    result.standardOutput,
+  assertSummaryContract(summary);
+  expect(summary).toMatch(/### Production deployment[\s\S]*?- Result: already tagged; deployment not required/m);
+  expect(summary).toMatch(/### Production deployment[\s\S]*?- Production preflight result: already tagged/m);
+  expect(summary).toMatch(
     new RegExp(
-      `^- Production tag: \\[${plannedProductionTagName}\\]\\(https://github\\.com/wireapp/wire-webapp/tree/${plannedProductionTagName}\\)$`,
-      'm',
+      `- Production tag: \\[${plannedProductionTagName}\\]\\(https://github\\.com/wireapp/wire-webapp/tree/${plannedProductionTagName}\\)`,
     ),
   );
-  assert.match(result.standardOutput, /^- Production tag creation result: not required; tag already exists$/m);
-  assert.match(
-    result.standardOutput,
-    /### Production distribution[\s\S]*?- Result: not run; Production tag already exists/m,
-  );
-  assert.doesNotMatch(result.standardOutput, /created-production-tag/);
+  expect(summary).toMatch(/- Production tag creation result: not required; tag already exists/);
+  expect(summary).toMatch(/### Production distribution[\s\S]*?- Result: not run; Production tag already exists/m);
+  expect(summary).not.toMatch(/created-production-tag/);
 });
 
 test('renders a Production runtime verification failure', () => {
-  const result = runReleaseCloudSummaryRenderer({
-    PRODUCTION_PROMOTION_REQUESTED: 'true',
-    PRODUCTION_PREFLIGHT_JOB_RESULT: 'success',
-    PRODUCTION_PREFLIGHT_RESULT: 'ready',
-    PRODUCTION_DEPLOYMENT_RESULT: 'success',
-    PRODUCTION_RUNTIME_VERIFICATION_RESULT: 'failure',
-    PRODUCTION_TAG_CREATION_RESULT: 'skipped',
-    CREATED_PRODUCTION_TAG_NAME: '',
-    PRODUCTION_DISTRIBUTION_JOB_RESULT: 'skipped',
-    PRODUCTION_DISTRIBUTION_RESULT: 'skipped',
-  });
+  const input: ReleaseCloudSummaryInput = {
+    ...baselineReleaseCloudSummaryInput,
+    production: {
+      ...baselineReleaseCloudSummaryInput.production,
+      deploymentResult: 'success',
+      preflightJobResult: 'success',
+      preflightResult: 'ready',
+      promotionRequested: true,
+      runtimeVerificationResult: 'failure',
+      tagCreationResult: 'skipped',
+    },
+  };
+  const summary = renderReleaseCloudSummary(input);
 
-  assertSuccessfulRendererRun(result);
-  assert.match(result.standardOutput, /^- Result: deployed, but runtime verification failed$/m);
-  assert.match(result.standardOutput, /^- Runtime verification result: failed$/m);
-  assert.match(result.standardOutput, /^- Production tag: not created$/m);
-  assert.match(result.standardOutput, /^- Result: not run$/m);
-  assert.doesNotMatch(result.standardOutput, /^- Production tag: \[/m);
+  assertSummaryContract(summary);
+  expect(summary).toMatch(/### Production deployment[\s\S]*?- Result: deployed, but runtime verification failed/m);
+  expect(summary).toMatch(/### Production deployment[\s\S]*?- Runtime verification result: failed/m);
+  expect(summary).toMatch(/### Production deployment[\s\S]*?- Production tag: not created/m);
+  expect(summary).toMatch(/### Production distribution[\s\S]*?- Result: not run/m);
+  expect(summary).not.toMatch(/### Production deployment[\s\S]*?- Production tag: \[/m);
 });
 
 test('renders a Beta deployment failure with the remaining gates not run', () => {
-  const result = runReleaseCloudSummaryRenderer({
-    BETA_RESULT: 'failure',
-    BETA_TAG_CREATION_RESULT: 'skipped',
-    E2E_RESULT: 'skipped',
-    PRODUCTION_PREFLIGHT_JOB_RESULT: 'skipped',
-    PRODUCTION_PREFLIGHT_RESULT: 'skipped',
-  });
+  const input: ReleaseCloudSummaryInput = {
+    ...baselineReleaseCloudSummaryInput,
+    beta: {
+      ...baselineReleaseCloudSummaryInput.beta,
+      deploymentResult: 'failure',
+      tagCreationResult: 'skipped',
+    },
+    e2e: {
+      ...baselineReleaseCloudSummaryInput.e2e,
+      result: 'skipped',
+    },
+    production: {
+      ...baselineReleaseCloudSummaryInput.production,
+      preflightJobResult: 'skipped',
+      preflightResult: 'skipped',
+    },
+  };
+  const summary = renderReleaseCloudSummary(input);
 
-  assertSuccessfulRendererRun(result);
-  assertSummarySectionHeadings(result.standardOutput);
-  assert.match(result.standardOutput, /^- Result: failed$/m);
-  assert.match(result.standardOutput, /^- Beta tag: not created$/m);
-  assert.match(result.standardOutput, /^- Result: did not run$/m);
+  assertSummaryContract(summary);
+  expect(summary).toMatch(/### Beta deployment[\s\S]*?- Result: failed/m);
+  expect(summary).toMatch(/### Beta deployment[\s\S]*?- Beta tag: not created/m);
+  expect(summary).toMatch(/### E2E system gate[\s\S]*?- Result: did not run/m);
 });
 
-test('uses not available for missing build metadata', () => {
-  const result = runReleaseCloudSummaryRenderer({
-    ARTIFACT_CHECKSUM: '',
-    ARTIFACT_NAME: '',
-    ARTIFACT_VERSION: '',
-    RELEASE_COMMIT_SHA: '',
-    RELEASE_IDENTIFIER: '',
-  });
+test('renders unknown results instead of treating unknown job states as success', () => {
+  const parsedInput = readReleaseCloudSummaryInput({BETA_RESULT: 'unexpected'});
+  const input: ReleaseCloudSummaryInput = {
+    ...baselineReleaseCloudSummaryInput,
+    beta: {
+      ...baselineReleaseCloudSummaryInput.beta,
+      deploymentResult: parsedInput.beta.deploymentResult,
+    },
+  };
+  const summary = renderReleaseCloudSummary(input);
 
-  assertSuccessfulRendererRun(result);
-  assertSummarySectionHeadings(result.standardOutput);
-  assert.match(result.standardOutput, /^- Artifact checksum: not available$/m);
-  assert.match(result.standardOutput, /^- Artifact name: not available$/m);
-  assert.match(result.standardOutput, /^- Artifact version: not available$/m);
-  assert.match(result.standardOutput, /^- Commit SHA: not available$/m);
-  assert.match(result.standardOutput, /^- Release identifier: not available$/m);
+  assertSummaryContract(summary);
+  expect(summary).toMatch(/### Beta deployment[\s\S]*?- Result: unknown result/m);
+  expect(summary).not.toMatch(/### Beta deployment[\s\S]*?- Result: deployed and verified successfully/m);
+});
+
+test('uses not available for missing release metadata', () => {
+  const input: ReleaseCloudSummaryInput = {
+    ...baselineReleaseCloudSummaryInput,
+    release: {
+      ...baselineReleaseCloudSummaryInput.release,
+      artifactChecksum: undefined,
+      artifactName: undefined,
+      artifactVersion: undefined,
+      commitSha: undefined,
+      identifier: undefined,
+    },
+  };
+  const summary = renderReleaseCloudSummary(input);
+
+  assertSummaryContract(summary);
+  expect(summary).toMatch(/- Artifact checksum: not available/);
+  expect(summary).toMatch(/- Artifact name: not available/);
+  expect(summary).toMatch(/- Artifact version: not available/);
+  expect(summary).toMatch(/- Commit SHA: not available/);
+  expect(summary).toMatch(/- Release identifier: not available/);
 });
 
 test('renders Manual reason only when a reason is provided', () => {
-  const reasonProvidedResult = runReleaseCloudSummaryRenderer({RELEASE_REASON: 'manual release for validation'});
-  const reasonOmittedResult = runReleaseCloudSummaryRenderer({RELEASE_REASON: ''});
+  const inputWithReason: ReleaseCloudSummaryInput = {
+    ...baselineReleaseCloudSummaryInput,
+    release: {
+      ...baselineReleaseCloudSummaryInput.release,
+      manualReason: 'manual release for validation',
+    },
+  };
+  const summaryWithReason = renderReleaseCloudSummary(inputWithReason);
+  const summaryWithoutReason = renderReleaseCloudSummary(baselineReleaseCloudSummaryInput);
 
-  assertSuccessfulRendererRun(reasonProvidedResult);
-  assertSuccessfulRendererRun(reasonOmittedResult);
-  assert.match(reasonProvidedResult.standardOutput, /^- Manual reason: manual release for validation$/m);
-  assert.doesNotMatch(reasonOmittedResult.standardOutput, /^- Manual reason:/m);
+  assertSummaryContract(summaryWithReason);
+  assertSummaryContract(summaryWithoutReason);
+  expect(summaryWithReason).toMatch(/- Manual reason: manual release for validation/);
+  expect(summaryWithoutReason).not.toMatch(/- Manual reason:/);
 });

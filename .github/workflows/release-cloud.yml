@@ -657,8 +657,15 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
-          sparse-checkout: .github/scripts
-          sparse-checkout-cone-mode: true
+          sparse-checkout: |
+            .nvmrc
+            bin/renderReleaseCloudSummary.ts
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
 
       - name: Add release summary
         env:
@@ -703,7 +710,7 @@ jobs:
           RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
           RELEASE_REASON: ${{ inputs.reason }}
           TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
-        run: bash .github/scripts/render-release-cloud-summary.sh >> "$GITHUB_STEP_SUMMARY"
+        run: node bin/renderReleaseCloudSummary.ts >> "$GITHUB_STEP_SUMMARY"
 
   notify_release_failure:
     name: Notify release failure
