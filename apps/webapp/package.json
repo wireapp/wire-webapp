@@ -136,7 +136,7 @@
     "@types/webpack-env": "1.18.8",
     "@types/wicg-file-system-access": "2023.10.7",
     "@wireapp/store-engine": "workspace:^",
-    "autoprefixer": "10.5.2",
+    "autoprefixer": "10.5.3",
     "babel-jest": "30.4.1",
     "babel-loader": "10.1.1",
     "babel-plugin-transform-import-meta": "2.3.3",
