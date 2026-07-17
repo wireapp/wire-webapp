@@ -225,12 +225,20 @@ jobs:
     name: Deploy to Beta
     runs-on: ubuntu-24.04
     needs: build_artifact
-    permissions: {}
+    permissions:
+      contents: read
     environment:
       name: wire-webapp-beta
       url: https://wire-webapp-beta.wire.com/
 
     steps:
+      - name: Checkout runtime verification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions/verify-webapp-runtime
+          sparse-checkout-cone-mode: true
+
       - name: Download build artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
@@ -258,56 +266,14 @@ jobs:
           use-existing-application-version-if-available: true
 
       - name: Verify Beta runtime
-        env:
-          BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
-          EXPECTED_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
-          EXPECTED_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
-          EXPECTED_COMMIT: ${{ needs.build_artifact.outputs.release_commit_sha }}
-          EXPECTED_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
-        run: |
-          set -euo pipefail
-
-          normalize_url() {
-            printf '%s' "${1%/}"
-          }
-
-          expected_backend_rest="$(normalize_url "${EXPECTED_BACKEND_REST}")"
-          expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
-
-          for attempt_number in {1..10}; do
-            version_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${BETA_WEBAPP_URL}version" || true)"
-            commit_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${BETA_WEBAPP_URL}commit" || true)"
-            runtime_config="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${BETA_WEBAPP_URL}config.js" || true)"
-
-            actual_version="$(
-              printf '%s' "${version_response}" |
-                jq --raw-output '.version'
-            )" || actual_version=''
-            actual_commit="$(
-              printf '%s' "${commit_response}" |
-                tr -d '\r\n'
-            )"
-            actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
-            actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
-
-            if [[
-              "${actual_version}" == "${EXPECTED_VERSION}" &&
-              "${actual_commit}" == "${EXPECTED_COMMIT}" &&
-              "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" &&
-              "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}"
-            ]]; then
-              exit 0
-            fi
-
-            echo "Beta runtime verification mismatch on attempt ${attempt_number}: VERSION=${actual_version:-missing}, COMMIT=${actual_commit:-missing}, REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}." >&2
-
-            if [[ "${attempt_number}" -lt 10 ]]; then
-              sleep 6
-            fi
-          done
-
-          echo "Beta runtime verification failed after 10 attempts." >&2
-          exit 1
+        uses: ./.github/actions/verify-webapp-runtime
+        with:
+          environment-label: Beta
+          webapp-url: ${{ env.BETA_WEBAPP_URL }}
+          expected-version: ${{ needs.build_artifact.outputs.artifact_version }}
+          expected-commit: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          expected-backend-rest: ${{ env.BETA_RUNTIME_BACKEND_REST }}
+          expected-backend-ws: ${{ env.BETA_RUNTIME_BACKEND_WS }}
 
   create_beta_tag:
     name: Create Beta tag
@@ -584,66 +550,27 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build_artifact, deploy_to_production]
     if: ${{ needs.deploy_to_production.result == 'success' }}
-    permissions: {}
+    permissions:
+      contents: read
     timeout-minutes: 10
 
     steps:
-      - name: Verify live Production runtime
-        env:
-          EXPECTED_BACKEND_REST: ${{ env.PRODUCTION_RUNTIME_BACKEND_REST }}
-          EXPECTED_BACKEND_WS: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}
-          EXPECTED_COMMIT: ${{ needs.build_artifact.outputs.release_commit_sha }}
-          EXPECTED_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
-          PRODUCTION_WEBAPP_URL: ${{ env.PRODUCTION_WEBAPP_URL }}
-        run: |
-          set -euo pipefail
+      - name: Checkout runtime verification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions/verify-webapp-runtime
+          sparse-checkout-cone-mode: true
 
-          normalize_url() {
-            printf '%s' "${1%/}"
-          }
-
-          expected_backend_rest="$(normalize_url "${EXPECTED_BACKEND_REST}")"
-          expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
-
-          for attempt_number in {1..10}; do
-            version_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${PRODUCTION_WEBAPP_URL}version" || true)"
-            commit_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${PRODUCTION_WEBAPP_URL}commit" || true)"
-            runtime_config="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${PRODUCTION_WEBAPP_URL}config.js" || true)"
-
-            actual_version="$(
-              printf '%s' "${version_response}" |
-                jq --raw-output '.version'
-            )" || actual_version=''
-            actual_commit="$(
-              printf '%s' "${commit_response}" |
-                tr -d '\r\n'
-            )"
-            actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
-            actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
-
-            if [[
-              "${actual_version}" == "${EXPECTED_VERSION}" &&
-              "${actual_commit}" == "${EXPECTED_COMMIT}" &&
-              "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" &&
-              "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}"
-            ]]; then
-              echo "Production runtime verification succeeded on attempt ${attempt_number}: VERSION=${actual_version}, COMMIT=${actual_commit}, REST=$(normalize_url "${actual_backend_rest}"), WS=$(normalize_url "${actual_backend_ws}")."
-              exit 0
-            fi
-
-            echo "Production runtime configuration mismatch on attempt ${attempt_number}." >&2
-            echo "Expected: VERSION=${EXPECTED_VERSION}, COMMIT=${EXPECTED_COMMIT}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
-            echo "Observed: VERSION=${actual_version:-missing}, COMMIT=${actual_commit:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
-
-            if [[ "${attempt_number}" -lt 10 ]]; then
-              sleep 6
-            fi
-          done
-
-          echo "Production runtime verification failed after 10 attempts." >&2
-          echo "Expected: VERSION=${EXPECTED_VERSION}, COMMIT=${EXPECTED_COMMIT}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
-          echo "Observed: VERSION=${actual_version:-missing}, COMMIT=${actual_commit:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
-          exit 1
+      - name: Verify Production runtime
+        uses: ./.github/actions/verify-webapp-runtime
+        with:
+          environment-label: Production
+          webapp-url: ${{ env.PRODUCTION_WEBAPP_URL }}
+          expected-version: ${{ needs.build_artifact.outputs.artifact_version }}
+          expected-commit: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          expected-backend-rest: ${{ env.PRODUCTION_RUNTIME_BACKEND_REST }}
+          expected-backend-ws: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}
 
   create_production_tag:
     name: Create Production tag
