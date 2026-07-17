@@ -1947,7 +1947,7 @@ describe('CellsAPI', () => {
       expect(result).toEqual(mockResponse);
     });
 
-    it('filters by multiple tags with Should operation (OR) so any selected tag matches (WPB-27126)', async () => {
+    it('creates one Should metadata filter per selected tag', async () => {
       const searchPhrase = 'test';
       const tags = ['tag1', 'tag2'];
       const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
