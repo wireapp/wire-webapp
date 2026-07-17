@@ -17,22 +17,15 @@
  *
  */
 
-import {useMeetNowModal} from 'Components/Meeting/MeetNowModal/useMeetNowModal';
-import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {User} from 'Repositories/entity/User';
+import type {TranslationKey} from 'Util/localizerUtil';
 
-export const useMeetingActions = () => {
-  const {wallClock} = useApplicationContext();
-  const openCreate = useScheduleMeetingModal(state => state.openCreate);
-  const openMeetNow = useMeetNowModal(state => state.open);
+export type MeetNowFormState = {
+  title: string;
+  selectedUsers: User[];
+  participantsFilter: string;
+};
 
-  const handleMeetNow = () => {
-    openMeetNow();
-  };
-
-  const handleScheduleMeeting = () => {
-    openCreate(wallClock);
-  };
-
-  return {handleMeetNow, handleScheduleMeeting};
+export type MeetNowFormErrors = {
+  title?: TranslationKey;
 };

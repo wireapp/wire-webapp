@@ -23,9 +23,9 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
 import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeetingInstanceToScheduleFormState';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {MeetNowFormState} from 'Components/Meeting/MeetNowModal/meetNowTypes';
 import {
-  scheduleMeeting as scheduleMeetingTask,
-  updateMeeting as updateMeetingTask,
+  type MeetNowSubmitSuccess,
   type MeetingSubmitSuccess,
   type UpdateMeetingParams,
 } from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
@@ -48,6 +48,7 @@ export type MeetingStoreState = {
   hasLoadError: boolean;
   loadMeetings: () => Promise<void>;
   scheduleMeeting: (formState: ScheduleMeetingFormState) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  meetNowMeeting: (formState: MeetNowFormState) => Task<MeetNowSubmitSuccess, MeetingSubmitErrors>;
   updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
 };
@@ -68,8 +69,9 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
 
       set({meetingSeries: listResult.meetingSeries, hasLoadError: listResult.hasLoadError, isLoading: false});
     },
-    scheduleMeeting: formState => scheduleMeetingTask(formState, deps),
-    updateMeeting: params => updateMeetingTask(params, deps),
+    scheduleMeeting: deps.serviceTasks.scheduleMeeting,
+    meetNowMeeting: deps.serviceTasks.meetNowMeeting,
+    updateMeeting: deps.serviceTasks.updateMeeting,
     loadMeetingForEdit: meetingInstance => {
       const {meetingSeries} = meetingInstance;
 

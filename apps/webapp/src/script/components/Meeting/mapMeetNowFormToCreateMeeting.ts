@@ -17,22 +17,18 @@
  *
  */
 
-import {useMeetNowModal} from 'Components/Meeting/MeetNowModal/useMeetNowModal';
-import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 
-export const useMeetingActions = () => {
-  const {wallClock} = useApplicationContext();
-  const openCreate = useScheduleMeetingModal(state => state.openCreate);
-  const openMeetNow = useMeetNowModal(state => state.open);
+import type {MeetNowFormState} from 'Components/Meeting/MeetNowModal/meetNowTypes';
+import {getMeetNowMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingDefaults';
 
-  const handleMeetNow = () => {
-    openMeetNow();
+export const mapMeetNowFormToCreateMeeting = (formState: MeetNowFormState, wallClock: WallClock): CreateMeeting => {
+  const {start, end} = getMeetNowMeetingTimes(wallClock);
+
+  return {
+    title: formState.title.trim(),
+    start_time: start.toISOString(),
+    end_time: end.toISOString(),
   };
-
-  const handleScheduleMeeting = () => {
-    openCreate(wallClock);
-  };
-
-  return {handleMeetNow, handleScheduleMeeting};
 };

@@ -22,7 +22,7 @@ import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 
-import type {MeetingStoreDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
+import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -31,7 +31,7 @@ import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository'
 import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
-import {scheduleMeeting, updateMeeting} from './scheduleMeetingService';
+import {meetNowMeeting, scheduleMeeting, updateMeeting} from './scheduleMeetingService';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
@@ -124,7 +124,7 @@ describe('scheduleMeeting', () => {
     establishMeetingConversation?: jest.Mock;
     safeAddUsers?: jest.Mock;
   } = {}): {
-    deps: MeetingStoreDeps;
+    deps: MeetingServiceDeps;
     createMeetingMock: jest.Mock;
     establishMeetingConversation: jest.Mock;
     saveMeetingConversationFromBackend: jest.Mock;
@@ -226,6 +226,70 @@ describe('scheduleMeeting', () => {
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.createFailed);
+  });
+});
+
+describe('meetNowMeeting', () => {
+  const createDeps = ({
+    createMeetingMock = jest.fn().mockReturnValue(
+      task.resolve({
+        qualified_conversation: qualifiedConversation,
+        qualified_id: meetingId,
+        conversation: meetingConversationResponse,
+      }),
+    ),
+    saveMeetingConversationFromBackend = jest.fn().mockReturnValue(task.resolve(undefined)),
+    safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation())),
+    establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+  }: {
+    createMeetingMock?: jest.Mock;
+    saveMeetingConversationFromBackend?: jest.Mock;
+    safeGetConversationById?: jest.Mock;
+    establishMeetingConversation?: jest.Mock;
+    safeAddUsers?: jest.Mock;
+  } = {}) => {
+    const meetingsRepository = {
+      createMeeting: createMeetingMock,
+      getMeetingsList: jest.fn(),
+    } as unknown as MeetingsRepository;
+
+    const conversationRepository = {
+      saveMeetingConversationFromBackend,
+      safeGetConversationById,
+      establishMeetingConversation,
+      safeAddUsers,
+    } as unknown as ConversationRepository;
+
+    return {
+      deps: {meetingsRepository, conversationRepository, wallClock},
+      createMeetingMock,
+      establishMeetingConversation,
+    };
+  };
+
+  it('creates an instant meeting and returns the qualified conversation', async () => {
+    const {deps, createMeetingMock} = createDeps();
+
+    const result = await meetNowMeeting(
+      {
+        title: 'Standup',
+        selectedUsers: [],
+        participantsFilter: '',
+      },
+      deps,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(result.match({Ok: value => value, Err: () => null})).toEqual({
+      failedToAdd: [],
+      qualifiedConversation,
+    });
+    expect(createMeetingMock).toHaveBeenCalledWith({
+      title: 'Standup',
+      start_time: fixedNow.toISOString(),
+      end_time: new Date(fixedNow.getTime() + 60 * 60 * 1000).toISOString(),
+    });
   });
 });
 
