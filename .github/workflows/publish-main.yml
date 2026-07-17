@@ -207,7 +207,7 @@ jobs:
           echo 'superseded=false' >> "${GITHUB_OUTPUT}"
           echo 'deploy_allowed=true' >> "${GITHUB_OUTPUT}"
 
-      - name: Download build artifact
+      - name: Download shared main artifact
         if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
@@ -268,7 +268,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   deploy_to_dev:
-    name: Deploy to hosted Dev
+    name: Deploy to Hosted Dev
     runs-on: ubuntu-24.04
     needs: build_main_artifacts
     permissions:
@@ -588,7 +588,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   notify_main_delivery_failure:
-    name: Notify main delivery failure to Deployoholics
+    name: Notify Deployoholics of main delivery failure
     runs-on: ubuntu-24.04
     needs:
       - build_main_artifacts
