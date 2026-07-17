@@ -40,7 +40,9 @@ jest.mock('@enormora/wall-clock/wall-clock', () => ({
 
 jest.mock('./renderer', () => ({
   WebGLRenderer: jest.fn().mockImplementation(() => ({
-    render: jest.fn(),
+    renderWithNewMasks: jest.fn(),
+    renderWithPreviousMask: jest.fn(),
+    renderPassthrough: jest.fn(),
     close: jest.fn(),
   })),
 }));
@@ -352,6 +354,231 @@ describe('segmenter tests', () => {
       expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(2);
 
       expect(firstSegmenter.close).toHaveBeenCalled();
+    });
+  });
+
+  describe('runSegmenter rendering', () => {
+    it('renders the original frame when background effects are disabled', async () => {
+      const segmenter = {
+        close: jest.fn(),
+        setOptions: jest.fn(),
+        segmentForVideo: jest.fn(),
+      };
+
+      (ImageSegmenter.createFromOptions as jest.Mock).mockResolvedValueOnce(segmenter);
+
+      let writerSink!: UnderlyingSink<VideoFrame>;
+
+      const readable = {
+        pipeTo: jest.fn(writer => {
+          writerSink = (writer as any).sink;
+          return Promise.resolve();
+        }),
+      } as unknown as ReadableStream;
+
+      const canvas = {
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      } as unknown as OffscreenCanvas;
+
+      await runSegmenter(
+        canvas,
+        readable,
+        {
+          enabled: false,
+          quality: 'bypass',
+          modelPath: 'model-a.tflite',
+          wasmLoaderPath: '/mock/vision_wasm_internal.js',
+          wasmBinaryPath: '/mock/vision_wasm_internal.wasm',
+        } as any,
+        jest.fn(),
+        jest.fn(),
+      );
+
+      const frame = {
+        codedWidth: 640,
+        codedHeight: 480,
+        displayWidth: 640,
+        displayHeight: 480,
+        timestamp: 1,
+        close: jest.fn(),
+      } as unknown as VideoFrame;
+
+      await writerSink.write!(frame, {} as WritableStreamDefaultController);
+
+      const {WebGLRenderer} = await import('./renderer');
+
+      const renderer = (WebGLRenderer as unknown as jest.Mock).mock.results[0].value;
+
+      expect(renderer.renderPassthrough).toHaveBeenCalledWith(frame);
+      expect(renderer.renderWithNewMasks).not.toHaveBeenCalled();
+      expect(renderer.renderWithPreviousMask).not.toHaveBeenCalled();
+      expect(segmenter.segmentForVideo).not.toHaveBeenCalled();
+      expect(frame.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders with new segmentation masks when background effects are enabled', async () => {
+      const categoryTexture = {} as WebGLTexture;
+      const confidenceTexture = {} as WebGLTexture;
+
+      const categoryMask = {
+        getAsWebGLTexture: jest.fn(() => categoryTexture),
+        close: jest.fn(),
+      };
+
+      const confidenceMask = {
+        getAsWebGLTexture: jest.fn(() => confidenceTexture),
+        close: jest.fn(),
+      };
+
+      const segmenter = {
+        close: jest.fn(),
+        setOptions: jest.fn(),
+        segmentForVideo: jest.fn(
+          (
+            _source: VideoFrame,
+            _timestamp: number,
+            callback: (result: {
+              categoryMask: typeof categoryMask;
+              confidenceMasks: Array<typeof confidenceMask>;
+            }) => void,
+          ) => {
+            callback({
+              categoryMask,
+              confidenceMasks: [confidenceMask],
+            });
+          },
+        ),
+      };
+
+      (ImageSegmenter.createFromOptions as jest.Mock).mockResolvedValueOnce(segmenter);
+
+      let writerSink!: UnderlyingSink<VideoFrame>;
+
+      const readable = {
+        pipeTo: jest.fn(writer => {
+          writerSink = (writer as any).sink;
+          return Promise.resolve();
+        }),
+      } as unknown as ReadableStream;
+
+      const canvas = {
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      } as unknown as OffscreenCanvas;
+
+      const options = {
+        enabled: true,
+        quality: 'auto',
+        enableFilters: false,
+        modelPath: 'model-a.tflite',
+        wasmLoaderPath: '/mock/vision_wasm_internal.js',
+        wasmBinaryPath: '/mock/vision_wasm_internal.wasm',
+      };
+
+      await runSegmenter(canvas, readable, options as any, jest.fn(), jest.fn());
+
+      const frame = {
+        codedWidth: 640,
+        codedHeight: 480,
+        displayWidth: 640,
+        displayHeight: 480,
+        timestamp: 1,
+        close: jest.fn(),
+      } as unknown as VideoFrame;
+
+      await writerSink.write!(frame, {} as WritableStreamDefaultController);
+
+      const {WebGLRenderer} = await import('./renderer');
+
+      const renderer = (WebGLRenderer as unknown as jest.Mock).mock.results[0].value;
+
+      expect(segmenter.segmentForVideo).toHaveBeenCalledWith(frame, 1000, expect.any(Function));
+
+      expect(renderer.renderWithNewMasks).toHaveBeenCalledWith(
+        frame,
+        expect.objectContaining(options),
+        categoryTexture,
+        confidenceTexture,
+        false,
+      );
+
+      expect(renderer.renderPassthrough).not.toHaveBeenCalled();
+      expect(renderer.renderWithPreviousMask).not.toHaveBeenCalled();
+
+      expect(categoryMask.close).toHaveBeenCalledTimes(1);
+      expect(confidenceMask.close).toHaveBeenCalledTimes(1);
+      expect(frame.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back to passthrough when the first segmentation result has no masks', async () => {
+      const segmenter = {
+        close: jest.fn(),
+        setOptions: jest.fn(),
+        segmentForVideo: jest.fn(
+          (
+            _source: VideoFrame,
+            _timestamp: number,
+            callback: (result: {categoryMask?: undefined; confidenceMasks?: undefined}) => void,
+          ) => {
+            callback({
+              categoryMask: undefined,
+              confidenceMasks: undefined,
+            });
+          },
+        ),
+      };
+
+      (ImageSegmenter.createFromOptions as jest.Mock).mockResolvedValueOnce(segmenter);
+
+      let writerSink!: UnderlyingSink<VideoFrame>;
+
+      const readable = {
+        pipeTo: jest.fn(writer => {
+          writerSink = (writer as any).sink;
+          return Promise.resolve();
+        }),
+      } as unknown as ReadableStream;
+
+      const canvas = {
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      } as unknown as OffscreenCanvas;
+
+      await runSegmenter(
+        canvas,
+        readable,
+        {
+          enabled: true,
+          quality: 'auto',
+          enableFilters: false,
+          modelPath: 'model-a.tflite',
+          wasmLoaderPath: '/mock/vision_wasm_internal.js',
+          wasmBinaryPath: '/mock/vision_wasm_internal.wasm',
+        } as any,
+        jest.fn(),
+        jest.fn(),
+      );
+
+      const frame = {
+        codedWidth: 640,
+        codedHeight: 480,
+        displayWidth: 640,
+        displayHeight: 480,
+        timestamp: 1,
+        close: jest.fn(),
+      } as unknown as VideoFrame;
+
+      await writerSink.write!(frame, {} as WritableStreamDefaultController);
+
+      const {WebGLRenderer} = await import('./renderer');
+
+      const renderer = (WebGLRenderer as unknown as jest.Mock).mock.results[0].value;
+
+      expect(renderer.renderPassthrough).toHaveBeenCalledWith(frame);
+      expect(renderer.renderWithNewMasks).not.toHaveBeenCalled();
+      expect(renderer.renderWithPreviousMask).not.toHaveBeenCalled();
+      expect(frame.close).toHaveBeenCalledTimes(1);
     });
   });
 });
