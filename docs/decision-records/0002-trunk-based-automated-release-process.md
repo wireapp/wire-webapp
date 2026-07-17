@@ -25,6 +25,8 @@ Today, `dev` and `master` both carry release meaning. That creates avoidable com
 flowchart LR
   mainBranch[main]
   edgeEnvironment[Edge]
+  hostedDevEnvironment[Hosted Dev<br/>Staging backend]
+  developmentDistribution[Publish dev Docker image and Helm chart<br/>Update wire-builds/dev]
   releaseBranch[release/YYYY-MM-DD.N]
   releaseArtifact[Release artifact]
   betaEnvironment[Beta company validation<br/>Production backend]
@@ -39,7 +41,9 @@ flowchart LR
   maintenanceBranch[maintenance/maintenance-line-key]
   maintenanceTag[maintenance-line-key-maintenance.X]
 
-  mainBranch -->|Every merge deploys| edgeEnvironment
+  mainBranch -->|Every eligible delivery deploys| edgeEnvironment
+  mainBranch -->|Every eligible delivery deploys| hostedDevEnvironment
+  mainBranch -->|Publish development distribution| developmentDistribution
   mainBranch -->|Create release branch| releaseBranch
   releaseBranch -->|Build once| releaseArtifact
   releaseArtifact -->|Deploy| betaEnvironment
@@ -75,6 +79,8 @@ We will adopt a trunk-based, GitHub-driven release process with automatic beta d
 
 Edge is the Web team's immediate dogfooding environment. Every eligible change merged to `main` may appear on Edge. Because Edge continuously follows trunk, it provides no stability guarantee and may include incomplete, experimental, or recently merged changes protected by feature flags. It is not intended to be stable enough for broader company-wide daily use.
 
+Hosted Dev is the historical hosted development frontend at `https://wire-webapp-dev.zinfra.io/`. Every eligible `main` delivery deploys the same internal artifact to Hosted Dev that it deploys to Edge. Hosted Dev connects to the Staging REST and WebSocket backend services at `https://staging-nginz-https.zinfra.io/` and `wss://staging-nginz-ssl.zinfra.io/`, respectively.
+
 Beta is the logical release stage for company-wide internal release-candidate validation. It follows an active release branch rather than trunk and should be stable enough for broader daily internal use. Beta represents the current candidate for the next Production release. Beta uses the `wire-webapp-beta` GitHub Environment and its canonical company-facing URL is `https://wire-webapp-beta.wire.com/`. Beta continues to deploy physically to the existing `wire-webapp-staging` Elastic Beanstalk environment. The physical AWS environment name is retained temporarily and is separate from the GitHub Environment name.
 
 Beta preserves the previous company-facing Staging release-candidate behavior: it connects to Production backend services, and employees validate it with their normal Production accounts and data. The legacy physical name `wire-webapp-staging` describes infrastructure only; it does not mean that the company-facing Beta frontend uses Staging backend services.
@@ -85,7 +91,7 @@ A Beta candidate may be promoted when validation is complete and no known releas
 
 The branch model is:
 
-- `main` is the single trunk branch and the source for Edge deployments.
+- `main` is the single trunk branch and the source for Edge and hosted Dev deployments.
 - During the migration, `main` was established from the active `dev` history because `dev` contained the current development history at cutover time.
 - `dev` and `master` are legacy branches retained temporarily for compatibility and old release-path retirement; normal development no longer targets either branch.
 - Release branches are cut from `main` as `release/YYYY-MM-DD.N`.
@@ -96,12 +102,14 @@ The release identifier uses the release branch name: `YYYY-MM-DD.N`. The full id
 
 The cloud release process is:
 
-- `publish-main.yml` owns delivery of every `main` commit. It builds the internal application exactly once, then feeds the exact build outputs to both the Edge deployment and the development distribution.
+- `publish-main.yml` owns delivery of every eligible `main` commit. It builds the internal application exactly once, then deploys that same internal artifact to Edge and hosted Dev. Edge remains the immediate trunk dogfooding environment.
 - The development distribution retains the external channel name `dev`: it publishes the Docker image and a matching prerelease Helm chart, then updates `wire-builds/dev`.
-- Internal integration environments consume `wire-builds/dev` downstream. The legacy `wire-webapp-dev` deployment is not restored.
+- `wire-builds/dev` remains the development distribution consumed by downstream internal integration environments; it is separate from the hosted Dev frontend deployment.
+- The legacy `publish-and-deploy-webapp.yml` workflow no longer owns `dev`; its `dev` branch trigger is not restored.
 - `wire-builds/main` remains Production-only and is never updated by an ordinary `main` push.
 - Development and Production distributions share the same Helm repository and prerelease version namespace. Their Docker, Helm, and `wire-builds` publications use one shared, non-cancellable distribution lock.
 - Edge verifies that its artifact still belongs to the current `main` commit after acquiring the deployment slot; stale Edge builds skip instead of moving Edge backwards.
+- Hosted Dev verifies that its artifact still belongs to the current `main` commit after acquiring its deployment slot; stale Hosted Dev builds skip instead of moving Hosted Dev backwards.
 - Development, verified Production, and remaining legacy distribution paths share one non-cancellable queued publication group with `queue: max`, which preserves pending publications until the legacy workflow is deleted.
 - Every merge to `main` deploys continuously to Edge without an approval gate. A newer `main` commit may supersede an in-progress Edge deployment.
 - A stale queued main publication checks the current `main` commit after acquiring the shared distribution lock and skips before external publication instead of regressing the shared `dev` channel.

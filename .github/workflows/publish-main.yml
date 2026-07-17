@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       reason:
-        description: 'Optional reason for manually delivering main to Edge and the development channel'
+        description: 'Optional reason for manually delivering main to Edge, hosted Dev, and the development channel'
         required: false
         type: string
       confirm_main_publish:
-        description: 'Confirm that this will deploy Edge and publish the dev Docker image, Helm chart, and wire-builds/dev channel'
+        description: 'Confirm that this will deploy Edge and hosted Dev, then publish the dev Docker image, Helm chart, and wire-builds/dev channel'
         required: true
         default: false
         type: boolean
@@ -20,6 +20,10 @@ env:
   AWS_REGION: eu-central-1
   BUILD_ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
   EDGE_ENVIRONMENT_NAME: wire-webapp-edge
+  DEV_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: wire-webapp-dev
+  DEV_WEBAPP_URL: https://wire-webapp-dev.zinfra.io/
+  DEV_RUNTIME_BACKEND_REST: https://staging-nginz-https.zinfra.io/
+  DEV_RUNTIME_BACKEND_WS: wss://staging-nginz-ssl.zinfra.io/
   DOCKER_REPOSITORY: quay.io/wire/webapp
   CHART_REPOSITORY_NAME: charts-webapp
   CHART_REPOSITORY_URL: s3://public.wire.com/charts-webapp
@@ -69,7 +73,8 @@ jobs:
     permissions:
       contents: read
     outputs:
-      edge_artifact_name: ${{ steps.artifact_metadata.outputs.edge_artifact_name }}
+      main_artifact_name: ${{ steps.artifact_metadata.outputs.main_artifact_name }}
+      artifact_version: ${{ steps.artifact_metadata.outputs.artifact_version }}
       development_context_artifact_name: ${{ steps.artifact_metadata.outputs.development_context_artifact_name }}
 
     steps:
@@ -98,7 +103,7 @@ jobs:
       - name: Build and package internal application
         run: ./bin/yarn build:prod
 
-      - name: Prepare exact development Docker context
+      - name: Prepare shared main artifact metadata and exact development Docker context
         id: artifact_metadata
         shell: bash
         env:
@@ -106,8 +111,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          edge_artifact_name="main-edge-artifact-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          main_artifact_name="main-artifact-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           development_context_artifact_name="main-development-context-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          artifact_version="$(unzip -p "${BUILD_ARTIFACT_PATH}" version.json | jq --exit-status --raw-output '.version | strings | select(length > 0)')"
+          test -n "${artifact_version}"
           development_context_directory="${RUNNER_TEMP}/${development_context_artifact_name}"
 
           mkdir -p \
@@ -128,14 +135,15 @@ jobs:
           test -d "${development_context_directory}/libraries/config/lib"
 
           {
-            echo "edge_artifact_name=${edge_artifact_name}"
+            echo "main_artifact_name=${main_artifact_name}"
+            echo "artifact_version=${artifact_version}"
             echo "development_context_artifact_name=${development_context_artifact_name}"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Upload Edge artifact
+      - name: Upload shared main artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ${{ steps.artifact_metadata.outputs.edge_artifact_name }}
+          name: ${{ steps.artifact_metadata.outputs.main_artifact_name }}
           path: ${{ env.BUILD_ARTIFACT_PATH }}
           if-no-files-found: error
 
@@ -203,7 +211,7 @@ jobs:
         if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: ${{ needs.build_main_artifacts.outputs.edge_artifact_name }}
+          name: ${{ needs.build_main_artifacts.outputs.main_artifact_name }}
           path: edge-artifact
 
       - name: Configure AWS credentials
@@ -257,6 +265,188 @@ jobs:
             if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' && -n "${WORKFLOW_DISPATCH_REASON}" ]]; then
               echo "- Manual reason: ${WORKFLOW_DISPATCH_REASON}"
             fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy_to_dev:
+    name: Deploy to hosted Dev
+    runs-on: ubuntu-24.04
+    needs: build_main_artifacts
+    permissions:
+      contents: read
+    concurrency:
+      group: deploy-dev
+      cancel-in-progress: true
+    outputs:
+      superseded: ${{ steps.check_latest_main.outputs.superseded }}
+    environment:
+      name: wire-webapp-dev
+      url: ${{ env.DEV_WEBAPP_URL }}
+
+    steps:
+      - name: Check whether this hosted Dev deployment is current
+        id: check_latest_main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          latest_main_sha="$(
+            gh api \
+              "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" \
+              --jq '.object.sha'
+          )"
+
+          if [[ -z "${latest_main_sha}" ]]; then
+            echo 'Unable to resolve the current main SHA.' >&2
+            exit 1
+          fi
+
+          if [[ "${GITHUB_SHA}" != "${latest_main_sha}" ]]; then
+            echo "Skipping hosted Dev deployment because ${GITHUB_SHA} was superseded by ${latest_main_sha}."
+
+            {
+              echo '## Hosted Dev deployment'
+              echo "- Skipped as superseded: \`${GITHUB_SHA}\`"
+              echo "- Current main commit: \`${latest_main_sha}\`"
+            } >> "${GITHUB_STEP_SUMMARY}"
+
+            echo 'superseded=true' >> "${GITHUB_OUTPUT}"
+            echo 'deploy_allowed=false' >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          echo 'superseded=false' >> "${GITHUB_OUTPUT}"
+          echo 'deploy_allowed=true' >> "${GITHUB_OUTPUT}"
+
+      - name: Download shared main artifact
+        if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ needs.build_main_artifacts.outputs.main_artifact_name }}
+          path: dev-artifact
+
+      - name: Configure AWS credentials
+        if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
+        with:
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to wire-webapp-dev
+        id: deploy
+        if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: ${{ env.DEV_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
+          version-label: ${{ github.run_id }}-${{ github.run_attempt }}-dev
+          deployment-package-path: dev-artifact/ebs.zip
+          wait-for-deployment: true
+          wait-for-environment-recovery: true
+          deployment-timeout: 150
+          use-existing-application-version-if-available: true
+
+      - name: Verify hosted Dev runtime
+        id: verify_runtime
+        if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
+        env:
+          EXPECTED_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
+          EXPECTED_COMMIT: ${{ github.sha }}
+          EXPECTED_BACKEND_REST: ${{ env.DEV_RUNTIME_BACKEND_REST }}
+          EXPECTED_BACKEND_WS: ${{ env.DEV_RUNTIME_BACKEND_WS }}
+          DEV_WEBAPP_URL: ${{ env.DEV_WEBAPP_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${EXPECTED_VERSION}" || -z "${EXPECTED_COMMIT}" || -z "${EXPECTED_BACKEND_REST}" || -z "${EXPECTED_BACKEND_WS}" ]]; then
+            echo 'Hosted Dev runtime verification requires all expected values.' >&2
+            exit 1
+          fi
+
+          normalize_url() {
+            local normalized_url="${1}"
+
+            while [[ "${normalized_url}" == */ ]]; do
+              normalized_url="${normalized_url%/}"
+            done
+
+            printf '%s' "${normalized_url}"
+          }
+
+          expected_backend_rest="$(normalize_url "${EXPECTED_BACKEND_REST}")"
+          expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
+
+          for attempt_number in {1..10}; do
+            version_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${DEV_WEBAPP_URL}version" || true)"
+            commit_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${DEV_WEBAPP_URL}commit" || true)"
+            runtime_config="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${DEV_WEBAPP_URL}config.js" || true)"
+
+            actual_version="$(
+              printf '%s' "${version_response}" |
+                jq --exit-status --raw-output '.version | strings | select(length > 0)'
+            )" || actual_version=''
+            actual_commit="$(
+              printf '%s' "${commit_response}" |
+                tr -d '\r\n'
+            )"
+            actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
+            actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
+
+            if [[
+              "${actual_version}" == "${EXPECTED_VERSION}" &&
+              "${actual_commit}" == "${EXPECTED_COMMIT}" &&
+              "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" &&
+              "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}"
+            ]]; then
+              echo "Hosted Dev runtime verification succeeded on attempt ${attempt_number}: VERSION=${actual_version}, COMMIT=${actual_commit}, REST=$(normalize_url "${actual_backend_rest}"), WS=$(normalize_url "${actual_backend_ws}")."
+              exit 0
+            fi
+
+            echo "Hosted Dev runtime configuration mismatch on attempt ${attempt_number}." >&2
+            echo "Expected: VERSION=${EXPECTED_VERSION}, COMMIT=${EXPECTED_COMMIT}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
+            echo "Observed: VERSION=${actual_version:-missing}, COMMIT=${actual_commit:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
+
+            if [[ "${attempt_number}" -lt 10 ]]; then
+              sleep 6
+            fi
+          done
+
+          echo 'Hosted Dev runtime verification failed after 10 attempts.' >&2
+          echo "Expected: VERSION=${EXPECTED_VERSION}, COMMIT=${EXPECTED_COMMIT}, REST=${expected_backend_rest}, WS=${expected_backend_ws}." >&2
+          echo "Observed: VERSION=${actual_version:-missing}, COMMIT=${actual_commit:-missing}, REST=$(normalize_url "${actual_backend_rest:-missing}"), WS=$(normalize_url "${actual_backend_ws:-missing}")." >&2
+          exit 1
+
+      - name: Summarize hosted Dev deployment
+        if: always()
+        env:
+          DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
+          VERIFY_OUTCOME: ${{ steps.verify_runtime.outcome }}
+          SUPERSEDED: ${{ steps.check_latest_main.outputs.superseded }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${SUPERSEDED:-false}" == 'true' ]]; then
+            dev_result='skipped as superseded'
+          elif [[ "${DEPLOY_OUTCOME:-}" == 'success' && "${VERIFY_OUTCOME:-}" == 'success' ]]; then
+            dev_result='deployed and verified successfully'
+          else
+            dev_result='failed'
+          fi
+
+          {
+            echo '## Hosted Dev deployment'
+            echo "- Result: ${dev_result}"
+            echo "- Deployed ref: ${GITHUB_REF}"
+            echo "- Commit SHA: ${GITHUB_SHA}"
+            echo "- Target environment: ${DEV_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
+            echo "- Hosted Dev URL: ${DEV_WEBAPP_URL}"
+            echo "- Expected REST backend: ${DEV_RUNTIME_BACKEND_REST}"
+            echo "- Expected WebSocket backend: ${DEV_RUNTIME_BACKEND_WS}"
+            echo "- Workflow run URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           } >> "$GITHUB_STEP_SUMMARY"
 
   publish_to_development_channel:
@@ -403,6 +593,7 @@ jobs:
     needs:
       - build_main_artifacts
       - deploy_to_edge
+      - deploy_to_dev
       - publish_to_development_channel
     if: >-
       ${{
@@ -410,6 +601,7 @@ jobs:
         (
           needs.build_main_artifacts.result == 'failure' ||
           needs.deploy_to_edge.result == 'failure' ||
+          needs.deploy_to_dev.result == 'failure' ||
           needs.publish_to_development_channel.result == 'failure'
         )
       }}
@@ -432,8 +624,9 @@ jobs:
           text: |
             ❌ Main delivery failed ❌
             **Main commit:** ${{ github.sha }}
-            **Build:** ${{ needs.build_main_artifacts.result }}
+            **Shared artifact build:** ${{ needs.build_main_artifacts.result }}
             **Edge deployment:** ${{ needs.deploy_to_edge.result }}
+            **Hosted Dev deployment:** ${{ needs.deploy_to_dev.result }}
             **Development channel:** ${{ needs.publish_to_development_channel.result }}
             **Docker image:** ${{ needs.publish_to_development_channel.outputs.docker_image_tag || 'not published' }}
             **Helm chart:** ${{ needs.publish_to_development_channel.outputs.helm_chart_version || 'not published' }}
@@ -443,7 +636,14 @@ jobs:
   summarize_main_delivery:
     name: Summarize main delivery
     runs-on: ubuntu-24.04
-    needs: [build_main_artifacts, deploy_to_edge, publish_to_development_channel, notify_main_delivery_failure]
+    needs:
+      [
+        build_main_artifacts,
+        deploy_to_edge,
+        deploy_to_dev,
+        publish_to_development_channel,
+        notify_main_delivery_failure,
+      ]
     if: always()
     permissions: {}
 
@@ -452,6 +652,11 @@ jobs:
         env:
           EDGE_RESULT: ${{ needs.deploy_to_edge.result }}
           EDGE_SUPERSEDED: ${{ needs.deploy_to_edge.outputs.superseded }}
+          DEV_RESULT: ${{ needs.deploy_to_dev.result }}
+          DEV_SUPERSEDED: ${{ needs.deploy_to_dev.outputs.superseded }}
+          DEV_WEBAPP_URL: ${{ env.DEV_WEBAPP_URL }}
+          DEV_RUNTIME_BACKEND_REST: ${{ env.DEV_RUNTIME_BACKEND_REST }}
+          DEV_RUNTIME_BACKEND_WS: ${{ env.DEV_RUNTIME_BACKEND_WS }}
           DOCKER_IMAGE_TAG: ${{ needs.publish_to_development_channel.outputs.docker_image_tag }}
           HELM_CHART_VERSION: ${{ needs.publish_to_development_channel.outputs.helm_chart_version }}
           WIRE_BUILDS_COMMIT_SHA: ${{ needs.publish_to_development_channel.outputs.wire_builds_commit_sha }}
@@ -469,10 +674,25 @@ jobs:
             edge_result='Edge failed'
           fi
 
+          if [[ "${DEV_SUPERSEDED:-false}" == 'true' ]]; then
+            dev_result='hosted Dev skipped as superseded'
+          elif [[ "${DEV_RESULT:-}" == 'success' ]]; then
+            dev_result='hosted Dev deployed and verified successfully'
+          elif [[ "${DEV_RESULT:-}" == 'skipped' ]]; then
+            dev_result='hosted Dev did not run'
+          else
+            dev_result='hosted Dev failed'
+          fi
+
           {
             echo '## Main delivery'
             echo "- Main commit SHA: ${GITHUB_SHA}"
             echo "- Edge deployment: ${edge_result}"
+            echo "- Hosted Dev deployment: ${dev_result}"
+            echo "- Hosted Dev skipped as superseded: ${DEV_SUPERSEDED:-false}"
+            echo "- Hosted Dev URL: ${DEV_WEBAPP_URL}"
+            echo "- Expected hosted Dev REST backend: ${DEV_RUNTIME_BACKEND_REST}"
+            echo "- Expected hosted Dev WebSocket backend: ${DEV_RUNTIME_BACKEND_WS}"
             echo "- Docker image: ${DOCKER_IMAGE_TAG:-not published}"
             echo "- Helm chart: ${HELM_CHART_VERSION:-not published}"
             echo "- wire-builds/dev: ${WIRE_BUILDS_COMMIT_SHA:-not updated}"
