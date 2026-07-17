@@ -99,6 +99,7 @@ const createMeetingStoreForTest = () =>
     hasLoadError: false,
     loadMeetings: jest.fn(),
     scheduleMeeting: jest.fn(),
+    meetNowMeeting: jest.fn(),
     updateMeeting: jest.fn(),
     loadMeetingForEdit: jest.fn(),
   }));

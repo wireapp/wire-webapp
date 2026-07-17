@@ -17,22 +17,16 @@
  *
  */
 
-import {useMeetNowModal} from 'Components/Meeting/MeetNowModal/useMeetNowModal';
-import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {
+  meetNowMeeting,
+  scheduleMeeting,
+  updateMeeting,
+} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
 
-export const useMeetingActions = () => {
-  const {wallClock} = useApplicationContext();
-  const openCreate = useScheduleMeetingModal(state => state.openCreate);
-  const openMeetNow = useMeetNowModal(state => state.open);
+import type {MeetingServiceDeps, MeetingStoreServiceTasks} from './meetingStoreDeps';
 
-  const handleMeetNow = () => {
-    openMeetNow();
-  };
-
-  const handleScheduleMeeting = () => {
-    openCreate(wallClock);
-  };
-
-  return {handleMeetNow, handleScheduleMeeting};
-};
+export const createMeetingStoreServiceTasks = (deps: MeetingServiceDeps): MeetingStoreServiceTasks => ({
+  scheduleMeeting: formState => scheduleMeeting(formState, deps),
+  meetNowMeeting: formState => meetNowMeeting(formState, deps),
+  updateMeeting: params => updateMeeting(params, deps),
+});

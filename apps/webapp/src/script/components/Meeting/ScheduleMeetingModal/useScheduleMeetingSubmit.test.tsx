@@ -64,6 +64,7 @@ const createMeetingStore = ({
     hasLoadError: false,
     loadMeetings,
     scheduleMeeting,
+    meetNowMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     updateMeeting,
     loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
   }));

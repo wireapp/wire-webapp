@@ -23,6 +23,7 @@ import {
   capEndForStart,
   getDefaultMeetingEndDateTime,
   getDefaultScheduleMeetingStartDateTime,
+  getMeetNowMeetingTimes,
   getNextHalfHourDateTime,
   resolveEndChange,
   resolveStartChange,
@@ -116,5 +117,25 @@ describe('scheduleMeetingDefaults', () => {
     });
 
     expect(getDefaultScheduleMeetingStartDateTime(wallClock)).toEqual(new Date(2026, 6, 13, 17, 0, 0, 0));
+  });
+
+  it('uses the current time as the meet-now start time', () => {
+    const now = new Date(2026, 6, 13, 16, 47, 0, 0);
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: now.getTime()});
+
+    expect(getMeetNowMeetingTimes(wallClock)).toEqual({
+      start: now,
+      end: new Date(2026, 6, 13, 17, 47, 0, 0),
+    });
+  });
+
+  it('caps meet-now end time at midnight for late starts', () => {
+    const now = new Date(2026, 6, 13, 23, 45, 0, 0);
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: now.getTime()});
+
+    expect(getMeetNowMeetingTimes(wallClock)).toEqual({
+      start: now,
+      end: new Date(2026, 6, 14, 0, 0, 0, 0),
+    });
   });
 });

@@ -25,7 +25,9 @@ import {meetingsContentWrapperStyles} from 'Components/Meeting/MeetingCallingVie
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
 import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingStore';
+import {createMeetingStoreServiceTasks} from 'Components/Meeting/meetingStore/createMeetingStoreServiceTasks';
 import {MeetingStoreProvider, useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import {MeetNowModal} from 'Components/Meeting/MeetNowModal/MeetNowModal';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -54,6 +56,7 @@ const MeetingsContent = () => {
       </div>
       <MeetingCallingView />
       <ScheduleMeetingModal />
+      <MeetNowModal />
     </div>
   );
 };
@@ -62,15 +65,14 @@ export const Meetings = () => {
   const {mainViewModel, wallClock} = useApplicationContext();
   const {meetings: meetingsRepository, conversation: conversationRepository} = mainViewModel.content.repositories;
 
-  const store = useMemo(
-    () =>
-      createMeetingStore({
-        meetingsRepository,
-        conversationRepository,
-        wallClock,
-      }),
-    [meetingsRepository, conversationRepository, wallClock],
-  );
+  const store = useMemo(() => {
+    const meetingServiceDeps = {meetingsRepository, conversationRepository, wallClock};
+
+    return createMeetingStore({
+      ...meetingServiceDeps,
+      serviceTasks: createMeetingStoreServiceTasks(meetingServiceDeps),
+    });
+  }, [meetingsRepository, conversationRepository, wallClock]);
 
   return (
     <MeetingStoreProvider store={store}>

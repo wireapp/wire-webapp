@@ -110,7 +110,11 @@ export const conversationSchema = z.object({
   access_role_v2: z.array(z.nativeEnum(CONVERSATION_ACCESS_ROLE)).optional(),
   cells_state: z.nativeEnum(CONVERSATION_CELLS_STATE),
   group_conv_type: z.nativeEnum(GROUP_CONVERSATION_TYPE).optional(),
-  add_permission: z.nativeEnum(ADD_PERMISSION).optional(),
+  add_permission: z
+    .nativeEnum(ADD_PERMISSION)
+    .nullable()
+    .optional()
+    .transform(addPermission => addPermission ?? undefined),
   name: z.string().optional(),
   last_event: z.string().optional(),
   last_event_time: z.string().optional(),

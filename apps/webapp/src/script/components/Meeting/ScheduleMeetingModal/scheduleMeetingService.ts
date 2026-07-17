@@ -18,12 +18,14 @@
  */
 
 import is from '@sindresorhus/is';
+import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {Maybe, Task, task} from 'true-myth';
 
 import {computeParticipantDiff} from 'Components/Meeting/computeMeetingParticipantDiff';
+import {mapMeetNowFormToCreateMeeting} from 'Components/Meeting/mapMeetNowFormToCreateMeeting';
 import {mapScheduleFormToCreateMeeting} from 'Components/Meeting/mapScheduleFormToCreateMeeting';
 import {mapScheduleFormToUpdateMeeting} from 'Components/Meeting/mapScheduleFormToUpdateMeeting';
 import {
@@ -31,13 +33,16 @@ import {
   syncMeetingConversationParticipants,
   type MeetingConversationSyncError,
 } from 'Components/Meeting/meetingConversationSync';
-import type {MeetingStoreDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
+import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {MeetNowFormState} from 'Components/Meeting/MeetNowModal/meetNowTypes';
 import type {User} from 'Repositories/entity/User';
 
 import type {ScheduleMeetingFormState, ScheduleMeetingRecurrenceOption} from './scheduleMeetingTypes';
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
+
+export type MeetNowSubmitSuccess = MeetingSubmitSuccess & {qualifiedConversation: QualifiedId};
 
 export type UpdateMeetingParams = {
   meetingId: QualifiedId;
@@ -63,7 +68,7 @@ const mapSyncErrorToSubmitError = (error: MeetingConversationSyncError): Meeting
 };
 
 const saveMeetingConversationFromResponse = (
-  conversationRepository: MeetingStoreDeps['conversationRepository'],
+  conversationRepository: MeetingServiceDeps['conversationRepository'],
   conversation: MeetingWithConversation['conversation'] | undefined,
   onFailure: MeetingSubmitErrors,
 ): Task<void, MeetingSubmitErrors> =>
@@ -71,21 +76,13 @@ const saveMeetingConversationFromResponse = (
     ? conversationRepository.saveMeetingConversationFromBackend(conversation).mapRejected(() => onFailure)
     : task.resolve(undefined);
 
-/**
- * Schedules a meeting and establishes the MLS conversation with selected participants.
- */
-export const scheduleMeeting = (
-  formState: ScheduleMeetingFormState,
-  deps: MeetingStoreDeps,
-): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
-  const mappingResult = mapScheduleFormToCreateMeeting(formState, deps.wallClock);
-
-  if (mappingResult.isErr) {
-    return task.reject(mappingResult.error);
-  }
-
-  return deps.meetingsRepository
-    .createMeeting(mappingResult.value)
+const createMeetingAndSyncParticipants = (
+  createPayload: CreateMeeting,
+  selectedUsers: User[],
+  deps: MeetingServiceDeps,
+): Task<MeetNowSubmitSuccess, MeetingSubmitErrors> =>
+  deps.meetingsRepository
+    .createMeeting(createPayload)
     .mapRejected(() => meetingSubmitErrors.createFailed)
     .andThen(createdMeeting =>
       saveMeetingConversationFromResponse(
@@ -95,21 +92,56 @@ export const scheduleMeeting = (
       ).andThen(() =>
         syncMeetingConversationParticipants(deps.conversationRepository, {
           qualifiedConversationId: createdMeeting.qualified_conversation,
-          selectedUsers: formState.selectedUsers,
-          usersToAdd: formState.selectedUsers,
+          selectedUsers,
+          usersToAdd: selectedUsers,
           userIdsToRemove: [],
           isCreate: true,
-        }).mapRejected(mapSyncErrorToSubmitError),
+        })
+          .mapRejected(mapSyncErrorToSubmitError)
+          .map(syncResult => ({
+            ...syncResult,
+            qualifiedConversation: createdMeeting.qualified_conversation,
+          })),
       ),
     );
+
+/**
+ * Schedules a meeting and establishes the MLS conversation with selected participants.
+ */
+export const scheduleMeeting = (
+  formState: ScheduleMeetingFormState,
+  deps: MeetingServiceDeps,
+): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+  const mappingResult = mapScheduleFormToCreateMeeting(formState, deps.wallClock);
+
+  if (mappingResult.isErr) {
+    return task.reject(mappingResult.error);
+  }
+
+  return createMeetingAndSyncParticipants(mappingResult.value, formState.selectedUsers, deps).map(({failedToAdd}) => ({
+    failedToAdd,
+  }));
 };
+
+/**
+ * Creates an instant meeting and establishes the MLS conversation with selected participants.
+ */
+export const meetNowMeeting = (
+  formState: MeetNowFormState,
+  deps: MeetingServiceDeps,
+): Task<MeetNowSubmitSuccess, MeetingSubmitErrors> =>
+  createMeetingAndSyncParticipants(
+    mapMeetNowFormToCreateMeeting(formState, deps.wallClock),
+    formState.selectedUsers,
+    deps,
+  );
 
 /**
  * Updates meeting metadata and syncs conversation participants.
  */
 export const updateMeeting = (
   {meetingId, formState, qualifiedConversation, originalRecurrence, originalSelectedUsers}: UpdateMeetingParams,
-  deps: MeetingStoreDeps,
+  deps: MeetingServiceDeps,
 ): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
   const mappingResult = mapScheduleFormToUpdateMeeting(formState, deps.wallClock, originalRecurrence);
 

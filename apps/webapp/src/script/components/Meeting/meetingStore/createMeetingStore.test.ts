@@ -27,20 +27,7 @@ import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository'
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {createMeetingStore} from './createMeetingStore';
-import type {MeetingStoreDeps} from './meetingStoreDeps';
-
-jest.mock('Components/Meeting/ScheduleMeetingModal/scheduleMeetingService', () => ({
-  scheduleMeeting: jest.fn(),
-  updateMeeting: jest.fn(),
-}));
-
-import {
-  scheduleMeeting as scheduleMeetingTask,
-  updateMeeting as updateMeetingTask,
-} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
-
-const mockedScheduleMeetingTask = scheduleMeetingTask as jest.MockedFunction<typeof scheduleMeetingTask>;
-const mockedUpdateMeetingTask = updateMeetingTask as jest.MockedFunction<typeof updateMeetingTask>;
+import type {MeetingStoreDeps, MeetingStoreServiceTasks} from './meetingStoreDeps';
 
 describe('createMeetingStore', () => {
   const apiMeeting = {
@@ -77,21 +64,30 @@ describe('createMeetingStore', () => {
     initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
   });
 
+  const createServiceTasks = (overrides: Partial<MeetingStoreServiceTasks> = {}): MeetingStoreServiceTasks => ({
+    scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    meetNowMeeting: jest
+      .fn()
+      .mockReturnValue(
+        task.resolve({failedToAdd: [], qualifiedConversation: {id: 'conversation-id', domain: 'example.com'}}),
+      ),
+    updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    ...overrides,
+  });
+
   const createDeps = ({
     getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting])),
     safeGetConversationById = jest.fn(),
+    serviceTasks = createServiceTasks(),
   }: {
     getMeetingsList?: jest.Mock;
     safeGetConversationById?: jest.Mock;
+    serviceTasks?: MeetingStoreServiceTasks;
   } = {}): MeetingStoreDeps => ({
     meetingsRepository: {getMeetingsList} as unknown as MeetingsRepository,
     conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
     wallClock,
-  });
-
-  beforeEach(() => {
-    mockedScheduleMeetingTask.mockReset();
-    mockedUpdateMeetingTask.mockReset();
+    serviceTasks,
   });
 
   it('loads meetings successfully', async () => {
@@ -125,9 +121,11 @@ describe('createMeetingStore', () => {
   });
 
   it('schedules a meeting without refreshing the meetings list', async () => {
-    mockedScheduleMeetingTask.mockReturnValue(task.resolve({failedToAdd: []}));
+    const scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
-    const store = createMeetingStore(createDeps({getMeetingsList}));
+    const store = createMeetingStore(
+      createDeps({getMeetingsList, serviceTasks: createServiceTasks({scheduleMeeting})}),
+    );
 
     const result = await store.getState().scheduleMeeting({
       title: 'Weekly sync',
@@ -139,7 +137,7 @@ describe('createMeetingStore', () => {
     });
 
     expect(result.isOk).toBe(true);
-    expect(mockedScheduleMeetingTask).toHaveBeenCalled();
+    expect(scheduleMeeting).toHaveBeenCalledTimes(1);
     expect(getMeetingsList).not.toHaveBeenCalled();
   });
 
@@ -157,8 +155,18 @@ describe('createMeetingStore', () => {
 
     expect(result.isOk).toBe(true);
     expect(safeGetConversationById).toHaveBeenCalledWith(listMeetingInstance.meetingSeries.qualified_conversation);
-    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T10:00:00.000Z'));
-    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
+    expect(
+      result.match({
+        Ok: value => value.formState.start.unwrapOr(new Date(0)),
+        Err: () => null,
+      }),
+    ).toEqual(new Date('2026-06-16T10:00:00.000Z'));
+    expect(
+      result.match({
+        Ok: value => value.formState.end.unwrapOr(new Date(0)),
+        Err: () => null,
+      }),
+    ).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 
   it('prefills edit form with the upcoming instance times for recurring meetings', async () => {
@@ -184,7 +192,17 @@ describe('createMeetingStore', () => {
     const result = await store.getState().loadMeetingForEdit(recurringMeetingInstance);
 
     expect(result.isOk).toBe(true);
-    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T10:00:00.000Z'));
-    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T11:00:00.000Z'));
+    expect(
+      result.match({
+        Ok: value => value.formState.start.unwrapOr(new Date(0)),
+        Err: () => null,
+      }),
+    ).toEqual(new Date('2026-06-22T10:00:00.000Z'));
+    expect(
+      result.match({
+        Ok: value => value.formState.end.unwrapOr(new Date(0)),
+        Err: () => null,
+      }),
+    ).toEqual(new Date('2026-06-22T11:00:00.000Z'));
   });
 });
