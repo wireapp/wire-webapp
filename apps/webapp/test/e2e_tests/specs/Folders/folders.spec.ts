@@ -58,7 +58,7 @@ test.describe('Folders', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam, createPage, createUser}) => {
+  test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
     const team = await createTeam('Team', {users: [userB]});
     userA = team.owner;
@@ -74,14 +74,15 @@ test.describe('Folders', () => {
 
       const customFolderName = 'Custom-Folder';
 
-      // Step 1: User A opens 1:1 conversation with User B
-      await userAPages.conversationList().getConversation(userB.fullName).open();
-      // Step 2: User A moves 1:1 conversation with User B into new custom folder
-      await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
-      // Step 3: 1:1 conversation with User B is in the custom folder
-      const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+      await test.step('User A moves 1:1 conversation with User B into new custom folder', async () => {
+        await userAPages.conversationList().getConversation(userB.fullName).open();
+        await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
+      });
 
-      await expect(actualTitle).toHaveText(customFolderName);
+      await test.step('1:1 conversation with User B is in the custom folder', async () => {
+        const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+        await expect(actualTitle).toHaveText(customFolderName);
+      });
     },
   );
 
@@ -98,14 +99,16 @@ test.describe('Folders', () => {
 
       await createGroup(userAPages, conversationName, [userB]);
 
-      // Step 1: User A opens group conversation with User B
-      await userAPages.conversationList().getConversation(conversationName).open();
-      // Step 2: User A moves group conversation with User B in new custom folder
-      await createCustomFolder(userAPageManager, conversationName, customFolderName);
-      // Step 3: Group conversation with User B is in the custom folder
-      const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+      await test.step('User A moves group conversation with User B into new custom folder', async () => {
+        await userAPages.conversationList().getConversation(conversationName).open();
+        await createCustomFolder(userAPageManager, conversationName, customFolderName);
 
-      await expect(actualTitle).toHaveText(customFolderName);
+      });
+
+      await test.step('Group conversation with User B is in the custom folder', async () => {
+        const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+        await expect(actualTitle).toHaveText(customFolderName);
+      });
     },
   );
 
@@ -126,12 +129,14 @@ test.describe('Folders', () => {
       await createCustomFolder(userAPageManager, conversationName, customFolderName);
       await userAComponents.conversationSidebar().allConversationsButton.click();
 
-      // Step 1: User A moves 1:1 conversation with User B into an existing custom folder
-      await moveConversationToFolder(userAPageManager, userB.fullName, customFolderName);
-      // Step 2: 1:1 conversation with User B is in the custom folder
-      const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+      await test.step('User A moves 1:1 conversation with User B into an existing custom folder', async () => {
+        await moveConversationToFolder(userAPageManager, userB.fullName, customFolderName);
+      });
 
-      await expect(actualTitle).toHaveText(customFolderName);
+      await test.step('1:1 conversation with User B is in the custom folder', async () => {
+        const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+        await expect(actualTitle).toHaveText(customFolderName);
+      });
     },
   );
 
@@ -146,35 +151,37 @@ test.describe('Folders', () => {
       const customFolderName = 'Custom-Folder';
       const conversationName = 'Group Conversation with User A and User B';
 
-      await createGroup(userAPages, conversationName, [userB]);
-
       // Preconditions: Create a custom folder with 1:1 conversation
       await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
       await userAComponents.conversationSidebar().allConversationsButton.click();
+      await createGroup(userAPages, conversationName, [userB]);
 
-      // Step 1: User A moves group with User B into an existing custom folder
-      await moveConversationToFolder(userAPageManager, conversationName, customFolderName);
-      // Step 2: Group conversation with User B is in the custom folder
-      const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+      await test.step('User A moves group with User B into an existing custom folder', async () => {
+        await moveConversationToFolder(userAPageManager, conversationName, customFolderName);
+      });
 
-      await expect(actualTitle).toHaveText(customFolderName);
+      await test.step('Group conversation with User B is in the custom folder', async () => {
+        const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+        await expect(userAComponents.conversationSidebar().folderList.getByText(customFolderName)).toBeVisible();
+        await expect(actualTitle).toHaveText(customFolderName);
+      });
     },
   );
 
-  // TODO: Blocked due to Bug-Ticket [WPB-22266]
-  test.skip(
+  test(
     'I want to see custom folder removed when last conversation is removed',
     {tag: ['@TC-553', '@regression']},
     async ({createPage}) => {
       const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
       await connectWithUser(userAPageManager, userB);
-      const userAPages = userAPageManager.webapp.pages;
+      const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
 
       const customFolderName = 'Custom-Folder';
 
       // Preconditions: Conversation is in custom folder
       const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
       await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
+      await expect(userAComponents.conversationSidebar().folderList.getByText(customFolderName)).toBeVisible();
 
       await test.step("User A clicks 'remove from custom folder' button", async () => {
         const contextMenu = await conversation.openContextMenu();
@@ -183,7 +190,7 @@ test.describe('Folders', () => {
 
       await test.step("The conversation list header is changed to 'All Conversations'", async () => {
         const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
-        await expect(actualTitle).toHaveText('All Conversations');
+        await expect(actualTitle).toHaveText('All conversations');
       });
 
       await test.step('Custom Folder Name is no longer visible in the Move-To-Menu', async () => {
