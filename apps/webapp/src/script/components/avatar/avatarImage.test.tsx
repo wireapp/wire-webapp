@@ -137,4 +137,45 @@ describe('AvatarImage', () => {
 
     await waitFor(() => expect(assetRepoSpy.getObjectUrl).not.toHaveBeenCalled());
   });
+
+  it('clears a previously loaded avatar when the picture resource is removed', async () => {
+    const avatarUrl = 'blob:avatar-image';
+    const assetRepoSpy = {
+      getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve(avatarUrl)),
+    };
+    const assetRepo = assetRepoSpy as unknown as AssetRepository;
+    const participant = new User('id', '', translateForTest);
+    const resource = {
+      downloadProgress: 0,
+    } as AssetRemoteData;
+    participant.previewPictureResource(resource);
+
+    const {rerender} = render(
+      <AvatarImage
+        assetRepository={assetRepo}
+        avatarAlt={participant.name()}
+        avatarSize={AVATAR_SIZE.SMALL}
+        mediumPicture={participant.mediumPictureResource()}
+        previewPicture={participant.previewPictureResource()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(document.querySelector('img')).toHaveAttribute('src', avatarUrl);
+    });
+
+    rerender(
+      <AvatarImage
+        assetRepository={assetRepo}
+        avatarAlt={participant.name()}
+        avatarSize={AVATAR_SIZE.SMALL}
+        mediumPicture={undefined}
+        previewPicture={undefined}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(document.querySelector('img')).toHaveAttribute('src', '');
+    });
+  });
 });
