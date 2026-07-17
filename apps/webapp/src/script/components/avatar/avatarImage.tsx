@@ -55,38 +55,41 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 }) => {
   const [avatarImage, setAvatarImage] = useState('');
   const [showTransition, setShowTransition] = useState(false);
-  const [avatarLoadingBlocked, setAvatarLoadingBlocked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!avatarLoadingBlocked && isVisible) {
-      setAvatarLoadingBlocked(true);
-
-      const isSmall = ![AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(avatarSize);
-      const loadHiRes = !isSmall && devicePixelRatio > 1;
-      const pictureResource: AssetRemoteData | undefined = loadHiRes
-        ? (mediumPicture ?? previewPicture)
-        : previewPicture;
-
-      (async () => {
-        if (pictureResource !== undefined) {
-          const isCached = pictureResource.downloadProgress === 100;
-          setShowTransition(!isCached && !isSmall);
-          try {
-            const url = await assetRepository.getObjectUrl(pictureResource);
-            if (url) {
-              setAvatarImage(url);
-            }
-            setAvatarLoadingBlocked(false);
-          } catch (error: unknown) {
-            console.warn('Failed to load avatar picture.', error);
-          }
-        } else {
-          setAvatarLoadingBlocked(false);
-        }
-      })();
+    if (!isVisible) {
+      return undefined;
     }
-  }, [previewPicture, mediumPicture, avatarSize, isVisible]);
+
+    const isSmall = ![AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(avatarSize);
+    const loadHiRes = !isSmall && devicePixelRatio > 1;
+    const pictureResource: AssetRemoteData | undefined = loadHiRes ? (mediumPicture ?? previewPicture) : previewPicture;
+
+    if (pictureResource === undefined) {
+      setAvatarImage('');
+      return undefined;
+    }
+
+    let cancelled = false;
+    const isCached = pictureResource.downloadProgress === 100;
+    setShowTransition(!isCached && !isSmall);
+
+    void (async () => {
+      try {
+        const url = await assetRepository.getObjectUrl(pictureResource);
+        if (!cancelled && url) {
+          setAvatarImage(url);
+        }
+      } catch (error: unknown) {
+        console.warn('Failed to load avatar picture.', error);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [previewPicture, mediumPicture, avatarSize, isVisible, assetRepository, devicePixelRatio]);
 
   const transitionImageStyles: Record<string, CSSObject> = {
     entered: {opacity: 1, transform: 'scale(1)'},
