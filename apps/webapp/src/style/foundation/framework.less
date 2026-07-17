@@ -46,8 +46,16 @@
       border-right: none;
     }
 
+    &--conversation-list-collapsed {
+      min-width: auto;
+    }
+
     .team-mode & {
       width: calc(var(--conversation-list-width) + var(--teams-width));
+
+      &.left-column--conversation-list-collapsed {
+        width: auto;
+      }
     }
   }
 
@@ -72,13 +80,17 @@
     #conversation-title-bar,
     #message-list {
       width: 100%;
-      transition: width var(--animation-timing-fast) var(--ease-out-quart);
 
       @media (min-width: 1000px) {
         &.is-right-panel-open {
           width: calc(100% - var(--right-width));
         }
       }
+    }
+
+    #conversation-input-bar,
+    #conversation-title-bar {
+      transition: width var(--animation-timing-fast) var(--ease-out-quart);
     }
   }
 

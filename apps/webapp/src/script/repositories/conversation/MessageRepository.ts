@@ -122,10 +122,6 @@ export interface MessageSendingOptions {
   recipients?: QualifiedId[] | QualifiedUserClients;
 }
 
-export type MessageRepositoryOptions = {
-  readonly isMessageSendingStatusFixEnabled: boolean;
-};
-
 type AddedMessageWaiter = {
   readonly messagePromise: Promise<Message>;
   readonly dispose: () => void;
@@ -192,9 +188,6 @@ export class MessageRepository {
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
     private readonly translate: Translate,
-    private readonly messageRepositoryOptions: MessageRepositoryOptions = {
-      isMessageSendingStatusFixEnabled: false,
-    },
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -295,16 +288,11 @@ export class MessageRepository {
       messageId,
     );
 
-    const currentClientId = this.clientState.currentClient?.id;
-    const canInjectOptimisticMessage = is.nonEmptyString(currentClientId);
-    const shouldRepairOptimisticMessageStatus =
-      this.messageRepositoryOptions.isMessageSendingStatusFixEnabled && isNewTextMessage && canInjectOptimisticMessage;
-
-    if (!shouldRepairOptimisticMessageStatus) {
+    if (!isNewTextMessage || !is.nonEmptyString(this.clientState.currentClient?.id)) {
       return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
     }
 
-    return this.sendNewTextMessageWithReliableInMemoryStatus(textMessage, conversation, {
+    return this.sendTextWithReliableInMemoryStatus(textMessage, conversation, {
       ...options,
       enableEphemeral: true,
     });
@@ -339,7 +327,7 @@ export class MessageRepository {
     return {dispose, messagePromise};
   }
 
-  private async sendNewTextMessageWithReliableInMemoryStatus(
+  private async sendTextWithReliableInMemoryStatus(
     textMessage: GenericMessage,
     conversation: Conversation,
     options: MessageSendingOptions & {enableEphemeral: true; syncTimestamp?: boolean},

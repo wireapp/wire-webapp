@@ -20,6 +20,7 @@
 import type {ReactNode} from 'react';
 
 import {act, renderHook} from '@testing-library/react';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {maybe, task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
 
@@ -34,6 +35,10 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
+
+const testWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: new Date('2026-06-16T10:00:00.000Z').getTime(),
+});
 
 const formState = {
   title: 'Weekly sync',
@@ -73,7 +78,7 @@ const createWrapper =
 
 describe('useScheduleMeetingSubmit', () => {
   beforeEach(() => {
-    useScheduleMeetingModal.getState().reset();
+    useScheduleMeetingModal.getState().reset(testWallClock);
   });
 
   it('refreshes meetings after a successful submit', async () => {

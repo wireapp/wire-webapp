@@ -111,6 +111,8 @@
   "accessibility.conversationDetailsActionGroupAdminLabel": "සමූහයේ පරිපාලක සකසන්න",
   "accessibility.conversationDetailsActionNotificationsLabel": "දැනුම්දීමේ සැකසුම් පෙන්වන්න",
   "accessibility.conversationDetailsCloseLabel": "රූපයේ විස්තර දැක්ම වසන්න",
+  "accessibility.conversationListCollapse": "Collapse conversation list",
+  "accessibility.conversationListExpand": "Expand conversation list",
   "accessibility.conversationMuted": "Muted",
   "accessibility.conversationOptionsMenu": "සංවාදයේ විකල්ප අරින්න",
   "accessibility.conversationOptionsMenuAccessKey": "සංවාද විකල්ප වට්ටෝරුව වෙත අවධානයට දකුණු ඊතල යතුර යොදා ගන්න",

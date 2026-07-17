@@ -17,7 +17,18 @@
  *
  */
 
-import {DEFAULT_TABS, FILTER_TABS, isTabVisible, SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
+import {
+  DEFAULT_TABS,
+  FILTER_TABS,
+  ConversationListStatus,
+  getCanCollapseConversationList,
+  getIsConversationListCollapsed,
+  isConversationListTab,
+  isTabVisible,
+  SidebarStatus,
+  SidebarTabs,
+  useSidebarStore,
+} from './useSidebarStore';
 
 describe('useSidebarStore', () => {
   beforeEach(() => {
@@ -55,6 +66,86 @@ describe('useSidebarStore', () => {
     useSidebarStore.getState().setStatus(SidebarStatus.CLOSED);
 
     expect(useSidebarStore.getState().status).toBe(SidebarStatus.CLOSED);
+  });
+
+  it('persists conversation list collapse preference', () => {
+    const setItem = jest.mocked(Storage.prototype.setItem);
+    setItem.mockClear();
+
+    useSidebarStore.getState().setConversationListStatus(ConversationListStatus.COLLAPSED);
+
+    const persistedEntry = setItem.mock.calls.find(([key]) => key === 'sidebar-store');
+    expect(persistedEntry).toBeDefined();
+
+    const persistedState = JSON.parse(String(persistedEntry?.[1])).state;
+    expect(persistedState.conversationListStatus).toBe(ConversationListStatus.COLLAPSED);
+  });
+
+  describe('conversation list collapse', () => {
+    const desktopCollapseParams = {
+      isFeatureEnabled: true,
+      currentTab: SidebarTabs.RECENT,
+      isScreenLessThanMdBreakpoint: false,
+    };
+
+    it('shows collapsed list only on conversation tabs when the feature is enabled', () => {
+      expect(
+        getIsConversationListCollapsed({
+          ...desktopCollapseParams,
+          conversationListStatus: ConversationListStatus.COLLAPSED,
+        }),
+      ).toBe(true);
+
+      expect(
+        getIsConversationListCollapsed({
+          ...desktopCollapseParams,
+          currentTab: SidebarTabs.PREFERENCES,
+          conversationListStatus: ConversationListStatus.COLLAPSED,
+        }),
+      ).toBe(false);
+    });
+
+    it('keeps stored collapse preference while visiting non-conversation tabs', () => {
+      useSidebarStore.getState().setConversationListStatus(ConversationListStatus.COLLAPSED);
+
+      expect(useSidebarStore.getState().conversationListStatus).toBe(ConversationListStatus.COLLAPSED);
+      expect(
+        getIsConversationListCollapsed({
+          ...desktopCollapseParams,
+          currentTab: SidebarTabs.CONNECT,
+          conversationListStatus: useSidebarStore.getState().conversationListStatus,
+        }),
+      ).toBe(false);
+    });
+
+    it('does not collapse on mobile viewports even when the stored preference is closed', () => {
+      expect(
+        getIsConversationListCollapsed({
+          ...desktopCollapseParams,
+          isScreenLessThanMdBreakpoint: true,
+          conversationListStatus: ConversationListStatus.COLLAPSED,
+        }),
+      ).toBe(false);
+    });
+
+    it('does not collapse when the feature toggle is disabled', () => {
+      expect(
+        getIsConversationListCollapsed({
+          ...desktopCollapseParams,
+          isFeatureEnabled: false,
+          conversationListStatus: ConversationListStatus.COLLAPSED,
+        }),
+      ).toBe(false);
+      expect(getCanCollapseConversationList(desktopCollapseParams)).toBe(true);
+      expect(getCanCollapseConversationList({...desktopCollapseParams, isFeatureEnabled: false})).toBe(false);
+    });
+
+    it('treats navigation tabs as outside the collapsible conversation list', () => {
+      [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS, SidebarTabs.MEETINGS].forEach(tab => {
+        expect(isConversationListTab(tab)).toBe(false);
+        expect(getCanCollapseConversationList({...desktopCollapseParams, currentTab: tab})).toBe(false);
+      });
+    });
   });
 
   it('sets visible tabs', () => {

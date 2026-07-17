@@ -76,7 +76,7 @@ export const ScheduleMeetingModal = () => {
 
   const handleClose = () => {
     close();
-    reset();
+    reset(wallClock);
   };
 
   const handleSubmit = () => {

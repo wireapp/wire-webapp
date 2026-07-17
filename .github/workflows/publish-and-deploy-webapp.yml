@@ -3,12 +3,12 @@ name: Publish and deploy webapp
 
 on:
   push:
-    branches: [master, dev, release/*]
+    branches: [master, dev]
     tags:
       - '*q1-2024*'
       - '*q2-2025*'
-      - '*staging*'
-      - '*production*'
+      - '*-staging.*'
+      - '*-production.*'
 
 concurrency:
   group: publish-${{ github.ref }}
@@ -17,6 +17,10 @@ concurrency:
 jobs:
   build:
     name: Build Docker image and Helm Chart
+    # ADR Production tags end in -production after the new workflow has already
+    # deployed the Beta-tested artifact. Keep legacy *-production.N tags working
+    # temporarily, but never rebuild and redeploy for ADR Production tags.
+    if: ${{ !(github.ref_type == 'tag' && endsWith(github.ref_name, '-production')) }}
     runs-on: ubuntu-24.04
 
     outputs:
@@ -263,8 +267,17 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build, publish_wire_builds]
     if: ${{ always() && needs.publish_wire_builds.result == 'failure' }}
+    permissions:
+      contents: read
 
     steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/actions/notify-deployoholics
+
       - name: Announce wire-builds bump failure
         uses: ./.github/actions/notify-deployoholics
         with:
@@ -390,8 +403,17 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build, deploy_to_aws]
     if: ${{ always() && needs.deploy_to_aws.result == 'failure' }}
+    permissions:
+      contents: read
 
     steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/actions/notify-deployoholics
+
       - name: Announce deployment failure
         uses: ./.github/actions/notify-deployoholics
         with:

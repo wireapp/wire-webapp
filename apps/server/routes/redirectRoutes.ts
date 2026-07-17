@@ -24,6 +24,7 @@ import {Maybe, maybe} from 'true-myth';
 
 import type {ServerConfig} from '@wireapp/config';
 
+import {setNonCacheHeaders} from '../http/setNonCacheHeaders';
 import * as BrowserUtil from '../util/browserUtil';
 
 const router = express.Router();
@@ -62,15 +63,6 @@ export function redirectToJoinConversation(request: Request, response: Response)
     },
     redirectUrl,
   );
-}
-
-export function setNonCacheHeaders(response: Response): Response {
-  response.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  response.set('Pragma', 'no-cache');
-  response.set('Expires', '0');
-  response.set('Surrogate-Control', 'no-store');
-
-  return response;
 }
 
 export const RedirectRoutes = (config: ServerConfig) => [

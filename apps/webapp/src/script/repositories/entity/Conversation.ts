@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
@@ -600,6 +601,29 @@ export class Conversation {
 
       if (this.isGroupOrChannel()) {
         if (this.name()) {
+          return this.name();
+        }
+
+        const hasUserEntities = is.nonEmptyArray(this.participating_user_ets());
+        if (hasUserEntities) {
+          const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
+          const joinedNames = this.participating_user_ets()
+            .filter(userEntity => isJustServices || !userEntity.isService)
+            .map(userEntity => userEntity.name())
+            .join(', ');
+
+          const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          return truncate(joinedNames, maxLength, false);
+        }
+
+        const hasUserIds = !!this.participating_user_ids().length;
+        if (!hasUserIds) {
+          return this.translate('conversationsEmptyConversation');
+        }
+      }
+
+      if (this.isMeeting()) {
+        if (is.nonEmptyString(this.name())) {
           return this.name();
         }
 

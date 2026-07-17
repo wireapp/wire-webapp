@@ -22,11 +22,15 @@ import {useEffect} from 'react';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {User} from 'Repositories/entity/User';
+import {conversationListCollapseFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Conversations} from './panels/conversations';
+import {getIsConversationListCollapsed, useSidebarStore} from './panels/conversations/useSidebarStore';
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
 import {ListViewModel} from '../../view_model/ListViewModel';
@@ -43,6 +47,16 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
   const repositories = listViewModel.contentViewModel.repositories;
 
   const listState = useAppState(state => state.listState);
+  const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
+  const {isFeatureToggleEnabled} = useApplicationContext();
+  const isConversationListCollapseEnabled = isFeatureToggleEnabled(conversationListCollapseFeatureToggleName);
+  const {currentTab, conversationListStatus} = useSidebarStore();
+  const isConversationListCollapsed = getIsConversationListCollapsed({
+    isFeatureEnabled: isConversationListCollapseEnabled,
+    currentTab,
+    isScreenLessThanMdBreakpoint,
+    conversationListStatus,
+  });
 
   useEffect(() => {
     function openCreateGroupModal() {
@@ -62,6 +76,7 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
       className={cx('left-column', {
         'left-column--light-theme': !isActivatedAccount,
         'left-column--shrinked': [ListState.CELLS, ListState.MEETINGS].includes(listState),
+        'left-column--conversation-list-collapsed': isConversationListCollapsed,
       })}
     >
       {[
@@ -73,6 +88,7 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
         ListState.MEETINGS,
       ].includes(listState) && (
         <Conversations
+          isConversationListCollapseEnabled={isConversationListCollapseEnabled}
           selfUser={selfUser}
           listViewModel={listViewModel}
           searchRepository={repositories.search}

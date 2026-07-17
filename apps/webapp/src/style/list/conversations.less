@@ -20,6 +20,19 @@
 .conversations {
   width: 320px;
   background-color: var(--app-bg);
+  transition: width 0.3s ease-in-out;
+
+  &[data-list-collapsed='true'] {
+    width: 64px;
+
+    .left-list-header {
+      padding-inline: 0;
+    }
+
+    .slow-connection-indicator {
+      display: none;
+    }
+  }
 }
 
 .conversations-sidebar {

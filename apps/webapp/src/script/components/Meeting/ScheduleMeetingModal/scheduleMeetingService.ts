@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {Maybe, Task, task} from 'true-myth';
@@ -60,6 +62,15 @@ const mapSyncErrorToSubmitError = (error: MeetingConversationSyncError): Meeting
   }
 };
 
+const saveMeetingConversationFromResponse = (
+  conversationRepository: MeetingStoreDeps['conversationRepository'],
+  conversation: MeetingWithConversation['conversation'] | undefined,
+  onFailure: MeetingSubmitErrors,
+): Task<void, MeetingSubmitErrors> =>
+  conversation
+    ? conversationRepository.saveMeetingConversationFromBackend(conversation).mapRejected(() => onFailure)
+    : task.resolve(undefined);
+
 /**
  * Schedules a meeting and establishes the MLS conversation with selected participants.
  */
@@ -77,13 +88,19 @@ export const scheduleMeeting = (
     .createMeeting(mappingResult.value)
     .mapRejected(() => meetingSubmitErrors.createFailed)
     .andThen(createdMeeting =>
-      syncMeetingConversationParticipants(deps.conversationRepository, {
-        qualifiedConversationId: createdMeeting.qualified_conversation,
-        selectedUsers: formState.selectedUsers,
-        usersToAdd: formState.selectedUsers,
-        userIdsToRemove: [],
-        isCreate: true,
-      }).mapRejected(mapSyncErrorToSubmitError),
+      saveMeetingConversationFromResponse(
+        deps.conversationRepository,
+        createdMeeting.conversation,
+        meetingSubmitErrors.createFailed,
+      ).andThen(() =>
+        syncMeetingConversationParticipants(deps.conversationRepository, {
+          qualifiedConversationId: createdMeeting.qualified_conversation,
+          selectedUsers: formState.selectedUsers,
+          usersToAdd: formState.selectedUsers,
+          userIdsToRemove: [],
+          isCreate: true,
+        }).mapRejected(mapSyncErrorToSubmitError),
+      ),
     );
 };
 
@@ -105,21 +122,27 @@ export const updateMeeting = (
   return deps.meetingsRepository
     .updateMeeting(meetingId, mappingResult.value.payload)
     .mapRejected(() => meetingSubmitErrors.updateFailed)
-    .andThen(() => {
-      if (usersToAdd.length === 0 && userIdsToRemove.length === 0) {
-        return task.resolve({failedToAdd: []});
-      }
+    .andThen(updatedMeeting =>
+      saveMeetingConversationFromResponse(
+        deps.conversationRepository,
+        updatedMeeting.conversation,
+        meetingSubmitErrors.updateFailed,
+      ).andThen(() => {
+        if (is.emptyArray(usersToAdd) && is.emptyArray(userIdsToRemove)) {
+          return task.resolve({failedToAdd: []});
+        }
 
-      if (qualifiedConversation.isNothing) {
-        return task.reject(meetingSubmitErrors.addParticipantsFailed);
-      }
+        if (qualifiedConversation.isNothing) {
+          return task.reject(meetingSubmitErrors.addParticipantsFailed);
+        }
 
-      return syncMeetingConversationParticipants(deps.conversationRepository, {
-        qualifiedConversationId: qualifiedConversation.value,
-        selectedUsers: formState.selectedUsers,
-        usersToAdd,
-        userIdsToRemove,
-        isCreate: false,
-      }).mapRejected(mapSyncErrorToSubmitError);
-    });
+        return syncMeetingConversationParticipants(deps.conversationRepository, {
+          qualifiedConversationId: qualifiedConversation.value,
+          selectedUsers: formState.selectedUsers,
+          usersToAdd,
+          userIdsToRemove,
+          isCreate: false,
+        }).mapRejected(mapSyncErrorToSubmitError);
+      }),
+    );
 };

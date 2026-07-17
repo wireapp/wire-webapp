@@ -18,16 +18,18 @@
  */
 
 import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useMeetingActions = () => {
+  const {wallClock} = useApplicationContext();
   const openCreate = useScheduleMeetingModal(state => state.openCreate);
 
   const handleMeetNow = () => {
-    // add calling functionality here
+    // TODO(Meet Now): create instant meeting, then joinMeetingCall (shared path; not wired yet)
   };
 
   const handleScheduleMeeting = () => {
-    openCreate();
+    openCreate(wallClock);
   };
 
   return {handleMeetNow, handleScheduleMeeting};

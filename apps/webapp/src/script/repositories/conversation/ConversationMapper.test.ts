@@ -18,11 +18,14 @@
  */
 
 import {
+  ADD_PERMISSION,
   CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
   CONVERSATION_ACCESS,
+  CONVERSATION_CELLS_STATE,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
+  GROUP_CONVERSATION_TYPE,
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
   DefaultConversationRoleName,
@@ -34,12 +37,14 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {BaseError} from 'src/script/error/baseError';
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './ConversationMapper';
+import {CONVERSATION_READONLY_STATE} from './ConversationRepository';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
@@ -184,6 +189,83 @@ describe('ConversationMapper', () => {
 
       expect(conversationEntity.name()).toBe(payload.name);
       expect(conversationEntity.teamId).toBe(payload.team);
+    });
+  });
+
+  describe('getUpdatableProperties', () => {
+    it('returns backend-owned fields only', () => {
+      const conversationEntity = new Conversation(createUuid(), 'example.com', CONVERSATION_PROTOCOL.MLS, translate);
+      conversationEntity.name('Weekly sync');
+      conversationEntity.addMessage(new ContentMessage(createUuid(), translateForTest));
+      conversationEntity.archivedState(true);
+      conversationEntity.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS);
+      conversationEntity.last_read_timestamp(987654321);
+
+      const updatableProperties = ConversationMapper.getUpdatableProperties(conversationEntity);
+
+      expect(updatableProperties).toEqual(expect.objectContaining({name: 'Weekly sync', domain: 'example.com'}));
+      expect(updatableProperties).not.toHaveProperty('messages_unordered');
+      expect(updatableProperties).not.toHaveProperty('archivedState');
+      expect(updatableProperties).not.toHaveProperty('readOnlyState');
+      expect(updatableProperties).not.toHaveProperty('last_read_timestamp');
+      expect(updatableProperties).not.toHaveProperty('isGuest');
+    });
+  });
+
+  describe('getUpdatablePropertiesFromBackend', () => {
+    it('keeps omitted optional fields out of the update object', () => {
+      const conversationData = {
+        qualified_id: {id: createUuid(), domain: 'example.com'},
+        creator: createUuid(),
+        type: CONVERSATION_TYPE.REGULAR,
+        access: [],
+        access_role: CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        cells_state: CONVERSATION_CELLS_STATE.DISABLED,
+        group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        group_id: 'group-id',
+        epoch: 0,
+        members: {others: [], self: {id: createUuid(), status_ref: '0.0', status_time: '1970-01-01T00:00:00.000Z'}},
+      };
+
+      const updatableProperties = ConversationMapper.getUpdatablePropertiesFromBackend(conversationData);
+
+      expect(updatableProperties).not.toHaveProperty('name');
+      expect(updatableProperties).not.toHaveProperty('conversationModerator');
+      expect(updatableProperties).toEqual(
+        expect.objectContaining({
+          groupConversationType: GROUP_CONVERSATION_TYPE.MEETING,
+          groupId: 'group-id',
+          epoch: 0,
+        }),
+      );
+    });
+
+    it('includes optional fields when present in the payload', () => {
+      const conversationData = {
+        qualified_id: {id: createUuid(), domain: 'example.com'},
+        creator: createUuid(),
+        type: CONVERSATION_TYPE.REGULAR,
+        access: [],
+        access_role: CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        cells_state: CONVERSATION_CELLS_STATE.DISABLED,
+        group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        group_id: 'group-id',
+        epoch: 0,
+        name: 'Weekly sync',
+        add_permission: ADD_PERMISSION.EVERYONE,
+        members: {others: [], self: {id: createUuid(), status_ref: '0.0', status_time: '1970-01-01T00:00:00.000Z'}},
+      };
+
+      const updatableProperties = ConversationMapper.getUpdatablePropertiesFromBackend(conversationData);
+
+      expect(updatableProperties).toEqual(
+        expect.objectContaining({
+          name: 'Weekly sync',
+          conversationModerator: ADD_PERMISSION.EVERYONE,
+        }),
+      );
     });
   });
 

@@ -36,7 +36,7 @@ export class Participant {
   // The (self-) participant hold everytime the original video and this will never change.
   public readonly videoStream = observable<MediaStream | undefined>();
   // In case of background changes effected we store this resulting media stream here.
-  // The CallingRepository will decide if this stream is sent. Because background changes are global app state changes!
+  // The CallingRepository will decide if this stream is played. Because background changes are global app state changes!
   public readonly processedVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
   public readonly hasActiveVideo: ko.PureComputed<boolean>;
   public readonly hasPausedVideo: ko.PureComputed<boolean>;
