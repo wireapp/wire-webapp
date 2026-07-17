@@ -28,7 +28,7 @@ import {
 } from 'Repositories/media/backgroundEffects/quality/definitions';
 import {QUALITY_TIERS, QualityController} from 'Repositories/media/backgroundEffects/quality/qualityController';
 import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
+import {BackgroundSource, BgStrength} from 'Repositories/media/VideoBackgroundEffects';
 import {getLogger, Logger} from 'Util/logger';
 
 import {type CapabilityInfo, type EffectMode, type Metrics, Mode} from './backgroundEffectsWorkerTypes';
@@ -46,7 +46,6 @@ import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
 // Blur strength (0–1) maps to Gaussian sigma in pixel units for the shader.
 // The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives
 // visually useful blur.  Multiply by this factor to get from the 0–1 range.
-const BLUR_SIGMA_SCALE = 15;
 const DEFAULT_FRAME_RATE = 15;
 const MAX_WIDTH = 256;
 const MAX_HEIGHT = 144;
@@ -195,17 +194,17 @@ export class BackgroundEffectsController {
 
   public setMode(mode: EffectMode): void {
     this.logger.info('Background effects mode', mode);
-    const renderFlags = modeToRenderFlags(mode, this.options.blurStrength, this.options.bgBlurRadius);
+    const renderFlags = modeToRenderFlags(mode, this.options.bgBlur, this.options.bgBlurRadius);
     this.options = {...this.options, mode, ...renderFlags};
     this.pushOptionsUpdate();
   }
 
-  public setBlurStrength(value: number): void {
+  public setBlurStrength(value: BgStrength): void {
     this.options = {
       ...this.options,
-      blurStrength: value,
       // Only raise bgBlur when in blur mode; virtual/passthrough use bgBlur=0.
-      bgBlur: this.options.mode === 'blur' ? blurStrengthToBgBlur(value) : this.options.bgBlur,
+      bgBlur: this.options.mode === 'blur' ? value.bgBlur : this.options.bgBlur,
+      bgBlurRadius: value.bgBlurRadius,
     };
     this.pushOptionsUpdate();
   }
@@ -361,16 +360,14 @@ export class BackgroundEffectsController {
 // Module-level pure helpers
 // ---------------------------------------------------------------------------
 
-const blurStrengthToBgBlur = (strength: number): number => Math.max(strength * BLUR_SIGMA_SCALE, 1);
-
 const modeToRenderFlags = (
   mode: EffectMode,
-  blurStrength: number,
+  bgBlur: number,
   bgBlurRadius: number,
 ): Pick<ProcessVideoTrackOptions, 'enabled' | 'bgBlur' | 'bgBlurRadius'> => {
   switch (mode) {
     case 'blur':
-      return {enabled: true, bgBlur: blurStrengthToBgBlur(blurStrength), bgBlurRadius};
+      return {enabled: true, bgBlur, bgBlurRadius};
     case 'virtual':
       return {enabled: true, bgBlur: 0, bgBlurRadius};
     case 'passthrough':
@@ -390,7 +387,7 @@ const withoutBitmap = (options: ProcessVideoTrackOptions): ProcessVideoTrackOpti
 };
 
 const resolveOptions = async (options: ProcessVideoTrackOptions): Promise<ProcessVideoTrackOptions> => {
-  const renderFlags = modeToRenderFlags(options.mode ?? 'blur', options.blurStrength, options.bgBlurRadius);
+  const renderFlags = modeToRenderFlags(options.mode ?? 'blur', options.bgBlur, options.bgBlurRadius);
   const resolved = {...options, ...renderFlags};
 
   if (resolved.backgroundSource?.media instanceof HTMLImageElement) {
@@ -427,7 +424,6 @@ const getWorkerOptions = (
     modelPath: options.modelPath,
     useWorker: options.useWorker,
     mode: options.mode,
-    blurStrength: options.blurStrength,
     enabled: options.enabled,
     quality: options.quality,
     borderSmooth: options.borderSmooth,
