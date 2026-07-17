@@ -102,7 +102,6 @@ test.describe('Folders', () => {
       await test.step('User A moves group conversation with User B into new custom folder', async () => {
         await userAPages.conversationList().getConversation(conversationName).open();
         await createCustomFolder(userAPageManager, conversationName, customFolderName);
-
       });
 
       await test.step('Group conversation with User B is in the custom folder', async () => {
