@@ -1,5 +1,5 @@
 ---
-name: Publish main
+name: Deliver main
 
 on:
   push:
@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       reason:
-        description: 'Optional reason for manually publishing the main development channels'
+        description: 'Optional reason for manually delivering main to Edge and the development channel'
         required: false
         type: string
       confirm_main_publish:
-        description: 'Confirm that this will deploy Edge and publish the dev Docker, Helm, and wire-builds distribution'
+        description: 'Confirm that this will deploy Edge and publish the dev Docker image, Helm chart, and wire-builds/dev channel'
         required: true
         default: false
         type: boolean
@@ -27,7 +27,7 @@ env:
 
 jobs:
   validate_request:
-    name: Validate main publication request
+    name: Validate main delivery request
     runs-on: ubuntu-24.04
     permissions: {}
 
@@ -40,7 +40,7 @@ jobs:
           set -euo pipefail
 
           {
-            echo '## Main publication request'
+            echo '## Main delivery request'
             echo "- Requested ref: ${GITHUB_REF}"
             echo "- Commit SHA: ${GITHUB_SHA}"
             echo "- Workflow run URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
@@ -52,18 +52,18 @@ jobs:
 
           if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' ]]; then
             if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]; then
-              echo "Manual main publication must run from refs/heads/main, received ${GITHUB_REF}." >&2
+              echo "Manual main delivery must run from refs/heads/main, received ${GITHUB_REF}." >&2
               exit 1
             fi
 
             if [[ "${CONFIRM_MAIN_PUBLISH}" != 'true' ]]; then
-              echo 'Main publication was not confirmed. Aborting.' >&2
+              echo 'Main delivery was not confirmed. Aborting.' >&2
               exit 1
             fi
           fi
 
   build_main_artifacts:
-    name: Build main artifacts once
+    name: Build main delivery artifacts
     runs-on: ubuntu-24.04
     needs: validate_request
     permissions:
@@ -163,7 +163,7 @@ jobs:
     environment: wire-webapp-edge
 
     steps:
-      - name: Check whether this Edge publication is current
+      - name: Check whether this Edge deployment is current
         id: check_latest_main
         env:
           GH_TOKEN: ${{ github.token }}
@@ -259,8 +259,8 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-  publish_development_distribution:
-    name: Publish development distribution
+  publish_to_development_channel:
+    name: Publish to development channel
     runs-on: ubuntu-24.04
     needs: build_main_artifacts
     permissions:
@@ -307,7 +307,7 @@ jobs:
         with:
           version: '3.21.3'
 
-      - name: Check whether this main publication is current
+      - name: Check whether this main delivery is current
         id: check_latest_main
         shell: bash
         run: |
@@ -320,9 +320,9 @@ jobs:
           fi
 
           if [[ "${GITHUB_SHA}" != "${latest_main_sha}" ]]; then
-            echo "Skipping development publication because ${GITHUB_SHA} was superseded by ${latest_main_sha}."
+            echo "Skipping development channel delivery because ${GITHUB_SHA} was superseded by ${latest_main_sha}."
             {
-              echo '### Development publication'
+              echo '### Development channel'
               echo "- Skipped as superseded: \`${GITHUB_SHA}\`"
               echo "- Current origin/main: \`${latest_main_sha}\`"
             } >> "${GITHUB_STEP_SUMMARY}"
@@ -377,7 +377,7 @@ jobs:
         working-directory: wire-builds
         run: ../bin/update-development-wire-builds.sh
 
-      - name: Summarize development publication
+      - name: Summarize development channel
         if: always()
         env:
           DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
@@ -388,7 +388,7 @@ jobs:
           set -euo pipefail
 
           {
-            echo '## Development publication'
+            echo '## Development channel'
             echo "- Main commit SHA: ${GITHUB_SHA}"
             echo "- Superseded: ${SUPERSEDED:-false}"
             echo "- Docker image: ${DOCKER_IMAGE_TAG:-not published}"
@@ -397,11 +397,22 @@ jobs:
             echo "- Workflow run URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           } >> "$GITHUB_STEP_SUMMARY"
 
-  notify_development_distribution_failure:
-    name: Notify development distribution failure to Deployoholics
+  notify_main_delivery_failure:
+    name: Notify main delivery failure to Deployoholics
     runs-on: ubuntu-24.04
-    needs: [build_main_artifacts, publish_development_distribution]
-    if: ${{ always() && needs.publish_development_distribution.result == 'failure' }}
+    needs:
+      - build_main_artifacts
+      - deploy_to_edge
+      - publish_to_development_channel
+    if: >-
+      ${{
+        always() &&
+        (
+          needs.build_main_artifacts.result == 'failure' ||
+          needs.deploy_to_edge.result == 'failure' ||
+          needs.publish_to_development_channel.result == 'failure'
+        )
+      }}
     permissions:
       contents: read
 
@@ -413,36 +424,38 @@ jobs:
           fetch-depth: 1
           sparse-checkout: .github/actions/notify-deployoholics
 
-      - name: Announce development distribution failure
+      - name: Announce main delivery failure
         uses: ./.github/actions/notify-deployoholics
         with:
           webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           status: failure
           text: |
-            ❌ Main development distribution failed ❌
+            ❌ Main delivery failed ❌
             **Main commit:** ${{ github.sha }}
-            **Docker result:** ${{ needs.publish_development_distribution.outputs.docker_image_tag || 'failed or not published' }}
-            **Helm result:** ${{ needs.publish_development_distribution.outputs.helm_chart_version || 'failed or not published' }}
-            **wire-builds/dev result:** ${{ needs.publish_development_distribution.outputs.wire_builds_commit_sha || 'failed or not updated' }}
+            **Build:** ${{ needs.build_main_artifacts.result }}
+            **Edge deployment:** ${{ needs.deploy_to_edge.result }}
+            **Development channel:** ${{ needs.publish_to_development_channel.result }}
+            **Docker image:** ${{ needs.publish_to_development_channel.outputs.docker_image_tag || 'not published' }}
+            **Helm chart:** ${{ needs.publish_to_development_channel.outputs.helm_chart_version || 'not published' }}
+            **wire-builds/dev:** ${{ needs.publish_to_development_channel.outputs.wire_builds_commit_sha || 'not updated' }}
             **Workflow:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-  summarize_main_publication:
-    name: Summarize main publication
+  summarize_main_delivery:
+    name: Summarize main delivery
     runs-on: ubuntu-24.04
-    needs:
-      [build_main_artifacts, deploy_to_edge, publish_development_distribution, notify_development_distribution_failure]
+    needs: [build_main_artifacts, deploy_to_edge, publish_to_development_channel, notify_main_delivery_failure]
     if: always()
     permissions: {}
 
     steps:
-      - name: Write main publication summary
+      - name: Write main delivery summary
         env:
           EDGE_RESULT: ${{ needs.deploy_to_edge.result }}
           EDGE_SUPERSEDED: ${{ needs.deploy_to_edge.outputs.superseded }}
-          DOCKER_IMAGE_TAG: ${{ needs.publish_development_distribution.outputs.docker_image_tag }}
-          HELM_CHART_VERSION: ${{ needs.publish_development_distribution.outputs.helm_chart_version }}
-          WIRE_BUILDS_COMMIT_SHA: ${{ needs.publish_development_distribution.outputs.wire_builds_commit_sha }}
-          SUPERSEDED: ${{ needs.publish_development_distribution.outputs.superseded }}
+          DOCKER_IMAGE_TAG: ${{ needs.publish_to_development_channel.outputs.docker_image_tag }}
+          HELM_CHART_VERSION: ${{ needs.publish_to_development_channel.outputs.helm_chart_version }}
+          WIRE_BUILDS_COMMIT_SHA: ${{ needs.publish_to_development_channel.outputs.wire_builds_commit_sha }}
+          SUPERSEDED: ${{ needs.publish_to_development_channel.outputs.superseded }}
         run: |
           set -euo pipefail
 
@@ -457,12 +470,12 @@ jobs:
           fi
 
           {
-            echo '## Main publication'
+            echo '## Main delivery'
             echo "- Main commit SHA: ${GITHUB_SHA}"
-            echo "- Edge result: ${edge_result}"
-            echo "- Immutable dev Docker image: ${DOCKER_IMAGE_TAG:-not published}"
-            echo "- Helm chart version: ${HELM_CHART_VERSION:-not published}"
-            echo "- wire-builds/dev commit SHA: ${WIRE_BUILDS_COMMIT_SHA:-not updated}"
-            echo "- Development publication skipped as superseded: ${SUPERSEDED:-false}"
+            echo "- Edge deployment: ${edge_result}"
+            echo "- Docker image: ${DOCKER_IMAGE_TAG:-not published}"
+            echo "- Helm chart: ${HELM_CHART_VERSION:-not published}"
+            echo "- wire-builds/dev: ${WIRE_BUILDS_COMMIT_SHA:-not updated}"
+            echo "- Development channel skipped as superseded: ${SUPERSEDED:-false}"
             echo "- Workflow URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           } >> "$GITHUB_STEP_SUMMARY"
