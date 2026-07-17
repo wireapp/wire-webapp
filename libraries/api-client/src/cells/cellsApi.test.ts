@@ -1914,9 +1914,9 @@ describe('CellsAPI', () => {
       );
     });
 
-    it('filters by tags when provided', async () => {
+    it('filters by a single tag with Should operation', async () => {
       const searchPhrase = 'test';
-      const tags = ['tag1', 'tag2'];
+      const tags = ['tag1'];
       const mockResponse: RestNodeCollection = {
         Nodes: [
           {
@@ -1938,13 +1938,41 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Not',
           },
-          Metadata: [{Namespace: 'usermeta-tags', Term: JSON.stringify(tags.join(','))}],
+          Metadata: [{Namespace: 'usermeta-tags', Term: 'tag1', Operation: 'Should'}],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
       });
       expect(result).toEqual(mockResponse);
+    });
+
+    it('filters by multiple tags with Should operation (OR) so any selected tag matches (WPB-27126)', async () => {
+      const searchPhrase = 'test';
+      const tags = ['tag1', 'tag2'];
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: searchPhrase, tags});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {
+          Text: {SearchIn: 'BaseName', Term: searchPhrase},
+          Type: 'UNKNOWN',
+          Status: {
+            Deleted: 'Not',
+          },
+          Metadata: [
+            {Namespace: 'usermeta-tags', Term: 'tag1', Operation: 'Should'},
+            {Namespace: 'usermeta-tags', Term: 'tag2', Operation: 'Should'},
+          ],
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
     });
 
     it('handles empty tags array', async () => {
@@ -2249,7 +2277,7 @@ describe('CellsAPI', () => {
           Type: 'UNKNOWN',
           Status: {Deleted: 'Not', HasPublicLink: true},
           Metadata: [
-            {Namespace: 'usermeta-tags', Term: JSON.stringify(tags.join(','))},
+            {Namespace: 'usermeta-tags', Term: 'important', Operation: 'Should'},
             {Namespace: 'mime', Term: 'image/*', Operation: 'Must'},
             {Namespace: 'usermeta-owner-uuid', Term: JSON.stringify(creatorId), Operation: 'Must'},
           ],

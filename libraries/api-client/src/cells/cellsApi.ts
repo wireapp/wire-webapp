@@ -468,9 +468,11 @@ export class CellsAPI {
           ...(hasPublicLink !== undefined ? {HasPublicLink: hasPublicLink} : {}),
         },
         Metadata: [
-          ...(tags !== undefined && tags.length > 0
-            ? [{Namespace: USER_META_TAGS_NAMESPACE, Term: this.transformTagsToJson(tags)}]
-            : []),
+          ...(tags?.map(tag => ({
+            Namespace: USER_META_TAGS_NAMESPACE,
+            Term: tag,
+            Operation: 'Should' as const,
+          })) ?? []),
           ...(mimeTypes?.map(term => ({Namespace: MIME_NAMESPACE, Term: term, Operation: mimeOp})) ?? []),
           ...(creatorIds?.map(term => ({
             Namespace: USER_META_OWNER_UUID_NAMESPACE,
