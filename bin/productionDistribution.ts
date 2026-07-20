@@ -20,6 +20,9 @@
 import is from '@sindresorhus/is';
 import {Result} from 'true-myth';
 
+import {isBuildMetadata} from '@wireapp/config';
+import type {BuildMetadata} from '@wireapp/config';
+
 import {validateProductionTagName} from './releaseMetadata';
 
 export type ProductionDistributionManifest = {
@@ -33,6 +36,7 @@ export type ProductionDistributionManifest = {
 };
 
 export type DistributionManifestValidationParameters = {
+  readonly artifactMetadata: unknown;
   readonly manifest: unknown;
   readonly productionTag: string;
   readonly productionTagCommitSha: string;
@@ -65,6 +69,48 @@ function getNonEmptyString(value: unknown): string | undefined {
   }
 
   return value;
+}
+
+type LegacyProductionDistributionArtifactMetadata = {
+  readonly version: string;
+};
+
+function validateProductionDistributionArtifactMetadata(
+  artifactMetadata: unknown,
+  artifactVersion: string,
+  releaseIdentifier: string,
+  releaseCommitSha: string,
+): Result<BuildMetadata | LegacyProductionDistributionArtifactMetadata, Error> {
+  if (isBuildMetadata(artifactMetadata)) {
+    if (artifactMetadata.version !== artifactVersion) {
+      return Result.err(new Error('Distribution artifact version does not match the manifest'));
+    }
+
+    if (artifactMetadata.version !== releaseIdentifier) {
+      return Result.err(new Error('Distribution artifact version does not match the release identifier'));
+    }
+
+    if (artifactMetadata.commit !== releaseCommitSha) {
+      return Result.err(new Error('Distribution artifact commit does not match the Production tag commit'));
+    }
+
+    return Result.ok(artifactMetadata);
+  }
+
+  if (
+    isRecord(artifactMetadata) &&
+    is.nonEmptyString(artifactMetadata.version) &&
+    !('commit' in artifactMetadata) &&
+    !('builtAt' in artifactMetadata)
+  ) {
+    if (artifactMetadata.version !== artifactVersion) {
+      return Result.err(new Error('Legacy distribution artifact version does not match the manifest'));
+    }
+
+    return Result.ok({version: artifactMetadata.version});
+  }
+
+  return Result.err(new Error('Distribution artifact metadata is invalid'));
 }
 
 export function validateProductionDistributionManifest(
@@ -115,6 +161,17 @@ export function validateProductionDistributionManifest(
 
   if (artifactVersion === undefined) {
     return Result.err(new Error('Distribution manifest artifact version must not be empty'));
+  }
+
+  const artifactMetadataResult = validateProductionDistributionArtifactMetadata(
+    parameters.artifactMetadata,
+    artifactVersion,
+    releaseIdentifier,
+    parameters.productionTagCommitSha,
+  );
+
+  if (artifactMetadataResult.isErr) {
+    return Result.err(artifactMetadataResult.error);
   }
 
   if (cloudArtifactChecksum === undefined) {

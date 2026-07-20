@@ -24,6 +24,7 @@ production_tag_commit_sha="$(git rev-parse "refs/tags/${PRODUCTION_TAG}^{commit}
 manifest_path="${DISTRIBUTION_CONTEXT_PATH}/distribution-manifest.json"
 
 validation_options=(
+  --artifact-metadata-path "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist/version.json"
   --manifest-path "${manifest_path}"
   --production-tag "${PRODUCTION_TAG}"
   --production-tag-commit-sha "${production_tag_commit_sha}"
@@ -61,13 +62,6 @@ cloud_artifact_checksum="$(jq --raw-output '.cloudArtifactChecksum' "${manifest_
 actual_cloud_artifact_checksum="$(sha256sum "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist/s3/ebs.zip" | awk '{print $1}')"
 if [[ "${actual_cloud_artifact_checksum}" != "${cloud_artifact_checksum}" ]]; then
   echo 'The distribution context EBS checksum does not match its manifest.' >&2
-  exit 1
-fi
-
-artifact_version="$(jq --raw-output '.artifactVersion' "${manifest_path}")"
-actual_artifact_version="$(jq --raw-output '.version' "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist/version.json")"
-if [[ "${actual_artifact_version}" != "${artifact_version}" ]]; then
-  echo 'The distribution context version does not match its manifest.' >&2
   exit 1
 fi
 
