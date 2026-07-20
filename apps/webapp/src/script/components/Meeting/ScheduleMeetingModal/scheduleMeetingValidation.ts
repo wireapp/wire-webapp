@@ -19,8 +19,9 @@
 
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Maybe} from 'true-myth';
+import {result, type Result} from 'true-myth';
 
-import type {ScheduleMeetingFormErrors} from './scheduleMeetingTypes';
+import {emptyScheduleMeetingFormErrors, type ScheduleMeetingFormErrors} from './scheduleMeetingTypes';
 
 export interface ScheduleMeetingValidationInput {
   title: string;
@@ -29,33 +30,46 @@ export interface ScheduleMeetingValidationInput {
   wallClock: WallClock;
 }
 
-export const validateScheduleMeetingForm = ({
+export const getScheduleMeetingFormErrors = ({
   title,
   start,
   end,
   wallClock,
 }: ScheduleMeetingValidationInput): ScheduleMeetingFormErrors => {
-  const errors: ScheduleMeetingFormErrors = {};
   const currentTimestampInMilliseconds = wallClock.currentTimestampInMilliseconds;
+  const endInPast =
+    end.isJust && end.value.getTime() <= currentTimestampInMilliseconds
+      ? 'meetings.schedule.errors.endInPast'
+      : undefined;
 
-  if (!title.trim()) {
-    errors.title = 'meetings.scheduleModal.error.titleRequired';
-  }
-
-  if (start.isJust && start.value.getTime() <= currentTimestampInMilliseconds) {
-    errors.startInPast = 'meetings.schedule.errors.startInPast';
-  }
-
-  if (end.isJust && end.value.getTime() <= currentTimestampInMilliseconds) {
-    errors.endInPast = 'meetings.schedule.errors.endInPast';
-  }
-
-  if (start.isJust && end.isJust && !errors.endInPast && end.value.getTime() <= start.value.getTime()) {
-    errors.endBeforeStart = 'meetings.scheduleModal.error.endBeforeStart';
-  }
-
-  return errors;
+  return {
+    title: !title.trim() ? 'meetings.scheduleModal.error.titleRequired' : undefined,
+    startInPast:
+      start.isJust && start.value.getTime() <= currentTimestampInMilliseconds
+        ? 'meetings.schedule.errors.startInPast'
+        : undefined,
+    endInPast,
+    endBeforeStart:
+      start.isJust && end.isJust && endInPast === undefined && end.value.getTime() <= start.value.getTime()
+        ? 'meetings.scheduleModal.error.endBeforeStart'
+        : undefined,
+  };
 };
 
 export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors): boolean =>
-  Boolean(errors.title || errors.startInPast || errors.endInPast || errors.endBeforeStart);
+  errors.title !== undefined ||
+  errors.startInPast !== undefined ||
+  errors.endInPast !== undefined ||
+  errors.endBeforeStart !== undefined;
+
+export const validateScheduleMeetingForm = (
+  input: ScheduleMeetingValidationInput,
+): Result<ScheduleMeetingValidationInput, ScheduleMeetingFormErrors> => {
+  const errors = getScheduleMeetingFormErrors(input);
+
+  if (hasScheduleMeetingFormErrors(errors)) {
+    return result.err(errors);
+  }
+
+  return result.ok(input);
+};

@@ -41,15 +41,22 @@ export type ScheduleMeetingFormErrorKey =
   | 'meetings.schedule.errors.endInPast';
 
 export interface ScheduleMeetingFormErrors {
-  title?: ScheduleMeetingFormErrorKey;
-  startInPast?: ScheduleMeetingFormErrorKey;
-  endInPast?: ScheduleMeetingFormErrorKey;
-  endBeforeStart?: ScheduleMeetingFormErrorKey;
+  title: ScheduleMeetingFormErrorKey | undefined;
+  startInPast: ScheduleMeetingFormErrorKey | undefined;
+  endInPast: ScheduleMeetingFormErrorKey | undefined;
+  endBeforeStart: ScheduleMeetingFormErrorKey | undefined;
 }
 
+export const emptyScheduleMeetingFormErrors = (): ScheduleMeetingFormErrors => ({
+  title: undefined,
+  startInPast: undefined,
+  endInPast: undefined,
+  endBeforeStart: undefined,
+});
+
 export interface ScheduleMeetingFormDisplayErrors {
-  title?: string;
-  startInPast?: string;
-  endInPast?: string;
-  endBeforeStart?: string;
+  title: string | undefined;
+  startInPast: string | undefined;
+  endInPast: string | undefined;
+  endBeforeStart: string | undefined;
 }

@@ -20,7 +20,7 @@
 import {maybe} from 'true-myth';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
-import {hasScheduleMeetingFormErrors, validateScheduleMeetingForm} from './scheduleMeetingValidation';
+import {getScheduleMeetingFormErrors, hasScheduleMeetingFormErrors} from './scheduleMeetingValidation';
 
 describe('scheduleMeetingValidation', () => {
   const fixedNow = new Date('2026-06-23T14:30:00.000Z');
@@ -33,7 +33,7 @@ describe('scheduleMeetingValidation', () => {
   const futureEnd = maybe.just(futureEndDate);
 
   it('returns titleRequired when title is empty', () => {
-    const errors = validateScheduleMeetingForm({title: '   ', start: futureStart, end: futureEnd, wallClock});
+    const errors = getScheduleMeetingFormErrors({title: '   ', start: futureStart, end: futureEnd, wallClock});
 
     expect(errors.title).toBe('meetings.scheduleModal.error.titleRequired');
     expect(errors.startInPast).toBeUndefined();
@@ -41,7 +41,7 @@ describe('scheduleMeetingValidation', () => {
   });
 
   it('returns startInPast when start is not in the future', () => {
-    const errors = validateScheduleMeetingForm({
+    const errors = getScheduleMeetingFormErrors({
       title: 'Weekly sync',
       start: maybe.just(pastStartDate),
       end: futureEnd,
@@ -52,7 +52,7 @@ describe('scheduleMeetingValidation', () => {
   });
 
   it('returns endInPast when end is not in the future', () => {
-    const errors = validateScheduleMeetingForm({
+    const errors = getScheduleMeetingFormErrors({
       title: 'Weekly sync',
       start: futureStart,
       end: maybe.just(pastStartDate),
@@ -67,7 +67,7 @@ describe('scheduleMeetingValidation', () => {
     const pastTimeToday = new Date(wallClock.currentDate);
     pastTimeToday.setHours(pastTimeToday.getHours() - 1);
 
-    const errors = validateScheduleMeetingForm({
+    const errors = getScheduleMeetingFormErrors({
       title: 'Weekly sync',
       start: maybe.just(pastTimeToday),
       end: futureEnd,
@@ -78,7 +78,7 @@ describe('scheduleMeetingValidation', () => {
   });
 
   it('returns endBeforeStart when end is not after start', () => {
-    const errors = validateScheduleMeetingForm({
+    const errors = getScheduleMeetingFormErrors({
       title: 'Weekly sync',
       start: futureStart,
       end: maybe.just(futureStartDate),
@@ -89,13 +89,13 @@ describe('scheduleMeetingValidation', () => {
   });
 
   it('returns no errors for valid input', () => {
-    const errors = validateScheduleMeetingForm({title: 'Weekly sync', start: futureStart, end: futureEnd, wallClock});
+    const errors = getScheduleMeetingFormErrors({title: 'Weekly sync', start: futureStart, end: futureEnd, wallClock});
 
     expect(hasScheduleMeetingFormErrors(errors)).toBe(false);
   });
 
   it('skips end validation when start or end is missing', () => {
-    const errors = validateScheduleMeetingForm({
+    const errors = getScheduleMeetingFormErrors({
       title: 'Weekly sync',
       start: maybe.nothing(),
       end: futureEnd,

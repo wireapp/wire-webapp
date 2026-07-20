@@ -55,7 +55,10 @@ export const MeetNowModal = () => {
   const selfUser = container.resolve(UserState).self();
   const submitGenerationRef = useRef(0);
 
-  const titleError = useMemo(() => (errors.title ? translate(errors.title) : undefined), [errors.title, translate]);
+  const titleError = useMemo(
+    () => (errors.title !== undefined ? translate(errors.title) : undefined),
+    [errors.title, translate],
+  );
 
   const dismissModal = () => {
     close();

@@ -27,8 +27,12 @@ export type MeetNowFormState = {
 };
 
 export type MeetNowFormErrors = {
-  title?: TranslationKey;
+  title: TranslationKey | undefined;
 };
+
+export const emptyMeetNowFormErrors = (): MeetNowFormErrors => ({
+  title: undefined,
+});
 
 export const meetNowSubmitResults = {
   creationFailed: 'creationFailed',

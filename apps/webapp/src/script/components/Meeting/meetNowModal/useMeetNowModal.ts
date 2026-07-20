@@ -17,11 +17,12 @@
  *
  */
 
+import {result, type Result} from 'true-myth';
 import {create} from 'zustand';
 
 import type {User} from 'Repositories/entity/User';
 
-import type {MeetNowFormErrors, MeetNowFormState} from './meetNowTypes';
+import {emptyMeetNowFormErrors, type MeetNowFormErrors, type MeetNowFormState} from './meetNowTypes';
 
 export type {MeetNowFormErrors, MeetNowFormState} from './meetNowTypes';
 
@@ -48,20 +49,24 @@ type MeetNowModalState = {
 const initialState = {
   isOpen: false,
   formState: getDefaultMeetNowFormState(),
-  errors: {} as MeetNowFormErrors,
+  errors: emptyMeetNowFormErrors(),
 };
 
-export const validateMeetNowForm = ({title}: MeetNowFormState): MeetNowFormErrors => {
-  const errors: MeetNowFormErrors = {};
+export const getMeetNowFormErrors = ({title}: MeetNowFormState): MeetNowFormErrors => ({
+  title: !title.trim() ? 'meetings.scheduleModal.error.titleRequired' : undefined,
+});
 
-  if (!title.trim()) {
-    errors.title = 'meetings.scheduleModal.error.titleRequired';
+export const hasMeetNowFormErrors = (errors: MeetNowFormErrors): boolean => errors.title !== undefined;
+
+export const validateMeetNowForm = (formState: MeetNowFormState): Result<MeetNowFormState, MeetNowFormErrors> => {
+  const errors = getMeetNowFormErrors(formState);
+
+  if (hasMeetNowFormErrors(errors)) {
+    return result.err(errors);
   }
 
-  return errors;
+  return result.ok(formState);
 };
-
-export const hasMeetNowFormErrors = (errors: MeetNowFormErrors): boolean => Boolean(errors.title);
 
 export const useMeetNowModal = create<MeetNowModalState>((set, get) => ({
   ...initialState,
@@ -69,13 +74,13 @@ export const useMeetNowModal = create<MeetNowModalState>((set, get) => ({
     set({
       isOpen: true,
       formState: getDefaultMeetNowFormState(),
-      errors: {},
+      errors: emptyMeetNowFormErrors(),
     }),
   close: () => set({isOpen: false}),
   reset: () =>
     set({
       formState: getDefaultMeetNowFormState(),
-      errors: {},
+      errors: emptyMeetNowFormErrors(),
     }),
   setTitle: title =>
     set(state => ({
@@ -91,9 +96,9 @@ export const useMeetNowModal = create<MeetNowModalState>((set, get) => ({
       formState: {...state.formState, participantsFilter},
     })),
   validate: () => {
-    const errors = validateMeetNowForm(get().formState);
+    const errors = getMeetNowFormErrors(get().formState);
     set({errors});
     return errors;
   },
-  clearErrors: () => set({errors: {}}),
+  clearErrors: () => set({errors: emptyMeetNowFormErrors()}),
 }));

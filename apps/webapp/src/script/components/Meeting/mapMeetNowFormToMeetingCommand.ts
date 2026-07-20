@@ -17,23 +17,16 @@
  *
  */
 
-import {result, Result} from 'true-myth';
+import {Result} from 'true-myth';
 
 import type {MeetNowFormErrors, MeetNowFormState} from 'Components/Meeting/meetNowModal/meetNowTypes';
-import {hasMeetNowFormErrors, validateMeetNowForm} from 'Components/Meeting/meetNowModal/useMeetNowModal';
+import {validateMeetNowForm} from 'Components/Meeting/meetNowModal/useMeetNowModal';
 import type {MeetNowMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 
 export const mapMeetNowFormToMeetingCommand = (
   formState: MeetNowFormState,
-): Result<MeetNowMeetingCommand, MeetNowFormErrors> => {
-  const errors = validateMeetNowForm(formState);
-
-  if (hasMeetNowFormErrors(errors)) {
-    return result.err(errors);
-  }
-
-  return result.ok({
-    title: formState.title.trim(),
-    selectedUsers: formState.selectedUsers,
-  });
-};
+): Result<MeetNowMeetingCommand, MeetNowFormErrors> =>
+  validateMeetNowForm(formState).map(validatedFormState => ({
+    title: validatedFormState.title.trim(),
+    selectedUsers: validatedFormState.selectedUsers,
+  }));

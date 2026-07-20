@@ -19,9 +19,9 @@
 
 import {
   getDefaultMeetNowFormState,
+  getMeetNowFormErrors,
   hasMeetNowFormErrors,
   useMeetNowModal,
-  validateMeetNowForm,
 } from './useMeetNowModal';
 
 describe('useMeetNowModal', () => {
@@ -38,7 +38,7 @@ describe('useMeetNowModal', () => {
   });
 
   it('requires a title before submit', () => {
-    const errors = validateMeetNowForm(getDefaultMeetNowFormState());
+    const errors = getMeetNowFormErrors(getDefaultMeetNowFormState());
 
     expect(errors.title).toBe('meetings.scheduleModal.error.titleRequired');
     expect(hasMeetNowFormErrors(errors)).toBe(true);
