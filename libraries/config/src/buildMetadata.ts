@@ -46,3 +46,25 @@ export function getShortCommitSha(commitSha: string): string {
 export function resolveBuildVersion(explicitVersion: Maybe<string>, commitSha: string): string {
   return explicitVersion.unwrapOr(`dev-${getShortCommitSha(commitSha)}`);
 }
+
+export function createAuthoritativeBuildMetadata(
+  existingBuildMetadata: Maybe<BuildMetadata>,
+  buildMetadataInput: BuildMetadataInput,
+): BuildMetadata {
+  return existingBuildMetadata.mapOrElse(
+    () => {
+      return createBuildMetadata(buildMetadataInput);
+    },
+    currentBuildMetadata => {
+      if (
+        currentBuildMetadata.version === buildMetadataInput.version &&
+        currentBuildMetadata.commit === buildMetadataInput.commit &&
+        currentBuildMetadata.builtAt.endsWith('Z')
+      ) {
+        return currentBuildMetadata;
+      }
+
+      return createBuildMetadata(buildMetadataInput);
+    },
+  );
+}

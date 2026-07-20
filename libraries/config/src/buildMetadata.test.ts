@@ -19,7 +19,12 @@
 
 import {Maybe} from 'true-myth';
 
-import {createBuildMetadata, getShortCommitSha, resolveBuildVersion} from './buildMetadata';
+import {
+  createAuthoritativeBuildMetadata,
+  createBuildMetadata,
+  getShortCommitSha,
+  resolveBuildVersion,
+} from './buildMetadata';
 
 describe('build metadata', () => {
   it('preserves an explicit release identifier', () => {
@@ -70,5 +75,38 @@ describe('build metadata', () => {
     expect(secondMetadata).toStrictEqual(firstMetadata);
     expect(firstMetadata.commit).toBe('025edc6f1234567890');
     expect(firstMetadata.builtAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+  });
+
+  it('preserves metadata when the logical version and commit are unchanged', () => {
+    const buildMetadataInput = {
+      version: 'main-025edc6',
+      commit: '025edc6f1234567890',
+      builtAt: '2026-07-20T06:18:03.123Z',
+    };
+    const existingMetadata = createBuildMetadata({
+      ...buildMetadataInput,
+      builtAt: '2026-07-20T06:00:00.000Z',
+    });
+
+    const actualMetadata = createAuthoritativeBuildMetadata(Maybe.just(existingMetadata), buildMetadataInput);
+
+    expect(actualMetadata).toStrictEqual(existingMetadata);
+  });
+
+  it('creates new metadata when the logical version changes', () => {
+    const buildMetadataInput = {
+      version: 'main-025edc6',
+      commit: '025edc6f1234567890',
+      builtAt: '2026-07-20T06:18:03.123Z',
+    };
+    const existingMetadata = createBuildMetadata({
+      ...buildMetadataInput,
+      version: 'dev-025edc6',
+      builtAt: '2026-07-20T06:00:00.000Z',
+    });
+
+    const actualMetadata = createAuthoritativeBuildMetadata(Maybe.just(existingMetadata), buildMetadataInput);
+
+    expect(actualMetadata).toStrictEqual(buildMetadataInput);
   });
 });

@@ -9,7 +9,7 @@
       "dependsOn": ["^build", "webapp:build"],
       "outputs": ["{projectRoot}/dist"],
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copy_server_assets.js"],
+        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.mts", "node {projectRoot}/bin/copy_server_assets.js"],
         "parallel": false
       }
     },
@@ -18,7 +18,7 @@
       "dependsOn": ["config-lib:build"],
       "outputs": ["{projectRoot}/dist"],
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copy_server_assets.js"],
+        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.mts", "node {projectRoot}/bin/copy_server_assets.js"],
         "parallel": false
       }
     },

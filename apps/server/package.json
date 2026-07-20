@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "scripts": {
-    "build": "rimraf ./dist/ && tsc && node ./bin/generateVersionFile.js && node ./bin/copy_server_assets.js",
+    "build": "rimraf ./dist/ && tsc && node ./bin/generateVersionFile.mts && node ./bin/copy_server_assets.js",
     "copy-assets": "node ./bin/copy_server_assets.js",
-    "generate-version-file": "node ./bin/generateVersionFile.js",
+    "generate-version-file": "node ./bin/generateVersionFile.mts",
     "clean": "rimraf ./dist/",
     "start:prod": "node ./index.js",
     "test": "jest"
