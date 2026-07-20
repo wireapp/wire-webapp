@@ -46,6 +46,9 @@ gateway:
   # - If you are running an older Envoy Gateway release, check that release's docs for
   #   any feature gate or compatibility notes before enabling this chart.
   # - A Gateway (gateway.networking.k8s.io/v1) must already exist, or be created separately.
+  # - In the shared setup we use in staging, the Gateway lives in a dedicated
+  #   namespace such as `web-gateway` and the chart's ListenerSet points there
+  #   via `gateway.namespace`.
   # - spec.gatewayClassName must point at the Envoy Gateway GatewayClass.
   # - spec.allowedListeners must allow ListenerSet attachments from this chart's namespace.
   #   `namespaces.from: All` is the broadest choice if you want to permit any namespace.
@@ -53,19 +56,27 @@ gateway:
   # apiVersion: gateway.networking.k8s.io/v1
   # kind: Gateway
   # metadata:
-  #   name: envoy-gateway
+  #   name: webapp-gateway
+  #   namespace: web-gateway
   # spec:
-  #   gatewayClassName: envoy-gateway # use the GatewayClass installed by Envoy Gateway
+  #   gatewayClassName: envoy # use the GatewayClass installed by Envoy Gateway
   #   allowedListeners:
   #     namespaces:
   #       from: All
+  #   listeners:
+  #     - name: http
+  #       protocol: HTTP
+  #       port: 80
   # - This chart creates a ListenerSet in the release namespace and an HTTPRoute that
-  #   attaches to it.
+  #   attaches to it. When using a shared Gateway namespace, set `gateway.namespace`
+  #   to that namespace.
   # - If tls.useCertManager=true and you rely on the default HTTP01 solver, the Gateway
   #   must also expose an HTTP listener on port 80, or you must provide custom solvers.
   # Gateway name used when routing.mode is envoy or migration.
   name: ""
   # Optional namespace of the Gateway. Defaults to the release namespace.
+  # Set this to a shared Gateway namespace like `web-gateway` when you keep the
+  # Envoy Gateway entrypoint separate from the application namespace.
   namespace: ""
   # Listener section name used by the ListenerSet and HTTPRoute parentRef.
   # Defaults to https when tls.enabled=true, otherwise http.
