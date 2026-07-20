@@ -22,7 +22,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const dotenv = require('dotenv-extended');
-const {execSync} = require('child_process');
+const {execFileSync} = require('child_process');
+const {readFileSync} = require('fs');
+const is = require('@sindresorhus/is');
 
 const path = require('path');
 
@@ -39,27 +41,34 @@ const srcScript = path.resolve(SRC_PATH, 'script');
 const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
 const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
 const UNSUPPORTED_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/unsupported.ejs');
+const BUILD_METADATA_FILE_PATH = path.resolve(ROOT_PATH, 'apps/server/dist/version.json');
+const BUILD_METADATA_SCRIPT_PATH = path.resolve(ROOT_PATH, 'apps/server/bin/generateVersionFile.mts');
 
-// Generate version information
-function generateVersion() {
-  return new Date()
-    .toISOString()
-    .replace(/[T\-:]/g, '.')
-    .replace(/\.\d+Z/, '');
+function isBuildMetadata(value) {
+  return (
+    is.object(value) &&
+    is.nonEmptyString(value.version) &&
+    is.nonEmptyString(value.commit) &&
+    is.nonEmptyString(value.builtAt)
+  );
 }
 
-function generateCommitHash() {
-  try {
-    return execSync('git rev-parse HEAD').toString().trim();
-  } catch (error) {
-    return 'unknown';
+function readBuildMetadata() {
+  execFileSync(process.execPath, [BUILD_METADATA_SCRIPT_PATH], {
+    cwd: ROOT_PATH,
+    stdio: 'inherit',
+  });
+
+  const parsedBuildMetadata = JSON.parse(readFileSync(BUILD_METADATA_FILE_PATH, 'utf8'));
+
+  if (!isBuildMetadata(parsedBuildMetadata)) {
+    throw new Error(`Invalid build metadata in '${BUILD_METADATA_FILE_PATH}'`);
   }
+
+  return parsedBuildMetadata;
 }
 
-const version = {
-  version: generateVersion(),
-  commit: generateCommitHash(),
-};
+const buildMetadata = readBuildMetadata();
 
 // Load environment variables
 const env = dotenv.load({
@@ -91,8 +100,8 @@ function generateUrls() {
 }
 
 const commonConfig = {
-  commit: version.commit,
-  version: version.version,
+  commit: buildMetadata.commit,
+  version: buildMetadata.version,
   env: env.NODE_ENV || 'production',
   urls: generateUrls(),
 };
