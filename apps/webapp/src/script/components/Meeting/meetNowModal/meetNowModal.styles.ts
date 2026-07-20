@@ -19,18 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export {
-  bodyStyles,
-  closeButtonStyles,
-  footerStyles,
-  headerStyles,
-  headerTitleStyles,
-  modalWrapperStyles,
-  submitButtonIconStyles,
-  submitButtonStyles,
-  wrapperStyles,
-} from 'Components/Meeting/shared/styles/meetingModalShell.styles';
-
 export const meetNowModalWrapperStyles: CSSObject = {
   maxWidth: '480px',
 };
