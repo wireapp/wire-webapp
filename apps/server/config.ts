@@ -24,8 +24,15 @@ import path from 'path';
 
 import {generateClientConfig, generateServerConfig, Env} from '@wireapp/config';
 
-const versionData = readFileSync(path.resolve(__dirname, './version.json'), 'utf8');
-const version = Boolean(versionData) ? JSON.parse(versionData) : {version: 'unknown', commit: 'unknown'};
+import {loadBuildMetadata} from './buildMetadata';
+
+function readBuildMetadataFile(metadataFilePath: string): string {
+  return readFileSync(metadataFilePath, 'utf8');
+}
+
+const buildMetadata = loadBuildMetadata(path.resolve(__dirname, './version.json'), {
+  readFile: readBuildMetadataFile,
+});
 const dotenvConfigurationIndentationSpaces = 2;
 
 // Determine the correct root path based on the directory structure
@@ -84,8 +91,8 @@ function generateUrls() {
 }
 
 const commonConfig = {
-  commit: version.commit,
-  version: version.version,
+  commit: buildMetadata.commit,
+  version: buildMetadata.version,
   env: Boolean(env.NODE_ENV) ? env.NODE_ENV : 'production',
   urls: generateUrls(),
 };
