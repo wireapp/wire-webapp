@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, useRef} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -53,12 +53,22 @@ export const MeetNowModal = () => {
   const conversationState = container.resolve(ConversationState);
   const {isSubmitting, submit} = useMeetNowSubmit(conversationState);
   const selfUser = container.resolve(UserState).self();
+  const submitGenerationRef = useRef(0);
 
   const titleError = useMemo(() => (errors.title ? translate(errors.title) : undefined), [errors.title, translate]);
 
-  const handleClose = () => {
+  const dismissModal = () => {
     close();
     reset();
+  };
+
+  const handleClose = () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    submitGenerationRef.current += 1;
+    dismissModal();
   };
 
   const handleSubmit = () => {
@@ -67,10 +77,17 @@ export const MeetNowModal = () => {
       return;
     }
 
+    const submitGeneration = submitGenerationRef.current;
+
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       const submitResult = await submit(formState);
+
+      if (submitGeneration !== submitGenerationRef.current) {
+        return;
+      }
+
       if (wasMeetNowMeetingCreated(submitResult)) {
-        handleClose();
+        dismissModal();
       }
     });
   };
@@ -91,6 +108,7 @@ export const MeetNowModal = () => {
             type="button"
             css={closeButtonStyles}
             onClick={handleClose}
+            disabled={isSubmitting}
             aria-label={translate('meetings.meetNowModal.closeAriaLabel')}
             data-uie-name="meet-now-modal-close"
           >
