@@ -9,10 +9,6 @@ on:
   merge_group:
     branches: [main, release/*]
 
-  push:
-    # Push CI on the trunk branch updates coverage monitoring.
-    branches: [main]
-
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
