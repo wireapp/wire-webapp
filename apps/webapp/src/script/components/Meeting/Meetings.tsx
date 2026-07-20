@@ -25,8 +25,8 @@ import {meetingsContentWrapperStyles} from 'Components/Meeting/MeetingCallingVie
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
 import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingStore';
-import {createMeetingStoreServiceTasks} from 'Components/Meeting/meetingStore/createMeetingStoreServiceTasks';
 import {MeetingStoreProvider, useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/Meeting/shared/service/meetingService';
 import {MeetNowModal} from 'Components/Meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -70,7 +70,11 @@ export const Meetings = () => {
 
     return createMeetingStore({
       ...meetingServiceDeps,
-      serviceTasks: createMeetingStoreServiceTasks(meetingServiceDeps),
+      serviceTasks: {
+        scheduleMeeting: command => scheduleMeeting(command, meetingServiceDeps),
+        meetNowMeeting: command => meetNowMeeting(command, meetingServiceDeps),
+        updateMeeting: params => updateMeeting(params, meetingServiceDeps),
+      },
     });
   }, [meetingsRepository, conversationRepository, wallClock]);
 
