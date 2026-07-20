@@ -106,7 +106,7 @@ describe('production distribution decisions', () => {
       sourceRunId: '12345',
     });
 
-    assert(actualValidation.isErr === true);
+    assert(actualValidation.isErr);
 
     expect(actualValidation.error.message).toBe('Distribution artifact version does not match the release identifier');
   });
@@ -127,7 +127,7 @@ describe('production distribution decisions', () => {
       sourceRunId: '12345',
     });
 
-    assert(actualValidation.isErr === true);
+    assert(actualValidation.isErr);
 
     expect(actualValidation.error.message).toBe(
       'Distribution artifact commit does not match the Production tag commit',
@@ -177,7 +177,7 @@ describe('production distribution decisions', () => {
       sourceRunId: '12345',
     });
 
-    assert(actualValidation.isErr === true);
+    assert(actualValidation.isErr);
 
     expect(actualValidation.error.message).toBe('Legacy distribution artifact version does not match the manifest');
   });
@@ -195,7 +195,7 @@ describe('production distribution decisions', () => {
       sourceRunId: '12345',
     });
 
-    assert(actualValidation.isErr === true);
+    assert(actualValidation.isErr);
 
     expect(actualValidation.error.message).toBe(
       'Legacy distribution artifact commit does not match the Production tag commit',
@@ -212,7 +212,7 @@ describe('production distribution decisions', () => {
       sourceRunId: '12345',
     });
 
-    assert(actualValidation.isErr === true);
+    assert(actualValidation.isErr);
 
     expect(actualValidation.error.message).toBe('Distribution artifact metadata is invalid');
   });
@@ -230,7 +230,7 @@ describe('production distribution decisions', () => {
       sourceRunId: '12345',
     });
 
-    assert(actualValidation.isErr === true);
+    assert(actualValidation.isErr);
 
     expect(actualValidation.error.message).toBe('Distribution artifact metadata is invalid');
   });
@@ -248,7 +248,7 @@ describe('production distribution decisions', () => {
       sourceRunId: '12345',
     });
 
-    assert(actualValidation.isErr === true);
+    assert(actualValidation.isErr);
 
     expect(actualValidation.error.message).toBe('Distribution artifact metadata is invalid');
   });
@@ -265,7 +265,7 @@ describe('production distribution decisions', () => {
       sourceRunId: '12345',
     });
 
-    assert(actualValidation.isErr === true);
+    assert(actualValidation.isErr);
 
     expect(actualValidation.error.message).toBe('Distribution artifact metadata is invalid');
   });

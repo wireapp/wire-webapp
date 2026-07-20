@@ -17,6 +17,8 @@
  *
  */
 
+import assert from 'node:assert';
+
 import {Maybe, Result} from 'true-myth';
 
 import {loadBuildMetadata, parseBuildMetadata} from './buildMetadata';
@@ -78,10 +80,8 @@ describe('server build metadata', () => {
     });
 
     expect(loadedBuildMetadataResult).toStrictEqual(Result.ok(authoritativeBuildMetadata));
-
-    if (loadedBuildMetadataResult.isOk) {
-      expect(typeof loadedBuildMetadataResult.value.version).toBe('string');
-    }
+    assert(loadedBuildMetadataResult.isOk);
+    expect(typeof loadedBuildMetadataResult.value.version).toBe('string');
   });
 
   it('fails when the metadata file is missing', () => {
@@ -91,10 +91,8 @@ describe('server build metadata', () => {
       },
     });
 
-    expect(loadedBuildMetadataResult.isErr).toBe(true);
-    if (loadedBuildMetadataResult.isErr) {
-      expect(loadedBuildMetadataResult.error.message).toBe("Unable to read build metadata file '/build/version.json'");
-    }
+    assert(loadedBuildMetadataResult.isErr);
+    expect(loadedBuildMetadataResult.error.message).toBe("Unable to read build metadata file '/build/version.json'");
   });
 
   it('fails when the metadata file cannot be read', () => {
@@ -104,10 +102,8 @@ describe('server build metadata', () => {
       },
     });
 
-    expect(loadedBuildMetadataResult.isErr).toBe(true);
-    if (loadedBuildMetadataResult.isErr) {
-      expect(loadedBuildMetadataResult.error.message).toBe("Unable to read build metadata file '/build/version.json'");
-    }
+    assert(loadedBuildMetadataResult.isErr);
+    expect(loadedBuildMetadataResult.error.message).toBe("Unable to read build metadata file '/build/version.json'");
   });
 
   it('fails when the metadata file contains malformed JSON', () => {
@@ -115,12 +111,10 @@ describe('server build metadata', () => {
       readFile: () => '{not-json',
     });
 
-    expect(loadedBuildMetadataResult.isErr).toBe(true);
-    if (loadedBuildMetadataResult.isErr) {
-      expect(loadedBuildMetadataResult.error.message).toBe(
-        "Build metadata file '/build/version.json' contains malformed JSON",
-      );
-    }
+    assert(loadedBuildMetadataResult.isErr);
+    expect(loadedBuildMetadataResult.error.message).toBe(
+      "Build metadata file '/build/version.json' contains malformed JSON",
+    );
   });
 
   it('fails when the metadata file has an invalid structure', () => {
@@ -133,12 +127,10 @@ describe('server build metadata', () => {
         }),
     });
 
-    expect(loadedBuildMetadataResult.isErr).toBe(true);
-    if (loadedBuildMetadataResult.isErr) {
-      expect(loadedBuildMetadataResult.error.message).toBe(
-        "Build metadata file '/build/version.json' has an invalid structure",
-      );
-    }
+    assert(loadedBuildMetadataResult.isErr);
+    expect(loadedBuildMetadataResult.error.message).toBe(
+      "Build metadata file '/build/version.json' has an invalid structure",
+    );
   });
 
   it('loads a structurally valid development fallback generated without Git metadata', () => {

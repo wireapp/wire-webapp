@@ -17,6 +17,8 @@
  *
  */
 
+import assert from 'node:assert';
+
 import {validateBuildArtifactMetadata} from './buildArtifactMetadata';
 
 const mainBuildMetadata = {
@@ -45,11 +47,8 @@ describe('build artifact metadata validation', () => {
       metadata: mainBuildMetadata,
     });
 
-    expect(validationResult.isOk).toBe(true);
-
-    if (validationResult.isOk) {
-      expect(validationResult.value).toStrictEqual(mainBuildMetadata);
-    }
+    assert(validationResult.isOk);
+    expect(validationResult.value).toStrictEqual(mainBuildMetadata);
   });
 
   it('accepts an explicit release identifier', () => {
