@@ -26,6 +26,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
 
+import {sortTagsAlphabetically} from '../../../../../common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useAllCellsTagsStore} from '../../../../../common/useAllCellsTagsStore/useAllCellsTagsStore';
 
 interface UseTagsManagementProps {
@@ -70,7 +71,7 @@ export const useTagsManagement = ({
   const allTags = useMemo(() => {
     const allTagNames = [...tagNames, ...createdTags];
     const uniqueTagNames = Array.from(new Set(allTagNames));
-    return uniqueTagNames.map(transformTagToSelectOption);
+    return sortTagsAlphabetically(uniqueTagNames).map(transformTagToSelectOption);
   }, [createdTags, tagNames]);
 
   const handleCreateOption = (inputValue: string) => {
