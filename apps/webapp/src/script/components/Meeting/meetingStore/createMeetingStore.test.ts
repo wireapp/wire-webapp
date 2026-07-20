@@ -161,9 +161,9 @@ describe('createMeetingStore', () => {
     }
 
     expect(result.value.formState.start.isJust).toBe(true);
-    expect(result.value.formState.start.value).toEqual(new Date('2026-06-16T10:00:00.000Z'));
+    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T10:00:00.000Z'));
     expect(result.value.formState.end.isJust).toBe(true);
-    expect(result.value.formState.end.value).toEqual(new Date('2026-06-16T11:00:00.000Z'));
+    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 
   it('prefills edit form with the upcoming instance times for recurring meetings', async () => {
@@ -195,8 +195,8 @@ describe('createMeetingStore', () => {
     }
 
     expect(result.value.formState.start.isJust).toBe(true);
-    expect(result.value.formState.start.value).toEqual(new Date('2026-06-22T10:00:00.000Z'));
+    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T10:00:00.000Z'));
     expect(result.value.formState.end.isJust).toBe(true);
-    expect(result.value.formState.end.value).toEqual(new Date('2026-06-22T11:00:00.000Z'));
+    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T11:00:00.000Z'));
   });
 });
