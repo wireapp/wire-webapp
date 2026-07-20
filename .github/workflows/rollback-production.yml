@@ -81,7 +81,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          webapp_build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${PRODUCTION_TAG}" "${GITHUB_SHA}" development)"
+          webapp_build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${PRODUCTION_TAG}" "${GITHUB_SHA}" production)"
           {
             echo "production_tag=${PRODUCTION_TAG}"
             echo "webapp_build_version=${webapp_build_version}"

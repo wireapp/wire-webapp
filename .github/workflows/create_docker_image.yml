@@ -55,11 +55,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [[ "${RELEASE_TAG}" == *production* ]]; then
-            build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${RELEASE_TAG}" "${SOURCE_COMMIT_SHA}" development)"
-          else
-            build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version '' "${SOURCE_COMMIT_SHA}" development)"
-          fi
+          build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${RELEASE_TAG}" "${SOURCE_COMMIT_SHA}" development)"
 
           {
             echo "version=${build_version}"

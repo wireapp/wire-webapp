@@ -56,7 +56,7 @@ jobs:
             exit 1
           fi
 
-          webapp_build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${TAG}" "${GITHUB_SHA}" development)"
+          webapp_build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${TAG}" "${GITHUB_SHA}" production)"
 
           {
             echo "webapp_build_version=${webapp_build_version}"

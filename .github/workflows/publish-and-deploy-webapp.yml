@@ -84,13 +84,13 @@ jobs:
       - name: Set webapp build metadata
         id: webapp_build_metadata
         env:
-          PRODUCTION_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          BUILD_REFERENCE: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
           SOURCE_COMMIT_SHA: ${{ github.sha }}
           WEBAPP_BUILD_CHANNEL: ${{ github.ref == 'refs/heads/master' && 'main' || 'development' }}
         run: |
           set -euo pipefail
 
-          build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${PRODUCTION_TAG}" "${SOURCE_COMMIT_SHA}" "${WEBAPP_BUILD_CHANNEL}")"
+          build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${BUILD_REFERENCE}" "${SOURCE_COMMIT_SHA}" "${WEBAPP_BUILD_CHANNEL}")"
 
           {
             echo "version=${build_version}"

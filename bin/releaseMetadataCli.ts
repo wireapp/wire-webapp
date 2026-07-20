@@ -42,7 +42,7 @@ const usageText = [
   '  releaseMetadataCli.ts next-beta-tag <YYYY-MM-DD.N> [existing-tag ...]',
   '  releaseMetadataCli.ts production-tag <YYYY-MM-DD.N>',
   '  releaseMetadataCli.ts validate-production-tag <YYYY-MM-DD.N-production>',
-  '  releaseMetadataCli.ts webapp-build-version <production-tag-or-empty> <full-commit-sha> <main|development>',
+  '  releaseMetadataCli.ts webapp-build-version <build-reference-or-empty> <full-commit-sha> <main|development|production>',
 ].join('\n');
 
 function writeResult(
