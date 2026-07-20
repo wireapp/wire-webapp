@@ -31,6 +31,7 @@ export type BetaTagName = NonEmptyString<`${ReleaseIdentifier}-beta.${number}`>;
 export type ProductionTagName = NonEmptyString<`${ReleaseIdentifier}-production`>;
 export type ReleaseTagName = BetaTagName | ProductionTagName;
 export type CommitHash = string & {readonly [commitHashBrand]: 'CommitHash'};
+export type WebappBuildChannel = 'main' | 'development' | 'production';
 
 export type ReleaseTagMetadata = {
   readonly commitHash: CommitHash;
@@ -43,9 +44,15 @@ export type ProductionTagPointsToCommitParameters = {
   readonly releaseTagMetadata: readonly ReleaseTagMetadata[];
 };
 
-const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
+const releaseDatePattern = String.raw`\d{4}-\d{2}-\d{2}`;
+const releaseIdentifierPattern = String.raw`${releaseDatePattern}\.[1-9]\d*`;
 const releaseBranchNamePattern = new RegExp(`^release/(${releaseIdentifierPattern})$`);
 const productionTagNamePattern = new RegExp(`^(${releaseIdentifierPattern})-production$`);
+const legacyProductionTagNamePattern = new RegExp(String.raw`^${releaseDatePattern}-production\.\d+$`);
+
+function isWebappBuildChannel(value: string): value is WebappBuildChannel {
+  return value === 'main' || value === 'development' || value === 'production';
+}
 
 function escapeRegularExpression(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
@@ -103,6 +110,41 @@ export function validateProductionTagName(productionTagName: string): Result<Pro
   }
 
   return Result.ok(productionTagName as ProductionTagName);
+}
+
+export function resolveWebappBuildVersion(
+  buildReferenceName: string,
+  commitSha: string,
+  buildChannel: string,
+): Result<string, Error> {
+  if (!isWebappBuildChannel(buildChannel)) {
+    return Result.err(new Error(`Invalid webapp build channel: ${buildChannel}`));
+  }
+
+  if (buildReferenceName.length === 0) {
+    if (buildChannel === 'production') {
+      return Result.err(new Error('A production webapp build requires a production tag name'));
+    }
+
+    const versionPrefix = buildChannel === 'main' ? 'main' : 'dev';
+    return Result.ok(`${versionPrefix}-${commitSha.slice(0, 7) || 'unknown'}`);
+  }
+
+  const productionTagNameMatch = productionTagNamePattern.exec(buildReferenceName);
+
+  if (productionTagNameMatch !== null) {
+    return Result.ok(productionTagNameMatch[1]);
+  }
+
+  if (legacyProductionTagNamePattern.test(buildReferenceName)) {
+    return Result.ok(buildReferenceName);
+  }
+
+  if (buildChannel === 'production' || buildReferenceName.includes('production')) {
+    return Result.err(new Error(`Invalid production tag name: ${buildReferenceName}`));
+  }
+
+  return Result.ok(`dev-${commitSha.slice(0, 7) || 'unknown'}`);
 }
 
 export function createNextBetaTagName(

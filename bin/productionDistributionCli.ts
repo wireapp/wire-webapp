@@ -110,6 +110,7 @@ function runCommand(commandName: string, optionValues: CommandLineOptions): void
     case 'validate-manifest': {
       const expectedCommitSha = optionValues.get('expected-commit-sha');
       const validationResult = validateProductionDistributionManifest({
+        artifactMetadata: readJsonFile(getRequiredOption(optionValues, 'artifact-metadata-path')),
         manifest: readJsonFile(getRequiredOption(optionValues, 'manifest-path')),
         productionTag: getRequiredOption(optionValues, 'production-tag'),
         productionTagCommitSha: getRequiredOption(optionValues, 'production-tag-commit-sha'),

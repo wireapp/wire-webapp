@@ -23,18 +23,20 @@ const fs = require('fs-extra');
 const path = require('path');
 
 const srcFolder = '../';
-const distFolder = '../dist/';
+const serverOutputDirectory = path.resolve(
+  process.env.WIRE_WEBAPP_SERVER_OUTPUT_PATH ?? path.resolve(__dirname, '../dist'),
+);
 const npmModulesFolder = '../../../node_modules/';
 
 const assetFolders = ['.ebextensions/', 'robots/', 'templates/', 'certificate'];
 
 assetFolders.forEach(assetFolder => {
-  fs.copySync(path.resolve(__dirname, srcFolder, assetFolder), path.resolve(__dirname, distFolder, assetFolder));
+  fs.copySync(path.resolve(__dirname, srcFolder, assetFolder), path.resolve(serverOutputDirectory, assetFolder));
 });
 
 fs.copySync(
   path.resolve(__dirname, npmModulesFolder, '@wireapp/telemetry/lib/embed.js'),
-  path.resolve(__dirname, distFolder, 'libs/wire/telemetry/embed.js'),
+  path.resolve(serverOutputDirectory, 'libs/wire/telemetry/embed.js'),
 );
 
 // Bundle all workspace dependencies for deployment
@@ -58,7 +60,7 @@ workspaceDeps.forEach(depName => {
   }
 
   // Copy the package to node_modules preserving structure
-  const packageDest = path.resolve(__dirname, distFolder, 'node_modules', depName);
+  const packageDest = path.resolve(serverOutputDirectory, 'node_modules', depName);
 
   console.log(`  - Bundling ${depName} from ${libraryPath}`);
 

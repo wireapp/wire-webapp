@@ -29,6 +29,7 @@
   },
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "webappBuildMetadata": [{"env": "WIRE_WEBAPP_BUILD_VERSION"}, {"env": "WIRE_WEBAPP_BUILD_COMMIT"}, {"env": "WIRE_WEBAPP_BUILD_TIMESTAMP"}],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",

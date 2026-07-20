@@ -21,5 +21,15 @@ export type {Env} from './env';
 export type {ClientConfig} from './client.config';
 export type {ServerConfig} from './server.config';
 export type {ConfigGeneratorParams} from './config.types';
+export type {BuildMetadata, BuildMetadataInput} from './buildMetadata';
 export {generateConfig as generateClientConfig} from './client.config';
 export {generateConfig as generateServerConfig} from './server.config';
+export {
+  createBuildMetadata,
+  getShortCommitSha,
+  isBuildMetadata,
+  isBuildMetadataInput,
+  parseBuildMetadata,
+  resolveAssetVersion,
+  resolveBuildVersion,
+} from './buildMetadata';

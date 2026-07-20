@@ -92,7 +92,9 @@ jobs:
     outputs:
       artifact_checksum: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
       artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
-      artifact_version: ${{ steps.artifact_metadata.outputs.artifact_version }}
+      artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
+      artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
       distribution_artifact_name: ${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
       release_branch: ${{ steps.release_metadata.outputs.release_branch }}
       release_commit_sha: ${{ steps.release_metadata.outputs.release_commit_sha }}
@@ -139,11 +141,25 @@ jobs:
 
       - name: Build and package public production
         if: ${{ inputs.promote_to_production }}
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_identifier }}
         run: ./bin/yarn build:prod:public
 
       - name: Build and package internal production
         if: ${{ !inputs.promote_to_production }}
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_identifier }}
         run: ./bin/yarn build:prod
+
+      - name: Validate release artifact metadata
+        id: validate_artifact_metadata
+        env:
+          BUILD_ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
+          EXPECTED_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
+          EXPECTED_VERSION: ${{ steps.release_metadata.outputs.release_identifier }}
+        run: node ./bin/validateBuildArtifact.mts
 
       - name: Compute artifact metadata
         id: artifact_metadata
@@ -154,12 +170,10 @@ jobs:
 
           artifact_name="${BETA_ARTIFACT_NAME_PREFIX}-${RELEASE_IDENTIFIER}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           artifact_checksum="$(sha256sum "${ARTIFACT_PATH}" | awk '{print $1}')"
-          artifact_version="$(unzip -p "${ARTIFACT_PATH}" version.json | jq --raw-output '.version')"
 
           {
             echo "artifact_name=${artifact_name}"
             echo "artifact_checksum=${artifact_checksum}"
-            echo "artifact_version=${artifact_version}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Prepare exact public Docker distribution context
@@ -167,7 +181,7 @@ jobs:
         id: distribution_artifact
         env:
           ARTIFACT_CHECKSUM: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
-          ARTIFACT_VERSION: ${{ steps.artifact_metadata.outputs.artifact_version }}
+          ARTIFACT_VERSION: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
           RELEASE_COMMIT_SHA: ${{ steps.release_metadata.outputs.release_commit_sha }}
           RELEASE_IDENTIFIER: ${{ steps.release_metadata.outputs.release_identifier }}
         run: |
@@ -271,7 +285,7 @@ jobs:
           environment-label: Beta
           webapp-url: ${{ env.BETA_WEBAPP_URL }}
           expected-version: ${{ needs.build_artifact.outputs.artifact_version }}
-          expected-commit: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          expected-commit: ${{ needs.build_artifact.outputs.artifact_commit }}
           expected-backend-rest: ${{ env.BETA_RUNTIME_BACKEND_REST }}
           expected-backend-ws: ${{ env.BETA_RUNTIME_BACKEND_WS }}
 
@@ -348,7 +362,7 @@ jobs:
       expectedBackendRest: https://staging-nginz-https.zinfra.io/
       expectedBackendWs: wss://staging-nginz-ssl.zinfra.io/
       expectedVersion: ${{ needs.build_artifact.outputs.artifact_version }}
-      expectedCommit: ${{ needs.build_artifact.outputs.release_commit_sha }}
+      expectedCommit: ${{ needs.build_artifact.outputs.artifact_commit }}
       grep: '@regression|@crit-flow-web'
       testinyRunName: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
     secrets:
@@ -568,7 +582,7 @@ jobs:
           environment-label: Production
           webapp-url: ${{ env.PRODUCTION_WEBAPP_URL }}
           expected-version: ${{ needs.build_artifact.outputs.artifact_version }}
-          expected-commit: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          expected-commit: ${{ needs.build_artifact.outputs.artifact_commit }}
           expected-backend-rest: ${{ env.PRODUCTION_RUNTIME_BACKEND_REST }}
           expected-backend-ws: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}
 
@@ -670,6 +684,7 @@ jobs:
       - name: Add release summary
         env:
           ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
+          ARTIFACT_BUILT_AT: ${{ needs.build_artifact.outputs.artifact_built_at }}
           ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
           ARTIFACT_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
           BETA_RESULT: ${{ needs.deploy_to_beta.result }}
@@ -764,7 +779,7 @@ jobs:
             Production distribution: ${{ needs.publish_production_distribution.result }}
 
             Production runtime verification result: ${{ needs.verify_production_runtime.result }}
-            Expected Production build version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
+            Expected Production webapp version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
             Expected Production release commit: ${{ needs.build_artifact.outputs.release_commit_sha || 'unavailable' }}
             Production tag name: ${{ needs.create_production_tag.outputs.production_tag_name || needs.production_preflight.outputs.production_tag_name || 'unavailable' }}
             Docker image tag: ${{ needs.publish_production_distribution.outputs.docker_image_tag || 'unavailable' }}

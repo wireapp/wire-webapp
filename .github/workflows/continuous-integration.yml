@@ -438,7 +438,12 @@ jobs:
             lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
 
       - name: Build and package
-        run: ./bin/yarn build:prod
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
+          WIRE_WEBAPP_BUILD_VERSION="dev-${short_commit_sha}" \
+          ./bin/yarn build:prod
 
       - name: Verify Quay credentials availability
         env:
@@ -505,4 +510,9 @@ jobs:
             lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
 
       - name: Build and verify public production package
-        run: ./bin/yarn build:prod:public
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
+          WIRE_WEBAPP_BUILD_VERSION="dev-${short_commit_sha}" \
+          ./bin/yarn build:prod:public

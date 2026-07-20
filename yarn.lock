@@ -11518,8 +11518,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/config@workspace:libraries/config"
   dependencies:
+    "@sindresorhus/is": "npm:4.6.0"
     fs-extra: "npm:11.3.6"
     logdown: "npm:3.3.1"
+    true-myth: "npm:9.4.0"
   languageName: unknown
   linkType: soft
 

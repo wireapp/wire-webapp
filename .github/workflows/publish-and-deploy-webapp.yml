@@ -81,12 +81,34 @@ jobs:
       - name: Update configuration
         run: ./bin/yarn nx run webapp:configure
 
+      - name: Set webapp build metadata
+        id: webapp_build_metadata
+        env:
+          BUILD_REFERENCE: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          SOURCE_COMMIT_SHA: ${{ github.sha }}
+          WEBAPP_BUILD_CHANNEL: ${{ github.ref == 'refs/heads/master' && 'main' || 'development' }}
+        run: |
+          set -euo pipefail
+
+          build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${BUILD_REFERENCE}" "${SOURCE_COMMIT_SHA}" "${WEBAPP_BUILD_CHANNEL}")"
+
+          {
+            echo "version=${build_version}"
+            echo "commit_sha=${SOURCE_COMMIT_SHA}"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Build and package public production
         if: ${{ github.ref == 'refs/heads/master' || contains(github.ref_name, 'production') }}
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.webapp_build_metadata.outputs.commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.webapp_build_metadata.outputs.version }}
         run: ./bin/yarn build:prod:public
 
       - name: Build and package internal production
         if: ${{ github.ref != 'refs/heads/master' && !contains(github.ref_name, 'production') }}
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.webapp_build_metadata.outputs.commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.webapp_build_metadata.outputs.version }}
         run: ./bin/yarn build:prod
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

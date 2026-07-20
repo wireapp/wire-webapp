@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       production_tag:
-        description: 'Existing Production tag to roll back to, for example 2026-06-29.1-production'
+        description: 'Existing Production tag to roll back to, for example 2026-06-29.1-production or 2026-06-29-production.0'
         required: true
         type: string
       reason:
@@ -37,6 +37,7 @@ jobs:
       contents: read
     outputs:
       production_tag: ${{ steps.validate_production_tag.outputs.production_tag }}
+      webapp_build_version: ${{ steps.validate_production_tag.outputs.webapp_build_version }}
 
     steps:
       - name: Validate confirmation and reason
@@ -80,8 +81,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          validated_production_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-production-tag "${PRODUCTION_TAG}")"
-          echo "production_tag=${validated_production_tag}" >> "$GITHUB_OUTPUT"
+          webapp_build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${PRODUCTION_TAG}" "${GITHUB_SHA}" production)"
+          {
+            echo "production_tag=${PRODUCTION_TAG}"
+            echo "webapp_build_version=${webapp_build_version}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Verify remote Production tag exists
         env:
@@ -144,6 +148,9 @@ jobs:
       # Interim limitation: until durable release artifact storage exists, this
       # workflow rebuilds the deployable artifact from the selected Production tag.
       - name: Build and package
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.rollback_commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
         run: ./bin/yarn build:prod:public
 
       - name: Compute artifact metadata
