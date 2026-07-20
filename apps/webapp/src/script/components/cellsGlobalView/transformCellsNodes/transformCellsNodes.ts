@@ -27,6 +27,7 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {formatBytes, getFileExtension, getName} from 'Util/util';
 
+import {sortTagsAlphabetically} from '../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
 export const transformCellsNodes = ({
@@ -137,5 +138,6 @@ const getTags = (node: RestNode): string[] => {
   }
 
   const parsedTags = JSON.parse(tags);
-  return parsedTags.split(',').map((tag: string) => tag.trim());
+  const tagNames = parsedTags.split(',').map((tag: string) => tag.trim());
+  return sortTagsAlphabetically(tagNames);
 };

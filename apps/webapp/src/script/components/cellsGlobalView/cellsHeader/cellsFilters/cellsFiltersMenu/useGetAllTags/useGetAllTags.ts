@@ -23,6 +23,8 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
+import {sortTagsAlphabetically} from '../../../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
+
 type UseGetAllTagsProps = {
   cellsRepository: CellsRepository;
   fireAndForgetInvoker: FireAndForgetInvoker;
@@ -45,7 +47,7 @@ export const useGetAllTags = (properties: UseGetAllTagsProps): UseGetAllTagsResu
     try {
       const tags = await cellsRepository.getAllTags();
       const filteredTags = tags.Values?.map(tag => tag).filter(Boolean) ?? [];
-      setTags(filteredTags);
+      setTags(sortTagsAlphabetically(filteredTags));
     } catch (error: unknown) {
       setError(error instanceof Error ? error : new Error('Unknown error'));
     } finally {
