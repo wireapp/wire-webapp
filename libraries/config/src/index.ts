@@ -24,4 +24,11 @@ export type {ConfigGeneratorParams} from './config.types';
 export type {BuildMetadata, BuildMetadataInput} from './buildMetadata';
 export {generateConfig as generateClientConfig} from './client.config';
 export {generateConfig as generateServerConfig} from './server.config';
-export {createAuthoritativeBuildMetadata, createBuildMetadata, getShortCommitSha, resolveBuildVersion} from './buildMetadata';
+export {
+  createAuthoritativeBuildMetadata,
+  createBuildMetadata,
+  getShortCommitSha,
+  isBuildMetadata,
+  parseBuildMetadata,
+  resolveBuildVersion,
+} from './buildMetadata';

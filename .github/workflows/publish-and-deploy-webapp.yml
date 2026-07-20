@@ -104,14 +104,14 @@ jobs:
       - name: Build and package public production
         if: ${{ github.ref == 'refs/heads/master' || contains(github.ref_name, 'production') }}
         env:
-          WIRE_WEBAPP_BUILD_COMMIT_SHA: ${{ steps.webapp_build_metadata.outputs.commit_sha }}
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.webapp_build_metadata.outputs.commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.webapp_build_metadata.outputs.version }}
         run: ./bin/yarn build:prod:public
 
       - name: Build and package internal production
         if: ${{ github.ref != 'refs/heads/master' && !contains(github.ref_name, 'production') }}
         env:
-          WIRE_WEBAPP_BUILD_COMMIT_SHA: ${{ steps.webapp_build_metadata.outputs.commit_sha }}
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.webapp_build_metadata.outputs.commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.webapp_build_metadata.outputs.version }}
         run: ./bin/yarn build:prod
 

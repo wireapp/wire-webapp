@@ -106,7 +106,7 @@ jobs:
 
       - name: Build and package
         env:
-          WIRE_WEBAPP_BUILD_COMMIT_SHA: ${{ steps.git_metadata.outputs.commit_sha }}
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.release_identifier }}
         run: ./bin/yarn build:prod:public
 

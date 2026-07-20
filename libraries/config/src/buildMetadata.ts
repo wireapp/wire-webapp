@@ -17,7 +17,8 @@
  *
  */
 
-import type {Maybe} from 'true-myth';
+import is from '@sindresorhus/is';
+import {Maybe} from 'true-myth';
 
 export type BuildMetadata = {
   readonly version: string;
@@ -31,6 +32,39 @@ export type BuildMetadataInput = {
   readonly builtAt: string;
 };
 
+const isoUtcTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+const shortCommitShaLength = 7;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return is.plainObject(value);
+}
+
+function isIsoUtcTimestamp(value: unknown): value is string {
+  if (!is.nonEmptyString(value) || !isoUtcTimestampPattern.test(value)) {
+    return false;
+  }
+
+  return !Number.isNaN(Date.parse(value));
+}
+
+export function isBuildMetadata(value: unknown): value is BuildMetadata {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return is.nonEmptyString(value.version) && is.nonEmptyString(value.commit) && isIsoUtcTimestamp(value.builtAt);
+}
+
+export function parseBuildMetadata(serializedBuildMetadata: string): Maybe<BuildMetadata> {
+  try {
+    const parsedBuildMetadata: unknown = JSON.parse(serializedBuildMetadata);
+
+    return isBuildMetadata(parsedBuildMetadata) ? Maybe.just(parsedBuildMetadata) : Maybe.nothing();
+  } catch {
+    return Maybe.nothing();
+  }
+}
+
 export function createBuildMetadata(buildMetadataInput: BuildMetadataInput): BuildMetadata {
   return {
     version: buildMetadataInput.version,
@@ -40,7 +74,7 @@ export function createBuildMetadata(buildMetadataInput: BuildMetadataInput): Bui
 }
 
 export function getShortCommitSha(commitSha: string): string {
-  return commitSha.slice(0, 7) || 'unknown';
+  return commitSha.slice(0, shortCommitShaLength) || 'unknown';
 }
 
 export function resolveBuildVersion(explicitVersion: Maybe<string>, commitSha: string): string {

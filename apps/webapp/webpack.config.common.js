@@ -24,11 +24,10 @@ const WorkboxPlugin = require('workbox-webpack-plugin');
 const dotenv = require('dotenv-extended');
 const {execFileSync} = require('child_process');
 const {readFileSync} = require('fs');
-const is = require('@sindresorhus/is');
 
 const path = require('path');
 
-const {generateClientConfig, generateServerConfig} = require('@wireapp/config');
+const {generateClientConfig, generateServerConfig, parseBuildMetadata} = require('@wireapp/config');
 
 const ROOT_PATH = path.resolve(__dirname, '../..');
 const SRC_PATH = path.resolve(__dirname, 'src');
@@ -44,28 +43,19 @@ const UNSUPPORTED_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/unsupported.ejs')
 const BUILD_METADATA_FILE_PATH = path.resolve(ROOT_PATH, 'apps/server/dist/version.json');
 const BUILD_METADATA_SCRIPT_PATH = path.resolve(ROOT_PATH, 'apps/server/bin/generateVersionFile.mts');
 
-function isBuildMetadata(value) {
-  return (
-    is.object(value) &&
-    is.nonEmptyString(value.version) &&
-    is.nonEmptyString(value.commit) &&
-    is.nonEmptyString(value.builtAt)
-  );
-}
-
 function readBuildMetadata() {
   execFileSync(process.execPath, [BUILD_METADATA_SCRIPT_PATH], {
     cwd: ROOT_PATH,
     stdio: 'inherit',
   });
 
-  const parsedBuildMetadata = JSON.parse(readFileSync(BUILD_METADATA_FILE_PATH, 'utf8'));
+  const parsedBuildMetadata = parseBuildMetadata(readFileSync(BUILD_METADATA_FILE_PATH, 'utf8'));
 
-  if (!isBuildMetadata(parsedBuildMetadata)) {
+  if (parsedBuildMetadata.isNothing) {
     throw new Error(`Invalid build metadata in '${BUILD_METADATA_FILE_PATH}'`);
   }
 
-  return parsedBuildMetadata;
+  return parsedBuildMetadata.value;
 }
 
 const buildMetadata = readBuildMetadata();

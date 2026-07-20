@@ -29,6 +29,8 @@ import {Maybe} from 'true-myth';
 
 import {
   createAuthoritativeBuildMetadata,
+  isBuildMetadata,
+  parseBuildMetadata,
   type BuildMetadata,
   type BuildMetadataInput,
   resolveBuildVersion,
@@ -36,9 +38,9 @@ import {
 
 const DEFAULT_METADATA_FILE_PATH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist/version.json');
 
-function resolveNonEmptyEnvironmentValue(environmentValue: Maybe<string>): Maybe<string> {
+function resolveNonEmptyEnvironmentValue(environmentValue: Maybe<unknown>): Maybe<string> {
   return environmentValue.andThen(environmentString => {
-    if (environmentString.length === 0) {
+    if (!is.nonEmptyString(environmentString)) {
       return Maybe.nothing();
     }
 
@@ -58,23 +60,13 @@ function resolveCommitSha(explicitCommitSha: Maybe<string>): string {
   }
 }
 
-function isBuildMetadata(value: unknown): value is BuildMetadata {
-  if (!is.object(value)) {
-    return false;
-  }
-
-  return is.nonEmptyString(value.version) && is.nonEmptyString(value.commit) && is.nonEmptyString(value.builtAt);
-}
-
 function readExistingBuildMetadata(metadataFilePath: string): Maybe<BuildMetadata> {
   if (!existsSync(metadataFilePath)) {
     return Maybe.nothing();
   }
 
   try {
-    const parsedMetadata: unknown = JSON.parse(readFileSync(metadataFilePath, 'utf8'));
-
-    return isBuildMetadata(parsedMetadata) ? Maybe.just(parsedMetadata) : Maybe.nothing();
+    return parseBuildMetadata(readFileSync(metadataFilePath, 'utf8'));
   } catch {
     return Maybe.nothing();
   }
@@ -84,7 +76,7 @@ function generateVersionFile(): void {
   const metadataFilePath = resolveNonEmptyEnvironmentValue(
     Maybe.of(process.env.WIRE_WEBAPP_BUILD_METADATA_PATH),
   ).unwrapOr(DEFAULT_METADATA_FILE_PATH);
-  const explicitCommitSha = resolveNonEmptyEnvironmentValue(Maybe.of(process.env.WIRE_WEBAPP_BUILD_COMMIT_SHA));
+  const explicitCommitSha = resolveNonEmptyEnvironmentValue(Maybe.of(process.env.WIRE_WEBAPP_BUILD_COMMIT));
   const commitSha = resolveCommitSha(explicitCommitSha);
   const explicitVersion = resolveNonEmptyEnvironmentValue(Maybe.of(process.env.WIRE_WEBAPP_BUILD_VERSION));
   const resolvedBuildVersion = resolveBuildVersion(explicitVersion, commitSha);
@@ -96,6 +88,9 @@ function generateVersionFile(): void {
     commit: commitSha,
     builtAt,
   };
+  if (!isBuildMetadata(buildMetadataInput)) {
+    throw new Error('Invalid webapp build metadata input');
+  }
   const existingBuildMetadata = readExistingBuildMetadata(metadataFilePath);
   const authoritativeBuildMetadata = createAuthoritativeBuildMetadata(existingBuildMetadata, buildMetadataInput);
 

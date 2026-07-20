@@ -23,6 +23,8 @@ import {
   createAuthoritativeBuildMetadata,
   createBuildMetadata,
   getShortCommitSha,
+  isBuildMetadata,
+  parseBuildMetadata,
   resolveBuildVersion,
 } from './buildMetadata';
 
@@ -74,7 +76,37 @@ describe('build metadata', () => {
     });
     expect(secondMetadata).toStrictEqual(firstMetadata);
     expect(firstMetadata.commit).toBe('025edc6f1234567890');
-    expect(firstMetadata.builtAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    expect(isBuildMetadata(firstMetadata)).toBe(true);
+  });
+
+  it('accepts only ISO 8601 UTC timestamps with milliseconds', () => {
+    expect(
+      parseBuildMetadata(
+        JSON.stringify({
+          version: '2026-07-20.1',
+          commit: '025edc6f1234567890',
+          builtAt: '2026-07-20T06:18:03.123Z',
+        }),
+      ).isJust,
+    ).toBe(true);
+    expect(
+      parseBuildMetadata(
+        JSON.stringify({
+          version: '2026-07-20.1',
+          commit: '025edc6f1234567890',
+          builtAt: '2026-07-20T06:18:03Z',
+        }),
+      ).isNothing,
+    ).toBe(true);
+    expect(
+      parseBuildMetadata(
+        JSON.stringify({
+          version: '2026-07-20.1',
+          commit: '025edc6f1234567890',
+          builtAt: '2026.07.20.06.18.03',
+        }),
+      ).isNothing,
+    ).toBe(true);
   });
 
   it('preserves metadata when the logical version and commit are unchanged', () => {

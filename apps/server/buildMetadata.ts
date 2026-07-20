@@ -17,9 +17,9 @@
  *
  */
 
-import is from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
+import {parseBuildMetadata as parseAuthoritativeBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
 
 export type BuildMetadataFileDependencies = {
@@ -32,32 +32,8 @@ const unknownBuildMetadata: BuildMetadata = {
   builtAt: '1970-01-01T00:00:00.000Z',
 };
 
-const isoUtcTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
-
-function isIsoUtcTimestamp(value: unknown): value is string {
-  if (!is.nonEmptyString(value) || !isoUtcTimestampPattern.test(value)) {
-    return false;
-  }
-
-  return !Number.isNaN(Date.parse(value));
-}
-
-function isBuildMetadata(value: unknown): value is BuildMetadata {
-  if (!is.plainObject(value)) {
-    return false;
-  }
-
-  return is.nonEmptyString(value.version) && is.nonEmptyString(value.commit) && isIsoUtcTimestamp(value.builtAt);
-}
-
 export function parseBuildMetadata(serializedBuildMetadata: string): Maybe<BuildMetadata> {
-  try {
-    const parsedBuildMetadata: unknown = JSON.parse(serializedBuildMetadata);
-
-    return isBuildMetadata(parsedBuildMetadata) ? Maybe.just(parsedBuildMetadata) : Maybe.nothing();
-  } catch {
-    return Maybe.nothing();
-  }
+  return parseAuthoritativeBuildMetadata(serializedBuildMetadata);
 }
 
 function readSerializedBuildMetadata(
@@ -76,6 +52,6 @@ export function loadBuildMetadata(
   dependencies: BuildMetadataFileDependencies,
 ): BuildMetadata {
   return readSerializedBuildMetadata(metadataFilePath, dependencies)
-    .andThen(parseBuildMetadata)
+    .andThen(parseAuthoritativeBuildMetadata)
     .unwrapOr(unknownBuildMetadata);
 }

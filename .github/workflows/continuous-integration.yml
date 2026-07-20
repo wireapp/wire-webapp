@@ -439,9 +439,9 @@ jobs:
 
       - name: Build and package
         env:
-          WIRE_WEBAPP_BUILD_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT_SHA::7}"
+          short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           WIRE_WEBAPP_BUILD_VERSION="dev-${short_commit_sha}" \
           ./bin/yarn build:prod
 
@@ -511,8 +511,8 @@ jobs:
 
       - name: Build and verify public production package
         env:
-          WIRE_WEBAPP_BUILD_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT_SHA::7}"
+          short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           WIRE_WEBAPP_BUILD_VERSION="dev-${short_commit_sha}" \
           ./bin/yarn build:prod:public

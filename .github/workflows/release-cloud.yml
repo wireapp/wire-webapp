@@ -140,14 +140,14 @@ jobs:
       - name: Build and package public production
         if: ${{ inputs.promote_to_production }}
         env:
-          WIRE_WEBAPP_BUILD_COMMIT_SHA: ${{ steps.release_metadata.outputs.release_commit_sha }}
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_identifier }}
         run: ./bin/yarn build:prod:public
 
       - name: Build and package internal production
         if: ${{ !inputs.promote_to_production }}
         env:
-          WIRE_WEBAPP_BUILD_COMMIT_SHA: ${{ steps.release_metadata.outputs.release_commit_sha }}
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_identifier }}
         run: ./bin/yarn build:prod
 

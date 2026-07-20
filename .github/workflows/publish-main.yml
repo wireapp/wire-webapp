@@ -105,7 +105,7 @@ jobs:
 
       - name: Build and package internal application
         env:
-          WIRE_WEBAPP_BUILD_COMMIT_SHA: ${{ github.sha }}
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.sha }}
         run: |
           short_commit_sha="${GITHUB_SHA::7}"
           WIRE_WEBAPP_BUILD_VERSION="main-${short_commit_sha}" ./bin/yarn build:prod
