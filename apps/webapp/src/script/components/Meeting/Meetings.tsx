@@ -27,7 +27,7 @@ import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
 import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {createMeetingStoreServiceTasks} from 'Components/Meeting/meetingStore/createMeetingStoreServiceTasks';
 import {MeetingStoreProvider, useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
-import {MeetNowModal} from 'Components/Meeting/MeetNowModal/MeetNowModal';
+import {MeetNowModal} from 'Components/Meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

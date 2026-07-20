@@ -31,7 +31,7 @@ import {useScheduleMeetingParticipants} from 'Components/Meeting/ScheduleMeeting
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {meetNowFormLayoutStyles} from './MeetNowModal.styles';
+import {meetNowFormLayoutStyles} from './meetNowModal.styles';
 import type {MeetNowFormState} from './meetNowTypes';
 
 export interface MeetNowFormProps {

@@ -17,7 +17,7 @@
  *
  */
 
-import {useMeetNowModal} from 'Components/Meeting/MeetNowModal/useMeetNowModal';
+import {useMeetNowModal} from 'Components/Meeting/meetNowModal/useMeetNowModal';
 import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

@@ -21,7 +21,7 @@ import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Task} from 'true-myth';
 
 import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowFormState} from 'Components/Meeting/MeetNowModal/meetNowTypes';
+import type {MeetNowFormState} from 'Components/Meeting/meetNowModal/meetNowTypes';
 import type {
   MeetNowSubmitSuccess,
   MeetingSubmitSuccess,

@@ -20,7 +20,7 @@
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 
-import type {MeetNowFormState} from 'Components/Meeting/MeetNowModal/meetNowTypes';
+import type {MeetNowFormState} from 'Components/Meeting/meetNowModal/meetNowTypes';
 import {getMeetNowMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingDefaults';
 
 export const mapMeetNowFormToCreateMeeting = (formState: MeetNowFormState, wallClock: WallClock): CreateMeeting => {

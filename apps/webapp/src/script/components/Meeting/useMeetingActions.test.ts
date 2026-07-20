@@ -20,7 +20,7 @@
 import {renderHook} from '@testing-library/react';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
-import {useMeetNowModal} from 'Components/Meeting/MeetNowModal/useMeetNowModal';
+import {useMeetNowModal} from 'Components/Meeting/meetNowModal/useMeetNowModal';
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
 import {
   createRootContextValueForTest,

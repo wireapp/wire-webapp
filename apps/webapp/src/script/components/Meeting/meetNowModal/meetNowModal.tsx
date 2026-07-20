@@ -29,7 +29,7 @@ import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
-import {MeetNowForm} from './MeetNowForm';
+import {MeetNowForm} from './meetNowForm';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -41,7 +41,7 @@ import {
   submitButtonIconStyles,
   submitButtonStyles,
   wrapperStyles,
-} from './MeetNowModal.styles';
+} from './meetNowModal.styles';
 import {hasMeetNowFormErrors, useMeetNowModal} from './useMeetNowModal';
 import {useMeetNowSubmit} from './useMeetNowSubmit';
 

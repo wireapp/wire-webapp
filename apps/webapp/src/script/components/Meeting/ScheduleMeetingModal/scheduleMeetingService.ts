@@ -35,7 +35,7 @@ import {
 } from 'Components/Meeting/meetingConversationSync';
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowFormState} from 'Components/Meeting/MeetNowModal/meetNowTypes';
+import type {MeetNowFormState} from 'Components/Meeting/meetNowModal/meetNowTypes';
 import type {User} from 'Repositories/entity/User';
 
 import type {ScheduleMeetingFormState, ScheduleMeetingRecurrenceOption} from './scheduleMeetingTypes';

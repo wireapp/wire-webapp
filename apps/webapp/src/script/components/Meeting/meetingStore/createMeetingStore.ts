@@ -23,7 +23,7 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
 import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeetingInstanceToScheduleFormState';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowFormState} from 'Components/Meeting/MeetNowModal/meetNowTypes';
+import type {MeetNowFormState} from 'Components/Meeting/meetNowModal/meetNowTypes';
 import {
   type MeetNowSubmitSuccess,
   type MeetingSubmitSuccess,
