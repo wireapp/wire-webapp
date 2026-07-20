@@ -24,7 +24,6 @@ import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import is from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
 import {
@@ -38,9 +37,9 @@ import {
 
 const DEFAULT_METADATA_FILE_PATH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist/version.json');
 
-function resolveNonEmptyEnvironmentValue(environmentValue: Maybe<unknown>): Maybe<string> {
+function resolveNonEmptyEnvironmentValue(environmentValue: Maybe<string>): Maybe<string> {
   return environmentValue.andThen(environmentString => {
-    if (!is.nonEmptyString(environmentString)) {
+    if (environmentString.length === 0) {
       return Maybe.nothing();
     }
 
