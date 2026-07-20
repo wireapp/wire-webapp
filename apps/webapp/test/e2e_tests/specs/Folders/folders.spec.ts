@@ -150,19 +150,23 @@ test.describe('Folders', () => {
       const customFolderName = 'Custom-Folder';
       const conversationName = 'Group Conversation with User A and User B';
 
-      // Preconditions: Create a custom folder with 1:1 conversation
-      await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
-      await userAComponents.conversationSidebar().allConversationsButton.click();
-      await createGroup(userAPages, conversationName, [userB]);
+      await test.step('User A creates a custom folder with 1:1 conversation with User B', async () => {
+        await userAPages.conversationList().getConversation(userB.fullName).open();
+        await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
+        await expect(userAComponents.conversationSidebar().folderList.getByText(customFolderName)).toBeVisible();
+      });
 
-      await test.step('User A moves group with User B into an existing custom folder', async () => {
+      await test.step('User A creates and moves group with User B into an existing custom folder', async () => {
+        await userAComponents.conversationSidebar().allConversationsButton.click();
+        await createGroup(userAPages, conversationName, [userB]);
         await moveConversationToFolder(userAPageManager, conversationName, customFolderName);
       });
 
-      await test.step('Group conversation with User B is in the custom folder', async () => {
+      await test.step('User A sees 1:1 and group conversations with User B in the custom folder', async () => {
         const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
-        await expect(userAComponents.conversationSidebar().folderList.getByText(customFolderName)).toBeVisible();
         await expect(actualTitle).toHaveText(customFolderName);
+        await expect(userAPages.conversationList().getConversation(conversationName)).toBeVisible();
+        await expect(userAPages.conversationList().getConversation(userB.fullName)).toBeVisible();
       });
     },
   );
