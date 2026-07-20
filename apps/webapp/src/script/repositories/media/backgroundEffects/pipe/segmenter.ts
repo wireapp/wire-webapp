@@ -36,28 +36,39 @@ import {WebGLRenderer} from './renderer';
 
 let segmenterOptions: WorkerProcessVideoTrackOptions = {} as WorkerProcessVideoTrackOptions;
 
+const SEGMENTATION_FRAME_INTERVAL = 1;
+
 export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
-  // Keep the references stable, this allows us to do option changes on segmenter runtime.
+  // Keep the reference stable so that runtime option changes
+  // are immediately visible inside the processing loop.
   Object.assign(segmenterOptions, opts);
 }
 
 async function createSegmenter(canvas: OffscreenCanvas) {
   const logger = getSafeLogger('segmenter:createSegmenter');
+
   const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
+
   if (!wasmLoaderPath || !wasmBinaryPath) {
     logger.error('wasmLoaderPath and wasmBinaryPath must be provided');
+
     throw new Error('wasmLoaderPath and wasmBinaryPath must be provided');
   }
 
-  const fileset = {wasmLoaderPath, wasmBinaryPath};
-  logger.log(`[virtual-background] createSegmenter`);
-
   if (!modelPath) {
     logger.error('Model path must be provided');
+
     throw new Error('Model path must be provided');
   }
 
-  const segmenter = await ImageSegmenter.createFromOptions(fileset, {
+  const fileset = {
+    wasmLoaderPath,
+    wasmBinaryPath,
+  };
+
+  logger.log('[virtual-background] createSegmenter');
+
+  return ImageSegmenter.createFromOptions(fileset, {
     baseOptions: {
       modelAssetPath: modelPath,
       delegate: 'GPU',
@@ -67,7 +78,6 @@ async function createSegmenter(canvas: OffscreenCanvas) {
     outputConfidenceMasks: true,
     canvas,
   });
-  return segmenter;
 }
 
 export function getSegmenterModelUpdatedOptions(
@@ -93,25 +103,33 @@ export async function runSegmenter(
   onPerformanceSample: (sample: PerformanceSample, mode: Mode) => void,
 ) {
   const logger = getSafeLogger('segmenter:runSegmenter');
-  logger.log(`[virtual-background] runSegmenter`);
+
+  logger.log('[virtual-background] runSegmenter');
+
   segmenterOptions = opts;
 
   let webGLRenderer: WebGLRenderer | null = new WebGLRenderer(canvas);
 
   function onContextLost(event: Event) {
     logger.log(`[virtual-background] webglcontextlost (${!!webGLRenderer})`);
+
     event.preventDefault();
+
     webGLRenderer?.close();
     webGLRenderer = null;
   }
 
   function onContextRestored() {
     logger.log(`[virtual-background] webglcontextrestored (${!!webGLRenderer})`);
+
     if (!webGLRenderer) {
       const timer = createWallClock();
+
       timer.setTimeout(() => {
         logger.log('[virtual-background] restart segmenter onContextRestored');
+
         webGLRenderer = new WebGLRenderer(canvas);
+
         restartSegmenter();
         attachCanvasEvents();
       }, 1000);
@@ -120,12 +138,27 @@ export async function runSegmenter(
 
   function attachCanvasEvents() {
     canvas.addEventListener('webglcontextlost', onContextLost, {once: true});
+
     canvas.addEventListener('webglcontextrestored', onContextRestored, {once: true});
   }
+
   attachCanvasEvents();
 
   let segmenter = await createSegmenter(canvas);
+
   let currentModelPath = segmenterOptions.modelPath;
+
+  /*
+   * This tracks whether the current renderer already has
+   * a valid stored mask that can be reused.
+   */
+  let hasSegmentationMask = false;
+
+  /*
+   * Used to decide whether the current frame should be
+   * segmented or rendered with the previous mask.
+   */
+  let segmentationFrameCounter = 0;
 
   const restartSegmenter = createRestartQueue(restartSegmenterSequentially);
 
@@ -136,9 +169,18 @@ export async function runSegmenter(
       const newSegmenter = await createSegmenter(canvas);
 
       const oldSegmenter = segmenter;
+
       segmenter = newSegmenter;
       currentModelPath = targetModelPath;
+
       oldSegmenter.close();
+
+      /*
+       * The renderer may have been recreated after a context
+       * loss. Force the next frame to generate a new mask.
+       */
+      hasSegmentationMask = false;
+      segmentationFrameCounter = 0;
     } catch (error: unknown) {
       logger.error('Error restarting segmenter:', error);
     }
@@ -146,6 +188,7 @@ export async function runSegmenter(
 
   async function updateSegmenterModel() {
     const targetModelPath = segmenterOptions.modelPath;
+
     const nextOptions = getSegmenterModelUpdatedOptions(targetModelPath, currentModelPath);
 
     if (nextOptions === null) {
@@ -154,56 +197,86 @@ export async function runSegmenter(
 
     try {
       logger.log(`[virtual-background] model is changed to ${nextOptions.baseOptions.modelAssetPath}`);
+
       await segmenter.setOptions(nextOptions);
+
       currentModelPath = targetModelPath;
+
+      /*
+       * A different model may produce masks with different
+       * semantics. Do not reuse the previous model's state.
+       */
+      hasSegmentationMask = false;
+      segmentationFrameCounter = 0;
     } catch (error: unknown) {
       logger.error('[virtual-background] Error updating segmenter model:', error);
     }
   }
 
-  // Filters.
   const effectsCanvas = new OffscreenCanvas(1, 1);
+
   const videoFilter = new VideoFilter(effectsCanvas);
 
-  // Metrics
   const metricsWindow = createMetricsWindow(60);
 
   let lastStatsTime = performance.now();
+
   let totalMsSum = 0;
   let segmentationMsSum = 0;
   let gpuMsSum = 0;
   let filterMsSum = 0;
+
   let frames = 0;
   let totalFrames = 0;
+
   const droppedFrames = 0;
 
   function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number) {
-    pushMetricsSample(metricsWindow, {totalMs, segmentationMs, gpuMs});
+    pushMetricsSample(metricsWindow, {
+      totalMs,
+      segmentationMs,
+      gpuMs,
+    });
 
     const quality = segmenterOptions.quality ?? 'auto';
+
     const tier = quality === 'auto' ? 'fhd' : quality;
 
     onMetrics(buildMetrics(metricsWindow, droppedFrames, tier, 'GPU'));
 
     const mode: Mode =
       segmenterOptions.mode === 'passthrough' || segmenterOptions.mode === undefined ? 'blur' : segmenterOptions.mode;
-    onPerformanceSample({totalMs, segmentationMs, gpuMs}, mode);
+
+    onPerformanceSample(
+      {
+        totalMs,
+        segmentationMs,
+        gpuMs,
+      },
+      mode,
+    );
   }
 
   function close() {
     segmenter.close();
+
     webGLRenderer?.close();
     webGLRenderer = null;
-    videoFilter?.destroy();
+
+    videoFilter.destroy();
+
     canvas.removeEventListener('webglcontextlost', onContextLost);
+
     canvas.removeEventListener('webglcontextrestored', onContextRestored);
   }
 
   let lastFrameTs = performance.now();
+
   const writer = new WritableStream(
     {
       async write(videoFrame: VideoFrame) {
         const {codedWidth, codedHeight, timestamp} = videoFrame;
+
         if (!codedWidth || !codedHeight) {
           videoFrame.close();
           return;
@@ -213,73 +286,144 @@ export async function runSegmenter(
 
         const useSelfieModel = currentModelPath?.includes('selfie_segmenter');
 
-        // start to process the frame
         const frameStart = performance.now();
+
         const frameDeltaMs = frameStart - lastFrameTs;
+
         lastFrameTs = frameStart;
 
         let filterMs = 0;
         let segmentationMs = 0;
         let gpuMs = 0;
-        const logger = getSafeLogger('segmenter:WritableStream::write');
+
+        const frameLogger = getSafeLogger('segmenter:WritableStream::write');
 
         try {
-          if (segmenterOptions.enabled && segmenterOptions.quality !== 'bypass') {
-            if (segmenterOptions.enableFilters) {
-              const filterStart = performance.now();
-              videoFilter.render(
-                videoFrame,
-                segmenterOptions.blur,
-                segmenterOptions.brightness,
-                segmenterOptions.contrast,
-                segmenterOptions.gamma,
-              );
-              filterMs = performance.now() - filterStart;
-            }
+          const backgroundEffectEnabled = segmenterOptions.enabled && segmenterOptions.quality !== 'bypass';
 
-            const segStart = performance.now();
-
-            await new Promise<void>(resolve => {
-              segmenter.segmentForVideo(
-                segmenterOptions.enableFilters ? effectsCanvas : videoFrame,
-                timestamp * 1000,
-                result => {
-                  segmentationMs = performance.now() - segStart;
-
-                  const categoryMask = result.categoryMask;
-                  const confidenceMask = result.confidenceMasks?.[0];
-
-                  try {
-                    if (!categoryMask || !confidenceMask) {
-                      logger.warn('Skipping frame: Missing masks or WebGL data.');
-                      return;
-                    }
-
-                    const categoryTextureMP = categoryMask.getAsWebGLTexture();
-                    const confidenceTextureMP = confidenceMask.getAsWebGLTexture();
-                    const gpuStart = performance.now();
-                    webGLRenderer?.render(
-                      videoFrame,
-                      segmenterOptions,
-                      categoryTextureMP,
-                      confidenceTextureMP,
-                      useSelfieModel,
-                    );
-                    gpuMs = performance.now() - gpuStart;
-                  } catch (e) {
-                    logger.error('Error in videoCallback:', e);
-                  } finally {
-                    categoryMask?.close();
-                    confidenceMask?.close();
-                    resolve();
-                  }
-                },
-              );
-            });
-          } else {
+          if (!backgroundEffectEnabled) {
+            /*
+             * Background effect disabled:
+             * render the original video frame.
+             */
             const gpuStart = performance.now();
-            webGLRenderer?.render(videoFrame, segmenterOptions);
+
+            webGLRenderer?.renderPassthrough(videoFrame);
+
             gpuMs = performance.now() - gpuStart;
+
+            /*
+             * The next enabled frame should run segmentation
+             * immediately rather than reusing an old state.
+             */
+            hasSegmentationMask = false;
+            segmentationFrameCounter = 0;
+          } else {
+            /*
+             * Always segment the first frame.
+             *
+             * Afterwards, only segment according to the
+             * configured interval.
+             */
+            const shouldRunSegmentation =
+              !hasSegmentationMask || segmentationFrameCounter % SEGMENTATION_FRAME_INTERVAL === 0;
+
+            segmentationFrameCounter++;
+
+            if (!shouldRunSegmentation) {
+              /*
+               * Skip MediaPipe and use the last stored mask.
+               */
+              const gpuStart = performance.now();
+
+              webGLRenderer?.renderWithPreviousMask(videoFrame, segmenterOptions);
+
+              gpuMs = performance.now() - gpuStart;
+            } else {
+              /*
+               * Filters only need to run on frames that are
+               * passed into MediaPipe.
+               */
+              if (segmenterOptions.enableFilters) {
+                const filterStart = performance.now();
+
+                videoFilter.render(
+                  videoFrame,
+                  segmenterOptions.blur,
+                  segmenterOptions.brightness,
+                  segmenterOptions.contrast,
+                  segmenterOptions.gamma,
+                );
+
+                filterMs = performance.now() - filterStart;
+              }
+
+              const segmentationStart = performance.now();
+
+              await new Promise<void>(resolve => {
+                segmenter.segmentForVideo(
+                  segmenterOptions.enableFilters ? effectsCanvas : videoFrame,
+                  timestamp * 1000,
+                  result => {
+                    segmentationMs = performance.now() - segmentationStart;
+
+                    const categoryMask = result.categoryMask;
+
+                    const confidenceMask = result.confidenceMasks?.[0];
+
+                    try {
+                      if (!categoryMask || !confidenceMask) {
+                        frameLogger.warn('Missing segmentation masks.');
+
+                        const gpuStart = performance.now();
+
+                        if (hasSegmentationMask) {
+                          webGLRenderer?.renderWithPreviousMask(videoFrame, segmenterOptions);
+                        } else {
+                          webGLRenderer?.renderPassthrough(videoFrame);
+                        }
+
+                        gpuMs = performance.now() - gpuStart;
+
+                        return;
+                      }
+
+                      const categoryTexture = categoryMask.getAsWebGLTexture();
+
+                      const confidenceTexture = confidenceMask.getAsWebGLTexture();
+
+                      const gpuStart = performance.now();
+
+                      webGLRenderer?.renderWithNewMasks(
+                        videoFrame,
+                        segmenterOptions,
+                        categoryTexture,
+                        confidenceTexture,
+                        useSelfieModel,
+                      );
+
+                      gpuMs = performance.now() - gpuStart;
+
+                      hasSegmentationMask = true;
+                    } catch (error) {
+                      frameLogger.error('Error processing segmentation result:', error);
+
+                      /*
+                       * If rendering the new mask failed,
+                       * force another segmentation attempt
+                       * on the next frame.
+                       */
+                      hasSegmentationMask = false;
+                    } finally {
+                      categoryMask?.close();
+                      confidenceMask?.close();
+
+                      resolve();
+                    }
+                  },
+                );
+              });
+            }
           }
         } finally {
           videoFrame.close();
@@ -292,6 +436,12 @@ export async function runSegmenter(
         gpuMsSum += gpuMs;
         filterMsSum += filterMs;
 
+        /*
+         * Keep the existing metric meaning:
+         * frameDeltaMs represents the time between frames.
+         *
+         * Skipped segmentation frames report segmentationMs = 0.
+         */
         updateMetrics(frameDeltaMs, segmentationMs, gpuMs);
 
         frames++;
@@ -301,27 +451,34 @@ export async function runSegmenter(
 
         if (now - lastStatsTime > 2000) {
           lastStatsTime = now;
+
           totalMsSum = 0;
           segmentationMsSum = 0;
           gpuMsSum = 0;
           filterMsSum = 0;
+
           frames = 0;
         }
       },
 
       close() {
         logger.log('[virtual-background] runSegmenter close');
+
         close();
       },
+
       abort(reason) {
         logger.log('[virtual-background] runSegmenter abort', reason);
+
         close();
       },
     },
-    new CountQueuingStrategy({highWaterMark: 1}),
+    new CountQueuingStrategy({
+      highWaterMark: 1,
+    }),
   );
 
-  readable.pipeTo(writer).catch((err: unknown) => {
-    logger.error(`[virtual-background] video error: ${(err as Error).message}`);
+  readable.pipeTo(writer).catch((error: unknown) => {
+    logger.error(`[virtual-background] video error: ${(error as Error).message}`);
   });
 }

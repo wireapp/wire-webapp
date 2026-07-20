@@ -152,10 +152,28 @@ export const ConversationsList = ({
 
   const parentRef = useRef(null);
 
+  const getItemKey = useCallback(
+    (index: number) => {
+      const item = conversationsToDisplay[index];
+
+      if (isConversationEntity(item)) {
+        return item.id;
+      }
+
+      if (item && 'heading' in item) {
+        return `heading-${item.heading}`;
+      }
+
+      return index;
+    },
+    [conversationsToDisplay],
+  );
+
   const rowVirtualizer = useVirtualizer({
     count: conversationsToDisplay.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => CONVERSATION_ROW_HEIGHT,
+    getItemKey,
   });
 
   const debouncedOnConversationClick = useDebouncedCallback(
