@@ -22,6 +22,7 @@ import {BackendClientE2E} from './backendClient.e2e';
 import {Service} from '../data/serviceInfo';
 import {User} from '../data/user';
 import {Role} from '@wireapp/api-client/lib/team';
+import {faker} from '@faker-js/faker';
 
 export class TeamRepositoryE2E extends BackendClientE2E {
   async inviteUserToTeam(emailOfInvitee: string, teamOwner: User, role: Role = Role.MEMBER): Promise<string> {
@@ -87,5 +88,64 @@ export class TeamRepositoryE2E extends BackendClientE2E {
         password: user.password,
       },
     });
+  }
+
+  public async upgradeTeam(teamId: string, user: User) {
+    const billingInfo = {
+      firstname: user.firstName,
+      lastname: user.lastName,
+      company: faker.company.name(),
+      street: '123 Test Street',
+      zip: '12345',
+      city: 'Berlin',
+      country: 'DE',
+    };
+
+    for (let i = 0; i < 5; i++) {
+      const res = await this.axiosInstance.put(`/teams/${teamId}/billing/info`, billingInfo, {
+        headers: {Authorization: `Bearer ${user.token}`},
+        validateStatus: _status => true, // Since we want the request to be retried we need to prevent axios from throwing automatically
+      });
+      if (res.status !== 412) break;
+
+      if (i === 4) {
+        throw new Error(`Failed to set billing information for team with id ${teamId}`);
+      }
+
+      console.log(`Failed to upgrade team with id ${teamId}, retrying in ${1 * (i + 1)} seconds...`, res.data);
+      await new Promise(res => setTimeout(res, 1_000 * (i + 1)));
+    }
+
+    await this.axiosInstance.put(
+      `/teams/${teamId}/billing/card`,
+      {
+        // tok_visa is a pre-built test token provided by Stripe for test mode environments.
+        // It represents the card number 4242424242424242 (Visa, always succeeds) without needing to go through the Stripe.js card tokenization flow.
+        stripeToken: 'tok_visa',
+      },
+      {headers: {Authorization: `Bearer ${user.token}`}},
+    );
+
+    const plansResponse = await this.axiosInstance.get(`teams/${teamId}/billing/plan/list`, {
+      headers: {Authorization: `Bearer ${user.token}`},
+    });
+    if (!Array.isArray(plansResponse.data) || plansResponse.data.length < 1) {
+      throw new Error('No valid enterprise plans found to upgrade to');
+    }
+
+    const plan = plansResponse.data.find(plan => plan.premium === true);
+
+    await this.axiosInstance.put(
+      `/teams/${teamId}/billing/subscription`,
+      {planId: plan.id},
+      {headers: {Authorization: `Bearer ${user.token}`}},
+    );
+
+    const {data: upgradedTeam} = await this.axiosInstance.get(`teams/${teamId}/billing/team`, {
+      headers: {Authorization: `Bearer ${user.token}`},
+    });
+    if (upgradedTeam.status !== 'active') {
+      throw new Error('Failed to upgrade team');
+    }
   }
 }
