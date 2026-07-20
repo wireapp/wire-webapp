@@ -259,6 +259,8 @@ jobs:
       - name: Summarize Edge deployment
         if: always()
         env:
+          ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
+          ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
           DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
           EDGE_RUNTIME_BACKEND_REST: ${{ env.EDGE_RUNTIME_BACKEND_REST }}
@@ -277,7 +279,13 @@ jobs:
             edge_result='failed'
           fi
 
-          commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          if [[ -n "${ARTIFACT_COMMIT:-}" ]]; then
+            artifact_commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${ARTIFACT_COMMIT}"
+            artifact_commit_display="[${ARTIFACT_COMMIT}](${artifact_commit_url})"
+          else
+            artifact_commit_display='not available'
+          fi
+
           workflow_run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
           {
@@ -285,8 +293,9 @@ jobs:
             echo
             echo "- Result: ${edge_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Target environment: ${EDGE_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${EDGE_WEBAPP_URL}](${EDGE_WEBAPP_URL})"
             echo "- REST backend URL: ${EDGE_RUNTIME_BACKEND_REST}"
@@ -397,6 +406,8 @@ jobs:
       - name: Summarize Hosted Dev deployment
         if: always()
         env:
+          ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
+          ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
           DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
           DEV_RUNTIME_BACKEND_REST: ${{ env.DEV_RUNTIME_BACKEND_REST }}
@@ -416,7 +427,13 @@ jobs:
             dev_result='failed'
           fi
 
-          commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          if [[ -n "${ARTIFACT_COMMIT:-}" ]]; then
+            artifact_commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${ARTIFACT_COMMIT}"
+            artifact_commit_display="[${ARTIFACT_COMMIT}](${artifact_commit_url})"
+          else
+            artifact_commit_display='not available'
+          fi
+
           workflow_run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
           {
@@ -424,8 +441,9 @@ jobs:
             echo
             echo "- Result: ${dev_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Target environment: ${DEV_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${DEV_WEBAPP_URL}](${DEV_WEBAPP_URL})"
             echo "- REST backend URL: ${DEV_RUNTIME_BACKEND_REST}"
@@ -553,6 +571,8 @@ jobs:
       - name: Summarize development channel
         if: always()
         env:
+          ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
+          ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
           CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
           DOCKER_IMAGE_OUTCOME: ${{ steps.publish_docker.outcome }}
@@ -593,7 +613,13 @@ jobs:
             wire_builds_commit='not updated'
           fi
 
-          commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          if [[ -n "${ARTIFACT_COMMIT:-}" ]]; then
+            artifact_commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${ARTIFACT_COMMIT}"
+            artifact_commit_display="[${ARTIFACT_COMMIT}](${artifact_commit_url})"
+          else
+            artifact_commit_display='not available'
+          fi
+
           workflow_run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
           {
@@ -601,8 +627,9 @@ jobs:
             echo
             echo "- Result: ${channel_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo '- Target channel: dev'
             echo "- Docker image: ${docker_image_reference}"
             echo "- Helm chart repository: ${CHART_REPOSITORY_URL}"
@@ -678,6 +705,8 @@ jobs:
     steps:
       - name: Write main delivery summary
         env:
+          ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
+          ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
           EDGE_RESULT: ${{ needs.deploy_to_edge.result }}
           EDGE_RUNTIME_BACKEND_REST: ${{ env.EDGE_RUNTIME_BACKEND_REST }}
@@ -757,15 +786,22 @@ jobs:
             wire_builds_commit='not updated'
           fi
 
-          commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          if [[ -n "${ARTIFACT_COMMIT:-}" ]]; then
+            artifact_commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${ARTIFACT_COMMIT}"
+            artifact_commit_display="[${ARTIFACT_COMMIT}](${artifact_commit_url})"
+          else
+            artifact_commit_display='not available'
+          fi
+
           workflow_run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
           {
             echo '## Main delivery'
             echo
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Workflow run URL: [${workflow_run_url}](${workflow_run_url})"
 
             echo
@@ -773,8 +809,8 @@ jobs:
             echo
             echo "- Result: ${edge_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
             echo "- Target environment: ${EDGE_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${EDGE_WEBAPP_URL}](${EDGE_WEBAPP_URL})"
             echo "- REST backend URL: ${EDGE_RUNTIME_BACKEND_REST}"
@@ -790,8 +826,8 @@ jobs:
             echo
             echo "- Result: ${dev_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
             echo "- Target environment: ${DEV_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${DEV_WEBAPP_URL}](${DEV_WEBAPP_URL})"
             echo "- REST backend URL: ${DEV_RUNTIME_BACKEND_REST}"
@@ -807,8 +843,8 @@ jobs:
             echo
             echo "- Result: ${channel_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
             echo '- Target channel: dev'
             echo "- Docker image: ${docker_image_reference}"
             echo "- Helm chart repository: ${CHART_REPOSITORY_URL}"
