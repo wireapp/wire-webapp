@@ -17,23 +17,19 @@
  *
  */
 
-import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
-import {maybe} from 'true-myth';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {maybe} from 'true-myth';
 
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
+import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
-import {mapScheduleFormToCreateMeeting} from './mapScheduleFormToCreateMeeting';
+import {mapScheduleFormToMeetingCommand} from './mapScheduleFormToMeetingCommand';
 import type {ScheduleMeetingFormState} from './ScheduleMeetingModal/scheduleMeetingTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
 const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
-const futureStartIso = futureStartDate.toISOString();
-const futureEndIso = futureEndDate.toISOString();
-
 const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
 
 const createUser = (id: string) => {
@@ -48,15 +44,17 @@ const baseFormState = (): ScheduleMeetingFormState => ({
   end: maybe.just(futureEndDate),
   recurrence: 'weekly',
   selectedUsers: [],
-  participantsFilter: '',
+  participantsFilter: 'alice',
 });
 
-describe('mapScheduleFormToCreateMeeting', () => {
-  it('maps title, times, and recurrence metadata only', () => {
-    const result = mapScheduleFormToCreateMeeting(
+describe('mapScheduleFormToMeetingCommand', () => {
+  it('maps validated form state to a meeting command', () => {
+    const alice = createUser('1');
+    const bob = createUser('2');
+    const result = mapScheduleFormToMeetingCommand(
       {
         ...baseFormState(),
-        selectedUsers: [createUser('1'), createUser('2')],
+        selectedUsers: [alice, bob],
       },
       wallClock,
     );
@@ -64,14 +62,15 @@ describe('mapScheduleFormToCreateMeeting', () => {
     expect(result.isOk).toBe(true);
     expect(unwrap(result)).toEqual({
       title: 'Weekly sync',
-      start_time: futureStartIso,
-      end_time: futureEndIso,
-      recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
+      start: futureStartDate,
+      end: futureEndDate,
+      recurrence: 'weekly',
+      selectedUsers: [alice, bob],
     });
   });
 
-  it('returns missingTimes when start or end is missing', () => {
-    const result = mapScheduleFormToCreateMeeting(
+  it('returns form errors when start or end is missing', () => {
+    const result = mapScheduleFormToMeetingCommand(
       {
         ...baseFormState(),
         start: maybe.nothing(),
@@ -80,6 +79,8 @@ describe('mapScheduleFormToCreateMeeting', () => {
     );
 
     expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe('missingTimes');
+    expect(unwrapErr(result)).toEqual({
+      endBeforeStart: 'meetings.scheduleModal.error.endBeforeStart',
+    });
   });
 });

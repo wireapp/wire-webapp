@@ -21,19 +21,19 @@ import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Task} from 'true-myth';
 
 import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowFormState} from 'Components/Meeting/meetNowModal/meetNowTypes';
+import type {MeetNowMeetingCommand} from 'Components/Meeting/meetNowModal/meetNowTypes';
 import type {
   MeetNowSubmitSuccess,
   MeetingSubmitSuccess,
   UpdateMeetingParams,
 } from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
-import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {ScheduleMeetingCommand} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 
 export type MeetingStoreServiceTasks = {
-  scheduleMeeting: (formState: ScheduleMeetingFormState) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
-  meetNowMeeting: (formState: MeetNowFormState) => Task<MeetNowSubmitSuccess, MeetingSubmitErrors>;
+  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  meetNowMeeting: (command: MeetNowMeetingCommand) => Task<MeetNowSubmitSuccess, MeetingSubmitErrors>;
   updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 

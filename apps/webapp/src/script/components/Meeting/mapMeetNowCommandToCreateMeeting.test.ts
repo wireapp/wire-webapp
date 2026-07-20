@@ -19,18 +19,17 @@
 
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
-import {mapMeetNowFormToCreateMeeting} from './mapMeetNowFormToCreateMeeting';
+import {mapMeetNowCommandToCreateMeeting} from './mapMeetNowCommandToCreateMeeting';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
 
-describe('mapMeetNowFormToCreateMeeting', () => {
+describe('mapMeetNowCommandToCreateMeeting', () => {
   it('maps title and immediate start/end times', () => {
-    const result = mapMeetNowFormToCreateMeeting(
+    const result = mapMeetNowCommandToCreateMeeting(
       {
-        title: '  Standup  ',
+        title: 'Standup',
         selectedUsers: [],
-        participantsFilter: '',
       },
       wallClock,
     );

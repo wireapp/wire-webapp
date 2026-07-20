@@ -17,16 +17,21 @@
  *
  */
 
-import {
-  meetNowMeeting,
-  scheduleMeeting,
-  updateMeeting,
-} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 
-import type {MeetingServiceDeps, MeetingStoreServiceTasks} from './meetingStoreDeps';
+import type {MeetNowMeetingCommand} from 'Components/Meeting/meetNowModal/meetNowTypes';
+import {getMeetNowMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingDefaults';
 
-export const createMeetingStoreServiceTasks = (deps: MeetingServiceDeps): MeetingStoreServiceTasks => ({
-  scheduleMeeting: command => scheduleMeeting(command, deps),
-  meetNowMeeting: command => meetNowMeeting(command, deps),
-  updateMeeting: params => updateMeeting(params, deps),
-});
+export const mapMeetNowCommandToCreateMeeting = (
+  command: MeetNowMeetingCommand,
+  wallClock: WallClock,
+): CreateMeeting => {
+  const {start, end} = getMeetNowMeetingTimes(wallClock);
+
+  return {
+    title: command.title,
+    start_time: start.toISOString(),
+    end_time: end.toISOString(),
+  };
+};

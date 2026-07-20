@@ -19,9 +19,11 @@
 
 import {useCallback, useState} from 'react';
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Maybe, type Task} from 'true-myth';
 
+import {mapScheduleFormToMeetingCommand} from 'Components/Meeting/mapScheduleFormToMeetingCommand';
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -31,7 +33,7 @@ import type {Translate} from 'Util/localizerUtil';
 
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
 import type {MeetingSubmitSuccess, UpdateMeetingParams} from './scheduleMeetingService';
-import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
+import type {ScheduleMeetingCommand, ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
 import {shouldRefreshMeetingsListAfterSubmitError} from './shouldRefreshMeetingsListAfterSubmitError';
 import {showMeetingPartialAddFailureModal} from './showMeetingPartialAddFailureModal';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
@@ -58,7 +60,8 @@ type SubmitMeetingParams = {
   qualifiedConversation: Maybe<QualifiedId>;
   originalRecurrence: UpdateMeetingParams['originalRecurrence'];
   originalSelectedUsers: User[];
-  scheduleMeeting: (formState: ScheduleMeetingFormState) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  wallClock: WallClock;
+  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 
@@ -69,11 +72,18 @@ const submitMeeting = ({
   qualifiedConversation,
   originalRecurrence,
   originalSelectedUsers,
+  wallClock,
   scheduleMeeting,
   updateMeeting,
 }: SubmitMeetingParams): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
   if (mode === 'create') {
-    return scheduleMeeting(formState);
+    const commandResult = mapScheduleFormToMeetingCommand(formState, wallClock);
+
+    if (commandResult.isErr) {
+      return task.reject(meetingSubmitErrors.createFailed);
+    }
+
+    return scheduleMeeting(commandResult.value);
   }
 
   if (editingMeetingId.isNothing) {
@@ -91,7 +101,7 @@ const submitMeeting = ({
 
 export const useScheduleMeetingSubmit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {translate} = useApplicationContext();
+  const {translate, wallClock} = useApplicationContext();
   const scheduleMeeting = useMeetingStore(state => state.scheduleMeeting);
   const updateMeeting = useMeetingStore(state => state.updateMeeting);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
@@ -112,6 +122,7 @@ export const useScheduleMeetingSubmit = () => {
         qualifiedConversation,
         originalRecurrence,
         originalSelectedUsers,
+        wallClock,
         scheduleMeeting,
         updateMeeting,
       });
@@ -150,6 +161,7 @@ export const useScheduleMeetingSubmit = () => {
       scheduleMeeting,
       translate,
       updateMeeting,
+      wallClock,
     ],
   );
 

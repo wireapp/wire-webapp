@@ -17,16 +17,26 @@
  *
  */
 
-import {
-  meetNowMeeting,
-  scheduleMeeting,
-  updateMeeting,
-} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
+import {result, Result} from 'true-myth';
 
-import type {MeetingServiceDeps, MeetingStoreServiceTasks} from './meetingStoreDeps';
+import type {
+  MeetNowFormErrors,
+  MeetNowFormState,
+  MeetNowMeetingCommand,
+} from 'Components/Meeting/meetNowModal/meetNowTypes';
+import {hasMeetNowFormErrors, validateMeetNowForm} from 'Components/Meeting/meetNowModal/useMeetNowModal';
 
-export const createMeetingStoreServiceTasks = (deps: MeetingServiceDeps): MeetingStoreServiceTasks => ({
-  scheduleMeeting: command => scheduleMeeting(command, deps),
-  meetNowMeeting: command => meetNowMeeting(command, deps),
-  updateMeeting: params => updateMeeting(params, deps),
-});
+export const mapMeetNowFormToMeetingCommand = (
+  formState: MeetNowFormState,
+): Result<MeetNowMeetingCommand, MeetNowFormErrors> => {
+  const errors = validateMeetNowForm(formState);
+
+  if (hasMeetNowFormErrors(errors)) {
+    return result.err(errors);
+  }
+
+  return result.ok({
+    title: formState.title.trim(),
+    selectedUsers: formState.selectedUsers,
+  });
+};

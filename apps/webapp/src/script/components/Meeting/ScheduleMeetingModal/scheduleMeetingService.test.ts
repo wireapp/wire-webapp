@@ -32,7 +32,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from './scheduleMeetingService';
-import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+import type {ScheduleMeetingCommand, ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
@@ -41,6 +41,14 @@ const futureStartIso = futureStartDate.toISOString();
 const futureEndIso = futureEndDate.toISOString();
 
 const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+
+const scheduleCommand: ScheduleMeetingCommand = {
+  title: 'Weekly sync',
+  start: futureStartDate,
+  end: futureEndDate,
+  recurrence: 'doesNotRepeat',
+  selectedUsers: [],
+};
 
 const formState: ScheduleMeetingFormState = {
   title: 'Weekly sync',
@@ -152,7 +160,7 @@ describe('scheduleMeeting', () => {
   it('creates a meeting and establishes the MLS conversation without participants', async () => {
     const {deps, createMeetingMock, establishMeetingConversation, saveMeetingConversationFromBackend} = createDeps();
 
-    const result = await scheduleMeeting(formState, deps);
+    const result = await scheduleMeeting(scheduleCommand, deps);
 
     expect(result.isOk).toBe(true);
     expect(result.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual([]);
@@ -176,7 +184,7 @@ describe('scheduleMeeting', () => {
 
     const result = await scheduleMeeting(
       {
-        ...formState,
+        ...scheduleCommand,
         selectedUsers: [alice, bob],
       },
       deps,
@@ -195,26 +203,10 @@ describe('scheduleMeeting', () => {
       establishMeetingConversation: jest.fn().mockReturnValue(task.reject(new Error('establish failed'))),
     });
 
-    const result = await scheduleMeeting(formState, deps);
+    const result = await scheduleMeeting(scheduleCommand, deps);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.addParticipantsFailed);
-  });
-
-  it('returns missingTimes and does not call API', async () => {
-    const {deps, createMeetingMock} = createDeps();
-
-    const result = await scheduleMeeting(
-      {
-        ...formState,
-        start: maybe.nothing(),
-      },
-      deps,
-    );
-
-    expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe('missingTimes');
-    expect(createMeetingMock).not.toHaveBeenCalled();
   });
 
   it('returns createFailed when API fails', async () => {
@@ -222,7 +214,7 @@ describe('scheduleMeeting', () => {
       createMeetingMock: jest.fn().mockReturnValue(task.reject(new Error('network'))),
     });
 
-    const result = await scheduleMeeting(formState, deps);
+    const result = await scheduleMeeting(scheduleCommand, deps);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.createFailed);
@@ -275,7 +267,6 @@ describe('meetNowMeeting', () => {
       {
         title: 'Standup',
         selectedUsers: [],
-        participantsFilter: '',
       },
       deps,
     );

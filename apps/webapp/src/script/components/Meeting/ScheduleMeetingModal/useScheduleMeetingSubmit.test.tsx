@@ -36,21 +36,33 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
+const fixedNow = new Date('2026-06-16T09:00:00.000Z');
+const futureStartDate = new Date('2026-06-16T10:00:00.000Z');
+const futureEndDate = new Date('2026-06-16T11:00:00.000Z');
+
 const testWallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: new Date('2026-06-16T10:00:00.000Z').getTime(),
+  initialCurrentTimestampInMilliseconds: fixedNow.getTime(),
 });
 
 const formState = {
   title: 'Weekly sync',
-  start: maybe.just(new Date('2026-06-16T10:00:00.000Z')),
-  end: maybe.just(new Date('2026-06-16T11:00:00.000Z')),
+  start: maybe.just(futureStartDate),
+  end: maybe.just(futureEndDate),
   recurrence: 'doesNotRepeat' as const,
   selectedUsers: [],
   participantsFilter: '',
 };
 
+const scheduleCommand = {
+  title: 'Weekly sync',
+  start: futureStartDate,
+  end: futureEndDate,
+  recurrence: 'doesNotRepeat' as const,
+  selectedUsers: [],
+};
+
 const RootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
+  createRootContextValueForTest({translate: translateForTest, wallClock: testWallClock}),
 );
 
 const createMeetingStore = ({
@@ -95,7 +107,7 @@ describe('useScheduleMeetingSubmit', () => {
     });
 
     expect(submitResult).toBe(true);
-    expect(scheduleMeeting).toHaveBeenCalledWith(formState);
+    expect(scheduleMeeting).toHaveBeenCalledWith(scheduleCommand);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
   });
 

@@ -48,6 +48,11 @@ const formState = {
   participantsFilter: '',
 };
 
+const meetNowCommand = {
+  title: 'Standup',
+  selectedUsers: [],
+};
+
 type JoinTestMocks = {
   conversationState: ConversationState;
   findConversation: jest.Mock;
@@ -155,7 +160,7 @@ describe('useMeetNowSubmit', () => {
     });
 
     expect(submitResult).toBe(meetNowSubmitResults.joined);
-    expect(meetNowMeeting).toHaveBeenCalledWith(formState);
+    expect(meetNowMeeting).toHaveBeenCalledWith(meetNowCommand);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
     expect(findConversation).toHaveBeenCalledWith(qualifiedConversation);
     expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversation);

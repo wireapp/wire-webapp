@@ -23,13 +23,16 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
 import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeetingInstanceToScheduleFormState';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowFormState} from 'Components/Meeting/meetNowModal/meetNowTypes';
+import type {MeetNowMeetingCommand} from 'Components/Meeting/meetNowModal/meetNowTypes';
 import {
   type MeetNowSubmitSuccess,
   type MeetingSubmitSuccess,
   type UpdateMeetingParams,
 } from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
-import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {
+  ScheduleMeetingCommand,
+  ScheduleMeetingFormState,
+} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
@@ -47,8 +50,8 @@ export type MeetingStoreState = {
   isLoading: boolean;
   hasLoadError: boolean;
   loadMeetings: () => Promise<void>;
-  scheduleMeeting: (formState: ScheduleMeetingFormState) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
-  meetNowMeeting: (formState: MeetNowFormState) => Task<MeetNowSubmitSuccess, MeetingSubmitErrors>;
+  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  meetNowMeeting: (command: MeetNowMeetingCommand) => Task<MeetNowSubmitSuccess, MeetingSubmitErrors>;
   updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
 };

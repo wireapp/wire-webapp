@@ -23,6 +23,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task} from 'true-myth';
 
 import {joinMeetingCall, type JoinMeetingCallDeps} from 'Components/Meeting/joinMeetingCall';
+import {mapMeetNowFormToMeetingCommand} from 'Components/Meeting/mapMeetNowFormToMeetingCommand';
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import {handleJoinMeetingCallResult} from 'Components/Meeting/useJoinMeetingCall';
@@ -132,7 +133,14 @@ export const useMeetNowSubmit = (conversationState: ConversationState) => {
     async (formState: MeetNowFormState): Promise<MeetNowSubmitResult> => {
       setIsSubmitting(true);
 
-      const submitResult = await meetNowMeeting(formState);
+      const commandResult = mapMeetNowFormToMeetingCommand(formState);
+
+      if (commandResult.isErr) {
+        setIsSubmitting(false);
+        return meetNowSubmitResults.creationFailed;
+      }
+
+      const submitResult = await meetNowMeeting(commandResult.value);
 
       if (submitResult.isErr) {
         if (shouldRefreshMeetingsListAfterSubmitError(submitResult.error)) {

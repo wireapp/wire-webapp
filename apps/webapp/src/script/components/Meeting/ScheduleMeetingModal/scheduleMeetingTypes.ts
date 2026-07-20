@@ -34,6 +34,14 @@ export interface ScheduleMeetingFormState {
   participantsFilter: string;
 }
 
+export type ScheduleMeetingCommand = {
+  title: string;
+  start: Date;
+  end: Date;
+  recurrence: ScheduleMeetingRecurrenceOption;
+  selectedUsers: User[];
+};
+
 export type ScheduleMeetingFormErrorKey =
   | 'meetings.scheduleModal.error.titleRequired'
   | 'meetings.scheduleModal.error.endBeforeStart'

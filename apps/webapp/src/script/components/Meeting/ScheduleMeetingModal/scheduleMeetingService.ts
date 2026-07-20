@@ -25,8 +25,8 @@ import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {Maybe, Task, task} from 'true-myth';
 
 import {computeParticipantDiff} from 'Components/Meeting/computeMeetingParticipantDiff';
-import {mapMeetNowFormToCreateMeeting} from 'Components/Meeting/mapMeetNowFormToCreateMeeting';
-import {mapScheduleFormToCreateMeeting} from 'Components/Meeting/mapScheduleFormToCreateMeeting';
+import {mapMeetNowCommandToCreateMeeting} from 'Components/Meeting/mapMeetNowCommandToCreateMeeting';
+import {mapScheduleCommandToCreateMeeting} from 'Components/Meeting/mapScheduleCommandToCreateMeeting';
 import {mapScheduleFormToUpdateMeeting} from 'Components/Meeting/mapScheduleFormToUpdateMeeting';
 import {
   meetingConversationSyncErrors,
@@ -35,10 +35,14 @@ import {
 } from 'Components/Meeting/meetingConversationSync';
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowFormState} from 'Components/Meeting/meetNowModal/meetNowTypes';
+import type {MeetNowMeetingCommand} from 'Components/Meeting/meetNowModal/meetNowTypes';
 import type {User} from 'Repositories/entity/User';
 
-import type {ScheduleMeetingFormState, ScheduleMeetingRecurrenceOption} from './scheduleMeetingTypes';
+import type {
+  ScheduleMeetingCommand,
+  ScheduleMeetingFormState,
+  ScheduleMeetingRecurrenceOption,
+} from './scheduleMeetingTypes';
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 
@@ -109,30 +113,25 @@ const createMeetingAndSyncParticipants = (
  * Schedules a meeting and establishes the MLS conversation with selected participants.
  */
 export const scheduleMeeting = (
-  formState: ScheduleMeetingFormState,
+  command: ScheduleMeetingCommand,
   deps: MeetingServiceDeps,
-): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
-  const mappingResult = mapScheduleFormToCreateMeeting(formState, deps.wallClock);
-
-  if (mappingResult.isErr) {
-    return task.reject(mappingResult.error);
-  }
-
-  return createMeetingAndSyncParticipants(mappingResult.value, formState.selectedUsers, deps).map(({failedToAdd}) => ({
-    failedToAdd,
-  }));
-};
+): Task<MeetingSubmitSuccess, MeetingSubmitErrors> =>
+  createMeetingAndSyncParticipants(mapScheduleCommandToCreateMeeting(command), command.selectedUsers, deps).map(
+    ({failedToAdd}) => ({
+      failedToAdd,
+    }),
+  );
 
 /**
  * Creates an instant meeting and establishes the MLS conversation with selected participants.
  */
 export const meetNowMeeting = (
-  formState: MeetNowFormState,
+  command: MeetNowMeetingCommand,
   deps: MeetingServiceDeps,
 ): Task<MeetNowSubmitSuccess, MeetingSubmitErrors> =>
   createMeetingAndSyncParticipants(
-    mapMeetNowFormToCreateMeeting(formState, deps.wallClock),
-    formState.selectedUsers,
+    mapMeetNowCommandToCreateMeeting(command, deps.wallClock),
+    command.selectedUsers,
     deps,
   );
 
