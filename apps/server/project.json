@@ -4,43 +4,53 @@
   "sourceRoot": "{projectRoot}",
   "projectType": "application",
   "targets": {
+    "generate-build-metadata": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["config-lib:build"],
+      "inputs": ["production", "webappBuildMetadata"],
+      "outputs": ["{projectRoot}/dist/version.json"],
+      "options": {
+        "commands": ["rimraf {projectRoot}/dist", "node {projectRoot}/bin/generateVersionFile.mts"],
+        "parallel": false
+      }
+    },
     "build": {
       "executor": "nx:run-commands",
-      "dependsOn": ["^build", "telemetry-lib:build"],
+      "dependsOn": ["^build", "generate-build-metadata", "telemetry-lib:build"],
       "inputs": ["production", "webappBuildMetadata"],
       "outputs": ["{projectRoot}/dist"],
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.mts", "node {projectRoot}/bin/copy_server_assets.js"],
+        "commands": ["tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/copy_server_assets.js"],
         "parallel": false
       }
     },
     "build-dev": {
       "executor": "nx:run-commands",
-      "dependsOn": ["config-lib:build", "telemetry-lib:build"],
+      "dependsOn": ["config-lib:build", "generate-build-metadata", "telemetry-lib:build"],
       "inputs": ["production", "webappBuildMetadata"],
       "outputs": ["{projectRoot}/dist"],
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.mts", "node {projectRoot}/bin/copy_server_assets.js"],
+        "commands": ["tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/copy_server_assets.js"],
         "parallel": false
       }
     },
     "package": {
       "executor": "nx:run-commands",
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "build", {"projects": "webapp", "target": "build"}],
       "inputs": ["production", "webappBuildMetadata"],
       "outputs": ["{projectRoot}/dist/s3"],
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "nx run server:build", "nx run webapp:build:production", "node bin/zip.js"],
+        "commands": ["node bin/zip.js"],
         "parallel": false
       }
     },
     "package-public": {
       "executor": "nx:run-commands",
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "build", {"projects": "webapp", "target": "build-production-public"}],
       "inputs": ["production", "webappBuildMetadata"],
       "outputs": ["{projectRoot}/dist/s3"],
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "nx run server:build", "nx run webapp:build:production-public", "yarn verify:bundle:prod:public", "node bin/zip.js"],
+        "commands": ["yarn verify:bundle:prod:public", "node bin/zip.js"],
         "parallel": false
       }
     },

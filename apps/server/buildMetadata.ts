@@ -17,41 +17,54 @@
  *
  */
 
-import {Maybe} from 'true-myth';
+import {Maybe, Result} from 'true-myth';
 
-import {parseBuildMetadata as parseAuthoritativeBuildMetadata} from '@wireapp/config';
+import {isBuildMetadata, parseBuildMetadata as parseAuthoritativeBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
 
 export type BuildMetadataFileDependencies = {
   readonly readFile: (metadataFilePath: string) => string;
 };
 
-const unknownBuildMetadata: BuildMetadata = {
-  version: 'dev-unknown',
-  commit: 'unknown',
-  builtAt: '1970-01-01T00:00:00.000Z',
-};
-
 export function parseBuildMetadata(serializedBuildMetadata: string): Maybe<BuildMetadata> {
   return parseAuthoritativeBuildMetadata(serializedBuildMetadata);
 }
 
-function readSerializedBuildMetadata(
+function readBuildMetadataFile(
   metadataFilePath: string,
   dependencies: BuildMetadataFileDependencies,
-): Maybe<string> {
+): Result<string, Error> {
   try {
-    return Maybe.just(dependencies.readFile(metadataFilePath));
-  } catch {
-    return Maybe.nothing();
+    return Result.ok(dependencies.readFile(metadataFilePath));
+  } catch (error: unknown) {
+    return Result.err(new Error(`Unable to read build metadata file '${metadataFilePath}'`, {cause: error}));
   }
+}
+
+function parseLoadedBuildMetadata(
+  metadataFilePath: string,
+  serializedBuildMetadata: string,
+): Result<BuildMetadata, Error> {
+  let parsedValue: unknown;
+
+  try {
+    parsedValue = JSON.parse(serializedBuildMetadata);
+  } catch (error: unknown) {
+    return Result.err(new Error(`Build metadata file '${metadataFilePath}' contains malformed JSON`, {cause: error}));
+  }
+
+  if (!isBuildMetadata(parsedValue)) {
+    return Result.err(new Error(`Build metadata file '${metadataFilePath}' has an invalid structure`));
+  }
+
+  return Result.ok(parsedValue);
 }
 
 export function loadBuildMetadata(
   metadataFilePath: string,
   dependencies: BuildMetadataFileDependencies,
-): BuildMetadata {
-  return readSerializedBuildMetadata(metadataFilePath, dependencies)
-    .andThen(parseAuthoritativeBuildMetadata)
-    .unwrapOr(unknownBuildMetadata);
+): Result<BuildMetadata, Error> {
+  return readBuildMetadataFile(metadataFilePath, dependencies).andThen(serializedBuildMetadata => {
+    return parseLoadedBuildMetadata(metadataFilePath, serializedBuildMetadata);
+  });
 }

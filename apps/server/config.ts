@@ -30,9 +30,15 @@ function readBuildMetadataFile(metadataFilePath: string): string {
   return readFileSync(metadataFilePath, 'utf8');
 }
 
-const buildMetadata = loadBuildMetadata(path.resolve(__dirname, './version.json'), {
+const buildMetadataResult = loadBuildMetadata(path.resolve(__dirname, './version.json'), {
   readFile: readBuildMetadataFile,
 });
+
+if (buildMetadataResult.isErr) {
+  throw buildMetadataResult.error;
+}
+
+const buildMetadata = buildMetadataResult.value;
 const dotenvConfigurationIndentationSpaces = 2;
 
 // Determine the correct root path based on the directory structure

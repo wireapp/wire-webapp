@@ -29,6 +29,7 @@ export {
   createBuildMetadata,
   getShortCommitSha,
   isBuildMetadata,
+  isBuildMetadataInput,
   parseBuildMetadata,
   resolveBuildVersion,
 } from './buildMetadata';

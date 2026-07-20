@@ -29,7 +29,7 @@ import {Maybe} from 'true-myth';
 
 import {
   createAuthoritativeBuildMetadata,
-  isBuildMetadata,
+  isBuildMetadataInput,
   parseBuildMetadata,
   type BuildMetadata,
   type BuildMetadataInput,
@@ -88,7 +88,7 @@ function generateVersionFile(): void {
     commit: commitSha,
     builtAt,
   };
-  if (!isBuildMetadata(buildMetadataInput)) {
+  if (!isBuildMetadataInput(buildMetadataInput)) {
     throw new Error('Invalid webapp build metadata input');
   }
   const existingBuildMetadata = readExistingBuildMetadata(metadataFilePath);

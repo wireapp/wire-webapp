@@ -21,14 +21,17 @@ import {validateBuildArtifactMetadata} from './buildArtifactMetadata';
 
 const mainBuildMetadata = {
   version: 'main-025edc6',
+  assetVersion: 'main-025edc6',
   commit: '025edc663787b3d2da366f21a5958013201e6cd4',
   builtAt: '2026-07-20T06:18:03.123Z',
 };
 
-function createHtmlDocument(version: string): {readonly archiveFilePath: string; readonly contents: string} {
+function createHtmlDocument(
+  metadata: typeof mainBuildMetadata,
+): {readonly archiveFilePath: string; readonly contents: string} {
   return {
     archiveFilePath: 'static/index.html',
-    contents: `<!--! ${version} --><link href="/image/favicon.ico?${version}"><script src="/min/app.js?v=${version}">`,
+    contents: `<!--! ${metadata.version} --><link href="/image/favicon.ico?${metadata.assetVersion}"><script src="/min/app.js?v=${metadata.assetVersion}">`,
   };
 }
 
@@ -37,7 +40,7 @@ describe('build artifact metadata validation', () => {
     const validationResult = validateBuildArtifactMetadata({
       expectedCommit: mainBuildMetadata.commit,
       expectedVersion: mainBuildMetadata.version,
-      htmlDocuments: [createHtmlDocument(mainBuildMetadata.version)],
+      htmlDocuments: [createHtmlDocument(mainBuildMetadata)],
       metadata: mainBuildMetadata,
     });
 
@@ -52,12 +55,13 @@ describe('build artifact metadata validation', () => {
     const releaseMetadata = {
       ...mainBuildMetadata,
       version: '2026-07-20.1',
+      assetVersion: '2026-07-20.1-025edc6',
     };
 
     const validationResult = validateBuildArtifactMetadata({
       expectedCommit: releaseMetadata.commit,
       expectedVersion: releaseMetadata.version,
-      htmlDocuments: [createHtmlDocument(releaseMetadata.version)],
+      htmlDocuments: [createHtmlDocument(releaseMetadata)],
       metadata: releaseMetadata,
     });
 
@@ -68,7 +72,7 @@ describe('build artifact metadata validation', () => {
     const validationResult = validateBuildArtifactMetadata({
       expectedCommit: mainBuildMetadata.commit,
       expectedVersion: 'main-fedcba9',
-      htmlDocuments: [createHtmlDocument(mainBuildMetadata.version)],
+      htmlDocuments: [createHtmlDocument(mainBuildMetadata)],
       metadata: mainBuildMetadata,
     });
 
@@ -79,7 +83,7 @@ describe('build artifact metadata validation', () => {
     const validationResult = validateBuildArtifactMetadata({
       expectedCommit: 'fedcba9876543210fedcba9876543210fedcba98',
       expectedVersion: mainBuildMetadata.version,
-      htmlDocuments: [createHtmlDocument(mainBuildMetadata.version)],
+      htmlDocuments: [createHtmlDocument(mainBuildMetadata)],
       metadata: mainBuildMetadata,
     });
 
@@ -90,7 +94,9 @@ describe('build artifact metadata validation', () => {
     const validationResult = validateBuildArtifactMetadata({
       expectedCommit: mainBuildMetadata.commit,
       expectedVersion: mainBuildMetadata.version,
-      htmlDocuments: [createHtmlDocument('dev-025edc6')],
+      htmlDocuments: [
+        createHtmlDocument({...mainBuildMetadata, version: 'dev-025edc6', assetVersion: 'dev-025edc6'}),
+      ],
       metadata: mainBuildMetadata,
     });
 
@@ -98,7 +104,7 @@ describe('build artifact metadata validation', () => {
   });
 
   it('rejects an unmarked version comment', () => {
-    const htmlDocument = createHtmlDocument(mainBuildMetadata.version);
+    const htmlDocument = createHtmlDocument(mainBuildMetadata);
     const validationResult = validateBuildArtifactMetadata({
       expectedCommit: mainBuildMetadata.commit,
       expectedVersion: mainBuildMetadata.version,
@@ -118,8 +124,29 @@ describe('build artifact metadata validation', () => {
     const validationResult = validateBuildArtifactMetadata({
       expectedCommit: mainBuildMetadata.commit,
       expectedVersion: mainBuildMetadata.version,
-      htmlDocuments: [createHtmlDocument(mainBuildMetadata.version)],
+      htmlDocuments: [createHtmlDocument(mainBuildMetadata)],
       metadata: {...mainBuildMetadata, builtAt: '2026.07.20.06.18.03'},
+    });
+
+    expect(validationResult.isErr).toBe(true);
+  });
+
+  it('rejects generated HTML that uses the logical version as its cache key', () => {
+    const releaseMetadata = {
+      ...mainBuildMetadata,
+      version: '2026-07-20.1',
+      assetVersion: '2026-07-20.1-025edc6',
+    };
+    const validationResult = validateBuildArtifactMetadata({
+      expectedCommit: releaseMetadata.commit,
+      expectedVersion: releaseMetadata.version,
+      htmlDocuments: [
+        {
+          archiveFilePath: 'static/index.html',
+          contents: `<!--! ${releaseMetadata.version} --><link href="/image/favicon.ico?${releaseMetadata.version}">`,
+        },
+      ],
+      metadata: releaseMetadata,
     });
 
     expect(validationResult.isErr).toBe(true);

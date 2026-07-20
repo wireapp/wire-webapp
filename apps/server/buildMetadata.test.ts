@@ -17,12 +17,13 @@
  *
  */
 
-import {Maybe} from 'true-myth';
+import {Maybe, Result} from 'true-myth';
 
 import {loadBuildMetadata, parseBuildMetadata} from './buildMetadata';
 
 const authoritativeBuildMetadata = {
   version: 'main-025edc6',
+  assetVersion: 'main-025edc6',
   commit: '025edc6f1234567890',
   builtAt: '2026-07-20T06:18:03.123Z',
 };
@@ -49,28 +50,98 @@ describe('server build metadata', () => {
   });
 
   it('loads metadata through the supplied file reader', () => {
-    const loadedBuildMetadata = loadBuildMetadata('/build/version.json', {
+    const loadedBuildMetadataResult = loadBuildMetadata('/build/version.json', {
       readFile: metadataFilePath => {
         expect(metadataFilePath).toBe('/build/version.json');
         return JSON.stringify(authoritativeBuildMetadata);
       },
     });
 
-    expect(loadedBuildMetadata).toStrictEqual(authoritativeBuildMetadata);
-    expect(typeof loadedBuildMetadata.version).toBe('string');
+    expect(loadedBuildMetadataResult).toStrictEqual(Result.ok(authoritativeBuildMetadata));
+
+    if (loadedBuildMetadataResult.isOk) {
+      expect(typeof loadedBuildMetadataResult.value.version).toBe('string');
+    }
   });
 
-  it('uses a deterministic development fallback when the metadata file cannot be read', () => {
-    const loadedBuildMetadata = loadBuildMetadata('/build/version.json', {
+  it('fails when the metadata file is missing', () => {
+    const loadedBuildMetadataResult = loadBuildMetadata('/build/version.json', {
       readFile: () => {
-        throw new Error('metadata file unavailable');
+        throw new Error('ENOENT: no such file or directory');
       },
     });
 
-    expect(loadedBuildMetadata).toStrictEqual({
+    expect(loadedBuildMetadataResult.isErr).toBe(true);
+    if (loadedBuildMetadataResult.isErr) {
+      expect(loadedBuildMetadataResult.error.message).toBe(
+        "Unable to read build metadata file '/build/version.json'",
+      );
+    }
+  });
+
+  it('fails when the metadata file cannot be read', () => {
+    const loadedBuildMetadataResult = loadBuildMetadata('/build/version.json', {
+      readFile: () => {
+        throw new Error('permission denied');
+      },
+    });
+
+    expect(loadedBuildMetadataResult.isErr).toBe(true);
+    if (loadedBuildMetadataResult.isErr) {
+      expect(loadedBuildMetadataResult.error.message).toBe(
+        "Unable to read build metadata file '/build/version.json'",
+      );
+    }
+  });
+
+  it('fails when the metadata file contains malformed JSON', () => {
+    const loadedBuildMetadataResult = loadBuildMetadata('/build/version.json', {
+      readFile: () => '{not-json',
+    });
+
+    expect(loadedBuildMetadataResult.isErr).toBe(true);
+    if (loadedBuildMetadataResult.isErr) {
+      expect(loadedBuildMetadataResult.error.message).toBe(
+        "Build metadata file '/build/version.json' contains malformed JSON",
+      );
+    }
+  });
+
+  it('fails when the metadata file has an invalid structure', () => {
+    const loadedBuildMetadataResult = loadBuildMetadata('/build/version.json', {
+      readFile: () =>
+        JSON.stringify({
+          version: 'main-025edc6',
+          commit: authoritativeBuildMetadata.commit,
+          builtAt: authoritativeBuildMetadata.builtAt,
+        }),
+    });
+
+    expect(loadedBuildMetadataResult.isErr).toBe(true);
+    if (loadedBuildMetadataResult.isErr) {
+      expect(loadedBuildMetadataResult.error.message).toBe(
+        "Build metadata file '/build/version.json' has an invalid structure",
+      );
+    }
+  });
+
+  it('loads a structurally valid development fallback generated without Git metadata', () => {
+    const loadedBuildMetadataResult = loadBuildMetadata('/build/version.json', {
+      readFile: () => {
+        return JSON.stringify({
+          version: 'dev-unknown',
+          assetVersion: 'dev-unknown',
+          commit: 'unknown',
+          builtAt: '1970-01-01T00:00:00.000Z',
+        });
+      },
+    });
+
+    expect(loadedBuildMetadataResult).toStrictEqual(Result.ok({
       version: 'dev-unknown',
+      assetVersion: 'dev-unknown',
       commit: 'unknown',
       builtAt: '1970-01-01T00:00:00.000Z',
-    });
+    }));
   });
 });

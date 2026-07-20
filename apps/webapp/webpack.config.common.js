@@ -22,7 +22,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const dotenv = require('dotenv-extended');
-const {execFileSync} = require('child_process');
 const {readFileSync} = require('fs');
 
 const path = require('path');
@@ -41,14 +40,8 @@ const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
 const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
 const UNSUPPORTED_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/unsupported.ejs');
 const BUILD_METADATA_FILE_PATH = path.resolve(ROOT_PATH, 'apps/server/dist/version.json');
-const BUILD_METADATA_SCRIPT_PATH = path.resolve(ROOT_PATH, 'apps/server/bin/generateVersionFile.mts');
 
 function readBuildMetadata() {
-  execFileSync(process.execPath, [BUILD_METADATA_SCRIPT_PATH], {
-    cwd: ROOT_PATH,
-    stdio: 'inherit',
-  });
-
   const parsedBuildMetadata = parseBuildMetadata(readFileSync(BUILD_METADATA_FILE_PATH, 'utf8'));
 
   if (parsedBuildMetadata.isNothing) {
@@ -101,6 +94,7 @@ const serverConfig = generateServerConfig(commonConfig, env);
 
 const templateParameters = {
   VERSION: clientConfig.VERSION,
+  ASSET_VERSION: buildMetadata.assetVersion,
   BRAND_NAME: clientConfig.BRAND_NAME,
   APP_BASE: clientConfig.APP_BASE,
   OPEN_GRAPH_TITLE: serverConfig.OPEN_GRAPH.TITLE,

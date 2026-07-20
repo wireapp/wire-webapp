@@ -52,6 +52,7 @@ function createValidDistributionManifest(): Record<string, unknown> {
 function createValidArtifactMetadata(): Record<string, string> {
   return {
     version: '2026-07-15.1',
+    assetVersion: '2026-07-15.1-1234567',
     commit: expectedReleaseCommitSha,
     builtAt: '2026-07-20T06:18:03.123Z',
   };

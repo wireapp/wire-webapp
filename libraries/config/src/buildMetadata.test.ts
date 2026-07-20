@@ -71,6 +71,7 @@ describe('build metadata', () => {
 
     expect(firstMetadata).toStrictEqual({
       version: '2026-07-20.1',
+      assetVersion: '2026-07-20.1-025edc6',
       commit: '025edc6f1234567890',
       builtAt: '2026-07-20T06:18:03.123Z',
     });
@@ -79,11 +80,29 @@ describe('build metadata', () => {
     expect(isBuildMetadata(firstMetadata)).toBe(true);
   });
 
+  it('derives different asset versions for different commits with the same release version', () => {
+    const firstMetadata = createBuildMetadata({
+      version: '2026-07-20.1',
+      commit: '025edc6f1234567890',
+      builtAt: '2026-07-20T06:18:03.123Z',
+    });
+    const secondMetadata = createBuildMetadata({
+      version: '2026-07-20.1',
+      commit: 'fedcba9876543210',
+      builtAt: '2026-07-20T06:18:03.123Z',
+    });
+
+    expect(firstMetadata.assetVersion).toBe('2026-07-20.1-025edc6');
+    expect(secondMetadata.assetVersion).toBe('2026-07-20.1-fedcba9');
+    expect(firstMetadata.assetVersion).not.toBe(secondMetadata.assetVersion);
+  });
+
   it('accepts only ISO 8601 UTC timestamps with milliseconds', () => {
     expect(
       parseBuildMetadata(
         JSON.stringify({
           version: '2026-07-20.1',
+          assetVersion: '2026-07-20.1-025edc6',
           commit: '025edc6f1234567890',
           builtAt: '2026-07-20T06:18:03.123Z',
         }),
@@ -93,6 +112,7 @@ describe('build metadata', () => {
       parseBuildMetadata(
         JSON.stringify({
           version: '2026-07-20.1',
+          assetVersion: '2026-07-20.1-025edc6',
           commit: '025edc6f1234567890',
           builtAt: '2026-07-20T06:18:03Z',
         }),
@@ -102,8 +122,22 @@ describe('build metadata', () => {
       parseBuildMetadata(
         JSON.stringify({
           version: '2026-07-20.1',
+          assetVersion: '2026-07-20.1-025edc6',
           commit: '025edc6f1234567890',
           builtAt: '2026.07.20.06.18.03',
+        }),
+      ).isNothing,
+    ).toBe(true);
+  });
+
+  it('rejects the old dot-separated timestamp as a logical version', () => {
+    expect(
+      parseBuildMetadata(
+        JSON.stringify({
+          version: '2026.07.20.06.18.03',
+          assetVersion: '2026.07.20.06.18.03-025edc6',
+          commit: '025edc6f1234567890',
+          builtAt: '2026-07-20T06:18:03.123Z',
         }),
       ).isNothing,
     ).toBe(true);
@@ -139,6 +173,6 @@ describe('build metadata', () => {
 
     const actualMetadata = createAuthoritativeBuildMetadata(Maybe.just(existingMetadata), buildMetadataInput);
 
-    expect(actualMetadata).toStrictEqual(buildMetadataInput);
+    expect(actualMetadata).toStrictEqual(createBuildMetadata(buildMetadataInput));
   });
 });

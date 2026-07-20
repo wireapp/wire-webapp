@@ -17,7 +17,7 @@
  *
  */
 
-import {Result} from 'true-myth';
+import {Maybe, Result} from 'true-myth';
 
 import {isBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
@@ -34,11 +34,21 @@ export type BuildArtifactMetadataValidationInput = {
   readonly metadata: unknown;
 };
 
-function containsExpectedVersion(htmlDocument: BuildArtifactHtmlDocument, expectedVersion: string): boolean {
+function readCacheBustingValues(htmlContents: string): readonly string[] {
+  return [...htmlContents.matchAll(/(?:\?|&)v=([^"'&\s]+)|\?([^"'&\s]+)/g)].flatMap(cacheBustingMatch => {
+    const cacheBustingValue = Maybe.of(cacheBustingMatch[1]).orElse(() => Maybe.of(cacheBustingMatch[2]));
+
+    return cacheBustingValue.map(value => [value]).unwrapOr([]);
+  });
+}
+
+function containsExpectedMetadata(htmlDocument: BuildArtifactHtmlDocument, metadata: BuildMetadata): boolean {
+  const cacheBustingValues = readCacheBustingValues(htmlDocument.contents);
+
   return (
-    htmlDocument.contents.includes(`<!--! ${expectedVersion} -->`) &&
-    htmlDocument.contents.includes(`?${expectedVersion}`) &&
-    (!htmlDocument.contents.includes('v=') || htmlDocument.contents.includes(`v=${expectedVersion}`))
+    htmlDocument.contents.includes(`<!--! ${metadata.version} -->`) &&
+    cacheBustingValues.length > 0 &&
+    cacheBustingValues.every(cacheBustingValue => cacheBustingValue === metadata.assetVersion)
   );
 }
 
@@ -70,10 +80,8 @@ export function validateBuildArtifactMetadata(
   }
 
   for (const htmlDocument of input.htmlDocuments) {
-    if (!containsExpectedVersion(htmlDocument, input.metadata.version)) {
-      return Result.err(
-        new Error(`Generated HTML '${htmlDocument.archiveFilePath}' does not use the artifact version`),
-      );
+    if (!containsExpectedMetadata(htmlDocument, input.metadata)) {
+      return Result.err(new Error(`Generated HTML '${htmlDocument.archiveFilePath}' does not use artifact metadata`));
     }
   }
 
