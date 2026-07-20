@@ -36,7 +36,7 @@ export type BuildArtifactMetadataValidationInput = {
 
 function containsExpectedVersion(htmlDocument: BuildArtifactHtmlDocument, expectedVersion: string): boolean {
   return (
-    htmlDocument.contents.includes(`<!-- ${expectedVersion} -->`) &&
+    htmlDocument.contents.includes(`<!--! ${expectedVersion} -->`) &&
     htmlDocument.contents.includes(`?${expectedVersion}`) &&
     (!htmlDocument.contents.includes('v=') || htmlDocument.contents.includes(`v=${expectedVersion}`))
   );

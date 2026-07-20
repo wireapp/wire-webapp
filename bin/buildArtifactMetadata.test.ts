@@ -28,7 +28,7 @@ const mainBuildMetadata = {
 function createHtmlDocument(version: string): {readonly archiveFilePath: string; readonly contents: string} {
   return {
     archiveFilePath: 'static/index.html',
-    contents: `<!-- ${version} --><link href="/image/favicon.ico?${version}"><script src="/min/app.js?v=${version}">`,
+    contents: `<!--! ${version} --><link href="/image/favicon.ico?${version}"><script src="/min/app.js?v=${version}">`,
   };
 }
 
@@ -91,6 +91,23 @@ describe('build artifact metadata validation', () => {
       expectedCommit: mainBuildMetadata.commit,
       expectedVersion: mainBuildMetadata.version,
       htmlDocuments: [createHtmlDocument('dev-025edc6')],
+      metadata: mainBuildMetadata,
+    });
+
+    expect(validationResult.isErr).toBe(true);
+  });
+
+  it('rejects an unmarked version comment', () => {
+    const htmlDocument = createHtmlDocument(mainBuildMetadata.version);
+    const validationResult = validateBuildArtifactMetadata({
+      expectedCommit: mainBuildMetadata.commit,
+      expectedVersion: mainBuildMetadata.version,
+      htmlDocuments: [
+        {
+          ...htmlDocument,
+          contents: htmlDocument.contents.replace('<!--! ', '<!-- '),
+        },
+      ],
       metadata: mainBuildMetadata,
     });
 

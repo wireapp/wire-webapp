@@ -254,21 +254,18 @@ module.exports = {
     // @todo: We should merge these when main & auth app are merged.
     new HtmlWebpackPlugin({
       inject: false,
-      minify: {removeComments: false},
       template: HOME_TEMPLATE_PATH,
       templateParameters,
     }),
     new HtmlWebpackPlugin({
       inject: false,
       filename: 'auth/index.html',
-      minify: {removeComments: false},
       template: AUTH_TEMPLATE_PATH,
       templateParameters,
     }),
     new HtmlWebpackPlugin({
       inject: false,
       filename: 'unsupported/index.html',
-      minify: {removeComments: false},
       template: UNSUPPORTED_TEMPLATE_PATH,
       templateParameters,
     }),
