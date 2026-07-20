@@ -20,20 +20,13 @@
  */
 
 import {execFileSync} from 'node:child_process';
-import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
+import {mkdirSync, writeFileSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import {Maybe} from 'true-myth';
 
-import {
-  createAuthoritativeBuildMetadata,
-  isBuildMetadataInput,
-  parseBuildMetadata,
-  type BuildMetadata,
-  type BuildMetadataInput,
-  resolveBuildVersion,
-} from '@wireapp/config';
+import {createBuildMetadata, isBuildMetadataInput, type BuildMetadataInput, resolveBuildVersion} from '@wireapp/config';
 
 const DEFAULT_METADATA_FILE_PATH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist/version.json');
 
@@ -59,18 +52,6 @@ function resolveCommitSha(explicitCommitSha: Maybe<string>): string {
   }
 }
 
-function readExistingBuildMetadata(metadataFilePath: string): Maybe<BuildMetadata> {
-  if (!existsSync(metadataFilePath)) {
-    return Maybe.nothing();
-  }
-
-  try {
-    return parseBuildMetadata(readFileSync(metadataFilePath, 'utf8'));
-  } catch {
-    return Maybe.nothing();
-  }
-}
-
 function generateVersionFile(): void {
   const metadataFilePath = resolveNonEmptyEnvironmentValue(
     Maybe.of(process.env.WIRE_WEBAPP_BUILD_METADATA_PATH),
@@ -90,8 +71,7 @@ function generateVersionFile(): void {
   if (!isBuildMetadataInput(buildMetadataInput)) {
     throw new Error('Invalid webapp build metadata input');
   }
-  const existingBuildMetadata = readExistingBuildMetadata(metadataFilePath);
-  const authoritativeBuildMetadata = createAuthoritativeBuildMetadata(existingBuildMetadata, buildMetadataInput);
+  const authoritativeBuildMetadata = createBuildMetadata(buildMetadataInput);
 
   mkdirSync(path.dirname(metadataFilePath), {recursive: true});
   writeFileSync(metadataFilePath, `${JSON.stringify(authoritativeBuildMetadata, null, 2)}\n`);

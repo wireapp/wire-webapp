@@ -34,7 +34,7 @@ export type BuildMetadataInput = {
 };
 
 const isoUtcTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
-const legacyTimestampVersionPattern = /^\d{4}\.\d{2}\.\d{2}\.\d{2}\.\d{2}\.\d{2}$/;
+const legacyTimestampVersionPattern = /^\d{4}(?:\.\d{2}){4,5}$/;
 const safeAssetVersionPattern = /^[A-Za-z0-9._~-]+$/;
 const shortCommitShaLength = 7;
 
@@ -59,18 +59,20 @@ function isLogicalBuildVersion(value: unknown): value is string {
 }
 
 export function isBuildMetadata(value: unknown): value is BuildMetadata {
-  if (!isRecord(value) || !isBuildMetadataInputRecord(value)) {
+  if (!isRecord(value) || !isBuildMetadataInputRecord(value) || !isSafeAssetVersion(value.assetVersion)) {
     return false;
   }
 
-  return isSafeAssetVersion(value.assetVersion);
+  return value.assetVersion === resolveAssetVersion(value.version, value.commit);
 }
 
 export function isBuildMetadataInput(value: unknown): value is BuildMetadataInput {
   return isRecord(value) && isBuildMetadataInputRecord(value);
 }
 
-function isBuildMetadataInputRecord(value: Record<string, unknown>): boolean {
+function isBuildMetadataInputRecord(
+  value: Record<string, unknown>,
+): value is Record<string, unknown> & BuildMetadataInput {
   return isLogicalBuildVersion(value.version) && is.nonEmptyString(value.commit) && isIsoUtcTimestamp(value.builtAt);
 }
 
@@ -85,18 +87,22 @@ export function parseBuildMetadata(serializedBuildMetadata: string): Maybe<Build
 }
 
 export function createBuildMetadata(buildMetadataInput: BuildMetadataInput): BuildMetadata {
-  const shortCommitSha = getShortCommitSha(buildMetadataInput.commit);
-  const assetVersionSuffix = `-${shortCommitSha}`;
-  const assetVersion = buildMetadataInput.version.endsWith(assetVersionSuffix)
-    ? buildMetadataInput.version
-    : `${buildMetadataInput.version}${assetVersionSuffix}`;
-
   return {
     version: buildMetadataInput.version,
-    assetVersion,
+    assetVersion: resolveAssetVersion(buildMetadataInput.version, buildMetadataInput.commit),
     commit: buildMetadataInput.commit,
     builtAt: buildMetadataInput.builtAt,
   };
+}
+
+export function resolveAssetVersion(version: string, commitSha: string): string {
+  const shortCommitSha = getShortCommitSha(commitSha);
+
+  if (version === `main-${shortCommitSha}` || version === `dev-${shortCommitSha}`) {
+    return version;
+  }
+
+  return `${version}-${shortCommitSha}`;
 }
 
 export function getShortCommitSha(commitSha: string): string {
@@ -105,26 +111,4 @@ export function getShortCommitSha(commitSha: string): string {
 
 export function resolveBuildVersion(explicitVersion: Maybe<string>, commitSha: string): string {
   return explicitVersion.unwrapOr(`dev-${getShortCommitSha(commitSha)}`);
-}
-
-export function createAuthoritativeBuildMetadata(
-  existingBuildMetadata: Maybe<BuildMetadata>,
-  buildMetadataInput: BuildMetadataInput,
-): BuildMetadata {
-  return existingBuildMetadata.mapOrElse(
-    () => {
-      return createBuildMetadata(buildMetadataInput);
-    },
-    currentBuildMetadata => {
-      if (
-        currentBuildMetadata.version === buildMetadataInput.version &&
-        currentBuildMetadata.commit === buildMetadataInput.commit &&
-        currentBuildMetadata.builtAt.endsWith('Z')
-      ) {
-        return currentBuildMetadata;
-      }
-
-      return createBuildMetadata(buildMetadataInput);
-    },
-  );
 }

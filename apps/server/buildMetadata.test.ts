@@ -43,6 +43,26 @@ describe('server build metadata', () => {
     expect(parsedBuildMetadata.isNothing).toBe(true);
   });
 
+  it('rejects metadata with an asset version inconsistent with its logical version and commit', () => {
+    const parsedBuildMetadata = parseBuildMetadata(
+      JSON.stringify({...authoritativeBuildMetadata, assetVersion: 'wrong-value'}),
+    );
+
+    expect(parsedBuildMetadata.isNothing).toBe(true);
+  });
+
+  it('rejects historical timestamp logical versions', () => {
+    const parsedBuildMetadata = parseBuildMetadata(
+      JSON.stringify({
+        ...authoritativeBuildMetadata,
+        version: '2026.07.20.06.18',
+        assetVersion: '2026.07.20.06.18-025edc6',
+      }),
+    );
+
+    expect(parsedBuildMetadata.isNothing).toBe(true);
+  });
+
   it('rejects malformed metadata JSON', () => {
     const parsedBuildMetadata = parseBuildMetadata('{not-json');
 
@@ -128,7 +148,7 @@ describe('server build metadata', () => {
           version: 'dev-unknown',
           assetVersion: 'dev-unknown',
           commit: 'unknown',
-          builtAt: '1970-01-01T00:00:00.000Z',
+          builtAt: '2026-07-20T06:18:03.123Z',
         });
       },
     });
@@ -138,7 +158,7 @@ describe('server build metadata', () => {
         version: 'dev-unknown',
         assetVersion: 'dev-unknown',
         commit: 'unknown',
-        builtAt: '1970-01-01T00:00:00.000Z',
+        builtAt: '2026-07-20T06:18:03.123Z',
       }),
     );
   });

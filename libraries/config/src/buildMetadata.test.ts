@@ -20,11 +20,11 @@
 import {Maybe} from 'true-myth';
 
 import {
-  createAuthoritativeBuildMetadata,
   createBuildMetadata,
   getShortCommitSha,
   isBuildMetadata,
   parseBuildMetadata,
+  resolveAssetVersion,
   resolveBuildVersion,
 } from './buildMetadata';
 
@@ -97,6 +97,36 @@ describe('build metadata', () => {
     expect(firstMetadata.assetVersion).not.toBe(secondMetadata.assetVersion);
   });
 
+  it('derives the same asset version for the same logical version and commit', () => {
+    const firstAssetVersion = resolveAssetVersion('2026-07-20.1', '025edc6f1234567890');
+    const secondAssetVersion = resolveAssetVersion('2026-07-20.1', '025edc6f1234567890');
+
+    expect(firstAssetVersion).toBe('2026-07-20.1-025edc6');
+    expect(secondAssetVersion).toBe(firstAssetVersion);
+  });
+
+  it.each([
+    ['main-025edc6', '025edc6f1234567890', 'main-025edc6'],
+    ['dev-025edc6', '025edc6f1234567890', 'dev-025edc6'],
+    ['dev-unknown', 'unknown', 'dev-unknown'],
+  ])('does not suffix the %s version twice', (logicalVersion, commitSha, expectedAssetVersion) => {
+    const actualAssetVersion = resolveAssetVersion(logicalVersion, commitSha);
+
+    expect(actualAssetVersion).toBe(expectedAssetVersion);
+  });
+
+  it('rejects metadata with an asset version inconsistent with its logical version and commit', () => {
+    const inconsistentMetadata = {
+      version: '2026-07-20.1',
+      assetVersion: 'wrong-value',
+      commit: '025edc6f1234567890',
+      builtAt: '2026-07-20T06:18:03.123Z',
+    };
+
+    expect(isBuildMetadata(inconsistentMetadata)).toBe(false);
+    expect(parseBuildMetadata(JSON.stringify(inconsistentMetadata)).isNothing).toBe(true);
+  });
+
   it('accepts only ISO 8601 UTC timestamps with milliseconds', () => {
     expect(
       parseBuildMetadata(
@@ -130,49 +160,45 @@ describe('build metadata', () => {
     ).toBe(true);
   });
 
-  it('rejects the old dot-separated timestamp as a logical version', () => {
+  it.each(['2026.07.20.06.18.03', '2026.07.20.06.18'])(
+    'rejects the historical dot-separated timestamp "%s" as a logical version',
+    historicalTimestampVersion => {
+      expect(
+        parseBuildMetadata(
+          JSON.stringify({
+            version: historicalTimestampVersion,
+            assetVersion: `${historicalTimestampVersion}-025edc6`,
+            commit: '025edc6f1234567890',
+            builtAt: '2026-07-20T06:18:03.123Z',
+          }),
+        ).isNothing,
+      ).toBe(true);
+    },
+  );
+
+  it.each(['2026-07-20.1', '2026-07-20-production.1', 'main-025edc6', 'dev-025edc6'])(
+    'accepts the logical version "%s"',
+    logicalVersion => {
+      const metadata = createBuildMetadata({
+        version: logicalVersion,
+        commit: '025edc6f1234567890',
+        builtAt: '2026-07-20T06:18:03.123Z',
+      });
+
+      expect(isBuildMetadata(metadata)).toBe(true);
+    },
+  );
+
+  it('parses only metadata that satisfies the asset-version derivation rule', () => {
     expect(
       parseBuildMetadata(
         JSON.stringify({
-          version: '2026.07.20.06.18.03',
-          assetVersion: '2026.07.20.06.18.03-025edc6',
+          version: '2026-07-20.1',
+          assetVersion: '2026-07-20.1-025edc6',
           commit: '025edc6f1234567890',
           builtAt: '2026-07-20T06:18:03.123Z',
         }),
-      ).isNothing,
+      ).isJust,
     ).toBe(true);
-  });
-
-  it('preserves metadata when the logical version and commit are unchanged', () => {
-    const buildMetadataInput = {
-      version: 'main-025edc6',
-      commit: '025edc6f1234567890',
-      builtAt: '2026-07-20T06:18:03.123Z',
-    };
-    const existingMetadata = createBuildMetadata({
-      ...buildMetadataInput,
-      builtAt: '2026-07-20T06:00:00.000Z',
-    });
-
-    const actualMetadata = createAuthoritativeBuildMetadata(Maybe.just(existingMetadata), buildMetadataInput);
-
-    expect(actualMetadata).toStrictEqual(existingMetadata);
-  });
-
-  it('creates new metadata when the logical version changes', () => {
-    const buildMetadataInput = {
-      version: 'main-025edc6',
-      commit: '025edc6f1234567890',
-      builtAt: '2026-07-20T06:18:03.123Z',
-    };
-    const existingMetadata = createBuildMetadata({
-      ...buildMetadataInput,
-      version: 'dev-025edc6',
-      builtAt: '2026-07-20T06:00:00.000Z',
-    });
-
-    const actualMetadata = createAuthoritativeBuildMetadata(Maybe.just(existingMetadata), buildMetadataInput);
-
-    expect(actualMetadata).toStrictEqual(createBuildMetadata(buildMetadataInput));
   });
 });
