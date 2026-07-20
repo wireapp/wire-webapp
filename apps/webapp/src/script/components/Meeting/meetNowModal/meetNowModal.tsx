@@ -104,7 +104,6 @@ export const MeetNowModal = () => {
       isShown={isOpen}
       onClosed={handleClose}
       onBgClick={handleClose}
-      data-uie-name="meet-now-modal"
       onKeyDown={event => handleEscDown(event, handleClose)}
     >
       <div css={wrapperStyles}>
@@ -115,13 +114,10 @@ export const MeetNowModal = () => {
             onClick={handleClose}
             disabled={isSubmitting}
             aria-label={translate('meetings.meetNowModal.closeAriaLabel')}
-            data-uie-name="meet-now-modal-close"
           >
             <CloseIcon aria-hidden="true" />
           </button>
-          <h2 css={headerTitleStyles} data-uie-name="meet-now-modal-title">
-            {translate('meetings.meetNowModal.title')}
-          </h2>
+          <h2 css={headerTitleStyles}>{translate('meetings.meetNowModal.title')}</h2>
         </header>
 
         <div css={bodyStyles}>
@@ -143,7 +139,6 @@ export const MeetNowModal = () => {
             variant={ButtonVariant.PRIMARY}
             css={submitButtonStyles}
             disabled={isSubmitting}
-            data-uie-name="meet-now-modal-submit"
           >
             <CallIcon aria-hidden="true" css={submitButtonIconStyles} />
             {translate('meetings.meetNowModal.startMeeting')}

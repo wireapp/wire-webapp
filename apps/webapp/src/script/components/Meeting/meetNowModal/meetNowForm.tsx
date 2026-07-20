@@ -67,26 +67,15 @@ export const MeetNowForm = ({
   const teamRepository = contentViewModel.repositories.team;
 
   return (
-    <form
-      id={MEET_NOW_FORM_ID}
-      css={meetNowFormLayoutStyles}
-      data-uie-name="meet-now-form"
-      onSubmit={onSubmit}
-      noValidate
-    >
+    <form id={MEET_NOW_FORM_ID} css={meetNowFormLayoutStyles} onSubmit={onSubmit} noValidate>
       <Input
         id="meet-now-title"
-        data-uie-name="meet-now-title"
         label={translate('meetings.scheduleModal.titleLabel')}
         placeholder={translate('meetings.scheduleModal.titlePlaceholder')}
         value={formState.title}
         onChange={event => onTitleChange(event.currentTarget.value)}
         markInvalid={is.nonEmptyString(titleError)}
-        error={
-          is.nonEmptyString(titleError) ? (
-            <ErrorMessage data-uie-name="meet-now-title-error">{titleError}</ErrorMessage>
-          ) : undefined
-        }
+        error={is.nonEmptyString(titleError) ? <ErrorMessage>{titleError}</ErrorMessage> : undefined}
         wrapperCSS={scheduleMeetingTitleInputWrapperStyles}
         endContent={
           formState.title.length > 0 && !is.nonEmptyString(titleError) ? (
@@ -95,7 +84,6 @@ export const MeetNowForm = ({
               onClick={() => onTitleChange('')}
               css={scheduleMeetingTitleClearButtonStyles}
               aria-label={translate('accessibility.userProfileDeleteEntry')}
-              data-uie-name="meet-now-title-clear"
             >
               <CircleCloseIcon />
             </button>
@@ -106,7 +94,6 @@ export const MeetNowForm = ({
       <div css={scheduleMeetingParticipantsSectionCss}>
         <MeetingParticipantsPicker
           id="meet-now-participants"
-          dataUieName="meet-now-participants"
           users={users}
           selectedUsers={formState.selectedUsers}
           onSelectedUsersChange={onSelectedUsersChange}

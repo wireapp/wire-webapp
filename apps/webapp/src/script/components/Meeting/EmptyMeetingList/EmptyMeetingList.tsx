@@ -38,7 +38,7 @@ export const EmptyMeetingList = () => {
       <p css={emptyListHeadingStyles}>{translate('meetings.noMeetingsText')}</p>
       <p css={emptyListBodyStyles}>{translate('meetings.startMeetingHelp')}</p>
       <div css={emptyListActionButtonContainerStyles}>
-        <Button variant={ButtonVariant.TERTIARY} onClick={handleMeetNow} data-uie-name="meet-now">
+        <Button variant={ButtonVariant.TERTIARY} onClick={handleMeetNow}>
           <CallIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.meetNow')}
         </Button>
         <Button variant={ButtonVariant.TERTIARY} onClick={handleScheduleMeeting} data-uie-name="schedule-meeting">
