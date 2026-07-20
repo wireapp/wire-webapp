@@ -284,6 +284,11 @@ export class BackgroundEffectsController {
     this.pushOptionsUpdate();
   }
 
+  public setEnhancePerformance(enable: boolean): void {
+    this.options = {...this.options, enhancePerformance: enable};
+    this.pushOptionsUpdate();
+  }
+
   private applyImageBitmap(bitmap: ImageBitmap, url: string): void {
     const workerSource: WorkerBackgroundSource = {type: 'image', media: bitmap, url};
     // Record the url without the bitmap so the options object remains serialisable.
@@ -465,6 +470,7 @@ const getWorkerOptions = (
     blurStrength: options.blurStrength,
     enabled: options.enabled,
     quality: options.quality,
+    enhancePerformance: options.enhancePerformance,
     borderSmooth: options.borderSmooth,
     smoothing: options.smoothing,
     smoothstepMin: options.smoothstepMin,

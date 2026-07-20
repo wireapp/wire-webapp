@@ -50,8 +50,10 @@ interface VideoBackgroundSettingsProps {
   backgrounds: BuiltinBackground[];
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
   onEnableHighQualityBlur: (event: ChangeEvent<HTMLInputElement>) => void;
+  onEnablePerformanceEnhancement: (event: ChangeEvent<HTMLInputElement>) => void;
   onClose: () => void;
   highQualityBlurAllowed: boolean;
+  performanceEnhancementEnabled: boolean;
   isWebGLAvailable: boolean;
 }
 
@@ -141,6 +143,8 @@ export const VideoBackgroundSettings = ({
   onSelectEffect,
   highQualityBlurAllowed,
   onEnableHighQualityBlur,
+  performanceEnhancementEnabled,
+  onEnablePerformanceEnhancement,
   onClose,
   isWebGLAvailable = true,
 }: VideoBackgroundSettingsProps) => {
@@ -156,6 +160,10 @@ export const VideoBackgroundSettings = ({
 
   const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
     onEnableHighQualityBlur(event);
+  };
+
+  const handleEnablePerformanceEnhancement = (event: ChangeEvent<HTMLInputElement>) => {
+    onEnablePerformanceEnhancement(event);
   };
 
   const noneEffect: BackgroundEffectSelection = {type: 'none'};
@@ -253,6 +261,16 @@ export const VideoBackgroundSettings = ({
               <p css={backgroundEffectPanelIndentedHintStyles}>
                 {translate('videoCallBackgroundEnableEnhancedQualityHint')}
               </p>
+              <Checkbox
+                id="enable-performance-enhancement"
+                checked={performanceEnhancementEnabled}
+                data-uie-name="enable-performance-enhancement"
+                onChange={(event: ChangeEvent<HTMLInputElement>) => handleEnablePerformanceEnhancement(event)}
+              >
+                <CheckboxLabel htmlFor="enable-performance-enhancement">
+                  {translate('videoCallBackgroundEnhancePerformance')}
+                </CheckboxLabel>
+              </Checkbox>
             </div>
 
             {/* Virtual backgrounds section */}

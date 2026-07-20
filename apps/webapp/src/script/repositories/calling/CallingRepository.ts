@@ -389,6 +389,10 @@ export class CallingRepository {
     this.backgroundEffectsHandler.enableSuperhighQualityTier(enable);
   }
 
+  public enablePerformanceEnhancement(enable: boolean) {
+    this.backgroundEffectsHandler.enablePerformanceEnhancement(enable);
+  }
+
   public getBackgroundEffectsHandler(): BackgroundEffectsHandler {
     return this.backgroundEffectsHandler;
   }

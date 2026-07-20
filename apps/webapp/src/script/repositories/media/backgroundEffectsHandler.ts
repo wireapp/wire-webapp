@@ -275,6 +275,11 @@ export class BackgroundEffectsHandler {
     backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(enable);
   }
 
+  public enablePerformanceEnhancement(enable: boolean): void {
+    this.controller.setEnhancePerformance(enable);
+    backgroundEffectsStore.getState().setIsPerformanceEnhancementEnabled(enable);
+  }
+
   public getCapabilityInfo(): CapabilityInfo {
     return this.controller.getCapabilityInfo();
   }
