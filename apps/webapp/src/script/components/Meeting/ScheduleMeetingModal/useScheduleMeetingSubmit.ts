@@ -31,11 +31,12 @@ import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 
-import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
-import type {MeetingSubmitSuccess, UpdateMeetingParams} from './scheduleMeetingService';
-import type {ScheduleMeetingCommand, ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
-import {shouldRefreshMeetingsListAfterSubmitError} from './shouldRefreshMeetingsListAfterSubmitError';
-import {showMeetingPartialAddFailureModal} from './showMeetingPartialAddFailureModal';
+import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
+import type {MeetingSubmitSuccess, UpdateMeetingParams} from 'Components/Meeting/shared/service/meetingService';
+import type {ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
+import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
+import {shouldRefreshMeetingsListAfterSubmitError} from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
+import {showMeetingPartialAddFailureModal} from 'Components/Meeting/shared/submit/showMeetingPartialAddFailureModal';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
 const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {

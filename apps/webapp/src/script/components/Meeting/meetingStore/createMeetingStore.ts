@@ -23,16 +23,13 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
 import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeetingInstanceToScheduleFormState';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowMeetingCommand} from 'Components/Meeting/meetNowModal/meetNowTypes';
+import type {MeetNowMeetingCommand, ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import {
   type MeetNowSubmitSuccess,
   type MeetingSubmitSuccess,
   type UpdateMeetingParams,
-} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
-import type {
-  ScheduleMeetingCommand,
-  ScheduleMeetingFormState,
-} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+} from 'Components/Meeting/shared/service/meetingService';
+import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';

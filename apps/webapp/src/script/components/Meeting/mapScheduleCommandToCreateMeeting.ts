@@ -20,7 +20,7 @@
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
-import type {ScheduleMeetingCommand} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 
 export const mapScheduleCommandToCreateMeeting = (command: ScheduleMeetingCommand): CreateMeeting => {
   const recurrence = mapRecurrenceOptionToMeetingRecurrence(command.recurrence);

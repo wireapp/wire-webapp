@@ -19,12 +19,9 @@
 
 import {result, Result} from 'true-myth';
 
-import type {
-  MeetNowFormErrors,
-  MeetNowFormState,
-  MeetNowMeetingCommand,
-} from 'Components/Meeting/meetNowModal/meetNowTypes';
+import type {MeetNowFormErrors, MeetNowFormState} from 'Components/Meeting/meetNowModal/meetNowTypes';
 import {hasMeetNowFormErrors, validateMeetNowForm} from 'Components/Meeting/meetNowModal/useMeetNowModal';
+import type {MeetNowMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 
 export const mapMeetNowFormToMeetingCommand = (
   formState: MeetNowFormState,

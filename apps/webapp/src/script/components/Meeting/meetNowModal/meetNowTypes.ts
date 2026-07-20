@@ -26,11 +26,6 @@ export type MeetNowFormState = {
   participantsFilter: string;
 };
 
-export type MeetNowMeetingCommand = {
-  title: string;
-  selectedUsers: User[];
-};
-
 export type MeetNowFormErrors = {
   title?: TranslationKey;
 };

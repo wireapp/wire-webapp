@@ -48,7 +48,7 @@ import {
   scheduleMeetingSelectMenuPortalStyles,
   scheduleMeetingTitleClearButtonStyles,
   scheduleMeetingTitleInputWrapperStyles,
-} from './ScheduleMeetingForm.styles';
+} from 'Components/Meeting/shared/styles/meetingForm.styles';
 import {
   SCHEDULE_MEETING_RECURRENCE_OPTIONS,
   SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
@@ -59,7 +59,7 @@ import type {
   ScheduleMeetingMode,
   ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
-import {useScheduleMeetingParticipants} from './useScheduleMeetingParticipants';
+import {useMeetingParticipants} from 'Components/Meeting/shared/participants/useMeetingParticipants';
 
 const toDateTimePickerValue = (value: Maybe<Date>): Date | null => value.unwrapOr(null);
 
@@ -95,7 +95,7 @@ export const ScheduleMeetingForm = ({
   selfUser,
 }: ScheduleMeetingFormProps) => {
   const {mainViewModel, translate, wallClock} = useApplicationContext();
-  const {users} = useScheduleMeetingParticipants();
+  const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
 
   const contentViewModel = mainViewModel.content;

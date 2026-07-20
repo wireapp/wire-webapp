@@ -23,7 +23,6 @@ import {result, Result} from 'true-myth';
 import {ScheduleFormErrors, scheduleFormErrors} from 'Components/Meeting/ScheduleFormErrors';
 import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
 import type {
-  ScheduleMeetingCommand,
   ScheduleMeetingFormErrors,
   ScheduleMeetingFormState,
 } from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
@@ -31,6 +30,7 @@ import {
   hasScheduleMeetingFormErrors,
   validateScheduleMeetingForm,
 } from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingValidation';
+import type {ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 
 const mapScheduleFormErrorToFormErrors = (error: ScheduleFormErrors): ScheduleMeetingFormErrors => {
   switch (error) {

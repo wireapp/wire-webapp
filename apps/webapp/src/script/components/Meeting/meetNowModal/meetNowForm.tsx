@@ -28,8 +28,8 @@ import {
   scheduleMeetingParticipantsSectionCss,
   scheduleMeetingTitleClearButtonStyles,
   scheduleMeetingTitleInputWrapperStyles,
-} from 'Components/Meeting/ScheduleMeetingModal/ScheduleMeetingForm.styles';
-import {useScheduleMeetingParticipants} from 'Components/Meeting/ScheduleMeetingModal/useScheduleMeetingParticipants';
+} from 'Components/Meeting/shared/styles/meetingForm.styles';
+import {useMeetingParticipants} from 'Components/Meeting/shared/participants/useMeetingParticipants';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -58,7 +58,7 @@ export const MeetNowForm = ({
   selfUser,
 }: MeetNowFormProps) => {
   const {mainViewModel, translate} = useApplicationContext();
-  const {users} = useScheduleMeetingParticipants();
+  const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
 
   const contentViewModel = mainViewModel.content;

@@ -35,14 +35,13 @@ import {
 } from 'Components/Meeting/meetingConversationSync';
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowMeetingCommand} from 'Components/Meeting/meetNowModal/meetNowTypes';
+import type {MeetNowMeetingCommand, ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import type {User} from 'Repositories/entity/User';
 
 import type {
-  ScheduleMeetingCommand,
   ScheduleMeetingFormState,
   ScheduleMeetingRecurrenceOption,
-} from './scheduleMeetingTypes';
+} from '../../ScheduleMeetingModal/scheduleMeetingTypes';
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 

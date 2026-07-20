@@ -27,9 +27,9 @@ import {
   getNextHalfHourDateTime,
   resolveEndChange,
   resolveStartChange,
-} from './scheduleMeetingDefaults';
+} from './meetingDateTimeDefaults';
 
-describe('scheduleMeetingDefaults', () => {
+describe('meetingDateTimeDefaults', () => {
   it('rounds the start time up to the next half hour', () => {
     const now = new Date(2026, 6, 13, 16, 47, 0, 0);
 

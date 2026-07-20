@@ -21,7 +21,7 @@ import {useCallback} from 'react';
 
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingErrorKeys';
+import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';

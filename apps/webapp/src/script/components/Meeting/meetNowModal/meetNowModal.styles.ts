@@ -29,7 +29,7 @@ export {
   submitButtonIconStyles,
   submitButtonStyles,
   wrapperStyles,
-} from 'Components/Meeting/ScheduleMeetingModal/ScheduleMeetingModal.styles';
+} from 'Components/Meeting/shared/styles/meetingModalShell.styles';
 
 export const meetNowModalWrapperStyles: CSSObject = {
   maxWidth: '480px',

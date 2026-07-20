@@ -39,7 +39,7 @@ import {
   submitButtonIconStyles,
   submitButtonStyles,
   wrapperStyles,
-} from './ScheduleMeetingModal.styles';
+} from 'Components/Meeting/shared/styles/meetingModalShell.styles';
 import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 

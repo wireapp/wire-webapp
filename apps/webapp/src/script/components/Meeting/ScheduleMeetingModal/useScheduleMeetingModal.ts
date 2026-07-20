@@ -30,7 +30,7 @@ import {
   getDefaultScheduleMeetingStartDateTime,
   resolveEndChange,
   resolveStartChange,
-} from './scheduleMeetingDefaults';
+} from 'Components/Meeting/shared/defaults/meetingDateTimeDefaults';
 import type {
   ScheduleMeetingFormErrors,
   ScheduleMeetingFormState,

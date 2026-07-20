@@ -17,11 +17,7 @@
  *
  */
 
-import {
-  meetNowMeeting,
-  scheduleMeeting,
-  updateMeeting,
-} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
+import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/Meeting/shared/service/meetingService';
 
 import type {MeetingServiceDeps, MeetingStoreServiceTasks} from './meetingStoreDeps';
 

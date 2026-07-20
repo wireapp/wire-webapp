@@ -17,21 +17,18 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
-import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
+import type {ScheduleMeetingRecurrenceOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {User} from 'Repositories/entity/User';
 
-import {getMeetNowMeetingTimes} from 'Components/Meeting/shared/defaults/meetingDateTimeDefaults';
-import type {MeetNowMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
+export type MeetNowMeetingCommand = {
+  title: string;
+  selectedUsers: User[];
+};
 
-export const mapMeetNowCommandToCreateMeeting = (
-  command: MeetNowMeetingCommand,
-  wallClock: WallClock,
-): CreateMeeting => {
-  const {start, end} = getMeetNowMeetingTimes(wallClock);
-
-  return {
-    title: command.title,
-    start_time: start.toISOString(),
-    end_time: end.toISOString(),
-  };
+export type ScheduleMeetingCommand = {
+  title: string;
+  start: Date;
+  end: Date;
+  recurrence: ScheduleMeetingRecurrenceOption;
+  selectedUsers: User[];
 };

@@ -31,8 +31,9 @@ import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository'
 import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
-import {meetNowMeeting, scheduleMeeting, updateMeeting} from './scheduleMeetingService';
-import type {ScheduleMeetingCommand, ScheduleMeetingFormState} from './scheduleMeetingTypes';
+import {meetNowMeeting, scheduleMeeting, updateMeeting} from './meetingService';
+import type {ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
+import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');

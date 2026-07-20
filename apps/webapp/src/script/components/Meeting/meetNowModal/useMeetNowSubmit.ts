@@ -36,9 +36,9 @@ import type {Translate} from 'Util/localizerUtil';
 
 import {meetNowSubmitResults, type MeetNowFormState, type MeetNowSubmitResult} from './meetNowTypes';
 
-import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from '../ScheduleMeetingModal/scheduleMeetingErrorKeys';
-import {shouldRefreshMeetingsListAfterSubmitError} from '../ScheduleMeetingModal/shouldRefreshMeetingsListAfterSubmitError';
-import {showMeetingPartialAddFailureModal} from '../ScheduleMeetingModal/showMeetingPartialAddFailureModal';
+import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
+import {shouldRefreshMeetingsListAfterSubmitError} from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
+import {showMeetingPartialAddFailureModal} from 'Components/Meeting/shared/submit/showMeetingPartialAddFailureModal';
 
 const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {
   const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[error];
