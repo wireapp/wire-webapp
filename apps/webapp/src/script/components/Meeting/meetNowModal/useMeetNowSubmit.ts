@@ -33,7 +33,7 @@ import {Config} from 'src/script/Config';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 
-import type {MeetNowFormState} from './meetNowTypes';
+import {meetNowSubmitResults, type MeetNowFormState, type MeetNowSubmitResult} from './meetNowTypes';
 
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from '../ScheduleMeetingModal/scheduleMeetingErrorKeys';
 import {shouldRefreshMeetingsListAfterSubmitError} from '../ScheduleMeetingModal/shouldRefreshMeetingsListAfterSubmitError';
@@ -103,23 +103,33 @@ export const useMeetNowSubmit = (conversationState: ConversationState) => {
   }, [translate]);
 
   const joinCreatedMeeting = useCallback(
-    (qualifiedConversationId: QualifiedId) => {
-      guardCall(async () => {
-        const result = await joinMeetingCall(joinDeps, qualifiedConversationId);
-
-        if (result.isErr) {
-          handleJoinMeetingCallResult(result, {
-            showConversationNotFoundModal,
-            showJoinFailedModal: () => showCallNotEstablishedModal(callNotEstablishedCopy),
-          });
-        }
+    async (qualifiedConversationId: QualifiedId): Promise<MeetNowSubmitResult> => {
+      let joinAllowed = false;
+      guardCall(() => {
+        joinAllowed = true;
       });
+
+      if (!joinAllowed) {
+        return meetNowSubmitResults.joinBlocked;
+      }
+
+      const result = await joinMeetingCall(joinDeps, qualifiedConversationId);
+
+      if (result.isErr) {
+        handleJoinMeetingCallResult(result, {
+          showConversationNotFoundModal,
+          showJoinFailedModal: () => showCallNotEstablishedModal(callNotEstablishedCopy),
+        });
+        return meetNowSubmitResults.joinFailed;
+      }
+
+      return meetNowSubmitResults.joined;
     },
     [callNotEstablishedCopy, guardCall, joinDeps, showConversationNotFoundModal],
   );
 
   const submit = useCallback(
-    async (formState: MeetNowFormState): Promise<boolean> => {
+    async (formState: MeetNowFormState): Promise<MeetNowSubmitResult> => {
       setIsSubmitting(true);
 
       const submitResult = await meetNowMeeting(formState);
@@ -131,7 +141,7 @@ export const useMeetNowSubmit = (conversationState: ConversationState) => {
 
         setIsSubmitting(false);
         showMeetingSubmitError(translate, submitResult.error);
-        return false;
+        return meetNowSubmitResults.creationFailed;
       }
 
       if (submitResult.value.failedToAdd.length > 0) {
@@ -146,10 +156,11 @@ export const useMeetNowSubmit = (conversationState: ConversationState) => {
 
       const {qualifiedConversation} = submitResult.value;
 
-      setIsSubmitting(false);
-      joinCreatedMeeting(qualifiedConversation);
+      const joinResult = await joinCreatedMeeting(qualifiedConversation);
 
-      return true;
+      setIsSubmitting(false);
+
+      return joinResult;
     },
     [joinCreatedMeeting, loadMeetings, meetNowMeeting, translate],
   );

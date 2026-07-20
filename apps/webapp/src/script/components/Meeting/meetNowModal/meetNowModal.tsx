@@ -42,6 +42,7 @@ import {
   submitButtonStyles,
   wrapperStyles,
 } from './meetNowModal.styles';
+import {wasMeetNowMeetingCreated} from './meetNowTypes';
 import {hasMeetNowFormErrors, useMeetNowModal} from './useMeetNowModal';
 import {useMeetNowSubmit} from './useMeetNowSubmit';
 
@@ -67,8 +68,8 @@ export const MeetNowModal = () => {
     }
 
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      const didStart = await submit(formState);
-      if (didStart) {
+      const submitResult = await submit(formState);
+      if (wasMeetNowMeetingCreated(submitResult)) {
         handleClose();
       }
     });

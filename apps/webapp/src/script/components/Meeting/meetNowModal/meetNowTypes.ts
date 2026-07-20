@@ -29,3 +29,15 @@ export type MeetNowFormState = {
 export type MeetNowFormErrors = {
   title?: TranslationKey;
 };
+
+export const meetNowSubmitResults = {
+  creationFailed: 'creationFailed',
+  joined: 'joined',
+  joinBlocked: 'joinBlocked',
+  joinFailed: 'joinFailed',
+} as const;
+
+export type MeetNowSubmitResult = (typeof meetNowSubmitResults)[keyof typeof meetNowSubmitResults];
+
+export const wasMeetNowMeetingCreated = (result: MeetNowSubmitResult): boolean =>
+  result !== meetNowSubmitResults.creationFailed;
