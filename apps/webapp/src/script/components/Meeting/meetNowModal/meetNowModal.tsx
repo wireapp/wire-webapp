@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, useRef} from 'react';
+import {type FormEvent, useMemo, useRef} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -29,7 +29,7 @@ import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
-import {MeetNowForm} from './meetNowForm';
+import {MEET_NOW_FORM_ID, MeetNowForm} from './meetNowForm';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -71,7 +71,9 @@ export const MeetNowModal = () => {
     dismissModal();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     const validationErrors = validate();
     if (hasMeetNowFormErrors(validationErrors)) {
       return;
@@ -126,15 +128,17 @@ export const MeetNowModal = () => {
             onTitleChange={setTitle}
             onSelectedUsersChange={setSelectedUsers}
             onParticipantsFilterChange={setParticipantsFilter}
+            onSubmit={handleSubmit}
             selfUser={selfUser}
           />
         </div>
 
         <footer css={footerStyles}>
           <Button
+            type="submit"
+            form={MEET_NOW_FORM_ID}
             variant={ButtonVariant.PRIMARY}
             css={submitButtonStyles}
-            onClick={handleSubmit}
             disabled={isSubmitting}
             data-uie-name="meet-now-modal-submit"
           >

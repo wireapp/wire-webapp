@@ -17,6 +17,8 @@
  *
  */
 
+import type {FormEvent} from 'react';
+
 import is from '@sindresorhus/is';
 
 import {CircleCloseIcon, ErrorMessage, getOverlayPortalContainer, Input} from '@wireapp/react-ui-kit';
@@ -34,12 +36,15 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {meetNowFormLayoutStyles} from './meetNowModal.styles';
 import type {MeetNowFormState} from './meetNowTypes';
 
+export const MEET_NOW_FORM_ID = 'meet-now-form';
+
 export interface MeetNowFormProps {
   formState: MeetNowFormState;
   titleError?: string;
   onTitleChange: (title: string) => void;
   onSelectedUsersChange: (users: User[]) => void;
   onParticipantsFilterChange: (filter: string) => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   selfUser: User;
 }
 
@@ -49,6 +54,7 @@ export const MeetNowForm = ({
   onTitleChange,
   onSelectedUsersChange,
   onParticipantsFilterChange,
+  onSubmit,
   selfUser,
 }: MeetNowFormProps) => {
   const {mainViewModel, translate} = useApplicationContext();
@@ -61,7 +67,13 @@ export const MeetNowForm = ({
   const teamRepository = contentViewModel.repositories.team;
 
   return (
-    <div css={meetNowFormLayoutStyles} data-uie-name="meet-now-form">
+    <form
+      id={MEET_NOW_FORM_ID}
+      css={meetNowFormLayoutStyles}
+      data-uie-name="meet-now-form"
+      onSubmit={onSubmit}
+      noValidate
+    >
       <Input
         id="meet-now-title"
         data-uie-name="meet-now-title"
@@ -109,6 +121,6 @@ export const MeetNowForm = ({
           popoverPortalContainer={portalContainer}
         />
       </div>
-    </div>
+    </form>
   );
 };
