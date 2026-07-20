@@ -29,9 +29,7 @@ wire_builds_field_options=(
 run_distribution_cli() {
   (
     cd "${webapp_repository_root}"
-    ./bin/yarn ts-node \
-      --project ./tsconfig.bin.json \
-      ./bin/productionDistributionCli.ts \
+    ./bin/run-production-distribution-cli.sh \
       "$@"
   )
 }

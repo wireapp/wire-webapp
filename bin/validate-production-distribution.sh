@@ -7,6 +7,8 @@ set -euo pipefail
 : "${PRODUCTION_TAG:?PRODUCTION_TAG is required}"
 : "${SOURCE_RUN_ID:?SOURCE_RUN_ID is required}"
 
+script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 if [[ ! "${PRODUCTION_TAG}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*-production$ ]]; then
   echo "Production tag does not match YYYY-MM-DD.N-production: ${PRODUCTION_TAG}" >&2
   exit 1
@@ -35,7 +37,7 @@ if [[ -n "${EXPECTED_COMMIT_SHA}" ]]; then
   validation_options+=(--expected-commit-sha "${EXPECTED_COMMIT_SHA}")
 fi
 
-./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/productionDistributionCli.ts \
+"${script_directory}/run-production-distribution-cli.sh" \
   validate-manifest "${validation_options[@]}"
 
 for required_context_path in \
