@@ -104,7 +104,11 @@ jobs:
         run: ./bin/yarn nx run webapp:configure
 
       - name: Build and package internal application
-        run: ./bin/yarn build:prod
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT_SHA: ${{ github.sha }}
+        run: |
+          short_commit_sha="${GITHUB_SHA::7}"
+          WIRE_WEBAPP_BUILD_VERSION="main-${short_commit_sha}" ./bin/yarn build:prod
 
       - name: Prepare shared main artifact metadata and exact development Docker context
         id: artifact_metadata

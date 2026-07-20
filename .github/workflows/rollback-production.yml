@@ -37,6 +37,7 @@ jobs:
       contents: read
     outputs:
       production_tag: ${{ steps.validate_production_tag.outputs.production_tag }}
+      release_identifier: ${{ steps.validate_production_tag.outputs.release_identifier }}
 
     steps:
       - name: Validate confirmation and reason
@@ -81,7 +82,11 @@ jobs:
           set -euo pipefail
 
           validated_production_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-production-tag "${PRODUCTION_TAG}")"
-          echo "production_tag=${validated_production_tag}" >> "$GITHUB_OUTPUT"
+          release_identifier="${validated_production_tag%-production}"
+          {
+            echo "production_tag=${validated_production_tag}"
+            echo "release_identifier=${release_identifier}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Verify remote Production tag exists
         env:
@@ -144,6 +149,9 @@ jobs:
       # Interim limitation: until durable release artifact storage exists, this
       # workflow rebuilds the deployable artifact from the selected Production tag.
       - name: Build and package
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT_SHA: ${{ steps.git_metadata.outputs.rollback_commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.release_identifier }}
         run: ./bin/yarn build:prod:public
 
       - name: Compute artifact metadata
