@@ -155,18 +155,15 @@ describe('createMeetingStore', () => {
 
     expect(result.isOk).toBe(true);
     expect(safeGetConversationById).toHaveBeenCalledWith(listMeetingInstance.meetingSeries.qualified_conversation);
-    expect(
-      result.match({
-        Ok: value => value.formState.start.unwrapOr(new Date(0)),
-        Err: () => null,
-      }),
-    ).toEqual(new Date('2026-06-16T10:00:00.000Z'));
-    expect(
-      result.match({
-        Ok: value => value.formState.end.unwrapOr(new Date(0)),
-        Err: () => null,
-      }),
-    ).toEqual(new Date('2026-06-16T11:00:00.000Z'));
+
+    if (!result.isOk) {
+      throw new Error('Expected loadMeetingForEdit to succeed');
+    }
+
+    expect(result.value.formState.start.isJust).toBe(true);
+    expect(result.value.formState.start.value).toEqual(new Date('2026-06-16T10:00:00.000Z'));
+    expect(result.value.formState.end.isJust).toBe(true);
+    expect(result.value.formState.end.value).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 
   it('prefills edit form with the upcoming instance times for recurring meetings', async () => {
@@ -192,17 +189,14 @@ describe('createMeetingStore', () => {
     const result = await store.getState().loadMeetingForEdit(recurringMeetingInstance);
 
     expect(result.isOk).toBe(true);
-    expect(
-      result.match({
-        Ok: value => value.formState.start.unwrapOr(new Date(0)),
-        Err: () => null,
-      }),
-    ).toEqual(new Date('2026-06-22T10:00:00.000Z'));
-    expect(
-      result.match({
-        Ok: value => value.formState.end.unwrapOr(new Date(0)),
-        Err: () => null,
-      }),
-    ).toEqual(new Date('2026-06-22T11:00:00.000Z'));
+
+    if (!result.isOk) {
+      throw new Error('Expected loadMeetingForEdit to succeed');
+    }
+
+    expect(result.value.formState.start.isJust).toBe(true);
+    expect(result.value.formState.start.value).toEqual(new Date('2026-06-22T10:00:00.000Z'));
+    expect(result.value.formState.end.isJust).toBe(true);
+    expect(result.value.formState.end.value).toEqual(new Date('2026-06-22T11:00:00.000Z'));
   });
 });
