@@ -54,8 +54,10 @@ describe('VideoBackgroundSettings', () => {
     backgrounds,
     onSelectEffect: jest.fn(),
     onEnableHighQualityBlur: jest.fn(),
+    onEnablePerformanceEnhancement: jest.fn(),
     onClose: jest.fn(),
     highQualityBlurAllowed: false,
+    performanceEnhancementEnabled: false,
     isWebGLAvailable: true,
   };
 
@@ -86,6 +88,29 @@ describe('VideoBackgroundSettings', () => {
     const {getByTestId} = renderComponent({highQualityBlurAllowed: true});
 
     expect(getByTestId('enable-high-quality-blur')).toBeChecked();
+  });
+
+  it('renders the enhance performance checkbox as unchecked', () => {
+    const {getByTestId} = renderComponent();
+
+    const checkbox = getByTestId('enable-performance-enhancement') as HTMLInputElement;
+
+    expect(checkbox).not.toBeChecked();
+    expect(checkbox).not.toBeDisabled();
+  });
+
+  it('renders the enhance performance checkbox as checked', () => {
+    const {getByTestId} = renderComponent({performanceEnhancementEnabled: true});
+
+    expect(getByTestId('enable-performance-enhancement')).toBeChecked();
+  });
+
+  it('calls onEnablePerformanceEnhancement when the enhance performance checkbox is toggled', () => {
+    const {getByTestId} = renderComponent();
+
+    fireEvent.click(getByTestId('enable-performance-enhancement'));
+
+    expect(defaultProps.onEnablePerformanceEnhancement).toHaveBeenCalledTimes(1);
   });
 
   it('calls onEnableHighQualityBlur when high quality blur checkbox changes', () => {

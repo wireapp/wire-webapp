@@ -38,6 +38,8 @@ export type ProcessVideoTrackOptions = {
   // quality mode
   quality: QualityMode;
 
+  enhancePerformance: boolean;
+
   // Metrics callback.
   onMetrics: ((metrics: Metrics) => void) | null;
   onModelChange: ((model: string) => void) | null;
@@ -92,6 +94,7 @@ export const defaultOpts = {
 
   // quality mode
   quality: 'auto',
+  enhancePerformance: false,
 
   // Metrics callback.
   onMetrics: null,
@@ -113,3 +116,8 @@ export const defaultOpts = {
   contrast: 1,
   gamma: 1,
 } as ProcessVideoTrackOptions;
+
+export const defaultWorkerOpts: WorkerProcessVideoTrackOptions = {
+  ...defaultOpts,
+  backgroundSource: null,
+};

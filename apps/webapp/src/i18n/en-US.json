@@ -2148,6 +2148,7 @@
   "videoCallBackgroundEffectsLabel": "Background Settings",
   "videoCallBackgroundEnableEnhancedQuality": "Enhanced quality",
   "videoCallBackgroundEnableEnhancedQualityHint": "Improves outline definition, but may impact the performance on your device.",
+  "videoCallBackgroundEnhancePerformance": "Enhance Performance",
   "videoCallBackgroundNoEffect": "No background effect",
   "videoCallBackgroundNoWebGLHint": "Your device doesn't support blurred and virtual backgrounds.",
   "videoCallBackgroundNone": "None",

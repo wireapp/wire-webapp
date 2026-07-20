@@ -304,6 +304,7 @@ const FullscreenVideoCall = ({
 
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
   const isHighQualityBlurEnabled = useBackgroundEffectsStore(state => state.isHighQualityBlurEnabled);
+  const isPerformanceEnhancementEnabled = useBackgroundEffectsStore(state => state.isPerformanceEnhancementEnabled);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
@@ -313,6 +314,10 @@ const FullscreenVideoCall = ({
 
   const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
     callingRepository.allowSuperhighQualityTier(event.target.checked);
+  };
+
+  const handleEnablePerformanceEnhancement = (event: ChangeEvent<HTMLInputElement>) => {
+    callingRepository.enablePerformanceEnhancement(event.target.checked);
   };
 
   return (
@@ -442,8 +447,10 @@ const FullscreenVideoCall = ({
               backgrounds={BUILTIN_BACKGROUNDS}
               onSelectEffect={handleBackgroundSidebarSelect}
               onEnableHighQualityBlur={handleEnableHighQualityBlur}
+              onEnablePerformanceEnhancement={handleEnablePerformanceEnhancement}
               onClose={() => backgroundSidebarHandler(false)}
               highQualityBlurAllowed={isHighQualityBlurEnabled}
+              performanceEnhancementEnabled={isPerformanceEnhancementEnabled}
               isWebGLAvailable={isWebGLAvailable}
             />
           )}
@@ -526,8 +533,10 @@ const FullscreenVideoCall = ({
           backgrounds={BUILTIN_BACKGROUNDS}
           onSelectEffect={handleBackgroundSidebarSelect}
           onEnableHighQualityBlur={handleEnableHighQualityBlur}
+          onEnablePerformanceEnhancement={handleEnablePerformanceEnhancement}
           onClose={() => backgroundSidebarHandler(false)}
           highQualityBlurAllowed={isHighQualityBlurEnabled}
+          performanceEnhancementEnabled={isPerformanceEnhancementEnabled}
           isWebGLAvailable={isWebGLAvailable}
         />
       )}
