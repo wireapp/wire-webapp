@@ -11520,6 +11520,7 @@ __metadata:
   dependencies:
     fs-extra: "npm:11.3.6"
     logdown: "npm:3.3.1"
+    true-myth: "npm:9.4.0"
   languageName: unknown
   linkType: soft
 

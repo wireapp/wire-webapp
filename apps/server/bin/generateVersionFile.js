@@ -19,26 +19,104 @@
  *
  */
 
+const {existsSync, mkdirSync, readFileSync, writeFileSync} = require('fs');
+const {execFileSync} = require('child_process');
 const path = require('path');
-const {writeFileSync} = require('fs');
-const {execSync} = require('child_process');
 
-function generateVersion() {
-  return new Date()
-    .toISOString()
-    .replace(/[T\-:]/g, '.')
-    .replace(/\.\d+Z/, '');
-}
+const {createBuildMetadata, resolveBuildVersion} = require('@wireapp/config');
 
-function generateCommmitHash() {
+const DEFAULT_METADATA_FILE_PATH = path.resolve(__dirname, '../dist/version.json');
+
+function resolveCommitSha(explicitCommitSha) {
+  if (explicitCommitSha.isJust) {
+    return explicitCommitSha.value;
+  }
+
   try {
-    return execSync('git rev-parse HEAD').toString().trim();
+    return execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim();
   } catch (error) {
     return 'unknown';
   }
 }
 
-writeFileSync(
-  path.resolve(__dirname, '../dist/version.json'),
-  JSON.stringify({version: generateVersion(), commit: generateCommmitHash()}),
-);
+function isBuildMetadata(value) {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof value.version === 'string' &&
+    typeof value.commit === 'string' &&
+    typeof value.builtAt === 'string'
+  );
+}
+
+function readExistingBuildMetadata(metadataFilePath, maybeModule) {
+  if (!existsSync(metadataFilePath)) {
+    return maybeModule.nothing();
+  }
+
+  try {
+    const parsedMetadata = JSON.parse(readFileSync(metadataFilePath, 'utf8'));
+
+    return isBuildMetadata(parsedMetadata) ? maybeModule.just(parsedMetadata) : maybeModule.nothing();
+  } catch (error) {
+    return maybeModule.nothing();
+  }
+}
+
+function createAuthoritativeBuildMetadata(existingBuildMetadata, resolvedBuildVersion, commitSha, builtAt) {
+  return existingBuildMetadata.mapOrElse(
+    () => {
+      return createBuildMetadata({
+        version: resolvedBuildVersion,
+        commit: commitSha,
+        builtAt,
+      });
+    },
+    existingMetadata => {
+      if (
+        existingMetadata.version === resolvedBuildVersion &&
+        existingMetadata.commit === commitSha &&
+        existingMetadata.builtAt.endsWith('Z')
+      ) {
+        return existingMetadata;
+      }
+
+      return createBuildMetadata({
+        version: resolvedBuildVersion,
+        commit: commitSha,
+        builtAt,
+      });
+    },
+  );
+}
+
+async function generateVersionFile() {
+  const {Maybe} = await import('true-myth');
+  const metadataFilePath = process.env.WIRE_WEBAPP_BUILD_METADATA_PATH || DEFAULT_METADATA_FILE_PATH;
+  const explicitCommitSha = Maybe.of(process.env.WIRE_WEBAPP_BUILD_COMMIT_SHA || null);
+  const commitSha = resolveCommitSha(explicitCommitSha);
+  const explicitVersion = Maybe.of(process.env.WIRE_WEBAPP_BUILD_VERSION || null);
+  const resolvedBuildVersion = resolveBuildVersion(explicitVersion, commitSha);
+  const builtAt = process.env.WIRE_WEBAPP_BUILD_TIMESTAMP || new Date().toISOString();
+  const existingBuildMetadata = readExistingBuildMetadata(metadataFilePath, Maybe);
+  const authoritativeBuildMetadata = createAuthoritativeBuildMetadata(
+    existingBuildMetadata,
+    resolvedBuildVersion,
+    commitSha,
+    builtAt,
+  );
+
+  mkdirSync(path.dirname(metadataFilePath), {recursive: true});
+  writeFileSync(metadataFilePath, `${JSON.stringify(authoritativeBuildMetadata, null, 2)}\n`);
+}
+
+async function run() {
+  try {
+    await generateVersionFile();
+  } catch (error) {
+    console.error(error);
+    process.exitCode = 1;
+  }
+}
+
+void run();

@@ -18,6 +18,7 @@
   ],
   "dependencies": {
     "fs-extra": "11.3.6",
-    "logdown": "3.3.1"
+    "logdown": "3.3.1",
+    "true-myth": "9.4.0"
   }
 }
