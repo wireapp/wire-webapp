@@ -69,6 +69,44 @@ describe('build artifact metadata validation', () => {
     expect(validationResult.isOk).toBe(true);
   });
 
+  it('ignores query strings outside intentional local cache-busted asset URLs', () => {
+    const htmlDocument = createHtmlDocument(mainBuildMetadata);
+    const validationResult = validateBuildArtifactMetadata({
+      expectedCommit: mainBuildMetadata.commit,
+      expectedVersion: mainBuildMetadata.version,
+      htmlDocuments: [
+        {
+          ...htmlDocument,
+          contents: `${htmlDocument.contents}
+            <meta property="og:image" content="https://example.com/image.png?width=1200">
+            <img src="https://example.com/image.png?width=1200">
+            <img src="data:image/svg+xml;base64,example?ignored">
+            <a href="/settings?tab=account">Settings</a>
+            <a href="#section?ignored">Section</a>`,
+        },
+      ],
+      metadata: mainBuildMetadata,
+    });
+
+    expect(validationResult.isOk).toBe(true);
+  });
+
+  it('rejects generated HTML without an intentional local cache-busted asset', () => {
+    const validationResult = validateBuildArtifactMetadata({
+      expectedCommit: mainBuildMetadata.commit,
+      expectedVersion: mainBuildMetadata.version,
+      htmlDocuments: [
+        {
+          archiveFilePath: 'static/index.html',
+          contents: `<!--! ${mainBuildMetadata.version} --><img src="https://example.com/image.png?v=${mainBuildMetadata.assetVersion}">`,
+        },
+      ],
+      metadata: mainBuildMetadata,
+    });
+
+    expect(validationResult.isErr).toBe(true);
+  });
+
   it('rejects an artifact version that differs from the expected version', () => {
     const validationResult = validateBuildArtifactMetadata({
       expectedCommit: mainBuildMetadata.commit,

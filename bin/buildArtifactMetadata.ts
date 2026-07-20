@@ -34,11 +34,72 @@ export type BuildArtifactMetadataValidationInput = {
   readonly metadata: unknown;
 };
 
-function readCacheBustingValues(htmlContents: string): readonly string[] {
-  return [...htmlContents.matchAll(/(?:\?|&)v=([^"'&\s]+)|\?([^"'&\s]+)/g)].flatMap(cacheBustingMatch => {
-    const cacheBustingValue = Maybe.of(cacheBustingMatch[1]).orElse(() => Maybe.of(cacheBustingMatch[2]));
+const localStaticAssetDirectoryNames = ['assets', 'audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker'];
 
-    return cacheBustingValue.map(value => [value]).unwrapOr([]);
+function readHtmlResourceAttributeValues(htmlContents: string): readonly string[] {
+  return [...htmlContents.matchAll(/\b(?:src|href)\s*=\s*(["'])(.*?)\1/giu)].flatMap(attributeMatch => {
+    return Maybe.of(attributeMatch[2])
+      .map(attributeValue => [attributeValue])
+      .unwrapOr([]);
+  });
+}
+
+function isLocalStaticAssetUrl(resourceUrl: string): boolean {
+  const normalizedResourceUrl = resourceUrl.toLowerCase();
+
+  if (
+    normalizedResourceUrl.startsWith('//') ||
+    normalizedResourceUrl.startsWith('#') ||
+    /^[a-z][a-z\d+.-]*:/u.test(normalizedResourceUrl)
+  ) {
+    return false;
+  }
+
+  const queryDelimiterIndex = resourceUrl.indexOf('?');
+  const assetPath = queryDelimiterIndex === -1 ? resourceUrl : resourceUrl.slice(0, queryDelimiterIndex);
+  const normalizedAssetPath = assetPath.replace(/^(?:(?:\.\.?\/)|\/)+/u, '');
+
+  return localStaticAssetDirectoryNames.some(directoryName => {
+    return normalizedAssetPath.startsWith(`${directoryName}/`);
+  });
+}
+
+function readCacheBustingValue(resourceUrl: string): Maybe<string> {
+  if (!isLocalStaticAssetUrl(resourceUrl)) {
+    return Maybe.nothing();
+  }
+
+  const queryDelimiterIndex = resourceUrl.indexOf('?');
+
+  if (queryDelimiterIndex === -1) {
+    return Maybe.nothing();
+  }
+
+  const queryWithOptionalFragment = resourceUrl.slice(queryDelimiterIndex + 1);
+  const fragmentDelimiterIndex = queryWithOptionalFragment.indexOf('#');
+  const query =
+    fragmentDelimiterIndex === -1
+      ? queryWithOptionalFragment
+      : queryWithOptionalFragment.slice(0, fragmentDelimiterIndex);
+
+  if (query.startsWith('v=')) {
+    return Maybe.of(new URLSearchParams(query).get('v')).andThen(cacheBustingValue => {
+      return cacheBustingValue.length > 0 ? Maybe.just(cacheBustingValue) : Maybe.nothing();
+    });
+  }
+
+  if (query.length > 0 && !query.includes('=') && !query.includes('&')) {
+    return Maybe.just(query);
+  }
+
+  return Maybe.nothing();
+}
+
+function readCacheBustingValues(htmlContents: string): readonly string[] {
+  return readHtmlResourceAttributeValues(htmlContents).flatMap(resourceUrl => {
+    return readCacheBustingValue(resourceUrl)
+      .map(cacheBustingValue => [cacheBustingValue])
+      .unwrapOr([]);
   });
 }
 
