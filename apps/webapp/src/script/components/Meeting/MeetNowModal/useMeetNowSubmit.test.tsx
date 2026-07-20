@@ -26,6 +26,7 @@ import {createStore} from 'zustand/vanilla';
 import type {MeetingStoreState} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {ConversationState} from 'Repositories/conversation/ConversationState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -36,6 +37,10 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {useMeetNowSubmit} from './useMeetNowSubmit';
 
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
+
+const conversationState = {
+  findConversation: jest.fn().mockReturnValue(undefined),
+} as unknown as ConversationState;
 
 const formState = {
   title: 'Standup',
@@ -98,7 +103,7 @@ describe('useMeetNowSubmit', () => {
     const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
 
-    const {result} = renderHook(() => useMeetNowSubmit(), {wrapper: createWrapper(store)});
+    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {wrapper: createWrapper(store)});
 
     let submitResult = false;
     await act(async () => {
@@ -115,7 +120,7 @@ describe('useMeetNowSubmit', () => {
     const meetNowMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
 
-    const {result} = renderHook(() => useMeetNowSubmit(), {wrapper: createWrapper(store)});
+    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {wrapper: createWrapper(store)});
 
     let submitResult = true;
     await act(async () => {

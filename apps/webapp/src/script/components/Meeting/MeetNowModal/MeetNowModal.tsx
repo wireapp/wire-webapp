@@ -24,6 +24,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, CallIcon, CloseIcon} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
@@ -48,7 +49,8 @@ export const MeetNowModal = () => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {isOpen, formState, errors, close, reset, setTitle, setSelectedUsers, setParticipantsFilter, validate} =
     useMeetNowModal();
-  const {isSubmitting, submit} = useMeetNowSubmit();
+  const conversationState = container.resolve(ConversationState);
+  const {isSubmitting, submit} = useMeetNowSubmit(conversationState);
   const selfUser = container.resolve(UserState).self();
 
   const titleError = useMemo(() => (errors.title ? translate(errors.title) : undefined), [errors.title, translate]);

@@ -21,7 +21,6 @@ import {useCallback, useMemo, useState} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task} from 'true-myth';
-import {container} from 'tsyringe';
 
 import {joinMeetingCall, type JoinMeetingCallDeps} from 'Components/Meeting/joinMeetingCall';
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
@@ -29,7 +28,7 @@ import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/
 import {handleJoinMeetingCallResult} from 'Components/Meeting/useJoinMeetingCall';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showCallNotEstablishedModal, useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config} from 'src/script/Config';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
@@ -55,7 +54,7 @@ const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors
   );
 };
 
-export const useMeetNowSubmit = () => {
+export const useMeetNowSubmit = (conversationState: ConversationState) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {translate} = useApplicationContext();
   const {content, calling: callingViewModel} = useMainViewModel();
@@ -81,12 +80,12 @@ export const useMeetNowSubmit = () => {
 
   const joinDeps = useMemo<JoinMeetingCallDeps>(
     () => ({
-      conversationState: container.resolve(ConversationState),
+      conversationState,
       conversationRepository,
       callingRepository,
       callingViewModel,
     }),
-    [callingRepository, callingViewModel, conversationRepository],
+    [callingRepository, callingViewModel, conversationRepository, conversationState],
   );
 
   const showConversationNotFoundModal = useCallback(() => {
