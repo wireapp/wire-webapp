@@ -45,7 +45,7 @@ import type {
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 
-export type MeetNowSubmitSuccess = MeetingSubmitSuccess & {qualifiedConversation: QualifiedId};
+export type CreateMeetingSuccess = MeetingSubmitSuccess & {qualifiedConversation: QualifiedId};
 
 export type UpdateMeetingParams = {
   meetingId: QualifiedId;
@@ -83,7 +83,7 @@ const createMeetingAndSyncParticipants = (
   createPayload: CreateMeeting,
   selectedUsers: User[],
   deps: MeetingServiceDeps,
-): Task<MeetNowSubmitSuccess, MeetingSubmitErrors> =>
+): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
   deps.meetingsRepository
     .createMeeting(createPayload)
     .mapRejected(() => meetingSubmitErrors.createFailed)
@@ -127,7 +127,7 @@ export const scheduleMeeting = (
 export const meetNowMeeting = (
   command: MeetNowMeetingCommand,
   deps: MeetingServiceDeps,
-): Task<MeetNowSubmitSuccess, MeetingSubmitErrors> =>
+): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
   createMeetingAndSyncParticipants(
     mapMeetNowCommandToCreateMeeting(command, deps.wallClock),
     command.selectedUsers,

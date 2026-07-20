@@ -23,7 +23,7 @@ import {task, type Task} from 'true-myth';
 import {joinMeetingCall, type JoinMeetingCallDeps} from 'Components/Meeting/joinMeetingCall';
 import {mapMeetNowFormToMeetingCommand} from 'Components/Meeting/mapMeetNowFormToMeetingCommand';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
+import type {CreateMeetingSuccess} from 'Components/Meeting/shared/service/meetingService';
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
 import {shouldRefreshMeetingsListAfterSubmitError} from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
 import {showMeetingPartialAddFailureModal} from 'Components/Meeting/shared/submit/showMeetingPartialAddFailureModal';
@@ -107,7 +107,7 @@ const joinCreatedMeeting = async ({
 
 export type SubmitMeetNowParams = {
   formState: MeetNowFormState;
-  meetNowMeeting: (command: MeetNowMeetingCommand) => Task<MeetNowSubmitSuccess, MeetingSubmitErrors>;
+  meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   loadMeetings: () => Promise<void>;
   joinDeps: JoinMeetingCallDeps;
   guardCall: (startCall: () => void) => void;

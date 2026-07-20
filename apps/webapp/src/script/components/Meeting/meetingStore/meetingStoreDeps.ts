@@ -23,7 +23,7 @@ import type {Task} from 'true-myth';
 import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {MeetNowMeetingCommand, ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import type {
-  MeetNowSubmitSuccess,
+  CreateMeetingSuccess,
   MeetingSubmitSuccess,
   UpdateMeetingParams,
 } from 'Components/Meeting/shared/service/meetingService';
@@ -32,7 +32,7 @@ import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository'
 
 export type MeetingStoreServiceTasks = {
   scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
-  meetNowMeeting: (command: MeetNowMeetingCommand) => Task<MeetNowSubmitSuccess, MeetingSubmitErrors>;
+  meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 

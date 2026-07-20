@@ -25,7 +25,7 @@ import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeeti
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {MeetNowMeetingCommand, ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import {
-  type MeetNowSubmitSuccess,
+  type CreateMeetingSuccess,
   type MeetingSubmitSuccess,
   type UpdateMeetingParams,
 } from 'Components/Meeting/shared/service/meetingService';
@@ -48,7 +48,7 @@ export type MeetingStoreState = {
   hasLoadError: boolean;
   loadMeetings: () => Promise<void>;
   scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
-  meetNowMeeting: (command: MeetNowMeetingCommand) => Task<MeetNowSubmitSuccess, MeetingSubmitErrors>;
+  meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
 };
