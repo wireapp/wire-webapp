@@ -24,12 +24,12 @@ import is from '@sindresorhus/is';
 import {CircleCloseIcon, ErrorMessage, getOverlayPortalContainer, Input} from '@wireapp/react-ui-kit';
 
 import {MeetingParticipantsPicker} from 'Components/Meeting/MeetingParticipantsPicker';
+import {useMeetingParticipants} from 'Components/Meeting/shared/participants/useMeetingParticipants';
 import {
   scheduleMeetingParticipantsSectionCss,
   scheduleMeetingTitleClearButtonStyles,
   scheduleMeetingTitleInputWrapperStyles,
 } from 'Components/Meeting/shared/styles/meetingForm.styles';
-import {useMeetingParticipants} from 'Components/Meeting/shared/participants/useMeetingParticipants';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

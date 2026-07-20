@@ -22,15 +22,15 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, maybe} from 'true-myth';
 import {create} from 'zustand';
 
-import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
-import type {User} from 'Repositories/entity/User';
-
 import {
   getDefaultMeetingEndDateTime,
   getDefaultScheduleMeetingStartDateTime,
   resolveEndChange,
   resolveStartChange,
 } from 'Components/Meeting/shared/defaults/meetingDateTimeDefaults';
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
+import type {User} from 'Repositories/entity/User';
+
 import {
   emptyScheduleMeetingFormErrors,
   type ScheduleMeetingFormErrors,
@@ -38,7 +38,7 @@ import {
   type ScheduleMeetingMode,
   type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
-import {getScheduleMeetingFormErrors, hasScheduleMeetingFormErrors} from './scheduleMeetingValidation';
+import {getScheduleMeetingFormErrors} from './scheduleMeetingValidation';
 
 export type {
   ScheduleMeetingFormErrors,

@@ -18,10 +18,10 @@
  */
 
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
-import type {Maybe} from 'true-myth';
-import {result, type Result} from 'true-myth';
+import type {Maybe, Result} from 'true-myth';
+import {result} from 'true-myth';
 
-import {emptyScheduleMeetingFormErrors, type ScheduleMeetingFormErrors} from './scheduleMeetingTypes';
+import {type ScheduleMeetingFormErrors} from './scheduleMeetingTypes';
 
 export interface ScheduleMeetingValidationInput {
   title: string;

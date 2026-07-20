@@ -25,8 +25,8 @@ import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternet
 import type {ConversationState} from 'Repositories/conversation/ConversationState';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 
-import {submitMeetNow} from './submitMeetNow';
 import type {MeetNowFormState, MeetNowSubmitResult} from './meetNowTypes';
+import {submitMeetNow} from './submitMeetNow';
 
 export const useMeetNowSubmit = (conversationState: ConversationState) => {
   const [isSubmitting, setIsSubmitting] = useState(false);

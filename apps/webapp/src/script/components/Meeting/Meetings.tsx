@@ -26,9 +26,9 @@ import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
 import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider, useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
-import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/Meeting/shared/service/meetingService';
 import {MeetNowModal} from 'Components/Meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
+import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/Meeting/shared/service/meetingService';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const MeetingsContent = () => {

@@ -21,12 +21,12 @@ import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Task} from 'true-myth';
 
 import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowMeetingCommand, ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import type {
   CreateMeetingSuccess,
   MeetingSubmitSuccess,
   UpdateMeetingParams,
 } from 'Components/Meeting/shared/service/meetingService';
+import type {MeetNowMeetingCommand, ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 

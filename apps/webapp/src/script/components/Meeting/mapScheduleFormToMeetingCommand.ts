@@ -22,10 +22,10 @@ import {result, Result} from 'true-myth';
 
 import {ScheduleFormErrors, scheduleFormErrors} from 'Components/Meeting/ScheduleFormErrors';
 import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
-import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import {
   emptyScheduleMeetingFormErrors,
   type ScheduleMeetingFormErrors,
+  type ScheduleMeetingFormState,
 } from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import {validateScheduleMeetingForm} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingValidation';
 import type {ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';

@@ -23,7 +23,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CallIcon, CloseIcon} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -35,6 +34,7 @@ import {
   submitButtonStyles,
   wrapperStyles,
 } from 'Components/Meeting/shared/styles/meetingModalShell.styles';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';

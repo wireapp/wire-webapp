@@ -34,10 +34,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {MeetingParticipantsPicker} from 'Components/Meeting/MeetingParticipantsPicker';
-import type {User} from 'Repositories/entity/User';
-import {currentLanguage} from 'src/script/auth/localeConfig';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useMeetingParticipants} from 'Components/Meeting/shared/participants/useMeetingParticipants';
 import {
   scheduleMeetingFormColumnCss,
   scheduleMeetingFormDividerCss,
@@ -49,6 +46,10 @@ import {
   scheduleMeetingTitleClearButtonStyles,
   scheduleMeetingTitleInputWrapperStyles,
 } from 'Components/Meeting/shared/styles/meetingForm.styles';
+import type {User} from 'Repositories/entity/User';
+import {currentLanguage} from 'src/script/auth/localeConfig';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+
 import {
   SCHEDULE_MEETING_RECURRENCE_OPTIONS,
   SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
@@ -59,7 +60,6 @@ import type {
   ScheduleMeetingMode,
   ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
-import {useMeetingParticipants} from 'Components/Meeting/shared/participants/useMeetingParticipants';
 
 const toDateTimePickerValue = (value: Maybe<Date>): Date | null => value.unwrapOr(null);
 
