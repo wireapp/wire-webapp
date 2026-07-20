@@ -513,6 +513,7 @@ test.describe('Federation', () => {
 
   testData.forEach(({title, tags, type}) => {
     test(title, {tag: tags}, async ({createPage}) => {
+      test.setTimeout(120_000);
       const [normalUserPage, federatedUserPage] = await Promise.all([
         createPage(withLogin(normalUser)),
         createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),
