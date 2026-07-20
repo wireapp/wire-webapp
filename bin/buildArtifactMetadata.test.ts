@@ -26,9 +26,10 @@ const mainBuildMetadata = {
   builtAt: '2026-07-20T06:18:03.123Z',
 };
 
-function createHtmlDocument(
-  metadata: typeof mainBuildMetadata,
-): {readonly archiveFilePath: string; readonly contents: string} {
+function createHtmlDocument(metadata: typeof mainBuildMetadata): {
+  readonly archiveFilePath: string;
+  readonly contents: string;
+} {
   return {
     archiveFilePath: 'static/index.html',
     contents: `<!--! ${metadata.version} --><link href="/image/favicon.ico?${metadata.assetVersion}"><script src="/min/app.js?v=${metadata.assetVersion}">`,
@@ -94,9 +95,7 @@ describe('build artifact metadata validation', () => {
     const validationResult = validateBuildArtifactMetadata({
       expectedCommit: mainBuildMetadata.commit,
       expectedVersion: mainBuildMetadata.version,
-      htmlDocuments: [
-        createHtmlDocument({...mainBuildMetadata, version: 'dev-025edc6', assetVersion: 'dev-025edc6'}),
-      ],
+      htmlDocuments: [createHtmlDocument({...mainBuildMetadata, version: 'dev-025edc6', assetVersion: 'dev-025edc6'})],
       metadata: mainBuildMetadata,
     });
 

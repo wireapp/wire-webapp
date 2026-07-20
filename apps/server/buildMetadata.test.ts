@@ -73,9 +73,7 @@ describe('server build metadata', () => {
 
     expect(loadedBuildMetadataResult.isErr).toBe(true);
     if (loadedBuildMetadataResult.isErr) {
-      expect(loadedBuildMetadataResult.error.message).toBe(
-        "Unable to read build metadata file '/build/version.json'",
-      );
+      expect(loadedBuildMetadataResult.error.message).toBe("Unable to read build metadata file '/build/version.json'");
     }
   });
 
@@ -88,9 +86,7 @@ describe('server build metadata', () => {
 
     expect(loadedBuildMetadataResult.isErr).toBe(true);
     if (loadedBuildMetadataResult.isErr) {
-      expect(loadedBuildMetadataResult.error.message).toBe(
-        "Unable to read build metadata file '/build/version.json'",
-      );
+      expect(loadedBuildMetadataResult.error.message).toBe("Unable to read build metadata file '/build/version.json'");
     }
   });
 
@@ -137,11 +133,13 @@ describe('server build metadata', () => {
       },
     });
 
-    expect(loadedBuildMetadataResult).toStrictEqual(Result.ok({
-      version: 'dev-unknown',
-      assetVersion: 'dev-unknown',
-      commit: 'unknown',
-      builtAt: '1970-01-01T00:00:00.000Z',
-    }));
+    expect(loadedBuildMetadataResult).toStrictEqual(
+      Result.ok({
+        version: 'dev-unknown',
+        assetVersion: 'dev-unknown',
+        commit: 'unknown',
+        builtAt: '1970-01-01T00:00:00.000Z',
+      }),
+    );
   });
 });

@@ -173,11 +173,7 @@ describe('releaseMetadata', () => {
   );
 
   it('resolveWebappBuildVersion() uses the development version for an empty tag', () => {
-    const actualBuildVersion = resolveWebappBuildVersion(
-      '',
-      '025edc663787b3d2da366f21a5958013201e6cd4',
-      'development',
-    );
+    const actualBuildVersion = resolveWebappBuildVersion('', '025edc663787b3d2da366f21a5958013201e6cd4', 'development');
 
     assert(actualBuildVersion.isOk === true);
 
@@ -201,11 +197,7 @@ describe('releaseMetadata', () => {
   });
 
   it('resolveWebappBuildVersion() uses the main version for the main channel', () => {
-    const actualBuildVersion = resolveWebappBuildVersion(
-      '',
-      '025edc663787b3d2da366f21a5958013201e6cd4',
-      'main',
-    );
+    const actualBuildVersion = resolveWebappBuildVersion('', '025edc663787b3d2da366f21a5958013201e6cd4', 'main');
 
     assert(actualBuildVersion.isOk === true);
 
