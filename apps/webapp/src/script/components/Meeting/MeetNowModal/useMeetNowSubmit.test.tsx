@@ -19,28 +19,27 @@
 
 import type {ReactNode} from 'react';
 
-import {act, renderHook} from '@testing-library/react';
+import {act, renderHook, waitFor} from '@testing-library/react';
 import {task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {ConversationState} from 'Repositories/conversation/ConversationState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
+import {TYPE} from 'src/script/view_model/WarningsContainer/WarningsTypes';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {useMeetNowSubmit} from './useMeetNowSubmit';
 
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
-
-const conversationState = {
-  findConversation: jest.fn().mockReturnValue(undefined),
-} as unknown as ConversationState;
 
 const formState = {
   title: 'Standup',
@@ -48,12 +47,36 @@ const formState = {
   participantsFilter: '',
 };
 
-const createMainViewModelForTest = (): MainViewModel =>
-  ({
+type JoinTestMocks = {
+  conversationState: ConversationState;
+  findConversation: jest.Mock;
+  safeGetConversationById: jest.Mock;
+  startAudio: jest.Mock;
+  mainViewModel: MainViewModel;
+};
+
+const createJoinTestMocks = ({
+  findConversationResult = undefined,
+  safeGetConversationByIdResult = task.resolve({qualifiedId: qualifiedConversation}),
+  startAudioResult = Promise.resolve(undefined),
+}: {
+  findConversationResult?: unknown;
+  safeGetConversationByIdResult?: ReturnType<typeof task.resolve> | ReturnType<typeof task.reject>;
+  startAudioResult?: Promise<void>;
+} = {}): JoinTestMocks => {
+  const findConversation = jest.fn().mockReturnValue(findConversationResult);
+  const safeGetConversationById = jest.fn().mockReturnValue(safeGetConversationByIdResult);
+  const startAudio = jest.fn().mockReturnValue(startAudioResult);
+
+  const conversationState = {
+    findConversation,
+  } as unknown as ConversationState;
+
+  const mainViewModel = {
     content: {
       repositories: {
         conversation: {
-          safeGetConversationById: jest.fn().mockReturnValue(task.resolve({qualifiedId: qualifiedConversation})),
+          safeGetConversationById,
         },
         calling: {
           findCall: jest.fn().mockReturnValue(undefined),
@@ -62,17 +85,13 @@ const createMainViewModelForTest = (): MainViewModel =>
     },
     calling: {
       callActions: {
-        startAudio: jest.fn().mockResolvedValue(undefined),
+        startAudio,
       },
     },
-  }) as unknown as MainViewModel;
+  } as unknown as MainViewModel;
 
-const RootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    translate: translateForTest,
-    mainViewModel: createMainViewModelForTest(),
-  }),
-);
+  return {conversationState, findConversation, safeGetConversationById, startAudio, mainViewModel};
+};
 
 const createMeetingStore = ({
   loadMeetings = jest.fn().mockResolvedValue(undefined),
@@ -90,20 +109,44 @@ const createMeetingStore = ({
   }));
 
 const createWrapper =
-  (store: ReturnType<typeof createMeetingStore>) =>
-  ({children}: {children: ReactNode}) => (
-    <RootProviderWrapper>
-      <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>
-    </RootProviderWrapper>
-  );
+  (store: ReturnType<typeof createMeetingStore>, mainViewModel: MainViewModel) =>
+  ({children}: {children: ReactNode}) => {
+    const RootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        mainViewModel,
+      }),
+    );
+
+    return (
+      <RootProviderWrapper>
+        <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>
+      </RootProviderWrapper>
+    );
+  };
 
 describe('useMeetNowSubmit', () => {
-  it('refreshes meetings after a successful submit', async () => {
+  beforeEach(() => {
+    useWarningsState.setState({name: '', warnings: []});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    act(() => {
+      useWarningsState.setState({name: '', warnings: []});
+    });
+  });
+
+  it('returns true, refreshes meetings, and joins the created conversation after a successful submit', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
+    const {conversationState, findConversation, safeGetConversationById, startAudio, mainViewModel} =
+      createJoinTestMocks();
 
-    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {wrapper: createWrapper(store)});
+    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
+      wrapper: createWrapper(store, mainViewModel),
+    });
 
     let submitResult = false;
     await act(async () => {
@@ -113,14 +156,21 @@ describe('useMeetNowSubmit', () => {
     expect(submitResult).toBe(true);
     expect(meetNowMeeting).toHaveBeenCalledWith(formState);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => expect(findConversation).toHaveBeenCalledWith(qualifiedConversation));
+    expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversation);
+    expect(startAudio).toHaveBeenCalledTimes(1);
   });
 
   it('returns false when meeting creation fails', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const meetNowMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
+    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
 
-    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {wrapper: createWrapper(store)});
+    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
+      wrapper: createWrapper(store, mainViewModel),
+    });
 
     let submitResult = true;
     await act(async () => {
@@ -129,5 +179,112 @@ describe('useMeetNowSubmit', () => {
 
     expect(submitResult).toBe(false);
     expect(loadMeetings).not.toHaveBeenCalled();
+    expect(startAudio).not.toHaveBeenCalled();
+  });
+
+  it('returns true but does not join when there is no internet connection', async () => {
+    const showModalSpy = jest.spyOn(PrimaryModal, 'show');
+    useWarningsState.setState({name: '', warnings: [TYPE.NO_INTERNET]});
+
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
+    const store = createMeetingStore({loadMeetings, meetNowMeeting});
+    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
+
+    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
+      wrapper: createWrapper(store, mainViewModel),
+    });
+
+    let submitResult = false;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(submitResult).toBe(true);
+    expect(loadMeetings).toHaveBeenCalledTimes(1);
+    expect(startAudio).not.toHaveBeenCalled();
+    expect(showModalSpy).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      expect.objectContaining({
+        text: expect.objectContaining({
+          title: 'callNotEstablishedTitle',
+        }),
+      }),
+      undefined,
+      translateForTest,
+    );
+  });
+
+  it('returns true but shows a modal when joining the created conversation fails', async () => {
+    const showModalSpy = jest.spyOn(PrimaryModal, 'show');
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
+    const store = createMeetingStore({loadMeetings, meetNowMeeting});
+    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks({
+      startAudioResult: Promise.reject(new Error('join failed')),
+    });
+
+    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
+      wrapper: createWrapper(store, mainViewModel),
+    });
+
+    let submitResult = false;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    await waitFor(() => expect(startAudio).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(showModalSpy).toHaveBeenCalled());
+
+    expect(submitResult).toBe(true);
+    expect(showModalSpy).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      expect.objectContaining({
+        text: expect.objectContaining({
+          title: 'callNotEstablishedTitle',
+        }),
+      }),
+      undefined,
+      translateForTest,
+    );
+  });
+
+  it('returns true but shows a modal when the created conversation cannot be found', async () => {
+    const showModalSpy = jest.spyOn(PrimaryModal, 'show');
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
+    const store = createMeetingStore({loadMeetings, meetNowMeeting});
+    const {conversationState, safeGetConversationById, startAudio, mainViewModel} = createJoinTestMocks({
+      safeGetConversationByIdResult: task.reject('not found'),
+    });
+
+    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
+      wrapper: createWrapper(store, mainViewModel),
+    });
+
+    let submitResult = false;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    await waitFor(() => expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversation));
+    await waitFor(() => expect(showModalSpy).toHaveBeenCalled());
+
+    expect(submitResult).toBe(true);
+    expect(startAudio).not.toHaveBeenCalled();
+    expect(showModalSpy).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      expect.objectContaining({
+        text: expect.objectContaining({
+          title: 'conversationNotFoundTitle',
+        }),
+      }),
+      undefined,
+      translateForTest,
+    );
   });
 });
