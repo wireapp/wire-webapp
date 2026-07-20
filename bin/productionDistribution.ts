@@ -73,7 +73,10 @@ function getNonEmptyString(value: unknown): string | undefined {
 
 type LegacyProductionDistributionArtifactMetadata = {
   readonly version: string;
+  readonly commit: string;
 };
+
+const legacyArtifactVersionPattern = /^\d{4}(?:\.\d{2}){4,5}$/;
 
 function validateProductionDistributionArtifactMetadata(
   artifactMetadata: unknown,
@@ -100,14 +103,20 @@ function validateProductionDistributionArtifactMetadata(
   if (
     isRecord(artifactMetadata) &&
     is.nonEmptyString(artifactMetadata.version) &&
-    !('commit' in artifactMetadata) &&
+    legacyArtifactVersionPattern.test(artifactMetadata.version) &&
+    is.nonEmptyString(artifactMetadata.commit) &&
+    !('assetVersion' in artifactMetadata) &&
     !('builtAt' in artifactMetadata)
   ) {
     if (artifactMetadata.version !== artifactVersion) {
       return Result.err(new Error('Legacy distribution artifact version does not match the manifest'));
     }
 
-    return Result.ok({version: artifactMetadata.version});
+    if (artifactMetadata.commit !== releaseCommitSha) {
+      return Result.err(new Error('Legacy distribution artifact commit does not match the Production tag commit'));
+    }
+
+    return Result.ok({version: artifactMetadata.version, commit: artifactMetadata.commit});
   }
 
   return Result.err(new Error('Distribution artifact metadata is invalid'));

@@ -58,6 +58,13 @@ function createValidArtifactMetadata(): Record<string, string> {
   };
 }
 
+function createValidLegacyArtifactMetadata(): Record<string, string> {
+  return {
+    version: '2026.07.15.12.00',
+    commit: expectedReleaseCommitSha,
+  };
+}
+
 function getUnrelatedWireBuildsState(buildJson: Record<string, unknown>): string {
   return execFileSync('jq', ['-S', '-c', 'del(.version, .helmCharts.webapp)'], {
     encoding: 'utf8',
@@ -112,15 +119,15 @@ describe('production distribution decisions', () => {
     expect(actualValidation.isErr).toBe(true);
   });
 
-  it('accepts a valid legacy repair artifact without commit metadata', () => {
-    const legacyArtifactVersion = '2026.07.15.12.00';
+  it('accepts legacy artifact metadata with matching version and commit', () => {
+    const legacyArtifactMetadata = createValidLegacyArtifactMetadata();
     const legacyManifest = {
       ...createValidDistributionManifest(),
-      artifactVersion: legacyArtifactVersion,
+      artifactVersion: legacyArtifactMetadata.version,
     };
 
     const actualValidation = validateProductionDistributionManifest({
-      artifactMetadata: {version: legacyArtifactVersion},
+      artifactMetadata: legacyArtifactMetadata,
       manifest: legacyManifest,
       productionTag: expectedProductionTag,
       productionTagCommitSha: expectedReleaseCommitSha,
@@ -128,6 +135,79 @@ describe('production distribution decisions', () => {
     });
 
     expect(actualValidation.isOk).toBe(true);
+  });
+
+  it('rejects legacy artifact metadata whose version differs from the manifest', () => {
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: createValidLegacyArtifactMetadata(),
+      manifest: {...createValidDistributionManifest(), artifactVersion: '2026.07.15.12.01'},
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    expect(actualValidation.isErr).toBe(true);
+  });
+
+  it('rejects legacy artifact metadata whose commit differs from the Production tag', () => {
+    const legacyArtifactMetadata = createValidLegacyArtifactMetadata();
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: {
+        ...legacyArtifactMetadata,
+        commit: 'fedcba0987654321fedcba0987654321fedcba09',
+      },
+      manifest: {...createValidDistributionManifest(), artifactVersion: legacyArtifactMetadata.version},
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    expect(actualValidation.isErr).toBe(true);
+  });
+
+  it('rejects legacy artifact metadata without commit metadata', () => {
+    const legacyArtifactMetadata = createValidLegacyArtifactMetadata();
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: {version: legacyArtifactMetadata.version},
+      manifest: {...createValidDistributionManifest(), artifactVersion: legacyArtifactMetadata.version},
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    expect(actualValidation.isErr).toBe(true);
+  });
+
+  it('rejects artifact metadata with builtAt but no assetVersion', () => {
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: {
+        version: '2026-07-15.1',
+        commit: expectedReleaseCommitSha,
+        builtAt: '2026-07-20T06:18:03.123Z',
+      },
+      manifest: createValidDistributionManifest(),
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    expect(actualValidation.isErr).toBe(true);
+  });
+
+  it('rejects artifact metadata with assetVersion but no builtAt', () => {
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: {
+        version: '2026-07-15.1',
+        assetVersion: '2026-07-15.1-1234567',
+        commit: expectedReleaseCommitSha,
+      },
+      manifest: createValidDistributionManifest(),
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    expect(actualValidation.isErr).toBe(true);
   });
 
   it('rejects incomplete new artifact metadata instead of treating it as legacy', () => {
