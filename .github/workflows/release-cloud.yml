@@ -684,6 +684,7 @@ jobs:
       - name: Add release summary
         env:
           ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
+          ARTIFACT_BUILT_AT: ${{ needs.build_artifact.outputs.artifact_built_at }}
           ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
           ARTIFACT_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
           BETA_RESULT: ${{ needs.deploy_to_beta.result }}
@@ -778,7 +779,7 @@ jobs:
             Production distribution: ${{ needs.publish_production_distribution.result }}
 
             Production runtime verification result: ${{ needs.verify_production_runtime.result }}
-            Expected Production build version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
+            Expected Production webapp version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
             Expected Production release commit: ${{ needs.build_artifact.outputs.release_commit_sha || 'unavailable' }}
             Production tag name: ${{ needs.create_production_tag.outputs.production_tag_name || needs.production_preflight.outputs.production_tag_name || 'unavailable' }}
             Docker image tag: ${{ needs.publish_production_distribution.outputs.docker_image_tag || 'unavailable' }}
