@@ -76,9 +76,11 @@ jobs:
     permissions:
       contents: read
     outputs:
-      main_artifact_name: ${{ steps.artifact_metadata.outputs.main_artifact_name }}
-      artifact_version: ${{ steps.artifact_metadata.outputs.artifact_version }}
-      development_context_artifact_name: ${{ steps.artifact_metadata.outputs.development_context_artifact_name }}
+      main_artifact_name: ${{ steps.prepare_artifact.outputs.main_artifact_name }}
+      artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
+      artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
+      development_context_artifact_name: ${{ steps.prepare_artifact.outputs.development_context_artifact_name }}
 
     steps:
       - name: Checkout
@@ -103,15 +105,32 @@ jobs:
       - name: Update configuration
         run: ./bin/yarn nx run webapp:configure
 
+      - name: Resolve main webapp build metadata inputs
+        id: build_metadata_inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "version=main-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "commit=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
       - name: Build and package internal application
         env:
-          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.sha }}
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.build_metadata_inputs.outputs.commit }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.build_metadata_inputs.outputs.version }}
         run: |
-          short_commit_sha="${GITHUB_SHA::7}"
-          WIRE_WEBAPP_BUILD_VERSION="main-${short_commit_sha}" ./bin/yarn build:prod
+          ./bin/yarn build:prod
+
+      - name: Validate main artifact metadata
+        id: validate_artifact_metadata
+        env:
+          BUILD_ARTIFACT_PATH: ${{ env.BUILD_ARTIFACT_PATH }}
+          EXPECTED_COMMIT: ${{ steps.build_metadata_inputs.outputs.commit }}
+          EXPECTED_VERSION: ${{ steps.build_metadata_inputs.outputs.version }}
+        run: node ./bin/validateBuildArtifact.mts
 
       - name: Prepare shared main artifact metadata and exact development Docker context
-        id: artifact_metadata
+        id: prepare_artifact
         shell: bash
         env:
           BUILD_ARTIFACT_PATH: ${{ env.BUILD_ARTIFACT_PATH }}
@@ -120,8 +139,6 @@ jobs:
 
           main_artifact_name="main-artifact-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           development_context_artifact_name="main-development-context-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          artifact_version="$(unzip -p "${BUILD_ARTIFACT_PATH}" version.json | jq --exit-status --raw-output '.version | strings | select(length > 0)')"
-          test -n "${artifact_version}"
           development_context_directory="${RUNNER_TEMP}/${development_context_artifact_name}"
 
           mkdir -p \
@@ -143,22 +160,21 @@ jobs:
 
           {
             echo "main_artifact_name=${main_artifact_name}"
-            echo "artifact_version=${artifact_version}"
             echo "development_context_artifact_name=${development_context_artifact_name}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Upload shared main artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ${{ steps.artifact_metadata.outputs.main_artifact_name }}
+          name: ${{ steps.prepare_artifact.outputs.main_artifact_name }}
           path: ${{ env.BUILD_ARTIFACT_PATH }}
           if-no-files-found: error
 
       - name: Upload exact development Docker context
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ${{ steps.artifact_metadata.outputs.development_context_artifact_name }}
-          path: ${{ runner.temp }}/${{ steps.artifact_metadata.outputs.development_context_artifact_name }}
+          name: ${{ steps.prepare_artifact.outputs.development_context_artifact_name }}
+          path: ${{ runner.temp }}/${{ steps.prepare_artifact.outputs.development_context_artifact_name }}
           if-no-files-found: error
           include-hidden-files: true
 
@@ -374,7 +390,7 @@ jobs:
           environment-label: Hosted Dev
           webapp-url: ${{ env.DEV_WEBAPP_URL }}
           expected-version: ${{ needs.build_main_artifacts.outputs.artifact_version }}
-          expected-commit: ${{ github.sha }}
+          expected-commit: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           expected-backend-rest: ${{ env.DEV_RUNTIME_BACKEND_REST }}
           expected-backend-ws: ${{ env.DEV_RUNTIME_BACKEND_WS }}
 

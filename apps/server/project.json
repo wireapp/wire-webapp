@@ -7,6 +7,7 @@
     "build": {
       "executor": "nx:run-commands",
       "dependsOn": ["^build"],
+      "inputs": ["production", "webappBuildMetadata"],
       "outputs": ["{projectRoot}/dist"],
       "options": {
         "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.mts", "node {projectRoot}/bin/copy_server_assets.js"],
@@ -16,6 +17,7 @@
     "build-dev": {
       "executor": "nx:run-commands",
       "dependsOn": ["config-lib:build"],
+      "inputs": ["production", "webappBuildMetadata"],
       "outputs": ["{projectRoot}/dist"],
       "options": {
         "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.mts", "node {projectRoot}/bin/copy_server_assets.js"],
@@ -25,6 +27,7 @@
     "package": {
       "executor": "nx:run-commands",
       "dependsOn": ["^build"],
+      "inputs": ["production", "webappBuildMetadata"],
       "outputs": ["{projectRoot}/dist/s3"],
       "options": {
         "commands": ["rimraf {projectRoot}/dist", "nx run server:build", "nx run webapp:build:production", "node bin/zip.js"],
@@ -34,6 +37,7 @@
     "package-public": {
       "executor": "nx:run-commands",
       "dependsOn": ["^build"],
+      "inputs": ["production", "webappBuildMetadata"],
       "outputs": ["{projectRoot}/dist/s3"],
       "options": {
         "commands": ["rimraf {projectRoot}/dist", "nx run server:build", "nx run webapp:build:production-public", "yarn verify:bundle:prod:public", "node bin/zip.js"],

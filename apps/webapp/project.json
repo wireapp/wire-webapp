@@ -9,6 +9,7 @@
       "outputs": ["{workspaceRoot}/apps/server/dist/static"],
       "defaultConfiguration": "production",
       "dependsOn": ["^build"],
+      "inputs": ["production", "webappBuildMetadata"],
       "options": {
         "command": "yarn build:prod",
         "cwd": "{projectRoot}"
