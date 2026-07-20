@@ -84,17 +84,13 @@ jobs:
       - name: Set webapp build metadata
         id: webapp_build_metadata
         env:
-          REF_NAME: ${{ github.ref_name }}
+          PRODUCTION_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
           SOURCE_COMMIT_SHA: ${{ github.sha }}
+          WEBAPP_BUILD_CHANNEL: ${{ github.ref == 'refs/heads/master' && 'main' || 'development' }}
         run: |
           set -euo pipefail
 
-          short_commit_sha="${SOURCE_COMMIT_SHA::7}"
-          if [[ "${REF_NAME}" =~ ^([0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*)-production$ ]]; then
-            build_version="${BASH_REMATCH[1]}"
-          else
-            build_version="dev-${short_commit_sha}"
-          fi
+          build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${PRODUCTION_TAG}" "${SOURCE_COMMIT_SHA}" "${WEBAPP_BUILD_CHANNEL}")"
 
           {
             echo "version=${build_version}"

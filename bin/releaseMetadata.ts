@@ -31,6 +31,7 @@ export type BetaTagName = NonEmptyString<`${ReleaseIdentifier}-beta.${number}`>;
 export type ProductionTagName = NonEmptyString<`${ReleaseIdentifier}-production`>;
 export type ReleaseTagName = BetaTagName | ProductionTagName;
 export type CommitHash = string & {readonly [commitHashBrand]: 'CommitHash'};
+export type WebappBuildChannel = 'main' | 'development';
 
 export type ReleaseTagMetadata = {
   readonly commitHash: CommitHash;
@@ -43,9 +44,15 @@ export type ProductionTagPointsToCommitParameters = {
   readonly releaseTagMetadata: readonly ReleaseTagMetadata[];
 };
 
-const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
+const releaseDatePattern = String.raw`\d{4}-\d{2}-\d{2}`;
+const releaseIdentifierPattern = String.raw`${releaseDatePattern}\.[1-9]\d*`;
 const releaseBranchNamePattern = new RegExp(`^release/(${releaseIdentifierPattern})$`);
 const productionTagNamePattern = new RegExp(`^(${releaseIdentifierPattern})-production$`);
+const legacyProductionTagNamePattern = new RegExp(String.raw`^${releaseDatePattern}-production\.\d+$`);
+
+function isWebappBuildChannel(value: string): value is WebappBuildChannel {
+  return value === 'main' || value === 'development';
+}
 
 function escapeRegularExpression(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
@@ -103,6 +110,33 @@ export function validateProductionTagName(productionTagName: string): Result<Pro
   }
 
   return Result.ok(productionTagName as ProductionTagName);
+}
+
+export function resolveWebappBuildVersion(
+  productionTagName: string,
+  commitSha: string,
+  buildChannel: string,
+): Result<string, Error> {
+  if (!isWebappBuildChannel(buildChannel)) {
+    return Result.err(new Error(`Invalid webapp build channel: ${buildChannel}`));
+  }
+
+  if (productionTagName.length === 0) {
+    const versionPrefix = buildChannel === 'main' ? 'main' : 'dev';
+    return Result.ok(`${versionPrefix}-${commitSha.slice(0, 7) || 'unknown'}`);
+  }
+
+  const productionTagNameMatch = productionTagNamePattern.exec(productionTagName);
+
+  if (productionTagNameMatch !== null) {
+    return Result.ok(productionTagNameMatch[1]);
+  }
+
+  if (legacyProductionTagNamePattern.test(productionTagName)) {
+    return Result.ok(productionTagName);
+  }
+
+  return Result.err(new Error(`Invalid production tag name: ${productionTagName}`));
 }
 
 export function createNextBetaTagName(
