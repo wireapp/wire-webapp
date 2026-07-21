@@ -248,6 +248,56 @@ describe('EventRepository', () => {
     });
   });
 
+  describe('distributeEvent', () => {
+    let eventRepository: EventRepository;
+
+    beforeEach(() => {
+      eventRepository = new EventRepository({} as any, {} as any, {} as any, {} as any);
+      eventRepository.setEventProcessors([]);
+      jest.spyOn(amplify, 'publish').mockReturnValue(true);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('publishes MEETING.DELETED with qualified_id for RFC-shaped meeting.delete events', async () => {
+      const meetingId = {id: 'meeting-id', domain: 'example.com'};
+      const event = {
+        type: 'meeting.delete',
+        time: '2026-07-21T12:00:00.000Z',
+        qualified_id: meetingId,
+        conversation: 'conversation-id',
+        qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+        from: 'user-id',
+        qualified_from: {id: 'user-id', domain: 'example.com'},
+        via: 'user',
+      };
+
+      await eventRepository['distributeEvent'](event as any, EventSource.WEBSOCKET);
+
+      expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.MEETING.DELETED, meetingId);
+      expect(amplify.publish).not.toHaveBeenCalledWith(
+        WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND,
+        expect.anything(),
+        expect.anything(),
+      );
+    });
+
+    it('does not publish MEETING.DELETED when meeting.delete is missing qualified_id', async () => {
+      const warnSpy = jest.spyOn(eventRepository.logger, 'warn').mockImplementation(() => {});
+      const event = {
+        type: 'meeting.delete',
+        time: '2026-07-21T12:00:00.000Z',
+      };
+
+      await eventRepository['distributeEvent'](event as any, EventSource.WEBSOCKET);
+
+      expect(amplify.publish).not.toHaveBeenCalledWith(WebAppEvents.MEETING.DELETED, expect.anything());
+      expect(warnSpy).toHaveBeenCalled();
+    });
+  });
+
   describe('connectWebSocket', () => {
     let eventRepository: EventRepository;
     let mockAccount: any;

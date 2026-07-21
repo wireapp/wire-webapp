@@ -136,7 +136,7 @@ describe('deleteMeetingForMe', () => {
   it('leaves the conversation for the command qualifiedConversation', async () => {
     const leaveConversation = jest.fn().mockResolvedValue(undefined);
     const conversation = createConversation();
-    const {deps} = createDeps({
+    const {deps, safeGetConversationById} = createDeps({
       safeGetConversationById: jest.fn().mockReturnValue(task.resolve(conversation)),
       leaveConversation,
     });
@@ -144,7 +144,25 @@ describe('deleteMeetingForMe', () => {
     const result = await deleteMeetingForMe(command, deps);
 
     expect(result.isOk).toBe(true);
+    expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversation);
     expect(leaveConversation).toHaveBeenCalledWith(conversation);
+  });
+
+  it('leaves after a successful remote fetch when the conversation is missing locally', async () => {
+    const leaveConversation = jest.fn().mockResolvedValue(undefined);
+    const fetchedConversation = createConversation();
+    const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(fetchedConversation));
+
+    const {deps} = createDeps({
+      safeGetConversationById,
+      leaveConversation,
+    });
+
+    const result = await deleteMeetingForMe(command, deps);
+
+    expect(result.isOk).toBe(true);
+    expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversation);
+    expect(leaveConversation).toHaveBeenCalledWith(fetchedConversation);
   });
 
   it('returns leaveConversationFailed when leaving the conversation fails', async () => {
@@ -157,14 +175,17 @@ describe('deleteMeetingForMe', () => {
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.leaveConversationFailed);
   });
 
-  it('returns leaveConversationFailed when the conversation is not found', async () => {
+  it('returns leaveConversationFailed when remote conversation fetch fails', async () => {
+    const leaveConversation = jest.fn().mockResolvedValue(undefined);
     const {deps} = createDeps({
       safeGetConversationById: jest.fn().mockReturnValue(task.reject(new Error('not found'))),
+      leaveConversation,
     });
 
     const result = await deleteMeetingForMe(command, deps);
 
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.leaveConversationFailed);
+    expect(leaveConversation).not.toHaveBeenCalled();
   });
 });
 

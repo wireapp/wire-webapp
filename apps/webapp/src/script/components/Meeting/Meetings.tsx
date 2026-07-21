@@ -21,6 +21,7 @@ import {useEffect, useMemo, useRef} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -35,6 +36,7 @@ import {MeetNowModal} from 'Components/Meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
 import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/Meeting/shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/Meeting/shared/service/meetingService';
+import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const MeetingsContent = () => {
@@ -45,6 +47,7 @@ const MeetingsContent = () => {
   const hasLoadError = useMeetingStore(state => state.hasLoadError);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
   const removeMeetingByQualifiedId = useMeetingStore(state => state.removeMeetingByQualifiedId);
+  const selfUser = container.resolve(UserState).self();
 
   useEffect(() => {
     fireAndForgetInvoker.fireAndForget(loadMeetings);
@@ -71,6 +74,7 @@ const MeetingsContent = () => {
           isLoading={isLoading}
           hasLoadError={hasLoadError}
           scrollElementRef={scrollContainerRef}
+          selfUser={selfUser}
         />
       </div>
       <MeetingCallingView />

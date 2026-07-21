@@ -309,6 +309,7 @@ describe('submitDeleteMeeting', () => {
       PrimaryModal.type.ACKNOWLEDGE,
       expect.objectContaining({
         text: expect.objectContaining({
+          title: translateForTest('meetings.deleteModal.error.leaveConversationFailedTitle'),
           message: translateForTest('meetings.deleteModal.error.leaveConversationFailed'),
         }),
       }),

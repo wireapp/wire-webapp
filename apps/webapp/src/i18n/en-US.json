@@ -1277,6 +1277,7 @@
   "meetings.deleteModal.error.alreadyInFlight": "A delete request for this meeting is already in progress. Please wait.",
   "meetings.deleteModal.error.alreadyInFlightTitle": "Delete already in progress",
   "meetings.deleteModal.error.leaveConversationFailed": "Something went wrong while leaving the meeting conversation. Please try again.",
+  "meetings.deleteModal.error.leaveConversationFailedTitle": "Could not leave meeting",
   "meetings.deleteModal.error.notAllowed": "This meeting can no longer be deleted. It may have already ended, or you may not have permission to delete it.",
   "meetings.deleteModal.error.notAllowedTitle": "Cannot delete meeting",
   "meetings.deleteModal.forAllMessage": "The meeting will be deleted for you and everybody else. All participants will be notified.",

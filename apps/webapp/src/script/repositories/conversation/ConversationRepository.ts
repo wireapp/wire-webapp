@@ -46,7 +46,6 @@ import {
   ConversationMemberUpdateEvent,
   ConversationMessageTimerUpdateEvent,
   ConversationMLSResetEvent,
-  MeetingDeleteEvent,
   ConversationProtocolUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
@@ -3650,10 +3649,7 @@ export class ConversationRepository {
       }
     }
 
-    const isConversationCreate =
-      type === CONVERSATION_EVENT.CREATE ||
-      type === CONVERSATION_EVENT.CREATE_MEETING ||
-      type === CONVERSATION_EVENT.MEETING_DELETE;
+    const isConversationCreate = type === CONVERSATION_EVENT.CREATE || type === CONVERSATION_EVENT.CREATE_MEETING;
     const onEventPromise = isConversationCreate
       ? Promise.resolve(null)
       : this.getConversationById(conversationId, true);
@@ -3829,9 +3825,6 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.CREATE:
       case CONVERSATION_EVENT.CREATE_MEETING:
         return this.onCreate(eventJson, eventSource);
-
-      case CONVERSATION_EVENT.MEETING_DELETE:
-        return this.onMeetingDelete(eventJson);
     }
 
     if (conversationEntity === null) {
@@ -4103,13 +4096,6 @@ export class ConversationRepository {
 
     conversationEntity.addMessage(messageEntity);
     return {conversationEntity};
-  }
-
-  /**
-   * A meeting was deleted for everyone by the host.
-   */
-  private onMeetingDelete(eventJson: MeetingDeleteEvent): void {
-    amplify.publish(WebAppEvents.MEETING.DELETED, eventJson.data);
   }
 
   /**
