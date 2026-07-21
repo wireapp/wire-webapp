@@ -17,15 +17,14 @@
  *
  */
 
-import {act, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import {task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
 
-import type {FireAndForgetInvoker} from '@wireapp/core';
-
+import type {CreateMeetingSuccess} from 'Components/Meeting/shared/service/meetingService';
 import type {MeetingStoreState} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
@@ -35,11 +34,13 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
+  createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
+import {KEY} from 'Util/keyboardUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {MeetNowModal} from './meetNowModal';
@@ -47,23 +48,27 @@ import {useMeetNowModal} from './useMeetNowModal';
 
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
 
-type DeferredFireAndForgetInvoker = FireAndForgetInvoker & {
-  runPending: () => Promise<void>;
+const createDeferred = <T,>() => {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>(resolvePromise => {
+    resolve = resolvePromise;
+  });
+
+  return {promise, resolve};
 };
 
-const createDeferredFireAndForgetInvokerForTest = (): DeferredFireAndForgetInvoker => {
-  const pendingActions: Array<() => Promise<unknown>> = [];
+const createDeferredMeetNowMeeting = () => {
+  const deferred = createDeferred<CreateMeetingSuccess>();
 
   return {
-    fireAndForget(asyncAction: () => Promise<unknown>): void {
-      pendingActions.push(asyncAction);
-    },
-    async runPending(): Promise<void> {
-      const actions = pendingActions.splice(0);
-      await Promise.allSettled(actions.map(action => action()));
-    },
-    async waitUntilAllSettled(): Promise<void> {
-      await this.runPending();
+    meetNowMeeting: jest.fn().mockReturnValue(
+      task.tryOrElse(
+        () => meetingSubmitErrors.createFailed,
+        () => deferred.promise,
+      ),
+    ),
+    resolveMeetNowMeeting: (value: CreateMeetingSuccess = {failedToAdd: [], qualifiedConversation}) => {
+      deferred.resolve(value);
     },
   };
 };
@@ -102,14 +107,14 @@ const createMainViewModel = (): MainViewModel => {
   } as unknown as MainViewModel;
 };
 
-const createMeetingStore = () =>
+const createMeetingStore = (meetNowMeeting: MeetingStoreState['meetNowMeeting']) =>
   createStore<MeetingStoreState>(() => ({
     meetingSeries: [],
     isLoading: false,
     hasLoadError: false,
     loadMeetings: jest.fn().mockResolvedValue(undefined),
     scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    meetNowMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation})),
+    meetNowMeeting,
     updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
   }));
@@ -147,8 +152,14 @@ const setupContainerMocks = () => {
   return {conversationState};
 };
 
-const renderMeetNowModal = (fireAndForgetInvoker: DeferredFireAndForgetInvoker) => {
-  const store = createMeetingStore();
+type RenderMeetNowModalOptions = {
+  meetNowMeeting?: MeetingStoreState['meetNowMeeting'];
+};
+
+const renderMeetNowModal = ({meetNowMeeting}: RenderMeetNowModalOptions = {}) => {
+  const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+  const deferredMeetNowMeeting = createDeferredMeetNowMeeting();
+  const store = createMeetingStore(meetNowMeeting ?? deferredMeetNowMeeting.meetNowMeeting);
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,
@@ -165,6 +176,11 @@ const renderMeetNowModal = (fireAndForgetInvoker: DeferredFireAndForgetInvoker) 
       rootProviderWrapper,
     ),
   );
+
+  return {
+    fireAndForgetInvoker,
+    resolveMeetNowMeeting: deferredMeetNowMeeting.resolveMeetNowMeeting,
+  };
 };
 
 const openModalWithTitle = async (title: string) => {
@@ -177,6 +193,19 @@ const openModalWithTitle = async (title: string) => {
 
 const submitForm = async () => {
   await userEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.startMeeting'}));
+};
+
+const getModalOverlay = () => screen.getByRole('dialog');
+
+const getModalContent = () => {
+  const overlay = getModalOverlay();
+  const content = overlay.firstElementChild;
+
+  if (!content) {
+    throw new Error('Expected modal content element');
+  }
+
+  return content;
 };
 
 describe('MeetNowModal', () => {
@@ -193,16 +222,44 @@ describe('MeetNowModal', () => {
     jest.restoreAllMocks();
   });
 
-  it('does not close a reopened modal when a stale submission completes', async () => {
-    const fireAndForgetInvoker = createDeferredFireAndForgetInvokerForTest();
-    renderMeetNowModal(fireAndForgetInvoker);
+  it('does not dismiss the modal while submission is pending', async () => {
+    const {fireAndForgetInvoker, resolveMeetNowMeeting} = renderMeetNowModal();
 
     await openModalWithTitle('Standup');
     await submitForm();
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: 'meetings.meetNowModal.startMeeting'})).toBeDisabled();
+      expect(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'})).toBeDisabled();
+    });
+
+    await userEvent.click(getModalOverlay());
+    fireEvent.keyDown(getModalContent(), {key: KEY.ESC});
+    await userEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
+
     expect(useMeetNowModal.getState().isOpen).toBe(true);
 
-    await userEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
+    resolveMeetNowMeeting();
+
+    await act(async () => {
+      await fireAndForgetInvoker.waitUntilAllSettled();
+    });
+
+    await waitFor(() => {
+      expect(useMeetNowModal.getState().isOpen).toBe(false);
+    });
+  });
+
+  it('does not close a reopened modal when a stale submission completes', async () => {
+    const {fireAndForgetInvoker, resolveMeetNowMeeting} = renderMeetNowModal();
+
+    await openModalWithTitle('Standup');
+
+    act(() => {
+      fireEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.startMeeting'}));
+      fireEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
+    });
+
     expect(useMeetNowModal.getState().isOpen).toBe(false);
 
     act(() => {
@@ -210,24 +267,25 @@ describe('MeetNowModal', () => {
     });
     expect(useMeetNowModal.getState().isOpen).toBe(true);
 
+    resolveMeetNowMeeting();
+
     await act(async () => {
-      await fireAndForgetInvoker.runPending();
+      await fireAndForgetInvoker.waitUntilAllSettled();
     });
 
-    await waitFor(() => {
-      expect(useMeetNowModal.getState().isOpen).toBe(true);
-    });
+    expect(useMeetNowModal.getState().isOpen).toBe(true);
   });
 
   it('closes the modal after a successful submit when it was not dismissed in the meantime', async () => {
-    const fireAndForgetInvoker = createDeferredFireAndForgetInvokerForTest();
-    renderMeetNowModal(fireAndForgetInvoker);
+    const {fireAndForgetInvoker, resolveMeetNowMeeting} = renderMeetNowModal();
 
     await openModalWithTitle('Standup');
     await submitForm();
 
+    resolveMeetNowMeeting();
+
     await act(async () => {
-      await fireAndForgetInvoker.runPending();
+      await fireAndForgetInvoker.waitUntilAllSettled();
     });
 
     await waitFor(() => {
