@@ -229,8 +229,11 @@ jobs:
       artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
       distribution_artifact_name: ${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
       release_branch: ${{ steps.release_metadata.outputs.release_branch }}
+      release_branch_action: ${{ needs.prepare_release_branch.outputs.release_branch_action }}
       release_commit_sha: ${{ steps.release_metadata.outputs.release_commit_sha }}
       release_identifier: ${{ steps.release_metadata.outputs.release_identifier }}
+      source_commit_sha: ${{ needs.prepare_release_branch.outputs.source_commit_sha }}
+      source_ref: ${{ needs.prepare_release_branch.outputs.source_ref }}
 
     steps:
       - name: Checkout release branch
@@ -730,9 +733,13 @@ jobs:
           PRODUCTION_SKIPPED_REASON: ${{ needs.production_preflight.outputs.production_skipped_reason }}
           PLANNED_PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
           RELEASE_BRANCH: ${{ needs.build_artifact.outputs.release_branch }}
+          RELEASE_ACTOR: ${{ github.actor }}
+          RELEASE_BRANCH_ACTION: ${{ needs.build_artifact.outputs.release_branch_action }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
           RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
           RELEASE_REASON: ${{ inputs.reason }}
+          SOURCE_COMMIT_SHA: ${{ needs.build_artifact.outputs.source_commit_sha }}
+          SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
           TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
         run: node bin/renderWebappReleaseSummary.ts --release-candidate >> "$GITHUB_STEP_SUMMARY"
 
@@ -948,9 +955,13 @@ jobs:
           PLANNED_PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
           PRODUCTION_WIRE_BUILDS_COMMIT_SHA: ${{ needs.publish_production_distribution.outputs.wire_builds_commit_sha }}
           RELEASE_BRANCH: ${{ needs.build_artifact.outputs.release_branch }}
+          RELEASE_ACTOR: ${{ github.actor }}
+          RELEASE_BRANCH_ACTION: ${{ needs.build_artifact.outputs.release_branch_action }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
           RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
           RELEASE_REASON: ${{ inputs.reason }}
+          SOURCE_COMMIT_SHA: ${{ needs.build_artifact.outputs.source_commit_sha }}
+          SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
           TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
         run: node bin/renderWebappReleaseSummary.ts >> "$GITHUB_STEP_SUMMARY"
 

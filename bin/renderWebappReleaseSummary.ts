@@ -22,6 +22,8 @@ import {match, P} from 'ts-pattern';
 
 export type WorkflowJobResult = 'cancelled' | 'failure' | 'skipped' | 'success';
 
+export type ReleaseBranchAction = 'created' | 'reused';
+
 export type ReleaseMetadata = {
   readonly artifactChecksum: Maybe<string>;
   readonly artifactAssetVersion: Maybe<string>;
@@ -85,10 +87,17 @@ export type ProductionDistributionSummaryInput = {
 };
 
 export type GitHubLinkContext = {
+  readonly actor: Maybe<string>;
   readonly repository: Maybe<string>;
   readonly runId: Maybe<string>;
   readonly serverUrl: Maybe<string>;
   readonly wireBuildsRepository: Maybe<string>;
+};
+
+export type ReleasePreparationSummaryInput = {
+  readonly branchAction: Maybe<ReleaseBranchAction>;
+  readonly sourceCommitSha: Maybe<string>;
+  readonly sourceRef: Maybe<string>;
 };
 
 export type WebappReleaseSummaryInput = {
@@ -96,6 +105,7 @@ export type WebappReleaseSummaryInput = {
   readonly distribution: ProductionDistributionSummaryInput;
   readonly e2e: E2ESummaryInput;
   readonly github: GitHubLinkContext;
+  readonly preparation: ReleasePreparationSummaryInput;
   readonly production: ProductionSummaryInput;
   readonly release: ReleaseMetadata;
 };
@@ -155,6 +165,20 @@ function readProductionPreflightResult(environment: NodeJS.ProcessEnv): Maybe<Pr
   });
 }
 
+function readReleaseBranchAction(environment: NodeJS.ProcessEnv): Maybe<ReleaseBranchAction> {
+  const environmentValue = readOptionalEnvironmentValue(environment, 'RELEASE_BRANCH_ACTION');
+
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with(P.union('created', 'reused'), validAction => {
+        return Maybe.just(validAction);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<ReleaseBranchAction>();
+      });
+  });
+}
+
 export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): WebappReleaseSummaryInput {
   return {
     beta: {
@@ -186,6 +210,7 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
       webappUrl: readOptionalEnvironmentValue(environment, 'E2E_WEBAPP_URL'),
     },
     github: {
+      actor: readOptionalEnvironmentValue(environment, 'RELEASE_ACTOR'),
       repository: readOptionalEnvironmentValue(environment, 'GITHUB_REPOSITORY'),
       runId: readOptionalEnvironmentValue(environment, 'GITHUB_RUN_ID'),
       serverUrl: readOptionalEnvironmentValue(environment, 'GITHUB_SERVER_URL'),
@@ -211,6 +236,11 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
       skippedReason: readOptionalEnvironmentValue(environment, 'PRODUCTION_SKIPPED_REASON'),
       tagCreationResult: readWorkflowJobResult(environment, 'PRODUCTION_TAG_CREATION_RESULT'),
       webappUrl: readOptionalEnvironmentValue(environment, 'PRODUCTION_WEBAPP_URL'),
+    },
+    preparation: {
+      branchAction: readReleaseBranchAction(environment),
+      sourceCommitSha: readOptionalEnvironmentValue(environment, 'SOURCE_COMMIT_SHA'),
+      sourceRef: readOptionalEnvironmentValue(environment, 'SOURCE_REF'),
     },
     release: {
       artifactAssetVersion: readOptionalEnvironmentValue(environment, 'ARTIFACT_ASSET_VERSION'),
@@ -273,6 +303,60 @@ function formatWorkflowRunLink(github: GitHubLinkContext): string {
       });
     })
     .unwrapOr('not available');
+}
+
+function formatReleaseBranchAction(branchAction: Maybe<ReleaseBranchAction>): string {
+  return branchAction.mapOrElse(
+    () => {
+      return 'not available';
+    },
+    actualAction => {
+      return match(actualAction)
+        .with('created', () => {
+          return 'created';
+        })
+        .with('reused', () => {
+          return 'reused';
+        })
+        .exhaustive();
+    },
+  );
+}
+
+function formatReleaseBranchPreparationNote(branchAction: Maybe<ReleaseBranchAction>): string {
+  return branchAction.mapOrElse(
+    () => {
+      return 'not available';
+    },
+    actualAction => {
+      return match(actualAction)
+        .with('created', () => {
+          return 'The release branch was created from the resolved source commit.';
+        })
+        .with('reused', () => {
+          return 'The existing release branch was reused and was not moved to source_ref.';
+        })
+        .exhaustive();
+    },
+  );
+}
+
+function formatSourceCommit(input: WebappReleaseSummaryInput): string {
+  return input.preparation.branchAction.mapOrElse(
+    () => {
+      return formatCommitLink(input.preparation.sourceCommitSha, input.github);
+    },
+    branchAction => {
+      return match(branchAction)
+        .with('created', () => {
+          return formatCommitLink(input.preparation.sourceCommitSha, input.github);
+        })
+        .with('reused', () => {
+          return 'not applicable; existing branch was reused';
+        })
+        .exhaustive();
+    },
+  );
 }
 
 function formatBetaResult(result: Maybe<WorkflowJobResult>): string {
@@ -807,7 +891,7 @@ function formatWireBuildsCommit(distribution: ProductionDistributionSummaryInput
 
 function renderBetaSection(input: WebappReleaseSummaryInput, commitLink: string, workflowRunLink: string): string {
   return [
-    '### Beta deployment',
+    '### Hosted Beta validation',
     '',
     `- Result: ${formatBetaResult(input.beta.deploymentResult)}`,
     `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
@@ -865,7 +949,7 @@ function renderProductionReadinessSection(input: WebappReleaseSummaryInput, work
     .unwrapOr([]);
 
   return [
-    '### Production readiness',
+    '### Hosted Production promotion',
     '',
     `- Production promotion requested: ${input.production.promotionRequested === true ? 'true' : 'false'}`,
     `- Production preflight job result: ${formatValueOrFallback(input.production.preflightJobResult)}`,
@@ -892,7 +976,7 @@ function renderProductionSection(
     .unwrapOr([]);
 
   return [
-    '### Production deployment',
+    '### Hosted Production promotion',
     '',
     `- Result: ${formatProductionResult(input.production)}`,
     `- Production promotion requested: ${input.production.promotionRequested === true ? 'true' : 'false'}`,
@@ -923,7 +1007,7 @@ function renderProductionDistributionSection(
   workflowRunLink: string,
 ): string {
   return [
-    '### Production distribution',
+    '### Release distribution',
     '',
     `- Result: ${formatDistributionResult(input.production, input.distribution)}`,
     `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
@@ -938,17 +1022,23 @@ function renderProductionDistributionSection(
   ].join('\n');
 }
 
-function renderReleaseMetadata(
+function renderReleasePreparationSection(
   input: WebappReleaseSummaryInput,
-  title: string,
   commitLink: string,
+  sourceCommitLink: string,
   workflowRunLink: string,
 ): string {
   return [
-    `## ${title}`,
+    '## Release preparation',
     '',
-    `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
     `- Release identifier: ${formatValueOrFallback(input.release.identifier)}`,
+    `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
+    `- Branch action: ${formatReleaseBranchAction(input.preparation.branchAction)}`,
+    `- Source ref: ${formatValueOrFallback(input.preparation.sourceRef)}`,
+    `- Source commit used for creation: ${sourceCommitLink}`,
+    `- Authoritative release commit: ${commitLink}`,
+    `- Branch preparation: ${formatReleaseBranchPreparationNote(input.preparation.branchAction)}`,
+    `- Actor: ${formatValueOrFallback(input.github.actor)}`,
     `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
     `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
     `- Commit SHA: ${commitLink}`,
@@ -966,11 +1056,12 @@ function renderReleaseMetadata(
 
 export function renderWebappReleaseCandidateSummary(input: WebappReleaseSummaryInput): string {
   const commitLink = formatCommitLink(input.release.commitSha, input.github);
+  const sourceCommitLink = formatSourceCommit(input);
   const workflowRunLink = formatWorkflowRunLink(input.github);
 
   return (
     [
-      renderReleaseMetadata(input, 'WebApp release candidate', commitLink, workflowRunLink),
+      renderReleasePreparationSection(input, commitLink, sourceCommitLink, workflowRunLink),
       renderBetaSection(input, commitLink, workflowRunLink),
       renderE2ESection(input, commitLink, workflowRunLink),
       renderProductionReadinessSection(input, workflowRunLink),
@@ -980,11 +1071,12 @@ export function renderWebappReleaseCandidateSummary(input: WebappReleaseSummaryI
 
 export function renderWebappReleaseSummary(input: WebappReleaseSummaryInput): string {
   const commitLink = formatCommitLink(input.release.commitSha, input.github);
+  const sourceCommitLink = formatSourceCommit(input);
   const workflowRunLink = formatWorkflowRunLink(input.github);
 
   return (
     [
-      renderReleaseMetadata(input, 'WebApp release', commitLink, workflowRunLink),
+      renderReleasePreparationSection(input, commitLink, sourceCommitLink, workflowRunLink),
       renderBetaSection(input, commitLink, workflowRunLink),
       renderE2ESection(input, commitLink, workflowRunLink),
       renderProductionSection(input, commitLink, workflowRunLink),

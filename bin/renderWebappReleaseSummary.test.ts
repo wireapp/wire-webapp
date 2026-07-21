@@ -24,6 +24,7 @@ import {
 } from './renderWebappReleaseSummary.ts';
 import type {
   ProductionPreflightResult,
+  ReleaseBranchAction,
   WebappReleaseSummaryInput,
   WorkflowJobResult,
 } from './renderWebappReleaseSummary.ts';
@@ -59,10 +60,16 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     webappUrl: Maybe.just('https://e2e.example.com'),
   },
   github: {
+    actor: Maybe.just('release-captain'),
     repository: Maybe.just('wireapp/wire-webapp'),
     runId: Maybe.just('123456789'),
     serverUrl: Maybe.just('https://github.com'),
     wireBuildsRepository: Maybe.just('wireapp/wire-builds'),
+  },
+  preparation: {
+    branchAction: Maybe.just('created'),
+    sourceCommitSha: Maybe.just('abcdef1234567890abcdef1234567890abcdef12'),
+    sourceRef: Maybe.just('main'),
   },
   production: {
     createdTagName: Maybe.nothing<string>(),
@@ -95,11 +102,11 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
 
 function assertSummaryContract(summary: string): void {
   expect(summary).toMatch(/\n$/);
-  expect(summary).toMatch(/^## WebApp release$/m);
-  expect(summary).toMatch(/^### Beta deployment$/m);
+  expect(summary).toMatch(/^## Release preparation$/m);
+  expect(summary).toMatch(/^### Hosted Beta validation$/m);
   expect(summary).toMatch(/^### E2E system gate$/m);
-  expect(summary).toMatch(/^### Production deployment$/m);
-  expect(summary).toMatch(/^### Production distribution$/m);
+  expect(summary).toMatch(/^### Hosted Production promotion$/m);
+  expect(summary).toMatch(/^### Release distribution$/m);
   expect(summary).not.toMatch(/\]\(\)/);
   expect(summary).not.toMatch(/\/releases\/tag\//);
   expect(summary).not.toMatch(/undefined/);
@@ -125,21 +132,21 @@ describe('WebApp release summary renderer', () => {
       ].join('\n'),
     );
     expect(summary).toMatch(/^- Built at \(UTC\): 2026-07-20T06:18:03\.123Z$/m);
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Webapp version: 2026-07-17\.1/m);
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Asset version: 2026-07-17\.1-1234567/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Webapp version: 2026-07-17\.1/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Asset version: 2026-07-17\.1-1234567/m);
     expect(summary).toMatch(/### E2E system gate[\s\S]*?- Webapp version: 2026-07-17\.1/m);
     expect(summary).toMatch(/### E2E system gate[\s\S]*?- Asset version: 2026-07-17\.1-1234567/m);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Webapp version: 2026-07-17\.1/m);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Asset version: 2026-07-17\.1-1234567/m);
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Result: deployed and verified successfully/m);
+    expect(summary).toMatch(/### Hosted Production promotion[\s\S]*?- Webapp version: 2026-07-17\.1/m);
+    expect(summary).toMatch(/### Hosted Production promotion[\s\S]*?- Asset version: 2026-07-17\.1-1234567/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Result: deployed and verified successfully/m);
     expect(summary).toMatch(/### E2E system gate[\s\S]*?- Result: passed successfully/m);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Result: not requested/m);
-    expect(summary).toMatch(/### Production distribution[\s\S]*?- Result: not requested/m);
+    expect(summary).toMatch(/### Hosted Production promotion[\s\S]*?- Result: not requested/m);
+    expect(summary).toMatch(/### Release distribution[\s\S]*?- Result: not requested/m);
     expect(summary).toMatch(
       /- Beta tag: \[2026-07-17\.1-beta\.1\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/tree\/2026-07-17\.1-beta\.1\)/,
     );
     expect(summary).toMatch(/- Production tag: not requested/);
-    expect(summary).not.toMatch(/### Production deployment[\s\S]*?- Production tag: \[/m);
+    expect(summary).not.toMatch(/### Hosted Production promotion[\s\S]*?- Production tag: \[/m);
   });
 
   it('renders a successful Production release with distribution metadata', () => {
@@ -170,9 +177,15 @@ describe('WebApp release summary renderer', () => {
     const summary = renderWebappReleaseSummary(input);
 
     assertSummaryContract(summary);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Result: deployed, verified, and tagged successfully/m);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Runtime verification result: verified successfully/m);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Runtime verification: \/version and \/config\.js/m);
+    expect(summary).toMatch(
+      /### Hosted Production promotion[\s\S]*?- Result: deployed, verified, and tagged successfully/m,
+    );
+    expect(summary).toMatch(
+      /### Hosted Production promotion[\s\S]*?- Runtime verification result: verified successfully/m,
+    );
+    expect(summary).toMatch(
+      /### Hosted Production promotion[\s\S]*?- Runtime verification: \/version and \/config\.js/m,
+    );
     expect(summary).toMatch(
       /- Production tag: \[2026-07-17\.1-production\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/tree\/2026-07-17\.1-production\)/,
     );
@@ -202,15 +215,17 @@ describe('WebApp release summary renderer', () => {
     const summary = renderWebappReleaseSummary(input);
 
     assertSummaryContract(summary);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Result: already tagged; deployment not required/m);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Production preflight result: already tagged/m);
+    expect(summary).toMatch(
+      /### Hosted Production promotion[\s\S]*?- Result: already tagged; deployment not required/m,
+    );
+    expect(summary).toMatch(/### Hosted Production promotion[\s\S]*?- Production preflight result: already tagged/m);
     expect(summary).toMatch(
       new RegExp(
         `- Production tag: \\[${plannedProductionTagName}\\]\\(https://github\\.com/wireapp/wire-webapp/tree/${plannedProductionTagName}\\)`,
       ),
     );
     expect(summary).toMatch(/- Production tag creation result: not required; tag already exists/);
-    expect(summary).toMatch(/### Production distribution[\s\S]*?- Result: not run; Production tag already exists/m);
+    expect(summary).toMatch(/### Release distribution[\s\S]*?- Result: not run; Production tag already exists/m);
     expect(summary).not.toMatch(/created-production-tag/);
   });
 
@@ -230,11 +245,13 @@ describe('WebApp release summary renderer', () => {
     const summary = renderWebappReleaseSummary(input);
 
     assertSummaryContract(summary);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Result: deployed, but runtime verification failed/m);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Runtime verification result: failed/m);
-    expect(summary).toMatch(/### Production deployment[\s\S]*?- Production tag: not created/m);
-    expect(summary).toMatch(/### Production distribution[\s\S]*?- Result: not run/m);
-    expect(summary).not.toMatch(/### Production deployment[\s\S]*?- Production tag: \[/m);
+    expect(summary).toMatch(
+      /### Hosted Production promotion[\s\S]*?- Result: deployed, but runtime verification failed/m,
+    );
+    expect(summary).toMatch(/### Hosted Production promotion[\s\S]*?- Runtime verification result: failed/m);
+    expect(summary).toMatch(/### Hosted Production promotion[\s\S]*?- Production tag: not created/m);
+    expect(summary).toMatch(/### Release distribution[\s\S]*?- Result: not run/m);
+    expect(summary).not.toMatch(/### Hosted Production promotion[\s\S]*?- Production tag: \[/m);
   });
 
   it('renders a Beta deployment failure with the remaining gates not run', () => {
@@ -258,8 +275,8 @@ describe('WebApp release summary renderer', () => {
     const summary = renderWebappReleaseSummary(input);
 
     assertSummaryContract(summary);
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Result: failed/m);
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Beta tag: not created/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Result: failed/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Beta tag: not created/m);
     expect(summary).toMatch(/### E2E system gate[\s\S]*?- Result: did not run/m);
   });
 
@@ -275,8 +292,8 @@ describe('WebApp release summary renderer', () => {
     const summary = renderWebappReleaseSummary(input);
 
     assertSummaryContract(summary);
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Result: unknown result/m);
-    expect(summary).not.toMatch(/### Beta deployment[\s\S]*?- Result: deployed and verified successfully/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Result: unknown result/m);
+    expect(summary).not.toMatch(/### Hosted Beta validation[\s\S]*?- Result: deployed and verified successfully/m);
   });
 
   it('uses not available for missing release metadata', () => {
@@ -298,8 +315,8 @@ describe('WebApp release summary renderer', () => {
     assertSummaryContract(summary);
     expect(summary).toMatch(/- Artifact checksum: not available/);
     expect(summary).toMatch(/- Artifact name: not available/);
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Webapp version: not available/m);
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Asset version: not available/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Webapp version: not available/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Asset version: not available/m);
     expect(summary).toMatch(/- Built at \(UTC\): not available/);
     expect(summary).toMatch(/- Commit SHA: not available/);
     expect(summary).toMatch(/- Release identifier: not available/);
@@ -309,10 +326,20 @@ describe('WebApp release summary renderer', () => {
     const input = readWebappReleaseSummaryInput({
       ARTIFACT_ASSET_VERSION: '2026-07-17.1-1234567',
       ARTIFACT_BUILT_AT: '2026-07-20T06:18:03.123Z',
+      RELEASE_ACTOR: 'release-captain',
+      RELEASE_BRANCH_ACTION: 'created',
+      SOURCE_COMMIT_SHA: 'abcdef1234567890abcdef1234567890abcdef12',
+      SOURCE_REF: 'main',
     });
 
     expect(input.release.artifactAssetVersion.unwrapOr('not available')).toBe('2026-07-17.1-1234567');
     expect(input.release.artifactBuiltAt.unwrapOr('not available')).toBe('2026-07-20T06:18:03.123Z');
+    expect(input.github.actor.unwrapOr('not available')).toBe('release-captain');
+    expect(input.preparation.branchAction.unwrapOr('reused')).toBe('created');
+    expect(input.preparation.sourceCommitSha.unwrapOr('not available')).toBe(
+      'abcdef1234567890abcdef1234567890abcdef12',
+    );
+    expect(input.preparation.sourceRef.unwrapOr('not available')).toBe('main');
   });
 
   it('renders a main-style artifact with the same webapp and asset versions', () => {
@@ -377,10 +404,16 @@ describe('WebApp release summary renderer', () => {
       webappUrl: Maybe.just('https://wire-webapp-precommit-3.zinfra.io/'),
     },
     github: {
+      actor: Maybe.just('release-captain'),
       repository: Maybe.just('wireapp/wire-webapp'),
       runId: Maybe.just('123456789'),
       serverUrl: Maybe.just('https://github.com'),
       wireBuildsRepository: Maybe.just('wireapp/wire-builds'),
+    },
+    preparation: {
+      branchAction: Maybe.just('created'),
+      sourceCommitSha: Maybe.just('abcdef1234567890abcdef1234567890abcdef12'),
+      sourceRef: Maybe.just('main'),
     },
     production: {
       createdTagName: Maybe.nothing<string>(),
@@ -413,12 +446,11 @@ describe('WebApp release summary renderer', () => {
 
   function assertCandidateSummaryContract(summary: string): void {
     expect(summary).toMatch(/\n$/);
-    expect(summary).toMatch(/^## WebApp release candidate$/m);
-    expect(summary).toMatch(/^### Beta deployment$/m);
+    expect(summary).toMatch(/^## Release preparation$/m);
+    expect(summary).toMatch(/^### Hosted Beta validation$/m);
     expect(summary).toMatch(/^### E2E system gate$/m);
-    expect(summary).toMatch(/^### Production readiness$/m);
-    expect(summary).not.toMatch(/^### Production deployment$/m);
-    expect(summary).not.toMatch(/^### Production distribution$/m);
+    expect(summary).toMatch(/^### Hosted Production promotion$/m);
+    expect(summary).not.toMatch(/^### Release distribution$/m);
     expect(summary).not.toMatch(/undefined/);
     expect(summary).not.toMatch(/null/);
     expect(summary).not.toMatch(/\]\(\)/);
@@ -436,6 +468,14 @@ describe('WebApp release summary renderer', () => {
 
     assertCandidateSummaryContract(summary);
     expect(summary).toMatch(/- Release branch: release\/2026-07-17\.1/);
+    expect(summary).toMatch(/- Branch action: created/);
+    expect(summary).toMatch(/- Source ref: main/);
+    expect(summary).toMatch(
+      /- Source commit used for creation: \[abcdef1234567890abcdef1234567890abcdef12\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/commit\/abcdef1234567890abcdef1234567890abcdef12\)/,
+    );
+    expect(summary).toMatch(/- Authoritative release commit: \[1234567890abcdef1234567890abcdef12345678\]/);
+    expect(summary).toMatch(/- Branch preparation: The release branch was created from the resolved source commit\./);
+    expect(summary).toMatch(/- Actor: release-captain/);
     expect(summary).toMatch(
       /- Commit SHA: \[1234567890abcdef1234567890abcdef12345678\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/commit\/1234567890abcdef1234567890abcdef12345678\)/,
     );
@@ -445,7 +485,7 @@ describe('WebApp release summary renderer', () => {
     expect(summary).toMatch(
       /- Beta tag: \[2026-07-17\.1-beta\.1\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/tree\/2026-07-17\.1-beta\.1\)/,
     );
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Runtime verification result: verified successfully/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Runtime verification result: verified successfully/m);
     expect(summary).toMatch(/### E2E system gate[\s\S]*?- Runtime verification: \/version and \/config\.js/m);
     expect(summary).toMatch(
       /- Playwright report URL: \[https:\/\/e2e\.example\.com\/report\/123\]\(https:\/\/e2e\.example\.com\/report\/123\)/,
@@ -462,6 +502,26 @@ describe('WebApp release summary renderer', () => {
     expect(summary).toMatch(
       /- Workflow run URL: \[https:\/\/github\.com\/wireapp\/wire-webapp\/actions\/runs\/123456789\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/actions\/runs\/123456789\)/,
     );
+  });
+
+  it('renders reused release branch preparation without a source commit link', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineReleaseCandidateInput,
+      preparation: {
+        branchAction: Maybe.just('reused'),
+        sourceCommitSha: Maybe.nothing<string>(),
+        sourceRef: Maybe.just('main'),
+      },
+    };
+    const summary = renderWebappReleaseCandidateSummary(input);
+
+    expect(summary).toMatch(/- Branch action: reused/);
+    expect(summary).toMatch(/- Source ref: main/);
+    expect(summary).toMatch(/- Source commit used for creation: not applicable; existing branch was reused/);
+    expect(summary).toMatch(
+      /- Branch preparation: The existing release branch was reused and was not moved to source_ref\./,
+    );
+    expect(summary).not.toMatch(/Source commit used for creation: \[/);
   });
 
   it('does not infer Beta runtime verification failure from a failed deployment', () => {
@@ -482,9 +542,9 @@ describe('WebApp release summary renderer', () => {
     };
     const summary = renderWebappReleaseCandidateSummary(input);
 
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Result: failed/m);
-    expect(summary).not.toMatch(/### Beta deployment[\s\S]*?- Runtime verification result:/m);
-    expect(summary).not.toMatch(/### Beta deployment[\s\S]*?- Runtime verification result: failed/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Result: failed/m);
+    expect(summary).not.toMatch(/### Hosted Beta validation[\s\S]*?- Runtime verification result:/m);
+    expect(summary).not.toMatch(/### Hosted Beta validation[\s\S]*?- Runtime verification result: failed/m);
   });
 
   it('renders an explicit Beta runtime verification failure', () => {
@@ -500,7 +560,7 @@ describe('WebApp release summary renderer', () => {
     };
     const summary = renderWebappReleaseCandidateSummary(input);
 
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Runtime verification result: failed/m);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Runtime verification result: failed/m);
   });
 
   it('does not report an independent runtime result for failed E2E tests', () => {
@@ -552,7 +612,7 @@ describe('WebApp release summary renderer', () => {
     const summary = renderWebappReleaseCandidateSummary(input);
 
     expect(summary).not.toMatch(/Runtime verification result: unknown result/);
-    expect(summary).not.toMatch(/### Beta deployment[\s\S]*?- Runtime verification result:/m);
+    expect(summary).not.toMatch(/### Hosted Beta validation[\s\S]*?- Runtime verification result:/m);
     expect(summary).not.toMatch(/### E2E system gate[\s\S]*?- Runtime verification result:/m);
   });
 
@@ -648,7 +708,7 @@ describe('WebApp release summary renderer', () => {
     const summary = renderWebappReleaseCandidateSummary(input);
 
     assertCandidateSummaryContract(summary);
-    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Result: failed/);
+    expect(summary).toMatch(/### Hosted Beta validation[\s\S]*?- Result: failed/);
     expect(summary).toMatch(/### E2E system gate[\s\S]*?- Result: did not run/);
     expect(summary).toMatch(
       /- Approval status: Production is blocked because an earlier gate failed: Beta deployment failed; Production preflight was skipped/,
@@ -705,10 +765,16 @@ describe('WebApp release summary renderer', () => {
         testinyRunName: Maybe.nothing<string>(),
       },
       github: {
+        actor: Maybe.nothing<string>(),
         repository: Maybe.nothing<string>(),
         runId: Maybe.nothing<string>(),
         serverUrl: Maybe.nothing<string>(),
         wireBuildsRepository: Maybe.nothing<string>(),
+      },
+      preparation: {
+        branchAction: Maybe.nothing<ReleaseBranchAction>(),
+        sourceCommitSha: Maybe.nothing<string>(),
+        sourceRef: Maybe.nothing<string>(),
       },
       production: {
         ...baselineReleaseCandidateInput.production,
@@ -731,6 +797,11 @@ describe('WebApp release summary renderer', () => {
     expect(summary).toMatch(/- Commit SHA: not available/);
     expect(summary).toMatch(/- Artifact name: not available/);
     expect(summary).toMatch(/- Artifact checksum: not available/);
+    expect(summary).toMatch(/- Branch action: not available/);
+    expect(summary).toMatch(/- Source ref: not available/);
+    expect(summary).toMatch(/- Source commit used for creation: not available/);
+    expect(summary).toMatch(/- Branch preparation: not available/);
+    expect(summary).toMatch(/- Actor: not available/);
     expect(summary).toMatch(/- Playwright report URL: not available/);
     expect(summary).toMatch(/- Planned Production tag: not available/);
     expect(summary).toMatch(/- Production preflight job result: not available/);
