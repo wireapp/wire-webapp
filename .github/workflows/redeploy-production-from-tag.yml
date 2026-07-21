@@ -68,6 +68,10 @@ jobs:
     runs-on: ubuntu-24.04
     needs: validate_request
     outputs:
+      artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      artifact_asset_version: ${{ steps.validate_artifact_metadata.outputs.artifact_asset_version }}
+      artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
+      artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
       commit_sha: ${{ steps.git_metadata.outputs.commit_sha }}
       commit_url: ${{ steps.git_metadata.outputs.commit_url }}
       commit_subject: ${{ steps.git_metadata.outputs.commit_subject }}
@@ -122,6 +126,14 @@ jobs:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
         run: ./bin/yarn build:prod:public
+
+      - name: Validate redeploy artifact metadata
+        id: validate_artifact_metadata
+        env:
+          BUILD_ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
+          EXPECTED_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
+          EXPECTED_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
+        run: node ./bin/validateBuildArtifact.mts
 
       - name: Upload build artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -187,5 +199,8 @@ jobs:
           text: |
             ❌ Production redeploy failed for tag ${{ needs.validate_request.outputs.tag }} ❌
             **Triggered by:** ${{ github.actor }}
-            **Commit:** [${{ needs.build_artifact.outputs.commit_sha }}](${{ needs.build_artifact.outputs.commit_url }}) — ${{ needs.build_artifact.outputs.commit_subject }}
+            **Webapp version:** ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
+            **Asset version:** ${{ needs.build_artifact.outputs.artifact_asset_version || 'unavailable' }}
+            **Commit SHA:** ${{ needs.build_artifact.outputs.artifact_commit || 'unavailable' }} — ${{ needs.build_artifact.outputs.commit_subject }}
+            **Built at (UTC):** ${{ needs.build_artifact.outputs.artifact_built_at || 'unavailable' }}
             **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
