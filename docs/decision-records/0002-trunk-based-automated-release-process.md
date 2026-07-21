@@ -131,8 +131,9 @@ The cloud release process is:
 - Quality assurance owns the go/no-go quality gate.
 - The engineering release captain owns production rollout, observability, and incident response.
 - The production workflow promotes the beta-tested artifact and does not rebuild from source.
-- Live deployment verification uses `/version` to identify the deployed build, `/commit` to identify its source revision, and `/config.js` to verify the active environment-specific REST and WebSocket backend configuration.
-- Build version and source commit are separate evidence: the same source commit can produce different builds, so `/commit` proves the source revision while `/version` identifies the particular build generated and promoted by the current workflow.
+- Live deployment verification uses `/version` to identify the deployed artifact with its complete authoritative `BuildMetadata` object (`version`, `assetVersion`, `commit`, and `builtAt`), and `/config.js` to verify the active environment-specific REST and WebSocket backend configuration.
+- `version` remains the logical application version, `assetVersion` identifies browser assets for the exact source revision, `commit` is the full Git SHA, and `builtAt` is the artifact assembly time in UTC. `/commit` remains a plain-text compatibility endpoint for existing consumers.
+- Deployment context such as the result, Git reference, target environment, service URLs, Docker image, Helm chart, `wire-builds` commit, workflow run URL, and manual-dispatch reason belongs in GitHub Actions summaries rather than `/version`.
 - Backend configuration is runtime state and is not inferred from build identity. Beta, precommit, and Production must each satisfy their expected combination of build version, source commit, REST backend, and WebSocket backend.
 - A successful deployment operation alone does not create a Production tag. The workflow creates the production tag `YYYY-MM-DD.N-production` only after all Production runtime assertions pass, so the tag represents a successfully deployed and verified runtime.
 - The cloud EBS artifact is built once and promoted unchanged through Beta, E2E, and Production.

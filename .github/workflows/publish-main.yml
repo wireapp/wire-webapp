@@ -78,6 +78,7 @@ jobs:
     outputs:
       main_artifact_name: ${{ steps.prepare_artifact.outputs.main_artifact_name }}
       artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      artifact_asset_version: ${{ steps.validate_artifact_metadata.outputs.artifact_asset_version }}
       artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
       artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
       development_context_artifact_name: ${{ steps.prepare_artifact.outputs.development_context_artifact_name }}
@@ -262,6 +263,7 @@ jobs:
           ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
           ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
+          ARTIFACT_ASSET_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_asset_version }}
           DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
           EDGE_RUNTIME_BACKEND_REST: ${{ env.EDGE_RUNTIME_BACKEND_REST }}
           EDGE_RUNTIME_BACKEND_WS: ${{ env.EDGE_RUNTIME_BACKEND_WS }}
@@ -293,8 +295,9 @@ jobs:
             echo
             echo "- Result: ${edge_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Asset version: ${ARTIFACT_ASSET_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Target environment: ${EDGE_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${EDGE_WEBAPP_URL}](${EDGE_WEBAPP_URL})"
@@ -358,8 +361,18 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          sparse-checkout: .github/actions/verify-webapp-runtime
-          sparse-checkout-cone-mode: true
+          sparse-checkout: |
+            .nvmrc
+            .github/actions/verify-webapp-runtime
+            bin/validateRuntimeResponses.mts
+            bin/validateRuntimeResponses.ts
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node.js for runtime verification
+        if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
 
       - name: Download shared main artifact
         if: ${{ steps.check_latest_main.outputs.deploy_allowed == 'true' }}
@@ -399,7 +412,9 @@ jobs:
           environment-label: Hosted Dev
           webapp-url: ${{ env.DEV_WEBAPP_URL }}
           expected-version: ${{ needs.build_main_artifacts.outputs.artifact_version }}
+          expected-asset-version: ${{ needs.build_main_artifacts.outputs.artifact_asset_version }}
           expected-commit: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
+          expected-built-at: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
           expected-backend-rest: ${{ env.DEV_RUNTIME_BACKEND_REST }}
           expected-backend-ws: ${{ env.DEV_RUNTIME_BACKEND_WS }}
 
@@ -409,6 +424,7 @@ jobs:
           ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
           ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
+          ARTIFACT_ASSET_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_asset_version }}
           DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
           DEV_RUNTIME_BACKEND_REST: ${{ env.DEV_RUNTIME_BACKEND_REST }}
           DEV_RUNTIME_BACKEND_WS: ${{ env.DEV_RUNTIME_BACKEND_WS }}
@@ -441,8 +457,9 @@ jobs:
             echo
             echo "- Result: ${dev_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Asset version: ${ARTIFACT_ASSET_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Target environment: ${DEV_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${DEV_WEBAPP_URL}](${DEV_WEBAPP_URL})"
@@ -574,6 +591,7 @@ jobs:
           ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
           ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
+          ARTIFACT_ASSET_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_asset_version }}
           CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
           DOCKER_IMAGE_OUTCOME: ${{ steps.publish_docker.outcome }}
           DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
@@ -627,8 +645,9 @@ jobs:
             echo
             echo "- Result: ${channel_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Asset version: ${ARTIFACT_ASSET_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo '- Target channel: dev'
             echo "- Docker image: ${docker_image_reference}"
@@ -708,6 +727,7 @@ jobs:
           ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
           ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
+          ARTIFACT_ASSET_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_asset_version }}
           EDGE_RESULT: ${{ needs.deploy_to_edge.result }}
           EDGE_RUNTIME_BACKEND_REST: ${{ env.EDGE_RUNTIME_BACKEND_REST }}
           EDGE_RUNTIME_BACKEND_WS: ${{ env.EDGE_RUNTIME_BACKEND_WS }}
@@ -799,8 +819,9 @@ jobs:
             echo '## Main delivery'
             echo
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Asset version: ${ARTIFACT_ASSET_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Workflow run URL: [${workflow_run_url}](${workflow_run_url})"
 
@@ -809,8 +830,10 @@ jobs:
             echo
             echo "- Result: ${edge_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Asset version: ${ARTIFACT_ASSET_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Target environment: ${EDGE_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${EDGE_WEBAPP_URL}](${EDGE_WEBAPP_URL})"
             echo "- REST backend URL: ${EDGE_RUNTIME_BACKEND_REST}"
@@ -826,8 +849,10 @@ jobs:
             echo
             echo "- Result: ${dev_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Asset version: ${ARTIFACT_ASSET_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Target environment: ${DEV_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${DEV_WEBAPP_URL}](${DEV_WEBAPP_URL})"
             echo "- REST backend URL: ${DEV_RUNTIME_BACKEND_REST}"
@@ -843,8 +868,10 @@ jobs:
             echo
             echo "- Result: ${channel_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: ${artifact_commit_display}"
             echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Asset version: ${ARTIFACT_ASSET_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo '- Target channel: dev'
             echo "- Docker image: ${docker_image_reference}"
             echo "- Helm chart repository: ${CHART_REPOSITORY_URL}"

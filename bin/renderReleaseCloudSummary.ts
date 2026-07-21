@@ -17,72 +17,78 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+import {match, P} from 'ts-pattern';
+
 export type WorkflowJobResult = 'cancelled' | 'failure' | 'skipped' | 'success';
 
 export type ReleaseMetadata = {
-  readonly artifactChecksum: string | undefined;
-  readonly artifactBuiltAt: string | undefined;
-  readonly artifactName: string | undefined;
-  readonly artifactVersion: string | undefined;
-  readonly branch: string | undefined;
-  readonly commitSha: string | undefined;
-  readonly identifier: string | undefined;
-  readonly manualReason: string | undefined;
+  readonly artifactChecksum: Maybe<string>;
+  readonly artifactAssetVersion: Maybe<string>;
+  readonly artifactBuiltAt: Maybe<string>;
+  readonly artifactName: Maybe<string>;
+  readonly artifactVersion: Maybe<string>;
+  readonly branch: Maybe<string>;
+  readonly commitSha: Maybe<string>;
+  readonly identifier: Maybe<string>;
+  readonly manualReason: Maybe<string>;
 };
 
 export type BetaSummaryInput = {
-  readonly deploymentResult: WorkflowJobResult | undefined;
-  readonly environmentName: string | undefined;
-  readonly runtimeBackendRest: string | undefined;
-  readonly runtimeBackendWebSocket: string | undefined;
-  readonly tagCreationResult: WorkflowJobResult | undefined;
-  readonly tagName: string | undefined;
-  readonly webappUrl: string | undefined;
+  readonly deploymentResult: Maybe<WorkflowJobResult>;
+  readonly environmentName: Maybe<string>;
+  readonly runtimeBackendRest: Maybe<string>;
+  readonly runtimeBackendWebSocket: Maybe<string>;
+  readonly runtimeVerificationResult: Maybe<WorkflowJobResult>;
+  readonly tagCreationResult: Maybe<WorkflowJobResult>;
+  readonly tagName: Maybe<string>;
+  readonly webappUrl: Maybe<string>;
 };
 
 export type E2ESummaryInput = {
-  readonly environmentName: string | undefined;
-  readonly reportUrl: string | undefined;
-  readonly result: WorkflowJobResult | undefined;
-  readonly runtimeBackendRest: string | undefined;
-  readonly runtimeBackendWebSocket: string | undefined;
-  readonly testinyRunName: string | undefined;
-  readonly webappUrl: string | undefined;
+  readonly environmentName: Maybe<string>;
+  readonly reportUrl: Maybe<string>;
+  readonly result: Maybe<WorkflowJobResult>;
+  readonly runtimeBackendRest: Maybe<string>;
+  readonly runtimeBackendWebSocket: Maybe<string>;
+  readonly testinyRunName: Maybe<string>;
+  readonly webappUrl: Maybe<string>;
 };
 
 export type ProductionPreflightResult = 'already_tagged' | 'failure' | 'ready' | 'skipped';
 
 export type ProductionSummaryInput = {
-  readonly deploymentResult: WorkflowJobResult | undefined;
-  readonly environmentName: string | undefined;
-  readonly preflightJobResult: WorkflowJobResult | undefined;
-  readonly preflightResult: ProductionPreflightResult | undefined;
+  readonly deploymentResult: Maybe<WorkflowJobResult>;
+  readonly deploymentRequired: Maybe<boolean>;
+  readonly environmentName: Maybe<string>;
+  readonly preflightJobResult: Maybe<WorkflowJobResult>;
+  readonly preflightResult: Maybe<ProductionPreflightResult>;
   readonly promotionRequested: boolean;
-  readonly runtimeBackendRest: string | undefined;
-  readonly runtimeBackendWebSocket: string | undefined;
-  readonly runtimeVerificationResult: WorkflowJobResult | undefined;
-  readonly skippedReason: string | undefined;
-  readonly tagCreationResult: WorkflowJobResult | undefined;
-  readonly createdTagName: string | undefined;
-  readonly plannedTagName: string | undefined;
-  readonly webappUrl: string | undefined;
+  readonly runtimeBackendRest: Maybe<string>;
+  readonly runtimeBackendWebSocket: Maybe<string>;
+  readonly runtimeVerificationResult: Maybe<WorkflowJobResult>;
+  readonly skippedReason: Maybe<string>;
+  readonly tagCreationResult: Maybe<WorkflowJobResult>;
+  readonly createdTagName: Maybe<string>;
+  readonly plannedTagName: Maybe<string>;
+  readonly webappUrl: Maybe<string>;
 };
 
 export type ProductionDistributionSummaryInput = {
-  readonly dockerImageTag: string | undefined;
-  readonly distributionJobResult: WorkflowJobResult | undefined;
-  readonly distributionResult: WorkflowJobResult | undefined;
-  readonly helmChartVersion: string | undefined;
-  readonly wireBuildsCommitSha: string | undefined;
-  readonly dockerRepository: string | undefined;
-  readonly chartRepositoryUrl: string | undefined;
+  readonly dockerImageTag: Maybe<string>;
+  readonly distributionJobResult: Maybe<WorkflowJobResult>;
+  readonly distributionResult: Maybe<WorkflowJobResult>;
+  readonly helmChartVersion: Maybe<string>;
+  readonly wireBuildsCommitSha: Maybe<string>;
+  readonly dockerRepository: Maybe<string>;
+  readonly chartRepositoryUrl: Maybe<string>;
 };
 
 export type GitHubLinkContext = {
-  readonly repository: string | undefined;
-  readonly runId: string | undefined;
-  readonly serverUrl: string | undefined;
-  readonly wireBuildsRepository: string | undefined;
+  readonly repository: Maybe<string>;
+  readonly runId: Maybe<string>;
+  readonly serverUrl: Maybe<string>;
+  readonly wireBuildsRepository: Maybe<string>;
 };
 
 export type ReleaseCloudSummaryInput = {
@@ -94,42 +100,59 @@ export type ReleaseCloudSummaryInput = {
   readonly release: ReleaseMetadata;
 };
 
-function readOptionalEnvironmentValue(environment: NodeJS.ProcessEnv, variableName: string): string | undefined {
-  const environmentValue = environment[variableName];
+function readOptionalEnvironmentValue(environment: NodeJS.ProcessEnv, variableName: string): Maybe<string> {
+  return Maybe.of(environment[variableName]).andThen(environmentValue => {
+    if (environmentValue === '') {
+      return Maybe.nothing<string>();
+    }
 
-  if (environmentValue === undefined || environmentValue === '') {
-    return undefined;
-  }
-
-  return environmentValue;
+    return Maybe.just(environmentValue);
+  });
 }
 
-function readWorkflowJobResult(environment: NodeJS.ProcessEnv, variableName: string): WorkflowJobResult | undefined {
+function readOptionalBoolean(environment: NodeJS.ProcessEnv, variableName: string): Maybe<boolean> {
   const environmentValue = readOptionalEnvironmentValue(environment, variableName);
 
-  switch (environmentValue) {
-    case 'cancelled':
-    case 'failure':
-    case 'skipped':
-    case 'success':
-      return environmentValue;
-    default:
-      return undefined;
-  }
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with('true', () => {
+        return Maybe.just(true);
+      })
+      .with('false', () => {
+        return Maybe.just(false);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<boolean>();
+      });
+  });
 }
 
-function readProductionPreflightResult(environment: NodeJS.ProcessEnv): ProductionPreflightResult | undefined {
+function readWorkflowJobResult(environment: NodeJS.ProcessEnv, variableName: string): Maybe<WorkflowJobResult> {
+  const environmentValue = readOptionalEnvironmentValue(environment, variableName);
+
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with(P.union('cancelled', 'failure', 'skipped', 'success'), validResult => {
+        return Maybe.just(validResult);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<WorkflowJobResult>();
+      });
+  });
+}
+
+function readProductionPreflightResult(environment: NodeJS.ProcessEnv): Maybe<ProductionPreflightResult> {
   const environmentValue = readOptionalEnvironmentValue(environment, 'PRODUCTION_PREFLIGHT_RESULT');
 
-  switch (environmentValue) {
-    case 'already_tagged':
-    case 'failure':
-    case 'ready':
-    case 'skipped':
-      return environmentValue;
-    default:
-      return undefined;
-  }
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with(P.union('already_tagged', 'failure', 'ready', 'skipped'), validResult => {
+        return Maybe.just(validResult);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<ProductionPreflightResult>();
+      });
+  });
 }
 
 export function readReleaseCloudSummaryInput(environment: NodeJS.ProcessEnv): ReleaseCloudSummaryInput {
@@ -139,6 +162,7 @@ export function readReleaseCloudSummaryInput(environment: NodeJS.ProcessEnv): Re
       environmentName: readOptionalEnvironmentValue(environment, 'BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME'),
       runtimeBackendRest: readOptionalEnvironmentValue(environment, 'BETA_RUNTIME_BACKEND_REST'),
       runtimeBackendWebSocket: readOptionalEnvironmentValue(environment, 'BETA_RUNTIME_BACKEND_WS'),
+      runtimeVerificationResult: readWorkflowJobResult(environment, 'BETA_RUNTIME_VERIFICATION_RESULT'),
       tagCreationResult: readWorkflowJobResult(environment, 'BETA_TAG_CREATION_RESULT'),
       tagName: readOptionalEnvironmentValue(environment, 'BETA_TAG_NAME'),
       webappUrl: readOptionalEnvironmentValue(environment, 'BETA_WEBAPP_URL'),
@@ -158,7 +182,7 @@ export function readReleaseCloudSummaryInput(environment: NodeJS.ProcessEnv): Re
       result: readWorkflowJobResult(environment, 'E2E_RESULT'),
       runtimeBackendRest: readOptionalEnvironmentValue(environment, 'E2E_RUNTIME_BACKEND_REST'),
       runtimeBackendWebSocket: readOptionalEnvironmentValue(environment, 'E2E_RUNTIME_BACKEND_WS'),
-      testinyRunName: environment.TESTINY_RUN_NAME,
+      testinyRunName: readOptionalEnvironmentValue(environment, 'TESTINY_RUN_NAME'),
       webappUrl: readOptionalEnvironmentValue(environment, 'E2E_WEBAPP_URL'),
     },
     github: {
@@ -170,11 +194,17 @@ export function readReleaseCloudSummaryInput(environment: NodeJS.ProcessEnv): Re
     production: {
       createdTagName: readOptionalEnvironmentValue(environment, 'CREATED_PRODUCTION_TAG_NAME'),
       deploymentResult: readWorkflowJobResult(environment, 'PRODUCTION_DEPLOYMENT_RESULT'),
+      deploymentRequired: readOptionalBoolean(environment, 'PRODUCTION_DEPLOYMENT_REQUIRED'),
       environmentName: readOptionalEnvironmentValue(environment, 'PRODUCTION_ENVIRONMENT_NAME'),
       plannedTagName: readOptionalEnvironmentValue(environment, 'PLANNED_PRODUCTION_TAG_NAME'),
       preflightJobResult: readWorkflowJobResult(environment, 'PRODUCTION_PREFLIGHT_JOB_RESULT'),
       preflightResult: readProductionPreflightResult(environment),
-      promotionRequested: environment.PRODUCTION_PROMOTION_REQUESTED === 'true',
+      promotionRequested: readOptionalBoolean(environment, 'PRODUCTION_PROMOTION_REQUESTED').mapOr(
+        false,
+        promotionRequested => {
+          return promotionRequested === true;
+        },
+      ),
       runtimeBackendRest: readOptionalEnvironmentValue(environment, 'PRODUCTION_RUNTIME_BACKEND_REST'),
       runtimeBackendWebSocket: readOptionalEnvironmentValue(environment, 'PRODUCTION_RUNTIME_BACKEND_WS'),
       runtimeVerificationResult: readWorkflowJobResult(environment, 'PRODUCTION_RUNTIME_VERIFICATION_RESULT'),
@@ -183,6 +213,7 @@ export function readReleaseCloudSummaryInput(environment: NodeJS.ProcessEnv): Re
       webappUrl: readOptionalEnvironmentValue(environment, 'PRODUCTION_WEBAPP_URL'),
     },
     release: {
+      artifactAssetVersion: readOptionalEnvironmentValue(environment, 'ARTIFACT_ASSET_VERSION'),
       artifactBuiltAt: readOptionalEnvironmentValue(environment, 'ARTIFACT_BUILT_AT'),
       artifactChecksum: readOptionalEnvironmentValue(environment, 'ARTIFACT_CHECKSUM'),
       artifactName: readOptionalEnvironmentValue(environment, 'ARTIFACT_NAME'),
@@ -195,76 +226,113 @@ export function readReleaseCloudSummaryInput(environment: NodeJS.ProcessEnv): Re
   };
 }
 
-function formatValueOrFallback(value: string | undefined, fallback: string = 'not available'): string {
-  return value === undefined ? fallback : value;
+function formatValueOrFallback(value: Maybe<string>, fallback: string = 'not available'): string {
+  return value.unwrapOr(fallback);
 }
 
 function formatMarkdownLink(label: string, url: string): string {
   return `[${label}](${url})`;
 }
 
-function formatOptionalFrontendUrl(url: string | undefined): string {
-  if (url !== undefined && (url.startsWith('http://') || url.startsWith('https://'))) {
-    return formatMarkdownLink(url, url);
-  }
+function formatOptionalFrontendUrl(url: Maybe<string>): string {
+  return url
+    .andThen(value => {
+      if (value.startsWith('http://') || value.startsWith('https://')) {
+        return Maybe.just(formatMarkdownLink(value, value));
+      }
 
-  return 'not available';
+      return Maybe.nothing<string>();
+    })
+    .unwrapOr('not available');
 }
 
-function formatOptionalReportUrl(url: string | undefined): string {
-  if (url !== undefined && (url.startsWith('http://') || url.startsWith('https://'))) {
-    return formatMarkdownLink(url, url);
-  }
-
-  return 'not available';
+function formatOptionalReportUrl(url: Maybe<string>): string {
+  return formatOptionalFrontendUrl(url);
 }
 
-function formatCommitLink(commitSha: string | undefined, github: GitHubLinkContext): string {
-  if (commitSha !== undefined && github.serverUrl !== undefined && github.repository !== undefined) {
-    return formatMarkdownLink(commitSha, `${github.serverUrl}/${github.repository}/commit/${commitSha}`);
-  }
-
-  return 'not available';
+function formatCommitLink(commitSha: Maybe<string>, github: GitHubLinkContext): string {
+  return commitSha
+    .andThen(commit => {
+      return github.serverUrl.andThen(serverUrl => {
+        return github.repository.map(repository => {
+          return formatMarkdownLink(commit, `${serverUrl}/${repository}/commit/${commit}`);
+        });
+      });
+    })
+    .unwrapOr('not available');
 }
 
 function formatWorkflowRunLink(github: GitHubLinkContext): string {
-  if (github.serverUrl !== undefined && github.repository !== undefined && github.runId !== undefined) {
-    const workflowRunUrl = `${github.serverUrl}/${github.repository}/actions/runs/${github.runId}`;
-    return formatMarkdownLink(workflowRunUrl, workflowRunUrl);
-  }
-
-  return 'not available';
+  return github.serverUrl
+    .andThen(serverUrl => {
+      return github.repository.andThen(repository => {
+        return github.runId.map(runId => {
+          const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
+          return formatMarkdownLink(workflowRunUrl, workflowRunUrl);
+        });
+      });
+    })
+    .unwrapOr('not available');
 }
 
-function formatBetaResult(result: WorkflowJobResult | undefined): string {
-  switch (result) {
-    case 'success':
-      return 'deployed and verified successfully';
-    case 'failure':
-      return 'failed';
-    case 'skipped':
-      return 'did not run';
-    case 'cancelled':
-      return 'cancelled';
-    default:
+function formatBetaResult(result: Maybe<WorkflowJobResult>): string {
+  return result.mapOrElse(
+    () => {
       return 'unknown result';
-  }
+    },
+    actualResult => {
+      return match(actualResult)
+        .with('success', () => {
+          return 'deployed and verified successfully';
+        })
+        .with('failure', () => {
+          return 'failed';
+        })
+        .with('skipped', () => {
+          return 'did not run';
+        })
+        .with('cancelled', () => {
+          return 'cancelled';
+        })
+        .exhaustive();
+    },
+  );
+}
+
+function hasWorkflowJobResult(result: Maybe<WorkflowJobResult>, expectedResult: WorkflowJobResult): boolean {
+  return result.mapOr(false, actualResult => {
+    return actualResult === expectedResult;
+  });
+}
+
+function hasProductionPreflightResult(
+  result: Maybe<ProductionPreflightResult>,
+  expectedResult: ProductionPreflightResult,
+): boolean {
+  return result.mapOr(false, actualResult => {
+    return actualResult === expectedResult;
+  });
+}
+
+function formatRepositoryTreeLink(label: Maybe<string>, github: GitHubLinkContext): Maybe<string> {
+  return label.andThen(value => {
+    return github.serverUrl.andThen(serverUrl => {
+      return github.repository.map(repository => {
+        return formatMarkdownLink(value, `${serverUrl}/${repository}/tree/${value}`);
+      });
+    });
+  });
 }
 
 function formatBetaTag(input: BetaSummaryInput, github: GitHubLinkContext): string {
-  if (
-    input.tagCreationResult === 'success' &&
-    input.tagName !== undefined &&
-    github.serverUrl !== undefined &&
-    github.repository !== undefined
-  ) {
-    return formatMarkdownLink(input.tagName, `${github.serverUrl}/${github.repository}/tree/${input.tagName}`);
+  if (hasWorkflowJobResult(input.tagCreationResult, 'success')) {
+    return formatRepositoryTreeLink(input.tagName, github).unwrapOr('not available');
   }
 
   if (
-    input.tagCreationResult === 'failure' ||
-    input.tagCreationResult === 'cancelled' ||
-    input.tagCreationResult === 'skipped'
+    hasWorkflowJobResult(input.tagCreationResult, 'failure') ||
+    hasWorkflowJobResult(input.tagCreationResult, 'cancelled') ||
+    hasWorkflowJobResult(input.tagCreationResult, 'skipped')
   ) {
     return 'not created';
   }
@@ -272,58 +340,100 @@ function formatBetaTag(input: BetaSummaryInput, github: GitHubLinkContext): stri
   return 'not available';
 }
 
-function formatE2EResult(result: WorkflowJobResult | undefined): string {
-  switch (result) {
-    case 'success':
-      return 'passed successfully';
-    case 'failure':
-      return 'failed';
-    case 'skipped':
-      return 'did not run';
-    case 'cancelled':
-      return 'cancelled';
-    default:
+function formatE2EResult(result: Maybe<WorkflowJobResult>): string {
+  return result.mapOrElse(
+    () => {
       return 'unknown result';
-  }
+    },
+    actualResult => {
+      return match(actualResult)
+        .with('success', () => {
+          return 'passed successfully';
+        })
+        .with('failure', () => {
+          return 'failed';
+        })
+        .with('skipped', () => {
+          return 'did not run';
+        })
+        .with('cancelled', () => {
+          return 'cancelled';
+        })
+        .exhaustive();
+    },
+  );
+}
+
+function formatRuntimeVerificationResult(result: WorkflowJobResult): string {
+  return match(result)
+    .with('success', () => {
+      return 'verified successfully';
+    })
+    .with('failure', () => {
+      return 'failed';
+    })
+    .with('skipped', () => {
+      return 'not run';
+    })
+    .with('cancelled', () => {
+      return 'cancelled';
+    })
+    .exhaustive();
+}
+
+function renderRuntimeVerificationLines(result: Maybe<WorkflowJobResult>): string[] {
+  return result.mapOrElse(
+    () => {
+      return [];
+    },
+    actualResult => {
+      return [`- Runtime verification result: ${formatRuntimeVerificationResult(actualResult)}`];
+    },
+  );
 }
 
 function formatProductionPreflightResult(input: ProductionSummaryInput): string {
-  switch (input.preflightResult) {
-    case 'ready':
-      return 'ready';
-    case 'already_tagged':
-      return 'already tagged';
-    case 'skipped':
-      return 'skipped';
-    case 'failure':
-      return 'failed';
-    default:
-      switch (input.preflightJobResult) {
-        case 'failure':
-          return 'failed';
-        case 'cancelled':
-          return 'cancelled';
-        case 'skipped':
-          return 'not run';
-        default:
+  return input.preflightResult.mapOrElse(
+    () => {
+      return input.preflightJobResult.mapOrElse(
+        () => {
           return 'unknown result';
-      }
-  }
-}
-
-function formatProductionRuntimeVerificationResult(result: WorkflowJobResult | undefined): string {
-  switch (result) {
-    case 'success':
-      return 'verified successfully';
-    case 'failure':
-      return 'failed';
-    case 'skipped':
-      return 'not run';
-    case 'cancelled':
-      return 'cancelled';
-    default:
-      return 'unknown result';
-  }
+        },
+        preflightJobResult => {
+          return match(preflightJobResult)
+            .with('failure', () => {
+              return 'failed';
+            })
+            .with('cancelled', () => {
+              return 'cancelled';
+            })
+            .with('skipped', () => {
+              return 'not run';
+            })
+            .with('success', () => {
+              return 'unknown result';
+            })
+            .exhaustive();
+        },
+      );
+    },
+    preflightResult => {
+      return match(preflightResult)
+        .with('ready', () => {
+          return 'ready';
+        })
+        .with('already_tagged', () => {
+          return 'already tagged';
+        })
+        .with('skipped', () => {
+          return 'skipped';
+        })
+        .with('failure', () => {
+          return 'failed';
+        })
+        .exhaustive();
+    },
+  );
 }
 
 function formatProductionResult(input: ProductionSummaryInput): string {
@@ -331,91 +441,220 @@ function formatProductionResult(input: ProductionSummaryInput): string {
     return 'not requested';
   }
 
-  if (input.preflightResult === 'already_tagged') {
+  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
     return 'already tagged; deployment not required';
   }
 
-  if (input.preflightJobResult === 'failure') {
+  if (hasWorkflowJobResult(input.preflightJobResult, 'failure')) {
     return 'failed during preflight';
   }
 
-  if (input.preflightJobResult === 'cancelled') {
+  if (hasWorkflowJobResult(input.preflightJobResult, 'cancelled')) {
     return 'cancelled during preflight';
   }
 
-  if (input.preflightJobResult === 'skipped') {
+  if (hasWorkflowJobResult(input.preflightJobResult, 'skipped')) {
     return 'not run because Production preflight did not run';
   }
 
-  if (input.preflightResult !== 'ready') {
+  if (!hasProductionPreflightResult(input.preflightResult, 'ready')) {
     return 'unknown result';
   }
 
-  if (input.deploymentResult === 'failure') {
+  if (hasWorkflowJobResult(input.deploymentResult, 'failure')) {
     return 'failed during deployment';
   }
 
-  if (input.deploymentResult === 'cancelled') {
+  if (hasWorkflowJobResult(input.deploymentResult, 'cancelled')) {
     return 'cancelled during deployment';
   }
 
-  if (input.deploymentResult === 'skipped') {
+  if (hasWorkflowJobResult(input.deploymentResult, 'skipped')) {
     return 'not run';
   }
 
-  if (input.deploymentResult !== 'success') {
+  if (!hasWorkflowJobResult(input.deploymentResult, 'success')) {
     return 'unknown result';
   }
 
-  if (input.runtimeVerificationResult === 'failure') {
+  if (hasWorkflowJobResult(input.runtimeVerificationResult, 'failure')) {
     return 'deployed, but runtime verification failed';
   }
 
-  if (input.runtimeVerificationResult === 'cancelled') {
+  if (hasWorkflowJobResult(input.runtimeVerificationResult, 'cancelled')) {
     return 'deployed, but runtime verification was cancelled';
   }
 
-  if (input.runtimeVerificationResult === 'skipped') {
+  if (hasWorkflowJobResult(input.runtimeVerificationResult, 'skipped')) {
     return 'deployed, but runtime verification did not run';
   }
 
-  if (input.runtimeVerificationResult !== 'success') {
+  if (!hasWorkflowJobResult(input.runtimeVerificationResult, 'success')) {
     return 'unknown result';
   }
 
-  if (input.tagCreationResult === 'success') {
+  if (hasWorkflowJobResult(input.tagCreationResult, 'success')) {
     return 'deployed, verified, and tagged successfully';
   }
 
-  if (input.tagCreationResult === 'failure') {
+  if (hasWorkflowJobResult(input.tagCreationResult, 'failure')) {
     return 'deployed and verified, but tag creation failed';
   }
 
-  if (input.tagCreationResult === 'cancelled') {
+  if (hasWorkflowJobResult(input.tagCreationResult, 'cancelled')) {
     return 'deployed and verified, but tag creation was cancelled';
   }
 
   return 'unknown result';
 }
 
-function formatProductionSkipReason(input: ProductionSummaryInput): string | undefined {
-  if (input.skippedReason !== undefined) {
+function formatProductionSkipReason(input: ProductionSummaryInput): Maybe<string> {
+  if (input.skippedReason.isJust) {
     return input.skippedReason;
   }
 
   if (input.promotionRequested === false) {
+    return Maybe.just('Production promotion was not requested');
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'skipped')) {
+    return Maybe.just('Production preflight did not run');
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'cancelled')) {
+    return Maybe.just('Production preflight was cancelled');
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'failure')) {
+    return Maybe.just('Production preflight failed');
+  }
+
+  if (hasWorkflowJobResult(input.deploymentResult, 'skipped')) {
+    return Maybe.just('Production deployment did not run');
+  }
+
+  return Maybe.nothing<string>();
+}
+
+function formatProductionDeploymentRequired(input: ProductionSummaryInput): string {
+  const inferredDeploymentRequirement = input.preflightResult.mapOrElse(
+    () => {
+      return match(input.promotionRequested)
+        .with(false, () => {
+          return 'false';
+        })
+        .otherwise(() => {
+          return 'not available';
+        });
+    },
+    preflightResult => {
+      return match([preflightResult, input.promotionRequested])
+        .with(['ready', P._], () => {
+          return 'true';
+        })
+        .with(['already_tagged', P._], () => {
+          return 'false';
+        })
+        .with([P._, false], () => {
+          return 'false';
+        })
+        .otherwise(() => {
+          return 'not available';
+        });
+    },
+  );
+
+  return input.deploymentRequired.mapOr(inferredDeploymentRequirement, deploymentRequired => {
+    return match(deploymentRequired)
+      .with(true, () => {
+        return 'true';
+      })
+      .with(false, () => {
+        return 'false';
+      })
+      .exhaustive();
+  });
+}
+
+function formatPlannedProductionTag(input: ProductionSummaryInput, release: ReleaseMetadata): string {
+  const plannedTagName = input.plannedTagName.orElse(() => {
+    return release.identifier.map(identifier => {
+      return `${identifier}-production`;
+    });
+  });
+
+  if (input.promotionRequested === false) {
+    return 'not requested';
+  }
+
+  return plannedTagName.mapOr('not available', plannedTag => {
+    return `\`${plannedTag}\``;
+  });
+}
+
+function formatEarlierFailedGate(beta: BetaSummaryInput, e2e: E2ESummaryInput): Maybe<string> {
+  if (hasWorkflowJobResult(beta.deploymentResult, 'failure')) {
+    return Maybe.just('Beta deployment failed');
+  }
+
+  if (hasWorkflowJobResult(beta.tagCreationResult, 'failure')) {
+    return Maybe.just('Beta tag creation failed');
+  }
+
+  if (hasWorkflowJobResult(e2e.result, 'failure')) {
+    return Maybe.just('E2E system gate failed');
+  }
+
+  return Maybe.nothing<string>();
+}
+
+function formatProductionApprovalStatus(
+  input: ProductionSummaryInput,
+  beta: BetaSummaryInput,
+  e2e: E2ESummaryInput,
+): string {
+  if (input.promotionRequested === false) {
     return 'Production promotion was not requested';
   }
 
-  if (input.preflightJobResult === 'skipped') {
-    return 'Production preflight did not run';
+  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
+    return 'Production deployment is not required because the release is already tagged';
   }
 
-  if (input.deploymentResult === 'skipped') {
-    return 'Production deployment did not run';
+  if (
+    hasProductionPreflightResult(input.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.preflightJobResult, 'success')
+  ) {
+    return 'Production is ready for deployment. Approval is enforced through the wire-webapp-prod GitHub Environment.';
   }
 
-  return undefined;
+  if (hasWorkflowJobResult(input.preflightJobResult, 'failure')) {
+    return 'Production is blocked because Production preflight failed';
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'cancelled')) {
+    return 'Production preflight was cancelled; Production approval is unavailable';
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'skipped')) {
+    const earlierFailedGate = formatEarlierFailedGate(beta, e2e);
+
+    if (earlierFailedGate.isJust) {
+      return `Production is blocked because an earlier gate failed: ${earlierFailedGate.value}; Production preflight was skipped`;
+    }
+
+    if (hasWorkflowJobResult(e2e.result, 'cancelled')) {
+      return 'Production preflight was skipped because the E2E system gate was cancelled';
+    }
+
+    if (hasWorkflowJobResult(e2e.result, 'skipped')) {
+      return 'Production preflight was skipped because the E2E system gate did not run';
+    }
+
+    return 'Production preflight was skipped; Production approval is unavailable';
+  }
+
+  return 'Production approval status is unavailable or unexpected';
 }
 
 function formatApprovalGate(input: ProductionSummaryInput): string {
@@ -423,11 +662,11 @@ function formatApprovalGate(input: ProductionSummaryInput): string {
     return 'not requested';
   }
 
-  if (input.preflightResult === 'already_tagged') {
+  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
     return 'not required; the release is already tagged as Production';
   }
 
-  if (input.preflightResult === 'ready') {
+  if (hasProductionPreflightResult(input.preflightResult, 'ready')) {
     return `${formatValueOrFallback(input.environmentName)} GitHub Environment settings`;
   }
 
@@ -435,51 +674,35 @@ function formatApprovalGate(input: ProductionSummaryInput): string {
 }
 
 function formatProductionTag(input: ProductionSummaryInput, github: GitHubLinkContext): string {
-  if (
-    input.tagCreationResult === 'success' &&
-    input.createdTagName !== undefined &&
-    github.serverUrl !== undefined &&
-    github.repository !== undefined
-  ) {
-    return formatMarkdownLink(
-      input.createdTagName,
-      `${github.serverUrl}/${github.repository}/tree/${input.createdTagName}`,
-    );
+  if (hasWorkflowJobResult(input.tagCreationResult, 'success')) {
+    return formatRepositoryTreeLink(input.createdTagName, github).unwrapOr('not available');
   }
 
-  if (
-    input.preflightResult === 'already_tagged' &&
-    input.plannedTagName !== undefined &&
-    github.serverUrl !== undefined &&
-    github.repository !== undefined
-  ) {
-    return formatMarkdownLink(
-      input.plannedTagName,
-      `${github.serverUrl}/${github.repository}/tree/${input.plannedTagName}`,
-    );
+  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
+    return formatRepositoryTreeLink(input.plannedTagName, github).unwrapOr('not available');
   }
 
   if (input.promotionRequested === false) {
     return 'not requested';
   }
 
-  if (input.preflightResult === 'already_tagged') {
+  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
     return 'not available';
   }
 
   if (
-    input.tagCreationResult === 'failure' ||
-    input.tagCreationResult === 'cancelled' ||
-    input.tagCreationResult === 'skipped' ||
-    input.deploymentResult === 'failure' ||
-    input.deploymentResult === 'cancelled' ||
-    input.deploymentResult === 'skipped' ||
-    input.runtimeVerificationResult === 'failure' ||
-    input.runtimeVerificationResult === 'cancelled' ||
-    input.runtimeVerificationResult === 'skipped' ||
-    input.preflightJobResult === 'failure' ||
-    input.preflightJobResult === 'cancelled' ||
-    input.preflightJobResult === 'skipped'
+    hasWorkflowJobResult(input.tagCreationResult, 'failure') ||
+    hasWorkflowJobResult(input.tagCreationResult, 'cancelled') ||
+    hasWorkflowJobResult(input.tagCreationResult, 'skipped') ||
+    hasWorkflowJobResult(input.deploymentResult, 'failure') ||
+    hasWorkflowJobResult(input.deploymentResult, 'cancelled') ||
+    hasWorkflowJobResult(input.deploymentResult, 'skipped') ||
+    hasWorkflowJobResult(input.runtimeVerificationResult, 'failure') ||
+    hasWorkflowJobResult(input.runtimeVerificationResult, 'cancelled') ||
+    hasWorkflowJobResult(input.runtimeVerificationResult, 'skipped') ||
+    hasWorkflowJobResult(input.preflightJobResult, 'failure') ||
+    hasWorkflowJobResult(input.preflightJobResult, 'cancelled') ||
+    hasWorkflowJobResult(input.preflightJobResult, 'skipped')
   ) {
     return 'not created';
   }
@@ -488,15 +711,9 @@ function formatProductionTag(input: ProductionSummaryInput, github: GitHubLinkCo
 }
 
 function formatProductionTagCreationResult(input: ProductionSummaryInput): string {
-  switch (input.tagCreationResult) {
-    case 'success':
-      return 'created successfully';
-    case 'failure':
-      return 'failed';
-    case 'cancelled':
-      return 'cancelled';
-    default:
-      if (input.preflightResult === 'already_tagged') {
+  return input.tagCreationResult.mapOrElse(
+    () => {
+      if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
         return 'not required; tag already exists';
       }
 
@@ -504,39 +721,62 @@ function formatProductionTagCreationResult(input: ProductionSummaryInput): strin
         return 'not requested';
       }
 
-      if (input.tagCreationResult === 'skipped') {
-        return 'not run';
-      }
-
       return 'unknown result';
-  }
+    },
+    tagCreationResult => {
+      return match(tagCreationResult)
+        .with('success', () => {
+          return 'created successfully';
+        })
+        .with('failure', () => {
+          return 'failed';
+        })
+        .with('cancelled', () => {
+          return 'cancelled';
+        })
+        .with('skipped', () => {
+          if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
+            return 'not required; tag already exists';
+          }
+
+          return 'not run';
+        })
+        .exhaustive();
+    },
+  );
 }
 
 function formatDistributionResult(
   input: ProductionSummaryInput,
   distribution: ProductionDistributionSummaryInput,
 ): string {
-  if (distribution.distributionJobResult === 'success' && distribution.distributionResult === 'success') {
+  if (
+    hasWorkflowJobResult(distribution.distributionJobResult, 'success') &&
+    hasWorkflowJobResult(distribution.distributionResult, 'success')
+  ) {
     return 'published successfully';
   }
 
-  if (distribution.distributionJobResult === 'failure') {
+  if (hasWorkflowJobResult(distribution.distributionJobResult, 'failure')) {
     return 'failed';
   }
 
-  if (distribution.distributionJobResult === 'cancelled') {
+  if (hasWorkflowJobResult(distribution.distributionJobResult, 'cancelled')) {
     return 'cancelled';
   }
 
-  if (distribution.distributionJobResult === 'skipped' && input.promotionRequested === false) {
+  if (hasWorkflowJobResult(distribution.distributionJobResult, 'skipped') && input.promotionRequested === false) {
     return 'not requested';
   }
 
-  if (distribution.distributionJobResult === 'skipped' && input.preflightResult === 'already_tagged') {
+  if (
+    hasWorkflowJobResult(distribution.distributionJobResult, 'skipped') &&
+    hasProductionPreflightResult(input.preflightResult, 'already_tagged')
+  ) {
     return 'not run; Production tag already exists';
   }
 
-  if (distribution.distributionJobResult === 'skipped') {
+  if (hasWorkflowJobResult(distribution.distributionJobResult, 'skipped')) {
     return 'not run';
   }
 
@@ -544,26 +784,25 @@ function formatDistributionResult(
 }
 
 function formatDockerImage(distribution: ProductionDistributionSummaryInput): string {
-  if (distribution.dockerImageTag !== undefined && distribution.dockerRepository !== undefined) {
-    return `${distribution.dockerRepository}:${distribution.dockerImageTag}`;
-  }
-
-  return 'not published';
+  return distribution.dockerRepository
+    .andThen(repository => {
+      return distribution.dockerImageTag.map(imageTag => {
+        return `${repository}:${imageTag}`;
+      });
+    })
+    .unwrapOr('not published');
 }
 
 function formatWireBuildsCommit(distribution: ProductionDistributionSummaryInput, github: GitHubLinkContext): string {
-  if (
-    distribution.wireBuildsCommitSha !== undefined &&
-    github.serverUrl !== undefined &&
-    github.wireBuildsRepository !== undefined
-  ) {
-    return formatMarkdownLink(
-      distribution.wireBuildsCommitSha,
-      `${github.serverUrl}/${github.wireBuildsRepository}/commit/${distribution.wireBuildsCommitSha}`,
-    );
-  }
-
-  return 'not updated';
+  return distribution.wireBuildsCommitSha
+    .andThen(commitSha => {
+      return github.serverUrl.andThen(serverUrl => {
+        return github.wireBuildsRepository.map(repository => {
+          return formatMarkdownLink(commitSha, `${serverUrl}/${repository}/commit/${commitSha}`);
+        });
+      });
+    })
+    .unwrapOr('not updated');
 }
 
 function renderBetaSection(input: ReleaseCloudSummaryInput, commitLink: string, workflowRunLink: string): string {
@@ -572,14 +811,19 @@ function renderBetaSection(input: ReleaseCloudSummaryInput, commitLink: string, 
     '',
     `- Result: ${formatBetaResult(input.beta.deploymentResult)}`,
     `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
-    `- Commit SHA: ${commitLink}`,
     `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
+    `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
+    `- Commit SHA: ${commitLink}`,
+    `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     '- GitHub Environment: wire-webapp-beta',
     `- Target environment: ${formatValueOrFallback(input.beta.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.beta.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.beta.runtimeBackendRest)}`,
     `- WebSocket backend URL: ${formatValueOrFallback(input.beta.runtimeBackendWebSocket)}`,
-    ...(input.beta.deploymentResult === 'success' ? ['- Runtime verification: /version, /commit, and /config.js'] : []),
+    ...renderRuntimeVerificationLines(input.beta.runtimeVerificationResult),
+    ...(hasWorkflowJobResult(input.beta.deploymentResult, 'success')
+      ? ['- Runtime verification: /version and /config.js']
+      : []),
     `- Beta tag: ${formatBetaTag(input.beta, input.github)}`,
     `- Artifact name: ${formatValueOrFallback(input.release.artifactName)}`,
     `- Artifact checksum: ${formatValueOrFallback(input.release.artifactChecksum)}`,
@@ -589,7 +833,7 @@ function renderBetaSection(input: ReleaseCloudSummaryInput, commitLink: string, 
 
 function renderE2ESection(input: ReleaseCloudSummaryInput, commitLink: string, workflowRunLink: string): string {
   const testinyRunName =
-    input.release.identifier !== undefined && input.beta.tagName !== undefined
+    input.release.identifier.isJust && input.beta.tagName.isJust
       ? formatValueOrFallback(input.e2e.testinyRunName)
       : 'not run';
 
@@ -597,38 +841,70 @@ function renderE2ESection(input: ReleaseCloudSummaryInput, commitLink: string, w
     '### E2E system gate',
     '',
     `- Result: ${formatE2EResult(input.e2e.result)}`,
-    `- Commit SHA: ${commitLink}`,
     `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
+    `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
+    `- Commit SHA: ${commitLink}`,
+    `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     `- Target environment: ${formatValueOrFallback(input.e2e.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.e2e.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.e2e.runtimeBackendRest)}`,
     `- WebSocket backend URL: ${formatValueOrFallback(input.e2e.runtimeBackendWebSocket)}`,
-    ...(input.e2e.result === 'success' ? ['- Runtime verification: /version, /commit, and /config.js'] : []),
+    ...(hasWorkflowJobResult(input.e2e.result, 'success') ? ['- Runtime verification: /version and /config.js'] : []),
     `- Playwright report URL: ${formatOptionalReportUrl(input.e2e.reportUrl)}`,
     `- Testiny run name: ${testinyRunName}`,
     `- Workflow run URL: ${workflowRunLink}`,
   ].join('\n');
 }
 
+function renderProductionReadinessSection(input: ReleaseCloudSummaryInput, workflowRunLink: string): string {
+  const productionSkipReason = formatProductionSkipReason(input.production);
+  const productionSkipReasonLines = productionSkipReason
+    .map(reason => {
+      return [`- Production skip reason: ${reason}`];
+    })
+    .unwrapOr([]);
+
+  return [
+    '### Production readiness',
+    '',
+    `- Production promotion requested: ${input.production.promotionRequested === true ? 'true' : 'false'}`,
+    `- Production preflight job result: ${formatValueOrFallback(input.production.preflightJobResult)}`,
+    `- Production preflight result: ${formatProductionPreflightResult(input.production)}`,
+    `- Production deployment required: ${formatProductionDeploymentRequired(input.production)}`,
+    ...productionSkipReasonLines,
+    `- Planned Production tag: ${formatPlannedProductionTag(input.production, input.release)}`,
+    `- GitHub Environment: ${formatValueOrFallback(input.production.environmentName)}`,
+    `- Approval status: ${formatProductionApprovalStatus(input.production, input.beta, input.e2e)}`,
+    `- Workflow run URL: ${workflowRunLink}`,
+  ].join('\n');
+}
+
 function renderProductionSection(input: ReleaseCloudSummaryInput, commitLink: string, workflowRunLink: string): string {
   const productionSkipReason = formatProductionSkipReason(input.production);
+  const productionSkipReasonLines = productionSkipReason
+    .map(reason => {
+      return [`- Skip reason: ${reason}`];
+    })
+    .unwrapOr([]);
 
   return [
     '### Production deployment',
     '',
     `- Result: ${formatProductionResult(input.production)}`,
-    `- Production promotion requested: ${input.production.promotionRequested ? 'true' : 'false'}`,
+    `- Production promotion requested: ${input.production.promotionRequested === true ? 'true' : 'false'}`,
     `- Production preflight result: ${formatProductionPreflightResult(input.production)}`,
-    ...(productionSkipReason === undefined ? [] : [`- Skip reason: ${productionSkipReason}`]),
-    `- Commit SHA: ${commitLink}`,
+    ...productionSkipReasonLines,
     `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
+    `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
+    `- Commit SHA: ${commitLink}`,
+    `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     `- Target environment: ${formatValueOrFallback(input.production.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.production.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.production.runtimeBackendRest)}`,
     `- WebSocket backend URL: ${formatValueOrFallback(input.production.runtimeBackendWebSocket)}`,
-    `- Runtime verification result: ${formatProductionRuntimeVerificationResult(input.production.runtimeVerificationResult)}`,
-    ...(input.production.runtimeVerificationResult === 'success'
-      ? ['- Runtime verification: /version, /commit, and /config.js']
+    ...renderRuntimeVerificationLines(input.production.runtimeVerificationResult),
+    ...(hasWorkflowJobResult(input.production.runtimeVerificationResult, 'success')
+      ? ['- Runtime verification: /version and /config.js']
       : []),
     `- Production tag: ${formatProductionTag(input.production, input.github)}`,
     `- Production tag creation result: ${formatProductionTagCreationResult(input.production)}`,
@@ -637,11 +913,19 @@ function renderProductionSection(input: ReleaseCloudSummaryInput, commitLink: st
   ].join('\n');
 }
 
-function renderProductionDistributionSection(input: ReleaseCloudSummaryInput, workflowRunLink: string): string {
+function renderProductionDistributionSection(
+  input: ReleaseCloudSummaryInput,
+  commitLink: string,
+  workflowRunLink: string,
+): string {
   return [
     '### Production distribution',
     '',
     `- Result: ${formatDistributionResult(input.production, input.distribution)}`,
+    `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
+    `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
+    `- Commit SHA: ${commitLink}`,
+    `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     `- Docker image: ${formatDockerImage(input.distribution)}`,
     `- Helm chart repository: ${formatValueOrFallback(input.distribution.chartRepositoryUrl)}`,
     `- Helm chart version: ${formatValueOrFallback(input.distribution.helmChartVersion, 'not published')}`,
@@ -650,37 +934,77 @@ function renderProductionDistributionSection(input: ReleaseCloudSummaryInput, wo
   ].join('\n');
 }
 
-export function renderReleaseCloudSummary(input: ReleaseCloudSummaryInput): string {
-  const commitLink = formatCommitLink(input.release.commitSha, input.github);
-  const workflowRunLink = formatWorkflowRunLink(input.github);
-  const releaseMetadata = [
-    '## Release Cloud',
+function renderReleaseMetadata(
+  input: ReleaseCloudSummaryInput,
+  title: string,
+  commitLink: string,
+  workflowRunLink: string,
+): string {
+  return [
+    `## ${title}`,
     '',
     `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
     `- Release identifier: ${formatValueOrFallback(input.release.identifier)}`,
+    `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
+    `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
     `- Commit SHA: ${commitLink}`,
     `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     `- Artifact name: ${formatValueOrFallback(input.release.artifactName)}`,
     `- Artifact checksum: ${formatValueOrFallback(input.release.artifactChecksum)}`,
     `- Workflow run URL: ${workflowRunLink}`,
-    ...(input.release.manualReason === undefined ? [] : [`- Manual reason: ${input.release.manualReason}`]),
+    ...input.release.manualReason
+      .map(reason => {
+        return [`- Manual reason: ${reason}`];
+      })
+      .unwrapOr([]),
   ].join('\n');
+}
+
+export function renderReleaseCandidateSummary(input: ReleaseCloudSummaryInput): string {
+  const commitLink = formatCommitLink(input.release.commitSha, input.github);
+  const workflowRunLink = formatWorkflowRunLink(input.github);
 
   return (
     [
-      releaseMetadata,
+      renderReleaseMetadata(input, 'Release Cloud release candidate', commitLink, workflowRunLink),
+      renderBetaSection(input, commitLink, workflowRunLink),
+      renderE2ESection(input, commitLink, workflowRunLink),
+      renderProductionReadinessSection(input, workflowRunLink),
+    ].join('\n\n') + '\n'
+  );
+}
+
+export function renderReleaseCloudSummary(input: ReleaseCloudSummaryInput): string {
+  const commitLink = formatCommitLink(input.release.commitSha, input.github);
+  const workflowRunLink = formatWorkflowRunLink(input.github);
+
+  return (
+    [
+      renderReleaseMetadata(input, 'Release Cloud', commitLink, workflowRunLink),
       renderBetaSection(input, commitLink, workflowRunLink),
       renderE2ESection(input, commitLink, workflowRunLink),
       renderProductionSection(input, commitLink, workflowRunLink),
-      renderProductionDistributionSection(input, workflowRunLink),
+      renderProductionDistributionSection(input, commitLink, workflowRunLink),
     ].join('\n\n') + '\n'
   );
+}
+
+type ReleaseCloudSummaryPhase = 'candidate' | 'final';
+
+function readReleaseCloudSummaryPhase(commandLineArguments: readonly string[]): ReleaseCloudSummaryPhase {
+  if (commandLineArguments.includes('--release-candidate')) {
+    return 'candidate';
+  }
+
+  return 'final';
 }
 
 function main(): void {
   try {
     const input = readReleaseCloudSummaryInput(process.env);
-    const summary = renderReleaseCloudSummary(input);
+    const summaryPhase = readReleaseCloudSummaryPhase(process.argv.slice(2));
+    const summary =
+      summaryPhase === 'candidate' ? renderReleaseCandidateSummary(input) : renderReleaseCloudSummary(input);
 
     process.stdout.write(summary);
   } catch (error) {

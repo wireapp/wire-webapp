@@ -23,6 +23,7 @@ import {Result} from 'true-myth';
 import {isBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
 
+import {isLegacyTimestampBuildVersion} from './legacyBuildMetadata';
 import {validateProductionTagName} from './releaseMetadata';
 
 export type ProductionDistributionManifest = {
@@ -76,8 +77,6 @@ type LegacyProductionDistributionArtifactMetadata = {
   readonly commit: string;
 };
 
-const legacyArtifactVersionPattern = /^\d{4}(?:\.\d{2}){4,5}$/;
-
 function validateProductionDistributionArtifactMetadata(
   artifactMetadata: unknown,
   artifactVersion: string,
@@ -103,7 +102,7 @@ function validateProductionDistributionArtifactMetadata(
   if (
     isRecord(artifactMetadata) &&
     is.nonEmptyString(artifactMetadata.version) &&
-    legacyArtifactVersionPattern.test(artifactMetadata.version) &&
+    isLegacyTimestampBuildVersion(artifactMetadata.version) &&
     is.nonEmptyString(artifactMetadata.commit) &&
     !('assetVersion' in artifactMetadata) &&
     !('builtAt' in artifactMetadata)

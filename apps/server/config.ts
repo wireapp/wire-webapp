@@ -38,7 +38,7 @@ if (buildMetadataResult.isErr) {
   throw buildMetadataResult.error;
 }
 
-const buildMetadata = buildMetadataResult.value;
+export const buildMetadata = buildMetadataResult.value;
 const dotenvConfigurationIndentationSpaces = 2;
 
 // Determine the correct root path based on the directory structure
