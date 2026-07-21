@@ -17,8 +17,8 @@
  *
  */
 
-import is from '@sindresorhus/is';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import is from '@sindresorhus/is';
 import type {Maybe, Result} from 'true-myth';
 import {result} from 'true-myth';
 
