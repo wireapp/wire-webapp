@@ -59,8 +59,8 @@ const MIME_NAMESPACE = 'mime';
 // Each selected tag is sent as its own metadata filter with the `Should` operation so the
 // backend applies OR semantics across tags (a node matching any selected tag is returned).
 // Matches the iOS client shape in WireMessaging RestAPI.swift.
-function createTagMetadataFilters(tags: string[] | undefined): LookupFilterMetaFilter[] {
-  return (tags ?? []).map(tag => ({
+function createTagMetadataFilters(tags: string[]): LookupFilterMetaFilter[] {
+  return tags.map(tag => ({
     Namespace: USER_META_TAGS_NAMESPACE,
     Term: tag,
     Operation: 'Should',
@@ -462,6 +462,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
+    const tagMetadataFilters = createTagMetadataFilters(tags ?? []);
     const mimeOp: 'Should' | 'Must' = mimeTypes !== undefined && mimeTypes.length > 1 ? 'Should' : 'Must';
     const creatorOp: 'Should' | 'Must' = creatorIds !== undefined && creatorIds.length > 1 ? 'Should' : 'Must';
 
@@ -480,7 +481,7 @@ export class CellsAPI {
           ...(hasPublicLink !== undefined ? {HasPublicLink: hasPublicLink} : {}),
         },
         Metadata: [
-          ...createTagMetadataFilters(tags),
+          ...tagMetadataFilters,
           ...(mimeTypes?.map(term => ({Namespace: MIME_NAMESPACE, Term: term, Operation: mimeOp})) ?? []),
           ...(creatorIds?.map(term => ({
             Namespace: USER_META_OWNER_UUID_NAMESPACE,

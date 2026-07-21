@@ -1914,7 +1914,7 @@ describe('CellsAPI', () => {
       );
     });
 
-    it('filters by a single tag with Should operation', async () => {
+    it('creates a Should metadata filter for a single tag', async () => {
       const searchPhrase = 'test';
       const tags = ['tag1'];
       const mockResponse: RestNodeCollection = {
@@ -1957,7 +1957,7 @@ describe('CellsAPI', () => {
       await cellsAPI.searchNodes({phrase: searchPhrase, tags});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
