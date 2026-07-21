@@ -24,10 +24,7 @@ import {task, type Task} from 'true-myth';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {DeleteMeetingModalMode} from 'Components/Meeting/shared/delete/showDeleteMeetingModal';
 import {DELETE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/deleteMeetingSubmitErrorKeys';
-import {
-  isMeetingDeletedDespiteSubmitError,
-  shouldRefreshMeetingsListAfterDeleteError,
-} from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
+import {isMeetingDeletedDespiteSubmitError} from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
 import {showMeetingSubmitError} from 'Components/Meeting/shared/submit/showMeetingSubmitError';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/Meeting/utils/canDeleteMeeting';
@@ -151,11 +148,8 @@ export const submitDeleteMeeting = async ({
       return deleteMeetingSubmitResults.succeeded;
     }
 
-    if (shouldRefreshMeetingsListAfterDeleteError(result.error)) {
-      await task.tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings);
-    }
-
     if (isMeetingDeletedDespiteSubmitError(result.error)) {
+      await task.tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings);
       removeMeetingByQualifiedId(meetingInstance.meetingSeries.qualified_id);
       showMeetingSubmitError(translate, result.error, DELETE_MEETING_ERROR_TRANSLATION_KEYS);
       return deleteMeetingSubmitResults.deletedButCleanupFailed;

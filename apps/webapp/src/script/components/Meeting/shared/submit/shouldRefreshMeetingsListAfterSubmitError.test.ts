@@ -21,7 +21,6 @@ import {meetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 
 import {
   isMeetingDeletedDespiteSubmitError,
-  shouldRefreshMeetingsListAfterDeleteError,
   shouldRefreshMeetingsListAfterSubmitError,
 } from './shouldRefreshMeetingsListAfterSubmitError';
 
@@ -47,19 +46,6 @@ describe('isMeetingDeletedDespiteSubmitError', () => {
   it('returns false for failures before the meeting was deleted', () => {
     expect(isMeetingDeletedDespiteSubmitError(meetingSubmitErrors.deleteFailed)).toBe(false);
     expect(isMeetingDeletedDespiteSubmitError(meetingSubmitErrors.leaveConversationFailed)).toBe(false);
-  });
-});
-
-describe('shouldRefreshMeetingsListAfterDeleteError', () => {
-  it('returns true only when the meeting was deleted but local cleanup failed', () => {
-    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.deleteSucceededButLocalCleanupFailed)).toBe(
-      true,
-    );
-  });
-
-  it('returns false for delete failures before server state changed', () => {
-    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.deleteFailed)).toBe(false);
-    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.leaveConversationFailed)).toBe(false);
-    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.removeParticipantsFailed)).toBe(false);
+    expect(isMeetingDeletedDespiteSubmitError(meetingSubmitErrors.removeParticipantsFailed)).toBe(false);
   });
 });

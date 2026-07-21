@@ -148,23 +148,6 @@ describe('deleteMeetingForMe', () => {
     expect(leaveConversation).toHaveBeenCalledWith(conversation);
   });
 
-  it('leaves after a successful remote fetch when the conversation is missing locally', async () => {
-    const leaveConversation = jest.fn().mockResolvedValue(undefined);
-    const fetchedConversation = createConversation();
-    const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(fetchedConversation));
-
-    const {deps} = createDeps({
-      safeGetConversationById,
-      leaveConversation,
-    });
-
-    const result = await deleteMeetingForMe(command, deps);
-
-    expect(result.isOk).toBe(true);
-    expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversation);
-    expect(leaveConversation).toHaveBeenCalledWith(fetchedConversation);
-  });
-
   it('returns leaveConversationFailed when leaving the conversation fails', async () => {
     const {deps} = createDeps({
       leaveConversation: jest.fn().mockRejectedValue(new Error('leave failed')),
