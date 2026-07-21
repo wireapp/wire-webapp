@@ -18,47 +18,92 @@
  */
 
 import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {ScheduleMeetingMode} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import type {TranslationKey} from 'Util/localizerUtil';
 
-export const SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS = {
-  missingTimes: {
-    titleKey: 'meetings.scheduleModal.error.createFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.missingTimes',
-  },
-  startInPast: {
-    titleKey: 'meetings.scheduleModal.error.createFailedTitle',
-    messageKey: 'meetings.schedule.errors.startInPast',
-  },
-  endInPast: {
-    titleKey: 'meetings.scheduleModal.error.createFailedTitle',
-    messageKey: 'meetings.schedule.errors.endInPast',
-  },
-  createFailed: {
-    titleKey: 'meetings.scheduleModal.error.createFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.createFailed',
-  },
+export type MeetingSubmitErrorTranslationKeys = {
+  titleKey: TranslationKey;
+  messageKey: TranslationKey;
+};
+
+export type MeetingSubmitErrorTranslationMap = Record<MeetingSubmitErrors, MeetingSubmitErrorTranslationKeys>;
+
+const meetNowCreateFailureKeys: MeetingSubmitErrorTranslationKeys = {
+  titleKey: 'meetings.meetNowModal.error.createFailedTitle',
+  messageKey: 'meetings.meetNowModal.error.createFailed',
+};
+
+const persistedSetupFailureKeys = {
   conversationSetupFailed: {
-    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.addParticipantsFailed',
-  },
-  updateFailed: {
-    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.updateFailed',
-  },
-  editMeetingIdMissing: {
-    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.editMeetingIdMissing',
+    titleKey: 'meetings.error.setupFailedTitle',
+    messageKey: 'meetings.error.conversationSetupFailed',
   },
   addParticipantsFailed: {
-    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.addParticipantsFailed',
+    titleKey: 'meetings.error.setupFailedTitle',
+    messageKey: 'meetings.error.addParticipantsFailed',
   },
-  removeParticipantsFailed: {
-    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.removeParticipantsFailed',
-  },
-  refreshFailed: {
-    titleKey: 'meetings.scheduleModal.error.updateFailedTitle',
-    messageKey: 'meetings.scheduleModal.error.updateFailed',
-  },
-} as const satisfies Record<MeetingSubmitErrors, {titleKey: TranslationKey; messageKey: TranslationKey}>;
+} satisfies Pick<MeetingSubmitErrorTranslationMap, 'conversationSetupFailed' | 'addParticipantsFailed'>;
+
+export const MEET_NOW_ERROR_TRANSLATION_KEYS = {
+  missingTimes: meetNowCreateFailureKeys,
+  startInPast: meetNowCreateFailureKeys,
+  endInPast: meetNowCreateFailureKeys,
+  createFailed: meetNowCreateFailureKeys,
+  conversationSetupFailed: persistedSetupFailureKeys.conversationSetupFailed,
+  updateFailed: meetNowCreateFailureKeys,
+  editMeetingIdMissing: meetNowCreateFailureKeys,
+  addParticipantsFailed: persistedSetupFailureKeys.addParticipantsFailed,
+  removeParticipantsFailed: meetNowCreateFailureKeys,
+  refreshFailed: meetNowCreateFailureKeys,
+} satisfies MeetingSubmitErrorTranslationMap;
+
+export const getScheduleMeetingSubmitErrorTranslationKeys = (
+  mode: ScheduleMeetingMode,
+): MeetingSubmitErrorTranslationMap => {
+  const createFailureTitleKey = 'meetings.scheduleModal.error.createFailedTitle';
+  const updateFailureTitleKey = 'meetings.scheduleModal.error.updateFailedTitle';
+  const setupFailureTitleKey = mode === 'create' ? 'meetings.error.setupFailedTitle' : updateFailureTitleKey;
+
+  return {
+    missingTimes: {
+      titleKey: createFailureTitleKey,
+      messageKey: 'meetings.scheduleModal.error.missingTimes',
+    },
+    startInPast: {
+      titleKey: createFailureTitleKey,
+      messageKey: 'meetings.schedule.errors.startInPast',
+    },
+    endInPast: {
+      titleKey: createFailureTitleKey,
+      messageKey: 'meetings.schedule.errors.endInPast',
+    },
+    createFailed: {
+      titleKey: createFailureTitleKey,
+      messageKey: 'meetings.scheduleModal.error.createFailed',
+    },
+    conversationSetupFailed: {
+      titleKey: setupFailureTitleKey,
+      messageKey: 'meetings.error.conversationSetupFailed',
+    },
+    updateFailed: {
+      titleKey: updateFailureTitleKey,
+      messageKey: 'meetings.scheduleModal.error.updateFailed',
+    },
+    editMeetingIdMissing: {
+      titleKey: updateFailureTitleKey,
+      messageKey: 'meetings.scheduleModal.error.editMeetingIdMissing',
+    },
+    addParticipantsFailed: {
+      titleKey: setupFailureTitleKey,
+      messageKey: 'meetings.scheduleModal.error.addParticipantsFailed',
+    },
+    removeParticipantsFailed: {
+      titleKey: updateFailureTitleKey,
+      messageKey: 'meetings.scheduleModal.error.removeParticipantsFailed',
+    },
+    refreshFailed: {
+      titleKey: updateFailureTitleKey,
+      messageKey: 'meetings.scheduleModal.error.updateFailed',
+    },
+  };
+};

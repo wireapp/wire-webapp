@@ -28,17 +28,16 @@ import {mapScheduleFormToUpdateMeetingCommand} from 'Components/Meeting/mapSched
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
-import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
+import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
 import {
   isMeetingPersistedDespiteSubmitError,
   shouldRefreshMeetingsListAfterSubmitError,
 } from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
 import {showMeetingPartialAddFailureModal} from 'Components/Meeting/shared/submit/showMeetingPartialAddFailureModal';
+import {showMeetingSubmitError} from 'Components/Meeting/shared/submit/showMeetingSubmitError';
 import type {ScheduleMeetingCommand, UpdateMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import type {Translate} from 'Util/localizerUtil';
 
 import {
   scheduleMeetingSubmitResults,
@@ -47,21 +46,6 @@ import {
   type ScheduleMeetingSubmitResult,
 } from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
-
-const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {
-  const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[error];
-  PrimaryModal.show(
-    PrimaryModal.type.ACKNOWLEDGE,
-    {
-      text: {
-        title: translate(titleKey),
-        message: translate(messageKey),
-      },
-    },
-    undefined,
-    translate,
-  );
-};
 
 type SubmitMeetingParams = {
   formState: ScheduleMeetingFormState;
@@ -150,7 +134,7 @@ export const useScheduleMeetingSubmit = () => {
         }
 
         setIsSubmitting(false);
-        showMeetingSubmitError(translate, submitResult.error);
+        showMeetingSubmitError(translate, submitResult.error, getScheduleMeetingSubmitErrorTranslationKeys(mode));
         return isMeetingPersistedDespiteSubmitError(submitResult.error)
           ? scheduleMeetingSubmitResults.setupFailed
           : scheduleMeetingSubmitResults.submitFailed;

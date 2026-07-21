@@ -24,11 +24,12 @@ import {joinMeetingCall, type JoinMeetingCallDeps} from 'Components/Meeting/join
 import {mapMeetNowFormToMeetingCommand} from 'Components/Meeting/mapMeetNowFormToMeetingCommand';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {CreateMeetingSuccess} from 'Components/Meeting/shared/service/meetingService';
-import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
+import {MEET_NOW_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
 import {
   isMeetingPersistedDespiteSubmitError,
   shouldRefreshMeetingsListAfterSubmitError,
 } from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
+import {showMeetingSubmitError} from 'Components/Meeting/shared/submit/showMeetingSubmitError';
 import {showMeetingPartialAddFailureModal} from 'Components/Meeting/shared/submit/showMeetingPartialAddFailureModal';
 import type {MeetNowMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import {handleJoinMeetingCallResult} from 'Components/Meeting/useJoinMeetingCall';
@@ -41,21 +42,6 @@ import {Config} from 'src/script/Config';
 import type {Translate} from 'Util/localizerUtil';
 
 import {meetNowSubmitResults, type MeetNowFormState, type MeetNowSubmitResult} from './meetNowTypes';
-
-const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {
-  const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[error];
-  PrimaryModal.show(
-    PrimaryModal.type.ACKNOWLEDGE,
-    {
-      text: {
-        title: translate(titleKey),
-        message: translate(messageKey),
-      },
-    },
-    undefined,
-    translate,
-  );
-};
 
 const showConversationNotFoundModal = (translate: Translate): void => {
   PrimaryModal.show(
@@ -140,7 +126,7 @@ export const submitMeetNow = async ({
       await task.tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings);
     }
 
-    showMeetingSubmitError(translate, submitResult.error);
+    showMeetingSubmitError(translate, submitResult.error, MEET_NOW_ERROR_TRANSLATION_KEYS);
 
     return isMeetingPersistedDespiteSubmitError(submitResult.error)
       ? meetNowSubmitResults.setupFailed
