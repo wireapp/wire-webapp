@@ -27,9 +27,9 @@ import {
   readBuildArtifactHtmlDocuments,
   readBuildArtifactMetadata,
 } from './buildArtifactArchive.ts';
-import {validateBuildArtifactMetadata} from './buildArtifactMetadata.ts';
-import {formatBuildArtifactMetadataOutputs} from './buildArtifactMetadataOutput.ts';
-import type {BuildMetadata} from '@wireapp/config';
+import {formatRecoverableBuildArtifactMetadataOutputs} from './recoveryBuildArtifactMetadataOutput.ts';
+import {validateRecoveryBuildArtifactMetadata} from './recoveryBuildArtifactMetadata.ts';
+import type {RecoverableBuildMetadata} from './recoveryBuildArtifactMetadata.ts';
 
 function readRequiredEnvironmentValue(environmentVariableName: string): string {
   const environmentValue = Maybe.of(process.env[environmentVariableName]).andThen(value => {
@@ -47,7 +47,7 @@ function readRequiredEnvironmentValue(environmentVariableName: string): string {
   return environmentValue.value;
 }
 
-function writeMetadataOutputs(metadata: BuildMetadata): void {
+function writeMetadataOutputs(metadata: RecoverableBuildMetadata): void {
   const githubOutputPath = Maybe.of(process.env.GITHUB_OUTPUT).andThen(value => {
     if (value.trim().length === 0) {
       return Maybe.nothing();
@@ -60,14 +60,14 @@ function writeMetadataOutputs(metadata: BuildMetadata): void {
     return;
   }
 
-  appendFileSync(githubOutputPath.value, formatBuildArtifactMetadataOutputs(metadata));
+  appendFileSync(githubOutputPath.value, formatRecoverableBuildArtifactMetadataOutputs(metadata));
 }
 
-function validateArtifact(): BuildMetadata {
+function validateArtifact(): RecoverableBuildMetadata {
   const artifactPath = readRequiredEnvironmentValue('BUILD_ARTIFACT_PATH');
   const expectedVersion = readRequiredEnvironmentValue('EXPECTED_VERSION');
   const expectedCommit = readRequiredEnvironmentValue('EXPECTED_COMMIT');
-  const validationResult = validateBuildArtifactMetadata({
+  const validationResult = validateRecoveryBuildArtifactMetadata({
     expectedCommit,
     expectedVersion,
     htmlDocuments: readBuildArtifactHtmlDocuments(artifactPath),
@@ -86,7 +86,7 @@ function run(): void {
     const metadata = validateArtifact();
 
     writeMetadataOutputs(metadata);
-    console.log(JSON.stringify(metadata));
+    console.log(JSON.stringify(metadata.metadata));
   } catch (error: unknown) {
     console.error(error);
     process.exitCode = 1;

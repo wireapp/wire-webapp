@@ -112,15 +112,25 @@ jobs:
       rollback_commit_url: ${{ steps.git_metadata.outputs.rollback_commit_url }}
 
     steps:
+      - name: Checkout current workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          ref: main
+          fetch-depth: 1
+          path: workflow-source
+
       - name: Checkout selected Production tag
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           ref: refs/tags/${{ needs.validate_request.outputs.production_tag }}
           fetch-depth: 0
+          path: selected-release
 
       - name: Collect rollback git metadata
         id: git_metadata
+        working-directory: selected-release
         run: |
           set -euo pipefail
 
@@ -134,24 +144,35 @@ jobs:
             echo "rollback_commit_url=${rollback_commit_url}"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: 'workflow-source/.nvmrc'
           cache: 'yarn'
+          cache-dependency-path: |
+            workflow-source/yarn.lock
+            selected-release/yarn.lock
 
-      - name: Install dependencies
+      - name: Install workflow tool dependencies
+        working-directory: workflow-source
         run: ./bin/yarn --immutable
 
-      - name: Update configuration
+      - name: Build workflow tool dependencies
+        working-directory: workflow-source
+        run: ./bin/yarn nx run config-lib:build
+
+      - name: Install selected release dependencies
+        working-directory: selected-release
+        run: ./bin/yarn --immutable
+
+      - name: Update selected release configuration
+        working-directory: selected-release
         run: ./bin/yarn nx run webapp:configure
 
       # Interim limitation: until durable release artifact storage exists, this
       # workflow rebuilds the deployable artifact from the selected Production tag.
       - name: Build and package
+        working-directory: selected-release
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.rollback_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
@@ -159,11 +180,12 @@ jobs:
 
       - name: Validate rollback artifact metadata
         id: validate_artifact_metadata
+        working-directory: workflow-source
         env:
-          BUILD_ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
+          BUILD_ARTIFACT_PATH: ${{ github.workspace }}/selected-release/${{ env.ARTIFACT_PATH }}
           EXPECTED_COMMIT: ${{ steps.git_metadata.outputs.rollback_commit_sha }}
           EXPECTED_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
-        run: node ./bin/validateBuildArtifact.mts
+        run: node ./bin/validateRecoveryBuildArtifact.mts
 
       - name: Compute artifact metadata
         id: artifact_metadata
@@ -179,7 +201,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: ${{ steps.artifact_metadata.outputs.artifact_name }}
-          path: ${{ env.ARTIFACT_PATH }}
+          path: selected-release/${{ env.ARTIFACT_PATH }}
 
   deploy_to_production:
     name: Deploy rollback to Production
@@ -286,7 +308,10 @@ jobs:
           status: failure
           text: |
             Production rollback failed for tag ${{ needs.validate_request.outputs.production_tag || inputs.production_tag }}
+            Webapp version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
+            Asset version: ${{ needs.build_artifact.outputs.artifact_asset_version || 'unavailable' }}
             Commit SHA: ${{ needs.build_artifact.outputs.artifact_commit || 'unavailable' }}
+            Built at (UTC): ${{ needs.build_artifact.outputs.artifact_built_at || 'unavailable' }}
             Triggered by: ${{ github.actor }}
             Reason: ${{ inputs.reason }}
             Incident reference: ${{ inputs.incident_reference || 'not provided' }}

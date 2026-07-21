@@ -85,15 +85,25 @@ jobs:
           set -euo pipefail
           git ls-remote --exit-code --tags "https://github.com/${REPOSITORY}.git" "refs/tags/${TAG}"
 
+      - name: Checkout current workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          ref: main
+          fetch-depth: 1
+          path: workflow-source
+
       - name: Checkout selected tag
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           ref: refs/tags/${{ needs.validate_request.outputs.tag }}
           fetch-depth: 0
+          path: selected-release
 
       - name: Collect git metadata
         id: git_metadata
+        working-directory: selected-release
         run: |
           set -euo pipefail
           commit_sha="$(git rev-parse HEAD)"
@@ -106,22 +116,33 @@ jobs:
             echo "commit_subject=${commit_subject}"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: 'workflow-source/.nvmrc'
           cache: 'yarn'
+          cache-dependency-path: |
+            workflow-source/yarn.lock
+            selected-release/yarn.lock
 
-      - name: Install JS dependencies
+      - name: Install workflow tool dependencies
+        working-directory: workflow-source
         run: ./bin/yarn --immutable
 
-      - name: Update configuration
+      - name: Build workflow tool dependencies
+        working-directory: workflow-source
+        run: ./bin/yarn nx run config-lib:build
+
+      - name: Install selected release dependencies
+        working-directory: selected-release
+        run: ./bin/yarn --immutable
+
+      - name: Update selected release configuration
+        working-directory: selected-release
         run: ./bin/yarn nx run webapp:configure
 
       - name: Build and package
+        working-directory: selected-release
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
@@ -129,17 +150,18 @@ jobs:
 
       - name: Validate redeploy artifact metadata
         id: validate_artifact_metadata
+        working-directory: workflow-source
         env:
-          BUILD_ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
+          BUILD_ARTIFACT_PATH: ${{ github.workspace }}/selected-release/apps/server/dist/s3/ebs.zip
           EXPECTED_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
           EXPECTED_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
-        run: node ./bin/validateBuildArtifact.mts
+        run: node ./bin/validateRecoveryBuildArtifact.mts
 
       - name: Upload build artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: build-artifact-${{ needs.validate_request.outputs.tag }}
-          path: apps/server/dist/s3/ebs.zip
+          path: selected-release/apps/server/dist/s3/ebs.zip
 
   deploy_to_production:
     name: Deploy to production
