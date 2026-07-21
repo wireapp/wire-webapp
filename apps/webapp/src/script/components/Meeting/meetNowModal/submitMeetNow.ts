@@ -29,8 +29,8 @@ import {
   isMeetingPersistedDespiteSubmitError,
   shouldRefreshMeetingsListAfterSubmitError,
 } from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
-import {showMeetingSubmitError} from 'Components/Meeting/shared/submit/showMeetingSubmitError';
 import {showMeetingPartialAddFailureModal} from 'Components/Meeting/shared/submit/showMeetingPartialAddFailureModal';
+import {showMeetingSubmitError} from 'Components/Meeting/shared/submit/showMeetingSubmitError';
 import type {MeetNowMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import {handleJoinMeetingCallResult} from 'Components/Meeting/useJoinMeetingCall';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
