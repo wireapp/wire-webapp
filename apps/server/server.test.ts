@@ -3,7 +3,7 @@ import type {Express} from 'express';
 
 import {createFactory} from '@enormora/objectory';
 import is from '@sindresorhus/is';
-import type {ClientConfig, ServerConfig} from '@wireapp/config';
+import type {BuildMetadata, ClientConfig, ServerConfig} from '@wireapp/config';
 
 import {Server} from './Server';
 
@@ -30,17 +30,24 @@ type ServerResponseTestCase = {
   readonly requestPath: string;
 };
 
+const mainBuildMetadata: BuildMetadata = {
+  version: 'main-bdb93c9',
+  assetVersion: 'main-bdb93c9',
+  commit: 'bdb93c9269866d577c012f3a781cbe904f7bf47c',
+  builtAt: '2026-07-20T14:43:21.123Z',
+};
+
+const releaseBuildMetadata: BuildMetadata = {
+  version: '2026-07-20.1',
+  assetVersion: '2026-07-20.1-025edc6',
+  commit: '025edc663787b3d2da366f21a5958013201e6cd4',
+  builtAt: '2026-07-20T06:18:03.123Z',
+};
+
 const nonCacheableResponseTestCaseFactory = createFactory<ServerResponseTestCase>(() => {
   return {
     expectedContentType: 'application/javascript',
     requestPath: '/config.js',
-  };
-});
-
-const metadataResponseTestCaseFactory = createFactory<ServerResponseTestCase>(() => {
-  return {
-    expectedBody: 'abc123',
-    requestPath: '/commit',
   };
 });
 
@@ -120,9 +127,10 @@ function closeHttpServer(httpServer: http.Server): Promise<void> {
 
 async function withHttpServer(
   clientConfiguration: ClientConfig,
+  buildMetadata: BuildMetadata,
   runTest: (baseUrl: string) => Promise<void>,
 ): Promise<void> {
-  const server = new Server(createServerConfiguration(), clientConfiguration);
+  const server = new Server(createServerConfiguration(), clientConfiguration, buildMetadata);
   const httpServer = http.createServer(getServerApplication(server));
   let serverIsListening = false;
 
@@ -184,7 +192,7 @@ describe('server response caching', () => {
     return async () => {
       const clientConfiguration = createClientConfiguration();
 
-      await withHttpServer(clientConfiguration, async baseUrl => {
+      await withHttpServer(clientConfiguration, mainBuildMetadata, async baseUrl => {
         const response = await requestHttpResponse(baseUrl, testCase.requestPath);
 
         if (testCase.expectedBody !== undefined) {
@@ -210,25 +218,33 @@ describe('server response caching', () => {
   it('returns the serialized runtime configuration from /config.js', async () => {
     const clientConfiguration = createClientConfiguration();
 
-    await withHttpServer(clientConfiguration, async baseUrl => {
+    await withHttpServer(clientConfiguration, mainBuildMetadata, async baseUrl => {
       const response = await requestHttpResponse(baseUrl, '/config.js');
 
       expect(response.body).toContain(`window.wire.env = ${JSON.stringify(clientConfiguration)};`);
     });
   });
 
-  [
-    metadataResponseTestCaseFactory.build({
-      expectedBody: JSON.stringify({version: '2026.03.16.10.30.00'}),
-      requestPath: '/version',
-    }),
-    metadataResponseTestCaseFactory.build(),
-  ].forEach(testCase => {
-    it(`keeps non-cache headers for ${testCase.requestPath}`, createServerResponseTest(testCase));
+  it.each([
+    {buildMetadata: mainBuildMetadata, requestPath: '/version'},
+    {buildMetadata: releaseBuildMetadata, requestPath: '/version'},
+    {buildMetadata: mainBuildMetadata, requestPath: '/commit'},
+  ])('returns exact metadata and keeps non-cache headers for $requestPath', async testCase => {
+    const clientConfiguration = createClientConfiguration();
+
+    await withHttpServer(clientConfiguration, testCase.buildMetadata, async baseUrl => {
+      const response = await requestHttpResponse(baseUrl, testCase.requestPath);
+
+      const expectedBody =
+        testCase.requestPath === '/version' ? JSON.stringify(testCase.buildMetadata) : 'abc123';
+
+      expect(response.body).toBe(expectedBody);
+      expectNonCacheableResponse(response);
+    });
   });
 
   it('keeps the public cache policy for ordinary responses', async () => {
-    await withHttpServer(createClientConfiguration(), async baseUrl => {
+    await withHttpServer(createClientConfiguration(), mainBuildMetadata, async baseUrl => {
       const response = await requestHttpResponse(baseUrl, '/_health');
 
       if (!is.number(response.statusCode)) {
