@@ -286,7 +286,7 @@ jobs:
           status: failure
           text: |
             Production rollback failed for tag ${{ needs.validate_request.outputs.production_tag || inputs.production_tag }}
-            Commit: ${{ needs.build_artifact.outputs.rollback_commit_sha || 'unavailable' }}
+            Commit SHA: ${{ needs.build_artifact.outputs.artifact_commit || 'unavailable' }}
             Triggered by: ${{ github.actor }}
             Reason: ${{ inputs.reason }}
             Incident reference: ${{ inputs.incident_reference || 'not provided' }}
