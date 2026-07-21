@@ -19,7 +19,7 @@
 
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {maybe, task} from 'true-myth';
+import {task} from 'true-myth';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -126,18 +126,19 @@ describe('createMeetingStore', () => {
     const store = createMeetingStore(
       createDeps({getMeetingsList, serviceTasks: createServiceTasks({scheduleMeeting})}),
     );
-
-    const result = await store.getState().scheduleMeeting({
+    const scheduleCommand = {
       title: 'Weekly sync',
-      start: maybe.just(new Date('2026-06-16T10:00:00.000Z')),
-      end: maybe.just(new Date('2026-06-16T11:00:00.000Z')),
-      recurrence: 'doesNotRepeat',
+      start: new Date('2026-06-16T10:00:00.000Z'),
+      end: new Date('2026-06-16T11:00:00.000Z'),
+      recurrence: 'doesNotRepeat' as const,
       selectedUsers: [],
-      participantsFilter: '',
-    });
+    };
+
+    const result = await store.getState().scheduleMeeting(scheduleCommand);
 
     expect(result.isOk).toBe(true);
     expect(scheduleMeeting).toHaveBeenCalledTimes(1);
+    expect(scheduleMeeting).toHaveBeenCalledWith(scheduleCommand);
     expect(getMeetingsList).not.toHaveBeenCalled();
   });
 
