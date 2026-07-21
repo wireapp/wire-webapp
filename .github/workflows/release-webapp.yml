@@ -500,6 +500,64 @@ jobs:
 
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
 
+  summarize_beta_release:
+    name: Summarize Beta release
+    runs-on: ubuntu-24.04
+    needs:
+      - build_artifact
+      - deploy_to_beta
+      - create_beta_tag
+    if: ${{ always() }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout WebApp release summary renderer
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install renderer dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable
+
+      - name: Add Beta release summary
+        env:
+          ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
+          ARTIFACT_BUILT_AT: ${{ needs.build_artifact.outputs.artifact_built_at }}
+          ARTIFACT_ASSET_VERSION: ${{ needs.build_artifact.outputs.artifact_asset_version }}
+          ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
+          ARTIFACT_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
+          BETA_RESULT: ${{ needs.deploy_to_beta.result }}
+          BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: ${{ env.BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
+          BETA_RUNTIME_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
+          BETA_RUNTIME_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
+          BETA_RUNTIME_VERIFICATION_RESULT: ${{ needs.deploy_to_beta.outputs.runtime_verification_result }}
+          BETA_TAG_CREATION_RESULT: ${{ needs.create_beta_tag.result }}
+          BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
+          RELEASE_BRANCH: ${{ needs.build_artifact.outputs.release_branch }}
+          RELEASE_ACTOR: ${{ github.actor }}
+          RELEASE_BRANCH_ACTION: ${{ needs.build_artifact.outputs.release_branch_action }}
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
+          RELEASE_REASON: ${{ inputs.reason }}
+          SOURCE_COMMIT_SHA: ${{ needs.build_artifact.outputs.source_commit_sha }}
+          SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
+        run: node bin/renderWebappReleaseSummary.ts --beta-release >> "$GITHUB_STEP_SUMMARY"
+
   # WebApp release owns release-specific success and failure notifications.
   # The reusable workflow's optional failure-only notification is intentionally
   # not enabled here to prevent duplicate failure messages.
@@ -676,75 +734,6 @@ jobs:
             echo 'production_skipped_reason='
             echo "production_tag_name=${production_tag_name}"
           } >> "$GITHUB_OUTPUT"
-
-  summarize_release_candidate:
-    name: Summarize release candidate
-    runs-on: ubuntu-24.04
-    needs: [build_artifact, deploy_to_beta, create_beta_tag, run_e2e, production_preflight]
-    if: ${{ always() }}
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout WebApp release summary renderer
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-          fetch-depth: 1
-          ref: ${{ github.sha }}
-
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'yarn'
-
-      - name: Install renderer dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable
-
-      - name: Add release candidate summary
-        env:
-          ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
-          ARTIFACT_BUILT_AT: ${{ needs.build_artifact.outputs.artifact_built_at }}
-          ARTIFACT_ASSET_VERSION: ${{ needs.build_artifact.outputs.artifact_asset_version }}
-          ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
-          ARTIFACT_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
-          BETA_RESULT: ${{ needs.deploy_to_beta.result }}
-          BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: ${{ env.BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
-          BETA_RUNTIME_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
-          BETA_RUNTIME_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
-          BETA_RUNTIME_VERIFICATION_RESULT: ${{ needs.deploy_to_beta.outputs.runtime_verification_result }}
-          BETA_TAG_CREATION_RESULT: ${{ needs.create_beta_tag.result }}
-          BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
-          BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
-          E2E_RUNTIME_BACKEND_REST: ${{ env.E2E_RUNTIME_BACKEND_REST }}
-          E2E_RUNTIME_BACKEND_WS: ${{ env.E2E_RUNTIME_BACKEND_WS }}
-          E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: ${{ env.E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
-          E2E_REPORT_URL: ${{ needs.run_e2e.outputs.reportUrl }}
-          E2E_RESULT: ${{ needs.run_e2e.result }}
-          E2E_WEBAPP_URL: ${{ env.E2E_WEBAPP_URL }}
-          PRODUCTION_DEPLOYMENT_REQUIRED: ${{ needs.production_preflight.outputs.should_deploy }}
-          PRODUCTION_ENVIRONMENT_NAME: ${{ env.PRODUCTION_ENVIRONMENT_NAME }}
-          PRODUCTION_PREFLIGHT_JOB_RESULT: ${{ needs.production_preflight.result }}
-          PRODUCTION_PREFLIGHT_RESULT: ${{ needs.production_preflight.outputs.production_preflight_result }}
-          PRODUCTION_PROMOTION_REQUESTED: ${{ inputs.promote_to_production }}
-          PRODUCTION_SKIPPED_REASON: ${{ needs.production_preflight.outputs.production_skipped_reason }}
-          PLANNED_PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
-          RELEASE_BRANCH: ${{ needs.build_artifact.outputs.release_branch }}
-          RELEASE_ACTOR: ${{ github.actor }}
-          RELEASE_BRANCH_ACTION: ${{ needs.build_artifact.outputs.release_branch_action }}
-          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
-          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
-          RELEASE_REASON: ${{ inputs.reason }}
-          SOURCE_COMMIT_SHA: ${{ needs.build_artifact.outputs.source_commit_sha }}
-          SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
-          TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
-        run: node bin/renderWebappReleaseSummary.ts --release-candidate >> "$GITHUB_STEP_SUMMARY"
 
   deploy_to_production:
     name: Deploy to Production

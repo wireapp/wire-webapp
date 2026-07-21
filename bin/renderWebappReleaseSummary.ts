@@ -110,12 +110,6 @@ export type WebappReleaseSummaryInput = {
   readonly release: ReleaseMetadata;
 };
 
-type FormatProductionApprovalStatusParameters = {
-  readonly input: ProductionSummaryInput;
-  readonly beta: BetaSummaryInput;
-  readonly e2e: E2ESummaryInput;
-};
-
 type RenderReleaseIdentityParameters = {
   readonly title: string;
   readonly outcome: string;
@@ -633,125 +627,6 @@ function formatProductionSkipReason(input: ProductionSummaryInput): Maybe<string
   return Maybe.nothing<string>();
 }
 
-function formatProductionDeploymentRequired(input: ProductionSummaryInput): string {
-  const inferredDeploymentRequirement = input.preflightResult.mapOrElse(
-    () => {
-      return match(input.promotionRequested)
-        .with(false, () => {
-          return 'false';
-        })
-        .otherwise(() => {
-          return 'not available';
-        });
-    },
-    preflightResult => {
-      return match([preflightResult, input.promotionRequested])
-        .with(['ready', P._], () => {
-          return 'true';
-        })
-        .with(['already_tagged', P._], () => {
-          return 'false';
-        })
-        .with([P._, false], () => {
-          return 'false';
-        })
-        .otherwise(() => {
-          return 'not available';
-        });
-    },
-  );
-
-  return input.deploymentRequired.mapOr(inferredDeploymentRequirement, deploymentRequired => {
-    return match(deploymentRequired)
-      .with(true, () => {
-        return 'true';
-      })
-      .with(false, () => {
-        return 'false';
-      })
-      .exhaustive();
-  });
-}
-
-function formatPlannedProductionTag(input: ProductionSummaryInput, release: ReleaseMetadata): string {
-  const plannedTagName = input.plannedTagName.orElse(() => {
-    return release.identifier.map(identifier => {
-      return `${identifier}-production`;
-    });
-  });
-
-  if (input.promotionRequested === false) {
-    return 'not requested';
-  }
-
-  return plannedTagName.mapOr('not available', plannedTag => {
-    return `\`${plannedTag}\``;
-  });
-}
-
-function formatEarlierFailedGate(beta: BetaSummaryInput, e2e: E2ESummaryInput): Maybe<string> {
-  if (hasWorkflowJobResult(beta.deploymentResult, 'failure')) {
-    return Maybe.just('Beta deployment failed');
-  }
-
-  if (hasWorkflowJobResult(beta.tagCreationResult, 'failure')) {
-    return Maybe.just('Beta tag creation failed');
-  }
-
-  if (hasWorkflowJobResult(e2e.result, 'failure')) {
-    return Maybe.just('E2E system gate failed');
-  }
-
-  return Maybe.nothing<string>();
-}
-
-function formatProductionApprovalStatus(parameters: FormatProductionApprovalStatusParameters): string {
-  const {input, beta, e2e} = parameters;
-
-  if (input.promotionRequested === false) {
-    return 'Production promotion was not requested';
-  }
-
-  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
-    return 'Production deployment is not required because the release is already tagged';
-  }
-
-  if (
-    hasProductionPreflightResult(input.preflightResult, 'ready') &&
-    hasWorkflowJobResult(input.preflightJobResult, 'success')
-  ) {
-    return 'Production is ready for deployment. Approval is enforced through the wire-webapp-prod GitHub Environment.';
-  }
-
-  if (hasWorkflowJobResult(input.preflightJobResult, 'failure')) {
-    return 'Production is blocked because Production preflight failed';
-  }
-
-  if (hasWorkflowJobResult(input.preflightJobResult, 'cancelled')) {
-    return 'Production preflight was cancelled; Production approval is unavailable';
-  }
-
-  if (hasWorkflowJobResult(input.preflightJobResult, 'skipped')) {
-    const earlierFailedGate = formatEarlierFailedGate(beta, e2e);
-
-    if (earlierFailedGate.isJust) {
-      return `Production is blocked because an earlier gate failed: ${earlierFailedGate.value}; Production preflight was skipped`;
-    }
-
-    if (hasWorkflowJobResult(e2e.result, 'cancelled')) {
-      return 'Production preflight was skipped because the E2E system gate was cancelled';
-    }
-
-    if (hasWorkflowJobResult(e2e.result, 'skipped')) {
-      return 'Production preflight was skipped because the E2E system gate did not run';
-    }
-
-    return 'Production preflight was skipped; Production approval is unavailable';
-  }
-
-  return 'Production approval status is unavailable or unexpected';
-}
-
 function formatApprovalGate(input: ProductionSummaryInput): string {
   if (input.promotionRequested === false) {
     return 'not requested';
@@ -974,63 +849,39 @@ function hasHostedProductionCompleted(input: ProductionSummaryInput): boolean {
   );
 }
 
-function formatReleaseCandidateOutcome(input: WebappReleaseSummaryInput): string {
+function formatBetaReleaseOutcome(input: WebappReleaseSummaryInput): string {
   if (hasWorkflowJobResult(input.beta.deploymentResult, 'failure')) {
-    return 'Release candidate blocked because Hosted Beta deployment failed';
+    return 'Beta release stopped because Hosted Beta deployment failed';
   }
 
   if (hasWorkflowJobResult(input.beta.deploymentResult, 'cancelled')) {
-    return 'Release candidate stopped because Hosted Beta deployment was cancelled';
+    return 'Beta release stopped because Hosted Beta deployment was cancelled';
   }
 
   if (hasWorkflowJobResult(input.beta.deploymentResult, 'skipped')) {
-    return 'Release candidate incomplete because Hosted Beta deployment did not run';
+    return 'Beta release incomplete because Hosted Beta deployment did not run';
   }
 
   if (hasWorkflowJobResult(input.beta.tagCreationResult, 'failure')) {
-    return 'Release candidate blocked because Beta tag creation failed';
+    return 'Beta release stopped because Beta tag creation failed';
   }
 
   if (hasWorkflowJobResult(input.beta.tagCreationResult, 'cancelled')) {
-    return 'Release candidate stopped because Beta tag creation was cancelled';
+    return 'Beta release stopped because Beta tag creation was cancelled';
   }
 
-  if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
-    return 'Release candidate blocked because the E2E system gate failed';
-  }
-
-  if (hasWorkflowJobResult(input.e2e.result, 'cancelled')) {
-    return 'Release candidate stopped because the E2E system gate was cancelled';
-  }
-
-  if (hasWorkflowJobResult(input.e2e.result, 'skipped')) {
-    return 'Release candidate incomplete because the E2E system gate did not run';
-  }
-
-  if (hasWorkflowJobResult(input.e2e.result, 'success') && input.production.promotionRequested === false) {
-    return 'Beta release candidate passed; Production promotion was not requested';
-  }
-
-  if (hasProductionPreflightResult(input.production.preflightResult, 'already_tagged')) {
-    return 'Release candidate already has the matching Production tag; deployment is not required';
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'skipped')) {
+    return 'Beta release incomplete because Beta tag creation did not run';
   }
 
   if (
-    hasProductionPreflightResult(input.production.preflightResult, 'ready') &&
-    hasWorkflowJobResult(input.production.preflightJobResult, 'success')
+    hasWorkflowJobResult(input.beta.deploymentResult, 'success') &&
+    hasWorkflowJobResult(input.beta.tagCreationResult, 'success')
   ) {
-    return 'Release candidate passed and is ready for Production approval';
+    return 'Beta release completed successfully';
   }
 
-  if (hasProductionPreflightFailure(input.production)) {
-    return 'Release candidate blocked because Production preflight failed';
-  }
-
-  if (hasProductionPreflightCancellation(input.production)) {
-    return 'Release candidate stopped because Production preflight was cancelled';
-  }
-
-  return 'Release candidate status is unavailable or unexpected';
+  return 'Beta release status is unavailable or unexpected';
 }
 
 function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
@@ -1135,65 +986,6 @@ function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
   }
 
   return 'Release status is unavailable or unexpected';
-}
-
-function formatCandidateProductionOverview(input: WebappReleaseSummaryInput): string {
-  if (input.production.promotionRequested === false) {
-    return 'promotion was not requested';
-  }
-
-  if (hasWorkflowJobResult(input.beta.deploymentResult, 'failure')) {
-    return 'blocked because Hosted Beta deployment failed';
-  }
-
-  if (hasWorkflowJobResult(input.beta.deploymentResult, 'cancelled')) {
-    return 'unavailable because Hosted Beta deployment was cancelled';
-  }
-
-  if (hasWorkflowJobResult(input.beta.deploymentResult, 'skipped')) {
-    return 'unavailable because Hosted Beta deployment did not run';
-  }
-
-  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'failure')) {
-    return 'blocked because Beta tag creation failed';
-  }
-
-  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'cancelled')) {
-    return 'unavailable because Beta tag creation was cancelled';
-  }
-
-  if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
-    return 'blocked because the E2E system gate failed';
-  }
-
-  if (hasWorkflowJobResult(input.e2e.result, 'cancelled')) {
-    return 'unavailable because the E2E system gate was cancelled';
-  }
-
-  if (hasWorkflowJobResult(input.e2e.result, 'skipped')) {
-    return 'unavailable because the E2E system gate did not run';
-  }
-
-  if (hasProductionPreflightResult(input.production.preflightResult, 'already_tagged')) {
-    return 'already has the matching Production tag; deployment is not required';
-  }
-
-  if (
-    hasProductionPreflightResult(input.production.preflightResult, 'ready') &&
-    hasWorkflowJobResult(input.production.preflightJobResult, 'success')
-  ) {
-    return 'ready for approval through the wire-webapp-prod GitHub Environment';
-  }
-
-  if (hasProductionPreflightFailure(input.production)) {
-    return 'blocked because Production preflight failed';
-  }
-
-  if (hasProductionPreflightCancellation(input.production)) {
-    return 'unavailable because Production preflight was cancelled';
-  }
-
-  return 'unavailable because Production readiness is unknown';
 }
 
 function formatFinalProductionOverview(input: WebappReleaseSummaryInput): string {
@@ -1323,32 +1115,6 @@ function renderE2ESection(input: WebappReleaseSummaryInput): string {
   ].join('\n');
 }
 
-function renderProductionReadinessSection(input: WebappReleaseSummaryInput): string {
-  const productionSkipReason = formatProductionSkipReason(input.production);
-  const productionSkipReasonLines = productionSkipReason
-    .map(reason => {
-      return [`- Production skip reason: ${reason}`];
-    })
-    .unwrapOr([]);
-
-  return [
-    '### Hosted Production promotion',
-    '',
-    `- Production promotion requested: ${input.production.promotionRequested === true ? 'true' : 'false'}`,
-    `- Production preflight job result: ${formatValueOrFallback(input.production.preflightJobResult)}`,
-    `- Production preflight result: ${formatProductionPreflightResult(input.production)}`,
-    `- Production deployment required: ${formatProductionDeploymentRequired(input.production)}`,
-    ...productionSkipReasonLines,
-    `- Planned Production tag: ${formatPlannedProductionTag(input.production, input.release)}`,
-    `- GitHub Environment: ${formatValueOrFallback(input.production.environmentName)}`,
-    `- Approval status: ${formatProductionApprovalStatus({
-      input: input.production,
-      beta: input.beta,
-      e2e: input.e2e,
-    })}`,
-  ].join('\n');
-}
-
 function renderProductionSection(input: WebappReleaseSummaryInput): string {
   const productionSkipReason = formatProductionSkipReason(input.production);
   const productionSkipReasonLines = productionSkipReason
@@ -1420,15 +1186,13 @@ function renderReleasePreparationSection(input: WebappReleaseSummaryInput): stri
   ].join('\n');
 }
 
-function renderTechnicalReleaseEvidence(input: WebappReleaseSummaryInput, isCandidate: boolean): string {
-  const technicalSections = [
-    renderReleasePreparationSection(input),
-    renderBetaSection(input),
-    renderE2ESection(input),
-    isCandidate ? renderProductionReadinessSection(input) : renderProductionSection(input),
-  ];
+type WebappReleaseSummaryPhase = 'beta' | 'final';
 
-  if (!isCandidate) {
+function renderTechnicalReleaseEvidence(input: WebappReleaseSummaryInput, phase: WebappReleaseSummaryPhase): string {
+  const technicalSections = [renderReleasePreparationSection(input), renderBetaSection(input)];
+
+  if (phase === 'final') {
+    technicalSections.push(renderE2ESection(input), renderProductionSection(input));
     technicalSections.push(renderProductionDistributionSection(input));
   }
 
@@ -1442,23 +1206,17 @@ function renderTechnicalReleaseEvidence(input: WebappReleaseSummaryInput, isCand
   ].join('\n');
 }
 
-export function renderWebappReleaseCandidateSummary(input: WebappReleaseSummaryInput): string {
+export function renderWebappBetaReleaseSummary(input: WebappReleaseSummaryInput): string {
   const visibleSummary = [
     renderReleaseIdentity({
-      title: '## WebApp release candidate',
-      outcome: formatReleaseCandidateOutcome(input),
+      title: '## WebApp Beta release',
+      outcome: formatBetaReleaseOutcome(input),
       input,
     }),
-    [
-      '### Release stages',
-      '',
-      `- Hosted Beta: ${formatBetaStageOverview(input)}`,
-      `- E2E system gate: ${formatE2EStageOverview(input)}`,
-      `- Hosted Production: ${formatCandidateProductionOverview(input)}`,
-    ].join('\n'),
+    ['### Release stages', '', `- Hosted Beta: ${formatBetaStageOverview(input)}`].join('\n'),
   ].join('\n\n');
 
-  return `${visibleSummary}\n\n${renderTechnicalReleaseEvidence(input, true)}\n`;
+  return `${visibleSummary}\n\n${renderTechnicalReleaseEvidence(input, 'beta')}\n`;
 }
 
 export function renderWebappReleaseSummary(input: WebappReleaseSummaryInput): string {
@@ -1490,16 +1248,14 @@ export function renderWebappReleaseSummary(input: WebappReleaseSummaryInput): st
     ].join('\n'),
   ].join('\n\n');
 
-  return `${visibleSummary}\n\n${renderTechnicalReleaseEvidence(input, false)}\n`;
+  return `${visibleSummary}\n\n${renderTechnicalReleaseEvidence(input, 'final')}\n`;
 }
-
-type WebappReleaseSummaryPhase = 'candidate' | 'final';
 
 const commandLineArgumentStartIndex = 2;
 
 function readWebappReleaseSummaryPhase(commandLineArguments: readonly string[]): WebappReleaseSummaryPhase {
-  if (commandLineArguments.includes('--release-candidate')) {
-    return 'candidate';
+  if (commandLineArguments.includes('--beta-release')) {
+    return 'beta';
   }
 
   return 'final';
@@ -1509,8 +1265,7 @@ function main(): void {
   try {
     const input = readWebappReleaseSummaryInput(process.env);
     const summaryPhase = readWebappReleaseSummaryPhase(process.argv.slice(commandLineArgumentStartIndex));
-    const summary =
-      summaryPhase === 'candidate' ? renderWebappReleaseCandidateSummary(input) : renderWebappReleaseSummary(input);
+    const summary = summaryPhase === 'beta' ? renderWebappBetaReleaseSummary(input) : renderWebappReleaseSummary(input);
 
     process.stdout.write(summary);
   } catch (error) {
