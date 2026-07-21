@@ -148,6 +148,7 @@ describe('submitDeleteMeeting', () => {
       PrimaryModal.type.ACKNOWLEDGE,
       expect.objectContaining({
         text: expect.objectContaining({
+          title: translateForTest('meetings.deleteModal.error.cleanupFailedTitle'),
           message: translateForTest('meetings.deleteModal.error.deleteSucceededButLocalCleanupFailed'),
         }),
       }),
@@ -156,7 +157,7 @@ describe('submitDeleteMeeting', () => {
     );
   });
 
-  it('refreshes the list but keeps the meeting when delete fails before server deletion', async () => {
+  it('keeps the meeting and does not refresh when delete fails before server deletion', async () => {
     const removeMeetingByQualifiedId = jest.fn();
     const deleteMeetingForAll = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.deleteFailed));
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
@@ -171,7 +172,7 @@ describe('submitDeleteMeeting', () => {
 
     expect(result).toBe(deleteMeetingSubmitResults.failed);
     expect(removeMeetingByQualifiedId).not.toHaveBeenCalled();
-    expect(loadMeetings).toHaveBeenCalledTimes(1);
+    expect(loadMeetings).not.toHaveBeenCalled();
     expect(primaryModalShow).toHaveBeenCalledTimes(1);
   });
 
@@ -187,7 +188,17 @@ describe('submitDeleteMeeting', () => {
 
     expect(result).toBe(deleteMeetingSubmitResults.blocked);
     expect(deleteMeetingForAll).not.toHaveBeenCalled();
-    expect(primaryModalShow).toHaveBeenCalledTimes(1);
+    expect(primaryModalShow).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      expect.objectContaining({
+        text: expect.objectContaining({
+          title: translateForTest('meetings.deleteModal.error.notAllowedTitle'),
+          message: translateForTest('meetings.deleteModal.error.notAllowed'),
+        }),
+      }),
+      undefined,
+      translateForTest,
+    );
   });
 
   it('shows feedback when selfUser is missing', async () => {
@@ -202,7 +213,17 @@ describe('submitDeleteMeeting', () => {
 
     expect(result).toBe(deleteMeetingSubmitResults.blocked);
     expect(deleteMeetingForAll).not.toHaveBeenCalled();
-    expect(primaryModalShow).toHaveBeenCalledTimes(1);
+    expect(primaryModalShow).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      expect.objectContaining({
+        text: expect.objectContaining({
+          title: translateForTest('meetings.deleteModal.error.notAllowedTitle'),
+          message: translateForTest('meetings.deleteModal.error.notAllowed'),
+        }),
+      }),
+      undefined,
+      translateForTest,
+    );
   });
 
   it('shows feedback when a second submit for the same meeting is already in flight', async () => {

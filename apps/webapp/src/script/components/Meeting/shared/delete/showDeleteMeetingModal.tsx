@@ -20,17 +20,41 @@
 import {TrashIcon} from '@wireapp/react-ui-kit';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate, TranslationKey} from 'Util/localizerUtil';
 
 export type DeleteMeetingModalMode = 'forAll' | 'forMe';
 
 type ShowDeleteMeetingModalParams = {
   mode: DeleteMeetingModalMode;
+  isRecurring: boolean;
   onConfirm: () => void;
   translate: Translate;
 };
 
-export const showDeleteMeetingModal = ({mode, onConfirm, translate}: ShowDeleteMeetingModalParams): void => {
+export const getDeleteMeetingModalMessageKey = ({
+  mode,
+  isRecurring,
+}: {
+  mode: DeleteMeetingModalMode;
+  isRecurring: boolean;
+}): TranslationKey => {
+  if (mode === 'forAll' && isRecurring) {
+    return 'meetings.deleteModal.forAllRecurringMessage';
+  }
+
+  if (mode === 'forAll') {
+    return 'meetings.deleteModal.forAllMessage';
+  }
+
+  return 'meetings.deleteModal.forMeMessage';
+};
+
+export const showDeleteMeetingModal = ({
+  mode,
+  isRecurring,
+  onConfirm,
+  translate,
+}: ShowDeleteMeetingModalParams): void => {
   const isForAll = mode === 'forAll';
 
   PrimaryModal.show(
@@ -52,7 +76,7 @@ export const showDeleteMeetingModal = ({mode, onConfirm, translate}: ShowDeleteM
       },
       text: {
         title: translate(isForAll ? 'meetings.deleteModal.forAllTitle' : 'meetings.deleteModal.forMeTitle'),
-        message: translate(isForAll ? 'meetings.deleteModal.forAllMessage' : 'meetings.deleteModal.forMeMessage'),
+        message: translate(getDeleteMeetingModalMessageKey({mode, isRecurring})),
       },
     },
     undefined,

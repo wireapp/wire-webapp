@@ -26,10 +26,13 @@ import {
 } from 'Components/Meeting/meetingConversationSync';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 
+export type LeaveMeetingConversationError =
+  typeof meetingConversationSyncErrors.conversationNotFound | typeof meetingConversationSyncErrors.leaveFailed;
+
 export const safeLeaveMeetingConversation = (
   conversationRepository: ConversationRepository,
   qualifiedConversationId: QualifiedId,
-): Task<void, MeetingConversationSyncError> =>
+): Task<void, LeaveMeetingConversationError> =>
   conversationRepository
     .safeGetConversationById(qualifiedConversationId)
     .mapRejected(() => meetingConversationSyncErrors.conversationNotFound)

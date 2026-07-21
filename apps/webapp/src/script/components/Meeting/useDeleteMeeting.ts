@@ -67,6 +67,7 @@ export const useDeleteMeeting = () => {
     (meetingInstance: MeetingInstance, mode: DeleteMeetingModalMode, selfUser: User | undefined) => {
       showDeleteMeetingModal({
         mode,
+        isRecurring: meetingInstance.meetingSeries.recurrence !== 'doesNotRepeat',
         translate,
         onConfirm: () => submitDelete(meetingInstance, mode, selfUser),
       });

@@ -19,6 +19,8 @@
 
 import {memo} from 'react';
 
+import {container} from 'tsyringe';
+
 import {MeetingListItem} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingListItem';
 import {
   listStyles,
@@ -26,6 +28,7 @@ import {
   sectionStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/meetingListItemGroup.styles';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface MeetingListItemGroupProps {
@@ -36,6 +39,7 @@ interface MeetingListItemGroupProps {
 
 const MeetingListItemGroupComponent = ({header, meetingInstances, nowMilliseconds}: MeetingListItemGroupProps) => {
   const {translate} = useApplicationContext();
+  const selfUser = container.resolve(UserState).self();
   const isEmpty = meetingInstances.length === 0;
 
   if (isEmpty) {
@@ -56,6 +60,7 @@ const MeetingListItemGroupComponent = ({header, meetingInstances, nowMillisecond
           <MeetingListItem
             key={`meeting-list-item-${meetingInstance.meetingSeries.qualified_id.id}-${meetingInstance.meetingSeries.qualified_id.domain}-${meetingInstance.start.getTime()}`}
             meetingInstance={meetingInstance}
+            selfUser={selfUser}
             nowMilliseconds={nowMilliseconds}
           />
         ))}

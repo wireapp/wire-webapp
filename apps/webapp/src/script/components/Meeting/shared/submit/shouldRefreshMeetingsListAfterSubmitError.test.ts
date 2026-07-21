@@ -51,14 +51,14 @@ describe('isMeetingDeletedDespiteSubmitError', () => {
 });
 
 describe('shouldRefreshMeetingsListAfterDeleteError', () => {
-  it('returns true for delete failures that need list reconciliation', () => {
+  it('returns true only when the meeting was deleted but local cleanup failed', () => {
     expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.deleteSucceededButLocalCleanupFailed)).toBe(
       true,
     );
-    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.deleteFailed)).toBe(true);
   });
 
   it('returns false for delete failures before server state changed', () => {
+    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.deleteFailed)).toBe(false);
     expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.leaveConversationFailed)).toBe(false);
     expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.removeParticipantsFailed)).toBe(false);
   });

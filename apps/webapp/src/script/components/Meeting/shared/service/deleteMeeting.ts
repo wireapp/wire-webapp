@@ -20,13 +20,11 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {Task} from 'true-myth';
 
-import {
-  meetingConversationSyncErrors,
-  type MeetingConversationSyncError,
-} from 'Components/Meeting/meetingConversationSync';
+import {meetingConversationSyncErrors} from 'Components/Meeting/meetingConversationSync';
 import {
   removeMeetingConversationLocally,
   safeLeaveMeetingConversation,
+  type LeaveMeetingConversationError,
 } from 'Components/Meeting/meetingConversationTeardown';
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
@@ -37,15 +35,10 @@ export type DeleteMeetingCommand = {
   qualifiedConversation: QualifiedId;
 };
 
-const mapLeaveSyncErrorToDeleteError = (error: MeetingConversationSyncError): MeetingSubmitErrors => {
+const mapLeaveSyncErrorToDeleteError = (error: LeaveMeetingConversationError): MeetingSubmitErrors => {
   switch (error) {
-    case meetingConversationSyncErrors.leaveFailed:
     case meetingConversationSyncErrors.conversationNotFound:
-    case meetingConversationSyncErrors.groupIdMissing:
-      return meetingSubmitErrors.leaveConversationFailed;
-    case meetingConversationSyncErrors.removeFailed:
-    case meetingConversationSyncErrors.establishFailed:
-    case meetingConversationSyncErrors.addFailed:
+    case meetingConversationSyncErrors.leaveFailed:
       return meetingSubmitErrors.leaveConversationFailed;
   }
 };

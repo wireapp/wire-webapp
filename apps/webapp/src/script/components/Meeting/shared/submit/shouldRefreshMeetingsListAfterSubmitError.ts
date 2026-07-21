@@ -48,12 +48,5 @@ export const shouldRefreshMeetingsListAfterSubmitError = isMeetingPersistedDespi
 /**
  * Returns whether the meetings list should be refreshed after a failed delete submit.
  */
-export const shouldRefreshMeetingsListAfterDeleteError = (error: MeetingSubmitErrors): boolean => {
-  switch (error) {
-    case meetingSubmitErrors.deleteSucceededButLocalCleanupFailed:
-    case meetingSubmitErrors.deleteFailed:
-      return true;
-    default:
-      return false;
-  }
-};
+export const shouldRefreshMeetingsListAfterDeleteError = (error: MeetingSubmitErrors): boolean =>
+  error === meetingSubmitErrors.deleteSucceededButLocalCleanupFailed;

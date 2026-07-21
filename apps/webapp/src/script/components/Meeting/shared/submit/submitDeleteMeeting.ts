@@ -82,8 +82,8 @@ const showDeleteAcknowledgeModal = (
 const showDeleteNotAllowedModal = (translate: Translate): void => {
   showDeleteAcknowledgeModal(
     translate,
-    'meetings.deleteModal.error.deleteFailedTitle',
-    'meetings.deleteModal.error.deleteFailed',
+    'meetings.deleteModal.error.notAllowedTitle',
+    'meetings.deleteModal.error.notAllowed',
   );
 };
 

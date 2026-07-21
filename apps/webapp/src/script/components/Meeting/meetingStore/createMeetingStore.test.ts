@@ -206,4 +206,34 @@ describe('createMeetingStore', () => {
     assert(maybe.isJust(result.value.formState.end));
     expect(result.value.formState.end.value).toEqual(new Date('2026-06-22T11:00:00.000Z'));
   });
+
+  it('maps deleteMeetingForAll to a DeleteMeetingCommand for serviceTasks', async () => {
+    const deleteMeetingForAll = jest.fn().mockReturnValue(task.resolve(undefined));
+    const store = createMeetingStore(
+      createDeps({serviceTasks: createServiceTasks({deleteMeetingForAll})}),
+    );
+
+    const result = await store.getState().deleteMeetingForAll(listMeetingInstance);
+
+    expect(result.isOk).toBe(true);
+    expect(deleteMeetingForAll).toHaveBeenCalledWith({
+      meetingId: listMeetingInstance.meetingSeries.qualified_id,
+      qualifiedConversation: listMeetingInstance.meetingSeries.qualified_conversation,
+    });
+  });
+
+  it('maps deleteMeetingForMe to a DeleteMeetingCommand for serviceTasks', async () => {
+    const deleteMeetingForMe = jest.fn().mockReturnValue(task.resolve(undefined));
+    const store = createMeetingStore(
+      createDeps({serviceTasks: createServiceTasks({deleteMeetingForMe})}),
+    );
+
+    const result = await store.getState().deleteMeetingForMe(listMeetingInstance);
+
+    expect(result.isOk).toBe(true);
+    expect(deleteMeetingForMe).toHaveBeenCalledWith({
+      meetingId: listMeetingInstance.meetingSeries.qualified_id,
+      qualifiedConversation: listMeetingInstance.meetingSeries.qualified_conversation,
+    });
+  });
 });

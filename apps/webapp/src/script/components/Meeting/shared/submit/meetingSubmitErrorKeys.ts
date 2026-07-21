@@ -109,7 +109,7 @@ export const getScheduleMeetingSubmitErrorTranslationKeys = (
       messageKey: 'meetings.deleteModal.error.deleteFailed',
     },
     deleteSucceededButLocalCleanupFailed: {
-      titleKey: 'meetings.deleteModal.error.deleteFailedTitle',
+      titleKey: 'meetings.deleteModal.error.cleanupFailedTitle',
       messageKey: 'meetings.deleteModal.error.deleteSucceededButLocalCleanupFailed',
     },
     leaveConversationFailed: {
