@@ -1598,7 +1598,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchNodes({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -1634,7 +1634,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchNodes({phrase: searchPhrase, deleted: true});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -1670,7 +1670,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchNodes({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -1710,7 +1710,7 @@ describe('CellsAPI', () => {
       });
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -1750,7 +1750,7 @@ describe('CellsAPI', () => {
       });
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -1792,7 +1792,7 @@ describe('CellsAPI', () => {
       });
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -1830,7 +1830,7 @@ describe('CellsAPI', () => {
       });
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'LEAF',
@@ -1857,7 +1857,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchNodes({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -1884,7 +1884,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchNodes({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: false},
+        Scope: {Root: {Path: ''}, Recursive: false},
         Filters: {
           Type: 'UNKNOWN',
           Status: {
@@ -1909,7 +1909,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith(
         expect.objectContaining({
-          Scope: {Root: {Path: '/'}, Recursive: true},
+          Scope: {Root: {Path: ''}, Recursive: true},
         }),
       );
     });
@@ -1931,7 +1931,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchNodes({phrase: searchPhrase, tags});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -1964,7 +1964,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchNodes({phrase: searchPhrase, tags});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -2029,7 +2029,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchNodes({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -2054,7 +2054,7 @@ describe('CellsAPI', () => {
       await cellsAPI.searchNodes({phrase: searchPhrase, mimeTypes: ['image/*']});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -2076,7 +2076,7 @@ describe('CellsAPI', () => {
       await cellsAPI.searchNodes({phrase: searchPhrase, mimeTypes: ['*presentation*', '*powerpoint*']});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -2168,7 +2168,7 @@ describe('CellsAPI', () => {
       await cellsAPI.searchNodes({phrase: searchPhrase, creatorIds: [creatorId]});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -2194,7 +2194,7 @@ describe('CellsAPI', () => {
       await cellsAPI.searchNodes({phrase: searchPhrase, creatorIds});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
@@ -2243,7 +2243,7 @@ describe('CellsAPI', () => {
       });
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: ''}, Recursive: true},
         Filters: {
           Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',

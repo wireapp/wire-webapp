@@ -419,7 +419,7 @@ export class CellsAPI {
 
   async searchNodes({
     phrase,
-    path = '/',
+    path = '',
     recursive,
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
