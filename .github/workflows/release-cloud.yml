@@ -93,6 +93,7 @@ jobs:
       artifact_checksum: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
       artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
       artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      artifact_asset_version: ${{ steps.validate_artifact_metadata.outputs.artifact_asset_version }}
       artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
       artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
       distribution_artifact_name: ${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
@@ -294,7 +295,9 @@ jobs:
           environment-label: Beta
           webapp-url: ${{ env.BETA_WEBAPP_URL }}
           expected-version: ${{ needs.build_artifact.outputs.artifact_version }}
+          expected-asset-version: ${{ needs.build_artifact.outputs.artifact_asset_version }}
           expected-commit: ${{ needs.build_artifact.outputs.artifact_commit }}
+          expected-built-at: ${{ needs.build_artifact.outputs.artifact_built_at }}
           expected-backend-rest: ${{ env.BETA_RUNTIME_BACKEND_REST }}
           expected-backend-ws: ${{ env.BETA_RUNTIME_BACKEND_WS }}
 
@@ -600,7 +603,9 @@ jobs:
           environment-label: Production
           webapp-url: ${{ env.PRODUCTION_WEBAPP_URL }}
           expected-version: ${{ needs.build_artifact.outputs.artifact_version }}
+          expected-asset-version: ${{ needs.build_artifact.outputs.artifact_asset_version }}
           expected-commit: ${{ needs.build_artifact.outputs.artifact_commit }}
+          expected-built-at: ${{ needs.build_artifact.outputs.artifact_built_at }}
           expected-backend-rest: ${{ env.PRODUCTION_RUNTIME_BACKEND_REST }}
           expected-backend-ws: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}
 

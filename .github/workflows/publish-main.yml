@@ -78,6 +78,7 @@ jobs:
     outputs:
       main_artifact_name: ${{ steps.prepare_artifact.outputs.main_artifact_name }}
       artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      artifact_asset_version: ${{ steps.validate_artifact_metadata.outputs.artifact_asset_version }}
       artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
       artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
       development_context_artifact_name: ${{ steps.prepare_artifact.outputs.development_context_artifact_name }}
@@ -409,7 +410,9 @@ jobs:
           environment-label: Hosted Dev
           webapp-url: ${{ env.DEV_WEBAPP_URL }}
           expected-version: ${{ needs.build_main_artifacts.outputs.artifact_version }}
+          expected-asset-version: ${{ needs.build_main_artifacts.outputs.artifact_asset_version }}
           expected-commit: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
+          expected-built-at: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
           expected-backend-rest: ${{ env.DEV_RUNTIME_BACKEND_REST }}
           expected-backend-ws: ${{ env.DEV_RUNTIME_BACKEND_WS }}
 
