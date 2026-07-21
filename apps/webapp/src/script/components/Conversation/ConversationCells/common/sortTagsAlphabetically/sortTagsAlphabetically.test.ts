@@ -32,6 +32,10 @@ describe('sortTagsAlphabetically', () => {
     expect(sortTagsAlphabetically(['Яблоко', 'арбуз', 'Банан'])).toEqual(['арбуз', 'Банан', 'Яблоко']);
   });
 
+  it('uses locale-independent lexical ordering', () => {
+    expect(sortTagsAlphabetically(['ä', 'z'])).toEqual(['z', 'ä']);
+  });
+
   it('does not mutate the original tags', () => {
     const tags = ['Zulu', 'alpha'];
 
