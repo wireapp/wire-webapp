@@ -576,11 +576,7 @@ function formatProductionDeploymentRequired(input: ProductionSummaryInput): stri
   });
 }
 
-function formatPlannedProductionTag(
-  input: ProductionSummaryInput,
-  release: ReleaseMetadata,
-  github: GitHubLinkContext,
-): string {
+function formatPlannedProductionTag(input: ProductionSummaryInput, release: ReleaseMetadata): string {
   const plannedTagName = input.plannedTagName.orElse(() => {
     return release.identifier.map(identifier => {
       return `${identifier}-production`;
@@ -591,7 +587,9 @@ function formatPlannedProductionTag(
     return 'not requested';
   }
 
-  return formatRepositoryTreeLink(plannedTagName, github).unwrapOr('not available');
+  return plannedTagName.mapOr('not available', plannedTag => {
+    return `\`${plannedTag}\``;
+  });
 }
 
 function formatEarlierFailedGate(beta: BetaSummaryInput, e2e: E2ESummaryInput): Maybe<string> {
@@ -627,7 +625,7 @@ function formatProductionApprovalStatus(
     hasProductionPreflightResult(input.preflightResult, 'ready') &&
     hasWorkflowJobResult(input.preflightJobResult, 'success')
   ) {
-    return 'Production is ready and waiting for approval through the wire-webapp-prod GitHub Environment';
+    return 'Production is ready for deployment. Approval is enforced through the wire-webapp-prod GitHub Environment.';
   }
 
   if (hasWorkflowJobResult(input.preflightJobResult, 'failure')) {
@@ -874,7 +872,7 @@ function renderProductionReadinessSection(input: ReleaseCloudSummaryInput, workf
     `- Production preflight result: ${formatProductionPreflightResult(input.production)}`,
     `- Production deployment required: ${formatProductionDeploymentRequired(input.production)}`,
     ...productionSkipReasonLines,
-    `- Planned Production tag: ${formatPlannedProductionTag(input.production, input.release, input.github)}`,
+    `- Planned Production tag: ${formatPlannedProductionTag(input.production, input.release)}`,
     `- GitHub Environment: ${formatValueOrFallback(input.production.environmentName)}`,
     `- Approval status: ${formatProductionApprovalStatus(input.production, input.beta, input.e2e)}`,
     `- Workflow run URL: ${workflowRunLink}`,

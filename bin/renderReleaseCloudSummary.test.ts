@@ -453,11 +453,10 @@ describe('Release Cloud summary renderer', () => {
     expect(summary).toMatch(/- Production preflight job result: success/);
     expect(summary).toMatch(/- Production preflight result: ready/);
     expect(summary).toMatch(/- Production deployment required: true/);
+    expect(summary).toMatch(/- Planned Production tag: `2026-07-17\.1-production`/);
+    expect(summary).not.toMatch(/- Planned Production tag: \[/);
     expect(summary).toMatch(
-      /- Planned Production tag: \[2026-07-17\.1-production\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/tree\/2026-07-17\.1-production\)/,
-    );
-    expect(summary).toMatch(
-      /- Approval status: Production is ready and waiting for approval through the wire-webapp-prod GitHub Environment/,
+      /- Approval status: Production is ready for deployment\. Approval is enforced through the wire-webapp-prod GitHub Environment\./,
     );
     expect(summary).toMatch(/- Manual reason: manual release for validation/);
     expect(summary).toMatch(
