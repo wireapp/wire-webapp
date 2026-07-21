@@ -17,6 +17,9 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {Maybe} from 'true-myth';
+
 import type {ScheduleMeetingRecurrenceOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import type {User} from 'Repositories/entity/User';
 
@@ -31,4 +34,16 @@ export type ScheduleMeetingCommand = {
   end: Date;
   recurrence: ScheduleMeetingRecurrenceOption;
   selectedUsers: User[];
+};
+
+export type UpdateMeetingCommand = {
+  meetingId: QualifiedId;
+  title: string;
+  start: Date;
+  end: Date;
+  recurrence: ScheduleMeetingRecurrenceOption;
+  originalRecurrence: ScheduleMeetingRecurrenceOption;
+  selectedUsers: User[];
+  originalSelectedUsers: User[];
+  qualifiedConversation: Maybe<QualifiedId>;
 };

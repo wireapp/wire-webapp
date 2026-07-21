@@ -19,22 +19,19 @@
 
 import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
 import {maybe} from 'true-myth';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {mapScheduleFormToUpdateMeeting} from './mapScheduleFormToUpdateMeeting';
-import type {ScheduleMeetingFormState} from './ScheduleMeetingModal/scheduleMeetingTypes';
+import {mapUpdateCommandToUpdateMeeting} from './mapUpdateCommandToUpdateMeeting';
+import type {UpdateMeetingCommand} from './shared/types/meetingCommandTypes';
 
-const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
 const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
 const futureStartIso = futureStartDate.toISOString();
 const futureEndIso = futureEndDate.toISOString();
-
-const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+const meetingId = {id: 'meeting-id', domain: 'example.com'};
+const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
 
 const createUser = (id: string) => {
   const user = new User(id, 'example.com', translateForTest);
@@ -42,28 +39,28 @@ const createUser = (id: string) => {
   return user;
 };
 
-const baseFormState = (): ScheduleMeetingFormState => ({
+const baseUpdateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): UpdateMeetingCommand => ({
+  meetingId,
   title: 'Weekly sync',
-  start: maybe.just(futureStartDate),
-  end: maybe.just(futureEndDate),
+  start: futureStartDate,
+  end: futureEndDate,
   recurrence: 'weekly',
+  originalRecurrence: 'doesNotRepeat',
   selectedUsers: [],
-  participantsFilter: '',
+  originalSelectedUsers: [],
+  qualifiedConversation: maybe.just(qualifiedConversation),
+  ...overrides,
 });
 
-describe('mapScheduleFormToUpdateMeeting', () => {
+describe('mapUpdateCommandToUpdateMeeting', () => {
   it('maps title, times, and changed recurrence metadata', () => {
-    const result = mapScheduleFormToUpdateMeeting(
-      {
-        ...baseFormState(),
-        selectedUsers: [createUser('1'), createUser('3')],
-      },
-      wallClock,
-      'doesNotRepeat',
-    );
-
-    expect(result.isOk).toBe(true);
-    expect(unwrap(result).payload).toEqual({
+    expect(
+      mapUpdateCommandToUpdateMeeting(
+        baseUpdateCommand({
+          selectedUsers: [createUser('1'), createUser('3')],
+        }),
+      ),
+    ).toEqual({
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
@@ -72,17 +69,14 @@ describe('mapScheduleFormToUpdateMeeting', () => {
   });
 
   it('omits recurrence when unchanged for non-repeating meetings', () => {
-    const result = mapScheduleFormToUpdateMeeting(
-      {
-        ...baseFormState(),
-        recurrence: 'doesNotRepeat',
-      },
-      wallClock,
-      'doesNotRepeat',
-    );
-
-    expect(result.isOk).toBe(true);
-    expect(unwrap(result).payload).toEqual({
+    expect(
+      mapUpdateCommandToUpdateMeeting(
+        baseUpdateCommand({
+          recurrence: 'doesNotRepeat',
+          originalRecurrence: 'doesNotRepeat',
+        }),
+      ),
+    ).toEqual({
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
@@ -90,10 +84,13 @@ describe('mapScheduleFormToUpdateMeeting', () => {
   });
 
   it('includes recurrence when unchanged for repeating meetings', () => {
-    const result = mapScheduleFormToUpdateMeeting(baseFormState(), wallClock, 'weekly');
-
-    expect(result.isOk).toBe(true);
-    expect(unwrap(result).payload).toEqual({
+    expect(
+      mapUpdateCommandToUpdateMeeting(
+        baseUpdateCommand({
+          originalRecurrence: 'weekly',
+        }),
+      ),
+    ).toEqual({
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
@@ -101,32 +98,15 @@ describe('mapScheduleFormToUpdateMeeting', () => {
     });
   });
 
-  it('returns missingTimes when start or end is missing', () => {
-    const result = mapScheduleFormToUpdateMeeting(
-      {
-        ...baseFormState(),
-        end: maybe.nothing(),
-      },
-      wallClock,
-      'weekly',
-    );
-
-    expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe('missingTimes');
-  });
-
   it('clears recurrence when changed to doesNotRepeat', () => {
-    const result = mapScheduleFormToUpdateMeeting(
-      {
-        ...baseFormState(),
-        recurrence: 'doesNotRepeat',
-      },
-      wallClock,
-      'weekly',
-    );
-
-    expect(result.isOk).toBe(true);
-    expect(unwrap(result).payload).toEqual({
+    expect(
+      mapUpdateCommandToUpdateMeeting(
+        baseUpdateCommand({
+          recurrence: 'doesNotRepeat',
+          originalRecurrence: 'weekly',
+        }),
+      ),
+    ).toEqual({
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,

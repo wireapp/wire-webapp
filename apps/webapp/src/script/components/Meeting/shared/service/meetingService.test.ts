@@ -32,8 +32,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from './meetingService';
-import type {ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
-import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {ScheduleMeetingCommand, UpdateMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
@@ -51,14 +50,18 @@ const scheduleCommand: ScheduleMeetingCommand = {
   selectedUsers: [],
 };
 
-const formState: ScheduleMeetingFormState = {
+const updateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): UpdateMeetingCommand => ({
+  meetingId,
   title: 'Weekly sync',
-  start: maybe.just(futureStartDate),
-  end: maybe.just(futureEndDate),
+  start: futureStartDate,
+  end: futureEndDate,
   recurrence: 'doesNotRepeat',
+  originalRecurrence: 'doesNotRepeat',
   selectedUsers: [],
-  participantsFilter: '',
-};
+  originalSelectedUsers: [],
+  qualifiedConversation: maybe.just(qualifiedConversation),
+  ...overrides,
+});
 
 const meetingId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
@@ -352,16 +355,10 @@ describe('updateMeeting', () => {
     });
 
     const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          selectedUsers: [bob, charlie],
-        },
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
+      updateCommand({
+        selectedUsers: [bob, charlie],
         originalSelectedUsers: [alice, bob],
-      },
+      }),
       deps,
     );
 
@@ -382,16 +379,10 @@ describe('updateMeeting', () => {
     const {deps, updateMeetingMock, safeGetConversationById, safeAddUsers, safeRemoveMembers} = createDeps();
 
     const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          selectedUsers: [alice, bob],
-        },
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
+      updateCommand({
+        selectedUsers: [alice, bob],
         originalSelectedUsers: [alice, bob],
-      },
+      }),
       deps,
     );
 
@@ -402,43 +393,12 @@ describe('updateMeeting', () => {
     expect(safeAddUsers).not.toHaveBeenCalled();
   });
 
-  it('returns missingTimes and does not call API', async () => {
-    const {deps, updateMeetingMock} = createDeps();
-
-    const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          end: maybe.nothing(),
-        },
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
-        originalSelectedUsers: [],
-      },
-      deps,
-    );
-
-    expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe('missingTimes');
-    expect(updateMeetingMock).not.toHaveBeenCalled();
-  });
-
   it('returns updateFailed when updateMeeting fails', async () => {
     const {deps} = createDeps({
       updateMeetingMock: jest.fn().mockReturnValue(task.reject(new Error('network'))),
     });
 
-    const result = await updateMeeting(
-      {
-        meetingId,
-        formState,
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
-        originalSelectedUsers: [],
-      },
-      deps,
-    );
+    const result = await updateMeeting(updateCommand(), deps);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.updateFailed);
@@ -452,16 +412,10 @@ describe('updateMeeting', () => {
     });
 
     const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          selectedUsers: [bob],
-        },
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
+      updateCommand({
+        selectedUsers: [bob],
         originalSelectedUsers: [alice, bob],
-      },
+      }),
       deps,
     );
 
@@ -478,16 +432,10 @@ describe('updateMeeting', () => {
     });
 
     const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          selectedUsers: [alice, charlie],
-        },
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
+      updateCommand({
+        selectedUsers: [alice, charlie],
         originalSelectedUsers: [alice],
-      },
+      }),
       deps,
     );
 
@@ -502,16 +450,11 @@ describe('updateMeeting', () => {
     const {deps, updateMeetingMock, safeGetConversationById} = createDeps();
 
     const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          selectedUsers: [bob],
-        },
-        qualifiedConversation: maybe.nothing(),
-        originalRecurrence: 'doesNotRepeat',
+      updateCommand({
+        selectedUsers: [bob],
         originalSelectedUsers: [alice],
-      },
+        qualifiedConversation: maybe.nothing(),
+      }),
       deps,
     );
 

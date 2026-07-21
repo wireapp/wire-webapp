@@ -22,12 +22,12 @@ import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting
 import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
-import {Maybe, Task, task} from 'true-myth';
+import {Task, task} from 'true-myth';
 
 import {computeParticipantDiff} from 'Components/Meeting/computeMeetingParticipantDiff';
 import {mapMeetNowCommandToCreateMeeting} from 'Components/Meeting/mapMeetNowCommandToCreateMeeting';
 import {mapScheduleCommandToCreateMeeting} from 'Components/Meeting/mapScheduleCommandToCreateMeeting';
-import {mapScheduleFormToUpdateMeeting} from 'Components/Meeting/mapScheduleFormToUpdateMeeting';
+import {mapUpdateCommandToUpdateMeeting} from 'Components/Meeting/mapUpdateCommandToUpdateMeeting';
 import {
   meetingConversationSyncErrors,
   syncMeetingConversationParticipants,
@@ -35,25 +35,16 @@ import {
 } from 'Components/Meeting/meetingConversationSync';
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetNowMeetingCommand, ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
-import type {User} from 'Repositories/entity/User';
-
 import type {
-  ScheduleMeetingFormState,
-  ScheduleMeetingRecurrenceOption,
-} from '../../ScheduleMeetingModal/scheduleMeetingTypes';
+  MeetNowMeetingCommand,
+  ScheduleMeetingCommand,
+  UpdateMeetingCommand,
+} from 'Components/Meeting/shared/types/meetingCommandTypes';
+import type {User} from 'Repositories/entity/User';
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 
 export type CreateMeetingSuccess = MeetingSubmitSuccess & {qualifiedConversation: QualifiedId};
-
-export type UpdateMeetingParams = {
-  meetingId: QualifiedId;
-  formState: ScheduleMeetingFormState;
-  qualifiedConversation: Maybe<QualifiedId>;
-  originalRecurrence: ScheduleMeetingRecurrenceOption;
-  originalSelectedUsers: User[];
-};
 
 const mapSyncErrorToSubmitError = (error: MeetingConversationSyncError): MeetingSubmitErrors => {
   switch (error) {
@@ -138,19 +129,13 @@ export const meetNowMeeting = (
  * Updates meeting metadata and syncs conversation participants.
  */
 export const updateMeeting = (
-  {meetingId, formState, qualifiedConversation, originalRecurrence, originalSelectedUsers}: UpdateMeetingParams,
+  command: UpdateMeetingCommand,
   deps: MeetingServiceDeps,
 ): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
-  const mappingResult = mapScheduleFormToUpdateMeeting(formState, deps.wallClock, originalRecurrence);
-
-  if (mappingResult.isErr) {
-    return task.reject(mappingResult.error);
-  }
-
-  const {usersToAdd, userIdsToRemove} = computeParticipantDiff(originalSelectedUsers, formState.selectedUsers);
+  const {usersToAdd, userIdsToRemove} = computeParticipantDiff(command.originalSelectedUsers, command.selectedUsers);
 
   return deps.meetingsRepository
-    .updateMeeting(meetingId, mappingResult.value.payload)
+    .updateMeeting(command.meetingId, mapUpdateCommandToUpdateMeeting(command))
     .mapRejected(() => meetingSubmitErrors.updateFailed)
     .andThen(updatedMeeting =>
       saveMeetingConversationFromResponse(
@@ -162,13 +147,13 @@ export const updateMeeting = (
           return task.resolve({failedToAdd: []});
         }
 
-        if (qualifiedConversation.isNothing) {
+        if (command.qualifiedConversation.isNothing) {
           return task.reject(meetingSubmitErrors.addParticipantsFailed);
         }
 
         return syncMeetingConversationParticipants(deps.conversationRepository, {
-          qualifiedConversationId: qualifiedConversation.value,
-          selectedUsers: formState.selectedUsers,
+          qualifiedConversationId: command.qualifiedConversation.value,
+          selectedUsers: command.selectedUsers,
           usersToAdd,
           userIdsToRemove,
           isCreate: false,

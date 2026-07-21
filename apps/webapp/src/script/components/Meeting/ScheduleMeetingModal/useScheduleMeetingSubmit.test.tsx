@@ -61,6 +61,18 @@ const scheduleCommand = {
   selectedUsers: [],
 };
 
+const updateCommand = {
+  meetingId: {id: 'meeting-id', domain: 'example.com'},
+  title: 'Weekly sync',
+  start: futureStartDate,
+  end: futureEndDate,
+  recurrence: 'doesNotRepeat' as const,
+  originalRecurrence: 'doesNotRepeat' as const,
+  selectedUsers: [],
+  originalSelectedUsers: [],
+  qualifiedConversation: maybe.just({id: 'conversation-id', domain: 'example.com'}),
+};
+
 const RootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest, wallClock: testWallClock}),
 );
@@ -157,7 +169,7 @@ describe('useScheduleMeetingSubmit', () => {
     });
 
     expect(submitResult).toBe(false);
-    expect(updateMeeting).toHaveBeenCalled();
+    expect(updateMeeting).toHaveBeenCalledWith(updateCommand);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
   });
 

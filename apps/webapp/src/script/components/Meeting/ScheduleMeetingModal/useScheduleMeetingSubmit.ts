@@ -24,13 +24,14 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Maybe, type Task} from 'true-myth';
 
 import {mapScheduleFormToMeetingCommand} from 'Components/Meeting/mapScheduleFormToMeetingCommand';
+import {mapScheduleFormToUpdateMeetingCommand} from 'Components/Meeting/mapScheduleFormToUpdateMeetingCommand';
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import type {MeetingSubmitSuccess, UpdateMeetingParams} from 'Components/Meeting/shared/service/meetingService';
+import type {MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
 import {shouldRefreshMeetingsListAfterSubmitError} from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
 import {showMeetingPartialAddFailureModal} from 'Components/Meeting/shared/submit/showMeetingPartialAddFailureModal';
-import type {ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
+import type {ScheduleMeetingCommand, UpdateMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -59,11 +60,11 @@ type SubmitMeetingParams = {
   mode: ScheduleMeetingMode;
   editingMeetingId: Maybe<QualifiedId>;
   qualifiedConversation: Maybe<QualifiedId>;
-  originalRecurrence: UpdateMeetingParams['originalRecurrence'];
+  originalRecurrence: ScheduleMeetingFormState['recurrence'];
   originalSelectedUsers: User[];
   wallClock: WallClock;
   scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
-  updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 
 const submitMeeting = ({
@@ -91,13 +92,20 @@ const submitMeeting = ({
     return task.reject(meetingSubmitErrors.editMeetingIdMissing);
   }
 
-  return updateMeeting({
-    meetingId: editingMeetingId.value,
+  const commandResult = mapScheduleFormToUpdateMeetingCommand({
     formState,
+    meetingId: editingMeetingId.value,
     qualifiedConversation,
     originalRecurrence,
     originalSelectedUsers,
+    wallClock,
   });
+
+  if (commandResult.isErr) {
+    return task.reject(commandResult.error);
+  }
+
+  return updateMeeting(commandResult.value);
 };
 
 export const useScheduleMeetingSubmit = () => {

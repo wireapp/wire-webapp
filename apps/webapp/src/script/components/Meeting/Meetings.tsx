@@ -73,7 +73,7 @@ export const Meetings = () => {
       serviceTasks: {
         scheduleMeeting: command => scheduleMeeting(command, meetingServiceDeps),
         meetNowMeeting: command => meetNowMeeting(command, meetingServiceDeps),
-        updateMeeting: params => updateMeeting(params, meetingServiceDeps),
+        updateMeeting: command => updateMeeting(command, meetingServiceDeps),
       },
     });
   }, [meetingsRepository, conversationRepository, wallClock]);
