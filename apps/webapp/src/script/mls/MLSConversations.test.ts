@@ -82,7 +82,7 @@ describe('MLSConversations', () => {
       mlsConversations.forEach(c => (c.epoch = 1));
 
       const conversationRepository = await testFactory.exposeConversationActors();
-      const repositoryCore = (conversationRepository as any).core as Core;
+      const repositoryCore = conversationRepository['core'];
       jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest
         .spyOn(
@@ -106,7 +106,7 @@ describe('MLSConversations', () => {
       mlsConversation.status(ConversationStatus.PAST_MEMBER);
 
       const conversationRepository = await testFactory.exposeConversationActors();
-      const repositoryCore = (conversationRepository as any).core as Core;
+      const repositoryCore = conversationRepository['core'];
 
       jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       mockSafeEpoch(repositoryCore);
@@ -122,7 +122,7 @@ describe('MLSConversations', () => {
       meetingConversation.groupConversationType(GROUP_CONVERSATION_TYPE.MEETING);
 
       const conversationRepository = await testFactory.exposeConversationActors();
-      const repositoryCore = (conversationRepository as any).core as Core;
+      const repositoryCore = conversationRepository['core'];
       jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest
         .spyOn(
@@ -202,7 +202,7 @@ describe('MLSConversations', () => {
       const conversations = [teamConversation, ...mlsConversations, selfConversation];
 
       const conversationRepository = await testFactory.exposeConversationActors();
-      const repositoryCore = (conversationRepository as any).core as Core;
+      const repositoryCore = conversationRepository['core'];
       jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(true);
       mockSafeEpoch(core);
 
@@ -232,7 +232,7 @@ describe('MLSConversations', () => {
       const conversations = [teamConversation, ...mlsConversations, selfConversation];
 
       const conversationRepository = await testFactory.exposeConversationActors();
-      const repositoryCore = (conversationRepository as any).core as Core;
+      const repositoryCore = conversationRepository['core'];
       mockSafeEpoch(repositoryCore);
       // MLS group is not yet established locally
       jest.spyOn(repositoryCore.service!.mls!, 'isConversationEstablished').mockResolvedValue(false);
