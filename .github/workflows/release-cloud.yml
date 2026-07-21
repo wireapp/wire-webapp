@@ -708,6 +708,7 @@ jobs:
         env:
           ARTIFACT_CHECKSUM: ${{ needs.build_artifact.outputs.artifact_checksum }}
           ARTIFACT_BUILT_AT: ${{ needs.build_artifact.outputs.artifact_built_at }}
+          ARTIFACT_ASSET_VERSION: ${{ needs.build_artifact.outputs.artifact_asset_version }}
           ARTIFACT_NAME: ${{ needs.build_artifact.outputs.artifact_name }}
           ARTIFACT_VERSION: ${{ needs.build_artifact.outputs.artifact_version }}
           BETA_RESULT: ${{ needs.deploy_to_beta.result }}
