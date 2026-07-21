@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {result, task} from 'true-myth';
@@ -115,6 +115,28 @@ describe('MLSConversations', () => {
       await initMLSGroupConversations([mlsConversation], conversationRepository, {core: repositoryCore});
 
       expect(joinSpy).not.toHaveBeenCalled();
+    });
+
+    it('joins unestablished MLS meeting conversations after login', async () => {
+      const meetingConversation = createMLSConversation(CONVERSATION_TYPE.REGULAR, 1);
+      meetingConversation.groupConversationType(GROUP_CONVERSATION_TYPE.MEETING);
+
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const repositoryCore = (conversationRepository as any).core as Core;
+      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      jest
+        .spyOn(
+          (conversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
+            .conversationService,
+          'getSafeConversationById',
+        )
+        .mockReturnValue(task.fromResult(result.ok({epoch: 1})));
+      mockSafeEpoch(repositoryCore);
+      const joinSpy = jest.spyOn(repositoryCore.service!.conversation, 'joinByExternalCommit');
+
+      await initMLSGroupConversations([meetingConversation], conversationRepository, {core: repositoryCore});
+
+      expect(joinSpy).toHaveBeenCalledWith(meetingConversation.qualifiedId);
     });
   });
 

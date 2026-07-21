@@ -24,6 +24,7 @@ import {STATE as CALL_STATE} from '@wireapp/avs';
 
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
 import type {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
@@ -57,6 +58,28 @@ const resolveConversation = (
     .mapRejected(() => joinMeetingCallErrors.conversationNotFound);
 };
 
+/**
+ * Meeting conversations are MLS group conversations that are not covered by
+ * `isGroupOrChannel()`, so they can be missing from core-crypto after a fresh login.
+ * Ensure the parent MLS group exists before creating the conference subconversation.
+ */
+const ensureMlsConversationReady = (
+  deps: JoinMeetingCallDeps,
+  conversation: Conversation,
+): Task<Conversation, JoinMeetingCallError> => {
+  if (!isMLSCapableConversation(conversation)) {
+    return task.resolve(conversation);
+  }
+
+  return deps.conversationRepository
+    .safeEnsureConversationExists({
+      conversationId: conversation.qualifiedId,
+      groupId: conversation.groupId,
+    })
+    .map(() => conversation)
+    .mapRejected(() => joinMeetingCallErrors.joinFailed);
+};
+
 const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Task<void, JoinMeetingCallError> => {
   const call = deps.callingRepository.findCall(conversation.qualifiedId);
 
@@ -81,4 +104,6 @@ export const joinMeetingCall = (
   deps: JoinMeetingCallDeps,
   qualifiedConversationId: QualifiedId,
 ): Task<void, JoinMeetingCallError> =>
-  resolveConversation(deps, qualifiedConversationId).andThen(conversation => performJoin(deps, conversation));
+  resolveConversation(deps, qualifiedConversationId)
+    .andThen(conversation => ensureMlsConversationReady(deps, conversation))
+    .andThen(conversation => performJoin(deps, conversation));
