@@ -25,6 +25,7 @@ import {execFileSync} from 'node:child_process';
 import {Maybe} from 'true-myth';
 
 import {validateBuildArtifactMetadata} from './buildArtifactMetadata.ts';
+import {formatBuildArtifactMetadataOutputs} from './buildArtifactMetadataOutput.ts';
 import type {BuildArtifactHtmlDocument} from './buildArtifactMetadata.ts';
 import type {BuildMetadata} from '@wireapp/config';
 
@@ -82,7 +83,7 @@ function writeMetadataOutputs(metadata: BuildMetadata): void {
 
   appendFileSync(
     githubOutputPath.value,
-    `artifact_version=${metadata.version}\nartifact_commit=${metadata.commit}\nartifact_built_at=${metadata.builtAt}\n`,
+    formatBuildArtifactMetadataOutputs(metadata),
   );
 }
 
