@@ -201,12 +201,12 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue(value);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      await searchNodesDebounced(value);
+      await searchNodesDebouncedRef.current(value);
     });
   };
 
   const handleClearSearch = async (): Promise<void> => {
-    searchNodesDebounced.cancel();
+    searchNodesDebouncedRef.current.cancel();
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue('');
     setSearchQuery('');
@@ -239,15 +239,17 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     }
   }, [fireAndForgetInvoker, searchNodes, searchQuery]);
 
+  // This cleanup models hook ownership ending. Do not depend on changing callbacks,
+  // otherwise ordinary rerenders would invalidate valid in-flight requests.
   useEffect(() => {
     const versionGate = requestVersionGate.current;
 
     return () => {
+      // Read from the ref during cleanup so we cancel the latest debounced search,
+      // not the one captured when this mount-only effect was created.
       searchNodesDebouncedRef.current.cancel();
       versionGate.invalidate();
     };
-    // This cleanup models hook ownership ending. Do not depend on changing callbacks,
-    // otherwise ordinary rerenders would invalidate valid in-flight requests.
   }, []);
 
   return {
