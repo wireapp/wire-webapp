@@ -29,6 +29,7 @@ import {
   toGlobalDriveSearchParams,
 } from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
 import {CellsSort} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
+import {createRequestVersionGate} from 'Components/Conversation/ConversationCells/useConversationSearch/requestVersionGate';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -79,10 +80,14 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
   const [pageSize, setPageSize] = useState(PAGE_INITIAL_SIZE);
   const isInitialLoad = useRef(true);
   const shouldPerformFullReload = useRef(true);
+  const requestVersionGate = useRef(createRequestVersionGate());
 
   const searchNodes = useCallback(
     async (properties: SearchNodesProperties): Promise<void> => {
       const {query, status, limit = pageSize} = properties;
+      const requestVersion = requestVersionGate.current.next();
+      const isCurrentRequest = (): boolean => !requestVersionGate.current.isStale(requestVersion);
+
       try {
         setStatus(status);
 
@@ -97,15 +102,27 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
           type: 'file',
         });
 
+        if (!isCurrentRequest()) {
+          return;
+        }
+
         const users = await getUsersFromNodes({
           nodes: result.Nodes ?? [],
           userRepository,
         });
 
+        if (!isCurrentRequest()) {
+          return;
+        }
+
         const conversations = await getConversationsFromNodes({
           nodes: result.Nodes ?? [],
           conversationRepository,
         });
+
+        if (!isCurrentRequest()) {
+          return;
+        }
 
         // filter out draft nodes from results
         const filteredNodes = result.Nodes?.filter(node => node.IsDraft !== true) ?? [];
@@ -129,6 +146,10 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
 
         setStatus('success');
       } catch {
+        if (!isCurrentRequest()) {
+          return;
+        }
+
         // If the user isn't part of any cells-enabled conversations, the user will not exist in Cells database
         // the search will return a 401 error
         const hasCellsConversations = conversationRepository.getAllCellEnabledGroupConversations().length > 0;
@@ -166,6 +187,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
   };
 
   const handleClearSearch = async (): Promise<void> => {
+    searchNodesDebounced.cancel();
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue('');
     setSearchQuery('');

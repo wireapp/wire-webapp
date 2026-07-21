@@ -56,8 +56,41 @@ function createFakeUserRepository(): FakeUserRepository {
 function createFakeConversationRepository(): FakeConversationRepository {
   return {
     getAllCellEnabledGroupConversations: jest.fn().mockReturnValue([]),
-    getConversationById: jest.fn(),
+    getConversationById: jest.fn().mockResolvedValue({qualifiedId: {id: 'conversation-id', domain: 'example.com'}}),
   };
+}
+
+function createDeferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+
+  return {promise, resolve, reject};
+}
+
+function createRestNode(name: string, uuid = name) {
+  return {
+    Uuid: uuid,
+    Path: `wire-cells-web/${name}`,
+    Type: 'LEAF',
+    Modified: 1,
+    Size: 1,
+    UserMetadata: [],
+    ContextWorkspace: {Uuid: 'conversation-id@example.com', Label: 'Conversation'},
+  };
+}
+
+async function flushPromises() {
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+}
+
+async function wait(milliseconds: number) {
+  await new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
 function renderSearchHook({
@@ -125,5 +158,49 @@ describe('useSearchCellsNodes', () => {
         type: 'file',
       }),
     );
+  });
+
+  it('cancels a pending debounced search when clearing the search input', async () => {
+    const cellsRepository = createFakeCellsRepository();
+    const {fireAndForgetInvoker, result} = renderSearchHook({cellsRepository});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    act(() => {
+      result.current.handleSearch('stale-query');
+    });
+
+    await act(async () => {
+      await result.current.handleClearSearch();
+      await wait(350);
+    });
+
+    expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(2);
+    expect(cellsRepository.searchNodes).not.toHaveBeenCalledWith(expect.objectContaining({query: 'stale-query'}));
+  });
+
+  it('ignores stale search responses when a newer request has already updated the files', async () => {
+    const staleSearch = createDeferred<RestNodeCollection>();
+    const currentSearch = createDeferred<RestNodeCollection>();
+    const cellsRepository: FakeCellsRepository = {
+      searchNodes: jest.fn().mockReturnValueOnce(staleSearch.promise).mockReturnValue(currentSearch.promise),
+    };
+
+    const {fireAndForgetInvoker, result} = renderSearchHook({cellsRepository});
+
+    let currentSearchPromise!: Promise<void>;
+    act(() => {
+      currentSearchPromise = result.current.handleReload();
+    });
+
+    await act(async () => {
+      currentSearch.resolve({Nodes: [createRestNode('current-file.pdf')]});
+      await currentSearchPromise;
+      await flushPromises();
+    });
+
+    staleSearch.resolve({Nodes: [createRestNode('stale-file.pdf')]});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
   });
 });
