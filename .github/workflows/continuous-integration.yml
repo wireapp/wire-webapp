@@ -3,7 +3,7 @@ name: Continuous integration
 
 on:
   pull_request:
-    # we want to run the CI on every PR targetting those branches
+    # we want to run the continuous integration on every pull request targetting those branches
     branches: [main, release/*]
 
   merge_group:
@@ -55,20 +55,13 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout (pull_request)
-        if: ${{ github.event_name == 'pull_request' }}
+      # Do not set ref to github.event.pull_request.head.sha. pull request continuous integration must use the default
+      # merge commit so the workflow and checked-out files stay aligned.
+      - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
           fetch-depth: 1
-          # Uses the head commit, not the merge commit.
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Checkout (non-PR)
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          persist-credentials: false
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -129,20 +122,11 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout (pull_request)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
           fetch-depth: 1
-          # Uses the head commit, not the merge commit.
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Checkout (non-PR)
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          persist-credentials: false
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -176,20 +160,11 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout (pull_request)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
           fetch-depth: 1
-          # Uses the head commit, not the merge commit.
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Checkout (non-PR)
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          persist-credentials: false
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -223,20 +198,11 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout (pull_request)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
           fetch-depth: 1
-          # Uses the head commit, not the merge commit.
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Checkout (non-PR)
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          persist-credentials: false
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -270,15 +236,12 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout (pull_request)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
           fetch-depth: 1
-          # Uses the head commit, not the merge commit.
           # Keep this shallow. Nx gets the base branch explicitly in the next step.
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Fetch base branch for Nx checks
         if: ${{ github.event_name == 'pull_request' }}
@@ -288,12 +251,6 @@ jobs:
           git fetch --no-tags --depth=1 origin \
             "${BASE_REF}:refs/remotes/origin/${BASE_REF}" \
             "${BASE_REF}:${BASE_REF}"
-
-      - name: Checkout (non-PR)
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          persist-credentials: false
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -355,20 +312,11 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout (pull_request)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
           fetch-depth: 1
-          # Uses the head commit, not the merge commit.
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Checkout (non-PR)
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          persist-credentials: false
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -428,8 +376,6 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
-          # Uses the head commit, not the merge commit.
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -475,10 +421,10 @@ jobs:
         env:
           DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
           DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_TAG: pr-${{ github.event.pull_request.number }}
-          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
-        # The third and fourth positional parameters are uniqueTagOut and commitSha; they are intentionally left empty here.
-        run: ./bin/yarn docker "$PR_TAG" "" "" --pr
+        # The uniqueTagOut argument is intentionally empty; commitSha contains the pull request head SHA.
+        run: ./bin/yarn docker "$PR_TAG" "" "$PR_HEAD_SHA" --pr
 
   public-production-package:
     runs-on: ubuntu-24.04
@@ -500,8 +446,6 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
-          # Uses the head commit, not the merge commit.
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
