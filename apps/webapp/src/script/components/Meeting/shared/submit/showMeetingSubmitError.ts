@@ -17,22 +17,27 @@
  *
  */
 
-import {useMeetNowModal} from 'Components/Meeting/meetNowModal/useMeetNowModal';
-import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {Translate} from 'Util/localizerUtil';
 
-export const useMeetingActions = () => {
-  const {wallClock} = useApplicationContext();
-  const openCreate = useScheduleMeetingModal(state => state.openCreate);
-  const openMeetNow = useMeetNowModal(state => state.open);
+import type {MeetingSubmitErrorTranslationMap} from './meetingSubmitErrorKeys';
 
-  const handleMeetNow = () => {
-    openMeetNow();
-  };
-
-  const handleScheduleMeeting = () => {
-    openCreate(wallClock);
-  };
-
-  return {handleMeetNow, handleScheduleMeeting};
+export const showMeetingSubmitError = (
+  translate: Translate,
+  error: MeetingSubmitErrors,
+  translationKeys: MeetingSubmitErrorTranslationMap,
+): void => {
+  const {titleKey, messageKey} = translationKeys[error];
+  PrimaryModal.show(
+    PrimaryModal.type.ACKNOWLEDGE,
+    {
+      text: {
+        title: translate(titleKey),
+        message: translate(messageKey),
+      },
+    },
+    undefined,
+    translate,
+  );
 };

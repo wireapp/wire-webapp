@@ -119,3 +119,9 @@ export const resolveEndChange = (previousStart: Date, previousEnd: Date, nextEnd
 
 export const getDefaultScheduleMeetingStartDateTime = (wallClock: WallClock): Date =>
   getNextHalfHourDateTime(wallClock.currentDate);
+
+export const getMeetNowMeetingTimes = (wallClock: WallClock): {start: Date; end: Date} => {
+  const start = wallClock.currentDate;
+
+  return {start, end: getDefaultMeetingEndDateTime(start)};
+};

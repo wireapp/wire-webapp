@@ -23,12 +23,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CalendarIcon, CloseIcon} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown} from 'Util/keyboardUtil';
-
-import {ScheduleMeetingForm} from './ScheduleMeetingForm';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -39,7 +33,14 @@ import {
   submitButtonIconStyles,
   submitButtonStyles,
   wrapperStyles,
-} from './ScheduleMeetingModal.styles';
+} from 'Components/Meeting/shared/styles/meetingModalShell.styles';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {UserState} from 'Repositories/user/userState';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {handleEscDown} from 'Util/keyboardUtil';
+
+import {ScheduleMeetingForm} from './ScheduleMeetingForm';
+import {wasScheduleMeetingPersisted} from './scheduleMeetingTypes';
 import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 
@@ -66,10 +67,11 @@ export const ScheduleMeetingModal = () => {
 
   const displayErrors = useMemo(
     () => ({
-      title: errors.title ? translate(errors.title) : undefined,
-      startInPast: errors.startInPast ? translate(errors.startInPast) : undefined,
-      endInPast: errors.endInPast ? translate(errors.endInPast) : undefined,
-      endBeforeStart: errors.endBeforeStart ? translate(errors.endBeforeStart) : undefined,
+      title: errors.title !== undefined ? translate(errors.title) : undefined,
+      missingTimes: errors.missingTimes !== undefined ? translate(errors.missingTimes) : undefined,
+      startInPast: errors.startInPast !== undefined ? translate(errors.startInPast) : undefined,
+      endInPast: errors.endInPast !== undefined ? translate(errors.endInPast) : undefined,
+      endBeforeStart: errors.endBeforeStart !== undefined ? translate(errors.endBeforeStart) : undefined,
     }),
     [errors, translate],
   );
@@ -86,8 +88,8 @@ export const ScheduleMeetingModal = () => {
     }
 
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      const didSchedule = await submit(formState);
-      if (didSchedule) {
+      const submitResult = await submit(formState);
+      if (wasScheduleMeetingPersisted(submitResult)) {
         handleClose();
       }
     });

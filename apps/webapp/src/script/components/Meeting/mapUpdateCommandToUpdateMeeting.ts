@@ -17,22 +17,14 @@
  *
  */
 
-import {useMeetNowModal} from 'Components/Meeting/meetNowModal/useMeetNowModal';
-import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
 
-export const useMeetingActions = () => {
-  const {wallClock} = useApplicationContext();
-  const openCreate = useScheduleMeetingModal(state => state.openCreate);
-  const openMeetNow = useMeetNowModal(state => state.open);
+import {buildUpdateMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
+import type {UpdateMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 
-  const handleMeetNow = () => {
-    openMeetNow();
-  };
-
-  const handleScheduleMeeting = () => {
-    openCreate(wallClock);
-  };
-
-  return {handleMeetNow, handleScheduleMeeting};
-};
+export const mapUpdateCommandToUpdateMeeting = (command: UpdateMeetingCommand): UpdateMeeting => ({
+  title: command.title,
+  start_time: command.start.toISOString(),
+  end_time: command.end.toISOString(),
+  ...buildUpdateMeetingRecurrence(command.recurrence, command.originalRecurrence),
+});

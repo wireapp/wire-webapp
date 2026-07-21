@@ -17,33 +17,18 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
-import {result, Result} from 'true-myth';
 
-import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
-import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 
-import {ScheduleFormErrors} from './ScheduleFormErrors';
+export const mapScheduleCommandToCreateMeeting = (command: ScheduleMeetingCommand): CreateMeeting => {
+  const recurrence = mapRecurrenceOptionToMeetingRecurrence(command.recurrence);
 
-export const mapScheduleFormToCreateMeeting = (
-  formState: ScheduleMeetingFormState,
-  wallClock: WallClock,
-): Result<CreateMeeting, ScheduleFormErrors> => {
-  const timesResult = requireScheduleMeetingTimes(formState, wallClock);
-
-  if (timesResult.isErr) {
-    return result.err(timesResult.error);
-  }
-
-  const {start, end} = timesResult.value;
-  const recurrence = mapRecurrenceOptionToMeetingRecurrence(formState.recurrence);
-
-  return result.ok({
-    title: formState.title.trim(),
-    start_time: start.toISOString(),
-    end_time: end.toISOString(),
+  return {
+    title: command.title,
+    start_time: command.start.toISOString(),
+    end_time: command.end.toISOString(),
     ...(recurrence !== undefined && {recurrence}),
-  });
+  };
 };

@@ -26,7 +26,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-export const useScheduleMeetingParticipants = (): {users: User[]} => {
+export const useMeetingParticipants = (): {users: User[]} => {
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
 

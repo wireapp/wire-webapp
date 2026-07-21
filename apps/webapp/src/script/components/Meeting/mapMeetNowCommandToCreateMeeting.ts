@@ -17,18 +17,21 @@
  *
  */
 
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 
-/**
- * Returns whether the meetings list should be refreshed after a failed submit.
- * Partial failures mean meeting metadata was already persisted and the UI should recover.
- */
-export const shouldRefreshMeetingsListAfterSubmitError = (error: MeetingSubmitErrors): boolean => {
-  switch (error) {
-    case meetingSubmitErrors.addParticipantsFailed:
-    case meetingSubmitErrors.removeParticipantsFailed:
-      return true;
-    default:
-      return false;
-  }
+import {getMeetNowMeetingTimes} from 'Components/Meeting/shared/defaults/meetingDateTimeDefaults';
+import type {MeetNowMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
+
+export const mapMeetNowCommandToCreateMeeting = (
+  command: MeetNowMeetingCommand,
+  wallClock: WallClock,
+): CreateMeeting => {
+  const {start, end} = getMeetNowMeetingTimes(wallClock);
+
+  return {
+    title: command.title,
+    start_time: start.toISOString(),
+    end_time: end.toISOString(),
+  };
 };

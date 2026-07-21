@@ -18,39 +18,52 @@
  */
 
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
-import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
-import {Result, result} from 'true-myth';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {result, Result, type Maybe} from 'true-myth';
 
+import {ScheduleFormErrors} from 'Components/Meeting/ScheduleFormErrors';
 import {requireScheduleMeetingTimes} from 'Components/Meeting/ScheduleMeetingModal/requireScheduleMeetingTimes';
-import {buildUpdateMeetingRecurrence} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {
   ScheduleMeetingFormState,
   ScheduleMeetingRecurrenceOption,
 } from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {UpdateMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
+import type {User} from 'Repositories/entity/User';
 
-import {ScheduleFormErrors} from './ScheduleFormErrors';
-
-export type MapScheduleFormToUpdateMeetingResult = {
-  payload: UpdateMeeting;
+export type MapScheduleFormToUpdateMeetingCommandParams = {
+  formState: ScheduleMeetingFormState;
+  meetingId: QualifiedId;
+  qualifiedConversation: Maybe<QualifiedId>;
+  originalRecurrence: ScheduleMeetingRecurrenceOption;
+  originalSelectedUsers: User[];
+  wallClock: WallClock;
 };
 
-export const mapScheduleFormToUpdateMeeting = (
-  formState: ScheduleMeetingFormState,
-  wallClock: WallClock,
-  originalRecurrence: ScheduleMeetingRecurrenceOption,
-): Result<MapScheduleFormToUpdateMeetingResult, ScheduleFormErrors> => {
+export const mapScheduleFormToUpdateMeetingCommand = ({
+  formState,
+  meetingId,
+  qualifiedConversation,
+  originalRecurrence,
+  originalSelectedUsers,
+  wallClock,
+}: MapScheduleFormToUpdateMeetingCommandParams): Result<UpdateMeetingCommand, ScheduleFormErrors> => {
   const timesResult = requireScheduleMeetingTimes(formState, wallClock);
+
   if (timesResult.isErr) {
     return result.err(timesResult.error);
   }
+
   const {start, end} = timesResult.value;
 
   return result.ok({
-    payload: {
-      title: formState.title.trim(),
-      start_time: start.toISOString(),
-      end_time: end.toISOString(),
-      ...buildUpdateMeetingRecurrence(formState.recurrence, originalRecurrence),
-    },
+    meetingId,
+    title: formState.title.trim(),
+    start,
+    end,
+    recurrence: formState.recurrence,
+    originalRecurrence,
+    selectedUsers: formState.selectedUsers,
+    originalSelectedUsers,
+    qualifiedConversation,
   });
 };

@@ -17,22 +17,14 @@
  *
  */
 
-import {useMeetNowModal} from 'Components/Meeting/meetNowModal/useMeetNowModal';
-import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {CSSObject} from '@emotion/react';
 
-export const useMeetingActions = () => {
-  const {wallClock} = useApplicationContext();
-  const openCreate = useScheduleMeetingModal(state => state.openCreate);
-  const openMeetNow = useMeetNowModal(state => state.open);
+export const meetNowModalWrapperStyles: CSSObject = {
+  maxWidth: '480px',
+};
 
-  const handleMeetNow = () => {
-    openMeetNow();
-  };
-
-  const handleScheduleMeeting = () => {
-    openCreate(wallClock);
-  };
-
-  return {handleMeetNow, handleScheduleMeeting};
+export const meetNowFormLayoutStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '24px',
 };

@@ -17,22 +17,16 @@
  *
  */
 
-import {useMeetNowModal} from 'Components/Meeting/meetNowModal/useMeetNowModal';
-import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {Result} from 'true-myth';
 
-export const useMeetingActions = () => {
-  const {wallClock} = useApplicationContext();
-  const openCreate = useScheduleMeetingModal(state => state.openCreate);
-  const openMeetNow = useMeetNowModal(state => state.open);
+import type {MeetNowFormErrors, MeetNowFormState} from 'Components/Meeting/meetNowModal/meetNowTypes';
+import {validateMeetNowForm} from 'Components/Meeting/meetNowModal/useMeetNowModal';
+import type {MeetNowMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 
-  const handleMeetNow = () => {
-    openMeetNow();
-  };
-
-  const handleScheduleMeeting = () => {
-    openCreate(wallClock);
-  };
-
-  return {handleMeetNow, handleScheduleMeeting};
-};
+export const mapMeetNowFormToMeetingCommand = (
+  formState: MeetNowFormState,
+): Result<MeetNowMeetingCommand, MeetNowFormErrors> =>
+  validateMeetNowForm(formState).map(validatedFormState => ({
+    title: validatedFormState.title.trim(),
+    selectedUsers: validatedFormState.selectedUsers,
+  }));
