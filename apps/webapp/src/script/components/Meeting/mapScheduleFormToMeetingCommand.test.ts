@@ -80,7 +80,11 @@ describe('mapScheduleFormToMeetingCommand', () => {
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toEqual({
-      endBeforeStart: 'meetings.scheduleModal.error.endBeforeStart',
+      title: undefined,
+      missingTimes: 'meetings.scheduleModal.error.missingTimes',
+      startInPast: undefined,
+      endInPast: undefined,
+      endBeforeStart: undefined,
     });
   });
 });

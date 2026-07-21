@@ -68,6 +68,7 @@ export const ScheduleMeetingModal = () => {
   const displayErrors = useMemo(
     () => ({
       title: errors.title !== undefined ? translate(errors.title) : undefined,
+      missingTimes: errors.missingTimes !== undefined ? translate(errors.missingTimes) : undefined,
       startInPast: errors.startInPast !== undefined ? translate(errors.startInPast) : undefined,
       endInPast: errors.endInPast !== undefined ? translate(errors.endInPast) : undefined,
       endBeforeStart: errors.endBeforeStart !== undefined ? translate(errors.endBeforeStart) : undefined,

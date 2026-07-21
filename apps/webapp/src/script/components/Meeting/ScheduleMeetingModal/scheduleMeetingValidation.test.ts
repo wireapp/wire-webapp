@@ -94,7 +94,7 @@ describe('scheduleMeetingValidation', () => {
     expect(hasScheduleMeetingFormErrors(errors)).toBe(false);
   });
 
-  it('skips end validation when start or end is missing', () => {
+  it('returns missingTimes when start or end is missing', () => {
     const errors = getScheduleMeetingFormErrors({
       title: 'Weekly sync',
       start: maybe.nothing(),
@@ -102,6 +102,8 @@ describe('scheduleMeetingValidation', () => {
       wallClock,
     });
 
+    expect(errors.missingTimes).toBe('meetings.scheduleModal.error.missingTimes');
     expect(errors.endBeforeStart).toBeUndefined();
+    expect(hasScheduleMeetingFormErrors(errors)).toBe(true);
   });
 });

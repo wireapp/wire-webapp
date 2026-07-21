@@ -170,8 +170,15 @@ export const ScheduleMeetingForm = ({
     return startDate.compare(todayValue) > 0 ? startDate : todayValue;
   }, [formState.start, todayValue]);
 
-  const startErrorText = firstNonEmptyError(errors.startInPast);
-  const endErrorText = firstNonEmptyError(errors.endInPast, errors.endBeforeStart);
+  const startErrorText = firstNonEmptyError(
+    errors.startInPast,
+    formState.start.isNothing ? errors.missingTimes : undefined,
+  );
+  const endErrorText = firstNonEmptyError(
+    errors.endInPast,
+    errors.endBeforeStart,
+    formState.end.isNothing ? errors.missingTimes : undefined,
+  );
 
   return (
     <div css={scheduleMeetingFormLayoutCss} data-uie-name="schedule-meeting-form" data-uie-mode={mode}>

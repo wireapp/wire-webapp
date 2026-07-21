@@ -33,13 +33,11 @@ import type {ScheduleMeetingCommand} from 'Components/Meeting/shared/types/meeti
 const mapScheduleFormErrorToFormErrors = (error: ScheduleFormErrors): ScheduleMeetingFormErrors => {
   switch (error) {
     case scheduleFormErrors.missingTimes:
-      return {...emptyScheduleMeetingFormErrors(), endBeforeStart: 'meetings.scheduleModal.error.endBeforeStart'};
+      return {...emptyScheduleMeetingFormErrors(), missingTimes: 'meetings.scheduleModal.error.missingTimes'};
     case scheduleFormErrors.startInPast:
       return {...emptyScheduleMeetingFormErrors(), startInPast: 'meetings.schedule.errors.startInPast'};
     case scheduleFormErrors.endInPast:
       return {...emptyScheduleMeetingFormErrors(), endInPast: 'meetings.schedule.errors.endInPast'};
-    default:
-      return {...emptyScheduleMeetingFormErrors(), endBeforeStart: 'meetings.scheduleModal.error.endBeforeStart'};
   }
 };
 

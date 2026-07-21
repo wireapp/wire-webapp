@@ -36,12 +36,14 @@ export interface ScheduleMeetingFormState {
 
 export type ScheduleMeetingFormErrorKey =
   | 'meetings.scheduleModal.error.titleRequired'
+  | 'meetings.scheduleModal.error.missingTimes'
   | 'meetings.scheduleModal.error.endBeforeStart'
   | 'meetings.schedule.errors.startInPast'
   | 'meetings.schedule.errors.endInPast';
 
 export interface ScheduleMeetingFormErrors {
   title: ScheduleMeetingFormErrorKey | undefined;
+  missingTimes: ScheduleMeetingFormErrorKey | undefined;
   startInPast: ScheduleMeetingFormErrorKey | undefined;
   endInPast: ScheduleMeetingFormErrorKey | undefined;
   endBeforeStart: ScheduleMeetingFormErrorKey | undefined;
@@ -49,6 +51,7 @@ export interface ScheduleMeetingFormErrors {
 
 export const emptyScheduleMeetingFormErrors = (): ScheduleMeetingFormErrors => ({
   title: undefined,
+  missingTimes: undefined,
   startInPast: undefined,
   endInPast: undefined,
   endBeforeStart: undefined,
@@ -56,6 +59,7 @@ export const emptyScheduleMeetingFormErrors = (): ScheduleMeetingFormErrors => (
 
 export interface ScheduleMeetingFormDisplayErrors {
   title: string | undefined;
+  missingTimes: string | undefined;
   startInPast: string | undefined;
   endInPast: string | undefined;
   endBeforeStart: string | undefined;

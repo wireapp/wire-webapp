@@ -160,7 +160,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       if (start.isNothing) {
         return {
           formState: {...state.formState, start},
-          errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined},
+          errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined, missingTimes: undefined},
         };
       }
 
@@ -177,7 +177,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
 
       return {
         formState: nextFormState,
-        errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined},
+        errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined, missingTimes: undefined},
       };
     }),
   setEnd: end =>
@@ -185,7 +185,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       if (end.isNothing) {
         return {
           formState: {...state.formState, end},
-          errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined},
+          errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined, missingTimes: undefined},
         };
       }
 
@@ -203,7 +203,13 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
 
       return {
         formState: nextFormState,
-        errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined, startInPast: undefined},
+        errors: {
+          ...state.errors,
+          endInPast: undefined,
+          endBeforeStart: undefined,
+          startInPast: undefined,
+          missingTimes: undefined,
+        },
       };
     }),
   setRecurrence: recurrence => set(state => ({formState: {...state.formState, recurrence}})),

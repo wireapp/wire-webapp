@@ -38,20 +38,26 @@ export const getScheduleMeetingFormErrors = ({
   wallClock,
 }: ScheduleMeetingValidationInput): ScheduleMeetingFormErrors => {
   const currentTimestampInMilliseconds = wallClock.currentTimestampInMilliseconds;
+  const missingTimes = start.isNothing || end.isNothing ? 'meetings.scheduleModal.error.missingTimes' : undefined;
   const endInPast =
-    end.isJust && end.value.getTime() <= currentTimestampInMilliseconds
+    missingTimes === undefined && end.isJust && end.value.getTime() <= currentTimestampInMilliseconds
       ? 'meetings.schedule.errors.endInPast'
       : undefined;
 
   return {
     title: is.emptyString(title.trim()) ? 'meetings.scheduleModal.error.titleRequired' : undefined,
+    missingTimes,
     startInPast:
-      start.isJust && start.value.getTime() <= currentTimestampInMilliseconds
+      missingTimes === undefined && start.isJust && start.value.getTime() <= currentTimestampInMilliseconds
         ? 'meetings.schedule.errors.startInPast'
         : undefined,
     endInPast,
     endBeforeStart:
-      start.isJust && end.isJust && endInPast === undefined && end.value.getTime() <= start.value.getTime()
+      missingTimes === undefined &&
+      start.isJust &&
+      end.isJust &&
+      endInPast === undefined &&
+      end.value.getTime() <= start.value.getTime()
         ? 'meetings.scheduleModal.error.endBeforeStart'
         : undefined,
   };
@@ -59,6 +65,7 @@ export const getScheduleMeetingFormErrors = ({
 
 export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors): boolean =>
   errors.title !== undefined ||
+  errors.missingTimes !== undefined ||
   errors.startInPast !== undefined ||
   errors.endInPast !== undefined ||
   errors.endBeforeStart !== undefined;
