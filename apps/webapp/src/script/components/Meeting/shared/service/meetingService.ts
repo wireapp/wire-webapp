@@ -91,7 +91,7 @@ const createMeetingAndSyncParticipants = (
       saveMeetingConversationFromResponse(
         deps.conversationRepository,
         createdMeeting.conversation,
-        meetingSubmitErrors.createFailed,
+        meetingSubmitErrors.conversationSetupFailed,
       ).andThen(() =>
         syncMeetingConversationParticipants(deps.conversationRepository, {
           qualifiedConversationId: createdMeeting.qualified_conversation,

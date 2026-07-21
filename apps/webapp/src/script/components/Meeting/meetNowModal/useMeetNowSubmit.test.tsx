@@ -37,7 +37,7 @@ import {useWarningsState} from 'src/script/view_model/WarningsContainer/Warnings
 import {TYPE} from 'src/script/view_model/WarningsContainer/WarningsTypes';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {meetNowSubmitResults, type MeetNowSubmitResult} from './meetNowTypes';
+import {meetNowSubmitResults, type MeetNowSubmitResult, wasMeetNowMeetingCreated} from './meetNowTypes';
 import {useMeetNowSubmit} from './useMeetNowSubmit';
 
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
@@ -183,7 +183,50 @@ describe('useMeetNowSubmit', () => {
     });
 
     expect(submitResult).toBe(meetNowSubmitResults.creationFailed);
+    expect(wasMeetNowMeetingCreated(submitResult)).toBe(false);
     expect(loadMeetings).not.toHaveBeenCalled();
+    expect(startAudio).not.toHaveBeenCalled();
+  });
+
+  it('returns setupFailed and refreshes meetings after a partial create failure', async () => {
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const meetNowMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.addParticipantsFailed));
+    const store = createMeetingStore({loadMeetings, meetNowMeeting});
+    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
+
+    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
+      wrapper: createWrapper(store, mainViewModel),
+    });
+
+    let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    expect(submitResult).toBe(meetNowSubmitResults.setupFailed);
+    expect(wasMeetNowMeetingCreated(submitResult)).toBe(true);
+    expect(loadMeetings).toHaveBeenCalledTimes(1);
+    expect(startAudio).not.toHaveBeenCalled();
+  });
+
+  it('returns setupFailed when saving the created conversation fails', async () => {
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const meetNowMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.conversationSetupFailed));
+    const store = createMeetingStore({loadMeetings, meetNowMeeting});
+    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
+
+    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
+      wrapper: createWrapper(store, mainViewModel),
+    });
+
+    let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    expect(submitResult).toBe(meetNowSubmitResults.setupFailed);
+    expect(wasMeetNowMeetingCreated(submitResult)).toBe(true);
+    expect(loadMeetings).toHaveBeenCalledTimes(1);
     expect(startAudio).not.toHaveBeenCalled();
   });
 

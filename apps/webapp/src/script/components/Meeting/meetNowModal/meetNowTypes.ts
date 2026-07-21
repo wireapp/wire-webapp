@@ -36,6 +36,7 @@ export const emptyMeetNowFormErrors = (): MeetNowFormErrors => ({
 
 export const meetNowSubmitResults = {
   creationFailed: 'creationFailed',
+  setupFailed: 'setupFailed',
   joined: 'joined',
   joinBlocked: 'joinBlocked',
   joinFailed: 'joinFailed',

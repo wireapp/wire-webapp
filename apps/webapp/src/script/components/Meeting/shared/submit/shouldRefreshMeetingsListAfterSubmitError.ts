@@ -20,15 +20,21 @@
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 
 /**
- * Returns whether the meetings list should be refreshed after a failed submit.
- * Partial failures mean meeting metadata was already persisted and the UI should recover.
+ * Returns whether meeting metadata was already persisted before the submit failed.
+ * Partial failures should refresh the meetings list and must not invite a full retry.
  */
-export const shouldRefreshMeetingsListAfterSubmitError = (error: MeetingSubmitErrors): boolean => {
+export const isMeetingPersistedDespiteSubmitError = (error: MeetingSubmitErrors): boolean => {
   switch (error) {
     case meetingSubmitErrors.addParticipantsFailed:
+    case meetingSubmitErrors.conversationSetupFailed:
     case meetingSubmitErrors.removeParticipantsFailed:
       return true;
     default:
       return false;
   }
 };
+
+/**
+ * Returns whether the meetings list should be refreshed after a failed submit.
+ */
+export const shouldRefreshMeetingsListAfterSubmitError = isMeetingPersistedDespiteSubmitError;

@@ -25,7 +25,10 @@ import {mapMeetNowFormToMeetingCommand} from 'Components/Meeting/mapMeetNowFormT
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {CreateMeetingSuccess} from 'Components/Meeting/shared/service/meetingService';
 import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
-import {shouldRefreshMeetingsListAfterSubmitError} from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
+import {
+  isMeetingPersistedDespiteSubmitError,
+  shouldRefreshMeetingsListAfterSubmitError,
+} from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
 import {showMeetingPartialAddFailureModal} from 'Components/Meeting/shared/submit/showMeetingPartialAddFailureModal';
 import type {MeetNowMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import {handleJoinMeetingCallResult} from 'Components/Meeting/useJoinMeetingCall';
@@ -138,7 +141,10 @@ export const submitMeetNow = async ({
     }
 
     showMeetingSubmitError(translate, submitResult.error);
-    return meetNowSubmitResults.creationFailed;
+
+    return isMeetingPersistedDespiteSubmitError(submitResult.error)
+      ? meetNowSubmitResults.setupFailed
+      : meetNowSubmitResults.creationFailed;
   }
 
   if (submitResult.value.failedToAdd.length > 0) {

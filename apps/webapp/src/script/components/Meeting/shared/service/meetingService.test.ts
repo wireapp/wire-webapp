@@ -210,6 +210,17 @@ describe('scheduleMeeting', () => {
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.addParticipantsFailed);
   });
 
+  it('returns conversationSetupFailed when saving the created conversation fails', async () => {
+    const {deps} = createDeps({
+      saveMeetingConversationFromBackend: jest.fn().mockReturnValue(task.reject(new Error('save failed'))),
+    });
+
+    const result = await scheduleMeeting(scheduleCommand, deps);
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.conversationSetupFailed);
+  });
+
   it('returns createFailed when API fails', async () => {
     const {deps} = createDeps({
       createMeetingMock: jest.fn().mockReturnValue(task.reject(new Error('network'))),
