@@ -39,28 +39,28 @@ const emptyFilters: GlobalDriveFiltersState = {
   isSharedViaLink: false,
 };
 
-type FakeCellsRepository = jest.Mocked<Pick<CellsRepository, 'searchNodes'>>;
-type FakeUserRepository = jest.Mocked<Pick<UserRepository, 'getUsersById'>>;
-type FakeConversationRepository = jest.Mocked<
+type CellsRepositoryMock = jest.Mocked<Pick<CellsRepository, 'searchNodes'>>;
+type UserRepositoryMock = jest.Mocked<Pick<UserRepository, 'getUsersById'>>;
+type ConversationRepositoryMock = jest.Mocked<
   Pick<ConversationRepository, 'getAllCellEnabledGroupConversations' | 'getConversationById'>
 >;
 
-function createFakeCellsRepository(searchResult: Partial<RestNodeCollection> = {}): FakeCellsRepository {
+function buildCellsRepositoryMock(searchResult: Partial<RestNodeCollection> = {}): CellsRepositoryMock {
   return {searchNodes: jest.fn().mockResolvedValue({Nodes: [], ...searchResult})};
 }
 
-function createFakeUserRepository(): FakeUserRepository {
+function buildUserRepositoryMock(): UserRepositoryMock {
   return {getUsersById: jest.fn().mockResolvedValue([])};
 }
 
-function createFakeConversationRepository(): FakeConversationRepository {
+function buildConversationRepositoryMock(): ConversationRepositoryMock {
   return {
     getAllCellEnabledGroupConversations: jest.fn().mockReturnValue([]),
     getConversationById: jest.fn().mockResolvedValue({qualifiedId: {id: 'conversation-id', domain: 'example.com'}}),
   };
 }
 
-function createDeferred<T>() {
+function createControllablePromise<T>() {
   let resolve!: (value: T) => void;
   const promise = new Promise<T>(resolvePromise => {
     resolve = resolvePromise;
@@ -69,7 +69,7 @@ function createDeferred<T>() {
   return {promise, resolve};
 }
 
-function createRestNode(name: string, uuid = name) {
+function buildRestNodeStub(name: string, uuid = name) {
   return {
     Uuid: uuid,
     Path: `wire-cells-web/${name}`,
@@ -81,13 +81,13 @@ function createRestNode(name: string, uuid = name) {
   };
 }
 
-async function flushPromises() {
+async function flushMicrotasks() {
   await Promise.resolve();
   await Promise.resolve();
   await Promise.resolve();
 }
 
-function createControlledDebouncedSearch() {
+function createControllableDebouncedSearchStub() {
   let pendingSearch: (() => Promise<void>) | undefined;
 
   return {
@@ -108,17 +108,17 @@ function createControlledDebouncedSearch() {
 }
 
 function renderSearchHook({
-  cellsRepository = createFakeCellsRepository(),
-  userRepository = createFakeUserRepository(),
-  conversationRepository = createFakeConversationRepository(),
+  cellsRepository = buildCellsRepositoryMock(),
+  userRepository = buildUserRepositoryMock(),
+  conversationRepository = buildConversationRepositoryMock(),
   fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
   filters = emptyFilters,
   sort = null,
   createDebouncedSearch,
 }: {
-  cellsRepository?: FakeCellsRepository;
-  userRepository?: FakeUserRepository;
-  conversationRepository?: FakeConversationRepository;
+  cellsRepository?: CellsRepositoryMock;
+  userRepository?: UserRepositoryMock;
+  conversationRepository?: ConversationRepositoryMock;
   fireAndForgetInvoker?: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
   filters?: GlobalDriveFiltersState;
   sort?: CellsSort | null;
@@ -148,7 +148,7 @@ describe('useSearchCellsNodes', () => {
   });
 
   it('requests global files with recency sorting by default', async () => {
-    const cellsRepository = createFakeCellsRepository();
+    const cellsRepository = buildCellsRepositoryMock();
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
@@ -163,7 +163,7 @@ describe('useSearchCellsNodes', () => {
   });
 
   it('requests global files with the selected sort instead of the default', async () => {
-    const cellsRepository = createFakeCellsRepository();
+    const cellsRepository = buildCellsRepositoryMock();
     const {fireAndForgetInvoker} = renderSearchHook({
       cellsRepository,
       sort: {field: 'name', direction: 'asc'},
@@ -180,24 +180,24 @@ describe('useSearchCellsNodes', () => {
   });
 
   it('keeps browse results when clearing a scheduled search before it runs', async () => {
-    const cellsRepository: FakeCellsRepository = {
+    const cellsRepository: CellsRepositoryMock = {
       searchNodes: jest
         .fn()
-        .mockResolvedValueOnce({Nodes: [createRestNode('initial-file.pdf')]})
-        .mockResolvedValueOnce({Nodes: [createRestNode('browse-file.pdf')]})
-        .mockResolvedValueOnce({Nodes: [createRestNode('stale-file.pdf')]}),
+        .mockResolvedValueOnce({Nodes: [buildRestNodeStub('initial-file.pdf')]})
+        .mockResolvedValueOnce({Nodes: [buildRestNodeStub('browse-file.pdf')]})
+        .mockResolvedValueOnce({Nodes: [buildRestNodeStub('stale-file.pdf')]}),
     };
-    const controlledDebouncedSearch = createControlledDebouncedSearch();
+    const debouncedSearchStub = createControllableDebouncedSearchStub();
     const {fireAndForgetInvoker, result} = renderSearchHook({
       cellsRepository,
-      createDebouncedSearch: controlledDebouncedSearch.create,
+      createDebouncedSearch: debouncedSearchStub.create,
     });
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
     await act(async () => {
       result.current.handleSearch('stale-query');
       await result.current.handleClearSearch();
-      await controlledDebouncedSearch.flush();
+      await debouncedSearchStub.flush();
     });
 
     expect(result.current.searchValue).toBe('');
@@ -206,11 +206,11 @@ describe('useSearchCellsNodes', () => {
   });
 
   it('does not replace files set after unmount when the pending request resolves', async () => {
-    const requestAfterUnmount = createDeferred<RestNodeCollection>();
-    const cellsRepository: FakeCellsRepository = {
+    const requestAfterUnmount = createControllablePromise<RestNodeCollection>();
+    const cellsRepository: CellsRepositoryMock = {
       searchNodes: jest
         .fn()
-        .mockResolvedValueOnce({Nodes: [createRestNode('current-file.pdf')]})
+        .mockResolvedValueOnce({Nodes: [buildRestNodeStub('current-file.pdf')]})
         .mockReturnValueOnce(requestAfterUnmount.promise),
     };
     const {fireAndForgetInvoker, result, unmount} = renderSearchHook({cellsRepository});
@@ -224,17 +224,17 @@ describe('useSearchCellsNodes', () => {
     useCellsStore.setState({nodes: currentFiles});
 
     await act(async () => {
-      requestAfterUnmount.resolve({Nodes: [createRestNode('unmounted-file.pdf')]});
-      await flushPromises();
+      requestAfterUnmount.resolve({Nodes: [buildRestNodeStub('unmounted-file.pdf')]});
+      await flushMicrotasks();
     });
 
     expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
   });
 
   it('keeps results from the newer request when the older request resolves last', async () => {
-    const staleSearch = createDeferred<RestNodeCollection>();
-    const currentSearch = createDeferred<RestNodeCollection>();
-    const cellsRepository: FakeCellsRepository = {
+    const staleSearch = createControllablePromise<RestNodeCollection>();
+    const currentSearch = createControllablePromise<RestNodeCollection>();
+    const cellsRepository: CellsRepositoryMock = {
       searchNodes: jest.fn().mockReturnValueOnce(staleSearch.promise).mockReturnValue(currentSearch.promise),
     };
 
@@ -246,12 +246,12 @@ describe('useSearchCellsNodes', () => {
     });
 
     await act(async () => {
-      currentSearch.resolve({Nodes: [createRestNode('current-file.pdf')]});
+      currentSearch.resolve({Nodes: [buildRestNodeStub('current-file.pdf')]});
       await currentSearchPromise;
-      await flushPromises();
+      await flushMicrotasks();
     });
 
-    staleSearch.resolve({Nodes: [createRestNode('stale-file.pdf')]});
+    staleSearch.resolve({Nodes: [buildRestNodeStub('stale-file.pdf')]});
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
     expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
