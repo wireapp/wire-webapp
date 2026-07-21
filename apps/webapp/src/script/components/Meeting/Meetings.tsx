@@ -98,7 +98,7 @@ export const Meetings = () => {
         meetNowMeeting: command => meetNowMeeting(command, meetingServiceDeps),
         updateMeeting: command => updateMeeting(command, meetingServiceDeps),
         deleteMeetingForMe: command => deleteMeetingForMe(command, meetingServiceDeps),
-        deleteMeetingForAll: (command, selfUser) => deleteMeetingForAll(command, selfUser, meetingServiceDeps),
+        deleteMeetingForAll: command => deleteMeetingForAll(command, meetingServiceDeps),
       },
     });
   }, [meetingsRepository, conversationRepository, callingRepository, wallClock]);

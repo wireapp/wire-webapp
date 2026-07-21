@@ -21,20 +21,24 @@ import type {MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Translate} from 'Util/localizerUtil';
 
-import type {MeetingSubmitErrorTranslationMap} from './meetingSubmitErrorKeys';
+import type {MeetingSubmitErrorTranslationKeys} from './meetingSubmitErrorKeys';
 
 export const showMeetingSubmitError = (
   translate: Translate,
   error: MeetingSubmitErrors,
-  translationKeys: MeetingSubmitErrorTranslationMap,
+  translationKeys: Partial<Record<MeetingSubmitErrors, MeetingSubmitErrorTranslationKeys>>,
 ): void => {
-  const {titleKey, messageKey} = translationKeys[error];
+  const keys = translationKeys[error];
+  if (keys === undefined) {
+    throw new Error(`Missing meeting submit error translation for ${error}`);
+  }
+
   PrimaryModal.show(
     PrimaryModal.type.ACKNOWLEDGE,
     {
       text: {
-        title: translate(titleKey),
-        message: translate(messageKey),
+        title: translate(keys.titleKey),
+        message: translate(keys.messageKey),
       },
     },
     undefined,

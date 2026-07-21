@@ -22,8 +22,8 @@ import {CloseIcon, EditIcon, TrashIcon} from '@wireapp/react-ui-kit';
 import {
   contextMenuDangerItemIconStyles,
   contextMenuDangerItemStyles,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingAction.styles';
-import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingActionTranslationKeys';
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/meetingAction.styles';
+import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/meetingActionTranslationKeys';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/Meeting/utils/canDeleteMeeting';
 import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';

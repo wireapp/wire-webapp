@@ -25,29 +25,27 @@ import {
   type MeetingConversationSyncError,
 } from 'Components/Meeting/meetingConversationSync';
 import {
-  removeAllOtherMeetingParticipants,
   removeMeetingConversationLocally,
   safeLeaveMeetingConversation,
 } from 'Components/Meeting/meetingConversationTeardown';
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import type {User} from 'Repositories/entity/User';
 
 export type DeleteMeetingCommand = {
   meetingId: QualifiedId;
   qualifiedConversation: QualifiedId;
 };
 
-const mapSyncErrorToDeleteError = (error: MeetingConversationSyncError): MeetingSubmitErrors => {
+const mapLeaveSyncErrorToDeleteError = (error: MeetingConversationSyncError): MeetingSubmitErrors => {
   switch (error) {
-    case meetingConversationSyncErrors.removeFailed:
-      return meetingSubmitErrors.removeParticipantsFailed;
     case meetingConversationSyncErrors.leaveFailed:
     case meetingConversationSyncErrors.conversationNotFound:
     case meetingConversationSyncErrors.groupIdMissing:
       return meetingSubmitErrors.leaveConversationFailed;
-    default:
+    case meetingConversationSyncErrors.removeFailed:
+    case meetingConversationSyncErrors.establishFailed:
+    case meetingConversationSyncErrors.addFailed:
       return meetingSubmitErrors.leaveConversationFailed;
   }
 };
@@ -69,34 +67,27 @@ export const deleteMeetingForMe = (
   leaveCallIfActive(deps, command.qualifiedConversation);
 
   return safeLeaveMeetingConversation(deps.conversationRepository, command.qualifiedConversation).mapRejected(
-    mapSyncErrorToDeleteError,
+    mapLeaveSyncErrorToDeleteError,
   );
 };
 
 /**
- * Deletes the meeting for everyone: remove invitees from MLS, DELETE /meetings while the host is still a member,
- * then remove the conversation locally.
+ * Deletes the meeting for everyone via DELETE /meetings.
+ * The backend deletes the meeting conversation and notifies remaining members.
+ * When in a call, leaves the call first, then removes the conversation locally after a successful delete.
  */
 export const deleteMeetingForAll = (
   command: DeleteMeetingCommand,
-  selfUser: User,
   deps: MeetingServiceDeps,
 ): Task<void, MeetingSubmitErrors> => {
   leaveCallIfActive(deps, command.qualifiedConversation);
 
-  return deps.conversationRepository
-    .safeGetConversationById(command.qualifiedConversation)
+  return deps.meetingsRepository
+    .deleteMeeting(command.meetingId)
     .mapRejected(() => meetingSubmitErrors.deleteFailed)
-    .andThen(conversation =>
-      removeAllOtherMeetingParticipants(deps.conversationRepository, conversation, selfUser)
-        .mapRejected(mapSyncErrorToDeleteError)
-        .andThen(() =>
-          deps.meetingsRepository.deleteMeeting(command.meetingId).mapRejected(() => meetingSubmitErrors.deleteFailed),
-        )
-        .andThen(() =>
-          removeMeetingConversationLocally(deps.conversationRepository, command.qualifiedConversation).mapRejected(
-            () => meetingSubmitErrors.deleteSucceededButLocalCleanupFailed,
-          ),
-        ),
+    .andThen(() =>
+      removeMeetingConversationLocally(deps.conversationRepository, command.qualifiedConversation).mapRejected(
+        () => meetingSubmitErrors.deleteSucceededButLocalCleanupFailed,
+      ),
     );
 };

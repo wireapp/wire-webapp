@@ -19,9 +19,11 @@
 
 import {memo, useMemo} from 'react';
 
+import {container} from 'tsyringe';
+
 import {CalendarIcon} from '@wireapp/react-ui-kit';
 
-import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingAction';
+import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/meetingAction';
 import {
   badgeWrapperStyles,
   calendarIconStyles,
@@ -42,6 +44,7 @@ import {
   isMeetingListItemOngoing,
   MeetingTemporalStatuses,
 } from 'Components/Meeting/utils/meetingStatusUtil';
+import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
 
@@ -59,6 +62,7 @@ const MeetingListItemComponent = ({
   const {translate, wallClock} = useApplicationContext();
   const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
   const {joinMeeting, isJoinDisabled, isCallActive} = useJoinMeetingCall(meetingSeries.qualified_conversation);
+  const selfUser = container.resolve(UserState).self();
 
   const now = useMemo(() => new Date(nowMilliseconds), [nowMilliseconds]);
 
@@ -112,7 +116,7 @@ const MeetingListItemComponent = ({
           isJoinDisabled={isJoinDisabled}
           isCallActive={isCallActive}
         />
-        <MeetingAction meetingInstance={meetingInstance} />
+        <MeetingAction meetingInstance={meetingInstance} selfUser={selfUser} />
       </div>
     </div>
   );

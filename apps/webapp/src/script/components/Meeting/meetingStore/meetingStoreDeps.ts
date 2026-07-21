@@ -30,7 +30,6 @@ import type {
 } from 'Components/Meeting/shared/types/meetingCommandTypes';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {User} from 'Repositories/entity/User';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 
 export type MeetingStoreServiceTasks = {
@@ -38,7 +37,7 @@ export type MeetingStoreServiceTasks = {
   meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   deleteMeetingForMe: (command: DeleteMeetingCommand) => Task<void, MeetingSubmitErrors>;
-  deleteMeetingForAll: (command: DeleteMeetingCommand, selfUser: User) => Task<void, MeetingSubmitErrors>;
+  deleteMeetingForAll: (command: DeleteMeetingCommand) => Task<void, MeetingSubmitErrors>;
 };
 
 export type MeetingServiceDeps = {

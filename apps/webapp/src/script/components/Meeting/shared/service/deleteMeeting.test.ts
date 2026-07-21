@@ -23,13 +23,12 @@ import {task} from 'true-myth';
 
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {deleteMeetingForAll, deleteMeetingForMe} from './deleteMeeting';
 
@@ -41,15 +40,6 @@ const wallClock = createDeterministicWallClock({
   initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
 });
 
-const createUser = (id: string) => {
-  const user = new User(id, 'example.com', translateForTest);
-  user.name(`User ${id}`);
-  return user;
-};
-
-const hostUser = createUser('host-id');
-const inviteeUser = createUser('invitee-id');
-
 const createConversation = () => {
   const conversation = new Conversation(
     qualifiedConversation.id,
@@ -58,13 +48,11 @@ const createConversation = () => {
     translateForTest,
   );
   conversation.groupId = 'group-id';
-  conversation.participating_user_ets([hostUser, inviteeUser]);
   return conversation;
 };
 
 const createDeps = ({
   safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation())),
-  safeRemoveMembers = jest.fn().mockReturnValue(task.resolve(undefined)),
   leaveConversation = jest.fn().mockResolvedValue(undefined),
   deleteConversationLocally = jest.fn().mockResolvedValue(undefined),
   deleteMeeting = jest.fn().mockReturnValue(task.resolve(undefined)),
@@ -72,7 +60,6 @@ const createDeps = ({
   leaveCall = jest.fn(),
 }: {
   safeGetConversationById?: jest.Mock;
-  safeRemoveMembers?: jest.Mock;
   leaveConversation?: jest.Mock;
   deleteConversationLocally?: jest.Mock;
   deleteMeeting?: jest.Mock;
@@ -83,12 +70,11 @@ const createDeps = ({
   leaveCall: jest.Mock;
   leaveConversation: jest.Mock;
   deleteConversationLocally: jest.Mock;
-  safeRemoveMembers: jest.Mock;
   deleteMeeting: jest.Mock;
+  safeGetConversationById: jest.Mock;
 } => {
   const conversationRepository = {
     safeGetConversationById,
-    safeRemoveMembers,
     leaveConversation,
     deleteConversationLocally,
   } as unknown as ConversationRepository;
@@ -107,8 +93,8 @@ const createDeps = ({
     leaveCall,
     leaveConversation,
     deleteConversationLocally,
-    safeRemoveMembers,
     deleteMeeting,
+    safeGetConversationById,
   };
 };
 
@@ -146,16 +132,49 @@ describe('deleteMeetingForMe', () => {
     expect(result.isOk).toBe(true);
     expect(leaveCall).not.toHaveBeenCalled();
   });
+
+  it('leaves the conversation for the command qualifiedConversation', async () => {
+    const leaveConversation = jest.fn().mockResolvedValue(undefined);
+    const conversation = createConversation();
+    const {deps} = createDeps({
+      safeGetConversationById: jest.fn().mockReturnValue(task.resolve(conversation)),
+      leaveConversation,
+    });
+
+    const result = await deleteMeetingForMe(command, deps);
+
+    expect(result.isOk).toBe(true);
+    expect(leaveConversation).toHaveBeenCalledWith(conversation);
+  });
+
+  it('returns leaveConversationFailed when leaving the conversation fails', async () => {
+    const {deps} = createDeps({
+      leaveConversation: jest.fn().mockRejectedValue(new Error('leave failed')),
+    });
+
+    const result = await deleteMeetingForMe(command, deps);
+
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.leaveConversationFailed);
+  });
+
+  it('returns leaveConversationFailed when the conversation is not found', async () => {
+    const {deps} = createDeps({
+      safeGetConversationById: jest.fn().mockReturnValue(task.reject(new Error('not found'))),
+    });
+
+    const result = await deleteMeetingForMe(command, deps);
+
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.leaveConversationFailed);
+  });
 });
 
 describe('deleteMeetingForAll', () => {
-  it('removes other participants, deletes the meeting, then removes the conversation locally', async () => {
-    const {deps, safeRemoveMembers, deleteConversationLocally, deleteMeeting} = createDeps();
+  it('deletes the meeting then removes the conversation locally', async () => {
+    const {deps, deleteConversationLocally, deleteMeeting} = createDeps();
 
-    const result = await deleteMeetingForAll(command, hostUser, deps);
+    const result = await deleteMeetingForAll(command, deps);
 
     expect(result.isOk).toBe(true);
-    expect(safeRemoveMembers).toHaveBeenCalledWith(expect.any(Conversation), [inviteeUser.qualifiedId]);
     expect(deleteMeeting).toHaveBeenCalledWith(meetingId);
     expect(deleteConversationLocally).toHaveBeenCalledWith(qualifiedConversation, true);
   });
@@ -177,7 +196,7 @@ describe('deleteMeetingForAll', () => {
       deleteMeeting,
     });
 
-    const result = await deleteMeetingForAll(command, hostUser, deps);
+    const result = await deleteMeetingForAll(command, deps);
 
     expect(result.isOk).toBe(true);
     expect(callOrder).toEqual(['leaveCall', 'deleteMeeting']);
@@ -195,20 +214,10 @@ describe('deleteMeetingForAll', () => {
 
     const {deps} = createDeps({deleteMeeting, deleteConversationLocally});
 
-    const result = await deleteMeetingForAll(command, hostUser, deps);
+    const result = await deleteMeetingForAll(command, deps);
 
     expect(result.isOk).toBe(true);
     expect(callOrder).toEqual(['deleteMeeting', 'deleteConversationLocally']);
-  });
-
-  it('returns removeParticipantsFailed when removing invitees fails', async () => {
-    const {deps} = createDeps({
-      safeRemoveMembers: jest.fn().mockReturnValue(task.reject(new Error('remove failed'))),
-    });
-
-    const result = await deleteMeetingForAll(command, hostUser, deps);
-
-    expect(unwrapErr(result)).toBe(meetingSubmitErrors.removeParticipantsFailed);
   });
 
   it('does not remove the conversation locally when deleteMeeting fails', async () => {
@@ -218,7 +227,7 @@ describe('deleteMeetingForAll', () => {
       deleteMeeting: jest.fn().mockReturnValue(task.reject(new Error('delete failed'))),
     });
 
-    const result = await deleteMeetingForAll(command, hostUser, deps);
+    const result = await deleteMeetingForAll(command, deps);
 
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.deleteFailed);
     expect(deleteConversationLocally).not.toHaveBeenCalled();
@@ -229,18 +238,8 @@ describe('deleteMeetingForAll', () => {
       deleteConversationLocally: jest.fn().mockRejectedValue(new Error('local cleanup failed')),
     });
 
-    const result = await deleteMeetingForAll(command, hostUser, deps);
+    const result = await deleteMeetingForAll(command, deps);
 
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.deleteSucceededButLocalCleanupFailed);
-  });
-
-  it('returns deleteFailed when invitees were removed but deleteMeeting fails', async () => {
-    const deleteMeeting = jest.fn().mockReturnValue(task.reject(new Error('delete failed')));
-    const {deps} = createDeps({deleteMeeting});
-
-    const result = await deleteMeetingForAll(command, hostUser, deps);
-
-    expect(unwrapErr(result)).toBe(meetingSubmitErrors.deleteFailed);
-    expect(deleteMeeting).toHaveBeenCalledWith(meetingId);
   });
 });

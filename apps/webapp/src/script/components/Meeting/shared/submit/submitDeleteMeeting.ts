@@ -33,7 +33,7 @@ import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/Meeting/utils/canDeleteMeeting';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {User} from 'Repositories/entity/User';
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate, TranslationKey} from 'Util/localizerUtil';
 
 const inFlightDeleteMeetingIds = new Set<string>();
 
@@ -56,22 +56,42 @@ export type SubmitDeleteMeetingParams = {
   wallClock: WallClock;
   translate: Translate;
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
-  deleteMeetingForAll: (meetingInstance: MeetingInstance, selfUser: User) => Task<void, MeetingSubmitErrors>;
+  deleteMeetingForAll: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
   loadMeetings: () => Promise<void>;
 };
 
-const showDeleteNotAllowedModal = (translate: Translate): void => {
+const showDeleteAcknowledgeModal = (
+  translate: Translate,
+  titleKey: TranslationKey,
+  messageKey: TranslationKey,
+): void => {
   PrimaryModal.show(
     PrimaryModal.type.ACKNOWLEDGE,
     {
       text: {
-        title: translate('meetings.deleteModal.error.deleteFailedTitle'),
-        message: translate('meetings.deleteModal.error.deleteFailed'),
+        title: translate(titleKey),
+        message: translate(messageKey),
       },
     },
     undefined,
     translate,
+  );
+};
+
+const showDeleteNotAllowedModal = (translate: Translate): void => {
+  showDeleteAcknowledgeModal(
+    translate,
+    'meetings.deleteModal.error.deleteFailedTitle',
+    'meetings.deleteModal.error.deleteFailed',
+  );
+};
+
+const showDeleteAlreadyInFlightModal = (translate: Translate): void => {
+  showDeleteAcknowledgeModal(
+    translate,
+    'meetings.deleteModal.error.alreadyInFlightTitle',
+    'meetings.deleteModal.error.alreadyInFlight',
   );
 };
 
@@ -115,14 +135,14 @@ export const submitDeleteMeeting = async ({
   const meetingIdKey = toMeetingIdKey(meetingInstance.meetingSeries.qualified_id);
 
   if (inFlightDeleteMeetingIds.has(meetingIdKey)) {
+    showDeleteAlreadyInFlightModal(translate);
     return deleteMeetingSubmitResults.alreadyInFlight;
   }
 
   inFlightDeleteMeetingIds.add(meetingIdKey);
 
   try {
-    const deleteTask =
-      mode === 'forAll' ? deleteMeetingForAll(meetingInstance, selfUser) : deleteMeetingForMe(meetingInstance);
+    const deleteTask = mode === 'forAll' ? deleteMeetingForAll(meetingInstance) : deleteMeetingForMe(meetingInstance);
 
     const result = await deleteTask;
 

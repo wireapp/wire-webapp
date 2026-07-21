@@ -17,62 +17,22 @@
  *
  */
 
-import type {MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
-import type {TranslationKey} from 'Util/localizerUtil';
+import type {MeetingSubmitErrorTranslationKeys} from './meetingSubmitErrorKeys';
 
-import type {MeetingSubmitErrorTranslationMap} from './meetingSubmitErrorKeys';
+export type DeleteMeetingSubmitError =
+  'deleteFailed' | 'deleteSucceededButLocalCleanupFailed' | 'leaveConversationFailed';
 
 export const DELETE_MEETING_ERROR_TRANSLATION_KEYS = {
-  missingTimes: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
-  },
-  startInPast: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
-  },
-  endInPast: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
-  },
-  createFailed: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
-  },
-  conversationSetupFailed: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
-  },
-  updateFailed: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
-  },
-  editMeetingIdMissing: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
-  },
-  addParticipantsFailed: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
-  },
-  removeParticipantsFailed: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.removeParticipantsFailed' as TranslationKey,
-  },
   deleteFailed: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
+    titleKey: 'meetings.deleteModal.error.deleteFailedTitle',
+    messageKey: 'meetings.deleteModal.error.deleteFailed',
   },
   deleteSucceededButLocalCleanupFailed: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteSucceededButLocalCleanupFailed' as TranslationKey,
+    titleKey: 'meetings.deleteModal.error.deleteFailedTitle',
+    messageKey: 'meetings.deleteModal.error.deleteSucceededButLocalCleanupFailed',
   },
   leaveConversationFailed: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.leaveConversationFailed' as TranslationKey,
+    titleKey: 'meetings.deleteModal.error.deleteFailedTitle',
+    messageKey: 'meetings.deleteModal.error.leaveConversationFailed',
   },
-  refreshFailed: {
-    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
-    messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
-  },
-} satisfies MeetingSubmitErrorTranslationMap satisfies Record<MeetingSubmitErrors, unknown>;
+} as const satisfies Record<DeleteMeetingSubmitError, MeetingSubmitErrorTranslationKeys>;

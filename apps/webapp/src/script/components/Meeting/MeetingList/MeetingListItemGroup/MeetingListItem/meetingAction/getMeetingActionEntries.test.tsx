@@ -19,8 +19,8 @@
 
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
-import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/getMeetingActionEntries';
-import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingActionTranslationKeys';
+import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/getMeetingActionEntries';
+import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/meetingActionTranslationKeys';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';

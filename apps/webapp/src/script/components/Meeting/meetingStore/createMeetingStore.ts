@@ -62,7 +62,7 @@ export type MeetingStoreState = {
   meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
-  deleteMeetingForAll: (meetingInstance: MeetingInstance, selfUser: User) => Task<void, MeetingSubmitErrors>;
+  deleteMeetingForAll: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
 };
@@ -88,8 +88,8 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
     updateMeeting: deps.serviceTasks.updateMeeting,
     deleteMeetingForMe: meetingInstance =>
       deps.serviceTasks.deleteMeetingForMe(toDeleteMeetingCommand(meetingInstance)),
-    deleteMeetingForAll: (meetingInstance, selfUser) =>
-      deps.serviceTasks.deleteMeetingForAll(toDeleteMeetingCommand(meetingInstance), selfUser),
+    deleteMeetingForAll: meetingInstance =>
+      deps.serviceTasks.deleteMeetingForAll(toDeleteMeetingCommand(meetingInstance)),
     removeMeetingByQualifiedId: meetingId =>
       set(state => ({
         meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingId),

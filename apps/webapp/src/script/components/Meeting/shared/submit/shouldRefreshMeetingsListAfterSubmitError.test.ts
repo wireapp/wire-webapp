@@ -55,11 +55,11 @@ describe('shouldRefreshMeetingsListAfterDeleteError', () => {
     expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.deleteSucceededButLocalCleanupFailed)).toBe(
       true,
     );
-    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.removeParticipantsFailed)).toBe(true);
     expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.deleteFailed)).toBe(true);
   });
 
   it('returns false for delete failures before server state changed', () => {
     expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.leaveConversationFailed)).toBe(false);
+    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.removeParticipantsFailed)).toBe(false);
   });
 });

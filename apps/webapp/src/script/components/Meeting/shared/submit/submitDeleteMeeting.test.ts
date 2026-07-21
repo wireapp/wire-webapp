@@ -205,7 +205,7 @@ describe('submitDeleteMeeting', () => {
     expect(primaryModalShow).toHaveBeenCalledTimes(1);
   });
 
-  it('ignores a second submit for the same meeting while the first is pending', async () => {
+  it('shows feedback when a second submit for the same meeting is already in flight', async () => {
     let releaseDelete!: () => void;
     const deleteGate = new Promise<void>(resolve => {
       releaseDelete = resolve;
@@ -230,9 +230,69 @@ describe('submitDeleteMeeting', () => {
 
     expect(await secondSubmit).toBe(deleteMeetingSubmitResults.alreadyInFlight);
     expect(deleteMeetingForAll).toHaveBeenCalledTimes(1);
+    expect(primaryModalShow).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      expect.objectContaining({
+        text: expect.objectContaining({
+          title: translateForTest('meetings.deleteModal.error.alreadyInFlightTitle'),
+          message: translateForTest('meetings.deleteModal.error.alreadyInFlight'),
+        }),
+      }),
+      undefined,
+      translateForTest,
+    );
 
     releaseDelete();
     expect(await firstSubmit).toBe(deleteMeetingSubmitResults.succeeded);
     expect(removeMeetingByQualifiedId).toHaveBeenCalledWith(meetingId);
+  });
+
+  it('removes the meeting from the store after a successful delete for me', async () => {
+    const removeMeetingByQualifiedId = jest.fn();
+    const deleteMeetingForMe = jest.fn().mockReturnValue(task.resolve(undefined));
+    const invitee = createSelfUser('invitee-id');
+
+    const result = await submitDeleteMeeting({
+      ...createSubmitDeps({
+        deleteMeetingForMe,
+        removeMeetingByQualifiedId,
+        selfUser: invitee,
+      }),
+      mode: 'forMe',
+    });
+
+    expect(result).toBe(deleteMeetingSubmitResults.succeeded);
+    expect(deleteMeetingForMe).toHaveBeenCalledTimes(1);
+    expect(removeMeetingByQualifiedId).toHaveBeenCalledWith(meetingId);
+  });
+
+  it('keeps the meeting in the store when delete for me fails to leave the conversation', async () => {
+    const removeMeetingByQualifiedId = jest.fn();
+    const deleteMeetingForMe = jest
+      .fn()
+      .mockReturnValue(task.reject(meetingSubmitErrors.leaveConversationFailed));
+    const invitee = createSelfUser('invitee-id');
+
+    const result = await submitDeleteMeeting({
+      ...createSubmitDeps({
+        deleteMeetingForMe,
+        removeMeetingByQualifiedId,
+        selfUser: invitee,
+      }),
+      mode: 'forMe',
+    });
+
+    expect(result).toBe(deleteMeetingSubmitResults.failed);
+    expect(removeMeetingByQualifiedId).not.toHaveBeenCalled();
+    expect(primaryModalShow).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      expect.objectContaining({
+        text: expect.objectContaining({
+          message: translateForTest('meetings.deleteModal.error.leaveConversationFailed'),
+        }),
+      }),
+      undefined,
+      translateForTest,
+    );
   });
 });
