@@ -25,9 +25,6 @@ import {
   type MeetingConversationSyncError,
 } from 'Components/Meeting/meetingConversationSync';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export const safeLeaveMeetingConversation = (
   conversationRepository: ConversationRepository,
@@ -51,22 +48,3 @@ export const removeMeetingConversationLocally = (
     () => meetingConversationSyncErrors.leaveFailed,
     () => conversationRepository.deleteConversationLocally(qualifiedConversationId, true),
   );
-
-export const removeAllOtherMeetingParticipants = (
-  conversationRepository: ConversationRepository,
-  conversation: Conversation,
-  selfUser: User,
-): Task<void, MeetingConversationSyncError> => {
-  const userIdsToRemove = conversation
-    .participating_user_ets()
-    .filter(user => !matchQualifiedIds(user.qualifiedId, selfUser.qualifiedId))
-    .map(user => user.qualifiedId);
-
-  if (userIdsToRemove.length === 0) {
-    return task.resolve(undefined);
-  }
-
-  return conversationRepository
-    .safeRemoveMembers(conversation, userIdsToRemove)
-    .mapRejected(() => meetingConversationSyncErrors.removeFailed);
-};
