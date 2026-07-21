@@ -31,6 +31,7 @@ import {
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {useDeleteMeeting} from 'Components/Meeting/useDeleteMeeting';
 import {useEditMeeting} from 'Components/Meeting/useEditMeeting';
+import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/Meeting/utils/canDeleteMeeting';
 import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -62,8 +63,16 @@ export const MeetingAction = ({meetingInstance}: MeetingActionProps) => {
             fireAndForgetInvoker.fireAndForget(() => editMeeting(meetingInstance));
           }
         },
-        onDeleteForAll: () => openDeleteMeetingModal(meetingInstance, 'forAll'),
-        onDeleteForMe: () => openDeleteMeetingModal(meetingInstance, 'forMe'),
+        onDeleteForAll: () => {
+          if (canDeleteMeetingForAll(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
+            openDeleteMeetingModal(meetingInstance, 'forAll', selfUser);
+          }
+        },
+        onDeleteForMe: () => {
+          if (canDeleteMeetingForMe(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
+            openDeleteMeetingModal(meetingInstance, 'forMe', selfUser);
+          }
+        },
       }),
       identifier: 'message-options-menu',
     });

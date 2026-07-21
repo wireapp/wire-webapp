@@ -19,7 +19,11 @@
 
 import {meetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 
-import {shouldRefreshMeetingsListAfterSubmitError} from './shouldRefreshMeetingsListAfterSubmitError';
+import {
+  isMeetingDeletedDespiteSubmitError,
+  shouldRefreshMeetingsListAfterDeleteError,
+  shouldRefreshMeetingsListAfterSubmitError,
+} from './shouldRefreshMeetingsListAfterSubmitError';
 
 describe('shouldRefreshMeetingsListAfterSubmitError', () => {
   it('returns true for participant sync partial failures', () => {
@@ -32,5 +36,30 @@ describe('shouldRefreshMeetingsListAfterSubmitError', () => {
     expect(shouldRefreshMeetingsListAfterSubmitError(meetingSubmitErrors.createFailed)).toBe(false);
     expect(shouldRefreshMeetingsListAfterSubmitError(meetingSubmitErrors.updateFailed)).toBe(false);
     expect(shouldRefreshMeetingsListAfterSubmitError('missingTimes')).toBe(false);
+  });
+});
+
+describe('isMeetingDeletedDespiteSubmitError', () => {
+  it('returns true when the meeting was deleted but local cleanup failed', () => {
+    expect(isMeetingDeletedDespiteSubmitError(meetingSubmitErrors.deleteSucceededButLocalCleanupFailed)).toBe(true);
+  });
+
+  it('returns false for failures before the meeting was deleted', () => {
+    expect(isMeetingDeletedDespiteSubmitError(meetingSubmitErrors.deleteFailed)).toBe(false);
+    expect(isMeetingDeletedDespiteSubmitError(meetingSubmitErrors.leaveConversationFailed)).toBe(false);
+  });
+});
+
+describe('shouldRefreshMeetingsListAfterDeleteError', () => {
+  it('returns true for delete failures that need list reconciliation', () => {
+    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.deleteSucceededButLocalCleanupFailed)).toBe(
+      true,
+    );
+    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.removeParticipantsFailed)).toBe(true);
+    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.deleteFailed)).toBe(true);
+  });
+
+  it('returns false for delete failures before server state changed', () => {
+    expect(shouldRefreshMeetingsListAfterDeleteError(meetingSubmitErrors.leaveConversationFailed)).toBe(false);
   });
 });

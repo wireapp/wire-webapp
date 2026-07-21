@@ -223,4 +223,24 @@ describe('deleteMeetingForAll', () => {
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.deleteFailed);
     expect(deleteConversationLocally).not.toHaveBeenCalled();
   });
+
+  it('returns deleteSucceededButLocalCleanupFailed when deleteMeeting succeeds but local cleanup fails', async () => {
+    const {deps} = createDeps({
+      deleteConversationLocally: jest.fn().mockRejectedValue(new Error('local cleanup failed')),
+    });
+
+    const result = await deleteMeetingForAll(command, hostUser, deps);
+
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.deleteSucceededButLocalCleanupFailed);
+  });
+
+  it('returns deleteFailed when invitees were removed but deleteMeeting fails', async () => {
+    const deleteMeeting = jest.fn().mockReturnValue(task.reject(new Error('delete failed')));
+    const {deps} = createDeps({deleteMeeting});
+
+    const result = await deleteMeetingForAll(command, hostUser, deps);
+
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.deleteFailed);
+    expect(deleteMeeting).toHaveBeenCalledWith(meetingId);
+  });
 });

@@ -63,6 +63,10 @@ export const DELETE_MEETING_ERROR_TRANSLATION_KEYS = {
     titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
     messageKey: 'meetings.deleteModal.error.deleteFailed' as TranslationKey,
   },
+  deleteSucceededButLocalCleanupFailed: {
+    titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
+    messageKey: 'meetings.deleteModal.error.deleteSucceededButLocalCleanupFailed' as TranslationKey,
+  },
   leaveConversationFailed: {
     titleKey: 'meetings.deleteModal.error.deleteFailedTitle' as TranslationKey,
     messageKey: 'meetings.deleteModal.error.leaveConversationFailed' as TranslationKey,

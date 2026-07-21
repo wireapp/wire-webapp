@@ -19,51 +19,56 @@
 
 import {useCallback} from 'react';
 
-import {container} from 'tsyringe';
-
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {
   showDeleteMeetingModal,
   type DeleteMeetingModalMode,
 } from 'Components/Meeting/shared/delete/showDeleteMeetingModal';
-import {DELETE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/Meeting/shared/submit/deleteMeetingSubmitErrorKeys';
-import {showMeetingSubmitError} from 'Components/Meeting/shared/submit/showMeetingSubmitError';
+import {submitDeleteMeeting} from 'Components/Meeting/shared/submit/submitDeleteMeeting';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
-import {UserState} from 'Repositories/user/userState';
+import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useDeleteMeeting = () => {
-  const {translate, fireAndForgetInvoker} = useApplicationContext();
+  const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
   const deleteMeetingForMe = useMeetingStore(state => state.deleteMeetingForMe);
   const deleteMeetingForAll = useMeetingStore(state => state.deleteMeetingForAll);
-  const selfUser = container.resolve(UserState).self();
+  const removeMeetingByQualifiedId = useMeetingStore(state => state.removeMeetingByQualifiedId);
+  const loadMeetings = useMeetingStore(state => state.loadMeetings);
 
   const submitDelete = useCallback(
-    (meetingInstance: MeetingInstance, mode: DeleteMeetingModalMode) => {
-      if (selfUser === undefined) {
-        return;
-      }
-
-      const deleteTask =
-        mode === 'forAll' ? deleteMeetingForAll(meetingInstance, selfUser) : deleteMeetingForMe(meetingInstance);
-
-      fireAndForgetInvoker.fireAndForget(async () => {
-        const result = await deleteTask;
-
-        if (result.isErr) {
-          showMeetingSubmitError(translate, result.error, DELETE_MEETING_ERROR_TRANSLATION_KEYS);
-        }
-      });
+    (meetingInstance: MeetingInstance, mode: DeleteMeetingModalMode, selfUser: User | undefined) => {
+      fireAndForgetInvoker.fireAndForget(() =>
+        submitDeleteMeeting({
+          meetingInstance,
+          mode,
+          selfUser,
+          wallClock,
+          translate,
+          deleteMeetingForMe,
+          deleteMeetingForAll,
+          removeMeetingByQualifiedId,
+          loadMeetings,
+        }),
+      );
     },
-    [deleteMeetingForAll, deleteMeetingForMe, fireAndForgetInvoker, selfUser, translate],
+    [
+      deleteMeetingForAll,
+      deleteMeetingForMe,
+      fireAndForgetInvoker,
+      loadMeetings,
+      removeMeetingByQualifiedId,
+      translate,
+      wallClock,
+    ],
   );
 
   const openDeleteMeetingModal = useCallback(
-    (meetingInstance: MeetingInstance, mode: DeleteMeetingModalMode) => {
+    (meetingInstance: MeetingInstance, mode: DeleteMeetingModalMode, selfUser: User | undefined) => {
       showDeleteMeetingModal({
         mode,
         translate,
-        onConfirm: () => submitDelete(meetingInstance, mode),
+        onConfirm: () => submitDelete(meetingInstance, mode, selfUser),
       });
     },
     [submitDelete, translate],

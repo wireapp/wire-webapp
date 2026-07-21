@@ -74,7 +74,8 @@ export const deleteMeetingForMe = (
 };
 
 /**
- * Deletes the meeting for everyone: removes invitees from MLS, leaves self, then DELETE /meetings.
+ * Deletes the meeting for everyone: remove invitees from MLS, DELETE /meetings while the host is still a member,
+ * then remove the conversation locally.
  */
 export const deleteMeetingForAll = (
   command: DeleteMeetingCommand,
@@ -94,7 +95,7 @@ export const deleteMeetingForAll = (
         )
         .andThen(() =>
           removeMeetingConversationLocally(deps.conversationRepository, command.qualifiedConversation).mapRejected(
-            mapSyncErrorToDeleteError,
+            () => meetingSubmitErrors.deleteSucceededButLocalCleanupFailed,
           ),
         ),
     );

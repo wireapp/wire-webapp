@@ -87,17 +87,9 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
     meetNowMeeting: deps.serviceTasks.meetNowMeeting,
     updateMeeting: deps.serviceTasks.updateMeeting,
     deleteMeetingForMe: meetingInstance =>
-      deps.serviceTasks.deleteMeetingForMe(toDeleteMeetingCommand(meetingInstance)).map(() => {
-        set(state => ({
-          meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingInstance.meetingSeries.qualified_id),
-        }));
-      }),
+      deps.serviceTasks.deleteMeetingForMe(toDeleteMeetingCommand(meetingInstance)),
     deleteMeetingForAll: (meetingInstance, selfUser) =>
-      deps.serviceTasks.deleteMeetingForAll(toDeleteMeetingCommand(meetingInstance), selfUser).map(() => {
-        set(state => ({
-          meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingInstance.meetingSeries.qualified_id),
-        }));
-      }),
+      deps.serviceTasks.deleteMeetingForAll(toDeleteMeetingCommand(meetingInstance), selfUser),
     removeMeetingByQualifiedId: meetingId =>
       set(state => ({
         meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingId),
