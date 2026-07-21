@@ -60,6 +60,7 @@ const createDeps = (overrides: Partial<JoinMeetingCallDeps> = {}): JoinMeetingCa
 
   const conversationRepository = {
     safeGetConversationById: () => task.reject('not found'),
+    safeEnsureConversationExists: () => task.resolve(undefined),
   } as unknown as ConversationRepository;
 
   const callingRepository = {
@@ -99,6 +100,58 @@ describe('joinMeetingCall', () => {
     expect(answer).not.toHaveBeenCalled();
   });
 
+  it('ensures the MLS group exists locally before starting the call', async () => {
+    const conversation = createMeetingConversation();
+    const startAudio = jest.fn(async () => {});
+    const safeEnsureConversationExists = jest.fn(() => task.resolve(undefined));
+
+    const deps = createDeps({
+      conversationState: {
+        findConversation: () => conversation,
+      } as unknown as ConversationState,
+      conversationRepository: {
+        safeGetConversationById: () => task.reject('not found'),
+        safeEnsureConversationExists,
+      } as unknown as ConversationRepository,
+      callingViewModel: {
+        callActions: {answer: jest.fn(), startAudio},
+      } as unknown as CallingViewModel,
+    });
+
+    const result = await joinMeetingCall(deps, qualifiedConversationId);
+
+    expect(result.isOk).toBe(true);
+    expect(safeEnsureConversationExists).toHaveBeenCalledWith({
+      conversationId: conversation.qualifiedId,
+      groupId: conversation.groupId,
+    });
+    expect(startAudio).toHaveBeenCalledWith(conversation);
+  });
+
+  it('returns joinFailed when ensuring the MLS group fails', async () => {
+    const conversation = createMeetingConversation();
+    const startAudio = jest.fn(async () => {});
+
+    const deps = createDeps({
+      conversationState: {
+        findConversation: () => conversation,
+      } as unknown as ConversationState,
+      conversationRepository: {
+        safeGetConversationById: () => task.reject('not found'),
+        safeEnsureConversationExists: () => task.reject(new Error('mls missing')),
+      } as unknown as ConversationRepository,
+      callingViewModel: {
+        callActions: {answer: jest.fn(), startAudio},
+      } as unknown as CallingViewModel,
+    });
+
+    const result = await joinMeetingCall(deps, qualifiedConversationId);
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);
+    expect(startAudio).not.toHaveBeenCalled();
+  });
+
   it('answers an incoming call when one exists in the meeting conversation', async () => {
     const conversation = createMeetingConversation();
     const incomingCall = createIncomingCall(conversation);
@@ -129,6 +182,7 @@ describe('joinMeetingCall', () => {
     const startAudio = jest.fn(async () => {});
     const findConversation = jest.fn(() => undefined);
     const safeGetConversationById = jest.fn(() => task.resolve(conversation));
+    const safeEnsureConversationExists = jest.fn(() => task.resolve(undefined));
 
     const deps = createDeps({
       conversationState: {
@@ -136,6 +190,7 @@ describe('joinMeetingCall', () => {
       } as unknown as ConversationState,
       conversationRepository: {
         safeGetConversationById,
+        safeEnsureConversationExists,
       } as unknown as ConversationRepository,
       callingViewModel: {
         callActions: {answer: jest.fn(), startAudio},
@@ -147,6 +202,10 @@ describe('joinMeetingCall', () => {
     expect(result.isOk).toBe(true);
     expect(findConversation).toHaveBeenCalledWith(qualifiedConversationId);
     expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversationId);
+    expect(safeEnsureConversationExists).toHaveBeenCalledWith({
+      conversationId: conversation.qualifiedId,
+      groupId: conversation.groupId,
+    });
     expect(startAudio).toHaveBeenCalledWith(conversation);
   });
 
