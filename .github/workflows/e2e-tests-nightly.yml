@@ -2,7 +2,7 @@ name: E2E Tests Nightly
 
 on:
   # Scheduled nightly testing is paused until the canonical Edge URL and TLS
-  # configuration are available. Beta validation continues through release-cloud;
+  # configuration are available. Beta validation continues through Release WebApp;
   # this workflow remains available for manual regression runs.
   workflow_dispatch:
     inputs:

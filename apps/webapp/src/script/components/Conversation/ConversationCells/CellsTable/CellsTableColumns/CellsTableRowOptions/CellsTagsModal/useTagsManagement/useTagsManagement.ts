@@ -68,6 +68,8 @@ export const useTagsManagement = ({
   }, [fetchAllTags, fetchTagsEnabled, hasFetchedTags]);
 
   const allTags = useMemo(() => {
+    // Fetched tags are already sorted by the centralized store. Keep newly created tags appended
+    // so creation and update order remain unchanged, as required by WPB-21608.
     const allTagNames = [...tagNames, ...createdTags];
     const uniqueTagNames = Array.from(new Set(allTagNames));
     return uniqueTagNames.map(transformTagToSelectOption);

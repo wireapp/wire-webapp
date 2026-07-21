@@ -1,6 +1,6 @@
 ---
 name: Verify webapp runtime
-description: Verify the deployed webapp runtime version, commit, and backend configuration
+description: Verify the deployed webapp build metadata and backend configuration
 
 inputs:
   environment-label:
@@ -10,10 +10,16 @@ inputs:
     description: Base URL of the deployed webapp
     required: true
   expected-version:
-    description: Expected webapp version returned by the version endpoint
+    description: Expected logical webapp version returned by the version endpoint
+    required: true
+  expected-asset-version:
+    description: Expected browser asset version returned by the version endpoint
     required: true
   expected-commit:
-    description: Expected commit returned by the commit endpoint
+    description: Expected full commit SHA returned by the version endpoint
+    required: true
+  expected-built-at:
+    description: Expected artifact assembly timestamp returned by the version endpoint
     required: true
   expected-backend-rest:
     description: Expected REST backend URL in the runtime configuration
@@ -31,7 +37,9 @@ runs:
         ENVIRONMENT_LABEL: ${{ inputs.environment-label }}
         WEBAPP_URL: ${{ inputs.webapp-url }}
         EXPECTED_VERSION: ${{ inputs.expected-version }}
+        EXPECTED_ASSET_VERSION: ${{ inputs.expected-asset-version }}
         EXPECTED_COMMIT: ${{ inputs.expected-commit }}
+        EXPECTED_BUILT_AT: ${{ inputs.expected-built-at }}
         EXPECTED_BACKEND_REST: ${{ inputs.expected-backend-rest }}
         EXPECTED_BACKEND_WS: ${{ inputs.expected-backend-ws }}
       run: bash "${GITHUB_ACTION_PATH}/verify-webapp-runtime.sh"

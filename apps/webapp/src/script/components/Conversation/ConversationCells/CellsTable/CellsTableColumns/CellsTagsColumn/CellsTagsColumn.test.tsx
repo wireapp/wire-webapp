@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,14 @@
  *
  */
 
-import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
+import {render, screen} from '@testing-library/react';
 
-import {wrapperStyles} from './cellsTableTagsColumn.styles';
+import {CellsTagsColumn} from './CellsTagsColumn';
 
-import {sortTagsAlphabetically} from '../../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
+describe('CellsTagsColumn', () => {
+  it('shows the first tag alphabetically', () => {
+    render(<CellsTagsColumn tags={['Zulu', 'alpha', 'Beta']} />);
 
-interface CellsTableTagsColumnProps {
-  tags: string[];
-}
-
-export const CellsTableTagsColumn = ({tags}: CellsTableTagsColumnProps) => {
-  if (tags.length === 0) {
-    return null;
-  }
-
-  return (
-    <div css={wrapperStyles}>
-      <BadgesWithTooltip items={sortTagsAlphabetically(tags)} />
-    </div>
-  );
-};
+    expect(screen.getByText('alpha')).toBeInTheDocument();
+  });
+});

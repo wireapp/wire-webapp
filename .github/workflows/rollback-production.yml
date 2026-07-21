@@ -103,20 +103,34 @@ jobs:
       contents: read
     outputs:
       artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
+      artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      artifact_asset_version: ${{ steps.validate_artifact_metadata.outputs.artifact_asset_version }}
+      artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
+      artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
       rollback_commit_sha: ${{ steps.git_metadata.outputs.rollback_commit_sha }}
       rollback_commit_subject: ${{ steps.git_metadata.outputs.rollback_commit_subject }}
       rollback_commit_url: ${{ steps.git_metadata.outputs.rollback_commit_url }}
 
     steps:
+      - name: Checkout current workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          ref: ${{ github.workflow_sha }}
+          fetch-depth: 1
+          path: workflow-source
+
       - name: Checkout selected Production tag
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           ref: refs/tags/${{ needs.validate_request.outputs.production_tag }}
           fetch-depth: 0
+          path: selected-release
 
       - name: Collect rollback git metadata
         id: git_metadata
+        working-directory: selected-release
         run: |
           set -euo pipefail
 
@@ -130,28 +144,58 @@ jobs:
             echo "rollback_commit_url=${rollback_commit_url}"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
-      - name: Setup Node.js
+      - name: Setup Node.js for workflow tools
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: 'workflow-source/.nvmrc'
           cache: 'yarn'
+          cache-dependency-path: 'workflow-source/yarn.lock'
 
-      - name: Install dependencies
+      - name: Install workflow tool dependencies
+        working-directory: workflow-source
         run: ./bin/yarn --immutable
 
-      - name: Update configuration
+      - name: Build workflow tool dependencies
+        working-directory: workflow-source
+        run: ./bin/yarn nx run config-lib:build
+
+      - name: Setup Node.js for selected release
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: 'selected-release/.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: 'selected-release/yarn.lock'
+
+      - name: Install selected release dependencies
+        working-directory: selected-release
+        run: ./bin/yarn --immutable
+
+      - name: Update selected release configuration
+        working-directory: selected-release
         run: ./bin/yarn nx run webapp:configure
 
       # Interim limitation: until durable release artifact storage exists, this
       # workflow rebuilds the deployable artifact from the selected Production tag.
       - name: Build and package
+        working-directory: selected-release
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.rollback_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
         run: ./bin/yarn build:prod:public
+
+      - name: Restore Node.js for workflow tools
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: 'workflow-source/.nvmrc'
+
+      - name: Validate rollback artifact metadata
+        id: validate_artifact_metadata
+        working-directory: workflow-source
+        env:
+          BUILD_ARTIFACT_PATH: ${{ github.workspace }}/selected-release/${{ env.ARTIFACT_PATH }}
+          EXPECTED_COMMIT: ${{ steps.git_metadata.outputs.rollback_commit_sha }}
+          EXPECTED_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
+        run: node ./bin/validateRecoveryBuildArtifact.mts
 
       - name: Compute artifact metadata
         id: artifact_metadata
@@ -167,7 +211,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: ${{ steps.artifact_metadata.outputs.artifact_name }}
-          path: ${{ env.ARTIFACT_PATH }}
+          path: selected-release/${{ env.ARTIFACT_PATH }}
 
   deploy_to_production:
     name: Deploy rollback to Production
@@ -177,8 +221,9 @@ jobs:
     # Production rollback approval is enforced by the wire-webapp-prod GitHub Environment settings.
     environment: wire-webapp-prod
     concurrency:
-      group: release-cloud-production
+      group: release-webapp-production
       cancel-in-progress: false
+      queue: max
 
     steps:
       - name: Download rollback artifact
@@ -217,11 +262,13 @@ jobs:
     steps:
       - name: Add rollback summary
         env:
+          ARTIFACT_ASSET_VERSION: ${{ needs.build_artifact.outputs.artifact_asset_version || 'unavailable' }}
+          ARTIFACT_BUILT_AT: ${{ needs.build_artifact.outputs.artifact_built_at || 'unavailable' }}
+          ARTIFACT_COMMIT: ${{ needs.build_artifact.outputs.artifact_commit || 'unavailable' }}
+          ARTIFACT_VERSION: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
           INCIDENT_REFERENCE: ${{ inputs.incident_reference }}
           PRODUCTION_ENVIRONMENT_NAME: ${{ env.PRODUCTION_ENVIRONMENT_NAME }}
-          ROLLBACK_COMMIT_SHA: ${{ needs.build_artifact.outputs.rollback_commit_sha || 'unavailable' }}
           ROLLBACK_COMMIT_SUBJECT: ${{ needs.build_artifact.outputs.rollback_commit_subject || 'unavailable' }}
-          ROLLBACK_COMMIT_URL: ${{ needs.build_artifact.outputs.rollback_commit_url || 'unavailable' }}
           ROLLBACK_REASON: ${{ inputs.reason }}
           ROLLBACK_TAG: ${{ needs.validate_request.outputs.production_tag || inputs.production_tag }}
           WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -231,8 +278,10 @@ jobs:
           {
             echo '## Production rollback'
             echo "- Rollback tag: ${ROLLBACK_TAG}"
-            echo "- Rollback commit SHA: ${ROLLBACK_COMMIT_SHA}"
-            echo "- Rollback commit URL: ${ROLLBACK_COMMIT_URL}"
+            echo "- Webapp version: ${ARTIFACT_VERSION}"
+            echo "- Asset version: ${ARTIFACT_ASSET_VERSION}"
+            echo "- Commit SHA: ${ARTIFACT_COMMIT}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT}"
             echo "- Rollback commit subject: ${ROLLBACK_COMMIT_SUBJECT}"
             echo "- Production environment: ${PRODUCTION_ENVIRONMENT_NAME}"
             echo "- Actor: ${GITHUB_ACTOR}"
@@ -270,7 +319,10 @@ jobs:
           status: failure
           text: |
             Production rollback failed for tag ${{ needs.validate_request.outputs.production_tag || inputs.production_tag }}
-            Commit: ${{ needs.build_artifact.outputs.rollback_commit_sha || 'unavailable' }}
+            Webapp version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
+            Asset version: ${{ needs.build_artifact.outputs.artifact_asset_version || 'unavailable' }}
+            Commit SHA: ${{ needs.build_artifact.outputs.artifact_commit || 'unavailable' }}
+            Built at (UTC): ${{ needs.build_artifact.outputs.artifact_built_at || 'unavailable' }}
             Triggered by: ${{ github.actor }}
             Reason: ${{ inputs.reason }}
             Incident reference: ${{ inputs.incident_reference || 'not provided' }}

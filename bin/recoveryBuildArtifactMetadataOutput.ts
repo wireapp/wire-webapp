@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,17 @@
  *
  */
 
-import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
+import type {RecoverableBuildMetadata} from './recoveryBuildArtifactMetadata.ts';
 
-import {wrapperStyles} from './cellsTableTagsColumn.styles';
+export function formatRecoverableBuildArtifactMetadataOutputs(metadata: RecoverableBuildMetadata): string {
+  const assetVersion = metadata.kind === 'current' ? metadata.metadata.assetVersion : '';
+  const builtAt = metadata.kind === 'current' ? metadata.metadata.builtAt : '';
 
-import {sortTagsAlphabetically} from '../../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
-
-interface CellsTableTagsColumnProps {
-  tags: string[];
+  return [
+    `artifact_version=${metadata.metadata.version}`,
+    `artifact_asset_version=${assetVersion}`,
+    `artifact_commit=${metadata.metadata.commit}`,
+    `artifact_built_at=${builtAt}`,
+    '',
+  ].join('\n');
 }
-
-export const CellsTableTagsColumn = ({tags}: CellsTableTagsColumnProps) => {
-  if (tags.length === 0) {
-    return null;
-  }
-
-  return (
-    <div css={wrapperStyles}>
-      <BadgesWithTooltip items={sortTagsAlphabetically(tags)} />
-    </div>
-  );
-};

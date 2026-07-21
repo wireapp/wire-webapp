@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,19 @@
  *
  */
 
-import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
+const compareTagsAlphabetically = (tagA: string, tagB: string): number => {
+  const normalizedTagA = tagA.toLowerCase();
+  const normalizedTagB = tagB.toLowerCase();
 
-import {wrapperStyles} from './cellsTableTagsColumn.styles';
-
-import {sortTagsAlphabetically} from '../../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
-
-interface CellsTableTagsColumnProps {
-  tags: string[];
-}
-
-export const CellsTableTagsColumn = ({tags}: CellsTableTagsColumnProps) => {
-  if (tags.length === 0) {
-    return null;
+  if (normalizedTagA < normalizedTagB) {
+    return -1;
   }
 
-  return (
-    <div css={wrapperStyles}>
-      <BadgesWithTooltip items={sortTagsAlphabetically(tags)} />
-    </div>
-  );
+  if (normalizedTagA > normalizedTagB) {
+    return 1;
+  }
+
+  return 0;
 };
+
+export const sortTagsAlphabetically = (tags: string[]): string[] => tags.toSorted(compareTagsAlphabetically);

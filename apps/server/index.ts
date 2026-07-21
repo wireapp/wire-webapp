@@ -17,12 +17,12 @@
  *
  */
 
-import {clientConfig, serverConfig} from './config';
+import {buildMetadata, clientConfig, serverConfig} from './config';
 import {Server} from './Server';
 import {logServerStartup} from './serverStartupLog';
 import {formatDate} from './util/timeUtil';
 
-const server = new Server(serverConfig, clientConfig);
+const server = new Server(serverConfig, clientConfig, buildMetadata);
 
 function getUnhandledRejectionType(unhandledRejection: unknown): string {
   if (unhandledRejection instanceof Error) {

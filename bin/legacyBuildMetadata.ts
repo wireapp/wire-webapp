@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,10 @@
  *
  */
 
-import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
+import is from '@sindresorhus/is';
 
-import {wrapperStyles} from './cellsTableTagsColumn.styles';
+const legacyTimestampBuildVersionPattern = /^\d{4}(?:\.\d{2}){4,5}$/;
 
-import {sortTagsAlphabetically} from '../../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
-
-interface CellsTableTagsColumnProps {
-  tags: string[];
+export function isLegacyTimestampBuildVersion(value: unknown): value is string {
+  return is.nonEmptyString(value) && legacyTimestampBuildVersionPattern.test(value);
 }
-
-export const CellsTableTagsColumn = ({tags}: CellsTableTagsColumnProps) => {
-  if (tags.length === 0) {
-    return null;
-  }
-
-  return (
-    <div css={wrapperStyles}>
-      <BadgesWithTooltip items={sortTagsAlphabetically(tags)} />
-    </div>
-  );
-};
