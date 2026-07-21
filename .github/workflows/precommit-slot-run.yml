@@ -7,9 +7,6 @@ on:
       env_name:
         type: string
         required: true
-      backendUrl:
-        type: string
-        required: true
       artifact_name:
         type: string
         required: false
@@ -189,7 +186,6 @@ jobs:
     uses: ./.github/workflows/e2e-tests.yml
     with:
       webappUrl: ${{ needs.deploy_to_aws.outputs.precommit_url }}
-      backendUrl: ${{ inputs.backendUrl }}
       grep: ${{ inputs.grep }}
       testinyRunName: ${{ inputs.testinyRunName }}
     secrets:

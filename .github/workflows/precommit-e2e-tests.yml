@@ -93,7 +93,6 @@ jobs:
     uses: ./.github/workflows/precommit-slot-run.yml
     with:
       env_name: ${{ needs.build.outputs.env_name }}
-      backendUrl: https://staging-nginz-https.zinfra.io/
       grep: ''
       notify_deployoholics_on_failure: ${{ github.event_name == 'schedule' }}
     secrets:
