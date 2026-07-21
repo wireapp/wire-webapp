@@ -110,6 +110,18 @@ export type WebappReleaseSummaryInput = {
   readonly release: ReleaseMetadata;
 };
 
+type FormatProductionApprovalStatusParameters = {
+  readonly input: ProductionSummaryInput;
+  readonly beta: BetaSummaryInput;
+  readonly e2e: E2ESummaryInput;
+};
+
+type RenderReleaseIdentityParameters = {
+  readonly title: string;
+  readonly outcome: string;
+  readonly input: WebappReleaseSummaryInput;
+};
+
 function readOptionalEnvironmentValue(environment: NodeJS.ProcessEnv, variableName: string): Maybe<string> {
   return Maybe.of(environment[variableName]).andThen(environmentValue => {
     if (environmentValue === '') {
@@ -298,6 +310,7 @@ function formatWorkflowRunLink(github: GitHubLinkContext): string {
       return github.repository.andThen(repository => {
         return github.runId.map(runId => {
           const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
+
           return formatMarkdownLink(workflowRunUrl, workflowRunUrl);
         });
       });
@@ -692,11 +705,9 @@ function formatEarlierFailedGate(beta: BetaSummaryInput, e2e: E2ESummaryInput): 
   return Maybe.nothing<string>();
 }
 
-function formatProductionApprovalStatus(
-  input: ProductionSummaryInput,
-  beta: BetaSummaryInput,
-  e2e: E2ESummaryInput,
-): string {
+function formatProductionApprovalStatus(parameters: FormatProductionApprovalStatusParameters): string {
+  const {input, beta, e2e} = parameters;
+
   if (input.promotionRequested === false) {
     return 'Production promotion was not requested';
   }
@@ -889,16 +900,396 @@ function formatWireBuildsCommit(distribution: ProductionDistributionSummaryInput
     .unwrapOr('not updated');
 }
 
-function renderBetaSection(input: WebappReleaseSummaryInput, commitLink: string, workflowRunLink: string): string {
+function formatOptionalExternalLink(label: string, url: Maybe<string>): Maybe<string> {
+  return url.andThen(value => {
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      return Maybe.just(formatMarkdownLink(label, value));
+    }
+
+    return Maybe.nothing<string>();
+  });
+}
+
+function formatVerifiedBetaTagLink(input: BetaSummaryInput, github: GitHubLinkContext): Maybe<string> {
+  if (hasWorkflowJobResult(input.tagCreationResult, 'success')) {
+    return formatRepositoryTreeLink(input.tagName, github);
+  }
+
+  return Maybe.nothing<string>();
+}
+
+function formatVerifiedProductionTagLink(input: ProductionSummaryInput, github: GitHubLinkContext): Maybe<string> {
+  if (hasWorkflowJobResult(input.tagCreationResult, 'success')) {
+    return formatRepositoryTreeLink(input.createdTagName, github);
+  }
+
+  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
+    return formatRepositoryTreeLink(input.plannedTagName, github);
+  }
+
+  return Maybe.nothing<string>();
+}
+
+function formatCodeValue(value: Maybe<string>): string {
+  return `\`${formatValueOrFallback(value)}\``;
+}
+
+function formatBetaStageOverview(input: WebappReleaseSummaryInput): string {
+  const betaTagLink = formatVerifiedBetaTagLink(input.beta, input.github);
+  const betaResult = formatBetaResult(input.beta.deploymentResult);
+
+  return betaTagLink.mapOr(betaResult, tagLink => {
+    return `${betaResult} — tag ${tagLink}`;
+  });
+}
+
+function formatE2EStageOverview(input: WebappReleaseSummaryInput): string {
+  const reportLink = formatOptionalExternalLink('Playwright report', input.e2e.reportUrl);
+  const e2EResult = formatE2EResult(input.e2e.result);
+
+  return reportLink.mapOr(e2EResult, link => {
+    return `${e2EResult} — ${link}`;
+  });
+}
+
+function hasProductionPreflightFailure(input: ProductionSummaryInput): boolean {
+  return (
+    hasWorkflowJobResult(input.preflightJobResult, 'failure') ||
+    hasProductionPreflightResult(input.preflightResult, 'failure')
+  );
+}
+
+function hasProductionPreflightCancellation(input: ProductionSummaryInput): boolean {
+  return hasWorkflowJobResult(input.preflightJobResult, 'cancelled');
+}
+
+function hasHostedProductionCompleted(input: ProductionSummaryInput): boolean {
+  return (
+    input.promotionRequested &&
+    hasProductionPreflightResult(input.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.preflightJobResult, 'success') &&
+    hasWorkflowJobResult(input.deploymentResult, 'success') &&
+    hasWorkflowJobResult(input.runtimeVerificationResult, 'success') &&
+    hasWorkflowJobResult(input.tagCreationResult, 'success')
+  );
+}
+
+function formatReleaseCandidateOutcome(input: WebappReleaseSummaryInput): string {
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'failure')) {
+    return 'Release candidate blocked because Hosted Beta deployment failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'cancelled')) {
+    return 'Release candidate stopped because Hosted Beta deployment was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'skipped')) {
+    return 'Release candidate incomplete because Hosted Beta deployment did not run';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'failure')) {
+    return 'Release candidate blocked because Beta tag creation failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'cancelled')) {
+    return 'Release candidate stopped because Beta tag creation was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
+    return 'Release candidate blocked because the E2E system gate failed';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'cancelled')) {
+    return 'Release candidate stopped because the E2E system gate was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'skipped')) {
+    return 'Release candidate incomplete because the E2E system gate did not run';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'success') && input.production.promotionRequested === false) {
+    return 'Beta release candidate passed; Production promotion was not requested';
+  }
+
+  if (hasProductionPreflightResult(input.production.preflightResult, 'already_tagged')) {
+    return 'Release candidate already has the matching Production tag; deployment is not required';
+  }
+
+  if (
+    hasProductionPreflightResult(input.production.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.production.preflightJobResult, 'success')
+  ) {
+    return 'Release candidate passed and is ready for Production approval';
+  }
+
+  if (hasProductionPreflightFailure(input.production)) {
+    return 'Release candidate blocked because Production preflight failed';
+  }
+
+  if (hasProductionPreflightCancellation(input.production)) {
+    return 'Release candidate stopped because Production preflight was cancelled';
+  }
+
+  return 'Release candidate status is unavailable or unexpected';
+}
+
+function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'failure')) {
+    return 'Release stopped because Hosted Beta deployment failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'cancelled')) {
+    return 'Release stopped because Hosted Beta deployment was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'skipped')) {
+    return 'Release incomplete because Hosted Beta deployment did not run';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'failure')) {
+    return 'Release stopped because Beta tag creation failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'cancelled')) {
+    return 'Release stopped because Beta tag creation was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'skipped')) {
+    return 'Release incomplete because Beta tag creation did not run';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
+    return 'Release stopped because the E2E system gate failed';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'cancelled')) {
+    return 'Release stopped because the E2E system gate was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'skipped')) {
+    return 'Release incomplete because the E2E system gate did not run';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'success') && input.production.promotionRequested === false) {
+    return 'Beta release completed; Production promotion was not requested';
+  }
+
+  if (hasProductionPreflightResult(input.production.preflightResult, 'already_tagged')) {
+    return 'Release already has the matching Production tag; deployment was not repeated';
+  }
+
+  if (hasProductionPreflightFailure(input.production)) {
+    return 'Release stopped because Production preflight failed';
+  }
+
+  if (hasProductionPreflightCancellation(input.production)) {
+    return 'Release stopped because Production preflight was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.production.deploymentResult, 'failure')) {
+    return 'Release stopped because Hosted Production deployment failed';
+  }
+
+  if (hasWorkflowJobResult(input.production.deploymentResult, 'cancelled')) {
+    return 'Release stopped because Hosted Production deployment was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.production.runtimeVerificationResult, 'failure')) {
+    return 'Hosted Production was deployed, but runtime verification failed';
+  }
+
+  if (hasWorkflowJobResult(input.production.runtimeVerificationResult, 'cancelled')) {
+    return 'Hosted Production was deployed, but runtime verification was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.production.tagCreationResult, 'failure')) {
+    return 'Hosted Production was deployed and verified, but Production tag creation failed';
+  }
+
+  if (hasWorkflowJobResult(input.production.tagCreationResult, 'cancelled')) {
+    return 'Hosted Production was deployed and verified, but Production tag creation was cancelled';
+  }
+
+  if (
+    hasHostedProductionCompleted(input.production) &&
+    (hasWorkflowJobResult(input.distribution.distributionJobResult, 'failure') ||
+      hasWorkflowJobResult(input.distribution.distributionResult, 'failure'))
+  ) {
+    return 'Hosted Production completed, but release distribution failed';
+  }
+
+  if (
+    hasHostedProductionCompleted(input.production) &&
+    (hasWorkflowJobResult(input.distribution.distributionJobResult, 'cancelled') ||
+      hasWorkflowJobResult(input.distribution.distributionResult, 'cancelled'))
+  ) {
+    return 'Hosted Production completed, but release distribution was cancelled';
+  }
+
+  if (
+    hasHostedProductionCompleted(input.production) &&
+    hasWorkflowJobResult(input.distribution.distributionJobResult, 'success') &&
+    hasWorkflowJobResult(input.distribution.distributionResult, 'success')
+  ) {
+    return 'Release completed successfully';
+  }
+
+  return 'Release status is unavailable or unexpected';
+}
+
+function formatCandidateProductionOverview(input: WebappReleaseSummaryInput): string {
+  if (input.production.promotionRequested === false) {
+    return 'promotion was not requested';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'failure')) {
+    return 'blocked because Hosted Beta deployment failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'cancelled')) {
+    return 'unavailable because Hosted Beta deployment was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'skipped')) {
+    return 'unavailable because Hosted Beta deployment did not run';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'failure')) {
+    return 'blocked because Beta tag creation failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'cancelled')) {
+    return 'unavailable because Beta tag creation was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
+    return 'blocked because the E2E system gate failed';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'cancelled')) {
+    return 'unavailable because the E2E system gate was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'skipped')) {
+    return 'unavailable because the E2E system gate did not run';
+  }
+
+  if (hasProductionPreflightResult(input.production.preflightResult, 'already_tagged')) {
+    return 'already has the matching Production tag; deployment is not required';
+  }
+
+  if (
+    hasProductionPreflightResult(input.production.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.production.preflightJobResult, 'success')
+  ) {
+    return 'ready for approval through the wire-webapp-prod GitHub Environment';
+  }
+
+  if (hasProductionPreflightFailure(input.production)) {
+    return 'blocked because Production preflight failed';
+  }
+
+  if (hasProductionPreflightCancellation(input.production)) {
+    return 'unavailable because Production preflight was cancelled';
+  }
+
+  return 'unavailable because Production readiness is unknown';
+}
+
+function formatFinalProductionOverview(input: WebappReleaseSummaryInput): string {
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'failure')) {
+    return 'blocked because Hosted Beta deployment failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'cancelled')) {
+    return 'unavailable because Hosted Beta deployment was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'skipped')) {
+    return 'unavailable because Hosted Beta deployment did not run';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'failure')) {
+    return 'blocked because Beta tag creation failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'cancelled')) {
+    return 'unavailable because Beta tag creation was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'skipped')) {
+    return 'unavailable because Beta tag creation did not run';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
+    return 'blocked because the E2E system gate failed';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'cancelled')) {
+    return 'unavailable because the E2E system gate was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'skipped')) {
+    return 'unavailable because the E2E system gate did not run';
+  }
+
+  return formatProductionResult(input.production);
+}
+
+function formatDistributionPublicationEvidence(
+  distribution: ProductionDistributionSummaryInput,
+  github: GitHubLinkContext,
+): string {
+  const evidence: string[] = [];
+
+  const dockerImage = formatDockerImage(distribution);
+  if (dockerImage !== 'not published') {
+    evidence.push(`Docker \`${dockerImage}\``);
+  }
+
+  distribution.helmChartVersion.map(version => {
+    evidence.push(`Helm \`${version}\``);
+
+    return version;
+  });
+
+  const wireBuildsCommitLink = distribution.wireBuildsCommitSha.andThen(commitSha => {
+    return github.serverUrl.andThen(serverUrl => {
+      return github.wireBuildsRepository.map(repository => {
+        return formatMarkdownLink(commitSha, `${serverUrl}/${repository}/commit/${commitSha}`);
+      });
+    });
+  });
+  wireBuildsCommitLink.map(commitLink => {
+    evidence.push(`wire-builds ${commitLink}`);
+
+    return commitLink;
+  });
+
+  return evidence.join(', ');
+}
+
+function renderReleaseIdentity({title, outcome, input}: RenderReleaseIdentityParameters): string {
+  const identityLines = [
+    title,
+    '',
+    `- Outcome: ${outcome}`,
+    `- Release: ${formatCodeValue(input.release.identifier)}`,
+    `- Release branch: ${formatCodeValue(input.release.branch)}`,
+    `- Commit: ${formatCommitLink(input.release.commitSha, input.github)}`,
+    `- Webapp version: ${formatCodeValue(input.release.artifactVersion)}`,
+  ];
+
+  identityLines.push(`- Workflow run: ${formatWorkflowRunLink(input.github)}`);
+
+  return identityLines.join('\n');
+}
+
+function renderBetaSection(input: WebappReleaseSummaryInput): string {
   return [
     '### Hosted Beta validation',
     '',
     `- Result: ${formatBetaResult(input.beta.deploymentResult)}`,
-    `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
-    `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
-    `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
-    `- Commit SHA: ${commitLink}`,
-    `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     '- GitHub Environment: wire-webapp-beta',
     `- Target environment: ${formatValueOrFallback(input.beta.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.beta.webappUrl)}`,
@@ -909,13 +1300,10 @@ function renderBetaSection(input: WebappReleaseSummaryInput, commitLink: string,
       ? ['- Runtime verification: /version and /config.js']
       : []),
     `- Beta tag: ${formatBetaTag(input.beta, input.github)}`,
-    `- Artifact name: ${formatValueOrFallback(input.release.artifactName)}`,
-    `- Artifact checksum: ${formatValueOrFallback(input.release.artifactChecksum)}`,
-    `- Workflow run URL: ${workflowRunLink}`,
   ].join('\n');
 }
 
-function renderE2ESection(input: WebappReleaseSummaryInput, commitLink: string, workflowRunLink: string): string {
+function renderE2ESection(input: WebappReleaseSummaryInput): string {
   const testinyRunName =
     input.release.identifier.isJust && input.beta.tagName.isJust
       ? formatValueOrFallback(input.e2e.testinyRunName)
@@ -925,10 +1313,6 @@ function renderE2ESection(input: WebappReleaseSummaryInput, commitLink: string, 
     '### E2E system gate',
     '',
     `- Result: ${formatE2EResult(input.e2e.result)}`,
-    `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
-    `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
-    `- Commit SHA: ${commitLink}`,
-    `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     `- Target environment: ${formatValueOrFallback(input.e2e.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.e2e.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.e2e.runtimeBackendRest)}`,
@@ -936,11 +1320,10 @@ function renderE2ESection(input: WebappReleaseSummaryInput, commitLink: string, 
     ...(hasWorkflowJobResult(input.e2e.result, 'success') ? ['- Runtime verification: /version and /config.js'] : []),
     `- Playwright report URL: ${formatOptionalReportUrl(input.e2e.reportUrl)}`,
     `- Testiny run name: ${testinyRunName}`,
-    `- Workflow run URL: ${workflowRunLink}`,
   ].join('\n');
 }
 
-function renderProductionReadinessSection(input: WebappReleaseSummaryInput, workflowRunLink: string): string {
+function renderProductionReadinessSection(input: WebappReleaseSummaryInput): string {
   const productionSkipReason = formatProductionSkipReason(input.production);
   const productionSkipReasonLines = productionSkipReason
     .map(reason => {
@@ -958,16 +1341,15 @@ function renderProductionReadinessSection(input: WebappReleaseSummaryInput, work
     ...productionSkipReasonLines,
     `- Planned Production tag: ${formatPlannedProductionTag(input.production, input.release)}`,
     `- GitHub Environment: ${formatValueOrFallback(input.production.environmentName)}`,
-    `- Approval status: ${formatProductionApprovalStatus(input.production, input.beta, input.e2e)}`,
-    `- Workflow run URL: ${workflowRunLink}`,
+    `- Approval status: ${formatProductionApprovalStatus({
+      input: input.production,
+      beta: input.beta,
+      e2e: input.e2e,
+    })}`,
   ].join('\n');
 }
 
-function renderProductionSection(
-  input: WebappReleaseSummaryInput,
-  commitLink: string,
-  workflowRunLink: string,
-): string {
+function renderProductionSection(input: WebappReleaseSummaryInput): string {
   const productionSkipReason = formatProductionSkipReason(input.production);
   const productionSkipReasonLines = productionSkipReason
     .map(reason => {
@@ -982,10 +1364,6 @@ function renderProductionSection(
     `- Production promotion requested: ${input.production.promotionRequested === true ? 'true' : 'false'}`,
     `- Production preflight result: ${formatProductionPreflightResult(input.production)}`,
     ...productionSkipReasonLines,
-    `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
-    `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
-    `- Commit SHA: ${commitLink}`,
-    `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     `- Target environment: ${formatValueOrFallback(input.production.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.production.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.production.runtimeBackendRest)}`,
@@ -997,39 +1375,28 @@ function renderProductionSection(
     `- Production tag: ${formatProductionTag(input.production, input.github)}`,
     `- Production tag creation result: ${formatProductionTagCreationResult(input.production)}`,
     `- Approval gate: ${formatApprovalGate(input.production)}`,
-    `- Workflow run URL: ${workflowRunLink}`,
   ].join('\n');
 }
 
-function renderProductionDistributionSection(
-  input: WebappReleaseSummaryInput,
-  commitLink: string,
-  workflowRunLink: string,
-): string {
+function renderProductionDistributionSection(input: WebappReleaseSummaryInput): string {
   return [
     '### Release distribution',
     '',
     `- Result: ${formatDistributionResult(input.production, input.distribution)}`,
-    `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
-    `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
-    `- Commit SHA: ${commitLink}`,
-    `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     `- Docker image: ${formatDockerImage(input.distribution)}`,
     `- Helm chart repository: ${formatValueOrFallback(input.distribution.chartRepositoryUrl)}`,
     `- Helm chart version: ${formatValueOrFallback(input.distribution.helmChartVersion, 'not published')}`,
     `- wire-builds/main commit: ${formatWireBuildsCommit(input.distribution, input.github)}`,
-    `- Workflow run URL: ${workflowRunLink}`,
   ].join('\n');
 }
 
-function renderReleasePreparationSection(
-  input: WebappReleaseSummaryInput,
-  commitLink: string,
-  sourceCommitLink: string,
-  workflowRunLink: string,
-): string {
+function renderReleasePreparationSection(input: WebappReleaseSummaryInput): string {
+  const commitLink = formatCommitLink(input.release.commitSha, input.github);
+  const sourceCommitLink = formatSourceCommit(input);
+  const workflowRunLink = formatWorkflowRunLink(input.github);
+
   return [
-    '## Release preparation',
+    '### Release preparation',
     '',
     `- Release identifier: ${formatValueOrFallback(input.release.identifier)}`,
     `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
@@ -1041,7 +1408,6 @@ function renderReleasePreparationSection(
     `- Actor: ${formatValueOrFallback(input.github.actor)}`,
     `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
     `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
-    `- Commit SHA: ${commitLink}`,
     `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     `- Artifact name: ${formatValueOrFallback(input.release.artifactName)}`,
     `- Artifact checksum: ${formatValueOrFallback(input.release.artifactChecksum)}`,
@@ -1054,38 +1420,82 @@ function renderReleasePreparationSection(
   ].join('\n');
 }
 
-export function renderWebappReleaseCandidateSummary(input: WebappReleaseSummaryInput): string {
-  const commitLink = formatCommitLink(input.release.commitSha, input.github);
-  const sourceCommitLink = formatSourceCommit(input);
-  const workflowRunLink = formatWorkflowRunLink(input.github);
+function renderTechnicalReleaseEvidence(input: WebappReleaseSummaryInput, isCandidate: boolean): string {
+  const technicalSections = [
+    renderReleasePreparationSection(input),
+    renderBetaSection(input),
+    renderE2ESection(input),
+    isCandidate ? renderProductionReadinessSection(input) : renderProductionSection(input),
+  ];
 
-  return (
+  if (!isCandidate) {
+    technicalSections.push(renderProductionDistributionSection(input));
+  }
+
+  return [
+    '<details>',
+    '<summary>Technical release evidence</summary>',
+    '',
+    technicalSections.join('\n\n'),
+    '',
+    '</details>',
+  ].join('\n');
+}
+
+export function renderWebappReleaseCandidateSummary(input: WebappReleaseSummaryInput): string {
+  const visibleSummary = [
+    renderReleaseIdentity({
+      title: '## WebApp release candidate',
+      outcome: formatReleaseCandidateOutcome(input),
+      input,
+    }),
     [
-      renderReleasePreparationSection(input, commitLink, sourceCommitLink, workflowRunLink),
-      renderBetaSection(input, commitLink, workflowRunLink),
-      renderE2ESection(input, commitLink, workflowRunLink),
-      renderProductionReadinessSection(input, workflowRunLink),
-    ].join('\n\n') + '\n'
-  );
+      '### Release stages',
+      '',
+      `- Hosted Beta: ${formatBetaStageOverview(input)}`,
+      `- E2E system gate: ${formatE2EStageOverview(input)}`,
+      `- Hosted Production: ${formatCandidateProductionOverview(input)}`,
+    ].join('\n'),
+  ].join('\n\n');
+
+  return `${visibleSummary}\n\n${renderTechnicalReleaseEvidence(input, true)}\n`;
 }
 
 export function renderWebappReleaseSummary(input: WebappReleaseSummaryInput): string {
-  const commitLink = formatCommitLink(input.release.commitSha, input.github);
-  const sourceCommitLink = formatSourceCommit(input);
-  const workflowRunLink = formatWorkflowRunLink(input.github);
-
-  return (
+  const distributionResult = formatDistributionResult(input.production, input.distribution);
+  const distributionEvidence =
+    distributionResult === 'published successfully'
+      ? formatDistributionPublicationEvidence(input.distribution, input.github)
+      : '';
+  const distributionOverview =
+    distributionEvidence === '' ? distributionResult : `${distributionResult} — ${distributionEvidence}`;
+  const productionTagLink = formatVerifiedProductionTagLink(input.production, input.github);
+  const formattedProductionOverview = formatFinalProductionOverview(input);
+  const productionOverview = productionTagLink.mapOr(formattedProductionOverview, tagLink => {
+    return `${formattedProductionOverview} — tag ${tagLink}`;
+  });
+  const visibleSummary = [
+    renderReleaseIdentity({
+      title: '## WebApp release',
+      outcome: formatFinalReleaseOutcome(input),
+      input,
+    }),
     [
-      renderReleasePreparationSection(input, commitLink, sourceCommitLink, workflowRunLink),
-      renderBetaSection(input, commitLink, workflowRunLink),
-      renderE2ESection(input, commitLink, workflowRunLink),
-      renderProductionSection(input, commitLink, workflowRunLink),
-      renderProductionDistributionSection(input, commitLink, workflowRunLink),
-    ].join('\n\n') + '\n'
-  );
+      '### Release stages',
+      '',
+      `- Hosted Beta: ${formatBetaStageOverview(input)}`,
+      `- E2E system gate: ${formatE2EStageOverview(input)}`,
+      `- Hosted Production: ${productionOverview}`,
+      `- Release distribution: ${distributionOverview}`,
+    ].join('\n'),
+  ].join('\n\n');
+
+  return `${visibleSummary}\n\n${renderTechnicalReleaseEvidence(input, false)}\n`;
 }
 
 type WebappReleaseSummaryPhase = 'candidate' | 'final';
+
+const commandLineArgumentStartIndex = 2;
 
 function readWebappReleaseSummaryPhase(commandLineArguments: readonly string[]): WebappReleaseSummaryPhase {
   if (commandLineArguments.includes('--release-candidate')) {
@@ -1098,7 +1508,7 @@ function readWebappReleaseSummaryPhase(commandLineArguments: readonly string[]):
 function main(): void {
   try {
     const input = readWebappReleaseSummaryInput(process.env);
-    const summaryPhase = readWebappReleaseSummaryPhase(process.argv.slice(2));
+    const summaryPhase = readWebappReleaseSummaryPhase(process.argv.slice(commandLineArgumentStartIndex));
     const summary =
       summaryPhase === 'candidate' ? renderWebappReleaseCandidateSummary(input) : renderWebappReleaseSummary(input);
 
