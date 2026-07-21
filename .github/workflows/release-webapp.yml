@@ -217,7 +217,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
   build_artifact:
-    name: Validate release branch and build artifact
+    name: Build release artifact
     runs-on: ubuntu-24.04
     needs: prepare_release_branch
     permissions:
@@ -238,7 +238,7 @@ jobs:
       source_ref: ${{ needs.prepare_release_branch.outputs.source_ref }}
 
     steps:
-      - name: Checkout release branch
+      - name: Checkout prepared release commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
@@ -257,7 +257,7 @@ jobs:
       - name: Install dependencies
         run: ./bin/yarn --immutable
 
-      - name: Validate release branch
+      - name: Verify prepared release commit
         id: release_metadata
         env:
           EXPECTED_RELEASE_COMMIT_SHA: ${{ needs.prepare_release_branch.outputs.release_commit_sha }}
