@@ -17,7 +17,7 @@
  *
  */
 
-import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {TranslationKey} from 'Util/localizerUtil';
 
 import type {MeetingSubmitErrorTranslationMap} from './meetingSubmitErrorKeys';

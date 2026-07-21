@@ -17,7 +17,7 @@
  *
  */
 
-import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 
 import {shouldRefreshMeetingsListAfterSubmitError} from './shouldRefreshMeetingsListAfterSubmitError';
 

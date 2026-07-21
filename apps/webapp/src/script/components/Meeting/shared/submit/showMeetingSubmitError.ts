@@ -17,7 +17,7 @@
  *
  */
 
-import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Translate} from 'Util/localizerUtil';
 

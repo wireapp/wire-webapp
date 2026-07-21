@@ -27,7 +27,7 @@ import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingLis
 import {
   iconContainerStyle,
   iconStyles,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingAction.styles';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {useDeleteMeeting} from 'Components/Meeting/useDeleteMeeting';
 import {useEditMeeting} from 'Components/Meeting/useEditMeeting';

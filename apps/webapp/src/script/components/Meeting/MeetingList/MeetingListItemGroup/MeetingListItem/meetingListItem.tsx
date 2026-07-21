@@ -21,7 +21,7 @@ import {memo, useMemo} from 'react';
 
 import {CalendarIcon} from '@wireapp/react-ui-kit';
 
-import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction';
+import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingAction';
 import {
   badgeWrapperStyles,
   calendarIconStyles,

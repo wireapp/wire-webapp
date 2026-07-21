@@ -17,7 +17,7 @@
  *
  */
 
-import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 
 import {getScheduleMeetingSubmitErrorTranslationKeys, MEET_NOW_ERROR_TRANSLATION_KEYS} from './meetingSubmitErrorKeys';
 

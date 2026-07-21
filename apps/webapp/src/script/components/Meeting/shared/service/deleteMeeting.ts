@@ -30,7 +30,7 @@ import {
   safeLeaveMeetingConversation,
 } from 'Components/Meeting/meetingConversationTeardown';
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import type {User} from 'Repositories/entity/User';
 

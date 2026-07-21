@@ -23,7 +23,7 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
 import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeetingInstanceToScheduleFormState';
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import type {DeleteMeetingCommand} from 'Components/Meeting/shared/service/deleteMeeting';
 import {type CreateMeetingSuccess, type MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';

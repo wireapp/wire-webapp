@@ -20,7 +20,7 @@
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Task} from 'true-myth';
 
-import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {DeleteMeetingCommand} from 'Components/Meeting/shared/service/deleteMeeting';
 import type {CreateMeetingSuccess, MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
 import type {

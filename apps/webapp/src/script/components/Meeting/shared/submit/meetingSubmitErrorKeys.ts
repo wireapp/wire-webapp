@@ -17,7 +17,7 @@
  *
  */
 
-import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {ScheduleMeetingMode} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import type {TranslationKey} from 'Util/localizerUtil';
 

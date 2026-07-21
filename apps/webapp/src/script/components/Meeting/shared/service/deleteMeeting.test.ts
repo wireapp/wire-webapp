@@ -22,7 +22,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {task} from 'true-myth';
 
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
-import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';

@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {contentStyles} from 'Components/Meeting/Meeting.styles';
+import {contentStyles} from 'Components/Meeting/meeting.styles';
 import {MeetingCallingView} from 'Components/Meeting/MeetingCallingView/meetingCallingView';
 import {meetingsContentWrapperStyles} from 'Components/Meeting/MeetingCallingView/meetingCallingView.styles';
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';

@@ -27,7 +27,7 @@ import {createStore} from 'zustand/vanilla';
 import type {CreateMeetingSuccess} from 'Components/Meeting/shared/service/meetingService';
 import type {MeetingStoreState} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
-import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
