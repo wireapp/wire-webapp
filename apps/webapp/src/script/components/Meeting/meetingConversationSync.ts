@@ -30,6 +30,7 @@ export const meetingConversationSyncErrors = {
   conversationNotFound: 'conversationNotFound',
   groupIdMissing: 'groupIdMissing',
   removeFailed: 'removeFailed',
+  leaveFailed: 'leaveFailed',
   establishFailed: 'establishFailed',
   addFailed: 'addFailed',
 } as const;

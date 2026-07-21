@@ -17,6 +17,7 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
@@ -24,6 +25,7 @@ import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
 import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeetingInstanceToScheduleFormState';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import type {DeleteMeetingCommand} from 'Components/Meeting/shared/service/deleteMeeting';
 import {type CreateMeetingSuccess, type MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
 import type {
   MeetNowMeetingCommand,
@@ -33,8 +35,17 @@ import type {
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import type {MeetingStoreDeps} from './meetingStoreDeps';
+
+const toDeleteMeetingCommand = (meetingInstance: MeetingInstance): DeleteMeetingCommand => ({
+  meetingId: meetingInstance.meetingSeries.qualified_id,
+  qualifiedConversation: meetingInstance.meetingSeries.qualified_conversation,
+});
+
+const filterOutMeetingSeries = (meetingSeries: MeetingSeries[], meetingId: QualifiedId): MeetingSeries[] =>
+  meetingSeries.filter(series => !matchQualifiedIds(series.qualified_id, meetingId));
 
 export type EditMeetingData = {
   formState: ScheduleMeetingFormState;
@@ -50,6 +61,9 @@ export type MeetingStoreState = {
   scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
+  deleteMeetingForAll: (meetingInstance: MeetingInstance, selfUser: User) => Task<void, MeetingSubmitErrors>;
+  removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
 };
 
@@ -72,6 +86,22 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
     scheduleMeeting: deps.serviceTasks.scheduleMeeting,
     meetNowMeeting: deps.serviceTasks.meetNowMeeting,
     updateMeeting: deps.serviceTasks.updateMeeting,
+    deleteMeetingForMe: meetingInstance =>
+      deps.serviceTasks.deleteMeetingForMe(toDeleteMeetingCommand(meetingInstance)).map(() => {
+        set(state => ({
+          meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingInstance.meetingSeries.qualified_id),
+        }));
+      }),
+    deleteMeetingForAll: (meetingInstance, selfUser) =>
+      deps.serviceTasks.deleteMeetingForAll(toDeleteMeetingCommand(meetingInstance), selfUser).map(() => {
+        set(state => ({
+          meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingInstance.meetingSeries.qualified_id),
+        }));
+      }),
+    removeMeetingByQualifiedId: meetingId =>
+      set(state => ({
+        meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingId),
+      })),
     loadMeetingForEdit: meetingInstance => {
       const {meetingSeries} = meetingInstance;
 

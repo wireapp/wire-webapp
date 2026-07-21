@@ -58,6 +58,9 @@ export enum CONVERSATION_EVENT {
   MLS_RESET = 'conversation.mls-reset',
   RECEIPT_MODE_UPDATE = 'conversation.receipt-mode-update',
   ADD_PERMISSION_UPDATE = 'conversation.add-permission-update',
+  MEETING_CREATE = 'meeting.create',
+  MEETING_UPDATE = 'meeting.update',
+  MEETING_DELETE = 'meeting.delete',
   RENAME = 'conversation.rename',
   TYPING = 'conversation.typing',
 }
@@ -80,6 +83,7 @@ export type ConversationEventData =
   | ConversationRenameData
   | ConversationTypingData
   | ConversationAddPermissionUpdateData
+  | QualifiedId
   | null;
 
 export type ConversationEvent =
@@ -101,7 +105,10 @@ export type ConversationEvent =
   | ConversationReceiptModeUpdateEvent
   | ConversationRenameEvent
   | ConversationTypingEvent
-  | ConversationAddPermissionUpdateEvent;
+  | ConversationAddPermissionUpdateEvent
+  | MeetingCreateEvent
+  | MeetingUpdateEvent
+  | MeetingDeleteEvent;
 
 export interface BaseConversationEvent {
   conversation: string;
@@ -215,4 +222,19 @@ export interface ConversationTypingEvent extends BaseConversationEvent {
 export interface ConversationAddPermissionUpdateEvent extends BaseConversationEvent {
   data: ConversationAddPermissionUpdateData;
   type: CONVERSATION_EVENT.ADD_PERMISSION_UPDATE;
+}
+
+export interface MeetingCreateEvent extends BaseConversationEvent {
+  data: QualifiedId;
+  type: CONVERSATION_EVENT.MEETING_CREATE;
+}
+
+export interface MeetingUpdateEvent extends BaseConversationEvent {
+  data: QualifiedId;
+  type: CONVERSATION_EVENT.MEETING_UPDATE;
+}
+
+export interface MeetingDeleteEvent extends BaseConversationEvent {
+  data: QualifiedId;
+  type: CONVERSATION_EVENT.MEETING_DELETE;
 }

@@ -29,6 +29,7 @@ import {
   iconStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import {useDeleteMeeting} from 'Components/Meeting/useDeleteMeeting';
 import {useEditMeeting} from 'Components/Meeting/useEditMeeting';
 import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
 import {UserState} from 'Repositories/user/userState';
@@ -43,6 +44,7 @@ interface MeetingActionProps {
 export const MeetingAction = ({meetingInstance}: MeetingActionProps) => {
   const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
+  const {openDeleteMeetingModal} = useDeleteMeeting();
   const selfUser = container.resolve(UserState).self();
 
   const handleActionButton = (event: MouseEvent<HTMLElement>) => {
@@ -60,6 +62,8 @@ export const MeetingAction = ({meetingInstance}: MeetingActionProps) => {
             fireAndForgetInvoker.fireAndForget(() => editMeeting(meetingInstance));
           }
         },
+        onDeleteForAll: () => openDeleteMeetingModal(meetingInstance, 'forAll'),
+        onDeleteForMe: () => openDeleteMeetingModal(meetingInstance, 'forMe'),
       }),
       identifier: 'message-options-menu',
     });

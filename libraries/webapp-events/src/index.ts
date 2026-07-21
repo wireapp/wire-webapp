@@ -157,6 +157,9 @@ export const WebAppEvents = {
     UNREAD_COUNT: 'wire.webapp.lifecycle.unread_count',
     UPDATE: 'wire.webapp.lifecycle.update',
   },
+  MEETING: {
+    DELETED: 'wire.webapp.meeting.deleted',
+  },
   NOTIFICATION: {
     CLICK: 'wire.webapp.notification.click',
     NOTIFY: 'wire.webapp.notification.notify',

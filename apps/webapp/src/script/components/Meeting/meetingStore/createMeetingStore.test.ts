@@ -23,6 +23,7 @@ import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-w
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
@@ -74,6 +75,8 @@ describe('createMeetingStore', () => {
         task.resolve({failedToAdd: [], qualifiedConversation: {id: 'conversation-id', domain: 'example.com'}}),
       ),
     updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
     ...overrides,
   });
 
@@ -88,6 +91,7 @@ describe('createMeetingStore', () => {
   } = {}): MeetingStoreDeps => ({
     meetingsRepository: {getMeetingsList} as unknown as MeetingsRepository,
     conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
+    callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
     wallClock,
     serviceTasks,
   });

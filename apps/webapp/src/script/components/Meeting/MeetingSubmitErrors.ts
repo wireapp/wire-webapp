@@ -26,6 +26,8 @@ export const meetingSubmitErrors = {
   editMeetingIdMissing: 'editMeetingIdMissing',
   addParticipantsFailed: 'addParticipantsFailed',
   removeParticipantsFailed: 'removeParticipantsFailed',
+  deleteFailed: 'deleteFailed',
+  leaveConversationFailed: 'leaveConversationFailed',
   refreshFailed: 'refreshFailed',
 } as const;
 
