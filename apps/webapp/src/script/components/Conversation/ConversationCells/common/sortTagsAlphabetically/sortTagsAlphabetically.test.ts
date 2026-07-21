@@ -24,6 +24,14 @@ describe('sortTagsAlphabetically', () => {
     expect(sortTagsAlphabetically(['Zulu', 'alpha', 'Beta'])).toEqual(['alpha', 'Beta', 'Zulu']);
   });
 
+  it('preserves accent differences when ordering free-text tags', () => {
+    expect(sortTagsAlphabetically(['résumé', 'resume'])).toEqual(['resume', 'résumé']);
+  });
+
+  it('sorts non-ASCII tag names', () => {
+    expect(sortTagsAlphabetically(['Яблоко', 'арбуз', 'Банан'])).toEqual(['арбуз', 'Банан', 'Яблоко']);
+  });
+
   it('does not mutate the original tags', () => {
     const tags = ['Zulu', 'alpha'];
 

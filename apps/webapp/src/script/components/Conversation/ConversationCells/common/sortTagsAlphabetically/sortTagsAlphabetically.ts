@@ -17,5 +17,7 @@
  *
  */
 
-export const sortTagsAlphabetically = (tags: string[]): string[] =>
-  tags.toSorted((tagA, tagB) => tagA.localeCompare(tagB, undefined, {sensitivity: 'base'}));
+// Tags are user-provided text, so use the runtime locale rather than the Wire interface locale.
+const runtimeLocaleTagCollator = new Intl.Collator(undefined, {sensitivity: 'accent'});
+
+export const sortTagsAlphabetically = (tags: string[]): string[] => tags.toSorted(runtimeLocaleTagCollator.compare);
