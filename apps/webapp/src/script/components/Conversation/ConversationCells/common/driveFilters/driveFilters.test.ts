@@ -28,6 +28,7 @@ import {
   toConversationDriveSearchParams,
   toGlobalDriveSearchParams,
 } from './driveFilters';
+import {FILE_TYPE_CATALOG} from './fileTypeCatalog';
 
 const emptyFilters: ConversationDriveFiltersState = {
   selectedTagIds: [],
@@ -41,6 +42,22 @@ const emptyGlobalFilters: GlobalDriveFiltersState = {
   selectedConversationIds: [],
   path: undefined,
 };
+
+describe('FILE_TYPE_CATALOG', () => {
+  it('lists file types in this fixed display order', () => {
+    expect(FILE_TYPE_CATALOG.map(({id}) => id)).toEqual([
+      'pdfs',
+      'documents',
+      'pictures',
+      'spreadsheets',
+      'presentations',
+      'videos',
+      'audio',
+      'archives',
+      'text',
+    ]);
+  });
+});
 
 describe('hasActiveConversationDriveFilters', () => {
   it('returns false when no filters are active', () => {
