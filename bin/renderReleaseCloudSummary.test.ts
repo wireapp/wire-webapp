@@ -19,66 +19,68 @@
 
 import {readReleaseCloudSummaryInput, renderReleaseCloudSummary} from './renderReleaseCloudSummary.ts';
 import type {ReleaseCloudSummaryInput} from './renderReleaseCloudSummary.ts';
+import {Maybe} from 'true-myth';
 
 const baselineReleaseCloudSummaryInput: ReleaseCloudSummaryInput = {
   beta: {
-    deploymentResult: 'success',
-    environmentName: 'wire-webapp-beta',
-    runtimeBackendRest: 'https://beta-backend.example.com',
-    runtimeBackendWebSocket: 'wss://beta-backend.example.com',
-    tagCreationResult: 'success',
-    tagName: '2026-07-17.1-beta.1',
-    webappUrl: 'https://beta.example.com',
+    deploymentResult: Maybe.just('success'),
+    environmentName: Maybe.just('wire-webapp-beta'),
+    runtimeBackendRest: Maybe.just('https://beta-backend.example.com'),
+    runtimeBackendWebSocket: Maybe.just('wss://beta-backend.example.com'),
+    tagCreationResult: Maybe.just('success'),
+    tagName: Maybe.just('2026-07-17.1-beta.1'),
+    webappUrl: Maybe.just('https://beta.example.com'),
   },
   distribution: {
-    chartRepositoryUrl: 'https://charts.example.com/webapp',
-    dockerImageTag: undefined,
-    dockerRepository: 'quay.io/wire/webapp',
-    distributionJobResult: 'skipped',
-    distributionResult: 'skipped',
-    helmChartVersion: undefined,
-    wireBuildsCommitSha: undefined,
+    chartRepositoryUrl: Maybe.just('https://charts.example.com/webapp'),
+    dockerImageTag: Maybe.nothing<string>(),
+    dockerRepository: Maybe.just('quay.io/wire/webapp'),
+    distributionJobResult: Maybe.just('skipped'),
+    distributionResult: Maybe.just('skipped'),
+    helmChartVersion: Maybe.nothing<string>(),
+    wireBuildsCommitSha: Maybe.nothing<string>(),
   },
   e2e: {
-    environmentName: 'wire-webapp-e2e',
-    reportUrl: 'https://e2e.example.com/report/123',
-    result: 'success',
-    runtimeBackendRest: 'https://e2e-backend.example.com',
-    runtimeBackendWebSocket: 'wss://e2e-backend.example.com',
-    testinyRunName: 'Release 2026-07-17.1 2026-07-17.1-beta.1',
-    webappUrl: 'https://e2e.example.com',
+    environmentName: Maybe.just('wire-webapp-e2e'),
+    reportUrl: Maybe.just('https://e2e.example.com/report/123'),
+    result: Maybe.just('success'),
+    runtimeBackendRest: Maybe.just('https://e2e-backend.example.com'),
+    runtimeBackendWebSocket: Maybe.just('wss://e2e-backend.example.com'),
+    testinyRunName: Maybe.just('Release 2026-07-17.1 2026-07-17.1-beta.1'),
+    webappUrl: Maybe.just('https://e2e.example.com'),
   },
   github: {
-    repository: 'wireapp/wire-webapp',
-    runId: '123456789',
-    serverUrl: 'https://github.com',
-    wireBuildsRepository: 'wireapp/wire-builds',
+    repository: Maybe.just('wireapp/wire-webapp'),
+    runId: Maybe.just('123456789'),
+    serverUrl: Maybe.just('https://github.com'),
+    wireBuildsRepository: Maybe.just('wireapp/wire-builds'),
   },
   production: {
-    createdTagName: undefined,
-    deploymentResult: 'skipped',
-    environmentName: 'wire-webapp-production',
-    plannedTagName: '2026-07-17.1-production',
-    preflightJobResult: 'skipped',
-    preflightResult: 'skipped',
+    createdTagName: Maybe.nothing<string>(),
+    deploymentResult: Maybe.just('skipped'),
+    deploymentRequired: Maybe.just(false),
+    environmentName: Maybe.just('wire-webapp-production'),
+    plannedTagName: Maybe.just('2026-07-17.1-production'),
+    preflightJobResult: Maybe.just('skipped'),
+    preflightResult: Maybe.just('skipped'),
     promotionRequested: false,
-    runtimeBackendRest: 'https://production-backend.example.com',
-    runtimeBackendWebSocket: 'wss://production-backend.example.com',
-    runtimeVerificationResult: 'skipped',
-    skippedReason: undefined,
-    tagCreationResult: 'skipped',
-    webappUrl: 'https://production.example.com',
+    runtimeBackendRest: Maybe.just('https://production-backend.example.com'),
+    runtimeBackendWebSocket: Maybe.just('wss://production-backend.example.com'),
+    runtimeVerificationResult: Maybe.just('skipped'),
+    skippedReason: Maybe.nothing<string>(),
+    tagCreationResult: Maybe.just('skipped'),
+    webappUrl: Maybe.just('https://production.example.com'),
   },
   release: {
-    artifactAssetVersion: '2026-07-17.1-1234567',
-    artifactBuiltAt: '2026-07-20T06:18:03.123Z',
-    artifactChecksum: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-    artifactName: 'wire-webapp-release-2026-07-17.1',
-    artifactVersion: '2026-07-17.1',
-    branch: 'release/2026-07-17.1',
-    commitSha: '1234567890abcdef1234567890abcdef12345678',
-    identifier: '2026-07-17.1',
-    manualReason: undefined,
+    artifactAssetVersion: Maybe.just('2026-07-17.1-1234567'),
+    artifactBuiltAt: Maybe.just('2026-07-20T06:18:03.123Z'),
+    artifactChecksum: Maybe.just('sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'),
+    artifactName: Maybe.just('wire-webapp-release-2026-07-17.1'),
+    artifactVersion: Maybe.just('2026-07-17.1'),
+    branch: Maybe.just('release/2026-07-17.1'),
+    commitSha: Maybe.just('1234567890abcdef1234567890abcdef12345678'),
+    identifier: Maybe.just('2026-07-17.1'),
+    manualReason: Maybe.nothing<string>(),
   },
 };
 
@@ -138,21 +140,21 @@ test('renders a successful Production release with distribution metadata', () =>
     ...baselineReleaseCloudSummaryInput,
     distribution: {
       ...baselineReleaseCloudSummaryInput.distribution,
-      dockerImageTag: productionImageTag,
-      distributionJobResult: 'success',
-      distributionResult: 'success',
-      helmChartVersion: '0.8.0-pre.3175',
-      wireBuildsCommitSha,
+      dockerImageTag: Maybe.just(productionImageTag),
+      distributionJobResult: Maybe.just('success'),
+      distributionResult: Maybe.just('success'),
+      helmChartVersion: Maybe.just('0.8.0-pre.3175'),
+      wireBuildsCommitSha: Maybe.just(wireBuildsCommitSha),
     },
     production: {
       ...baselineReleaseCloudSummaryInput.production,
-      createdTagName: productionTagName,
-      deploymentResult: 'success',
-      preflightJobResult: 'success',
-      preflightResult: 'ready',
+      createdTagName: Maybe.just(productionTagName),
+      deploymentResult: Maybe.just('success'),
+      preflightJobResult: Maybe.just('success'),
+      preflightResult: Maybe.just('ready'),
       promotionRequested: true,
-      runtimeVerificationResult: 'success',
-      tagCreationResult: 'success',
+      runtimeVerificationResult: Maybe.just('success'),
+      tagCreationResult: Maybe.just('success'),
     },
   };
   const summary = renderReleaseCloudSummary(input);
@@ -179,12 +181,12 @@ test('renders a Production release that is already tagged', () => {
     ...baselineReleaseCloudSummaryInput,
     production: {
       ...baselineReleaseCloudSummaryInput.production,
-      createdTagName: 'created-production-tag',
-      deploymentResult: 'skipped',
-      preflightJobResult: 'success',
-      preflightResult: 'already_tagged',
+      createdTagName: Maybe.just('created-production-tag'),
+      deploymentResult: Maybe.just('skipped'),
+      preflightJobResult: Maybe.just('success'),
+      preflightResult: Maybe.just('already_tagged'),
       promotionRequested: true,
-      tagCreationResult: 'skipped',
+      tagCreationResult: Maybe.just('skipped'),
     },
   };
   const summary = renderReleaseCloudSummary(input);
@@ -207,12 +209,12 @@ test('renders a Production runtime verification failure', () => {
     ...baselineReleaseCloudSummaryInput,
     production: {
       ...baselineReleaseCloudSummaryInput.production,
-      deploymentResult: 'success',
-      preflightJobResult: 'success',
-      preflightResult: 'ready',
+      deploymentResult: Maybe.just('success'),
+      preflightJobResult: Maybe.just('success'),
+      preflightResult: Maybe.just('ready'),
       promotionRequested: true,
-      runtimeVerificationResult: 'failure',
-      tagCreationResult: 'skipped',
+      runtimeVerificationResult: Maybe.just('failure'),
+      tagCreationResult: Maybe.just('skipped'),
     },
   };
   const summary = renderReleaseCloudSummary(input);
@@ -230,17 +232,17 @@ test('renders a Beta deployment failure with the remaining gates not run', () =>
     ...baselineReleaseCloudSummaryInput,
     beta: {
       ...baselineReleaseCloudSummaryInput.beta,
-      deploymentResult: 'failure',
-      tagCreationResult: 'skipped',
+      deploymentResult: Maybe.just('failure'),
+      tagCreationResult: Maybe.just('skipped'),
     },
     e2e: {
       ...baselineReleaseCloudSummaryInput.e2e,
-      result: 'skipped',
+      result: Maybe.just('skipped'),
     },
     production: {
       ...baselineReleaseCloudSummaryInput.production,
-      preflightJobResult: 'skipped',
-      preflightResult: 'skipped',
+      preflightJobResult: Maybe.just('skipped'),
+      preflightResult: Maybe.just('skipped'),
     },
   };
   const summary = renderReleaseCloudSummary(input);
@@ -272,13 +274,13 @@ test('uses not available for missing release metadata', () => {
     ...baselineReleaseCloudSummaryInput,
     release: {
       ...baselineReleaseCloudSummaryInput.release,
-      artifactBuiltAt: undefined,
-      artifactAssetVersion: undefined,
-      artifactChecksum: undefined,
-      artifactName: undefined,
-      artifactVersion: undefined,
-      commitSha: undefined,
-      identifier: undefined,
+      artifactBuiltAt: Maybe.nothing<string>(),
+      artifactAssetVersion: Maybe.nothing<string>(),
+      artifactChecksum: Maybe.nothing<string>(),
+      artifactName: Maybe.nothing<string>(),
+      artifactVersion: Maybe.nothing<string>(),
+      commitSha: Maybe.nothing<string>(),
+      identifier: Maybe.nothing<string>(),
     },
   };
   const summary = renderReleaseCloudSummary(input);
@@ -299,8 +301,8 @@ test('reads artifact build time from the workflow environment', () => {
     ARTIFACT_BUILT_AT: '2026-07-20T06:18:03.123Z',
   });
 
-  expect(input.release.artifactAssetVersion).toBe('2026-07-17.1-1234567');
-  expect(input.release.artifactBuiltAt).toBe('2026-07-20T06:18:03.123Z');
+  expect(input.release.artifactAssetVersion.unwrapOr('not available')).toBe('2026-07-17.1-1234567');
+  expect(input.release.artifactBuiltAt.unwrapOr('not available')).toBe('2026-07-20T06:18:03.123Z');
 });
 
 test('renders a main-style artifact with the same webapp and asset versions', () => {
@@ -308,8 +310,8 @@ test('renders a main-style artifact with the same webapp and asset versions', ()
     ...baselineReleaseCloudSummaryInput,
     release: {
       ...baselineReleaseCloudSummaryInput.release,
-      artifactAssetVersion: 'main-bdb93c9',
-      artifactVersion: 'main-bdb93c9',
+      artifactAssetVersion: Maybe.just('main-bdb93c9'),
+      artifactVersion: Maybe.just('main-bdb93c9'),
     },
   };
   const summary = renderReleaseCloudSummary(input);
@@ -323,7 +325,7 @@ test('renders Manual reason only when a reason is provided', () => {
     ...baselineReleaseCloudSummaryInput,
     release: {
       ...baselineReleaseCloudSummaryInput.release,
-      manualReason: 'manual release for validation',
+      manualReason: Maybe.just('manual release for validation'),
     },
   };
   const summaryWithReason = renderReleaseCloudSummary(inputWithReason);
