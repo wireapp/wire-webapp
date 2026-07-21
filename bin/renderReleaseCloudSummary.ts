@@ -583,7 +583,7 @@ function renderBetaSection(input: ReleaseCloudSummaryInput, commitLink: string, 
     `- Frontend URL: ${formatOptionalFrontendUrl(input.beta.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.beta.runtimeBackendRest)}`,
     `- WebSocket backend URL: ${formatValueOrFallback(input.beta.runtimeBackendWebSocket)}`,
-    ...(input.beta.deploymentResult === 'success' ? ['- Runtime verification: /version, /commit, and /config.js'] : []),
+    ...(input.beta.deploymentResult === 'success' ? ['- Runtime verification: /version and /config.js'] : []),
     `- Beta tag: ${formatBetaTag(input.beta, input.github)}`,
     `- Artifact name: ${formatValueOrFallback(input.release.artifactName)}`,
     `- Artifact checksum: ${formatValueOrFallback(input.release.artifactChecksum)}`,
@@ -609,7 +609,7 @@ function renderE2ESection(input: ReleaseCloudSummaryInput, commitLink: string, w
     `- Frontend URL: ${formatOptionalFrontendUrl(input.e2e.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.e2e.runtimeBackendRest)}`,
     `- WebSocket backend URL: ${formatValueOrFallback(input.e2e.runtimeBackendWebSocket)}`,
-    ...(input.e2e.result === 'success' ? ['- Runtime verification: /version, /commit, and /config.js'] : []),
+    ...(input.e2e.result === 'success' ? ['- Runtime verification: /version and /config.js'] : []),
     `- Playwright report URL: ${formatOptionalReportUrl(input.e2e.reportUrl)}`,
     `- Testiny run name: ${testinyRunName}`,
     `- Workflow run URL: ${workflowRunLink}`,
@@ -636,7 +636,7 @@ function renderProductionSection(input: ReleaseCloudSummaryInput, commitLink: st
     `- WebSocket backend URL: ${formatValueOrFallback(input.production.runtimeBackendWebSocket)}`,
     `- Runtime verification result: ${formatProductionRuntimeVerificationResult(input.production.runtimeVerificationResult)}`,
     ...(input.production.runtimeVerificationResult === 'success'
-      ? ['- Runtime verification: /version, /commit, and /config.js']
+      ? ['- Runtime verification: /version and /config.js']
       : []),
     `- Production tag: ${formatProductionTag(input.production, input.github)}`,
     `- Production tag creation result: ${formatProductionTagCreationResult(input.production)}`,

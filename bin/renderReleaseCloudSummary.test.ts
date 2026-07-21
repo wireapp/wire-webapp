@@ -160,6 +160,7 @@ test('renders a successful Production release with distribution metadata', () =>
   assertSummaryContract(summary);
   expect(summary).toMatch(/### Production deployment[\s\S]*?- Result: deployed, verified, and tagged successfully/m);
   expect(summary).toMatch(/### Production deployment[\s\S]*?- Runtime verification result: verified successfully/m);
+  expect(summary).toMatch(/### Production deployment[\s\S]*?- Runtime verification: \/version and \/config\.js/m);
   expect(summary).toMatch(
     /- Production tag: \[2026-07-17\.1-production\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/tree\/2026-07-17\.1-production\)/,
   );
