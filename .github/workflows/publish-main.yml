@@ -76,9 +76,11 @@ jobs:
     permissions:
       contents: read
     outputs:
-      main_artifact_name: ${{ steps.artifact_metadata.outputs.main_artifact_name }}
-      artifact_version: ${{ steps.artifact_metadata.outputs.artifact_version }}
-      development_context_artifact_name: ${{ steps.artifact_metadata.outputs.development_context_artifact_name }}
+      main_artifact_name: ${{ steps.prepare_artifact.outputs.main_artifact_name }}
+      artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
+      artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
+      development_context_artifact_name: ${{ steps.prepare_artifact.outputs.development_context_artifact_name }}
 
     steps:
       - name: Checkout
@@ -103,11 +105,32 @@ jobs:
       - name: Update configuration
         run: ./bin/yarn nx run webapp:configure
 
+      - name: Resolve main webapp build metadata inputs
+        id: build_metadata_inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "version=main-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "commit=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
       - name: Build and package internal application
-        run: ./bin/yarn build:prod
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.build_metadata_inputs.outputs.commit }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.build_metadata_inputs.outputs.version }}
+        run: |
+          ./bin/yarn build:prod
+
+      - name: Validate main artifact metadata
+        id: validate_artifact_metadata
+        env:
+          BUILD_ARTIFACT_PATH: ${{ env.BUILD_ARTIFACT_PATH }}
+          EXPECTED_COMMIT: ${{ steps.build_metadata_inputs.outputs.commit }}
+          EXPECTED_VERSION: ${{ steps.build_metadata_inputs.outputs.version }}
+        run: node ./bin/validateBuildArtifact.mts
 
       - name: Prepare shared main artifact metadata and exact development Docker context
-        id: artifact_metadata
+        id: prepare_artifact
         shell: bash
         env:
           BUILD_ARTIFACT_PATH: ${{ env.BUILD_ARTIFACT_PATH }}
@@ -116,8 +139,6 @@ jobs:
 
           main_artifact_name="main-artifact-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           development_context_artifact_name="main-development-context-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          artifact_version="$(unzip -p "${BUILD_ARTIFACT_PATH}" version.json | jq --exit-status --raw-output '.version | strings | select(length > 0)')"
-          test -n "${artifact_version}"
           development_context_directory="${RUNNER_TEMP}/${development_context_artifact_name}"
 
           mkdir -p \
@@ -139,22 +160,21 @@ jobs:
 
           {
             echo "main_artifact_name=${main_artifact_name}"
-            echo "artifact_version=${artifact_version}"
             echo "development_context_artifact_name=${development_context_artifact_name}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Upload shared main artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ${{ steps.artifact_metadata.outputs.main_artifact_name }}
+          name: ${{ steps.prepare_artifact.outputs.main_artifact_name }}
           path: ${{ env.BUILD_ARTIFACT_PATH }}
           if-no-files-found: error
 
       - name: Upload exact development Docker context
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ${{ steps.artifact_metadata.outputs.development_context_artifact_name }}
-          path: ${{ runner.temp }}/${{ steps.artifact_metadata.outputs.development_context_artifact_name }}
+          name: ${{ steps.prepare_artifact.outputs.development_context_artifact_name }}
+          path: ${{ runner.temp }}/${{ steps.prepare_artifact.outputs.development_context_artifact_name }}
           if-no-files-found: error
           include-hidden-files: true
 
@@ -239,6 +259,8 @@ jobs:
       - name: Summarize Edge deployment
         if: always()
         env:
+          ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
+          ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
           DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
           EDGE_RUNTIME_BACKEND_REST: ${{ env.EDGE_RUNTIME_BACKEND_REST }}
@@ -257,7 +279,13 @@ jobs:
             edge_result='failed'
           fi
 
-          commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          if [[ -n "${ARTIFACT_COMMIT:-}" ]]; then
+            artifact_commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${ARTIFACT_COMMIT}"
+            artifact_commit_display="[${ARTIFACT_COMMIT}](${artifact_commit_url})"
+          else
+            artifact_commit_display='not available'
+          fi
+
           workflow_run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
           {
@@ -265,8 +293,9 @@ jobs:
             echo
             echo "- Result: ${edge_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Target environment: ${EDGE_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${EDGE_WEBAPP_URL}](${EDGE_WEBAPP_URL})"
             echo "- REST backend URL: ${EDGE_RUNTIME_BACKEND_REST}"
@@ -370,13 +399,15 @@ jobs:
           environment-label: Hosted Dev
           webapp-url: ${{ env.DEV_WEBAPP_URL }}
           expected-version: ${{ needs.build_main_artifacts.outputs.artifact_version }}
-          expected-commit: ${{ github.sha }}
+          expected-commit: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           expected-backend-rest: ${{ env.DEV_RUNTIME_BACKEND_REST }}
           expected-backend-ws: ${{ env.DEV_RUNTIME_BACKEND_WS }}
 
       - name: Summarize Hosted Dev deployment
         if: always()
         env:
+          ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
+          ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
           DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
           DEV_RUNTIME_BACKEND_REST: ${{ env.DEV_RUNTIME_BACKEND_REST }}
@@ -396,7 +427,13 @@ jobs:
             dev_result='failed'
           fi
 
-          commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          if [[ -n "${ARTIFACT_COMMIT:-}" ]]; then
+            artifact_commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${ARTIFACT_COMMIT}"
+            artifact_commit_display="[${ARTIFACT_COMMIT}](${artifact_commit_url})"
+          else
+            artifact_commit_display='not available'
+          fi
+
           workflow_run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
           {
@@ -404,8 +441,9 @@ jobs:
             echo
             echo "- Result: ${dev_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Target environment: ${DEV_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${DEV_WEBAPP_URL}](${DEV_WEBAPP_URL})"
             echo "- REST backend URL: ${DEV_RUNTIME_BACKEND_REST}"
@@ -533,6 +571,8 @@ jobs:
       - name: Summarize development channel
         if: always()
         env:
+          ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
+          ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
           CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
           DOCKER_IMAGE_OUTCOME: ${{ steps.publish_docker.outcome }}
@@ -573,7 +613,13 @@ jobs:
             wire_builds_commit='not updated'
           fi
 
-          commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          if [[ -n "${ARTIFACT_COMMIT:-}" ]]; then
+            artifact_commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${ARTIFACT_COMMIT}"
+            artifact_commit_display="[${ARTIFACT_COMMIT}](${artifact_commit_url})"
+          else
+            artifact_commit_display='not available'
+          fi
+
           workflow_run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
           {
@@ -581,8 +627,9 @@ jobs:
             echo
             echo "- Result: ${channel_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo '- Target channel: dev'
             echo "- Docker image: ${docker_image_reference}"
             echo "- Helm chart repository: ${CHART_REPOSITORY_URL}"
@@ -658,6 +705,8 @@ jobs:
     steps:
       - name: Write main delivery summary
         env:
+          ARTIFACT_BUILT_AT: ${{ needs.build_main_artifacts.outputs.artifact_built_at }}
+          ARTIFACT_COMMIT: ${{ needs.build_main_artifacts.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ needs.build_main_artifacts.outputs.artifact_version }}
           EDGE_RESULT: ${{ needs.deploy_to_edge.result }}
           EDGE_RUNTIME_BACKEND_REST: ${{ env.EDGE_RUNTIME_BACKEND_REST }}
@@ -737,15 +786,22 @@ jobs:
             wire_builds_commit='not updated'
           fi
 
-          commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          if [[ -n "${ARTIFACT_COMMIT:-}" ]]; then
+            artifact_commit_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${ARTIFACT_COMMIT}"
+            artifact_commit_display="[${ARTIFACT_COMMIT}](${artifact_commit_url})"
+          else
+            artifact_commit_display='not available'
+          fi
+
           workflow_run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
           {
             echo '## Main delivery'
             echo
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Built at (UTC): ${ARTIFACT_BUILT_AT:-not available}"
             echo "- Workflow run URL: [${workflow_run_url}](${workflow_run_url})"
 
             echo
@@ -753,8 +809,8 @@ jobs:
             echo
             echo "- Result: ${edge_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
             echo "- Target environment: ${EDGE_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${EDGE_WEBAPP_URL}](${EDGE_WEBAPP_URL})"
             echo "- REST backend URL: ${EDGE_RUNTIME_BACKEND_REST}"
@@ -770,8 +826,8 @@ jobs:
             echo
             echo "- Result: ${dev_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
             echo "- Target environment: ${DEV_ELASTIC_BEANSTALK_ENVIRONMENT_NAME}"
             echo "- Frontend URL: [${DEV_WEBAPP_URL}](${DEV_WEBAPP_URL})"
             echo "- REST backend URL: ${DEV_RUNTIME_BACKEND_REST}"
@@ -787,8 +843,8 @@ jobs:
             echo
             echo "- Result: ${channel_result}"
             echo "- Ref: ${GITHUB_REF}"
-            echo "- Commit SHA: [${GITHUB_SHA}](${commit_url})"
-            echo "- Artifact version: ${ARTIFACT_VERSION:-not available}"
+            echo "- Commit SHA: ${artifact_commit_display}"
+            echo "- Webapp version: ${ARTIFACT_VERSION:-not available}"
             echo '- Target channel: dev'
             echo "- Docker image: ${docker_image_reference}"
             echo "- Helm chart repository: ${CHART_REPOSITORY_URL}"

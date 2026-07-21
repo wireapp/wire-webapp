@@ -70,9 +70,10 @@ const baselineReleaseCloudSummaryInput: ReleaseCloudSummaryInput = {
     webappUrl: 'https://production.example.com',
   },
   release: {
+    artifactBuiltAt: '2026-07-20T06:18:03.123Z',
     artifactChecksum: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
     artifactName: 'wire-webapp-release-2026-07-17.1',
-    artifactVersion: '2026.07.17.1',
+    artifactVersion: '2026-07-17.1',
     branch: 'release/2026-07-17.1',
     commitSha: '1234567890abcdef1234567890abcdef12345678',
     identifier: '2026-07-17.1',
@@ -91,12 +92,25 @@ function assertSummaryContract(summary: string): void {
   expect(summary).not.toMatch(/\/releases\/tag\//);
   expect(summary).not.toMatch(/undefined/);
   expect(summary).not.toMatch(/null/);
+  expect(summary).not.toMatch(/Artifact version:/);
 }
 
 test('renders a successful Beta-only release', () => {
   const summary = renderReleaseCloudSummary(baselineReleaseCloudSummaryInput);
 
   assertSummaryContract(summary);
+  expect(summary).toMatch(/^- Release identifier: 2026-07-17\.1$/m);
+  expect(summary).toMatch(
+    /^- Commit SHA: \[1234567890abcdef1234567890abcdef12345678\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/commit\/1234567890abcdef1234567890abcdef12345678\)$/m,
+  );
+  expect(summary).toMatch(/^- Built at \(UTC\): 2026-07-20T06:18:03\.123Z$/m);
+  expect(summary).toMatch(/### Beta deployment[\s\S]*?- Webapp version: 2026-07-17\.1/m);
+  expect(summary).toMatch(/### E2E system gate[\s\S]*?- Webapp version: 2026-07-17\.1/m);
+  expect(summary).toMatch(/### Production deployment[\s\S]*?- Webapp version: 2026-07-17\.1/m);
+  expect(summary.split('\n\n')[0]).not.toMatch(/Webapp version:/);
+  expect(summary).not.toMatch(/### Beta deployment[\s\S]*?- Built at \(UTC\):/m);
+  expect(summary).not.toMatch(/### E2E system gate[\s\S]*?- Built at \(UTC\):/m);
+  expect(summary).not.toMatch(/### Production deployment[\s\S]*?- Built at \(UTC\):/m);
   expect(summary).toMatch(/### Beta deployment[\s\S]*?- Result: deployed and verified successfully/m);
   expect(summary).toMatch(/### E2E system gate[\s\S]*?- Result: passed successfully/m);
   expect(summary).toMatch(/### Production deployment[\s\S]*?- Result: not requested/m);
@@ -249,6 +263,7 @@ test('uses not available for missing release metadata', () => {
     ...baselineReleaseCloudSummaryInput,
     release: {
       ...baselineReleaseCloudSummaryInput.release,
+      artifactBuiltAt: undefined,
       artifactChecksum: undefined,
       artifactName: undefined,
       artifactVersion: undefined,
@@ -261,9 +276,16 @@ test('uses not available for missing release metadata', () => {
   assertSummaryContract(summary);
   expect(summary).toMatch(/- Artifact checksum: not available/);
   expect(summary).toMatch(/- Artifact name: not available/);
-  expect(summary).toMatch(/- Artifact version: not available/);
+  expect(summary).toMatch(/### Beta deployment[\s\S]*?- Webapp version: not available/m);
+  expect(summary).toMatch(/- Built at \(UTC\): not available/);
   expect(summary).toMatch(/- Commit SHA: not available/);
   expect(summary).toMatch(/- Release identifier: not available/);
+});
+
+test('reads artifact build time from the workflow environment', () => {
+  const input = readReleaseCloudSummaryInput({ARTIFACT_BUILT_AT: '2026-07-20T06:18:03.123Z'});
+
+  expect(input.release.artifactBuiltAt).toBe('2026-07-20T06:18:03.123Z');
 });
 
 test('renders Manual reason only when a reason is provided', () => {

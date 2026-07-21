@@ -42,10 +42,26 @@ function createValidDistributionManifest(): Record<string, unknown> {
     productionTag: null,
     releaseIdentifier: '2026-07-15.1',
     releaseCommitSha: expectedReleaseCommitSha,
-    artifactVersion: '2026.07.15.12.00',
+    artifactVersion: '2026-07-15.1',
     cloudArtifactChecksum: 'a'.repeat(64),
     sourceRunId: '12345',
     sourceRunAttempt: '1',
+  };
+}
+
+function createValidArtifactMetadata(): Record<string, string> {
+  return {
+    version: '2026-07-15.1',
+    assetVersion: '2026-07-15.1-1234567',
+    commit: expectedReleaseCommitSha,
+    builtAt: '2026-07-20T06:18:03.123Z',
+  };
+}
+
+function createValidLegacyArtifactMetadata(): Record<string, string> {
+  return {
+    version: '2026.07.15.12.00',
+    commit: expectedReleaseCommitSha,
   };
 }
 
@@ -59,6 +75,7 @@ function getUnrelatedWireBuildsState(buildJson: Record<string, unknown>): string
 describe('production distribution decisions', () => {
   it('validates the Production identity and distribution manifest together', () => {
     const actualManifest = validateProductionDistributionManifest({
+      artifactMetadata: createValidArtifactMetadata(),
       manifest: createValidDistributionManifest(),
       productionTag: expectedProductionTag,
       productionTagCommitSha: expectedReleaseCommitSha,
@@ -72,8 +89,190 @@ describe('production distribution decisions', () => {
     expect(actualManifest.value.cloudArtifactChecksum).toHaveLength(64);
   });
 
+  it('rejects a new artifact whose version differs from the release identifier', () => {
+    const mismatchingVersion = '2026-07-15.2';
+    const artifactMetadata = {
+      ...createValidArtifactMetadata(),
+      version: mismatchingVersion,
+      assetVersion: `${mismatchingVersion}-1234567`,
+    };
+    const manifest = {...createValidDistributionManifest(), artifactVersion: mismatchingVersion};
+
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata,
+      manifest,
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualValidation.isErr);
+
+    expect(actualValidation.error.message).toBe('Distribution artifact version does not match the release identifier');
+  });
+
+  it('rejects a new artifact whose commit differs from the Production tag', () => {
+    const mismatchingCommit = 'fedcba9876543210fedcba9876543210fedcba98';
+    const artifactMetadata = {
+      ...createValidArtifactMetadata(),
+      assetVersion: '2026-07-15.1-fedcba9',
+      commit: mismatchingCommit,
+    };
+
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata,
+      manifest: createValidDistributionManifest(),
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualValidation.isErr);
+
+    expect(actualValidation.error.message).toBe(
+      'Distribution artifact commit does not match the Production tag commit',
+    );
+  });
+
+  it('accepts legacy artifact metadata with matching version and commit', () => {
+    const legacyArtifactMetadata = createValidLegacyArtifactMetadata();
+    const legacyManifest = {
+      ...createValidDistributionManifest(),
+      artifactVersion: legacyArtifactMetadata.version,
+    };
+
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: legacyArtifactMetadata,
+      manifest: legacyManifest,
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    expect(actualValidation.isOk).toBe(true);
+  });
+
+  it('accepts legacy artifact metadata with a six-component timestamp version', () => {
+    const legacyArtifactVersion = '2026.07.20.06.18.03';
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: {
+        version: legacyArtifactVersion,
+        commit: expectedReleaseCommitSha,
+      },
+      manifest: {...createValidDistributionManifest(), artifactVersion: legacyArtifactVersion},
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    expect(actualValidation.isOk).toBe(true);
+  });
+
+  it('rejects legacy artifact metadata whose version differs from the manifest', () => {
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: createValidLegacyArtifactMetadata(),
+      manifest: {...createValidDistributionManifest(), artifactVersion: '2026.07.15.12.01'},
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualValidation.isErr);
+
+    expect(actualValidation.error.message).toBe('Legacy distribution artifact version does not match the manifest');
+  });
+
+  it('rejects legacy artifact metadata whose commit differs from the Production tag', () => {
+    const legacyArtifactMetadata = createValidLegacyArtifactMetadata();
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: {
+        ...legacyArtifactMetadata,
+        commit: 'fedcba0987654321fedcba0987654321fedcba09',
+      },
+      manifest: {...createValidDistributionManifest(), artifactVersion: legacyArtifactMetadata.version},
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualValidation.isErr);
+
+    expect(actualValidation.error.message).toBe(
+      'Legacy distribution artifact commit does not match the Production tag commit',
+    );
+  });
+
+  it('rejects legacy artifact metadata without commit metadata', () => {
+    const legacyArtifactMetadata = createValidLegacyArtifactMetadata();
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: {version: legacyArtifactMetadata.version},
+      manifest: {...createValidDistributionManifest(), artifactVersion: legacyArtifactMetadata.version},
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualValidation.isErr);
+
+    expect(actualValidation.error.message).toBe('Distribution artifact metadata is invalid');
+  });
+
+  it('rejects artifact metadata with builtAt but no assetVersion', () => {
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: {
+        version: '2026-07-15.1',
+        commit: expectedReleaseCommitSha,
+        builtAt: '2026-07-20T06:18:03.123Z',
+      },
+      manifest: createValidDistributionManifest(),
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualValidation.isErr);
+
+    expect(actualValidation.error.message).toBe('Distribution artifact metadata is invalid');
+  });
+
+  it('rejects artifact metadata with assetVersion but no builtAt', () => {
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: {
+        version: '2026-07-15.1',
+        assetVersion: '2026-07-15.1-1234567',
+        commit: expectedReleaseCommitSha,
+      },
+      manifest: createValidDistributionManifest(),
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualValidation.isErr);
+
+    expect(actualValidation.error.message).toBe('Distribution artifact metadata is invalid');
+  });
+
+  it('rejects incomplete new artifact metadata instead of treating it as legacy', () => {
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: {
+        version: '2026-07-15.1',
+        commit: expectedReleaseCommitSha,
+      },
+      manifest: createValidDistributionManifest(),
+      productionTag: expectedProductionTag,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualValidation.isErr);
+
+    expect(actualValidation.error.message).toBe('Distribution artifact metadata is invalid');
+  });
+
   it('rejects a manifest for a non-ADR Production tag', () => {
     const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: createValidArtifactMetadata(),
       manifest: createValidDistributionManifest(),
       productionTag: '2026-07-15-production.1',
       productionTagCommitSha: expectedReleaseCommitSha,
@@ -88,6 +287,7 @@ describe('production distribution decisions', () => {
     manifest.releaseCommitSha = 'fedcba0987654321fedcba0987654321fedcba09';
 
     const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: createValidArtifactMetadata(),
       manifest,
       productionTag: expectedProductionTag,
       productionTagCommitSha: expectedReleaseCommitSha,
@@ -99,6 +299,7 @@ describe('production distribution decisions', () => {
 
   it('rejects an empty expected commit when the caller supplies one', () => {
     const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: createValidArtifactMetadata(),
       manifest: createValidDistributionManifest(),
       productionTag: expectedProductionTag,
       productionTagCommitSha: expectedReleaseCommitSha,
@@ -111,6 +312,7 @@ describe('production distribution decisions', () => {
 
   it('rejects an expected commit that differs from the Production tag', () => {
     const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: createValidArtifactMetadata(),
       manifest: createValidDistributionManifest(),
       productionTag: expectedProductionTag,
       productionTagCommitSha: expectedReleaseCommitSha,
@@ -123,6 +325,7 @@ describe('production distribution decisions', () => {
 
   it('rejects a manifest from a different source workflow run', () => {
     const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: createValidArtifactMetadata(),
       manifest: createValidDistributionManifest(),
       productionTag: expectedProductionTag,
       productionTagCommitSha: expectedReleaseCommitSha,

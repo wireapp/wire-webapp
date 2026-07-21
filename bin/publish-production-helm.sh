@@ -6,6 +6,8 @@ set -euo pipefail
 : "${CHART_REPOSITORY_URL:?CHART_REPOSITORY_URL is required}"
 : "${DOCKER_IMAGE_TAG:?DOCKER_IMAGE_TAG is required}"
 
+script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
 helm repo add "${CHART_REPOSITORY_NAME}" "${CHART_REPOSITORY_URL}"
 helm repo update
@@ -14,7 +16,7 @@ published_charts_path="${RUNNER_TEMP}/published-webapp-charts.json"
 helm search repo "${CHART_REPOSITORY_NAME}/webapp" --devel --versions --output json > "${published_charts_path}"
 
 helm_action="$(
-  ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/productionDistributionCli.ts \
+  "${script_directory}/run-production-distribution-cli.sh" \
     select-helm-chart --charts-path "${published_charts_path}" --image-tag "${DOCKER_IMAGE_TAG}"
 )"
 

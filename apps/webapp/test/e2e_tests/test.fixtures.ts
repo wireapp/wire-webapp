@@ -232,9 +232,7 @@ export const createTeam = async (
   }
 
   if (options?.features && Object.values(options.features).some(Boolean)) {
-    // The team will be reset right after initialization, so we need to wait a short time for it to finish
-    // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await api.team.upgradeTeam(teamId, owner);
 
     if (options.features.conferenceCalling) {
       await api.enableConferenceCallingFeature(teamId);

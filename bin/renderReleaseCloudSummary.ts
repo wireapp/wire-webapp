@@ -21,6 +21,7 @@ export type WorkflowJobResult = 'cancelled' | 'failure' | 'skipped' | 'success';
 
 export type ReleaseMetadata = {
   readonly artifactChecksum: string | undefined;
+  readonly artifactBuiltAt: string | undefined;
   readonly artifactName: string | undefined;
   readonly artifactVersion: string | undefined;
   readonly branch: string | undefined;
@@ -182,6 +183,7 @@ export function readReleaseCloudSummaryInput(environment: NodeJS.ProcessEnv): Re
       webappUrl: readOptionalEnvironmentValue(environment, 'PRODUCTION_WEBAPP_URL'),
     },
     release: {
+      artifactBuiltAt: readOptionalEnvironmentValue(environment, 'ARTIFACT_BUILT_AT'),
       artifactChecksum: readOptionalEnvironmentValue(environment, 'ARTIFACT_CHECKSUM'),
       artifactName: readOptionalEnvironmentValue(environment, 'ARTIFACT_NAME'),
       artifactVersion: readOptionalEnvironmentValue(environment, 'ARTIFACT_VERSION'),
@@ -571,7 +573,7 @@ function renderBetaSection(input: ReleaseCloudSummaryInput, commitLink: string, 
     `- Result: ${formatBetaResult(input.beta.deploymentResult)}`,
     `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
     `- Commit SHA: ${commitLink}`,
-    `- Artifact version: ${formatValueOrFallback(input.release.artifactVersion)}`,
+    `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
     '- GitHub Environment: wire-webapp-beta',
     `- Target environment: ${formatValueOrFallback(input.beta.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.beta.webappUrl)}`,
@@ -596,7 +598,7 @@ function renderE2ESection(input: ReleaseCloudSummaryInput, commitLink: string, w
     '',
     `- Result: ${formatE2EResult(input.e2e.result)}`,
     `- Commit SHA: ${commitLink}`,
-    `- Artifact version: ${formatValueOrFallback(input.release.artifactVersion)}`,
+    `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
     `- Target environment: ${formatValueOrFallback(input.e2e.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.e2e.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.e2e.runtimeBackendRest)}`,
@@ -619,7 +621,7 @@ function renderProductionSection(input: ReleaseCloudSummaryInput, commitLink: st
     `- Production preflight result: ${formatProductionPreflightResult(input.production)}`,
     ...(productionSkipReason === undefined ? [] : [`- Skip reason: ${productionSkipReason}`]),
     `- Commit SHA: ${commitLink}`,
-    `- Artifact version: ${formatValueOrFallback(input.release.artifactVersion)}`,
+    `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
     `- Target environment: ${formatValueOrFallback(input.production.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.production.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.production.runtimeBackendRest)}`,
@@ -657,7 +659,7 @@ export function renderReleaseCloudSummary(input: ReleaseCloudSummaryInput): stri
     `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
     `- Release identifier: ${formatValueOrFallback(input.release.identifier)}`,
     `- Commit SHA: ${commitLink}`,
-    `- Artifact version: ${formatValueOrFallback(input.release.artifactVersion)}`,
+    `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
     `- Artifact name: ${formatValueOrFallback(input.release.artifactName)}`,
     `- Artifact checksum: ${formatValueOrFallback(input.release.artifactChecksum)}`,
     `- Workflow run URL: ${workflowRunLink}`,

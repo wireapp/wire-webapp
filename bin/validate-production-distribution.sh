@@ -7,6 +7,8 @@ set -euo pipefail
 : "${PRODUCTION_TAG:?PRODUCTION_TAG is required}"
 : "${SOURCE_RUN_ID:?SOURCE_RUN_ID is required}"
 
+script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 if [[ ! "${PRODUCTION_TAG}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*-production$ ]]; then
   echo "Production tag does not match YYYY-MM-DD.N-production: ${PRODUCTION_TAG}" >&2
   exit 1
@@ -24,6 +26,7 @@ production_tag_commit_sha="$(git rev-parse "refs/tags/${PRODUCTION_TAG}^{commit}
 manifest_path="${DISTRIBUTION_CONTEXT_PATH}/distribution-manifest.json"
 
 validation_options=(
+  --artifact-metadata-path "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist/version.json"
   --manifest-path "${manifest_path}"
   --production-tag "${PRODUCTION_TAG}"
   --production-tag-commit-sha "${production_tag_commit_sha}"
@@ -34,7 +37,7 @@ if [[ -n "${EXPECTED_COMMIT_SHA}" ]]; then
   validation_options+=(--expected-commit-sha "${EXPECTED_COMMIT_SHA}")
 fi
 
-./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/productionDistributionCli.ts \
+"${script_directory}/run-production-distribution-cli.sh" \
   validate-manifest "${validation_options[@]}"
 
 for required_context_path in \
@@ -61,13 +64,6 @@ cloud_artifact_checksum="$(jq --raw-output '.cloudArtifactChecksum' "${manifest_
 actual_cloud_artifact_checksum="$(sha256sum "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist/s3/ebs.zip" | awk '{print $1}')"
 if [[ "${actual_cloud_artifact_checksum}" != "${cloud_artifact_checksum}" ]]; then
   echo 'The distribution context EBS checksum does not match its manifest.' >&2
-  exit 1
-fi
-
-artifact_version="$(jq --raw-output '.artifactVersion' "${manifest_path}")"
-actual_artifact_version="$(jq --raw-output '.version' "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist/version.json")"
-if [[ "${actual_artifact_version}" != "${artifact_version}" ]]; then
-  echo 'The distribution context version does not match its manifest.' >&2
   exit 1
 fi
 

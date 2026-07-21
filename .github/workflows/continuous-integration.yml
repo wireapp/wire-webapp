@@ -9,10 +9,6 @@ on:
   merge_group:
     branches: [main, release/*]
 
-  push:
-    # Push CI on the trunk branch updates coverage monitoring.
-    branches: [main]
-
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -85,6 +81,23 @@ jobs:
 
       - name: Install dependencies
         run: ./bin/yarn --immutable
+
+      - name: Verify deployment CLI from clean install
+        run: |
+          rm -rf libraries/config/lib
+          published_charts_path="$(mktemp)"
+          printf '%s\n' '[]' > "${published_charts_path}"
+
+          helm_action="$(
+            ./bin/run-production-distribution-cli.sh \
+              select-helm-chart \
+              --charts-path "${published_charts_path}" \
+              --image-tag "dev-test-image"
+          )"
+
+          test "${helm_action}" = 'publish'
+          test -f libraries/config/lib/index.js
+          test -f libraries/config/lib/index.d.ts
 
       - name: Restore Nx and ESLint caches
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -438,7 +451,12 @@ jobs:
             lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
 
       - name: Build and package
-        run: ./bin/yarn build:prod
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
+          WIRE_WEBAPP_BUILD_VERSION="dev-${short_commit_sha}" \
+          ./bin/yarn build:prod
 
       - name: Verify Quay credentials availability
         env:
@@ -505,4 +523,9 @@ jobs:
             lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
 
       - name: Build and verify public production package
-        run: ./bin/yarn build:prod:public
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
+          WIRE_WEBAPP_BUILD_VERSION="dev-${short_commit_sha}" \
+          ./bin/yarn build:prod:public
