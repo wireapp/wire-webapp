@@ -21,7 +21,7 @@ import {Maybe} from 'true-myth';
 
 import {
   readWebappReleaseSummaryInput,
-  renderWebappReleaseCandidateSummary,
+  renderWebappBetaReleaseSummary,
   renderWebappReleaseSummary,
 } from './renderWebappReleaseSummary.ts';
 import type {WebappReleaseSummaryInput} from './renderWebappReleaseSummary.ts';
@@ -157,6 +157,25 @@ function assertVisibleIdentity(summary: string): void {
   );
 }
 
+function assertBetaSummaryContainsOnlyBetaEvidence(summary: string): void {
+  const forbiddenTerms = [
+    'E2E system gate',
+    'Playwright',
+    'Testiny',
+    'Hosted Production',
+    'Production preflight',
+    'Production tag',
+    'Release distribution',
+    'Docker image',
+    'Helm chart',
+    'wire-builds',
+  ];
+
+  for (const forbiddenTerm of forbiddenTerms) {
+    expect(summary).not.toContain(forbiddenTerm);
+  }
+}
+
 describe('WebApp release summary renderer', () => {
   it('renders a successful Beta-only release with a concise visible overview', () => {
     const summary = renderWebappReleaseSummary(baselineWebappReleaseSummaryInput);
@@ -181,13 +200,19 @@ describe('WebApp release summary renderer', () => {
     );
   });
 
-  it('shows the verified Beta tag once in the visible candidate summary', () => {
-    const summary = renderWebappReleaseCandidateSummary(baselineWebappReleaseSummaryInput);
+  it('renders a successful Beta release with only Beta evidence', () => {
+    const summary = renderWebappBetaReleaseSummary(baselineWebappReleaseSummaryInput);
     const visibleContent = visibleSummary(summary);
 
+    assertMarkdownContract(summary, false);
+    assertVisibleIdentity(summary);
+    expect(visibleContent).toContain('## WebApp Beta release');
+    expect(visibleContent).toContain('- Outcome: Beta release completed successfully');
     expect(visibleContent).toContain(`- Hosted Beta: deployed and verified successfully — tag [${betaTagName}]`);
     expect(countOccurrences(visibleContent, `[${betaTagName}]`)).toBe(1);
-    expect(visibleContent).not.toContain('- Beta tag:');
+    expect(summary).toContain('### Release preparation');
+    expect(summary).toContain('### Hosted Beta validation');
+    assertBetaSummaryContainsOnlyBetaEvidence(summary);
   });
 
   it('renders a successful Production release and distribution evidence', () => {
@@ -231,36 +256,6 @@ describe('WebApp release summary renderer', () => {
     expect(detailsContent).toContain('- Production tag creation result: created successfully');
     expect(detailsContent).toContain('- Docker image: quay.io/wire/webapp:2026-07-17.1-production-v0.34.9-0-1234567');
     expect(detailsContent).toContain('- Helm chart repository: https://charts.example.com/webapp');
-  });
-
-  it('renders a release candidate that is ready for Production approval', () => {
-    const input: WebappReleaseSummaryInput = {
-      ...baselineWebappReleaseSummaryInput,
-      production: {
-        ...baselineWebappReleaseSummaryInput.production,
-        deploymentRequired: Maybe.just(true),
-        preflightJobResult: Maybe.just('success'),
-        preflightResult: Maybe.just('ready'),
-        promotionRequested: true,
-      },
-    };
-    const summary = renderWebappReleaseCandidateSummary(input);
-    const visibleContent = visibleSummary(summary);
-    const detailsContent = technicalEvidence(summary);
-
-    assertMarkdownContract(summary, false);
-    assertVisibleIdentity(summary);
-    expect(visibleContent).toContain('## WebApp release candidate');
-    expect(visibleContent).toContain('Release candidate passed and is ready for Production approval');
-    expect(visibleContent).toContain(
-      '- Hosted Production: ready for approval through the wire-webapp-prod GitHub Environment',
-    );
-    expect(detailsContent).toContain('- Production promotion requested: true');
-    expect(detailsContent).toContain('- Production preflight job result: success');
-    expect(detailsContent).toContain('- Planned Production tag: `2026-07-17.1-production`');
-    expect(detailsContent).toContain(
-      '- Approval status: Production is ready for deployment. Approval is enforced through the wire-webapp-prod GitHub Environment.',
-    );
   });
 
   it('renders an already-tagged Production release without linking a nonexistent tag', () => {
@@ -310,16 +305,31 @@ describe('WebApp release summary renderer', () => {
       },
     };
     const finalSummary = renderWebappReleaseSummary(input);
-    const candidateSummary = renderWebappReleaseCandidateSummary(input);
+    const betaSummary = renderWebappBetaReleaseSummary(input);
 
     expect(visibleSummary(finalSummary)).toContain('Release stopped because Hosted Beta deployment failed');
-    expect(visibleSummary(candidateSummary)).toContain(
-      'Release candidate blocked because Hosted Beta deployment failed',
-    );
+    expect(visibleSummary(betaSummary)).toContain('Beta release stopped because Hosted Beta deployment failed');
+    expect(visibleSummary(betaSummary)).not.toContain(`[${betaTagName}]`);
     expect(visibleSummary(finalSummary)).toContain(
       '- Hosted Production: blocked because Hosted Beta deployment failed',
     );
     expect(technicalEvidence(finalSummary)).toContain('- Result: failed');
+  });
+
+  it('stops the Beta release when Hosted Beta deployment is cancelled', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      beta: {
+        ...baselineWebappReleaseSummaryInput.beta,
+        deploymentResult: Maybe.just('cancelled'),
+        tagCreationResult: Maybe.just('skipped'),
+        tagName: Maybe.nothing<string>(),
+      },
+    };
+    const summary = renderWebappBetaReleaseSummary(input);
+
+    expect(visibleSummary(summary)).toContain('Beta release stopped because Hosted Beta deployment was cancelled');
+    expect(visibleSummary(summary)).not.toContain('failed');
   });
 
   it('reports an incomplete release when Hosted Beta deployment is skipped', () => {
@@ -341,11 +351,18 @@ describe('WebApp release summary renderer', () => {
         promotionRequested: true,
       },
     };
-    const summary = renderWebappReleaseSummary(input);
-    const visibleContent = visibleSummary(summary);
+    const finalSummary = renderWebappReleaseSummary(input);
+    const betaSummary = renderWebappBetaReleaseSummary(input);
+    const finalVisibleContent = visibleSummary(finalSummary);
+    const betaVisibleContent = visibleSummary(betaSummary);
 
-    expect(visibleContent).toContain('- Outcome: Release incomplete because Hosted Beta deployment did not run');
-    expect(visibleContent).toContain('- Hosted Production: unavailable because Hosted Beta deployment did not run');
+    expect(finalVisibleContent).toContain('- Outcome: Release incomplete because Hosted Beta deployment did not run');
+    expect(finalVisibleContent).toContain(
+      '- Hosted Production: unavailable because Hosted Beta deployment did not run',
+    );
+    expect(betaVisibleContent).toContain(
+      '- Outcome: Beta release incomplete because Hosted Beta deployment did not run',
+    );
   });
 
   it('reports an incomplete release when Beta tag creation is skipped', () => {
@@ -368,11 +385,42 @@ describe('WebApp release summary renderer', () => {
         promotionRequested: true,
       },
     };
-    const summary = renderWebappReleaseSummary(input);
-    const visibleContent = visibleSummary(summary);
+    const finalSummary = renderWebappReleaseSummary(input);
+    const betaSummary = renderWebappBetaReleaseSummary(input);
+    const finalVisibleContent = visibleSummary(finalSummary);
+    const betaVisibleContent = visibleSummary(betaSummary);
 
-    expect(visibleContent).toContain('- Outcome: Release incomplete because Beta tag creation did not run');
-    expect(visibleContent).toContain('- Hosted Production: unavailable because Beta tag creation did not run');
+    expect(finalVisibleContent).toContain('- Outcome: Release incomplete because Beta tag creation did not run');
+    expect(finalVisibleContent).toContain('- Hosted Production: unavailable because Beta tag creation did not run');
+    expect(betaVisibleContent).toContain('- Outcome: Beta release incomplete because Beta tag creation did not run');
+  });
+
+  it('stops the Beta release when Beta tag creation fails', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      beta: {
+        ...baselineWebappReleaseSummaryInput.beta,
+        tagCreationResult: Maybe.just('failure'),
+        tagName: Maybe.nothing<string>(),
+      },
+    };
+    const summary = renderWebappBetaReleaseSummary(input);
+
+    expect(visibleSummary(summary)).toContain('Beta release stopped because Beta tag creation failed');
+  });
+
+  it('stops the Beta release when Beta tag creation is cancelled', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      beta: {
+        ...baselineWebappReleaseSummaryInput.beta,
+        tagCreationResult: Maybe.just('cancelled'),
+        tagName: Maybe.nothing<string>(),
+      },
+    };
+    const summary = renderWebappBetaReleaseSummary(input);
+
+    expect(visibleSummary(summary)).toContain('Beta release stopped because Beta tag creation was cancelled');
   });
 
   it('reports an incomplete release when the E2E system gate is skipped', () => {
@@ -413,10 +461,8 @@ describe('WebApp release summary renderer', () => {
       },
     };
     const finalSummary = renderWebappReleaseSummary(input);
-    const candidateSummary = renderWebappReleaseCandidateSummary(input);
 
     expect(visibleSummary(finalSummary)).toContain('Release stopped because the E2E system gate failed');
-    expect(visibleSummary(candidateSummary)).toContain('Release candidate blocked because the E2E system gate failed');
     expect(visibleSummary(finalSummary)).toContain('- Hosted Production: blocked because the E2E system gate failed');
     expect(technicalEvidence(finalSummary)).toContain('- Result: failed');
   });
@@ -440,12 +486,9 @@ describe('WebApp release summary renderer', () => {
         promotionRequested: true,
       },
     };
-    const candidateSummary = renderWebappReleaseCandidateSummary(input);
     const finalSummary = renderWebappReleaseSummary(input);
-    const candidateVisibleContent = visibleSummary(candidateSummary);
     const finalVisibleContent = visibleSummary(finalSummary);
 
-    expect(candidateVisibleContent).toContain('Release candidate stopped because the E2E system gate was cancelled');
     expect(finalVisibleContent).toContain('Release stopped because the E2E system gate was cancelled');
     expect(finalVisibleContent).toContain('- Hosted Beta: deployed and verified successfully');
     expect(finalVisibleContent).toContain('- E2E system gate: cancelled');
@@ -595,10 +638,8 @@ describe('WebApp release summary renderer', () => {
         identifier: Maybe.nothing<string>(),
       },
     };
-    const candidateSummary = renderWebappReleaseCandidateSummary(input);
     const finalSummary = renderWebappReleaseSummary(input);
 
-    assertMarkdownContract(candidateSummary, false);
     assertMarkdownContract(finalSummary, true);
     expect(visibleSummary(finalSummary)).toContain('- Release: `not available`');
     expect(visibleSummary(finalSummary)).toContain('- Commit: not available');
@@ -615,12 +656,9 @@ describe('WebApp release summary renderer', () => {
         manualReason: Maybe.just('manual release for validation'),
       },
     };
-    const candidateSummary = renderWebappReleaseCandidateSummary(input);
     const finalSummary = renderWebappReleaseSummary(input);
 
-    expect(technicalEvidence(candidateSummary)).toContain('- Manual reason: manual release for validation');
     expect(technicalEvidence(finalSummary)).toContain('- Manual reason: manual release for validation');
-    expect(visibleSummary(candidateSummary)).not.toContain('Manual reason');
     expect(visibleSummary(finalSummary)).not.toContain('Manual reason');
   });
 
