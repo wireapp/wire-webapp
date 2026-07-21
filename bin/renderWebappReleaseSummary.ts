@@ -879,7 +879,11 @@ function renderProductionReadinessSection(input: WebappReleaseSummaryInput, work
   ].join('\n');
 }
 
-function renderProductionSection(input: WebappReleaseSummaryInput, commitLink: string, workflowRunLink: string): string {
+function renderProductionSection(
+  input: WebappReleaseSummaryInput,
+  commitLink: string,
+  workflowRunLink: string,
+): string {
   const productionSkipReason = formatProductionSkipReason(input.production);
   const productionSkipReasonLines = productionSkipReason
     .map(reason => {
@@ -1004,9 +1008,7 @@ function main(): void {
     const input = readWebappReleaseSummaryInput(process.env);
     const summaryPhase = readWebappReleaseSummaryPhase(process.argv.slice(2));
     const summary =
-      summaryPhase === 'candidate'
-        ? renderWebappReleaseCandidateSummary(input)
-        : renderWebappReleaseSummary(input);
+      summaryPhase === 'candidate' ? renderWebappReleaseCandidateSummary(input) : renderWebappReleaseSummary(input);
 
     process.stdout.write(summary);
   } catch (error) {
