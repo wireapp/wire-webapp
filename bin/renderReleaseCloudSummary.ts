@@ -39,6 +39,7 @@ export type BetaSummaryInput = {
   readonly environmentName: Maybe<string>;
   readonly runtimeBackendRest: Maybe<string>;
   readonly runtimeBackendWebSocket: Maybe<string>;
+  readonly runtimeVerificationResult: Maybe<WorkflowJobResult>;
   readonly tagCreationResult: Maybe<WorkflowJobResult>;
   readonly tagName: Maybe<string>;
   readonly webappUrl: Maybe<string>;
@@ -161,6 +162,7 @@ export function readReleaseCloudSummaryInput(environment: NodeJS.ProcessEnv): Re
       environmentName: readOptionalEnvironmentValue(environment, 'BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME'),
       runtimeBackendRest: readOptionalEnvironmentValue(environment, 'BETA_RUNTIME_BACKEND_REST'),
       runtimeBackendWebSocket: readOptionalEnvironmentValue(environment, 'BETA_RUNTIME_BACKEND_WS'),
+      runtimeVerificationResult: readWorkflowJobResult(environment, 'BETA_RUNTIME_VERIFICATION_RESULT'),
       tagCreationResult: readWorkflowJobResult(environment, 'BETA_TAG_CREATION_RESULT'),
       tagName: readOptionalEnvironmentValue(environment, 'BETA_TAG_NAME'),
       webappUrl: readOptionalEnvironmentValue(environment, 'BETA_WEBAPP_URL'),
@@ -362,26 +364,30 @@ function formatE2EResult(result: Maybe<WorkflowJobResult>): string {
   );
 }
 
-function formatRuntimeVerificationResult(result: Maybe<WorkflowJobResult>): string {
+function formatRuntimeVerificationResult(result: WorkflowJobResult): string {
+  return match(result)
+    .with('success', () => {
+      return 'verified successfully';
+    })
+    .with('failure', () => {
+      return 'failed';
+    })
+    .with('skipped', () => {
+      return 'not run';
+    })
+    .with('cancelled', () => {
+      return 'cancelled';
+    })
+    .exhaustive();
+}
+
+function renderRuntimeVerificationLines(result: Maybe<WorkflowJobResult>): string[] {
   return result.mapOrElse(
     () => {
-      return 'unknown result';
+      return [];
     },
     actualResult => {
-      return match(actualResult)
-        .with('success', () => {
-          return 'verified successfully';
-        })
-        .with('failure', () => {
-          return 'failed';
-        })
-        .with('skipped', () => {
-          return 'not run';
-        })
-        .with('cancelled', () => {
-          return 'cancelled';
-        })
-        .exhaustive();
+      return [`- Runtime verification result: ${formatRuntimeVerificationResult(actualResult)}`];
     },
   );
 }
@@ -816,7 +822,7 @@ function renderBetaSection(input: ReleaseCloudSummaryInput, commitLink: string, 
     `- Frontend URL: ${formatOptionalFrontendUrl(input.beta.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.beta.runtimeBackendRest)}`,
     `- WebSocket backend URL: ${formatValueOrFallback(input.beta.runtimeBackendWebSocket)}`,
-    `- Runtime verification result: ${formatRuntimeVerificationResult(input.beta.deploymentResult)}`,
+    ...renderRuntimeVerificationLines(input.beta.runtimeVerificationResult),
     ...(hasWorkflowJobResult(input.beta.deploymentResult, 'success')
       ? ['- Runtime verification: /version and /config.js']
       : []),
@@ -845,7 +851,6 @@ function renderE2ESection(input: ReleaseCloudSummaryInput, commitLink: string, w
     `- Frontend URL: ${formatOptionalFrontendUrl(input.e2e.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.e2e.runtimeBackendRest)}`,
     `- WebSocket backend URL: ${formatValueOrFallback(input.e2e.runtimeBackendWebSocket)}`,
-    `- Runtime verification result: ${formatRuntimeVerificationResult(input.e2e.result)}`,
     ...(hasWorkflowJobResult(input.e2e.result, 'success') ? ['- Runtime verification: /version and /config.js'] : []),
     `- Playwright report URL: ${formatOptionalReportUrl(input.e2e.reportUrl)}`,
     `- Testiny run name: ${testinyRunName}`,
@@ -899,7 +904,7 @@ function renderProductionSection(input: ReleaseCloudSummaryInput, commitLink: st
     `- Frontend URL: ${formatOptionalFrontendUrl(input.production.webappUrl)}`,
     `- REST backend URL: ${formatValueOrFallback(input.production.runtimeBackendRest)}`,
     `- WebSocket backend URL: ${formatValueOrFallback(input.production.runtimeBackendWebSocket)}`,
-    `- Runtime verification result: ${formatRuntimeVerificationResult(input.production.runtimeVerificationResult)}`,
+    ...renderRuntimeVerificationLines(input.production.runtimeVerificationResult),
     ...(hasWorkflowJobResult(input.production.runtimeVerificationResult, 'success')
       ? ['- Runtime verification: /version and /config.js']
       : []),

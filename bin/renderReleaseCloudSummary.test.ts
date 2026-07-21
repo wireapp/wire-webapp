@@ -35,6 +35,7 @@ const baselineReleaseCloudSummaryInput: ReleaseCloudSummaryInput = {
     environmentName: Maybe.just('wire-webapp-beta'),
     runtimeBackendRest: Maybe.just('https://beta-backend.example.com'),
     runtimeBackendWebSocket: Maybe.just('wss://beta-backend.example.com'),
+    runtimeVerificationResult: Maybe.just('success'),
     tagCreationResult: Maybe.just('success'),
     tagName: Maybe.just('2026-07-17.1-beta.1'),
     webappUrl: Maybe.just('https://beta.example.com'),
@@ -352,6 +353,7 @@ describe('Release Cloud summary renderer', () => {
       environmentName: Maybe.just('wire-webapp-staging'),
       runtimeBackendRest: Maybe.just('https://prod-nginz-https.wire.com'),
       runtimeBackendWebSocket: Maybe.just('wss://prod-nginz-ssl.wire.com'),
+      runtimeVerificationResult: Maybe.just('success'),
       tagCreationResult: Maybe.just('success'),
       tagName: Maybe.just('2026-07-17.1-beta.1'),
       webappUrl: Maybe.just('https://wire-webapp-beta.wire.com/'),
@@ -443,7 +445,8 @@ describe('Release Cloud summary renderer', () => {
     expect(summary).toMatch(
       /- Beta tag: \[2026-07-17\.1-beta\.1\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/tree\/2026-07-17\.1-beta\.1\)/,
     );
-    expect(summary).toMatch(/- Runtime verification result: verified successfully/);
+    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Runtime verification result: verified successfully/m);
+    expect(summary).toMatch(/### E2E system gate[\s\S]*?- Runtime verification: \/version and \/config\.js/m);
     expect(summary).toMatch(
       /- Playwright report URL: \[https:\/\/e2e\.example\.com\/report\/123\]\(https:\/\/e2e\.example\.com\/report\/123\)/,
     );
@@ -460,6 +463,98 @@ describe('Release Cloud summary renderer', () => {
     expect(summary).toMatch(
       /- Workflow run URL: \[https:\/\/github\.com\/wireapp\/wire-webapp\/actions\/runs\/123456789\]\(https:\/\/github\.com\/wireapp\/wire-webapp\/actions\/runs\/123456789\)/,
     );
+  });
+
+  it('does not infer Beta runtime verification failure from a failed deployment', () => {
+    const input: ReleaseCloudSummaryInput = {
+      ...baselineReleaseCandidateInput,
+      beta: {
+        ...baselineReleaseCandidateInput.beta,
+        deploymentResult: Maybe.just('failure'),
+        runtimeVerificationResult: Maybe.nothing<WorkflowJobResult>(),
+        tagCreationResult: Maybe.just('skipped'),
+        tagName: Maybe.nothing<string>(),
+      },
+      e2e: {
+        ...baselineReleaseCandidateInput.e2e,
+        result: Maybe.just('skipped'),
+        runtimeVerificationResult: Maybe.nothing<WorkflowJobResult>(),
+      },
+    };
+    const summary = renderReleaseCandidateSummary(input);
+
+    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Result: failed/m);
+    expect(summary).not.toMatch(/### Beta deployment[\s\S]*?- Runtime verification result:/m);
+    expect(summary).not.toMatch(/### Beta deployment[\s\S]*?- Runtime verification result: failed/m);
+  });
+
+  it('renders an explicit Beta runtime verification failure', () => {
+    const input: ReleaseCloudSummaryInput = {
+      ...baselineReleaseCandidateInput,
+      beta: {
+        ...baselineReleaseCandidateInput.beta,
+        deploymentResult: Maybe.just('failure'),
+        runtimeVerificationResult: Maybe.just('failure'),
+        tagCreationResult: Maybe.just('skipped'),
+        tagName: Maybe.nothing<string>(),
+      },
+    };
+    const summary = renderReleaseCandidateSummary(input);
+
+    expect(summary).toMatch(/### Beta deployment[\s\S]*?- Runtime verification result: failed/m);
+  });
+
+  it('does not report an independent runtime result for failed E2E tests', () => {
+    const input: ReleaseCloudSummaryInput = {
+      ...baselineReleaseCandidateInput,
+      e2e: {
+        ...baselineReleaseCandidateInput.e2e,
+        result: Maybe.just('failure'),
+      },
+      production: {
+        ...baselineReleaseCandidateInput.production,
+        deploymentRequired: Maybe.nothing<boolean>(),
+        preflightJobResult: Maybe.just('skipped'),
+        preflightResult: Maybe.nothing<ProductionPreflightResult>(),
+      },
+    };
+    const summary = renderReleaseCandidateSummary(input);
+
+    expect(summary).toMatch(/### E2E system gate[\s\S]*?- Result: failed/m);
+    expect(summary).not.toMatch(/### E2E system gate[\s\S]*?- Runtime verification result:/m);
+    expect(summary).not.toMatch(/### E2E system gate[\s\S]*?- Runtime verification: \/version and \/config\.js/m);
+  });
+
+  it('does not report runtime verification when precommit deployment failed first', () => {
+    const input: ReleaseCloudSummaryInput = {
+      ...baselineReleaseCandidateInput,
+      e2e: {
+        ...baselineReleaseCandidateInput.e2e,
+        result: Maybe.just('failure'),
+      },
+    };
+    const summary = renderReleaseCandidateSummary(input);
+
+    expect(summary).toMatch(/### E2E system gate[\s\S]*?- Result: failed/m);
+    expect(summary).not.toMatch(/### E2E system gate[\s\S]*?- Runtime verification result:/m);
+  });
+
+  it('uses no runtime verification result line when the dedicated information is missing', () => {
+    const input: ReleaseCloudSummaryInput = {
+      ...baselineReleaseCandidateInput,
+      beta: {
+        ...baselineReleaseCandidateInput.beta,
+        runtimeVerificationResult: Maybe.nothing<WorkflowJobResult>(),
+      },
+      e2e: {
+        ...baselineReleaseCandidateInput.e2e,
+      },
+    };
+    const summary = renderReleaseCandidateSummary(input);
+
+    expect(summary).not.toMatch(/Runtime verification result: unknown result/);
+    expect(summary).not.toMatch(/### Beta deployment[\s\S]*?- Runtime verification result:/m);
+    expect(summary).not.toMatch(/### E2E system gate[\s\S]*?- Runtime verification result:/m);
   });
 
   it('renders a Beta-only release candidate without Production noise', () => {

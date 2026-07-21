@@ -246,6 +246,9 @@ jobs:
       name: wire-webapp-beta
       url: https://wire-webapp-beta.wire.com/
 
+    outputs:
+      runtime_verification_result: ${{ steps.verify_beta_runtime.outcome }}
+
     steps:
       - name: Checkout runtime verification action
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -285,6 +288,7 @@ jobs:
           use-existing-application-version-if-available: true
 
       - name: Verify Beta runtime
+        id: verify_beta_runtime
         uses: ./.github/actions/verify-webapp-runtime
         with:
           environment-label: Beta
@@ -571,6 +575,7 @@ jobs:
           BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: ${{ env.BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
           BETA_RUNTIME_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
           BETA_RUNTIME_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
+          BETA_RUNTIME_VERIFICATION_RESULT: ${{ needs.deploy_to_beta.outputs.runtime_verification_result }}
           BETA_TAG_CREATION_RESULT: ${{ needs.create_beta_tag.result }}
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
           BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
@@ -774,6 +779,7 @@ jobs:
           BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME: ${{ env.BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
           BETA_RUNTIME_BACKEND_REST: ${{ env.BETA_RUNTIME_BACKEND_REST }}
           BETA_RUNTIME_BACKEND_WS: ${{ env.BETA_RUNTIME_BACKEND_WS }}
+          BETA_RUNTIME_VERIFICATION_RESULT: ${{ needs.deploy_to_beta.outputs.runtime_verification_result }}
           BETA_TAG_CREATION_RESULT: ${{ needs.create_beta_tag.result }}
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
           BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
