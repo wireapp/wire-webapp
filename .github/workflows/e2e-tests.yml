@@ -29,9 +29,6 @@ on:
       webappUrl:
         type: string
         required: true
-      backendUrl:
-        type: string
-        required: true
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
@@ -57,6 +54,9 @@ on:
       reportUrl:
         description: URL to the playwright report artifact
         value: ${{ jobs.e2e-report.outputs.reportUrl }}
+
+env:
+  BACKEND_URL: https://staging-nginz-https.zinfra.io/
 
 jobs:
   bootstrap_smoke_test:
@@ -95,7 +95,6 @@ jobs:
       - name: Run bootstrap smoke test
         env:
           WEBAPP_URL: ${{ inputs.webappUrl }}
-          BACKEND_URL: ${{ github.event_name == 'workflow_dispatch' && 'https://staging-nginz-https.zinfra.io/' || inputs.backendUrl }}
           TEST_SERVICE_URL: http://localhost:8080
         run: ./bin/yarn playwright test -c apps/webapp/playwright.config.ts apps/webapp/test/e2e_tests/specs/CriticalFlow/startupHasNoConsoleErrors.spec.ts
 
@@ -186,7 +185,6 @@ jobs:
       - name: Run tests
         env:
           WEBAPP_URL: ${{ inputs.webappUrl }}
-          BACKEND_URL: ${{ inputs.backendUrl }}
           TEST_SERVICE_URL: http://testservice:8080
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
