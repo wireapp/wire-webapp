@@ -9,11 +9,11 @@ on:
         required: true
         type: string
       source_run_id:
-        description: 'Release Cloud run containing the distribution artifact'
+        description: 'WebApp release run containing the distribution artifact'
         required: true
         type: string
       distribution_artifact_name:
-        description: 'Exact distribution context artifact from Release Cloud'
+        description: 'Exact distribution context artifact from the WebApp release'
         required: true
         type: string
       confirm_repair:
@@ -27,7 +27,7 @@ on:
         type: string
 
 concurrency:
-  group: release-cloud-production
+  group: release-webapp-production
   cancel-in-progress: false
 
 permissions: {}

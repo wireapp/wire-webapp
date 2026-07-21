@@ -31,7 +31,7 @@ on:
         type: string
 
 concurrency:
-  group: ${{ inputs.promote_to_production && 'release-cloud-production' || format('release-webapp-beta-{0}', inputs.release_identifier) }}
+  group: ${{ inputs.promote_to_production && 'release-webapp-production' || format('release-webapp-beta-{0}', inputs.release_identifier) }}
   cancel-in-progress: false
 
 permissions: {}
@@ -39,6 +39,7 @@ permissions: {}
 env:
   AWS_REGION: eu-central-1
   ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
+  # Retain this legacy artifact prefix so previous release runs remain repairable.
   BETA_ARTIFACT_NAME_PREFIX: release-cloud-ebs
   BETA_RUNTIME_BACKEND_REST: https://prod-nginz-https.wire.com
   BETA_RUNTIME_BACKEND_WS: wss://prod-nginz-ssl.wire.com
@@ -328,6 +329,7 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Retain this legacy artifact prefix so previous release runs remain repairable.
           distribution_artifact_name="release-cloud-distribution-context-${RELEASE_IDENTIFIER}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           distribution_context_directory="${RUNNER_TEMP}/${distribution_artifact_name}"
           mkdir -p \
@@ -1027,7 +1029,7 @@ jobs:
             Playwright report: ${{ needs.run_e2e.outputs.reportUrl || 'unavailable' }}
             Source workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'Cloud Production deployment and verification succeeded.' || 'Production was blocked because a release gate failed.' }}
+            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'Hosted Production deployment and verification succeeded.' || 'Production was blocked because a release gate failed.' }}
             ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'The Production tag exists.' || 'Production tag creation was blocked by the failed release gate.' }}
             ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'Docker, Helm, or wire-builds publication failed.' || '' }}
             ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'The release is incomplete for on-premises distribution.' || '' }}
