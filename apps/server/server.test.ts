@@ -10,6 +10,7 @@ import {Server} from './Server';
 type HttpResponse = {
   readonly body: string;
   readonly headers: http.IncomingHttpHeaders;
+  readonly responseCount: number;
   readonly statusCode: number | undefined;
 };
 
@@ -147,7 +148,9 @@ async function withHttpServer(
 
 function requestHttpResponse(baseUrl: string, requestPath: string): Promise<HttpResponse> {
   return new Promise((resolve, reject) => {
+    let responseCount = 0;
     const request = http.get(`${baseUrl}${requestPath}`, response => {
+      responseCount += 1;
       const responseBodyChunks: Buffer[] = [];
 
       response.on('data', responseBodyChunk => {
@@ -157,6 +160,7 @@ function requestHttpResponse(baseUrl: string, requestPath: string): Promise<Http
         resolve({
           body: Buffer.concat(responseBodyChunks).toString('utf8'),
           headers: response.headers,
+          responseCount,
           statusCode: response.statusCode,
         });
       });
@@ -238,8 +242,42 @@ describe('server response caching', () => {
       const expectedBody = testCase.requestPath === '/version' ? JSON.stringify(testCase.buildMetadata) : 'abc123';
 
       expect(response.body).toBe(expectedBody);
+      expect(response.responseCount).toBe(1);
       expectNonCacheableResponse(response);
     });
+  });
+
+  it('keeps injected metadata isolated between server instances', async () => {
+    const mainServer = new Server(createServerConfiguration(), createClientConfiguration(), mainBuildMetadata);
+    const releaseServer = new Server(createServerConfiguration(), createClientConfiguration(), releaseBuildMetadata);
+    const mainHttpServer = http.createServer(getServerApplication(mainServer));
+    const releaseHttpServer = http.createServer(getServerApplication(releaseServer));
+    let mainServerIsListening = false;
+    let releaseServerIsListening = false;
+
+    try {
+      const mainBaseUrl = await openHttpServer(mainHttpServer);
+      mainServerIsListening = true;
+      const releaseBaseUrl = await openHttpServer(releaseHttpServer);
+      releaseServerIsListening = true;
+
+      const [mainResponse, releaseResponse] = await Promise.all([
+        requestHttpResponse(mainBaseUrl, '/version'),
+        requestHttpResponse(releaseBaseUrl, '/version'),
+      ]);
+
+      expect(mainResponse.body).toBe(JSON.stringify(mainBuildMetadata));
+      expect(releaseResponse.body).toBe(JSON.stringify(releaseBuildMetadata));
+      expect(mainResponse.responseCount).toBe(1);
+      expect(releaseResponse.responseCount).toBe(1);
+    } finally {
+      if (mainServerIsListening) {
+        await closeHttpServer(mainHttpServer);
+      }
+      if (releaseServerIsListening) {
+        await closeHttpServer(releaseHttpServer);
+      }
+    }
   });
 
   it('keeps the public cache policy for ordinary responses', async () => {

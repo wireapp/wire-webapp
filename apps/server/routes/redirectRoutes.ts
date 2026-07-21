@@ -63,53 +63,53 @@ export function redirectToJoinConversation(request: Request, response: Response)
   );
 }
 
-export const RedirectRoutes = (config: ServerConfig, buildMetadata: BuildMetadata) => {
+export function RedirectRoutes(config: ServerConfig, buildMetadata: BuildMetadata): express.Router {
   const router = express.Router();
 
-  return [
-    router.get('/robots.txt', async (req, res) => {
-      const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as ReadonlyArray<string>).includes(req.hostname)
-        ? config.ROBOTS.ALLOW
-        : config.ROBOTS.DISALLOW;
-      return res.contentType('text/plain; charset=UTF-8').send(robotsContent);
-    }),
-    router.get('/join/?', redirectToJoinConversation),
-    router.get('/browser/?', (req, res, next) => {
-      if (config.DEVELOPMENT) {
-        return next();
-      }
-      const userAgent = req.header('User-Agent');
-      const parseResult = BrowserUtil.parseUserAgent(userAgent);
-      return res.json(parseResult);
-    }),
-    router.get('/test/agent/?', (req, res) => {
-      const userAgent = req.header('User-Agent');
-      const parseResult = BrowserUtil.parseUserAgent(userAgent);
-      return res.json(parseResult);
-    }),
-    router.get('/commit/?', (_req, res) => {
-      const response = setNonCacheHeaders(res);
+  router.get('/robots.txt', async (req, res) => {
+    const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as ReadonlyArray<string>).includes(req.hostname)
+      ? config.ROBOTS.ALLOW
+      : config.ROBOTS.DISALLOW;
+    return res.contentType('text/plain; charset=UTF-8').send(robotsContent);
+  });
+  router.get('/join/?', redirectToJoinConversation);
+  router.get('/browser/?', (req, res, next) => {
+    if (config.DEVELOPMENT) {
+      return next();
+    }
+    const userAgent = req.header('User-Agent');
+    const parseResult = BrowserUtil.parseUserAgent(userAgent);
+    return res.json(parseResult);
+  });
+  router.get('/test/agent/?', (req, res) => {
+    const userAgent = req.header('User-Agent');
+    const parseResult = BrowserUtil.parseUserAgent(userAgent);
+    return res.json(parseResult);
+  });
+  router.get('/commit/?', (_req, res) => {
+    const response = setNonCacheHeaders(res);
 
-      return response.send(config.COMMIT);
-    }),
-    router.get('/version/?', (_req, res) => {
-      const response = setNonCacheHeaders(res);
+    return response.send(config.COMMIT);
+  });
+  router.get('/version/?', (_req, res) => {
+    const response = setNonCacheHeaders(res);
 
-      return response.json(buildMetadata);
-    }),
+    return response.json(buildMetadata);
+  });
     /**
      * This route is used by the OIDC Provider to redirect the user back to the client.
      * The OIDC Provider will redirect the user to this route with a query string containing the necessary information for the client to complete the authentication.
      */
-    router.get('/oidc?', (_req, res) => {
-      const {query} = _req;
-      const queryString = Object.keys(query)
-        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key] as string)}`)
-        .join('&');
-      return res.redirect(
-        HTTP_STATUS.MOVED_TEMPORARILY,
-        `/?${Boolean(queryString) ? queryString : 'no_query=true'}#/e2ei-redirect`,
-      );
-    }),
-  ];
-};
+  router.get('/oidc?', (_req, res) => {
+    const {query} = _req;
+    const queryString = Object.keys(query)
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key] as string)}`)
+      .join('&');
+    return res.redirect(
+      HTTP_STATUS.MOVED_TEMPORARILY,
+      `/?${Boolean(queryString) ? queryString : 'no_query=true'}#/e2ei-redirect`,
+    );
+  });
+
+  return router;
+}
