@@ -251,12 +251,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          sparse-checkout: |
-            .nvmrc
-            .github/actions/verify-webapp-runtime
-            bin/validateRuntimeResponses.mts
-            bin/validateRuntimeResponses.ts
-          sparse-checkout-cone-mode: false
+          fetch-depth: 1
 
       - name: Setup Node.js for runtime verification
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
@@ -407,7 +402,6 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
-          sparse-checkout: .github/actions/notify-deployoholics
 
       - name: Announce successful release E2E gate
         uses: ./.github/actions/notify-deployoholics
@@ -649,12 +643,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          sparse-checkout: |
-            .nvmrc
-            .github/actions/verify-webapp-runtime
-            bin/validateRuntimeResponses.mts
-            bin/validateRuntimeResponses.ts
-          sparse-checkout-cone-mode: false
+          fetch-depth: 1
 
       - name: Setup Node.js for runtime verification
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
@@ -848,7 +837,6 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
-          sparse-checkout: .github/actions/notify-deployoholics
 
       - name: Announce release failure
         uses: ./.github/actions/notify-deployoholics
