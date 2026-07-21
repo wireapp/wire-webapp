@@ -17,9 +17,11 @@
  *
  */
 
+import assert from 'node:assert';
+
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {task} from 'true-myth';
+import {maybe, task} from 'true-myth';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -161,10 +163,10 @@ describe('createMeetingStore', () => {
       throw new Error('Expected loadMeetingForEdit to succeed');
     }
 
-    expect(result.value.formState.start.isJust).toBe(true);
-    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T10:00:00.000Z'));
-    expect(result.value.formState.end.isJust).toBe(true);
-    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
+    assert(maybe.isJust(result.value.formState.start));
+    expect(result.value.formState.start.value).toEqual(new Date('2026-06-16T10:00:00.000Z'));
+    assert(maybe.isJust(result.value.formState.end));
+    expect(result.value.formState.end.value).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 
   it('prefills edit form with the upcoming instance times for recurring meetings', async () => {
@@ -195,9 +197,9 @@ describe('createMeetingStore', () => {
       throw new Error('Expected loadMeetingForEdit to succeed');
     }
 
-    expect(result.value.formState.start.isJust).toBe(true);
-    expect(result.value.formState.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T10:00:00.000Z'));
-    expect(result.value.formState.end.isJust).toBe(true);
-    expect(result.value.formState.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-22T11:00:00.000Z'));
+    assert(maybe.isJust(result.value.formState.start));
+    expect(result.value.formState.start.value).toEqual(new Date('2026-06-22T10:00:00.000Z'));
+    assert(maybe.isJust(result.value.formState.end));
+    expect(result.value.formState.end.value).toEqual(new Date('2026-06-22T11:00:00.000Z'));
   });
 });
