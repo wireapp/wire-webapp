@@ -19,9 +19,13 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {result} from 'true-myth';
+
 import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+
+import {validateGetAllTagsResponse} from '../../../../../Conversation/ConversationCells/common/useAllCellsTagsStore/useAllCellsTagsStore';
 
 type UseGetAllTagsProps = {
   cellsRepository: CellsRepository;
@@ -43,9 +47,14 @@ export const useGetAllTags = (properties: UseGetAllTagsProps): UseGetAllTagsResu
   const fetchTags = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     try {
-      const tags = await cellsRepository.getAllTags();
-      const filteredTags = tags.Values?.map(tag => tag).filter(Boolean) ?? [];
-      setTags(filteredTags);
+      const tags = validateGetAllTagsResponse(await cellsRepository.getAllTags());
+
+      if (result.isErr(tags)) {
+        setError(tags.error);
+        return;
+      }
+
+      setTags(tags.value);
     } catch (error: unknown) {
       setError(error instanceof Error ? error : new Error('Unknown error'));
     } finally {

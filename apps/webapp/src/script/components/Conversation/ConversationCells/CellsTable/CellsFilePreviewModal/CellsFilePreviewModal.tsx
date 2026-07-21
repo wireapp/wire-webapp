@@ -20,6 +20,7 @@
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
+import {sortTagsAlphabetically} from '../../common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 // This component is duplicated across global view and conversation view
@@ -62,7 +63,7 @@ export const CellsFilePreviewModal = () => {
       status={filePreviewUrl === undefined ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
-      badges={tags}
+      badges={sortTagsAlphabetically(tags)}
       isEditMode={isEditMode}
     />
   );
