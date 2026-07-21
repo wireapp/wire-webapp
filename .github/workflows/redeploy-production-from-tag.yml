@@ -89,7 +89,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          ref: main
+          ref: ${{ github.workflow_sha }}
           fetch-depth: 1
           path: workflow-source
 
@@ -116,14 +116,12 @@ jobs:
             echo "commit_subject=${commit_subject}"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Setup Node.js
+      - name: Setup Node.js for workflow tools
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: 'workflow-source/.nvmrc'
           cache: 'yarn'
-          cache-dependency-path: |
-            workflow-source/yarn.lock
-            selected-release/yarn.lock
+          cache-dependency-path: 'workflow-source/yarn.lock'
 
       - name: Install workflow tool dependencies
         working-directory: workflow-source
@@ -132,6 +130,13 @@ jobs:
       - name: Build workflow tool dependencies
         working-directory: workflow-source
         run: ./bin/yarn nx run config-lib:build
+
+      - name: Setup Node.js for selected release
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: 'selected-release/.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: 'selected-release/yarn.lock'
 
       - name: Install selected release dependencies
         working-directory: selected-release
@@ -147,6 +152,11 @@ jobs:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
         run: ./bin/yarn build:prod:public
+
+      - name: Restore Node.js for workflow tools
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: 'workflow-source/.nvmrc'
 
       - name: Validate redeploy artifact metadata
         id: validate_artifact_metadata
