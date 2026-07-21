@@ -27,6 +27,8 @@ flowchart LR
   edgeEnvironment[Edge]
   hostedDevEnvironment[Hosted Dev<br/>Staging backend]
   developmentDistribution[Publish dev Docker image and Helm chart<br/>Update wire-builds/dev]
+  runReleaseWebApp[Run Release WebApp]
+  prepareReleaseBranch[Prepare release branch<br/>Resolve one exact source commit]
   releaseBranch[release/YYYY-MM-DD.N]
   releaseArtifact[Release artifact]
   betaEnvironment[Beta company validation<br/>Production backend]
@@ -44,7 +46,7 @@ flowchart LR
   mainBranch -->|Every eligible delivery deploys| edgeEnvironment
   mainBranch -->|Every eligible delivery deploys| hostedDevEnvironment
   mainBranch -->|Publish development distribution| developmentDistribution
-  mainBranch -->|Create release branch| releaseBranch
+  runReleaseWebApp --> prepareReleaseBranch --> releaseBranch
   releaseBranch -->|Build once| releaseArtifact
   releaseArtifact -->|Deploy| betaEnvironment
   betaEnvironment -->|Verify Production runtime| betaTag
@@ -73,7 +75,7 @@ flowchart LR
 
 ## Decision
 
-We will adopt a trunk-based, GitHub-driven release process with automatic beta deployments from release branches, explicit quality assurance approval before production, and post-deployment production tagging.
+We will adopt a trunk-based, GitHub-driven WebApp release process with `Release WebApp` as the single normal-release entrypoint, explicit quality assurance approval before hosted Production, and post-deployment Production tagging.
 
 ### Environment audiences and stability expectations
 
@@ -94,13 +96,21 @@ The branch model is:
 - `main` is the single trunk branch and the source for Edge and hosted Dev deployments.
 - During the migration, `main` was established from the active `dev` history because `dev` contained the current development history at cutover time.
 - `dev` and `master` are legacy branches retained temporarily for compatibility and old release-path retirement; normal development no longer targets either branch.
-- Release branches are cut from `main` as `release/YYYY-MM-DD.N`.
+- `Release WebApp` creates a missing `release/YYYY-MM-DD.N` branch from one exact source commit or reuses the existing branch head without moving it.
 - Removing the legacy branches is a later operational cleanup decision.
 - On-premises maintenance branches are created only when a customer-managed release line needs maintenance after the original production release.
 
 The release identifier uses the release branch name: `YYYY-MM-DD.N`. The full identifier is anchored to the release branch, not to the later deployment date. For example, updates to `release/2026-05-05.1` always create tags in the `2026-05-05.1` family, even if a hotfix is added on a later day.
 
-The cloud release process is:
+The WebApp release process is:
+
+- `Release WebApp` is the single user-facing normal-release entrypoint. The release captain supplies a release identifier in `YYYY-MM-DD.N` format; the workflow derives `release/YYYY-MM-DD.N` and performs branch preparation, hosted deployment, validation, approval, and release distribution.
+- When the derived release branch does not exist, `Release WebApp` resolves the requested `source_ref` to one exact remote commit, creates the branch at that commit without force-pushing, refetches it, and verifies the resulting remote head. If another run wins the creation race, the workflow resolves and reuses the actual remote branch.
+- When the derived release branch already exists, its current remote head is authoritative. The workflow reuses that branch without moving it to `source_ref`, current `main`, or any other commit. Reviewed fixes may therefore update an active release branch before a later candidate run.
+- Repeated dispatches with the same identifier reuse the release branch and build its current head, producing subsequent Beta candidates such as `YYYY-MM-DD.N-beta.2`. A new identifier is required to release a newer state of `main`.
+- Hosted Beta and hosted Production are deployment stages operated by Wire. E2E remains a blocking release gate, and Production approval remains explicit through the `wire-webapp-prod` GitHub Environment.
+- Docker, Helm, and `wire-builds/main` form the release distribution consumed by hosted and customer-managed deployments. Release distribution is part of the complete WebApp release lifecycle, not merely a hosted deployment detail.
+- The standalone branch-creation workflow no longer exists; automatic release-branch triggering remains disabled during the transition.
 
 - `publish-main.yml` owns delivery of every eligible `main` commit. It builds the internal application exactly once, then deploys that same internal artifact to Edge and hosted Dev. Edge remains the immediate trunk dogfooding environment.
 - The development distribution retains the external channel name `dev`: it publishes the Docker image and a matching prerelease Helm chart, then updates `wire-builds/dev`.
@@ -113,19 +123,17 @@ The cloud release process is:
 - Development, verified Production, and remaining legacy distribution paths share one non-cancellable queued publication group with `queue: max`, which preserves pending publications until the legacy workflow is deleted.
 - Every merge to `main` deploys continuously to Edge without an approval gate. A newer `main` commit may supersede an in-progress Edge deployment.
 - A stale queued main publication checks the current `main` commit after acquiring the shared distribution lock and skips before external publication instead of regressing the shared `dev` channel.
-- The release workflow is explicitly dispatched for `release/YYYY-MM-DD.N`; automatic release-branch triggering remains disabled during the transition.
-- The release workflow deploys the release branch to Beta.
-- After a successful beta deployment, the workflow creates a beta tag such as `YYYY-MM-DD.N-beta.1`, `YYYY-MM-DD.N-beta.2`, and so on.
+- `Release WebApp` deploys the exact prepared release commit and artifact to hosted Beta, creates a beta tag such as `YYYY-MM-DD.N-beta.1`, and deploys that same artifact to the dedicated E2E validation environment connected to Staging backend services.
 - Beta tag numbers are derived from existing beta tags for the release identifier. If concurrent workflows try to create the same tag for different commits, the later workflow must fail and be rerun after fetching the latest tags.
-- The release workflow deploys the Beta artifact to a dedicated E2E validation environment connected to Staging backend services, runs E2E there, and reports the result to Testiny.
+- The workflow runs E2E there and reports the result to Testiny.
 - The complete selected release E2E suite is a blocking full-system Production gate. The suite is not split into blocking and advisory tests, and no selected release E2E test uses `continue-on-error` or a flaky-test quarantine.
 - This gate intentionally validates the complete Wire system: frontend, backend, infrastructure, and integration failures may all block Production because customers consume the whole system.
 - Test implementation defects are fixed as test defects; known instability is not converted into `continue-on-error`.
 - Temporary system outages require investigation and a manual decision on whether to rerun. Failed tests may be manually rerun only after investigation; automatic test reruns are not part of the release decision.
 - Successful E2E and Testiny reporting are required before Production promotion.
 - Production preflight is not allowed after any E2E failure, and QA approval cannot override a technically failed E2E gate in this workflow.
-- Failed release gates use the Release Cloud failure notification with stage evidence and Playwright report links when available.
-- After a successful E2E gate and Production preflight, Release Cloud notifies Deployoholics that the candidate passed and reports whether Production is ready for approval, unnecessary because the release is already tagged, or not requested. Notification delivery is informational and does not gate the release. The reusable precommit workflow's optional failure notification remains disabled to prevent duplicate failure messages.
+- Failed release gates use the WebApp release failure notification with stage evidence and Playwright report links when available.
+- After a successful E2E gate and Production preflight, `Release WebApp` notifies Deployoholics that the candidate passed and reports whether hosted Production is ready for approval, unnecessary because the release is already tagged, or not requested. Notification delivery is informational and does not gate the release. The reusable precommit workflow's optional failure notification remains disabled to prevent duplicate failure messages.
 - The production deployment job waits for GitHub Environment approval on the production environment.
 - GitHub Environment approval means the workflow pauses before using the production environment until configured reviewers approve or reject the deployment in GitHub.
 - Quality assurance owns the go/no-go quality gate.
@@ -136,13 +144,13 @@ The cloud release process is:
 - Deployment context such as the result, Git reference, target environment, service URLs, Docker image, Helm chart, `wire-builds` commit, workflow run URL, and manual-dispatch reason belongs in GitHub Actions summaries rather than `/version`.
 - Backend configuration is runtime state and is not inferred from build identity. Beta, precommit, and Production must each satisfy their expected combination of build version, source commit, REST backend, and WebSocket backend.
 - A successful deployment operation alone does not create a Production tag. The workflow creates the production tag `YYYY-MM-DD.N-production` only after all Production runtime assertions pass, so the tag represents a successfully deployed and verified runtime.
-- The cloud EBS artifact is built once and promoted unchanged through Beta, E2E, and Production.
+- The hosted-deployment EBS artifact is built once and promoted unchanged through hosted Beta, E2E, and hosted Production.
 - A Production-capable run also preserves the exact public build outputs needed by the Dockerfile. The public Docker image is built from those outputs, from the same release commit, without rebuilding the application.
 - Docker and Helm publication starts only after Production deployment and runtime verification succeed and the immutable Production tag has been created.
 - `wire-builds/main` is updated only after the immutable image and Helm chart have been published or reused and verified.
-- A Production tag represents verified cloud deployment. The release is fully distributed only after the `wire-builds/main` update succeeds.
-- A distribution failure does not move or delete the Production tag. The Release Cloud run remains failed and identifies the release as incomplete for on-premises distribution.
-- A dedicated reusable distribution workflow is called explicitly by Release Cloud after the immutable Production tag exists. A separate manual repair workflow validates confirmation, reason, and the existing annotated Production tag before calling the same reusable workflow for a partial distribution failure. Publication is not triggered by a tag listener.
+- A Production tag represents verified hosted Production deployment. The release is fully distributed only after the `wire-builds/main` update succeeds.
+- A distribution failure does not move or delete the Production tag. The WebApp release run remains failed and identifies the release as incomplete for customer-managed distribution.
+- A dedicated reusable distribution workflow is called explicitly by `Release WebApp` after the immutable Production tag exists. A separate manual repair workflow validates confirmation, reason, and the existing annotated Production tag before calling the same reusable workflow for a partial distribution failure. Publication is not triggered by a tag listener.
 - Docker, Helm, and `wire-builds/main` publication is retry-safe and idempotent. Existing immutable image and chart identities are reused, and an exact `wire-builds` entry is a no-op.
 - The current WebApp distribution policy is preserved: when no matching chart exists, Helm publication uses the prerelease chart version sequence consumed by `wire-builds/main`.
 - A `wire-builds/main` update may change only the top-level `version` and `helmCharts.webapp`; every other field and chart entry must remain byte-for-byte equivalent after normalized JSON comparison.
@@ -156,6 +164,7 @@ Release workflows must be serialized:
 - Only one Production deployment may run at a time for the repository.
 - Production deployments must not be cancelled automatically.
 - The repository-wide Production lock covers deployment, runtime verification, Production tag creation, Docker publication, Helm publication, and the `wire-builds/main` update. Manual distribution repairs use the same lock.
+- WebApp releases, Production rollbacks, and Production distribution repairs use the same non-cancellable concurrency group with `queue: max` so pending Production operations are preserved rather than replaced.
 
 - Release workflow failures and stalled approvals are monitored by the engineering release captain and announced in Wire.
 
@@ -163,7 +172,8 @@ Release workflows must be serialized:
 flowchart TD
   mergeToMain[Merge to main]
   deployToEdge[Deploy to Edge]
-  createReleaseBranch[Create or update release/YYYY-MM-DD.N]
+  runReleaseWebApp[Run Release WebApp]
+  prepareReleaseBranch[Prepare release branch<br/>Create or reuse release/YYYY-MM-DD.N]
   buildArtifact[Build release artifact once]
   deployToBeta[Deploy artifact to Beta<br/>Production backend]
   verifyBetaRuntime[Verify Beta runtime<br/>Build version, source commit, and Production backends]
@@ -185,7 +195,7 @@ flowchart TD
   deployKnownGoodArtifact[Deploy previous known-good production artifact]
 
   mergeToMain --> deployToEdge
-  createReleaseBranch --> buildArtifact --> deployToBeta --> verifyBetaRuntime --> createBetaTag
+  runReleaseWebApp --> prepareReleaseBranch --> buildArtifact --> deployToBeta --> verifyBetaRuntime --> createBetaTag
   createBetaTag --> deployToE2E --> verifyE2ERuntime --> runEndToEndTests --> reportToTestiny
   reportToTestiny --> productionApproval --> deployToProduction --> verifyProductionRuntime --> createProductionTag
   createProductionTag --> publishDocker --> publishHelm --> updateWireBuilds
@@ -250,4 +260,4 @@ The process depends more strongly on pull request discipline and feature flag us
 
 The legacy monolithic workflow no longer owns `dev` publication; it remains only for its legacy tag, `master`, and maintenance paths until those responsibilities are retired.
 
-On-premises customers can receive controlled maintenance artifacts without making every production release a long-term-support line or constraining the cloud release cadence.
+On-premises customers can receive controlled maintenance artifacts without making every production release a long-term-support line or constraining the WebApp release cadence.

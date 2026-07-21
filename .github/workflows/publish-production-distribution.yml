@@ -13,11 +13,11 @@ on:
         required: true
         type: string
       source_run_id:
-        description: 'Release Cloud run that created the distribution artifact'
+        description: 'WebApp release run that created the distribution artifact'
         required: true
         type: string
       distribution_artifact_name:
-        description: 'Exact distribution context artifact from Release Cloud'
+        description: 'Exact distribution context artifact from the WebApp release'
         required: true
         type: string
     outputs:

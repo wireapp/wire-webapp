@@ -221,8 +221,9 @@ jobs:
     # Production rollback approval is enforced by the wire-webapp-prod GitHub Environment settings.
     environment: wire-webapp-prod
     concurrency:
-      group: release-cloud-production
+      group: release-webapp-production
       cancel-in-progress: false
+      queue: max
 
     steps:
       - name: Download rollback artifact
