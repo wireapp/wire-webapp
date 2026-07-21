@@ -60,3 +60,15 @@ export interface ScheduleMeetingFormDisplayErrors {
   endInPast: string | undefined;
   endBeforeStart: string | undefined;
 }
+
+export const scheduleMeetingSubmitResults = {
+  submitFailed: 'submitFailed',
+  setupFailed: 'setupFailed',
+  succeeded: 'succeeded',
+} as const;
+
+export type ScheduleMeetingSubmitResult =
+  (typeof scheduleMeetingSubmitResults)[keyof typeof scheduleMeetingSubmitResults];
+
+export const wasScheduleMeetingPersisted = (result: ScheduleMeetingSubmitResult): boolean =>
+  result !== scheduleMeetingSubmitResults.submitFailed;

@@ -40,6 +40,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
 import {ScheduleMeetingForm} from './ScheduleMeetingForm';
+import {wasScheduleMeetingPersisted} from './scheduleMeetingTypes';
 import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 
@@ -86,8 +87,8 @@ export const ScheduleMeetingModal = () => {
     }
 
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      const didSchedule = await submit(formState);
-      if (didSchedule) {
+      const submitResult = await submit(formState);
+      if (wasScheduleMeetingPersisted(submitResult)) {
         handleClose();
       }
     });

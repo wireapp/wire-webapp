@@ -404,6 +404,17 @@ describe('updateMeeting', () => {
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.updateFailed);
   });
 
+  it('returns conversationSetupFailed when saving the updated conversation fails', async () => {
+    const {deps} = createDeps({
+      saveMeetingConversationFromBackend: jest.fn().mockReturnValue(task.reject(new Error('save failed'))),
+    });
+
+    const result = await updateMeeting(updateCommand(), deps);
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.conversationSetupFailed);
+  });
+
   it('returns removeParticipantsFailed when removeMembers fails', async () => {
     const alice = createUser('1');
     const bob = createUser('2');

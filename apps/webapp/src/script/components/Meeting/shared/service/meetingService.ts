@@ -141,7 +141,7 @@ export const updateMeeting = (
       saveMeetingConversationFromResponse(
         deps.conversationRepository,
         updatedMeeting.conversation,
-        meetingSubmitErrors.updateFailed,
+        meetingSubmitErrors.conversationSetupFailed,
       ).andThen(() => {
         if (is.emptyArray(usersToAdd) && is.emptyArray(userIdsToRemove)) {
           return task.resolve({failedToAdd: []});

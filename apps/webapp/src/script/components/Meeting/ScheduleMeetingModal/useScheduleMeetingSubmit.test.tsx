@@ -35,6 +35,11 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
+import {
+  scheduleMeetingSubmitResults,
+  type ScheduleMeetingSubmitResult,
+  wasScheduleMeetingPersisted,
+} from './scheduleMeetingTypes';
 
 const fixedNow = new Date('2026-06-16T09:00:00.000Z');
 const futureStartDate = new Date('2026-06-16T10:00:00.000Z');
@@ -113,33 +118,34 @@ describe('useScheduleMeetingSubmit', () => {
 
     const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
 
-    let submitResult = false;
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(true);
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.succeeded);
     expect(scheduleMeeting).toHaveBeenCalledWith(scheduleCommand);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
   });
 
-  it('refreshes meetings after a partial create failure', async () => {
+  it('returns setupFailed and refreshes meetings after a partial create failure', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const scheduleMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.addParticipantsFailed));
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
 
     const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
 
-    let submitResult = false;
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(false);
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.setupFailed);
+    expect(wasScheduleMeetingPersisted(submitResult)).toBe(true);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
   });
 
-  it('refreshes meetings after a partial update failure', async () => {
+  it('returns setupFailed and refreshes meetings after a partial update failure', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const updateMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.removeParticipantsFailed));
     const store = createMeetingStore({loadMeetings, updateMeeting});
@@ -163,29 +169,31 @@ describe('useScheduleMeetingSubmit', () => {
 
     const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
 
-    let submitResult = false;
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(false);
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.setupFailed);
+    expect(wasScheduleMeetingPersisted(submitResult)).toBe(true);
     expect(updateMeeting).toHaveBeenCalledWith(updateCommand);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
   });
 
-  it('does not refresh meetings when create fails before server state changes', async () => {
+  it('returns submitFailed and does not refresh meetings when create fails before server state changes', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const scheduleMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed));
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
 
     const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
 
-    let submitResult = false;
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(false);
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.submitFailed);
+    expect(wasScheduleMeetingPersisted(submitResult)).toBe(false);
     expect(loadMeetings).not.toHaveBeenCalled();
   });
 });
