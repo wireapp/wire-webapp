@@ -91,7 +91,7 @@ export type GitHubLinkContext = {
   readonly wireBuildsRepository: Maybe<string>;
 };
 
-export type ReleaseCloudSummaryInput = {
+export type WebappReleaseSummaryInput = {
   readonly beta: BetaSummaryInput;
   readonly distribution: ProductionDistributionSummaryInput;
   readonly e2e: E2ESummaryInput;
@@ -155,7 +155,7 @@ function readProductionPreflightResult(environment: NodeJS.ProcessEnv): Maybe<Pr
   });
 }
 
-export function readReleaseCloudSummaryInput(environment: NodeJS.ProcessEnv): ReleaseCloudSummaryInput {
+export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): WebappReleaseSummaryInput {
   return {
     beta: {
       deploymentResult: readWorkflowJobResult(environment, 'BETA_RESULT'),
@@ -805,7 +805,7 @@ function formatWireBuildsCommit(distribution: ProductionDistributionSummaryInput
     .unwrapOr('not updated');
 }
 
-function renderBetaSection(input: ReleaseCloudSummaryInput, commitLink: string, workflowRunLink: string): string {
+function renderBetaSection(input: WebappReleaseSummaryInput, commitLink: string, workflowRunLink: string): string {
   return [
     '### Beta deployment',
     '',
@@ -831,7 +831,7 @@ function renderBetaSection(input: ReleaseCloudSummaryInput, commitLink: string, 
   ].join('\n');
 }
 
-function renderE2ESection(input: ReleaseCloudSummaryInput, commitLink: string, workflowRunLink: string): string {
+function renderE2ESection(input: WebappReleaseSummaryInput, commitLink: string, workflowRunLink: string): string {
   const testinyRunName =
     input.release.identifier.isJust && input.beta.tagName.isJust
       ? formatValueOrFallback(input.e2e.testinyRunName)
@@ -856,7 +856,7 @@ function renderE2ESection(input: ReleaseCloudSummaryInput, commitLink: string, w
   ].join('\n');
 }
 
-function renderProductionReadinessSection(input: ReleaseCloudSummaryInput, workflowRunLink: string): string {
+function renderProductionReadinessSection(input: WebappReleaseSummaryInput, workflowRunLink: string): string {
   const productionSkipReason = formatProductionSkipReason(input.production);
   const productionSkipReasonLines = productionSkipReason
     .map(reason => {
@@ -879,7 +879,7 @@ function renderProductionReadinessSection(input: ReleaseCloudSummaryInput, workf
   ].join('\n');
 }
 
-function renderProductionSection(input: ReleaseCloudSummaryInput, commitLink: string, workflowRunLink: string): string {
+function renderProductionSection(input: WebappReleaseSummaryInput, commitLink: string, workflowRunLink: string): string {
   const productionSkipReason = formatProductionSkipReason(input.production);
   const productionSkipReasonLines = productionSkipReason
     .map(reason => {
@@ -914,7 +914,7 @@ function renderProductionSection(input: ReleaseCloudSummaryInput, commitLink: st
 }
 
 function renderProductionDistributionSection(
-  input: ReleaseCloudSummaryInput,
+  input: WebappReleaseSummaryInput,
   commitLink: string,
   workflowRunLink: string,
 ): string {
@@ -935,7 +935,7 @@ function renderProductionDistributionSection(
 }
 
 function renderReleaseMetadata(
-  input: ReleaseCloudSummaryInput,
+  input: WebappReleaseSummaryInput,
   title: string,
   commitLink: string,
   workflowRunLink: string,
@@ -960,13 +960,13 @@ function renderReleaseMetadata(
   ].join('\n');
 }
 
-export function renderReleaseCandidateSummary(input: ReleaseCloudSummaryInput): string {
+export function renderWebappReleaseCandidateSummary(input: WebappReleaseSummaryInput): string {
   const commitLink = formatCommitLink(input.release.commitSha, input.github);
   const workflowRunLink = formatWorkflowRunLink(input.github);
 
   return (
     [
-      renderReleaseMetadata(input, 'Release Cloud release candidate', commitLink, workflowRunLink),
+      renderReleaseMetadata(input, 'WebApp release candidate', commitLink, workflowRunLink),
       renderBetaSection(input, commitLink, workflowRunLink),
       renderE2ESection(input, commitLink, workflowRunLink),
       renderProductionReadinessSection(input, workflowRunLink),
@@ -974,13 +974,13 @@ export function renderReleaseCandidateSummary(input: ReleaseCloudSummaryInput): 
   );
 }
 
-export function renderReleaseCloudSummary(input: ReleaseCloudSummaryInput): string {
+export function renderWebappReleaseSummary(input: WebappReleaseSummaryInput): string {
   const commitLink = formatCommitLink(input.release.commitSha, input.github);
   const workflowRunLink = formatWorkflowRunLink(input.github);
 
   return (
     [
-      renderReleaseMetadata(input, 'Release Cloud', commitLink, workflowRunLink),
+      renderReleaseMetadata(input, 'WebApp release', commitLink, workflowRunLink),
       renderBetaSection(input, commitLink, workflowRunLink),
       renderE2ESection(input, commitLink, workflowRunLink),
       renderProductionSection(input, commitLink, workflowRunLink),
@@ -989,9 +989,9 @@ export function renderReleaseCloudSummary(input: ReleaseCloudSummaryInput): stri
   );
 }
 
-type ReleaseCloudSummaryPhase = 'candidate' | 'final';
+type WebappReleaseSummaryPhase = 'candidate' | 'final';
 
-function readReleaseCloudSummaryPhase(commandLineArguments: readonly string[]): ReleaseCloudSummaryPhase {
+function readWebappReleaseSummaryPhase(commandLineArguments: readonly string[]): WebappReleaseSummaryPhase {
   if (commandLineArguments.includes('--release-candidate')) {
     return 'candidate';
   }
@@ -1001,10 +1001,12 @@ function readReleaseCloudSummaryPhase(commandLineArguments: readonly string[]): 
 
 function main(): void {
   try {
-    const input = readReleaseCloudSummaryInput(process.env);
-    const summaryPhase = readReleaseCloudSummaryPhase(process.argv.slice(2));
+    const input = readWebappReleaseSummaryInput(process.env);
+    const summaryPhase = readWebappReleaseSummaryPhase(process.argv.slice(2));
     const summary =
-      summaryPhase === 'candidate' ? renderReleaseCandidateSummary(input) : renderReleaseCloudSummary(input);
+      summaryPhase === 'candidate'
+        ? renderWebappReleaseCandidateSummary(input)
+        : renderWebappReleaseSummary(input);
 
     process.stdout.write(summary);
   } catch (error) {
@@ -1014,6 +1016,6 @@ function main(): void {
   }
 }
 
-if (process.argv[1]?.endsWith('renderReleaseCloudSummary.ts') === true) {
+if (process.argv[1]?.endsWith('renderWebappReleaseSummary.ts') === true) {
   main();
 }

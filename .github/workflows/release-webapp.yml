@@ -1,5 +1,5 @@
 ---
-name: Release Cloud
+name: Release WebApp
 
 on:
   # Automatic release/** triggering is intentionally disabled during the
@@ -357,7 +357,7 @@ jobs:
 
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
 
-  # Release Cloud owns release-specific success and failure notifications.
+  # WebApp release owns release-specific success and failure notifications.
   # The reusable workflow's optional failure-only notification is intentionally
   # not enabled here to prevent duplicate failure messages.
   run_e2e:
@@ -543,7 +543,7 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout Release Cloud summary renderer
+      - name: Checkout WebApp release summary renderer
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
@@ -597,7 +597,7 @@ jobs:
           RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
           RELEASE_REASON: ${{ inputs.reason }}
           TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
-        run: node bin/renderReleaseCloudSummary.ts --release-candidate >> "$GITHUB_STEP_SUMMARY"
+        run: node bin/renderWebappReleaseSummary.ts --release-candidate >> "$GITHUB_STEP_SUMMARY"
 
   deploy_to_production:
     name: Deploy to Production
@@ -747,7 +747,7 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout Release Cloud summary renderer
+      - name: Checkout WebApp release summary renderer
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
@@ -815,7 +815,7 @@ jobs:
           RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
           RELEASE_REASON: ${{ inputs.reason }}
           TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
-        run: node bin/renderReleaseCloudSummary.ts >> "$GITHUB_STEP_SUMMARY"
+        run: node bin/renderWebappReleaseSummary.ts >> "$GITHUB_STEP_SUMMARY"
 
   notify_release_failure:
     name: Notify release failure
@@ -850,7 +850,7 @@ jobs:
           webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           status: failure
           text: |
-            ❌ Release Cloud blocked Production ❌
+            ❌ WebApp release blocked Production ❌
 
             Release: ${{ needs.build_artifact.outputs.release_identifier || 'unavailable' }}
             Branch: ${{ needs.build_artifact.outputs.release_branch || inputs.release_branch || 'unavailable' }}
