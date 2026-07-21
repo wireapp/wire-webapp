@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Maybe, Result} from 'true-myth';
 import {result} from 'true-myth';
@@ -43,7 +44,7 @@ export const getScheduleMeetingFormErrors = ({
       : undefined;
 
   return {
-    title: !title.trim() ? 'meetings.scheduleModal.error.titleRequired' : undefined,
+    title: is.emptyString(title.trim()) ? 'meetings.scheduleModal.error.titleRequired' : undefined,
     startInPast:
       start.isJust && start.value.getTime() <= currentTimestampInMilliseconds
         ? 'meetings.schedule.errors.startInPast'

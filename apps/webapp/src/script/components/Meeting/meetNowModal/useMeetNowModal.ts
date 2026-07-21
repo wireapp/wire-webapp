@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {result, type Result} from 'true-myth';
 import {create} from 'zustand';
 
@@ -53,7 +54,7 @@ const initialState = {
 };
 
 export const getMeetNowFormErrors = ({title}: MeetNowFormState): MeetNowFormErrors => ({
-  title: !title.trim() ? 'meetings.scheduleModal.error.titleRequired' : undefined,
+  title: is.emptyString(title.trim()) ? 'meetings.scheduleModal.error.titleRequired' : undefined,
 });
 
 export const hasMeetNowFormErrors = (errors: MeetNowFormErrors): boolean => errors.title !== undefined;
