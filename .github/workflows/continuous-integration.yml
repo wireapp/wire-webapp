@@ -79,6 +79,9 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
+      - name: Verify sparse runtime validation entry point
+        run: bash ./bin/verifySparseRuntimeValidation.sh
+
       - name: Install dependencies
         run: ./bin/yarn --immutable
 

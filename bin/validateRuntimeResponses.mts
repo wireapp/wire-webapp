@@ -20,7 +20,6 @@
  */
 
 import {readFileSync} from 'node:fs';
-import {fileURLToPath} from 'node:url';
 
 import {validateRuntimeResponses} from './validateRuntimeResponses.ts';
 import type {BuildMetadata} from '@wireapp/config';
@@ -61,6 +60,4 @@ function run(): void {
   }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  run();
-}
+run();
