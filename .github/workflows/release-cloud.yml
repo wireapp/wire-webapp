@@ -250,8 +250,17 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          sparse-checkout: .github/actions/verify-webapp-runtime
-          sparse-checkout-cone-mode: true
+          sparse-checkout: |
+            .nvmrc
+            .github/actions/verify-webapp-runtime
+            bin/validateRuntimeResponses.mts
+            bin/validateRuntimeResponses.ts
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node.js for runtime verification
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
 
       - name: Download build artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
@@ -573,8 +582,17 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          sparse-checkout: .github/actions/verify-webapp-runtime
-          sparse-checkout-cone-mode: true
+          sparse-checkout: |
+            .nvmrc
+            .github/actions/verify-webapp-runtime
+            bin/validateRuntimeResponses.mts
+            bin/validateRuntimeResponses.ts
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node.js for runtime verification
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
 
       - name: Verify Production runtime
         uses: ./.github/actions/verify-webapp-runtime

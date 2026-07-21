@@ -81,10 +81,7 @@ function writeMetadataOutputs(metadata: BuildMetadata): void {
     return;
   }
 
-  appendFileSync(
-    githubOutputPath.value,
-    formatBuildArtifactMetadataOutputs(metadata),
-  );
+  appendFileSync(githubOutputPath.value, formatBuildArtifactMetadataOutputs(metadata));
 }
 
 function validateArtifact(): BuildMetadata {

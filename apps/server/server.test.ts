@@ -235,8 +235,7 @@ describe('server response caching', () => {
     await withHttpServer(clientConfiguration, testCase.buildMetadata, async baseUrl => {
       const response = await requestHttpResponse(baseUrl, testCase.requestPath);
 
-      const expectedBody =
-        testCase.requestPath === '/version' ? JSON.stringify(testCase.buildMetadata) : 'abc123';
+      const expectedBody = testCase.requestPath === '/version' ? JSON.stringify(testCase.buildMetadata) : 'abc123';
 
       expect(response.body).toBe(expectedBody);
       expectNonCacheableResponse(response);
