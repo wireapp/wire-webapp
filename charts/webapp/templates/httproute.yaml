@@ -15,6 +15,10 @@ metadata:
     {{- range $key, $val := .Values.gateway.httpRouteAnnotations }}
     {{ $key }}: {{ $val | quote }}
     {{- end }}
+    {{- $setIdentifier := include "webapp.externalDnsSetIdentifier" (dict "ctx" . "kind" "envoy") | trim -}}
+    {{- if $setIdentifier }}
+    external-dns.alpha.kubernetes.io/set-identifier: {{ $setIdentifier | quote }}
+    {{- end }}
     {{- if not (hasKey .Values.gateway.httpRouteAnnotations "external-dns.alpha.kubernetes.io/hostname") }}
     external-dns.alpha.kubernetes.io/hostname: {{ .Values.webappDomain | quote }}
     {{- end }}

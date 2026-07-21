@@ -95,6 +95,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 {{- end -}}
 
+{{- define "webapp.externalDnsSetIdentifier" -}}
+{{- $ctx := .ctx -}}
+{{- $kind := .kind -}}
+{{- if eq (include "webapp.routingMode" $ctx) "migration" -}}
+{{- printf "%s-%s" (include "webapp.baseName" $ctx) $kind -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "webapp.listenerSetName" -}}
 {{- printf "%s-listeners" (include "webapp.baseName" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

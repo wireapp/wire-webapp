@@ -23,6 +23,10 @@ metadata:
     {{- range $key, $val := .Values.ingress.annotations }}
     {{ $key }}: {{ $val | quote }}
     {{- end }}
+    {{- $setIdentifier := include "webapp.externalDnsSetIdentifier" (dict "ctx" . "kind" "nginx") | trim -}}
+    {{- if $setIdentifier }}
+    external-dns.alpha.kubernetes.io/set-identifier: {{ $setIdentifier | quote }}
+    {{- end }}
     {{- if .Values.ingress.renderCSPInIngress }}
     {{- if not (contains $ingressClass "nginx") }}
         {{- fail "In ingress CSP header setting only works with a 'nginx' controller. (Rename it to 'nginx-*' if it is one.)" }}
