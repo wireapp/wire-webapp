@@ -50,7 +50,7 @@ function expectValidationError(validationErrors: readonly string[], expectedFiel
 }
 
 describe('runtime build metadata verification', () => {
-  test('accepts complete matching metadata and backend configuration', () => {
+  it('accepts complete matching metadata and backend configuration', () => {
     expect(validateMatchingRuntimeResponses(mainBuildMetadata, matchingRuntimeConfiguration)).toEqual([]);
   });
 
@@ -65,7 +65,7 @@ describe('runtime build metadata verification', () => {
     expectValidationError(validationErrors, propertyName);
   });
 
-  test('rejects missing assetVersion', () => {
+  it('rejects missing assetVersion', () => {
     const versionResponse = JSON.stringify({
       version: mainBuildMetadata.version,
       commit: mainBuildMetadata.commit,
@@ -77,7 +77,7 @@ describe('runtime build metadata verification', () => {
     expectValidationError(validationErrors, 'assetVersion');
   });
 
-  test('rejects missing builtAt', () => {
+  it('rejects missing builtAt', () => {
     const versionResponse = JSON.stringify({
       version: mainBuildMetadata.version,
       assetVersion: mainBuildMetadata.assetVersion,
@@ -89,13 +89,13 @@ describe('runtime build metadata verification', () => {
     expectValidationError(validationErrors, 'builtAt');
   });
 
-  test('rejects malformed JSON', () => {
+  it('rejects malformed JSON', () => {
     const validationErrors = validateBuildMetadataResponse('{not-json', mainBuildMetadata);
 
     expect(validationErrors).toEqual(['/version response is not valid JSON']);
   });
 
-  test('continues validating backend configuration', () => {
+  it('continues validating backend configuration', () => {
     const runtimeConfiguration = matchingRuntimeConfiguration.replaceAll(
       'backend.example.com',
       'other-backend.example.com',
@@ -107,7 +107,7 @@ describe('runtime build metadata verification', () => {
     expectValidationError(validationErrors, 'BACKEND_WS');
   });
 
-  test('does not reconstruct assetVersion or builtAt from other metadata fields', () => {
+  it('does not reconstruct assetVersion or builtAt from other metadata fields', () => {
     const actualBuildMetadata = {
       version: mainBuildMetadata.version,
       assetVersion: 'main-bdb93c9-reconstructed',
