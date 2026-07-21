@@ -164,6 +164,7 @@ Release workflows must be serialized:
 - Only one Production deployment may run at a time for the repository.
 - Production deployments must not be cancelled automatically.
 - The repository-wide Production lock covers deployment, runtime verification, Production tag creation, Docker publication, Helm publication, and the `wire-builds/main` update. Manual distribution repairs use the same lock.
+- WebApp releases, Production rollbacks, and Production distribution repairs use the same non-cancellable concurrency group with `queue: max` so pending Production operations are preserved rather than replaced.
 
 - Release workflow failures and stalled approvals are monitored by the engineering release captain and announced in Wire.
 

@@ -223,6 +223,7 @@ jobs:
     concurrency:
       group: release-webapp-production
       cancel-in-progress: false
+      queue: max
 
     steps:
       - name: Download rollback artifact

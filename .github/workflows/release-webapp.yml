@@ -33,6 +33,7 @@ on:
 concurrency:
   group: ${{ inputs.promote_to_production && 'release-webapp-production' || format('release-webapp-beta-{0}', inputs.release_identifier) }}
   cancel-in-progress: false
+  queue: max
 
 permissions: {}
 
