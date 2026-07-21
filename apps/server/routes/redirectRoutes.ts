@@ -96,10 +96,10 @@ export function RedirectRoutes(config: ServerConfig, buildMetadata: BuildMetadat
 
     return response.json(buildMetadata);
   });
-    /**
-     * This route is used by the OIDC Provider to redirect the user back to the client.
-     * The OIDC Provider will redirect the user to this route with a query string containing the necessary information for the client to complete the authentication.
-     */
+  /**
+   * This route is used by the OIDC Provider to redirect the user back to the client.
+   * The OIDC Provider will redirect the user to this route with a query string containing the necessary information for the client to complete the authentication.
+   */
   router.get('/oidc?', (_req, res) => {
     const {query} = _req;
     const queryString = Object.keys(query)

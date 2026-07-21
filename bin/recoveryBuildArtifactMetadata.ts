@@ -104,7 +104,9 @@ function validateLegacyBuildArtifactMetadata(
 
   if (isLegacyTimestampBuildVersion(input.expectedVersion) && version !== input.expectedVersion) {
     return Result.err(
-      new Error(`Legacy build artifact version '${version}' does not match expected version '${input.expectedVersion}'`),
+      new Error(
+        `Legacy build artifact version '${version}' does not match expected version '${input.expectedVersion}'`,
+      ),
     );
   }
 

@@ -23,10 +23,7 @@ import {appendFileSync} from 'node:fs';
 
 import {Maybe} from 'true-myth';
 
-import {
-  readBuildArtifactHtmlDocuments,
-  readBuildArtifactMetadata,
-} from './buildArtifactArchive.ts';
+import {readBuildArtifactHtmlDocuments, readBuildArtifactMetadata} from './buildArtifactArchive.ts';
 import {formatRecoverableBuildArtifactMetadataOutputs} from './recoveryBuildArtifactMetadataOutput.ts';
 import {validateRecoveryBuildArtifactMetadata} from './recoveryBuildArtifactMetadata.ts';
 import type {RecoverableBuildMetadata} from './recoveryBuildArtifactMetadata.ts';

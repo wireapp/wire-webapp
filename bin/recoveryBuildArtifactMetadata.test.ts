@@ -96,10 +96,13 @@ describe('recovery build artifact metadata validation', () => {
   });
 
   it('rejects a legacy commit mismatch', () => {
-    const validationResult = validateMetadata({
-      version: '2026.07.15.12.00',
-      commit: 'fedcba9876543210fedcba9876543210fedcba98',
-    }, '2026.07.15.12.00');
+    const validationResult = validateMetadata(
+      {
+        version: '2026.07.15.12.00',
+        commit: 'fedcba9876543210fedcba9876543210fedcba98',
+      },
+      '2026.07.15.12.00',
+    );
 
     expect(validationResult.isErr).toBe(true);
     if (validationResult.isErr) {
@@ -108,11 +111,14 @@ describe('recovery build artifact metadata validation', () => {
   });
 
   it('rejects a current commit mismatch', () => {
-    const validationResult = validateMetadata({
-      ...releaseBuildMetadata,
-      commit: 'fedcba9876543210fedcba9876543210fedcba98',
-      assetVersion: '2026-07-20.1-fedcba9',
-    }, releaseBuildMetadata.version);
+    const validationResult = validateMetadata(
+      {
+        ...releaseBuildMetadata,
+        commit: 'fedcba9876543210fedcba9876543210fedcba98',
+        assetVersion: '2026-07-20.1-fedcba9',
+      },
+      releaseBuildMetadata.version,
+    );
 
     expect(validationResult.isErr).toBe(true);
     if (validationResult.isErr) {

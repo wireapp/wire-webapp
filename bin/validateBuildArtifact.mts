@@ -23,10 +23,7 @@ import {appendFileSync} from 'node:fs';
 
 import {Maybe} from 'true-myth';
 
-import {
-  readBuildArtifactHtmlDocuments,
-  readBuildArtifactMetadata,
-} from './buildArtifactArchive.ts';
+import {readBuildArtifactHtmlDocuments, readBuildArtifactMetadata} from './buildArtifactArchive.ts';
 import {validateBuildArtifactMetadata} from './buildArtifactMetadata.ts';
 import {formatBuildArtifactMetadataOutputs} from './buildArtifactMetadataOutput.ts';
 import type {BuildMetadata} from '@wireapp/config';
