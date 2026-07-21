@@ -62,13 +62,11 @@ function createFakeConversationRepository(): FakeConversationRepository {
 
 function createDeferred<T>() {
   let resolve!: (value: T) => void;
-  let reject!: (error: unknown) => void;
-  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+  const promise = new Promise<T>(resolvePromise => {
     resolve = resolvePromise;
-    reject = rejectPromise;
   });
 
-  return {promise, resolve, reject};
+  return {promise, resolve};
 }
 
 function createRestNode(name: string, uuid = name) {
@@ -89,8 +87,24 @@ async function flushPromises() {
   await Promise.resolve();
 }
 
-async function wait(milliseconds: number) {
-  await new Promise(resolve => setTimeout(resolve, milliseconds));
+function createControlledDebouncedSearch() {
+  let pendingSearch: (() => Promise<void>) | undefined;
+
+  return {
+    create: (search: (value: string) => Promise<void>) => {
+      const debouncedSearch = (async (value: string): Promise<void> => {
+        pendingSearch = () => search(value);
+      }) as ((value: string) => Promise<void>) & {cancel: () => void};
+      debouncedSearch.cancel = () => {
+        pendingSearch = undefined;
+      };
+      return debouncedSearch;
+    },
+    flush: async () => {
+      await pendingSearch?.();
+      pendingSearch = undefined;
+    },
+  };
 }
 
 function renderSearchHook({
@@ -100,6 +114,7 @@ function renderSearchHook({
   fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
   filters = emptyFilters,
   sort = null,
+  createDebouncedSearch,
 }: {
   cellsRepository?: FakeCellsRepository;
   userRepository?: FakeUserRepository;
@@ -107,6 +122,9 @@ function renderSearchHook({
   fireAndForgetInvoker?: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
   filters?: GlobalDriveFiltersState;
   sort?: CellsSort | null;
+  createDebouncedSearch?: (
+    search: (value: string) => Promise<void>,
+  ) => ((value: string) => Promise<void>) & {cancel: () => void};
 } = {}) {
   return {
     fireAndForgetInvoker,
@@ -118,6 +136,7 @@ function renderSearchHook({
         fireAndForgetInvoker,
         filters,
         sort,
+        createDebouncedSearch,
       }),
     ),
   };
@@ -162,20 +181,39 @@ describe('useSearchCellsNodes', () => {
 
   it('cancels a pending debounced search when clearing the search input', async () => {
     const cellsRepository = createFakeCellsRepository();
-    const {fireAndForgetInvoker, result} = renderSearchHook({cellsRepository});
+    const controlledDebouncedSearch = createControlledDebouncedSearch();
+    const {fireAndForgetInvoker, result} = renderSearchHook({
+      cellsRepository,
+      createDebouncedSearch: controlledDebouncedSearch.create,
+    });
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    act(() => {
-      result.current.handleSearch('stale-query');
-    });
-
     await act(async () => {
+      result.current.handleSearch('stale-query');
       await result.current.handleClearSearch();
-      await wait(350);
+      await controlledDebouncedSearch.flush();
     });
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(2);
     expect(cellsRepository.searchNodes).not.toHaveBeenCalledWith(expect.objectContaining({query: 'stale-query'}));
+  });
+
+  it('does not update the shared files store when an in-flight search resolves after unmount', async () => {
+    const search = createDeferred<RestNodeCollection>();
+    const cellsRepository: FakeCellsRepository = {
+      searchNodes: jest.fn().mockReturnValue(search.promise),
+    };
+
+    const {unmount} = renderSearchHook({cellsRepository});
+
+    unmount();
+
+    await act(async () => {
+      search.resolve({Nodes: [createRestNode('unmounted-file.pdf')]});
+      await flushPromises();
+    });
+
+    expect(useCellsStore.getState().nodes).toEqual([]);
   });
 
   it('ignores stale search responses when a newer request has already updated the files', async () => {
