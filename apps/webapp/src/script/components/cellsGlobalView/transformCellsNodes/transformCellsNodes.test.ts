@@ -31,13 +31,13 @@ const createNodeWithTags = (tags: string): RestNode =>
   }) as RestNode;
 
 describe('transformCellsNodes', () => {
-  it('renders All Files tags alphabetically', () => {
+  it('preserves backend tag order in the cell model', () => {
     const [node] = transformCellsNodes({
       nodes: [createNodeWithTags('Zulu, alpha, Beta')],
       users: [],
       conversations: [],
     });
 
-    expect(node.tags).toEqual(['alpha', 'Beta', 'Zulu']);
+    expect(node.tags).toEqual(['Zulu', 'alpha', 'Beta']);
   });
 });

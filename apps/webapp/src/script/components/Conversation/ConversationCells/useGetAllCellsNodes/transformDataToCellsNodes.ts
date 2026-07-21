@@ -27,7 +27,6 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
 import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
-import {sortTagsAlphabetically} from '../common/sortTagsAlphabetically/sortTagsAlphabetically';
 
 export const transformDataToCellsNodes = ({nodes, users}: {nodes: RestNode[]; users: User[]}): Array<CellNode> => {
   return nodes.map(node => {
@@ -137,6 +136,5 @@ const getTags = (node: RestNode): string[] => {
   }
 
   const parsedTags = JSON.parse(tags);
-  const tagNames = parsedTags.split(',').map((tag: string) => tag.trim());
-  return sortTagsAlphabetically(tagNames);
+  return parsedTags.split(',').map((tag: string) => tag.trim());
 };

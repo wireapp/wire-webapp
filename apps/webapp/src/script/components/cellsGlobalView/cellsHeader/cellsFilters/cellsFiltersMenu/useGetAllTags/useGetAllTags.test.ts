@@ -27,7 +27,7 @@ import {useGetAllTags} from './useGetAllTags';
 describe('useGetAllTags', () => {
   it('returns tags alphabetically', async () => {
     const cellsRepository = {
-      getAllTags: jest.fn().mockResolvedValue({Values: ['Zulu', 'alpha', 'Beta']}),
+      getAllTags: jest.fn().mockResolvedValue({Values: ['Zulu', '', '  ', 'alpha', 'Beta']}),
     } as unknown as CellsRepository;
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 

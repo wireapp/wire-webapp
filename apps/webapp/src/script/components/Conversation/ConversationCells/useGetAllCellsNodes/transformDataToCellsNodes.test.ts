@@ -30,9 +30,9 @@ const createNodeWithTags = (tags: string): RestNode =>
   }) as RestNode;
 
 describe('transformDataToCellsNodes', () => {
-  it('renders conversation file tags alphabetically', () => {
+  it('preserves backend tag order in the cell model', () => {
     const [node] = transformDataToCellsNodes({nodes: [createNodeWithTags('Zulu, alpha, Beta')], users: []});
 
-    expect(node.tags).toEqual(['alpha', 'Beta', 'Zulu']);
+    expect(node.tags).toEqual(['Zulu', 'alpha', 'Beta']);
   });
 });
