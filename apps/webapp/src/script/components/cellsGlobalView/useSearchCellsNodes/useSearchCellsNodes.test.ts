@@ -147,7 +147,7 @@ describe('useSearchCellsNodes', () => {
     useCellsStore.getState().clearAll();
   });
 
-  it('uses recency sorting for the global all-files view by default', async () => {
+  it('requests global files with recency sorting by default', async () => {
     const cellsRepository = createFakeCellsRepository();
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
@@ -162,7 +162,7 @@ describe('useSearchCellsNodes', () => {
     );
   });
 
-  it('lets the selected sort override the global default', async () => {
+  it('requests global files with the selected sort instead of the default', async () => {
     const cellsRepository = createFakeCellsRepository();
     const {fireAndForgetInvoker} = renderSearchHook({
       cellsRepository,
@@ -179,8 +179,14 @@ describe('useSearchCellsNodes', () => {
     );
   });
 
-  it('cancels a pending debounced search when clearing the search input', async () => {
-    const cellsRepository = createFakeCellsRepository();
+  it('keeps browse results when clearing a scheduled search before it runs', async () => {
+    const cellsRepository: FakeCellsRepository = {
+      searchNodes: jest
+        .fn()
+        .mockResolvedValueOnce({Nodes: [createRestNode('initial-file.pdf')]})
+        .mockResolvedValueOnce({Nodes: [createRestNode('browse-file.pdf')]})
+        .mockResolvedValueOnce({Nodes: [createRestNode('stale-file.pdf')]}),
+    };
     const controlledDebouncedSearch = createControlledDebouncedSearch();
     const {fireAndForgetInvoker, result} = renderSearchHook({
       cellsRepository,
@@ -194,29 +200,38 @@ describe('useSearchCellsNodes', () => {
       await controlledDebouncedSearch.flush();
     });
 
-    expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(2);
-    expect(cellsRepository.searchNodes).not.toHaveBeenCalledWith(expect.objectContaining({query: 'stale-query'}));
+    expect(result.current.searchValue).toBe('');
+    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['browse-file.pdf']);
+    expect(useCellsStore.getState().status).toBe('success');
   });
 
-  it('does not update the shared files store when an in-flight search resolves after unmount', async () => {
-    const search = createDeferred<RestNodeCollection>();
+  it('does not replace files set after unmount when the pending request resolves', async () => {
+    const requestAfterUnmount = createDeferred<RestNodeCollection>();
     const cellsRepository: FakeCellsRepository = {
-      searchNodes: jest.fn().mockReturnValue(search.promise),
+      searchNodes: jest
+        .fn()
+        .mockResolvedValueOnce({Nodes: [createRestNode('current-file.pdf')]})
+        .mockReturnValueOnce(requestAfterUnmount.promise),
     };
+    const {fireAndForgetInvoker, result, unmount} = renderSearchHook({cellsRepository});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    const currentFiles = useCellsStore.getState().nodes;
 
-    const {unmount} = renderSearchHook({cellsRepository});
-
+    act(() => {
+      void result.current.handleReload();
+    });
     unmount();
+    useCellsStore.setState({nodes: currentFiles});
 
     await act(async () => {
-      search.resolve({Nodes: [createRestNode('unmounted-file.pdf')]});
+      requestAfterUnmount.resolve({Nodes: [createRestNode('unmounted-file.pdf')]});
       await flushPromises();
     });
 
-    expect(useCellsStore.getState().nodes).toEqual([]);
+    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
   });
 
-  it('ignores stale search responses when a newer request has already updated the files', async () => {
+  it('keeps results from the newer request when the older request resolves last', async () => {
     const staleSearch = createDeferred<RestNodeCollection>();
     const currentSearch = createDeferred<RestNodeCollection>();
     const cellsRepository: FakeCellsRepository = {
