@@ -1,5 +1,6 @@
 {{- $routingMode := include "webapp.routingMode" . -}}
-{{- if and .Values.routing.enabled (or (eq $routingMode "nginx") (eq $routingMode "migration")) }}
+{{- $routingEnabled := eq (include "webapp.routingEnabled" . | trim) "true" -}}
+{{- if and $routingEnabled (or (eq $routingMode "nginx") (eq $routingMode "migration")) }}
 {{- include "webapp.validateDomainConfig" . }}
 {{- $ingressClass := default "nginx" .Values.ingress.className -}}
 {{- $backendDomain := "" -}}

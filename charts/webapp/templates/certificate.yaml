@@ -1,4 +1,5 @@
-{{- if and .Values.tls.enabled .Values.tls.useCertManager .Values.routing.enabled (empty .Values.tls.existingSecretName) }}
+{{- $routingEnabled := eq (include "webapp.routingEnabled" . | trim) "true" -}}
+{{- if and .Values.tls.enabled .Values.tls.useCertManager $routingEnabled (empty .Values.tls.existingSecretName) }}
 {{- include "webapp.validateDomainConfig" . }}
 apiVersion: cert-manager.io/v1
 kind: Certificate

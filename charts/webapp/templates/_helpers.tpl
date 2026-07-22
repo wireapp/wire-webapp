@@ -42,7 +42,8 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 {{- define "webapp.validateDomainConfig" -}}
   {{- $routingMode := default "nginx" .Values.routing.mode | lower -}}
-  {{- if or .Values.routing.enabled .Values.tls.enabled }}
+  {{- $routingEnabled := eq (include "webapp.routingEnabled" . | trim) "true" -}}
+  {{- if or $routingEnabled .Values.tls.enabled }}
     {{- if not .Values.webappDomain }}
       {{- fail "webappDomain must be set when enabling routing or tls" }}
     {{- end }}
@@ -50,24 +51,28 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
   {{- if and (ne $routingMode "nginx") (ne $routingMode "envoy") (ne $routingMode "migration") }}
     {{- fail "routing.mode must be one of nginx, envoy, or migration" }}
   {{- end }}
-  {{- if and (or (eq $routingMode "envoy") (eq $routingMode "migration")) (not .Values.routing.enabled) }}
+  {{- if and (or (eq $routingMode "envoy") (eq $routingMode "migration")) (not $routingEnabled) }}
     {{- fail "routing.enabled must be true when routing.mode is envoy or migration" }}
   {{- end }}
-  {{- if and .Values.routing.enabled (or (eq $routingMode "envoy") (eq $routingMode "migration")) (empty .Values.gateway.name) }}
+  {{- if and $routingEnabled (or (eq $routingMode "envoy") (eq $routingMode "migration")) (empty .Values.gateway.name) }}
     {{- fail "gateway.name must be set when routing.mode is envoy or migration" }}
   {{- end }}
-  {{- if and .Values.routing.enabled (eq $routingMode "migration") (and (ne (default "nginx" .Values.routing.migration.primary | lower) "nginx") (ne (default "nginx" .Values.routing.migration.primary | lower) "envoy")) }}
+  {{- if and $routingEnabled (eq $routingMode "migration") (and (ne (default "nginx" .Values.routing.migration.primary | lower) "nginx") (ne (default "nginx" .Values.routing.migration.primary | lower) "envoy")) }}
     {{- fail "routing.migration.primary must be one of nginx or envoy" }}
   {{- end }}
   {{- if and .Values.ingress.renderCSPInIngress (eq $routingMode "envoy") }}
     {{- fail "ingress.renderCSPInIngress only works with routing.mode=nginx or migration" }}
   {{- end }}
-  {{- if and .Values.tls.enabled (not .Values.routing.enabled) }}
+  {{- if and .Values.tls.enabled (not $routingEnabled) }}
     {{- fail "routing.enabled must be true when tls.enabled is true" }}
   {{- end }}
   {{- if and .Values.tls.enabled (not .Values.tls.useCertManager) (empty .Values.tls.existingSecretName) }}
     {{- fail "When tls.enabled is true, either tls.useCertManager must be true or tls.existingSecretName must be set" }}
   {{- end }}
+{{- end -}}
+
+{{- define "webapp.routingEnabled" -}}
+{{- or .Values.routing.enabled .Values.ingress.enabled -}}
 {{- end -}}
 
 {{- define "webapp.routingMode" -}}

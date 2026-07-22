@@ -19,6 +19,10 @@ appendReleaseNameToResources: false
 # webappDomain: webapp.example.com
 
 routing:
+  # `routing.enabled` controls whether the chart renders the shared HTTP Service
+  # plus either an Ingress (nginx mode) or Gateway API resources (envoy or
+  # migration mode). `ingress.enabled` remains a deprecated alias for one
+  # release so older values files keep working during the rename.
   enabled: false
   # Controller mode for web traffic:
   # - nginx: render only a Kubernetes Ingress
@@ -52,6 +56,11 @@ gateway:
   # - spec.gatewayClassName must point at the Envoy Gateway GatewayClass.
   # - spec.allowedListeners must allow ListenerSet attachments from this chart's namespace.
   #   `namespaces.from: All` is the broadest choice if you want to permit any namespace.
+  # - ExternalDNS must run with `--gateway-listener-sets` so it follows the ListenerSet
+  #   parentRef and publishes DNS targets for envoy or migration mode. Without it,
+  #   Envoy may accept the route while ExternalDNS emits no target, which breaks the
+  #   weighted migration path. That flag is disabled by default and requires Gateway
+  #   API v1.5+ CRDs.
   # Example:
   # apiVersion: gateway.networking.k8s.io/v1
   # kind: Gateway
@@ -67,11 +76,16 @@ gateway:
   #     - name: http
   #       protocol: HTTP
   #       port: 80
+  #       allowedRoutes:
+  #         namespaces:
+  #           from: All
   # - This chart creates a ListenerSet in the release namespace and an HTTPRoute that
   #   attaches to it. When using a shared Gateway namespace, set `gateway.namespace`
   #   to that namespace.
-  # - If tls.useCertManager=true and you rely on the default HTTP01 solver, the Gateway
-  #   must also expose an HTTP listener on port 80, or you must provide custom solvers.
+  # - If tls.useCertManager=true and you rely on the default HTTP01 solver, cert-manager's
+  #   Gateway API integration must be enabled. When `gateway.namespace` differs from the
+  #   release namespace, the port 80 listener must also allow routes from the Certificate
+  #   namespace, for example with `allowedRoutes.namespaces.from: All`.
   # Gateway name used when routing.mode is envoy or migration.
   name: ""
   # Optional namespace of the Gateway. Defaults to the release namespace.
@@ -86,6 +100,10 @@ gateway:
 
 tls:
   enabled: false
+  # Set this to true when cert-manager should provision the certificate using
+  # its Gateway API HTTP-01 solver. This requires cert-manager's Gateway API
+  # integration to be enabled, and the Gateway listener must allow the solver
+  # namespace when the Gateway lives outside the release namespace.
   useCertManager: false
   createIssuer: false
   # existingSecretName: "" # set this if you created e.g. a wildcard cert outside this chart

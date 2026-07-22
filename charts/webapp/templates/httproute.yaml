@@ -1,5 +1,6 @@
 {{- $routingMode := include "webapp.routingMode" . -}}
-{{- if and .Values.routing.enabled (or (eq $routingMode "envoy") (eq $routingMode "migration")) }}
+{{- $routingEnabled := eq (include "webapp.routingEnabled" . | trim) "true" -}}
+{{- if and $routingEnabled (or (eq $routingMode "envoy") (eq $routingMode "migration")) }}
 {{- include "webapp.validateDomainConfig" . }}
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
