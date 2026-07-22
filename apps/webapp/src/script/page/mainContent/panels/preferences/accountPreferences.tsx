@@ -93,7 +93,11 @@ export const AccountPreferences = ({
 }: AccountPreferencesProps) => {
   const core = container.resolve(Core);
   const {translate} = useApplicationContext();
-  const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
+  const {isTeam, teamName, isProfileLinkEnabled} = useKoSubscribableChildren(teamState, [
+    'isTeam',
+    'teamName',
+    'isProfileLinkEnabled',
+  ]);
   const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
@@ -217,11 +221,13 @@ export const AccountPreferences = ({
             ))}
           </div>
 
-          <AccountLink
-            label={translate('preferencesAccountLink')}
-            value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}@${selfUser.domain}`}
-            data-uie-name="element-profile-link"
-          />
+          {isProfileLinkEnabled && (
+            <AccountLink
+              label={translate('preferencesAccountLink')}
+              value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}@${selfUser.domain}`}
+              data-uie-name="element-profile-link"
+            />
+          )}
         </PreferencesSection>
       ) : (
         <PreferencesSection hasSeparator>

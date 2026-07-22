@@ -50,6 +50,7 @@ export class TeamState {
   public readonly isProtocolToggleEnabledForUser: ko.PureComputed<boolean>;
   public readonly isBackgroundEffectsEnabled: ko.PureComputed<boolean>;
   public readonly isGuestLinkEnabled: ko.PureComputed<boolean>;
+  public readonly isProfileLinkEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
   public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SELF_DELETING_TIMEOUT>;
@@ -141,6 +142,11 @@ export class TeamState {
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FEATURE_STATUS.ENABLED,
     );
+
+    this.isProfileLinkEnabled = ko.pureComputed(() => {
+      const status = this.teamFeatures()?.simplifiedUserConnectionRequestQRCode?.status;
+      return status ? status === FEATURE_STATUS.ENABLED : true;
+    });
 
     this.selfRole = ko.pureComputed(() => {
       const roles = this.memberRoles();

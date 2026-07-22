@@ -329,6 +329,21 @@ export const Conversation = ({
   };
 
   const openUserProfile = async (id: string, domain?: string) => {
+    if (!teamState.isProfileLinkEnabled()) {
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message: translate('profileLinkDisabled'),
+            title: translate('profileLinkDisabledHeadline'),
+          },
+        },
+        undefined,
+        translate,
+      );
+      return;
+    }
+
     try {
       const userEntity = await repositories.user.getUserById({
         id,

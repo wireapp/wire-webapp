@@ -1817,6 +1817,8 @@
   "preferencesOptionsPreviewsSendCheckbox": "Link previews",
   "preferencesOptionsPreviewsSendDetail": "When this is on, you create link previews when you share a URL in a conversation. You also get previews sent by others if they have turned it on.",
   "preferencesOptionsUseDarkMode": "Dark theme",
+  "profileLinkDisabled": "Using profile links or QR codes is not allowed in your team. Contact your admin.",
+  "profileLinkDisabledHeadline": "Not allowed",
   "proteusDeviceDetails": "Proteus Device Details",
   "proteusDeviceVerified": "Device verified (Proteus)",
   "proteusID": "Proteus ID",
