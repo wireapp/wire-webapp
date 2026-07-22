@@ -36,6 +36,7 @@ import {
   tableCellRow,
   tableCellStyles,
   tableStyles,
+  wrapperWithRowsStyles,
   wrapperStyles,
 } from './cellsTable.styles';
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
@@ -90,10 +91,11 @@ export const CellsTable = ({
   });
 
   const rows = table.getRowModel().rows;
+  const tableWrapperStyles = rows.length > 0 ? [wrapperStyles, wrapperWithRowsStyles] : wrapperStyles;
 
   return (
     <FilePreviewProvider>
-      <div css={wrapperStyles}>
+      <div css={tableWrapperStyles}>
         <table css={tableStyles}>
           <thead>
             {table.getHeaderGroups().map(headerGroup => (

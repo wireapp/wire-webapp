@@ -24,7 +24,10 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import type {GlobalDriveFiltersState} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
+import {
+  hasActiveGlobalDriveFilters,
+  type GlobalDriveFiltersState,
+} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
 import {useCellsSorting} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -91,7 +94,8 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
   const isError = nodesStatus === 'error';
   const isSuccess = nodesStatus === 'success';
   const hasFiles = nodes.length > 0;
-  const emptySearchResults = is.nonEmptyString(searchValue) && nodesStatus === 'success' && nodes.length === 0;
+  const hasActiveSearchCriteria = is.nonEmptyString(searchValue) || hasActiveGlobalDriveFilters(searchFilterState);
+  const emptySearchResults = hasActiveSearchCriteria && nodesStatus === 'success' && nodes.length === 0;
 
   const showTable =
     (isSuccess || (pagination !== undefined && pagination !== null && isFetchingMore)) && !emptySearchResults;
@@ -121,6 +125,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
       />
       {emptySearchResults && (
         <CellsStateInfo
+          variant="search"
           heading={translate('cells.emptySearchResults.heading')}
           description={translate('cells.emptySearchResults.description')}
         />
