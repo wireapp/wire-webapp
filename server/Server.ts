@@ -37,6 +37,7 @@ import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
 import {RedirectRoutes} from './routes/RedirectRoutes';
 import {Root} from './routes/Root';
+import {SupportRoute} from './routes/support/SupportRoute';
 import {replaceHostnameInObject} from './util/hostnameReplacer';
 
 class Server {
@@ -70,6 +71,7 @@ class Server {
     // eslint-disable-next-line import/no-named-as-default-member
     this.app.use('/libs', express.static(path.join(__dirname, 'libs')));
     this.app.use(Root());
+    this.app.use(SupportRoute());
     this.app.use(HealthCheckRoute());
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
@@ -174,6 +176,9 @@ class Server {
       this.app.use(`/${route}`, express.static(path.join(__dirname, `static/${route}`)));
     });
 
+    // eslint-disable-next-line import/no-named-as-default-member
+    this.app.use('/support', express.static(path.join(__dirname, 'templates/support'), {index: false}));
+
     this.app.get('/favicon.ico', (_req, res) => res.sendFile(path.join(__dirname, 'static/image/favicon.ico')));
     if (!this.config.DEVELOPMENT) {
       this.app.get('/sw.js', (_req, res) => res.sendFile(path.join(__dirname, 'static/sw.js')));
@@ -192,6 +197,7 @@ class Server {
         req.path.startsWith('/auth') ||
         req.path.startsWith('/google') ||
         req.path.startsWith('/unsupported') ||
+        req.path.startsWith('/support') ||
         req.path.startsWith('/apple-app-site-association');
 
       if (ignoredPath) {
