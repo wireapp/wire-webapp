@@ -186,8 +186,8 @@ describe('WebApp release summary renderer', () => {
     assertVisibleIdentity(summary);
     expect(visibleContent).toContain('## WebApp release');
     expect(visibleContent).toContain('Beta release completed; Production promotion was not requested');
-    expect(visibleContent).toContain(`- Hosted Beta: deployed and verified successfully — tag [${betaTagName}]`);
-    expect(visibleContent).toContain('- E2E system gate: passed successfully — [Playwright report]');
+    expect(visibleContent).toContain(`- Hosted Beta: deployed and verified successfully - tag [${betaTagName}]`);
+    expect(visibleContent).toContain('- E2E system gate: passed successfully - [Playwright report]');
     expect(visibleContent).toContain('- Hosted Production: not requested');
     expect(visibleContent).toContain('- Release distribution: not requested');
     expect(detailsContent).toContain('- Asset version: 2026-07-17.1-1234567');
@@ -208,7 +208,7 @@ describe('WebApp release summary renderer', () => {
     assertVisibleIdentity(summary);
     expect(visibleContent).toContain('## WebApp Beta release');
     expect(visibleContent).toContain('- Outcome: Beta release completed successfully');
-    expect(visibleContent).toContain(`- Hosted Beta: deployed and verified successfully — tag [${betaTagName}]`);
+    expect(visibleContent).toContain(`- Hosted Beta: deployed and verified successfully - tag [${betaTagName}]`);
     expect(countOccurrences(visibleContent, `[${betaTagName}]`)).toBe(1);
     expect(summary).toContain('### Release preparation');
     expect(summary).toContain('### Hosted Beta validation');
@@ -247,10 +247,10 @@ describe('WebApp release summary renderer', () => {
     assertVisibleIdentity(summary);
     expect(visibleContent).toContain('- Outcome: Release completed successfully');
     expect(visibleContent).toContain(
-      `Hosted Production: deployed, verified, and tagged successfully — tag [${productionTagName}]`,
+      `Hosted Production: deployed, verified, and tagged successfully - tag [${productionTagName}]`,
     );
     expect(visibleContent).toContain(
-      `Release distribution: published successfully — Docker \`quay.io/wire/webapp:${productionTagName}-v0.34.9-0-1234567\`, Helm \`0.8.0-pre.3175\`, wire-builds [${wireBuildsCommitSha}](https://github.com/wireapp/wire-builds/commit/${wireBuildsCommitSha})`,
+      `Release distribution: published successfully - Docker \`quay.io/wire/webapp:${productionTagName}-v0.34.9-0-1234567\`, Helm \`0.8.0-pre.3175\`, wire-builds [${wireBuildsCommitSha}](https://github.com/wireapp/wire-builds/commit/${wireBuildsCommitSha})`,
     );
     expect(detailsContent).toContain('- Runtime verification result: verified successfully');
     expect(detailsContent).toContain('- Production tag creation result: created successfully');
@@ -276,7 +276,7 @@ describe('WebApp release summary renderer', () => {
     assertMarkdownContract(summary, true);
     expect(visibleContent).toContain('Release already has the matching Production tag; deployment was not repeated');
     expect(visibleContent).toContain(
-      `Hosted Production: already tagged; deployment not required — tag [${productionTagName}](https://github.com/wireapp/wire-webapp/tree/${productionTagName})`,
+      `Hosted Production: already tagged; deployment not required - tag [${productionTagName}](https://github.com/wireapp/wire-webapp/tree/${productionTagName})`,
     );
     expect(visibleContent).toContain('- Release distribution: not run; Production tag already exists');
     expect(detailsContent).toContain('- Production tag creation result: not required; tag already exists');
