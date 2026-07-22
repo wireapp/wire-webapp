@@ -214,9 +214,7 @@ describe('createMeetingStore', () => {
 
   it('maps deleteMeetingForAll to a DeleteMeetingCommand for serviceTasks', async () => {
     const deleteMeetingForAll = jest.fn().mockReturnValue(task.resolve(undefined));
-    const store = createMeetingStore(
-      createDeps({serviceTasks: createServiceTasks({deleteMeetingForAll})}),
-    );
+    const store = createMeetingStore(createDeps({serviceTasks: createServiceTasks({deleteMeetingForAll})}));
 
     const result = await store.getState().deleteMeetingForAll(listMeetingInstance);
 
@@ -229,9 +227,7 @@ describe('createMeetingStore', () => {
 
   it('maps deleteMeetingForMe to a DeleteMeetingCommand for serviceTasks', async () => {
     const deleteMeetingForMe = jest.fn().mockReturnValue(task.resolve(undefined));
-    const store = createMeetingStore(
-      createDeps({serviceTasks: createServiceTasks({deleteMeetingForMe})}),
-    );
+    const store = createMeetingStore(createDeps({serviceTasks: createServiceTasks({deleteMeetingForMe})}));
 
     const result = await store.getState().deleteMeetingForMe(listMeetingInstance);
 

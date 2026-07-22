@@ -99,7 +99,11 @@ describe('canDeleteMeetingForAll', () => {
     const meetingInstance = createMeetingInstance();
 
     expect(
-      canDeleteMeetingForAll(meetingInstance, createSelfUser('invitee-id'), futureWallClock.currentTimestampInMilliseconds),
+      canDeleteMeetingForAll(
+        meetingInstance,
+        createSelfUser('invitee-id'),
+        futureWallClock.currentTimestampInMilliseconds,
+      ),
     ).toBe(false);
   });
 });
@@ -109,7 +113,11 @@ describe('canDeleteMeetingForMe', () => {
     const meetingInstance = createMeetingInstance();
 
     expect(
-      canDeleteMeetingForMe(meetingInstance, createSelfUser('invitee-id'), futureWallClock.currentTimestampInMilliseconds),
+      canDeleteMeetingForMe(
+        meetingInstance,
+        createSelfUser('invitee-id'),
+        futureWallClock.currentTimestampInMilliseconds,
+      ),
     ).toBe(true);
   });
 

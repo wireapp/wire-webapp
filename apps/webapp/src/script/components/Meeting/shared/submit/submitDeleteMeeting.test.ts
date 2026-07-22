@@ -101,10 +101,8 @@ describe('submitDeleteMeeting', () => {
     selfUser: 'selfUser' in overrides ? overrides.selfUser : createSelfUser(),
     wallClock: overrides.wallClock ?? futureWallClock,
     translate: translateForTest,
-    deleteMeetingForMe:
-      overrides.deleteMeetingForMe ?? jest.fn().mockReturnValue(task.resolve(undefined)),
-    deleteMeetingForAll:
-      overrides.deleteMeetingForAll ?? jest.fn().mockReturnValue(task.resolve(undefined)),
+    deleteMeetingForMe: overrides.deleteMeetingForMe ?? jest.fn().mockReturnValue(task.resolve(undefined)),
+    deleteMeetingForAll: overrides.deleteMeetingForAll ?? jest.fn().mockReturnValue(task.resolve(undefined)),
     removeMeetingByQualifiedId: overrides.removeMeetingByQualifiedId ?? jest.fn(),
     loadMeetings: overrides.loadMeetings ?? jest.fn().mockResolvedValue(undefined),
   });
@@ -289,9 +287,7 @@ describe('submitDeleteMeeting', () => {
 
   it('keeps the meeting in the store when delete for me fails to leave the conversation', async () => {
     const removeMeetingByQualifiedId = jest.fn();
-    const deleteMeetingForMe = jest
-      .fn()
-      .mockReturnValue(task.reject(meetingSubmitErrors.leaveConversationFailed));
+    const deleteMeetingForMe = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.leaveConversationFailed));
     const invitee = createSelfUser('invitee-id');
 
     const result = await submitDeleteMeeting({
