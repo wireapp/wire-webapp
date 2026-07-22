@@ -33,7 +33,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {CellsHeader} from './CellsHeader/CellsHeader';
 import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
-import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
+import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';

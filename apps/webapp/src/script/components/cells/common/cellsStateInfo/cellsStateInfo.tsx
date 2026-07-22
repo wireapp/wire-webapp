@@ -29,7 +29,7 @@ import {
   searchTextWrapperStyles,
   searchWrapperStyles,
   wrapperStyles,
-} from './CellsStateInfo.styles';
+} from './cellsStateInfo.styles';
 
 type DefaultCellsStateInfoProps = {
   heading?: string;
