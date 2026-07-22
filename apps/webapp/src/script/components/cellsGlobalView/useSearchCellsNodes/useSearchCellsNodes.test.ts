@@ -295,7 +295,9 @@ describe('useSearchCellsNodes', () => {
   });
 
   it('shows an error and clears results when the current request fails for a Cells participant', async () => {
-    const cellsRepository: CellsRepositoryMock = {searchNodes: jest.fn().mockRejectedValue(new Error('request failed'))};
+    const cellsRepository: CellsRepositoryMock = {
+      searchNodes: jest.fn().mockRejectedValue(new Error('request failed')),
+    };
     const conversationRepository: ConversationRepositoryMock = {
       ...buildConversationRepositoryMock(),
       getAllCellEnabledGroupConversations: jest.fn().mockReturnValue([{}]),
@@ -310,7 +312,9 @@ describe('useSearchCellsNodes', () => {
   });
 
   it('treats a current request failure as an empty result when the user has no Cells conversations', async () => {
-    const cellsRepository: CellsRepositoryMock = {searchNodes: jest.fn().mockRejectedValue(new Error('request failed'))};
+    const cellsRepository: CellsRepositoryMock = {
+      searchNodes: jest.fn().mockRejectedValue(new Error('request failed')),
+    };
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
 
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
