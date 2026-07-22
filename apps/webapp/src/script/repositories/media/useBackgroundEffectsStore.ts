@@ -23,14 +23,14 @@ import {createStore} from 'zustand/vanilla';
 
 import {Metrics, QualityTier} from 'Repositories/media/backgroundEffects';
 import {
+  SELFIE_MULTICLASS_MODEL_PATH,
+  SELFIE_SEGMENTER_MODEL_PATH,
+} from 'Repositories/media/backgroundEffects/pipe/options';
+import {
   BackgroundEffectSelection,
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
 } from 'Repositories/media/VideoBackgroundEffects';
-import {
-  SELFIE_MULTICLASS_MODEL_PATH,
-  SELFIE_SEGMENTER_MODEL_PATH
-} from "Repositories/media/backgroundEffects/pipe/options";
 
 export interface RenderMetrics extends Metrics {
   budget: number;

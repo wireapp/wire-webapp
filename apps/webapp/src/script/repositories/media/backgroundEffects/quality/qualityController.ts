@@ -249,10 +249,6 @@ export class QualityController {
       // Determine dominant cost to optimize downgrade strategy
       const nextTier = this.downgradeTier();
       if (nextTier !== this.tier) {
-        // If we have one tim issues with FHD we will stay in HD
-        if (this.tier === QUALITY_TIERS.FHD) {
-          this.applyMaxTierCap(QUALITY_TIERS.HD);
-        }
         this.registerUpgradeFailure(nextTier);
         this.logger.info('downgrade', {
           from: this.tier,
