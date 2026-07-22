@@ -17,14 +17,15 @@
  *
  */
 
-import {ReactNode, CSSProperties, useEffect, useState} from 'react';
+import {CSSProperties, ReactNode, useEffect, useState} from 'react';
 
 import {css} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {QUERY} from '@wireapp/react-ui-kit';
+import {Loading, QUERY} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {groupVideoBackgroundInitializingOverlay} from 'Components/calling/GroupVideoGridTile.styles';
 import * as Icon from 'Components/icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {Call} from 'Repositories/calling/Call';
@@ -34,6 +35,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
+import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
 const PARTICIPANTS_LIMITS = {
@@ -148,6 +150,11 @@ const GroupVideoGrid = ({
     'videoStream',
     'processedVideoStream',
   ]);
+  const {showLoadingOverlay, onVideoCanPlay} = useShowLoadingOverlay(
+    true,
+    thumbnail.hasActiveVideo,
+    thumbnail.processedVideoStream,
+  );
 
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(
     calculateRowsAndColumns({
@@ -286,11 +293,21 @@ const GroupVideoGrid = ({
             */
             muted
             data-uie-name="self-video-thumbnail"
+            onCanPlay={onVideoCanPlay}
             css={{
               transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
             }}
             srcObject={thumbnail.processedVideoStream?.stream ?? thumbnail.videoStream}
           />
+          {showLoadingOverlay && (
+            <div
+              aria-busy={showLoadingOverlay}
+              css={groupVideoBackgroundInitializingOverlay}
+              data-uie-name="background-effect-initializing"
+            >
+              <Loading size={32} />
+            </div>
+          )}
           {selfIsMuted && !minimized && (
             <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
               <Icon.MicOffIcon data-uie-name="mic-icon-off" />
