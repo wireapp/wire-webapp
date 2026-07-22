@@ -74,8 +74,10 @@ export class QualityController {
   private totalSamplesSeen = 0;
   /** Current quality tier. Starts at (highest quality). */
   private tier: QualityTier = QUALITY_TIERS.FHD;
+  /** Maximum tier allowed for upgrades defined by hardware capabilities. */
+  private hardwareMaxTier: QualityTier | null;
   /** Maximum tier allowed for upgrades once performance caps are applied. */
-  private maxTier: QualityTier | null = null;
+  private performanceMaxTier: QualityTier | null = null;
   /** Frame time budget in milliseconds derived from target FPS. */
   private readonly budgetMs: number;
   /** Threshold in milliseconds below which we can upgrade tier. */
@@ -130,10 +132,10 @@ export class QualityController {
    *
    * @param targetFps - Target frames per second. Used to calculate frame budget
    *                    and performance thresholds (budget = 1000ms / targetFps).
-   * @param maxTier - Maximum tier allowed for upgrades once performance caps are applied.
+   * @param hardwareMaxTier - Maximum tier allowed for upgrades defined by hardware capabilities.
    *                  If null, no cap is applied.
    */
-  constructor(targetFps: number, maxTier: QualityTier | null = null) {
+  constructor(targetFps: number, hardwareMaxTier: QualityTier | null = null) {
     const resolvedTargetFps = Number.isFinite(targetFps) && targetFps > 0 ? targetFps : DEFAULT_TARGET_FPS;
 
     if (resolvedTargetFps !== targetFps) {
@@ -144,7 +146,8 @@ export class QualityController {
     }
     this.logger.info('[QualityController] init', {targetFps: resolvedTargetFps});
 
-    this.maxTier = maxTier;
+    this.hardwareMaxTier = hardwareMaxTier;
+    this.tier = hardwareMaxTier ?? QUALITY_TIERS.FHD;
     // Calculate frame budget: time available per frame to maintain target FPS
     const budget = MILLISECONDS_PER_SECOND / resolvedTargetFps;
     this.budgetMs = budget;
@@ -164,6 +167,10 @@ export class QualityController {
     this.cooldownFramesAfterDowngrade = DEFAULT_TUNING.cooldownFramesAfterDowngrade;
     this.upgradeFailureWindowFrames = DEFAULT_TUNING.upgradeFailureWindowFrames;
     this.upgradeFailureLimit = DEFAULT_TUNING.upgradeFailureLimit;
+  }
+
+  public setHardwareMaxTier(hardwareMaxTier: QualityTier | null): void {
+    this.hardwareMaxTier = hardwareMaxTier;
   }
 
   /**
@@ -261,7 +268,8 @@ export class QualityController {
           severeOverBudgetFrames: this.severeOverBudgetFrames,
           overBudgetRatio,
           sampleCount: this.sampleCount,
-          maxTier: this.maxTier,
+          hardwareMaxTier: this.hardwareMaxTier,
+          performanceMaxTier: this.performanceMaxTier,
         });
 
         this.tier = nextTier;
@@ -287,7 +295,8 @@ export class QualityController {
           ewmaSegmentationMs,
           ewmaGpuMs,
           sampleCount: this.sampleCount,
-          maxTier: this.maxTier,
+          hardwareMaxTier: this.hardwareMaxTier,
+          performanceMaxTier: this.performanceMaxTier,
         });
         this.tier = nextTier;
         this.stableFrames = 0;
@@ -474,21 +483,21 @@ export class QualityController {
     if (framesSinceUpgrade <= this.upgradeFailureWindowFrames) {
       this.upgradeFailureCount += 1;
       if (this.upgradeFailureCount >= this.upgradeFailureLimit) {
-        this.applyMaxTierCap(nextTier);
+        this.applyPerformanceMaxTierCap(nextTier);
       }
     }
     this.lastUpgradeSample = null;
   }
 
   /**
-   * Applies a maximum tier cap, keeping the most restrictive cap.
+   * Applies a maximum performance tier cap, keeping the most restrictive cap.
    *
    * @param cap - The highest tier allowed for future upgrades.
    */
-  private applyMaxTierCap(cap: QualityTier): void {
-    if (!this.maxTier || this.getTierRank(cap) < this.getTierRank(this.maxTier)) {
-      this.maxTier = cap;
-      this.logger.info('maxTier cap set', {maxTier: this.maxTier});
+  private applyPerformanceMaxTierCap(cap: QualityTier): void {
+    if (this.performanceMaxTier === null || this.getTierRank(cap) < this.getTierRank(this.performanceMaxTier)) {
+      this.performanceMaxTier = cap;
+      this.logger.info('performance max tier cap set', {performanceMaxTier: this.performanceMaxTier});
     }
   }
 
@@ -503,10 +512,13 @@ export class QualityController {
    * @returns True if upgrade to the tier is allowed, false if it exceeds maxTier.
    */
   private canUpgradeTo(tier: QualityTier): boolean {
-    if (!this.maxTier) {
-      return true;
+    const targetRank = this.getTierRank(tier);
+
+    if (this.hardwareMaxTier !== null && targetRank > this.getTierRank(this.hardwareMaxTier)) {
+      return false;
     }
-    return this.getTierRank(tier) <= this.getTierRank(this.maxTier);
+
+    return !(this.performanceMaxTier !== null && targetRank > this.getTierRank(this.performanceMaxTier));
   }
 
   private getTierRank(tier: QualityTier): number {
