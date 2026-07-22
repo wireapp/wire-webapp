@@ -145,8 +145,15 @@ function renderSearchHook({
 }
 
 describe('useSearchCellsNodes', () => {
+  let consoleDebugSpy: jest.SpyInstance<void, Parameters<typeof console.debug>>;
+
   beforeEach(() => {
     useCellsStore.getState().clearAll();
+    consoleDebugSpy = jest.spyOn(console, 'debug').mockImplementation();
+  });
+
+  afterEach(() => {
+    consoleDebugSpy.mockRestore();
   });
 
   it('requests global files with recency sorting by default', async () => {
@@ -256,6 +263,7 @@ describe('useSearchCellsNodes', () => {
     staleSearch.resolve({Nodes: [buildRestNodeStub('stale-file.pdf')]});
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
+    expect(consoleDebugSpy).toHaveBeenCalledWith('Ignoring stale request version:', 1);
     expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
   });
 

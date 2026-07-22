@@ -18,15 +18,15 @@
  */
 
 export interface RequestVersionGate {
-  next: () => number;
-  invalidate: () => void;
-  isStale: (requestId: number) => boolean;
+  readonly next: () => number;
+  readonly invalidate: () => void;
+  readonly isStale: (requestId: number) => boolean;
 }
 
-export const createRequestVersionGate = (): RequestVersionGate => {
+export const createRequestVersionGate = (): Readonly<RequestVersionGate> => {
   let currentRequestId = 0;
 
-  return {
+  return Object.freeze({
     next(): number {
       currentRequestId += 1;
       return currentRequestId;
@@ -37,5 +37,5 @@ export const createRequestVersionGate = (): RequestVersionGate => {
     isStale(requestId: number): boolean {
       return requestId !== currentRequestId;
     },
-  };
+  });
 };

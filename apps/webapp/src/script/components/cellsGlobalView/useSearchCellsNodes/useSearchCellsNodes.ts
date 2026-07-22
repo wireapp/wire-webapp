@@ -99,7 +99,14 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     async (properties: SearchNodesProperties): Promise<void> => {
       const {query, status, limit = pageSize} = properties;
       const requestVersion = requestVersionGate.current.next();
-      const isCurrentRequest = (): boolean => !requestVersionGate.current.isStale(requestVersion);
+      const shouldIgnoreStaleRequest = (): boolean => {
+        const isStaleRequest = requestVersionGate.current.isStale(requestVersion);
+        if (isStaleRequest) {
+          // eslint-disable-next-line no-console
+          console.debug('Ignoring stale request version:', requestVersion);
+        }
+        return isStaleRequest;
+      };
 
       try {
         setStatus(status);
@@ -115,7 +122,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
           type: 'file',
         });
 
-        if (!isCurrentRequest()) {
+        if (shouldIgnoreStaleRequest()) {
           return;
         }
 
@@ -130,7 +137,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
           }),
         ]);
 
-        if (!isCurrentRequest()) {
+        if (shouldIgnoreStaleRequest()) {
           return;
         }
 
@@ -156,7 +163,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
 
         setStatus('success');
       } catch {
-        if (!isCurrentRequest()) {
+        if (shouldIgnoreStaleRequest()) {
           return;
         }
 

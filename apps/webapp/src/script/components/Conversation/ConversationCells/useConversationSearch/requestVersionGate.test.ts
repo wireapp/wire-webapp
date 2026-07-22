@@ -38,4 +38,10 @@ describe('createRequestVersionGate', () => {
 
     expect(requestVersionGate.isStale(request)).toBe(true);
   });
+
+  it('returns a frozen gate to protect request state operations', () => {
+    const requestVersionGate = createRequestVersionGate();
+
+    expect(Object.isFrozen(requestVersionGate)).toBe(true);
+  });
 });
