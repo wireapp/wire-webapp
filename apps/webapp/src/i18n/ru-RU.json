@@ -393,7 +393,7 @@
   "cells.error.heading": "При загрузке что-то пошло не так",
   "cells.filePreviewButton.ariaLabel": "Предпросмотр для {name}",
   "cells.fileType.archives": "Архивы",
-  "cells.fileType.audio": "Аудио",
+  "cells.fileType.audio": "Аудиофайлы",
   "cells.fileType.documents": "Документы",
   "cells.fileType.pdfs": "PDF-файлы",
   "cells.fileType.pictures": "Изображения",

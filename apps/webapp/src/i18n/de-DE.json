@@ -393,7 +393,7 @@
   "cells.error.heading": "Beim Laden ist ein Fehler aufgetreten",
   "cells.filePreviewButton.ariaLabel": "Vorschau für {name}",
   "cells.fileType.archives": "Archiv",
-  "cells.fileType.audio": "Audio",
+  "cells.fileType.audio": "Audiodateien",
   "cells.fileType.documents": "Dokumente",
   "cells.fileType.pdfs": "PDFs",
   "cells.fileType.pictures": "Bilder",
