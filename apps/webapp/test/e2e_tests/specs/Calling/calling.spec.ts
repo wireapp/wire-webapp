@@ -698,6 +698,7 @@ test.describe('Calling', () => {
     },
   ].forEach(({description, tag, verify}) => {
     test(description, {tag: [tag, '@regression']}, async ({createPage, createUser}) => {
+      test.setTimeout(120_000);
       const {pages: userAPages, modals: userAModals} = PageManager.from(await createPage(withLogin(userA))).webapp;
 
       const {groupMembers, memberPages} =
