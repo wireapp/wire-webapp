@@ -38,6 +38,17 @@ let segmenterOptions: WorkerProcessVideoTrackOptions = {} as WorkerProcessVideoT
 
 const SEGMENTATION_FRAME_INTERVAL = 1;
 
+// Performance measurement point object for active GPU calculation time
+const activeGpuQueries = new Map<
+  WebGLSync,
+  {
+    gpuStart: number;
+    frameDeltaMs: number;
+    segmentationMs: number;
+    filterMs: number;
+  }
+>();
+
 export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
   // Keep the reference stable so that runtime option changes
   // are immediately visible inside the processing loop.
@@ -270,6 +281,80 @@ export async function runSegmenter(
     canvas.removeEventListener('webglcontextrestored', onContextRestored);
   }
 
+  function triggerGpuTracking(gpuStart: number, frameDeltaMs: number, segmentationMs: number, filterMs: number) {
+    const gl = webGLRenderer?.gl;
+    if (!gl) {
+      return;
+    }
+
+    // Create a Fence in the GPU queue after the Draw calls
+    const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+    if (!sync) {
+      return;
+    }
+    gl.flush(); // Forces the browser to send commands to the GPU immediately
+
+    // Remember data for this specific frame in the background
+    activeGpuQueries.set(sync, {gpuStart, frameDeltaMs, segmentationMs, filterMs});
+
+    // If the background_loop is not yet running, start it
+    if (activeGpuQueries.size === 1) {
+      requestAnimationFrame(checkGpuQueries);
+    }
+  }
+
+  function checkGpuQueries() {
+    const gl = webGLRenderer?.gl;
+    if (!gl || activeGpuQueries.size === 0) {
+      return;
+    }
+
+    for (const [sync, data] of activeGpuQueries.entries()) {
+      // Check instantaneously (0-nanosecond timeout) if the GPU has finished this frame
+      const status = gl.clientWaitSync(sync, 0, 0);
+
+      if (status === gl.ALREADY_SIGNALED || status === gl.CONDITION_SATISFIED) {
+        const gpuMs = performance.now() - data.gpuStart;
+        const totalMs = data.filterMs + data.segmentationMs + gpuMs;
+
+        // 1. Increment statistics in the background
+        totalMsSum += totalMs;
+        segmentationMsSum += data.segmentationMs;
+        gpuMsSum += gpuMs;
+        filterMsSum += data.filterMs;
+        frames++;
+        totalFrames++;
+
+        // 2. Update your metrics (delayed until GPU was ready)
+        updateMetrics(totalMs, data.segmentationMs, gpuMs);
+
+        // 3. Tidying Up
+        gl.deleteSync(sync);
+        activeGpuQueries.delete(sync);
+      }
+    }
+
+    const now = performance.now();
+    if (now - lastStatsTime > 2000) {
+      // Only log/reset if data was present at all in the last 2 seconds
+      if (frames > 0) {
+        totalMsSum = 0;
+        segmentationMsSum = 0;
+        gpuMsSum = 0;
+        filterMsSum = 0;
+        frames = 0;
+      }
+
+      // Set the timer in any case to "now", so that the 2-second window starts clean from the beginning
+      lastStatsTime = now;
+    }
+
+    // If there are still open measurements, check again in the next frame
+    if (activeGpuQueries.size > 0) {
+      setTimeout(checkGpuQueries, 2);
+    }
+  }
+
   let lastFrameTs = performance.now();
 
   const writer = new WritableStream(
@@ -286,15 +371,13 @@ export async function runSegmenter(
 
         const useSelfieModel = currentModelPath?.includes('selfie_segmenter');
 
+        // Performance measurement points --
         const frameStart = performance.now();
-
         const frameDeltaMs = frameStart - lastFrameTs;
-
-        lastFrameTs = frameStart;
-
         let filterMs = 0;
         let segmentationMs = 0;
-        let gpuMs = 0;
+        lastFrameTs = frameStart;
+        // ---------------------------------
 
         const frameLogger = getSafeLogger('segmenter:WritableStream::write');
 
@@ -310,7 +393,8 @@ export async function runSegmenter(
 
             webGLRenderer?.renderPassthrough(videoFrame);
 
-            gpuMs = performance.now() - gpuStart;
+            // Register GPU measurement asynchronously in the background (segmentationMs and filterMs are simply 0 here)
+            triggerGpuTracking(gpuStart, frameDeltaMs, 0, 0);
 
             /*
              * The next enabled frame should run segmentation
@@ -338,7 +422,8 @@ export async function runSegmenter(
 
               webGLRenderer?.renderWithPreviousMask(videoFrame, segmenterOptions);
 
-              gpuMs = performance.now() - gpuStart;
+              // Register GPU measurement asynchronously in the background (segmentationMs and filterMs are simply 0 here)
+              triggerGpuTracking(gpuStart, frameDeltaMs, 0, 0);
             } else {
               /*
                * Filters only need to run on frames that are
@@ -365,6 +450,7 @@ export async function runSegmenter(
                   segmenterOptions.enableFilters ? effectsCanvas : videoFrame,
                   timestamp * 1000,
                   result => {
+                    // Stop pure segmentation time immediately (before textures are processed)
                     segmentationMs = performance.now() - segmentationStart;
 
                     const categoryMask = result.categoryMask;
@@ -376,15 +462,14 @@ export async function runSegmenter(
                         frameLogger.warn('Missing segmentation masks.');
 
                         const gpuStart = performance.now();
-
                         if (hasSegmentationMask) {
                           webGLRenderer?.renderWithPreviousMask(videoFrame, segmenterOptions);
                         } else {
                           webGLRenderer?.renderPassthrough(videoFrame);
                         }
 
-                        gpuMs = performance.now() - gpuStart;
-
+                        triggerGpuTracking(gpuStart, frameDeltaMs, segmentationMs, filterMs);
+                        resolve(); // RESOLVE IMMEDIATELY, do not wait for GPU!
                         return;
                       }
 
@@ -402,9 +487,10 @@ export async function runSegmenter(
                         useSelfieModel,
                       );
 
-                      gpuMs = performance.now() - gpuStart;
-
                       hasSegmentationMask = true;
+
+                      // Registering REAL GPU measurement in the background
+                      triggerGpuTracking(gpuStart, frameDeltaMs, segmentationMs, filterMs);
                     } catch (error) {
                       frameLogger.error('Error processing segmentation result:', error);
 
@@ -417,8 +503,7 @@ export async function runSegmenter(
                     } finally {
                       categoryMask?.close();
                       confidenceMask?.close();
-
-                      resolve();
+                      resolve(); // Resolve! The stream moves directly to the next frame.
                     }
                   },
                 );
@@ -427,37 +512,6 @@ export async function runSegmenter(
           }
         } finally {
           videoFrame.close();
-        }
-
-        const totalMs = performance.now() - frameStart;
-
-        totalMsSum += totalMs;
-        segmentationMsSum += segmentationMs;
-        gpuMsSum += gpuMs;
-        filterMsSum += filterMs;
-
-        /*
-         * Keep the existing metric meaning:
-         * frameDeltaMs represents the time between frames.
-         *
-         * Skipped segmentation frames report segmentationMs = 0.
-         */
-        updateMetrics(frameDeltaMs, segmentationMs, gpuMs);
-
-        frames++;
-        totalFrames++;
-
-        const now = performance.now();
-
-        if (now - lastStatsTime > 2000) {
-          lastStatsTime = now;
-
-          totalMsSum = 0;
-          segmentationMsSum = 0;
-          gpuMsSum = 0;
-          filterMsSum = 0;
-
-          frames = 0;
         }
       },
 
