@@ -41,7 +41,7 @@
     "true-myth": "9.4.0"
   },
   "devDependencies": {
-    "@swc/core": "1.15.43",
+    "@swc/core": "1.15.46",
     "@swc/jest": "0.2.39",
     "@types/lodash": "4.17.24",
     "commander": "14.0.3",
