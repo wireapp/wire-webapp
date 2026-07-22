@@ -27,6 +27,10 @@ import {
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
 } from 'Repositories/media/VideoBackgroundEffects';
+import {
+  SELFIE_MULTICLASS_MODEL_PATH,
+  SELFIE_SEGMENTER_MODEL_PATH
+} from "Repositories/media/backgroundEffects/pipe/options";
 
 export interface RenderMetrics extends Metrics {
   budget: number;
@@ -92,7 +96,16 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
 
     setModel: model =>
       set(state => {
-        state.model = model ?? 'unknown';
+        switch (model) {
+          case SELFIE_SEGMENTER_MODEL_PATH:
+            state.model = 'selfie-segmenter';
+            break;
+          case SELFIE_MULTICLASS_MODEL_PATH:
+            state.model = 'selfie-multiclass';
+            break;
+          default:
+            state.model = 'unknown';
+        }
       }),
 
     setIsHighQualityBlurEnabled: value =>
