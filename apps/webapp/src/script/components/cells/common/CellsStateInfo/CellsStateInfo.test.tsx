@@ -23,7 +23,7 @@ import {render, screen} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CellsStateInfo} from './CellsStateInfo';
+import {CellsStateInfo} from './cellsStateInfo';
 
 const withTheme = (component: ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 
@@ -38,11 +38,7 @@ describe('CellsStateInfo', () => {
   it('announces search no-results state with heading and description', () => {
     render(
       withTheme(
-        <CellsStateInfo
-          variant="search"
-          heading="No results found"
-          description="Try to adjust your search."
-        />,
+        <CellsStateInfo variant="search" heading="No results found" description="Try to adjust your search." />,
       ),
     );
 
