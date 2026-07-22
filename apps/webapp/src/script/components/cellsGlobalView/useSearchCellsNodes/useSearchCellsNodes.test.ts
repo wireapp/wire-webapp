@@ -24,6 +24,7 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import type {Logger} from 'Util/logger';
 
 import {useSearchCellsNodes} from './useSearchCellsNodes';
 
@@ -44,6 +45,7 @@ type UserRepositoryMock = jest.Mocked<Pick<UserRepository, 'getUsersById'>>;
 type ConversationRepositoryMock = jest.Mocked<
   Pick<ConversationRepository, 'getAllCellEnabledGroupConversations' | 'getConversationById'>
 >;
+type LoggerMock = jest.Mocked<Pick<Logger, 'debug'>>;
 
 function buildCellsRepositoryMock(searchResult: Partial<RestNodeCollection> = {}): CellsRepositoryMock {
   return {searchNodes: jest.fn().mockResolvedValue({Nodes: [], ...searchResult})};
@@ -58,6 +60,10 @@ function buildConversationRepositoryMock(): ConversationRepositoryMock {
     getAllCellEnabledGroupConversations: jest.fn().mockReturnValue([]),
     getConversationById: jest.fn().mockResolvedValue({qualifiedId: {id: 'conversation-id', domain: 'example.com'}}),
   };
+}
+
+function buildLoggerMock(): LoggerMock {
+  return {debug: jest.fn()};
 }
 
 function createControllablePromise<T>() {
@@ -117,6 +123,7 @@ function renderSearchHook({
   filters = emptyFilters,
   sort = null,
   createDebouncedSearch,
+  logger = buildLoggerMock(),
 }: {
   cellsRepository?: CellsRepositoryMock;
   userRepository?: UserRepositoryMock;
@@ -127,6 +134,7 @@ function renderSearchHook({
   createDebouncedSearch?: (
     search: (value: string) => Promise<void>,
   ) => ((value: string) => Promise<void>) & {cancel: () => void};
+  logger?: LoggerMock;
 } = {}) {
   return {
     fireAndForgetInvoker,
@@ -139,21 +147,15 @@ function renderSearchHook({
         filters,
         sort,
         createDebouncedSearch,
+        logger: logger as unknown as Logger,
       }),
     ),
   };
 }
 
 describe('useSearchCellsNodes', () => {
-  let consoleDebugSpy: jest.SpyInstance<void, Parameters<typeof console.debug>>;
-
   beforeEach(() => {
     useCellsStore.getState().clearAll();
-    consoleDebugSpy = jest.spyOn(console, 'debug').mockImplementation();
-  });
-
-  afterEach(() => {
-    consoleDebugSpy.mockRestore();
   });
 
   it('requests global files with recency sorting by default', async () => {
@@ -246,8 +248,9 @@ describe('useSearchCellsNodes', () => {
     const cellsRepository: CellsRepositoryMock = {
       searchNodes: jest.fn().mockReturnValueOnce(staleSearch.promise).mockReturnValue(currentSearch.promise),
     };
+    const logger = buildLoggerMock();
 
-    const {fireAndForgetInvoker, result} = renderSearchHook({cellsRepository});
+    const {fireAndForgetInvoker, result} = renderSearchHook({cellsRepository, logger});
 
     let currentSearchPromise!: Promise<void>;
     act(() => {
@@ -263,7 +266,7 @@ describe('useSearchCellsNodes', () => {
     staleSearch.resolve({Nodes: [buildRestNodeStub('stale-file.pdf')]});
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(consoleDebugSpy).toHaveBeenCalledWith('Ignoring stale request version:', 1);
+    expect(logger.debug).toHaveBeenCalledWith('Ignoring stale request version:', 1);
     expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
   });
 

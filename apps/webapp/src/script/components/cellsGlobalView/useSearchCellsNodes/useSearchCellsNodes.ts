@@ -33,6 +33,7 @@ import {createRequestVersionGate} from 'Components/Conversation/ConversationCell
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {getLogger, Logger} from 'Util/logger';
 
 import {getConversationsFromNodes} from './getConversationsFromNodes';
 import {getUsersFromNodes} from './getUsersFromNodes';
@@ -53,6 +54,7 @@ interface UseSearchCellsNodesProps {
   filters: GlobalDriveFiltersState;
   sort: CellsSort | null;
   createDebouncedSearch?: CreateDebouncedSearch;
+  logger?: Logger;
 }
 
 type SearchNodesProperties = {
@@ -75,6 +77,7 @@ const PAGE_INITIAL_SIZE = 30;
 const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 const FETCH_ALL_QUERY = '*';
+const defaultLogger = getLogger('useSearchCellsNodes');
 
 export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSearchCellsNodesResult => {
   const {
@@ -85,6 +88,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     filters,
     sort,
     createDebouncedSearch,
+    logger = defaultLogger,
   } = properties;
   const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
 
@@ -102,8 +106,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
       const shouldIgnoreStaleRequest = (): boolean => {
         const isStaleRequest = requestVersionGate.current.isStale(requestVersion);
         if (isStaleRequest) {
-          // eslint-disable-next-line no-console
-          console.debug('Ignoring stale request version:', requestVersion);
+          logger.debug('Ignoring stale request version:', requestVersion);
         }
         return isStaleRequest;
       };
@@ -181,7 +184,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pageSize, setNodes, setPagination, setStatus, filters, sort],
+    [pageSize, setNodes, setPagination, setStatus, filters, sort, logger],
   );
 
   const defaultSearchNodesDebounced = useDebouncedCallback(async (value: string): Promise<void> => {
