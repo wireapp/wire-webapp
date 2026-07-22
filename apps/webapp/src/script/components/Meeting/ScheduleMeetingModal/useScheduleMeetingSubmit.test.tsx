@@ -35,22 +35,51 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
+import {
+  scheduleMeetingSubmitResults,
+  type ScheduleMeetingSubmitResult,
+  wasScheduleMeetingPersisted,
+} from './scheduleMeetingTypes';
+
+const fixedNow = new Date('2026-06-16T09:00:00.000Z');
+const futureStartDate = new Date('2026-06-16T10:00:00.000Z');
+const futureEndDate = new Date('2026-06-16T11:00:00.000Z');
 
 const testWallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: new Date('2026-06-16T10:00:00.000Z').getTime(),
+  initialCurrentTimestampInMilliseconds: fixedNow.getTime(),
 });
 
 const formState = {
   title: 'Weekly sync',
-  start: maybe.just(new Date('2026-06-16T10:00:00.000Z')),
-  end: maybe.just(new Date('2026-06-16T11:00:00.000Z')),
+  start: maybe.just(futureStartDate),
+  end: maybe.just(futureEndDate),
   recurrence: 'doesNotRepeat' as const,
   selectedUsers: [],
   participantsFilter: '',
 };
 
+const scheduleCommand = {
+  title: 'Weekly sync',
+  start: futureStartDate,
+  end: futureEndDate,
+  recurrence: 'doesNotRepeat' as const,
+  selectedUsers: [],
+};
+
+const updateCommand = {
+  meetingId: {id: 'meeting-id', domain: 'example.com'},
+  title: 'Weekly sync',
+  start: futureStartDate,
+  end: futureEndDate,
+  recurrence: 'doesNotRepeat' as const,
+  originalRecurrence: 'doesNotRepeat' as const,
+  selectedUsers: [],
+  originalSelectedUsers: [],
+  qualifiedConversation: maybe.just({id: 'conversation-id', domain: 'example.com'}),
+};
+
 const RootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
+  createRootContextValueForTest({translate: translateForTest, wallClock: testWallClock}),
 );
 
 const createMeetingStore = ({
@@ -64,6 +93,7 @@ const createMeetingStore = ({
     hasLoadError: false,
     loadMeetings,
     scheduleMeeting,
+    meetNowMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     updateMeeting,
     loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
   }));
@@ -88,33 +118,34 @@ describe('useScheduleMeetingSubmit', () => {
 
     const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
 
-    let submitResult = false;
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(true);
-    expect(scheduleMeeting).toHaveBeenCalledWith(formState);
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.succeeded);
+    expect(scheduleMeeting).toHaveBeenCalledWith(scheduleCommand);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
   });
 
-  it('refreshes meetings after a partial create failure', async () => {
+  it('returns setupFailed and refreshes meetings after a partial create failure', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const scheduleMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.addParticipantsFailed));
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
 
     const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
 
-    let submitResult = false;
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(false);
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.setupFailed);
+    expect(wasScheduleMeetingPersisted(submitResult)).toBe(true);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
   });
 
-  it('refreshes meetings after a partial update failure', async () => {
+  it('returns setupFailed and refreshes meetings after a partial update failure', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const updateMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.removeParticipantsFailed));
     const store = createMeetingStore({loadMeetings, updateMeeting});
@@ -138,29 +169,31 @@ describe('useScheduleMeetingSubmit', () => {
 
     const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
 
-    let submitResult = false;
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(false);
-    expect(updateMeeting).toHaveBeenCalled();
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.setupFailed);
+    expect(wasScheduleMeetingPersisted(submitResult)).toBe(true);
+    expect(updateMeeting).toHaveBeenCalledWith(updateCommand);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
   });
 
-  it('does not refresh meetings when create fails before server state changes', async () => {
+  it('returns submitFailed and does not refresh meetings when create fails before server state changes', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const scheduleMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed));
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
 
     const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
 
-    let submitResult = false;
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(false);
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.submitFailed);
+    expect(wasScheduleMeetingPersisted(submitResult)).toBe(false);
     expect(loadMeetings).not.toHaveBeenCalled();
   });
 });

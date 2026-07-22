@@ -26,7 +26,9 @@ import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
 import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider, useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import {MeetNowModal} from 'Components/Meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
+import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/Meeting/shared/service/meetingService';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const MeetingsContent = () => {
@@ -54,6 +56,7 @@ const MeetingsContent = () => {
       </div>
       <MeetingCallingView />
       <ScheduleMeetingModal />
+      <MeetNowModal />
     </div>
   );
 };
@@ -62,15 +65,18 @@ export const Meetings = () => {
   const {mainViewModel, wallClock} = useApplicationContext();
   const {meetings: meetingsRepository, conversation: conversationRepository} = mainViewModel.content.repositories;
 
-  const store = useMemo(
-    () =>
-      createMeetingStore({
-        meetingsRepository,
-        conversationRepository,
-        wallClock,
-      }),
-    [meetingsRepository, conversationRepository, wallClock],
-  );
+  const store = useMemo(() => {
+    const meetingServiceDeps = {meetingsRepository, conversationRepository, wallClock};
+
+    return createMeetingStore({
+      ...meetingServiceDeps,
+      serviceTasks: {
+        scheduleMeeting: command => scheduleMeeting(command, meetingServiceDeps),
+        meetNowMeeting: command => meetNowMeeting(command, meetingServiceDeps),
+        updateMeeting: command => updateMeeting(command, meetingServiceDeps),
+      },
+    });
+  }, [meetingsRepository, conversationRepository, wallClock]);
 
   return (
     <MeetingStoreProvider store={store}>

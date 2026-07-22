@@ -43,6 +43,7 @@ const logger = getLogger('Webapp/MLSConversations');
 
 /**
  * Will initialize all the MLS conversations that the user is member of but that are not yet locally established.
+ * Includes group, channel, and meeting conversations.
  *
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
@@ -67,7 +68,9 @@ export async function initMLSGroupConversations(
 
   const mlsGroupConversations = conversations.filter(
     (conversation): conversation is MLSCapableConversation =>
-      conversation.isGroupOrChannel() && isMLSCapableConversation(conversation) && !conversation.isSelfUserRemoved(),
+      (conversation.isGroupOrChannel() || conversation.isMeeting()) &&
+      isMLSCapableConversation(conversation) &&
+      !conversation.isSelfUserRemoved(),
   );
 
   for (const mlsConversation of mlsGroupConversations) {

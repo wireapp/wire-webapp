@@ -22,7 +22,7 @@ import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 
-import type {MeetingStoreDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
+import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -31,8 +31,8 @@ import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository'
 import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
-import {scheduleMeeting, updateMeeting} from './scheduleMeetingService';
-import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
+import {meetNowMeeting, scheduleMeeting, updateMeeting} from './meetingService';
+import type {ScheduleMeetingCommand, UpdateMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
@@ -42,14 +42,26 @@ const futureEndIso = futureEndDate.toISOString();
 
 const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
 
-const formState: ScheduleMeetingFormState = {
+const scheduleCommand: ScheduleMeetingCommand = {
   title: 'Weekly sync',
-  start: maybe.just(futureStartDate),
-  end: maybe.just(futureEndDate),
+  start: futureStartDate,
+  end: futureEndDate,
   recurrence: 'doesNotRepeat',
   selectedUsers: [],
-  participantsFilter: '',
 };
+
+const updateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): UpdateMeetingCommand => ({
+  meetingId,
+  title: 'Weekly sync',
+  start: futureStartDate,
+  end: futureEndDate,
+  recurrence: 'doesNotRepeat',
+  originalRecurrence: 'doesNotRepeat',
+  selectedUsers: [],
+  originalSelectedUsers: [],
+  qualifiedConversation: maybe.just(qualifiedConversation),
+  ...overrides,
+});
 
 const meetingId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
@@ -124,7 +136,7 @@ describe('scheduleMeeting', () => {
     establishMeetingConversation?: jest.Mock;
     safeAddUsers?: jest.Mock;
   } = {}): {
-    deps: MeetingStoreDeps;
+    deps: MeetingServiceDeps;
     createMeetingMock: jest.Mock;
     establishMeetingConversation: jest.Mock;
     saveMeetingConversationFromBackend: jest.Mock;
@@ -152,7 +164,7 @@ describe('scheduleMeeting', () => {
   it('creates a meeting and establishes the MLS conversation without participants', async () => {
     const {deps, createMeetingMock, establishMeetingConversation, saveMeetingConversationFromBackend} = createDeps();
 
-    const result = await scheduleMeeting(formState, deps);
+    const result = await scheduleMeeting(scheduleCommand, deps);
 
     expect(result.isOk).toBe(true);
     expect(result.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual([]);
@@ -176,7 +188,7 @@ describe('scheduleMeeting', () => {
 
     const result = await scheduleMeeting(
       {
-        ...formState,
+        ...scheduleCommand,
         selectedUsers: [alice, bob],
       },
       deps,
@@ -195,26 +207,21 @@ describe('scheduleMeeting', () => {
       establishMeetingConversation: jest.fn().mockReturnValue(task.reject(new Error('establish failed'))),
     });
 
-    const result = await scheduleMeeting(formState, deps);
+    const result = await scheduleMeeting(scheduleCommand, deps);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.addParticipantsFailed);
   });
 
-  it('returns missingTimes and does not call API', async () => {
-    const {deps, createMeetingMock} = createDeps();
+  it('returns conversationSetupFailed when saving the created conversation fails', async () => {
+    const {deps} = createDeps({
+      saveMeetingConversationFromBackend: jest.fn().mockReturnValue(task.reject(new Error('save failed'))),
+    });
 
-    const result = await scheduleMeeting(
-      {
-        ...formState,
-        start: maybe.nothing(),
-      },
-      deps,
-    );
+    const result = await scheduleMeeting(scheduleCommand, deps);
 
     expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe('missingTimes');
-    expect(createMeetingMock).not.toHaveBeenCalled();
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.conversationSetupFailed);
   });
 
   it('returns createFailed when API fails', async () => {
@@ -222,10 +229,73 @@ describe('scheduleMeeting', () => {
       createMeetingMock: jest.fn().mockReturnValue(task.reject(new Error('network'))),
     });
 
-    const result = await scheduleMeeting(formState, deps);
+    const result = await scheduleMeeting(scheduleCommand, deps);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.createFailed);
+  });
+});
+
+describe('meetNowMeeting', () => {
+  const createDeps = ({
+    createMeetingMock = jest.fn().mockReturnValue(
+      task.resolve({
+        qualified_conversation: qualifiedConversation,
+        qualified_id: meetingId,
+        conversation: meetingConversationResponse,
+      }),
+    ),
+    saveMeetingConversationFromBackend = jest.fn().mockReturnValue(task.resolve(undefined)),
+    safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation())),
+    establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+  }: {
+    createMeetingMock?: jest.Mock;
+    saveMeetingConversationFromBackend?: jest.Mock;
+    safeGetConversationById?: jest.Mock;
+    establishMeetingConversation?: jest.Mock;
+    safeAddUsers?: jest.Mock;
+  } = {}) => {
+    const meetingsRepository = {
+      createMeeting: createMeetingMock,
+      getMeetingsList: jest.fn(),
+    } as unknown as MeetingsRepository;
+
+    const conversationRepository = {
+      saveMeetingConversationFromBackend,
+      safeGetConversationById,
+      establishMeetingConversation,
+      safeAddUsers,
+    } as unknown as ConversationRepository;
+
+    return {
+      deps: {meetingsRepository, conversationRepository, wallClock},
+      createMeetingMock,
+      establishMeetingConversation,
+    };
+  };
+
+  it('creates an instant meeting and returns the qualified conversation', async () => {
+    const {deps, createMeetingMock} = createDeps();
+
+    const result = await meetNowMeeting(
+      {
+        title: 'Standup',
+        selectedUsers: [],
+      },
+      deps,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(result.match({Ok: value => value, Err: () => null})).toEqual({
+      failedToAdd: [],
+      qualifiedConversation,
+    });
+    expect(createMeetingMock).toHaveBeenCalledWith({
+      title: 'Standup',
+      start_time: fixedNow.toISOString(),
+      end_time: new Date(fixedNow.getTime() + 60 * 60 * 1000).toISOString(),
+    });
   });
 });
 
@@ -285,16 +355,10 @@ describe('updateMeeting', () => {
     });
 
     const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          selectedUsers: [bob, charlie],
-        },
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
+      updateCommand({
+        selectedUsers: [bob, charlie],
         originalSelectedUsers: [alice, bob],
-      },
+      }),
       deps,
     );
 
@@ -315,16 +379,10 @@ describe('updateMeeting', () => {
     const {deps, updateMeetingMock, safeGetConversationById, safeAddUsers, safeRemoveMembers} = createDeps();
 
     const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          selectedUsers: [alice, bob],
-        },
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
+      updateCommand({
+        selectedUsers: [alice, bob],
         originalSelectedUsers: [alice, bob],
-      },
+      }),
       deps,
     );
 
@@ -335,46 +393,26 @@ describe('updateMeeting', () => {
     expect(safeAddUsers).not.toHaveBeenCalled();
   });
 
-  it('returns missingTimes and does not call API', async () => {
-    const {deps, updateMeetingMock} = createDeps();
-
-    const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          end: maybe.nothing(),
-        },
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
-        originalSelectedUsers: [],
-      },
-      deps,
-    );
-
-    expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe('missingTimes');
-    expect(updateMeetingMock).not.toHaveBeenCalled();
-  });
-
   it('returns updateFailed when updateMeeting fails', async () => {
     const {deps} = createDeps({
       updateMeetingMock: jest.fn().mockReturnValue(task.reject(new Error('network'))),
     });
 
-    const result = await updateMeeting(
-      {
-        meetingId,
-        formState,
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
-        originalSelectedUsers: [],
-      },
-      deps,
-    );
+    const result = await updateMeeting(updateCommand(), deps);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.updateFailed);
+  });
+
+  it('returns conversationSetupFailed when saving the updated conversation fails', async () => {
+    const {deps} = createDeps({
+      saveMeetingConversationFromBackend: jest.fn().mockReturnValue(task.reject(new Error('save failed'))),
+    });
+
+    const result = await updateMeeting(updateCommand(), deps);
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.conversationSetupFailed);
   });
 
   it('returns removeParticipantsFailed when removeMembers fails', async () => {
@@ -385,16 +423,10 @@ describe('updateMeeting', () => {
     });
 
     const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          selectedUsers: [bob],
-        },
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
+      updateCommand({
+        selectedUsers: [bob],
         originalSelectedUsers: [alice, bob],
-      },
+      }),
       deps,
     );
 
@@ -411,16 +443,10 @@ describe('updateMeeting', () => {
     });
 
     const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          selectedUsers: [alice, charlie],
-        },
-        qualifiedConversation: maybe.just(qualifiedConversation),
-        originalRecurrence: 'doesNotRepeat',
+      updateCommand({
+        selectedUsers: [alice, charlie],
         originalSelectedUsers: [alice],
-      },
+      }),
       deps,
     );
 
@@ -435,16 +461,11 @@ describe('updateMeeting', () => {
     const {deps, updateMeetingMock, safeGetConversationById} = createDeps();
 
     const result = await updateMeeting(
-      {
-        meetingId,
-        formState: {
-          ...formState,
-          selectedUsers: [bob],
-        },
-        qualifiedConversation: maybe.nothing(),
-        originalRecurrence: 'doesNotRepeat',
+      updateCommand({
+        selectedUsers: [bob],
         originalSelectedUsers: [alice],
-      },
+        qualifiedConversation: maybe.nothing(),
+      }),
       deps,
     );
 

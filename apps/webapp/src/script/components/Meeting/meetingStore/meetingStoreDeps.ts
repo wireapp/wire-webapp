@@ -18,12 +18,30 @@
  */
 
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Task} from 'true-myth';
 
+import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {CreateMeetingSuccess, MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
+import type {
+  MeetNowMeetingCommand,
+  ScheduleMeetingCommand,
+  UpdateMeetingCommand,
+} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 
-export type MeetingStoreDeps = {
+export type MeetingStoreServiceTasks = {
+  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
+  updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+};
+
+export type MeetingServiceDeps = {
   meetingsRepository: MeetingsRepository;
   conversationRepository: ConversationRepository;
   wallClock: WallClock;
+};
+
+export type MeetingStoreDeps = MeetingServiceDeps & {
+  serviceTasks: MeetingStoreServiceTasks;
 };

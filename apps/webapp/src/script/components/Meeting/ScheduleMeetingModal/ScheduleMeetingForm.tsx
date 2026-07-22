@@ -34,10 +34,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {MeetingParticipantsPicker} from 'Components/Meeting/MeetingParticipantsPicker';
-import type {User} from 'Repositories/entity/User';
-import {currentLanguage} from 'src/script/auth/localeConfig';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useMeetingParticipants} from 'Components/Meeting/shared/participants/useMeetingParticipants';
 import {
   scheduleMeetingFormColumnCss,
   scheduleMeetingFormDividerCss,
@@ -48,7 +45,11 @@ import {
   scheduleMeetingSelectMenuPortalStyles,
   scheduleMeetingTitleClearButtonStyles,
   scheduleMeetingTitleInputWrapperStyles,
-} from './ScheduleMeetingForm.styles';
+} from 'Components/Meeting/shared/styles/meetingForm.styles';
+import type {User} from 'Repositories/entity/User';
+import {currentLanguage} from 'src/script/auth/localeConfig';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+
 import {
   SCHEDULE_MEETING_RECURRENCE_OPTIONS,
   SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
@@ -59,7 +60,6 @@ import type {
   ScheduleMeetingMode,
   ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
-import {useScheduleMeetingParticipants} from './useScheduleMeetingParticipants';
 
 const toDateTimePickerValue = (value: Maybe<Date>): Date | null => value.unwrapOr(null);
 
@@ -95,7 +95,7 @@ export const ScheduleMeetingForm = ({
   selfUser,
 }: ScheduleMeetingFormProps) => {
   const {mainViewModel, translate, wallClock} = useApplicationContext();
-  const {users} = useScheduleMeetingParticipants();
+  const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
 
   const contentViewModel = mainViewModel.content;
@@ -170,8 +170,15 @@ export const ScheduleMeetingForm = ({
     return startDate.compare(todayValue) > 0 ? startDate : todayValue;
   }, [formState.start, todayValue]);
 
-  const startErrorText = firstNonEmptyError(errors.startInPast);
-  const endErrorText = firstNonEmptyError(errors.endInPast, errors.endBeforeStart);
+  const startErrorText = firstNonEmptyError(
+    errors.startInPast,
+    formState.start.isNothing ? errors.missingTimes : undefined,
+  );
+  const endErrorText = firstNonEmptyError(
+    errors.endInPast,
+    errors.endBeforeStart,
+    formState.end.isNothing ? errors.missingTimes : undefined,
+  );
 
   return (
     <div css={scheduleMeetingFormLayoutCss} data-uie-name="schedule-meeting-form" data-uie-mode={mode}>

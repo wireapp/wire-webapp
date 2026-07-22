@@ -19,47 +19,44 @@
 
 import {useCallback, useState} from 'react';
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Maybe, type Task} from 'true-myth';
 
+import {mapScheduleFormToMeetingCommand} from 'Components/Meeting/mapScheduleFormToMeetingCommand';
+import {mapScheduleFormToUpdateMeetingCommand} from 'Components/Meeting/mapScheduleFormToUpdateMeetingCommand';
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
+import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
+import {
+  isMeetingPersistedDespiteSubmitError,
+  shouldRefreshMeetingsListAfterSubmitError,
+} from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
+import {showMeetingPartialAddFailureModal} from 'Components/Meeting/shared/submit/showMeetingPartialAddFailureModal';
+import {showMeetingSubmitError} from 'Components/Meeting/shared/submit/showMeetingSubmitError';
+import type {ScheduleMeetingCommand, UpdateMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import type {Translate} from 'Util/localizerUtil';
 
-import {SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS} from './scheduleMeetingErrorKeys';
-import type {MeetingSubmitSuccess, UpdateMeetingParams} from './scheduleMeetingService';
-import type {ScheduleMeetingFormState, ScheduleMeetingMode} from './scheduleMeetingTypes';
-import {shouldRefreshMeetingsListAfterSubmitError} from './shouldRefreshMeetingsListAfterSubmitError';
-import {showMeetingPartialAddFailureModal} from './showMeetingPartialAddFailureModal';
+import {
+  scheduleMeetingSubmitResults,
+  type ScheduleMeetingFormState,
+  type ScheduleMeetingMode,
+  type ScheduleMeetingSubmitResult,
+} from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
-
-const showMeetingSubmitError = (translate: Translate, error: MeetingSubmitErrors): void => {
-  const {titleKey, messageKey} = SCHEDULE_MEETING_ERROR_TRANSLATION_KEYS[error];
-  PrimaryModal.show(
-    PrimaryModal.type.ACKNOWLEDGE,
-    {
-      text: {
-        title: translate(titleKey),
-        message: translate(messageKey),
-      },
-    },
-    undefined,
-    translate,
-  );
-};
 
 type SubmitMeetingParams = {
   formState: ScheduleMeetingFormState;
   mode: ScheduleMeetingMode;
   editingMeetingId: Maybe<QualifiedId>;
   qualifiedConversation: Maybe<QualifiedId>;
-  originalRecurrence: UpdateMeetingParams['originalRecurrence'];
+  originalRecurrence: ScheduleMeetingFormState['recurrence'];
   originalSelectedUsers: User[];
-  scheduleMeeting: (formState: ScheduleMeetingFormState) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
-  updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  wallClock: WallClock;
+  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 
 const submitMeeting = ({
@@ -69,29 +66,43 @@ const submitMeeting = ({
   qualifiedConversation,
   originalRecurrence,
   originalSelectedUsers,
+  wallClock,
   scheduleMeeting,
   updateMeeting,
 }: SubmitMeetingParams): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
   if (mode === 'create') {
-    return scheduleMeeting(formState);
+    const commandResult = mapScheduleFormToMeetingCommand(formState, wallClock);
+
+    if (commandResult.isErr) {
+      return task.reject(meetingSubmitErrors.createFailed);
+    }
+
+    return scheduleMeeting(commandResult.value);
   }
 
   if (editingMeetingId.isNothing) {
     return task.reject(meetingSubmitErrors.editMeetingIdMissing);
   }
 
-  return updateMeeting({
-    meetingId: editingMeetingId.value,
+  const commandResult = mapScheduleFormToUpdateMeetingCommand({
     formState,
+    meetingId: editingMeetingId.value,
     qualifiedConversation,
     originalRecurrence,
     originalSelectedUsers,
+    wallClock,
   });
+
+  if (commandResult.isErr) {
+    return task.reject(commandResult.error);
+  }
+
+  return updateMeeting(commandResult.value);
 };
 
 export const useScheduleMeetingSubmit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {translate} = useApplicationContext();
+  const {translate, wallClock} = useApplicationContext();
   const scheduleMeeting = useMeetingStore(state => state.scheduleMeeting);
   const updateMeeting = useMeetingStore(state => state.updateMeeting);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
@@ -102,7 +113,7 @@ export const useScheduleMeetingSubmit = () => {
   const originalSelectedUsers = useScheduleMeetingModal(state => state.originalSelectedUsers);
 
   const submit = useCallback(
-    async (formState: ScheduleMeetingFormState): Promise<boolean> => {
+    async (formState: ScheduleMeetingFormState): Promise<ScheduleMeetingSubmitResult> => {
       setIsSubmitting(true);
 
       const submitResult = await submitMeeting({
@@ -112,6 +123,7 @@ export const useScheduleMeetingSubmit = () => {
         qualifiedConversation,
         originalRecurrence,
         originalSelectedUsers,
+        wallClock,
         scheduleMeeting,
         updateMeeting,
       });
@@ -122,8 +134,10 @@ export const useScheduleMeetingSubmit = () => {
         }
 
         setIsSubmitting(false);
-        showMeetingSubmitError(translate, submitResult.error);
-        return false;
+        showMeetingSubmitError(translate, submitResult.error, getScheduleMeetingSubmitErrorTranslationKeys(mode));
+        return isMeetingPersistedDespiteSubmitError(submitResult.error)
+          ? scheduleMeetingSubmitResults.setupFailed
+          : scheduleMeetingSubmitResults.submitFailed;
       }
 
       if (submitResult.value.failedToAdd.length > 0) {
@@ -138,7 +152,7 @@ export const useScheduleMeetingSubmit = () => {
 
       setIsSubmitting(false);
 
-      return true;
+      return scheduleMeetingSubmitResults.succeeded;
     },
     [
       editingMeetingId,
@@ -150,6 +164,7 @@ export const useScheduleMeetingSubmit = () => {
       scheduleMeeting,
       translate,
       updateMeeting,
+      wallClock,
     ],
   );
 

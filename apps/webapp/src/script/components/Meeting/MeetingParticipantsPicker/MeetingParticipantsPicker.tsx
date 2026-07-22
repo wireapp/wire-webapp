@@ -51,7 +51,7 @@ import {
 
 export interface MeetingParticipantsPickerProps {
   id: string;
-  dataUieName: string;
+  dataUieName?: string;
   users: User[];
   selectedUsers: User[];
   onSelectedUsersChange: (users: User[]) => void;
@@ -166,7 +166,7 @@ export const MeetingParticipantsPicker = ({
       <div
         ref={triggerRef}
         css={controlStyles({isDisabled: disabled, isOpen, markInvalid})}
-        data-uie-name={`${dataUieName}-control`}
+        data-uie-name={dataUieName ? `${dataUieName}-control` : undefined}
         data-disabled={disabled || undefined}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
@@ -175,7 +175,7 @@ export const MeetingParticipantsPicker = ({
         <div css={valueContainerStyles}>
           <SearchIcon aria-hidden="true" css={searchIconStyles} />
           {hasSelection && (
-            <span css={selectedSummaryStyles} data-uie-name={`${dataUieName}-summary`}>
+            <span css={selectedSummaryStyles} data-uie-name={dataUieName ? `${dataUieName}-summary` : undefined}>
               {selectedSummary}
             </span>
           )}
@@ -191,7 +191,7 @@ export const MeetingParticipantsPicker = ({
             disabled={disabled}
             placeholder={showPlaceholder ? placeholder : ''}
             aria-label={placeholder}
-            data-uie-name={`${dataUieName}-input`}
+            data-uie-name={dataUieName ? `${dataUieName}-input` : undefined}
             onChange={event => {
               onFilterChange(event.target.value);
               if (!isOpen) {
@@ -214,7 +214,7 @@ export const MeetingParticipantsPicker = ({
           css={chevronButtonStyles}
           isDisabled={disabled}
           aria-label={label ?? placeholder}
-          data-uie-name={`${dataUieName}-toggle`}
+          data-uie-name={dataUieName ? `${dataUieName}-toggle` : undefined}
           onPress={() => handleOpenChange(!isOpen)}
         >
           <ChevronDownIcon aria-hidden="true" width={16} height={16} css={chevronIconStyles(isOpen)} />
@@ -237,7 +237,7 @@ export const MeetingParticipantsPicker = ({
           <div
             id={listboxId}
             css={listContainerStyles}
-            data-uie-name={`dropdown-${dataUieName}`}
+            data-uie-name={dataUieName ? `dropdown-${dataUieName}` : undefined}
             role="listbox"
             aria-multiselectable="true"
           >
@@ -257,7 +257,7 @@ export const MeetingParticipantsPicker = ({
               allowRemoteSearch
               filterRemoteTeamUsers
               showAllProvidedUsers
-              dataUieName={`${dataUieName}-list`}
+              dataUieName={dataUieName ? `${dataUieName}-list` : undefined}
             />
           </div>
         </div>

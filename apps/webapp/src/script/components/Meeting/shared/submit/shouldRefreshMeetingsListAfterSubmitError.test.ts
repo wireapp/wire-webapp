@@ -25,6 +25,7 @@ describe('shouldRefreshMeetingsListAfterSubmitError', () => {
   it('returns true for participant sync partial failures', () => {
     expect(shouldRefreshMeetingsListAfterSubmitError(meetingSubmitErrors.addParticipantsFailed)).toBe(true);
     expect(shouldRefreshMeetingsListAfterSubmitError(meetingSubmitErrors.removeParticipantsFailed)).toBe(true);
+    expect(shouldRefreshMeetingsListAfterSubmitError(meetingSubmitErrors.conversationSetupFailed)).toBe(true);
   });
 
   it('returns false for failures before server state changed', () => {

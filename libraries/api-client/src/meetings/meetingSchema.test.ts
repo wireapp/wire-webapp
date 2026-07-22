@@ -106,6 +106,24 @@ describe('meetingSchema', () => {
     expect(meetingWithConversationSchema.safeParse(validMeetingWithConversation).success).toBe(true);
   });
 
+  it('accepts null add_permission on embedded meeting conversations', () => {
+    const result = meetingWithConversationSchema.safeParse({
+      ...validMeetingWithConversation,
+      conversation: {
+        ...validMeetingConversation,
+        add_permission: null,
+      },
+    });
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error('Expected meeting with conversation schema parse to succeed');
+    }
+
+    expect(result.data.conversation.add_permission).toBeUndefined();
+  });
+
   it('normalizes member fields to match backend conversation types', () => {
     const result = meetingWithConversationSchema.safeParse({
       ...validMeetingWithConversation,
