@@ -62,11 +62,13 @@ function buildConversationRepositoryMock(): ConversationRepositoryMock {
 
 function createControllablePromise<T>() {
   let resolve!: (value: T) => void;
-  const promise = new Promise<T>(resolvePromise => {
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
     resolve = resolvePromise;
+    reject = rejectPromise;
   });
 
-  return {promise, resolve};
+  return {promise, resolve, reject};
 }
 
 function buildRestNodeStub(name: string, uuid = name) {
@@ -255,5 +257,55 @@ describe('useSearchCellsNodes', () => {
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
     expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
+  });
+
+  it('keeps newer results when an older request rejects last', async () => {
+    const staleSearch = createControllablePromise<RestNodeCollection>();
+    const currentSearch = createControllablePromise<RestNodeCollection>();
+    const cellsRepository: CellsRepositoryMock = {
+      searchNodes: jest.fn().mockReturnValueOnce(staleSearch.promise).mockReturnValue(currentSearch.promise),
+    };
+    const {fireAndForgetInvoker, result} = renderSearchHook({cellsRepository});
+
+    let currentSearchPromise!: Promise<void>;
+    act(() => {
+      currentSearchPromise = result.current.handleReload();
+    });
+
+    await act(async () => {
+      currentSearch.resolve({Nodes: [buildRestNodeStub('current-file.pdf')]});
+      await currentSearchPromise;
+      staleSearch.reject(new Error('stale request failed'));
+      await fireAndForgetInvoker.waitUntilAllSettled();
+    });
+
+    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
+    expect(useCellsStore.getState().status).toBe('success');
+  });
+
+  it('shows an error and clears results when the current request fails for a Cells participant', async () => {
+    const cellsRepository: CellsRepositoryMock = {searchNodes: jest.fn().mockRejectedValue(new Error('request failed'))};
+    const conversationRepository: ConversationRepositoryMock = {
+      ...buildConversationRepositoryMock(),
+      getAllCellEnabledGroupConversations: jest.fn().mockReturnValue([{}]),
+    };
+    const {fireAndForgetInvoker} = renderSearchHook({cellsRepository, conversationRepository});
+
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(useCellsStore.getState().nodes).toEqual([]);
+    expect(useCellsStore.getState().pagination).toBeNull();
+    expect(useCellsStore.getState().status).toBe('error');
+  });
+
+  it('treats a current request failure as an empty result when the user has no Cells conversations', async () => {
+    const cellsRepository: CellsRepositoryMock = {searchNodes: jest.fn().mockRejectedValue(new Error('request failed'))};
+    const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
+
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(useCellsStore.getState().nodes).toEqual([]);
+    expect(useCellsStore.getState().pagination).toBeNull();
+    expect(useCellsStore.getState().status).toBe('success');
   });
 });
