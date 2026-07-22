@@ -358,8 +358,7 @@ test.describe('Federation', () => {
           .getMessage({sender: federatedUser})
           .filter({has: normalUserPage.getByTestId('image-asset')});
 
-        // It takes a bit longer for the image to be uploaded and received, so the timeout is increased to 30 seconds to avoid flakiness in the test
-        await expect(messageWithImage).toBeVisible({timeout: 30_000});
+        await expect(messageWithImage).toBeVisible();
         // Wait for messages to be read before exporting backup
         await expect(groupConversation.unreadIndicator).not.toBeVisible();
       });
