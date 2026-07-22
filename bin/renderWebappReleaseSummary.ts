@@ -814,7 +814,7 @@ function formatBetaStageOverview(input: WebappReleaseSummaryInput): string {
   const betaResult = formatBetaResult(input.beta.deploymentResult);
 
   return betaTagLink.mapOr(betaResult, tagLink => {
-    return `${betaResult} — tag ${tagLink}`;
+    return `${betaResult} - tag ${tagLink}`;
   });
 }
 
@@ -823,7 +823,7 @@ function formatE2EStageOverview(input: WebappReleaseSummaryInput): string {
   const e2EResult = formatE2EResult(input.e2e.result);
 
   return reportLink.mapOr(e2EResult, link => {
-    return `${e2EResult} — ${link}`;
+    return `${e2EResult} - ${link}`;
   });
 }
 
@@ -1226,11 +1226,11 @@ export function renderWebappReleaseSummary(input: WebappReleaseSummaryInput): st
       ? formatDistributionPublicationEvidence(input.distribution, input.github)
       : '';
   const distributionOverview =
-    distributionEvidence === '' ? distributionResult : `${distributionResult} — ${distributionEvidence}`;
+    distributionEvidence === '' ? distributionResult : `${distributionResult} - ${distributionEvidence}`;
   const productionTagLink = formatVerifiedProductionTagLink(input.production, input.github);
   const formattedProductionOverview = formatFinalProductionOverview(input);
   const productionOverview = productionTagLink.mapOr(formattedProductionOverview, tagLink => {
-    return `${formattedProductionOverview} — tag ${tagLink}`;
+    return `${formattedProductionOverview} - tag ${tagLink}`;
   });
   const visibleSummary = [
     renderReleaseIdentity({
