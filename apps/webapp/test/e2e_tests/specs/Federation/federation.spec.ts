@@ -358,7 +358,7 @@ test.describe('Federation', () => {
           .getMessage({sender: federatedUser})
           .filter({has: normalUserPage.getByTestId('image-asset')});
         await expect(messageWithImage).toBeVisible();
-        
+
         // Wait for messages to be read before exporting backup
         await expect(groupConversation.unreadIndicator).not.toBeVisible();
       });
