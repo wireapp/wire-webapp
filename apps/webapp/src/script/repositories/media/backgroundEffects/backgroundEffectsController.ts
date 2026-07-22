@@ -36,6 +36,7 @@ import {detectCapabilities} from './helper/capability';
 import {
   defaultOpts,
   ProcessVideoTrackOptions,
+  SELFIE_MULTICLASS_MODEL_PATH,
   SELFIE_SEGMENTER_MODEL_PATH,
   WorkerBackgroundSource,
   WorkerProcessVideoTrackOptions,
@@ -72,6 +73,7 @@ export class BackgroundEffectsController {
   private qualitySampleQueue = Promise.resolve();
   private maxResolution: Resolution = TIER_DEFINITIONS.hd.resolution;
   private maxQualityTier: QualityTier = 'hd';
+  private requestedModelPath: string = SELFIE_SEGMENTER_MODEL_PATH;
   private refcount = 0;
 
   /**
@@ -89,6 +91,8 @@ export class BackgroundEffectsController {
     const resolved = await resolveOptions(options);
 
     this.options = withoutBitmap(resolved);
+    this.requestedModelPath = resolved.modelPath;
+    backgroundEffectsStore.getState().setModel(this.requestedModelPath);
     this.onMetrics = options.onMetrics;
 
     const trackCapabilities = inputTrack.getCapabilities();
@@ -258,6 +262,7 @@ export class BackgroundEffectsController {
   }
 
   public setModelPath(path: string): void {
+    this.requestedModelPath = path;
     this.options = {...this.options, modelPath: path};
     this.pushOptionsUpdate();
   }
@@ -278,11 +283,19 @@ export class BackgroundEffectsController {
     if (!this.refcount) {
       return;
     }
-    // in case of not HD we will always use more performant model
-    if (this.options.quality !== 'hd' && this.options.quality !== 'fhd' && this.options.quality !== 'auto') {
-      this.options.modelPath = SELFIE_SEGMENTER_MODEL_PATH;
-      backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(false);
-    }
+
+    const isLowQualityTier =
+      this.options.quality !== 'hd' && this.options.quality !== 'fhd' && this.options.quality !== 'auto';
+
+    const effectiveModelPath =
+      isLowQualityTier && this.requestedModelPath === SELFIE_MULTICLASS_MODEL_PATH
+        ? SELFIE_SEGMENTER_MODEL_PATH
+        : this.requestedModelPath;
+
+    this.options.modelPath = effectiveModelPath;
+
+    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(effectiveModelPath === SELFIE_MULTICLASS_MODEL_PATH);
+    backgroundEffectsStore.getState().setModel(effectiveModelPath);
 
     const {options: workerOptions} = getWorkerOptions(this.options);
     const finalOptions: WorkerProcessVideoTrackOptions = workerSource
