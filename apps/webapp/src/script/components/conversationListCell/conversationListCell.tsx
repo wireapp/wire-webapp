@@ -229,7 +229,7 @@ export const ConversationListCell = ({
         tabIndex={isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
         aria-label={accessibilityConversationLabel}
         aria-describedby={contextMenuKeyboardShortcut}
-        aria-selected={isActive}
+        aria-current={isActive}
       >
         <span
           id={contextMenuKeyboardShortcut}
