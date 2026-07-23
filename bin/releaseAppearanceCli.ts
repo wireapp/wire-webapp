@@ -32,14 +32,14 @@ import {
   prepareReleaseAppearanceComment,
   selectBetaDiscoveryRange,
   selectProductionDiscoveryRange,
-} from './releaseAppearance';
+} from './releaseAppearance.ts';
 import type {
   CommitDiscoveryRange,
   CommitRangeRelationship,
   PreparedReleaseAppearanceComment,
   ReleaseAppearanceComment,
   ReleaseAppearanceEnvironment,
-} from './releaseAppearance';
+} from './releaseAppearance.ts';
 
 const nodeExecutableAndScriptPathArgumentCount = 2;
 const maximumGitHubRetryCount = 2;
@@ -1113,6 +1113,6 @@ async function main(): Promise<void> {
   });
 }
 
-if (require.main === module) {
+if (process.argv[1]?.endsWith('releaseAppearanceCli.ts')) {
   void main();
 }
