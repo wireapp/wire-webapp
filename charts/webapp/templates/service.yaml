@@ -1,4 +1,5 @@
-{{- if .Values.ingress.enabled }}
+{{- $routingEnabled := eq (include "webapp.routingEnabled" . | trim) "true" -}}
+{{- if $routingEnabled }}
 {{- $appName := include "webapp.baseName" . -}}
 apiVersion: v1
 kind: Service

@@ -1,0 +1,36 @@
+{{- $routingMode := include "webapp.routingMode" . -}}
+{{- $routingEnabled := eq (include "webapp.routingEnabled" . | trim) "true" -}}
+{{- if and $routingEnabled (or (eq $routingMode "envoy") (eq $routingMode "migration")) }}
+{{- include "webapp.validateDomainConfig" . }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: {{ include "webapp.listenerSetName" . }}
+  labels:
+    app: {{ include "webapp.baseName" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  parentRef:
+    name: {{ required "gateway.name must be set when routing.mode is envoy or migration" .Values.gateway.name | quote }}
+    {{- if .Values.gateway.namespace }}
+    namespace: {{ .Values.gateway.namespace | quote }}
+    {{- else }}
+    namespace: {{ .Release.Namespace | quote }}
+    {{- end }}
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+    - name: {{ include "webapp.listenerName" . | quote }}
+      hostname: {{ .Values.webappDomain | quote }}
+      protocol: {{ include "webapp.listenerProtocol" . | quote }}
+      port: {{ include "webapp.listenerPort" . }}
+      {{- if .Values.tls.enabled }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: {{ include "webapp.tlsSecretName" . | quote }}
+      {{- end }}
+{{- end }}
