@@ -301,7 +301,7 @@ export class BackgroundEffectsController {
       return;
     }
 
-    const isLowQualityTier = this.activeQualityTier !== 'hd' && this.activeQualityTier !== 'fhd';
+    const isLowQualityTier = !TIER_DEFINITIONS[this.activeQualityTier].isHighQuality;
 
     const effectiveModelPath =
       isLowQualityTier && this.requestedModelPath === SELFIE_MULTICLASS_MODEL_PATH
