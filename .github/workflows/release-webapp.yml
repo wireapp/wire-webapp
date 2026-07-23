@@ -539,7 +539,7 @@ jobs:
           WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseAppearanceCli.ts \
+          node ./bin/releaseAppearanceCli.ts \
             beta \
             "${RELEASE_TAG_NAME}" \
             "${RELEASE_COMMIT_SHA}" \
@@ -926,7 +926,7 @@ jobs:
           WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseAppearanceCli.ts \
+          node ./bin/releaseAppearanceCli.ts \
             production \
             "${RELEASE_TAG_NAME}" \
             "${RELEASE_COMMIT_SHA}" \
