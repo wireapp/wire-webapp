@@ -192,6 +192,17 @@ function createCommitRange(): CommitDiscoveryRange {
 function createGitCommand(outputs: ReadonlyMap<string, string>): GitCommand {
   return async (commandArguments: readonly string[]): Promise<string> => {
     const commandKey = commandArguments.join(' ');
+
+    if (commandArguments[0] === 'cat-file' && commandArguments[1] === '-t') {
+      return 'tag';
+    }
+
+    if (commandArguments[0] === 'for-each-ref') {
+      const tagName = commandArguments.at(-1) ?? '';
+      const betaCandidateMatch = /-beta\.(\d+)$/u.exec(tagName);
+      return betaCandidateMatch === null || Number(betaCandidateMatch[1]) > 1 ? '300' : '200';
+    }
+
     const commandOutput = outputs.get(commandKey);
 
     if (commandOutput === undefined) {
@@ -366,8 +377,9 @@ describe('release appearance CLI orchestration', () => {
     });
 
     assert(actualRangeResult.isOk);
-    expect(actualRangeResult.value.range.baselineTagName).toBe('2026-07-21.3-beta.1');
-    expect(actualRangeResult.value.range.revisionRange).toBe(`${mergeBaseCommitHash}..${currentCommitHash}`);
+    assert(actualRangeResult.value.kind === 'range');
+    expect(actualRangeResult.value.resolvedRange.range.baselineTagName).toBe('2026-07-21.3-beta.1');
+    expect(actualRangeResult.value.resolvedRange.range.revisionRange).toBe(`${mergeBaseCommitHash}..${currentCommitHash}`);
   });
 
   it('handles paginated issue comments and leaves an existing Beta value unchanged', async () => {
@@ -758,16 +770,45 @@ describe('release appearance CLI orchestration', () => {
       commentProcessing,
       discovery,
       environment: 'production',
-      range: Maybe.just({
-        baselineRelationshipFailures: [],
-        range: createCommitRange(),
-      }),
+      resolution: {
+        kind: 'range',
+        resolvedRange: {
+          baselineRelationshipFailures: [],
+          range: createCommitRange(),
+        },
+      },
       releaseTagName: '2026-07-21.3-production',
     });
 
     expect(actualSummary).toContain('Baseline tag: `2026-07-20.4-production`');
     expect(actualSummary).toContain(`Merge base: \`${mergeBaseCommitHash}\``);
     expect(actualSummary).toContain(`- \`${firstDiscoveredCommitHash}\``);
+  });
+
+  it('renders the bootstrap state without a selected range', () => {
+    const actualSummary = renderReleaseAppearanceSummary({
+      commentProcessing: {
+        createdPullRequestNumbers: [],
+        failedPullRequests: [],
+        plans: [],
+        unchangedPullRequestNumbers: [],
+        updatedPullRequestNumbers: [],
+      },
+      discovery: {
+        commitFailures: [],
+        commitsInspected: [],
+        commitsWithoutPullRequests: [],
+        pullRequestNumbers: [],
+      },
+      environment: 'production',
+      resolution: {kind: 'bootstrap'},
+      releaseTagName: '2026-07-21.3-production',
+    });
+
+    expect(actualSummary).toContain(
+      'Bootstrap release: no preceding ADR 0002 Production baseline exists; no pull request discovery or writes were performed.',
+    );
+    expect(actualSummary).toContain('Baseline tag: `Not selected`');
   });
 
   it('orders supported pull requests numerically and continues after an unrelated commit discovery failure', async (): Promise<void> => {

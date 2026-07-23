@@ -52,6 +52,7 @@ describe('release appearance metadata', () => {
   it('uses the preceding Production baseline for Beta candidate 1', () => {
     const actualRangeResult = selectBetaDiscoveryRange({
       currentBetaTagName: '2026-07-21.3-beta.1',
+      currentBetaTagCreatedAtSeconds: 300,
       currentCommitHash: currentReleaseCommitHash,
       betaTagRelationships: [],
       existingBetaTagNames: ['2026-07-20.4-beta.9'],
@@ -61,23 +62,27 @@ describe('release appearance metadata', () => {
           mergeBaseCommitHash: previousProductionCommitHash,
           tagCommitHash: previousProductionCommitHash,
           tagName: '2026-07-20.4-production',
-          tagTimestampSeconds: 100,
+          tagCreatedAtSeconds: 100,
         },
       ],
     });
 
     assert(actualRangeResult.isOk);
     expect(actualRangeResult.value).toEqual({
+      kind: 'range',
+      range: {
       baselineCommitHash: previousProductionCommitHash,
       baselineTagName: '2026-07-20.4-production',
       mergeBaseCommitHash: previousProductionCommitHash,
       revisionRange: `${previousProductionCommitHash}..${currentReleaseCommitHash}`,
+      },
     });
   });
 
   it('uses Beta candidate 1 as the baseline for candidate 2', () => {
     const actualRangeResult = selectBetaDiscoveryRange({
       currentBetaTagName: '2026-07-21.3-beta.2',
+      currentBetaTagCreatedAtSeconds: 300,
       currentCommitHash: currentReleaseCommitHash,
       betaTagRelationships: [
         {
@@ -85,7 +90,7 @@ describe('release appearance metadata', () => {
           mergeBaseCommitHash: previousBetaMergeBaseCommitHash,
           tagCommitHash: previousBetaCommitHash,
           tagName: '2026-07-21.3-beta.1',
-          tagTimestampSeconds: 200,
+          tagCreatedAtSeconds: 200,
         },
       ],
       existingBetaTagNames: ['2026-07-21.3-beta.1'],
@@ -94,10 +99,13 @@ describe('release appearance metadata', () => {
 
     assert(actualRangeResult.isOk);
     expect(actualRangeResult.value).toEqual({
+      kind: 'range',
+      range: {
       baselineCommitHash: previousBetaCommitHash,
       baselineTagName: '2026-07-21.3-beta.1',
       mergeBaseCommitHash: previousBetaMergeBaseCommitHash,
       revisionRange: `${previousBetaMergeBaseCommitHash}..${currentReleaseCommitHash}`,
+      },
     });
   });
 
@@ -135,35 +143,51 @@ describe('release appearance metadata', () => {
     ).toBe('2026-07-21.3-beta.1');
   });
 
-  it('prefers the nearest direct Production ancestor over lexicographical order', () => {
+  it('selects the latest Production tag by annotated tag creation order', () => {
     const actualBaselineResult = selectPreviousProductionBaseline({
-      currentCommitHash: currentReleaseCommitHash,
-      currentProductionTagName: '2026-07-21.3-production',
+      currentReleaseIdentifier: '2026-07-21.3',
+      currentTagCreatedAtSeconds: 400,
+      currentTagName: '2026-07-21.3-production',
       productionTagRelationships: [
         {
           commitDistanceFromMergeBase: 8,
           mergeBaseCommitHash: previousBetaMergeBaseCommitHash,
           tagCommitHash: previousProductionCommitHash,
           tagName: '2026-07-19.1-production',
-          tagTimestampSeconds: 100,
+          tagCreatedAtSeconds: 300,
         },
         {
           commitDistanceFromMergeBase: 3,
           mergeBaseCommitHash: previousBetaCommitHash,
           tagCommitHash: previousBetaCommitHash,
           tagName: '2026-07-20.4-production',
-          tagTimestampSeconds: 200,
+          tagCreatedAtSeconds: 200,
         },
       ],
     });
 
     assert(actualBaselineResult.isOk);
-    expect(actualBaselineResult.value.tagName).toBe('2026-07-20.4-production');
+    expect(actualBaselineResult.value.kind).toBe('baseline');
+    assert(actualBaselineResult.value.kind === 'baseline');
+    expect(actualBaselineResult.value.relationship.tagName).toBe('2026-07-19.1-production');
+  });
+
+  it('returns an explicit bootstrap result when no preceding Production tag exists', () => {
+    const actualBaselineResult = selectPreviousProductionBaseline({
+      currentReleaseIdentifier: '2026-07-21.3',
+      currentTagCreatedAtSeconds: 100,
+      currentTagName: '2026-07-21.3-production',
+      productionTagRelationships: [],
+    });
+
+    assert(actualBaselineResult.isOk);
+    expect(actualBaselineResult.value).toEqual({kind: 'bootstrap'});
   });
 
   it('uses a merge base when the preceding Production tag is not an ancestor', () => {
     const actualRangeResult = selectProductionDiscoveryRange({
       currentCommitHash: currentReleaseCommitHash,
+      currentProductionTagCreatedAtSeconds: 300,
       currentProductionTagName: '2026-07-21.3-production',
       productionTagRelationships: [
         {
@@ -171,13 +195,14 @@ describe('release appearance metadata', () => {
           mergeBaseCommitHash: previousBetaMergeBaseCommitHash,
           tagCommitHash: previousProductionCommitHash,
           tagName: '2026-07-20.4-production',
-          tagTimestampSeconds: 200,
+          tagCreatedAtSeconds: 200,
         },
       ],
     });
 
     assert(actualRangeResult.isOk);
-    expect(actualRangeResult.value.mergeBaseCommitHash).toBe(previousBetaMergeBaseCommitHash);
+    assert(actualRangeResult.value.kind === 'range');
+    expect(actualRangeResult.value.range.mergeBaseCommitHash).toBe(previousBetaMergeBaseCommitHash);
   });
 
   it('does not replace an existing Beta value', () => {
@@ -368,7 +393,7 @@ describe('release appearance metadata', () => {
     expect(actualCommentResult.value.body).toContain('| Beta | 2026-07-21.3-beta.1 |');
   });
 
-  it('accepts legacy Production tags in immutable state', () => {
+  it('rejects legacy Production tags in immutable state', () => {
     const actualComment = renderReleaseAppearanceComment(
       createCommentState({
         production: {
@@ -378,6 +403,14 @@ describe('release appearance metadata', () => {
       }),
     );
 
-    expect(actualComment).toContain('| Production | 2026-07-20-production.0 |');
+    const actualCommentResult = prepareReleaseAppearanceComment({
+      comments: [{body: actualComment, commentId: 19}],
+      environment: 'production',
+      tagName: '2026-07-21.3-production',
+      workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/13',
+    });
+
+    assert(actualCommentResult.isErr);
+    expect(actualCommentResult.error.message).toContain('invalid state');
   });
 });
