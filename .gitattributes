@@ -13,6 +13,7 @@
 *.ttf binary
 *.woff binary
 *.woff2 binary
+*.tgz binary
 # Machine Learning Models
 *.tflite binary
 *.onnx binary

@@ -8939,10 +8939,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:10.0.0-pre.12":
-  version: 10.0.0-pre.12
-  resolution: "@wireapp/core-crypto@npm:10.0.0-pre.12"
-  checksum: 10/4e51ff13873228aeb622e440f8694439e1cf967916edbcd73ac2691ae5436932106b52bb7464350f3b59558133f4f5677036ce529198a510de5f0058f42e06ef
+"@wireapp/core-crypto@file:wireapp-core-crypto-10.1.1.tgz::locator=%40wireapp%2Fcore%40workspace%3Alibraries%2Fcore":
+  version: 10.1.1
+  resolution: "@wireapp/core-crypto@file:wireapp-core-crypto-10.1.1.tgz#wireapp-core-crypto-10.1.1.tgz::hash=abd199&locator=%40wireapp%2Fcore%40workspace%3Alibraries%2Fcore"
+  checksum: 10/c4441f91f746e26280e485ca50d0fa324249d66248cb690b98047d0dbe02fe4fe5b9a6faafa233fe789b18ed1bd6b42f72a73eda15374dab45b2195a95dfb7fa
   languageName: node
   linkType: hard
 
@@ -8954,7 +8954,7 @@ __metadata:
     "@swc/jest": "npm:0.2.39"
     "@types/lodash": "npm:4.17.24"
     "@wireapp/api-client": "npm:27.96.0"
-    "@wireapp/core-crypto": "npm:10.0.0-pre.12"
+    "@wireapp/core-crypto": "file:wireapp-core-crypto-10.1.1.tgz"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:2.1.19"
     "@wireapp/promise-queue": "npm:2.4.13"
