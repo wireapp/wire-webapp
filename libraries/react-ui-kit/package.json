@@ -15,8 +15,8 @@
   "homepage": "https://wire-react-ui-kit.netlify.app/",
   "dependencies": {
     "@internationalized/date": "3.12.2",
-    "@radix-ui/react-accordion": "1.2.16",
-    "@radix-ui/react-dropdown-menu": "2.1.20",
+    "@radix-ui/react-accordion": "1.2.17",
+    "@radix-ui/react-dropdown-menu": "2.1.21",
     "@sindresorhus/is": "4.6.0",
     "@types/color": "3.0.7",
     "color": "4.2.3",
