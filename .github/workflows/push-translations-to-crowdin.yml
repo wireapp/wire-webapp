@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: crowdin-push-${{ github.ref }}
-  cancel-in-progress: true
+  group: crowdin-push-main
+  cancel-in-progress: false
 
 jobs:
   push_to_crowdin:

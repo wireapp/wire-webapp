@@ -1,8 +1,8 @@
 name: Pull translations from Crowdin
 
 on:
-  push:
-    branches: [main]
+  schedule:
+    - cron: '17 12,14,16,18 * * 1-5'
   workflow_dispatch:
 
 permissions:
@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: crowdin-pull-main
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   pull_from_crowdin:
