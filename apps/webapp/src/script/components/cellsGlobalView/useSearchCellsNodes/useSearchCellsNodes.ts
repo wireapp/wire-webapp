@@ -187,19 +187,18 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     [pageSize, setNodes, setPagination, setStatus, filters, sort, logger],
   );
 
-  const defaultSearchNodesDebounced = useDebouncedCallback(async (value: string): Promise<void> => {
-    shouldPerformFullReload.current = false;
-    setSearchQuery(value);
-    await searchNodes({query: value, status: 'loading'});
-    shouldPerformFullReload.current = true;
-  }, DEBOUNCE_TIME);
-  const searchNodesDebounced =
-    createDebouncedSearch?.(async (value: string): Promise<void> => {
+  const runDebouncedSearch = useCallback(
+    async (value: string): Promise<void> => {
       shouldPerformFullReload.current = false;
       setSearchQuery(value);
       await searchNodes({query: value, status: 'loading'});
       shouldPerformFullReload.current = true;
-    }, DEBOUNCE_TIME) ?? defaultSearchNodesDebounced;
+    },
+    [searchNodes],
+  );
+  const defaultSearchNodesDebounced = useDebouncedCallback(runDebouncedSearch, DEBOUNCE_TIME);
+  const searchNodesDebounced =
+    createDebouncedSearch?.(runDebouncedSearch, DEBOUNCE_TIME) ?? defaultSearchNodesDebounced;
   const searchNodesDebouncedRef = useRef(searchNodesDebounced);
   searchNodesDebouncedRef.current = searchNodesDebounced;
 
@@ -224,6 +223,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
   };
 
   const handleReload = async (): Promise<void> => {
+    searchNodesDebouncedRef.current.cancel();
     setStatus('loading');
     clearAll();
     await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, status: 'loading'});

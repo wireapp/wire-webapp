@@ -112,6 +112,11 @@ function createControllableDebouncedSearchStub() {
       await pendingSearch?.();
       pendingSearch = undefined;
     },
+    startPendingSearch: () => {
+      const searchPromise = pendingSearch?.();
+      pendingSearch = undefined;
+      return searchPromise;
+    },
   };
 }
 
@@ -216,6 +221,64 @@ describe('useSearchCellsNodes', () => {
     expect(useCellsStore.getState().status).toBe('success');
   });
 
+  it('keeps reload results when reloading before a scheduled search runs', async () => {
+    const cellsRepository: CellsRepositoryMock = {
+      searchNodes: jest
+        .fn()
+        .mockResolvedValueOnce({Nodes: [buildRestNodeStub('initial-file.pdf')]})
+        .mockResolvedValueOnce({Nodes: [buildRestNodeStub('reload-file.pdf')]})
+        .mockResolvedValueOnce({Nodes: [buildRestNodeStub('stale-file.pdf')]}),
+    };
+    const debouncedSearchStub = createControllableDebouncedSearchStub();
+    const {fireAndForgetInvoker, result} = renderSearchHook({
+      cellsRepository,
+      createDebouncedSearch: debouncedSearchStub.create,
+    });
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    await act(async () => {
+      result.current.handleSearch('stale-query');
+      await flushMicrotasks();
+      await result.current.handleReload();
+      await debouncedSearchStub.flush();
+    });
+
+    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['reload-file.pdf']);
+    expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps browse results when clearing an in-flight search before it resolves', async () => {
+    const staleSearch = createControllablePromise<RestNodeCollection>();
+    const cellsRepository: CellsRepositoryMock = {
+      searchNodes: jest
+        .fn()
+        .mockResolvedValueOnce({Nodes: [buildRestNodeStub('initial-file.pdf')]})
+        .mockReturnValueOnce(staleSearch.promise)
+        .mockResolvedValueOnce({Nodes: [buildRestNodeStub('browse-file.pdf')]}),
+    };
+    const debouncedSearchStub = createControllableDebouncedSearchStub();
+    const {fireAndForgetInvoker, result} = renderSearchHook({
+      cellsRepository,
+      createDebouncedSearch: debouncedSearchStub.create,
+    });
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    await act(async () => {
+      result.current.handleSearch('stale-query');
+      debouncedSearchStub.startPendingSearch();
+      await flushMicrotasks();
+      await result.current.handleClearSearch();
+    });
+
+    await act(async () => {
+      staleSearch.resolve({Nodes: [buildRestNodeStub('stale-file.pdf')]});
+      await flushMicrotasks();
+    });
+
+    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['browse-file.pdf']);
+    expect(useCellsStore.getState().status).toBe('success');
+  });
+
   it('does not replace files set after unmount when the pending request resolves', async () => {
     const requestAfterUnmount = createControllablePromise<RestNodeCollection>();
     const cellsRepository: CellsRepositoryMock = {
@@ -226,20 +289,19 @@ describe('useSearchCellsNodes', () => {
     };
     const {fireAndForgetInvoker, result, unmount} = renderSearchHook({cellsRepository});
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
-    const currentFiles = useCellsStore.getState().nodes;
 
     act(() => {
       void result.current.handleReload();
     });
     unmount();
-    useCellsStore.setState({nodes: currentFiles});
 
     await act(async () => {
       requestAfterUnmount.resolve({Nodes: [buildRestNodeStub('unmounted-file.pdf')]});
       await flushMicrotasks();
     });
 
-    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
+    expect(useCellsStore.getState().nodes).toEqual([]);
+    expect(useCellsStore.getState().status).toBe('loading');
   });
 
   it('keeps results from the newer request when the older request resolves last', async () => {
