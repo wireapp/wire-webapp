@@ -86,7 +86,7 @@
     "react-intl": "7.1.14",
     "react-pdf": "9.2.1",
     "react-redux": "9.3.0",
-    "react-router": "6.30.4",
+    "react-router": "7.18.0",
     "react-router-dom": "6.30.4",
     "react-transition-group": "4.4.5",
     "redux": "5.0.1",
