@@ -20,6 +20,7 @@
 import {act, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {UserType} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
@@ -29,6 +30,7 @@ import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {TeamEntity} from 'Repositories/team/TeamEntity';
@@ -39,8 +41,9 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
 import 'src/script/util/test/mock/localStorageMock';
+import {translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationDetails} from './conversationDetails';
@@ -48,7 +51,6 @@ import {ConversationDetails} from './conversationDetails';
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Components/panel/enrichedFields', () => ({
   useEnrichedFields: (): never[] => [],
@@ -120,6 +122,48 @@ const getDefaultParams = () => {
 };
 
 describe('ConversationDetails', () => {
+  it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
+    'shows legacy bots and apps in %s groups',
+    protocol => {
+      const conversation = new Conversation(createUuid(), '', protocol, translateForTest);
+      const regularUser = new User('regular-user', '', translateForTest);
+      const legacyBot = new User('legacy-bot', '', translateForTest);
+      const app = new User('app', '', translateForTest);
+
+      regularUser.name('Regular user');
+      legacyBot.name('Legacy bot');
+      legacyBot.isService = true;
+      legacyBot.type = UserType.BOT;
+      app.name('App');
+      app.type = UserType.APP;
+      conversation.participating_user_ets([regularUser, legacyBot, app]);
+
+      const defaultProps = getDefaultParams();
+      const integrationRepository = {
+        ...defaultProps.integrationRepository,
+        mapServiceFromUser: (user: User) =>
+          new ServiceEntity({
+            id: user.id,
+            name: user.name(),
+            qualifiedId: user.qualifiedId,
+            type: 'App',
+          }),
+      } as IntegrationRepository;
+
+      const {getByTestId} = render(
+        <ConversationDetails
+          {...defaultProps}
+          activeConversation={conversation}
+          integrationRepository={integrationRepository}
+        />,
+        {wrapper: rootProviderWrapper},
+      );
+
+      expect(getByTestId(`service-list-service-${legacyBot.id}`)).not.toBeNull();
+      expect(getByTestId(`service-list-service-${app.id}`)).not.toBeNull();
+    },
+  );
+
   it("returns the right actions depending on the conversation's type for non group creators", () => {
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const otherUser = new User('other-user', '', translateForTest);
