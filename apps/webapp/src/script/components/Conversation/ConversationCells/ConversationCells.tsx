@@ -33,7 +33,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {CellsHeader} from './CellsHeader/CellsHeader';
 import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
-import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
+import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
@@ -197,11 +197,13 @@ export const ConversationCells = memo(
     const hasNodes = !!nodes.length;
     const emptyView = !isError && !hasNodes && isCellsStateReady;
 
-    const isTableVisible = (isSuccess || isLoading || isFetchingMore) && isCellsStateReady;
     const isLoadingVisible = isLoading && isCellsStateReady;
     const isFetchingMoreVisible = isFetchingMore && isCellsStateReady && hasNodes;
     const isNoNodesVisible = !isLoading && !isFetchingMore && emptyView && !isInRecycleBin();
     const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading && !isFetchingMore;
+    const isEmptySearchResultsVisible = isInSearchMode && isNoNodesVisible;
+    const isTableVisible =
+      (isSuccess || isLoading || isFetchingMore) && isCellsStateReady && !isEmptySearchResultsVisible;
     const hasMorePages = loadMoreOffset.isJust;
     const hasAppendError = isSuccess && hasNodes && storeError !== null;
 
@@ -245,10 +247,17 @@ export const ConversationCells = memo(
             description={translate('cells.pending.description')}
           />
         )}
-        {isNoNodesVisible && (
+        {isNoNodesVisible && !isEmptySearchResultsVisible && (
           <CellsStateInfo
             heading={translate('cells.noNodes.heading')}
             description={translate('cells.noNodes.description')}
+          />
+        )}
+        {isEmptySearchResultsVisible && (
+          <CellsStateInfo
+            variant="search"
+            heading={translate('cells.emptySearchResults.heading')}
+            description={translate('cells.emptySearchResults.description')}
           />
         )}
         {isEmptyRecycleBin && <CellsStateInfo description={translate('cells.emptyRecycleBin.description')} />}

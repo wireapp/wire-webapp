@@ -24,9 +24,36 @@ export const wrapperStyles: CSSObject = {
   justifyContent: 'center',
   alignItems: 'center',
   flexDirection: 'column',
-  marginTop: '128px',
   width: '100%',
-  height: '100%',
+  paddingTop: '48px',
+};
+
+export const searchStateWrapperStyles: CSSObject = {
+  ...wrapperStyles,
+};
+
+export const searchWrapperStyles: CSSObject = {
+  display: 'flex',
+  width: '272px',
+  maxWidth: '100%',
+  padding: '8px 0',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '16px',
+};
+
+export const searchIconStyles: CSSObject = {
+  width: '16px',
+  height: '16px',
+  color: 'var(--main-color)',
+  flexShrink: 0,
+};
+
+export const searchTextWrapperStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '16px',
 };
 
 export const headingStyles: CSSObject = {
@@ -36,10 +63,20 @@ export const headingStyles: CSSObject = {
   marginBottom: '8px',
 };
 
+export const searchHeadingStyles: CSSObject = {
+  ...headingStyles,
+  marginBottom: '0',
+};
+
 export const paragraphStyles: CSSObject = {
   color: 'var(--main-color)',
   fontWeight: 'var(--font-weight-regular)',
   marginBottom: '8px',
   maxWidth: '260px',
   textAlign: 'center',
+};
+
+export const searchParagraphStyles: CSSObject = {
+  ...paragraphStyles,
+  marginBottom: '0',
 };

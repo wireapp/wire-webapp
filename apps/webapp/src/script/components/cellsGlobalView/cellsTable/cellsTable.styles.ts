@@ -24,6 +24,9 @@ import {styleBreakpoint} from '../common/styleBreakpoint/styleBreakpoint';
 export const wrapperStyles: CSSObject = {
   maxWidth: '100%',
   overflowX: 'auto',
+};
+
+export const wrapperWithRowsStyles: CSSObject = {
   marginBottom: 'auto',
 };
 

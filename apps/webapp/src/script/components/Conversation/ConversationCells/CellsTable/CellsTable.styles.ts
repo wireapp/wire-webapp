@@ -25,6 +25,9 @@ export const wrapperStyles: CSSObject = {
   maxWidth: '100%',
   overflowX: 'auto',
   overflowY: 'auto',
+};
+
+export const wrapperWithRowsStyles: CSSObject = {
   marginBottom: 'auto',
 };
 
