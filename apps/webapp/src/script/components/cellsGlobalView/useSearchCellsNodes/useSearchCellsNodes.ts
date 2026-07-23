@@ -29,9 +29,11 @@ import {
   toGlobalDriveSearchParams,
 } from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
 import {CellsSort} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
+import {createRequestVersionGate} from 'Components/Conversation/ConversationCells/useConversationSearch/requestVersionGate';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {getLogger, Logger} from 'Util/logger';
 
 import {getConversationsFromNodes} from './getConversationsFromNodes';
 import {getUsersFromNodes} from './getUsersFromNodes';
@@ -40,6 +42,10 @@ import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
 import {transformCellsNodes} from '../transformCellsNodes/transformCellsNodes';
 import {transformCellsPagination} from '../transformCellsPagination/transformCellsPagination';
 
+type DebouncedSearch = ((value: string) => Promise<void>) & {cancel: () => void};
+
+type CreateDebouncedSearch = (search: (value: string) => Promise<void>, debounceTime: number) => DebouncedSearch;
+
 interface UseSearchCellsNodesProps {
   cellsRepository: CellsRepository;
   userRepository: UserRepository;
@@ -47,6 +53,8 @@ interface UseSearchCellsNodesProps {
   fireAndForgetInvoker: FireAndForgetInvoker;
   filters: GlobalDriveFiltersState;
   sort: CellsSort | null;
+  createDebouncedSearch?: CreateDebouncedSearch;
+  logger?: Logger;
 }
 
 type SearchNodesProperties = {
@@ -69,9 +77,19 @@ const PAGE_INITIAL_SIZE = 30;
 const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 const FETCH_ALL_QUERY = '*';
+const defaultLogger = getLogger('useSearchCellsNodes');
 
 export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSearchCellsNodesResult => {
-  const {cellsRepository, userRepository, conversationRepository, fireAndForgetInvoker, filters, sort} = properties;
+  const {
+    cellsRepository,
+    userRepository,
+    conversationRepository,
+    fireAndForgetInvoker,
+    filters,
+    sort,
+    createDebouncedSearch,
+    logger = defaultLogger,
+  } = properties;
   const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -79,10 +97,20 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
   const [pageSize, setPageSize] = useState(PAGE_INITIAL_SIZE);
   const isInitialLoad = useRef(true);
   const shouldPerformFullReload = useRef(true);
+  const requestVersionGate = useRef(createRequestVersionGate());
 
   const searchNodes = useCallback(
     async (properties: SearchNodesProperties): Promise<void> => {
       const {query, status, limit = pageSize} = properties;
+      const requestVersion = requestVersionGate.current.next();
+      const shouldIgnoreStaleRequest = (): boolean => {
+        const isStaleRequest = requestVersionGate.current.isStale(requestVersion);
+        if (isStaleRequest) {
+          logger.debug('Ignoring stale request version:', requestVersion);
+        }
+        return isStaleRequest;
+      };
+
       try {
         setStatus(status);
 
@@ -97,15 +125,24 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
           type: 'file',
         });
 
-        const users = await getUsersFromNodes({
-          nodes: result.Nodes ?? [],
-          userRepository,
-        });
+        if (shouldIgnoreStaleRequest()) {
+          return;
+        }
 
-        const conversations = await getConversationsFromNodes({
-          nodes: result.Nodes ?? [],
-          conversationRepository,
-        });
+        const [users, conversations] = await Promise.all([
+          getUsersFromNodes({
+            nodes: result.Nodes ?? [],
+            userRepository,
+          }),
+          getConversationsFromNodes({
+            nodes: result.Nodes ?? [],
+            conversationRepository,
+          }),
+        ]);
+
+        if (shouldIgnoreStaleRequest()) {
+          return;
+        }
 
         // filter out draft nodes from results
         const filteredNodes = result.Nodes?.filter(node => node.IsDraft !== true) ?? [];
@@ -129,6 +166,10 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
 
         setStatus('success');
       } catch {
+        if (shouldIgnoreStaleRequest()) {
+          return;
+        }
+
         // If the user isn't part of any cells-enabled conversations, the user will not exist in Cells database
         // the search will return a 401 error
         const hasCellsConversations = conversationRepository.getAllCellEnabledGroupConversations().length > 0;
@@ -143,15 +184,23 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pageSize, setNodes, setPagination, setStatus, filters, sort],
+    [pageSize, setNodes, setPagination, setStatus, filters, sort, logger],
   );
 
-  const searchNodesDebounced = useDebouncedCallback(async (value: string): Promise<void> => {
-    shouldPerformFullReload.current = false;
-    setSearchQuery(value);
-    await searchNodes({query: value, status: 'loading'});
-    shouldPerformFullReload.current = true;
-  }, DEBOUNCE_TIME);
+  const runDebouncedSearch = useCallback(
+    async (value: string): Promise<void> => {
+      shouldPerformFullReload.current = false;
+      setSearchQuery(value);
+      await searchNodes({query: value, status: 'loading'});
+      shouldPerformFullReload.current = true;
+    },
+    [searchNodes],
+  );
+  const defaultSearchNodesDebounced = useDebouncedCallback(runDebouncedSearch, DEBOUNCE_TIME);
+  const searchNodesDebounced =
+    createDebouncedSearch?.(runDebouncedSearch, DEBOUNCE_TIME) ?? defaultSearchNodesDebounced;
+  const searchNodesDebouncedRef = useRef(searchNodesDebounced);
+  searchNodesDebouncedRef.current = searchNodesDebounced;
 
   const handleSearch = (value: string): void => {
     if (!is.nonEmptyString(value)) {
@@ -161,11 +210,12 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue(value);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      await searchNodesDebounced(value);
+      await searchNodesDebouncedRef.current(value);
     });
   };
 
   const handleClearSearch = async (): Promise<void> => {
+    searchNodesDebouncedRef.current.cancel();
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue('');
     setSearchQuery('');
@@ -173,6 +223,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
   };
 
   const handleReload = async (): Promise<void> => {
+    searchNodesDebouncedRef.current.cancel();
     setStatus('loading');
     clearAll();
     await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, status: 'loading'});
@@ -197,6 +248,19 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
       });
     }
   }, [fireAndForgetInvoker, searchNodes, searchQuery]);
+
+  // This cleanup models hook ownership ending. Do not depend on changing callbacks,
+  // otherwise ordinary rerenders would invalidate valid in-flight requests.
+  useEffect(() => {
+    const versionGate = requestVersionGate.current;
+
+    return () => {
+      // Read from the ref during cleanup so we cancel the latest debounced search,
+      // not the one captured when this mount-only effect was created.
+      searchNodesDebouncedRef.current.cancel();
+      versionGate.invalidate();
+    };
+  }, []);
 
   return {
     searchValue,
