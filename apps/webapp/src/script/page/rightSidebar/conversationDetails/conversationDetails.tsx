@@ -21,7 +21,6 @@ import {forwardRef, useEffect, useMemo, useState} from 'react';
 
 import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {UserType} from '@wireapp/api-client/lib/user';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -200,20 +199,18 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const allUsersCount = exceedsMaxUserCount ? usersCount : 0;
 
     const serviceParticipants: ServiceEntity[] = useMemo(() => {
-      const services = new Array<ServiceEntity>();
+      return participatingUserEts.flatMap(participant => {
+        if (isServiceEntity(participant)) {
+          return [participant];
+        }
 
-      if (activeConversation.protocol === CONVERSATION_PROTOCOL.PROTEUS) {
-        services.push(...participatingUserEts.filter(service => isServiceEntity(service)));
-      } else {
-        services.push(
-          ...participatingUserEts
-            .filter(user => user.type === UserType.APP)
-            .map(user => integrationRepository.mapServiceFromUser(user)),
-        );
-      }
+        if (participant.type === UserType.APP) {
+          return [integrationRepository.mapServiceFromUser(participant)];
+        }
 
-      return services;
-    }, [activeConversation.protocol, integrationRepository, participatingUserEts]);
+        return [];
+      });
+    }, [integrationRepository, participatingUserEts]);
 
     const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
 
