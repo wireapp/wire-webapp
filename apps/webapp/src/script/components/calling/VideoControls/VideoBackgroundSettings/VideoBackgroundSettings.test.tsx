@@ -53,11 +53,9 @@ describe('VideoBackgroundSettings', () => {
     selectedEffect: {type: 'none'} as const,
     backgrounds,
     onSelectEffect: jest.fn(),
-    onEnableHighQualityBlur: jest.fn(),
-    onEnablePerformanceEnhancement: jest.fn(),
+    backgroundEffectsQuality: 'balanced' as const,
+    onBackgroundEffectsQualityChange: jest.fn(),
     onClose: jest.fn(),
-    highQualityBlurAllowed: false,
-    performanceEnhancementEnabled: false,
     isWebGLAvailable: true,
   };
 
@@ -75,50 +73,34 @@ describe('VideoBackgroundSettings', () => {
     expect(getByTestId('video-background-settings')).toBeInTheDocument();
   });
 
-  it('renders the high quality blur checkbox as unchecked', () => {
+  it('renders the selected background effects quality radio button', () => {
     const {getByTestId} = renderComponent();
 
-    const checkbox = getByTestId('enable-high-quality-blur') as HTMLInputElement;
-
-    expect(checkbox).not.toBeChecked();
-    expect(checkbox).not.toBeDisabled();
+    expect(getByTestId('background-effects-quality-balanced')).toBeChecked();
   });
 
-  it('renders the high quality blur checkbox as checked', () => {
-    const {getByTestId} = renderComponent({highQualityBlurAllowed: true});
+  it('renders the best background effects quality radio button as selected', () => {
+    const {getByTestId} = renderComponent({backgroundEffectsQuality: 'best'});
 
-    expect(getByTestId('enable-high-quality-blur')).toBeChecked();
+    expect(getByTestId('background-effects-quality-best')).toBeChecked();
+    expect(getByTestId('background-effects-quality-balanced')).not.toBeChecked();
+    expect(getByTestId('background-effects-quality-performance')).not.toBeChecked();
   });
 
-  it('renders the enhance performance checkbox as unchecked', () => {
+  it('calls onBackgroundEffectsQualityChange when a background effects quality radio button changes', () => {
     const {getByTestId} = renderComponent();
 
-    const checkbox = getByTestId('enable-performance-enhancement') as HTMLInputElement;
+    fireEvent.click(getByTestId('background-effects-quality-performance'));
 
-    expect(checkbox).not.toBeChecked();
-    expect(checkbox).not.toBeDisabled();
+    expect(defaultProps.onBackgroundEffectsQualityChange).toHaveBeenCalledWith('performance');
   });
 
-  it('renders the enhance performance checkbox as checked', () => {
-    const {getByTestId} = renderComponent({performanceEnhancementEnabled: true});
-
-    expect(getByTestId('enable-performance-enhancement')).toBeChecked();
-  });
-
-  it('calls onEnablePerformanceEnhancement when the enhance performance checkbox is toggled', () => {
+  it('calls onBackgroundEffectsQualityChange with best when best quality is selected', () => {
     const {getByTestId} = renderComponent();
 
-    fireEvent.click(getByTestId('enable-performance-enhancement'));
+    fireEvent.click(getByTestId('background-effects-quality-best'));
 
-    expect(defaultProps.onEnablePerformanceEnhancement).toHaveBeenCalledTimes(1);
-  });
-
-  it('calls onEnableHighQualityBlur when high quality blur checkbox changes', () => {
-    const {getByTestId} = renderComponent();
-
-    fireEvent.click(getByTestId('enable-high-quality-blur'));
-
-    expect(defaultProps.onEnableHighQualityBlur).toHaveBeenCalledTimes(1);
+    expect(defaultProps.onBackgroundEffectsQualityChange).toHaveBeenCalledWith('best');
   });
 
   it('calls onClose when close modal close button is clicked', () => {
@@ -259,7 +241,7 @@ describe('VideoBackgroundSettings', () => {
     expect(queryByText('videoCallBackgroundBlurSectionLabel')).not.toBeInTheDocument();
     expect(queryByText('videoCallBackgroundBlurLow')).not.toBeInTheDocument();
     expect(queryByText('videoCallBackgroundBlurHigh')).not.toBeInTheDocument();
-    expect(queryByTestId('enable-high-quality-blur')).not.toBeInTheDocument();
+    expect(queryByTestId('background-effects-quality-balanced')).not.toBeInTheDocument();
   });
 
   it('does not render virtual background tiles when WebGL is unavailable', () => {

@@ -17,20 +17,20 @@
  *
  */
 
-import {ChangeEvent, CSSProperties, ReactNode, useEffect, useId, useRef} from 'react';
+import {CSSProperties, ReactNode, useEffect, useId, useRef} from 'react';
 
 import {match} from 'ts-pattern';
 
-import {BlurHighIcon, BlurLowIcon, Checkbox, CheckboxLabel, CircleIcon} from '@wireapp/react-ui-kit';
+import {BlurHighIcon, BlurLowIcon, CircleIcon} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
+import {RadioGroup} from 'Components/Radio';
 import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   backgroundEffectPanelHintStyles,
-  backgroundEffectPanelIndentedHintStyles,
   backgroundSettingsHeaderStyles,
   backgroundSettingsScrollableContentStyles,
   backgroundSettingsTitleStyles,
@@ -49,13 +49,29 @@ interface VideoBackgroundSettingsProps {
   selectedEffect: BackgroundEffectSelection;
   backgrounds: BuiltinBackground[];
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
-  onEnableHighQualityBlur: (event: ChangeEvent<HTMLInputElement>) => void;
-  onEnablePerformanceEnhancement: (event: ChangeEvent<HTMLInputElement>) => void;
+  backgroundEffectsQuality: BackgroundEffectsQuality;
+  onBackgroundEffectsQualityChange: (quality: BackgroundEffectsQuality) => void;
   onClose: () => void;
-  highQualityBlurAllowed: boolean;
-  performanceEnhancementEnabled: boolean;
   isWebGLAvailable: boolean;
 }
+
+export type BackgroundEffectsQuality = 'best' | 'balanced' | 'performance';
+
+export const getBackgroundEffectsQuality = (
+  highQualityBlurAllowed: boolean,
+  performanceEnhancementEnabled: boolean,
+): BackgroundEffectsQuality => {
+  if (highQualityBlurAllowed) {
+    return 'best';
+  }
+
+  return performanceEnhancementEnabled ? 'performance' : 'balanced';
+};
+
+export const getBackgroundEffectsQualitySettings = (quality: BackgroundEffectsQuality) => ({
+  highQualityBlurAllowed: quality === 'best',
+  performanceEnhancementEnabled: quality === 'performance',
+});
 
 const isEffectSelected = (selected: BackgroundEffectSelection, candidate: BackgroundEffectSelection): boolean => {
   if (selected.type !== candidate.type) {
@@ -141,10 +157,8 @@ export const VideoBackgroundSettings = ({
   selectedEffect,
   backgrounds,
   onSelectEffect,
-  highQualityBlurAllowed,
-  onEnableHighQualityBlur,
-  performanceEnhancementEnabled,
-  onEnablePerformanceEnhancement,
+  backgroundEffectsQuality,
+  onBackgroundEffectsQualityChange,
   onClose,
   isWebGLAvailable = true,
 }: VideoBackgroundSettingsProps) => {
@@ -157,14 +171,6 @@ export const VideoBackgroundSettings = ({
   useEffect(() => {
     closeButtonRef.current?.focus();
   }, []);
-
-  const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
-    onEnableHighQualityBlur(event);
-  };
-
-  const handleEnablePerformanceEnhancement = (event: ChangeEvent<HTMLInputElement>) => {
-    onEnablePerformanceEnhancement(event);
-  };
 
   const noneEffect: BackgroundEffectSelection = {type: 'none'};
   const lowBlurEffect: BackgroundEffectSelection = {type: 'blur', level: 'low'};
@@ -248,29 +254,33 @@ export const VideoBackgroundSettings = ({
             </div>
 
             <div>
-              <Checkbox
-                id="enable-high-quality-blur"
-                checked={highQualityBlurAllowed}
-                data-uie-name="enable-high-quality-blur"
-                onChange={(event: ChangeEvent<HTMLInputElement>) => handleEnableHighQualityBlur(event)}
-              >
-                <CheckboxLabel htmlFor="enable-high-quality-blur">
-                  {translate('videoCallBackgroundEnableEnhancedQuality')}
-                </CheckboxLabel>
-              </Checkbox>
-              <p css={backgroundEffectPanelIndentedHintStyles}>
-                {translate('videoCallBackgroundEnableEnhancedQualityHint')}
-              </p>
-              <Checkbox
-                id="enable-performance-enhancement"
-                checked={performanceEnhancementEnabled}
-                data-uie-name="enable-performance-enhancement"
-                onChange={(event: ChangeEvent<HTMLInputElement>) => handleEnablePerformanceEnhancement(event)}
-              >
-                <CheckboxLabel htmlFor="enable-performance-enhancement">
-                  {translate('videoCallBackgroundEnhancePerformance')}
-                </CheckboxLabel>
-              </Checkbox>
+              <h3 id="background-effects-quality-label" css={sectionLabelStyles}>
+                {translate('videoCallBackgroundEffectsQualitySectionLabel')}
+              </h3>
+              <RadioGroup
+                ariaLabelledBy="background-effects-quality-label"
+                name="background-effects-quality"
+                selectedValue={backgroundEffectsQuality}
+                onChange={onBackgroundEffectsQualityChange}
+                uieName="background-effects-quality"
+                options={[
+                  {
+                    value: 'best' as const,
+                    label: translate('videoCallBackgroundEffectsQualityBest'),
+                    optionUieName: 'background-effects-quality-best',
+                  },
+                  {
+                    value: 'balanced' as const,
+                    label: translate('videoCallBackgroundEffectsQualityBalanced'),
+                    optionUieName: 'background-effects-quality-balanced',
+                  },
+                  {
+                    value: 'performance' as const,
+                    label: translate('videoCallBackgroundEffectsQualityPerformance'),
+                    optionUieName: 'background-effects-quality-performance',
+                  },
+                ]}
+              />
             </div>
 
             {/* Virtual backgrounds section */}
