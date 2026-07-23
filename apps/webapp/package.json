@@ -140,7 +140,7 @@
     "babel-jest": "30.4.1",
     "babel-loader": "10.1.1",
     "babel-plugin-transform-import-meta": "2.3.3",
-    "baseline-browser-mapping": "2.10.43",
+    "baseline-browser-mapping": "2.10.44",
     "browserslist": "4.28.6",
     "copy-webpack-plugin": "13.0.1",
     "css-loader": "7.1.4",
