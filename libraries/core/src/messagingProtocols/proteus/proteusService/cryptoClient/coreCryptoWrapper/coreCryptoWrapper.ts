@@ -122,7 +122,8 @@ export const getCoreCryptoDbName = (storeEngine: CRUDEngine): string => {
 export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> => {
   const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
   try {
-    await coreCryptoDatabase?.close();
+    // removed in this PR
+    // await coreCryptoDatabase?.close();
     coreCryptoDatabase = undefined;
     await deleteDB(coreCryptoDbName);
     logger.log('info', 'CoreCrypto DB wiped successfully');
