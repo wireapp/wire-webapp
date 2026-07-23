@@ -21,13 +21,17 @@ import is from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
 
 export const releaseAppearanceCommentMarker = '<!-- wire-webapp-release-appearance:v1';
+export const releaseAppearanceTestCommentMarker = '<!-- wire-webapp-release-appearance-test:v1';
 
 const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
 const betaCandidateTagPattern = new RegExp(String.raw`^(${releaseIdentifierPattern})-beta\.(\d+)$`);
-const productionTagPattern = new RegExp(String.raw`^${releaseIdentifierPattern}-production$`);
+const productionTagPattern = new RegExp(
+  String.raw`^(?:${releaseIdentifierPattern}-production|\d{4}-\d{2}-\d{2}-production\.\d+)$`,
+);
 const commitHashPattern = /^[0-9a-f]{40}$/i;
 
 export type ReleaseAppearanceEnvironment = 'beta' | 'production';
+export type ReleaseAppearanceCommentMode = 'production' | 'test';
 
 export type BetaCandidateTag = {
   readonly candidateNumber: number;
@@ -61,8 +65,9 @@ export type ReleaseAppearanceCommentState = {
 };
 
 type SerializedReleaseAppearanceCommentState = {
-  readonly beta?: ReleaseAppearanceValue;
-  readonly production?: ReleaseAppearanceValue;
+  readonly version?: 1;
+  readonly beta: ReleaseAppearanceValue | undefined;
+  readonly production: ReleaseAppearanceValue | undefined;
 };
 
 export type ReleaseAppearanceComment = {
@@ -97,10 +102,44 @@ export type ProductionDiscoveryRangeSelectionParameters = {
 
 export type PrepareReleaseAppearanceCommentParameters = {
   readonly comments: readonly ReleaseAppearanceComment[];
+  readonly commentMode?: ReleaseAppearanceCommentMode;
   readonly environment: ReleaseAppearanceEnvironment;
   readonly tagName: string;
   readonly workflowRunUrl: string;
 };
+
+type CreateReleaseAppearanceValueParameters = {
+  readonly environment: ReleaseAppearanceEnvironment;
+  readonly tagName: string;
+  readonly workflowRunUrl: string;
+};
+
+export type SelectPreviousProductionBaselineParameters = {
+  readonly currentCommitHash: string;
+  readonly currentProductionTagName: string;
+  readonly productionTagRelationships: readonly CommitRangeRelationship[];
+};
+
+type CreateCommentStateParameters = {
+  readonly environment: ReleaseAppearanceEnvironment;
+  readonly tagName: string;
+  readonly workflowRunUrl: string;
+};
+
+type AddMissingCommentStateValueParameters = {
+  readonly environment: ReleaseAppearanceEnvironment;
+  readonly state: ReleaseAppearanceCommentState;
+  readonly tagName: string;
+  readonly workflowRunUrl: string;
+};
+
+export function getReleaseAppearanceCommentMarker(commentMode: ReleaseAppearanceCommentMode): string {
+  return commentMode === 'test' ? releaseAppearanceTestCommentMarker : releaseAppearanceCommentMarker;
+}
+
+export function isProductionReleaseTagName(tagName: string): boolean {
+  return productionTagPattern.test(tagName);
+}
 
 function isValidCommitHash(commitHash: string): boolean {
   return is.nonEmptyString(commitHash) && commitHashPattern.test(commitHash);
@@ -138,23 +177,27 @@ function isValidReleaseAppearanceCommentState(value: unknown): value is Serializ
     return false;
   }
 
+  const hasSupportedVersion = is.undefined(value.version) || value.version === 1;
   const hasValidBetaValue = is.undefined(value.beta) || isValidReleaseAppearanceValue(value.beta, 'beta');
   const hasValidProductionValue =
     is.undefined(value.production) || isValidReleaseAppearanceValue(value.production, 'production');
 
-  return hasValidBetaValue && hasValidProductionValue;
+  return hasSupportedVersion && hasValidBetaValue && hasValidProductionValue;
 }
 
 function createReleaseAppearanceValue(
-  environment: ReleaseAppearanceEnvironment,
-  tagName: string,
-  workflowRunUrl: string,
+  parameters: CreateReleaseAppearanceValueParameters,
 ): Result<ReleaseAppearanceValue, Error> {
-  if (!isValidReleaseAppearanceValue({tagName, workflowRunUrl}, environment)) {
-    return Result.err(new Error(`Invalid ${environment} release appearance value.`));
+  if (
+    !isValidReleaseAppearanceValue(
+      {tagName: parameters.tagName, workflowRunUrl: parameters.workflowRunUrl},
+      parameters.environment,
+    )
+  ) {
+    return Result.err(new Error(`Invalid ${parameters.environment} release appearance value.`));
   }
 
-  return Result.ok({tagName, workflowRunUrl});
+  return Result.ok({tagName: parameters.tagName, workflowRunUrl: parameters.workflowRunUrl});
 }
 
 export function parseBetaCandidateTag(tagName: string): Result<BetaCandidateTag, Error> {
@@ -247,27 +290,27 @@ function compareProductionBaselineCandidates(
 }
 
 export function selectPreviousProductionBaseline(
-  currentProductionTagName: string,
-  currentCommitHash: string,
-  productionTagRelationships: readonly CommitRangeRelationship[],
+  parameters: SelectPreviousProductionBaselineParameters,
 ): Result<CommitRangeRelationship, Error> {
-  if (!productionTagPattern.test(currentProductionTagName)) {
-    return Result.err(new Error(`Invalid Production tag name: ${currentProductionTagName}`));
+  if (!productionTagPattern.test(parameters.currentProductionTagName)) {
+    return Result.err(new Error(`Invalid Production tag name: ${parameters.currentProductionTagName}`));
   }
 
-  if (!isValidCommitHash(currentCommitHash)) {
-    return Result.err(new Error(`Invalid current release commit SHA: ${currentCommitHash}`));
+  if (!isValidCommitHash(parameters.currentCommitHash)) {
+    return Result.err(new Error(`Invalid current release commit SHA: ${parameters.currentCommitHash}`));
   }
 
-  const previousProductionBaselineCandidates = productionTagRelationships.filter(productionTagRelationship => {
-    return (
-      productionTagRelationship.tagName !== currentProductionTagName &&
-      productionTagRelationship.tagCommitHash !== currentCommitHash &&
-      isValidCommitHash(productionTagRelationship.tagCommitHash) &&
-      isValidCommitHash(productionTagRelationship.mergeBaseCommitHash) &&
-      productionTagRelationship.commitDistanceFromMergeBase >= 0
-    );
-  });
+  const previousProductionBaselineCandidates = parameters.productionTagRelationships.filter(
+    productionTagRelationship => {
+      return (
+        productionTagRelationship.tagName !== parameters.currentProductionTagName &&
+        productionTagRelationship.tagCommitHash !== parameters.currentCommitHash &&
+        isValidCommitHash(productionTagRelationship.tagCommitHash) &&
+        isValidCommitHash(productionTagRelationship.mergeBaseCommitHash) &&
+        productionTagRelationship.commitDistanceFromMergeBase >= 0
+      );
+    },
+  );
 
   const selectedProductionBaseline = Maybe.of(
     previousProductionBaselineCandidates.toSorted(compareProductionBaselineCandidates)[0],
@@ -340,11 +383,11 @@ export function selectBetaDiscoveryRange(
   if (previousBetaTagResult.value.isJust) {
     baselineTagName = previousBetaTagResult.value.value.tagName;
   } else {
-    const previousProductionBaselineResult = selectPreviousProductionBaseline(
-      `${currentBetaCandidateTagResult.value.releaseIdentifier}-production`,
-      parameters.currentCommitHash,
-      parameters.productionTagRelationships,
-    );
+    const previousProductionBaselineResult = selectPreviousProductionBaseline({
+      currentCommitHash: parameters.currentCommitHash,
+      currentProductionTagName: `${currentBetaCandidateTagResult.value.releaseIdentifier}-production`,
+      productionTagRelationships: parameters.productionTagRelationships,
+    });
 
     if (previousProductionBaselineResult.isErr) {
       return Result.err(previousProductionBaselineResult.error);
@@ -368,11 +411,11 @@ export function selectBetaDiscoveryRange(
 export function selectProductionDiscoveryRange(
   parameters: ProductionDiscoveryRangeSelectionParameters,
 ): Result<CommitDiscoveryRange, Error> {
-  const previousProductionBaselineResult = selectPreviousProductionBaseline(
-    parameters.currentProductionTagName,
-    parameters.currentCommitHash,
-    parameters.productionTagRelationships,
-  );
+  const previousProductionBaselineResult = selectPreviousProductionBaseline({
+    currentCommitHash: parameters.currentCommitHash,
+    currentProductionTagName: parameters.currentProductionTagName,
+    productionTagRelationships: parameters.productionTagRelationships,
+  });
 
   if (previousProductionBaselineResult.isErr) {
     return Result.err(previousProductionBaselineResult.error);
@@ -381,31 +424,29 @@ export function selectProductionDiscoveryRange(
   return createCommitDiscoveryRange(previousProductionBaselineResult.value, parameters.currentCommitHash);
 }
 
-function parseAppearanceCommentState(commentBody: string): Result<ReleaseAppearanceCommentState, Error> {
-  const markerIndex = commentBody.indexOf(releaseAppearanceCommentMarker);
+function parseAppearanceCommentState(
+  commentBody: string,
+  commentMarker: string,
+): Result<ReleaseAppearanceCommentState, Error> {
+  const markerIndex = commentBody.indexOf(commentMarker);
 
   if (markerIndex === -1) {
     return Result.err(new Error('Release appearance marker is missing.'));
   }
 
-  const secondMarkerIndex = commentBody.indexOf(
-    releaseAppearanceCommentMarker,
-    markerIndex + releaseAppearanceCommentMarker.length,
-  );
+  const secondMarkerIndex = commentBody.indexOf(commentMarker, markerIndex + commentMarker.length);
 
   if (secondMarkerIndex !== -1) {
     return Result.err(new Error('Release appearance marker occurs more than once in one comment.'));
   }
 
-  const commentEndIndex = commentBody.indexOf('-->', markerIndex + releaseAppearanceCommentMarker.length);
+  const commentEndIndex = commentBody.indexOf('-->', markerIndex + commentMarker.length);
 
   if (commentEndIndex === -1) {
     return Result.err(new Error('Release appearance comment is missing its closing marker.'));
   }
 
-  const serializedState = commentBody
-    .slice(markerIndex + releaseAppearanceCommentMarker.length, commentEndIndex)
-    .trim();
+  const serializedState = commentBody.slice(markerIndex + commentMarker.length, commentEndIndex).trim();
 
   try {
     const parsedState: unknown = JSON.parse(serializedState);
@@ -423,57 +464,60 @@ function parseAppearanceCommentState(commentBody: string): Result<ReleaseAppeara
   }
 }
 
-function countMarkerComments(comments: readonly ReleaseAppearanceComment[]): number {
+function countMarkerComments(comments: readonly ReleaseAppearanceComment[], commentMarker: string): number {
   return comments.reduce((markerCommentCount, comment) => {
-    return comment.body.includes(releaseAppearanceCommentMarker) ? markerCommentCount + 1 : markerCommentCount;
+    return comment.body.includes(commentMarker) ? markerCommentCount + 1 : markerCommentCount;
   }, 0);
 }
 
-function createCommentState(
-  environment: ReleaseAppearanceEnvironment,
-  tagName: string,
-  workflowRunUrl: string,
-): Result<ReleaseAppearanceCommentState, Error> {
-  return addMissingCommentStateValue(
-    {
+function createCommentState(parameters: CreateCommentStateParameters): Result<ReleaseAppearanceCommentState, Error> {
+  return addMissingCommentStateValue({
+    environment: parameters.environment,
+    state: {
       beta: Maybe.nothing(),
       production: Maybe.nothing(),
     },
-    environment,
-    tagName,
-    workflowRunUrl,
-  );
+    tagName: parameters.tagName,
+    workflowRunUrl: parameters.workflowRunUrl,
+  });
 }
 
 function addMissingCommentStateValue(
-  state: ReleaseAppearanceCommentState,
-  environment: ReleaseAppearanceEnvironment,
-  tagName: string,
-  workflowRunUrl: string,
+  parameters: AddMissingCommentStateValueParameters,
 ): Result<ReleaseAppearanceCommentState, Error> {
-  const releaseAppearanceValueResult = createReleaseAppearanceValue(environment, tagName, workflowRunUrl);
+  const releaseAppearanceValueResult = createReleaseAppearanceValue({
+    environment: parameters.environment,
+    tagName: parameters.tagName,
+    workflowRunUrl: parameters.workflowRunUrl,
+  });
 
   if (releaseAppearanceValueResult.isErr) {
     return Result.err(releaseAppearanceValueResult.error);
   }
 
-  return Result.ok(
-    environment === 'beta'
-      ? {...state, beta: Maybe.just(releaseAppearanceValueResult.value)}
-      : {...state, production: Maybe.just(releaseAppearanceValueResult.value)},
-  );
+  return Result.ok({
+    beta: parameters.environment === 'beta' ? Maybe.just(releaseAppearanceValueResult.value) : parameters.state.beta,
+    production:
+      parameters.environment === 'production'
+        ? Maybe.just(releaseAppearanceValueResult.value)
+        : parameters.state.production,
+  });
 }
 
 function serializeReleaseAppearanceCommentState(
   state: ReleaseAppearanceCommentState,
 ): SerializedReleaseAppearanceCommentState {
   return {
-    ...(state.beta.isJust ? {beta: state.beta.value} : {}),
-    ...(state.production.isJust ? {production: state.production.value} : {}),
+    version: 1,
+    beta: state.beta.unwrapOr(undefined),
+    production: state.production.unwrapOr(undefined),
   };
 }
 
-export function renderReleaseAppearanceComment(state: ReleaseAppearanceCommentState): string {
+export function renderReleaseAppearanceComment(
+  state: ReleaseAppearanceCommentState,
+  commentMode: ReleaseAppearanceCommentMode = 'production',
+): string {
   const betaReleaseTag = state.beta
     .map(releaseAppearanceValue => {
       return releaseAppearanceValue.tagName;
@@ -486,7 +530,14 @@ export function renderReleaseAppearanceComment(state: ReleaseAppearanceCommentSt
     .unwrapOr('Not yet deployed');
 
   return [
-    releaseAppearanceCommentMarker,
+    ...(commentMode === 'test'
+      ? [
+          '> Test comment created by the manual release-appearance validation workflow.',
+          '> It does not represent an actual deployment.',
+          '',
+        ]
+      : []),
+    getReleaseAppearanceCommentMarker(commentMode),
     JSON.stringify(serializeReleaseAppearanceCommentState(state)),
     '-->',
     '',
@@ -502,29 +553,31 @@ export function renderReleaseAppearanceComment(state: ReleaseAppearanceCommentSt
 export function prepareReleaseAppearanceComment(
   parameters: PrepareReleaseAppearanceCommentParameters,
 ): Result<PreparedReleaseAppearanceComment, Error> {
-  const markerCommentCount = countMarkerComments(parameters.comments);
+  const commentMode = parameters.commentMode ?? 'production';
+  const commentMarker = getReleaseAppearanceCommentMarker(commentMode);
+  const markerCommentCount = countMarkerComments(parameters.comments, commentMarker);
 
   if (markerCommentCount > 1) {
     return Result.err(new Error('More than one release appearance marker comment exists.'));
   }
 
   if (markerCommentCount === 0) {
-    const commentStateResult = createCommentState(
-      parameters.environment,
-      parameters.tagName,
-      parameters.workflowRunUrl,
-    );
+    const commentStateResult = createCommentState({
+      environment: parameters.environment,
+      tagName: parameters.tagName,
+      workflowRunUrl: parameters.workflowRunUrl,
+    });
 
     if (commentStateResult.isErr) {
       return Result.err(commentStateResult.error);
     }
 
-    return Result.ok({action: 'create', body: renderReleaseAppearanceComment(commentStateResult.value)});
+    return Result.ok({action: 'create', body: renderReleaseAppearanceComment(commentStateResult.value, commentMode)});
   }
 
   const markerComment = Maybe.of(
     parameters.comments.find(comment => {
-      return comment.body.includes(releaseAppearanceCommentMarker);
+      return comment.body.includes(commentMarker);
     }),
   );
 
@@ -532,7 +585,7 @@ export function prepareReleaseAppearanceComment(
     return Result.err(new Error('Unable to resolve the release appearance marker comment.'));
   }
 
-  const existingStateResult = parseAppearanceCommentState(markerComment.value.body);
+  const existingStateResult = parseAppearanceCommentState(markerComment.value.body, commentMarker);
 
   if (existingStateResult.isErr) {
     return Result.err(existingStateResult.error);
@@ -548,12 +601,12 @@ export function prepareReleaseAppearanceComment(
     });
   }
 
-  const updatedStateResult = addMissingCommentStateValue(
-    existingStateResult.value,
-    parameters.environment,
-    parameters.tagName,
-    parameters.workflowRunUrl,
-  );
+  const updatedStateResult = addMissingCommentStateValue({
+    environment: parameters.environment,
+    state: existingStateResult.value,
+    tagName: parameters.tagName,
+    workflowRunUrl: parameters.workflowRunUrl,
+  });
 
   if (updatedStateResult.isErr) {
     return Result.err(updatedStateResult.error);
@@ -561,7 +614,7 @@ export function prepareReleaseAppearanceComment(
 
   return Result.ok({
     action: 'update',
-    body: renderReleaseAppearanceComment(updatedStateResult.value),
+    body: renderReleaseAppearanceComment(updatedStateResult.value, commentMode),
     commentId: markerComment.value.commentId,
   });
 }

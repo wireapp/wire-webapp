@@ -23,6 +23,7 @@ import assert from 'node:assert';
 import {
   createGitHubClient,
   discoverPullRequestsInRange,
+  parseReleaseAppearanceArguments,
   processPullRequestsSequentially,
   renderReleaseAppearanceSummary,
   resolveReleaseAppearanceRange,
@@ -32,6 +33,7 @@ import type {
   AssociatedPullRequest,
   CommentProcessingResult,
   GitCommand,
+  GitHubPullRequest,
   GitHubClient,
   GitHubPage,
   PullRequestDiscoveryResult,
@@ -56,6 +58,7 @@ type FakeGitHubClient = {
   readonly client: GitHubClient;
   readonly commentPageCalls: readonly string[];
   readonly createdComments: readonly CreatedComment[];
+  readonly pullRequestCalls: readonly number[];
   readonly updatedComments: readonly UpdatedComment[];
 };
 
@@ -75,10 +78,16 @@ type UpdatedComment = {
 };
 
 type CreateFakeGitHubClientParameters = {
-  readonly associatedPages?: ReadonlyMap<string, readonly GitHubPage<AssociatedPullRequest>[]>;
+  readonly associatedPages?: ReadonlyMap<string, readonly GitHubPage<AssociatedPullRequestFixture>[]>;
   readonly commentPages?: ReadonlyMap<number, readonly GitHubPage<ReleaseAppearanceComment>[]>;
   readonly createIssueComment?: (pullRequestNumber: number, body: string) => Promise<void>;
   readonly updateIssueComment?: (commentId: number, body: string) => Promise<void>;
+  readonly getPullRequest?: (pullRequestNumber: number) => Promise<GitHubPullRequest>;
+};
+
+type AssociatedPullRequestFixture = {
+  readonly pullRequestNumber: number;
+  readonly targetBranchName?: string;
 };
 
 function createCommentState(overrides: CommentStateOverrides = {}): ReleaseAppearanceCommentState {
@@ -92,6 +101,7 @@ function createFakeGitHubClient(parameters: CreateFakeGitHubClientParameters = {
   const associatedCommitCalls: string[] = [];
   const commentPageCalls: string[] = [];
   const createdComments: CreatedComment[] = [];
+  const pullRequestCalls: number[] = [];
   const updatedComments: UpdatedComment[] = [];
 
   const createIssueCommentCallback =
@@ -106,14 +116,14 @@ function createFakeGitHubClient(parameters: CreateFakeGitHubClientParameters = {
     });
 
   const client: GitHubClient = {
-    createIssueComment: async (pullRequestNumber: number, body: string): Promise<void> => {
+    async createIssueComment(pullRequestNumber: number, body: string): Promise<void> {
       createdComments.push({body, pullRequestNumber});
       await createIssueCommentCallback(pullRequestNumber, body);
     },
-    listIssueComments: async (
+    async listIssueComments(
       pullRequestNumber: number,
       pageNumber: number,
-    ): Promise<GitHubPage<ReleaseAppearanceComment>> => {
+    ): Promise<GitHubPage<ReleaseAppearanceComment>> {
       commentPageCalls.push(`${pullRequestNumber}:${pageNumber}`);
       return (
         parameters.commentPages?.get(pullRequestNumber)?.[pageNumber - 1] ?? {
@@ -122,19 +132,39 @@ function createFakeGitHubClient(parameters: CreateFakeGitHubClientParameters = {
         }
       );
     },
-    listPullRequestsAssociatedWithCommit: async (
+    async listPullRequestsAssociatedWithCommit(
       commitHash: string,
       pageNumber: number,
-    ): Promise<GitHubPage<AssociatedPullRequest>> => {
+    ): Promise<GitHubPage<AssociatedPullRequest>> {
       associatedCommitCalls.push(`${commitHash}:${pageNumber}`);
+      const page = parameters.associatedPages?.get(commitHash)?.[pageNumber - 1] ?? {
+        hasNextPage: false,
+        items: [],
+      };
+      return {
+        hasNextPage: page.hasNextPage,
+        items: page.items.map(associatedPullRequest => {
+          return {
+            ...associatedPullRequest,
+            targetBranchName: associatedPullRequest.targetBranchName ?? 'main',
+          };
+        }),
+      };
+    },
+    async getPullRequest(pullRequestNumber: number): Promise<GitHubPullRequest> {
+      pullRequestCalls.push(pullRequestNumber);
+      const configuredPullRequest = await parameters.getPullRequest?.(pullRequestNumber);
+
       return (
-        parameters.associatedPages?.get(commitHash)?.[pageNumber - 1] ?? {
-          hasNextPage: false,
-          items: [],
+        configuredPullRequest ?? {
+          isLocked: false,
+          isMerged: true,
+          pullRequestNumber,
+          targetBranchName: 'main',
         }
       );
     },
-    updateIssueComment: async (commentId: number, body: string): Promise<void> => {
+    async updateIssueComment(commentId: number, body: string): Promise<void> {
       updatedComments.push({body, commentId});
       await updateIssueCommentCallback(commentId, body);
     },
@@ -145,6 +175,7 @@ function createFakeGitHubClient(parameters: CreateFakeGitHubClientParameters = {
     client,
     commentPageCalls,
     createdComments,
+    pullRequestCalls,
     updatedComments,
   };
 }
@@ -247,8 +278,8 @@ describe('release appearance CLI orchestration', () => {
     const responses = [
       new Response(
         JSON.stringify([
-          {merged_at: '2026-07-23T10:00:00Z', number: 204},
-          {merged_at: null, number: 205},
+          {base: {ref: 'main'}, merged_at: '2026-07-23T10:00:00Z', number: 204},
+          {base: {ref: 'main'}, merged_at: null, number: 205},
         ]),
         {
           headers: {
@@ -257,7 +288,12 @@ describe('release appearance CLI orchestration', () => {
           status: 200,
         },
       ),
-      new Response(JSON.stringify([{merged_at: '2026-07-23T11:00:00Z', number: 206}]), {status: 200}),
+      new Response(
+        JSON.stringify([{base: {ref: 'release/2026-07-21.3'}, merged_at: '2026-07-23T11:00:00Z', number: 206}]),
+        {
+          status: 200,
+        },
+      ),
       new Response(JSON.stringify([{body: 'First comment', id: 61}]), {
         headers: {
           link: '<https://api.github.com/repos/wireapp/wire-webapp/issues/204/comments?page=2>; rel="next"',
@@ -294,8 +330,14 @@ describe('release appearance CLI orchestration', () => {
     const firstCommentPage = await githubClient.listIssueComments(204, 1);
     const secondCommentPage = await githubClient.listIssueComments(204, 2);
 
-    expect(firstPullRequestPage).toEqual({hasNextPage: true, items: [{pullRequestNumber: 204}]});
-    expect(secondPullRequestPage).toEqual({hasNextPage: false, items: [{pullRequestNumber: 206}]});
+    expect(firstPullRequestPage).toEqual({
+      hasNextPage: true,
+      items: [{pullRequestNumber: 204, targetBranchName: 'main'}],
+    });
+    expect(secondPullRequestPage).toEqual({
+      hasNextPage: false,
+      items: [{pullRequestNumber: 206, targetBranchName: 'release/2026-07-21.3'}],
+    });
     expect(firstCommentPage).toEqual({hasNextPage: true, items: [{body: 'First comment', commentId: 61}]});
     expect(secondCommentPage).toEqual({hasNextPage: false, items: [{body: 'Second comment', commentId: 62}]});
     expect(requests).toEqual([
@@ -366,6 +408,14 @@ describe('release appearance CLI orchestration', () => {
     expect(actualProcessing).toEqual({
       createdPullRequestNumbers: [],
       failedPullRequests: [],
+      plans: [
+        {
+          action: 'unchanged',
+          body: existingCommentBody,
+          commentId: Maybe.just(2),
+          pullRequestNumber: 301,
+        },
+      ],
       unchangedPullRequestNumbers: [301],
       updatedPullRequestNumbers: [],
     });
@@ -448,7 +498,7 @@ describe('release appearance CLI orchestration', () => {
         [402, [{hasNextPage: false, items: [{body: productionCommentBody, commentId: 43}]}]],
         [403, [{hasNextPage: false, items: []}]],
       ]),
-      updateIssueComment: async (): Promise<void> => {
+      async updateIssueComment(): Promise<void> {
         throw new Error('permission denied');
       },
     });
@@ -526,6 +576,86 @@ describe('release appearance CLI orchestration', () => {
     expect(permanentAttemptCount).toBe(1);
   });
 
+  it('respects Retry-After for retryable GitHub responses', async (): Promise<void> => {
+    let attemptCount = 0;
+    const githubClientResult = createGitHubClient({
+      apiUrl: 'https://api.github.com',
+      fetchFunction: async (): Promise<Response> => {
+        attemptCount += 1;
+
+        if (attemptCount === 1) {
+          return new Response('rate limited', {headers: {'Retry-After': '0'}, status: 429});
+        }
+
+        return new Response(JSON.stringify([{body: 'Recovered comment', id: 707}]), {status: 200});
+      },
+      retryDelay: (): number => {
+        throw new Error('Retry-After was not respected.');
+      },
+      repositoryName: 'wireapp/wire-webapp',
+      token: 'test-token',
+    });
+
+    assert(githubClientResult.isOk);
+    const actualComments = await githubClientResult.value.listIssueComments(707, 1);
+
+    expect(actualComments.items).toEqual([{body: 'Recovered comment', commentId: 707}]);
+    expect(attemptCount).toBe(2);
+  });
+
+  it('redacts the GitHub token from network failure diagnostics', async (): Promise<void> => {
+    const githubToken = 'test-token-that-must-not-be-logged';
+    const githubClientResult = createGitHubClient({
+      apiUrl: 'https://api.github.com',
+      fetchFunction: async (): Promise<Response> => {
+        throw new Error(`request failed while handling ${githubToken}`);
+      },
+      repositoryName: 'wireapp/wire-webapp',
+      token: githubToken,
+    });
+
+    assert(githubClientResult.isOk);
+    let actualErrorMessage = '';
+
+    try {
+      await githubClientResult.value.listIssueComments(708, 1);
+    } catch (error: unknown) {
+      actualErrorMessage = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(actualErrorMessage).not.toContain(githubToken);
+    expect(actualErrorMessage).toContain('[REDACTED]');
+  });
+
+  it('validates pull request metadata used by the controlled test mode', async (): Promise<void> => {
+    const githubClientResult = createGitHubClient({
+      apiUrl: 'https://api.github.com',
+      fetchFunction: async (): Promise<Response> => {
+        return new Response(
+          JSON.stringify({
+            base: {ref: 'release/2026-07-21.3'},
+            locked: false,
+            merged_at: '2026-07-23T12:00:00Z',
+            number: 709,
+          }),
+          {status: 200},
+        );
+      },
+      repositoryName: 'wireapp/wire-webapp',
+      token: 'test-token',
+    });
+
+    assert(githubClientResult.isOk);
+    const actualPullRequest = await githubClientResult.value.getPullRequest(709);
+
+    expect(actualPullRequest).toEqual({
+      isLocked: false,
+      isMerged: true,
+      pullRequestNumber: 709,
+      targetBranchName: 'release/2026-07-21.3',
+    });
+  });
+
   it('does not retry comment creation after a transient GitHub failure', async () => {
     let createAttemptCount = 0;
     const githubClientResult = createGitHubClient({
@@ -563,7 +693,7 @@ describe('release appearance CLI orchestration', () => {
         [firstDiscoveredCommitHash, [{hasNextPage: false, items: [{pullRequestNumber: 404}]}]],
       ]),
       commentPages: new Map([[404, [{hasNextPage: false, items: [{body: productionCommentBody, commentId: 44}]}]]]),
-      updateIssueComment: async (): Promise<void> => {
+      async updateIssueComment(): Promise<void> {
         throw new Error('permission denied');
       },
     });
@@ -571,8 +701,12 @@ describe('release appearance CLI orchestration', () => {
     const errorMessages: string[] = [];
     const actualExitCode = await runReleaseAppearance(
       {
+        baselineTagName: Maybe.nothing<string>(),
+        commentMode: Maybe.just('production'),
         currentCommitHash,
+        dryRun: Maybe.just(false),
         environment: 'beta',
+        pullRequestNumber: Maybe.nothing<number>(),
         releaseTagName: '2026-07-21.3-beta.2',
         workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/6',
       },
@@ -616,6 +750,7 @@ describe('release appearance CLI orchestration', () => {
     const commentProcessing: CommentProcessingResult = {
       createdPullRequestNumbers: [],
       failedPullRequests: [],
+      plans: [],
       unchangedPullRequestNumbers: [],
       updatedPullRequestNumbers: [],
     };
@@ -623,15 +758,286 @@ describe('release appearance CLI orchestration', () => {
       commentProcessing,
       discovery,
       environment: 'production',
-      range: {
+      range: Maybe.just({
         baselineRelationshipFailures: [],
         range: createCommitRange(),
-      },
+      }),
       releaseTagName: '2026-07-21.3-production',
     });
 
     expect(actualSummary).toContain('Baseline tag: `2026-07-20.4-production`');
     expect(actualSummary).toContain(`Merge base: \`${mergeBaseCommitHash}\``);
     expect(actualSummary).toContain(`- \`${firstDiscoveredCommitHash}\``);
+  });
+
+  it('orders supported pull requests numerically and continues after an unrelated commit discovery failure', async (): Promise<void> => {
+    const fakeGitHubClient = createFakeGitHubClient({
+      associatedPages: new Map([
+        [
+          firstDiscoveredCommitHash,
+          [
+            {
+              hasNextPage: false,
+              items: [
+                {pullRequestNumber: 302, targetBranchName: 'main'},
+                {pullRequestNumber: 999, targetBranchName: 'feature/not-a-release-branch'},
+              ],
+            },
+          ],
+        ],
+        [
+          thirdDiscoveredCommitHash,
+          [{hasNextPage: false, items: [{pullRequestNumber: 301, targetBranchName: 'release/2026-07-21.3'}]}],
+        ],
+        [
+          secondDiscoveredCommitHash,
+          [{hasNextPage: false, items: [{pullRequestNumber: 998, targetBranchName: 'feature/not-a-release-branch'}]}],
+        ],
+      ]),
+    });
+    const actualDiscovery = await discoverPullRequestsInRange({
+      executeGitCommand: createGitCommand(
+        new Map([
+          [
+            `rev-list --reverse ${mergeBaseCommitHash}..${currentCommitHash}`,
+            `${thirdDiscoveredCommitHash}\n${secondDiscoveredCommitHash}\n${firstDiscoveredCommitHash}`,
+          ],
+        ]),
+      ),
+      githubClient: fakeGitHubClient.client,
+      range: createCommitRange(),
+    });
+
+    expect(actualDiscovery.pullRequestNumbers).toEqual([301, 302]);
+    expect(actualDiscovery.commitsWithoutPullRequests).toEqual([secondDiscoveredCommitHash]);
+
+    const failureClient = createFakeGitHubClient({
+      associatedPages: new Map([
+        [
+          firstDiscoveredCommitHash,
+          [{hasNextPage: false, items: [{pullRequestNumber: 304, targetBranchName: 'main'}]}],
+        ],
+      ]),
+    });
+    const failureDiscovery = await discoverPullRequestsInRange({
+      executeGitCommand: createGitCommand(
+        new Map([
+          [
+            `rev-list --reverse ${mergeBaseCommitHash}..${currentCommitHash}`,
+            `${thirdDiscoveredCommitHash}\n${firstDiscoveredCommitHash}`,
+          ],
+        ]),
+      ),
+      githubClient: {
+        ...failureClient.client,
+        async listPullRequestsAssociatedWithCommit(
+          commitHash: string,
+          pageNumber: number,
+        ): Promise<GitHubPage<AssociatedPullRequest>> {
+          if (commitHash === thirdDiscoveredCommitHash) {
+            throw new Error('temporary discovery failure');
+          }
+
+          return failureClient.client.listPullRequestsAssociatedWithCommit(commitHash, pageNumber);
+        },
+      },
+      range: createCommitRange(),
+    });
+
+    expect(failureDiscovery.pullRequestNumbers).toEqual([304]);
+    expect(failureDiscovery.commitFailures).toEqual([
+      `Commit ${thirdDiscoveredCommitHash}: temporary discovery failure`,
+    ]);
+  });
+
+  it('rejects incompatible command-line combinations', () => {
+    const testModeWithoutPullRequestResult = parseReleaseAppearanceArguments([
+      'beta',
+      '2026-07-21.3-beta.1',
+      currentCommitHash,
+      'https://github.com/wireapp/wire-webapp/actions/runs/20',
+      '--comment-mode',
+      'test',
+    ]);
+    const productionModeWithPullRequestResult = parseReleaseAppearanceArguments([
+      'production',
+      '2026-07-21.3-production',
+      currentCommitHash,
+      'https://github.com/wireapp/wire-webapp/actions/runs/20',
+      '--pull-request-number',
+      '701',
+    ]);
+
+    assert(testModeWithoutPullRequestResult.isErr);
+    assert(productionModeWithPullRequestResult.isErr);
+    expect(testModeWithoutPullRequestResult.error.message).toContain('requires --pull-request-number');
+    expect(productionModeWithPullRequestResult.error.message).toContain('cannot use --pull-request-number');
+  });
+
+  it('runs a selected test comment without range discovery and never touches the production marker', async (): Promise<void> => {
+    const fakeGitHubClient = createFakeGitHubClient();
+    const summaryMessages: string[] = [];
+    const actualExitCode = await runReleaseAppearance(
+      {
+        baselineTagName: Maybe.nothing<string>(),
+        commentMode: Maybe.just('test'),
+        currentCommitHash,
+        dryRun: Maybe.just(false),
+        environment: 'beta',
+        pullRequestNumber: Maybe.just(702),
+        releaseTagName: '2026-07-21.3-beta.1',
+        workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/21',
+      },
+      {
+        executeGitCommand: createGitCommand(
+          new Map([[`rev-parse --verify refs/tags/2026-07-21.3-beta.1^\u007bcommit\u007d`, currentCommitHash]]),
+        ),
+        githubClient: fakeGitHubClient.client,
+        writeError: (): void => {
+          return;
+        },
+        writeOutput: (): void => {
+          return;
+        },
+        writeSummary: async (message: string): Promise<void> => {
+          summaryMessages.push(message);
+        },
+      },
+    );
+
+    expect(actualExitCode).toBe(0);
+    expect(fakeGitHubClient.associatedCommitCalls).toEqual([]);
+    expect(fakeGitHubClient.pullRequestCalls).toEqual([702]);
+    expect(fakeGitHubClient.createdComments).toHaveLength(1);
+    expect(fakeGitHubClient.createdComments[0].body).toContain('wire-webapp-release-appearance-test:v1');
+    expect(fakeGitHubClient.createdComments[0].body).not.toContain('<!-- wire-webapp-release-appearance:v1');
+    expect(summaryMessages[0]).toContain('Mode: write');
+  });
+
+  it('dry-run computes create, update, unchanged, and no-pull-request results without writing comments', async (): Promise<void> => {
+    const existingProductionComment = renderReleaseAppearanceComment(
+      createCommentState({
+        production: {tagName: '2026-07-20.4-production', workflowRunUrl: 'https://example.invalid/1'},
+      }),
+    );
+    const existingBetaComment = renderReleaseAppearanceComment(
+      createCommentState({beta: {tagName: '2026-07-21.3-beta.2', workflowRunUrl: 'https://example.invalid/2'}}),
+    );
+    const fakeGitHubClient = createFakeGitHubClient({
+      associatedPages: new Map([
+        [
+          firstDiscoveredCommitHash,
+          [{hasNextPage: false, items: [{pullRequestNumber: 703, targetBranchName: 'main'}]}],
+        ],
+        [
+          secondDiscoveredCommitHash,
+          [{hasNextPage: false, items: [{pullRequestNumber: 704, targetBranchName: 'main'}]}],
+        ],
+        [
+          thirdDiscoveredCommitHash,
+          [{hasNextPage: false, items: [{pullRequestNumber: 705, targetBranchName: 'main'}]}],
+        ],
+      ]),
+      commentPages: new Map([
+        [703, [{hasNextPage: false, items: []}]],
+        [704, [{hasNextPage: false, items: [{body: existingProductionComment, commentId: 7040}]}]],
+        [705, [{hasNextPage: false, items: [{body: existingBetaComment, commentId: 7050}]}]],
+      ]),
+    });
+    const summaryMessages: string[] = [];
+    const actualExitCode = await runReleaseAppearance(
+      {
+        baselineTagName: Maybe.nothing<string>(),
+        commentMode: Maybe.just('production'),
+        currentCommitHash,
+        dryRun: Maybe.just(true),
+        environment: 'beta',
+        pullRequestNumber: Maybe.nothing<number>(),
+        releaseTagName: '2026-07-21.3-beta.2',
+        workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/22',
+      },
+      {
+        executeGitCommand: createGitCommand(
+          new Map([
+            [`rev-parse --verify refs/tags/2026-07-21.3-beta.2^\u007bcommit\u007d`, currentCommitHash],
+            ['tag --list', '2026-07-21.3-beta.1\n2026-07-21.3-beta.2\n'],
+            [`rev-parse --verify refs/tags/2026-07-21.3-beta.1^\u007bcommit\u007d`, previousCommitHash],
+            [`merge-base ${previousCommitHash} ${currentCommitHash}`, mergeBaseCommitHash],
+            [`rev-list --count ${mergeBaseCommitHash}..${currentCommitHash}`, '3'],
+            [`show -s --format=%ct ${previousCommitHash}`, '200'],
+            [
+              `rev-list --reverse ${mergeBaseCommitHash}..${currentCommitHash}`,
+              `${firstDiscoveredCommitHash}\n${secondDiscoveredCommitHash}\n${thirdDiscoveredCommitHash}`,
+            ],
+          ]),
+        ),
+        githubClient: fakeGitHubClient.client,
+        writeError: (): void => {
+          return;
+        },
+        writeOutput: (): void => {
+          return;
+        },
+        writeSummary: async (message: string): Promise<void> => {
+          summaryMessages.push(message);
+        },
+      },
+    );
+
+    expect(actualExitCode).toBe(0);
+    expect(fakeGitHubClient.createdComments).toEqual([]);
+    expect(fakeGitHubClient.updatedComments).toEqual([]);
+    expect(summaryMessages[0]).toContain('Mode: dry-run');
+    expect(summaryMessages[0]).toContain('Comments created: 1');
+    expect(summaryMessages[0]).toContain('Comments updated: 1');
+    expect(summaryMessages[0]).toContain('Comments unchanged: 1');
+    expect(summaryMessages[0]).toContain('Proposed comment states:');
+  });
+
+  it('validates a selected pull request before a test write', async (): Promise<void> => {
+    const fakeGitHubClient = createFakeGitHubClient({
+      async getPullRequest(): Promise<GitHubPullRequest> {
+        return {
+          isLocked: true,
+          isMerged: true,
+          pullRequestNumber: 706,
+          targetBranchName: 'main',
+        };
+      },
+    });
+    const errors: string[] = [];
+    const actualExitCode = await runReleaseAppearance(
+      {
+        baselineTagName: Maybe.nothing<string>(),
+        commentMode: Maybe.just('test'),
+        currentCommitHash,
+        dryRun: Maybe.just(false),
+        environment: 'beta',
+        pullRequestNumber: Maybe.just(706),
+        releaseTagName: '2026-07-21.3-beta.1',
+        workflowRunUrl: 'https://github.com/wireapp/wireapp/actions/runs/23',
+      },
+      {
+        executeGitCommand: createGitCommand(
+          new Map([[`rev-parse --verify refs/tags/2026-07-21.3-beta.1^\u007bcommit\u007d`, currentCommitHash]]),
+        ),
+        githubClient: fakeGitHubClient.client,
+        writeError: (message: string): void => {
+          errors.push(message);
+        },
+        writeOutput: (): void => {
+          return;
+        },
+        writeSummary: async (): Promise<void> => {
+          return;
+        },
+      },
+    );
+
+    expect(actualExitCode).toBe(1);
+    expect(fakeGitHubClient.createdComments).toEqual([]);
+    expect(errors).toEqual([
+      'Release appearance processing failed: Pull request #706 is locked and cannot receive a test comment.',
+    ]);
   });
 });

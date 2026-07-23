@@ -19,6 +19,7 @@
 
 import {
   prepareReleaseAppearanceComment,
+  releaseAppearanceCommentMarker,
   renderReleaseAppearanceComment,
   selectBetaDiscoveryRange,
   selectPreviousBetaTag,
@@ -135,22 +136,26 @@ describe('release appearance metadata', () => {
   });
 
   it('prefers the nearest direct Production ancestor over lexicographical order', () => {
-    const actualBaselineResult = selectPreviousProductionBaseline('2026-07-21.3-production', currentReleaseCommitHash, [
-      {
-        commitDistanceFromMergeBase: 8,
-        mergeBaseCommitHash: previousBetaMergeBaseCommitHash,
-        tagCommitHash: previousProductionCommitHash,
-        tagName: '2026-07-19.1-production',
-        tagTimestampSeconds: 100,
-      },
-      {
-        commitDistanceFromMergeBase: 3,
-        mergeBaseCommitHash: previousBetaCommitHash,
-        tagCommitHash: previousBetaCommitHash,
-        tagName: '2026-07-20.4-production',
-        tagTimestampSeconds: 200,
-      },
-    ]);
+    const actualBaselineResult = selectPreviousProductionBaseline({
+      currentCommitHash: currentReleaseCommitHash,
+      currentProductionTagName: '2026-07-21.3-production',
+      productionTagRelationships: [
+        {
+          commitDistanceFromMergeBase: 8,
+          mergeBaseCommitHash: previousBetaMergeBaseCommitHash,
+          tagCommitHash: previousProductionCommitHash,
+          tagName: '2026-07-19.1-production',
+          tagTimestampSeconds: 100,
+        },
+        {
+          commitDistanceFromMergeBase: 3,
+          mergeBaseCommitHash: previousBetaCommitHash,
+          tagCommitHash: previousBetaCommitHash,
+          tagName: '2026-07-20.4-production',
+          tagTimestampSeconds: 200,
+        },
+      ],
+    });
 
     assert(actualBaselineResult.isOk);
     expect(actualBaselineResult.value.tagName).toBe('2026-07-20.4-production');
@@ -307,5 +312,72 @@ describe('release appearance metadata', () => {
     });
 
     assert(actualCommentResult.isErr);
+  });
+
+  it('ignores comments without the automation marker and creates a new marked comment', () => {
+    const actualCommentResult = prepareReleaseAppearanceComment({
+      comments: [{body: 'Human-maintained release note', commentId: 15}],
+      environment: 'beta',
+      tagName: '2026-07-21.3-beta.1',
+      workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/8',
+    });
+
+    assert(actualCommentResult.isOk);
+    expect(actualCommentResult.value.action).toBe('create');
+    expect(actualCommentResult.value.body).toContain('wire-webapp-release-appearance:v1');
+  });
+
+  it('reports malformed machine-readable state safely', () => {
+    const actualCommentResult = prepareReleaseAppearanceComment({
+      comments: [{body: `${releaseAppearanceCommentMarker}{not-json}-->`, commentId: 16}],
+      environment: 'beta',
+      tagName: '2026-07-21.3-beta.1',
+      workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/9',
+    });
+
+    assert(actualCommentResult.isErr);
+    expect(actualCommentResult.error.message).toContain('invalid JSON state');
+  });
+
+  it('reports unsupported machine-readable state versions safely', () => {
+    const actualCommentResult = prepareReleaseAppearanceComment({
+      comments: [{body: `${releaseAppearanceCommentMarker}{"version":2}-->`, commentId: 17}],
+      environment: 'beta',
+      tagName: '2026-07-21.3-beta.1',
+      workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/10',
+    });
+
+    assert(actualCommentResult.isErr);
+    expect(actualCommentResult.error.message).toContain('invalid state');
+  });
+
+  it('uses the fixed test marker and warning while ignoring the production marker', () => {
+    const existingProductionComment = renderReleaseAppearanceComment(createCommentState());
+    const actualCommentResult = prepareReleaseAppearanceComment({
+      comments: [{body: existingProductionComment, commentId: 18}],
+      commentMode: 'test',
+      environment: 'beta',
+      tagName: '2026-07-21.3-beta.1',
+      workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/11',
+    });
+
+    assert(actualCommentResult.isOk);
+    expect(actualCommentResult.value.action).toBe('create');
+    expect(actualCommentResult.value.body).toContain('wire-webapp-release-appearance-test:v1');
+    expect(actualCommentResult.value.body).toContain('It does not represent an actual deployment.');
+    expect(actualCommentResult.value.body).toContain('| Beta | 2026-07-21.3-beta.1 |');
+  });
+
+  it('accepts legacy Production tags in immutable state', () => {
+    const actualComment = renderReleaseAppearanceComment(
+      createCommentState({
+        production: {
+          tagName: '2026-07-20-production.0',
+          workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/12',
+        },
+      }),
+    );
+
+    expect(actualComment).toContain('| Production | 2026-07-20-production.0 |');
   });
 });
