@@ -25,9 +25,7 @@ export const releaseAppearanceTestCommentMarker = '<!-- wire-webapp-release-appe
 
 const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
 const betaCandidateTagPattern = new RegExp(String.raw`^(${releaseIdentifierPattern})-beta\.(\d+)$`);
-const productionTagPattern = new RegExp(
-  String.raw`^(?:${releaseIdentifierPattern}-production|\d{4}-\d{2}-\d{2}-production\.\d+)$`,
-);
+const productionTagPattern = new RegExp(String.raw`^(${releaseIdentifierPattern})-production$`);
 const commitHashPattern = /^[0-9a-f]{40}$/i;
 
 export type ReleaseAppearanceEnvironment = 'beta' | 'production';
@@ -43,8 +41,20 @@ export type CommitRangeRelationship = {
   readonly commitDistanceFromMergeBase: number;
   readonly mergeBaseCommitHash: string;
   readonly tagCommitHash: string;
+  readonly tagCreatedAtSeconds: number;
   readonly tagName: string;
-  readonly tagTimestampSeconds: number;
+};
+
+export type ReleaseTagMetadata = {
+  readonly releaseIdentifier: string;
+  readonly tagCommitHash: string;
+  readonly tagCreatedAtSeconds: number;
+  readonly tagName: string;
+};
+
+export type ProductionReleaseTag = {
+  readonly releaseIdentifier: string;
+  readonly tagName: string;
 };
 
 export type CommitDiscoveryRange = {
@@ -53,6 +63,15 @@ export type CommitDiscoveryRange = {
   readonly mergeBaseCommitHash: string;
   readonly revisionRange: string;
 };
+
+export type CommitDiscoveryRangeSelection =
+  | {
+      readonly kind: 'bootstrap';
+    }
+  | {
+      readonly kind: 'range';
+      readonly range: CommitDiscoveryRange;
+    };
 
 export type ReleaseAppearanceValue = {
   readonly tagName: string;
@@ -88,6 +107,7 @@ export type PreparedReleaseAppearanceComment =
 
 export type BetaDiscoveryRangeSelectionParameters = {
   readonly currentBetaTagName: string;
+  readonly currentBetaTagCreatedAtSeconds: number;
   readonly currentCommitHash: string;
   readonly betaTagRelationships: readonly CommitRangeRelationship[];
   readonly existingBetaTagNames: readonly string[];
@@ -96,6 +116,7 @@ export type BetaDiscoveryRangeSelectionParameters = {
 
 export type ProductionDiscoveryRangeSelectionParameters = {
   readonly currentCommitHash: string;
+  readonly currentProductionTagCreatedAtSeconds: number;
   readonly currentProductionTagName: string;
   readonly productionTagRelationships: readonly CommitRangeRelationship[];
 };
@@ -115,10 +136,20 @@ type CreateReleaseAppearanceValueParameters = {
 };
 
 export type SelectPreviousProductionBaselineParameters = {
-  readonly currentCommitHash: string;
-  readonly currentProductionTagName: string;
+  readonly currentReleaseIdentifier: string;
+  readonly currentTagCreatedAtSeconds: number;
+  readonly currentTagName: string;
   readonly productionTagRelationships: readonly CommitRangeRelationship[];
 };
+
+export type PreviousProductionBaselineSelection =
+  | {
+      readonly kind: 'bootstrap';
+    }
+  | {
+      readonly kind: 'baseline';
+      readonly relationship: CommitRangeRelationship;
+    };
 
 type CreateCommentStateParameters = {
   readonly environment: ReleaseAppearanceEnvironment;
@@ -220,6 +251,19 @@ export function parseBetaCandidateTag(tagName: string): Result<BetaCandidateTag,
   });
 }
 
+export function parseProductionReleaseTag(tagName: string): Result<ProductionReleaseTag, Error> {
+  const productionTagMatch = productionTagPattern.exec(tagName);
+
+  if (productionTagMatch === null) {
+    return Result.err(new Error(`Invalid Production tag name: ${tagName}`));
+  }
+
+  return Result.ok({
+    releaseIdentifier: productionTagMatch[1],
+    tagName,
+  });
+}
+
 export function selectPreviousBetaTag(
   currentBetaTagName: string,
   existingTagNames: readonly string[],
@@ -267,44 +311,75 @@ export function selectPreviousBetaTag(
   return Result.ok(previousBetaCandidateTag);
 }
 
+function compareReleaseIdentifiers(leftReleaseIdentifier: string, rightReleaseIdentifier: string): number {
+  const releaseIdentifierPatternMatch = /^(\d{4}-\d{2}-\d{2})\.([1-9]\d*)$/u;
+  const leftMatch = releaseIdentifierPatternMatch.exec(leftReleaseIdentifier);
+  const rightMatch = releaseIdentifierPatternMatch.exec(rightReleaseIdentifier);
+
+  if (leftMatch === null || rightMatch === null) {
+    return leftReleaseIdentifier.localeCompare(rightReleaseIdentifier);
+  }
+
+  const dateComparison = leftMatch[1].localeCompare(rightMatch[1]);
+
+  if (dateComparison !== 0) {
+    return dateComparison;
+  }
+
+  const releaseSequenceComparison = Number(leftMatch[2]) - Number(rightMatch[2]);
+
+  if (releaseSequenceComparison !== 0) {
+    return releaseSequenceComparison;
+  }
+
+  return leftReleaseIdentifier.localeCompare(rightReleaseIdentifier);
+}
+
 function compareProductionBaselineCandidates(
   leftCandidate: CommitRangeRelationship,
   rightCandidate: CommitRangeRelationship,
 ): number {
-  const leftIsDirectAncestor = leftCandidate.tagCommitHash === leftCandidate.mergeBaseCommitHash;
-  const rightIsDirectAncestor = rightCandidate.tagCommitHash === rightCandidate.mergeBaseCommitHash;
-
-  if (leftIsDirectAncestor !== rightIsDirectAncestor) {
-    return leftIsDirectAncestor ? -1 : 1;
+  if (leftCandidate.tagCreatedAtSeconds !== rightCandidate.tagCreatedAtSeconds) {
+    return rightCandidate.tagCreatedAtSeconds - leftCandidate.tagCreatedAtSeconds;
   }
 
-  if (leftCandidate.commitDistanceFromMergeBase !== rightCandidate.commitDistanceFromMergeBase) {
-    return leftCandidate.commitDistanceFromMergeBase - rightCandidate.commitDistanceFromMergeBase;
+  const leftReleaseTagResult = parseProductionReleaseTag(leftCandidate.tagName);
+  const rightReleaseTagResult = parseProductionReleaseTag(rightCandidate.tagName);
+
+  if (leftReleaseTagResult.isOk && rightReleaseTagResult.isOk) {
+    const releaseIdentifierComparison = compareReleaseIdentifiers(
+      rightReleaseTagResult.value.releaseIdentifier,
+      leftReleaseTagResult.value.releaseIdentifier,
+    );
+
+    if (releaseIdentifierComparison !== 0) {
+      return releaseIdentifierComparison;
+    }
   }
 
-  if (leftCandidate.tagTimestampSeconds !== rightCandidate.tagTimestampSeconds) {
-    return rightCandidate.tagTimestampSeconds - leftCandidate.tagTimestampSeconds;
-  }
-
-  return leftCandidate.tagName.localeCompare(rightCandidate.tagName);
+  return rightCandidate.tagName.localeCompare(leftCandidate.tagName);
 }
 
 export function selectPreviousProductionBaseline(
   parameters: SelectPreviousProductionBaselineParameters,
-): Result<CommitRangeRelationship, Error> {
-  if (!productionTagPattern.test(parameters.currentProductionTagName)) {
-    return Result.err(new Error(`Invalid Production tag name: ${parameters.currentProductionTagName}`));
+): Result<PreviousProductionBaselineSelection, Error> {
+  if (!productionTagPattern.test(`${parameters.currentReleaseIdentifier}-production`)) {
+    return Result.err(new Error(`Invalid release identifier: ${parameters.currentReleaseIdentifier}`));
   }
 
-  if (!isValidCommitHash(parameters.currentCommitHash)) {
-    return Result.err(new Error(`Invalid current release commit SHA: ${parameters.currentCommitHash}`));
+  if (!is.integer(parameters.currentTagCreatedAtSeconds) || parameters.currentTagCreatedAtSeconds < 0) {
+    return Result.err(new Error(`Invalid tag creation time for ${parameters.currentTagName}`));
   }
 
   const previousProductionBaselineCandidates = parameters.productionTagRelationships.filter(
     productionTagRelationship => {
+      const productionTagResult = parseProductionReleaseTag(productionTagRelationship.tagName);
+
       return (
-        productionTagRelationship.tagName !== parameters.currentProductionTagName &&
-        productionTagRelationship.tagCommitHash !== parameters.currentCommitHash &&
+        productionTagResult.isOk &&
+        productionTagResult.value.releaseIdentifier !== parameters.currentReleaseIdentifier &&
+        productionTagRelationship.tagName !== parameters.currentTagName &&
+        productionTagRelationship.tagCreatedAtSeconds < parameters.currentTagCreatedAtSeconds &&
         isValidCommitHash(productionTagRelationship.tagCommitHash) &&
         isValidCommitHash(productionTagRelationship.mergeBaseCommitHash) &&
         productionTagRelationship.commitDistanceFromMergeBase >= 0
@@ -317,10 +392,10 @@ export function selectPreviousProductionBaseline(
   );
 
   if (selectedProductionBaseline.isNothing) {
-    return Result.err(new Error('Unable to find a verified Production baseline without using the repository root.'));
+    return Result.ok({kind: 'bootstrap'});
   }
 
-  return Result.ok(selectedProductionBaseline.value);
+  return Result.ok({kind: 'baseline', relationship: selectedProductionBaseline.value});
 }
 
 function findCommitRangeRelationship(
@@ -365,7 +440,7 @@ function createCommitDiscoveryRange(
 
 export function selectBetaDiscoveryRange(
   parameters: BetaDiscoveryRangeSelectionParameters,
-): Result<CommitDiscoveryRange, Error> {
+): Result<CommitDiscoveryRangeSelection, Error> {
   const previousBetaTagResult = selectPreviousBetaTag(parameters.currentBetaTagName, parameters.existingBetaTagNames);
 
   if (previousBetaTagResult.isErr) {
@@ -384,8 +459,9 @@ export function selectBetaDiscoveryRange(
     baselineTagName = previousBetaTagResult.value.value.tagName;
   } else {
     const previousProductionBaselineResult = selectPreviousProductionBaseline({
-      currentCommitHash: parameters.currentCommitHash,
-      currentProductionTagName: `${currentBetaCandidateTagResult.value.releaseIdentifier}-production`,
+      currentReleaseIdentifier: currentBetaCandidateTagResult.value.releaseIdentifier,
+      currentTagCreatedAtSeconds: parameters.currentBetaTagCreatedAtSeconds,
+      currentTagName: parameters.currentBetaTagName,
       productionTagRelationships: parameters.productionTagRelationships,
     });
 
@@ -393,7 +469,11 @@ export function selectBetaDiscoveryRange(
       return Result.err(previousProductionBaselineResult.error);
     }
 
-    baselineTagName = previousProductionBaselineResult.value.tagName;
+    if (previousProductionBaselineResult.value.kind === 'bootstrap') {
+      return Result.ok({kind: 'bootstrap'});
+    }
+
+    baselineTagName = previousProductionBaselineResult.value.relationship.tagName;
   }
 
   const baselineRelationships = previousBetaTagResult.value.isJust
@@ -405,15 +485,29 @@ export function selectBetaDiscoveryRange(
     return Result.err(baselineRelationshipResult.error);
   }
 
-  return createCommitDiscoveryRange(baselineRelationshipResult.value, parameters.currentCommitHash);
+  const commitDiscoveryRangeResult = createCommitDiscoveryRange(
+    baselineRelationshipResult.value,
+    parameters.currentCommitHash,
+  );
+
+  return commitDiscoveryRangeResult.map(range => {
+    return {kind: 'range', range};
+  });
 }
 
 export function selectProductionDiscoveryRange(
   parameters: ProductionDiscoveryRangeSelectionParameters,
-): Result<CommitDiscoveryRange, Error> {
+): Result<CommitDiscoveryRangeSelection, Error> {
+  const currentProductionTagResult = parseProductionReleaseTag(parameters.currentProductionTagName);
+
+  if (currentProductionTagResult.isErr) {
+    return Result.err(currentProductionTagResult.error);
+  }
+
   const previousProductionBaselineResult = selectPreviousProductionBaseline({
-    currentCommitHash: parameters.currentCommitHash,
-    currentProductionTagName: parameters.currentProductionTagName,
+    currentReleaseIdentifier: currentProductionTagResult.value.releaseIdentifier,
+    currentTagCreatedAtSeconds: parameters.currentProductionTagCreatedAtSeconds,
+    currentTagName: parameters.currentProductionTagName,
     productionTagRelationships: parameters.productionTagRelationships,
   });
 
@@ -421,7 +515,16 @@ export function selectProductionDiscoveryRange(
     return Result.err(previousProductionBaselineResult.error);
   }
 
-  return createCommitDiscoveryRange(previousProductionBaselineResult.value, parameters.currentCommitHash);
+  if (previousProductionBaselineResult.value.kind === 'bootstrap') {
+    return Result.ok({kind: 'bootstrap'});
+  }
+
+  return createCommitDiscoveryRange(
+    previousProductionBaselineResult.value.relationship,
+    parameters.currentCommitHash,
+  ).map(range => {
+    return {kind: 'range', range};
+  });
 }
 
 function parseAppearanceCommentState(

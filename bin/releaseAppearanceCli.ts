@@ -31,6 +31,7 @@ import {
   getReleaseAppearanceCommentMarker,
   isProductionReleaseTagName,
   parseBetaCandidateTag,
+  parseProductionReleaseTag,
   prepareReleaseAppearanceComment,
   selectBetaDiscoveryRange,
   selectProductionDiscoveryRange,
@@ -42,6 +43,7 @@ import type {
   ReleaseAppearanceComment,
   ReleaseAppearanceCommentMode,
   ReleaseAppearanceEnvironment,
+  ReleaseTagMetadata,
 } from './releaseAppearance.ts';
 
 const nodeExecutableAndScriptPathArgumentCount = 2;
@@ -107,6 +109,17 @@ export type ResolvedAppearanceRange = {
   readonly baselineRelationshipFailures: readonly string[];
   readonly range: CommitDiscoveryRange;
 };
+
+export type ReleaseAppearanceRangeResolution =
+  | {
+      readonly kind: 'bootstrap';
+    }
+  | {
+      readonly kind: 'range';
+      readonly resolvedRange: ResolvedAppearanceRange;
+    };
+
+export type ReleaseAppearanceDiscoveryResolution = ReleaseAppearanceRangeResolution | {readonly kind: 'test'};
 
 export type ReleaseAppearanceSummaryDependencies = Pick<ReleaseAppearanceDependencies, 'writeError' | 'writeSummary'>;
 
@@ -187,7 +200,7 @@ export type ReleaseAppearanceSummaryParameters = {
   readonly discovery: PullRequestDiscoveryResult;
   readonly dryRun?: boolean;
   readonly environment: ReleaseAppearanceEnvironment;
-  readonly range: Maybe<ResolvedAppearanceRange>;
+  readonly resolution: ReleaseAppearanceDiscoveryResolution;
   readonly releaseTagName: string;
 };
 
@@ -375,6 +388,23 @@ async function resolveCommitRangeRelationship(
   parameters: ResolveCommitRangeRelationshipParameters,
 ): Promise<Result<CommitRangeRelationship, Error>> {
   try {
+    const tagObjectTypeResult = parseGitOutput(
+      await parameters.executeGitCommand(['cat-file', '-t', `refs/tags/${parameters.tagName}`]),
+      `Object type for tag ${parameters.tagName}`,
+    );
+
+    if (tagObjectTypeResult.isErr) {
+      return Result.err(tagObjectTypeResult.error);
+    }
+
+    if (tagObjectTypeResult.value !== 'tag') {
+      return Result.err(
+        new Error(
+          `Release tag ${parameters.tagName} must be an annotated tag; Git reported a ${tagObjectTypeResult.value} object.`,
+        ),
+      );
+    }
+
     const tagCommitHashResult = parseFullCommitHash(
       await parameters.executeGitCommand(['rev-parse', '--verify', `refs/tags/${parameters.tagName}^{commit}`]),
       `Commit for tag ${parameters.tagName}`,
@@ -406,21 +436,21 @@ async function resolveCommitRangeRelationship(
       return Result.err(commitDistanceResult.error);
     }
 
-    const tagTimestampResult = parseGitInteger(
-      await parameters.executeGitCommand(['show', '-s', '--format=%ct', tagCommitHashResult.value]),
-      `Timestamp for tag ${parameters.tagName}`,
+    const tagCreatedAtResult = parseGitInteger(
+      await parameters.executeGitCommand(['for-each-ref', '--format=%(taggerdate:unix)', `refs/tags/${parameters.tagName}`]),
+      `Creation time for tag ${parameters.tagName}`,
     );
 
-    if (tagTimestampResult.isErr) {
-      return Result.err(tagTimestampResult.error);
+    if (tagCreatedAtResult.isErr) {
+      return Result.err(tagCreatedAtResult.error);
     }
 
     return Result.ok({
       commitDistanceFromMergeBase: commitDistanceResult.value,
       mergeBaseCommitHash: mergeBaseCommitHashResult.value,
       tagCommitHash: tagCommitHashResult.value,
+      tagCreatedAtSeconds: tagCreatedAtResult.value,
       tagName: parameters.tagName,
-      tagTimestampSeconds: tagTimestampResult.value,
     });
   } catch (error: unknown) {
     return Result.err(new Error(`Unable to inspect tag ${parameters.tagName}: ${describeUnknownError(error)}`));
@@ -512,12 +542,29 @@ async function readReleaseTagNames(executeGitCommand: GitCommand): Promise<reado
 
 async function validateCurrentReleaseTag(
   parameters: ValidateCurrentReleaseTagParameters,
-): Promise<Result<void, Error>> {
+): Promise<Result<ReleaseTagMetadata, Error>> {
   if (!isFullCommitHash(parameters.currentCommitHash)) {
     return Result.err(new Error(`Invalid current release commit SHA: ${parameters.currentCommitHash}`));
   }
 
   try {
+    const tagObjectTypeResult = parseGitOutput(
+      await parameters.executeGitCommand(['cat-file', '-t', `refs/tags/${parameters.releaseTagName}`]),
+      `Object type for release tag ${parameters.releaseTagName}`,
+    );
+
+    if (tagObjectTypeResult.isErr) {
+      return Result.err(tagObjectTypeResult.error);
+    }
+
+    if (tagObjectTypeResult.value !== 'tag') {
+      return Result.err(
+        new Error(
+          `Release tag ${parameters.releaseTagName} must be an annotated tag; Git reported a ${tagObjectTypeResult.value} object.`,
+        ),
+      );
+    }
+
     const currentTagCommitHashResult = parseFullCommitHash(
       await parameters.executeGitCommand(['rev-parse', '--verify', `refs/tags/${parameters.releaseTagName}^{commit}`]),
       `Commit for release tag ${parameters.releaseTagName}`,
@@ -535,7 +582,37 @@ async function validateCurrentReleaseTag(
       );
     }
 
-    return Result.ok(undefined);
+    const releaseTagResult = parseBetaCandidateTag(parameters.releaseTagName);
+    const productionTagResult = parseProductionReleaseTag(parameters.releaseTagName);
+    const releaseIdentifierResult = releaseTagResult.isOk
+      ? Result.ok(releaseTagResult.value.releaseIdentifier)
+      : productionTagResult.isOk
+        ? Result.ok(productionTagResult.value.releaseIdentifier)
+        : Result.err(new Error(`Invalid release tag name: ${parameters.releaseTagName}`));
+
+    if (releaseIdentifierResult.isErr) {
+      return Result.err(releaseIdentifierResult.error);
+    }
+
+    const tagCreatedAtResult = parseGitInteger(
+      await parameters.executeGitCommand([
+        'for-each-ref',
+        '--format=%(taggerdate:unix)',
+        `refs/tags/${parameters.releaseTagName}`,
+      ]),
+      `Creation time for release tag ${parameters.releaseTagName}`,
+    );
+
+    if (tagCreatedAtResult.isErr) {
+      return Result.err(tagCreatedAtResult.error);
+    }
+
+    return Result.ok({
+      releaseIdentifier: releaseIdentifierResult.value,
+      tagCommitHash: currentTagCommitHashResult.value,
+      tagCreatedAtSeconds: tagCreatedAtResult.value,
+      tagName: parameters.releaseTagName,
+    });
   } catch (error: unknown) {
     return Result.err(new Error(`Unable to validate release tag: ${describeUnknownError(error)}`));
   }
@@ -543,7 +620,7 @@ async function validateCurrentReleaseTag(
 
 export async function resolveReleaseAppearanceRange(
   parameters: ResolveReleaseAppearanceRangeParameters,
-): Promise<Result<ResolvedAppearanceRange, Error>> {
+): Promise<Result<ReleaseAppearanceRangeResolution, Error>> {
   const releaseTagEnvironmentValidationResult = validateReleaseTagEnvironment(
     parameters.environment,
     parameters.releaseTagName,
@@ -558,6 +635,8 @@ export async function resolveReleaseAppearanceRange(
   if (currentReleaseTagValidationResult.isErr) {
     return Result.err(currentReleaseTagValidationResult.error);
   }
+
+  const currentReleaseTagMetadata = currentReleaseTagValidationResult.value;
 
   const allTagNames = await readReleaseTagNames(parameters.executeGitCommand);
   const productionTagNames = allTagNames.filter(isProductionReleaseTagName);
@@ -603,12 +682,15 @@ export async function resolveReleaseAppearanceRange(
     }
 
     return Result.ok({
-      baselineRelationshipFailures: baselineRelationshipResolution.failures,
-      range: {
-        baselineCommitHash: baselineRelationship.value.tagCommitHash,
-        baselineTagName: baselineRelationship.value.tagName,
-        mergeBaseCommitHash: baselineRelationship.value.mergeBaseCommitHash,
-        revisionRange: `${baselineRelationship.value.mergeBaseCommitHash}..${parameters.currentCommitHash}`,
+      kind: 'range',
+      resolvedRange: {
+        baselineRelationshipFailures: baselineRelationshipResolution.failures,
+        range: {
+          baselineCommitHash: baselineRelationship.value.tagCommitHash,
+          baselineTagName: baselineRelationship.value.tagName,
+          mergeBaseCommitHash: baselineRelationship.value.mergeBaseCommitHash,
+          revisionRange: `${baselineRelationship.value.mergeBaseCommitHash}..${parameters.currentCommitHash}`,
+        },
       },
     });
   }
@@ -621,6 +703,7 @@ export async function resolveReleaseAppearanceRange(
     });
     const rangeResult = selectProductionDiscoveryRange({
       currentCommitHash: parameters.currentCommitHash,
+      currentProductionTagCreatedAtSeconds: currentReleaseTagMetadata.tagCreatedAtSeconds,
       currentProductionTagName: parameters.releaseTagName,
       productionTagRelationships: productionRelationshipResolution.relationships,
     });
@@ -629,9 +712,16 @@ export async function resolveReleaseAppearanceRange(
       return Result.err(rangeResult.error);
     }
 
+    if (rangeResult.value.kind === 'bootstrap') {
+      return Result.ok({kind: 'bootstrap'});
+    }
+
     return Result.ok({
-      baselineRelationshipFailures: productionRelationshipResolution.failures,
-      range: rangeResult.value,
+      kind: 'range',
+      resolvedRange: {
+        baselineRelationshipFailures: productionRelationshipResolution.failures,
+        range: rangeResult.value.range,
+      },
     });
   }
 
@@ -665,6 +755,7 @@ export async function resolveReleaseAppearanceRange(
   const rangeResult = selectBetaDiscoveryRange({
     betaTagRelationships: betaRelationshipResolution.relationships,
     currentBetaTagName: parameters.releaseTagName,
+    currentBetaTagCreatedAtSeconds: currentReleaseTagMetadata.tagCreatedAtSeconds,
     currentCommitHash: parameters.currentCommitHash,
     existingBetaTagNames: betaTagNames,
     productionTagRelationships: productionRelationshipResolution.relationships,
@@ -674,12 +765,19 @@ export async function resolveReleaseAppearanceRange(
     return Result.err(rangeResult.error);
   }
 
+  if (rangeResult.value.kind === 'bootstrap') {
+    return Result.ok({kind: 'bootstrap'});
+  }
+
   return Result.ok({
-    baselineRelationshipFailures: [
-      ...betaRelationshipResolution.failures,
-      ...productionRelationshipResolution.failures,
-    ],
-    range: rangeResult.value,
+    kind: 'range',
+    resolvedRange: {
+      baselineRelationshipFailures: [
+        ...betaRelationshipResolution.failures,
+        ...productionRelationshipResolution.failures,
+      ],
+      range: rangeResult.value.range,
+    },
   });
 }
 
@@ -883,29 +981,36 @@ export async function processPullRequestsSequentially(
 }
 
 export function renderReleaseAppearanceSummary(parameters: ReleaseAppearanceSummaryParameters): string {
-  const selectedBaselineTagName = parameters.range
-    .map(resolvedRange => {
-      return resolvedRange.range.baselineTagName;
+  const resolvedRange =
+    parameters.resolution.kind === 'range'
+      ? Maybe.just(parameters.resolution.resolvedRange)
+      : Maybe.nothing<ResolvedAppearanceRange>();
+  const selectedBaselineTagName = resolvedRange
+    .map(resolvedAppearanceRange => {
+      return resolvedAppearanceRange.range.baselineTagName;
     })
     .unwrapOr('Not selected');
-  const selectedMergeBaseCommitHash = parameters.range
-    .map(resolvedRange => {
-      return resolvedRange.range.mergeBaseCommitHash;
+  const selectedMergeBaseCommitHash = resolvedRange
+    .map(resolvedAppearanceRange => {
+      return resolvedAppearanceRange.range.mergeBaseCommitHash;
     })
     .unwrapOr('Not selected');
-  const selectedRevisionRange = parameters.range
-    .map(resolvedRange => {
-      return resolvedRange.range.revisionRange;
+  const selectedRevisionRange = resolvedRange
+    .map(resolvedAppearanceRange => {
+      return resolvedAppearanceRange.range.revisionRange;
     })
     .unwrapOr('Not selected');
-  const baselineRelationshipFailures = parameters.range
-    .map(resolvedRange => {
-      return resolvedRange.baselineRelationshipFailures;
+  const baselineRelationshipFailures = resolvedRange
+    .map(resolvedAppearanceRange => {
+      return resolvedAppearanceRange.baselineRelationshipFailures;
     })
     .unwrapOr([]);
   const lines = [
     '### First appeared in comment processing',
     '',
+    ...(parameters.resolution.kind === 'bootstrap'
+      ? ['- Bootstrap release: no preceding ADR 0002 Production baseline exists; no pull request discovery or writes were performed.']
+      : []),
     `- Mode: ${parameters.dryRun === true ? 'dry-run' : 'write'}`,
     `- Comment marker: \`${getReleaseAppearanceCommentMarker(parameters.commentMode ?? 'production')}\``,
     `- Environment: ${parameters.environment === 'beta' ? 'Beta' : 'Production'}`,
@@ -987,7 +1092,7 @@ async function writeSummarySafely(
 
 type ReleaseAppearanceDiscovery = {
   readonly discovery: PullRequestDiscoveryResult;
-  readonly range: Maybe<ResolvedAppearanceRange>;
+  readonly resolution: ReleaseAppearanceDiscoveryResolution;
 };
 
 type ResolveReleaseAppearanceDiscoveryParameters = {
@@ -1037,7 +1142,7 @@ async function resolveReleaseAppearanceDiscovery(
           commitsWithoutPullRequests: [],
           pullRequestNumbers: [pullRequestNumber],
         },
-        range: Maybe.nothing<ResolvedAppearanceRange>(),
+        resolution: {kind: 'test' as const},
       };
     })
     .with('production', async () => {
@@ -1053,13 +1158,28 @@ async function resolveReleaseAppearanceDiscovery(
         throw rangeResult.error;
       }
 
+      if (rangeResult.value.kind === 'bootstrap') {
+        return {
+          discovery: {
+            commitFailures: [],
+            commitsInspected: [],
+            commitsWithoutPullRequests: [],
+            pullRequestNumbers: [],
+          },
+          resolution: {kind: 'bootstrap' as const},
+        };
+      }
+
       return {
         discovery: await discoverPullRequestsInRange({
           executeGitCommand: parameters.releaseAppearanceDependencies.executeGitCommand,
           githubClient: parameters.releaseAppearanceDependencies.githubClient,
-          range: rangeResult.value.range,
+          range: rangeResult.value.resolvedRange.range,
         }),
-        range: Maybe.just(rangeResult.value),
+        resolution: {
+          kind: 'range' as const,
+          resolvedRange: rangeResult.value.resolvedRange,
+        },
       };
     })
     .exhaustive();
@@ -1085,7 +1205,7 @@ export async function runReleaseAppearance(
       throw new Error('Test comment mode cannot select a release baseline.');
     }
 
-    const {discovery, range} = await resolveReleaseAppearanceDiscovery({
+    const {discovery, resolution} = await resolveReleaseAppearanceDiscovery({
       commentMode,
       releaseAppearanceDependencies: dependencies,
       releaseAppearanceParameters: parameters,
@@ -1108,7 +1228,7 @@ export async function runReleaseAppearance(
       discovery,
       dryRun,
       environment: parameters.environment,
-      range,
+      resolution,
       releaseTagName: parameters.releaseTagName,
     });
 
