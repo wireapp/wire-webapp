@@ -20,6 +20,7 @@
     "@nx/jest": "22.7.7",
     "@nx/node": "22.7.7",
     "@nx/workspace": "22.7.7",
+    "@sindresorhus/is": "4.6.0",
     "@stylistic/eslint-plugin": "5.10.0",
     "@tony.ganchev/eslint-plugin-header": "3.4.4",
     "@types/eslint": "9.6.1",

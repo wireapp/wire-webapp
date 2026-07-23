@@ -32454,6 +32454,7 @@ __metadata:
     "@nx/jest": "npm:22.7.7"
     "@nx/node": "npm:22.7.7"
     "@nx/workspace": "npm:22.7.7"
+    "@sindresorhus/is": "npm:4.6.0"
     "@stylistic/eslint-plugin": "npm:5.10.0"
     "@tony.ganchev/eslint-plugin-header": "npm:3.4.4"
     "@types/eslint": "npm:9.6.1"
