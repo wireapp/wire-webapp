@@ -145,7 +145,7 @@
     "copy-webpack-plugin": "13.0.1",
     "css-loader": "7.1.4",
     "cssnano": "7.1.9",
-    "dexie": "4.4.3",
+    "dexie": "4.4.4",
     "html-webpack-plugin": "5.6.7",
     "i18next-scanner": "4.6.0",
     "jest-canvas-mock": "2.5.8",
