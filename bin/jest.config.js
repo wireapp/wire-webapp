@@ -24,5 +24,5 @@ module.exports = {
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', {configFile: './apps/server/babel.config.js'}],
   },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(ky|true-myth)/)'],
 };

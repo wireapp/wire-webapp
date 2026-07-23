@@ -22020,6 +22020,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ky@npm:2.0.2":
+  version: 2.0.2
+  resolution: "ky@npm:2.0.2"
+  checksum: 10/a146b47f7a19fb8b564fcbdb8418c61ccbbf7d1bc918db389bec4ac74221a417926b5701461b13b05e14055e479c8a1fcbb7364a5ff772828c054b31e0b2239a
+  languageName: node
+  linkType: hard
+
 "language-subtag-registry@npm:^0.3.20":
   version: 0.3.23
   resolution: "language-subtag-registry@npm:0.3.23"
@@ -32501,6 +32508,7 @@ __metadata:
     jest-environment-jsdom: "npm:30.4.1"
     js-yaml: "npm:4.3.0"
     jsdom: "npm:29.1.1"
+    ky: "npm:2.0.2"
     logdown: "npm:3.3.1"
     long: "npm:5.3.2"
     nock: "npm:14.0.16"
