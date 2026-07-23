@@ -35,6 +35,7 @@ import {CRUDEngine} from '@wireapp/store-engine';
 
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/cryptoClient';
+import {wipeCoreCryptoDb} from '../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
 
 import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
 
@@ -129,6 +130,9 @@ export class ClientService {
       if (notFoundOnBackend && this.storeEngine !== undefined) {
         const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
         await this.proteusService.wipe();
+        // The MLS/CoreCrypto keystore is scoped to the user (not the client id), so it survives
+        // a plain proteus wipe and would otherwise let a re-registered client inherit stale MLS key material.
+        await wipeCoreCryptoDb(this.storeEngine);
         if (shouldDeleteWholeDatabase) {
           await this.storeEngine.clearTables();
         }
