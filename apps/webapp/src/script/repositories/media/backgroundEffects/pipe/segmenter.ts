@@ -284,12 +284,14 @@ export async function runSegmenter(
   function triggerGpuTracking(gpuStart: number, frameDeltaMs: number, segmentationMs: number, filterMs: number) {
     const gl = webGLRenderer?.gl;
     if (!gl) {
+      logger.info('[virtual-background] WebGL context not available, ignore GPU measurement.');
       return;
     }
 
     // Create a Fence in the GPU queue after the Draw calls
     const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
     if (!sync) {
+      logger.error('[virtual-background] Failed to create GPU sync object.');
       return;
     }
     gl.flush(); // Forces the browser to send commands to the GPU immediately
@@ -306,6 +308,7 @@ export async function runSegmenter(
   function checkGpuQueries() {
     const gl = webGLRenderer?.gl;
     if (!gl || activeGpuQueries.size === 0) {
+      logger.warn('[virtual-background] WebGL context not available, do not read GPU query.');
       return;
     }
 
