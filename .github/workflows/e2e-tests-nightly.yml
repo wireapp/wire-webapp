@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       webappUrl:
-        description: Choose the canonical Beta URL for release-candidate validation or QA for manual regression
+        description: Webapp URL to run the tests against
         required: true
         type: choice
         options:
-          - https://wire-webapp-beta.wire.com/
+          - https://wire-webapp-dev.wire.com/
           - https://wire-webapp-qa.zinfra.io/
 
 # Only allow one instance of this workflow to run per branch at a time
@@ -25,7 +25,6 @@ jobs:
     uses: ./.github/workflows/e2e-tests.yml
     with:
       webappUrl: ${{ inputs.webappUrl }}
-      backendUrl: https://staging-nginz-https.zinfra.io/
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       WIRE_E2E_TEST_BOT_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}

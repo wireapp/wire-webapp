@@ -347,7 +347,6 @@ jobs:
     uses: ./.github/workflows/precommit-slot-run.yml
     with:
       env_name: wire-webapp-precommit-3
-      backendUrl: https://staging-nginz-https.zinfra.io/
       grep: '@crit-flow-web'
       notify_deployoholics_on_failure: true
     secrets:
