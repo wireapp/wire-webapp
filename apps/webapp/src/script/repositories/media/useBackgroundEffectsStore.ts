@@ -67,7 +67,7 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     metrics: undefined,
     model: 'unknown',
     lastVirtualBackgroundId: DEFAULT_BUILTIN_BACKGROUND_ID,
-    isHighQualityBlurEnabled: true,
+    isHighQualityBlurEnabled: false,
     isPerformanceEnhancementEnabled: false,
 
     setIsFeatureEnabled: value =>
