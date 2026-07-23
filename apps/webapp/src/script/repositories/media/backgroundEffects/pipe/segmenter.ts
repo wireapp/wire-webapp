@@ -281,17 +281,23 @@ export async function runSegmenter(
     canvas.removeEventListener('webglcontextrestored', onContextRestored);
   }
 
+  const triggerGpuLogger = getSafeLogger('segmenter:triggerGpuLogger');
+  let hasLoggedTriggerGpuMissingWebGLContext = false;
   function triggerGpuTracking(gpuStart: number, frameDeltaMs: number, segmentationMs: number, filterMs: number) {
     const gl = webGLRenderer?.gl;
     if (!gl) {
-      logger.info('[virtual-background] WebGL context not available, ignore GPU measurement.');
+      if (!hasLoggedTriggerGpuMissingWebGLContext) {
+        triggerGpuLogger.info('[virtual-background] WebGL context not available, ignore GPU measurement.');
+        hasLoggedTriggerGpuMissingWebGLContext = true;
+      }
       return;
     }
 
+    hasLoggedTriggerGpuMissingWebGLContext = false;
     // Create a Fence in the GPU queue after the Draw calls
     const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
     if (!sync) {
-      logger.error('[virtual-background] Failed to create GPU sync object.');
+      triggerGpuLogger.error('[virtual-background] Failed to create GPU sync object.');
       return;
     }
     gl.flush(); // Forces the browser to send commands to the GPU immediately
@@ -305,10 +311,21 @@ export async function runSegmenter(
     }
   }
 
+  const queriesLogger = getSafeLogger('segmenter:heckGpuQueries');
+  let hasLoggedMissingWebGLContext = false;
   function checkGpuQueries() {
     const gl = webGLRenderer?.gl;
-    if (!gl || activeGpuQueries.size === 0) {
-      logger.warn('[virtual-background] WebGL context not available, do not read GPU query.');
+    if (!gl) {
+      if (!hasLoggedMissingWebGLContext) {
+        queriesLogger.warn('[virtual-background] WebGL context not available, GPU queries cannot be read.');
+        hasLoggedMissingWebGLContext = true;
+      }
+      return;
+    }
+
+    hasLoggedMissingWebGLContext = false;
+
+    if (activeGpuQueries.size === 0) {
       return;
     }
 
