@@ -500,6 +500,51 @@ jobs:
 
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
 
+  comment_first_appearance_in_beta:
+    name: Comment first appearance in Beta
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, create_beta_tag]
+    if: ${{ needs.create_beta_tag.result == 'success' }}
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+
+    steps:
+      - name: Checkout release history
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Add Beta first-appearance comments
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          RELEASE_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseAppearanceCli.ts \
+            beta \
+            "${RELEASE_TAG_NAME}" \
+            "${RELEASE_COMMIT_SHA}" \
+            "${WORKFLOW_RUN_URL}"
+
   summarize_beta_release:
     name: Summarize Beta release
     runs-on: ubuntu-24.04
@@ -841,6 +886,51 @@ jobs:
           git push origin "refs/tags/$PRODUCTION_TAG_NAME"
 
           echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "$GITHUB_OUTPUT"
+
+  comment_first_appearance_in_production:
+    name: Comment first appearance in Production
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, create_production_tag]
+    if: ${{ needs.create_production_tag.result == 'success' }}
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+
+    steps:
+      - name: Checkout release history
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Add Production first-appearance comments
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          RELEASE_TAG_NAME: ${{ needs.create_production_tag.outputs.production_tag_name }}
+          WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseAppearanceCli.ts \
+            production \
+            "${RELEASE_TAG_NAME}" \
+            "${RELEASE_COMMIT_SHA}" \
+            "${WORKFLOW_RUN_URL}"
 
   publish_production_distribution:
     name: Publish Production distribution
