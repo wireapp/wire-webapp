@@ -25,6 +25,7 @@ import {UserType} from '@wireapp/api-client/lib/user';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -163,6 +164,35 @@ describe('ConversationDetails', () => {
       expect(getByTestId(`service-list-service-${app.id}`)).not.toBeNull();
     },
   );
+
+  it('keeps legacy bots visible while a Proteus group migrates through Mixed to MLS', () => {
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const legacyBot = new User('legacy-bot', '', translateForTest);
+
+    legacyBot.name('Legacy bot');
+    legacyBot.isService = true;
+    legacyBot.type = UserType.BOT;
+    conversation.participating_user_ets([legacyBot]);
+
+    const defaultProps = getDefaultParams();
+    const {getByTestId, rerender} = render(
+      <ConversationDetails {...defaultProps} activeConversation={conversation} />,
+      {wrapper: rootProviderWrapper},
+    );
+    const legacyBotTestId = `service-list-service-${legacyBot.id}`;
+
+    expect(getByTestId(legacyBotTestId)).not.toBeNull();
+
+    ConversationMapper.updateProperties(conversation, {protocol: CONVERSATION_PROTOCOL.MIXED});
+    rerender(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+
+    expect(getByTestId(legacyBotTestId)).not.toBeNull();
+
+    ConversationMapper.updateProperties(conversation, {protocol: CONVERSATION_PROTOCOL.MLS});
+    rerender(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+
+    expect(getByTestId(legacyBotTestId)).not.toBeNull();
+  });
 
   it("returns the right actions depending on the conversation's type for non group creators", () => {
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
