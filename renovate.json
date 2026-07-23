@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":semanticCommits"],
+  "extends": ["config:recommended", ":semanticCommitsDisabled"],
   "labels": ["renovate"],
   "timezone": "Europe/Berlin",
   "dependencyDashboard": true,
