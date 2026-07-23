@@ -22,12 +22,14 @@ import {appendFile} from 'node:fs/promises';
 import process from 'node:process';
 
 import is from '@sindresorhus/is';
-import ky, {isHTTPError, isNetworkError, isTimeoutError} from 'ky';
+import ky, {isHTTPError} from 'ky';
 import type {KyInstance, Options as KyOptions} from 'ky';
-import {match} from 'ts-pattern';
+import {P, match} from 'ts-pattern';
 import {Maybe, Result} from 'true-myth';
 
 import {
+  getReleaseAppearanceCommentMarker,
+  isProductionReleaseTagName,
   parseBetaCandidateTag,
   prepareReleaseAppearanceComment,
   selectBetaDiscoveryRange,
@@ -38,6 +40,7 @@ import type {
   CommitRangeRelationship,
   PreparedReleaseAppearanceComment,
   ReleaseAppearanceComment,
+  ReleaseAppearanceCommentMode,
   ReleaseAppearanceEnvironment,
 } from './releaseAppearance.ts';
 
@@ -45,7 +48,6 @@ const nodeExecutableAndScriptPathArgumentCount = 2;
 const maximumGitHubRetryCount = 2;
 const initialGitHubRetryDelayMilliseconds = 1000;
 const fullCommitHashPattern = /^[0-9a-f]{40}$/iu;
-const productionTagPattern = /^\d{4}-\d{2}-\d{2}\.[1-9]\d*-production$/u;
 const retryableGitHubHttpStatusCodes = [408, 429, 500, 502, 503, 504] as const;
 const retryableGitHubRequestMethods = ['get', 'patch'] as const;
 
@@ -58,6 +60,14 @@ export type GitHubPage<Item> = {
 
 export type AssociatedPullRequest = {
   readonly pullRequestNumber: number;
+  readonly targetBranchName: string;
+};
+
+export type GitHubPullRequest = {
+  readonly isLocked: boolean;
+  readonly isMerged: boolean;
+  readonly pullRequestNumber: number;
+  readonly targetBranchName: string;
 };
 
 export type GitHubClient = {
@@ -70,6 +80,7 @@ export type GitHubClient = {
     commitHash: string,
     pageNumber: number,
   ) => Promise<GitHubPage<AssociatedPullRequest>>;
+  readonly getPullRequest: (pullRequestNumber: number) => Promise<GitHubPullRequest>;
   readonly updateIssueComment: (commentId: number, body: string) => Promise<void>;
 };
 
@@ -82,8 +93,12 @@ export type ReleaseAppearanceDependencies = {
 };
 
 export type ReleaseAppearanceRunParameters = {
+  readonly baselineTagName: Maybe<string>;
+  readonly commentMode: Maybe<ReleaseAppearanceCommentMode>;
   readonly currentCommitHash: string;
+  readonly dryRun: Maybe<boolean>;
   readonly environment: ReleaseAppearanceEnvironment;
+  readonly pullRequestNumber: Maybe<number>;
   readonly releaseTagName: string;
   readonly workflowRunUrl: string;
 };
@@ -111,7 +126,26 @@ type ValidateCurrentReleaseTagParameters = {
   readonly releaseTagName: string;
 };
 
+type ResolveCommitRangeRelationshipParameters = {
+  readonly currentCommitHash: string;
+  readonly executeGitCommand: GitCommand;
+  readonly tagName: string;
+};
+
+type ResolveTagRelationshipsParameters = {
+  readonly currentCommitHash: string;
+  readonly executeGitCommand: GitCommand;
+  readonly tagNames: readonly string[];
+};
+
+type ValidateBaselineTagForEnvironmentParameters = {
+  readonly baselineTagName: string;
+  readonly environment: ReleaseAppearanceEnvironment;
+  readonly releaseTagName: string;
+};
+
 export type ResolveReleaseAppearanceRangeParameters = {
+  readonly baselineTagName?: string;
   readonly currentCommitHash: string;
   readonly environment: ReleaseAppearanceEnvironment;
   readonly executeGitCommand: GitCommand;
@@ -136,7 +170,9 @@ type ApplyPreparedCommentParameters = {
 };
 
 export type ProcessPullRequestsSequentiallyParameters = {
+  readonly commentMode?: ReleaseAppearanceCommentMode;
   readonly currentReleaseTagName: string;
+  readonly dryRun?: boolean;
   readonly environment: ReleaseAppearanceEnvironment;
   readonly githubClient: GitHubClient;
   readonly pullRequestNumbers: readonly number[];
@@ -146,10 +182,12 @@ export type ProcessPullRequestsSequentiallyParameters = {
 };
 
 export type ReleaseAppearanceSummaryParameters = {
+  readonly commentMode?: ReleaseAppearanceCommentMode;
   readonly commentProcessing: CommentProcessingResult;
   readonly discovery: PullRequestDiscoveryResult;
+  readonly dryRun?: boolean;
   readonly environment: ReleaseAppearanceEnvironment;
-  readonly range: ResolvedAppearanceRange;
+  readonly range: Maybe<ResolvedAppearanceRange>;
   readonly releaseTagName: string;
 };
 
@@ -193,7 +231,15 @@ export type PullRequestDiscoveryResult = {
   readonly pullRequestNumbers: readonly number[];
 };
 
+export type CommentProcessingPlan = {
+  readonly action: PreparedReleaseAppearanceComment['action'];
+  readonly body: string;
+  readonly commentId: Maybe<number>;
+  readonly pullRequestNumber: number;
+};
+
 export type CommentProcessingResult = {
+  readonly plans: readonly CommentProcessingPlan[];
   readonly createdPullRequestNumbers: readonly number[];
   readonly failedPullRequests: readonly string[];
   readonly unchangedPullRequestNumbers: readonly number[];
@@ -265,6 +311,10 @@ function parseGitTagNames(output: string): readonly string[] {
     .filter(is.nonEmptyString);
 }
 
+function isSupportedPullRequestTargetBranch(targetBranchName: string): boolean {
+  return targetBranchName === 'main' || /^release\/[^\s/]+$/u.test(targetBranchName);
+}
+
 function parseGitHubRepository(repositoryName: string): Result<GitHubRepository, Error> {
   const repositoryParts = repositoryName.split('/');
 
@@ -292,31 +342,15 @@ function isSafeGitHubApiUrl(apiUrl: string): boolean {
   }
 }
 
-function shouldRetryGitHubRequest(error: unknown): boolean {
-  return match(error)
-    .when(isHTTPError, httpError => {
-      return retryableGitHubHttpStatusCodes.some((retryableHttpStatusCode: number): boolean => {
-        return retryableHttpStatusCode === httpError.response.status;
-      });
-    })
-    .when(isNetworkError, (): boolean => {
-      return true;
-    })
-    .when(isTimeoutError, (): boolean => {
-      return true;
-    })
-    .otherwise((): boolean => {
-      return false;
-    });
-}
+function createGitHubRequestError(error: unknown, sensitiveToken: string): Error {
+  const safeErrorDescription = describeUnknownError(error).replaceAll(sensitiveToken, '[REDACTED]');
 
-function createGitHubRequestError(error: unknown): Error {
   return match(error)
     .when(isHTTPError, httpError => {
       return new Error(`GitHub request returned HTTP ${httpError.response.status}.`, {cause: error});
     })
-    .otherwise(() => {
-      return new Error(`GitHub request failed before receiving a response: ${describeUnknownError(error)}`, {
+    .otherwise((): Error => {
+      return new Error(`GitHub request failed before receiving a response: ${safeErrorDescription}`, {
         cause: error,
       });
     });
@@ -338,14 +372,12 @@ export function createGitCommand(): GitCommand {
 }
 
 async function resolveCommitRangeRelationship(
-  tagName: string,
-  currentCommitHash: string,
-  executeGitCommand: GitCommand,
+  parameters: ResolveCommitRangeRelationshipParameters,
 ): Promise<Result<CommitRangeRelationship, Error>> {
   try {
     const tagCommitHashResult = parseFullCommitHash(
-      await executeGitCommand(['rev-parse', '--verify', `refs/tags/${tagName}^{commit}`]),
-      `Commit for tag ${tagName}`,
+      await parameters.executeGitCommand(['rev-parse', '--verify', `refs/tags/${parameters.tagName}^{commit}`]),
+      `Commit for tag ${parameters.tagName}`,
     );
 
     if (tagCommitHashResult.isErr) {
@@ -353,8 +385,8 @@ async function resolveCommitRangeRelationship(
     }
 
     const mergeBaseCommitHashResult = parseFullCommitHash(
-      await executeGitCommand(['merge-base', tagCommitHashResult.value, currentCommitHash]),
-      `Merge base for tag ${tagName}`,
+      await parameters.executeGitCommand(['merge-base', tagCommitHashResult.value, parameters.currentCommitHash]),
+      `Merge base for tag ${parameters.tagName}`,
     );
 
     if (mergeBaseCommitHashResult.isErr) {
@@ -362,8 +394,12 @@ async function resolveCommitRangeRelationship(
     }
 
     const commitDistanceResult = parseGitInteger(
-      await executeGitCommand(['rev-list', '--count', `${mergeBaseCommitHashResult.value}..${currentCommitHash}`]),
-      `Commit distance for tag ${tagName}`,
+      await parameters.executeGitCommand([
+        'rev-list',
+        '--count',
+        `${mergeBaseCommitHashResult.value}..${parameters.currentCommitHash}`,
+      ]),
+      `Commit distance for tag ${parameters.tagName}`,
     );
 
     if (commitDistanceResult.isErr) {
@@ -371,8 +407,8 @@ async function resolveCommitRangeRelationship(
     }
 
     const tagTimestampResult = parseGitInteger(
-      await executeGitCommand(['show', '-s', '--format=%ct', tagCommitHashResult.value]),
-      `Timestamp for tag ${tagName}`,
+      await parameters.executeGitCommand(['show', '-s', '--format=%ct', tagCommitHashResult.value]),
+      `Timestamp for tag ${parameters.tagName}`,
     );
 
     if (tagTimestampResult.isErr) {
@@ -383,24 +419,26 @@ async function resolveCommitRangeRelationship(
       commitDistanceFromMergeBase: commitDistanceResult.value,
       mergeBaseCommitHash: mergeBaseCommitHashResult.value,
       tagCommitHash: tagCommitHashResult.value,
-      tagName,
+      tagName: parameters.tagName,
       tagTimestampSeconds: tagTimestampResult.value,
     });
   } catch (error: unknown) {
-    return Result.err(new Error(`Unable to inspect tag ${tagName}: ${describeUnknownError(error)}`));
+    return Result.err(new Error(`Unable to inspect tag ${parameters.tagName}: ${describeUnknownError(error)}`));
   }
 }
 
 async function resolveTagRelationships(
-  tagNames: readonly string[],
-  currentCommitHash: string,
-  executeGitCommand: GitCommand,
+  parameters: ResolveTagRelationshipsParameters,
 ): Promise<TagRelationshipResolution> {
   let relationships: readonly CommitRangeRelationship[] = [];
   let failures: readonly string[] = [];
 
-  for (const tagName of tagNames) {
-    const relationshipResult = await resolveCommitRangeRelationship(tagName, currentCommitHash, executeGitCommand);
+  for (const tagName of parameters.tagNames) {
+    const relationshipResult = await resolveCommitRangeRelationship({
+      currentCommitHash: parameters.currentCommitHash,
+      executeGitCommand: parameters.executeGitCommand,
+      tagName,
+    });
 
     if (relationshipResult.isErr) {
       failures = [...failures, relationshipResult.error.message];
@@ -412,8 +450,60 @@ async function resolveTagRelationships(
   return {failures, relationships};
 }
 
-function isProductionTagName(tagName: string): boolean {
-  return productionTagPattern.test(tagName);
+function validateReleaseTagEnvironment(
+  environment: ReleaseAppearanceEnvironment,
+  releaseTagName: string,
+): Result<void, Error> {
+  const isValidTag = match(environment)
+    .with('beta', () => {
+      return parseBetaCandidateTag(releaseTagName).isOk;
+    })
+    .with('production', () => {
+      return isProductionReleaseTagName(releaseTagName);
+    })
+    .exhaustive();
+
+  if (!isValidTag) {
+    return Result.err(new Error(`Release tag ${releaseTagName} does not match the ${environment} stage.`));
+  }
+
+  return Result.ok(undefined);
+}
+
+function validateBaselineTagForEnvironment(
+  parameters: ValidateBaselineTagForEnvironmentParameters,
+): Result<void, Error> {
+  if (parameters.baselineTagName === parameters.releaseTagName) {
+    return Result.err(new Error('Baseline tag must not equal the deployment tag.'));
+  }
+
+  const baselineBetaCandidateTagResult = parseBetaCandidateTag(parameters.baselineTagName);
+  const releaseBetaCandidateTagResult = parseBetaCandidateTag(parameters.releaseTagName);
+  const isBetaBaselineForSameRelease =
+    parameters.environment === 'beta' &&
+    baselineBetaCandidateTagResult.isOk &&
+    releaseBetaCandidateTagResult.isOk &&
+    baselineBetaCandidateTagResult.value.releaseIdentifier === releaseBetaCandidateTagResult.value.releaseIdentifier;
+  const isProductionBaseline = isProductionReleaseTagName(parameters.baselineTagName);
+
+  return match({
+    environment: parameters.environment,
+    isBetaBaselineForSameRelease,
+    isProductionBaseline,
+  })
+    .with({environment: 'production', isProductionBaseline: false}, () => {
+      return Result.err(new Error(`Production baseline tag is invalid: ${parameters.baselineTagName}`));
+    })
+    .with({environment: 'beta', isBetaBaselineForSameRelease: false, isProductionBaseline: false}, () => {
+      return Result.err(
+        new Error(
+          `Beta baseline tag must be a same-release Beta tag or a Production tag: ${parameters.baselineTagName}`,
+        ),
+      );
+    })
+    .otherwise(() => {
+      return Result.ok(undefined);
+    });
 }
 
 async function readReleaseTagNames(executeGitCommand: GitCommand): Promise<readonly string[]> {
@@ -454,6 +544,15 @@ async function validateCurrentReleaseTag(
 export async function resolveReleaseAppearanceRange(
   parameters: ResolveReleaseAppearanceRangeParameters,
 ): Promise<Result<ResolvedAppearanceRange, Error>> {
+  const releaseTagEnvironmentValidationResult = validateReleaseTagEnvironment(
+    parameters.environment,
+    parameters.releaseTagName,
+  );
+
+  if (releaseTagEnvironmentValidationResult.isErr) {
+    return Result.err(releaseTagEnvironmentValidationResult.error);
+  }
+
   const currentReleaseTagValidationResult = await validateCurrentReleaseTag(parameters);
 
   if (currentReleaseTagValidationResult.isErr) {
@@ -461,14 +560,65 @@ export async function resolveReleaseAppearanceRange(
   }
 
   const allTagNames = await readReleaseTagNames(parameters.executeGitCommand);
-  const productionTagNames = allTagNames.filter(isProductionTagName);
+  const productionTagNames = allTagNames.filter(isProductionReleaseTagName);
+
+  if (parameters.baselineTagName !== undefined) {
+    const baselineValidationResult = validateBaselineTagForEnvironment({
+      baselineTagName: parameters.baselineTagName,
+      environment: parameters.environment,
+      releaseTagName: parameters.releaseTagName,
+    });
+
+    if (baselineValidationResult.isErr) {
+      return Result.err(baselineValidationResult.error);
+    }
+
+    if (!allTagNames.includes(parameters.baselineTagName)) {
+      return Result.err(new Error(`Baseline tag does not exist: ${parameters.baselineTagName}`));
+    }
+
+    const baselineRelationshipResolution = await resolveTagRelationships({
+      currentCommitHash: parameters.currentCommitHash,
+      executeGitCommand: parameters.executeGitCommand,
+      tagNames: [parameters.baselineTagName],
+    });
+
+    if (baselineRelationshipResolution.relationships.length === 0) {
+      return Result.err(
+        new Error(
+          baselineRelationshipResolution.failures[0] ??
+            `Unable to validate baseline tag: ${parameters.baselineTagName}`,
+        ),
+      );
+    }
+
+    const baselineRelationship = Maybe.of(baselineRelationshipResolution.relationships[0]);
+
+    if (baselineRelationship.isNothing) {
+      return Result.err(new Error(`Unable to validate baseline tag: ${parameters.baselineTagName}`));
+    }
+
+    if (baselineRelationship.value.tagCommitHash === parameters.currentCommitHash) {
+      return Result.err(new Error('Baseline tag must not point to the deployment commit.'));
+    }
+
+    return Result.ok({
+      baselineRelationshipFailures: baselineRelationshipResolution.failures,
+      range: {
+        baselineCommitHash: baselineRelationship.value.tagCommitHash,
+        baselineTagName: baselineRelationship.value.tagName,
+        mergeBaseCommitHash: baselineRelationship.value.mergeBaseCommitHash,
+        revisionRange: `${baselineRelationship.value.mergeBaseCommitHash}..${parameters.currentCommitHash}`,
+      },
+    });
+  }
 
   if (parameters.environment === 'production') {
-    const productionRelationshipResolution = await resolveTagRelationships(
-      productionTagNames,
-      parameters.currentCommitHash,
-      parameters.executeGitCommand,
-    );
+    const productionRelationshipResolution = await resolveTagRelationships({
+      currentCommitHash: parameters.currentCommitHash,
+      executeGitCommand: parameters.executeGitCommand,
+      tagNames: productionTagNames,
+    });
     const rangeResult = selectProductionDiscoveryRange({
       currentCommitHash: parameters.currentCommitHash,
       currentProductionTagName: parameters.releaseTagName,
@@ -498,11 +648,19 @@ export async function resolveReleaseAppearanceRange(
   });
   const betaRelationshipResolution =
     currentBetaCandidateTagResult.value.candidateNumber > 1
-      ? await resolveTagRelationships(betaTagNames, parameters.currentCommitHash, parameters.executeGitCommand)
+      ? await resolveTagRelationships({
+          currentCommitHash: parameters.currentCommitHash,
+          executeGitCommand: parameters.executeGitCommand,
+          tagNames: betaTagNames,
+        })
       : {failures: [], relationships: []};
   const productionRelationshipResolution =
     currentBetaCandidateTagResult.value.candidateNumber === 1
-      ? await resolveTagRelationships(productionTagNames, parameters.currentCommitHash, parameters.executeGitCommand)
+      ? await resolveTagRelationships({
+          currentCommitHash: parameters.currentCommitHash,
+          executeGitCommand: parameters.executeGitCommand,
+          tagNames: productionTagNames,
+        })
       : {failures: [], relationships: []};
   const rangeResult = selectBetaDiscoveryRange({
     betaTagRelationships: betaRelationshipResolution.relationships,
@@ -547,9 +705,12 @@ export async function discoverPullRequestsInRange(
           pageNumber,
         );
 
-        associatedPullRequestCount += pullRequestPage.items.length;
+        const supportedPullRequests = pullRequestPage.items.filter(associatedPullRequest => {
+          return isSupportedPullRequestTargetBranch(associatedPullRequest.targetBranchName);
+        });
+        associatedPullRequestCount += supportedPullRequests.length;
 
-        for (const associatedPullRequest of pullRequestPage.items) {
+        for (const associatedPullRequest of supportedPullRequests) {
           if (!pullRequestNumbers.includes(associatedPullRequest.pullRequestNumber)) {
             pullRequestNumbers = [...pullRequestNumbers, associatedPullRequest.pullRequestNumber];
           }
@@ -569,7 +730,14 @@ export async function discoverPullRequestsInRange(
     }
   }
 
-  return {commitFailures, commitsInspected, commitsWithoutPullRequests, pullRequestNumbers};
+  return {
+    commitFailures,
+    commitsInspected,
+    commitsWithoutPullRequests,
+    pullRequestNumbers: pullRequestNumbers.toSorted((leftPullRequestNumber, rightPullRequestNumber) => {
+      return leftPullRequestNumber - rightPullRequestNumber;
+    }),
+  };
 }
 
 async function readAllIssueComments(
@@ -605,13 +773,56 @@ async function applyPreparedComment(parameters: ApplyPreparedCommentParameters):
     .exhaustive();
 }
 
+function createCommentProcessingPlan(
+  pullRequestNumber: number,
+  preparedComment: PreparedReleaseAppearanceComment,
+): CommentProcessingPlan {
+  return match(preparedComment)
+    .with({action: 'create'}, ({action, body}) => {
+      return {action, body, commentId: Maybe.nothing<number>(), pullRequestNumber};
+    })
+    .with({action: P.union('update', 'unchanged')}, ({action, body, commentId}) => {
+      return {action, body, commentId: Maybe.just(commentId), pullRequestNumber};
+    })
+    .exhaustive();
+}
+
+async function validateSinglePullRequest(pullRequestNumber: number, githubClient: GitHubClient): Promise<void> {
+  if (!is.integer(pullRequestNumber) || pullRequestNumber < 1) {
+    throw new Error(`Pull request number must be a positive integer: ${pullRequestNumber}`);
+  }
+
+  const pullRequest = await githubClient.getPullRequest(pullRequestNumber);
+
+  if (pullRequest.pullRequestNumber !== pullRequestNumber) {
+    throw new Error(
+      `GitHub returned pull request #${pullRequest.pullRequestNumber} for requested #${pullRequestNumber}.`,
+    );
+  }
+
+  if (pullRequest.isLocked) {
+    throw new Error(`Pull request #${pullRequestNumber} is locked and cannot receive a test comment.`);
+  }
+
+  if (!pullRequest.isMerged) {
+    throw new Error(`Pull request #${pullRequestNumber} is not merged and cannot receive a test comment.`);
+  }
+
+  if (!isSupportedPullRequestTargetBranch(pullRequest.targetBranchName)) {
+    throw new Error(`Pull request #${pullRequestNumber} targets unsupported branch ${pullRequest.targetBranchName}.`);
+  }
+}
+
 export async function processPullRequestsSequentially(
   parameters: ProcessPullRequestsSequentiallyParameters,
 ): Promise<CommentProcessingResult> {
+  const commentMode = parameters.commentMode ?? 'production';
+  const dryRun = parameters.dryRun ?? false;
   let createdPullRequestNumbers: readonly number[] = [];
   let unchangedPullRequestNumbers: readonly number[] = [];
   let updatedPullRequestNumbers: readonly number[] = [];
   let failedPullRequests: readonly string[] = [];
+  let plans: readonly CommentProcessingPlan[] = [];
 
   for (const pullRequestNumber of parameters.pullRequestNumbers) {
     try {
@@ -621,6 +832,7 @@ export async function processPullRequestsSequentially(
       });
       const preparedCommentResult = prepareReleaseAppearanceComment({
         comments,
+        commentMode,
         environment: parameters.environment,
         tagName: parameters.currentReleaseTagName,
         workflowRunUrl: parameters.workflowRunUrl,
@@ -631,11 +843,15 @@ export async function processPullRequestsSequentially(
       }
 
       const preparedComment = preparedCommentResult.value;
-      await applyPreparedComment({
-        githubClient: parameters.githubClient,
-        preparedComment,
-        pullRequestNumber,
-      });
+      if (!dryRun) {
+        await applyPreparedComment({
+          githubClient: parameters.githubClient,
+          preparedComment,
+          pullRequestNumber,
+        });
+      }
+
+      plans = [...plans, createCommentProcessingPlan(pullRequestNumber, preparedComment)];
 
       match(preparedComment.action)
         .with('create', (): void => {
@@ -660,20 +876,43 @@ export async function processPullRequestsSequentially(
   return {
     createdPullRequestNumbers,
     failedPullRequests,
+    plans,
     unchangedPullRequestNumbers,
     updatedPullRequestNumbers,
   };
 }
 
 export function renderReleaseAppearanceSummary(parameters: ReleaseAppearanceSummaryParameters): string {
+  const selectedBaselineTagName = parameters.range
+    .map(resolvedRange => {
+      return resolvedRange.range.baselineTagName;
+    })
+    .unwrapOr('Not selected');
+  const selectedMergeBaseCommitHash = parameters.range
+    .map(resolvedRange => {
+      return resolvedRange.range.mergeBaseCommitHash;
+    })
+    .unwrapOr('Not selected');
+  const selectedRevisionRange = parameters.range
+    .map(resolvedRange => {
+      return resolvedRange.range.revisionRange;
+    })
+    .unwrapOr('Not selected');
+  const baselineRelationshipFailures = parameters.range
+    .map(resolvedRange => {
+      return resolvedRange.baselineRelationshipFailures;
+    })
+    .unwrapOr([]);
   const lines = [
     '### First appeared in comment processing',
     '',
+    `- Mode: ${parameters.dryRun === true ? 'dry-run' : 'write'}`,
+    `- Comment marker: \`${getReleaseAppearanceCommentMarker(parameters.commentMode ?? 'production')}\``,
     `- Environment: ${parameters.environment === 'beta' ? 'Beta' : 'Production'}`,
     `- Release tag: \`${parameters.releaseTagName}\``,
-    `- Baseline tag: \`${parameters.range.range.baselineTagName}\``,
-    `- Merge base: \`${parameters.range.range.mergeBaseCommitHash}\``,
-    `- Revision range: \`${parameters.range.range.revisionRange}\``,
+    `- Baseline tag: \`${selectedBaselineTagName}\``,
+    `- Merge base: \`${selectedMergeBaseCommitHash}\``,
+    `- Revision range: \`${selectedRevisionRange}\``,
     `- Commits inspected: ${parameters.discovery.commitsInspected.length}`,
     `- Pull requests discovered: ${parameters.discovery.pullRequestNumbers.length}`,
     `- Comments created: ${parameters.commentProcessing.createdPullRequestNumbers.length}`,
@@ -706,10 +945,27 @@ export function renderReleaseAppearanceSummary(parameters: ReleaseAppearanceSumm
     }
   }
 
-  if (parameters.range.baselineRelationshipFailures.length > 0) {
+  if (baselineRelationshipFailures.length > 0) {
     lines.push('', 'Baseline candidates that could not be inspected:');
-    for (const baselineRelationshipFailure of parameters.range.baselineRelationshipFailures) {
+    for (const baselineRelationshipFailure of baselineRelationshipFailures) {
       lines.push(`- ${baselineRelationshipFailure}`);
+    }
+  }
+
+  lines.push('', 'Proposed comment states:');
+
+  if (parameters.commentProcessing.plans.length === 0) {
+    lines.push('- None');
+  } else {
+    for (const plan of parameters.commentProcessing.plans) {
+      lines.push(
+        '',
+        `<details><summary>Pull request #${plan.pullRequestNumber}: ${plan.action}</summary>`,
+        '',
+        '```markdown',
+      );
+      lines.push(plan.body);
+      lines.push('```', '', '</details>');
     }
   }
 
@@ -729,29 +985,116 @@ async function writeSummarySafely(
   }
 }
 
+type ReleaseAppearanceDiscovery = {
+  readonly discovery: PullRequestDiscoveryResult;
+  readonly range: Maybe<ResolvedAppearanceRange>;
+};
+
+type ResolveReleaseAppearanceDiscoveryParameters = {
+  readonly commentMode: ReleaseAppearanceCommentMode;
+  readonly releaseAppearanceDependencies: Pick<ReleaseAppearanceDependencies, 'executeGitCommand' | 'githubClient'>;
+  readonly releaseAppearanceParameters: ReleaseAppearanceRunParameters;
+};
+
+async function resolveReleaseAppearanceDiscovery(
+  parameters: ResolveReleaseAppearanceDiscoveryParameters,
+): Promise<ReleaseAppearanceDiscovery> {
+  return match(parameters.commentMode)
+    .with('test', async () => {
+      const selectedPullRequestNumber = parameters.releaseAppearanceParameters.pullRequestNumber;
+
+      if (selectedPullRequestNumber.isNothing) {
+        throw new Error('Test comment mode requires a pull request number.');
+      }
+
+      const pullRequestNumber = selectedPullRequestNumber.value;
+
+      const releaseTagValidationResult = validateReleaseTagEnvironment(
+        parameters.releaseAppearanceParameters.environment,
+        parameters.releaseAppearanceParameters.releaseTagName,
+      );
+
+      if (releaseTagValidationResult.isErr) {
+        throw releaseTagValidationResult.error;
+      }
+
+      const currentReleaseTagValidationResult = await validateCurrentReleaseTag({
+        currentCommitHash: parameters.releaseAppearanceParameters.currentCommitHash,
+        executeGitCommand: parameters.releaseAppearanceDependencies.executeGitCommand,
+        releaseTagName: parameters.releaseAppearanceParameters.releaseTagName,
+      });
+
+      if (currentReleaseTagValidationResult.isErr) {
+        throw currentReleaseTagValidationResult.error;
+      }
+
+      await validateSinglePullRequest(pullRequestNumber, parameters.releaseAppearanceDependencies.githubClient);
+
+      return {
+        discovery: {
+          commitFailures: [],
+          commitsInspected: [],
+          commitsWithoutPullRequests: [],
+          pullRequestNumbers: [pullRequestNumber],
+        },
+        range: Maybe.nothing<ResolvedAppearanceRange>(),
+      };
+    })
+    .with('production', async () => {
+      const rangeResult = await resolveReleaseAppearanceRange({
+        baselineTagName: parameters.releaseAppearanceParameters.baselineTagName.unwrapOr(undefined),
+        currentCommitHash: parameters.releaseAppearanceParameters.currentCommitHash,
+        environment: parameters.releaseAppearanceParameters.environment,
+        executeGitCommand: parameters.releaseAppearanceDependencies.executeGitCommand,
+        releaseTagName: parameters.releaseAppearanceParameters.releaseTagName,
+      });
+
+      if (rangeResult.isErr) {
+        throw rangeResult.error;
+      }
+
+      return {
+        discovery: await discoverPullRequestsInRange({
+          executeGitCommand: parameters.releaseAppearanceDependencies.executeGitCommand,
+          githubClient: parameters.releaseAppearanceDependencies.githubClient,
+          range: rangeResult.value.range,
+        }),
+        range: Maybe.just(rangeResult.value),
+      };
+    })
+    .exhaustive();
+}
+
 export async function runReleaseAppearance(
   parameters: ReleaseAppearanceRunParameters,
   dependencies: ReleaseAppearanceDependencies,
 ): Promise<number> {
   try {
-    const rangeResult = await resolveReleaseAppearanceRange({
-      currentCommitHash: parameters.currentCommitHash,
-      environment: parameters.environment,
-      executeGitCommand: dependencies.executeGitCommand,
-      releaseTagName: parameters.releaseTagName,
-    });
+    const commentMode = parameters.commentMode.unwrapOr('production');
+    const dryRun = parameters.dryRun.unwrapOr(false);
 
-    if (rangeResult.isErr) {
-      throw rangeResult.error;
+    if (commentMode === 'test' && parameters.pullRequestNumber.isNothing) {
+      throw new Error('Test comment mode requires a pull request number.');
     }
 
-    const discovery = await discoverPullRequestsInRange({
-      executeGitCommand: dependencies.executeGitCommand,
-      githubClient: dependencies.githubClient,
-      range: rangeResult.value.range,
+    if (commentMode === 'production' && parameters.pullRequestNumber.isJust) {
+      throw new Error('Production comment mode cannot force a single pull request.');
+    }
+
+    if (commentMode === 'test' && parameters.baselineTagName.isJust) {
+      throw new Error('Test comment mode cannot select a release baseline.');
+    }
+
+    const {discovery, range} = await resolveReleaseAppearanceDiscovery({
+      commentMode,
+      releaseAppearanceDependencies: dependencies,
+      releaseAppearanceParameters: parameters,
     });
+
     const commentProcessing = await processPullRequestsSequentially({
+      commentMode,
       currentReleaseTagName: parameters.releaseTagName,
+      dryRun,
       environment: parameters.environment,
       githubClient: dependencies.githubClient,
       pullRequestNumbers: discovery.pullRequestNumbers,
@@ -760,10 +1103,12 @@ export async function runReleaseAppearance(
       writeOutput: dependencies.writeOutput,
     });
     const summary = renderReleaseAppearanceSummary({
+      commentMode,
       commentProcessing,
       discovery,
+      dryRun,
       environment: parameters.environment,
-      range: rangeResult.value,
+      range,
       releaseTagName: parameters.releaseTagName,
     });
 
@@ -796,7 +1141,7 @@ async function requestGitHubJson(parameters: GitHubRequestParameters): Promise<G
       method: parameters.method,
     });
   } catch (error: unknown) {
-    throw createGitHubRequestError(error);
+    throw createGitHubRequestError(error, parameters.token);
   }
 
   let responseBody: unknown;
@@ -814,7 +1159,13 @@ async function requestGitHubJson(parameters: GitHubRequestParameters): Promise<G
 }
 
 function parseAssociatedPullRequest(value: unknown, itemIndex: number): Result<Maybe<AssociatedPullRequest>, Error> {
-  if (!is.plainObject(value) || !is.integer(value.number) || value.number < 1) {
+  if (
+    !is.plainObject(value) ||
+    !is.integer(value.number) ||
+    value.number < 1 ||
+    !is.plainObject(value.base) ||
+    !is.nonEmptyString(value.base.ref)
+  ) {
     return Result.err(new Error(`Associated pull request at index ${itemIndex} has an invalid number.`));
   }
 
@@ -823,7 +1174,9 @@ function parseAssociatedPullRequest(value: unknown, itemIndex: number): Result<M
   }
 
   return Result.ok(
-    is.nonEmptyString(value.merged_at) ? Maybe.just({pullRequestNumber: value.number}) : Maybe.nothing(),
+    is.nonEmptyString(value.merged_at)
+      ? Maybe.just({pullRequestNumber: value.number, targetBranchName: value.base.ref})
+      : Maybe.nothing(),
   );
 }
 
@@ -877,6 +1230,27 @@ function parseIssueCommentPage(responseBody: unknown): Result<readonly ReleaseAp
   return Result.ok(comments);
 }
 
+function parseGitHubPullRequest(responseBody: unknown): Result<GitHubPullRequest, Error> {
+  if (
+    !is.plainObject(responseBody) ||
+    !is.integer(responseBody.number) ||
+    responseBody.number < 1 ||
+    !is.boolean(responseBody.locked) ||
+    !is.plainObject(responseBody.base) ||
+    !is.nonEmptyString(responseBody.base.ref) ||
+    (!is.null_(responseBody.merged_at) && !is.nonEmptyString(responseBody.merged_at))
+  ) {
+    return Result.err(new Error('GitHub pull request response had invalid fields.'));
+  }
+
+  return Result.ok({
+    isLocked: responseBody.locked,
+    isMerged: is.nonEmptyString(responseBody.merged_at),
+    pullRequestNumber: responseBody.number,
+    targetBranchName: responseBody.base.ref,
+  });
+}
+
 function createIssueCommentRequestBody(body: string): string {
   return JSON.stringify({body});
 }
@@ -911,15 +1285,12 @@ export function createGitHubClient(parameters: CreateGitHubClientParameters): Re
       delay: retryDelay,
       limit: maximumGitHubRetryCount,
       methods: [...retryableGitHubRequestMethods],
-      shouldRetry: ({error}): boolean => {
-        return shouldRetryGitHubRequest(error);
-      },
       statusCodes: [...retryableGitHubHttpStatusCodes],
     },
   });
 
   return Result.ok({
-    createIssueComment: async (pullRequestNumber: number, body: string): Promise<void> => {
+    async createIssueComment(pullRequestNumber: number, body: string): Promise<void> {
       const response = await requestGitHubJson({
         apiUrl: parameters.apiUrl,
         githubRequest,
@@ -934,10 +1305,10 @@ export function createGitHubClient(parameters: CreateGitHubClientParameters): Re
         throw new Error(`GitHub created comment response was invalid: ${commentResult.error.message}`);
       }
     },
-    listIssueComments: async (
+    async listIssueComments(
       pullRequestNumber: number,
       pageNumber: number,
-    ): Promise<GitHubPage<ReleaseAppearanceComment>> => {
+    ): Promise<GitHubPage<ReleaseAppearanceComment>> {
       const response = await requestGitHubJson({
         apiUrl: parameters.apiUrl,
         githubRequest,
@@ -953,10 +1324,10 @@ export function createGitHubClient(parameters: CreateGitHubClientParameters): Re
 
       return {hasNextPage: response.hasNextPage, items: commentsResult.value};
     },
-    listPullRequestsAssociatedWithCommit: async (
+    async listPullRequestsAssociatedWithCommit(
       commitHash: string,
       pageNumber: number,
-    ): Promise<GitHubPage<AssociatedPullRequest>> => {
+    ): Promise<GitHubPage<AssociatedPullRequest>> {
       const response = await requestGitHubJson({
         apiUrl: parameters.apiUrl,
         githubRequest,
@@ -974,7 +1345,23 @@ export function createGitHubClient(parameters: CreateGitHubClientParameters): Re
 
       return {hasNextPage: response.hasNextPage, items: pullRequestsResult.value};
     },
-    updateIssueComment: async (commentId: number, body: string): Promise<void> => {
+    async getPullRequest(pullRequestNumber: number): Promise<GitHubPullRequest> {
+      const response = await requestGitHubJson({
+        apiUrl: parameters.apiUrl,
+        githubRequest,
+        method: 'GET',
+        requestPath: `${repositoryPath}/pulls/${pullRequestNumber}`,
+        token: parameters.token,
+      });
+      const pullRequestResult = parseGitHubPullRequest(response.responseBody);
+
+      if (pullRequestResult.isErr) {
+        throw new Error(`GitHub pull request response was invalid: ${pullRequestResult.error.message}`);
+      }
+
+      return pullRequestResult.value;
+    },
+    async updateIssueComment(commentId: number, body: string): Promise<void> {
       const response = await requestGitHubJson({
         apiUrl: parameters.apiUrl,
         githubRequest,
@@ -1035,10 +1422,19 @@ function readRequiredEnvironmentValues(): Result<RequiredEnvironmentValues, Erro
   });
 }
 
-function parseReleaseAppearanceArguments(
+const releaseAppearanceUsageText = [
+  'Usage: releaseAppearanceCli.ts <beta|production> <release-tag-name> <release-commit-sha> <workflow-run-url> [options]',
+  'Options:',
+  '  --dry-run',
+  '  --baseline-tag <existing-baseline-tag>',
+  '  --pull-request-number <positive-integer>',
+  '  --comment-mode <production|test>',
+].join('\n');
+
+export function parseReleaseAppearanceArguments(
   commandLineArguments: readonly string[],
 ): Result<ReleaseAppearanceRunParameters, Error> {
-  const [environmentName, releaseTagName, currentCommitHash, workflowRunUrl] = commandLineArguments;
+  const [environmentName, releaseTagName, currentCommitHash, workflowRunUrl, ...optionArguments] = commandLineArguments;
 
   if (
     (environmentName !== 'beta' && environmentName !== 'production') ||
@@ -1046,16 +1442,94 @@ function parseReleaseAppearanceArguments(
     !is.nonEmptyString(currentCommitHash) ||
     !is.nonEmptyString(workflowRunUrl)
   ) {
-    return Result.err(
-      new Error(
-        'Usage: releaseAppearanceCli.ts <beta|production> <release-tag-name> <release-commit-sha> <workflow-run-url>',
-      ),
-    );
+    return Result.err(new Error(releaseAppearanceUsageText));
+  }
+
+  let baselineTagName: string | undefined;
+  let commentMode: ReleaseAppearanceCommentMode = 'production';
+  let commentModeOptionProvided = false;
+  let dryRun = false;
+  let pullRequestNumber: number | undefined;
+
+  for (let optionIndex = 0; optionIndex < optionArguments.length; optionIndex += 1) {
+    const optionName = optionArguments[optionIndex];
+
+    if (optionName === '--dry-run') {
+      if (dryRun) {
+        return Result.err(new Error('The --dry-run option must not be repeated.'));
+      }
+
+      dryRun = true;
+      continue;
+    }
+
+    if (optionName === '--baseline-tag' || optionName === '--pull-request-number' || optionName === '--comment-mode') {
+      const optionValue = optionArguments[optionIndex + 1];
+
+      if (optionValue === undefined || optionValue.startsWith('--') || optionValue.length === 0) {
+        return Result.err(new Error(`Option ${optionName} requires a non-empty value.`));
+      }
+
+      optionIndex += 1;
+
+      if (optionName === '--baseline-tag') {
+        if (baselineTagName !== undefined) {
+          return Result.err(new Error('The --baseline-tag option must not be repeated.'));
+        }
+
+        baselineTagName = optionValue;
+        continue;
+      }
+
+      if (optionName === '--pull-request-number') {
+        if (pullRequestNumber !== undefined || !/^\d+$/u.test(optionValue)) {
+          return Result.err(new Error(`Invalid pull request number: ${optionValue}`));
+        }
+
+        pullRequestNumber = Number(optionValue);
+
+        if (!is.integer(pullRequestNumber) || pullRequestNumber < 1) {
+          return Result.err(new Error(`Invalid pull request number: ${optionValue}`));
+        }
+
+        continue;
+      }
+
+      if (optionValue !== 'production' && optionValue !== 'test') {
+        return Result.err(new Error(`Invalid comment mode: ${optionValue}`));
+      }
+
+      if (commentModeOptionProvided) {
+        return Result.err(new Error('The --comment-mode option must not be repeated.'));
+      }
+
+      commentModeOptionProvided = true;
+      commentMode = optionValue;
+      continue;
+    }
+
+    return Result.err(new Error(`Unknown release appearance option: ${optionName}\n${releaseAppearanceUsageText}`));
+  }
+
+  if (commentMode === 'test' && pullRequestNumber === undefined) {
+    return Result.err(new Error('Test comment mode requires --pull-request-number.'));
+  }
+
+  if (commentMode === 'production' && pullRequestNumber !== undefined) {
+    return Result.err(new Error('Production comment mode cannot use --pull-request-number.'));
+  }
+
+  if (commentMode === 'test' && baselineTagName !== undefined) {
+    return Result.err(new Error('Test comment mode cannot use --baseline-tag.'));
   }
 
   return Result.ok({
+    baselineTagName: Maybe.of(baselineTagName),
+    commentMode: Maybe.just(commentMode),
     currentCommitHash,
+    dryRun: Maybe.just(dryRun),
     environment: environmentName,
+    pullRequestNumber: Maybe.of(pullRequestNumber),
     releaseTagName,
     workflowRunUrl,
   });
