@@ -18,7 +18,7 @@
  */
 
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
-import type {Meeting} from '@wireapp/api-client/lib/meetings/meeting';
+import type {Meeting, MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
 import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Task, task} from 'true-myth';
@@ -28,7 +28,7 @@ import type {MeetingsDataSource} from './meetingsDataSource';
 export class MeetingsRepository {
   constructor(private readonly dataSource: MeetingsDataSource) {}
 
-  createMeeting(payload: CreateMeeting): Task<Meeting, unknown> {
+  createMeeting(payload: CreateMeeting): Task<MeetingWithConversation, unknown> {
     return task.tryOrElse(
       error => error,
       () => this.dataSource.createMeeting(payload),
@@ -42,7 +42,7 @@ export class MeetingsRepository {
     );
   }
 
-  updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Task<Meeting, unknown> {
+  updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Task<MeetingWithConversation, unknown> {
     return task.tryOrElse(
       error => error,
       () => this.dataSource.updateMeeting(meetingId, payload),

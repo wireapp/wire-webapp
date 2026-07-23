@@ -183,3 +183,49 @@ body.theme-dark {
 }
 
 /* states */
+
+.conversations[data-list-collapsed='true'] {
+  .conversation-list-heading,
+  .conversation-list-no-results {
+    display: none;
+  }
+
+  .conversation-list-cell-center,
+  .conversation-list-cell-right .conversation-list-cell-context-menu,
+  .conversation-list-cell-right .call-ui__button--join {
+    display: none;
+  }
+
+  .conversation-list-cell {
+    justify-content: center;
+
+    &::after {
+      left: 0;
+    }
+  }
+
+  .conversation-list-cell-main-button {
+    justify-content: center;
+  }
+
+  .conversation-list-cell-left {
+    width: 100%;
+  }
+
+  .conversation-list-cell-right {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    padding: 0;
+    border: none;
+    pointer-events: none;
+  }
+
+  .conversation-list-cell-badge {
+    min-width: 14px;
+    height: 14px;
+    padding: 0 3px;
+    font-size: 9px;
+    line-height: 14px;
+  }
+}

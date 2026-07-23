@@ -41,17 +41,101 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "webapp.validateDomainConfig" -}}
-  {{- if or .Values.ingress.enabled .Values.tls.enabled }}
+  {{- $routingMode := default "nginx" .Values.routing.mode | lower -}}
+  {{- $routingEnabled := eq (include "webapp.routingEnabled" . | trim) "true" -}}
+  {{- if or $routingEnabled .Values.tls.enabled }}
     {{- if not .Values.webappDomain }}
-      {{- fail "webappDomain must be set when enabling ingress or tls" }}
+      {{- fail "webappDomain must be set when enabling routing or tls" }}
     {{- end }}
   {{- end }}
-  {{- if and .Values.tls.enabled (not .Values.ingress.enabled) }}
-    {{- fail "ingress.enabled must be true when tls.enabled is true" }}
+  {{- if and (ne $routingMode "nginx") (ne $routingMode "envoy") (ne $routingMode "migration") }}
+    {{- fail "routing.mode must be one of nginx, envoy, or migration" }}
+  {{- end }}
+  {{- if and (or (eq $routingMode "envoy") (eq $routingMode "migration")) (not $routingEnabled) }}
+    {{- fail "routing.enabled must be true when routing.mode is envoy or migration" }}
+  {{- end }}
+  {{- if and $routingEnabled (or (eq $routingMode "envoy") (eq $routingMode "migration")) (empty .Values.gateway.name) }}
+    {{- fail "gateway.name must be set when routing.mode is envoy or migration" }}
+  {{- end }}
+  {{- if and $routingEnabled (eq $routingMode "migration") (and (ne (default "nginx" .Values.routing.migration.primary | lower) "nginx") (ne (default "nginx" .Values.routing.migration.primary | lower) "envoy")) }}
+    {{- fail "routing.migration.primary must be one of nginx or envoy" }}
+  {{- end }}
+  {{- if and .Values.ingress.renderCSPInIngress (eq $routingMode "envoy") }}
+    {{- fail "ingress.renderCSPInIngress only works with routing.mode=nginx or migration" }}
+  {{- end }}
+  {{- if and .Values.tls.enabled (not $routingEnabled) }}
+    {{- fail "routing.enabled must be true when tls.enabled is true" }}
   {{- end }}
   {{- if and .Values.tls.enabled (not .Values.tls.useCertManager) (empty .Values.tls.existingSecretName) }}
     {{- fail "When tls.enabled is true, either tls.useCertManager must be true or tls.existingSecretName must be set" }}
   {{- end }}
+{{- end -}}
+
+{{- define "webapp.routingEnabled" -}}
+{{- or .Values.routing.enabled .Values.ingress.enabled -}}
+{{- end -}}
+
+{{- define "webapp.routingMode" -}}
+{{- default "nginx" .Values.routing.mode | lower -}}
+{{- end -}}
+
+{{- define "webapp.routingPrimaryController" -}}
+{{- $mode := include "webapp.routingMode" . -}}
+{{- if eq $mode "migration" -}}
+{{- default "nginx" .Values.routing.migration.primary | lower -}}
+{{- else -}}
+{{- $mode -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "webapp.externalDnsWeight" -}}
+{{- $ctx := .ctx -}}
+{{- $kind := .kind -}}
+{{- if eq (include "webapp.routingMode" $ctx) "migration" -}}
+{{- if eq (include "webapp.routingPrimaryController" $ctx) $kind -}}
+100
+{{- else -}}
+0
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "webapp.externalDnsSetIdentifier" -}}
+{{- $ctx := .ctx -}}
+{{- $kind := .kind -}}
+{{- if eq (include "webapp.routingMode" $ctx) "migration" -}}
+{{- printf "%s-%s" (include "webapp.baseName" $ctx) $kind -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "webapp.listenerSetName" -}}
+{{- printf "%s-listeners" (include "webapp.baseName" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "webapp.listenerName" -}}
+{{- if .Values.gateway.sectionName -}}
+{{- .Values.gateway.sectionName -}}
+{{- else if .Values.tls.enabled -}}
+https
+{{- else -}}
+http
+{{- end -}}
+{{- end -}}
+
+{{- define "webapp.listenerProtocol" -}}
+{{- if .Values.tls.enabled -}}
+HTTPS
+{{- else -}}
+HTTP
+{{- end -}}
+{{- end -}}
+
+{{- define "webapp.listenerPort" -}}
+{{- if .Values.tls.enabled -}}
+443
+{{- else -}}
+80
+{{- end -}}
 {{- end -}}
 
 {{- define "webapp.certificateSecretName" -}}

@@ -22,6 +22,7 @@ import {waitFor} from '@testing-library/react';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {
+  ADD_PERMISSION,
   Conversation as BackendConversation,
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
@@ -29,11 +30,13 @@ import {
   RemoteConversations,
   MLSConversation as BackendMLSConversation,
   CONVERSATION_CELLS_STATE,
+  GROUP_CONVERSATION_TYPE,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {
   ConversationProtocolUpdateEvent,
   ConversationCreateEvent,
+  ConversationCreateMeetingEvent,
   ConversationMemberJoinEvent,
   CONVERSATION_EVENT,
   ConversationMLSWelcomeEvent,
@@ -57,6 +60,7 @@ import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {Message} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
@@ -88,6 +92,7 @@ import {CONVERSATION_READONLY_STATE, ConversationRepository} from './Conversatio
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStatus} from './ConversationStatus';
+import {ConversationVerificationState} from './ConversationVerificationState';
 import {
   ButtonActionConfirmationEvent,
   ButtonActionEvent,
@@ -283,6 +288,171 @@ describe('ConversationRepository', () => {
       const stored = conversationRepository['conversationState'].findConversation(existing.qualifiedId)!;
       expect(stored.participating_user_ids()).toHaveLength(1);
       expect(stored.participating_user_ids()[0]).toEqual(user.qualifiedId);
+    });
+
+    it('updates observable-backed properties when merging into an existing conversation', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const existing = _generateConversation({name: 'Old title'});
+      await conversationRepository['saveConversation'](existing);
+
+      const updated = _generateConversation({
+        id: existing.qualifiedId,
+        name: 'New title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+      await conversationRepository['saveConversation'](updated);
+
+      const stored = conversationRepository['conversationState'].findConversation(existing.qualifiedId)!;
+      expect(stored.name()).toBe('New title');
+      expect(stored.groupConversationType()).toBe(GROUP_CONVERSATION_TYPE.MEETING);
+      expect(stored.display_name()).toBe('New title');
+    });
+
+    it('preserves guest status when merging into an existing conversation', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const existing = _generateConversation({name: 'Old title'});
+      existing.isGuest(true);
+      await conversationRepository['saveConversation'](existing);
+
+      const updated = _generateConversation({
+        id: existing.qualifiedId,
+        name: 'New title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+      await conversationRepository['saveConversation'](updated);
+
+      const stored = conversationRepository['conversationState'].findConversation(existing.qualifiedId)!;
+      expect(stored.name()).toBe('New title');
+      expect(stored.isGuest()).toBe(true);
+    });
+  });
+
+  describe('saveMeetingConversationFromBackend', () => {
+    it('updates the name of an already-loaded meeting conversation', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
+      const existing = _generateConversation({
+        id: qualifiedId,
+        name: 'Old meeting title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+      await conversationRepository['saveConversation'](existing);
+
+      spyOn(conversationRepository, 'updateParticipatingUserEntities').and.returnValue(Promise.resolve());
+
+      const backendConversation = generateAPIConversation({
+        id: qualifiedId,
+        name: 'Updated meeting title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+
+      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+
+      expect(result.isOk).toBe(true);
+      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      expect(stored.name()).toBe('Updated meeting title');
+      expect(stored.display_name()).toBe('Updated meeting title');
+    });
+
+    it('preserves guest status when updating the meeting title', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
+      const existing = _generateConversation({
+        id: qualifiedId,
+        name: 'Old meeting title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING, team_id: 'other-team'},
+      });
+      existing.isGuest(true);
+      await conversationRepository['saveConversation'](existing);
+
+      spyOn(conversationRepository, 'updateParticipatingUserEntities').and.returnValue(Promise.resolve());
+
+      const backendConversation = generateAPIConversation({
+        id: qualifiedId,
+        name: 'Updated meeting title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+
+      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+
+      expect(result.isOk).toBe(true);
+      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      expect(stored.name()).toBe('Updated meeting title');
+      expect(stored.isGuest()).toBe(true);
+    });
+
+    it('preserves loaded messages and local state when updating the meeting title', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
+      const message = new ContentMessage(createUuid(), translateForTest);
+      message.id = createUuid();
+
+      const existing = _generateConversation({
+        id: qualifiedId,
+        name: 'Old meeting title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+      existing.addMessage(message);
+      existing.archivedState(true);
+      existing.archivedTimestamp(123456789);
+      existing.last_read_timestamp(987654321);
+      existing.verification_state(ConversationVerificationState.VERIFIED);
+      existing.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS);
+
+      await conversationRepository['saveConversation'](existing);
+
+      spyOn(conversationRepository, 'updateParticipatingUserEntities').and.returnValue(Promise.resolve());
+
+      const backendConversation = generateAPIConversation({
+        id: qualifiedId,
+        name: 'Updated meeting title',
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+
+      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+
+      expect(result.isOk).toBe(true);
+      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      expect(stored.name()).toBe('Updated meeting title');
+      expect(stored.display_name()).toBe('Updated meeting title');
+      expect(stored.messages_unordered()).toHaveLength(1);
+      expect(stored.messages_unordered()[0].id).toBe(message.id);
+      expect(stored.archivedState()).toBe(true);
+      expect(stored.archivedTimestamp()).toBe(123456789);
+      expect(stored.last_read_timestamp()).toBe(987654321);
+      expect(stored.verification_state()).toBe(ConversationVerificationState.VERIFIED);
+      expect(stored.readOnlyState()).toBe(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS);
+    });
+
+    it('preserves existing title and add permission when the update payload omits those fields', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
+      const existing = _generateConversation({
+        id: qualifiedId,
+        name: 'Existing meeting title',
+        overwites: {
+          group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+          add_permission: ADD_PERMISSION.EVERYONE,
+        },
+      });
+      existing.conversationModerator(ADD_PERMISSION.EVERYONE);
+      await conversationRepository['saveConversation'](existing);
+
+      spyOn(conversationRepository, 'updateParticipatingUserEntities').and.returnValue(Promise.resolve());
+
+      const backendConversation = generateAPIConversation({
+        id: qualifiedId,
+        overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+      });
+      delete backendConversation.name;
+      delete backendConversation.add_permission;
+
+      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+
+      expect(result.isOk).toBe(true);
+      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      expect(stored.name()).toBe('Existing meeting title');
+      expect(stored.conversationModerator()).toBe(ADD_PERMISSION.EVERYONE);
     });
   });
 
@@ -1963,6 +2133,163 @@ describe('ConversationRepository', () => {
             time.getTime(),
           );
         });
+      });
+    });
+
+    describe('conversation.create-meeting', () => {
+      it('should process create-meeting event like conversation.create', () => {
+        spyOn(testFactory.conversation_repository as any, 'onCreate').and.callThrough();
+        spyOn(testFactory.conversation_repository, 'mapConversations').and.returnValue([
+          new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
+        ]);
+        spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
+        spyOn(testFactory.conversation_repository as any, 'saveConversation').and.returnValue(false);
+
+        const createMeetingEvent: ConversationCreateMeetingEvent = {
+          conversation: createUuid(),
+          data: {
+            access: [CONVERSATION_ACCESS.INVITE],
+            access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
+            access_role_v2: [],
+            cells_state: CONVERSATION_CELLS_STATE.DISABLED,
+            creator: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
+            group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+            last_event: '0.0',
+            last_event_time: '1970-01-01T00:00:00.000Z',
+            members: {
+              others: [],
+              self: {
+                conversation_role: 'wire_admin',
+                hidden: false,
+                hidden_ref: null,
+                id: '9dcb21e0-9670-4d05-8590-408f3686c873',
+                otr_archived: false,
+                otr_archived_ref: null,
+                otr_muted_ref: null,
+                otr_muted_status: null,
+                service: null,
+                status_ref: '0.0',
+                status_time: '1970-01-01T00:00:00.000Z',
+              },
+            },
+            message_timer: null,
+            name: 'Weekly sync',
+            protocol: CONVERSATION_PROTOCOL.MLS,
+            qualified_id: {
+              domain: 'bella.wire.link',
+              id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
+            },
+            receipt_mode: null,
+            team: null,
+            type: 0,
+          },
+          from: '',
+          time: '1970-01-01T00:00:00.001Z',
+          type: CONVERSATION_EVENT.CREATE_MEETING,
+        };
+
+        jest
+          .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
+          .mockResolvedValueOnce(createMeetingEvent.data);
+
+        return testFactory.conversation_repository['handleConversationEvent'](createMeetingEvent).then(() => {
+          expect(testFactory.conversation_repository['onCreate']).toHaveBeenCalled();
+          expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(
+            [createMeetingEvent.data],
+            1,
+          );
+        });
+      });
+
+      it('injects a group creation message when create-meeting has participants', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const injectEventSpy = jest
+          .spyOn(conversationRepository['eventRepository'], 'injectEvent')
+          .mockResolvedValue(undefined);
+        const updateParticipatingUserEntitiesSpy = jest
+          .spyOn(conversationRepository, 'updateParticipatingUserEntities')
+          .mockResolvedValue(true);
+        const saveConversationSpy = jest
+          .spyOn(conversationRepository as any, 'saveConversation')
+          .mockResolvedValue(false);
+
+        try {
+          const otherUserId = {
+            domain: 'bella.wire.link',
+            id: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
+          };
+
+          const createMeetingEvent: ConversationCreateMeetingEvent = {
+            conversation: createUuid(),
+            data: {
+              access: [CONVERSATION_ACCESS.INVITE],
+              access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
+              access_role_v2: [],
+              cells_state: CONVERSATION_CELLS_STATE.DISABLED,
+              creator: '9dcb21e0-9670-4d05-8590-408f3686c873',
+              epoch: 0,
+              group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+              group_id: 'meeting-group-id',
+              last_event: '0.0',
+              last_event_time: '1970-01-01T00:00:00.000Z',
+              members: {
+                others: [
+                  {
+                    conversation_role: 'wire_member',
+                    id: otherUserId.id,
+                    qualified_id: otherUserId,
+                    status: 0,
+                  },
+                ],
+                self: {
+                  conversation_role: 'wire_admin',
+                  hidden: false,
+                  hidden_ref: null,
+                  id: '9dcb21e0-9670-4d05-8590-408f3686c873',
+                  otr_archived: false,
+                  otr_archived_ref: null,
+                  otr_muted_ref: null,
+                  otr_muted_status: null,
+                  service: null,
+                  status_ref: '0.0',
+                  status_time: '1970-01-01T00:00:00.000Z',
+                },
+              },
+              message_timer: null,
+              name: 'Weekly sync',
+              protocol: CONVERSATION_PROTOCOL.MLS,
+              qualified_id: {
+                domain: 'bella.wire.link',
+                id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
+              },
+              receipt_mode: null,
+              team: null,
+              type: 0,
+            },
+            from: '',
+            time: '1970-01-01T00:00:00.001Z',
+            type: CONVERSATION_EVENT.CREATE_MEETING,
+          };
+
+          jest
+            .spyOn(conversationRepository['conversationService'], 'getConversationById')
+            .mockResolvedValueOnce(createMeetingEvent.data);
+
+          await conversationRepository['handleConversationEvent'](createMeetingEvent);
+
+          expect(injectEventSpy).toHaveBeenCalledWith(
+            expect.objectContaining({type: CONVERSATION.GROUP_CREATION}),
+            expect.anything(),
+          );
+          expect(injectEventSpy).not.toHaveBeenCalledWith(
+            expect.objectContaining({type: CONVERSATION.ONE2ONE_CREATION}),
+            expect.anything(),
+          );
+        } finally {
+          injectEventSpy.mockRestore();
+          updateParticipatingUserEntitiesSpy.mockRestore();
+          saveConversationSpy.mockRestore();
+        }
       });
     });
 

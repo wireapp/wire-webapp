@@ -22,6 +22,7 @@ import is from '@sindresorhus/is';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
+import {sortTagsAlphabetically} from '../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 // This component is duplicated across global view and conversation view
@@ -67,7 +68,7 @@ export const CellsFilePreviewModal = () => {
       status={getFileUrl() === undefined ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
-      badges={tags}
+      badges={sortTagsAlphabetically(tags)}
       isEditMode={isEditMode}
     />
   );

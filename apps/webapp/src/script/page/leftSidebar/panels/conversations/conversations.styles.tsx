@@ -22,3 +22,16 @@ import {CSSObject} from '@emotion/react';
 export const conversationsSpacerStyles = (mdBreakpoint: Boolean): CSSObject => ({
   minWidth: mdBreakpoint ? '64px' : '0',
 });
+
+export const conversationsListHandleStyles: CSSObject = {
+  position: 'absolute',
+  zIndex: 10,
+  top: 0,
+  right: -6,
+  bottom: 0,
+  width: 12,
+  padding: 0,
+  border: 'none',
+  background: 'transparent',
+  cursor: 'pointer',
+};

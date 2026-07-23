@@ -47,6 +47,21 @@ jobs:
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      - name: Set webapp build metadata
+        id: webapp_build_metadata
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          SOURCE_COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${RELEASE_TAG}" "${SOURCE_COMMIT_SHA}" development)"
+
+          {
+            echo "version=${build_version}"
+            echo "commit_sha=${SOURCE_COMMIT_SHA}"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Test
         env:
           RELEASE_TAG: ${{ inputs.tag }}
@@ -60,10 +75,16 @@ jobs:
 
       - name: Build and package public production
         if: ${{ contains(inputs.tag, 'production') }}
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.webapp_build_metadata.outputs.commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.webapp_build_metadata.outputs.version }}
         run: ./bin/yarn build:prod:public
 
       - name: Build and package internal production
         if: ${{ !contains(inputs.tag, 'production') }}
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.webapp_build_metadata.outputs.commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.webapp_build_metadata.outputs.version }}
         run: ./bin/yarn build:prod
 
       - name: Push Docker image

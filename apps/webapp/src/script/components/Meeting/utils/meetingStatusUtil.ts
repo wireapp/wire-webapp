@@ -17,38 +17,28 @@
  *
  */
 
-export enum MeetingStatuses {
+import {isAfter, isBefore} from 'date-fns';
+
+export enum MeetingTemporalStatuses {
   ON_GOING = 'on_going',
-  PARTICIPATING = 'participating',
   UPCOMING = 'upcoming',
   PAST = 'past',
 }
 
 /**
- * Determines the status of a meeting at a specific time.
- *
- * @param {number} nowMilliseconds - The current time in milliseconds.
- * @param {string} start_date - The start date of the meeting in ISO format.
- * @param {string} end_date - The end date of the meeting in ISO format.
- * @param {boolean} [attending=false] - Whether the user is attending the meeting.
- * @returns {MeetingStatuses} - The status of the meeting.
+ * Determines the scheduled time window of a meeting at a specific instant.
  */
-export const getMeetingStatusAt = (
-  nowMilliseconds: number,
-  start_date: string,
-  end_date: string,
-  attending: boolean = false,
-): MeetingStatuses => {
-  const startMs = new Date(start_date).getTime();
-  const endMs = new Date(end_date).getTime();
-
-  if (nowMilliseconds > endMs) {
-    return MeetingStatuses.PAST;
+export const getMeetingTemporalStatusAt = (now: Date, start: Date, end: Date): MeetingTemporalStatuses => {
+  if (isAfter(now, end)) {
+    return MeetingTemporalStatuses.PAST;
   }
 
-  if (nowMilliseconds >= startMs) {
-    return attending ? MeetingStatuses.PARTICIPATING : MeetingStatuses.ON_GOING;
+  if (!isBefore(now, start)) {
+    return MeetingTemporalStatuses.ON_GOING;
   }
 
-  return MeetingStatuses.UPCOMING;
+  return MeetingTemporalStatuses.UPCOMING;
 };
+
+export const isMeetingListItemOngoing = (temporalStatus: MeetingTemporalStatuses, isCallActive: boolean): boolean =>
+  temporalStatus === MeetingTemporalStatuses.ON_GOING || isCallActive;

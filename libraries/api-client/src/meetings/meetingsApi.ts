@@ -20,8 +20,8 @@
 import {AxiosRequestConfig} from 'axios';
 
 import {CreateMeeting} from './createMeeting';
-import {Meeting} from './meeting';
-import {meetingSchema, meetingsListResponseSchema} from './meetingSchema';
+import {Meeting, MeetingWithConversation} from './meeting';
+import {meetingSchema, meetingWithConversationSchema, meetingsListResponseSchema} from './meetingSchema';
 import {UpdateMeeting} from './updateMeeting';
 
 import {HttpClient} from '../http';
@@ -43,6 +43,10 @@ export class MeetingsAPI {
     return meetingSchema.parse(data);
   }
 
+  private parseMeetingWithConversationResponse(data: unknown): MeetingWithConversation {
+    return meetingWithConversationSchema.parse(data);
+  }
+
   private parseMeetingsListResponse(data: unknown): Meeting[] {
     return meetingsListResponseSchema.parse(data);
   }
@@ -50,15 +54,15 @@ export class MeetingsAPI {
   /**
    * Create a new meeting.
    */
-  public async createMeeting(newMeeting: CreateMeeting): Promise<Meeting> {
+  public async createMeeting(newMeeting: CreateMeeting): Promise<MeetingWithConversation> {
     const config: AxiosRequestConfig = {
       data: newMeeting,
       method: 'post',
       url: MeetingsAPI.URL.MEETINGS,
     };
 
-    const response = await this.client.sendJSON<Meeting>(config);
-    return this.parseMeetingResponse(response.data);
+    const response = await this.client.sendJSON<MeetingWithConversation>(config);
+    return this.parseMeetingWithConversationResponse(response.data);
   }
 
   /**
@@ -103,14 +107,14 @@ export class MeetingsAPI {
   /**
    * Update an existing meeting.
    */
-  public async updateMeeting(meetingId: QualifiedId, updateMeeting: UpdateMeeting): Promise<Meeting> {
+  public async updateMeeting(meetingId: QualifiedId, updateMeeting: UpdateMeeting): Promise<MeetingWithConversation> {
     const config: AxiosRequestConfig = {
       data: updateMeeting,
       method: 'put',
       url: this.generateMeetingUrl(meetingId),
     };
 
-    const response = await this.client.sendJSON<Meeting>(config);
-    return this.parseMeetingResponse(response.data);
+    const response = await this.client.sendJSON<MeetingWithConversation>(config);
+    return this.parseMeetingWithConversationResponse(response.data);
   }
 }

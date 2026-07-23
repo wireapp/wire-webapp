@@ -33,6 +33,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {MeetingList, type MeetingListProps} from './MeetingList';
@@ -80,6 +81,17 @@ const createMeetingSeries = (start: string, end: string, title: string): Meeting
   qualified_conversation: {id: 'conv-id', domain: 'example.com'},
 });
 
+const createMainViewModelForTest = (): MainViewModel =>
+  ({
+    content: {
+      repositories: {
+        conversation: {},
+        calling: {},
+      },
+    },
+    calling: {},
+  }) as MainViewModel;
+
 const createMeetingStoreForTest = () =>
   createStore<MeetingStoreState>(() => ({
     meetingSeries: [],
@@ -87,6 +99,7 @@ const createMeetingStoreForTest = () =>
     hasLoadError: false,
     loadMeetings: jest.fn(),
     scheduleMeeting: jest.fn(),
+    meetNowMeeting: jest.fn(),
     updateMeeting: jest.fn(),
     loadMeetingForEdit: jest.fn(),
   }));
@@ -96,7 +109,11 @@ const renderMeetingList = (
   wallClock = createDeterministicWallClock(),
 ) => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({translate: translateForTest, wallClock}),
+    createRootContextValueForTest({
+      translate: translateForTest,
+      wallClock,
+      mainViewModel: createMainViewModelForTest(),
+    }),
   );
   const meetingStore = createMeetingStoreForTest();
 

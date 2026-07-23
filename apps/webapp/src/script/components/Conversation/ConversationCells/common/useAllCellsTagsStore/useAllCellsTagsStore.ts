@@ -23,6 +23,8 @@ import {create} from 'zustand';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
+import {sortTagsAlphabetically} from '../sortTagsAlphabetically/sortTagsAlphabetically';
+
 interface AllCellsTagsState {
   tags: string[];
   isLoading: boolean;
@@ -39,7 +41,8 @@ export function validateGetAllTagsResponse(raw: unknown): Result<string[], Error
   const validationResult = getAllTagsResponseSchema.safeParse(raw);
 
   if (validationResult.success) {
-    return Result.ok(validationResult.data.Values.filter(tagName => tagName.trim() !== ''));
+    const tags = validationResult.data.Values.filter(tagName => tagName.trim() !== '');
+    return Result.ok(sortTagsAlphabetically(tags));
   }
 
   return Result.err(validationResult.error);

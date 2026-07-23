@@ -27,6 +27,7 @@ import {
   isReleaseBranchName,
   productionTagExists,
   productionTagPointsToCommit,
+  resolveWebappBuildVersion,
   validateProductionTagName,
 } from './releaseMetadata';
 import type {CommitHash, ReleaseTagMetadata} from './releaseMetadata';
@@ -151,6 +152,81 @@ describe('releaseMetadata', () => {
     assert(actualProductionTagName.isErr === true);
 
     expect(actualProductionTagName.error.message).toBe(`Invalid production tag name: ${invalidProductionTagName}`);
+  });
+
+  it.each([
+    ['2026-06-19.1-production', '2026-06-19.1'],
+    ['2026-06-19-production.1', '2026-06-19-production.1'],
+  ])(
+    'resolveWebappBuildVersion() preserves the version for production tag "%s"',
+    (productionTagName, expectedVersion) => {
+      const actualBuildVersion = resolveWebappBuildVersion(
+        productionTagName,
+        '025edc663787b3d2da366f21a5958013201e6cd4',
+        'development',
+      );
+
+      assert(actualBuildVersion.isOk === true);
+
+      expect(actualBuildVersion.value).toBe(expectedVersion);
+    },
+  );
+
+  it.each([
+    ['', 'main', 'main-025edc6'],
+    ['', 'development', 'dev-025edc6'],
+    ['2026-07-20-staging.1', 'development', 'dev-025edc6'],
+    ['q1-2024', 'development', 'dev-025edc6'],
+    ['q2-2025', 'development', 'dev-025edc6'],
+  ])(
+    'resolveWebappBuildVersion() resolves build reference "%s" on the %s channel to "%s"',
+    (buildReferenceName, buildChannel, expectedVersion) => {
+      const actualBuildVersion = resolveWebappBuildVersion(
+        buildReferenceName,
+        '025edc663787b3d2da366f21a5958013201e6cd4',
+        buildChannel,
+      );
+
+      assert(actualBuildVersion.isOk === true);
+
+      expect(actualBuildVersion.value).toBe(expectedVersion);
+    },
+  );
+
+  it('resolveWebappBuildVersion() uses the explicit unknown fallback without a commit', () => {
+    const actualBuildVersion = resolveWebappBuildVersion('', '', 'development');
+
+    assert(actualBuildVersion.isOk === true);
+
+    expect(actualBuildVersion.value).toBe('dev-unknown');
+  });
+
+  it('resolveWebappBuildVersion() rejects unknown non-empty tags', () => {
+    const actualBuildVersion = resolveWebappBuildVersion('2026-06-19.1-production.unknown', '025edc6', 'development');
+
+    assert(actualBuildVersion.isErr === true);
+
+    expect(actualBuildVersion.error.message).toBe('Invalid production tag name: 2026-06-19.1-production.unknown');
+  });
+
+  it('resolveWebappBuildVersion() requires a production tag on the production channel', () => {
+    const actualBuildVersion = resolveWebappBuildVersion('', '025edc663787b3d2da366f21a5958013201e6cd4', 'production');
+
+    assert(actualBuildVersion.isErr === true);
+
+    expect(actualBuildVersion.error.message).toBe('A production webapp build requires a production tag name');
+  });
+
+  it('resolveWebappBuildVersion() rejects a non-production tag on the production channel', () => {
+    const actualBuildVersion = resolveWebappBuildVersion(
+      '2026-07-20-staging.1',
+      '025edc663787b3d2da366f21a5958013201e6cd4',
+      'production',
+    );
+
+    assert(actualBuildVersion.isErr === true);
+
+    expect(actualBuildVersion.error.message).toBe('Invalid production tag name: 2026-07-20-staging.1');
   });
 
   it('createNextBetaTagName() increments the latest beta tag for the release identifier', () => {

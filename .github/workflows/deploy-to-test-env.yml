@@ -51,7 +51,12 @@ jobs:
         run: ./bin/yarn --immutable
 
       - name: Build and package
-        run: ./bin/yarn build:prod
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.sha }}
+        run: |
+          short_commit_sha="${GITHUB_SHA::7}"
+          WIRE_WEBAPP_BUILD_VERSION="dev-${short_commit_sha}" \
+          ./bin/yarn build:prod
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37

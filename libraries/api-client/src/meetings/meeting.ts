@@ -19,6 +19,7 @@
 
 import {MeetingRecurrence} from './meetingRecurrence';
 
+import type {ValidatedMeetingConversation} from '../conversation/conversationSchema';
 import {QualifiedId} from '../user/qualifiedId';
 
 export interface Meeting {
@@ -32,4 +33,8 @@ export interface Meeting {
   title: string;
   trial: boolean;
   updated_at: string;
+}
+
+export interface MeetingWithConversation extends Meeting {
+  conversation: ValidatedMeetingConversation;
 }

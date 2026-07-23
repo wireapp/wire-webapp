@@ -6,23 +6,35 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/apps/server/dist/static"],
-      "defaultConfiguration": "production",
-      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": ["{projectRoot}/dist/internal"],
+      "dependsOn": ["^build", "server:generate-build-metadata"],
+      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "yarn build:prod",
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal yarn build:prod",
         "cwd": "{projectRoot}"
-      },
-      "configurations": {
-        "development": {
-          "command": "yarn build:dev"
-        },
-        "production": {
-          "command": "yarn build:prod"
-        },
-        "production-public": {
-          "command": "yarn build:prod:public"
-        }
+      }
+    },
+    "build-development": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "outputs": ["{projectRoot}/dist/development"],
+      "dependsOn": ["^build", "server:generate-build-metadata"],
+      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
+      "options": {
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development yarn build:dev",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "build-production-public": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "outputs": ["{projectRoot}/dist/public"],
+      "dependsOn": ["^build", "server:generate-build-metadata"],
+      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
+      "options": {
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public yarn build:prod:public",
+        "cwd": "{projectRoot}"
       }
     },
     "watch-deps": {

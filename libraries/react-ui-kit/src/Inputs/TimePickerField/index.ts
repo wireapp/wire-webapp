@@ -20,7 +20,9 @@
 export * from './TimePickerField';
 export {
   buildTimeOptions,
+  filterTimeOptionsAfter,
   formatTimeLabel,
+  getTimeOptionTotalMinutes,
   nearestTimeOptionFromDate,
   parseTimeLabel,
   timeOptionFromDate,

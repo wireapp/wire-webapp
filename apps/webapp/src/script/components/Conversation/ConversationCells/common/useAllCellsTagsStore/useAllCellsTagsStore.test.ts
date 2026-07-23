@@ -27,12 +27,12 @@ import {useAllCellsTagsStore, validateGetAllTagsResponse} from './useAllCellsTag
 describe('validateGetAllTagsResponse()', () => {
   it('returns Result ok with tags for a valid getAllTags response', () => {
     const validationResult = validateGetAllTagsResponse({
-      Values: ['finance', 'legal', 'design', '', '   '],
+      Values: ['finance', 'legal', 'design', 'Accounting', '', '   '],
     });
 
     assert(result.isOk(validationResult));
 
-    expect(validationResult.value).toEqual(['finance', 'legal', 'design']);
+    expect(validationResult.value).toEqual(['Accounting', 'design', 'finance', 'legal']);
   });
 
   it('returns Result ok with empty tags when Values is missing', () => {

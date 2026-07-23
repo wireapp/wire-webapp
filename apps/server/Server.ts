@@ -29,7 +29,7 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 
-import type {ClientConfig, ServerConfig} from '@wireapp/config';
+import type {BuildMetadata, ClientConfig, ServerConfig} from '@wireapp/config';
 
 import {AppleAssociationRoute} from './routes/appleassociation/appleAssociationRoute';
 import {parseClientVersion} from './routes/clientVersionCheck/clientVersion';
@@ -49,6 +49,7 @@ class Server {
   constructor(
     private readonly config: ServerConfig,
     private readonly clientConfig: ClientConfig,
+    private readonly buildMetadata: BuildMetadata,
   ) {
     if (this.config.DEVELOPMENT) {
       console.info(this.config);
@@ -188,7 +189,7 @@ class Server {
   }
 
   private initStaticRoutes() {
-    this.app.use(RedirectRoutes(this.config));
+    this.app.use(RedirectRoutes(this.config, this.buildMetadata));
 
     const staticRoutes = ['audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker', 'assets'];
 

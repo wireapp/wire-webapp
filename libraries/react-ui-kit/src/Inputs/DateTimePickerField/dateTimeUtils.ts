@@ -31,6 +31,11 @@ export const dateValueFromDate = (date: Date): DateValue => {
   });
 };
 
+export const isSameLocalCalendarDay = (left: Date, right: Date): boolean =>
+  left.getFullYear() === right.getFullYear() &&
+  left.getMonth() === right.getMonth() &&
+  left.getDate() === right.getDate();
+
 export const combineDateAndTime = (date: DateValue | null, time: Option | null): Date | null => {
   if (date === null || time === null || typeof time.value !== 'string' || time.value.length === 0) {
     return null;

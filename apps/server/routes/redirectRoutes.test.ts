@@ -2,36 +2,13 @@ import {type Request, type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Maybe} from 'true-myth';
 
-import {createJoinConversationRedirectUrl, redirectToJoinConversation, setNonCacheHeaders} from './redirectRoutes';
-
-type HeaderValueMap = Record<string, string>;
-
-type ResponseWithHeaderCapture = {
-  readonly headerValues: HeaderValueMap;
-  readonly response: Response;
-};
+import {createJoinConversationRedirectUrl, redirectToJoinConversation} from './redirectRoutes';
 
 type JoinRedirectResponse = {
   readonly response: Response;
   readonly redirect: jest.Mock;
   readonly sendStatus: jest.Mock;
 };
-
-function createResponseWithHeaderCapture(): ResponseWithHeaderCapture {
-  const headerValues: HeaderValueMap = {};
-  const response = {
-    set(name: string, value: string) {
-      headerValues[name] = value;
-
-      return this;
-    },
-  } as unknown as Response;
-
-  return {
-    headerValues,
-    response,
-  };
-}
 
 function createJoinRedirectResponse(): JoinRedirectResponse {
   const redirect = jest.fn();
@@ -124,21 +101,5 @@ describe('RedirectRoutes join redirect', () => {
       '/auth/?join_key=key&join_code=code#/join-conversation',
     );
     expect(sendStatus).not.toHaveBeenCalled();
-  });
-});
-
-describe('RedirectRoutes response caching', () => {
-  it('sets non-cache headers for version metadata responses', () => {
-    const {headerValues, response} = createResponseWithHeaderCapture();
-
-    const returnedResponse = setNonCacheHeaders(response);
-
-    expect(returnedResponse).toBe(response);
-    expect(headerValues).toEqual({
-      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-      Expires: '0',
-      Pragma: 'no-cache',
-      'Surrogate-Control': 'no-store',
-    });
   });
 });

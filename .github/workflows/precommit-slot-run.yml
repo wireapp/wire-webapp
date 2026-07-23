@@ -10,7 +10,26 @@ on:
       backendUrl:
         type: string
         required: true
+      artifact_name:
+        type: string
+        required: false
+        default: build-artifact
+      expectedBackendRest:
+        type: string
+        required: false
+      expectedBackendWs:
+        type: string
+        required: false
+      expectedVersion:
+        type: string
+        required: false
+      expectedCommit:
+        type: string
+        required: false
       grep:
+        type: string
+        required: false
+      testinyRunName:
         type: string
         required: false
       notify_deployoholics_on_failure:
@@ -25,6 +44,8 @@ on:
       WEBTEAM_AWS_SECRET_ACCESS_KEY:
         required: true
       WIRE_DEPLOYOHOLICS_WEBHOOK_URL:
+        required: false
+      TESTINY_API_KEY:
         required: false
     outputs:
       precommit_url:
@@ -55,7 +76,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: build-artifact
+          name: ${{ inputs.artifact_name }}
 
       - name: Validate precommit environment
         env:
@@ -84,7 +105,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           application-name: Webapp
           environment-name: ${{ inputs.env_name }}
-          version-label: ${{ github.run_id }}
+          version-label: ${{ github.run_id }}-${{ github.run_attempt }}
           deployment-package-path: ebs.zip
           wait-for-deployment: true
           wait-for-environment-recovery: true
@@ -98,6 +119,59 @@ jobs:
           echo "Deploying to precommit environment: $ENV_NAME"
           echo "Resolved precommit URL: https://$ENV_NAME.zinfra.io/"
           echo "url=https://$ENV_NAME.zinfra.io/" >> "$GITHUB_OUTPUT"
+
+      - name: Verify precommit runtime
+        if: ${{ inputs.expectedVersion || inputs.expectedCommit || inputs.expectedBackendRest || inputs.expectedBackendWs }}
+        env:
+          EXPECTED_BACKEND_REST: ${{ inputs.expectedBackendRest }}
+          EXPECTED_BACKEND_WS: ${{ inputs.expectedBackendWs }}
+          EXPECTED_COMMIT: ${{ inputs.expectedCommit }}
+          EXPECTED_VERSION: ${{ inputs.expectedVersion }}
+          PRECOMMIT_URL: ${{ steps.fetch_url.outputs.url }}
+        run: |
+          set -euo pipefail
+
+          normalize_url() {
+            printf '%s' "${1%/}"
+          }
+
+          expected_backend_rest="$(normalize_url "${EXPECTED_BACKEND_REST}")"
+          expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
+
+          for attempt_number in {1..10}; do
+            version_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${PRECOMMIT_URL}version" || true)"
+            commit_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${PRECOMMIT_URL}commit" || true)"
+            runtime_config="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${PRECOMMIT_URL}config.js" || true)"
+
+            actual_version="$(
+              printf '%s' "${version_response}" |
+                jq --raw-output '.version'
+            )" || actual_version=''
+            actual_commit="$(
+              printf '%s' "${commit_response}" |
+                tr -d '\r\n'
+            )"
+            actual_backend_rest="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_REST":"\([^"]*\)".*/\1/p')"
+            actual_backend_ws="$(printf '%s' "${runtime_config}" | sed -n 's/.*"BACKEND_WS":"\([^"]*\)".*/\1/p')"
+
+            if [[
+              ( -z "${EXPECTED_VERSION}" || "${actual_version}" == "${EXPECTED_VERSION}" ) &&
+              ( -z "${EXPECTED_COMMIT}" || "${actual_commit}" == "${EXPECTED_COMMIT}" ) &&
+              ( -z "${EXPECTED_BACKEND_REST}" || "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" ) &&
+              ( -z "${EXPECTED_BACKEND_WS}" || "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" )
+            ]]; then
+              exit 0
+            fi
+
+            echo "Precommit runtime verification mismatch on attempt ${attempt_number}: VERSION=${actual_version:-missing}, COMMIT=${actual_commit:-missing}, REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}." >&2
+
+            if [[ "${attempt_number}" -lt 10 ]]; then
+              sleep 6
+            fi
+          done
+
+          echo "Precommit runtime verification failed after 10 attempts." >&2
+          exit 1
 
       - name: Deployment Status
         if: ${{ always() }}
@@ -117,16 +191,27 @@ jobs:
       webappUrl: ${{ needs.deploy_to_aws.outputs.precommit_url }}
       backendUrl: ${{ inputs.backendUrl }}
       grep: ${{ inputs.grep }}
+      testinyRunName: ${{ inputs.testinyRunName }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
 
   notify_deployoholics:
     name: Notify Deployoholics about failed critical flow
     runs-on: ubuntu-24.04
     needs: [deploy_to_aws, e2e_tests]
     if: ${{ always() && inputs.notify_deployoholics_on_failure && needs.e2e_tests.result == 'failure' }}
+    permissions:
+      contents: read
 
     steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/actions/notify-deployoholics
+
       - name: Announce failed critical flow
         uses: ./.github/actions/notify-deployoholics
         with:

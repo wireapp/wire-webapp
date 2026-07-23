@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {
   CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
@@ -85,6 +86,31 @@ export type ConversationDatabaseData = ConversationRecord &
     team_id: string;
   };
 
+/**
+ * Backend-owned conversation fields that may be merged into an existing entity.
+ * Client-only state such as loaded messages or archive/read timestamps must stay excluded.
+ */
+const BACKEND_UPDATABLE_CONVERSATION_PROPERTY_KEYS = [
+  'accessModes',
+  'accessRole',
+  'cellsState',
+  'cipherSuite',
+  'conversationModerator',
+  'creator',
+  'domain',
+  'epoch',
+  'globalMessageTimer',
+  'groupConversationType',
+  'groupId',
+  'initialProtocol',
+  'name',
+  'participating_user_ids',
+  'receiptMode',
+  'roles',
+  'teamId',
+  'type',
+] as const satisfies readonly (keyof Conversation)[];
+
 export class ConversationMapper {
   static mapConversations(
     conversationsData: ConversationDatabaseData[],
@@ -100,6 +126,156 @@ export class ConversationMapper {
     return conversationsData.map((conversationData: ConversationDatabaseData, index: number) => {
       return ConversationMapper.createConversationEntity(conversationData, translate, timestamp + index);
     });
+  }
+
+  static getUpdatableProperties(conversationEntity: Conversation): Partial<Record<keyof Conversation, unknown>> {
+    const conversationData: Partial<Record<keyof Conversation, unknown>> = {};
+
+    for (const key of BACKEND_UPDATABLE_CONVERSATION_PROPERTY_KEYS) {
+      const value = conversationEntity[key];
+
+      if (ko.isWriteableObservable(value)) {
+        conversationData[key] = value();
+      } else if (typeof value !== 'function') {
+        conversationData[key] = value;
+      }
+    }
+
+    return conversationData;
+  }
+
+  /**
+   * Maps backend-owned fields from a conversation payload for merging into an existing entity.
+   * Omitted optional fields stay omitted so entity-creation defaults are not applied during merge.
+   */
+  static getUpdatablePropertiesFromBackend(
+    conversationData: ConversationBackendData | ConversationDatabaseData,
+  ): Partial<Record<keyof Conversation, unknown>> {
+    const updates: Partial<Record<keyof Conversation, unknown>> = {};
+
+    const accessModes =
+      'accessModes' in conversationData && !is.undefined(conversationData.accessModes)
+        ? conversationData.accessModes
+        : conversationData.access;
+    if (!is.undefined(accessModes)) {
+      updates.accessModes = accessModes;
+    }
+
+    const accessRoleV2 =
+      'accessRoleV2' in conversationData && !is.undefined(conversationData.accessRoleV2)
+        ? conversationData.accessRoleV2
+        : conversationData.access_role_v2;
+    const accessRole =
+      'accessRole' in conversationData && !is.undefined(conversationData.accessRole)
+        ? conversationData.accessRole
+        : conversationData.access_role;
+    if (!is.undefined(accessRoleV2) || !is.undefined(accessRole)) {
+      updates.accessRole = accessRoleV2 ?? accessRole;
+    }
+
+    if (!is.undefined(conversationData.cells_state)) {
+      updates.cellsState = conversationData.cells_state;
+    }
+
+    if (!is.undefined(conversationData.cipher_suite)) {
+      updates.cipherSuite = conversationData.cipher_suite;
+    }
+
+    if (!is.undefined(conversationData.add_permission)) {
+      updates.conversationModerator = conversationData.add_permission;
+    }
+
+    if (!is.undefined(conversationData.creator)) {
+      updates.creator = conversationData.creator;
+    }
+
+    const domain =
+      ('domain' in conversationData ? conversationData.domain : undefined) ?? conversationData.qualified_id?.domain;
+    if (!is.undefined(domain)) {
+      updates.domain = domain;
+    }
+
+    if (!is.undefined(conversationData.epoch)) {
+      updates.epoch = conversationData.epoch;
+    }
+
+    const messageTimer =
+      conversationData.message_timer ??
+      ('global_message_timer' in conversationData ? conversationData.global_message_timer : undefined);
+    if (!is.undefined(messageTimer)) {
+      updates.globalMessageTimer = messageTimer;
+    }
+
+    if (!is.undefined(conversationData.group_conv_type)) {
+      updates.groupConversationType = conversationData.group_conv_type;
+    }
+
+    if (!is.undefined(conversationData.group_id)) {
+      updates.groupId = conversationData.group_id;
+    }
+
+    if ('initial_protocol' in conversationData && !is.undefined(conversationData.initial_protocol)) {
+      updates.initialProtocol = conversationData.initial_protocol;
+    }
+
+    if (!is.undefined(conversationData.name)) {
+      updates.name = conversationData.name;
+    }
+
+    const participatingUserIds = ConversationMapper.getParticipatingUserIdsFromBackend(conversationData);
+    if (!is.undefined(participatingUserIds)) {
+      updates.participating_user_ids = participatingUserIds;
+    }
+
+    if (!is.undefined(conversationData.receipt_mode)) {
+      updates.receiptMode = conversationData.receipt_mode;
+    }
+
+    if (
+      ('roles' in conversationData && !is.undefined(conversationData.roles)) ||
+      !is.undefined(conversationData.members)
+    ) {
+      updates.roles = ConversationMapper.computeRoles(conversationData);
+    }
+
+    if ('team_id' in conversationData || 'team' in conversationData) {
+      const teamId = ('team_id' in conversationData ? conversationData.team_id : undefined) ?? conversationData.team;
+      if (is.nonEmptyString(teamId)) {
+        updates.teamId = teamId;
+      }
+    }
+
+    if (!is.undefined(conversationData.type)) {
+      updates.type = conversationData.type;
+    }
+
+    return updates;
+  }
+
+  private static getParticipatingUserIdsFromBackend(
+    conversationData: ConversationBackendData | ConversationDatabaseData,
+  ): QualifiedId[] | undefined {
+    const qualifiedOthers = 'qualified_others' in conversationData ? conversationData.qualified_others : undefined;
+    if (!is.undefined(qualifiedOthers)) {
+      return qualifiedOthers;
+    }
+
+    if (!is.undefined(conversationData.members?.others)) {
+      return conversationData.members.others.map(other => ({
+        domain: other.qualified_id?.domain ?? '',
+        id: other.id,
+      }));
+    }
+
+    const others = 'others' in conversationData ? conversationData.others : undefined;
+    if (!is.undefined(others)) {
+      return others.map(userId => ({
+        domain: '',
+        id: userId,
+      }));
+    }
+
+    return undefined;
   }
 
   static updateProperties(
@@ -331,7 +507,7 @@ export class ConversationMapper {
 
     // Team ID from database or backend payload
     const teamId = conversationData.team_id ?? conversationData.team;
-    if (teamId !== undefined) {
+    if (is.nonEmptyString(teamId)) {
       conversationEntity.teamId = teamId;
     }
 

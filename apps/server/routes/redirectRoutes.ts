@@ -22,11 +22,10 @@ import express, {type Request, type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Maybe, maybe} from 'true-myth';
 
-import type {ServerConfig} from '@wireapp/config';
+import type {BuildMetadata, ServerConfig} from '@wireapp/config';
 
+import {setNonCacheHeaders} from '../http/setNonCacheHeaders';
 import * as BrowserUtil from '../util/browserUtil';
-
-const router = express.Router();
 
 type JoinRedirectQuery = {
   readonly key?: unknown;
@@ -64,23 +63,16 @@ export function redirectToJoinConversation(request: Request, response: Response)
   );
 }
 
-export function setNonCacheHeaders(response: Response): Response {
-  response.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  response.set('Pragma', 'no-cache');
-  response.set('Expires', '0');
-  response.set('Surrogate-Control', 'no-store');
+export function RedirectRoutes(config: ServerConfig, buildMetadata: BuildMetadata): express.Router {
+  const router = express.Router();
 
-  return response;
-}
-
-export const RedirectRoutes = (config: ServerConfig) => [
   router.get('/robots.txt', async (req, res) => {
     const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as ReadonlyArray<string>).includes(req.hostname)
       ? config.ROBOTS.ALLOW
       : config.ROBOTS.DISALLOW;
     return res.contentType('text/plain; charset=UTF-8').send(robotsContent);
-  }),
-  router.get('/join/?', redirectToJoinConversation),
+  });
+  router.get('/join/?', redirectToJoinConversation);
   router.get('/browser/?', (req, res, next) => {
     if (config.DEVELOPMENT) {
       return next();
@@ -88,22 +80,22 @@ export const RedirectRoutes = (config: ServerConfig) => [
     const userAgent = req.header('User-Agent');
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     return res.json(parseResult);
-  }),
+  });
   router.get('/test/agent/?', (req, res) => {
     const userAgent = req.header('User-Agent');
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     return res.json(parseResult);
-  }),
+  });
   router.get('/commit/?', (_req, res) => {
     const response = setNonCacheHeaders(res);
 
     return response.send(config.COMMIT);
-  }),
+  });
   router.get('/version/?', (_req, res) => {
     const response = setNonCacheHeaders(res);
 
-    return response.json({version: config.VERSION});
-  }),
+    return response.json(buildMetadata);
+  });
   /**
    * This route is used by the OIDC Provider to redirect the user back to the client.
    * The OIDC Provider will redirect the user to this route with a query string containing the necessary information for the client to complete the authentication.
@@ -117,5 +109,7 @@ export const RedirectRoutes = (config: ServerConfig) => [
       HTTP_STATUS.MOVED_TEMPORARILY,
       `/?${Boolean(queryString) ? queryString : 'no_query=true'}#/e2ei-redirect`,
     );
-  }),
-];
+  });
+
+  return router;
+}

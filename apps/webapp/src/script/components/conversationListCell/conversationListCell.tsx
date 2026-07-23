@@ -17,8 +17,15 @@
  *
  */
 
-import React, {KeyboardEvent as ReactKeyBoardEvent, MouseEvent as ReactMouseEvent, useRef, useState} from 'react';
+import React, {
+  CSSProperties,
+  KeyboardEvent as ReactKeyBoardEvent,
+  MouseEvent as ReactMouseEvent,
+  useRef,
+  useState,
+} from 'react';
 
+import {CSSObject} from '@emotion/react';
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 
@@ -50,6 +57,8 @@ interface ConversationListCellProps {
   showJoinButton: boolean;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isFocused?: boolean;
+  listItemCss?: CSSObject;
+  listItemStyle?: CSSProperties;
   // This method resetting the current focused conversation to first conversation on click outside or click tab or shift + tab
   resetConversationFocus: () => void;
 }
@@ -64,6 +73,8 @@ export const ConversationListCell = ({
   dataUieName,
   handleArrowKeyDown,
   isFocused = false,
+  listItemCss,
+  listItemStyle,
   resetConversationFocus,
 }: ConversationListCellProps) => {
   const {translate} = useApplicationContext();
@@ -210,6 +221,8 @@ export const ConversationListCell = ({
       data-uie-status={isActive ? 'active' : 'inactive'}
       data-protocol={conversation.protocol}
       className={cx('conversation-list-cell', {'conversation-list-cell--active': isActive})}
+      css={listItemCss}
+      style={listItemStyle}
     >
       <div
         role="button"

@@ -17,17 +17,21 @@
  *
  */
 
+import {useMeetNowModal} from 'Components/Meeting/meetNowModal/useMeetNowModal';
 import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useMeetingActions = () => {
+  const {wallClock} = useApplicationContext();
   const openCreate = useScheduleMeetingModal(state => state.openCreate);
+  const openMeetNow = useMeetNowModal(state => state.open);
 
   const handleMeetNow = () => {
-    // add calling functionality here
+    openMeetNow();
   };
 
   const handleScheduleMeeting = () => {
-    openCreate();
+    openCreate(wallClock);
   };
 
   return {handleMeetNow, handleScheduleMeeting};

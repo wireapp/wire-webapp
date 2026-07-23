@@ -41,7 +41,7 @@ import {createNavigate, createNavigateKeyboard} from '../../../../router/routerB
 
 interface CallingHeaderProps {
   isOngoing: boolean;
-  isGroup: boolean;
+  isGroupCall: boolean;
   isChannel: boolean;
   showAlert: boolean;
   isVideoCall: boolean;
@@ -61,7 +61,7 @@ interface CallingHeaderProps {
 }
 
 export const CallingHeader = ({
-  isGroup,
+  isGroupCall,
   isChannel,
   isOngoing,
   showAlert,
@@ -93,7 +93,7 @@ export const CallingHeader = ({
   let avatarContent;
   if (isChannel) {
     avatarContent = <ChannelAvatar conversationID={conversationID} />;
-  } else if (isGroup) {
+  } else if (isGroupCall) {
     avatarContent = <GroupAvatar conversationID={conversationID} />;
   } else if (conversationParticipants.length > 0) {
     avatarContent = <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />;
@@ -103,14 +103,14 @@ export const CallingHeader = ({
     <div css={callingHeaderContainer}>
       <div
         ref={element => {
-          if ((isGroup || isOngoing) && showAlert && !isVideoCall) {
+          if ((isGroupCall || isOngoing) && showAlert && !isVideoCall) {
             element?.focus();
           }
         }}
         css={callingHeaderWrapper}
         onClick={createNavigate(conversationUrl)}
         onBlur={() => {
-          if (isGroup || isOngoing) {
+          if (isGroupCall || isOngoing) {
             clearShowAlert();
           }
         }}

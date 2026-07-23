@@ -22,16 +22,19 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const dotenv = require('dotenv-extended');
-const {execSync} = require('child_process');
+const {readFileSync} = require('fs');
 
 const path = require('path');
 
-const {generateClientConfig, generateServerConfig} = require('@wireapp/config');
+const {generateClientConfig, generateServerConfig, parseBuildMetadata} = require('@wireapp/config');
 
 const ROOT_PATH = path.resolve(__dirname, '../..');
 const SRC_PATH = path.resolve(__dirname, 'src');
 
-const dist = path.resolve(ROOT_PATH, 'apps/server/dist/static');
+const dist = path.resolve(
+  ROOT_PATH,
+  process.env.WIRE_WEBAPP_BUILD_OUTPUT_PATH ?? path.resolve(ROOT_PATH, 'apps/server/dist/static'),
+);
 const auth = path.resolve(SRC_PATH, 'script/auth');
 const checkBrowser = path.resolve(SRC_PATH, 'script/browser');
 const srcScript = path.resolve(SRC_PATH, 'script');
@@ -39,27 +42,22 @@ const srcScript = path.resolve(SRC_PATH, 'script');
 const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
 const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
 const UNSUPPORTED_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/unsupported.ejs');
+const BUILD_METADATA_FILE_PATH = path.resolve(
+  ROOT_PATH,
+  process.env.WIRE_WEBAPP_BUILD_METADATA_PATH ?? path.resolve(ROOT_PATH, 'apps/server/dist/version.json'),
+);
 
-// Generate version information
-function generateVersion() {
-  return new Date()
-    .toISOString()
-    .replace(/[T\-:]/g, '.')
-    .replace(/\.\d+Z/, '');
-}
+function readBuildMetadata() {
+  const parsedBuildMetadata = parseBuildMetadata(readFileSync(BUILD_METADATA_FILE_PATH, 'utf8'));
 
-function generateCommitHash() {
-  try {
-    return execSync('git rev-parse HEAD').toString().trim();
-  } catch (error) {
-    return 'unknown';
+  if (parsedBuildMetadata.isNothing) {
+    throw new Error(`Invalid build metadata in '${BUILD_METADATA_FILE_PATH}'`);
   }
+
+  return parsedBuildMetadata.value;
 }
 
-const version = {
-  version: generateVersion(),
-  commit: generateCommitHash(),
-};
+const buildMetadata = readBuildMetadata();
 
 // Load environment variables
 const env = dotenv.load({
@@ -91,8 +89,8 @@ function generateUrls() {
 }
 
 const commonConfig = {
-  commit: version.commit,
-  version: version.version,
+  commit: buildMetadata.commit,
+  version: buildMetadata.version,
   env: env.NODE_ENV || 'production',
   urls: generateUrls(),
 };
@@ -102,6 +100,7 @@ const serverConfig = generateServerConfig(commonConfig, env);
 
 const templateParameters = {
   VERSION: clientConfig.VERSION,
+  ASSET_VERSION: buildMetadata.assetVersion,
   BRAND_NAME: clientConfig.BRAND_NAME,
   APP_BASE: clientConfig.APP_BASE,
   OPEN_GRAPH_TITLE: serverConfig.OPEN_GRAPH.TITLE,
@@ -113,7 +112,7 @@ module.exports = {
   cache: {
     buildDependencies: {
       // https://webpack.js.org/blog/2020-10-10-webpack-5-release/#persistent-caching
-      config: [__filename],
+      config: [__filename, BUILD_METADATA_FILE_PATH],
     },
     type: 'filesystem',
   },
@@ -210,6 +209,7 @@ module.exports = {
   },
   output: {
     chunkFilename: 'min/[name].js',
+    clean: true,
     filename: 'min/[name].js',
     path: dist,
     publicPath: '/',

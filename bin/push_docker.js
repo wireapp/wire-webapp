@@ -20,6 +20,8 @@
  */
 
 const child = require('child_process');
+const nodeFileSystem = require('fs');
+const path = require('path');
 const appConfigPkg = require('../apps/webapp/app-config/package.json');
 
 require('dotenv').config({quiet: true});
@@ -37,68 +39,212 @@ require('dotenv').config({quiet: true});
  * ./bin/yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff' --pr
  */
 
-/** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev", "pr-123") */
-const versionTag = process.argv[2].replace('/', '-');
-const uniqueTagOut = process.argv[3] || '';
-/** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
-let commitSha = process.env.GITHUB_SHA || process.argv[4];
-/** Flag to indicate if this is a PR build */
-const isPR = process.argv.includes('--pr');
-
-if (isPR) {
-  /** on PRs, use the SHA from the head commit (not the merge commit) for tagging purposes */
-  commitSha = child.execSync('git rev-parse HEAD').toString().trim();
-}
-const commitShortSha = commitSha.substring(0, 7);
-const dockerRegistryDomain = 'quay.io';
-const repository = `${dockerRegistryDomain}/wire/webapp`;
-
-const tags = [];
-const requiredEnvironmentDefaultKeys = ['BACKEND_NAME', 'BRAND_NAME', 'URL_ACCOUNT_BASE', 'BACKEND_REST', 'BACKEND_WS'];
-const environmentDefaultsSmokeCheckCommand = [
-  'test -s /dist/.env.defaults',
-  ...requiredEnvironmentDefaultKeys.map(requiredEnvironmentDefaultKey => {
-    return `grep -q "^${requiredEnvironmentDefaultKey}=" /dist/.env.defaults`;
-  }),
-].join(' && ');
-
-/** One Docker image can have multiple tags, e.g. "production" (links always to the latest production build) & "2021-08-30-production.0-v0.28.25-0-1240cfd" (links to a fixed production build) */
-tags.push(`${repository}:${versionTag}`);
-
-/** Defines which config version (listed in "app-config/package.json") is going to be used */
-
-var configurationEntry;
-if (versionTag.includes('production')) {
-  configurationEntry = 'wire-web-config-default-master';
-} else {
-  configurationEntry = 'wire-web-config-default-staging';
-}
-const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
-const uniqueTag = `${versionTag}-${configVersion}-${commitShortSha}`;
-if (!isPR) {
-  tags.push(`${repository}:${uniqueTag}`);
+function selectReleaseCommit({releaseCommitSha, commandLineCommitSha, pullRequestCommitSha, githubSha}) {
+  return releaseCommitSha || commandLineCommitSha || pullRequestCommitSha || githubSha;
 }
 
-if (isPR) {
-  tags.push(`${repository}:${versionTag}-${commitShortSha}`);
+function createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha}) {
+  return versionTag.replace('/', '-') + '-' + configurationVersion + '-' + releaseCommitSha.substring(0, 7);
 }
 
-const dockerCommands = [
-  `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
-  `docker build . --file apps/server/Dockerfile --tag ${commitShortSha}`,
-  `docker run --rm --entrypoint sh ${commitShortSha} -c ${JSON.stringify(environmentDefaultsSmokeCheckCommand)}`,
-  `if [ "${uniqueTagOut}" != "" ]; then echo -n "${uniqueTag}" > "${uniqueTagOut}"; fi`,
-];
+function runProcess(command, commandArguments, processOptions, spawnProcess = child.spawnSync) {
+  const result = spawnProcess(command, commandArguments, {
+    ...processOptions,
+    shell: false,
+  });
 
-tags.forEach(containerImageTagValue => {
-  dockerCommands.push(
-    `docker tag ${commitShortSha} ${containerImageTagValue}`,
-    `docker push ${containerImageTagValue}`,
+  if (result.error) {
+    throw new Error(`${command} failed with status ${result.status ?? 'unknown'}: ${result.error.message}`, {
+      cause: result.error,
+    });
+  }
+
+  if (result.status !== 0) {
+    throw new Error(`${command} exited with status ${result.status}`);
+  }
+
+  return result;
+}
+
+function getCurrentCommitSha() {
+  return child.execFileSync('git', ['rev-parse', 'HEAD']).toString().trim();
+}
+
+function resolveDockerContextPath(configuredPath, workingDirectory) {
+  if (!configuredPath) {
+    return workingDirectory;
+  }
+
+  if (configuredPath.includes('\0')) {
+    throw new Error('Docker context path must not contain null bytes');
+  }
+
+  const resolvedWorkingDirectory = path.resolve(workingDirectory);
+  const resolvedDockerContextPath = path.resolve(resolvedWorkingDirectory, configuredPath);
+  const relativeDockerContextPath = path.relative(resolvedWorkingDirectory, resolvedDockerContextPath);
+  const escapesWorkingDirectory =
+    relativeDockerContextPath === '..' ||
+    relativeDockerContextPath.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relativeDockerContextPath);
+
+  if (escapesWorkingDirectory) {
+    throw new Error('Docker context path must remain inside the working directory');
+  }
+
+  return resolvedDockerContextPath;
+}
+
+function requireDockerBuildPaths(dockerContextPath, dockerfilePath) {
+  if (!nodeFileSystem.existsSync(dockerContextPath)) {
+    throw new Error(`Docker context directory does not exist: ${dockerContextPath}`);
+  }
+
+  if (!nodeFileSystem.statSync(dockerContextPath).isDirectory()) {
+    throw new Error(`Docker context path is not a directory: ${dockerContextPath}`);
+  }
+
+  if (!nodeFileSystem.existsSync(dockerfilePath)) {
+    throw new Error(`Dockerfile does not exist: ${dockerfilePath}`);
+  }
+
+  if (!nodeFileSystem.statSync(dockerfilePath).isFile()) {
+    throw new Error(`Dockerfile path is not a file: ${dockerfilePath}`);
+  }
+}
+
+function writeImageTag(outputPath, imageTag) {
+  if (outputPath) {
+    nodeFileSystem.writeFileSync(outputPath, imageTag);
+  }
+}
+
+function runDockerPublication(
+  commandLineArguments,
+  environment,
+  {
+    runProcess: executeProcess = runProcess,
+    getCurrentCommitSha: readCurrentCommitSha = getCurrentCommitSha,
+    writeFile = writeImageTag,
+  } = {},
+) {
+  /** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev", "pr-123") */
+  const versionTag = commandLineArguments[0].replace('/', '-');
+  const uniqueTagOut = commandLineArguments[1] || '';
+  /** Flag to indicate if this is a PR build */
+  const isPullRequest = commandLineArguments.includes('--pr');
+  const commandLineCommitSha = commandLineArguments[2]?.startsWith('--') ? undefined : commandLineArguments[2];
+  /** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
+  const releaseCommitSha = selectReleaseCommit({
+    releaseCommitSha: environment.WIRE_WEBAPP_RELEASE_COMMIT_SHA,
+    commandLineCommitSha,
+    pullRequestCommitSha:
+      isPullRequest && !environment.WIRE_WEBAPP_RELEASE_COMMIT_SHA && !commandLineCommitSha
+        ? readCurrentCommitSha()
+        : undefined,
+    githubSha: environment.GITHUB_SHA,
+  });
+  const printImageTagOnly = commandLineArguments.includes('--print-image-tag');
+
+  if (!releaseCommitSha) {
+    throw new Error(
+      'A release commit SHA is required through WIRE_WEBAPP_RELEASE_COMMIT_SHA, an argument, or GITHUB_SHA',
+    );
+  }
+
+  const commitShortSha = releaseCommitSha.substring(0, 7);
+  const dockerRegistryDomain = 'quay.io';
+  const repository = dockerRegistryDomain + '/wire/webapp';
+  const containerImageTags = [];
+  const requiredEnvironmentDefaultKeys = [
+    'BACKEND_NAME',
+    'BRAND_NAME',
+    'URL_ACCOUNT_BASE',
+    'BACKEND_REST',
+    'BACKEND_WS',
+  ];
+  const environmentDefaultsSmokeCheckCommand = [
+    'test -s /dist/.env.defaults',
+    ...requiredEnvironmentDefaultKeys.map(requiredEnvironmentDefaultKey => {
+      return 'grep -q "^' + requiredEnvironmentDefaultKey + '=" /dist/.env.defaults';
+    }),
+  ].join(' && ');
+
+  /** Defines which config version (listed in "app-config/package.json") is going to be used */
+  const configurationEntry = versionTag.includes('production')
+    ? 'wire-web-config-default-master'
+    : 'wire-web-config-default-staging';
+  const configurationVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
+  const uniqueImageTag = createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha});
+
+  if (printImageTagOnly) {
+    console.log(uniqueImageTag);
+    return uniqueImageTag;
+  }
+
+  /** One Docker image can have multiple tags, e.g. "production" (links always to the latest production build) & "2021-08-30-production.0-v0.28.25-0-1240cfd" (links to a fixed production build) */
+  containerImageTags.push(repository + ':' + versionTag);
+
+  if (!isPullRequest) {
+    containerImageTags.push(repository + ':' + uniqueImageTag);
+  }
+
+  if (isPullRequest) {
+    containerImageTags.push(repository + ':' + versionTag + '-' + commitShortSha);
+  }
+
+  const dockerUsername = environment.DOCKER_USERNAME;
+  const dockerPassword = environment.DOCKER_PASSWORD;
+  if (!dockerUsername || !dockerPassword) {
+    throw new Error('DOCKER_USERNAME and DOCKER_PASSWORD are required');
+  }
+
+  const dockerContextPath = resolveDockerContextPath(environment.WIRE_WEBAPP_DOCKER_CONTEXT_PATH, process.cwd());
+  const dockerfilePath = path.join(dockerContextPath, 'apps/server/Dockerfile');
+  requireDockerBuildPaths(dockerContextPath, dockerfilePath);
+
+  executeProcess('docker', ['login', '--username', dockerUsername, '--password-stdin', dockerRegistryDomain], {
+    env: environment,
+    input: `${dockerPassword}\n`,
+    stdio: ['pipe', 'inherit', 'inherit'],
+  });
+  executeProcess('docker', ['build', dockerContextPath, '--file', dockerfilePath, '--tag', commitShortSha], {
+    stdio: 'inherit',
+    env: environment,
+  });
+  executeProcess(
+    'docker',
+    ['run', '--rm', '--entrypoint', 'sh', commitShortSha, '-c', environmentDefaultsSmokeCheckCommand],
+    {stdio: 'inherit', env: environment},
   );
-});
+  writeFile(uniqueTagOut, uniqueImageTag);
 
-dockerCommands.push(`docker logout ${dockerRegistryDomain}`);
+  containerImageTags.forEach(containerImageTagValue => {
+    executeProcess('docker', ['tag', commitShortSha, containerImageTagValue], {
+      stdio: 'inherit',
+      env: environment,
+    });
+    executeProcess('docker', ['push', containerImageTagValue], {
+      stdio: 'inherit',
+      env: environment,
+    });
+  });
 
-dockerCommands.forEach(command => {
-  child.execSync(command, {stdio: 'inherit'});
-});
+  executeProcess('docker', ['logout', dockerRegistryDomain], {
+    stdio: 'inherit',
+    env: environment,
+  });
+
+  return uniqueImageTag;
+}
+
+if (require.main === module) {
+  runDockerPublication(process.argv.slice(2), process.env);
+}
+
+module.exports = {
+  createUniqueImageTag,
+  resolveDockerContextPath,
+  runDockerPublication,
+  runProcess,
+  selectReleaseCommit,
+};

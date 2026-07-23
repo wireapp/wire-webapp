@@ -46,6 +46,7 @@ export enum CONVERSATION_EVENT {
   CODE_UPDATE = 'conversation.code-update',
   CONNECT_REQUEST = 'conversation.connect-request',
   CREATE = 'conversation.create',
+  CREATE_MEETING = 'conversation.create-meeting',
   DELETE = 'conversation.delete',
   MEMBER_JOIN = 'conversation.member-join',
   MEMBER_LEAVE = 'conversation.member-leave',
@@ -87,6 +88,7 @@ export type ConversationEvent =
   | ConversationCodeDeleteEvent
   | ConversationConnectRequestEvent
   | ConversationCreateEvent
+  | ConversationCreateMeetingEvent
   | ConversationDeleteEvent
   | ConversationMemberJoinEvent
   | ConversationMemberLeaveEvent
@@ -140,6 +142,11 @@ export interface ConversationConnectRequestEvent extends BaseConversationEvent {
 export interface ConversationCreateEvent extends BaseConversationEvent {
   data: ConversationCreateData;
   type: CONVERSATION_EVENT.CREATE;
+}
+
+export interface ConversationCreateMeetingEvent extends BaseConversationEvent {
+  data: ConversationCreateData;
+  type: CONVERSATION_EVENT.CREATE_MEETING;
 }
 
 export interface ConversationDeleteEvent extends BaseConversationEvent {

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing production release tag to redeploy (for example 2026-03-09-production.0)'
+        description: 'Existing production release tag to redeploy (for example 2026-03-09.1-production or 2026-03-09-production.0)'
         required: true
         type: string
       confirm_production_redeploy:
@@ -22,9 +22,27 @@ jobs:
     name: Validate redeploy request
     runs-on: ubuntu-24.04
     outputs:
+      webapp_build_version: ${{ steps.validate.outputs.webapp_build_version }}
       tag: ${{ steps.validate.outputs.tag }}
 
     steps:
+      - name: Checkout workflow source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
       - name: Validate input, actor, and tag
         id: validate
         env:
@@ -38,18 +56,22 @@ jobs:
             exit 1
           fi
 
-          if [[ ! "${TAG}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-production\.[0-9]+$ ]]; then
-            echo "Tag '${TAG}' does not match the expected production release format YYYY-MM-DD-production.N." >&2
-            exit 1
-          fi
+          webapp_build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${TAG}" "${GITHUB_SHA}" production)"
 
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          {
+            echo "webapp_build_version=${webapp_build_version}"
+            echo "tag=${TAG}"
+          } >> "$GITHUB_OUTPUT"
 
   build_artifact:
     name: Rebuild tagged release artifact
     runs-on: ubuntu-24.04
     needs: validate_request
     outputs:
+      artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      artifact_asset_version: ${{ steps.validate_artifact_metadata.outputs.artifact_asset_version }}
+      artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
+      artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
       commit_sha: ${{ steps.git_metadata.outputs.commit_sha }}
       commit_url: ${{ steps.git_metadata.outputs.commit_url }}
       commit_subject: ${{ steps.git_metadata.outputs.commit_subject }}
@@ -63,15 +85,25 @@ jobs:
           set -euo pipefail
           git ls-remote --exit-code --tags "https://github.com/${REPOSITORY}.git" "refs/tags/${TAG}"
 
+      - name: Checkout current workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          ref: ${{ github.workflow_sha }}
+          fetch-depth: 1
+          path: workflow-source
+
       - name: Checkout selected tag
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           ref: refs/tags/${{ needs.validate_request.outputs.tag }}
           fetch-depth: 0
+          path: selected-release
 
       - name: Collect git metadata
         id: git_metadata
+        working-directory: selected-release
         run: |
           set -euo pipefail
           commit_sha="$(git rev-parse HEAD)"
@@ -84,29 +116,62 @@ jobs:
             echo "commit_subject=${commit_subject}"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
-      - name: Setup Node.js
+      - name: Setup Node.js for workflow tools
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: 'workflow-source/.nvmrc'
           cache: 'yarn'
+          cache-dependency-path: 'workflow-source/yarn.lock'
 
-      - name: Install JS dependencies
+      - name: Install workflow tool dependencies
+        working-directory: workflow-source
         run: ./bin/yarn --immutable
 
-      - name: Update configuration
+      - name: Build workflow tool dependencies
+        working-directory: workflow-source
+        run: ./bin/yarn nx run config-lib:build
+
+      - name: Setup Node.js for selected release
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: 'selected-release/.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: 'selected-release/yarn.lock'
+
+      - name: Install selected release dependencies
+        working-directory: selected-release
+        run: ./bin/yarn --immutable
+
+      - name: Update selected release configuration
+        working-directory: selected-release
         run: ./bin/yarn nx run webapp:configure
 
       - name: Build and package
+        working-directory: selected-release
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
         run: ./bin/yarn build:prod:public
+
+      - name: Restore Node.js for workflow tools
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: 'workflow-source/.nvmrc'
+
+      - name: Validate redeploy artifact metadata
+        id: validate_artifact_metadata
+        working-directory: workflow-source
+        env:
+          BUILD_ARTIFACT_PATH: ${{ github.workspace }}/selected-release/apps/server/dist/s3/ebs.zip
+          EXPECTED_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
+          EXPECTED_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
+        run: node ./bin/validateRecoveryBuildArtifact.mts
 
       - name: Upload build artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: build-artifact-${{ needs.validate_request.outputs.tag }}
-          path: apps/server/dist/s3/ebs.zip
+          path: selected-release/apps/server/dist/s3/ebs.zip
 
   deploy_to_production:
     name: Deploy to production
@@ -147,8 +212,17 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [validate_request, build_artifact, deploy_to_production]
     if: ${{ always() && needs.deploy_to_production.result == 'failure' }}
+    permissions:
+      contents: read
 
     steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/actions/notify-deployoholics
+
       - name: Announce production redeploy failure
         uses: ./.github/actions/notify-deployoholics
         with:
@@ -157,5 +231,8 @@ jobs:
           text: |
             ❌ Production redeploy failed for tag ${{ needs.validate_request.outputs.tag }} ❌
             **Triggered by:** ${{ github.actor }}
-            **Commit:** [${{ needs.build_artifact.outputs.commit_sha }}](${{ needs.build_artifact.outputs.commit_url }}) — ${{ needs.build_artifact.outputs.commit_subject }}
+            **Webapp version:** ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
+            **Asset version:** ${{ needs.build_artifact.outputs.artifact_asset_version || 'unavailable' }}
+            **Commit SHA:** ${{ needs.build_artifact.outputs.artifact_commit || 'unavailable' }} — ${{ needs.build_artifact.outputs.commit_subject }}
+            **Built at (UTC):** ${{ needs.build_artifact.outputs.artifact_built_at || 'unavailable' }}
             **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

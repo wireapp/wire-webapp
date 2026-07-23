@@ -28,6 +28,7 @@ import {
   NewConversation,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
+import type {ValidatedMeetingConversation} from '@wireapp/api-client/lib/conversation/conversationSchema';
 import {
   ConversationReceiptModeUpdateData,
   MemberLeaveReason,
@@ -38,6 +39,7 @@ import {
   CONVERSATION_EVENT,
   ConversationAddPermissionUpdateEvent,
   ConversationCreateEvent,
+  ConversationCreateMeetingEvent,
   ConversationEvent,
   ConversationMemberJoinEvent,
   ConversationMemberLeaveEvent,
@@ -984,8 +986,9 @@ export class ConversationRepository {
       const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage?.isCreation();
       if (checkCreationMessage) {
         const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage?.isGroupCreation();
-        const one2oneConnectionMessageInGroup = conversationEntity.isGroupOrChannel() && firstMessage?.isConnection();
-        const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
+        const one2oneConnectionMessageInGroupLike =
+          (conversationEntity.isGroupOrChannel() || conversationEntity.isMeeting()) && firstMessage?.isConnection();
+        const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroupLike;
 
         if (wrongMessageTypeForConversation) {
           this.messageRepository.deleteMessage(conversationEntity, firstMessage);
@@ -1025,9 +1028,10 @@ export class ConversationRepository {
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
     }
 
-    const creationEvent = conversationEntity.isGroupOrChannel()
-      ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
-      : EventBuilder.build1to1Creation(conversationEntity);
+    const creationEvent =
+      conversationEntity.isGroupOrChannel() || conversationEntity.isMeeting()
+        ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
+        : EventBuilder.build1to1Creation(conversationEntity);
 
     await this.eventRepository.injectEvent(creationEvent, eventSource);
   }
@@ -1328,6 +1332,23 @@ export class ConversationRepository {
     return task.tryOrElse(
       error => error,
       () => this.getConversationById(conversationId, searchInLocalDB),
+    );
+  }
+
+  /**
+   * Persists a meeting conversation returned by the meetings API or websocket.
+   */
+  saveMeetingConversationFromBackend(conversationData: ValidatedMeetingConversation): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        const [conversationEntity] = this.mapConversations([conversationData]);
+        await this.updateParticipatingUserEntities(conversationEntity);
+        await this.saveConversation(
+          conversationEntity,
+          ConversationMapper.getUpdatablePropertiesFromBackend(conversationData),
+        );
+      },
     );
   }
 
@@ -2494,7 +2515,7 @@ export class ConversationRepository {
    * @returns Mapped conversation/s
    */
   mapConversations(
-    payload: (BackendConversation | ConversationDatabaseData)[],
+    payload: (BackendConversation | ValidatedMeetingConversation | ConversationDatabaseData)[],
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
     const entities = ConversationMapper.mapConversations(
@@ -2535,18 +2556,14 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to be saved in the repository
    * @returns Resolves when conversation was saved
    */
-  saveConversation(conversationEntity: Conversation) {
+  saveConversation(
+    conversationEntity: Conversation,
+    conversationData: Partial<Record<keyof Conversation, unknown>> = ConversationMapper.getUpdatableProperties(
+      conversationEntity,
+    ),
+  ) {
     // Look up an existing conversation with the same ID so we can merge if necessary
     const existingConversation = this.conversationState.findConversation(conversationEntity.qualifiedId);
-
-    // Build a plain object copy of the entity, excluding methods
-    const conversationData: Partial<Record<keyof Conversation, unknown>> = {};
-    for (const key in conversationEntity) {
-      const value = conversationEntity[key as keyof Conversation];
-      if (typeof value !== 'function') {
-        conversationData[key as keyof Conversation] = value;
-      }
-    }
 
     // Merge path: update the existing conversation with new fields
     if (existingConversation) {
@@ -2557,6 +2574,13 @@ export class ConversationRepository {
       // If the old conversation had participants and the new one doesn’t, drop the field
       if (prevParticipantIds.length > 0 && nextParticipantIds.length === 0) {
         delete conversationData.participating_user_ids;
+        delete conversationData.participating_user_ets;
+        delete conversationData.connection;
+      }
+
+      // Preserve team ownership when the incoming payload has no team context.
+      if (!conversationData.teamId && existingConversation.teamId) {
+        delete conversationData.teamId;
       }
 
       // Apply merged data and persist the updated conversation
@@ -3625,7 +3649,7 @@ export class ConversationRepository {
       }
     }
 
-    const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
+    const isConversationCreate = type === CONVERSATION_EVENT.CREATE || type === CONVERSATION_EVENT.CREATE_MEETING;
     const onEventPromise = isConversationCreate
       ? Promise.resolve(null)
       : this.getConversationById(conversationId, true);
@@ -3799,6 +3823,7 @@ export class ConversationRepository {
   ) {
     switch (eventJson.type) {
       case CONVERSATION_EVENT.CREATE:
+      case CONVERSATION_EVENT.CREATE_MEETING:
         return this.onCreate(eventJson, eventSource);
     }
 
@@ -4081,7 +4106,7 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private async onCreate(
-    eventJson: ConversationCreateEvent,
+    eventJson: ConversationCreateEvent | ConversationCreateMeetingEvent,
     eventSource?: EventSource,
   ): Promise<Conversation | undefined> {
     const {conversation, data: eventData, qualified_conversation, time} = eventJson;

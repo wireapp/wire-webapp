@@ -26,12 +26,38 @@ import type {Translate} from 'Util/localizerUtil';
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 
-interface NoInternetCallGuardCopy {
+export interface NoInternetCallGuardCopy {
   description: string;
   descriptionPoints: [string, string, string];
   title: string;
   translate: Translate;
 }
+
+export const showCallNotEstablishedModal = (noInternetCallGuardCopy: NoInternetCallGuardCopy) => {
+  const {description, descriptionPoints, title, translate} = noInternetCallGuardCopy;
+  const [firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint] = descriptionPoints;
+
+  PrimaryModal.show(
+    PrimaryModal.type.ACKNOWLEDGE,
+    {
+      text: {
+        message: (
+          <span>
+            {description}
+            <ul css={styles}>
+              <li>{firstDescriptionPoint}</li>
+              <li>{secondDescriptionPoint}</li>
+              <li>{thirdDescriptionPoint}</li>
+            </ul>
+          </span>
+        ),
+        title,
+      },
+    },
+    undefined,
+    translate,
+  );
+};
 
 export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGuardCopy) => {
   const {description, descriptionPoints, title, translate} = noInternetCallGuardCopy;
@@ -39,28 +65,10 @@ export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGu
   const warnings = useWarningsState(state => state.warnings);
   const visibleWarning = warnings[warnings.length - 1];
 
-  const showCallNotEstablishedMessage = useCallback(() => {
-    PrimaryModal.show(
-      PrimaryModal.type.ACKNOWLEDGE,
-      {
-        text: {
-          message: (
-            <span>
-              {description}
-              <ul css={styles}>
-                <li>{firstDescriptionPoint}</li>
-                <li>{secondDescriptionPoint}</li>
-                <li>{thirdDescriptionPoint}</li>
-              </ul>
-            </span>
-          ),
-          title,
-        },
-      },
-      undefined,
-      translate,
-    );
-  }, [description, firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint, title, translate]);
+  const showCallNotEstablishedMessage = useCallback(
+    () => showCallNotEstablishedModal(noInternetCallGuardCopy),
+    [description, firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint, title, translate],
+  );
 
   return useCallback(
     (startCall: () => void) => {

@@ -36,20 +36,43 @@ export interface ScheduleMeetingFormState {
 
 export type ScheduleMeetingFormErrorKey =
   | 'meetings.scheduleModal.error.titleRequired'
+  | 'meetings.scheduleModal.error.missingTimes'
   | 'meetings.scheduleModal.error.endBeforeStart'
   | 'meetings.schedule.errors.startInPast'
   | 'meetings.schedule.errors.endInPast';
 
 export interface ScheduleMeetingFormErrors {
-  title?: ScheduleMeetingFormErrorKey;
-  startInPast?: ScheduleMeetingFormErrorKey;
-  endInPast?: ScheduleMeetingFormErrorKey;
-  endBeforeStart?: ScheduleMeetingFormErrorKey;
+  title: ScheduleMeetingFormErrorKey | undefined;
+  missingTimes: ScheduleMeetingFormErrorKey | undefined;
+  startInPast: ScheduleMeetingFormErrorKey | undefined;
+  endInPast: ScheduleMeetingFormErrorKey | undefined;
+  endBeforeStart: ScheduleMeetingFormErrorKey | undefined;
 }
 
+export const emptyScheduleMeetingFormErrors = (): ScheduleMeetingFormErrors => ({
+  title: undefined,
+  missingTimes: undefined,
+  startInPast: undefined,
+  endInPast: undefined,
+  endBeforeStart: undefined,
+});
+
 export interface ScheduleMeetingFormDisplayErrors {
-  title?: string;
-  startInPast?: string;
-  endInPast?: string;
-  endBeforeStart?: string;
+  title: string | undefined;
+  missingTimes: string | undefined;
+  startInPast: string | undefined;
+  endInPast: string | undefined;
+  endBeforeStart: string | undefined;
 }
+
+export const scheduleMeetingSubmitResults = {
+  submitFailed: 'submitFailed',
+  setupFailed: 'setupFailed',
+  succeeded: 'succeeded',
+} as const;
+
+export type ScheduleMeetingSubmitResult =
+  (typeof scheduleMeetingSubmitResults)[keyof typeof scheduleMeetingSubmitResults];
+
+export const wasScheduleMeetingPersisted = (result: ScheduleMeetingSubmitResult): boolean =>
+  result !== scheduleMeetingSubmitResults.submitFailed;

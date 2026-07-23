@@ -4,39 +4,108 @@
   "sourceRoot": "{projectRoot}",
   "projectType": "application",
   "targets": {
+    "generate-build-metadata": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["config-lib:build"],
+      "inputs": ["production", "webappBuildMetadata"],
+      "outputs": ["{projectRoot}/build/metadata/version.json"],
+      "cache": false,
+      "options": {
+        "commands": ["rimraf {projectRoot}/build/metadata", "WIRE_WEBAPP_BUILD_METADATA_PATH={projectRoot}/build/metadata/version.json node {projectRoot}/bin/generateVersionFile.mts"],
+        "parallel": false
+      }
+    },
     "build": {
       "executor": "nx:run-commands",
-      "dependsOn": ["^build", "webapp:build"],
-      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": ["^build", "telemetry-lib:build"],
+      "inputs": ["production"],
+      "outputs": ["{projectRoot}/build/server"],
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copy_server_assets.js"],
+        "commands": [
+          "rimraf {projectRoot}/build/server",
+          "tsc -p {projectRoot}/tsconfig.json --outDir {projectRoot}/build/server",
+          "WIRE_WEBAPP_SERVER_OUTPUT_PATH={projectRoot}/build/server node {projectRoot}/bin/copy_server_assets.js"
+        ],
         "parallel": false
       }
     },
     "build-dev": {
       "executor": "nx:run-commands",
-      "dependsOn": ["config-lib:build"],
+      "dependsOn": ["config-lib:build", "generate-build-metadata", "telemetry-lib:build"],
+      "inputs": ["production", "webappBuildMetadata"],
       "outputs": ["{projectRoot}/dist"],
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copy_server_assets.js"],
+        "commands": [
+          "rimraf {projectRoot}/dist",
+          "tsc -p {projectRoot}/tsconfig.json",
+          "node {projectRoot}/bin/copy_server_assets.js",
+          "cp {projectRoot}/build/metadata/version.json {projectRoot}/dist/version.json"
+        ],
         "parallel": false
+      }
+    },
+    "assemble": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build", {"projects": "webapp", "target": "build"}, "generate-build-metadata"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": false,
+      "options": {
+        "command": "node {projectRoot}/bin/assembleBuild.mts internal artifact"
+      }
+    },
+    "assemble-public": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build", {"projects": "webapp", "target": "build-production-public"}, "generate-build-metadata"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": false,
+      "options": {
+        "command": "node {projectRoot}/bin/assembleBuild.mts public artifact"
+      }
+    },
+    "assemble-webapp": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{"projects": "webapp", "target": "build"}, "generate-build-metadata"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": false,
+      "options": {
+        "command": "node {projectRoot}/bin/assembleBuild.mts internal webapp"
+      }
+    },
+    "assemble-webapp-development": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{"projects": "webapp", "target": "build-development"}, "generate-build-metadata"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": false,
+      "options": {
+        "command": "node {projectRoot}/bin/assembleBuild.mts development webapp"
+      }
+    },
+    "assemble-webapp-public": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{"projects": "webapp", "target": "build-production-public"}, "generate-build-metadata"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": false,
+      "options": {
+        "command": "node {projectRoot}/bin/assembleBuild.mts public webapp"
       }
     },
     "package": {
       "executor": "nx:run-commands",
-      "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/dist/s3"],
+      "dependsOn": ["assemble"],
+      "inputs": ["production", "webappBuildMetadata"],
+      "cache": false,
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "nx run server:build", "nx run webapp:build:production", "node bin/zip.js"],
+        "commands": ["node bin/zip.js"],
         "parallel": false
       }
     },
     "package-public": {
       "executor": "nx:run-commands",
-      "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/dist/s3"],
+      "dependsOn": ["assemble-public"],
+      "inputs": ["production", "webappBuildMetadata"],
+      "cache": false,
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "nx run server:build", "nx run webapp:build:production-public", "yarn verify:bundle:prod:public", "node bin/zip.js"],
+        "commands": ["yarn verify:bundle:prod:public", "node bin/zip.js"],
         "parallel": false
       }
     },
@@ -83,7 +152,8 @@
       "executor": "nx:run-commands",
       "dependsOn": ["config-lib:build"],
       "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
+        "commands": ["tsc --project {projectRoot}/tsconfig.json --noEmit", "tsc --project {projectRoot}/bin/tsconfig.json --noEmit"],
+        "parallel": false
       }
     }
   },

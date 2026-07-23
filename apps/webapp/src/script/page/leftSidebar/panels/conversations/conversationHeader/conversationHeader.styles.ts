@@ -70,3 +70,29 @@ export const searchInputWrapperStyles: CSSObject = {
   position: 'relative',
   marginBlock: '4px 16px',
 };
+
+export const collapsedHeader: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+};
+
+export const collapsedIconRow: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  height: '56px',
+};
+
+export const collapsedIconButton: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '28px',
+  height: '28px',
+  minWidth: '28px',
+  padding: 0,
+  borderRadius: '50%',
+  marginBottom: 0,
+};

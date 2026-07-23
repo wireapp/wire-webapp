@@ -48,7 +48,13 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import {isConversationEntity} from 'Util/typePredicateUtil';
 
 import {ConnectionRequests} from './connectionRequests';
-import {conversationsList, headingTitle, noResultsMessage, virtualizationStyles} from './conversationsList.styles';
+import {
+  conversationsList,
+  headingTitle,
+  noResultsMessage,
+  virtualizationSpacerStyles,
+  virtualizationStyles,
+} from './conversationsList.styles';
 import {conversationSearchFilter, getConversationsWithHeadings} from './helpers';
 
 import {generateConversationUrl} from '../../../../router/routeGenerator';
@@ -146,10 +152,28 @@ export const ConversationsList = ({
 
   const parentRef = useRef(null);
 
+  const getItemKey = useCallback(
+    (index: number) => {
+      const item = conversationsToDisplay[index];
+
+      if (isConversationEntity(item)) {
+        return item.id;
+      }
+
+      if (item && 'heading' in item) {
+        return `heading-${item.heading}`;
+      }
+
+      return index;
+    },
+    [conversationsToDisplay],
+  );
+
   const rowVirtualizer = useVirtualizer({
     count: conversationsToDisplay.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => CONVERSATION_ROW_HEIGHT,
+    getItemKey,
   });
 
   const debouncedOnConversationClick = useDebouncedCallback(
@@ -222,7 +246,9 @@ export const ConversationsList = ({
       <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
 
       {conversations.length === 0 && groupParticipantsConversations.length > 0 && (
-        <p css={noResultsMessage}>{translate('searchConversationsNoResult')}</p>
+        <p className="conversation-list-no-results" css={noResultsMessage}>
+          {translate('searchConversationsNoResult')}
+        </p>
       )}
 
       <ul
@@ -232,63 +258,62 @@ export const ConversationsList = ({
         style={{
           height: '100%',
           overflow: 'auto',
+          position: 'relative',
         }}
       >
-        <div
-          style={{
-            height: `${rowVirtualizer.getTotalSize()}px`,
-            width: '100%',
-            position: 'relative',
-          }}
-        >
-          {rowVirtualizer.getVirtualItems().map(virtualItem => {
-            const conversation = conversationsToDisplay[virtualItem.index];
+        <li
+          aria-hidden="true"
+          css={virtualizationSpacerStyles}
+          style={{height: `${rowVirtualizer.getTotalSize()}px`}}
+        />
+        {rowVirtualizer.getVirtualItems().map(virtualItem => {
+          const conversation = conversationsToDisplay[virtualItem.index];
 
-            // Have to use some hacky way to display properly heading while filtering conversations, can be improved
-            // in the future
-            const isHeading = 'isHeader' in conversation && 'heading' in conversation;
+          // Have to use some hacky way to display properly heading while filtering conversations, can be improved
+          // in the future
+          const isHeading = 'isHeader' in conversation && 'heading' in conversation;
 
-            if (!isConversationEntity(conversation) && conversationsFilter && !isEmpty && isHeading) {
-              const translationKey = conversation.heading as 'searchConversationNames' | 'searchGroupParticipants';
-              return (
-                <div
-                  key={virtualItem.key}
-                  css={[headingTitle, virtualizationStyles]}
-                  style={{
-                    transform: `translateY(${virtualItem.start}px)`,
-                  }}
-                >
+          if (!isConversationEntity(conversation) && conversationsFilter && !isEmpty && isHeading) {
+            const translationKey = conversation.heading as 'searchConversationNames' | 'searchGroupParticipants';
+            return (
+              <li
+                key={virtualItem.key}
+                css={virtualizationStyles}
+                style={{
+                  height: `${virtualItem.size}px`,
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                <h3 className="conversation-list-heading" css={headingTitle}>
                   {translate(translationKey)}
-                </div>
-              );
-            }
+                </h3>
+              </li>
+            );
+          }
 
-            if (isConversationEntity(conversation)) {
-              return (
-                <div
-                  key={virtualItem.key}
-                  css={virtualizationStyles}
-                  style={{
-                    height: `${virtualItem.size}px`,
-                    transform: `translateY(${virtualItem.start}px)`,
-                  }}
-                >
-                  <ConversationListCell
-                    key={conversation.id}
-                    {...getCommonConversationCellProps(conversation, virtualItem.index)}
-                  />
-                </div>
-              );
-            }
+          if (isConversationEntity(conversation)) {
+            return (
+              <ConversationListCell
+                key={virtualItem.key}
+                listItemCss={virtualizationStyles}
+                listItemStyle={{
+                  height: `${virtualItem.size}px`,
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+                {...getCommonConversationCellProps(conversation, virtualItem.index)}
+              />
+            );
+          }
 
-            return null;
-          })}
-        </div>
+          return null;
+        })}
       </ul>
 
       {isGroupParticipantsVisible && (
         <>
-          <h3 css={headingTitle}>{translate('searchGroupParticipants')}</h3>
+          <h3 className="conversation-list-heading" css={headingTitle}>
+            {translate('searchGroupParticipants')}
+          </h3>
           <ul
             css={conversationsList}
             data-uie-name="group-participants-conversations-view"

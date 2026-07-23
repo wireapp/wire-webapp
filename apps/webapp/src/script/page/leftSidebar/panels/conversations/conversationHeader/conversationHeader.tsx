@@ -36,6 +36,9 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   button,
+  collapsedHeader,
+  collapsedIconButton,
+  collapsedIconRow,
   header,
   label,
   closeIconStyles,
@@ -43,6 +46,14 @@ import {
   searchInputStyles,
   searchInputWrapperStyles,
 } from './conversationHeader.styles';
+
+export const conversationsPanelHeadingId = 'conversations-heading';
+
+const focusSearchInputRef = (searchInputRef: MutableRefObject<HTMLInputElement | null>) => {
+  requestAnimationFrame(() => {
+    searchInputRef.current?.focus();
+  });
+};
 
 interface ConversationHeaderProps {
   currentTab: SidebarTabs;
@@ -55,6 +66,8 @@ interface ConversationHeaderProps {
   onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
   jumpToRecentSearch: () => void;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
+  isListCollapsed?: boolean;
+  onExpandList?: () => void;
 }
 
 export const ConversationHeaderComponent = ({
@@ -68,6 +81,8 @@ export const ConversationHeaderComponent = ({
   onSearchEnterClick,
   jumpToRecentSearch,
   searchInputRef,
+  isListCollapsed = false,
+  onExpandList,
 }: ConversationHeaderProps) => {
   const {translate} = useApplicationContext();
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
@@ -95,8 +110,9 @@ export const ConversationHeaderComponent = ({
 
   useEffect(() => {
     const onSearchShortcut = () => {
+      onExpandList?.();
       jumpToRecentSearch();
-      searchInputRef?.current?.focus();
+      focusSearchInputRef(searchInputRef);
     };
 
     amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
@@ -104,7 +120,7 @@ export const ConversationHeaderComponent = ({
     return () => {
       amplify.unsubscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
     };
-  }, [searchInputRef, jumpToRecentSearch]);
+  }, [jumpToRecentSearch, onExpandList, searchInputRef]);
 
   const showCreateConversationModal = () => {
     if (isChannelsEnabled && canCreateChannels) {
@@ -114,14 +130,62 @@ export const ConversationHeaderComponent = ({
     }
   };
 
+  const handleCollapsedSearchClick = () => {
+    onExpandList?.();
+    focusSearchInputRef(searchInputRef);
+  };
+
+  const showCreateButton =
+    currentTab !== SidebarTabs.ARCHIVES && (canCreateGroupConversation() || canExternalUserCreateChannel);
+
+  const headerTitle = isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab];
+
+  if (isListCollapsed) {
+    return (
+      <>
+        <h2 id={conversationsPanelHeadingId} className="visually-hidden">
+          {headerTitle}
+        </h2>
+
+        <div css={collapsedHeader}>
+          {showSearchInput && (
+            <div css={collapsedIconRow}>
+              <IconButton
+                onClick={handleCollapsedSearchClick}
+                data-uie-name="search-conversations"
+                css={collapsedIconButton}
+                title={searchInputPlaceholder}
+              >
+                <SearchIcon width={14} height={14} />
+              </IconButton>
+            </div>
+          )}
+
+          {showCreateButton && (
+            <div css={collapsedIconRow}>
+              <IconButton
+                onClick={showCreateConversationModal}
+                data-uie-name="go-create-group"
+                css={collapsedIconButton}
+                title={translate('conversationDetailsActionCreateGroup')}
+              >
+                <Icon.PlusIcon />
+              </IconButton>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <div css={header}>
-        <h2 css={label} data-uie-name="conversation-list-header-title">
-          {isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab]}
+        <h2 id={conversationsPanelHeadingId} css={label} data-uie-name="conversation-list-header-title">
+          {headerTitle}
         </h2>
 
-        {currentTab !== SidebarTabs.ARCHIVES && (canCreateGroupConversation() || canExternalUserCreateChannel) && (
+        {showCreateButton && (
           <IconButton
             onClick={showCreateConversationModal}
             data-uie-name="go-create-group"

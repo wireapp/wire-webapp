@@ -36,7 +36,12 @@ import {MeetingParticipants} from 'Components/Meeting/MeetingList/MeetingListIte
 import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
 import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingRecurrence';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
-import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/meetingStatusUtil';
+import {useJoinMeetingCall} from 'Components/Meeting/useJoinMeetingCall';
+import {
+  getMeetingTemporalStatusAt,
+  isMeetingListItemOngoing,
+  MeetingTemporalStatuses,
+} from 'Components/Meeting/utils/meetingStatusUtil';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
 
@@ -50,20 +55,17 @@ const MeetingListItemComponent = ({
   nowMilliseconds: providedNowMilliseconds,
 }: MeetingListItemProps) => {
   const {meetingSeries, start, end} = meetingInstance;
-  const {title, recurrence, attending} = meetingSeries;
+  const {title, recurrence} = meetingSeries;
   const {translate, wallClock} = useApplicationContext();
   const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
+  const {joinMeeting, isJoinDisabled, isCallActive} = useJoinMeetingCall(meetingSeries.qualified_conversation);
 
-  const startDateIso = start.toISOString();
-  const endDateIso = end.toISOString();
+  const now = useMemo(() => new Date(nowMilliseconds), [nowMilliseconds]);
+
+  const temporalStatus = useMemo(() => getMeetingTemporalStatusAt(now, start, end), [now, start, end]);
 
   const time = useMemo(() => {
-    const startMs = start.getTime();
-    const endMs = end.getTime();
-    const isPast = nowMilliseconds > endMs;
-    const isOngoing = nowMilliseconds >= startMs && nowMilliseconds < endMs;
-
-    if (isPast) {
+    if (temporalStatus === MeetingTemporalStatuses.PAST) {
       const dayOfWeek = formatLocale(start, 'EEEE');
       const month = formatLocale(start, 'MMMM');
       const day = formatLocale(start, 'd');
@@ -71,7 +73,7 @@ const MeetingListItemComponent = ({
       return `${dayOfWeek}, ${month} ${day} • ${translate('meetings.meetingStatus.startedAt', {time: startedAtTime})}`;
     }
 
-    if (isOngoing) {
+    if (temporalStatus === MeetingTemporalStatuses.ON_GOING) {
       const startedAtTime = formatLocale(start, 'h:mm a');
       return translate('meetings.meetingStatus.startedAt', {time: startedAtTime});
     }
@@ -80,14 +82,9 @@ const MeetingListItemComponent = ({
     return sameMeridiem
       ? `${formatLocale(start, 'h:mm')} – ${formatLocale(end, 'h:mm a')}`
       : `${formatLocale(start, 'h:mm a')} – ${formatLocale(end, 'h:mm a')}`;
-  }, [end, start, nowMilliseconds, translate]);
+  }, [end, start, temporalStatus, translate]);
 
-  const meetingStatus = useMemo(
-    () => getMeetingStatusAt(nowMilliseconds, startDateIso, endDateIso, attending),
-    [nowMilliseconds, startDateIso, endDateIso, attending],
-  );
-
-  const isOngoing = meetingStatus === MeetingStatuses.ON_GOING || meetingStatus === MeetingStatuses.PARTICIPATING;
+  const isOngoing = isMeetingListItemOngoing(temporalStatus, isCallActive);
 
   return (
     <div css={[itemStyles, isOngoing && onGoingMeetingStyles]}>
@@ -110,10 +107,10 @@ const MeetingListItemComponent = ({
       <div css={rightStyles}>
         <MeetingParticipants qualifiedConversation={meetingSeries.qualified_conversation} isOngoing={isOngoing} />
         <MeetingStatus
-          start_date={startDateIso}
-          end_date={endDateIso}
-          attending={attending}
-          nowMilliseconds={nowMilliseconds}
+          temporalStatus={temporalStatus}
+          joinMeeting={joinMeeting}
+          isJoinDisabled={isJoinDisabled}
+          isCallActive={isCallActive}
         />
         <MeetingAction meetingInstance={meetingInstance} />
       </div>

@@ -21,17 +21,17 @@ import {z} from 'zod';
 
 import {MeetingRecurrenceFrequency} from './meetingRecurrence';
 
+import {meetingConversationSchema, qualifiedIdSchema} from '../conversation/conversationSchema';
+
+export {meetingConversationSchema};
+export type {ValidatedMeetingConversation} from '../conversation/conversationSchema';
+
 /**
  * Runtime validation schemas for the Wire meetings API according to
  * https://staging-nginz-https.zinfra.io/v16/api/swagger-ui/#/default/get_meetings_list
  *
  * MeetingsAPI validates responses with parse() and throws on invalid data.
  */
-
-const qualifiedIdSchema = z.object({
-  domain: z.string(),
-  id: z.string().min(1),
-});
 
 const utcTimeSchema = z.string().datetime();
 
@@ -41,7 +41,7 @@ const meetingRecurrenceSchema = z.object({
   until: utcTimeSchema.optional(),
 });
 
-export const meetingSchema = z.object({
+const meetingFieldsSchema = {
   created_at: utcTimeSchema,
   end_time: utcTimeSchema,
   qualified_conversation: qualifiedIdSchema,
@@ -52,8 +52,16 @@ export const meetingSchema = z.object({
   title: z.string().min(1).max(256),
   trial: z.boolean(),
   updated_at: utcTimeSchema,
+} as const;
+
+export const meetingSchema = z.object(meetingFieldsSchema);
+
+export const meetingWithConversationSchema = z.object({
+  ...meetingFieldsSchema,
+  conversation: meetingConversationSchema,
 });
 
 export const meetingsListResponseSchema = z.array(meetingSchema);
 
 export type ValidatedMeeting = z.infer<typeof meetingSchema>;
+export type ValidatedMeetingWithConversation = z.infer<typeof meetingWithConversationSchema>;

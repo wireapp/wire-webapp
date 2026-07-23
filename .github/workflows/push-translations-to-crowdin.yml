@@ -2,7 +2,7 @@ name: Push translations to Crowdin
 
 on:
   push:
-    branches: [dev]
+    branches: [main]
   workflow_dispatch:
 
 concurrency:

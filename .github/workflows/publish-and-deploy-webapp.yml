@@ -3,20 +3,27 @@ name: Publish and deploy webapp
 
 on:
   push:
-    branches: [master, dev, release/*]
+    # Main development publication is owned by publish-main.yml.
+    branches: [master]
     tags:
       - '*q1-2024*'
       - '*q2-2025*'
-      - '*staging*'
-      - '*production*'
+      - '*-staging.*'
+      - '*-production.*'
 
+# Temporary shared lock until this legacy workflow is fully retired.
 concurrency:
-  group: publish-${{ github.ref }}
-  cancel-in-progress: true
+  group: publish-webapp-distribution
+  cancel-in-progress: false
+  queue: max
 
 jobs:
   build:
     name: Build Docker image and Helm Chart
+    # ADR Production tags end in -production after the new workflow has already
+    # deployed the Beta-tested artifact. Keep legacy *-production.N tags working
+    # temporarily, but never rebuild and redeploy for ADR Production tags.
+    if: ${{ !(github.ref_type == 'tag' && endsWith(github.ref_name, '-production')) }}
     runs-on: ubuntu-24.04
 
     outputs:
@@ -74,12 +81,34 @@ jobs:
       - name: Update configuration
         run: ./bin/yarn nx run webapp:configure
 
+      - name: Set webapp build metadata
+        id: webapp_build_metadata
+        env:
+          BUILD_REFERENCE: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          SOURCE_COMMIT_SHA: ${{ github.sha }}
+          WEBAPP_BUILD_CHANNEL: ${{ github.ref == 'refs/heads/master' && 'main' || 'development' }}
+        run: |
+          set -euo pipefail
+
+          build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${BUILD_REFERENCE}" "${SOURCE_COMMIT_SHA}" "${WEBAPP_BUILD_CHANNEL}")"
+
+          {
+            echo "version=${build_version}"
+            echo "commit_sha=${SOURCE_COMMIT_SHA}"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Build and package public production
         if: ${{ github.ref == 'refs/heads/master' || contains(github.ref_name, 'production') }}
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.webapp_build_metadata.outputs.commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.webapp_build_metadata.outputs.version }}
         run: ./bin/yarn build:prod:public
 
       - name: Build and package internal production
         if: ${{ github.ref != 'refs/heads/master' && !contains(github.ref_name, 'production') }}
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.webapp_build_metadata.outputs.commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.webapp_build_metadata.outputs.version }}
         run: ./bin/yarn build:prod
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -170,8 +199,6 @@ jobs:
 
           if [[ "${GITHUB_REF}" == *production* ]]; then
             wire_build_target_branches_json='["main"]'
-          elif [[ "${GITHUB_REF}" == *dev* ]]; then
-            wire_build_target_branches_json='["dev"]'
           elif [[ "${GITHUB_REF}" == *q1-2024* ]]; then
             wire_build_target_branches_json='["q1-2024"]'
           elif [[ "${GITHUB_REF}" == *q2-2025* ]]; then
@@ -263,8 +290,17 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build, publish_wire_builds]
     if: ${{ always() && needs.publish_wire_builds.result == 'failure' }}
+    permissions:
+      contents: read
 
     steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/actions/notify-deployoholics
+
       - name: Announce wire-builds bump failure
         uses: ./.github/actions/notify-deployoholics
         with:
@@ -292,9 +328,7 @@ jobs:
         run: |
           deployment_targets_json=""
 
-          if [[ "${GITHUB_REF}" == *dev* ]]; then
-            deployment_targets_json='["wire-webapp-dev", "wire-webapp-edge"]'
-          elif [[ "${GITHUB_REF}" == *master* ]]; then
+          if [[ "${GITHUB_REF}" == *master* ]]; then
             deployment_targets_json='["wire-webapp-main"]'
           elif [[ "${GITHUB_REF}" == *production* ]]; then
             deployment_targets_json='["wire-webapp-prod"]'
@@ -390,8 +424,17 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build, deploy_to_aws]
     if: ${{ always() && needs.deploy_to_aws.result == 'failure' }}
+    permissions:
+      contents: read
 
     steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/actions/notify-deployoholics
+
       - name: Announce deployment failure
         uses: ./.github/actions/notify-deployoholics
         with:

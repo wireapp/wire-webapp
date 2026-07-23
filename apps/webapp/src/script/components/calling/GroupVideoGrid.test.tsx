@@ -25,6 +25,7 @@ import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -71,7 +72,23 @@ const createMockCall = () => {
   );
 };
 
+const createMediaStream = () =>
+  ({
+    getVideoTracks: jest.fn(() => []),
+  }) as unknown as MediaStream;
+
+const createProcessedVideoStream = (stream: MediaStream) => ({
+  stream,
+  release: jest.fn(),
+});
+
 describe('GroupVideoGrid', () => {
+  beforeEach(() => {
+    backgroundEffectsStore.setState({
+      isInitializing: false,
+    });
+  });
+
   it('renders video grids', async () => {
     const selfParticipant = createMockParticipant('selfUser', 'selfClient', {isMuted: true});
     selfParticipant.user.name('Anton Bertha');
@@ -173,6 +190,35 @@ describe('GroupVideoGrid', () => {
 
     expect(thumbnailElements).not.toHaveLength(0);
     expect(thumbnailMutedIcons).not.toHaveLength(0);
+  });
+
+  it('shows and hides the loading overlay while the thumbnail video is loading', () => {
+    const participant = createMockParticipant('userId', 'clientId', {});
+    const videoStream = createMediaStream();
+    participant.videoState(VIDEO_STATE.STARTED);
+    participant.videoStream(videoStream);
+    participant.processedVideoStream(createProcessedVideoStream(videoStream));
+
+    const props: GroupVideoGripProps = {
+      grid: {
+        grid: [],
+        thumbnail: participant,
+      },
+      maximizedParticipant: null,
+      minimized: false,
+      selfParticipant: participant,
+      setMaximizedParticipant: jest.fn(),
+      call: createMockCall(),
+    };
+
+    const {container} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
+    const video = container.querySelector('[data-uie-name="self-video-thumbnail"]')!;
+
+    expect(container.querySelector('[data-uie-name="background-effect-initializing"]')).toBeInTheDocument();
+
+    fireEvent.canPlay(video);
+
+    expect(container.querySelector('[data-uie-name="background-effect-initializing"]')).not.toBeInTheDocument();
   });
 
   it('does not render muted thumbnail when un-muted', async () => {

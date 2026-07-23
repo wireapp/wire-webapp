@@ -368,11 +368,9 @@ export class CryptographyMapper {
 
   private _mapAsset(asset: Asset) {
     const {original, preview, uploaded, notUploaded} = asset;
-    let data: AssetData = {
-      content_length: 0,
-      content_type: '',
-      info: {},
-    };
+
+    // Initializing this with empty values breaks rendering of images of services
+    let data = {} as AssetData;
 
     if (original !== null && original !== undefined) {
       data = {

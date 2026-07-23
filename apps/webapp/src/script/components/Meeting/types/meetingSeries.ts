@@ -32,5 +32,4 @@ export type MeetingSeries = {
   qualified_id: QualifiedId;
   qualified_creator: QualifiedId;
   title: string;
-  attending?: boolean;
 };

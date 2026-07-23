@@ -21,6 +21,8 @@ import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
 
 import {wrapperStyles} from './cellsTableTagsColumn.styles';
 
+import {sortTagsAlphabetically} from '../../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
+
 interface CellsTableTagsColumnProps {
   tags: string[];
 }
@@ -32,7 +34,7 @@ export const CellsTableTagsColumn = ({tags}: CellsTableTagsColumnProps) => {
 
   return (
     <div css={wrapperStyles}>
-      <BadgesWithTooltip items={tags} />
+      <BadgesWithTooltip items={sortTagsAlphabetically(tags)} />
     </div>
   );
 };

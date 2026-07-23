@@ -287,9 +287,6 @@ export class TestFactory {
       this.assetRepository,
       new AudioRepository(),
       translate,
-      {
-        isMessageSendingStatusFixEnabled: false,
-      },
       this.user_repository['userState'],
       clientState,
     );

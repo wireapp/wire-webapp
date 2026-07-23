@@ -52,6 +52,17 @@ export const buildTimeOptions = (): Option[] =>
     return {value: label, label};
   });
 
+export const getTimeOptionTotalMinutes = (option: Option): number => {
+  const {hour24, minutes} = parseTimeLabel(option.value);
+  return hour24 * 60 + minutes;
+};
+
+export const filterTimeOptionsAfter = (options: Option[], minTime: Date): Option[] => {
+  const minTotalMinutes = minTime.getHours() * 60 + minTime.getMinutes();
+
+  return options.filter(option => getTimeOptionTotalMinutes(option) > minTotalMinutes);
+};
+
 export const timeOptionFromDate = (date: Date): Option => {
   const label = formatTimeLabel(date.getHours(), date.getMinutes());
   return {value: label, label};

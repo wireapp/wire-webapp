@@ -1,0 +1,45 @@
+{{- $routingMode := include "webapp.routingMode" . -}}
+{{- $routingEnabled := eq (include "webapp.routingEnabled" . | trim) "true" -}}
+{{- if and $routingEnabled (or (eq $routingMode "envoy") (eq $routingMode "migration")) }}
+{{- include "webapp.validateDomainConfig" . }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "webapp.baseName" . }}
+  labels:
+    app: {{ include "webapp.baseName" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  {{- $setIdentifier := include "webapp.externalDnsSetIdentifier" (dict "ctx" . "kind" "envoy") | trim -}}
+  {{- $weight := include "webapp.externalDnsWeight" (dict "ctx" . "kind" "envoy") | trim -}}
+  {{- if or .Values.gateway.httpRouteAnnotations $setIdentifier $weight }}
+  annotations:
+    {{- range $key, $val := .Values.gateway.httpRouteAnnotations }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- if $setIdentifier }}
+    external-dns.alpha.kubernetes.io/set-identifier: {{ $setIdentifier | quote }}
+    {{- end }}
+    {{- if $weight }}
+    external-dns.alpha.kubernetes.io/aws-weight: {{ $weight | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  parentRefs:
+    - name: {{ include "webapp.listenerSetName" . | quote }}
+      kind: ListenerSet
+      group: gateway.networking.k8s.io
+      sectionName: {{ include "webapp.listenerName" . | quote }}
+  hostnames:
+    - {{ .Values.webappDomain | quote }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {{ include "webapp.httpServiceName" . }}
+          port: {{ .Values.service.http.port | default .Values.service.http.internalPort }}
+          kind: Service
+{{- end }}

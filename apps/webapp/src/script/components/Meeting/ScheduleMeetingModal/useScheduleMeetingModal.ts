@@ -22,18 +22,23 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, maybe} from 'true-myth';
 import {create} from 'zustand';
 
-import {getNextHourDateTime} from '@wireapp/react-ui-kit';
-
+import {
+  getDefaultMeetingEndDateTime,
+  getDefaultScheduleMeetingStartDateTime,
+  resolveEndChange,
+  resolveStartChange,
+} from 'Components/Meeting/shared/defaults/meetingDateTimeDefaults';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 
-import type {
-  ScheduleMeetingFormErrors,
-  ScheduleMeetingFormState,
-  ScheduleMeetingMode,
-  ScheduleMeetingRecurrenceOption,
+import {
+  emptyScheduleMeetingFormErrors,
+  type ScheduleMeetingFormErrors,
+  type ScheduleMeetingFormState,
+  type ScheduleMeetingMode,
+  type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
-import {hasScheduleMeetingFormErrors, validateScheduleMeetingForm} from './scheduleMeetingValidation';
+import {getScheduleMeetingFormErrors} from './scheduleMeetingValidation';
 
 export type {
   ScheduleMeetingFormErrors,
@@ -42,22 +47,18 @@ export type {
 } from './scheduleMeetingTypes';
 export type {ScheduleMeetingMode as ScheduleMeetingModalMode} from './scheduleMeetingTypes';
 
-export {hasScheduleMeetingFormErrors, validateScheduleMeetingForm};
+export {
+  getScheduleMeetingFormErrors,
+  hasScheduleMeetingFormErrors,
+  validateScheduleMeetingForm,
+} from './scheduleMeetingValidation';
 
-const MEETING_DURATION_MINUTES = 30;
-
-const getDefaultEndDateTime = (start: Date): Date => {
-  const end = new Date(start);
-  end.setMinutes(end.getMinutes() + MEETING_DURATION_MINUTES);
-  return end;
-};
-
-export const getDefaultScheduleMeetingFormState = (): ScheduleMeetingFormState => {
-  const start = getNextHourDateTime();
+export const getDefaultScheduleMeetingFormState = (wallClock: WallClock): ScheduleMeetingFormState => {
+  const start = getDefaultScheduleMeetingStartDateTime(wallClock);
   return {
     title: '',
     start: maybe.just(start),
-    end: maybe.just(getDefaultEndDateTime(start)),
+    end: maybe.just(getDefaultMeetingEndDateTime(start)),
     recurrence: 'doesNotRepeat',
     selectedUsers: [],
     participantsFilter: '',
@@ -73,7 +74,7 @@ type ScheduleMeetingModalState = {
   qualifiedConversation: Maybe<QualifiedId>;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
-  openCreate: () => void;
+  openCreate: (wallClock: WallClock) => void;
   openEdit: (
     meetingSeries: MeetingSeries,
     formState: ScheduleMeetingFormState,
@@ -81,7 +82,7 @@ type ScheduleMeetingModalState = {
     originalSelectedUsers: User[],
   ) => void;
   close: () => void;
-  reset: () => void;
+  reset: (wallClock: WallClock) => void;
   setTitle: (title: string) => void;
   setStart: (start: Maybe<Date>) => void;
   setEnd: (end: Maybe<Date>) => void;
@@ -92,11 +93,20 @@ type ScheduleMeetingModalState = {
   clearErrors: () => void;
 };
 
+const emptyFormState: ScheduleMeetingFormState = {
+  title: '',
+  start: maybe.nothing(),
+  end: maybe.nothing(),
+  recurrence: 'doesNotRepeat',
+  selectedUsers: [],
+  participantsFilter: '',
+};
+
 const initialState = {
   isOpen: false,
   mode: 'create' as ScheduleMeetingMode,
-  formState: getDefaultScheduleMeetingFormState(),
-  errors: {} as ScheduleMeetingFormErrors,
+  formState: emptyFormState,
+  errors: emptyScheduleMeetingFormErrors(),
   editingMeetingId: Maybe.nothing<QualifiedId>(),
   qualifiedConversation: Maybe.nothing<QualifiedId>(),
   originalRecurrence: 'doesNotRepeat' as ScheduleMeetingRecurrenceOption,
@@ -105,12 +115,12 @@ const initialState = {
 
 export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, get) => ({
   ...initialState,
-  openCreate: () =>
+  openCreate: wallClock =>
     set({
       isOpen: true,
       mode: 'create',
-      formState: getDefaultScheduleMeetingFormState(),
-      errors: {},
+      formState: getDefaultScheduleMeetingFormState(wallClock),
+      errors: emptyScheduleMeetingFormErrors(),
       editingMeetingId: Maybe.nothing(),
       qualifiedConversation: Maybe.nothing(),
       originalRecurrence: 'doesNotRepeat',
@@ -126,7 +136,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       isOpen: true,
       mode: 'edit',
       formState,
-      errors: {},
+      errors: emptyScheduleMeetingFormErrors(),
       editingMeetingId: maybe.just(meetingSeries.qualified_id),
       qualifiedConversation: maybe.just(qualifiedConversation),
       originalRecurrence: formState.recurrence,
@@ -139,30 +149,77 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       originalRecurrence: 'doesNotRepeat',
       originalSelectedUsers: [],
     }),
-  reset: () => set({...initialState, formState: getDefaultScheduleMeetingFormState()}),
+  reset: wallClock => set({...initialState, formState: getDefaultScheduleMeetingFormState(wallClock)}),
   setTitle: title =>
     set(state => ({
       formState: {...state.formState, title},
       errors: {...state.errors, title: undefined},
     })),
   setStart: start =>
-    set(state => ({
-      formState: {...state.formState, start},
-      errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined},
-    })),
+    set(state => {
+      if (start.isNothing) {
+        return {
+          formState: {...state.formState, start},
+          errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined, missingTimes: undefined},
+        };
+      }
+
+      const nextFormState = {...state.formState};
+
+      if (state.formState.end.isJust && state.formState.start.isJust) {
+        const resolved = resolveStartChange(state.formState.start.value, state.formState.end.value, start.value);
+        nextFormState.start = maybe.just(resolved.start);
+        nextFormState.end = maybe.just(resolved.end);
+      } else {
+        nextFormState.start = start;
+        nextFormState.end = maybe.just(getDefaultMeetingEndDateTime(start.value));
+      }
+
+      return {
+        formState: nextFormState,
+        errors: {...state.errors, startInPast: undefined, endBeforeStart: undefined, missingTimes: undefined},
+      };
+    }),
   setEnd: end =>
-    set(state => ({
-      formState: {...state.formState, end},
-      errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined},
-    })),
+    set(state => {
+      if (end.isNothing) {
+        return {
+          formState: {...state.formState, end},
+          errors: {...state.errors, endInPast: undefined, endBeforeStart: undefined, missingTimes: undefined},
+        };
+      }
+
+      const nextFormState = {...state.formState};
+
+      if (state.formState.start.isJust) {
+        const previousStart = state.formState.start.value;
+        const previousEnd = state.formState.end.unwrapOr(getDefaultMeetingEndDateTime(previousStart));
+        const resolved = resolveEndChange(previousStart, previousEnd, end.value);
+        nextFormState.start = maybe.just(resolved.start);
+        nextFormState.end = maybe.just(resolved.end);
+      } else {
+        nextFormState.end = end;
+      }
+
+      return {
+        formState: nextFormState,
+        errors: {
+          ...state.errors,
+          endInPast: undefined,
+          endBeforeStart: undefined,
+          startInPast: undefined,
+          missingTimes: undefined,
+        },
+      };
+    }),
   setRecurrence: recurrence => set(state => ({formState: {...state.formState, recurrence}})),
   setSelectedUsers: selectedUsers => set(state => ({formState: {...state.formState, selectedUsers}})),
   setParticipantsFilter: participantsFilter => set(state => ({formState: {...state.formState, participantsFilter}})),
   validate: wallClock => {
     const {title, start, end} = get().formState;
-    const errors = validateScheduleMeetingForm({title, start, end, wallClock});
+    const errors = getScheduleMeetingFormErrors({title, start, end, wallClock});
     set({errors});
     return errors;
   },
-  clearErrors: () => set({errors: {}}),
+  clearErrors: () => set({errors: emptyScheduleMeetingFormErrors()}),
 }));

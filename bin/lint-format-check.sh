@@ -11,7 +11,7 @@
 #
 set -euo pipefail
 
-BASE="${BASE_REF:-dev}"
+BASE="${BASE_REF:-main}"
 HEAD="${HEAD_REF:-HEAD}"
 
 OUTPUT="$(mktemp)"

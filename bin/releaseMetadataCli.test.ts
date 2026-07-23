@@ -128,6 +128,54 @@ describe('releaseMetadataCli', () => {
     });
   });
 
+  it('prints the ADR webapp build version', () => {
+    const actualResult = runCommand([
+      'webapp-build-version',
+      '2026-06-19.1-production',
+      '025edc663787b3d2da366f21a5958013201e6cd4',
+      'development',
+    ]);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['2026-06-19.1'],
+    });
+  });
+
+  it('prints the complete legacy webapp build version', () => {
+    const actualResult = runCommand([
+      'webapp-build-version',
+      '2026-06-19-production.1',
+      '025edc663787b3d2da366f21a5958013201e6cd4',
+      'development',
+    ]);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['2026-06-19-production.1'],
+    });
+  });
+
+  it.each(['2026-07-20-staging.1', 'q1-2024', 'q2-2025'])(
+    'prints the development webapp build version for non-production reference "%s"',
+    buildReferenceName => {
+      const actualResult = runCommand([
+        'webapp-build-version',
+        buildReferenceName,
+        '025edc663787b3d2da366f21a5958013201e6cd4',
+        'development',
+      ]);
+
+      expect(actualResult).toEqual({
+        errors: [],
+        exitCode: 0,
+        outputs: ['dev-025edc6'],
+      });
+    },
+  );
+
   it('rejects an invalid production tag name', () => {
     const actualResult = runCommand(['validate-production-tag', '2026-06-19.0-production']);
 

@@ -43,6 +43,8 @@ export interface FileTypeCatalogEntry {
 }
 
 export const FILE_TYPE_CATALOG: readonly FileTypeCatalogEntry[] = [
+  {id: 'pdfs', labelKey: 'cells.fileType.pdfs', Icon: PdfFileIcon, mimeTerms: ['application/pdf']},
+  {id: 'documents', labelKey: 'cells.fileType.documents', Icon: DocumentFileIcon, mimeTerms: ['*word*']},
   {id: 'pictures', labelKey: 'cells.fileType.pictures', Icon: ImageFileIcon, mimeTerms: ['image/*']},
   {
     id: 'spreadsheets',
@@ -56,10 +58,8 @@ export const FILE_TYPE_CATALOG: readonly FileTypeCatalogEntry[] = [
     Icon: PresentationFileIcon,
     mimeTerms: ['*presentation*', '*powerpoint*'],
   },
-  {id: 'documents', labelKey: 'cells.fileType.documents', Icon: DocumentFileIcon, mimeTerms: ['*word*']},
-  {id: 'pdfs', labelKey: 'cells.fileType.pdfs', Icon: PdfFileIcon, mimeTerms: ['application/pdf']},
-  {id: 'audio', labelKey: 'cells.fileType.audio', Icon: AudioFileIcon, mimeTerms: ['audio/*']},
   {id: 'videos', labelKey: 'cells.fileType.videos', Icon: VideoFileIcon, mimeTerms: ['video/*']},
+  {id: 'audio', labelKey: 'cells.fileType.audio', Icon: AudioFileIcon, mimeTerms: ['audio/*']},
   {
     id: 'archives',
     labelKey: 'cells.fileType.archives',

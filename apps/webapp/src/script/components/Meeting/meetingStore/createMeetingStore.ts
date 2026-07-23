@@ -23,13 +23,13 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
 import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeetingInstanceToScheduleFormState';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
-import {
-  scheduleMeeting as scheduleMeetingTask,
-  updateMeeting as updateMeetingTask,
-  type MeetingSubmitSuccess,
-  type UpdateMeetingParams,
-} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingService';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
+import {type CreateMeetingSuccess, type MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
+import type {
+  MeetNowMeetingCommand,
+  ScheduleMeetingCommand,
+  UpdateMeetingCommand,
+} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
@@ -47,8 +47,9 @@ export type MeetingStoreState = {
   isLoading: boolean;
   hasLoadError: boolean;
   loadMeetings: () => Promise<void>;
-  scheduleMeeting: (formState: ScheduleMeetingFormState) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
-  updateMeeting: (params: UpdateMeetingParams) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
+  updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
 };
 
@@ -68,8 +69,9 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
 
       set({meetingSeries: listResult.meetingSeries, hasLoadError: listResult.hasLoadError, isLoading: false});
     },
-    scheduleMeeting: formState => scheduleMeetingTask(formState, deps),
-    updateMeeting: params => updateMeetingTask(params, deps),
+    scheduleMeeting: deps.serviceTasks.scheduleMeeting,
+    meetNowMeeting: deps.serviceTasks.meetNowMeeting,
+    updateMeeting: deps.serviceTasks.updateMeeting,
     loadMeetingForEdit: meetingInstance => {
       const {meetingSeries} = meetingInstance;
 
