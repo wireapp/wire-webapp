@@ -28,6 +28,7 @@ import {
   discoverBetaCandidateHistory,
   processPullRequestsSequentially,
   resolveReleaseAppearanceRange,
+  runReleaseAppearance,
 } from './releaseAppearanceCli';
 import type {
   AssociatedPullRequest,
@@ -43,6 +44,8 @@ type TemporaryGitRepository = {
   readonly executeGitCommand: GitCommand;
   readonly path: string;
 };
+
+type TemporaryGitRepositoryTest = (repository: TemporaryGitRepository) => Promise<void>;
 
 type CreateCommitTagParameters = {
   readonly executeGitCommand: GitCommand;
@@ -92,8 +95,14 @@ function resolveDeterministicTaggerDate(commandArguments: readonly string[]): Ma
   return Maybe.nothing();
 }
 
-function executeGitCommandInRepository(repositoryPath: string, commandArguments: readonly string[]): Promise<string> {
-  const deterministicTaggerDate = resolveDeterministicTaggerDate(commandArguments);
+function executeGitCommandInRepository(
+  repositoryPath: string,
+  commandArguments: readonly string[],
+  taggerDateOverride: Maybe<string>,
+): Promise<string> {
+  const deterministicTaggerDate = taggerDateOverride.isJust
+    ? taggerDateOverride
+    : resolveDeterministicTaggerDate(commandArguments);
 
   return new Promise<string>((resolve, reject) => {
     execFile(
@@ -124,7 +133,7 @@ function executeGitCommandInRepository(repositoryPath: string, commandArguments:
 async function createTemporaryGitRepository(): Promise<TemporaryGitRepository> {
   const repositoryPath = await mkdtemp(join(tmpdir(), 'wire-webapp-release-appearance-'));
   const executeGitCommand: GitCommand = async (commandArguments: readonly string[]): Promise<string> => {
-    return executeGitCommandInRepository(repositoryPath, commandArguments);
+    return executeGitCommandInRepository(repositoryPath, commandArguments, Maybe.nothing());
   };
 
   await executeGitCommand(['init', '--quiet', '--initial-branch', 'main']);
@@ -137,6 +146,16 @@ async function createTemporaryGitRepository(): Promise<TemporaryGitRepository> {
   return {executeGitCommand, path: repositoryPath};
 }
 
+async function withTemporaryGitRepository(test: TemporaryGitRepositoryTest): Promise<void> {
+  const repository = await createTemporaryGitRepository();
+
+  try {
+    await test(repository);
+  } finally {
+    await rm(repository.path, {force: true, recursive: true});
+  }
+}
+
 async function createCommit(executeGitCommand: GitCommand, message: string): Promise<string> {
   await executeGitCommand(['commit', '--quiet', '--allow-empty', '--message', message]);
   return (await executeGitCommand(['rev-parse', 'HEAD'])).trim();
@@ -144,6 +163,18 @@ async function createCommit(executeGitCommand: GitCommand, message: string): Pro
 
 async function createAnnotatedTag(executeGitCommand: GitCommand, tagName: string): Promise<void> {
   await executeGitCommand(['tag', '--annotate', tagName, '--message', `Release ${tagName}`]);
+}
+
+async function createAnnotatedTagAt(
+  repository: TemporaryGitRepository,
+  tagName: string,
+  taggerDate: string,
+): Promise<void> {
+  await executeGitCommandInRepository(
+    repository.path,
+    ['tag', '--annotate', tagName, '--message', `Release ${tagName}`],
+    Maybe.just(taggerDate),
+  );
 }
 
 async function createCommitTag(parameters: CreateCommitTagParameters): Promise<string> {
@@ -269,9 +300,7 @@ async function resolveRange(
 
 describe('release appearance range selection with real Git repositories', () => {
   it('reconstructs Beta candidate history and repairs a failed first-candidate write', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+    await withTemporaryGitRepository(async repository => {
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
       const betaOneCommitHash = await createCommit(repository.executeGitCommand, 'Beta candidate 1 change');
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.1');
@@ -353,15 +382,11 @@ describe('release appearance range selection with real Git repositories', () => 
       expect(secondCandidateProcessing.createdPullRequestNumbers).toEqual([100, 101]);
       expect(commentGitHubClient.commentsByPullRequest.get(100)?.[0].body).toContain('| Beta | 2026-07-02.1-beta.1 |');
       expect(commentGitHubClient.commentsByPullRequest.get(101)?.[0].body).toContain('| Beta | 2026-07-02.1-beta.2 |');
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+    });
   });
 
   it('uses Beta history for Production comments and validates the promoted commit', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+    await withTemporaryGitRepository(async repository => {
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
       const betaOneCommitHash = await createCommit(repository.executeGitCommand, 'Beta candidate 1 change');
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.1');
@@ -427,15 +452,11 @@ describe('release appearance range selection with real Git repositories', () => 
 
       assert(mismatchedHistoryResult.isErr);
       expect(mismatchedHistoryResult.error.message).toContain('expected');
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+    });
   });
 
   it('uses the preceding verified Production tag for the first Beta candidate and returns only introduced commits', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+    await withTemporaryGitRepository(async repository => {
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
       const firstIntroducedCommitHash = await createCommit(repository.executeGitCommand, 'first introduced commit');
       const secondIntroducedCommitHash = await createCommit(repository.executeGitCommand, 'second introduced commit');
@@ -453,15 +474,11 @@ describe('release appearance range selection with real Git repositories', () => 
       await expect(
         readRevisionHashes(repository.executeGitCommand, rangeResult.value.resolvedRange.range.revisionRange),
       ).resolves.toEqual([firstIntroducedCommitHash, secondIntroducedCommitHash]);
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+    });
   });
 
   it('uses Beta candidate 1 as the baseline for candidate 2', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+    await withTemporaryGitRepository(async repository => {
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
       await createCommitTag({
         executeGitCommand: repository.executeGitCommand,
@@ -483,15 +500,50 @@ describe('release appearance range selection with real Git repositories', () => 
       await expect(
         readRevisionHashes(repository.executeGitCommand, rangeResult.value.resolvedRange.range.revisionRange),
       ).resolves.toEqual([introducedCommitHash]);
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+    });
+  });
+
+  it('reconstructs Beta history after an explicit same-release Beta baseline', async (): Promise<void> => {
+    await withTemporaryGitRepository(async repository => {
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
+      await createCommitTag({
+        executeGitCommand: repository.executeGitCommand,
+        message: 'Beta candidate 1',
+        tagName: '2026-07-02.1-beta.1',
+      });
+      const betaTwoCommitHash = await createCommit(repository.executeGitCommand, 'Beta candidate 2 change');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.2');
+      const betaThreeCommitHash = await createCommit(repository.executeGitCommand, 'Beta candidate 3 change');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.3');
+
+      const historyResult = await discoverBetaCandidateHistory({
+        baselineTagName: Maybe.just('2026-07-02.1-beta.1'),
+        currentCommitHash: betaThreeCommitHash,
+        executeGitCommand: repository.executeGitCommand,
+        githubClient: createCandidateHistoryGitHubClient(
+          new Map([
+            [betaTwoCommitHash, [{pullRequestNumber: 202, targetBranchName: 'main'}]],
+            [betaThreeCommitHash, [{pullRequestNumber: 203, targetBranchName: 'main'}]],
+          ]),
+        ),
+        requireFinalCandidate: false,
+        releaseTagName: '2026-07-02.1-beta.3',
+      });
+
+      assert(historyResult.isOk);
+      assert(historyResult.value.kind === 'history');
+      expect(
+        historyResult.value.history.candidateRanges.map(candidateRange => candidateRange.candidateTag.tagName),
+      ).toEqual(['2026-07-02.1-beta.2', '2026-07-02.1-beta.3']);
+      expect([...historyResult.value.history.earliestCandidateTagByPullRequest.entries()]).toEqual([
+        [202, '2026-07-02.1-beta.2'],
+        [203, '2026-07-02.1-beta.3'],
+      ]);
+    });
   });
 
   it('selects Beta candidate 9 before candidate 10 and ignores another release identifier', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+    await withTemporaryGitRepository(async repository => {
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
       await createCommitTag({
         executeGitCommand: repository.executeGitCommand,
@@ -519,15 +571,11 @@ describe('release appearance range selection with real Git repositories', () => 
       await expect(
         readRevisionHashes(repository.executeGitCommand, rangeResult.value.resolvedRange.range.revisionRange),
       ).resolves.toEqual([introducedCommitHash]);
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+    });
   });
 
   it('does not select the current Beta or current Production tag as its own baseline', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+    await withTemporaryGitRepository(async repository => {
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
       await createCommitTag({
         executeGitCommand: repository.executeGitCommand,
@@ -556,42 +604,100 @@ describe('release appearance range selection with real Git repositories', () => 
       assert(productionRangeResult.value.kind === 'range');
       expect(productionRangeResult.value.resolvedRange.range.baselineTagName).toBe('2026-07-01.1-production');
       expect(productionRangeResult.value.resolvedRange.range.baselineCommitHash).not.toBe(productionCommitHash);
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+    });
   });
 
-  it('selects the nearest Production baseline by ancestry', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+  it('selects the immediately preceding Production tag by annotated creation order', async (): Promise<void> => {
+    await withTemporaryGitRepository(async repository => {
+      await createCommit(repository.executeGitCommand, 'Old direct ancestor release');
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
-      await createCommitTag({
-        executeGitCommand: repository.executeGitCommand,
-        message: 'Near Production release',
-        tagName: '2026-07-02.1-production',
-      });
+      await repository.executeGitCommand(['checkout', '--quiet', '-b', 'release-sibling']);
+      await createCommit(repository.executeGitCommand, 'Sibling release branch');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.2-production');
+      await repository.executeGitCommand(['checkout', '--quiet', 'main']);
       await createCommit(repository.executeGitCommand, 'Current release change');
-      await createAnnotatedTag(repository.executeGitCommand, '2026-07-03.1-production');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-production');
 
       const rangeResult = await resolveRange({
         environment: 'production',
-        releaseTagName: '2026-07-03.1-production',
+        releaseTagName: '2026-07-02.1-production',
         repository,
       });
 
       assert(rangeResult.isOk);
       assert(rangeResult.value.kind === 'range');
-      expect(rangeResult.value.resolvedRange.range.baselineTagName).toBe('2026-07-02.1-production');
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+      expect(rangeResult.value.resolvedRange.range.baselineTagName).toBe('2026-07-01.2-production');
+      const commitTimestamp = await repository.executeGitCommand(['show', '-s', '--format=%ct', 'HEAD']);
+      const tagCreationTimestamp = await repository.executeGitCommand([
+        'for-each-ref',
+        '--format=%(taggerdate:unix)',
+        'refs/tags/2026-07-02.1-production',
+      ]);
+      expect(tagCreationTimestamp.trim()).not.toBe(commitTimestamp.trim());
+    });
+  });
+
+  it('uses the parsed release identifier as the deterministic tie-breaker', async (): Promise<void> => {
+    await withTemporaryGitRepository(async repository => {
+      await createCommit(repository.executeGitCommand, 'First tied release');
+      await createAnnotatedTagAt(repository, '2026-07-01.1-production', '2026-01-02T00:00:00Z');
+      await createCommit(repository.executeGitCommand, 'Second tied release');
+      await createAnnotatedTagAt(repository, '2026-07-01.2-production', '2026-01-02T00:00:00Z');
+      await createCommit(repository.executeGitCommand, 'Current release');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-production');
+
+      const rangeResult = await resolveRange({
+        environment: 'production',
+        releaseTagName: '2026-07-02.1-production',
+        repository,
+      });
+
+      assert(rangeResult.isOk);
+      assert(rangeResult.value.kind === 'range');
+      expect(rangeResult.value.resolvedRange.range.baselineTagName).toBe('2026-07-01.2-production');
+    });
+  });
+
+  it('selects the historical predecessor when resolving a historical Production tag', async (): Promise<void> => {
+    await withTemporaryGitRepository(async repository => {
+      await createCommit(repository.executeGitCommand, 'Historical predecessor');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
+      const historicalCommitHash = await createCommit(repository.executeGitCommand, 'Historical current release');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-production');
+      await createCommit(repository.executeGitCommand, 'Newer current release');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-03.1-production');
+
+      const rangeResult = await resolveReleaseAppearanceRange({
+        baselineTagName: Maybe.nothing<string>(),
+        currentCommitHash: historicalCommitHash,
+        environment: 'production',
+        executeGitCommand: repository.executeGitCommand,
+        releaseTagName: '2026-07-02.1-production',
+      });
+
+      assert(rangeResult.isOk);
+      assert(rangeResult.value.kind === 'range');
+      expect(rangeResult.value.resolvedRange.range.baselineTagName).toBe('2026-07-01.1-production');
+    });
+  });
+
+  it('rejects a lightweight new-format Production tag instead of using its commit timestamp', async (): Promise<void> => {
+    await withTemporaryGitRepository(async repository => {
+      await repository.executeGitCommand(['tag', '2026-07-02.1-production']);
+
+      const rangeResult = await resolveRange({
+        environment: 'production',
+        releaseTagName: '2026-07-02.1-production',
+        repository,
+      });
+
+      assert(rangeResult.isErr);
+      expect(rangeResult.error.message).toContain('must be an annotated tag');
+    });
   });
 
   it('ignores legacy Production tags and returns bootstrap without a new-format baseline', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+    await withTemporaryGitRepository(async repository => {
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-01-production.0');
       await createCommit(repository.executeGitCommand, 'Migration release change');
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.1');
@@ -604,15 +710,52 @@ describe('release appearance range selection with real Git repositories', () => 
 
       assert(rangeResult.isOk);
       expect(rangeResult.value).toEqual({kind: 'bootstrap'});
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+    });
+  });
+
+  it('performs no Production discovery or writes for the first new-format Production release', async (): Promise<void> => {
+    await withTemporaryGitRepository(async repository => {
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-production');
+      const currentCommitHash = (await repository.executeGitCommand(['rev-parse', 'HEAD'])).trim();
+      const githubClient = createCandidateHistoryGitHubClient(new Map());
+      const errors: string[] = [];
+      const summaries: string[] = [];
+
+      const actualExitCode = await runReleaseAppearance(
+        {
+          baselineTagName: Maybe.nothing<string>(),
+          commentMode: Maybe.just('production'),
+          currentBetaTagName: Maybe.nothing<string>(),
+          currentCommitHash,
+          dryRun: Maybe.just(false),
+          environment: 'production',
+          pullRequestNumber: Maybe.nothing<number>(),
+          releaseTagName: '2026-07-02.1-production',
+          workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/bootstrap',
+        },
+        {
+          executeGitCommand: repository.executeGitCommand,
+          githubClient,
+          writeError: (message: string): void => {
+            errors.push(message);
+          },
+          writeOutput: (): void => {
+            return;
+          },
+          writeSummary: async (message: string): Promise<void> => {
+            summaries.push(message);
+          },
+        },
+      );
+
+      expect(actualExitCode).toBe(0);
+      expect(errors).toEqual([]);
+      expect(summaries[0]).toContain('Bootstrap release');
+    });
   });
 
   it('uses the explicitly designed merge-base range for a non-ancestor Production tag', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+    await withTemporaryGitRepository(async repository => {
       const commonAncestorCommitHash = (await repository.executeGitCommand(['rev-parse', 'HEAD'])).trim();
       await repository.executeGitCommand(['checkout', '--quiet', '-b', 'release-side']);
       const nonAncestorCommitHash = await createCommit(repository.executeGitCommand, 'Side Production change');
@@ -634,15 +777,11 @@ describe('release appearance range selection with real Git repositories', () => 
       expect(
         await readRevisionHashes(repository.executeGitCommand, rangeResult.value.resolvedRange.range.revisionRange),
       ).not.toContain(nonAncestorCommitHash);
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+    });
   });
 
   it('rejects an unrelated explicit baseline and never falls back to the repository root', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+    await withTemporaryGitRepository(async repository => {
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
       await createCommit(repository.executeGitCommand, 'Current release change');
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.1');
@@ -672,9 +811,7 @@ describe('release appearance range selection with real Git repositories', () => 
       assert(unrelatedBaselineResult.isErr);
       expect(unrelatedBaselineResult.error.message).toContain('Unable to inspect tag');
 
-      const noBaselineRepository = await createTemporaryGitRepository();
-
-      try {
+      await withTemporaryGitRepository(async noBaselineRepository => {
         await createCommitTag({
           executeGitCommand: noBaselineRepository.executeGitCommand,
           message: 'Current release',
@@ -687,18 +824,12 @@ describe('release appearance range selection with real Git repositories', () => 
         });
         assert(noBaselineResult.isOk);
         expect(noBaselineResult.value).toEqual({kind: 'bootstrap'});
-      } finally {
-        await rm(noBaselineRepository.path, {force: true, recursive: true});
-      }
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+      });
+    });
   });
 
   it('validates explicit baseline format, existence, identity, and ancestry before use', async (): Promise<void> => {
-    const repository = await createTemporaryGitRepository();
-
-    try {
+    await withTemporaryGitRepository(async repository => {
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
       await createCommit(repository.executeGitCommand, 'Current release change');
       await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.1');
@@ -730,8 +861,6 @@ describe('release appearance range selection with real Git repositories', () => 
       assert(validOverrideResult.isOk);
       assert(validOverrideResult.value.kind === 'range');
       expect(validOverrideResult.value.resolvedRange.range.baselineTagName).toBe('2026-07-01.1-production');
-    } finally {
-      await rm(repository.path, {force: true, recursive: true});
-    }
+    });
   });
 });
