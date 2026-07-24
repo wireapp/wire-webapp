@@ -1408,7 +1408,7 @@ export async function processPullRequestsSequentially(
           ? Maybe.just(betaAppearanceTagName.unwrapOr(parameters.currentReleaseTagName))
           : betaAppearanceTagName;
 
-      if (parameters.environment === 'production' && desiredBetaTagName.isNothing) {
+      if (parameters.environment === 'production' && commentMode !== 'test' && desiredBetaTagName.isNothing) {
         throw new Error(`Pull request #${pullRequestNumber} has no provable Beta appearance in the promoted artifact.`);
       }
 

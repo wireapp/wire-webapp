@@ -890,7 +890,7 @@ jobs:
   comment_first_appearance_in_production:
     name: Comment first appearance in Production
     runs-on: ubuntu-24.04
-    needs: [build_artifact, create_production_tag]
+    needs: [build_artifact, create_beta_tag, create_production_tag]
     if: ${{ needs.create_production_tag.result == 'success' }}
     continue-on-error: true
     permissions:
@@ -920,6 +920,7 @@ jobs:
 
       - name: Add Production first-appearance comments
         env:
+          BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
           RELEASE_TAG_NAME: ${{ needs.create_production_tag.outputs.production_tag_name }}
@@ -930,7 +931,9 @@ jobs:
             production \
             "${RELEASE_TAG_NAME}" \
             "${RELEASE_COMMIT_SHA}" \
-            "${WORKFLOW_RUN_URL}"
+            "${WORKFLOW_RUN_URL}" \
+            --beta-tag \
+            "${BETA_TAG_NAME}"
 
   publish_production_distribution:
     name: Publish Production distribution

@@ -1187,6 +1187,43 @@ describe('release appearance CLI orchestration', () => {
     expect(summaryMessages[0]).toContain('Mode: write');
   });
 
+  it('allows a controlled Production test to extend an existing test marker', async (): Promise<void> => {
+    const existingTestCommentBody = renderReleaseAppearanceComment(
+      createCommentState({
+        beta: {
+          tagName: '2026-07-21.3-beta.1',
+          workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/711',
+        },
+      }),
+      'test',
+    );
+    const fakeGitHubClient = createFakeGitHubClient({
+      commentPages: new Map([[711, [{hasNextPage: false, items: [{body: existingTestCommentBody, commentId: 711}]}]]]),
+    });
+
+    const actualProcessing = await processPullRequestsSequentially({
+      commentMode: 'test',
+      currentReleaseTagName: '2026-07-21.3-production',
+      environment: 'production',
+      firstAppearanceTagNames: Maybe.nothing(),
+      githubClient: fakeGitHubClient.client,
+      pullRequestNumbers: [711],
+      workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/711',
+      writeError: (): void => {
+        return;
+      },
+      writeOutput: (): void => {
+        return;
+      },
+    });
+
+    expect(actualProcessing.createdPullRequestNumbers).toEqual([]);
+    expect(actualProcessing.updatedPullRequestNumbers).toEqual([711]);
+    expect(actualProcessing.failedPullRequests).toEqual([]);
+    expect(fakeGitHubClient.updatedComments[0].body).toContain('| Beta | 2026-07-21.3-beta.1 |');
+    expect(fakeGitHubClient.updatedComments[0].body).toContain('| Production | 2026-07-21.3-production |');
+  });
+
   it('dry-run computes create, update, unchanged, and no-pull-request results without writing comments', async (): Promise<void> => {
     const existingProductionComment = renderReleaseAppearanceComment(
       createCommentState({
