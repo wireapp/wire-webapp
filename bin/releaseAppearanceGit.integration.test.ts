@@ -66,30 +66,30 @@ const fixedGitEnvironment = {
   GIT_COMMITTER_DATE: '2026-01-01T00:00:00Z',
 };
 
-function resolveDeterministicTaggerDate(commandArguments: readonly string[]): string | undefined {
+function resolveDeterministicTaggerDate(commandArguments: readonly string[]): Maybe<string> {
   if (commandArguments[0] !== 'tag' || !commandArguments.includes('--annotate')) {
-    return undefined;
+    return Maybe.nothing();
   }
 
-  const tagName = commandArguments[2];
+  const tagName = Maybe.of(commandArguments[2]);
 
-  if (tagName === undefined) {
-    return undefined;
+  if (tagName.isNothing) {
+    return Maybe.nothing();
   }
 
-  const betaCandidateMatch = /^(\d{4}-\d{2}-\d{2})\.([1-9]\d*)-beta\.(\d+)$/u.exec(tagName);
+  const betaCandidateMatch = Maybe.of(/^(\d{4}-\d{2}-\d{2})\.([1-9]\d*)-beta\.(\d+)$/u.exec(tagName.value));
 
-  if (betaCandidateMatch !== null) {
-    return `${betaCandidateMatch[1]}T00:00:${betaCandidateMatch[3].padStart(2, '0')}Z`;
+  if (betaCandidateMatch.isJust) {
+    return Maybe.just(`${betaCandidateMatch.value[1]}T00:00:${betaCandidateMatch.value[3].padStart(2, '0')}Z`);
   }
 
-  const productionTagMatch = /^(\d{4}-\d{2}-\d{2})\.([1-9]\d*)-production$/u.exec(tagName);
+  const productionTagMatch = Maybe.of(/^(\d{4}-\d{2}-\d{2})\.([1-9]\d*)-production$/u.exec(tagName.value));
 
-  if (productionTagMatch !== null) {
-    return `${productionTagMatch[1]}T00:01:${productionTagMatch[2].padStart(2, '0')}Z`;
+  if (productionTagMatch.isJust) {
+    return Maybe.just(`${productionTagMatch.value[1]}T00:01:${productionTagMatch.value[2].padStart(2, '0')}Z`);
   }
 
-  return undefined;
+  return Maybe.nothing();
 }
 
 function executeGitCommandInRepository(repositoryPath: string, commandArguments: readonly string[]): Promise<string> {
@@ -104,12 +104,14 @@ function executeGitCommandInRepository(repositoryPath: string, commandArguments:
         env: {
           ...process.env,
           ...fixedGitEnvironment,
-          ...(deterministicTaggerDate === undefined ? {} : {GIT_COMMITTER_DATE: deterministicTaggerDate}),
+          ...(deterministicTaggerDate.isJust ? {GIT_COMMITTER_DATE: deterministicTaggerDate.value} : {}),
         },
       },
       (error, standardOutput) => {
-        if (error !== null) {
-          reject(error);
+        const commandError = Maybe.of(error);
+
+        if (commandError.isJust) {
+          reject(commandError.value);
           return;
         }
 
@@ -199,14 +201,14 @@ type InMemoryCommentGitHubClient = {
   readonly createAttemptCount: () => number;
 };
 
-function createInMemoryCommentGitHubClient(): InMemoryCommentGitHubClient {
+function createInMemoryCommentGitHubClient(shouldFailFirstCommentCreate = true): InMemoryCommentGitHubClient {
   const commentsByPullRequest = new Map<number, readonly ReleaseAppearanceComment[]>();
   let commentCreateAttemptCount = 0;
 
   async function createIssueComment(pullRequestNumber: number, body: string): Promise<void> {
     commentCreateAttemptCount += 1;
 
-    if (commentCreateAttemptCount === 1) {
+    if (shouldFailFirstCommentCreate && commentCreateAttemptCount === 1) {
       throw new Error('temporary create failure');
     }
 
@@ -255,15 +257,12 @@ async function resolveRange(
 ): Promise<Awaited<ReturnType<typeof resolveReleaseAppearanceRange>>> {
   const currentCommitHash = (await parameters.repository.executeGitCommand(['rev-parse', 'HEAD'])).trim();
   const releaseRangeParameters: ResolveReleaseAppearanceRangeParameters = {
+    baselineTagName: Maybe.of(parameters.baselineTagName),
     currentCommitHash,
     environment: parameters.environment,
     executeGitCommand: parameters.repository.executeGitCommand,
     releaseTagName: parameters.releaseTagName,
   };
-
-  if (parameters.baselineTagName !== undefined) {
-    releaseRangeParameters.baselineTagName = parameters.baselineTagName;
-  }
 
   return resolveReleaseAppearanceRange(releaseRangeParameters);
 }
@@ -297,9 +296,11 @@ describe('release appearance range selection with real Git repositories', () => 
         ]),
       );
       const historyResult = await discoverBetaCandidateHistory({
+        baselineTagName: Maybe.nothing<string>(),
         currentCommitHash: betaTwoCommitHash,
         executeGitCommand: repository.executeGitCommand,
         githubClient: historyGitHubClient,
+        requireFinalCandidate: false,
         releaseTagName: '2026-07-02.1-beta.2',
       });
 
@@ -352,6 +353,80 @@ describe('release appearance range selection with real Git repositories', () => 
       expect(secondCandidateProcessing.createdPullRequestNumbers).toEqual([100, 101]);
       expect(commentGitHubClient.commentsByPullRequest.get(100)?.[0].body).toContain('| Beta | 2026-07-02.1-beta.1 |');
       expect(commentGitHubClient.commentsByPullRequest.get(101)?.[0].body).toContain('| Beta | 2026-07-02.1-beta.2 |');
+    } finally {
+      await rm(repository.path, {force: true, recursive: true});
+    }
+  });
+
+  it('uses Beta history for Production comments and validates the promoted commit', async (): Promise<void> => {
+    const repository = await createTemporaryGitRepository();
+
+    try {
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
+      const betaOneCommitHash = await createCommit(repository.executeGitCommand, 'Beta candidate 1 change');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.1');
+      const betaTwoCommitHash = await createCommit(repository.executeGitCommand, 'Beta candidate 2 change');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.2');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-production');
+
+      const historyGitHubClient = createCandidateHistoryGitHubClient(
+        new Map([
+          [betaOneCommitHash, [{pullRequestNumber: 100, targetBranchName: 'main'}]],
+          [
+            betaTwoCommitHash,
+            [
+              {pullRequestNumber: 100, targetBranchName: 'main'},
+              {pullRequestNumber: 101, targetBranchName: 'main'},
+            ],
+          ],
+        ]),
+      );
+      const historyResult = await discoverBetaCandidateHistory({
+        baselineTagName: Maybe.nothing<string>(),
+        currentCommitHash: betaTwoCommitHash,
+        executeGitCommand: repository.executeGitCommand,
+        githubClient: historyGitHubClient,
+        requireFinalCandidate: true,
+        releaseTagName: '2026-07-02.1-beta.2',
+      });
+
+      assert(historyResult.isOk);
+      assert(historyResult.value.kind === 'history');
+      const commentGitHubClient = createInMemoryCommentGitHubClient(false);
+      const actualProcessing = await processPullRequestsSequentially({
+        currentReleaseTagName: '2026-07-02.1-production',
+        environment: 'production',
+        firstAppearanceTagNames: Maybe.just(historyResult.value.history.earliestCandidateTagByPullRequest),
+        githubClient: commentGitHubClient.client,
+        pullRequestNumbers: [100, 101],
+        workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/102',
+        writeError: (): void => {
+          return;
+        },
+        writeOutput: (): void => {
+          return;
+        },
+      });
+
+      expect(actualProcessing.createdPullRequestNumbers).toEqual([100, 101]);
+      expect(commentGitHubClient.commentsByPullRequest.get(100)?.[0].body).toContain('| Beta | 2026-07-02.1-beta.1 |');
+      expect(commentGitHubClient.commentsByPullRequest.get(100)?.[0].body).toContain(
+        '| Production | 2026-07-02.1-production |',
+      );
+      expect(commentGitHubClient.commentsByPullRequest.get(101)?.[0].body).toContain('| Beta | 2026-07-02.1-beta.2 |');
+
+      const mismatchedCommitHash = await createCommit(repository.executeGitCommand, 'Unpromoted Production change');
+      const mismatchedHistoryResult = await discoverBetaCandidateHistory({
+        baselineTagName: Maybe.nothing<string>(),
+        currentCommitHash: mismatchedCommitHash,
+        executeGitCommand: repository.executeGitCommand,
+        githubClient: historyGitHubClient,
+        requireFinalCandidate: true,
+        releaseTagName: '2026-07-02.1-beta.2',
+      });
+
+      assert(mismatchedHistoryResult.isErr);
+      expect(mismatchedHistoryResult.error.message).toContain('expected');
     } finally {
       await rm(repository.path, {force: true, recursive: true});
     }

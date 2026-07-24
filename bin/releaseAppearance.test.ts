@@ -19,6 +19,7 @@
 
 import {
   prepareReleaseAppearanceComment,
+  prepareReleaseAppearanceCommentWithDesiredState,
   releaseAppearanceCommentMarker,
   renderReleaseAppearanceComment,
   selectBetaDiscoveryRange,
@@ -289,6 +290,27 @@ describe('release appearance metadata', () => {
       ),
       commentId: 10,
     });
+  });
+
+  it('merges Beta and Production desired state in one comment transition', () => {
+    const actualCommentResult = prepareReleaseAppearanceCommentWithDesiredState({
+      comments: [],
+      desiredState: {
+        beta: Maybe.just({
+          tagName: '2026-07-21.3-beta.1',
+          workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/20',
+        }),
+        production: Maybe.just({
+          tagName: '2026-07-21.3-production',
+          workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/20',
+        }),
+      },
+    });
+
+    assert(actualCommentResult.isOk);
+    expect(actualCommentResult.value.action).toBe('create');
+    expect(actualCommentResult.value.body).toContain('| Beta | 2026-07-21.3-beta.1 |');
+    expect(actualCommentResult.value.body).toContain('| Production | 2026-07-21.3-production |');
   });
 
   it('does not replace an existing Production value', () => {
