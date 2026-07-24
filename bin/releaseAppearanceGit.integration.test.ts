@@ -24,8 +24,20 @@ import {join} from 'node:path';
 
 import assert from 'node:assert';
 
-import {resolveReleaseAppearanceRange} from './releaseAppearanceCli';
-import type {GitCommand, ResolveReleaseAppearanceRangeParameters} from './releaseAppearanceCli';
+import {
+  discoverBetaCandidateHistory,
+  processPullRequestsSequentially,
+  resolveReleaseAppearanceRange,
+} from './releaseAppearanceCli';
+import type {
+  AssociatedPullRequest,
+  GitCommand,
+  GitHubClient,
+  GitHubPage,
+  ResolveReleaseAppearanceRangeParameters,
+} from './releaseAppearanceCli';
+import type {ReleaseAppearanceComment} from './releaseAppearance';
+import {Maybe} from 'true-myth';
 
 type TemporaryGitRepository = {
   readonly executeGitCommand: GitCommand;
@@ -146,6 +158,98 @@ async function readRevisionHashes(executeGitCommand: GitCommand, revisionRange: 
     .filter(revisionHash => revisionHash.length > 0);
 }
 
+function createCandidateHistoryGitHubClient(
+  associatedPullRequestsByCommit: ReadonlyMap<string, readonly AssociatedPullRequest[]>,
+): GitHubClient {
+  async function createIssueComment(): Promise<void> {
+    return;
+  }
+
+  async function listIssueComments(): Promise<GitHubPage<ReleaseAppearanceComment>> {
+    return {hasNextPage: false, items: []};
+  }
+
+  async function listPullRequestsAssociatedWithCommit(commitHash: string): Promise<GitHubPage<AssociatedPullRequest>> {
+    return {
+      hasNextPage: false,
+      items: associatedPullRequestsByCommit.get(commitHash) ?? [],
+    };
+  }
+
+  async function getPullRequest(pullRequestNumber: number): Promise<never> {
+    throw new Error(`Unexpected pull request lookup: ${pullRequestNumber}`);
+  }
+
+  async function updateIssueComment(): Promise<void> {
+    return;
+  }
+
+  return {
+    createIssueComment,
+    getPullRequest,
+    listIssueComments,
+    listPullRequestsAssociatedWithCommit,
+    updateIssueComment,
+  };
+}
+
+type InMemoryCommentGitHubClient = {
+  readonly client: GitHubClient;
+  readonly commentsByPullRequest: Map<number, readonly ReleaseAppearanceComment[]>;
+  readonly createAttemptCount: () => number;
+};
+
+function createInMemoryCommentGitHubClient(): InMemoryCommentGitHubClient {
+  const commentsByPullRequest = new Map<number, readonly ReleaseAppearanceComment[]>();
+  let commentCreateAttemptCount = 0;
+
+  async function createIssueComment(pullRequestNumber: number, body: string): Promise<void> {
+    commentCreateAttemptCount += 1;
+
+    if (commentCreateAttemptCount === 1) {
+      throw new Error('temporary create failure');
+    }
+
+    commentsByPullRequest.set(pullRequestNumber, [
+      ...(commentsByPullRequest.get(pullRequestNumber) ?? []),
+      {body, commentId: commentCreateAttemptCount},
+    ]);
+  }
+
+  async function listIssueComments(pullRequestNumber: number): Promise<GitHubPage<ReleaseAppearanceComment>> {
+    return {
+      hasNextPage: false,
+      items: commentsByPullRequest.get(pullRequestNumber) ?? [],
+    };
+  }
+
+  async function listPullRequestsAssociatedWithCommit(): Promise<GitHubPage<AssociatedPullRequest>> {
+    throw new Error('Unexpected commit discovery request.');
+  }
+
+  async function getPullRequest(pullRequestNumber: number): Promise<never> {
+    throw new Error(`Unexpected pull request lookup: ${pullRequestNumber}`);
+  }
+
+  async function updateIssueComment(): Promise<void> {
+    return;
+  }
+
+  return {
+    client: {
+      createIssueComment,
+      getPullRequest,
+      listIssueComments,
+      listPullRequestsAssociatedWithCommit,
+      updateIssueComment,
+    },
+    commentsByPullRequest,
+    createAttemptCount: (): number => {
+      return commentCreateAttemptCount;
+    },
+  };
+}
+
 async function resolveRange(
   parameters: ResolveRangeParameters,
 ): Promise<Awaited<ReturnType<typeof resolveReleaseAppearanceRange>>> {
@@ -165,6 +269,94 @@ async function resolveRange(
 }
 
 describe('release appearance range selection with real Git repositories', () => {
+  it('reconstructs Beta candidate history and repairs a failed first-candidate write', async (): Promise<void> => {
+    const repository = await createTemporaryGitRepository();
+
+    try {
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-01.1-production');
+      const betaOneCommitHash = await createCommit(repository.executeGitCommand, 'Beta candidate 1 change');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.1');
+      const betaTwoCommitHash = await createCommit(repository.executeGitCommand, 'Beta candidate 2 change');
+      await createAnnotatedTag(repository.executeGitCommand, '2026-07-02.1-beta.2');
+      await createCommitTag({
+        executeGitCommand: repository.executeGitCommand,
+        message: 'Beta candidate 3 change',
+        tagName: '2026-07-02.1-beta.3',
+      });
+
+      const historyGitHubClient = createCandidateHistoryGitHubClient(
+        new Map([
+          [betaOneCommitHash, [{pullRequestNumber: 100, targetBranchName: 'main'}]],
+          [
+            betaTwoCommitHash,
+            [
+              {pullRequestNumber: 100, targetBranchName: 'main'},
+              {pullRequestNumber: 101, targetBranchName: 'release/2026-07-02.1'},
+            ],
+          ],
+        ]),
+      );
+      const historyResult = await discoverBetaCandidateHistory({
+        currentCommitHash: betaTwoCommitHash,
+        executeGitCommand: repository.executeGitCommand,
+        githubClient: historyGitHubClient,
+        releaseTagName: '2026-07-02.1-beta.2',
+      });
+
+      assert(historyResult.isOk);
+      assert(historyResult.value.kind === 'history');
+      expect(
+        historyResult.value.history.candidateRanges.map(candidateRange => candidateRange.candidateTag.tagName),
+      ).toEqual(['2026-07-02.1-beta.1', '2026-07-02.1-beta.2']);
+      expect([...historyResult.value.history.earliestCandidateTagByPullRequest.entries()]).toEqual([
+        [100, '2026-07-02.1-beta.1'],
+        [101, '2026-07-02.1-beta.2'],
+      ]);
+
+      const commentGitHubClient = createInMemoryCommentGitHubClient();
+      const firstCandidateErrors: string[] = [];
+      const firstCandidateProcessing = await processPullRequestsSequentially({
+        currentReleaseTagName: '2026-07-02.1-beta.1',
+        environment: 'beta',
+        firstAppearanceTagNames: Maybe.just(new Map([[100, '2026-07-02.1-beta.1']])),
+        githubClient: commentGitHubClient.client,
+        pullRequestNumbers: [100],
+        workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/100',
+        writeError: (message: string): void => {
+          firstCandidateErrors.push(message);
+        },
+        writeOutput: (): void => {
+          return;
+        },
+      });
+
+      expect(firstCandidateProcessing.failedPullRequests).toEqual(['Pull request #100: temporary create failure']);
+      expect(firstCandidateErrors).toEqual(['Pull request #100: temporary create failure']);
+      expect(commentGitHubClient.createAttemptCount()).toBe(1);
+
+      const secondCandidateProcessing = await processPullRequestsSequentially({
+        currentReleaseTagName: '2026-07-02.1-beta.2',
+        environment: 'beta',
+        firstAppearanceTagNames: Maybe.just(historyResult.value.history.earliestCandidateTagByPullRequest),
+        githubClient: commentGitHubClient.client,
+        pullRequestNumbers: [100, 101],
+        workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/101',
+        writeError: (): void => {
+          return;
+        },
+        writeOutput: (): void => {
+          return;
+        },
+      });
+
+      expect(secondCandidateProcessing.createdPullRequestNumbers).toEqual([100, 101]);
+      expect(commentGitHubClient.commentsByPullRequest.get(100)?.[0].body).toContain('| Beta | 2026-07-02.1-beta.1 |');
+      expect(commentGitHubClient.commentsByPullRequest.get(101)?.[0].body).toContain('| Beta | 2026-07-02.1-beta.2 |');
+    } finally {
+      await rm(repository.path, {force: true, recursive: true});
+    }
+  });
+
   it('uses the preceding verified Production tag for the first Beta candidate and returns only introduced commits', async (): Promise<void> => {
     const repository = await createTemporaryGitRepository();
 

@@ -22,6 +22,7 @@ import {
   releaseAppearanceCommentMarker,
   renderReleaseAppearanceComment,
   selectBetaDiscoveryRange,
+  selectCurrentReleaseBetaCandidates,
   selectPreviousBetaTag,
   selectPreviousProductionBaseline,
   selectProductionDiscoveryRange,
@@ -71,10 +72,10 @@ describe('release appearance metadata', () => {
     expect(actualRangeResult.value).toEqual({
       kind: 'range',
       range: {
-      baselineCommitHash: previousProductionCommitHash,
-      baselineTagName: '2026-07-20.4-production',
-      mergeBaseCommitHash: previousProductionCommitHash,
-      revisionRange: `${previousProductionCommitHash}..${currentReleaseCommitHash}`,
+        baselineCommitHash: previousProductionCommitHash,
+        baselineTagName: '2026-07-20.4-production',
+        mergeBaseCommitHash: previousProductionCommitHash,
+        revisionRange: `${previousProductionCommitHash}..${currentReleaseCommitHash}`,
       },
     });
   });
@@ -101,10 +102,10 @@ describe('release appearance metadata', () => {
     expect(actualRangeResult.value).toEqual({
       kind: 'range',
       range: {
-      baselineCommitHash: previousBetaCommitHash,
-      baselineTagName: '2026-07-21.3-beta.1',
-      mergeBaseCommitHash: previousBetaMergeBaseCommitHash,
-      revisionRange: `${previousBetaMergeBaseCommitHash}..${currentReleaseCommitHash}`,
+        baselineCommitHash: previousBetaCommitHash,
+        baselineTagName: '2026-07-21.3-beta.1',
+        mergeBaseCommitHash: previousBetaMergeBaseCommitHash,
+        revisionRange: `${previousBetaMergeBaseCommitHash}..${currentReleaseCommitHash}`,
       },
     });
   });
@@ -125,6 +126,23 @@ describe('release appearance metadata', () => {
         })
         .unwrapOr(''),
     ).toBe('2026-07-21.3-beta.9');
+  });
+
+  it('reconstructs only the current release Beta candidates through the selected candidate', () => {
+    const actualCandidatesResult = selectCurrentReleaseBetaCandidates('2026-07-21.3-beta.10', [
+      '2026-07-20.4-beta.99',
+      '2026-07-21.3-beta.10',
+      '2026-07-21.3-beta.1',
+      '2026-07-21.3-beta.9',
+      '2026-07-21.3-beta.11',
+    ]);
+
+    assert(actualCandidatesResult.isOk);
+    const actualCandidateNames = actualCandidatesResult.value.map(candidateTag => {
+      return candidateTag.tagName;
+    });
+
+    expect(actualCandidateNames).toEqual(['2026-07-21.3-beta.1', '2026-07-21.3-beta.9', '2026-07-21.3-beta.10']);
   });
 
   it('ignores Beta tags from another release identifier', () => {
