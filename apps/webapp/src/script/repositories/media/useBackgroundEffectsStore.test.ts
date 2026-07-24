@@ -23,8 +23,8 @@ describe('backgroundEffectsStore:lastVirtualBackgroundId', () => {
     expect(typeof state.lastVirtualBackgroundId).toBe('string');
   });
 
-  it('initializes background effects with balanced quality', () => {
-    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(false);
+  it('initializes background effects with privacy quality', () => {
+    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(true);
     expect(backgroundEffectsStore.getState().isPerformanceEnhancementEnabled).toBe(false);
   });
 

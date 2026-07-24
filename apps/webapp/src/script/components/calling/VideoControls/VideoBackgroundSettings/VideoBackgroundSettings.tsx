@@ -55,21 +55,21 @@ interface VideoBackgroundSettingsProps {
   isWebGLAvailable: boolean;
 }
 
-export type BackgroundEffectsQuality = 'best' | 'balanced' | 'performance';
+export type BackgroundEffectsQuality = 'privacy' | 'balanced' | 'performance';
 
 export const getBackgroundEffectsQuality = (
   highQualityBlurAllowed: boolean,
   performanceEnhancementEnabled: boolean,
 ): BackgroundEffectsQuality => {
   if (highQualityBlurAllowed) {
-    return 'best';
+    return 'privacy';
   }
 
   return performanceEnhancementEnabled ? 'performance' : 'balanced';
 };
 
 export const getBackgroundEffectsQualitySettings = (quality: BackgroundEffectsQuality) => ({
-  highQualityBlurAllowed: quality === 'best',
+  highQualityBlurAllowed: quality === 'privacy',
   performanceEnhancementEnabled: quality === 'performance',
 });
 
@@ -265,18 +265,21 @@ export const VideoBackgroundSettings = ({
                 uieName="background-effects-quality"
                 options={[
                   {
-                    value: 'best' as const,
-                    label: translate('videoCallBackgroundEffectsQualityBest'),
-                    optionUieName: 'background-effects-quality-best',
+                    value: 'privacy' as const,
+                    label: translate('videoCallBackgroundEffectsQualityPrivacy'),
+                    description: translate('videoCallBackgroundEffectsQualityPrivacyDescription'),
+                    optionUieName: 'background-effects-quality-privacy',
                   },
                   {
                     value: 'balanced' as const,
                     label: translate('videoCallBackgroundEffectsQualityBalanced'),
+                    description: translate('videoCallBackgroundEffectsQualityBalancedDescription'),
                     optionUieName: 'background-effects-quality-balanced',
                   },
                   {
                     value: 'performance' as const,
                     label: translate('videoCallBackgroundEffectsQualityPerformance'),
+                    description: translate('videoCallBackgroundEffectsQualityPerformanceDescription'),
                     optionUieName: 'background-effects-quality-performance',
                   },
                 ]}

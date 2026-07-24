@@ -27,7 +27,12 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {withTheme} from '../../../../auth/util/test/testUtil';
 
-import {getBackgroundEffectLabel, VideoBackgroundSettings} from './VideoBackgroundSettings';
+import {
+  getBackgroundEffectLabel,
+  getBackgroundEffectsQuality,
+  getBackgroundEffectsQualitySettings,
+  VideoBackgroundSettings,
+} from './VideoBackgroundSettings';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
@@ -67,6 +72,24 @@ describe('VideoBackgroundSettings', () => {
     return render(withTheme(<VideoBackgroundSettings {...defaultProps} {...props} />), {wrapper: rootProviderWrapper});
   };
 
+  describe('background effects quality', () => {
+    it('uses balance when high-quality blur and performance enhancement are disabled', () => {
+      expect(getBackgroundEffectsQuality(false, false)).toBe('balanced');
+      expect(getBackgroundEffectsQualitySettings('balanced')).toEqual({
+        highQualityBlurAllowed: false,
+        performanceEnhancementEnabled: false,
+      });
+    });
+
+    it('uses privacy for high-quality blur', () => {
+      expect(getBackgroundEffectsQuality(true, false)).toBe('privacy');
+      expect(getBackgroundEffectsQualitySettings('privacy')).toEqual({
+        highQualityBlurAllowed: true,
+        performanceEnhancementEnabled: false,
+      });
+    });
+  });
+
   it('renders video background settings wrapper', () => {
     const {getByTestId} = renderComponent();
 
@@ -79,10 +102,10 @@ describe('VideoBackgroundSettings', () => {
     expect(getByTestId('background-effects-quality-balanced')).toBeChecked();
   });
 
-  it('renders the best background effects quality radio button as selected', () => {
-    const {getByTestId} = renderComponent({backgroundEffectsQuality: 'best'});
+  it('renders the privacy background effects quality radio button as selected', () => {
+    const {getByTestId} = renderComponent({backgroundEffectsQuality: 'privacy'});
 
-    expect(getByTestId('background-effects-quality-best')).toBeChecked();
+    expect(getByTestId('background-effects-quality-privacy')).toBeChecked();
     expect(getByTestId('background-effects-quality-balanced')).not.toBeChecked();
     expect(getByTestId('background-effects-quality-performance')).not.toBeChecked();
   });
@@ -95,12 +118,12 @@ describe('VideoBackgroundSettings', () => {
     expect(defaultProps.onBackgroundEffectsQualityChange).toHaveBeenCalledWith('performance');
   });
 
-  it('calls onBackgroundEffectsQualityChange with best when best quality is selected', () => {
+  it('calls onBackgroundEffectsQualityChange with privacy when privacy quality is selected', () => {
     const {getByTestId} = renderComponent();
 
-    fireEvent.click(getByTestId('background-effects-quality-best'));
+    fireEvent.click(getByTestId('background-effects-quality-privacy'));
 
-    expect(defaultProps.onBackgroundEffectsQualityChange).toHaveBeenCalledWith('best');
+    expect(defaultProps.onBackgroundEffectsQualityChange).toHaveBeenCalledWith('privacy');
   });
 
   it('calls onClose when close modal close button is clicked', () => {

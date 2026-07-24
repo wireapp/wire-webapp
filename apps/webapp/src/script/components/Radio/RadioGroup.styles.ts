@@ -23,16 +23,16 @@ export const radioInputStyles = (isDisabled: boolean): CSSObject => ({
   position: 'absolute',
   opacity: 0,
 
-  ['&[type="radio"]:checked + label::before']: {
+  ['&[type="radio"]:checked + div label::before']: {
     borderWidth: '6px',
     borderColor: isDisabled ? 'var(--checkbox-background-disabled-selected)' : 'var(--accent-color-500)',
   },
 
-  ['&[type="radio"]:hover + label::before']: {
+  ['&[type="radio"]:hover + div label::before']: {
     borderColor: isDisabled ? '' : 'var(--accent-color-500)',
   },
 
-  [' &[type="radio"]:focus-visible + label::before']: {
+  [' &[type="radio"]:focus-visible + div label::before']: {
     borderColor: isDisabled ? '' : 'var(--accent-color-600)',
   },
 });
@@ -73,6 +73,14 @@ export const radioOptionStyles: CSSObject = {
 
 export const radioHintStyles: CSSObject = {
   color: 'var(--foreground)',
+};
+
+export const radioDescriptionStyles: CSSObject = {
+  color: 'var(--foreground)',
+  fontSize: 'var(--font-size-small)',
+  lineHeight: 1.25,
+  margin: '2px 0 0 28px',
+  maxWidth: 260,
 };
 
 export const radioOptionHorizontalStyles: CSSObject = {

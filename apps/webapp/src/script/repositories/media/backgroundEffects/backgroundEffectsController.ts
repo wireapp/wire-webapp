@@ -77,7 +77,7 @@ export class BackgroundEffectsController {
   // the manually set mode. if set to auto, then adaptive quality mode is activated
   private qualityMode: QualityMode = 'auto';
   private activeQualityTier: QualityTier = 'fhd';
-  private requestedModelPath: string = SELFIE_SEGMENTER_MODEL_PATH;
+  private requestedModelPath: string = SELFIE_MULTICLASS_MODEL_PATH;
   private refcount = 0;
 
   /**
