@@ -728,6 +728,168 @@ describe('release appearance CLI orchestration', () => {
     expect(createAttemptCount).toBe(1);
   });
 
+  it('reconciles an ambiguous comment creation after GitHub accepted the POST', async (): Promise<void> => {
+    const expectedCommentBody = renderReleaseAppearanceComment(
+      createCommentState({
+        beta: {
+          tagName: '2026-07-21.3-beta.1',
+          workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/604',
+        },
+      }),
+    );
+    const responses = [
+      new Response(JSON.stringify([]), {status: 200}),
+      new Response('temporary failure', {headers: {'Retry-After': '0'}, status: 503}),
+      new Response(JSON.stringify([{body: expectedCommentBody, id: 604}]), {status: 200}),
+    ];
+    let requestCount = 0;
+    const githubClientResult = createGitHubClient({
+      apiUrl: 'https://api.github.com',
+      fetchFunction: async (): Promise<Response> => {
+        requestCount += 1;
+        const response = Maybe.of(responses.shift());
+        assert(response.isJust);
+        return response.value;
+      },
+      repositoryName: 'wireapp/wire-webapp',
+      retryDelay: (): number => {
+        return 0;
+      },
+      token: 'test-token',
+    });
+
+    assert(githubClientResult.isOk);
+    const errors: string[] = [];
+    const actualProcessing = await processPullRequestsSequentially({
+      currentReleaseTagName: '2026-07-21.3-beta.1',
+      environment: 'beta',
+      firstAppearanceTagNames: Maybe.just(new Map([[604, '2026-07-21.3-beta.1']])),
+      githubClient: githubClientResult.value,
+      pullRequestNumbers: [604],
+      workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/604',
+      writeError: (message: string): void => {
+        errors.push(message);
+      },
+      writeOutput: (): void => {
+        return;
+      },
+    });
+
+    expect(actualProcessing.createdPullRequestNumbers).toEqual([604]);
+    expect(actualProcessing.failedPullRequests).toEqual([]);
+    expect(errors).toEqual([]);
+    expect(requestCount).toBe(3);
+  });
+
+  it('performs one bounded retry when an ambiguous comment POST created nothing', async (): Promise<void> => {
+    const expectedCommentBody = renderReleaseAppearanceComment(
+      createCommentState({
+        beta: {
+          tagName: '2026-07-21.3-beta.1',
+          workflowRunUrl: 'https://github.com/wireapp/wireapp/actions/runs/605',
+        },
+      }),
+    );
+    const responses = [
+      new Response(JSON.stringify([]), {status: 200}),
+      new Response('temporary failure', {headers: {'Retry-After': '0'}, status: 503}),
+      new Response(JSON.stringify([]), {status: 200}),
+      new Response(JSON.stringify({body: expectedCommentBody, id: 605}), {status: 201}),
+    ];
+    let requestCount = 0;
+    const githubClientResult = createGitHubClient({
+      apiUrl: 'https://api.github.com',
+      fetchFunction: async (): Promise<Response> => {
+        requestCount += 1;
+        const response = Maybe.of(responses.shift());
+        assert(response.isJust);
+        return response.value;
+      },
+      repositoryName: 'wireapp/wire-webapp',
+      retryDelay: (): number => {
+        return 0;
+      },
+      token: 'test-token',
+    });
+
+    assert(githubClientResult.isOk);
+    const errors: string[] = [];
+    const actualProcessing = await processPullRequestsSequentially({
+      currentReleaseTagName: '2026-07-21.3-beta.1',
+      environment: 'beta',
+      firstAppearanceTagNames: Maybe.just(new Map([[605, '2026-07-21.3-beta.1']])),
+      githubClient: githubClientResult.value,
+      pullRequestNumbers: [605],
+      workflowRunUrl: 'https://github.com/wireapp/wireapp/actions/runs/605',
+      writeError: (message: string): void => {
+        errors.push(message);
+      },
+      writeOutput: (): void => {
+        return;
+      },
+    });
+
+    expect(errors).toEqual([]);
+    expect(actualProcessing.createdPullRequestNumbers).toEqual([605]);
+    expect(actualProcessing.failedPullRequests).toEqual([]);
+    expect(requestCount).toBe(4);
+  });
+
+  it('fails reconciliation when an ambiguous comment POST leaves multiple markers', async (): Promise<void> => {
+    const markerCommentBody = renderReleaseAppearanceComment(
+      createCommentState({
+        beta: {
+          tagName: '2026-07-21.3-beta.1',
+          workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/606',
+        },
+      }),
+    );
+    const responses = [
+      new Response(JSON.stringify([]), {status: 200}),
+      new Response('temporary failure', {headers: {'Retry-After': '0'}, status: 503}),
+      new Response(
+        JSON.stringify([
+          {body: markerCommentBody, id: 606},
+          {body: markerCommentBody, id: 607},
+        ]),
+        {status: 200},
+      ),
+    ];
+    const githubClientResult = createGitHubClient({
+      apiUrl: 'https://api.github.com',
+      fetchFunction: async (): Promise<Response> => {
+        const response = Maybe.of(responses.shift());
+        assert(response.isJust);
+        return response.value;
+      },
+      repositoryName: 'wireapp/wire-webapp',
+      token: 'test-token',
+    });
+
+    assert(githubClientResult.isOk);
+    const errors: string[] = [];
+    const actualProcessing = await processPullRequestsSequentially({
+      currentReleaseTagName: '2026-07-21.3-beta.1',
+      environment: 'beta',
+      firstAppearanceTagNames: Maybe.just(new Map([[606, '2026-07-21.3-beta.1']])),
+      githubClient: githubClientResult.value,
+      pullRequestNumbers: [606],
+      workflowRunUrl: 'https://github.com/wireapp/wireapp/actions/runs/606',
+      writeError: (message: string): void => {
+        errors.push(message);
+      },
+      writeOutput: (): void => {
+        return;
+      },
+    });
+
+    expect(actualProcessing.createdPullRequestNumbers).toEqual([]);
+    expect(actualProcessing.failedPullRequests).toEqual([
+      'Pull request #606: More than one release appearance marker comment exists.',
+    ]);
+    expect(errors).toEqual(['Pull request #606: More than one release appearance marker comment exists.']);
+  });
+
   it('returns a non-zero result and writes a failure summary when a comment update fails', async () => {
     const productionCommentBody = renderReleaseAppearanceComment(
       createCommentState({

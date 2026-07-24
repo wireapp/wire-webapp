@@ -27,6 +27,7 @@ import {
   selectPreviousBetaTag,
   selectPreviousProductionBaseline,
   selectProductionDiscoveryRange,
+  verifyReleaseAppearanceCommentState,
 } from './releaseAppearance';
 import type {ReleaseAppearanceCommentState, ReleaseAppearanceValue} from './releaseAppearance';
 
@@ -361,6 +362,47 @@ describe('release appearance metadata', () => {
 
     assert(actualCommentResult.isOk);
     expect(actualCommentResult.value.action).toBe('unchanged');
+  });
+
+  it('distinguishes missing, matching, and mismatched marker state', () => {
+    const desiredState = createCommentState({
+      beta: {
+        tagName: '2026-07-21.3-beta.1',
+        workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/1',
+      },
+      production: {
+        tagName: '2026-07-21.3-production',
+        workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/2',
+      },
+    });
+    const missingResult = verifyReleaseAppearanceCommentState({comments: [], desiredState});
+    const matchingResult = verifyReleaseAppearanceCommentState({
+      comments: [{body: renderReleaseAppearanceComment(desiredState), commentId: 13}],
+      desiredState,
+    });
+    const mismatchingResult = verifyReleaseAppearanceCommentState({
+      comments: [
+        {
+          body: renderReleaseAppearanceComment(
+            createCommentState({
+              beta: {
+                tagName: '2026-07-21.3-beta.2',
+                workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/3',
+              },
+            }),
+          ),
+          commentId: 14,
+        },
+      ],
+      desiredState,
+    });
+
+    assert(missingResult.isOk);
+    assert(matchingResult.isOk);
+    assert(mismatchingResult.isOk);
+    expect(missingResult.value).toEqual({kind: 'missing'});
+    expect(matchingResult.value).toEqual({kind: 'matches'});
+    expect(mismatchingResult.value).toEqual({kind: 'mismatch'});
   });
 
   it('treats multiple marker comments as an error', () => {
