@@ -21,19 +21,26 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 type ApplicationRefreshDependencies = {
   readonly isDesktopApplication: () => boolean;
+  readonly supportsWebViewRefresh: () => boolean;
   readonly publishLifecycleEvent: (lifecycleEventName: string) => void;
   readonly reloadWindowLocation: () => void;
   readonly focusWindow: () => void;
 };
 
 export function refreshApplication(dependencies: ApplicationRefreshDependencies): void {
-  const {focusWindow, isDesktopApplication, publishLifecycleEvent, reloadWindowLocation} = dependencies;
+  const {focusWindow, isDesktopApplication, publishLifecycleEvent, reloadWindowLocation, supportsWebViewRefresh} =
+    dependencies;
 
-  if (isDesktopApplication()) {
+  if (!isDesktopApplication()) {
+    reloadWindowLocation();
+    focusWindow();
+    return;
+  }
+
+  if (supportsWebViewRefresh()) {
     publishLifecycleEvent(WebAppEvents.LIFECYCLE.REFRESH);
     return;
   }
 
-  reloadWindowLocation();
-  focusWindow();
+  publishLifecycleEvent(WebAppEvents.LIFECYCLE.RESTART);
 }
