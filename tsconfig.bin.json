@@ -4,10 +4,10 @@
     "module": "commonjs",
     "target": "es2024",
     "lib": ["ES2024"],
-    "types": ["node"],
+    "types": ["node", "jest"],
     "rootDir": ".",
     "allowImportingTsExtensions": true
   },
-  "include": ["bin/**/*.ts"],
+  "include": ["bin/**/*.ts", "tools/**/*.ts"],
   "exclude": ["node_modules", "dist", "tmp", "bin/**/*.test.ts", "bin/jest.config.js"]
 }
