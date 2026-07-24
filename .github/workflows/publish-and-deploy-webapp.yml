@@ -363,6 +363,10 @@ jobs:
     environment: ${{ matrix.target }}
     needs: [build, set_deployment_targets, release_critical_flow]
     if: ${{ always() && needs.build.result == 'success' && needs.set_deployment_targets.result == 'success' && needs.set_deployment_targets.outputs.deployment_targets && (needs.release_critical_flow.result == 'success' || needs.release_critical_flow.result == 'skipped') }}
+    concurrency:
+      group: ${{ matrix.target == 'wire-webapp-staging' && 'deploy-webapp-beta' || matrix.target == 'wire-webapp-prod' && 'deploy-webapp-production' || format('deploy-webapp-target-{0}', matrix.target) }}
+      cancel-in-progress: false
+      queue: max
 
     strategy:
       matrix:

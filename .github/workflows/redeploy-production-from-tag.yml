@@ -180,6 +180,10 @@ jobs:
       AWS_REGION: eu-central-1
     needs: [validate_request, build_artifact]
     environment: wire-webapp-prod
+    concurrency:
+      group: deploy-webapp-production
+      cancel-in-progress: false
+      queue: max
 
     steps:
       - name: Download build artifact
