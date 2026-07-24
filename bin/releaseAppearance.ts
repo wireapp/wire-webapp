@@ -19,6 +19,7 @@
 
 import is from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
+import type {Unit} from 'true-myth';
 
 export const releaseAppearanceCommentMarker = '<!-- wire-webapp-release-appearance:v1';
 export const releaseAppearanceTestCommentMarker = '<!-- wire-webapp-release-appearance-test:v1';
@@ -66,6 +67,7 @@ export type CommitDiscoveryRange = {
 
 export type BetaCandidateDiscoveryRange = {
   readonly candidateTag: BetaCandidateTag;
+  readonly candidateCommitHash: string;
   readonly range: CommitDiscoveryRange;
 };
 
@@ -88,10 +90,12 @@ export type ReleaseAppearanceCommentState = {
   readonly production: Maybe<ReleaseAppearanceValue>;
 };
 
+export type DesiredReleaseAppearanceCommentState = ReleaseAppearanceCommentState;
+
 type SerializedReleaseAppearanceCommentState = {
   readonly version?: 1;
-  readonly beta: ReleaseAppearanceValue | undefined;
-  readonly production: ReleaseAppearanceValue | undefined;
+  readonly beta?: ReleaseAppearanceValue;
+  readonly production?: ReleaseAppearanceValue;
 };
 
 export type ReleaseAppearanceComment = {
@@ -132,6 +136,12 @@ export type PrepareReleaseAppearanceCommentParameters = {
   readonly environment: ReleaseAppearanceEnvironment;
   readonly tagName: string;
   readonly workflowRunUrl: string;
+};
+
+export type PrepareReleaseAppearanceCommentWithDesiredStateParameters = {
+  readonly comments: readonly ReleaseAppearanceComment[];
+  readonly commentMode?: ReleaseAppearanceCommentMode;
+  readonly desiredState: DesiredReleaseAppearanceCommentState;
 };
 
 type CreateReleaseAppearanceValueParameters = {
@@ -237,13 +247,13 @@ function createReleaseAppearanceValue(
 }
 
 export function parseBetaCandidateTag(tagName: string): Result<BetaCandidateTag, Error> {
-  const betaCandidateTagMatch = betaCandidateTagPattern.exec(tagName);
+  const betaCandidateTagMatch = Maybe.of(betaCandidateTagPattern.exec(tagName));
 
-  if (betaCandidateTagMatch === null) {
+  if (betaCandidateTagMatch.isNothing) {
     return Result.err(new Error(`Invalid Beta candidate tag name: ${tagName}`));
   }
 
-  const candidateNumber = Number(betaCandidateTagMatch[2]);
+  const candidateNumber = Number(betaCandidateTagMatch.value[2]);
 
   if (!is.integer(candidateNumber) || candidateNumber < 1) {
     return Result.err(new Error(`Invalid Beta candidate tag number: ${tagName}`));
@@ -251,20 +261,20 @@ export function parseBetaCandidateTag(tagName: string): Result<BetaCandidateTag,
 
   return Result.ok({
     candidateNumber,
-    releaseIdentifier: betaCandidateTagMatch[1],
+    releaseIdentifier: betaCandidateTagMatch.value[1],
     tagName,
   });
 }
 
 export function parseProductionReleaseTag(tagName: string): Result<ProductionReleaseTag, Error> {
-  const productionTagMatch = productionTagPattern.exec(tagName);
+  const productionTagMatch = Maybe.of(productionTagPattern.exec(tagName));
 
-  if (productionTagMatch === null) {
+  if (productionTagMatch.isNothing) {
     return Result.err(new Error(`Invalid Production tag name: ${tagName}`));
   }
 
   return Result.ok({
-    releaseIdentifier: productionTagMatch[1],
+    releaseIdentifier: productionTagMatch.value[1],
     tagName,
   });
 }
@@ -357,20 +367,20 @@ export function selectCurrentReleaseBetaCandidates(
 
 function compareReleaseIdentifiers(leftReleaseIdentifier: string, rightReleaseIdentifier: string): number {
   const releaseIdentifierPatternMatch = /^(\d{4}-\d{2}-\d{2})\.([1-9]\d*)$/u;
-  const leftMatch = releaseIdentifierPatternMatch.exec(leftReleaseIdentifier);
-  const rightMatch = releaseIdentifierPatternMatch.exec(rightReleaseIdentifier);
+  const leftMatch = Maybe.of(releaseIdentifierPatternMatch.exec(leftReleaseIdentifier));
+  const rightMatch = Maybe.of(releaseIdentifierPatternMatch.exec(rightReleaseIdentifier));
 
-  if (leftMatch === null || rightMatch === null) {
+  if (leftMatch.isNothing || rightMatch.isNothing) {
     return leftReleaseIdentifier.localeCompare(rightReleaseIdentifier);
   }
 
-  const dateComparison = leftMatch[1].localeCompare(rightMatch[1]);
+  const dateComparison = leftMatch.value[1].localeCompare(rightMatch.value[1]);
 
   if (dateComparison !== 0) {
     return dateComparison;
   }
 
-  const releaseSequenceComparison = Number(leftMatch[2]) - Number(rightMatch[2]);
+  const releaseSequenceComparison = Number(leftMatch.value[2]) - Number(rightMatch.value[2]);
 
   if (releaseSequenceComparison !== 0) {
     return releaseSequenceComparison;
@@ -603,8 +613,8 @@ function parseAppearanceCommentState(
     }
 
     return Result.ok({
-      beta: is.undefined(parsedState.beta) ? Maybe.nothing() : Maybe.just(parsedState.beta),
-      production: is.undefined(parsedState.production) ? Maybe.nothing() : Maybe.just(parsedState.production),
+      beta: Maybe.of(parsedState.beta),
+      production: Maybe.of(parsedState.production),
     });
   } catch {
     return Result.err(new Error('Release appearance comment contains invalid JSON state.'));
@@ -651,13 +661,73 @@ function addMissingCommentStateValue(
   });
 }
 
+function validateDesiredReleaseAppearanceCommentState(
+  desiredState: DesiredReleaseAppearanceCommentState,
+): Result<Unit, Error> {
+  if (desiredState.beta.isJust && !isValidReleaseAppearanceValue(desiredState.beta.value, 'beta')) {
+    return Result.err(new Error('Desired Beta release appearance value is invalid.'));
+  }
+
+  if (desiredState.production.isJust && !isValidReleaseAppearanceValue(desiredState.production.value, 'production')) {
+    return Result.err(new Error('Desired Production release appearance value is invalid.'));
+  }
+
+  if (desiredState.beta.isNothing && desiredState.production.isNothing) {
+    return Result.err(new Error('Desired release appearance state must contain Beta or Production metadata.'));
+  }
+
+  return Result.ok();
+}
+
+function mergeReleaseAppearanceCommentState(
+  existingState: ReleaseAppearanceCommentState,
+  desiredState: DesiredReleaseAppearanceCommentState,
+): ReleaseAppearanceCommentState {
+  return {
+    beta: existingState.beta.isJust ? existingState.beta : desiredState.beta,
+    production: existingState.production.isJust ? existingState.production : desiredState.production,
+  };
+}
+
+function areReleaseAppearanceValuesEqual(
+  leftValue: Maybe<ReleaseAppearanceValue>,
+  rightValue: Maybe<ReleaseAppearanceValue>,
+): boolean {
+  if (leftValue.isNothing || rightValue.isNothing) {
+    return leftValue.isNothing === rightValue.isNothing;
+  }
+
+  return (
+    leftValue.value.tagName === rightValue.value.tagName &&
+    leftValue.value.workflowRunUrl === rightValue.value.workflowRunUrl
+  );
+}
+
+function areReleaseAppearanceCommentStatesEqual(
+  leftState: ReleaseAppearanceCommentState,
+  rightState: ReleaseAppearanceCommentState,
+): boolean {
+  return (
+    areReleaseAppearanceValuesEqual(leftState.beta, rightState.beta) &&
+    areReleaseAppearanceValuesEqual(leftState.production, rightState.production)
+  );
+}
+
 function serializeReleaseAppearanceCommentState(
   state: ReleaseAppearanceCommentState,
 ): SerializedReleaseAppearanceCommentState {
   return {
     version: 1,
-    beta: state.beta.unwrapOr(undefined),
-    production: state.production.unwrapOr(undefined),
+    ...state.beta
+      .map(releaseAppearanceValue => {
+        return {beta: releaseAppearanceValue};
+      })
+      .unwrapOr({}),
+    ...state.production
+      .map(releaseAppearanceValue => {
+        return {production: releaseAppearanceValue};
+      })
+      .unwrapOr({}),
   };
 }
 
@@ -700,7 +770,33 @@ export function renderReleaseAppearanceComment(
 export function prepareReleaseAppearanceComment(
   parameters: PrepareReleaseAppearanceCommentParameters,
 ): Result<PreparedReleaseAppearanceComment, Error> {
-  const commentMode = parameters.commentMode ?? 'production';
+  const commentStateResult = createCommentState({
+    environment: parameters.environment,
+    tagName: parameters.tagName,
+    workflowRunUrl: parameters.workflowRunUrl,
+  });
+
+  if (commentStateResult.isErr) {
+    return Result.err(commentStateResult.error);
+  }
+
+  return prepareReleaseAppearanceCommentWithDesiredState({
+    comments: parameters.comments,
+    commentMode: parameters.commentMode,
+    desiredState: commentStateResult.value,
+  });
+}
+
+export function prepareReleaseAppearanceCommentWithDesiredState(
+  parameters: PrepareReleaseAppearanceCommentWithDesiredStateParameters,
+): Result<PreparedReleaseAppearanceComment, Error> {
+  const desiredStateValidationResult = validateDesiredReleaseAppearanceCommentState(parameters.desiredState);
+
+  if (desiredStateValidationResult.isErr) {
+    return Result.err(desiredStateValidationResult.error);
+  }
+
+  const commentMode = Maybe.of(parameters.commentMode).unwrapOr('production');
   const commentMarker = getReleaseAppearanceCommentMarker(commentMode);
   const markerCommentCount = countMarkerComments(parameters.comments, commentMarker);
 
@@ -709,17 +805,10 @@ export function prepareReleaseAppearanceComment(
   }
 
   if (markerCommentCount === 0) {
-    const commentStateResult = createCommentState({
-      environment: parameters.environment,
-      tagName: parameters.tagName,
-      workflowRunUrl: parameters.workflowRunUrl,
+    return Result.ok({
+      action: 'create',
+      body: renderReleaseAppearanceComment(parameters.desiredState, commentMode),
     });
-
-    if (commentStateResult.isErr) {
-      return Result.err(commentStateResult.error);
-    }
-
-    return Result.ok({action: 'create', body: renderReleaseAppearanceComment(commentStateResult.value, commentMode)});
   }
 
   const markerComment = Maybe.of(
@@ -738,9 +827,9 @@ export function prepareReleaseAppearanceComment(
     return Result.err(existingStateResult.error);
   }
 
-  const existingReleaseAppearanceValue = existingStateResult.value[parameters.environment];
+  const mergedState = mergeReleaseAppearanceCommentState(existingStateResult.value, parameters.desiredState);
 
-  if (existingReleaseAppearanceValue.isJust) {
+  if (areReleaseAppearanceCommentStatesEqual(existingStateResult.value, mergedState)) {
     return Result.ok({
       action: 'unchanged',
       body: markerComment.value.body,
@@ -748,20 +837,9 @@ export function prepareReleaseAppearanceComment(
     });
   }
 
-  const updatedStateResult = addMissingCommentStateValue({
-    environment: parameters.environment,
-    state: existingStateResult.value,
-    tagName: parameters.tagName,
-    workflowRunUrl: parameters.workflowRunUrl,
-  });
-
-  if (updatedStateResult.isErr) {
-    return Result.err(updatedStateResult.error);
-  }
-
   return Result.ok({
     action: 'update',
-    body: renderReleaseAppearanceComment(updatedStateResult.value, commentMode),
+    body: renderReleaseAppearanceComment(mergedState, commentMode),
     commentId: markerComment.value.commentId,
   });
 }

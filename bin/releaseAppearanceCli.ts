@@ -26,13 +26,14 @@ import ky, {isHTTPError} from 'ky';
 import type {KyInstance, Options as KyOptions} from 'ky';
 import {P, match} from 'ts-pattern';
 import {Maybe, Result} from 'true-myth';
+import type {Unit} from 'true-myth';
 
 import {
   getReleaseAppearanceCommentMarker,
   isProductionReleaseTagName,
   parseBetaCandidateTag,
   parseProductionReleaseTag,
-  prepareReleaseAppearanceComment,
+  prepareReleaseAppearanceCommentWithDesiredState,
   selectCurrentReleaseBetaCandidates,
   selectPreviousProductionBaseline,
   selectBetaDiscoveryRange,
@@ -42,6 +43,7 @@ import type {
   BetaCandidateDiscoveryRange,
   CommitDiscoveryRange,
   CommitRangeRelationship,
+  DesiredReleaseAppearanceCommentState,
   PreparedReleaseAppearanceComment,
   ReleaseAppearanceComment,
   ReleaseAppearanceCommentMode,
@@ -100,6 +102,7 @@ export type ReleaseAppearanceDependencies = {
 export type ReleaseAppearanceRunParameters = {
   readonly baselineTagName: Maybe<string>;
   readonly commentMode: Maybe<ReleaseAppearanceCommentMode>;
+  readonly currentBetaTagName: Maybe<string>;
   readonly currentCommitHash: string;
   readonly dryRun: Maybe<boolean>;
   readonly environment: ReleaseAppearanceEnvironment;
@@ -178,15 +181,19 @@ type ResolveCommitRangeBetweenTagsParameters = {
 };
 
 type ResolveBetaCandidateRangesParameters = {
+  readonly baselineTagName: Maybe<string>;
   readonly currentCommitHash: string;
   readonly executeGitCommand: GitCommand;
+  readonly requireFinalCandidate: boolean;
   readonly releaseTagName: string;
 };
 
 export type DiscoverBetaCandidateHistoryParameters = {
+  readonly baselineTagName: Maybe<string>;
   readonly currentCommitHash: string;
   readonly executeGitCommand: GitCommand;
   readonly githubClient: GitHubClient;
+  readonly requireFinalCandidate: boolean;
   readonly releaseTagName: string;
 };
 
@@ -197,7 +204,7 @@ type ValidateBaselineTagForEnvironmentParameters = {
 };
 
 export type ResolveReleaseAppearanceRangeParameters = {
-  readonly baselineTagName?: string;
+  readonly baselineTagName: Maybe<string>;
   readonly currentCommitHash: string;
   readonly environment: ReleaseAppearanceEnvironment;
   readonly executeGitCommand: GitCommand;
@@ -370,16 +377,20 @@ function isSupportedPullRequestTargetBranch(targetBranchName: string): boolean {
 
 function parseGitHubRepository(repositoryName: string): Result<GitHubRepository, Error> {
   const repositoryParts = repositoryName.split('/');
+  const ownerName = Maybe.of(repositoryParts[0]);
+  const repositoryNamePart = Maybe.of(repositoryParts[1]);
 
   if (
     repositoryParts.length !== 2 ||
-    !is.nonEmptyString(repositoryParts[0]) ||
-    !is.nonEmptyString(repositoryParts[1])
+    ownerName.isNothing ||
+    repositoryNamePart.isNothing ||
+    !is.nonEmptyString(ownerName.value) ||
+    !is.nonEmptyString(repositoryNamePart.value)
   ) {
     return Result.err(new Error(`Invalid GitHub repository name: ${repositoryName}`));
   }
 
-  return Result.ok({name: repositoryParts[1], owner: repositoryParts[0]});
+  return Result.ok({name: repositoryNamePart.value, owner: ownerName.value});
 }
 
 function isSafeGitHubApiUrl(apiUrl: string): boolean {
@@ -413,8 +424,10 @@ export function createGitCommand(): GitCommand {
   return async (commandArguments: readonly string[]): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
       execFile('git', [...commandArguments], {encoding: 'utf8'}, (error, standardOutput) => {
-        if (error !== null) {
-          reject(error);
+        const commandError = Maybe.of(error);
+
+        if (commandError.isJust) {
+          reject(commandError.value);
           return;
         }
 
@@ -564,7 +577,7 @@ async function resolveCommitRangeBetweenTags(
 function validateReleaseTagEnvironment(
   environment: ReleaseAppearanceEnvironment,
   releaseTagName: string,
-): Result<void, Error> {
+): Result<Unit, Error> {
   const isValidTag = match(environment)
     .with('beta', () => {
       return parseBetaCandidateTag(releaseTagName).isOk;
@@ -578,12 +591,12 @@ function validateReleaseTagEnvironment(
     return Result.err(new Error(`Release tag ${releaseTagName} does not match the ${environment} stage.`));
   }
 
-  return Result.ok(undefined);
+  return Result.ok();
 }
 
 function validateBaselineTagForEnvironment(
   parameters: ValidateBaselineTagForEnvironmentParameters,
-): Result<void, Error> {
+): Result<Unit, Error> {
   if (parameters.baselineTagName === parameters.releaseTagName) {
     return Result.err(new Error('Baseline tag must not equal the deployment tag.'));
   }
@@ -613,7 +626,7 @@ function validateBaselineTagForEnvironment(
       );
     })
     .otherwise(() => {
-      return Result.ok(undefined);
+      return Result.ok();
     });
 }
 
@@ -725,32 +738,92 @@ async function resolveBetaCandidateRanges(
     return Result.err(currentReleaseBetaCandidatesResult.error);
   }
 
+  if (parameters.requireFinalCandidate) {
+    const currentReleaseCandidateTags = allTagNames.flatMap(tagName => {
+      const betaCandidateTagResult = parseBetaCandidateTag(tagName);
+
+      if (
+        betaCandidateTagResult.isErr ||
+        betaCandidateTagResult.value.releaseIdentifier !== currentBetaCandidateTagResult.value.releaseIdentifier
+      ) {
+        return [];
+      }
+
+      return [betaCandidateTagResult.value];
+    });
+    const finalCandidateTag = Maybe.of(
+      currentReleaseCandidateTags.toSorted((leftCandidateTag, rightCandidateTag) => {
+        return rightCandidateTag.candidateNumber - leftCandidateTag.candidateNumber;
+      })[0],
+    );
+
+    if (finalCandidateTag.isJust && finalCandidateTag.value.tagName !== parameters.releaseTagName) {
+      return Result.err(
+        new Error(
+          `Production promotion must use the final Beta candidate ${finalCandidateTag.value.tagName}, not ${parameters.releaseTagName}.`,
+        ),
+      );
+    }
+  }
+
   const productionTagNames = allTagNames.filter(isProductionReleaseTagName);
   const productionRelationshipResolution = await resolveTagRelationships({
     currentCommitHash: parameters.currentCommitHash,
     executeGitCommand: parameters.executeGitCommand,
     tagNames: productionTagNames,
   });
-  const previousProductionBaselineResult = selectPreviousProductionBaseline({
-    currentReleaseIdentifier: currentBetaCandidateTagResult.value.releaseIdentifier,
-    currentTagCreatedAtSeconds: currentReleaseTagValidationResult.value.tagCreatedAtSeconds,
-    currentTagName: parameters.releaseTagName,
-    productionTagRelationships: productionRelationshipResolution.relationships,
-  });
+  let previousProductionBaselineRelationship: Maybe<CommitRangeRelationship> = Maybe.nothing();
 
-  if (previousProductionBaselineResult.isErr) {
-    return Result.err(previousProductionBaselineResult.error);
-  }
+  if (parameters.baselineTagName.isJust) {
+    const baselineTagName = parameters.baselineTagName.value;
+    const baselineValidationResult = validateBaselineTagForEnvironment({
+      baselineTagName,
+      environment: 'production',
+      releaseTagName: parameters.releaseTagName,
+    });
 
-  if (previousProductionBaselineResult.value.kind === 'bootstrap') {
-    if (
-      productionRelationshipResolution.relationships.length === 0 &&
-      productionRelationshipResolution.failures.length > 0
-    ) {
-      return Result.err(new Error(productionRelationshipResolution.failures[0]));
+    if (baselineValidationResult.isErr) {
+      return Result.err(baselineValidationResult.error);
     }
 
-    return Result.ok({kind: 'bootstrap'});
+    if (!allTagNames.includes(baselineTagName)) {
+      return Result.err(new Error(`Baseline tag does not exist: ${baselineTagName}`));
+    }
+
+    const baselineRelationship = productionRelationshipResolution.relationships.find(relationship => {
+      return relationship.tagName === baselineTagName;
+    });
+    previousProductionBaselineRelationship = Maybe.of(baselineRelationship);
+
+    if (previousProductionBaselineRelationship.isNothing) {
+      return Result.err(new Error(`Unable to inspect tag ${baselineTagName}`));
+    }
+  } else {
+    const previousProductionBaselineResult = selectPreviousProductionBaseline({
+      currentReleaseIdentifier: currentBetaCandidateTagResult.value.releaseIdentifier,
+      currentTagCreatedAtSeconds: currentReleaseTagValidationResult.value.tagCreatedAtSeconds,
+      currentTagName: parameters.releaseTagName,
+      productionTagRelationships: productionRelationshipResolution.relationships,
+    });
+
+    if (previousProductionBaselineResult.isErr) {
+      return Result.err(previousProductionBaselineResult.error);
+    }
+
+    if (previousProductionBaselineResult.value.kind === 'bootstrap') {
+      if (
+        productionRelationshipResolution.relationships.length === 0 &&
+        productionRelationshipResolution.failures.length > 0
+      ) {
+        return Result.err(
+          new Error(Maybe.of(productionRelationshipResolution.failures[0]).unwrapOr('Unknown tag failure.')),
+        );
+      }
+
+      return Result.ok({kind: 'bootstrap'});
+    }
+
+    previousProductionBaselineRelationship = Maybe.just(previousProductionBaselineResult.value.relationship);
   }
 
   const betaTagRelationships = await resolveTagRelationships({
@@ -762,10 +835,14 @@ async function resolveBetaCandidateRanges(
   });
 
   if (betaTagRelationships.failures.length > 0) {
-    return Result.err(new Error(betaTagRelationships.failures[0]));
+    return Result.err(new Error(Maybe.of(betaTagRelationships.failures[0]).unwrapOr('Unknown Beta tag failure.')));
   }
 
-  let earlierTagRelationship = previousProductionBaselineResult.value.relationship;
+  if (previousProductionBaselineRelationship.isNothing) {
+    return Result.err(new Error('Unable to select the preceding Production baseline.'));
+  }
+
+  let earlierTagRelationship = previousProductionBaselineRelationship.value;
   let candidateRanges: readonly BetaCandidateDiscoveryRange[] = [];
 
   for (const candidateTag of currentReleaseBetaCandidatesResult.value) {
@@ -793,6 +870,7 @@ async function resolveBetaCandidateRanges(
       ...candidateRanges,
       {
         candidateTag,
+        candidateCommitHash: candidateTagRelationship.value.tagCommitHash,
         range: candidateRangeResult.value,
       },
     ];
@@ -838,9 +916,10 @@ export async function resolveReleaseAppearanceRange(
   const allTagNames = await readReleaseTagNames(parameters.executeGitCommand);
   const productionTagNames = allTagNames.filter(isProductionReleaseTagName);
 
-  if (parameters.baselineTagName !== undefined) {
+  if (parameters.baselineTagName.isJust) {
+    const baselineTagName = parameters.baselineTagName.value;
     const baselineValidationResult = validateBaselineTagForEnvironment({
-      baselineTagName: parameters.baselineTagName,
+      baselineTagName,
       environment: parameters.environment,
       releaseTagName: parameters.releaseTagName,
     });
@@ -849,29 +928,26 @@ export async function resolveReleaseAppearanceRange(
       return Result.err(baselineValidationResult.error);
     }
 
-    if (!allTagNames.includes(parameters.baselineTagName)) {
-      return Result.err(new Error(`Baseline tag does not exist: ${parameters.baselineTagName}`));
+    if (!allTagNames.includes(baselineTagName)) {
+      return Result.err(new Error(`Baseline tag does not exist: ${baselineTagName}`));
     }
 
     const baselineRelationshipResolution = await resolveTagRelationships({
       currentCommitHash: parameters.currentCommitHash,
       executeGitCommand: parameters.executeGitCommand,
-      tagNames: [parameters.baselineTagName],
+      tagNames: [baselineTagName],
     });
-
-    if (baselineRelationshipResolution.relationships.length === 0) {
-      return Result.err(
-        new Error(
-          baselineRelationshipResolution.failures[0] ??
-            `Unable to validate baseline tag: ${parameters.baselineTagName}`,
-        ),
-      );
-    }
 
     const baselineRelationship = Maybe.of(baselineRelationshipResolution.relationships[0]);
 
     if (baselineRelationship.isNothing) {
-      return Result.err(new Error(`Unable to validate baseline tag: ${parameters.baselineTagName}`));
+      return Result.err(
+        new Error(
+          Maybe.of(baselineRelationshipResolution.failures[0]).unwrapOr(
+            `Unable to validate baseline tag: ${baselineTagName}`,
+          ),
+        ),
+      );
     }
 
     if (baselineRelationship.value.tagCommitHash === parameters.currentCommitHash) {
@@ -1039,8 +1115,10 @@ export async function discoverBetaCandidateHistory(
   parameters: DiscoverBetaCandidateHistoryParameters,
 ): Promise<Result<BetaCandidateHistoryResolution, Error>> {
   const candidateRangesResult = await resolveBetaCandidateRanges({
+    baselineTagName: parameters.baselineTagName,
     currentCommitHash: parameters.currentCommitHash,
     executeGitCommand: parameters.executeGitCommand,
+    requireFinalCandidate: parameters.requireFinalCandidate,
     releaseTagName: parameters.releaseTagName,
   });
 
@@ -1178,8 +1256,8 @@ async function validateSinglePullRequest(pullRequestNumber: number, githubClient
 export async function processPullRequestsSequentially(
   parameters: ProcessPullRequestsSequentiallyParameters,
 ): Promise<CommentProcessingResult> {
-  const commentMode = parameters.commentMode ?? 'production';
-  const dryRun = parameters.dryRun ?? false;
+  const commentMode = Maybe.of(parameters.commentMode).unwrapOr('production');
+  const dryRun = Maybe.of(parameters.dryRun).unwrapOr(false);
   const firstAppearanceTagNames = Maybe.of(parameters.firstAppearanceTagNames).andThen(tagNames => {
     return tagNames;
   });
@@ -1195,16 +1273,31 @@ export async function processPullRequestsSequentially(
         githubClient: parameters.githubClient,
         pullRequestNumber,
       });
-      const preparedCommentResult = prepareReleaseAppearanceComment({
+      const betaAppearanceTagName = firstAppearanceTagNames.andThen(tagNames => {
+        return Maybe.of(tagNames.get(pullRequestNumber));
+      });
+      const desiredBetaTagName =
+        parameters.environment === 'beta'
+          ? Maybe.just(betaAppearanceTagName.unwrapOr(parameters.currentReleaseTagName))
+          : betaAppearanceTagName;
+
+      if (parameters.environment === 'production' && desiredBetaTagName.isNothing) {
+        throw new Error(`Pull request #${pullRequestNumber} has no provable Beta appearance in the promoted artifact.`);
+      }
+
+      const desiredState: DesiredReleaseAppearanceCommentState = {
+        beta: desiredBetaTagName.map(tagName => {
+          return {tagName, workflowRunUrl: parameters.workflowRunUrl};
+        }),
+        production:
+          parameters.environment === 'production'
+            ? Maybe.just({tagName: parameters.currentReleaseTagName, workflowRunUrl: parameters.workflowRunUrl})
+            : Maybe.nothing(),
+      };
+      const preparedCommentResult = prepareReleaseAppearanceCommentWithDesiredState({
         comments,
         commentMode,
-        environment: parameters.environment,
-        tagName: firstAppearanceTagNames
-          .andThen(tagNames => {
-            return Maybe.of(tagNames.get(pullRequestNumber));
-          })
-          .unwrapOr(parameters.currentReleaseTagName),
-        workflowRunUrl: parameters.workflowRunUrl,
+        desiredState,
       });
 
       if (preparedCommentResult.isErr) {
@@ -1299,7 +1392,7 @@ export function renderReleaseAppearanceSummary(parameters: ReleaseAppearanceSumm
         ]
       : []),
     `- Mode: ${parameters.dryRun === true ? 'dry-run' : 'write'}`,
-    `- Comment marker: \`${getReleaseAppearanceCommentMarker(parameters.commentMode ?? 'production')}\``,
+    `- Comment marker: \`${getReleaseAppearanceCommentMarker(Maybe.of(parameters.commentMode).unwrapOr('production'))}\``,
     `- Environment: ${parameters.environment === 'beta' ? 'Beta' : 'Production'}`,
     `- Release tag: \`${parameters.releaseTagName}\``,
     `- Baseline tag: \`${selectedBaselineTagName}\``,
@@ -1442,9 +1535,11 @@ async function resolveReleaseAppearanceDiscovery(
 
       if (releaseAppearanceParameters.environment === 'beta' && releaseAppearanceParameters.baselineTagName.isNothing) {
         const betaCandidateHistoryResult = await discoverBetaCandidateHistory({
+          baselineTagName: Maybe.nothing<string>(),
           currentCommitHash: releaseAppearanceParameters.currentCommitHash,
           executeGitCommand: parameters.releaseAppearanceDependencies.executeGitCommand,
           githubClient: parameters.releaseAppearanceDependencies.githubClient,
+          requireFinalCandidate: false,
           releaseTagName: releaseAppearanceParameters.releaseTagName,
         });
 
@@ -1475,7 +1570,7 @@ async function resolveReleaseAppearanceDiscovery(
       }
 
       const rangeResult = await resolveReleaseAppearanceRange({
-        baselineTagName: releaseAppearanceParameters.baselineTagName.unwrapOr(undefined),
+        baselineTagName: releaseAppearanceParameters.baselineTagName,
         currentCommitHash: releaseAppearanceParameters.currentCommitHash,
         environment: releaseAppearanceParameters.environment,
         executeGitCommand: parameters.releaseAppearanceDependencies.executeGitCommand,
@@ -1496,6 +1591,37 @@ async function resolveReleaseAppearanceDiscovery(
           },
           firstAppearanceTagNames: Maybe.nothing<ReadonlyMap<number, string>>(),
           resolution: {kind: 'bootstrap' as const},
+        };
+      }
+
+      if (releaseAppearanceParameters.environment === 'production') {
+        if (releaseAppearanceParameters.currentBetaTagName.isNothing) {
+          throw new Error('Production comment processing requires the promoted Beta tag.');
+        }
+
+        const betaCandidateHistoryResult = await discoverBetaCandidateHistory({
+          baselineTagName: releaseAppearanceParameters.baselineTagName,
+          currentCommitHash: releaseAppearanceParameters.currentCommitHash,
+          executeGitCommand: parameters.releaseAppearanceDependencies.executeGitCommand,
+          githubClient: parameters.releaseAppearanceDependencies.githubClient,
+          requireFinalCandidate: true,
+          releaseTagName: releaseAppearanceParameters.currentBetaTagName.value,
+        });
+
+        if (betaCandidateHistoryResult.isErr) {
+          throw betaCandidateHistoryResult.error;
+        }
+
+        if (betaCandidateHistoryResult.value.kind === 'bootstrap') {
+          throw new Error('Production promotion requires a preceding Beta candidate history.');
+        }
+
+        return {
+          discovery: betaCandidateHistoryResult.value.history.discovery,
+          firstAppearanceTagNames: Maybe.just(
+            betaCandidateHistoryResult.value.history.earliestCandidateTagByPullRequest,
+          ),
+          resolution: betaCandidateHistoryResult.value,
         };
       }
 
@@ -1615,8 +1741,11 @@ async function requestGitHubJson(parameters: GitHubRequestParameters): Promise<G
     throw new Error(`GitHub response was not valid JSON: ${describeUnknownError(error)}`, {cause: error});
   }
 
-  const linkHeader = response.headers.get('link');
-  const hasNextPage = is.nonEmptyString(linkHeader) && /<[^>]+>;\s*rel="next"/u.test(linkHeader);
+  const hasNextPage = Maybe.of(response.headers.get('link'))
+    .map(linkHeader => {
+      return is.nonEmptyString(linkHeader) && /<[^>]+>;\s*rel="next"/u.test(linkHeader);
+    })
+    .unwrapOr(false);
 
   return {hasNextPage, responseBody};
 }
@@ -1632,14 +1761,14 @@ function parseAssociatedPullRequest(value: unknown, itemIndex: number): Result<M
     return Result.err(new Error(`Associated pull request at index ${itemIndex} has an invalid number.`));
   }
 
-  if (!is.null_(value.merged_at) && !is.nonEmptyString(value.merged_at)) {
+  const mergedAt = Maybe.of(value.merged_at);
+
+  if (mergedAt.isJust && !is.nonEmptyString(mergedAt.value)) {
     return Result.err(new Error(`Associated pull request at index ${itemIndex} has invalid merge metadata.`));
   }
 
   return Result.ok(
-    is.nonEmptyString(value.merged_at)
-      ? Maybe.just({pullRequestNumber: value.number, targetBranchName: value.base.ref})
-      : Maybe.nothing(),
+    mergedAt.isJust ? Maybe.just({pullRequestNumber: value.number, targetBranchName: value.base.ref}) : Maybe.nothing(),
   );
 }
 
@@ -1700,15 +1829,20 @@ function parseGitHubPullRequest(responseBody: unknown): Result<GitHubPullRequest
     responseBody.number < 1 ||
     !is.boolean(responseBody.locked) ||
     !is.plainObject(responseBody.base) ||
-    !is.nonEmptyString(responseBody.base.ref) ||
-    (!is.null_(responseBody.merged_at) && !is.nonEmptyString(responseBody.merged_at))
+    !is.nonEmptyString(responseBody.base.ref)
   ) {
     return Result.err(new Error('GitHub pull request response had invalid fields.'));
   }
 
+  const mergedAt = Maybe.of(responseBody.merged_at);
+
+  if (mergedAt.isJust && !is.nonEmptyString(mergedAt.value)) {
+    return Result.err(new Error('GitHub pull request response had invalid merge metadata.'));
+  }
+
   return Result.ok({
     isLocked: responseBody.locked,
-    isMerged: is.nonEmptyString(responseBody.merged_at),
+    isMerged: mergedAt.isJust,
     pullRequestNumber: responseBody.number,
     targetBranchName: responseBody.base.ref,
   });
@@ -1736,11 +1870,9 @@ export function createGitHubClient(parameters: CreateGitHubClientParameters): Re
   const repositoryPath = `/repos/${encodeURIComponent(repositoryResult.value.owner)}/${encodeURIComponent(
     repositoryResult.value.name,
   )}`;
-  const retryDelay =
-    parameters.retryDelay ??
-    ((retryAttemptNumber: number): number => {
-      return initialGitHubRetryDelayMilliseconds * 2 ** (retryAttemptNumber - 1);
-    });
+  const retryDelay = Maybe.of(parameters.retryDelay).unwrapOr((retryAttemptNumber: number): number => {
+    return initialGitHubRetryDelayMilliseconds * 2 ** (retryAttemptNumber - 1);
+  });
   const githubRequest = ky.create({
     fetch: parameters.fetchFunction,
     retry: {
@@ -1890,6 +2022,7 @@ const releaseAppearanceUsageText = [
   'Options:',
   '  --dry-run',
   '  --baseline-tag <existing-baseline-tag>',
+  '  --beta-tag <promoted-beta-tag>',
   '  --pull-request-number <positive-integer>',
   '  --comment-mode <production|test>',
 ].join('\n');
@@ -1908,16 +2041,23 @@ export function parseReleaseAppearanceArguments(
     return Result.err(new Error(releaseAppearanceUsageText));
   }
 
-  let baselineTagName: string | undefined;
+  let baselineTagName: Maybe<string> = Maybe.nothing();
+  let currentBetaTagName: Maybe<string> = Maybe.nothing();
   let commentMode: ReleaseAppearanceCommentMode = 'production';
   let commentModeOptionProvided = false;
   let dryRun = false;
-  let pullRequestNumber: number | undefined;
+  let pullRequestNumber: Maybe<number> = Maybe.nothing();
 
   for (let optionIndex = 0; optionIndex < optionArguments.length; optionIndex += 1) {
-    const optionName = optionArguments[optionIndex];
+    const optionName = Maybe.of(optionArguments[optionIndex]);
 
-    if (optionName === '--dry-run') {
+    if (optionName.isNothing) {
+      return Result.err(new Error(`Missing option name at index ${optionIndex}.`));
+    }
+
+    const optionNameValue = optionName.value;
+
+    if (optionNameValue === '--dry-run') {
       if (dryRun) {
         return Result.err(new Error('The --dry-run option must not be repeated.'));
       }
@@ -1926,35 +2066,55 @@ export function parseReleaseAppearanceArguments(
       continue;
     }
 
-    if (optionName === '--baseline-tag' || optionName === '--pull-request-number' || optionName === '--comment-mode') {
-      const optionValue = optionArguments[optionIndex + 1];
+    if (
+      optionNameValue === '--baseline-tag' ||
+      optionNameValue === '--beta-tag' ||
+      optionNameValue === '--pull-request-number' ||
+      optionNameValue === '--comment-mode'
+    ) {
+      const optionValueResult = Maybe.of(optionArguments[optionIndex + 1]);
 
-      if (optionValue === undefined || optionValue.startsWith('--') || optionValue.length === 0) {
-        return Result.err(new Error(`Option ${optionName} requires a non-empty value.`));
+      if (
+        optionValueResult.isNothing ||
+        optionValueResult.value.startsWith('--') ||
+        optionValueResult.value.length === 0
+      ) {
+        return Result.err(new Error(`Option ${optionNameValue} requires a non-empty value.`));
       }
 
       optionIndex += 1;
+      const optionValue = optionValueResult.value;
 
-      if (optionName === '--baseline-tag') {
-        if (baselineTagName !== undefined) {
+      if (optionNameValue === '--baseline-tag') {
+        if (baselineTagName.isJust) {
           return Result.err(new Error('The --baseline-tag option must not be repeated.'));
         }
 
-        baselineTagName = optionValue;
+        baselineTagName = Maybe.just(optionValue);
         continue;
       }
 
-      if (optionName === '--pull-request-number') {
-        if (pullRequestNumber !== undefined || !/^\d+$/u.test(optionValue)) {
+      if (optionNameValue === '--beta-tag') {
+        if (currentBetaTagName.isJust) {
+          return Result.err(new Error('The --beta-tag option must not be repeated.'));
+        }
+
+        currentBetaTagName = Maybe.just(optionValue);
+        continue;
+      }
+
+      if (optionNameValue === '--pull-request-number') {
+        if (pullRequestNumber.isJust || !/^\d+$/u.test(optionValue)) {
           return Result.err(new Error(`Invalid pull request number: ${optionValue}`));
         }
 
-        pullRequestNumber = Number(optionValue);
+        const parsedPullRequestNumber = Number(optionValue);
 
-        if (!is.integer(pullRequestNumber) || pullRequestNumber < 1) {
+        if (!is.integer(parsedPullRequestNumber) || parsedPullRequestNumber < 1) {
           return Result.err(new Error(`Invalid pull request number: ${optionValue}`));
         }
 
+        pullRequestNumber = Maybe.just(parsedPullRequestNumber);
         continue;
       }
 
@@ -1971,28 +2131,35 @@ export function parseReleaseAppearanceArguments(
       continue;
     }
 
-    return Result.err(new Error(`Unknown release appearance option: ${optionName}\n${releaseAppearanceUsageText}`));
+    return Result.err(
+      new Error(`Unknown release appearance option: ${optionNameValue}\n${releaseAppearanceUsageText}`),
+    );
   }
 
-  if (commentMode === 'test' && pullRequestNumber === undefined) {
+  if (commentMode === 'test' && pullRequestNumber.isNothing) {
     return Result.err(new Error('Test comment mode requires --pull-request-number.'));
   }
 
-  if (commentMode === 'production' && pullRequestNumber !== undefined) {
+  if (commentMode === 'production' && pullRequestNumber.isJust) {
     return Result.err(new Error('Production comment mode cannot use --pull-request-number.'));
   }
 
-  if (commentMode === 'test' && baselineTagName !== undefined) {
+  if (commentMode === 'test' && baselineTagName.isJust) {
     return Result.err(new Error('Test comment mode cannot use --baseline-tag.'));
   }
 
+  if (environmentName === 'beta' && currentBetaTagName.isJust) {
+    return Result.err(new Error('Beta comment processing cannot use --beta-tag.'));
+  }
+
   return Result.ok({
-    baselineTagName: Maybe.of(baselineTagName),
+    baselineTagName,
     commentMode: Maybe.just(commentMode),
+    currentBetaTagName,
     currentCommitHash,
     dryRun: Maybe.just(dryRun),
     environment: environmentName,
-    pullRequestNumber: Maybe.of(pullRequestNumber),
+    pullRequestNumber,
     releaseTagName,
     workflowRunUrl,
   });

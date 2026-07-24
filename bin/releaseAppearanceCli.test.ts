@@ -199,22 +199,22 @@ function createGitCommand(outputs: ReadonlyMap<string, string>): GitCommand {
     }
 
     if (commandArguments[0] === 'for-each-ref') {
-      const tagName = commandArguments.at(-1) ?? '';
+      const tagName = Maybe.of(commandArguments.at(-1)).unwrapOr('');
       if (tagName.endsWith('-production')) {
         return '100';
       }
 
-      const betaCandidateMatch = /-beta\.(\d+)$/u.exec(tagName);
-      return betaCandidateMatch === null || Number(betaCandidateMatch[1]) > 1 ? '300' : '200';
+      const betaCandidateMatch = Maybe.of(/-beta\.(\d+)$/u.exec(tagName));
+      return betaCandidateMatch.isNothing || Number(betaCandidateMatch.value[1]) > 1 ? '300' : '200';
     }
 
-    const commandOutput = outputs.get(commandKey);
+    const commandOutput = Maybe.of(outputs.get(commandKey));
 
-    if (commandOutput === undefined) {
+    if (commandOutput.isNothing) {
       throw new Error(`Unexpected Git command: ${commandKey}`);
     }
 
-    return commandOutput;
+    return commandOutput.value;
   };
 }
 
@@ -366,6 +366,7 @@ describe('release appearance CLI orchestration', () => {
 
   it('uses the immediately preceding Beta tag for the same release identifier', async () => {
     const actualRangeResult = await resolveReleaseAppearanceRange({
+      baselineTagName: Maybe.nothing<string>(),
       currentCommitHash,
       environment: 'beta',
       executeGitCommand: createGitCommand(
@@ -460,7 +461,7 @@ describe('release appearance CLI orchestration', () => {
     const actualProcessing = await processPullRequestsSequentially({
       currentReleaseTagName: '2026-07-21.3-production',
       environment: 'production',
-      firstAppearanceTagNames: Maybe.nothing(),
+      firstAppearanceTagNames: Maybe.just(new Map([[302, '2026-07-21.3-beta.1']])),
       githubClient: fakeGitHubClient.client,
       pullRequestNumbers: [302],
       workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/3',
@@ -490,6 +491,32 @@ describe('release appearance CLI orchestration', () => {
         commentId: 22,
       },
     ]);
+  });
+
+  it('does not write a Production-only comment when Beta appearance is unprovable', async () => {
+    const fakeGitHubClient = createFakeGitHubClient();
+    const errors: string[] = [];
+    const actualProcessing = await processPullRequestsSequentially({
+      currentReleaseTagName: '2026-07-21.3-production',
+      environment: 'production',
+      firstAppearanceTagNames: Maybe.nothing(),
+      githubClient: fakeGitHubClient.client,
+      pullRequestNumbers: [303],
+      workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/30',
+      writeError: (message: string): void => {
+        errors.push(message);
+      },
+      writeOutput: (): void => {
+        return;
+      },
+    });
+
+    expect(actualProcessing.failedPullRequests).toEqual([
+      'Pull request #303: Pull request #303 has no provable Beta appearance in the promoted artifact.',
+    ]);
+    expect(fakeGitHubClient.createdComments).toEqual([]);
+    expect(fakeGitHubClient.updatedComments).toEqual([]);
+    expect(errors).toEqual(actualProcessing.failedPullRequests);
   });
 
   it('continues after a multiple-marker failure and a failed update', async () => {
@@ -725,6 +752,7 @@ describe('release appearance CLI orchestration', () => {
       {
         baselineTagName: Maybe.nothing<string>(),
         commentMode: Maybe.just('production'),
+        currentBetaTagName: Maybe.nothing<string>(),
         currentCommitHash,
         dryRun: Maybe.just(false),
         environment: 'beta',
@@ -926,11 +954,32 @@ describe('release appearance CLI orchestration', () => {
       '--pull-request-number',
       '701',
     ]);
+    const productionModeWithBetaTagResult = parseReleaseAppearanceArguments([
+      'production',
+      '2026-07-21.3-production',
+      currentCommitHash,
+      'https://github.com/wireapp/wire-webapp/actions/runs/20',
+      '--beta-tag',
+      '2026-07-21.3-beta.2',
+    ]);
+    const betaModeWithBetaTagResult = parseReleaseAppearanceArguments([
+      'beta',
+      '2026-07-21.3-beta.2',
+      currentCommitHash,
+      'https://github.com/wireapp/wire-webapp/actions/runs/20',
+      '--beta-tag',
+      '2026-07-21.3-beta.2',
+    ]);
 
     assert(testModeWithoutPullRequestResult.isErr);
     assert(productionModeWithPullRequestResult.isErr);
+    assert(productionModeWithBetaTagResult.isOk);
+    assert(productionModeWithBetaTagResult.value.currentBetaTagName.isJust);
+    expect(productionModeWithBetaTagResult.value.currentBetaTagName.value).toBe('2026-07-21.3-beta.2');
+    assert(betaModeWithBetaTagResult.isErr);
     expect(testModeWithoutPullRequestResult.error.message).toContain('requires --pull-request-number');
     expect(productionModeWithPullRequestResult.error.message).toContain('cannot use --pull-request-number');
+    expect(betaModeWithBetaTagResult.error.message).toContain('cannot use --beta-tag');
   });
 
   it('runs a selected test comment without range discovery and never touches the production marker', async (): Promise<void> => {
@@ -941,6 +990,7 @@ describe('release appearance CLI orchestration', () => {
       {
         baselineTagName: Maybe.nothing<string>(),
         commentMode: Maybe.just('test'),
+        currentBetaTagName: Maybe.nothing<string>(),
         currentCommitHash,
         dryRun: Maybe.just(false),
         environment: 'beta',
@@ -1010,6 +1060,7 @@ describe('release appearance CLI orchestration', () => {
       {
         baselineTagName: Maybe.nothing<string>(),
         commentMode: Maybe.just('production'),
+        currentBetaTagName: Maybe.nothing<string>(),
         currentCommitHash,
         dryRun: Maybe.just(true),
         environment: 'beta',
@@ -1079,6 +1130,7 @@ describe('release appearance CLI orchestration', () => {
       {
         baselineTagName: Maybe.nothing<string>(),
         commentMode: Maybe.just('test'),
+        currentBetaTagName: Maybe.nothing<string>(),
         currentCommitHash,
         dryRun: Maybe.just(false),
         environment: 'beta',
