@@ -54,6 +54,7 @@ declare global {
     desktopAppConfig?: {
       version: string;
       supportsCallingPopoutWindow?: boolean;
+      supportsWebViewRefresh?: boolean;
       managedConfig?: {applockOverride: boolean};
     };
   }

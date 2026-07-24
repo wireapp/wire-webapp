@@ -927,6 +927,9 @@ export class App {
   readonly refresh = (): void => {
     refreshApplication({
       isDesktopApplication: Runtime.isDesktopApp,
+      supportsWebViewRefresh: () => {
+        return Config.getDesktopConfig()?.supportsWebViewRefresh === true;
+      },
       publishLifecycleEvent: lifecycleEventName => {
         amplify.publish(lifecycleEventName);
       },

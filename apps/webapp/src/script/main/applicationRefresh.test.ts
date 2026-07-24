@@ -22,38 +22,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {refreshApplication} from './applicationRefresh';
 
 describe('refreshApplication', () => {
-  it('publishes refresh rather than restart in the desktop application', () => {
-    const publishedLifecycleEvents: string[] = [];
-    let reloadWindowLocationCallCount = 0;
-    let focusWindowCallCount = 0;
-
-    function publishLifecycleEvent(lifecycleEventName: string): void {
-      publishedLifecycleEvents.push(lifecycleEventName);
-    }
-
-    function reloadWindowLocation(): void {
-      reloadWindowLocationCallCount += 1;
-    }
-
-    function focusWindow(): void {
-      focusWindowCallCount += 1;
-    }
-
-    refreshApplication({
-      isDesktopApplication: () => {
-        return true;
-      },
-      publishLifecycleEvent,
-      reloadWindowLocation,
-      focusWindow,
-    });
-
-    expect(publishedLifecycleEvents).toEqual([WebAppEvents.LIFECYCLE.REFRESH]);
-    expect(publishedLifecycleEvents).not.toContain(WebAppEvents.LIFECYCLE.RESTART);
-    expect(reloadWindowLocationCallCount).toBe(0);
-    expect(focusWindowCallCount).toBe(0);
-  });
-
   it('reloads and focuses the browser window outside the desktop application', () => {
     const publishedLifecycleEvents: string[] = [];
     let reloadWindowLocationCallCount = 0;
@@ -75,6 +43,9 @@ describe('refreshApplication', () => {
       isDesktopApplication: () => {
         return false;
       },
+      supportsWebViewRefresh: () => {
+        return false;
+      },
       publishLifecycleEvent,
       reloadWindowLocation,
       focusWindow,
@@ -83,5 +54,73 @@ describe('refreshApplication', () => {
     expect(publishedLifecycleEvents).toEqual([]);
     expect(reloadWindowLocationCallCount).toBe(1);
     expect(focusWindowCallCount).toBe(1);
+  });
+
+  it('publishes refresh for a desktop application that supports webview refresh', () => {
+    const publishedLifecycleEvents: string[] = [];
+    let reloadWindowLocationCallCount = 0;
+    let focusWindowCallCount = 0;
+
+    function publishLifecycleEvent(lifecycleEventName: string): void {
+      publishedLifecycleEvents.push(lifecycleEventName);
+    }
+
+    function reloadWindowLocation(): void {
+      reloadWindowLocationCallCount += 1;
+    }
+
+    function focusWindow(): void {
+      focusWindowCallCount += 1;
+    }
+
+    refreshApplication({
+      isDesktopApplication: () => {
+        return true;
+      },
+      supportsWebViewRefresh: () => {
+        return true;
+      },
+      publishLifecycleEvent,
+      reloadWindowLocation,
+      focusWindow,
+    });
+
+    expect(publishedLifecycleEvents).toEqual([WebAppEvents.LIFECYCLE.REFRESH]);
+    expect(reloadWindowLocationCallCount).toBe(0);
+    expect(focusWindowCallCount).toBe(0);
+  });
+
+  it('publishes restart for a desktop application without webview refresh support', () => {
+    const publishedLifecycleEvents: string[] = [];
+    let reloadWindowLocationCallCount = 0;
+    let focusWindowCallCount = 0;
+
+    function publishLifecycleEvent(lifecycleEventName: string): void {
+      publishedLifecycleEvents.push(lifecycleEventName);
+    }
+
+    function reloadWindowLocation(): void {
+      reloadWindowLocationCallCount += 1;
+    }
+
+    function focusWindow(): void {
+      focusWindowCallCount += 1;
+    }
+
+    refreshApplication({
+      isDesktopApplication: () => {
+        return true;
+      },
+      supportsWebViewRefresh: () => {
+        return false;
+      },
+      publishLifecycleEvent,
+      reloadWindowLocation,
+      focusWindow,
+    });
+
+    expect(publishedLifecycleEvents).toEqual([WebAppEvents.LIFECYCLE.RESTART]);
+    expect(reloadWindowLocationCallCount).toBe(0);
+    expect(focusWindowCallCount).toBe(0);
   });
 });
