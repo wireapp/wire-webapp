@@ -24,8 +24,8 @@ const AppsDisabledNote = () => {
   const {translate} = useApplicationContext();
 
   return (
-    <Note title={translate('servicesNotEnabledNoteTitle')}>
-      <span className={'subline'}>{translate('servicesNotEnabledBody')}</span>
+    <Note title={translate('appsNotEnabledNoteTitle')}>
+      <span className={'subline'}>{translate('appsNotEnabledBody')}</span>
     </Note>
   );
 };

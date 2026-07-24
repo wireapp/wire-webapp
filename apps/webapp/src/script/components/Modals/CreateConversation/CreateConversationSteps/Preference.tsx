@@ -88,10 +88,10 @@ export const Preference = () => {
       <InfoToggle
         className="modal-style"
         dataUieName="info-toggle-services"
-        info={translate('servicesRoomToggleInfoExtended')}
+        info={translate('appsRoomToggleInfoExtended')}
         setIsChecked={setIsServicesEnabled}
         isDisabled={!isAppsFeatureAvailable}
-        name={translate('servicesOptionsTitle')}
+        name={translate('appsOptionsTitle')}
         isChecked={isServicesEnabled && isAppsFeatureAvailable}
         footer={!isAppsFeatureAvailable && <AppsDisabledNote />}
       />

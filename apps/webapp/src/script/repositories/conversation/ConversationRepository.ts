@@ -2921,8 +2921,8 @@ export class ConversationRepository {
       case BackendErrorLabel.SERVER_ERROR:
       case BackendErrorLabel.SERVICE_DISABLED:
       case BackendErrorLabel.TOO_MANY_SERVICES: {
-        const messageText = this.translate('modalServiceUnavailableMessage');
-        const titleText = this.translate('modalServiceUnavailableHeadline');
+        const messageText = this.translate('modalAppUnavailableMessage');
+        const titleText = this.translate('modalAppUnavailableHeadline');
 
         this.showModal(messageText, titleText);
         break;

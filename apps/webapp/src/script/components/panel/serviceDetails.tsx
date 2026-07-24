@@ -55,11 +55,11 @@ const ServiceDetails = ({service}: ServiceDetailsProps) => {
         </div>
       </div>
 
-      <p css={authorLabel}>{translate('serviceDetailsAuthor', {author: author ?? ''})}</p>
+      <p css={authorLabel}>{translate('appDetailsAuthor', {author: author ?? ''})}</p>
 
       <div css={description}>
         <div id={descriptionId} css={description.headline}>
-          {translate('serviceDetailsDescription')}
+          {translate('appDetailsDescription')}
         </div>
         <p aria-labelledby={descriptionId} data-uie-name="status-service-description">
           {service.description}
