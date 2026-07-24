@@ -31,7 +31,7 @@ on:
         type: string
 
 concurrency:
-  group: ${{ inputs.promote_to_production && 'release-webapp-production' || format('release-webapp-beta-{0}', inputs.release_identifier) }}
+  group: release-webapp-${{ inputs.release_identifier }}
   cancel-in-progress: false
   queue: max
 
@@ -385,6 +385,10 @@ jobs:
     needs: build_artifact
     permissions:
       contents: read
+    concurrency:
+      group: deploy-webapp-beta
+      cancel-in-progress: false
+      queue: max
     environment:
       name: wire-webapp-beta
       url: https://wire-webapp-beta.wire.com/
@@ -742,6 +746,10 @@ jobs:
     permissions: {}
     # Production approval is enforced by the wire-webapp-prod GitHub Environment settings.
     environment: wire-webapp-prod
+    concurrency:
+      group: deploy-webapp-production
+      cancel-in-progress: false
+      queue: max
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c

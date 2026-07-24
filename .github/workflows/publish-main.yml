@@ -73,6 +73,9 @@ jobs:
     name: Build main delivery artifacts
     runs-on: ubuntu-24.04
     needs: validate_request
+    concurrency:
+      group: build-main-delivery
+      cancel-in-progress: true
     permissions:
       contents: read
     outputs:
@@ -186,8 +189,8 @@ jobs:
     permissions:
       contents: read
     concurrency:
-      group: deploy-edge
-      cancel-in-progress: true
+      group: deploy-webapp-edge
+      cancel-in-progress: false
     outputs:
       superseded: ${{ steps.check_latest_main.outputs.superseded }}
     # ADR 0002 requires Edge to deploy without an approval gate, so the
@@ -317,8 +320,8 @@ jobs:
     permissions:
       contents: read
     concurrency:
-      group: deploy-dev
-      cancel-in-progress: true
+      group: deploy-webapp-dev
+      cancel-in-progress: false
     outputs:
       superseded: ${{ steps.check_latest_main.outputs.superseded }}
     environment:
