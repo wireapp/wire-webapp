@@ -2,6 +2,7 @@
   "files": [],
   "references": [
     { "path": "./apps/webapp" },
-    { "path": "./apps/server" }
+    { "path": "./apps/server" },
+    { "path": "./tsconfig.bin.json" }
   ]
 }

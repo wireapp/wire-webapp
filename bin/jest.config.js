@@ -20,7 +20,7 @@
 module.exports = {
   rootDir: '..',
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/bin/**/*.test.ts'],
+  testMatch: ['<rootDir>/bin/**/*.test.ts', '<rootDir>/tools/**/*.test.ts'],
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', {configFile: './apps/server/babel.config.js'}],
   },
