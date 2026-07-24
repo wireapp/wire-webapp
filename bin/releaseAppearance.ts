@@ -64,6 +64,11 @@ export type CommitDiscoveryRange = {
   readonly revisionRange: string;
 };
 
+export type BetaCandidateDiscoveryRange = {
+  readonly candidateTag: BetaCandidateTag;
+  readonly range: CommitDiscoveryRange;
+};
+
 export type CommitDiscoveryRangeSelection =
   | {
       readonly kind: 'bootstrap';
@@ -309,6 +314,45 @@ export function selectPreviousBetaTag(
   );
 
   return Result.ok(previousBetaCandidateTag);
+}
+
+export function selectCurrentReleaseBetaCandidates(
+  currentBetaTagName: string,
+  existingTagNames: readonly string[],
+): Result<readonly BetaCandidateTag[], Error> {
+  const currentBetaCandidateTagResult = parseBetaCandidateTag(currentBetaTagName);
+
+  if (currentBetaCandidateTagResult.isErr) {
+    return Result.err(currentBetaCandidateTagResult.error);
+  }
+
+  const currentBetaCandidateTag = currentBetaCandidateTagResult.value;
+  const candidateTags = existingTagNames.flatMap(existingTagName => {
+    const betaCandidateTagResult = parseBetaCandidateTag(existingTagName);
+
+    if (betaCandidateTagResult.isErr) {
+      return [];
+    }
+
+    const betaCandidateTag = betaCandidateTagResult.value;
+
+    return betaCandidateTag.releaseIdentifier === currentBetaCandidateTag.releaseIdentifier &&
+      betaCandidateTag.candidateNumber <= currentBetaCandidateTag.candidateNumber
+      ? [betaCandidateTag]
+      : [];
+  });
+  const includesCurrentBetaCandidate = candidateTags.some(candidateTag => {
+    return candidateTag.tagName === currentBetaCandidateTag.tagName;
+  });
+  const candidateTagsIncludingCurrent = includesCurrentBetaCandidate
+    ? candidateTags
+    : [...candidateTags, currentBetaCandidateTag];
+
+  return Result.ok(
+    candidateTagsIncludingCurrent.toSorted((leftCandidateTag, rightCandidateTag) => {
+      return leftCandidateTag.candidateNumber - rightCandidateTag.candidateNumber;
+    }),
+  );
 }
 
 function compareReleaseIdentifiers(leftReleaseIdentifier: string, rightReleaseIdentifier: string): number {

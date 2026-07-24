@@ -48,6 +48,7 @@ import type {
 
 const currentCommitHash = '1111111111111111111111111111111111111111';
 const previousCommitHash = '2222222222222222222222222222222222222222';
+const previousBetaCommitHash = '7777777777777777777777777777777777777777';
 const mergeBaseCommitHash = '3333333333333333333333333333333333333333';
 const firstDiscoveredCommitHash = '4444444444444444444444444444444444444444';
 const secondDiscoveredCommitHash = '5555555555555555555555555555555555555555';
@@ -199,6 +200,10 @@ function createGitCommand(outputs: ReadonlyMap<string, string>): GitCommand {
 
     if (commandArguments[0] === 'for-each-ref') {
       const tagName = commandArguments.at(-1) ?? '';
+      if (tagName.endsWith('-production')) {
+        return '100';
+      }
+
       const betaCandidateMatch = /-beta\.(\d+)$/u.exec(tagName);
       return betaCandidateMatch === null || Number(betaCandidateMatch[1]) > 1 ? '300' : '200';
     }
@@ -379,7 +384,9 @@ describe('release appearance CLI orchestration', () => {
     assert(actualRangeResult.isOk);
     assert(actualRangeResult.value.kind === 'range');
     expect(actualRangeResult.value.resolvedRange.range.baselineTagName).toBe('2026-07-21.3-beta.1');
-    expect(actualRangeResult.value.resolvedRange.range.revisionRange).toBe(`${mergeBaseCommitHash}..${currentCommitHash}`);
+    expect(actualRangeResult.value.resolvedRange.range.revisionRange).toBe(
+      `${mergeBaseCommitHash}..${currentCommitHash}`,
+    );
   });
 
   it('handles paginated issue comments and leaves an existing Beta value unchanged', async () => {
@@ -406,6 +413,7 @@ describe('release appearance CLI orchestration', () => {
     const actualProcessing = await processPullRequestsSequentially({
       currentReleaseTagName: '2026-07-21.3-beta.2',
       environment: 'beta',
+      firstAppearanceTagNames: Maybe.nothing(),
       githubClient: fakeGitHubClient.client,
       pullRequestNumbers: [301],
       workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/2',
@@ -452,6 +460,7 @@ describe('release appearance CLI orchestration', () => {
     const actualProcessing = await processPullRequestsSequentially({
       currentReleaseTagName: '2026-07-21.3-production',
       environment: 'production',
+      firstAppearanceTagNames: Maybe.nothing(),
       githubClient: fakeGitHubClient.client,
       pullRequestNumbers: [302],
       workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/3',
@@ -518,6 +527,7 @@ describe('release appearance CLI orchestration', () => {
     const actualProcessing = await processPullRequestsSequentially({
       currentReleaseTagName: '2026-07-21.3-beta.1',
       environment: 'beta',
+      firstAppearanceTagNames: Maybe.nothing(),
       githubClient: fakeGitHubClient.client,
       pullRequestNumbers: [401, 402, 403],
       workflowRunUrl: 'https://github.com/wireapp/wire-webapp/actions/runs/4',
@@ -726,11 +736,19 @@ describe('release appearance CLI orchestration', () => {
         executeGitCommand: createGitCommand(
           new Map([
             ['rev-parse --verify refs/tags/2026-07-21.3-beta.2^\u007bcommit\u007d', currentCommitHash],
-            ['tag --list', '2026-07-21.3-beta.1\n2026-07-21.3-beta.2\n'],
+            ['tag --list', '2026-07-20.4-production\n2026-07-21.3-beta.1\n2026-07-21.3-beta.2\n'],
+            ['rev-parse --verify refs/tags/2026-07-20.4-production^\u007bcommit\u007d', previousBetaCommitHash],
+            [`merge-base ${previousBetaCommitHash} ${currentCommitHash}`, previousBetaCommitHash],
+            [`rev-list --count ${previousBetaCommitHash}..${currentCommitHash}`, '2'],
             ['rev-parse --verify refs/tags/2026-07-21.3-beta.1^\u007bcommit\u007d', previousCommitHash],
             [`merge-base ${previousCommitHash} ${currentCommitHash}`, mergeBaseCommitHash],
             [`rev-list --count ${mergeBaseCommitHash}..${currentCommitHash}`, '2'],
-            [`show -s --format=%ct ${previousCommitHash}`, '200'],
+            ['rev-parse --verify refs/tags/2026-07-21.3-beta.2^\u007bcommit\u007d', currentCommitHash],
+            [`merge-base ${currentCommitHash} ${currentCommitHash}`, currentCommitHash],
+            [`rev-list --count ${currentCommitHash}..${currentCommitHash}`, '0'],
+            [`merge-base ${previousBetaCommitHash} ${previousCommitHash}`, previousBetaCommitHash],
+            [`merge-base ${previousCommitHash} ${currentCommitHash}`, mergeBaseCommitHash],
+            [`rev-list --reverse ${previousBetaCommitHash}..${previousCommitHash}`, firstDiscoveredCommitHash],
             [`rev-list --reverse ${mergeBaseCommitHash}..${currentCommitHash}`, firstDiscoveredCommitHash],
           ]),
         ),
@@ -918,6 +936,7 @@ describe('release appearance CLI orchestration', () => {
   it('runs a selected test comment without range discovery and never touches the production marker', async (): Promise<void> => {
     const fakeGitHubClient = createFakeGitHubClient();
     const summaryMessages: string[] = [];
+    const errorMessages: string[] = [];
     const actualExitCode = await runReleaseAppearance(
       {
         baselineTagName: Maybe.nothing<string>(),
@@ -934,8 +953,8 @@ describe('release appearance CLI orchestration', () => {
           new Map([[`rev-parse --verify refs/tags/2026-07-21.3-beta.1^\u007bcommit\u007d`, currentCommitHash]]),
         ),
         githubClient: fakeGitHubClient.client,
-        writeError: (): void => {
-          return;
+        writeError: (message: string): void => {
+          errorMessages.push(message);
         },
         writeOutput: (): void => {
           return;
@@ -946,6 +965,7 @@ describe('release appearance CLI orchestration', () => {
       },
     );
 
+    expect(errorMessages).toEqual([]);
     expect(actualExitCode).toBe(0);
     expect(fakeGitHubClient.associatedCommitCalls).toEqual([]);
     expect(fakeGitHubClient.pullRequestCalls).toEqual([702]);
@@ -1001,11 +1021,19 @@ describe('release appearance CLI orchestration', () => {
         executeGitCommand: createGitCommand(
           new Map([
             [`rev-parse --verify refs/tags/2026-07-21.3-beta.2^\u007bcommit\u007d`, currentCommitHash],
-            ['tag --list', '2026-07-21.3-beta.1\n2026-07-21.3-beta.2\n'],
+            ['tag --list', '2026-07-20.4-production\n2026-07-21.3-beta.1\n2026-07-21.3-beta.2\n'],
+            ['rev-parse --verify refs/tags/2026-07-20.4-production^\u007bcommit\u007d', previousBetaCommitHash],
+            [`merge-base ${previousBetaCommitHash} ${currentCommitHash}`, previousBetaCommitHash],
+            [`rev-list --count ${previousBetaCommitHash}..${currentCommitHash}`, '3'],
             [`rev-parse --verify refs/tags/2026-07-21.3-beta.1^\u007bcommit\u007d`, previousCommitHash],
             [`merge-base ${previousCommitHash} ${currentCommitHash}`, mergeBaseCommitHash],
             [`rev-list --count ${mergeBaseCommitHash}..${currentCommitHash}`, '3'],
-            [`show -s --format=%ct ${previousCommitHash}`, '200'],
+            [`rev-parse --verify refs/tags/2026-07-21.3-beta.2^\u007bcommit\u007d`, currentCommitHash],
+            [`merge-base ${currentCommitHash} ${currentCommitHash}`, currentCommitHash],
+            [`rev-list --count ${currentCommitHash}..${currentCommitHash}`, '0'],
+            [`merge-base ${previousBetaCommitHash} ${previousCommitHash}`, previousBetaCommitHash],
+            [`merge-base ${previousCommitHash} ${currentCommitHash}`, mergeBaseCommitHash],
+            [`rev-list --reverse ${previousBetaCommitHash}..${previousCommitHash}`, firstDiscoveredCommitHash],
             [
               `rev-list --reverse ${mergeBaseCommitHash}..${currentCommitHash}`,
               `${firstDiscoveredCommitHash}\n${secondDiscoveredCommitHash}\n${thirdDiscoveredCommitHash}`,
