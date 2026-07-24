@@ -120,7 +120,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
               label: text,
               value: value,
               isDisabled: isCustom || isSelfDeletingMessagesEnforced,
-              optionUeiName: 'item-timed-messages-option',
+              optionUieName: 'item-timed-messages-option',
             }))}
           />
         </div>

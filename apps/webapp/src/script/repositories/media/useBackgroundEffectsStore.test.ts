@@ -23,8 +23,9 @@ describe('backgroundEffectsStore:lastVirtualBackgroundId', () => {
     expect(typeof state.lastVirtualBackgroundId).toBe('string');
   });
 
-  it('initializes high quality blur as enabled', () => {
-    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(true);
+  it('initializes background effects with balanced quality', () => {
+    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(false);
+    expect(backgroundEffectsStore.getState().isPerformanceEnhancementEnabled).toBe(false);
   });
 
   it('updates isHighQualityBlurEnabled when setIsHighQualityBlurEnabled is called', () => {

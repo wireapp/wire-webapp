@@ -36,7 +36,14 @@ import {WebGLRenderer} from './renderer';
 
 let segmenterOptions: WorkerProcessVideoTrackOptions = {} as WorkerProcessVideoTrackOptions;
 
-const SEGMENTATION_FRAME_INTERVAL = 1;
+const DEFAULT_SEGMENTATION_FRAME_INTERVAL = 1;
+const ENHANCED_PERFORMANCE_SEGMENTATION_FRAME_INTERVAL = 2;
+
+function getSegmentationFrameInterval(): number {
+  return segmenterOptions.enhancePerformance
+    ? ENHANCED_PERFORMANCE_SEGMENTATION_FRAME_INTERVAL
+    : DEFAULT_SEGMENTATION_FRAME_INTERVAL;
+}
 
 export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
   // Keep the reference stable so that runtime option changes
@@ -326,7 +333,7 @@ export async function runSegmenter(
              * configured interval.
              */
             const shouldRunSegmentation =
-              !hasSegmentationMask || segmentationFrameCounter % SEGMENTATION_FRAME_INTERVAL === 0;
+              !hasSegmentationMask || segmentationFrameCounter % getSegmentationFrameInterval() === 0;
 
             segmentationFrameCounter++;
 
