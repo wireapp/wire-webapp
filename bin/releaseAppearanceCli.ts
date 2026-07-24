@@ -843,18 +843,20 @@ async function resolveBetaCandidateRanges(
   }
 
   const productionTagNames = allTagNames.filter(isProductionReleaseTagName);
-  const productionRelationshipResolution = await resolveTagRelationships({
+  const baselineTagNames = parameters.baselineTagName.isJust ? [parameters.baselineTagName.value] : productionTagNames;
+  const baselineRelationshipResolution = await resolveTagRelationships({
     currentCommitHash: parameters.currentCommitHash,
     executeGitCommand: parameters.executeGitCommand,
-    tagNames: productionTagNames,
+    tagNames: baselineTagNames,
   });
+  let candidateTags = currentReleaseBetaCandidatesResult.value;
   let previousProductionBaselineRelationship: Maybe<CommitRangeRelationship> = Maybe.nothing();
 
   if (parameters.baselineTagName.isJust) {
     const baselineTagName = parameters.baselineTagName.value;
     const baselineValidationResult = validateBaselineTagForEnvironment({
       baselineTagName,
-      environment: 'production',
+      environment: 'beta',
       releaseTagName: parameters.releaseTagName,
     });
 
@@ -866,7 +868,22 @@ async function resolveBetaCandidateRanges(
       return Result.err(new Error(`Baseline tag does not exist: ${baselineTagName}`));
     }
 
-    const baselineRelationship = productionRelationshipResolution.relationships.find(relationship => {
+    const baselineBetaCandidateTagResult = parseBetaCandidateTag(baselineTagName);
+
+    if (
+      baselineBetaCandidateTagResult.isOk &&
+      baselineBetaCandidateTagResult.value.candidateNumber >= currentBetaCandidateTagResult.value.candidateNumber
+    ) {
+      return Result.err(new Error(`Beta baseline must precede the deployment tag: ${baselineTagName}`));
+    }
+
+    if (baselineBetaCandidateTagResult.isOk) {
+      candidateTags = currentReleaseBetaCandidatesResult.value.filter(candidateTag => {
+        return candidateTag.candidateNumber > baselineBetaCandidateTagResult.value.candidateNumber;
+      });
+    }
+
+    const baselineRelationship = baselineRelationshipResolution.relationships.find(relationship => {
       return relationship.tagName === baselineTagName;
     });
     previousProductionBaselineRelationship = Maybe.of(baselineRelationship);
@@ -879,7 +896,7 @@ async function resolveBetaCandidateRanges(
       currentReleaseIdentifier: currentBetaCandidateTagResult.value.releaseIdentifier,
       currentTagCreatedAtSeconds: currentReleaseTagValidationResult.value.tagCreatedAtSeconds,
       currentTagName: parameters.releaseTagName,
-      productionTagRelationships: productionRelationshipResolution.relationships,
+      productionTagRelationships: baselineRelationshipResolution.relationships,
     });
 
     if (previousProductionBaselineResult.isErr) {
@@ -888,11 +905,11 @@ async function resolveBetaCandidateRanges(
 
     if (previousProductionBaselineResult.value.kind === 'bootstrap') {
       if (
-        productionRelationshipResolution.relationships.length === 0 &&
-        productionRelationshipResolution.failures.length > 0
+        baselineRelationshipResolution.relationships.length === 0 &&
+        baselineRelationshipResolution.failures.length > 0
       ) {
         return Result.err(
-          new Error(Maybe.of(productionRelationshipResolution.failures[0]).unwrapOr('Unknown tag failure.')),
+          new Error(Maybe.of(baselineRelationshipResolution.failures[0]).unwrapOr('Unknown tag failure.')),
         );
       }
 
@@ -905,7 +922,7 @@ async function resolveBetaCandidateRanges(
   const betaTagRelationships = await resolveTagRelationships({
     currentCommitHash: parameters.currentCommitHash,
     executeGitCommand: parameters.executeGitCommand,
-    tagNames: currentReleaseBetaCandidatesResult.value.map(candidateTag => {
+    tagNames: candidateTags.map(candidateTag => {
       return candidateTag.tagName;
     }),
   });
@@ -921,7 +938,7 @@ async function resolveBetaCandidateRanges(
   let earlierTagRelationship = previousProductionBaselineRelationship.value;
   let candidateRanges: readonly BetaCandidateDiscoveryRange[] = [];
 
-  for (const candidateTag of currentReleaseBetaCandidatesResult.value) {
+  for (const candidateTag of candidateTags) {
     const candidateTagRelationship = Maybe.of(
       betaTagRelationships.relationships.find(relationship => {
         return relationship.tagName === candidateTag.tagName;
@@ -956,7 +973,7 @@ async function resolveBetaCandidateRanges(
   return Result.ok({
     kind: 'history',
     history: {
-      baselineRelationshipFailures: productionRelationshipResolution.failures,
+      baselineRelationshipFailures: baselineRelationshipResolution.failures,
       candidateRanges,
       discovery: {
         commitFailures: [],
