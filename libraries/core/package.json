@@ -28,7 +28,7 @@
     "@sindresorhus/is": "4.6.0",
     "@wireapp/api-client": "workspace:^",
     "@wireapp/commons": "workspace:^",
-    "@wireapp/core-crypto": "9.3.4",
+    "@wireapp/core-crypto": "10.1.1",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/priority-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.56.0",
