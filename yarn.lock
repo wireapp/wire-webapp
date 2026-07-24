@@ -8941,8 +8941,8 @@ __metadata:
 
 "@wireapp/core-crypto@file:wireapp-core-crypto-10.1.1.tgz::locator=%40wireapp%2Fcore%40workspace%3Alibraries%2Fcore":
   version: 10.1.1
-  resolution: "@wireapp/core-crypto@file:wireapp-core-crypto-10.1.1.tgz#wireapp-core-crypto-10.1.1.tgz::hash=abd199&locator=%40wireapp%2Fcore%40workspace%3Alibraries%2Fcore"
-  checksum: 10/c4441f91f746e26280e485ca50d0fa324249d66248cb690b98047d0dbe02fe4fe5b9a6faafa233fe789b18ed1bd6b42f72a73eda15374dab45b2195a95dfb7fa
+  resolution: "@wireapp/core-crypto@file:wireapp-core-crypto-10.1.1.tgz#wireapp-core-crypto-10.1.1.tgz::hash=25d756&locator=%40wireapp%2Fcore%40workspace%3Alibraries%2Fcore"
+  checksum: 10/4f64bc14455a20d18c49f9b326fba4eb81797b86d70461068371b3c9e90e1b77ba17297dcb1c2e6c90c6700a813f026c7e56af038df79e42e5624b648cf53928
   languageName: node
   linkType: hard
 
