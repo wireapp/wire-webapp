@@ -38,6 +38,7 @@ import {
   selectPreviousProductionBaseline,
   selectBetaDiscoveryRange,
   selectProductionDiscoveryRange,
+  verifyReleaseAppearanceCommentState,
 } from './releaseAppearance.ts';
 import type {
   BetaCandidateDiscoveryRange,
@@ -53,6 +54,7 @@ import type {
 
 const nodeExecutableAndScriptPathArgumentCount = 2;
 const maximumGitHubRetryCount = 2;
+const maximumAmbiguousCommentCreateAttempts = 2;
 const initialGitHubRetryDelayMilliseconds = 1000;
 const fullCommitHashPattern = /^[0-9a-f]{40}$/iu;
 const retryableGitHubHttpStatusCodes = [408, 429, 500, 502, 503, 504] as const;
@@ -223,6 +225,8 @@ type ReadIssueCommentsParameters = {
 };
 
 type ApplyPreparedCommentParameters = {
+  readonly commentMode: ReleaseAppearanceCommentMode;
+  readonly desiredState: DesiredReleaseAppearanceCommentState;
   readonly githubClient: GitHubClient;
   readonly preparedComment: PreparedReleaseAppearanceComment;
   readonly pullRequestNumber: number;
@@ -258,6 +262,15 @@ type GitHubRequestParameters = {
   readonly requestBody?: string;
   readonly requestPath: string;
   readonly token: string;
+};
+
+type GitHubRequestMethod = GitHubRequestParameters['method'];
+
+type GitHubRequestFailure = Error & {
+  readonly kind: 'github-request-failure';
+  readonly method: GitHubRequestMethod;
+  readonly retryAfterMilliseconds: Maybe<number>;
+  readonly statusCode: Maybe<number>;
 };
 
 type GitHubJsonResponse = {
@@ -406,18 +419,81 @@ function isSafeGitHubApiUrl(apiUrl: string): boolean {
   }
 }
 
-function createGitHubRequestError(error: unknown, sensitiveToken: string): Error {
-  const safeErrorDescription = describeUnknownError(error).replaceAll(sensitiveToken, '[REDACTED]');
+function parseRetryAfterHeader(retryAfterHeader: string, currentTimeMilliseconds: number): Maybe<number> {
+  const retryAfterSeconds = Number(retryAfterHeader);
+
+  if (Number.isFinite(retryAfterSeconds) && retryAfterSeconds >= 0) {
+    return Maybe.just(retryAfterSeconds * 1000);
+  }
+
+  const retryAfterTimestampMilliseconds = Date.parse(retryAfterHeader);
+
+  if (is.nan(retryAfterTimestampMilliseconds)) {
+    return Maybe.nothing();
+  }
+
+  return Maybe.just(Math.max(0, retryAfterTimestampMilliseconds - currentTimeMilliseconds));
+}
+
+function readRetryAfterMilliseconds(response: Response): Maybe<number> {
+  return Maybe.of(response.headers.get('retry-after')).andThen(retryAfterHeader => {
+    if (!is.nonEmptyString(retryAfterHeader)) {
+      return Maybe.nothing();
+    }
+
+    return parseRetryAfterHeader(retryAfterHeader, Date.now());
+  });
+}
+
+function createGitHubRequestError(
+  error: unknown,
+  parameters: Pick<GitHubRequestParameters, 'method' | 'token'>,
+): GitHubRequestFailure {
+  const safeErrorDescription = describeUnknownError(error).replaceAll(parameters.token, '[REDACTED]');
 
   return match(error)
     .when(isHTTPError, httpError => {
-      return new Error(`GitHub request returned HTTP ${httpError.response.status}.`, {cause: error});
-    })
-    .otherwise((): Error => {
-      return new Error(`GitHub request failed before receiving a response: ${safeErrorDescription}`, {
-        cause: error,
+      return Object.assign(new Error(`GitHub request returned HTTP ${httpError.response.status}.`, {cause: error}), {
+        kind: 'github-request-failure' as const,
+        method: parameters.method,
+        retryAfterMilliseconds: readRetryAfterMilliseconds(httpError.response),
+        statusCode: Maybe.just(httpError.response.status),
       });
+    })
+    .otherwise((): GitHubRequestFailure => {
+      return Object.assign(
+        new Error(`GitHub request failed before receiving a response: ${safeErrorDescription}`, {cause: error}),
+        {
+          kind: 'github-request-failure' as const,
+          method: parameters.method,
+          retryAfterMilliseconds: Maybe.nothing<number>(),
+          statusCode: Maybe.nothing<number>(),
+        },
+      );
     });
+}
+
+function isAmbiguousTemporaryGitHubFailure(error: unknown): error is GitHubRequestFailure {
+  if (!is.error(error)) {
+    return false;
+  }
+
+  const requestFailure = error as Partial<GitHubRequestFailure>;
+
+  if (requestFailure.kind !== 'github-request-failure' || requestFailure.method !== 'POST') {
+    return false;
+  }
+
+  const statusCode = Maybe.of(requestFailure.statusCode).andThen(status => {
+    return status;
+  });
+
+  return (
+    statusCode.isNothing ||
+    retryableGitHubHttpStatusCodes.some(retryableStatusCode => {
+      return retryableStatusCode === statusCode.value;
+    })
+  );
 }
 
 export function createGitCommand(): GitCommand {
@@ -1197,12 +1273,63 @@ async function readAllIssueComments(
   return comments;
 }
 
+async function waitForAmbiguousCommentCreateRetry(delayMilliseconds: number): Promise<void> {
+  await new Promise<void>(resolve => {
+    setTimeout((): void => {
+      resolve();
+    }, delayMilliseconds);
+  });
+}
+
+async function createCommentWithReconciliation(parameters: ApplyPreparedCommentParameters): Promise<void> {
+  for (let attemptNumber = 1; attemptNumber <= maximumAmbiguousCommentCreateAttempts; attemptNumber += 1) {
+    try {
+      await parameters.githubClient.createIssueComment(parameters.pullRequestNumber, parameters.preparedComment.body);
+      return;
+    } catch (error: unknown) {
+      if (!isAmbiguousTemporaryGitHubFailure(error)) {
+        throw error;
+      }
+
+      const comments = await readAllIssueComments({
+        githubClient: parameters.githubClient,
+        pullRequestNumber: parameters.pullRequestNumber,
+      });
+      const verificationResult = verifyReleaseAppearanceCommentState({
+        comments,
+        commentMode: parameters.commentMode,
+        desiredState: parameters.desiredState,
+      });
+
+      if (verificationResult.isErr) {
+        throw verificationResult.error;
+      }
+
+      if (verificationResult.value.kind === 'matches') {
+        return;
+      }
+
+      if (verificationResult.value.kind === 'mismatch') {
+        throw new Error('Ambiguous comment creation found a marker comment with unexpected state.');
+      }
+
+      if (attemptNumber === maximumAmbiguousCommentCreateAttempts) {
+        throw new Error('Ambiguous comment creation did not produce a marker comment after bounded retries.');
+      }
+
+      await waitForAmbiguousCommentCreateRetry(
+        error.retryAfterMilliseconds.unwrapOr(initialGitHubRetryDelayMilliseconds),
+      );
+    }
+  }
+}
+
 async function applyPreparedComment(parameters: ApplyPreparedCommentParameters): Promise<void> {
   const preparedComment = parameters.preparedComment;
 
   return match(preparedComment)
-    .with({action: 'create'}, async ({body}): Promise<void> => {
-      await parameters.githubClient.createIssueComment(parameters.pullRequestNumber, body);
+    .with({action: 'create'}, async (): Promise<void> => {
+      await createCommentWithReconciliation(parameters);
     })
     .with({action: 'update'}, async ({body, commentId}): Promise<void> => {
       await parameters.githubClient.updateIssueComment(commentId, body);
@@ -1307,6 +1434,8 @@ export async function processPullRequestsSequentially(
       const preparedComment = preparedCommentResult.value;
       if (!dryRun) {
         await applyPreparedComment({
+          commentMode,
+          desiredState,
           githubClient: parameters.githubClient,
           preparedComment,
           pullRequestNumber,
@@ -1730,7 +1859,7 @@ async function requestGitHubJson(parameters: GitHubRequestParameters): Promise<G
       method: parameters.method,
     });
   } catch (error: unknown) {
-    throw createGitHubRequestError(error, parameters.token);
+    throw createGitHubRequestError(error, parameters);
   }
 
   let responseBody: unknown;

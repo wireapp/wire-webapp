@@ -114,6 +114,9 @@ export type PreparedReleaseAppearanceComment =
       readonly commentId: number;
     };
 
+export type ReleaseAppearanceCommentStateVerification =
+  {readonly kind: 'missing'} | {readonly kind: 'matches'} | {readonly kind: 'mismatch'};
+
 export type BetaDiscoveryRangeSelectionParameters = {
   readonly currentBetaTagName: string;
   readonly currentBetaTagCreatedAtSeconds: number;
@@ -139,6 +142,12 @@ export type PrepareReleaseAppearanceCommentParameters = {
 };
 
 export type PrepareReleaseAppearanceCommentWithDesiredStateParameters = {
+  readonly comments: readonly ReleaseAppearanceComment[];
+  readonly commentMode?: ReleaseAppearanceCommentMode;
+  readonly desiredState: DesiredReleaseAppearanceCommentState;
+};
+
+export type VerifyReleaseAppearanceCommentStateParameters = {
   readonly comments: readonly ReleaseAppearanceComment[];
   readonly commentMode?: ReleaseAppearanceCommentMode;
   readonly desiredState: DesiredReleaseAppearanceCommentState;
@@ -842,4 +851,53 @@ export function prepareReleaseAppearanceCommentWithDesiredState(
     body: renderReleaseAppearanceComment(mergedState, commentMode),
     commentId: markerComment.value.commentId,
   });
+}
+
+export function verifyReleaseAppearanceCommentState(
+  parameters: VerifyReleaseAppearanceCommentStateParameters,
+): Result<ReleaseAppearanceCommentStateVerification, Error> {
+  const desiredStateValidationResult = validateDesiredReleaseAppearanceCommentState(parameters.desiredState);
+
+  if (desiredStateValidationResult.isErr) {
+    return Result.err(desiredStateValidationResult.error);
+  }
+
+  const commentMode = Maybe.of(parameters.commentMode).unwrapOr('production');
+  const commentMarker = getReleaseAppearanceCommentMarker(commentMode);
+  const markerCommentCount = countMarkerComments(parameters.comments, commentMarker);
+
+  if (markerCommentCount === 0) {
+    return Result.ok({kind: 'missing'});
+  }
+
+  if (markerCommentCount > 1) {
+    return Result.err(new Error('More than one release appearance marker comment exists.'));
+  }
+
+  const markerComment = Maybe.of(
+    parameters.comments.find(comment => {
+      return comment.body.includes(commentMarker);
+    }),
+  );
+
+  if (markerComment.isNothing) {
+    return Result.err(new Error('Unable to resolve the release appearance marker comment.'));
+  }
+
+  const existingStateResult = parseAppearanceCommentState(markerComment.value.body, commentMarker);
+
+  if (existingStateResult.isErr) {
+    return Result.err(existingStateResult.error);
+  }
+
+  const betaMatches =
+    parameters.desiredState.beta.isNothing ||
+    (existingStateResult.value.beta.isJust &&
+      areReleaseAppearanceValuesEqual(existingStateResult.value.beta, parameters.desiredState.beta));
+  const productionMatches =
+    parameters.desiredState.production.isNothing ||
+    (existingStateResult.value.production.isJust &&
+      areReleaseAppearanceValuesEqual(existingStateResult.value.production, parameters.desiredState.production));
+
+  return Result.ok({kind: betaMatches && productionMatches ? 'matches' : 'mismatch'});
 }
