@@ -23,6 +23,10 @@ import {createStore} from 'zustand/vanilla';
 
 import {Metrics, QualityTier} from 'Repositories/media/backgroundEffects';
 import {
+  SELFIE_MULTICLASS_MODEL_PATH,
+  SELFIE_SEGMENTER_MODEL_PATH,
+} from 'Repositories/media/backgroundEffects/pipe/options';
+import {
   BackgroundEffectSelection,
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
@@ -92,7 +96,16 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
 
     setModel: model =>
       set(state => {
-        state.model = model ?? 'unknown';
+        switch (model) {
+          case SELFIE_SEGMENTER_MODEL_PATH:
+            state.model = 'selfie-segmenter';
+            break;
+          case SELFIE_MULTICLASS_MODEL_PATH:
+            state.model = 'selfie-multiclass';
+            break;
+          default:
+            state.model = 'unknown';
+        }
       }),
 
     setIsHighQualityBlurEnabled: value =>

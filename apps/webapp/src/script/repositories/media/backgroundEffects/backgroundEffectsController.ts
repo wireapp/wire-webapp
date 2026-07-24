@@ -36,6 +36,7 @@ import {detectCapabilities} from './helper/capability';
 import {
   defaultOpts,
   ProcessVideoTrackOptions,
+  SELFIE_MULTICLASS_MODEL_PATH,
   SELFIE_SEGMENTER_MODEL_PATH,
   WorkerBackgroundSource,
   WorkerProcessVideoTrackOptions,
@@ -68,10 +69,15 @@ export class BackgroundEffectsController {
     requestVideoFrameCallback: false,
   };
 
+  // adaptive quality mode settings:
   private qualityController: QualityController | null = null;
   private qualitySampleQueue = Promise.resolve();
-  private maxResolution: Resolution = TIER_DEFINITIONS.hd.resolution;
-  private maxQualityTier: QualityTier = 'hd';
+  private maxResolution: Resolution = TIER_DEFINITIONS.fhd.resolution;
+  private maxQualityTier: QualityTier = 'fhd';
+  // the manually set mode. if set to auto, then adaptive quality mode is activated
+  private qualityMode: QualityMode = 'auto';
+  private activeQualityTier: QualityTier = 'fhd';
+  private requestedModelPath: string = SELFIE_SEGMENTER_MODEL_PATH;
   private refcount = 0;
 
   /**
@@ -89,6 +95,8 @@ export class BackgroundEffectsController {
     const resolved = await resolveOptions(options);
 
     this.options = withoutBitmap(resolved);
+    this.requestedModelPath = resolved.modelPath;
+    backgroundEffectsStore.getState().setModel(this.requestedModelPath);
     this.onMetrics = options.onMetrics;
 
     const trackCapabilities = inputTrack.getCapabilities();
@@ -228,12 +236,25 @@ export class BackgroundEffectsController {
   public async setQuality(quality: QualityMode): Promise<void> {
     this.logger.info('setQuality', quality);
 
-    let requestedQuality = quality;
-    if (quality !== 'auto') {
-      requestedQuality = await this.changeResolution(quality);
+    this.qualityMode = quality;
+
+    if (quality === 'auto') {
+      const tier = this.qualityController?.getCurrentTier() ?? this.maxQualityTier;
+      await this.applyQualityTier(tier);
+      return;
     }
 
-    this.options = {...this.options, quality: requestedQuality};
+    this.qualityController?.setTier(quality);
+    await this.applyQualityTier(quality);
+  }
+
+  private async applyQualityTier(quality: QualityTier): Promise<void> {
+    const appliedTier = await this.changeResolution(quality);
+
+    this.activeQualityTier = appliedTier;
+
+    this.options = {...this.options, quality: appliedTier};
+
     this.pushOptionsUpdate();
   }
 
@@ -258,6 +279,7 @@ export class BackgroundEffectsController {
   }
 
   public setModelPath(path: string): void {
+    this.requestedModelPath = path;
     this.options = {...this.options, modelPath: path};
     this.pushOptionsUpdate();
   }
@@ -278,11 +300,18 @@ export class BackgroundEffectsController {
     if (!this.refcount) {
       return;
     }
-    // in case of not HD we will always use more performant model
-    if (this.options.quality !== 'hd' && this.options.quality !== 'fhd' && this.options.quality !== 'auto') {
-      this.options.modelPath = SELFIE_SEGMENTER_MODEL_PATH;
-      backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(false);
-    }
+
+    const isLowQualityTier = !TIER_DEFINITIONS[this.activeQualityTier].isHighQuality;
+
+    const effectiveModelPath =
+      isLowQualityTier && this.requestedModelPath === SELFIE_MULTICLASS_MODEL_PATH
+        ? SELFIE_SEGMENTER_MODEL_PATH
+        : this.requestedModelPath;
+
+    this.options.modelPath = effectiveModelPath;
+
+    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(effectiveModelPath === SELFIE_MULTICLASS_MODEL_PATH);
+    backgroundEffectsStore.getState().setModel(effectiveModelPath);
 
     const {options: workerOptions} = getWorkerOptions(this.options);
     const finalOptions: WorkerProcessVideoTrackOptions = workerSource
@@ -296,8 +325,8 @@ export class BackgroundEffectsController {
     }
   }
 
-  private async changeResolution(quality: QualityMode): Promise<QualityMode> {
-    if (!this.inputTrack || quality === 'auto') {
+  private async changeResolution(quality: QualityTier): Promise<QualityTier> {
+    if (!this.inputTrack) {
       return quality;
     }
 
@@ -347,13 +376,19 @@ export class BackgroundEffectsController {
       return;
     }
 
+    if (this.qualityMode !== 'auto') {
+      return;
+    }
+
     const currentQualityTier = this.qualityController.getCurrentTier();
     const tier = this.qualityController.update(sample, mode);
+
     if (tier.tier === currentQualityTier) {
       return;
     }
+
     this.logger.log(`onPerformanceSample: qualityController.update from: ${currentQualityTier} to ${tier.tier}`);
-    return this.setQuality(tier.tier);
+    await this.applyQualityTier(tier.tier);
   }
 }
 

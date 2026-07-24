@@ -30,6 +30,7 @@ export interface QualityTierParams {
   /** Quality tier identifier */
   tier: QualityTier;
   resolution: Resolution;
+  isHighQuality: boolean;
   downscale: boolean;
 }
 
@@ -37,26 +38,31 @@ export const TIER_DEFINITIONS: Record<QualityTier, QualityTierParams> = {
   fhd: {
     tier: 'fhd',
     resolution: {width: 1920, height: 1080},
-    downscale: false,
+    isHighQuality: true,
+    downscale: true,
   },
   hd: {
     tier: 'hd',
     resolution: {width: 1280, height: 720},
+    isHighQuality: true,
     downscale: true,
   },
   qhd: {
     tier: 'qhd',
     resolution: {width: 960, height: 540},
+    isHighQuality: false,
     downscale: true,
   },
   nhd: {
     tier: 'nhd',
     resolution: {width: 640, height: 360},
+    isHighQuality: false,
     downscale: false,
   },
   bypass: {
     tier: 'bypass',
     resolution: {width: 0, height: 0},
+    isHighQuality: false,
     downscale: false,
   },
 };

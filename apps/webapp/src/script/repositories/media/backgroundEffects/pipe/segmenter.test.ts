@@ -70,6 +70,7 @@ jest.mock('./filter', () => ({
 jest.mock('Repositories/media/backgroundEffects/helper/logger', () => ({
   getSafeLogger: jest.fn(() => ({
     log: jest.fn(),
+    info: jest.fn(),
     warn: jest.fn(),
     error: jest.fn(),
   })),
