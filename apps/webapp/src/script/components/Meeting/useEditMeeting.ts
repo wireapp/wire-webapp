@@ -20,7 +20,7 @@
 import {useCallback} from 'react';
 
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
-import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';

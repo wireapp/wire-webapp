@@ -17,31 +17,22 @@
  *
  */
 
-import type {MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Translate} from 'Util/localizerUtil';
-
 import type {MeetingSubmitErrorTranslationKeys} from './meetingSubmitErrorKeys';
 
-export const showMeetingSubmitError = (
-  translate: Translate,
-  error: MeetingSubmitErrors,
-  translationKeys: Partial<Record<MeetingSubmitErrors, MeetingSubmitErrorTranslationKeys>>,
-): void => {
-  const keys = translationKeys[error];
-  if (keys === undefined) {
-    throw new Error(`Missing meeting submit error translation for ${error}`);
-  }
+export type DeleteMeetingSubmitError =
+  'deleteFailed' | 'deleteSucceededButLocalCleanupFailed' | 'leaveConversationFailed';
 
-  PrimaryModal.show(
-    PrimaryModal.type.ACKNOWLEDGE,
-    {
-      text: {
-        title: translate(keys.titleKey),
-        message: translate(keys.messageKey),
-      },
-    },
-    undefined,
-    translate,
-  );
-};
+export const DELETE_MEETING_ERROR_TRANSLATION_KEYS = {
+  deleteFailed: {
+    titleKey: 'meetings.deleteModal.error.deleteFailedTitle',
+    messageKey: 'meetings.deleteModal.error.deleteFailed',
+  },
+  deleteSucceededButLocalCleanupFailed: {
+    titleKey: 'meetings.deleteModal.error.cleanupFailedTitle',
+    messageKey: 'meetings.deleteModal.error.deleteSucceededButLocalCleanupFailed',
+  },
+  leaveConversationFailed: {
+    titleKey: 'meetings.deleteModal.error.leaveConversationFailedTitle',
+    messageKey: 'meetings.deleteModal.error.leaveConversationFailed',
+  },
+} as const satisfies Record<DeleteMeetingSubmitError, MeetingSubmitErrorTranslationKeys>;

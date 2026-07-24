@@ -34,7 +34,7 @@ import {
   type MeetingConversationSyncError,
 } from 'Components/Meeting/meetingConversationSync';
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {
   MeetNowMeetingCommand,
   ScheduleMeetingCommand,

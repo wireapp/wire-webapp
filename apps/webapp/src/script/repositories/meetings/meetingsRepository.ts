@@ -35,6 +35,13 @@ export class MeetingsRepository {
     );
   }
 
+  deleteMeeting(meetingId: QualifiedId): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.dataSource.deleteMeeting(meetingId),
+    );
+  }
+
   getMeetingsList(): Task<Meeting[], unknown> {
     return task.tryOrElse(
       error => error,

@@ -22,10 +22,11 @@ import {CloseIcon, EditIcon, TrashIcon} from '@wireapp/react-ui-kit';
 import {
   contextMenuDangerItemIconStyles,
   contextMenuDangerItemStyles,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
-import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingActionTranslationKeys';
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/meetingAction.styles';
+import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/meetingActionTranslationKeys';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
-import {canEditMeeting, isMeetingHost} from 'Components/Meeting/utils/canEditMeeting';
+import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/Meeting/utils/canDeleteMeeting';
+import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
 import type {User} from 'Repositories/entity/User';
 import type {ContextMenuEntry} from 'src/script/ui/contextMenu';
 import type {Translate} from 'Util/localizerUtil';
@@ -36,6 +37,8 @@ type GetMeetingActionEntriesParams = {
   nowMilliseconds: number;
   translate: Translate;
   onEdit: () => void;
+  onDeleteForAll: () => void;
+  onDeleteForMe: () => void;
 };
 
 export const getMeetingActionEntries = ({
@@ -44,9 +47,9 @@ export const getMeetingActionEntries = ({
   nowMilliseconds,
   translate,
   onEdit,
+  onDeleteForAll,
+  onDeleteForMe,
 }: GetMeetingActionEntriesParams): ContextMenuEntry[] => {
-  const {meetingSeries} = meetingInstance;
-
   const editEntry: ContextMenuEntry = {
     icon: () => <EditIcon />,
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.editMeeting),
@@ -57,18 +60,22 @@ export const getMeetingActionEntries = ({
     css: contextMenuDangerItemStyles,
     icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForMe),
+    click: onDeleteForMe,
   };
 
   const deleteForAllEntry: ContextMenuEntry = {
     css: contextMenuDangerItemStyles,
     icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll),
+    click: onDeleteForAll,
   };
 
-  const isHost = isMeetingHost(meetingSeries, selfUser);
+  const showDeleteForAll = canDeleteMeetingForAll(meetingInstance, selfUser, nowMilliseconds);
+  const showDeleteForMe = canDeleteMeetingForMe(meetingInstance, selfUser, nowMilliseconds);
 
   return [
     ...(canEditMeeting(meetingInstance, selfUser, nowMilliseconds) ? [editEntry] : []),
-    ...(isHost ? [deleteForAllEntry] : [deleteForMeEntry]),
+    ...(showDeleteForAll ? [deleteForAllEntry] : []),
+    ...(showDeleteForMe ? [deleteForMeEntry] : []),
   ];
 };

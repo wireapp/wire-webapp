@@ -19,8 +19,8 @@
 
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
-import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/getMeetingActionEntries';
-import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/meetingActionTranslationKeys';
+import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/getMeetingActionEntries';
+import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/meetingActionTranslationKeys';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
@@ -70,6 +70,8 @@ const createSelfUser = (id = 'host-id') => {
 
 const translate = (key: string) => key;
 
+const noop = () => undefined;
+
 const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
   entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.editMeeting);
 
@@ -89,6 +91,8 @@ describe('getMeetingActionEntries', () => {
       nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
     });
 
     expect(getEntryLabels(entries)).toEqual([
@@ -105,6 +109,8 @@ describe('getMeetingActionEntries', () => {
       nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
     });
 
     expect(getEditEntryLabel(entries)).toBeDefined();
@@ -117,6 +123,8 @@ describe('getMeetingActionEntries', () => {
       nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
     });
 
     expect(getEditEntryLabel(entries)).toBeUndefined();
@@ -129,6 +137,8 @@ describe('getMeetingActionEntries', () => {
       nowMilliseconds: ongoingWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
     });
 
     expect(getEditEntryLabel(entries)).toBeUndefined();
@@ -141,6 +151,8 @@ describe('getMeetingActionEntries', () => {
       nowMilliseconds: pastWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
     });
 
     expect(getEditEntryLabel(entries)).toBeUndefined();
@@ -161,6 +173,8 @@ describe('getMeetingActionEntries', () => {
       nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
     });
 
     expect(getEditEntryLabel(entries)).toBeDefined();
@@ -173,6 +187,8 @@ describe('getMeetingActionEntries', () => {
       nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
     });
 
     expect(getDeleteForAllEntryLabel(entries)).toBeDefined();
@@ -186,9 +202,26 @@ describe('getMeetingActionEntries', () => {
       nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
     });
 
     expect(getDeleteForMeEntryLabel(entries)).toBeDefined();
     expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('omits delete actions for past meetings', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser(),
+      nowMilliseconds: pastWallClock.currentTimestampInMilliseconds,
+      translate,
+      onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
+    expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
   });
 });

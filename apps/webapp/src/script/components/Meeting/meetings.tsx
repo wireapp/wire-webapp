@@ -19,7 +19,13 @@
 
 import {useEffect, useMemo, useRef} from 'react';
 
-import {contentStyles} from 'Components/Meeting/Meeting.styles';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {contentStyles} from 'Components/Meeting/meeting.styles';
 import {MeetingCallingView} from 'Components/Meeting/MeetingCallingView/meetingCallingView';
 import {meetingsContentWrapperStyles} from 'Components/Meeting/MeetingCallingView/meetingCallingView.styles';
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
@@ -28,7 +34,9 @@ import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingS
 import {MeetingStoreProvider, useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {MeetNowModal} from 'Components/Meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
+import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/Meeting/shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/Meeting/shared/service/meetingService';
+import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const MeetingsContent = () => {
@@ -38,10 +46,24 @@ const MeetingsContent = () => {
   const isLoading = useMeetingStore(state => state.isLoading);
   const hasLoadError = useMeetingStore(state => state.hasLoadError);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
+  const removeMeetingByQualifiedId = useMeetingStore(state => state.removeMeetingByQualifiedId);
+  const selfUser = container.resolve(UserState).self();
 
   useEffect(() => {
     fireAndForgetInvoker.fireAndForget(loadMeetings);
   }, [loadMeetings, fireAndForgetInvoker]);
+
+  useEffect(() => {
+    const onMeetingDeleted = (meetingId: QualifiedId) => {
+      removeMeetingByQualifiedId(meetingId);
+    };
+
+    amplify.subscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
+    };
+  }, [removeMeetingByQualifiedId]);
 
   return (
     <div css={meetingsContentWrapperStyles}>
@@ -52,6 +74,7 @@ const MeetingsContent = () => {
           isLoading={isLoading}
           hasLoadError={hasLoadError}
           scrollElementRef={scrollContainerRef}
+          selfUser={selfUser}
         />
       </div>
       <MeetingCallingView />
@@ -63,10 +86,14 @@ const MeetingsContent = () => {
 
 export const Meetings = () => {
   const {mainViewModel, wallClock} = useApplicationContext();
-  const {meetings: meetingsRepository, conversation: conversationRepository} = mainViewModel.content.repositories;
+  const {
+    meetings: meetingsRepository,
+    conversation: conversationRepository,
+    calling: callingRepository,
+  } = mainViewModel.content.repositories;
 
   const store = useMemo(() => {
-    const meetingServiceDeps = {meetingsRepository, conversationRepository, wallClock};
+    const meetingServiceDeps = {meetingsRepository, conversationRepository, callingRepository, wallClock};
 
     return createMeetingStore({
       ...meetingServiceDeps,
@@ -74,9 +101,11 @@ export const Meetings = () => {
         scheduleMeeting: command => scheduleMeeting(command, meetingServiceDeps),
         meetNowMeeting: command => meetNowMeeting(command, meetingServiceDeps),
         updateMeeting: command => updateMeeting(command, meetingServiceDeps),
+        deleteMeetingForMe: command => deleteMeetingForMe(command, meetingServiceDeps),
+        deleteMeetingForAll: command => deleteMeetingForAll(command, meetingServiceDeps),
       },
     });
-  }, [meetingsRepository, conversationRepository, wallClock]);
+  }, [meetingsRepository, conversationRepository, callingRepository, wallClock]);
 
   return (
     <MeetingStoreProvider store={store}>

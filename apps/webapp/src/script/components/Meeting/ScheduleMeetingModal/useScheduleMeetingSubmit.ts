@@ -26,7 +26,7 @@ import {task, type Maybe, type Task} from 'true-myth';
 import {mapScheduleFormToMeetingCommand} from 'Components/Meeting/mapScheduleFormToMeetingCommand';
 import {mapScheduleFormToUpdateMeetingCommand} from 'Components/Meeting/mapScheduleFormToUpdateMeetingCommand';
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
 import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
 import {

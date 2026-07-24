@@ -17,7 +17,7 @@
  *
  */
 
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 
 /**
  * Returns whether meeting metadata was already persisted before the submit failed.
@@ -33,6 +33,13 @@ export const isMeetingPersistedDespiteSubmitError = (error: MeetingSubmitErrors)
       return false;
   }
 };
+
+/**
+ * Returns whether the meeting was already deleted on the server before the delete flow failed.
+ * Callers should refresh / remove the meeting from the list and must not invite a full retry.
+ */
+export const isMeetingDeletedDespiteSubmitError = (error: MeetingSubmitErrors): boolean =>
+  error === meetingSubmitErrors.deleteSucceededButLocalCleanupFailed;
 
 /**
  * Returns whether the meetings list should be refreshed after a failed submit.

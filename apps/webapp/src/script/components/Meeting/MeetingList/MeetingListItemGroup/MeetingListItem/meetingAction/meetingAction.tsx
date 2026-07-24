@@ -19,33 +19,38 @@
 
 import {MouseEvent} from 'react';
 
-import {container} from 'tsyringe';
-
 import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/getMeetingActionEntries';
+import {getMeetingActionEntries} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/getMeetingActionEntries';
 import {
   iconContainerStyle,
   iconStyles,
-} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/meetingAction.styles';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import {useDeleteMeeting} from 'Components/Meeting/useDeleteMeeting';
 import {useEditMeeting} from 'Components/Meeting/useEditMeeting';
+import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/Meeting/utils/canDeleteMeeting';
 import {canEditMeeting} from 'Components/Meeting/utils/canEditMeeting';
-import {UserState} from 'Repositories/user/userState';
+import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {showContextMenu} from '../../../../../../ui/contextMenu';
 
 interface MeetingActionProps {
   meetingInstance: MeetingInstance;
+  selfUser: User | undefined;
 }
 
-export const MeetingAction = ({meetingInstance}: MeetingActionProps) => {
+export const MeetingAction = ({meetingInstance, selfUser}: MeetingActionProps) => {
   const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
-  const selfUser = container.resolve(UserState).self();
+  const {openDeleteMeetingModal} = useDeleteMeeting();
 
   const handleActionButton = (event: MouseEvent<HTMLElement>) => {
+    if (selfUser === undefined) {
+      return;
+    }
+
     const nowMilliseconds = wallClock.currentTimestampInMilliseconds;
 
     showContextMenu({
@@ -58,6 +63,16 @@ export const MeetingAction = ({meetingInstance}: MeetingActionProps) => {
         onEdit: () => {
           if (canEditMeeting(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
             fireAndForgetInvoker.fireAndForget(() => editMeeting(meetingInstance));
+          }
+        },
+        onDeleteForAll: () => {
+          if (canDeleteMeetingForAll(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
+            openDeleteMeetingModal(meetingInstance, 'forAll', selfUser);
+          }
+        },
+        onDeleteForMe: () => {
+          if (canDeleteMeetingForMe(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
+            openDeleteMeetingModal(meetingInstance, 'forMe', selfUser);
           }
         },
       }),

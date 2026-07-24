@@ -1259,7 +1259,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * @return Event handling status (if handled successfully also the decrypted payload and the raw event)
    */
   public async handleEvent(event: BackendEvent): Promise<HandledEventResult> {
-    if ('conversation' in event) {
+    if ('conversation' in event && typeof event.conversation === 'string') {
       const isBlacklisted = await this.isConversationBlacklisted(event.conversation);
       if (isBlacklisted) {
         this.logger.info(`Conversation ${event.conversation} is blacklisted, ignoring event ${event.type}`);

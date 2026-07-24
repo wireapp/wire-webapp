@@ -26,15 +26,22 @@ import {
   sectionStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/meetingListItemGroup.styles';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
+import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface MeetingListItemGroupProps {
   header?: string;
   meetingInstances: MeetingInstance[];
+  selfUser: User | undefined;
   nowMilliseconds?: number;
 }
 
-const MeetingListItemGroupComponent = ({header, meetingInstances, nowMilliseconds}: MeetingListItemGroupProps) => {
+const MeetingListItemGroupComponent = ({
+  header,
+  meetingInstances,
+  selfUser,
+  nowMilliseconds,
+}: MeetingListItemGroupProps) => {
   const {translate} = useApplicationContext();
   const isEmpty = meetingInstances.length === 0;
 
@@ -56,6 +63,7 @@ const MeetingListItemGroupComponent = ({header, meetingInstances, nowMillisecond
           <MeetingListItem
             key={`meeting-list-item-${meetingInstance.meetingSeries.qualified_id.id}-${meetingInstance.meetingSeries.qualified_id.domain}-${meetingInstance.start.getTime()}`}
             meetingInstance={meetingInstance}
+            selfUser={selfUser}
             nowMilliseconds={nowMilliseconds}
           />
         ))}

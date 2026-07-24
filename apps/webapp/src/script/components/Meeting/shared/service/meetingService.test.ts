@@ -22,8 +22,9 @@ import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
-import {meetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import {meetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
@@ -154,7 +155,12 @@ describe('scheduleMeeting', () => {
     } as unknown as ConversationRepository;
 
     return {
-      deps: {meetingsRepository, conversationRepository, wallClock},
+      deps: {
+        meetingsRepository,
+        conversationRepository,
+        callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
+        wallClock,
+      },
       createMeetingMock,
       establishMeetingConversation,
       saveMeetingConversationFromBackend,
@@ -269,7 +275,12 @@ describe('meetNowMeeting', () => {
     } as unknown as ConversationRepository;
 
     return {
-      deps: {meetingsRepository, conversationRepository, wallClock},
+      deps: {
+        meetingsRepository,
+        conversationRepository,
+        callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
+        wallClock,
+      },
       createMeetingMock,
       establishMeetingConversation,
     };
@@ -335,7 +346,12 @@ describe('updateMeeting', () => {
     } as unknown as ConversationRepository;
 
     return {
-      deps: {meetingsRepository, conversationRepository, wallClock},
+      deps: {
+        meetingsRepository,
+        conversationRepository,
+        callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
+        wallClock,
+      },
       updateMeetingMock,
       saveMeetingConversationFromBackend,
       safeGetConversationById,

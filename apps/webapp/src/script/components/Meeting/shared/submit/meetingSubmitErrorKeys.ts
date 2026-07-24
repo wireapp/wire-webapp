@@ -17,7 +17,7 @@
  *
  */
 
-import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {ScheduleMeetingMode} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import type {TranslationKey} from 'Util/localizerUtil';
 
@@ -54,6 +54,9 @@ export const MEET_NOW_ERROR_TRANSLATION_KEYS = {
   editMeetingIdMissing: meetNowCreateFailureKeys,
   addParticipantsFailed: persistedSetupFailureKeys.addParticipantsFailed,
   removeParticipantsFailed: meetNowCreateFailureKeys,
+  deleteFailed: meetNowCreateFailureKeys,
+  deleteSucceededButLocalCleanupFailed: meetNowCreateFailureKeys,
+  leaveConversationFailed: meetNowCreateFailureKeys,
   refreshFailed: meetNowCreateFailureKeys,
 } satisfies MeetingSubmitErrorTranslationMap;
 
@@ -100,6 +103,18 @@ export const getScheduleMeetingSubmitErrorTranslationKeys = (
     removeParticipantsFailed: {
       titleKey: updateFailureTitleKey,
       messageKey: 'meetings.scheduleModal.error.removeParticipantsFailed',
+    },
+    deleteFailed: {
+      titleKey: 'meetings.deleteModal.error.deleteFailedTitle',
+      messageKey: 'meetings.deleteModal.error.deleteFailed',
+    },
+    deleteSucceededButLocalCleanupFailed: {
+      titleKey: 'meetings.deleteModal.error.cleanupFailedTitle',
+      messageKey: 'meetings.deleteModal.error.deleteSucceededButLocalCleanupFailed',
+    },
+    leaveConversationFailed: {
+      titleKey: 'meetings.deleteModal.error.leaveConversationFailedTitle',
+      messageKey: 'meetings.deleteModal.error.leaveConversationFailed',
     },
     refreshFailed: {
       titleKey: updateFailureTitleKey,

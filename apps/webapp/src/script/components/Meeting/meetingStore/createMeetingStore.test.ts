@@ -20,11 +20,17 @@
 import assert from 'node:assert';
 
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {MEETING_EVENT} from '@wireapp/api-client/lib/event';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {maybe, task} from 'true-myth';
 
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {EventSource} from 'Repositories/event/EventSource';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import {translateForTest} from 'Util/test/translateForTest';
 
@@ -74,6 +80,8 @@ describe('createMeetingStore', () => {
         task.resolve({failedToAdd: [], qualifiedConversation: {id: 'conversation-id', domain: 'example.com'}}),
       ),
     updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
     ...overrides,
   });
 
@@ -88,6 +96,7 @@ describe('createMeetingStore', () => {
   } = {}): MeetingStoreDeps => ({
     meetingsRepository: {getMeetingsList} as unknown as MeetingsRepository,
     conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
+    callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
     wallClock,
     serviceTasks,
   });
@@ -201,5 +210,63 @@ describe('createMeetingStore', () => {
     expect(result.value.formState.start.value).toEqual(new Date('2026-06-22T10:00:00.000Z'));
     assert(maybe.isJust(result.value.formState.end));
     expect(result.value.formState.end.value).toEqual(new Date('2026-06-22T11:00:00.000Z'));
+  });
+
+  it('maps deleteMeetingForAll to a DeleteMeetingCommand for serviceTasks', async () => {
+    const deleteMeetingForAll = jest.fn().mockReturnValue(task.resolve(undefined));
+    const store = createMeetingStore(createDeps({serviceTasks: createServiceTasks({deleteMeetingForAll})}));
+
+    const result = await store.getState().deleteMeetingForAll(listMeetingInstance);
+
+    expect(result.isOk).toBe(true);
+    expect(deleteMeetingForAll).toHaveBeenCalledWith({
+      meetingId: listMeetingInstance.meetingSeries.qualified_id,
+      qualifiedConversation: listMeetingInstance.meetingSeries.qualified_conversation,
+    });
+  });
+
+  it('maps deleteMeetingForMe to a DeleteMeetingCommand for serviceTasks', async () => {
+    const deleteMeetingForMe = jest.fn().mockReturnValue(task.resolve(undefined));
+    const store = createMeetingStore(createDeps({serviceTasks: createServiceTasks({deleteMeetingForMe})}));
+
+    const result = await store.getState().deleteMeetingForMe(listMeetingInstance);
+
+    expect(result.isOk).toBe(true);
+    expect(deleteMeetingForMe).toHaveBeenCalledWith({
+      meetingId: listMeetingInstance.meetingSeries.qualified_id,
+      qualifiedConversation: listMeetingInstance.meetingSeries.qualified_conversation,
+    });
+  });
+
+  it('removes a meeting when meeting.delete is distributed with its qualified_id', async () => {
+    const store = createMeetingStore(createDeps(), {meetingSeries: [meetingSeriesEntry]});
+    const onMeetingDeleted = (meetingId: {id: string; domain: string}) => {
+      store.getState().removeMeetingByQualifiedId(meetingId);
+    };
+
+    amplify.subscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
+
+    const eventRepository = new EventRepository({} as any, {} as any, {} as any, {} as any);
+    eventRepository.setEventProcessors([]);
+
+    try {
+      await eventRepository['distributeEvent'](
+        {
+          type: MEETING_EVENT.DELETE,
+          time: '2026-07-21T12:00:00.000Z',
+          qualified_id: meetingSeriesEntry.qualified_id,
+          conversation: meetingSeriesEntry.conversation_id,
+          qualified_conversation: meetingSeriesEntry.qualified_conversation,
+          from: 'user-id',
+          qualified_from: {id: 'user-id', domain: 'example.com'},
+          via: 'user',
+        },
+        EventSource.WEBSOCKET,
+      );
+
+      expect(store.getState().meetingSeries).toEqual([]);
+    } finally {
+      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
+    }
   });
 });

@@ -19,6 +19,7 @@
 
 import {
   CONVERSATION_EVENT,
+  MEETING_EVENT,
   USER_EVENT,
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
@@ -562,6 +563,9 @@ export class EventRepository {
       case EVENT_TYPE.CONVERSATION:
         amplify.publish(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, event, source);
         break;
+      case EVENT_TYPE.MEETING:
+        this.distributeMeetingEvent(event);
+        break;
       case EVENT_TYPE.FEATURE_CONFIG:
       case EVENT_TYPE.TEAM:
         amplify.publish(WebAppEvents.TEAM.EVENT_FROM_BACKEND, event, source);
@@ -574,6 +578,21 @@ export class EventRepository {
     }
     // Wait for the event handlers to have finished their async tasks
     await new Promise(res => setTimeout(res, 0));
+  }
+
+  private distributeMeetingEvent(event: IncomingEvent): void {
+    if (event.type !== MEETING_EVENT.DELETE) {
+      amplify.publish(event.type, event);
+      return;
+    }
+
+    const meetingId = 'qualified_id' in event ? event.qualified_id : undefined;
+    if (meetingId === undefined || typeof meetingId.id !== 'string' || typeof meetingId.domain !== 'string') {
+      this.logger.warn('Ignored meeting.delete event without a valid qualified_id', event);
+      return;
+    }
+
+    amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
   }
 
   /**

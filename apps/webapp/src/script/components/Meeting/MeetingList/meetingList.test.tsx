@@ -101,11 +101,15 @@ const createMeetingStoreForTest = () =>
     scheduleMeeting: jest.fn(),
     meetNowMeeting: jest.fn(),
     updateMeeting: jest.fn(),
+    deleteMeetingForMe: jest.fn(),
+    deleteMeetingForAll: jest.fn(),
+    removeMeetingByQualifiedId: jest.fn(),
     loadMeetingForEdit: jest.fn(),
   }));
 
 const renderMeetingList = (
-  props: Omit<MeetingListProps, 'useMeetingDayGroupVirtualizer'>,
+  props: Omit<MeetingListProps, 'useMeetingDayGroupVirtualizer' | 'selfUser'> &
+    Partial<Pick<MeetingListProps, 'selfUser'>>,
   wallClock = createDeterministicWallClock(),
 ) => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -120,7 +124,11 @@ const renderMeetingList = (
   return render(
     withThemeAndRootContext(
       <MeetingStoreProvider store={meetingStore}>
-        <MeetingList {...props} useMeetingDayGroupVirtualizer={createUseMeetingDayGroupVirtualizerForTest()} />
+        <MeetingList
+          {...props}
+          selfUser={props.selfUser}
+          useMeetingDayGroupVirtualizer={createUseMeetingDayGroupVirtualizerForTest()}
+        />
       </MeetingStoreProvider>,
       rootProviderWrapper,
     ),

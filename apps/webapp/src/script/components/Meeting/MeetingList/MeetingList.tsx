@@ -41,6 +41,7 @@ import {groupMeetingInstancesByDay} from 'Components/Meeting/selectors/groupMeet
 import type {MeetingInstancesByDay} from 'Components/Meeting/selectors/groupMeetingInstancesByDay';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {getDaySectionHeader} from 'Components/Meeting/utils/getDaySectionHeader';
+import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -48,6 +49,7 @@ export interface MeetingListProps {
   meetingSeries: MeetingSeries[];
   isLoading: boolean;
   hasLoadError: boolean;
+  selfUser: User | undefined;
   scrollElementRef?: RefObject<HTMLElement | null>;
   useMeetingDayGroupVirtualizer?: UseMeetingDayGroupVirtualizer;
 }
@@ -75,6 +77,7 @@ export const MeetingList = ({
   meetingSeries,
   isLoading,
   hasLoadError,
+  selfUser,
   scrollElementRef,
   useMeetingDayGroupVirtualizer: useMeetingDayGroupVirtualizerDependency = useMeetingDayGroupVirtualizer,
 }: MeetingListProps) => {
@@ -199,6 +202,7 @@ export const MeetingList = ({
                 header={getDaySectionHeader(dayGroup.day, now, translate)}
                 meetingInstances={dayGroup.meetingInstances}
                 nowMilliseconds={nowMilliseconds}
+                selfUser={selfUser}
               />
             </div>
           );

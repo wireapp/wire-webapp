@@ -21,7 +21,7 @@ import {memo, useMemo} from 'react';
 
 import {CalendarIcon} from '@wireapp/react-ui-kit';
 
-import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction';
+import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/meetingAction/meetingAction';
 import {
   badgeWrapperStyles,
   calendarIconStyles,
@@ -42,16 +42,19 @@ import {
   isMeetingListItemOngoing,
   MeetingTemporalStatuses,
 } from 'Components/Meeting/utils/meetingStatusUtil';
+import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatLocale} from 'Util/timeUtil';
 
 interface MeetingListItemProps {
   meetingInstance: MeetingInstance;
+  selfUser: User | undefined;
   nowMilliseconds?: number;
 }
 
 const MeetingListItemComponent = ({
   meetingInstance,
+  selfUser,
   nowMilliseconds: providedNowMilliseconds,
 }: MeetingListItemProps) => {
   const {meetingSeries, start, end} = meetingInstance;
@@ -112,7 +115,7 @@ const MeetingListItemComponent = ({
           isJoinDisabled={isJoinDisabled}
           isCallActive={isCallActive}
         />
-        <MeetingAction meetingInstance={meetingInstance} />
+        <MeetingAction meetingInstance={meetingInstance} selfUser={selfUser} />
       </div>
     </div>
   );

@@ -28,6 +28,10 @@ export class MeetingsApiDataSource implements MeetingsDataSource {
     return this.meetingsApi.createMeeting(...args);
   }
 
+  deleteMeeting(...args: Parameters<MeetingsDataSource['deleteMeeting']>) {
+    return this.meetingsApi.deleteMeeting(...args);
+  }
+
   getMeetingsList(...args: Parameters<MeetingsDataSource['getMeetingsList']>) {
     return this.meetingsApi.getMeetingsList(...args);
   }

@@ -20,13 +20,15 @@
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Task} from 'true-myth';
 
-import type {MeetingSubmitErrors} from 'Components/Meeting/MeetingSubmitErrors';
+import type {MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
+import type {DeleteMeetingCommand} from 'Components/Meeting/shared/service/deleteMeeting';
 import type {CreateMeetingSuccess, MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
 import type {
   MeetNowMeetingCommand,
   ScheduleMeetingCommand,
   UpdateMeetingCommand,
 } from 'Components/Meeting/shared/types/meetingCommandTypes';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 
@@ -34,11 +36,14 @@ export type MeetingStoreServiceTasks = {
   scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  deleteMeetingForMe: (command: DeleteMeetingCommand) => Task<void, MeetingSubmitErrors>;
+  deleteMeetingForAll: (command: DeleteMeetingCommand) => Task<void, MeetingSubmitErrors>;
 };
 
 export type MeetingServiceDeps = {
   meetingsRepository: MeetingsRepository;
   conversationRepository: ConversationRepository;
+  callingRepository: CallingRepository;
   wallClock: WallClock;
 };
 
