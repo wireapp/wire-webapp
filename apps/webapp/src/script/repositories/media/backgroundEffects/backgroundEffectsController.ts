@@ -43,6 +43,7 @@ import {
 } from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
 import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
+import {qualityTierFromModel} from './qualityTierMapping';
 
 // Blur strength (0–1) maps to Gaussian sigma in pixel units for the shader.
 // The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives
@@ -97,6 +98,9 @@ export class BackgroundEffectsController {
     this.options = withoutBitmap(resolved);
     this.requestedModelPath = resolved.modelPath;
     backgroundEffectsStore.getState().setModel(this.requestedModelPath);
+    backgroundEffectsStore
+      .getState()
+      .setEffectiveQualityTier(qualityTierFromModel(this.requestedModelPath, this.options.enhancePerformance));
     this.onMetrics = options.onMetrics;
 
     const trackCapabilities = inputTrack.getCapabilities();
@@ -315,8 +319,10 @@ export class BackgroundEffectsController {
 
     this.options.modelPath = effectiveModelPath;
 
-    backgroundEffectsStore.getState().setEnhancedModelActive(effectiveModelPath === SELFIE_MULTICLASS_MODEL_PATH);
     backgroundEffectsStore.getState().setModel(effectiveModelPath);
+    backgroundEffectsStore
+      .getState()
+      .setEffectiveQualityTier(qualityTierFromModel(effectiveModelPath, this.options.enhancePerformance));
 
     const {options: workerOptions} = getWorkerOptions(this.options);
     const finalOptions: WorkerProcessVideoTrackOptions = workerSource

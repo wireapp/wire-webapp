@@ -51,6 +51,7 @@ export type BackgroundEffectsState = {
   model: string;
   lastVirtualBackgroundId: string;
   qualityTier: BackgroundEffectsQuality;
+  effectiveQualityTier: BackgroundEffectsQuality;
   isInitializing: boolean;
 
   setIsFeatureEnabled(value: boolean): void;
@@ -60,7 +61,7 @@ export type BackgroundEffectsState = {
   setMetrics(metrics: RenderMetrics | undefined): void;
   setModel(model: string | undefined): void;
   setQualityTier(tier: BackgroundEffectsQuality): void;
-  setEnhancedModelActive(isActive: boolean): void;
+  setEffectiveQualityTier(tier: BackgroundEffectsQuality): void;
   setIsInitializing(value: boolean): void;
 };
 
@@ -73,6 +74,7 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     model: 'unknown',
     lastVirtualBackgroundId: DEFAULT_BUILTIN_BACKGROUND_ID,
     qualityTier: 'privacy',
+    effectiveQualityTier: 'privacy',
 
     setIsFeatureEnabled: value =>
       set(state => {
@@ -116,11 +118,9 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
         state.qualityTier = tier;
       }),
 
-    setEnhancedModelActive: isActive =>
+    setEffectiveQualityTier: tier =>
       set(state => {
-        if (!isActive && state.qualityTier === 'privacy') {
-          state.qualityTier = 'balanced';
-        }
+        state.effectiveQualityTier = tier;
       }),
 
     isInitializing: false,

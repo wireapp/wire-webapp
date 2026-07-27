@@ -303,7 +303,7 @@ const FullscreenVideoCall = ({
   const isWebGLAvailable = detectCapabilities().webgl2;
 
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
-  const backgroundEffectsQuality = useBackgroundEffectsStore(state => state.qualityTier);
+  const backgroundEffectsQuality = useBackgroundEffectsStore(state => state.effectiveQualityTier);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {

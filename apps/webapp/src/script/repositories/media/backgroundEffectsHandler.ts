@@ -22,11 +22,8 @@ import {container} from 'tsyringe';
 import {detectCapabilities, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {
-  defaultOpts,
-  SELFIE_MULTICLASS_MODEL_PATH,
-  SELFIE_SEGMENTER_MODEL_PATH,
-} from 'Repositories/media/backgroundEffects/pipe/options';
+import {defaultOpts} from 'Repositories/media/backgroundEffects/pipe/options';
+import {deriveModelConfig} from 'Repositories/media/backgroundEffects/qualityTierMapping';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -144,7 +141,7 @@ export class BackgroundEffectsHandler {
   public async applyBackgroundEffect(
     originalVideoStream: MediaStream,
   ): Promise<{applied: boolean; media: ReleasableMediaStream}> {
-    const {preferredEffect, qualityTier} = backgroundEffectsStore.getState();
+    const {preferredEffect} = backgroundEffectsStore.getState();
 
     if (preferredEffect.type === 'none') {
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
@@ -174,10 +171,12 @@ export class BackgroundEffectsHandler {
     }
 
     try {
+      const {qualityTier} = backgroundEffectsStore.getState();
+      const {modelPath, enhancePerformance} = deriveModelConfig(qualityTier);
       const outputTrack = await this.controller.start(videoTrack, {
         ...defaultOpts,
-        modelPath: qualityTier === 'privacy' ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH,
-        enhancePerformance: qualityTier === 'performance',
+        modelPath,
+        enhancePerformance,
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,
         quality: 'auto',
@@ -273,9 +272,10 @@ export class BackgroundEffectsHandler {
   }
 
   public setQualityTier(quality: BackgroundEffectsQuality): void {
-    this.controller.setModelPath(quality === 'privacy' ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH);
-    this.controller.setEnhancePerformance(quality === 'performance');
     backgroundEffectsStore.getState().setQualityTier(quality);
+    const {modelPath, enhancePerformance} = deriveModelConfig(quality);
+    this.controller.setModelPath(modelPath);
+    this.controller.setEnhancePerformance(enhancePerformance);
   }
 
   public getCapabilityInfo(): CapabilityInfo {
