@@ -32,6 +32,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventSource} from 'Repositories/event/EventSource';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {createMeetingStore} from './createMeetingStore';
@@ -87,14 +88,16 @@ describe('createMeetingStore', () => {
 
   const createDeps = ({
     getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting])),
+    getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting)),
     safeGetConversationById = jest.fn(),
     serviceTasks = createServiceTasks(),
   }: {
     getMeetingsList?: jest.Mock;
+    getMeeting?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     serviceTasks?: MeetingStoreServiceTasks;
   } = {}): MeetingStoreDeps => ({
-    meetingsRepository: {getMeetingsList} as unknown as MeetingsRepository,
+    meetingsRepository: {getMeetingsList, getMeeting} as unknown as MeetingsRepository,
     conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
     callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
     wallClock,
@@ -268,5 +271,71 @@ describe('createMeetingStore', () => {
     } finally {
       amplify.unsubscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
     }
+  });
+
+  describe('syncMeetingByQualifiedId', () => {
+    const otherDomainEntry = {
+      ...meetingSeriesEntry,
+      qualified_id: {id: 'meeting-id', domain: 'other.com'},
+    };
+
+    it('inserts the fetched meeting when no entry exists for its qualified id', async () => {
+      const getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting));
+      const store = createMeetingStore(createDeps({getMeeting}));
+
+      const result = await store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
+
+      expect(unwrap(result)).toMatchObject(meetingSeriesEntry);
+      expect(getMeeting).toHaveBeenCalledWith(apiMeeting.qualified_id);
+      expect(store.getState().meetingSeries).toHaveLength(1);
+      expect(store.getState().meetingSeries[0]).toMatchObject(meetingSeriesEntry);
+    });
+
+    it('replaces the existing entry for the same qualified id instead of duplicating it', async () => {
+      const updatedApiMeeting = {...apiMeeting, title: 'Weekly sync (updated)'};
+      const getMeeting = jest.fn().mockReturnValue(task.resolve(updatedApiMeeting));
+      const store = createMeetingStore(createDeps({getMeeting}), {meetingSeries: [meetingSeriesEntry]});
+
+      const result = await store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
+
+      expect(unwrap(result).title).toBe('Weekly sync (updated)');
+      expect(store.getState().meetingSeries).toHaveLength(1);
+      expect(store.getState().meetingSeries[0]?.title).toBe('Weekly sync (updated)');
+    });
+
+    it('leaves an entry with the same bare id in another domain untouched', async () => {
+      const getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting));
+      const store = createMeetingStore(createDeps({getMeeting}), {meetingSeries: [otherDomainEntry]});
+
+      const result = await store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
+
+      expect(result.isOk).toBe(true);
+      expect(store.getState().meetingSeries).toHaveLength(2);
+      expect(store.getState().meetingSeries).toContainEqual(otherDomainEntry);
+      expect(store.getState().meetingSeries.find(series => series.qualified_id.domain === 'example.com')).toEqual(
+        expect.objectContaining(meetingSeriesEntry),
+      );
+    });
+
+    it('preserves existing state and rejects with fetchFailed when fetching the meeting fails', async () => {
+      const getMeeting = jest.fn().mockReturnValue(task.reject(new Error('network error')));
+      const store = createMeetingStore(createDeps({getMeeting}), {meetingSeries: [meetingSeriesEntry]});
+
+      const result = await store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
+
+      expect(unwrapErr(result)).toBe('fetchFailed');
+      expect(store.getState().meetingSeries).toEqual([meetingSeriesEntry]);
+    });
+
+    it('preserves existing state and rejects with mapFailed when the fetched meeting fails to map', async () => {
+      const invalidApiMeeting = {...apiMeeting, start_time: 'not-a-date'};
+      const getMeeting = jest.fn().mockReturnValue(task.resolve(invalidApiMeeting));
+      const store = createMeetingStore(createDeps({getMeeting}), {meetingSeries: [meetingSeriesEntry]});
+
+      const result = await store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
+
+      expect(unwrapErr(result)).toBe('mapFailed');
+      expect(store.getState().meetingSeries).toEqual([meetingSeriesEntry]);
+    });
   });
 });
