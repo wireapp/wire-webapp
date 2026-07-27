@@ -72,10 +72,11 @@ const RadioGroup = <T extends string | number>({
       {options.map(
         ({value, label, description, detailLabel, isDisabled = false, optionUieName = `${uieName}-${value}`}) => {
           const currentId = radioId + value;
+          const descriptionId = `${currentId}-description`;
           const isChecked = selectedValue === value;
 
           return (
-            <div key={value} css={radioOptionStyles} aria-describedby={currentId}>
+            <div key={value} css={radioOptionStyles}>
               <input
                 css={radioInputStyles(isDisabled || disabled)}
                 disabled={isDisabled || disabled}
@@ -87,6 +88,7 @@ const RadioGroup = <T extends string | number>({
                 onChange={() => onChange(value)}
                 checked={isChecked}
                 data-uie-name={optionUieName}
+                aria-describedby={is.nonEmptyString(description) ? descriptionId : undefined}
               />
 
               <div>
@@ -98,7 +100,11 @@ const RadioGroup = <T extends string | number>({
                   )}
                 </label>
 
-                {is.nonEmptyString(description) && <div css={radioDescriptionStyles}>{description}</div>}
+                {is.nonEmptyString(description) && (
+                  <div id={descriptionId} css={radioDescriptionStyles}>
+                    {description}
+                  </div>
+                )}
               </div>
             </div>
           );
