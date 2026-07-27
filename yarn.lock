@@ -12081,7 +12081,7 @@ __metadata:
     path-browserify: "npm:1.0.1"
     path-to-regexp: "npm:8.4.2"
     platform: "npm:1.3.6"
-    postcss: "npm:8.5.22"
+    postcss: "npm:8.5.23"
     postcss-import: "npm:16.1.1"
     postcss-less: "npm:6.0.0"
     postcss-loader: "npm:8.2.1"
@@ -26263,14 +26263,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.5.22":
-  version: 8.5.22
-  resolution: "postcss@npm:8.5.22"
+"postcss@npm:8.5.23":
+  version: 8.5.23
+  resolution: "postcss@npm:8.5.23"
   dependencies:
     nanoid: "npm:^3.3.16"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
-  checksum: 10/7944444f267f2d94c7caeed66f3da56d5b947bd4a7e57a166a5161af25c6006dd73f40e2a1a6822f3d7fccc2fa005778c03058368eb7efca1b5038aec55abd14
+  checksum: 10/8387f421216696bf62a13e5a270e9fefdafc81e196903c0f8d7653f8bab315367cc2261b3c22cf197e492cb075f31bdfc07fd9c3be1cb165ff3cabe14c5a039a
   languageName: node
   linkType: hard
 
