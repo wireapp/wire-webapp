@@ -19,7 +19,7 @@
 
 import {useMemo} from 'react';
 
-import {render, screen, within} from '@testing-library/react';
+import {act, render, screen, within} from '@testing-library/react';
 import type {Virtualizer} from '@tanstack/react-virtual';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {createStore} from 'zustand/vanilla';
@@ -108,8 +108,8 @@ const createMeetingStoreForTest = () =>
   }));
 
 const renderMeetingList = (
-  props: Omit<MeetingListProps, 'useMeetingDayGroupVirtualizer' | 'selfUser'> &
-    Partial<Pick<MeetingListProps, 'selfUser'>>,
+  props: Omit<MeetingListProps, 'useMeetingDayGroupVirtualizer' | 'selfUser' | 'onRefresh'> &
+    Partial<Pick<MeetingListProps, 'selfUser' | 'onRefresh'>>,
   wallClock = createDeterministicWallClock(),
 ) => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -126,6 +126,7 @@ const renderMeetingList = (
       <MeetingStoreProvider store={meetingStore}>
         <MeetingList
           {...props}
+          onRefresh={props.onRefresh ?? jest.fn()}
           selfUser={props.selfUser}
           useMeetingDayGroupVirtualizer={createUseMeetingDayGroupVirtualizerForTest()}
         />
@@ -140,6 +141,17 @@ describe('MeetingList', () => {
     renderMeetingList({meetingSeries: [], isLoading: false, hasLoadError: true});
 
     expect(screen.getByText('meetings.list.loadError')).toBeInTheDocument();
+  });
+
+  it('allows retrying after the meetings list fails to load', () => {
+    const onRefresh = jest.fn();
+    renderMeetingList({meetingSeries: [], isLoading: false, hasLoadError: true, onRefresh});
+
+    act(() => {
+      screen.getByRole('button', {name: 'meetings.list.refresh'}).click();
+    });
+
+    expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
   it('renders ongoing meetings within the today section', () => {

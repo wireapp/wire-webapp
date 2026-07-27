@@ -30,13 +30,17 @@ import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvi
 import {MeetNowModal} from 'Components/Meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
 import {UserState} from 'Repositories/user/userState';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const Meetings = () => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const meetingSeries = useMeetingStore(state => state.meetingSeries);
   const isLoading = useMeetingStore(state => state.isLoading);
   const hasLoadError = useMeetingStore(state => state.hasLoadError);
+  const loadMeetings = useMeetingStore(state => state.loadMeetings);
   const selfUser = container.resolve(UserState).self();
+  const refreshMeetings = () => fireAndForgetInvoker.fireAndForget(loadMeetings);
 
   return (
     <div css={meetingsContentWrapperStyles}>
@@ -46,6 +50,7 @@ export const Meetings = () => {
           meetingSeries={meetingSeries}
           isLoading={isLoading}
           hasLoadError={hasLoadError}
+          onRefresh={refreshMeetings}
           scrollElementRef={scrollContainerRef}
           selfUser={selfUser}
         />
