@@ -29,6 +29,7 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {MeetingStoreRoot} from 'Components/Meeting/meetingStore/MeetingStoreRoot';
 import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
@@ -194,15 +195,17 @@ export const AppContainer = (properties: AppProps) => {
       >
         {selfUser => {
           return (
-            <AppMain
-              app={app}
-              isFeatureToggleEnabled={isFeatureToggleEnabled}
-              selfUser={selfUser}
-              mainView={mainView}
-              locked={softLockEnabled}
-              fireAndForgetInvoker={fireAndForgetInvoker}
-              wallClock={wallClock}
-            />
+            <MeetingStoreRoot>
+              <AppMain
+                app={app}
+                isFeatureToggleEnabled={isFeatureToggleEnabled}
+                selfUser={selfUser}
+                mainView={mainView}
+                locked={softLockEnabled}
+                fireAndForgetInvoker={fireAndForgetInvoker}
+                wallClock={wallClock}
+              />
+            </MeetingStoreRoot>
           );
         }}
       </AppLoader>
