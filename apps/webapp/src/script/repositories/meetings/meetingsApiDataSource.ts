@@ -32,6 +32,10 @@ export class MeetingsApiDataSource implements MeetingsDataSource {
     return this.meetingsApi.deleteMeeting(...args);
   }
 
+  getMeeting(...args: Parameters<MeetingsDataSource['getMeeting']>) {
+    return this.meetingsApi.getMeeting(...args);
+  }
+
   getMeetingsList(...args: Parameters<MeetingsDataSource['getMeetingsList']>) {
     return this.meetingsApi.getMeetingsList(...args);
   }

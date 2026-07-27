@@ -42,6 +42,13 @@ export class MeetingsRepository {
     );
   }
 
+  getMeeting(meetingId: QualifiedId): Task<Meeting, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.dataSource.getMeeting(meetingId),
+    );
+  }
+
   getMeetingsList(): Task<Meeting[], unknown> {
     return task.tryOrElse(
       error => error,
