@@ -41,4 +41,31 @@ describe('MeetingsApiDataSource', () => {
     expect(createMeeting).toHaveBeenCalledTimes(1);
     expect(getMeetingsList).toHaveBeenCalledTimes(1);
   });
+
+  it('delegates getMeeting to the injected MeetingsAPI', async () => {
+    const meetingId = {id: 'meeting-id', domain: 'example.com'};
+    const meeting = {
+      created_at: '2026-06-15T09:00:00.000Z',
+      updated_at: '2026-06-15T09:00:00.000Z',
+      start_time: '2026-06-16T10:00:00.000Z',
+      end_time: '2026-06-16T11:00:00.000Z',
+      title: 'Weekly sync',
+      qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+      qualified_creator: {id: 'creator-id', domain: 'example.com'},
+      qualified_id: meetingId,
+      trial: false,
+    };
+    const getMeeting = jest.fn().mockResolvedValue(meeting);
+    const meetingsApi = {
+      getMeeting,
+    } as unknown as MeetingsAPI;
+
+    const dataSource = new MeetingsApiDataSource(meetingsApi);
+
+    const result = await dataSource.getMeeting(meetingId);
+
+    expect(getMeeting).toHaveBeenCalledTimes(1);
+    expect(getMeeting).toHaveBeenCalledWith(meetingId);
+    expect(result).toBe(meeting);
+  });
 });

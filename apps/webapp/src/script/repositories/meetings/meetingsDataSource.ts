@@ -25,6 +25,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 export interface MeetingsDataSource {
   createMeeting(payload: CreateMeeting): Promise<MeetingWithConversation>;
   deleteMeeting(meetingId: QualifiedId): Promise<void>;
+  getMeeting(meetingId: QualifiedId): Promise<Meeting>;
   getMeetingsList(): Promise<Meeting[]>;
   updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Promise<MeetingWithConversation>;
 }
