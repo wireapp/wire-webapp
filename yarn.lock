@@ -12067,7 +12067,7 @@ __metadata:
     webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.6"
     workbox-webpack-plugin: "npm:7.4.1"
-    worker-timers: "npm:8.0.33"
+    worker-timers: "npm:8.0.34"
     xstate: "npm:5.32.5"
     zustand: "npm:4.5.7"
   languageName: unknown
@@ -32798,15 +32798,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"worker-timers@npm:8.0.33":
-  version: 8.0.33
-  resolution: "worker-timers@npm:8.0.33"
+"worker-timers@npm:8.0.34":
+  version: 8.0.34
+  resolution: "worker-timers@npm:8.0.34"
   dependencies:
     "@babel/runtime": "npm:^7.29.7"
     tslib: "npm:^2.8.1"
     worker-timers-broker: "npm:^8.0.18"
     worker-timers-worker: "npm:^9.0.15"
-  checksum: 10/6f710d17f2fa1dc9ccf02c3b0171d5f6adc3d7733e4751bc2b71b0240c73e524cdf64804d712a21a461e8e6ded39d5e0ee42db2cd4911609d74c3520bdc3bbef
+  checksum: 10/41b42d200a13706f8b23331040a36dffb8693c2da4dd0706a65143d85c9c265fde054091915d799cc5032306c2b8ea300460a5234c226badd55816357f7f2c7b
   languageName: node
   linkType: hard
 
