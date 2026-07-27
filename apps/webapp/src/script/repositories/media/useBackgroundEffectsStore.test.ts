@@ -24,21 +24,46 @@ describe('backgroundEffectsStore:lastVirtualBackgroundId', () => {
   });
 
   it('initializes background effects with privacy quality', () => {
-    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(true);
-    expect(backgroundEffectsStore.getState().isPerformanceEnhancementEnabled).toBe(false);
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('privacy');
   });
 
-  it('updates isHighQualityBlurEnabled when setIsHighQualityBlurEnabled is called', () => {
-    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(false);
+  it('updates qualityTier when setQualityTier is called', () => {
+    backgroundEffectsStore.getState().setQualityTier('balanced');
 
-    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(false);
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('balanced');
   });
 
-  it('can enable high quality blur again', () => {
-    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(false);
-    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(true);
+  it('can switch back to privacy quality', () => {
+    backgroundEffectsStore.getState().setQualityTier('balanced');
+    backgroundEffectsStore.getState().setQualityTier('privacy');
 
-    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(true);
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('privacy');
+  });
+
+  it('never allows the enhanced model and performance enhancement to be active at the same time', () => {
+    backgroundEffectsStore.getState().setQualityTier('performance');
+
+    backgroundEffectsStore.getState().setEnhancedModelActive(true);
+
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('performance');
+  });
+
+  it('downgrades from privacy to balanced when the enhanced model becomes inactive', () => {
+    backgroundEffectsStore.getState().setQualityTier('privacy');
+
+    backgroundEffectsStore.getState().setEnhancedModelActive(false);
+
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('balanced');
+  });
+
+  it('does not change qualityTier when setEnhancedModelActive is called outside of privacy', () => {
+    backgroundEffectsStore.getState().setQualityTier('balanced');
+    backgroundEffectsStore.getState().setEnhancedModelActive(false);
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('balanced');
+
+    backgroundEffectsStore.getState().setQualityTier('performance');
+    backgroundEffectsStore.getState().setEnhancedModelActive(false);
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('performance');
   });
 
   it('initializes performance panel as disabled', () => {

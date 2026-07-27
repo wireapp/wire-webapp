@@ -39,7 +39,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 
-import {backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
+import {backgroundEffectsStore, BackgroundEffectsQuality, RenderMetrics} from './useBackgroundEffectsStore';
 
 export const TARGET_FPS = 15;
 export const DEBOUNCE_TIMER = 500;
@@ -270,14 +270,10 @@ export class BackgroundEffectsHandler {
     return this.controller.getQuality();
   }
 
-  public enableSuperhighQualityTier(enable: boolean): void {
-    this.controller.setModelPath(enable ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH);
-    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(enable);
-  }
-
-  public enablePerformanceEnhancement(enable: boolean): void {
-    this.controller.setEnhancePerformance(enable);
-    backgroundEffectsStore.getState().setIsPerformanceEnhancementEnabled(enable);
+  public setQualityTier(quality: BackgroundEffectsQuality): void {
+    this.controller.setModelPath(quality === 'privacy' ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH);
+    this.controller.setEnhancePerformance(quality === 'performance');
+    backgroundEffectsStore.getState().setQualityTier(quality);
   }
 
   public getCapabilityInfo(): CapabilityInfo {

@@ -26,6 +26,7 @@ import {BlurHighIcon, BlurLowIcon, CircleIcon} from '@wireapp/react-ui-kit';
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {RadioGroup} from 'Components/Radio';
+import {BackgroundEffectsQuality} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -54,24 +55,6 @@ interface VideoBackgroundSettingsProps {
   onClose: () => void;
   isWebGLAvailable: boolean;
 }
-
-export type BackgroundEffectsQuality = 'privacy' | 'balanced' | 'performance';
-
-export const getBackgroundEffectsQuality = (
-  highQualityBlurAllowed: boolean,
-  performanceEnhancementEnabled: boolean,
-): BackgroundEffectsQuality => {
-  if (highQualityBlurAllowed) {
-    return 'privacy';
-  }
-
-  return performanceEnhancementEnabled ? 'performance' : 'balanced';
-};
-
-export const getBackgroundEffectsQualitySettings = (quality: BackgroundEffectsQuality) => ({
-  highQualityBlurAllowed: quality === 'privacy',
-  performanceEnhancementEnabled: quality === 'performance',
-});
 
 const isEffectSelected = (selected: BackgroundEffectSelection, candidate: BackgroundEffectSelection): boolean => {
   if (selected.type !== candidate.type) {

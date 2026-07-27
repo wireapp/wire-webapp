@@ -69,7 +69,7 @@ describe('BackgroundEffectsHandler', () => {
     backgroundEffectsStore.getState().setPreferredEffect({type: 'none'});
     backgroundEffectsStore.getState().setMetrics(undefined);
     backgroundEffectsStore.getState().setLastVirtualBackgroundId(DEFAULT_BUILTIN_BACKGROUND_ID);
-    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(true);
+    backgroundEffectsStore.getState().setQualityTier('privacy');
     teamState.teamFeatures(undefined);
   });
 
@@ -82,6 +82,7 @@ describe('BackgroundEffectsHandler', () => {
       setBlurStrength: jest.fn(),
       setBackgroundSource: jest.fn(),
       setModelPath: jest.fn(),
+      setEnhancePerformance: jest.fn(),
     };
 
     mockStorage = {
@@ -328,22 +329,34 @@ describe('BackgroundEffectsHandler', () => {
     expect(virtualIdCalls[0][1]).toBe('office-2');
   });
 
-  it('enables super high quality tier by switching to multiclass model and updating store', () => {
+  it('sets privacy quality by switching to multiclass model and updating store', () => {
     const handler = new BackgroundEffectsHandler(mockController);
 
-    handler.enableSuperhighQualityTier(true);
+    handler.setQualityTier('privacy');
 
     expect(mockController.setModelPath).toHaveBeenCalledWith(SELFIE_MULTICLASS_MODEL_PATH);
-    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(true);
+    expect(mockController.setEnhancePerformance).toHaveBeenCalledWith(false);
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('privacy');
   });
 
-  it('disables super high quality tier by switching to segmenter model and updating store', () => {
+  it('sets balanced quality by switching to segmenter model and updating store', () => {
     const handler = new BackgroundEffectsHandler(mockController);
 
-    handler.enableSuperhighQualityTier(false);
+    handler.setQualityTier('balanced');
 
     expect(mockController.setModelPath).toHaveBeenCalledWith(SELFIE_SEGMENTER_MODEL_PATH);
-    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(false);
+    expect(mockController.setEnhancePerformance).toHaveBeenCalledWith(false);
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('balanced');
+  });
+
+  it('sets performance quality by switching to segmenter model, enabling performance enhancement and updating store', () => {
+    const handler = new BackgroundEffectsHandler(mockController);
+
+    handler.setQualityTier('performance');
+
+    expect(mockController.setModelPath).toHaveBeenCalledWith(SELFIE_SEGMENTER_MODEL_PATH);
+    expect(mockController.setEnhancePerformance).toHaveBeenCalledWith(true);
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('performance');
   });
 
   it('keeps stored preferred effect when WebGL is available', () => {

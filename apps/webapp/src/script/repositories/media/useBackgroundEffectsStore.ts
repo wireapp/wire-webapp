@@ -41,6 +41,8 @@ export interface RenderMetrics extends Metrics {
   tier: QualityTier;
 }
 
+export type BackgroundEffectsQuality = 'privacy' | 'balanced' | 'performance';
+
 export type BackgroundEffectsState = {
   isFeatureEnabled: boolean;
   isPerformancePanelEnabled: boolean;
@@ -48,8 +50,7 @@ export type BackgroundEffectsState = {
   metrics: RenderMetrics | undefined;
   model: string;
   lastVirtualBackgroundId: string;
-  isHighQualityBlurEnabled: boolean;
-  isPerformanceEnhancementEnabled: boolean;
+  qualityTier: BackgroundEffectsQuality;
   isInitializing: boolean;
 
   setIsFeatureEnabled(value: boolean): void;
@@ -58,8 +59,8 @@ export type BackgroundEffectsState = {
   setLastVirtualBackgroundId(backgroundId: string): void;
   setMetrics(metrics: RenderMetrics | undefined): void;
   setModel(model: string | undefined): void;
-  setIsHighQualityBlurEnabled(value: boolean): void;
-  setIsPerformanceEnhancementEnabled(value: boolean): void;
+  setQualityTier(tier: BackgroundEffectsQuality): void;
+  setEnhancedModelActive(isActive: boolean): void;
   setIsInitializing(value: boolean): void;
 };
 
@@ -71,8 +72,7 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     metrics: undefined,
     model: 'unknown',
     lastVirtualBackgroundId: DEFAULT_BUILTIN_BACKGROUND_ID,
-    isHighQualityBlurEnabled: true,
-    isPerformanceEnhancementEnabled: false,
+    qualityTier: 'privacy',
 
     setIsFeatureEnabled: value =>
       set(state => {
@@ -111,14 +111,16 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
         }
       }),
 
-    setIsHighQualityBlurEnabled: value =>
+    setQualityTier: tier =>
       set(state => {
-        state.isHighQualityBlurEnabled = value;
+        state.qualityTier = tier;
       }),
 
-    setIsPerformanceEnhancementEnabled: value =>
+    setEnhancedModelActive: isActive =>
       set(state => {
-        state.isPerformanceEnhancementEnabled = value;
+        if (!isActive && state.qualityTier === 'privacy') {
+          state.qualityTier = 'balanced';
+        }
       }),
 
     isInitializing: false,

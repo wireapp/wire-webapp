@@ -50,7 +50,7 @@ import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {detectCapabilities} from 'Repositories/media/backgroundEffects';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {BackgroundEffectsQuality, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
@@ -77,12 +77,7 @@ import {
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination/Pagination';
-import type {BackgroundEffectsQuality} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
-import {
-  getBackgroundEffectsQuality,
-  getBackgroundEffectsQualitySettings,
-  VideoBackgroundSettings,
-} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
+import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
@@ -308,12 +303,7 @@ const FullscreenVideoCall = ({
   const isWebGLAvailable = detectCapabilities().webgl2;
 
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
-  const isHighQualityBlurEnabled = useBackgroundEffectsStore(state => state.isHighQualityBlurEnabled);
-  const isPerformanceEnhancementEnabled = useBackgroundEffectsStore(state => state.isPerformanceEnhancementEnabled);
-  const backgroundEffectsQuality = getBackgroundEffectsQuality(
-    isHighQualityBlurEnabled,
-    isPerformanceEnhancementEnabled,
-  );
+  const backgroundEffectsQuality = useBackgroundEffectsStore(state => state.qualityTier);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
@@ -322,10 +312,7 @@ const FullscreenVideoCall = ({
   };
 
   const handleBackgroundEffectsQualityChange = (quality: BackgroundEffectsQuality) => {
-    const {highQualityBlurAllowed, performanceEnhancementEnabled} = getBackgroundEffectsQualitySettings(quality);
-
-    callingRepository.allowSuperhighQualityTier(highQualityBlurAllowed);
-    callingRepository.enablePerformanceEnhancement(performanceEnhancementEnabled);
+    callingRepository.setBackgroundEffectsQualityTier(quality);
   };
 
   return (

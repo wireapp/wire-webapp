@@ -27,12 +27,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {withTheme} from '../../../../auth/util/test/testUtil';
 
-import {
-  getBackgroundEffectLabel,
-  getBackgroundEffectsQuality,
-  getBackgroundEffectsQualitySettings,
-  VideoBackgroundSettings,
-} from './VideoBackgroundSettings';
+import {getBackgroundEffectLabel, VideoBackgroundSettings} from './VideoBackgroundSettings';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
@@ -71,24 +66,6 @@ describe('VideoBackgroundSettings', () => {
   const renderComponent = (props = {}) => {
     return render(withTheme(<VideoBackgroundSettings {...defaultProps} {...props} />), {wrapper: rootProviderWrapper});
   };
-
-  describe('background effects quality', () => {
-    it('uses balance when high-quality blur and performance enhancement are disabled', () => {
-      expect(getBackgroundEffectsQuality(false, false)).toBe('balanced');
-      expect(getBackgroundEffectsQualitySettings('balanced')).toEqual({
-        highQualityBlurAllowed: false,
-        performanceEnhancementEnabled: false,
-      });
-    });
-
-    it('uses privacy for high-quality blur', () => {
-      expect(getBackgroundEffectsQuality(true, false)).toBe('privacy');
-      expect(getBackgroundEffectsQualitySettings('privacy')).toEqual({
-        highQualityBlurAllowed: true,
-        performanceEnhancementEnabled: false,
-      });
-    });
-  });
 
   it('renders video background settings wrapper', () => {
     const {getByTestId} = renderComponent();

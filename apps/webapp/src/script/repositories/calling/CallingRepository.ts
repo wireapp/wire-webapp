@@ -79,7 +79,7 @@ import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHand
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
-import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {backgroundEffectsStore, BackgroundEffectsQuality} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
@@ -385,12 +385,8 @@ export class CallingRepository {
     await this.applyCurrentBackgroundEffectOnSelfParticipant(originalVideoStream, true);
   }
 
-  public allowSuperhighQualityTier(enable: boolean) {
-    this.backgroundEffectsHandler.enableSuperhighQualityTier(enable);
-  }
-
-  public enablePerformanceEnhancement(enable: boolean) {
-    this.backgroundEffectsHandler.enablePerformanceEnhancement(enable);
+  public setBackgroundEffectsQualityTier(quality: BackgroundEffectsQuality) {
+    this.backgroundEffectsHandler.setQualityTier(quality);
   }
 
   public getBackgroundEffectsHandler(): BackgroundEffectsHandler {

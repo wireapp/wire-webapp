@@ -315,7 +315,7 @@ export class BackgroundEffectsController {
 
     this.options.modelPath = effectiveModelPath;
 
-    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(effectiveModelPath === SELFIE_MULTICLASS_MODEL_PATH);
+    backgroundEffectsStore.getState().setEnhancedModelActive(effectiveModelPath === SELFIE_MULTICLASS_MODEL_PATH);
     backgroundEffectsStore.getState().setModel(effectiveModelPath);
 
     const {options: workerOptions} = getWorkerOptions(this.options);
