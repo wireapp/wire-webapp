@@ -17,17 +17,14 @@
  *
  */
 
-import {ReactElement, useMemo} from 'react';
+import {ReactElement} from 'react';
 
 import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {
-  hasActiveGlobalDriveFilters,
-  type GlobalDriveFiltersState,
-} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
+import {hasActiveGlobalDriveFilters} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
 import {useCellsSorting} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -43,7 +40,6 @@ import {useGlobalDriveFilters} from './common/useGlobalDriveFilters/useGlobalDri
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
-import {sharedDriveSearchAndFiltersFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../page/rootProvider';
 
 interface CellsGlobalViewProps {
@@ -58,32 +54,18 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
     userRepository = container.resolve(UserRepository),
     conversationRepository = container.resolve(ConversationRepository),
   } = properties;
-  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
-  const legacyFilters = useCellsStore(state => state.filters);
-  const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
 
   const {filters, filterState} = useGlobalDriveFilters({cellsRepository, conversationRepository, translate});
   const {sort, getDirectionFor, toggleSort} = useCellsSorting();
-  const legacyFilterState = useMemo<GlobalDriveFiltersState>(
-    () => ({
-      selectedTagIds: legacyFilters.tags,
-      selectedFileTypeIds: [],
-      selectedCreatorIds: [],
-      selectedConversationIds: [],
-      isSharedViaLink: false,
-      path: legacyFilters.path,
-    }),
-    [legacyFilters.path, legacyFilters.tags],
-  );
-  const searchFilterState = isSharedDriveSearchAndFiltersEnabled ? filterState : legacyFilterState;
 
   const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsNodes({
     cellsRepository,
     userRepository,
     conversationRepository,
     fireAndForgetInvoker,
-    filters: searchFilterState,
+    filters: filterState,
     sort,
   });
 
@@ -94,7 +76,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
   const isError = nodesStatus === 'error';
   const isSuccess = nodesStatus === 'success';
   const hasFiles = nodes.length > 0;
-  const hasActiveSearchCriteria = is.nonEmptyString(searchValue) || hasActiveGlobalDriveFilters(searchFilterState);
+  const hasActiveSearchCriteria = is.nonEmptyString(searchValue) || hasActiveGlobalDriveFilters(filterState);
   const emptySearchResults = hasActiveSearchCriteria && nodesStatus === 'success' && nodes.length === 0;
 
   const showTable =
@@ -120,8 +102,6 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
         onRefresh={handleReload}
         searchStatus={nodesStatus}
         filters={filters}
-        cellsRepository={cellsRepository}
-        isSharedDriveSearchAndFiltersEnabled={isSharedDriveSearchAndFiltersEnabled}
       />
       {emptySearchResults && (
         <CellsStateInfo
@@ -135,7 +115,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
           nodes={nodes}
           cellsRepository={cellsRepository}
           getDirectionFor={getDirectionFor}
-          isSortingEnabled={isSharedDriveSearchAndFiltersEnabled}
+          isSortingEnabled
           onToggleSort={toggleSort}
         />
       )}

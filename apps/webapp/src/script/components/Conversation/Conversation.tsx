@@ -46,7 +46,6 @@ import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
-import {sharedDriveSearchAndFiltersFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -102,11 +101,9 @@ export const Conversation = ({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
-  const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
-
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
   const [isGiphyModalOpen, setIsGiphyModalOpen] = useState<boolean>(false);
@@ -570,10 +567,10 @@ export const Conversation = ({
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
 
   useEffect(() => {
-    if ((!isFileTabActive || !isSharedDriveSearchAndFiltersEnabled) && isSharedDriveSearchViewOpen) {
+    if (!isFileTabActive && isSharedDriveSearchViewOpen) {
       setIsSharedDriveSearchViewOpen(false);
     }
-  }, [isFileTabActive, isSharedDriveSearchAndFiltersEnabled, isSharedDriveSearchViewOpen]);
+  }, [isFileTabActive, isSharedDriveSearchViewOpen]);
 
   const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, handlePastedFile, isDragAccept} =
     useFilesUploadDropzone({
@@ -606,8 +603,8 @@ export const Conversation = ({
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
             isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
-            withBottomDivider={!isCellsEnabled || (isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen)}
-            isSharedDriveSearchViewOpen={isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen}
+            withBottomDivider={!isCellsEnabled || isSharedDriveSearchViewOpen}
+            isSharedDriveSearchViewOpen={isSharedDriveSearchViewOpen}
             onCloseSharedDriveSearchView={() => setIsSharedDriveSearchViewOpen(false)}
           />
 
@@ -615,10 +612,8 @@ export const Conversation = ({
             <>
               <div css={tabsWrapperStyles}>
                 <div
-                  aria-hidden={(isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen) || undefined}
-                  css={
-                    isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen ? tabsHiddenStyles : undefined
-                  }
+                  aria-hidden={isSharedDriveSearchViewOpen || undefined}
+                  css={isSharedDriveSearchViewOpen ? tabsHiddenStyles : undefined}
                 >
                   <ConversationTabs
                     activeTabIndex={activeTabIndex}
@@ -626,7 +621,7 @@ export const Conversation = ({
                     conversationQualifiedId={activeConversation.qualifiedId}
                   />
                 </div>
-                {isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen && (
+                {isSharedDriveSearchViewOpen && (
                   <div css={searchResultsOverlayStyles}>
                     <h3 css={searchResultsHeadingStyles}>Search results</h3>
                   </div>
@@ -639,13 +634,8 @@ export const Conversation = ({
                     userRepository={repositories.user}
                     cellsRepository={repositories.cells}
                     conversationRepository={conversationRepository}
-                    isSharedDriveSearchAndFiltersEnabled={isSharedDriveSearchAndFiltersEnabled}
-                    isSearchViewOpen={isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen}
-                    onOpenSearchView={() => {
-                      if (isSharedDriveSearchAndFiltersEnabled) {
-                        setIsSharedDriveSearchViewOpen(true);
-                      }
-                    }}
+                    isSearchViewOpen={isSharedDriveSearchViewOpen}
+                    onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
                     onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
                   />
                 )}

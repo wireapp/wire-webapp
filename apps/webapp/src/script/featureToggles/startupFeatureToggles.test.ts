@@ -26,13 +26,11 @@ import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   meetingsFeatureToggleName,
-  sharedDriveSearchAndFiltersFeatureToggleName,
   startupFeatureToggleNames,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
-  sharedDriveSearchAndFiltersFeatureToggleName,
   meetingsFeatureToggleName,
   conversationListCollapseFeatureToggleName,
 ] as const;
@@ -85,14 +83,6 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
-  });
-
-  it('enables the shared drive search and filters feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${sharedDriveSearchAndFiltersFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName)).toBe(true);
   });
 
   it('enables the meetings feature toggle when present in the query parameter', () => {
@@ -150,7 +140,6 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       applockRefactoredFeatureToggleName,
-      sharedDriveSearchAndFiltersFeatureToggleName,
       meetingsFeatureToggleName,
       conversationListCollapseFeatureToggleName,
     ]);

@@ -19,10 +19,8 @@
 
 import {CellsFiltersBar} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/CellsFiltersBar';
 import type {FilterConfig} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {CellsFilters} from './cellsFilters/cellsFilters';
 import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cellsHeader.styles';
 import {CellsRefresh} from './cellsRefresh/cellsRefresh';
 import {CellsSearch} from './cellsSearch/cellsSeach';
@@ -36,8 +34,6 @@ interface CellsHeaderProps {
   onRefresh: () => void;
   searchStatus: 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
   filters: FilterConfig[];
-  cellsRepository: CellsRepository;
-  isSharedDriveSearchAndFiltersEnabled: boolean;
 }
 
 export const CellsHeader = ({
@@ -47,8 +43,6 @@ export const CellsHeader = ({
   onRefresh,
   searchStatus,
   filters,
-  cellsRepository,
-  isSharedDriveSearchAndFiltersEnabled,
 }: CellsHeaderProps) => {
   const {translate} = useApplicationContext();
 
@@ -60,11 +54,7 @@ export const CellsHeader = ({
       </div>
       <div css={contentStyles}>
         <CellsSearch searchValue={searchValue} onSearch={onSearch} onClearSearch={onClearSearch} />
-        {isSharedDriveSearchAndFiltersEnabled ? (
-          <CellsFiltersBar filters={filters} />
-        ) : (
-          <CellsFilters cellsRepository={cellsRepository} />
-        )}
+        <CellsFiltersBar filters={filters} />
         {searchStatus === 'loading' && <CellsTableLoader />}
         {searchStatus === 'error' && <p>{translate('cells.search.failed')}</p>}
       </div>
