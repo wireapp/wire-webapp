@@ -144,7 +144,7 @@ export class BackgroundEffectsHandler {
   public async applyBackgroundEffect(
     originalVideoStream: MediaStream,
   ): Promise<{applied: boolean; media: ReleasableMediaStream}> {
-    const {preferredEffect} = backgroundEffectsStore.getState();
+    const {preferredEffect, qualityTier} = backgroundEffectsStore.getState();
 
     if (preferredEffect.type === 'none') {
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
@@ -176,6 +176,8 @@ export class BackgroundEffectsHandler {
     try {
       const outputTrack = await this.controller.start(videoTrack, {
         ...defaultOpts,
+        modelPath: qualityTier === 'privacy' ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH,
+        enhancePerformance: qualityTier === 'performance',
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,
         quality: 'auto',

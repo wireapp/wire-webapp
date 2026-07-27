@@ -249,6 +249,34 @@ describe('BackgroundEffectsHandler', () => {
     expect(stop).toHaveBeenCalled();
   });
 
+  it('applies the stored quality tier when processing is restarted', async () => {
+    const handler = new BackgroundEffectsHandler(mockController);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
+    handler.setQualityTier('performance');
+
+    let isProcessing = false;
+    mockController.isProcessing.mockImplementation(() => isProcessing);
+    mockController.start.mockImplementation(async () => {
+      isProcessing = true;
+      return {stop: jest.fn(() => (isProcessing = false))};
+    });
+
+    const stream = createMockStream();
+    const firstResult = await handler.applyBackgroundEffect(stream);
+    firstResult.media.release();
+    const secondResult = await handler.applyBackgroundEffect(stream);
+
+    expect(secondResult.applied).toBe(true);
+    expect(mockController.start).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        modelPath: SELFIE_SEGMENTER_MODEL_PATH,
+        enhancePerformance: true,
+      }),
+    );
+    expect(backgroundEffectsStore.getState().qualityTier).toBe('performance');
+  });
+
   it('reads preferred effect from storage on init', () => {
     mockStorage.getItem.mockImplementation((key: string) => {
       if (key === 'video-background-effects') {
