@@ -42,7 +42,7 @@ export const Layout = ({children}: {children: ReactNode}) => {
           <div css={{marginTop: '0.5rem'}}>
             <Text css={{...whiteFontCss, lineHeight: '1.5rem'}}>{t('layoutSidebarContent')}</Text>
             <br />
-            <Link href={Config.getConfig().URL.WEBSITE_BASE}>
+            <Link href={Config.getConfig().URL.WEBSITE_BASE} target="_blank" rel="noopener noreferrer">
               <Bold css={{...whiteFontCss, textDecoration: 'underline'}}> {t('layoutSidebarLink')}</Bold>
             </Link>
           </div>
