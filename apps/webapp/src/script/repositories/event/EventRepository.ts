@@ -581,18 +581,38 @@ export class EventRepository {
   }
 
   private distributeMeetingEvent(event: IncomingEvent): void {
-    if (event.type !== MEETING_EVENT.DELETE) {
-      amplify.publish(event.type, event);
-      return;
-    }
-
     const meetingId = 'qualified_id' in event ? event.qualified_id : undefined;
-    if (meetingId === undefined || typeof meetingId.id !== 'string' || typeof meetingId.domain !== 'string') {
-      this.logger.warn('Ignored meeting.delete event without a valid qualified_id', event);
-      return;
-    }
+    const hasValidQualifiedId =
+      meetingId !== undefined && typeof meetingId.id === 'string' && typeof meetingId.domain === 'string';
 
-    amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+    switch (event.type) {
+      case MEETING_EVENT.CREATE: {
+        if (!hasValidQualifiedId) {
+          this.logger.warn('Ignored meeting.create event without a valid qualified_id', event);
+          return;
+        }
+        amplify.publish(WebAppEvents.MEETING.CREATED, meetingId);
+        return;
+      }
+      case MEETING_EVENT.UPDATE: {
+        if (!hasValidQualifiedId) {
+          this.logger.warn('Ignored meeting.update event without a valid qualified_id', event);
+          return;
+        }
+        amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId);
+        return;
+      }
+      case MEETING_EVENT.DELETE: {
+        if (!hasValidQualifiedId) {
+          this.logger.warn('Ignored meeting.delete event without a valid qualified_id', event);
+          return;
+        }
+        amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+        return;
+      }
+      default:
+        amplify.publish(event.type, event);
+    }
   }
 
   /**

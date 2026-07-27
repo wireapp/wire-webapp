@@ -158,7 +158,9 @@ export const WebAppEvents = {
     UPDATE: 'wire.webapp.lifecycle.update',
   },
   MEETING: {
+    CREATED: 'wire.webapp.meeting.created',
     DELETED: 'wire.webapp.meeting.deleted',
+    UPDATED: 'wire.webapp.meeting.updated',
   },
   NOTIFICATION: {
     CLICK: 'wire.webapp.notification.click',
