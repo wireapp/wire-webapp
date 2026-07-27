@@ -12066,7 +12066,7 @@ __metadata:
     keyboardjs: "npm:2.7.0"
     knockout: "npm:3.5.1"
     ky: "npm:1.14.3"
-    less: "npm:4.7.0"
+    less: "npm:4.8.0"
     less-loader: "npm:12.3.3"
     lexical: "npm:0.27.2"
     libsodium-wrappers-sumo: "npm:0.8.4"
@@ -22206,9 +22206,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"less@npm:4.7.0":
-  version: 4.7.0
-  resolution: "less@npm:4.7.0"
+"less@npm:4.8.0":
+  version: 4.8.0
+  resolution: "less@npm:4.8.0"
   dependencies:
     copy-anything: "npm:^3.0.5"
     errno: "npm:^0.1.1"
@@ -22236,7 +22236,7 @@ __metadata:
       optional: true
   bin:
     lessc: bin/lessc
-  checksum: 10/2a8d7b3ae77aa3e46d5d08ad7dac6edc30c64609d5a440c52d9f54575b6ff5867136430976e6896d8586493258c4fa01ef103122b4a4f49d44ebc190a37fd652
+  checksum: 10/a2264aa6a028fc2a803d7d72689251d0bd8b516371903f566a0a956ec9975a6c62c3ed33fe61cf63f71820d654024f7e4552cac43963d6059048e75d79017afb
   languageName: node
   linkType: hard
 
