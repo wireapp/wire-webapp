@@ -17,7 +17,7 @@
  *
  */
 
-import {BackendEvent, CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {BackendEvent, CONVERSATION_EVENT, MEETING_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {ConnectionState} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -261,40 +261,88 @@ describe('EventRepository', () => {
       jest.restoreAllMocks();
     });
 
-    it('publishes MEETING.DELETED with qualified_id for RFC-shaped meeting.delete events', async () => {
-      const meetingId = {id: 'meeting-id', domain: 'example.com'};
+    const meetingId = {id: 'meeting-id', domain: 'example.com'};
+    const meetingLifecycleEventBase = {
+      time: '2026-07-21T12:00:00.000Z',
+      qualified_id: meetingId,
+      conversation: 'conversation-id',
+      qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+      from: 'user-id',
+      qualified_from: {id: 'user-id', domain: 'example.com'},
+      via: 'user',
+    };
+
+    const meetingLifecycleCases = [
+      [MEETING_EVENT.CREATE, WebAppEvents.MEETING.CREATED],
+      [MEETING_EVENT.UPDATE, WebAppEvents.MEETING.UPDATED],
+      [MEETING_EVENT.DELETE, WebAppEvents.MEETING.DELETED],
+    ] as const;
+
+    it.each(meetingLifecycleCases)(
+      'publishes %s as normalized WebApp event with qualified_id only',
+      async (eventType, webAppEvent) => {
+        const event = {
+          ...meetingLifecycleEventBase,
+          type: eventType,
+        };
+
+        await eventRepository['distributeEvent'](event as any, EventSource.WEBSOCKET);
+
+        expect(amplify.publish).toHaveBeenCalledWith(webAppEvent, meetingId);
+        expect(amplify.publish).not.toHaveBeenCalledWith(eventType, expect.anything());
+        expect(amplify.publish).not.toHaveBeenCalledWith(
+          WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND,
+          expect.anything(),
+          expect.anything(),
+        );
+      },
+    );
+
+    const malformedQualifiedIdCases = [
+      ['missing qualified_id', {qualified_id: undefined}],
+      ['non-string id', {qualified_id: {id: 123, domain: 'example.com'}}],
+      ['non-string domain', {qualified_id: {id: 'meeting-id', domain: 456}}],
+    ] as const;
+
+    it.each(
+      meetingLifecycleCases.flatMap(([eventType, webAppEvent]) =>
+        malformedQualifiedIdCases.map(([description, eventOverrides]) => ({
+          description,
+          eventOverrides,
+          eventType,
+          webAppEvent,
+        })),
+      ),
+    )(
+      'does not publish normalized event when $eventType has $description',
+      async ({eventType, webAppEvent, eventOverrides}) => {
+        const warnSpy = jest.spyOn(eventRepository.logger, 'warn').mockImplementation(() => {});
+        const event = {
+          ...meetingLifecycleEventBase,
+          ...eventOverrides,
+          type: eventType,
+        };
+
+        await eventRepository['distributeEvent'](event as any, EventSource.WEBSOCKET);
+
+        expect(amplify.publish).not.toHaveBeenCalledWith(webAppEvent, expect.anything());
+        expect(warnSpy).toHaveBeenCalled();
+      },
+    );
+
+    it('publishes unknown meeting events with the raw backend event type', async () => {
       const event = {
-        type: 'meeting.delete',
+        type: 'meeting.unknown',
         time: '2026-07-21T12:00:00.000Z',
-        qualified_id: meetingId,
-        conversation: 'conversation-id',
-        qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
-        from: 'user-id',
-        qualified_from: {id: 'user-id', domain: 'example.com'},
-        via: 'user',
+        payload: 'keep-me',
       };
 
       await eventRepository['distributeEvent'](event as any, EventSource.WEBSOCKET);
 
-      expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.MEETING.DELETED, meetingId);
-      expect(amplify.publish).not.toHaveBeenCalledWith(
-        WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND,
-        expect.anything(),
-        expect.anything(),
-      );
-    });
-
-    it('does not publish MEETING.DELETED when meeting.delete is missing qualified_id', async () => {
-      const warnSpy = jest.spyOn(eventRepository.logger, 'warn').mockImplementation(() => {});
-      const event = {
-        type: 'meeting.delete',
-        time: '2026-07-21T12:00:00.000Z',
-      };
-
-      await eventRepository['distributeEvent'](event as any, EventSource.WEBSOCKET);
-
+      expect(amplify.publish).toHaveBeenCalledWith('meeting.unknown', event);
+      expect(amplify.publish).not.toHaveBeenCalledWith(WebAppEvents.MEETING.CREATED, expect.anything());
+      expect(amplify.publish).not.toHaveBeenCalledWith(WebAppEvents.MEETING.UPDATED, expect.anything());
       expect(amplify.publish).not.toHaveBeenCalledWith(WebAppEvents.MEETING.DELETED, expect.anything());
-      expect(warnSpy).toHaveBeenCalled();
     });
   });
 
