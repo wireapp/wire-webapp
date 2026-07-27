@@ -24,6 +24,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {UserVerificationBadges} from 'Components/badge';
 import {ErrorFallback} from 'Components/errorFallback';
+import {getUserProfileUrl} from 'src/script/externalRoute';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/enrichedFields';
 import {ClientRepository} from 'Repositories/client';
@@ -224,7 +225,7 @@ export const AccountPreferences = ({
           {isProfileLinkEnabled && (
             <AccountLink
               label={translate('preferencesAccountLink')}
-              value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}@${selfUser.domain}`}
+              value={getUserProfileUrl(selfUser.id, selfUser.domain) ?? ''}
               data-uie-name="element-profile-link"
             />
           )}
