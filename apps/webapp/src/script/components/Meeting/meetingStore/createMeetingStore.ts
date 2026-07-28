@@ -99,11 +99,13 @@ const toQualifiedIdKey = (qualifiedId: QualifiedId): string => `${qualifiedId.do
 
 export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: MeetingStoreInitialState): MeetingStore => {
   const meetingMutationVersions = new Map<string, number>();
+  let meetingStoreMutationVersion = 0;
   const getMeetingMutationVersion = (meetingId: QualifiedId): number =>
     meetingMutationVersions.get(toQualifiedIdKey(meetingId)) ?? 0;
   const incrementMeetingMutationVersion = (meetingId: QualifiedId): void => {
     const meetingIdKey = toQualifiedIdKey(meetingId);
     meetingMutationVersions.set(meetingIdKey, getMeetingMutationVersion(meetingId) + 1);
+    meetingStoreMutationVersion += 1;
   };
 
   return createStore<MeetingStoreState>(set => ({
@@ -111,9 +113,15 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
     isLoading: initialState?.isLoading ?? false,
     hasLoadError: initialState?.hasLoadError ?? false,
     loadMeetings: async () => {
+      const mutationVersionBeforeFetch = meetingStoreMutationVersion;
       set({isLoading: true, hasLoadError: false});
 
       const listResult = await loadMeetingsList(deps.meetingsRepository);
+
+      if (meetingStoreMutationVersion !== mutationVersionBeforeFetch) {
+        set({isLoading: false});
+        return;
+      }
 
       set({meetingSeries: listResult.meetingSeries, hasLoadError: listResult.hasLoadError, isLoading: false});
     },
@@ -155,6 +163,7 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
         .map(updatedSeries => {
           if (getMeetingMutationVersion(meetingId) === mutationVersionBeforeFetch) {
             set(state => ({meetingSeries: upsertMeetingSeries(state.meetingSeries, updatedSeries)}));
+            meetingStoreMutationVersion += 1;
           }
 
           return updatedSeries;
