@@ -135,7 +135,7 @@ describe('createMeetingStore', () => {
   });
 
   it('does not restore a removed meeting when an older list reload finishes', async () => {
-    let finishFetch = () => undefined;
+    let finishFetch: () => void = () => {};
     const fetchGate = new Promise<void>(resolve => {
       finishFetch = resolve;
     });
@@ -160,6 +160,32 @@ describe('createMeetingStore', () => {
       isLoading: false,
       meetingSeries: [],
     });
+  });
+
+  it('does not remove a newly synchronized meeting when an older list reload finishes', async () => {
+    let finishFetch: () => void = () => {};
+    const fetchGate = new Promise<void>(resolve => {
+      finishFetch = resolve;
+    });
+    const getMeetingsList = jest.fn().mockReturnValue(
+      task.tryOrElse(
+        () => new Error('fetch failed'),
+        async () => {
+          await fetchGate;
+          return [];
+        },
+      ),
+    );
+    const store = createMeetingStore(createDeps({getMeetingsList}));
+
+    const pendingReload = store.getState().loadMeetings();
+    const syncResult = await store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
+    finishFetch();
+
+    await pendingReload;
+
+    expect(syncResult.isOk).toBe(true);
+    expect(store.getState().meetingSeries).toEqual([expect.objectContaining(meetingSeriesEntry)]);
   });
 
   it('schedules a meeting without refreshing the meetings list', async () => {
@@ -332,7 +358,7 @@ describe('createMeetingStore', () => {
     });
 
     it('does not restore a locally removed meeting when an older sync finishes', async () => {
-      let finishFetch = () => undefined;
+      let finishFetch: () => void = () => {};
       const fetchGate = new Promise<void>(resolve => {
         finishFetch = resolve;
       });
