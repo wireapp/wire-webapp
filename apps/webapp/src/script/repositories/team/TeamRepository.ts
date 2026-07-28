@@ -388,7 +388,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     return IntegrationMapper.mapServicesFromArray(servicesData, domain);
   }
 
-  async getTeamCollaborators(): Promise<User[]> {
+  async getTeamCollaborators(abortController?: AbortController): Promise<User[]> {
     const teamId = this.teamState.team()?.id;
     if (!teamId) {
       return [];
@@ -396,12 +396,24 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     const domain = this.teamState.teamDomain();
     const selfId = this.userState.self().id;
-    const collaborators = await this.teamService.getCollaborators(teamId);
+    const collaborators = await this.teamService.getCollaborators(teamId, abortController);
     const collaboratorIds: QualifiedId[] = collaborators
       .map(({user}) => ({domain, id: user}))
       .filter(({id}) => id !== selfId);
 
     return this.userRepository.getUsersById(collaboratorIds);
+  }
+
+  async getTeamApps(abortController?: AbortController): Promise<User[]> {
+    const teamId = this.teamState.team()?.id;
+    if (!teamId) {
+      return [];
+    }
+
+    const domain = this.teamState.teamDomain();
+    const apps = await this.teamService.getApps(teamId, abortController);
+
+    return this.userRepository.userMapper.mapUsersFromJson(apps, domain);
   }
 
   readonly onTeamEvent = async (eventJson: any, source: EventSource): Promise<void> => {

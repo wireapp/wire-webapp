@@ -22,6 +22,7 @@ import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import is from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {UserType} from '@wireapp/api-client/lib/user';
+import {isCancel} from 'axios';
 import cx from 'classnames';
 
 import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
@@ -125,22 +126,35 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
   const [isInitialServiceSearch, setIsInitialServiceSearch] = useState<boolean>(true);
   const [collaborators, setCollaborators] = useState<User[]>([]);
+  const [teamApps, setTeamApps] = useState<User[]>([]);
 
   useEffect(() => {
     if (!isTeam) {
       return undefined;
     }
 
-    let isCurrent = true;
+    const abortController = new AbortController();
 
-    void teamRepository.getTeamCollaborators().then(fetchedCollaborators => {
-      if (isCurrent) {
-        setCollaborators(fetchedCollaborators);
-      }
-    });
+    teamRepository
+      .getTeamCollaborators(abortController)
+      .then(setCollaborators)
+      .catch((error: unknown) => {
+        if (!isCancel(error)) {
+          throw error;
+        }
+      });
+
+    teamRepository
+      .getTeamApps(abortController)
+      .then(setTeamApps)
+      .catch((error: unknown) => {
+        if (!isCancel(error)) {
+          throw error;
+        }
+      });
 
     return () => {
-      isCurrent = false;
+      abortController.abort();
     };
   }, [isTeam, teamRepository]);
 
@@ -153,14 +167,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
 
   const contacts = useMemo(() => {
-    if (!collaborators.length) {
+    if (!collaborators.length && !teamApps.length) {
       return baseContacts;
     }
-    // Collaborators (team-level, without full team membership) are shown alongside team members/apps
     const knownIds = new Set(baseContacts.map(contact => contact.id));
     const newCollaborators = collaborators.filter(collaborator => !knownIds.has(collaborator.id));
-    return [...baseContacts, ...newCollaborators];
-  }, [baseContacts, collaborators]);
+    return [...baseContacts, ...newCollaborators, ...teamApps];
+  }, [baseContacts, collaborators, teamApps]);
 
   const apps = useMemo(() => {
     const normalizedQuery = searchInput.trim().toLowerCase();
