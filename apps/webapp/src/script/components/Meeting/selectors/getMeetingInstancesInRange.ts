@@ -17,7 +17,7 @@
  *
  */
 
-import {addDays, addMonths} from 'date-fns';
+import {addDays} from 'date-fns';
 
 import type {ScheduleMeetingRecurrenceOption} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
@@ -25,6 +25,7 @@ import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 
 const daysPerWeek = 7;
 const daysPerBiweeklyPeriod = 14;
+const daysPerFourWeeksPeriod = 28;
 
 const createMeetingInstance = (meetingSeries: MeetingSeries, start: Date): MeetingInstance => ({
   meetingSeries,
@@ -48,8 +49,8 @@ const advanceInstanceStart = (start: Date, recurrence: ScheduleMeetingRecurrence
       return addDays(start, daysPerWeek);
     case 'everyTwoWeeks':
       return addDays(start, daysPerBiweeklyPeriod);
-    case 'monthly':
-      return addMonths(start, 1);
+    case 'everyFourWeeks':
+      return addDays(start, daysPerFourWeeksPeriod);
   }
 };
 
