@@ -28,7 +28,7 @@ import {UpdateTeamData} from './updateTeamData';
 
 import {NewTeamData, TeamChunkData, TeamData} from '../';
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http/';
-import {RequestCancellationError} from '../../user';
+import {RequestCancellationError, User} from '../../user';
 
 export class TeamAPI {
   constructor(private readonly client: HttpClient) {}
@@ -145,13 +145,23 @@ export class TeamAPI {
     return response.data;
   }
 
-  public async getCollaborators(teamId: string): Promise<TeamCollaborator[]> {
+  public async getCollaborators(teamId: string, abortController?: AbortController): Promise<TeamCollaborator[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.COLLABORATORS}`,
     };
 
-    const response = await this.client.sendJSON<TeamCollaborator[]>(config);
+    const response = await this.client.sendJSON<TeamCollaborator[]>(config, false, abortController);
+    return response.data;
+  }
+
+  public async getApps(teamId: string, abortController?: AbortController): Promise<User[]> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.APPS}`,
+    };
+
+    const response = await this.client.sendJSON<User[]>(config, false, abortController);
     return response.data;
   }
 
