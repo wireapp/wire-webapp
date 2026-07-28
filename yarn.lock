@@ -11997,7 +11997,7 @@ __metadata:
     dexie-encrypted: "npm:2.0.0"
     dotenv-extended: "npm:2.9.0"
     emoji-picker-react: "npm:4.16.1"
-    html-webpack-plugin: "npm:5.6.7"
+    html-webpack-plugin: "npm:5.6.8"
     i18next-scanner: "npm:4.6.0"
     immer: "npm:11.1.15"
     jest-canvas-mock: "npm:2.5.8"
@@ -19249,7 +19249,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-webpack-plugin@npm:5.6.7, html-webpack-plugin@npm:^5.5.0":
+"html-webpack-plugin@npm:5.6.8":
+  version: 5.6.8
+  resolution: "html-webpack-plugin@npm:5.6.8"
+  dependencies:
+    "@types/html-minifier-terser": "npm:^6.0.0"
+    html-minifier-terser: "npm:^6.0.2"
+    lodash: "npm:^4.17.21"
+    pretty-error: "npm:^4.0.0"
+    tapable: "npm:^2.0.0"
+  peerDependencies:
+    "@rspack/core": 0.x || 1.x || 2.x
+    webpack: ^5.20.0
+  peerDependenciesMeta:
+    "@rspack/core":
+      optional: true
+    webpack:
+      optional: true
+  checksum: 10/c5b484f7594c155ee2b47b28b291f69ab7948e25f989c8d7e2130bb58b6b5e6724ef4b309e8adcdcb50e4e072bf82bfbbaaa08a35161f2aaa81c01fc58280b68
+  languageName: node
+  linkType: hard
+
+"html-webpack-plugin@npm:^5.5.0":
   version: 5.6.7
   resolution: "html-webpack-plugin@npm:5.6.7"
   dependencies:
