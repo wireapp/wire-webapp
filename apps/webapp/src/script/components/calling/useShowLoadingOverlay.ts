@@ -31,6 +31,7 @@ const useShowLoadingOverlay = (
   hasActiveVideo: boolean,
   processedVideoStream?: ProcessedVideoStream,
 ) => {
+  const isBackgroundEffectFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
   const isBackgroundEffectInitializing = useBackgroundEffectsStore(state => state.isInitializing);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
@@ -42,11 +43,9 @@ const useShowLoadingOverlay = (
     setIsVideoReady(true);
   }, []);
 
-  const hasProcessedVideoStream = processedVideoStream !== undefined;
-
   const showLoadingOverlay =
     isSelfParticipant &&
-    (isBackgroundEffectInitializing || (hasActiveVideo && !isVideoReady && hasProcessedVideoStream));
+    ((isBackgroundEffectFeatureEnabled && isBackgroundEffectInitializing) || (hasActiveVideo && !isVideoReady));
 
   return {
     onVideoCanPlay,
