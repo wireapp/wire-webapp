@@ -21,11 +21,8 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Task} from 'true-myth';
 
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
-import {getLogger} from 'Util/logger';
 
 import type {SyncMeetingError} from './createMeetingStore';
-
-const logger = getLogger('meetingLifecycleDispatcher');
 
 const dispatcherOperationFailed = 'dispatcherOperationFailed';
 
@@ -33,6 +30,7 @@ export type MeetingLifecycleDispatcherDependencies = {
   loadMeetings: () => Promise<void>;
   syncMeeting: (meetingId: QualifiedId) => Task<MeetingSeries, SyncMeetingError>;
   removeMeeting: (meetingId: QualifiedId) => void;
+  reportOperationFailure: (operationName: string) => void;
 };
 
 export type MeetingLifecycleDispatcher = {
@@ -61,7 +59,7 @@ export const createMeetingLifecycleDispatcher = (
       const operationResult = await task.tryOrElse(() => dispatcherOperationFailed, operation);
 
       if (operationResult.isErr) {
-        logger.warn('Meeting lifecycle operation failed', {operationName});
+        dependencies.reportOperationFailure(operationName);
       }
     });
   };
@@ -71,7 +69,13 @@ export const createMeetingLifecycleDispatcher = (
       enqueue('initialLoad', dependencies.loadMeetings);
     },
     enqueueMeetingSync: meetingId => {
-      enqueue('meetingSync', async () => dependencies.syncMeeting(meetingId));
+      enqueue('meetingSync', async () => {
+        const syncResult = await dependencies.syncMeeting(meetingId);
+
+        if (syncResult.isErr) {
+          dependencies.reportOperationFailure('meetingSync');
+        }
+      });
     },
     enqueueMeetingRemoval: meetingId => {
       enqueue('meetingRemoval', async () => {

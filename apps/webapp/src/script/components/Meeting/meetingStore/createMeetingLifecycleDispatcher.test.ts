@@ -67,6 +67,7 @@ const createDependencies = (
   loadMeetings: async () => undefined,
   syncMeeting: () => task.resolve(meetingSeries),
   removeMeeting: () => undefined,
+  reportOperationFailure: jest.fn(),
   ...overrides,
 });
 
@@ -196,6 +197,22 @@ describe('createMeetingLifecycleDispatcher', () => {
     await dispatcher.waitUntilAllSettled();
 
     expect(removeMeeting).toHaveBeenCalledWith(meetingId);
+  });
+
+  it('reports when a sync Task rejects', async () => {
+    const reportOperationFailure = jest.fn();
+    const dispatcher = createMeetingLifecycleDispatcher(
+      createDependencies({
+        syncMeeting: () => task.reject(syncMeetingErrors.fetchFailed),
+        reportOperationFailure,
+      }),
+    );
+
+    dispatcher.enqueueMeetingSync(meetingId);
+
+    await dispatcher.waitUntilAllSettled();
+
+    expect(reportOperationFailure).toHaveBeenCalledWith('meetingSync');
   });
 
   it('keeps running queued work after the initial load throws', async () => {
