@@ -36,12 +36,14 @@ const createProcessedVideoStream = (stream: MediaStream) => ({
 describe('useShowLoadingOverlay', () => {
   beforeEach(() => {
     backgroundEffectsStore.setState({
+      isFeatureEnabled: false,
       isInitializing: false,
     });
   });
 
   it('should show loading overlay when background effect is initializing', () => {
     backgroundEffectsStore.setState({
+      isFeatureEnabled: true,
       isInitializing: true,
     });
 
@@ -62,6 +64,18 @@ describe('useShowLoadingOverlay', () => {
     const {result} = renderHook(() => useShowLoadingOverlay(true, true, processedVideoStream));
 
     expect(result.current.showLoadingOverlay).toBe(true);
+  });
+
+  it('should show loading overlay while raw video is loading when background effects are disabled', () => {
+    const {result} = renderHook(() => useShowLoadingOverlay(true, true, undefined));
+
+    expect(result.current.showLoadingOverlay).toBe(true);
+
+    act(() => {
+      result.current.onVideoCanPlay();
+    });
+
+    expect(result.current.showLoadingOverlay).toBe(false);
   });
 
   it('should hide loading overlay when video is ready', () => {
