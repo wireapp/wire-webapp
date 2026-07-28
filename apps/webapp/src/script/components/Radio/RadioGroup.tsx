@@ -24,6 +24,7 @@ import is from '@sindresorhus/is';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {
+  radioDescriptionStyles,
   radioHintStyles,
   radioInputStyles,
   radioLabelStyles,
@@ -38,9 +39,10 @@ interface RadioGroupProps<T> {
   options: {
     label: string;
     value: T;
+    description?: string;
     detailLabel?: string;
     isDisabled?: boolean;
-    optionUeiName?: string;
+    optionUieName?: string;
   }[];
   selectedValue: T;
   uieName?: string;
@@ -67,33 +69,47 @@ const RadioGroup = <T extends string | number>({
       css={horizontal === true ? radioOptionHorizontalStyles : undefined}
       role="radiogroup"
     >
-      {options.map(({value, label, detailLabel, isDisabled = false, optionUeiName = `${uieName}-${value}`}) => {
-        const currentId = radioId + value;
-        const isChecked = selectedValue === value;
+      {options.map(
+        ({value, label, description, detailLabel, isDisabled = false, optionUieName = `${uieName}-${value}`}) => {
+          const currentId = radioId + value;
+          const descriptionId = `${currentId}-description`;
+          const isChecked = selectedValue === value;
 
-        return (
-          <div key={value} css={radioOptionStyles} aria-describedby={currentId}>
-            <input
-              css={radioInputStyles(isDisabled || disabled)}
-              disabled={isDisabled || disabled}
-              tabIndex={TabIndex.FOCUSABLE}
-              type="radio"
-              id={currentId}
-              name={name}
-              value={value}
-              onChange={() => onChange(value)}
-              checked={isChecked}
-              data-uie-name={optionUeiName}
-            />
+          return (
+            <div key={value} css={radioOptionStyles}>
+              <input
+                css={radioInputStyles(isDisabled || disabled)}
+                disabled={isDisabled || disabled}
+                tabIndex={TabIndex.FOCUSABLE}
+                type="radio"
+                id={currentId}
+                name={name}
+                value={value}
+                onChange={() => onChange(value)}
+                checked={isChecked}
+                data-uie-name={optionUieName}
+                aria-describedby={is.nonEmptyString(description) ? descriptionId : undefined}
+              />
 
-            <label css={radioLabelStyles(isDisabled || disabled)} htmlFor={currentId}>
-              <span>{label}</span>
+              <div>
+                <label css={radioLabelStyles(isDisabled || disabled)} htmlFor={currentId}>
+                  <span>{label}</span>
 
-              {is.nonEmptyString(detailLabel) && isChecked && <span css={radioHintStyles}>{` · ${detailLabel}`}</span>}
-            </label>
-          </div>
-        );
-      })}
+                  {is.nonEmptyString(detailLabel) && isChecked && (
+                    <span css={radioHintStyles}>{` · ${detailLabel}`}</span>
+                  )}
+                </label>
+
+                {is.nonEmptyString(description) && (
+                  <div id={descriptionId} css={radioDescriptionStyles}>
+                    {description}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        },
+      )}
     </div>
   );
 };

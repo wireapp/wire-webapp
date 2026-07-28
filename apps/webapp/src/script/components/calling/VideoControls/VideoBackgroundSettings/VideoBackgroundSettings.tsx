@@ -17,20 +17,21 @@
  *
  */
 
-import {ChangeEvent, CSSProperties, ReactNode, useEffect, useId, useRef} from 'react';
+import {CSSProperties, ReactNode, useEffect, useId, useRef} from 'react';
 
 import {match} from 'ts-pattern';
 
-import {BlurHighIcon, BlurLowIcon, Checkbox, CheckboxLabel, CircleIcon} from '@wireapp/react-ui-kit';
+import {BlurHighIcon, BlurLowIcon, CircleIcon} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
+import {RadioGroup} from 'Components/Radio';
+import {BackgroundEffectsQuality} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   backgroundEffectPanelHintStyles,
-  backgroundEffectPanelIndentedHintStyles,
   backgroundSettingsHeaderStyles,
   backgroundSettingsScrollableContentStyles,
   backgroundSettingsTitleStyles,
@@ -49,9 +50,9 @@ interface VideoBackgroundSettingsProps {
   selectedEffect: BackgroundEffectSelection;
   backgrounds: BuiltinBackground[];
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
-  onEnableHighQualityBlur: (event: ChangeEvent<HTMLInputElement>) => void;
+  backgroundEffectsQuality: BackgroundEffectsQuality;
+  onBackgroundEffectsQualityChange: (quality: BackgroundEffectsQuality) => void;
   onClose: () => void;
-  highQualityBlurAllowed: boolean;
   isWebGLAvailable: boolean;
 }
 
@@ -139,8 +140,8 @@ export const VideoBackgroundSettings = ({
   selectedEffect,
   backgrounds,
   onSelectEffect,
-  highQualityBlurAllowed,
-  onEnableHighQualityBlur,
+  backgroundEffectsQuality,
+  onBackgroundEffectsQualityChange,
   onClose,
   isWebGLAvailable = true,
 }: VideoBackgroundSettingsProps) => {
@@ -153,10 +154,6 @@ export const VideoBackgroundSettings = ({
   useEffect(() => {
     closeButtonRef.current?.focus();
   }, []);
-
-  const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
-    onEnableHighQualityBlur(event);
-  };
 
   const noneEffect: BackgroundEffectSelection = {type: 'none'};
   const lowBlurEffect: BackgroundEffectSelection = {type: 'blur', level: 'low'};
@@ -240,19 +237,36 @@ export const VideoBackgroundSettings = ({
             </div>
 
             <div>
-              <Checkbox
-                id="enable-high-quality-blur"
-                checked={highQualityBlurAllowed}
-                data-uie-name="enable-high-quality-blur"
-                onChange={(event: ChangeEvent<HTMLInputElement>) => handleEnableHighQualityBlur(event)}
-              >
-                <CheckboxLabel htmlFor="enable-high-quality-blur">
-                  {translate('videoCallBackgroundEnableEnhancedQuality')}
-                </CheckboxLabel>
-              </Checkbox>
-              <p css={backgroundEffectPanelIndentedHintStyles}>
-                {translate('videoCallBackgroundEnableEnhancedQualityHint')}
-              </p>
+              <h3 id="background-effects-quality-label" css={sectionLabelStyles}>
+                {translate('videoCallBackgroundEffectsQualitySectionLabel')}
+              </h3>
+              <RadioGroup
+                ariaLabelledBy="background-effects-quality-label"
+                name="background-effects-quality"
+                selectedValue={backgroundEffectsQuality}
+                onChange={onBackgroundEffectsQualityChange}
+                uieName="background-effects-quality"
+                options={[
+                  {
+                    value: 'privacy' as const,
+                    label: translate('videoCallBackgroundEffectsQualityPrivacy'),
+                    description: translate('videoCallBackgroundEffectsQualityPrivacyDescription'),
+                    optionUieName: 'background-effects-quality-privacy',
+                  },
+                  {
+                    value: 'balanced' as const,
+                    label: translate('videoCallBackgroundEffectsQualityBalanced'),
+                    description: translate('videoCallBackgroundEffectsQualityBalancedDescription'),
+                    optionUieName: 'background-effects-quality-balanced',
+                  },
+                  {
+                    value: 'performance' as const,
+                    label: translate('videoCallBackgroundEffectsQualityPerformance'),
+                    description: translate('videoCallBackgroundEffectsQualityPerformanceDescription'),
+                    optionUieName: 'background-effects-quality-performance',
+                  },
+                ]}
+              />
             </div>
 
             {/* Virtual backgrounds section */}

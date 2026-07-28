@@ -50,7 +50,7 @@ import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {detectCapabilities} from 'Repositories/media/backgroundEffects';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {BackgroundEffectsQuality, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
@@ -303,7 +303,7 @@ const FullscreenVideoCall = ({
   const isWebGLAvailable = detectCapabilities().webgl2;
 
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
-  const isHighQualityBlurEnabled = useBackgroundEffectsStore(state => state.isHighQualityBlurEnabled);
+  const backgroundEffectsQuality = useBackgroundEffectsStore(state => state.effectiveQualityTier);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
@@ -311,8 +311,8 @@ const FullscreenVideoCall = ({
     });
   };
 
-  const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
-    callingRepository.allowSuperhighQualityTier(event.target.checked);
+  const handleBackgroundEffectsQualityChange = (quality: BackgroundEffectsQuality) => {
+    callingRepository.setBackgroundEffectsQualityTier(quality);
   };
 
   return (
@@ -441,9 +441,9 @@ const FullscreenVideoCall = ({
               selectedEffect={selectedBackgroundEffect}
               backgrounds={BUILTIN_BACKGROUNDS}
               onSelectEffect={handleBackgroundSidebarSelect}
-              onEnableHighQualityBlur={handleEnableHighQualityBlur}
+              backgroundEffectsQuality={backgroundEffectsQuality}
+              onBackgroundEffectsQualityChange={handleBackgroundEffectsQualityChange}
               onClose={() => backgroundSidebarHandler(false)}
-              highQualityBlurAllowed={isHighQualityBlurEnabled}
               isWebGLAvailable={isWebGLAvailable}
             />
           )}
@@ -525,9 +525,9 @@ const FullscreenVideoCall = ({
           selectedEffect={selectedBackgroundEffect}
           backgrounds={BUILTIN_BACKGROUNDS}
           onSelectEffect={handleBackgroundSidebarSelect}
-          onEnableHighQualityBlur={handleEnableHighQualityBlur}
+          backgroundEffectsQuality={backgroundEffectsQuality}
+          onBackgroundEffectsQualityChange={handleBackgroundEffectsQualityChange}
           onClose={() => backgroundSidebarHandler(false)}
-          highQualityBlurAllowed={isHighQualityBlurEnabled}
           isWebGLAvailable={isWebGLAvailable}
         />
       )}
