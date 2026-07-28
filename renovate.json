@@ -142,6 +142,11 @@
     {
       "matchPackageNames": ["geolite2"],
       "allowedVersions": "<2"
+    },
+    {
+      "description": "Keep emoji-picker-react on 4.16.1 because later versions change emoji data and runtime aliases used by Wire",
+      "matchPackageNames": ["emoji-picker-react"],
+      "allowedVersions": "4.16.1"
     }
   ]
 }
