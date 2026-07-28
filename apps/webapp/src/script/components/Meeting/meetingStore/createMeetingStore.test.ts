@@ -134,6 +134,34 @@ describe('createMeetingStore', () => {
     });
   });
 
+  it('does not restore a removed meeting when an older list reload finishes', async () => {
+    let finishFetch = () => undefined;
+    const fetchGate = new Promise<void>(resolve => {
+      finishFetch = resolve;
+    });
+    const getMeetingsList = jest.fn().mockReturnValue(
+      task.tryOrElse(
+        () => new Error('fetch failed'),
+        async () => {
+          await fetchGate;
+          return [apiMeeting];
+        },
+      ),
+    );
+    const store = createMeetingStore(createDeps({getMeetingsList}), {meetingSeries: [meetingSeriesEntry]});
+
+    const pendingReload = store.getState().loadMeetings();
+    store.getState().removeMeetingByQualifiedId(apiMeeting.qualified_id);
+    finishFetch();
+
+    await pendingReload;
+
+    expect(store.getState()).toMatchObject({
+      isLoading: false,
+      meetingSeries: [],
+    });
+  });
+
   it('schedules a meeting without refreshing the meetings list', async () => {
     const scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
