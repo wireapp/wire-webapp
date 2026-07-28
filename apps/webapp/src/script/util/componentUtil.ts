@@ -19,14 +19,16 @@
 
 import {useEffect, useState} from 'react';
 
-import ko, {Unwrapped} from 'knockout';
+import ko from 'knockout';
 
 type Subscribables<T> = {
   [Key in keyof T]: T[Key] extends ko.Subscribable ? T[Key] : never;
 };
 
+type SubscribableValue<T> = T extends ko.Subscribable<infer Value> ? Value : never;
+
 type UnwrappedValues<T, S = Subscribables<T>> = {
-  [Key in keyof S]: Unwrapped<S[Key]>;
+  [Key in keyof S]: SubscribableValue<S[Key]>;
 };
 
 const resolveObservables = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
@@ -59,7 +61,7 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
     .filter(child => ko.isSubscribable(object?.[child]))
     .map(child => {
       const subscribable = object[child];
-      return subscribable?.subscribe((value: Unwrapped<typeof subscribable>) => {
+      return subscribable?.subscribe((value: SubscribableValue<typeof subscribable>) => {
         onUpdate({[child]: value} as Partial<UnwrappedValues<P>>);
       });
     });
