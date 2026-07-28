@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useCallback, useMemo, useState} from 'react';
+import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -124,13 +124,43 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
 
   const [isInitialServiceSearch, setIsInitialServiceSearch] = useState<boolean>(true);
-  const contacts = useMemo(() => {
+  const [collaborators, setCollaborators] = useState<User[]>([]);
+
+  useEffect(() => {
+    if (!isTeam) {
+      return undefined;
+    }
+
+    let isCurrent = true;
+
+    void teamRepository.getTeamCollaborators().then(fetchedCollaborators => {
+      if (isCurrent) {
+        setCollaborators(fetchedCollaborators);
+      }
+    });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [isTeam, teamRepository]);
+
+  const baseContacts = useMemo(() => {
     if (isTeam) {
       const isTeamOrServices = isTeamOnly || isServicesRoom;
       return isTeamOrServices ? teamMembers.toSorted(sortUsersByPriority) : teamUsers;
     }
     return connectedUsers;
   }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
+
+  const contacts = useMemo(() => {
+    if (!collaborators.length) {
+      return baseContacts;
+    }
+    // Collaborators (team-level, without full team membership) are shown alongside team members/apps
+    const knownIds = new Set(baseContacts.map(contact => contact.id));
+    const newCollaborators = collaborators.filter(collaborator => !knownIds.has(collaborator.id));
+    return [...baseContacts, ...newCollaborators];
+  }, [baseContacts, collaborators]);
 
   const apps = useMemo(() => {
     const normalizedQuery = searchInput.trim().toLowerCase();
