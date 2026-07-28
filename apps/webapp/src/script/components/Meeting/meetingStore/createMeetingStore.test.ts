@@ -303,6 +303,30 @@ describe('createMeetingStore', () => {
       expect(store.getState().meetingSeries[0]?.title).toBe('Weekly sync (updated)');
     });
 
+    it('does not restore a locally removed meeting when an older sync finishes', async () => {
+      let finishFetch = () => undefined;
+      const fetchGate = new Promise<void>(resolve => {
+        finishFetch = resolve;
+      });
+      const getMeeting = jest.fn().mockReturnValue(
+        task.tryOrElse(
+          () => new Error('fetch failed'),
+          async () => {
+            await fetchGate;
+            return apiMeeting;
+          },
+        ),
+      );
+      const store = createMeetingStore(createDeps({getMeeting}), {meetingSeries: [meetingSeriesEntry]});
+
+      const pendingSync = store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
+      store.getState().removeMeetingByQualifiedId(apiMeeting.qualified_id);
+      finishFetch();
+
+      expect((await pendingSync).isOk).toBe(true);
+      expect(store.getState().meetingSeries).toEqual([]);
+    });
+
     it('leaves an entry with the same bare id in another domain untouched', async () => {
       const getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting));
       const store = createMeetingStore(createDeps({getMeeting}), {meetingSeries: [otherDomainEntry]});
