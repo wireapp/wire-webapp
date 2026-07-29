@@ -34,6 +34,7 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
+import {getUserProfileUrl} from 'src/script/externalRoute';
 import {TeamCreationAccountHeader} from 'src/script/page/leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationAccountHeader';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
@@ -93,7 +94,11 @@ export const AccountPreferences = ({
 }: AccountPreferencesProps) => {
   const core = container.resolve(Core);
   const {translate} = useApplicationContext();
-  const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
+  const {isTeam, teamName, isProfileLinkEnabled} = useKoSubscribableChildren(teamState, [
+    'isTeam',
+    'teamName',
+    'isProfileLinkEnabled',
+  ]);
   const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
@@ -217,11 +222,13 @@ export const AccountPreferences = ({
             ))}
           </div>
 
-          <AccountLink
-            label={translate('preferencesAccountLink')}
-            value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}@${selfUser.domain}`}
-            data-uie-name="element-profile-link"
-          />
+          {isProfileLinkEnabled && (
+            <AccountLink
+              label={translate('preferencesAccountLink')}
+              value={getUserProfileUrl(selfUser.id, selfUser.domain) ?? ''}
+              data-uie-name="element-profile-link"
+            />
+          )}
         </PreferencesSection>
       ) : (
         <PreferencesSection hasSeparator>

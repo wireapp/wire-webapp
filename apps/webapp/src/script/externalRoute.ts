@@ -43,6 +43,10 @@ const getAccountPagesUrl = (path: string = ''): string | undefined => {
   return URL.ACCOUNT_BASE ? `${URL.ACCOUNT_BASE}${path}` : undefined;
 };
 
+export const getUserProfileUrl = (userId: string, domain: string): string | undefined => {
+  return getAccountPagesUrl(`/user-profile/?id=${userId}@${domain}`);
+};
+
 const getPrivacyPolicyUrl = () => {
   const language = currentLanguage();
   if (language === 'de-DE') {
