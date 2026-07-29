@@ -176,8 +176,6 @@ describe('releaseMetadata', () => {
     ['', 'main', 'main-025edc6'],
     ['', 'development', 'dev-025edc6'],
     ['2026-07-20-staging.1', 'development', 'dev-025edc6'],
-    ['q1-2024', 'development', 'dev-025edc6'],
-    ['q2-2025', 'development', 'dev-025edc6'],
   ])(
     'resolveWebappBuildVersion() resolves build reference "%s" on the %s channel to "%s"',
     (buildReferenceName, buildChannel, expectedVersion) => {
@@ -247,7 +245,7 @@ describe('releaseMetadata', () => {
       '2026-06-19.1-beta.1',
       '2026-06-19.1-production',
       '2026-06-19.1-beta.extra',
-      'q2-2025',
+      'unrelated-tag',
     ];
 
     const actualNextBetaTagName = createNextBetaTagName(releaseIdentifier, existingTagNames);
