@@ -24,7 +24,6 @@ import {Runtime} from '@wireapp/commons';
 
 import {UserVerificationBadges} from 'Components/badge';
 import {ErrorFallback} from 'Components/errorFallback';
-import {getUserProfileUrl} from 'src/script/externalRoute';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/enrichedFields';
 import {ClientRepository} from 'Repositories/client';
@@ -35,6 +34,7 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
+import {getUserProfileUrl} from 'src/script/externalRoute';
 import {TeamCreationAccountHeader} from 'src/script/page/leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationAccountHeader';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
