@@ -87,12 +87,20 @@ describe('canDeleteMeeting', () => {
 });
 
 describe('canDeleteMeetingForAll', () => {
-  it('allows host delete when the meeting is not past', () => {
+  it('allows host delete when the meeting has not started', () => {
     const meetingInstance = createMeetingInstance();
 
     expect(
       canDeleteMeetingForAll(meetingInstance, createSelfUser(), futureWallClock.currentTimestampInMilliseconds),
     ).toBe(true);
+  });
+
+  it('disallows host delete when the meeting has started', () => {
+    const meetingInstance = createMeetingInstance();
+
+    expect(
+      canDeleteMeetingForAll(meetingInstance, createSelfUser(), ongoingWallClock.currentTimestampInMilliseconds),
+    ).toBe(false);
   });
 
   it('disallows delete for non-host users', () => {

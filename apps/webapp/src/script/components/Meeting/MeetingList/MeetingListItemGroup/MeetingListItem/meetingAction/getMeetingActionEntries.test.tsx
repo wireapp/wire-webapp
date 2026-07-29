@@ -195,11 +195,41 @@ describe('getMeetingActionEntries', () => {
     expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
   });
 
+  it('omits Delete meeting for everyone when the instance has started', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser(),
+      nowMilliseconds: ongoingWallClock.currentTimestampInMilliseconds,
+      translate,
+      onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
+    expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
+  });
+
   it('includes Delete meeting for me for a participant', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser('invitee-id'),
       nowMilliseconds: futureWallClock.currentTimestampInMilliseconds,
+      translate,
+      onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    expect(getDeleteForMeEntryLabel(entries)).toBeDefined();
+    expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('includes Delete meeting for me for a participant while the meeting is ongoing', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser('invitee-id'),
+      nowMilliseconds: ongoingWallClock.currentTimestampInMilliseconds,
       translate,
       onEdit: jest.fn(),
       onDeleteForAll: noop,

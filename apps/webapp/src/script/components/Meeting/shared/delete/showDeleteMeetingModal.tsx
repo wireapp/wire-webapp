@@ -19,6 +19,10 @@
 
 import {TrashIcon} from '@wireapp/react-ui-kit';
 
+import {
+  deleteMeetingConfirmButtonContentStyles,
+  deleteMeetingConfirmButtonIconStyles,
+} from 'Components/Meeting/shared/delete/showDeleteMeetingModal.styles';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
 
@@ -65,9 +69,10 @@ export const showDeleteMeetingModal = ({
       primaryAction: {
         action: onConfirm,
         text: (
-          <>
-            <TrashIcon width={16} height={16} /> {translate('meetings.deleteModal.confirmDelete')}
-          </>
+          <span css={deleteMeetingConfirmButtonContentStyles}>
+            <TrashIcon width={16} height={16} css={deleteMeetingConfirmButtonIconStyles} />
+            {translate('meetings.deleteModal.confirmDelete')}
+          </span>
         ),
       },
       secondaryAction: {

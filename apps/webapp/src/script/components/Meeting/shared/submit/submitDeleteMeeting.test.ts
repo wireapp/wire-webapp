@@ -68,6 +68,10 @@ const futureWallClock = createDeterministicWallClock({
   initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
 });
 
+const ongoingWallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T14:30:00.000Z'),
+});
+
 const pastWallClock = createDeterministicWallClock({
   initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T16:00:00.000Z'),
 });
@@ -172,6 +176,31 @@ describe('submitDeleteMeeting', () => {
     expect(removeMeetingByQualifiedId).not.toHaveBeenCalled();
     expect(loadMeetings).not.toHaveBeenCalled();
     expect(primaryModalShow).toHaveBeenCalledTimes(1);
+  });
+
+  it('blocks delete for all when the meeting has started before submit', async () => {
+    const deleteMeetingForAll = jest.fn().mockReturnValue(task.resolve(undefined));
+
+    const result = await submitDeleteMeeting(
+      createSubmitDeps({
+        deleteMeetingForAll,
+        wallClock: ongoingWallClock,
+      }),
+    );
+
+    expect(result).toBe(deleteMeetingSubmitResults.blocked);
+    expect(deleteMeetingForAll).not.toHaveBeenCalled();
+    expect(primaryModalShow).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      expect.objectContaining({
+        text: expect.objectContaining({
+          title: translateForTest('meetings.deleteModal.error.notAllowedTitle'),
+          message: translateForTest('meetings.deleteModal.error.notAllowed'),
+        }),
+      }),
+      undefined,
+      translateForTest,
+    );
   });
 
   it('blocks delete when the meeting became past before submit', async () => {
