@@ -8,16 +8,30 @@
  * (at your option) any later version.
  */
 
-import {openDebugToolbar, openDebugToolbarEventName} from './debugToolbarEvents';
+import {act, render, screen} from '@testing-library/react';
 
-describe('openDebugToolbar', () => {
-  it('requests the developer menu to open', () => {
-    const openHandler = jest.fn();
-    window.addEventListener(openDebugToolbarEventName, openHandler);
+import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translateForTest} from 'Util/test/translateForTest';
 
-    openDebugToolbar();
+import {ConfigToolbar} from './configToolbar';
+import {openDebugToolbar} from './debugToolbarEvents';
 
-    expect(openHandler).toHaveBeenCalledTimes(1);
-    window.removeEventListener(openDebugToolbarEventName, openHandler);
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
+
+describe('ConfigToolbar', () => {
+  it('opens the developer menu when requested', () => {
+    render(withTheme(<ConfigToolbar />), {wrapper: rootProviderWrapper});
+
+    expect(screen.queryByRole('heading', {name: 'Developer Menu'})).not.toBeInTheDocument();
+
+    act(() => openDebugToolbar());
+
+    expect(screen.getByRole('heading', {name: 'Developer Menu'})).toBeInTheDocument();
   });
 });

@@ -17,8 +17,6 @@
  *
  */
 
-import {useEffect, useState} from 'react';
-
 import {container} from 'tsyringe';
 
 import {
@@ -65,6 +63,7 @@ import {
 } from './conversationTabs.styles';
 import {FolderIcon} from './folderIcon';
 import {MeetingsConversationTab} from './meetingsConversationTab';
+import {SettingsTab} from './settingsTab';
 import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 
 import {Config} from '../../../../../Config';
@@ -114,38 +113,6 @@ export const ConversationTabs = ({
   const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const isDebugEnabled = Config.getConfig().FEATURE.ENABLE_DEBUG;
-  const [isAltKeyPressed, setIsAltKeyPressed] = useState(false);
-  const [isSettingsTargeted, setIsSettingsTargeted] = useState(false);
-
-  useEffect(() => {
-    if (!isDebugEnabled) {
-      return;
-    }
-
-    const showAlternateSettingsAction = (event: KeyboardEvent) => {
-      if (event.key === 'Alt') {
-        setIsAltKeyPressed(true);
-      }
-    };
-    const hideAlternateSettingsAction = (event: KeyboardEvent) => {
-      if (event.key === 'Alt') {
-        setIsAltKeyPressed(false);
-      }
-    };
-    const resetAlternateSettingsAction = () => setIsAltKeyPressed(false);
-
-    window.addEventListener('keydown', showAlternateSettingsAction);
-    window.addEventListener('keyup', hideAlternateSettingsAction);
-    window.addEventListener('blur', resetAlternateSettingsAction);
-
-    return () => {
-      window.removeEventListener('keydown', showAlternateSettingsAction);
-      window.removeEventListener('keyup', hideAlternateSettingsAction);
-      window.removeEventListener('blur', resetAlternateSettingsAction);
-    };
-  }, [isDebugEnabled]);
-
-  const settingsLabel = isAltKeyPressed && isSettingsTargeted ? 'Developer Menu' : translate('preferencesHeadline');
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
     favoriteConversation.hasUnread(),
@@ -418,29 +385,16 @@ export const ConversationTabs = ({
           </div>
         )}
 
-        <ConversationTab
-          title={settingsLabel}
-          label={settingsLabel}
-          type={SidebarTabs.PREFERENCES}
-          Icon={<Icon.SettingsIcon />}
-          onChangeTab={(tab, event) => {
-            if (isDebugEnabled && isAltKeyPressed && isSettingsTargeted) {
-              event.stopPropagation();
-              openDebugToolbar();
-              return;
-            }
-
-            onChangeTab(tab);
+        <SettingsTab
+          settingsLabel={translate('preferencesHeadline')}
+          isDebugEnabled={isDebugEnabled}
+          onOpenDeveloperMenu={openDebugToolbar}
+          onOpenPreferences={() => {
+            onChangeTab(SidebarTabs.PREFERENCES);
             onClickPreferences(ContentState.PREFERENCES_ACCOUNT);
           }}
-          conversationTabIndex={1}
-          dataUieName="go-preferences"
           showNotificationsBadge={showNotificationsBadge}
           isActive={currentTab === SidebarTabs.PREFERENCES}
-          onMouseEnter={() => setIsSettingsTargeted(true)}
-          onMouseLeave={() => setIsSettingsTargeted(false)}
-          onFocus={() => setIsSettingsTargeted(true)}
-          onBlur={() => setIsSettingsTargeted(false)}
         />
 
         {hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (

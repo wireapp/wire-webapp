@@ -16,10 +16,9 @@ import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useS
 import {ConversationTab} from './conversationTab';
 
 describe('ConversationTab', () => {
-  it('exposes the Alt modifier to alternate tab actions', async () => {
+  it('changes to the selected tab when clicked', async () => {
     const user = userEvent.setup();
     const onChangeTab = jest.fn();
-    const onMouseEnter = jest.fn();
 
     render(
       <ConversationTab
@@ -29,16 +28,31 @@ describe('ConversationTab', () => {
         onChangeTab={onChangeTab}
         Icon={<span />}
         dataUieName="go-preferences"
-        onMouseEnter={onMouseEnter}
       />,
     );
 
-    await user.keyboard('{Alt>}');
-    await user.hover(screen.getByRole('tab', {name: 'Settings'}));
     await user.click(screen.getByRole('tab', {name: 'Settings'}));
-    await user.keyboard('{/Alt}');
 
-    expect(onMouseEnter).toHaveBeenCalledTimes(1);
-    expect(onChangeTab).toHaveBeenCalledWith(SidebarTabs.PREFERENCES, expect.objectContaining({altKey: true}));
+    expect(onChangeTab).toHaveBeenCalledWith(SidebarTabs.PREFERENCES);
+  });
+
+  it('runs a custom click action when clicked', async () => {
+    const user = userEvent.setup();
+    const onClick = jest.fn();
+
+    render(
+      <ConversationTab
+        title="Settings"
+        type={SidebarTabs.PREFERENCES}
+        conversationTabIndex={1}
+        onClick={onClick}
+        Icon={<span />}
+        dataUieName="go-preferences"
+      />,
+    );
+
+    await user.click(screen.getByRole('tab', {name: 'Settings'}));
+
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });
