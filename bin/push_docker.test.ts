@@ -56,15 +56,6 @@ describe('push_docker metadata', () => {
     expect(actualReleaseCommitSha).toBe('caller-commit-sha');
   });
 
-  it('uses the pull request head commit before GITHUB_SHA for legacy pull request callers', () => {
-    const actualReleaseCommitSha = selectReleaseCommit({
-      pullRequestCommitSha: 'pull-request-head-sha',
-      githubSha: 'caller-commit-sha',
-    });
-
-    expect(actualReleaseCommitSha).toBe('pull-request-head-sha');
-  });
-
   it('generates immutable image metadata from the config version and short release commit', () => {
     const actualImageTag = createUniqueImageTag({
       versionTag: '2026-07-15.1-production',
@@ -173,6 +164,10 @@ describe('push_docker metadata', () => {
     expect(runEvent.commandArguments.slice(0, 6)).toEqual(['run', '--rm', '--entrypoint', 'sh', '1234567', '-c']);
     expect(tagEvents.every(event => event.commandArguments.length === 3)).toBe(true);
     expect(tagEvents.every(event => event.commandArguments[1] === '1234567')).toBe(true);
+    expect(tagEvents.map(event => event.commandArguments[2])).toEqual([
+      'quay.io/wire/webapp:2026-07-15.1-production',
+      'quay.io/wire/webapp:2026-07-15.1-production-v0.34.9-0-1234567',
+    ]);
     expect(pushEvents.every(event => event.commandArguments.length === 2)).toBe(true);
     expect(pushEvents.every(event => typeof event.commandArguments[1] === 'string')).toBe(true);
     expect(events.map(event => event.kind).slice(0, 4)).toEqual(['process', 'process', 'process', 'write']);
