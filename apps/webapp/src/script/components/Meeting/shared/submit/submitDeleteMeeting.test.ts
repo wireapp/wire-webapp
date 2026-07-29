@@ -64,14 +64,6 @@ const createSelfUser = (id = 'host-id') => {
   return user;
 };
 
-const futureWallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
-});
-
-const pastWallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T16:00:00.000Z'),
-});
-
 describe('submitDeleteMeeting', () => {
   let primaryModalShow: jest.Mock;
 
@@ -86,20 +78,18 @@ describe('submitDeleteMeeting', () => {
     resetInFlightDeleteMeetingsForTest();
   });
 
-  const createSubmitDeps = (
-    overrides: {
-      deleteMeetingForAll?: jest.Mock;
-      deleteMeetingForMe?: jest.Mock;
-      removeMeetingByQualifiedId?: jest.Mock;
-      loadMeetings?: jest.Mock;
-      wallClock?: typeof futureWallClock;
-      selfUser?: User | undefined;
-    } = {},
-  ) => ({
+  const createSubmitDeps = (overrides: {
+    deleteMeetingForAll?: jest.Mock;
+    deleteMeetingForMe?: jest.Mock;
+    removeMeetingByQualifiedId?: jest.Mock;
+    loadMeetings?: jest.Mock;
+    wallClock: ReturnType<typeof createDeterministicWallClock>;
+    selfUser?: User | undefined;
+  }) => ({
     meetingInstance: createMeetingInstance(),
     mode: 'forAll' as const,
     selfUser: 'selfUser' in overrides ? overrides.selfUser : createSelfUser(),
-    wallClock: overrides.wallClock ?? futureWallClock,
+    wallClock: overrides.wallClock,
     translate: translateForTest,
     deleteMeetingForMe: overrides.deleteMeetingForMe ?? jest.fn().mockReturnValue(task.resolve(undefined)),
     deleteMeetingForAll: overrides.deleteMeetingForAll ?? jest.fn().mockReturnValue(task.resolve(undefined)),
@@ -110,11 +100,15 @@ describe('submitDeleteMeeting', () => {
   it('removes the meeting from the store after a successful delete for all', async () => {
     const removeMeetingByQualifiedId = jest.fn();
     const deleteMeetingForAll = jest.fn().mockReturnValue(task.resolve(undefined));
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+    });
 
     const result = await submitDeleteMeeting(
       createSubmitDeps({
         deleteMeetingForAll,
         removeMeetingByQualifiedId,
+        wallClock,
       }),
     );
 
@@ -130,12 +124,16 @@ describe('submitDeleteMeeting', () => {
       .fn()
       .mockReturnValue(task.reject(meetingSubmitErrors.deleteSucceededButLocalCleanupFailed));
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+    });
 
     const result = await submitDeleteMeeting(
       createSubmitDeps({
         deleteMeetingForAll,
         removeMeetingByQualifiedId,
         loadMeetings,
+        wallClock,
       }),
     );
 
@@ -159,12 +157,16 @@ describe('submitDeleteMeeting', () => {
     const removeMeetingByQualifiedId = jest.fn();
     const deleteMeetingForAll = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.deleteFailed));
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+    });
 
     const result = await submitDeleteMeeting(
       createSubmitDeps({
         deleteMeetingForAll,
         removeMeetingByQualifiedId,
         loadMeetings,
+        wallClock,
       }),
     );
 
@@ -174,13 +176,44 @@ describe('submitDeleteMeeting', () => {
     expect(primaryModalShow).toHaveBeenCalledTimes(1);
   });
 
-  it('blocks delete when the meeting became past before submit', async () => {
+  it('blocks delete for all when the meeting has started before submit', async () => {
     const deleteMeetingForAll = jest.fn().mockReturnValue(task.resolve(undefined));
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T14:30:00.000Z'),
+    });
 
     const result = await submitDeleteMeeting(
       createSubmitDeps({
         deleteMeetingForAll,
-        wallClock: pastWallClock,
+        wallClock,
+      }),
+    );
+
+    expect(result).toBe(deleteMeetingSubmitResults.blocked);
+    expect(deleteMeetingForAll).not.toHaveBeenCalled();
+    expect(primaryModalShow).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      expect.objectContaining({
+        text: expect.objectContaining({
+          title: translateForTest('meetings.deleteModal.error.notAllowedTitle'),
+          message: translateForTest('meetings.deleteModal.error.notAllowed'),
+        }),
+      }),
+      undefined,
+      translateForTest,
+    );
+  });
+
+  it('blocks delete when the meeting became past before submit', async () => {
+    const deleteMeetingForAll = jest.fn().mockReturnValue(task.resolve(undefined));
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T16:00:00.000Z'),
+    });
+
+    const result = await submitDeleteMeeting(
+      createSubmitDeps({
+        deleteMeetingForAll,
+        wallClock,
       }),
     );
 
@@ -201,11 +234,15 @@ describe('submitDeleteMeeting', () => {
 
   it('shows feedback when selfUser is missing', async () => {
     const deleteMeetingForAll = jest.fn().mockReturnValue(task.resolve(undefined));
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+    });
 
     const result = await submitDeleteMeeting(
       createSubmitDeps({
         deleteMeetingForAll,
         selfUser: undefined,
+        wallClock,
       }),
     );
 
@@ -238,10 +275,14 @@ describe('submitDeleteMeeting', () => {
       ),
     );
     const removeMeetingByQualifiedId = jest.fn();
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+    });
 
     const deps = createSubmitDeps({
       deleteMeetingForAll,
       removeMeetingByQualifiedId,
+      wallClock,
     });
 
     const firstSubmit = submitDeleteMeeting(deps);
@@ -270,12 +311,16 @@ describe('submitDeleteMeeting', () => {
     const removeMeetingByQualifiedId = jest.fn();
     const deleteMeetingForMe = jest.fn().mockReturnValue(task.resolve(undefined));
     const invitee = createSelfUser('invitee-id');
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+    });
 
     const result = await submitDeleteMeeting({
       ...createSubmitDeps({
         deleteMeetingForMe,
         removeMeetingByQualifiedId,
         selfUser: invitee,
+        wallClock,
       }),
       mode: 'forMe',
     });
@@ -289,12 +334,16 @@ describe('submitDeleteMeeting', () => {
     const removeMeetingByQualifiedId = jest.fn();
     const deleteMeetingForMe = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.leaveConversationFailed));
     const invitee = createSelfUser('invitee-id');
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+    });
 
     const result = await submitDeleteMeeting({
       ...createSubmitDeps({
         deleteMeetingForMe,
         removeMeetingByQualifiedId,
         selfUser: invitee,
+        wallClock,
       }),
       mode: 'forMe',
     });
