@@ -60,7 +60,7 @@ export class User {
   public readonly expirationRemaining: ko.Observable<number>;
   public readonly expirationRemainingText: ko.Observable<string>;
   public readonly expirationText: ko.Observable<string>;
-  public readonly hasPendingLegalHold: ko.PureComputed<boolean>;
+  public readonly hasPendingLegalHold: ko.WritablePureComputed<boolean>;
   public readonly initials: ko.PureComputed<string>;
   public readonly is_trusted: ko.PureComputed<boolean>;
   // Manual Proteus verification

@@ -25,7 +25,7 @@ type Subscribables<T> = {
   [Key in keyof T]: T[Key] extends ko.Subscribable ? T[Key] : never;
 };
 
-type SubscribableValue<T> = T extends ko.Subscribable<infer Value> ? Value : never;
+type SubscribableValue<T> = T extends {(): infer Value} ? Value : never;
 
 type UnwrappedValues<T, S = Subscribables<T>> = {
   [Key in keyof S]: SubscribableValue<S[Key]>;
