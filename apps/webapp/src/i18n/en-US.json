@@ -1340,7 +1340,7 @@
   "meetings.scheduleModal.timeSelectAriaLabel": "Select time",
   "meetings.scheduleModal.titleLabel": "Title",
   "meetings.scheduleModal.titlePlaceholder": "Enter a title",
-  "meetings.startMeetingHelp": "Start a meeting with team members, guests, or external parties. Your communication is always end-to-end encrypted, offering the highest level of security.",
+  "meetings.startMeetingHelp": "Start a meeting with team members. Your communication is always end-to-end encrypted, offering the highest level of security.",
   "meetings.tabs.ariaLabel": "Meetings tabs",
   "meetings.tabs.next": "Next",
   "messageCouldNotBeSentBackEndOffline": "Message could not be sent as the back-end of [bold]{domain}[/bold] could not be reached.",

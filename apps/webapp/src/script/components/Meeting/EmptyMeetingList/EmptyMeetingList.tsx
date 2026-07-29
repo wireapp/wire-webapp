@@ -29,9 +29,13 @@ import {
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const EmptyMeetingList = () => {
+export interface EmptyMeetingListProps {
+  useMeetingActionsHook?: typeof useMeetingActions;
+}
+
+export const EmptyMeetingList = ({useMeetingActionsHook = useMeetingActions}: EmptyMeetingListProps) => {
   const {translate} = useApplicationContext();
-  const {handleMeetNow, handleScheduleMeeting} = useMeetingActions();
+  const {handleMeetNow, handleScheduleMeeting} = useMeetingActionsHook();
 
   return (
     <div css={emptyListStyles} data-uie-name="empty-meetings-list">
