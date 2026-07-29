@@ -2,26 +2,16 @@
 name: Release WebApp
 
 on:
-  # Automatic release/** triggering is intentionally disabled during the
-  # transition. Enable it after Release WebApp is the official release path.
+  # Release WebApp is intentionally started explicitly. Branch preparation and
+  # the complete release lifecycle are one auditable workflow operation.
   workflow_dispatch:
     inputs:
       release_identifier:
         description: 'Release identifier in YYYY-MM-DD.N format, for example 2026-07-18.1'
         required: true
         type: string
-      source_ref:
-        description: 'Source branch used only when the release branch does not already exist'
-        required: true
-        default: main
-        type: string
       confirm_release:
-        description: 'Confirm that this will create or reuse the release branch, deploy Beta, and run the WebApp release validation flow'
-        required: true
-        default: false
-        type: boolean
-      promote_to_production:
-        description: 'Continue to hosted Production approval after the release E2E gate succeeds'
+        description: 'I understand that this creates or reuses the release branch, automatically deploys and verifies Beta, runs the blocking E2E gate, and then waits for separate Production approval before deploying Production and publishing the release'
         required: true
         default: false
         type: boolean
@@ -70,7 +60,6 @@ jobs:
     outputs:
       release_identifier: ${{ steps.validate_request.outputs.release_identifier }}
       release_branch: ${{ steps.validate_request.outputs.release_branch }}
-      source_ref: ${{ steps.validate_request.outputs.source_ref }}
 
     steps:
       - name: Checkout workflow tools
@@ -78,6 +67,16 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
+
+      - name: Validate workflow ref
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]; then
+            echo 'Release WebApp must be started with "Use workflow from: main".' >&2
+            echo "Received workflow ref: ${GITHUB_REF}" >&2
+            exit 1
+          fi
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -96,7 +95,6 @@ jobs:
         env:
           CONFIRM_RELEASE: ${{ inputs.confirm_release }}
           RELEASE_IDENTIFIER: ${{ inputs.release_identifier }}
-          SOURCE_REF: ${{ inputs.source_ref }}
         run: |
           set -euo pipefail
 
@@ -105,32 +103,11 @@ jobs:
             exit 1
           fi
 
-          if [[ -z "${SOURCE_REF//[[:space:]]/}" ]]; then
-            echo 'source_ref must not be empty.' >&2
-            exit 1
-          fi
-
-          if [[ "${SOURCE_REF}" == refs/* || "${SOURCE_REF}" == origin/* ]]; then
-            echo "source_ref must be a branch name like main or release/YYYY-MM-DD.N, not a fully qualified or remote-style ref: ${SOURCE_REF}" >&2
-            exit 1
-          fi
-
-          if [[ "${SOURCE_REF}" == -* ]]; then
-            echo "source_ref must not begin with '-': ${SOURCE_REF}" >&2
-            exit 1
-          fi
-
-          if ! git check-ref-format --branch "${SOURCE_REF}" > /dev/null; then
-            echo "source_ref must be a valid branch name: ${SOURCE_REF}" >&2
-            exit 1
-          fi
-
           release_branch="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts release-branch "${RELEASE_IDENTIFIER}")"
 
           {
             echo "release_identifier=${RELEASE_IDENTIFIER}"
             echo "release_branch=${release_branch}"
-            echo "source_ref=${SOURCE_REF}"
           } >> "$GITHUB_OUTPUT"
 
   prepare_release_branch:
@@ -157,18 +134,19 @@ jobs:
         with:
           persist-credentials: true
           fetch-depth: 1
+          ref: ${{ github.sha }}
 
       - name: Prepare release branch
         id: prepare_release_branch
         env:
           RELEASE_BRANCH: ${{ needs.validate_request.outputs.release_branch }}
           RELEASE_IDENTIFIER: ${{ needs.validate_request.outputs.release_identifier }}
-          SOURCE_REF: ${{ needs.validate_request.outputs.source_ref }}
         run: |
           set -euo pipefail
 
           release_branch_remote_ref="refs/remotes/origin/${RELEASE_BRANCH}"
           release_branch_action=''
+          source_ref=''
           source_commit_sha=''
 
           if git ls-remote --exit-code --heads origin "${RELEASE_BRANCH}" > /dev/null; then
@@ -181,8 +159,13 @@ jobs:
               exit "${ls_remote_exit_code}"
             fi
 
-            git fetch --no-tags origin "+refs/heads/${SOURCE_REF}:refs/remotes/origin/${SOURCE_REF}"
-            source_commit_sha="$(git rev-parse "refs/remotes/origin/${SOURCE_REF}^{commit}")"
+            source_ref='main'
+            source_commit_sha="${GITHUB_SHA}"
+
+            if ! git rev-parse --verify "${source_commit_sha}^{commit}" > /dev/null; then
+              echo "The workflow dispatch commit is not available in the local repository: ${source_commit_sha}" >&2
+              exit 1
+            fi
 
             if git push origin "${source_commit_sha}:refs/heads/${RELEASE_BRANCH}"; then
               release_branch_action='created'
@@ -195,6 +178,7 @@ jobs:
               fi
 
               release_branch_action='reused'
+              source_ref=''
               source_commit_sha=''
             fi
           fi
@@ -212,7 +196,7 @@ jobs:
             echo "release_branch=${RELEASE_BRANCH}"
             echo "release_commit_sha=${release_commit_sha}"
             echo "release_branch_action=${release_branch_action}"
-            echo "source_ref=${SOURCE_REF}"
+            echo "source_ref=${source_ref}"
             echo "source_commit_sha=${source_commit_sha}"
           } >> "$GITHUB_OUTPUT"
 
@@ -283,18 +267,10 @@ jobs:
         run: ./bin/yarn nx run webapp:configure
 
       - name: Build and package public production
-        if: ${{ inputs.promote_to_production }}
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_identifier }}
         run: ./bin/yarn build:prod:public
-
-      - name: Build and package internal production
-        if: ${{ !inputs.promote_to_production }}
-        env:
-          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
-          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_identifier }}
-        run: ./bin/yarn build:prod
 
       - name: Validate release artifact metadata
         id: validate_artifact_metadata
@@ -320,7 +296,6 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Prepare exact public Docker distribution context
-        if: ${{ inputs.promote_to_production }}
         id: distribution_artifact
         env:
           ARTIFACT_CHECKSUM: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
@@ -365,7 +340,6 @@ jobs:
           echo "distribution_artifact_name=${distribution_artifact_name}" >> "$GITHUB_OUTPUT"
 
       - name: Upload exact public Docker distribution context
-        if: ${{ inputs.promote_to_production }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: ${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
@@ -624,7 +598,6 @@ jobs:
             Commit: ${{ needs.build_artifact.outputs.release_commit_sha }}
             Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
             E2E system gate: ${{ needs.run_e2e.result }}
-            Production promotion requested: ${{ inputs.promote_to_production }}
             Production preflight: ${{ needs.production_preflight.outputs.production_preflight_result }}
             Production deployment required: ${{ needs.production_preflight.outputs.should_deploy }}
             Playwright report: ${{ needs.run_e2e.outputs.reportUrl || 'unavailable' }}
@@ -633,12 +606,10 @@ jobs:
             ${{
               needs.production_preflight.outputs.should_deploy == 'true' &&
               'Production is ready for approval through the wire-webapp-prod GitHub Environment.' ||
-              inputs.promote_to_production &&
               format(
                 'Production deployment is not required: {0}',
                 needs.production_preflight.outputs.production_skipped_reason
-              ) ||
-              'This was a Beta-only release run; Production promotion was not requested.'
+              )
             }}
 
   production_preflight:
@@ -655,7 +626,6 @@ jobs:
 
     steps:
       - name: Checkout release commit
-        if: ${{ inputs.promote_to_production }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
@@ -663,43 +633,25 @@ jobs:
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
       - name: Add repository Yarn wrapper to PATH
-        if: ${{ inputs.promote_to_production }}
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
 
       - name: Setup Node.js
-        if: ${{ inputs.promote_to_production }}
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Install dependencies
-        if: ${{ inputs.promote_to_production }}
         run: ./bin/yarn --immutable
 
       - name: Check Production promotion eligibility
         id: production_preflight
         env:
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
-          PROMOTE_TO_PRODUCTION: ${{ inputs.promote_to_production }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
           RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
         run: |
           set -euo pipefail
-
-          if [[ "${PROMOTE_TO_PRODUCTION}" != 'true' ]]; then
-            production_tag_name="${RELEASE_IDENTIFIER}-production"
-            production_skipped_reason='Production promotion was not requested'
-
-            {
-              echo 'should_deploy=false'
-              echo 'production_preflight_result=skipped'
-              echo "production_skipped_reason=${production_skipped_reason}"
-              echo "production_tag_name=${production_tag_name}"
-            } >> "$GITHUB_OUTPUT"
-
-            exit 0
-          fi
 
           git fetch --tags origin
 
@@ -853,7 +805,7 @@ jobs:
   publish_production_distribution:
     name: Publish Production distribution
     needs: [build_artifact, create_production_tag]
-    if: ${{ needs.create_production_tag.result == 'success' && inputs.promote_to_production }}
+    if: ${{ needs.create_production_tag.result == 'success' }}
     permissions:
       actions: read
       contents: read
@@ -941,7 +893,6 @@ jobs:
           PRODUCTION_ENVIRONMENT_NAME: ${{ env.PRODUCTION_ENVIRONMENT_NAME }}
           PRODUCTION_PREFLIGHT_JOB_RESULT: ${{ needs.production_preflight.result }}
           PRODUCTION_PREFLIGHT_RESULT: ${{ needs.production_preflight.outputs.production_preflight_result }}
-          PRODUCTION_PROMOTION_REQUESTED: ${{ inputs.promote_to_production }}
           PRODUCTION_RUNTIME_VERIFICATION_RESULT: ${{ needs.verify_production_runtime.result }}
           PRODUCTION_RUNTIME_BACKEND_REST: ${{ env.PRODUCTION_RUNTIME_BACKEND_REST }}
           PRODUCTION_RUNTIME_BACKEND_WS: ${{ env.PRODUCTION_RUNTIME_BACKEND_WS }}

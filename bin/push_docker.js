@@ -36,11 +36,10 @@ require('dotenv').config({quiet: true});
  *
  * Demo execution:
  * ./bin/yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
- * ./bin/yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff' --pr
  */
 
-function selectReleaseCommit({releaseCommitSha, commandLineCommitSha, pullRequestCommitSha, githubSha}) {
-  return releaseCommitSha || commandLineCommitSha || pullRequestCommitSha || githubSha;
+function selectReleaseCommit({releaseCommitSha, commandLineCommitSha, githubSha}) {
+  return releaseCommitSha || commandLineCommitSha || githubSha;
 }
 
 function createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha}) {
@@ -64,10 +63,6 @@ function runProcess(command, commandArguments, processOptions, spawnProcess = ch
   }
 
   return result;
-}
-
-function getCurrentCommitSha() {
-  return child.execFileSync('git', ['rev-parse', 'HEAD']).toString().trim();
 }
 
 function resolveDockerContextPath(configuredPath, workingDirectory) {
@@ -121,26 +116,16 @@ function writeImageTag(outputPath, imageTag) {
 function runDockerPublication(
   commandLineArguments,
   environment,
-  {
-    runProcess: executeProcess = runProcess,
-    getCurrentCommitSha: readCurrentCommitSha = getCurrentCommitSha,
-    writeFile = writeImageTag,
-  } = {},
+  {runProcess: executeProcess = runProcess, writeFile = writeImageTag} = {},
 ) {
-  /** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev", "pr-123") */
+  /** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev") */
   const versionTag = commandLineArguments[0].replace('/', '-');
   const uniqueTagOut = commandLineArguments[1] || '';
-  /** Flag to indicate if this is a PR build */
-  const isPullRequest = commandLineArguments.includes('--pr');
   const commandLineCommitSha = commandLineArguments[2]?.startsWith('--') ? undefined : commandLineArguments[2];
   /** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
   const releaseCommitSha = selectReleaseCommit({
     releaseCommitSha: environment.WIRE_WEBAPP_RELEASE_COMMIT_SHA,
     commandLineCommitSha,
-    pullRequestCommitSha:
-      isPullRequest && !environment.WIRE_WEBAPP_RELEASE_COMMIT_SHA && !commandLineCommitSha
-        ? readCurrentCommitSha()
-        : undefined,
     githubSha: environment.GITHUB_SHA,
   });
   const printImageTagOnly = commandLineArguments.includes('--print-image-tag');
@@ -184,13 +169,7 @@ function runDockerPublication(
   /** One Docker image can have multiple tags, e.g. "production" (links always to the latest production build) & "2021-08-30-production.0-v0.28.25-0-1240cfd" (links to a fixed production build) */
   containerImageTags.push(repository + ':' + versionTag);
 
-  if (!isPullRequest) {
-    containerImageTags.push(repository + ':' + uniqueImageTag);
-  }
-
-  if (isPullRequest) {
-    containerImageTags.push(repository + ':' + versionTag + '-' + commitShortSha);
-  }
+  containerImageTags.push(repository + ':' + uniqueImageTag);
 
   const dockerUsername = environment.DOCKER_USERNAME;
   const dockerPassword = environment.DOCKER_PASSWORD;

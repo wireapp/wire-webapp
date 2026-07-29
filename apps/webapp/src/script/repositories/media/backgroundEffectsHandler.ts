@@ -22,11 +22,8 @@ import {container} from 'tsyringe';
 import {detectCapabilities, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {
-  defaultOpts,
-  SELFIE_MULTICLASS_MODEL_PATH,
-  SELFIE_SEGMENTER_MODEL_PATH,
-} from 'Repositories/media/backgroundEffects/pipe/options';
+import {defaultOpts} from 'Repositories/media/backgroundEffects/pipe/options';
+import {deriveModelConfig} from 'Repositories/media/backgroundEffects/qualityTierMapping';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -39,7 +36,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 
-import {backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
+import {backgroundEffectsStore, BackgroundEffectsQuality, RenderMetrics} from './useBackgroundEffectsStore';
 
 export const TARGET_FPS = 15;
 export const DEBOUNCE_TIMER = 500;
@@ -174,8 +171,12 @@ export class BackgroundEffectsHandler {
     }
 
     try {
+      const {qualityTier} = backgroundEffectsStore.getState();
+      const {modelPath, enhancePerformance} = deriveModelConfig(qualityTier);
       const outputTrack = await this.controller.start(videoTrack, {
         ...defaultOpts,
+        modelPath,
+        enhancePerformance,
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,
         quality: 'auto',
@@ -270,9 +271,11 @@ export class BackgroundEffectsHandler {
     return this.controller.getQuality();
   }
 
-  public enableSuperhighQualityTier(enable: boolean): void {
-    this.controller.setModelPath(enable ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH);
-    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(enable);
+  public setQualityTier(quality: BackgroundEffectsQuality): void {
+    backgroundEffectsStore.getState().setQualityTier(quality);
+    const {modelPath, enhancePerformance} = deriveModelConfig(quality);
+    this.controller.setModelPath(modelPath);
+    this.controller.setEnhancePerformance(enhancePerformance);
   }
 
   public getCapabilityInfo(): CapabilityInfo {

@@ -49,7 +49,6 @@ interface UseConversationSearchFilesProps {
   userRepository: UserRepository;
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
-  allowSearchWhenDisabled?: boolean;
   fireAndForgetInvoker: FireAndForgetInvoker;
   filters: ConversationDriveFiltersState;
   onClear?: () => void;
@@ -58,7 +57,6 @@ interface UseConversationSearchFilesProps {
 
 type ClearSearchRefreshOptions = {
   preserveFilters: boolean;
-  hasActiveParamsBeforeClear: boolean;
 };
 
 const DEBOUNCE_TIME = 300;
@@ -70,7 +68,6 @@ export const useConversationSearchFiles = ({
   userRepository,
   conversationQualifiedId,
   enabled,
-  allowSearchWhenDisabled = false,
   fireAndForgetInvoker,
   filters,
   onClear,
@@ -87,9 +84,6 @@ export const useConversationSearchFiles = ({
   // Prevents stale in-flight responses from overwriting the store after the search view closes.
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
-  const allowSearchWhenDisabledRef = useRef(allowSearchWhenDisabled);
-  allowSearchWhenDisabledRef.current = allowSearchWhenDisabled;
-
   const searchParams = useMemo(() => toConversationDriveSearchParams(filters), [filters]);
   const hasActiveParams = hasActiveSearchParams(searchParams);
   const hasSearchOrActiveParams = searchQuery.trim().length > 0 || hasActiveParams;
@@ -97,28 +91,17 @@ export const useConversationSearchFiles = ({
 
   const {id, domain} = conversationQualifiedId;
 
-  const canSearchOwnResults = useCallback((): boolean => {
-    return enabledRef.current === true || allowSearchWhenDisabledRef.current === true;
+  const isValidSearchRequest = useCallback((requestVersion: number): boolean => {
+    return enabledRef.current === true && requestVersionGate.current.isStale(requestVersion) === false;
   }, []);
 
-  const isValidSearchRequest = useCallback(
-    (requestVersion: number): boolean => {
-      return canSearchOwnResults() === true && requestVersionGate.current.isStale(requestVersion) === false;
-    },
-    [canSearchOwnResults],
-  );
-
   const shouldRefreshSearchResultsAfterClearingInput = useCallback(
-    ({preserveFilters, hasActiveParamsBeforeClear}: ClearSearchRefreshOptions): boolean => {
+    ({preserveFilters}: ClearSearchRefreshOptions): boolean => {
       if (preserveFilters === false) {
         return false;
       }
 
-      if (enabledRef.current === true) {
-        return true;
-      }
-
-      return allowSearchWhenDisabledRef.current === true && hasActiveParamsBeforeClear === true;
+      return enabledRef.current === true;
     },
     [],
   );
@@ -281,7 +264,6 @@ export const useConversationSearchFiles = ({
 
     const shouldRefreshSearchResults = shouldRefreshSearchResultsAfterClearingInput({
       preserveFilters,
-      hasActiveParamsBeforeClear: hasActiveParams,
     });
 
     if (shouldRefreshSearchResults === true) {
@@ -341,7 +323,7 @@ export const useConversationSearchFiles = ({
     const hasNoSearchInput = normalizeSearchQuery(searchValue).length === 0;
 
     if (hadActiveSearchParamsRef.current === true && hasActiveParams === false && hasNoSearchInput === true) {
-      if (canSearchOwnResults() === true) {
+      if (enabledRef.current === true) {
         fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
           await searchNodes({query: '', filters});
         });
@@ -350,7 +332,7 @@ export const useConversationSearchFiles = ({
       }
     }
     hadActiveSearchParamsRef.current = hasActiveParams;
-  }, [canSearchOwnResults, filters, fireAndForgetInvoker, hasActiveParams, onClear, searchNodes, searchValue]);
+  }, [filters, fireAndForgetInvoker, hasActiveParams, onClear, searchNodes, searchValue]);
 
   // The main search effect above refetches active query/filter searches when `searchNodes`
   // changes with the selected sort. Empty search has no query/filter, so it needs this

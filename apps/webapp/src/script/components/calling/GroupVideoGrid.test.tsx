@@ -77,14 +77,10 @@ const createMediaStream = () =>
     getVideoTracks: jest.fn(() => []),
   }) as unknown as MediaStream;
 
-const createProcessedVideoStream = (stream: MediaStream) => ({
-  stream,
-  release: jest.fn(),
-});
-
 describe('GroupVideoGrid', () => {
   beforeEach(() => {
     backgroundEffectsStore.setState({
+      isFeatureEnabled: false,
       isInitializing: false,
     });
   });
@@ -192,12 +188,11 @@ describe('GroupVideoGrid', () => {
     expect(thumbnailMutedIcons).not.toHaveLength(0);
   });
 
-  it('shows and hides the loading overlay while the thumbnail video is loading', () => {
+  it('shows and hides the loading overlay while the raw thumbnail video is loading with background effects disabled', () => {
     const participant = createMockParticipant('userId', 'clientId', {});
     const videoStream = createMediaStream();
     participant.videoState(VIDEO_STATE.STARTED);
     participant.videoStream(videoStream);
-    participant.processedVideoStream(createProcessedVideoStream(videoStream));
 
     const props: GroupVideoGripProps = {
       grid: {

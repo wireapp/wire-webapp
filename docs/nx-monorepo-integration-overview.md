@@ -26,13 +26,7 @@ The `workspace-tools` project is a special Nx project that provides workspace-le
 
 **Available workspace-tools commands:**
 - `nx run workspace-tools:clean-jest` - Clean Jest cache
-- `nx run workspace-tools:changelog-production` - Generate production changelog
-- `nx run workspace-tools:changelog-staging` - Generate staging changelog
-- `nx run workspace-tools:changelog-rc` - Generate RC changelog
 - `nx run workspace-tools:docker` - Build Docker image
-- `nx run workspace-tools:release-staging` - Release to staging
-- `nx run workspace-tools:release-production` - Release to production
-- `nx run workspace-tools:release-custom` - Custom release
 
 These commands are exposed as root npm scripts in [`package.json`](package.json):
 
@@ -40,14 +34,11 @@ These commands are exposed as root npm scripts in [`package.json`](package.json)
 {
   "scripts": {
     "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
-    "changelog:production": "nx run workspace-tools:changelog-production",
-    "changelog:staging": "nx run workspace-tools:changelog-staging",
-    "changelog:rc": "nx run workspace-tools:changelog-rc",
-    "deploy": "nx run server:package && eb deploy",
     "docker": "nx run workspace-tools:docker",
-    "release:staging": "nx run workspace-tools:release-staging",
-    "release:production": "nx run workspace-tools:release-production",
-    "release:custom": "nx run workspace-tools:release-custom",
+    "release": "nx release",
+    "release:dry-run": "nx release --dry-run",
+    "release:version": "nx release version",
+    "release:publish": "nx release publish",
     "start": "nx serve server",
     "build:prod": "nx build webapp --configuration=production"
   }
@@ -927,7 +918,7 @@ The deployment includes:
 
 **Deployment Artifacts:**
 
-The final `ebs.zip` file is uploaded to AWS Elastic Beanstalk via the `eb deploy` command (defined in [`package.json`](package.json) as `deploy` script).
+The final `ebs.zip` file is consumed by the maintained GitHub Actions deployment workflows for their target environments. The repository does not expose a local Elastic Beanstalk deployment script.
 
 ### Edge Cases and Troubleshooting
 
@@ -1669,6 +1660,28 @@ nx show project webapp
 
 ## CI/CD Integration
 
+### Current WebApp delivery ownership
+
+~~~mermaid
+flowchart LR
+  main[main] --> deliverMain[Deliver main]
+  deliverMain --> edge[Edge]
+  deliverMain --> hostedDev[Hosted Dev]
+  deliverMain --> developmentDistribution[Development Docker and Helm<br/>wire-builds/dev]
+
+  releaseWebApp[Release WebApp] --> beta[Hosted Beta]
+  beta --> e2e[Blocking E2E gate]
+  e2e --> approval[Production approval]
+  approval --> production[Hosted Production]
+  production --> productionDistribution[Production Docker and Helm<br/>wire-builds/main]
+~~~
+
+Only `main` is a long-lived development branch. `Deliver main` owns Edge,
+Hosted Dev, and the development distribution. `Release WebApp` is the only
+normal Beta-to-Production release entrypoint. Recovery workflows remain
+separate explicit operations for rollback, redeployment from historical
+Production tags, and distribution repair.
+
 ### GitHub Workflows Using Nx
 
 | Workflow | Nx Commands Used |
@@ -1676,7 +1689,8 @@ nx show project webapp
 | [`ci.yml`](.github/workflows/ci.yml) | `nx run-many -t lint --all`, `nx run-many -t test --all` |
 | [`precommit.yml`](.github/workflows/precommit.yml) | `nx run webapp:configure`, `nx run server:package` |
 | [`release-webapp.yml`](.github/workflows/release-webapp.yml) | `nx run webapp:configure`, `nx run server:package` through the exact WebApp release artifact build |
-| [`publish-and-deploy-webapp.yml`](.github/workflows/publish-and-deploy-webapp.yml) | `nx run webapp:configure`, `nx run-many -t test --all`, `nx run server:package` |
+| [`publish-main.yml`](.github/workflows/publish-main.yml) | Main artifact build, Edge and Hosted Dev delivery, and development distribution |
+| [`publish-production-distribution.yml`](.github/workflows/publish-production-distribution.yml) | Immutable Production Docker, Helm, and `wire-builds/main` distribution |
 
 ### Coverage in CI
 

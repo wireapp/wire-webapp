@@ -18,13 +18,11 @@
  */
 
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
-export const sharedDriveSearchAndFiltersFeatureToggleName = 'shared-drive-search-and-filters';
 export const meetingsFeatureToggleName = 'meetings';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
-  sharedDriveSearchAndFiltersFeatureToggleName,
   meetingsFeatureToggleName,
   conversationListCollapseFeatureToggleName,
 ] as const;

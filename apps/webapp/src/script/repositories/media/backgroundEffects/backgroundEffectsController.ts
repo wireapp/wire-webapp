@@ -43,6 +43,7 @@ import {
 } from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
 import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
+import {qualityTierFromModel} from './qualityTierMapping';
 
 // Blur strength (0–1) maps to Gaussian sigma in pixel units for the shader.
 // The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives
@@ -77,7 +78,7 @@ export class BackgroundEffectsController {
   // the manually set mode. if set to auto, then adaptive quality mode is activated
   private qualityMode: QualityMode = 'auto';
   private activeQualityTier: QualityTier = 'fhd';
-  private requestedModelPath: string = SELFIE_SEGMENTER_MODEL_PATH;
+  private requestedModelPath: string = SELFIE_MULTICLASS_MODEL_PATH;
   private refcount = 0;
 
   /**
@@ -97,6 +98,9 @@ export class BackgroundEffectsController {
     this.options = withoutBitmap(resolved);
     this.requestedModelPath = resolved.modelPath;
     backgroundEffectsStore.getState().setModel(this.requestedModelPath);
+    backgroundEffectsStore
+      .getState()
+      .setEffectiveQualityTier(qualityTierFromModel(this.requestedModelPath, this.options.enhancePerformance));
     this.onMetrics = options.onMetrics;
 
     const trackCapabilities = inputTrack.getCapabilities();
@@ -284,6 +288,11 @@ export class BackgroundEffectsController {
     this.pushOptionsUpdate();
   }
 
+  public setEnhancePerformance(enable: boolean): void {
+    this.options = {...this.options, enhancePerformance: enable};
+    this.pushOptionsUpdate();
+  }
+
   private applyImageBitmap(bitmap: ImageBitmap, url: string): void {
     const workerSource: WorkerBackgroundSource = {type: 'image', media: bitmap, url};
     // Record the url without the bitmap so the options object remains serialisable.
@@ -310,8 +319,10 @@ export class BackgroundEffectsController {
 
     this.options.modelPath = effectiveModelPath;
 
-    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(effectiveModelPath === SELFIE_MULTICLASS_MODEL_PATH);
     backgroundEffectsStore.getState().setModel(effectiveModelPath);
+    backgroundEffectsStore
+      .getState()
+      .setEffectiveQualityTier(qualityTierFromModel(effectiveModelPath, this.options.enhancePerformance));
 
     const {options: workerOptions} = getWorkerOptions(this.options);
     const finalOptions: WorkerProcessVideoTrackOptions = workerSource
@@ -465,6 +476,7 @@ const getWorkerOptions = (
     blurStrength: options.blurStrength,
     enabled: options.enabled,
     quality: options.quality,
+    enhancePerformance: options.enhancePerformance,
     borderSmooth: options.borderSmooth,
     smoothing: options.smoothing,
     smoothstepMin: options.smoothstepMin,
