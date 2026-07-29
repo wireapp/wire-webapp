@@ -257,7 +257,7 @@ export class DebugUtil {
       removeDebugInfo(debugInfos);
     } else {
       const debugElements = document.querySelectorAll<HTMLElement>(
-        '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=sender-name]',
+        '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=sender-name], #message-list[data-uie-uid]',
       );
       addDebugInfo(debugElements);
     }

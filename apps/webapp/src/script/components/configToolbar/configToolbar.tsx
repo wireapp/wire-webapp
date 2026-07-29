@@ -60,6 +60,7 @@ export function ConfigToolbar() {
   const alphabeticallySortedStartupFeatureToggleNames = startupFeatureToggleNames.toSorted();
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
+  const [isAdvancingEpoch, setIsAdvancingEpoch] = useState(false);
   const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() ?? false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
   const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
@@ -388,6 +389,17 @@ export function ConfigToolbar() {
     }
   };
 
+  const advanceEpoch = async () => {
+    setIsAdvancingEpoch(true);
+    try {
+      await window.wire?.app?.debug?.updateActiveConversationKeyPackages();
+    } catch (error: unknown) {
+      console.error('Error advancing epoch:', error);
+    } finally {
+      setIsAdvancingEpoch(false);
+    }
+  };
+
   const downloadNotificationsDump = async () => {
     setIsDownloadingNotifications(true);
     try {
@@ -496,6 +508,9 @@ export function ConfigToolbar() {
       </Button>
       <Button disabled={isResettingMLSConversation} onClick={resetMLSConversation}>
         Reset MLS Conversation
+      </Button>
+      <Button disabled={isAdvancingEpoch} onClick={advanceEpoch}>
+        {isAdvancingEpoch ? 'Advancing Epoch…' : 'Advance Epoch'}
       </Button>
       <Button onClick={() => window.wire?.app?.debug?.refreshE2EIRevocationData()}>Force CRL expiry</Button>
 
