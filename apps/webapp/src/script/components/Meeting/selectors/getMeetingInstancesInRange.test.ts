@@ -131,13 +131,10 @@ describe('getMeetingInstancesInRange', () => {
     expect(meetingInstance?.end.toISOString()).toBe('2026-06-16T11:30:00.000Z');
   });
 
-  describe('monthly recurrence', () => {
-    // Monthly steps use date-fns addMonths in UTC (see jest.config.ts). That keeps the same
-    // calendar day when possible and clamps to the last day of shorter months (e.g. Jan 31 -> Feb 28).
-
-    it('expands monthly series on the same calendar day each month', () => {
+  describe('everyFourWeeks recurrence', () => {
+    it('advances by exactly 28 days across month boundaries', () => {
       const meetingSeries = createMeetingSeries({
-        recurrence: 'monthly',
+        recurrence: 'everyFourWeeks',
         series_start_date: '2026-01-15T10:00:00.000Z',
       });
       const windowStart = new Date('2026-03-01T00:00:00.000Z');
@@ -146,15 +143,15 @@ describe('getMeetingInstancesInRange', () => {
       const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
       expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-        '2026-03-15T10:00:00.000Z',
-        '2026-04-15T10:00:00.000Z',
-        '2026-05-15T10:00:00.000Z',
+        '2026-03-12T10:00:00.000Z',
+        '2026-04-09T10:00:00.000Z',
+        '2026-05-07T10:00:00.000Z',
       ]);
     });
 
-    it('advances monthly series with a past anchor into the visible window', () => {
+    it('advances every-four-weeks series with a past anchor into the visible window', () => {
       const meetingSeries = createMeetingSeries({
-        recurrence: 'monthly',
+        recurrence: 'everyFourWeeks',
         series_start_date: '2026-01-15T10:00:00.000Z',
       });
       const windowStart = new Date('2026-06-16T00:00:00.000Z');
@@ -163,14 +160,15 @@ describe('getMeetingInstancesInRange', () => {
       const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
       expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-        '2026-07-15T10:00:00.000Z',
-        '2026-08-15T10:00:00.000Z',
+        '2026-07-02T10:00:00.000Z',
+        '2026-07-30T10:00:00.000Z',
+        '2026-08-27T10:00:00.000Z',
       ]);
     });
 
-    it('clamps end-of-month anchors to the last day of shorter months', () => {
+    it('advances end-of-month anchors by 28 days without calendar-month clamping', () => {
       const meetingSeries = createMeetingSeries({
-        recurrence: 'monthly',
+        recurrence: 'everyFourWeeks',
         series_start_date: '2026-01-31T10:00:00.000Z',
       });
       const windowStart = new Date('2026-02-01T00:00:00.000Z');
@@ -181,15 +179,15 @@ describe('getMeetingInstancesInRange', () => {
       expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
         '2026-02-28T10:00:00.000Z',
         '2026-03-28T10:00:00.000Z',
-        '2026-04-28T10:00:00.000Z',
-        '2026-05-28T10:00:00.000Z',
-        '2026-06-28T10:00:00.000Z',
+        '2026-04-25T10:00:00.000Z',
+        '2026-05-23T10:00:00.000Z',
+        '2026-06-20T10:00:00.000Z',
       ]);
     });
 
-    it('stops monthly instances after recurrence_until', () => {
+    it('stops every-four-weeks instances after recurrence_until', () => {
       const meetingSeries = createMeetingSeries({
-        recurrence: 'monthly',
+        recurrence: 'everyFourWeeks',
         series_start_date: '2026-01-15T10:00:00.000Z',
         recurrence_until: '2026-07-31T23:59:59.000Z',
       });
@@ -199,8 +197,25 @@ describe('getMeetingInstancesInRange', () => {
       const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
       expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-        '2026-06-15T10:00:00.000Z',
-        '2026-07-15T10:00:00.000Z',
+        '2026-06-04T10:00:00.000Z',
+        '2026-07-02T10:00:00.000Z',
+        '2026-07-30T10:00:00.000Z',
+      ]);
+    });
+
+    it('advances across a year boundary', () => {
+      const meetingSeries = createMeetingSeries({
+        recurrence: 'everyFourWeeks',
+        series_start_date: '2026-12-15T10:00:00.000Z',
+      });
+      const windowStart = new Date('2026-12-01T00:00:00.000Z');
+      const windowEnd = new Date('2027-02-01T00:00:00.000Z');
+
+      const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
+
+      expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
+        '2026-12-15T10:00:00.000Z',
+        '2027-01-12T10:00:00.000Z',
       ]);
     });
   });
