@@ -95,7 +95,6 @@
     "bundle:prod:public": "nx run server:assemble-webapp-public",
     "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
     "clean:yarn": "find . -name node_modules -type d -prune -exec rm -rf '{}' + && ./bin/yarn cache clean",
-    "deploy": "nx run server:package && eb deploy",
     "dev": "nx serve server",
     "dev:packages": "nx run-many -t watch --projects=tag:type:lib",
     "docker": "nx run workspace-tools:docker",
