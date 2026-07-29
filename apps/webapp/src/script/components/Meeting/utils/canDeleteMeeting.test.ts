@@ -26,21 +26,10 @@ import {
 } from 'Components/Meeting/utils/canDeleteMeeting';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
-const fixedFutureNow = new Date('2026-06-15T13:00:00.000Z');
-const fixedOngoingNow = new Date('2026-06-15T14:30:00.000Z');
-const fixedPastNow = new Date('2026-06-15T16:00:00.000Z');
-
-const futureWallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: fixedFutureNow.getTime(),
-});
-const ongoingWallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: fixedOngoingNow.getTime(),
-});
-const pastWallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: fixedPastNow.getTime(),
-});
+const futureNowMilliseconds = Date.parse('2026-06-15T13:00:00.000Z');
+const ongoingNowMilliseconds = Date.parse('2026-06-15T14:30:00.000Z');
+const pastNowMilliseconds = Date.parse('2026-06-15T16:00:00.000Z');
 
 const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
   series_start_date: '2026-06-15T14:00:00.000Z',
@@ -75,14 +64,14 @@ describe('canDeleteMeeting', () => {
   it('allows delete for upcoming and ongoing meetings', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(canDeleteMeeting(meetingInstance, futureWallClock.currentTimestampInMilliseconds)).toBe(true);
-    expect(canDeleteMeeting(meetingInstance, ongoingWallClock.currentTimestampInMilliseconds)).toBe(true);
+    expect(canDeleteMeeting(meetingInstance, futureNowMilliseconds)).toBe(true);
+    expect(canDeleteMeeting(meetingInstance, ongoingNowMilliseconds)).toBe(true);
   });
 
   it('disallows delete for past meetings', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(canDeleteMeeting(meetingInstance, pastWallClock.currentTimestampInMilliseconds)).toBe(false);
+    expect(canDeleteMeeting(meetingInstance, pastNowMilliseconds)).toBe(false);
   });
 });
 
@@ -91,7 +80,7 @@ describe('canDeleteMeetingForAll', () => {
     const meetingInstance = createMeetingInstance();
 
     expect(
-      canDeleteMeetingForAll(meetingInstance, createSelfUser(), futureWallClock.currentTimestampInMilliseconds),
+      canDeleteMeetingForAll(meetingInstance, createSelfUser(), futureNowMilliseconds),
     ).toBe(true);
   });
 
@@ -99,7 +88,7 @@ describe('canDeleteMeetingForAll', () => {
     const meetingInstance = createMeetingInstance();
 
     expect(
-      canDeleteMeetingForAll(meetingInstance, createSelfUser(), ongoingWallClock.currentTimestampInMilliseconds),
+      canDeleteMeetingForAll(meetingInstance, createSelfUser(), ongoingNowMilliseconds),
     ).toBe(false);
   });
 
@@ -110,7 +99,7 @@ describe('canDeleteMeetingForAll', () => {
       canDeleteMeetingForAll(
         meetingInstance,
         createSelfUser('invitee-id'),
-        futureWallClock.currentTimestampInMilliseconds,
+        futureNowMilliseconds,
       ),
     ).toBe(false);
   });
@@ -124,7 +113,7 @@ describe('canDeleteMeetingForMe', () => {
       canDeleteMeetingForMe(
         meetingInstance,
         createSelfUser('invitee-id'),
-        futureWallClock.currentTimestampInMilliseconds,
+        futureNowMilliseconds,
       ),
     ).toBe(true);
   });
@@ -133,7 +122,7 @@ describe('canDeleteMeetingForMe', () => {
     const meetingInstance = createMeetingInstance();
 
     expect(
-      canDeleteMeetingForMe(meetingInstance, createSelfUser(), futureWallClock.currentTimestampInMilliseconds),
+      canDeleteMeetingForMe(meetingInstance, createSelfUser(), futureNowMilliseconds),
     ).toBe(false);
   });
 });
