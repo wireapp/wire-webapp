@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2024",
@@ -8,6 +8,6 @@
     "rootDir": ".",
     "allowImportingTsExtensions": true
   },
-  "include": ["bin/**/*.ts"],
-  "exclude": ["node_modules", "dist", "tmp", "bin/**/*.test.ts", "bin/jest.config.js"]
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules", "dist", "tmp"]
 }

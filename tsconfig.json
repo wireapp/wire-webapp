@@ -3,6 +3,7 @@
   "references": [
     { "path": "./apps/webapp" },
     { "path": "./apps/server" },
-    { "path": "./tsconfig.bin.json" }
+    { "path": "./tsconfig.bin.json" },
+    { "path": "./tools/release-appearance" }
   ]
 }
