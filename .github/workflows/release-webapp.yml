@@ -2,8 +2,8 @@
 name: Release WebApp
 
 on:
-  # Automatic release/** triggering is intentionally disabled during the
-  # transition. Enable it after Release WebApp is the official release path.
+  # Release WebApp is intentionally started explicitly. Branch preparation and
+  # the complete release lifecycle are one auditable workflow operation.
   workflow_dispatch:
     inputs:
       release_identifier:

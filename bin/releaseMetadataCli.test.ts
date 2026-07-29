@@ -158,7 +158,7 @@ describe('releaseMetadataCli', () => {
     });
   });
 
-  it.each(['2026-07-20-staging.1', 'q1-2024', 'q2-2025'])(
+  it.each(['2026-07-20-staging.1'])(
     'prints the development webapp build version for non-production reference "%s"',
     buildReferenceName => {
       const actualResult = runCommand([

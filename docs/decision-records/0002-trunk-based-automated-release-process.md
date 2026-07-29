@@ -93,11 +93,10 @@ After successful Hosted Beta and E2E validation, every normal WebApp release adv
 
 The branch model is:
 
-- `main` is the single trunk branch and the source for Edge and hosted Dev deployments.
+- `main` is the only long-lived development branch, the single trunk branch, and the source for Edge and hosted Dev deployments.
 - During the migration, `main` was established from the active `dev` history because `dev` contained the current development history at cutover time.
-- `dev` and `master` are legacy branches retained temporarily for compatibility and old release-path retirement; normal development no longer targets either branch.
+- `dev` and `master` are obsolete Git branches. They are not normal development targets; Phase 10 is complete only after the cleanup pull request is merged and both remote branches are deleted.
 - `Release WebApp` creates a missing `release/YYYY-MM-DD.N` branch from one exact source commit or reuses the existing branch head without moving it.
-- Removing the legacy branches is a later operational cleanup decision.
 - On-premises maintenance branches are created only when a customer-managed release line needs maintenance after the original production release.
 
 The release identifier uses the release branch name: `YYYY-MM-DD.N`. The full identifier is anchored to the release branch, not to the later deployment date. For example, updates to `release/2026-05-05.1` always create tags in the `2026-05-05.1` family, even if a hotfix is added on a later day.
@@ -110,17 +109,19 @@ The WebApp release process is:
 - Repeated dispatches with the same identifier reuse the release branch and build its current head, producing subsequent Beta candidates such as `YYYY-MM-DD.N-beta.2`. A new identifier is required to release a newer state of `main`.
 - Hosted Beta and hosted Production are deployment stages operated by Wire. E2E remains a blocking release gate, and Production approval remains explicit through the `wire-webapp-prod` GitHub Environment.
 - Docker, Helm, and `wire-builds/main` form the release distribution consumed by hosted and customer-managed deployments. Release distribution is part of the complete WebApp release lifecycle, not merely a hosted deployment detail.
-- The standalone branch-creation workflow no longer exists; automatic release-branch triggering remains disabled during the transition.
+- The standalone branch-creation workflow no longer exists. `Release WebApp` is intentionally started explicitly; branch preparation and the complete release lifecycle are one auditable workflow operation.
 
 - `publish-main.yml` owns delivery of every eligible `main` commit. It builds the internal application exactly once, then deploys that same internal artifact to Edge and hosted Dev. Edge remains the immediate trunk dogfooding environment.
 - The development distribution retains the external channel name `dev`: it publishes the Docker image and a matching prerelease Helm chart, then updates `wire-builds/dev`.
 - `wire-builds/dev` remains the development distribution consumed by downstream internal integration environments; it is separate from the hosted Dev frontend deployment.
-- The legacy `publish-and-deploy-webapp.yml` workflow no longer owns `dev`; its `dev` branch trigger is not restored.
+- The legacy tag-driven `publish-and-deploy-webapp.yml` workflow has been deleted. Its obsolete `dev`, `master`, staging-tag, Production-tag, and maintenance publication paths are not restored.
+- The arbitrary manual release-artifact workflow and local staging and Production tag commands have been deleted. `q1-2024` and `q2-2025` publication handling was retired rather than migrated; recovery from existing historical Production tags remains available, and maintenance-release automation remains separate future work for Phase 11.
+- The legacy path was retired before the first complete Production run of the final workflow. Any issue discovered during the next release will be repaired in the new pipeline rather than falling back to the retired path.
 - `wire-builds/main` remains Production-only and is never updated by an ordinary `main` push.
 - Development and Production distributions share the same Helm repository and prerelease version namespace. Their Docker, Helm, and `wire-builds` publications use one shared, non-cancellable distribution lock.
 - Edge verifies that its artifact still belongs to the current `main` commit after acquiring the deployment slot; stale Edge builds skip instead of moving Edge backwards.
 - Hosted Dev verifies that its artifact still belongs to the current `main` commit after acquiring its deployment slot; stale Hosted Dev builds skip instead of moving Hosted Dev backwards.
-- Development, verified Production, and remaining legacy distribution paths share one non-cancellable queued publication group with `queue: max`, which preserves pending publications until the legacy workflow is deleted.
+- Development and verified Production distributions share one non-cancellable queued publication group with `queue: max`.
 - Every merge to `main` deploys continuously to Edge without an approval gate. A newer `main` commit may supersede an in-progress Edge deployment.
 - A stale queued main publication checks the current `main` commit after acquiring the shared distribution lock and skips before external publication instead of regressing the shared `dev` channel.
 - `Release WebApp` deploys the exact prepared release commit and artifact to hosted Beta, creates a beta tag such as `YYYY-MM-DD.N-beta.1`, and deploys that same artifact to the dedicated E2E validation environment connected to Staging backend services.
@@ -257,7 +258,5 @@ The process removes the `dev` to `master` promotion step and the `master` to `de
 Quality assurance gains a clear quality gate without owning production operations. Engineering keeps ownership of production rollout, observability, incident response, and rollback.
 
 The process depends more strongly on pull request discipline and feature flag usage because `main` continuously deploys to Edge.
-
-The legacy monolithic workflow no longer owns `dev` publication; it remains only for its legacy tag, `master`, and maintenance paths until those responsibilities are retired.
 
 On-premises customers can receive controlled maintenance artifacts without making every production release a long-term-support line or constraining the WebApp release cadence.
