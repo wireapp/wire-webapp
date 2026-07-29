@@ -65,7 +65,6 @@ export type ProductionSummaryInput = {
   readonly environmentName: Maybe<string>;
   readonly preflightJobResult: Maybe<WorkflowJobResult>;
   readonly preflightResult: Maybe<ProductionPreflightResult>;
-  readonly promotionRequested: boolean;
   readonly runtimeBackendRest: Maybe<string>;
   readonly runtimeBackendWebSocket: Maybe<string>;
   readonly runtimeVerificationResult: Maybe<WorkflowJobResult>;
@@ -230,12 +229,6 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
       plannedTagName: readOptionalEnvironmentValue(environment, 'PLANNED_PRODUCTION_TAG_NAME'),
       preflightJobResult: readWorkflowJobResult(environment, 'PRODUCTION_PREFLIGHT_JOB_RESULT'),
       preflightResult: readProductionPreflightResult(environment),
-      promotionRequested: readOptionalBoolean(environment, 'PRODUCTION_PROMOTION_REQUESTED').mapOr(
-        false,
-        promotionRequested => {
-          return promotionRequested === true;
-        },
-      ),
       runtimeBackendRest: readOptionalEnvironmentValue(environment, 'PRODUCTION_RUNTIME_BACKEND_REST'),
       runtimeBackendWebSocket: readOptionalEnvironmentValue(environment, 'PRODUCTION_RUNTIME_BACKEND_WS'),
       runtimeVerificationResult: readWorkflowJobResult(environment, 'PRODUCTION_RUNTIME_VERIFICATION_RESULT'),
@@ -528,10 +521,6 @@ function formatProductionPreflightResult(input: ProductionSummaryInput): string 
 }
 
 function formatProductionResult(input: ProductionSummaryInput): string {
-  if (input.promotionRequested === false) {
-    return 'not requested';
-  }
-
   if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
     return 'already tagged; deployment not required';
   }
@@ -545,6 +534,10 @@ function formatProductionResult(input: ProductionSummaryInput): string {
   }
 
   if (hasWorkflowJobResult(input.preflightJobResult, 'skipped')) {
+    return 'not run because Production preflight did not run';
+  }
+
+  if (hasProductionPreflightResult(input.preflightResult, 'skipped')) {
     return 'not run because Production preflight did not run';
   }
 
@@ -604,11 +597,11 @@ function formatProductionSkipReason(input: ProductionSummaryInput): Maybe<string
     return input.skippedReason;
   }
 
-  if (input.promotionRequested === false) {
-    return Maybe.just('Production promotion was not requested');
+  if (hasWorkflowJobResult(input.preflightJobResult, 'skipped')) {
+    return Maybe.just('Production preflight did not run');
   }
 
-  if (hasWorkflowJobResult(input.preflightJobResult, 'skipped')) {
+  if (hasProductionPreflightResult(input.preflightResult, 'skipped')) {
     return Maybe.just('Production preflight did not run');
   }
 
@@ -628,10 +621,6 @@ function formatProductionSkipReason(input: ProductionSummaryInput): Maybe<string
 }
 
 function formatApprovalGate(input: ProductionSummaryInput): string {
-  if (input.promotionRequested === false) {
-    return 'not requested';
-  }
-
   if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
     return 'not required; the release is already tagged as Production';
   }
@@ -650,14 +639,6 @@ function formatProductionTag(input: ProductionSummaryInput, github: GitHubLinkCo
 
   if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
     return formatRepositoryTreeLink(input.plannedTagName, github).unwrapOr('not available');
-  }
-
-  if (input.promotionRequested === false) {
-    return 'not requested';
-  }
-
-  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
-    return 'not available';
   }
 
   if (
@@ -687,8 +668,8 @@ function formatProductionTagCreationResult(input: ProductionSummaryInput): strin
         return 'not required; tag already exists';
       }
 
-      if (input.promotionRequested === false) {
-        return 'not requested';
+      if (hasProductionPreflightResult(input.preflightResult, 'skipped')) {
+        return 'not run';
       }
 
       return 'unknown result';
@@ -733,10 +714,6 @@ function formatDistributionResult(
 
   if (hasWorkflowJobResult(distribution.distributionJobResult, 'cancelled')) {
     return 'cancelled';
-  }
-
-  if (hasWorkflowJobResult(distribution.distributionJobResult, 'skipped') && input.promotionRequested === false) {
-    return 'not requested';
   }
 
   if (
@@ -840,7 +817,6 @@ function hasProductionPreflightCancellation(input: ProductionSummaryInput): bool
 
 function hasHostedProductionCompleted(input: ProductionSummaryInput): boolean {
   return (
-    input.promotionRequested &&
     hasProductionPreflightResult(input.preflightResult, 'ready') &&
     hasWorkflowJobResult(input.preflightJobResult, 'success') &&
     hasWorkflowJobResult(input.deploymentResult, 'success') &&
@@ -921,10 +897,6 @@ function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
     return 'Release incomplete because the E2E system gate did not run';
   }
 
-  if (hasWorkflowJobResult(input.e2e.result, 'success') && input.production.promotionRequested === false) {
-    return 'Beta release completed; Production promotion was not requested';
-  }
-
   if (hasProductionPreflightResult(input.production.preflightResult, 'already_tagged')) {
     return 'Release already has the matching Production tag; deployment was not repeated';
   }
@@ -935,6 +907,13 @@ function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
 
   if (hasProductionPreflightCancellation(input.production)) {
     return 'Release stopped because Production preflight was cancelled';
+  }
+
+  if (
+    hasWorkflowJobResult(input.production.preflightJobResult, 'skipped') ||
+    hasProductionPreflightResult(input.production.preflightResult, 'skipped')
+  ) {
+    return 'Release incomplete because Production preflight did not run';
   }
 
   if (hasWorkflowJobResult(input.production.deploymentResult, 'failure')) {
@@ -1127,7 +1106,6 @@ function renderProductionSection(input: WebappReleaseSummaryInput): string {
     '### Hosted Production promotion',
     '',
     `- Result: ${formatProductionResult(input.production)}`,
-    `- Production promotion requested: ${input.production.promotionRequested === true ? 'true' : 'false'}`,
     `- Production preflight result: ${formatProductionPreflightResult(input.production)}`,
     ...productionSkipReasonLines,
     `- Target environment: ${formatValueOrFallback(input.production.environmentName)}`,

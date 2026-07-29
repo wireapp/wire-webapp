@@ -80,7 +80,6 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     plannedTagName: Maybe.just(productionTagName),
     preflightJobResult: Maybe.just('skipped'),
     preflightResult: Maybe.just('skipped'),
-    promotionRequested: false,
     runtimeBackendRest: Maybe.just('https://production-backend.example.com'),
     runtimeBackendWebSocket: Maybe.just('wss://production-backend.example.com'),
     runtimeVerificationResult: Maybe.just('skipped'),
@@ -141,6 +140,8 @@ function assertMarkdownContract(summary: string, includesDistribution: boolean):
   } else {
     expect(summary).not.toContain('### Release distribution');
   }
+
+  assertOptionalProductionPromotionTermsAreAbsent(summary);
 }
 
 function assertVisibleIdentity(summary: string): void {
@@ -176,8 +177,22 @@ function assertBetaSummaryContainsOnlyBetaEvidence(summary: string): void {
   }
 }
 
+function assertOptionalProductionPromotionTermsAreAbsent(summary: string): void {
+  const forbiddenTerms = [
+    'Production promotion requested',
+    'Production promotion was not requested',
+    'Beta-only',
+    'Hosted Production: not requested',
+    'Release distribution: not requested',
+  ];
+
+  for (const forbiddenTerm of forbiddenTerms) {
+    expect(summary).not.toContain(forbiddenTerm);
+  }
+}
+
 describe('WebApp release summary renderer', () => {
-  it('renders a successful Beta-only release with a concise visible overview', () => {
+  it('reports an unexpected skipped Production preflight as an incomplete release', () => {
     const summary = renderWebappReleaseSummary(baselineWebappReleaseSummaryInput);
     const visibleContent = visibleSummary(summary);
     const detailsContent = technicalEvidence(summary);
@@ -185,11 +200,13 @@ describe('WebApp release summary renderer', () => {
     assertMarkdownContract(summary, true);
     assertVisibleIdentity(summary);
     expect(visibleContent).toContain('## WebApp release');
-    expect(visibleContent).toContain('Beta release completed; Production promotion was not requested');
+    expect(visibleContent).toContain('Release incomplete because Production preflight did not run');
     expect(visibleContent).toContain(`- Hosted Beta: deployed and verified successfully - tag [${betaTagName}]`);
     expect(visibleContent).toContain('- E2E system gate: passed successfully - [Playwright report]');
-    expect(visibleContent).toContain('- Hosted Production: not requested');
-    expect(visibleContent).toContain('- Release distribution: not requested');
+    expect(visibleContent).toContain('- Hosted Production: not run because Production preflight did not run');
+    expect(visibleContent).toContain('- Release distribution: not run');
+    expect(detailsContent).toContain('- Production preflight result: skipped');
+    expect(detailsContent).toContain('- Skip reason: Production preflight did not run');
     expect(detailsContent).toContain('- Asset version: 2026-07-17.1-1234567');
     expect(detailsContent).toContain('- Built at (UTC): 2026-07-20T06:18:03.123Z');
     expect(detailsContent).toContain(
@@ -234,7 +251,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.just(true),
         preflightJobResult: Maybe.just('success'),
         preflightResult: Maybe.just('ready'),
-        promotionRequested: true,
         runtimeVerificationResult: Maybe.just('success'),
         tagCreationResult: Maybe.just('success'),
       },
@@ -266,7 +282,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.just(false),
         preflightJobResult: Maybe.just('success'),
         preflightResult: Maybe.just('already_tagged'),
-        promotionRequested: true,
       },
     };
     const summary = renderWebappReleaseSummary(input);
@@ -301,7 +316,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.nothing<boolean>(),
         preflightJobResult: Maybe.just('skipped'),
         preflightResult: Maybe.nothing(),
-        promotionRequested: true,
       },
     };
     const finalSummary = renderWebappReleaseSummary(input);
@@ -348,7 +362,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.nothing<boolean>(),
         preflightJobResult: Maybe.just('skipped'),
         preflightResult: Maybe.nothing(),
-        promotionRequested: true,
       },
     };
     const finalSummary = renderWebappReleaseSummary(input);
@@ -382,7 +395,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.nothing<boolean>(),
         preflightJobResult: Maybe.just('skipped'),
         preflightResult: Maybe.nothing(),
-        promotionRequested: true,
       },
     };
     const finalSummary = renderWebappReleaseSummary(input);
@@ -435,7 +447,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.nothing<boolean>(),
         preflightJobResult: Maybe.just('skipped'),
         preflightResult: Maybe.nothing(),
-        promotionRequested: true,
       },
     };
     const summary = renderWebappReleaseSummary(input);
@@ -457,7 +468,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.nothing<boolean>(),
         preflightJobResult: Maybe.just('skipped'),
         preflightResult: Maybe.nothing(),
-        promotionRequested: true,
       },
     };
     const finalSummary = renderWebappReleaseSummary(input);
@@ -483,7 +493,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.nothing<boolean>(),
         preflightJobResult: Maybe.just('skipped'),
         preflightResult: Maybe.nothing(),
-        promotionRequested: true,
       },
     };
     const finalSummary = renderWebappReleaseSummary(input);
@@ -505,7 +514,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.just(true),
         preflightJobResult: Maybe.just('failure'),
         preflightResult: Maybe.just('failure'),
-        promotionRequested: true,
       },
     };
     const summary = renderWebappReleaseSummary(input);
@@ -524,7 +532,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.just(true),
         preflightJobResult: Maybe.just('success'),
         preflightResult: Maybe.just('ready'),
-        promotionRequested: true,
         runtimeVerificationResult: Maybe.just('skipped'),
         tagCreationResult: Maybe.just('skipped'),
       },
@@ -545,7 +552,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.just(true),
         preflightJobResult: Maybe.just('success'),
         preflightResult: Maybe.just('ready'),
-        promotionRequested: true,
         runtimeVerificationResult: Maybe.just('failure'),
         tagCreationResult: Maybe.just('skipped'),
       },
@@ -566,7 +572,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.just(true),
         preflightJobResult: Maybe.just('success'),
         preflightResult: Maybe.just('ready'),
-        promotionRequested: true,
         runtimeVerificationResult: Maybe.just('success'),
         tagCreationResult: Maybe.just('failure'),
       },
@@ -595,7 +600,6 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.just(true),
         preflightJobResult: Maybe.just('success'),
         preflightResult: Maybe.just('ready'),
-        promotionRequested: true,
         runtimeVerificationResult: Maybe.just('success'),
         tagCreationResult: Maybe.just('success'),
       },
@@ -662,10 +666,11 @@ describe('WebApp release summary renderer', () => {
     expect(visibleSummary(finalSummary)).not.toContain('Manual reason');
   });
 
-  it('reads release summary values from the workflow environment', () => {
+  it('reads the Production deployment requirement from the workflow environment', () => {
     const input = readWebappReleaseSummaryInput({
       ARTIFACT_ASSET_VERSION: '2026-07-17.1-1234567',
       ARTIFACT_BUILT_AT: '2026-07-20T06:18:03.123Z',
+      PRODUCTION_DEPLOYMENT_REQUIRED: 'true',
       RELEASE_ACTOR: 'release-captain',
       RELEASE_BRANCH_ACTION: 'created',
       SOURCE_COMMIT_SHA: sourceCommitSha,
@@ -678,6 +683,7 @@ describe('WebApp release summary renderer', () => {
     expect(input.preparation.branchAction.unwrapOr('reused')).toBe('created');
     expect(input.preparation.sourceCommitSha.unwrapOr('not available')).toBe(sourceCommitSha);
     expect(input.preparation.sourceRef.unwrapOr('not available')).toBe('main');
+    expect(input.production.deploymentRequired.unwrapOr(false)).toBe(true);
   });
 
   it('does not create a link for an invalid E2E report URL', () => {
