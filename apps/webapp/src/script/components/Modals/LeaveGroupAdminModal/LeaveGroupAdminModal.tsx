@@ -114,7 +114,8 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
           ) : (
             <>
               {translate('leaveGroupAdminModalMessageNoEligibleFirstPart')} <br />
-              {translate('leaveGroupAdminModalMessageNoEligibleSecondPart')}
+              {translate('leaveGroupAdminModalMessageNoEligibleSecondPart')} <br />
+              {translate('leaveGroupAdminModalMessageNoEligibleThirdPart')}
             </>
           )}
         </p>
