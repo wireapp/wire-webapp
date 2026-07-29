@@ -9788,13 +9788,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/generate-changelog@npm:1.8.3":
-  version: 1.8.3
-  resolution: "@types/generate-changelog@npm:1.8.3"
-  checksum: 10/be2ba32c05331cb4a500ebdc214feb6f9ce6f4c4f09514eaf88f8d21ca3340071fe003bf985cb49cd8b5a410814f3ece02381b7d74c5695e12ca5b41f79b1a4c
-  languageName: node
-  linkType: hard
-
 "@types/geolite2@npm:2.0.2":
   version: 2.0.2
   resolution: "@types/geolite2@npm:2.0.2"
@@ -13390,7 +13383,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bluebird@npm:^3.0.6, bluebird@npm:^3.4.1, bluebird@npm:^3.7.2":
+"bluebird@npm:^3.4.1, bluebird@npm:^3.7.2":
   version: 3.7.2
   resolution: "bluebird@npm:3.7.2"
   checksum: 10/007c7bad22c5d799c8dd49c85b47d012a1fe3045be57447721e6afbd1d5be43237af1db62e26cb9b0d9ba812d2e4ca3bac82f6d7e016b6b88de06ee25ceb96e7
@@ -14405,7 +14398,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^2.2.0, commander@npm:^2.20.0, commander@npm:^2.9.0":
+"commander@npm:^2.2.0, commander@npm:^2.20.0":
   version: 2.20.3
   resolution: "commander@npm:2.20.3"
   checksum: 10/90c5b6898610cd075984c58c4f88418a4fb44af08c1b1415e9854c03171bec31b336b7f3e4cefe33de994b3f12b03c5e2d638da4316df83593b9e82554e7e95b
@@ -18429,20 +18422,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"generate-changelog@npm:1.8.0":
-  version: 1.8.0
-  resolution: "generate-changelog@npm:1.8.0"
-  dependencies:
-    bluebird: "npm:^3.0.6"
-    commander: "npm:^2.9.0"
-    github-url-from-git: "npm:^1.4.0"
-  bin:
-    changelog: ./bin/generate
-    generate-changelog: ./bin/generate
-  checksum: 10/d35f1e611e39bb02f51ed3dcd940909487dfbe931865e70897e46f95ed5a9a1d5b7f4534cdfe48af6a56477bbcde9d9e4d7c9a360208f401c2978973f87cb8d7
-  languageName: node
-  linkType: hard
-
 "generator-function@npm:^2.0.0":
   version: 2.0.1
   resolution: "generator-function@npm:2.0.1"
@@ -18596,13 +18575,6 @@ __metadata:
   version: 0.0.0
   resolution: "github-from-package@npm:0.0.0"
   checksum: 10/2a091ba07fbce22205642543b4ea8aaf068397e1433c00ae0f9de36a3607baf5bcc14da97fbb798cfca6393b3c402031fca06d8b491a44206d6efef391c58537
-  languageName: node
-  linkType: hard
-
-"github-url-from-git@npm:^1.4.0":
-  version: 1.5.0
-  resolution: "github-url-from-git@npm:1.5.0"
-  checksum: 10/928d401865f850e76dec5e604e8aad110c0e7c221362356830e5037332ec3d1c0678b6c0b2dbd6f4df0e8a34a9cd69f85dee1d4c5256bd465b5e61a1c758d23c
   languageName: node
   linkType: hard
 
@@ -32507,7 +32479,6 @@ __metadata:
     "@types/eslint": "npm:9.6.1"
     "@types/eslint-plugin-jsx-a11y": "npm:6.10.1"
     "@types/fs-extra": "npm:11.0.4"
-    "@types/generate-changelog": "npm:1.8.3"
     "@types/jest": "npm:30.0.0"
     "@types/js-yaml": "npm:4.0.9"
     "@types/jsdom": "npm:28.0.3"
@@ -32542,7 +32513,6 @@ __metadata:
     eslint-plugin-unused-imports: "npm:4.4.1"
     fake-indexeddb: "npm:6.2.5"
     fs-extra: "npm:11.4.0"
-    generate-changelog: "npm:1.8.0"
     http-status-codes: "npm:2.3.0"
     jest: "npm:30.4.2"
     jest-environment-jsdom: "npm:30.4.1"
