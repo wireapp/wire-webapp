@@ -51,7 +51,7 @@ const resolveObservables = <C extends keyof Subscribables<P>, P extends Partial<
  */
 const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
   object: P,
-  onUpdate: (updates: Partial<UnwrappedValues<P>>) => void,
+  onUpdate: (updates: Partial<UnwrappedValues<Pick<P, C>>>) => void,
   children?: C[],
 ) => {
   const properties = children ?? (Object.keys(object).filter(key => key !== '$raw') as C[]);
@@ -62,7 +62,7 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
     .map(child => {
       const subscribable = object[child];
       return subscribable?.subscribe((value: SubscribableValue<typeof subscribable>) => {
-        onUpdate({[child]: value} as Partial<UnwrappedValues<P>>);
+        onUpdate({[child]: value} as Partial<UnwrappedValues<Pick<P, C>>>);
       });
     });
 
