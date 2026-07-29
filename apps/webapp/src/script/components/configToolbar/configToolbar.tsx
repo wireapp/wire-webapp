@@ -34,6 +34,7 @@ import {CoreCryptoLogLevel} from 'Util/debugUtil';
 import {getLogger} from 'Util/logger';
 
 import {wrapperStyles} from './configToolbar.styles';
+import {openDebugToolbarEventName} from './debugToolbarEvents';
 
 const logger = getLogger('ConfigToolbar');
 
@@ -83,6 +84,13 @@ export function ConfigToolbar() {
   const [notificationDumpToMode, setNotificationDumpToMode] = useState<NotificationDumpToMode>('now');
   const [notificationDumpToDate, setNotificationDumpToDate] = useState(() => toDateInputValue(new Date()));
   const [isDownloadingNotifications, setIsDownloadingNotifications] = useState(false);
+
+  useEffect(() => {
+    const openToolbar = () => setShowConfig(true);
+    window.addEventListener(openDebugToolbarEventName, openToolbar);
+
+    return () => window.removeEventListener(openDebugToolbarEventName, openToolbar);
+  }, []);
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {

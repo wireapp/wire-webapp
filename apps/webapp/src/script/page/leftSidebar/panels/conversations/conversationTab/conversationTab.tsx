@@ -26,12 +26,16 @@ interface ConversationTabProps {
   label?: string;
   type: SidebarTabs;
   conversationTabIndex: number;
-  onChangeTab: (tab: SidebarTabs) => void;
+  onChangeTab: (tab: SidebarTabs, event: React.MouseEvent<HTMLButtonElement>) => void;
   Icon: JSX.Element;
   unreadConversations?: number;
   dataUieName: string;
   isActive?: boolean;
   showNotificationsBadge?: boolean;
+  onMouseEnter?: React.MouseEventHandler<HTMLButtonElement>;
+  onMouseLeave?: React.MouseEventHandler<HTMLButtonElement>;
+  onFocus?: React.FocusEventHandler<HTMLButtonElement>;
+  onBlur?: React.FocusEventHandler<HTMLButtonElement>;
 }
 
 export const ConversationTab = ({
@@ -45,6 +49,10 @@ export const ConversationTab = ({
   dataUieName,
   isActive = false,
   showNotificationsBadge = false,
+  onMouseEnter,
+  onMouseLeave,
+  onFocus,
+  onBlur,
 }: ConversationTabProps) => {
   return (
     <button
@@ -52,7 +60,11 @@ export const ConversationTab = ({
       type="button"
       role="tab"
       className={cx(`conversations-sidebar-btn`, {active: isActive})}
-      onClick={() => onChangeTab(type)}
+      onClick={event => onChangeTab(type, event)}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onFocus={onFocus}
+      onBlur={onBlur}
       title={title}
       data-uie-name={dataUieName}
       data-uie-status={isActive ? 'active' : 'inactive'}
