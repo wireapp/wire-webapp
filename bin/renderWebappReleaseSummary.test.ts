@@ -212,13 +212,14 @@ describe('WebApp release summary renderer', () => {
         ...baselineWebappReleaseSummaryInput.preparation,
         branchAction: Maybe.just('reused'),
         sourceCommitSha: Maybe.nothing<string>(),
+        sourceRef: Maybe.nothing<string>(),
       },
     };
     const summary = renderWebappReleaseSummary(input);
     const visibleContent = visibleSummary(summary);
     const detailsContent = technicalEvidence(summary);
 
-    expect(detailsContent).toContain('- Branch creation source: main');
+    expect(detailsContent).toContain('- Branch creation source: not applicable; existing release branch was reused');
     expect(detailsContent).toContain(
       '- Commit used to create the release branch: not applicable; existing release branch was reused',
     );

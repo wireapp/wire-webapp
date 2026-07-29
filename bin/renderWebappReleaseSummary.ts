@@ -341,6 +341,24 @@ function formatReleaseBranchPreparationNote(branchAction: Maybe<ReleaseBranchAct
   );
 }
 
+function formatBranchCreationSource(input: WebappReleaseSummaryInput): string {
+  return input.preparation.branchAction.mapOrElse(
+    () => {
+      return formatValueOrFallback(input.preparation.sourceRef);
+    },
+    branchAction => {
+      return match(branchAction)
+        .with('created', () => {
+          return formatValueOrFallback(input.preparation.sourceRef);
+        })
+        .with('reused', () => {
+          return 'not applicable; existing release branch was reused';
+        })
+        .exhaustive();
+    },
+  );
+}
+
 function formatSourceCommit(input: WebappReleaseSummaryInput): string {
   return input.preparation.branchAction.mapOrElse(
     () => {
@@ -1145,7 +1163,7 @@ function renderReleasePreparationSection(input: WebappReleaseSummaryInput): stri
     `- Release identifier: ${formatValueOrFallback(input.release.identifier)}`,
     `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
     `- Branch action: ${formatReleaseBranchAction(input.preparation.branchAction)}`,
-    `- Branch creation source: ${formatValueOrFallback(input.preparation.sourceRef)}`,
+    `- Branch creation source: ${formatBranchCreationSource(input)}`,
     `- Commit used to create the release branch: ${sourceCommitLink}`,
     `- Authoritative release commit: ${commitLink}`,
     `- Branch preparation: ${formatReleaseBranchPreparationNote(input.preparation.branchAction)}`,

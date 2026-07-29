@@ -146,8 +146,8 @@ jobs:
 
           release_branch_remote_ref="refs/remotes/origin/${RELEASE_BRANCH}"
           release_branch_action=''
+          source_ref=''
           source_commit_sha=''
-          source_ref='main'
 
           if git ls-remote --exit-code --heads origin "${RELEASE_BRANCH}" > /dev/null; then
             release_branch_action='reused'
@@ -159,6 +159,7 @@ jobs:
               exit "${ls_remote_exit_code}"
             fi
 
+            source_ref='main'
             source_commit_sha="${GITHUB_SHA}"
 
             if ! git rev-parse --verify "${source_commit_sha}^{commit}" > /dev/null; then
@@ -177,6 +178,7 @@ jobs:
               fi
 
               release_branch_action='reused'
+              source_ref=''
               source_commit_sha=''
             fi
           fi
