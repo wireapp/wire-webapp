@@ -28,7 +28,7 @@ flowchart LR
   hostedDevEnvironment[Hosted Dev<br/>Staging backend]
   developmentDistribution[Publish dev Docker image and Helm chart<br/>Update wire-builds/dev]
   runReleaseWebApp[Run Release WebApp]
-  prepareReleaseBranch[Prepare release branch<br/>Resolve one exact source commit]
+  prepareReleaseBranch[Prepare release branch<br/>Create from dispatch commit or reuse current head]
   releaseBranch[release/YYYY-MM-DD.N]
   releaseArtifact[Release artifact]
   betaEnvironment[Beta company validation<br/>Production backend]
@@ -103,10 +103,11 @@ The release identifier uses the release branch name: `YYYY-MM-DD.N`. The full id
 
 The WebApp release process is:
 
-- `Release WebApp` is the single user-facing normal-release entrypoint. The release captain supplies a release identifier in `YYYY-MM-DD.N` format; the workflow derives `release/YYYY-MM-DD.N` and performs branch preparation, hosted deployment, validation, approval, and release distribution.
-- When the derived release branch does not exist, `Release WebApp` resolves the requested `source_ref` to one exact remote commit, creates the branch at that commit without force-pushing, refetches it, and verifies the resulting remote head. If another run wins the creation race, the workflow resolves and reuses the actual remote branch.
-- When the derived release branch already exists, its current remote head is authoritative. The workflow reuses that branch without moving it to `source_ref`, current `main`, or any other commit. Reviewed fixes may therefore update an active release branch before a later candidate run.
-- Repeated dispatches with the same identifier reuse the release branch and build its current head, producing subsequent Beta candidates such as `YYYY-MM-DD.N-beta.2`. A new identifier is required to release a newer state of `main`.
+- `Release WebApp` is the single user-facing normal-release entrypoint and must be manually started with GitHub's `Use workflow from: main` selector. Its dispatch form has no configurable source-branch input; the release captain supplies only a release identifier in `YYYY-MM-DD.N` format, release confirmation, and an optional reason. The workflow derives `release/YYYY-MM-DD.N` and performs branch preparation, hosted deployment, validation, approval, and release distribution.
+- When the derived release branch does not exist, `Release WebApp` creates it from the exact `GITHUB_SHA` selected for that manual workflow run on `main`, without force-pushing, refetches it, and verifies the resulting remote head. The workflow does not resolve a later moving `main` head, so the branch remains based on the dispatch commit even if `main` advances while the run waits or is rerun. If another run wins the creation race, the workflow resolves and reuses the actual remote branch.
+- When the derived release branch already exists, its current remote head is authoritative. The workflow reuses that branch without merging, resetting, rebasing, force-pushing, or otherwise applying the selected `main` commit. Reviewed fixes may therefore update an active release branch through reviewed pull requests targeting that release branch before a later candidate run.
+- Repeated dispatches with the same identifier reuse the release branch's current head and build it exactly as it exists, producing subsequent Beta candidates such as `YYYY-MM-DD.N-beta.2`. A new identifier is required to release a newer state of `main`.
+- Every confirmed normal release follows the complete release path: Beta deployment and runtime verification, Beta tagging, the blocking E2E deployment/runtime gate and Testiny reporting, Production preflight and explicit Production Environment approval, Production deployment and runtime verification, Production tagging, and Docker, Helm, and `wire-builds/main` distribution.
 - Hosted Beta and hosted Production are deployment stages operated by Wire. E2E remains a blocking release gate, and Production approval remains explicit through the `wire-webapp-prod` GitHub Environment.
 - Docker, Helm, and `wire-builds/main` form the release distribution consumed by hosted and customer-managed deployments. Release distribution is part of the complete WebApp release lifecycle, not merely a hosted deployment detail.
 - The standalone branch-creation workflow no longer exists. `Release WebApp` is intentionally started explicitly; branch preparation and the complete release lifecycle are one auditable workflow operation.

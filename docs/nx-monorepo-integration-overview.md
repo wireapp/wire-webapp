@@ -34,7 +34,6 @@ These commands are exposed as root npm scripts in [`package.json`](package.json)
 {
   "scripts": {
     "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
-    "deploy": "nx run server:package && eb deploy",
     "docker": "nx run workspace-tools:docker",
     "release": "nx release",
     "release:dry-run": "nx release --dry-run",
@@ -919,7 +918,7 @@ The deployment includes:
 
 **Deployment Artifacts:**
 
-The final `ebs.zip` file is uploaded to AWS Elastic Beanstalk via the `eb deploy` command (defined in [`package.json`](package.json) as `deploy` script).
+The final `ebs.zip` file is consumed by the maintained GitHub Actions deployment workflows for their target environments. The repository does not expose a local Elastic Beanstalk deployment script.
 
 ### Edge Cases and Troubleshooting
 

@@ -10,13 +10,8 @@ on:
         description: 'Release identifier in YYYY-MM-DD.N format, for example 2026-07-18.1'
         required: true
         type: string
-      source_ref:
-        description: 'Source branch used only when the release branch does not already exist'
-        required: true
-        default: main
-        type: string
       confirm_release:
-        description: 'Confirm the complete WebApp release: create or reuse the release branch, validate Beta and E2E, then continue to Production approval and distribution'
+        description: 'I understand that this creates or reuses the release branch, automatically deploys and verifies Beta, runs the blocking E2E gate, and then waits for separate Production approval before deploying Production and publishing the release'
         required: true
         default: false
         type: boolean
@@ -65,7 +60,6 @@ jobs:
     outputs:
       release_identifier: ${{ steps.validate_request.outputs.release_identifier }}
       release_branch: ${{ steps.validate_request.outputs.release_branch }}
-      source_ref: ${{ steps.validate_request.outputs.source_ref }}
 
     steps:
       - name: Checkout workflow tools
@@ -73,6 +67,16 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
+
+      - name: Validate workflow ref
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]; then
+            echo 'Release WebApp must be started with "Use workflow from: main".' >&2
+            echo "Received workflow ref: ${GITHUB_REF}" >&2
+            exit 1
+          fi
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -91,7 +95,6 @@ jobs:
         env:
           CONFIRM_RELEASE: ${{ inputs.confirm_release }}
           RELEASE_IDENTIFIER: ${{ inputs.release_identifier }}
-          SOURCE_REF: ${{ inputs.source_ref }}
         run: |
           set -euo pipefail
 
@@ -100,32 +103,11 @@ jobs:
             exit 1
           fi
 
-          if [[ -z "${SOURCE_REF//[[:space:]]/}" ]]; then
-            echo 'source_ref must not be empty.' >&2
-            exit 1
-          fi
-
-          if [[ "${SOURCE_REF}" == refs/* || "${SOURCE_REF}" == origin/* ]]; then
-            echo "source_ref must be a branch name like main or release/YYYY-MM-DD.N, not a fully qualified or remote-style ref: ${SOURCE_REF}" >&2
-            exit 1
-          fi
-
-          if [[ "${SOURCE_REF}" == -* ]]; then
-            echo "source_ref must not begin with '-': ${SOURCE_REF}" >&2
-            exit 1
-          fi
-
-          if ! git check-ref-format --branch "${SOURCE_REF}" > /dev/null; then
-            echo "source_ref must be a valid branch name: ${SOURCE_REF}" >&2
-            exit 1
-          fi
-
           release_branch="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts release-branch "${RELEASE_IDENTIFIER}")"
 
           {
             echo "release_identifier=${RELEASE_IDENTIFIER}"
             echo "release_branch=${release_branch}"
-            echo "source_ref=${SOURCE_REF}"
           } >> "$GITHUB_OUTPUT"
 
   prepare_release_branch:
@@ -152,18 +134,19 @@ jobs:
         with:
           persist-credentials: true
           fetch-depth: 1
+          ref: ${{ github.sha }}
 
       - name: Prepare release branch
         id: prepare_release_branch
         env:
           RELEASE_BRANCH: ${{ needs.validate_request.outputs.release_branch }}
           RELEASE_IDENTIFIER: ${{ needs.validate_request.outputs.release_identifier }}
-          SOURCE_REF: ${{ needs.validate_request.outputs.source_ref }}
         run: |
           set -euo pipefail
 
           release_branch_remote_ref="refs/remotes/origin/${RELEASE_BRANCH}"
           release_branch_action=''
+          source_ref=''
           source_commit_sha=''
 
           if git ls-remote --exit-code --heads origin "${RELEASE_BRANCH}" > /dev/null; then
@@ -176,8 +159,13 @@ jobs:
               exit "${ls_remote_exit_code}"
             fi
 
-            git fetch --no-tags origin "+refs/heads/${SOURCE_REF}:refs/remotes/origin/${SOURCE_REF}"
-            source_commit_sha="$(git rev-parse "refs/remotes/origin/${SOURCE_REF}^{commit}")"
+            source_ref='main'
+            source_commit_sha="${GITHUB_SHA}"
+
+            if ! git rev-parse --verify "${source_commit_sha}^{commit}" > /dev/null; then
+              echo "The workflow dispatch commit is not available in the local repository: ${source_commit_sha}" >&2
+              exit 1
+            fi
 
             if git push origin "${source_commit_sha}:refs/heads/${RELEASE_BRANCH}"; then
               release_branch_action='created'
@@ -190,6 +178,7 @@ jobs:
               fi
 
               release_branch_action='reused'
+              source_ref=''
               source_commit_sha=''
             fi
           fi
@@ -207,7 +196,7 @@ jobs:
             echo "release_branch=${RELEASE_BRANCH}"
             echo "release_commit_sha=${release_commit_sha}"
             echo "release_branch_action=${release_branch_action}"
-            echo "source_ref=${SOURCE_REF}"
+            echo "source_ref=${source_ref}"
             echo "source_commit_sha=${source_commit_sha}"
           } >> "$GITHUB_OUTPUT"
 

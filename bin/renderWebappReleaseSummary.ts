@@ -331,10 +331,28 @@ function formatReleaseBranchPreparationNote(branchAction: Maybe<ReleaseBranchAct
     actualAction => {
       return match(actualAction)
         .with('created', () => {
-          return 'The release branch was created from the resolved source commit.';
+          return 'The release branch was created from the exact main commit selected when the workflow was started.';
         })
         .with('reused', () => {
-          return 'The existing release branch was reused and was not moved to source_ref.';
+          return 'The existing release branch head was reused. The selected main commit was not merged, reset, or applied.';
+        })
+        .exhaustive();
+    },
+  );
+}
+
+function formatBranchCreationSource(input: WebappReleaseSummaryInput): string {
+  return input.preparation.branchAction.mapOrElse(
+    () => {
+      return formatValueOrFallback(input.preparation.sourceRef);
+    },
+    branchAction => {
+      return match(branchAction)
+        .with('created', () => {
+          return formatValueOrFallback(input.preparation.sourceRef);
+        })
+        .with('reused', () => {
+          return 'not applicable; existing release branch was reused';
         })
         .exhaustive();
     },
@@ -352,7 +370,7 @@ function formatSourceCommit(input: WebappReleaseSummaryInput): string {
           return formatCommitLink(input.preparation.sourceCommitSha, input.github);
         })
         .with('reused', () => {
-          return 'not applicable; existing branch was reused';
+          return 'not applicable; existing release branch was reused';
         })
         .exhaustive();
     },
@@ -1145,8 +1163,8 @@ function renderReleasePreparationSection(input: WebappReleaseSummaryInput): stri
     `- Release identifier: ${formatValueOrFallback(input.release.identifier)}`,
     `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
     `- Branch action: ${formatReleaseBranchAction(input.preparation.branchAction)}`,
-    `- Source ref: ${formatValueOrFallback(input.preparation.sourceRef)}`,
-    `- Source commit used for creation: ${sourceCommitLink}`,
+    `- Branch creation source: ${formatBranchCreationSource(input)}`,
+    `- Commit used to create the release branch: ${sourceCommitLink}`,
     `- Authoritative release commit: ${commitLink}`,
     `- Branch preparation: ${formatReleaseBranchPreparationNote(input.preparation.branchAction)}`,
     `- Actor: ${formatValueOrFallback(input.github.actor)}`,
