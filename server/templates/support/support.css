@@ -2765,6 +2765,10 @@ table th {
   widows: 2;
   text-align: left;
 }
+.c9:has(> span > img) {
+  display: flex;
+  align-items: center;
+}
 .c23 {
   margin-left: 36pt;
   padding-top: 0pt;
@@ -3155,7 +3159,7 @@ table th {
   margin: 0;
 }
 .c138 {
-  max-width: 468pt;
+  max-width: 600pt;
   padding: 16pt 16pt 16pt 16pt;
 }
 .c126 {
@@ -3452,4 +3456,45 @@ h6 {
   orphans: 2;
   widows: 2;
   text-align: left;
+}
+
+/* Responsive overrides for mobile viewports */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+span[style*='width'] {
+  max-width: 100% !important;
+}
+table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 600px) {
+  .c138 {
+    max-width: 100% !important;
+    padding: 16px !important;
+  }
+  body.doc-content {
+    margin-top: 16px !important;
+  }
+}
+
+/* Use Calibri as the site-wide font */
+* {
+  font-family: 'Calibri', 'Arial', sans-serif !important;
 }
