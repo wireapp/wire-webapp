@@ -17,13 +17,24 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {contentStyles} from './meeting.styles';
+import {meetingsContentWrapperStyles} from './MeetingCallingView/meetingCallingView.styles';
 
-export const contentStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  flexDirection: 'column',
-  flex: 1,
-  minHeight: 0,
-  overflowY: 'auto',
-};
+describe('meeting layout styles', () => {
+  it('sizes the meeting list from the available parent height', () => {
+    expect(contentStyles).toMatchObject({
+      flex: 1,
+      minHeight: 0,
+      overflowY: 'auto',
+    });
+    expect(JSON.stringify(contentStyles)).not.toContain('100vh');
+  });
+
+  it('allows the meetings wrapper to shrink within the main content column', () => {
+    expect(meetingsContentWrapperStyles).toMatchObject({
+      flex: 1,
+      minHeight: 0,
+      height: '100%',
+    });
+  });
+});

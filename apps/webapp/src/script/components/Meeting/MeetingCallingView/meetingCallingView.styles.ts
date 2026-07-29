@@ -32,6 +32,7 @@ export const meetingsContentWrapperStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
+  minHeight: 0,
   height: '100%',
   position: 'relative',
 };
