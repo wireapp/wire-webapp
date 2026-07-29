@@ -78,16 +78,14 @@ describe('submitDeleteMeeting', () => {
     resetInFlightDeleteMeetingsForTest();
   });
 
-  const createSubmitDeps = (
-    overrides: {
-      deleteMeetingForAll?: jest.Mock;
-      deleteMeetingForMe?: jest.Mock;
-      removeMeetingByQualifiedId?: jest.Mock;
-      loadMeetings?: jest.Mock;
-      wallClock: ReturnType<typeof createDeterministicWallClock>;
-      selfUser?: User | undefined;
-    },
-  ) => ({
+  const createSubmitDeps = (overrides: {
+    deleteMeetingForAll?: jest.Mock;
+    deleteMeetingForMe?: jest.Mock;
+    removeMeetingByQualifiedId?: jest.Mock;
+    loadMeetings?: jest.Mock;
+    wallClock: ReturnType<typeof createDeterministicWallClock>;
+    selfUser?: User | undefined;
+  }) => ({
     meetingInstance: createMeetingInstance(),
     mode: 'forAll' as const,
     selfUser: 'selfUser' in overrides ? overrides.selfUser : createSelfUser(),

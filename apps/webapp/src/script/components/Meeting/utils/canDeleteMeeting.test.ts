@@ -79,29 +79,19 @@ describe('canDeleteMeetingForAll', () => {
   it('allows host delete when the meeting has not started', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(
-      canDeleteMeetingForAll(meetingInstance, createSelfUser(), futureNowMilliseconds),
-    ).toBe(true);
+    expect(canDeleteMeetingForAll(meetingInstance, createSelfUser(), futureNowMilliseconds)).toBe(true);
   });
 
   it('disallows host delete when the meeting has started', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(
-      canDeleteMeetingForAll(meetingInstance, createSelfUser(), ongoingNowMilliseconds),
-    ).toBe(false);
+    expect(canDeleteMeetingForAll(meetingInstance, createSelfUser(), ongoingNowMilliseconds)).toBe(false);
   });
 
   it('disallows delete for non-host users', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(
-      canDeleteMeetingForAll(
-        meetingInstance,
-        createSelfUser('invitee-id'),
-        futureNowMilliseconds,
-      ),
-    ).toBe(false);
+    expect(canDeleteMeetingForAll(meetingInstance, createSelfUser('invitee-id'), futureNowMilliseconds)).toBe(false);
   });
 });
 
@@ -109,20 +99,12 @@ describe('canDeleteMeetingForMe', () => {
   it('allows participant delete when the meeting is not past', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(
-      canDeleteMeetingForMe(
-        meetingInstance,
-        createSelfUser('invitee-id'),
-        futureNowMilliseconds,
-      ),
-    ).toBe(true);
+    expect(canDeleteMeetingForMe(meetingInstance, createSelfUser('invitee-id'), futureNowMilliseconds)).toBe(true);
   });
 
   it('disallows delete for the host', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(
-      canDeleteMeetingForMe(meetingInstance, createSelfUser(), futureNowMilliseconds),
-    ).toBe(false);
+    expect(canDeleteMeetingForMe(meetingInstance, createSelfUser(), futureNowMilliseconds)).toBe(false);
   });
 });
