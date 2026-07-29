@@ -89,7 +89,7 @@ Beta preserves the previous company-facing Staging release-candidate behavior: i
 
 Automated E2E must never run against Production backend services or create test users in Production. The release workflow deploys the exact Beta artifact to the dedicated `wire-webapp-precommit-3` validation environment, verifies that its runtime configuration uses Staging backend services, then runs E2E there with disposable Staging users and test data. Beta, precommit validation, and Production use the same built artifact; their differences are runtime environment configuration, not rebuilt application artifacts.
 
-A Beta candidate may be promoted when validation is complete and no known release-blocking issues remain. Production receives only the exact artifact validated on Beta. Production promotion remains an explicit decision through GitHub Environment approval; the absence of reported issues does not automatically deploy Beta to Production.
+After successful Hosted Beta and E2E validation, every normal WebApp release advances to the `wire-webapp-prod` GitHub Environment approval gate. This does not deploy automatically: Hosted Production still requires explicit human approval, and any failed release gate prevents the approval step from being reached. Production receives only the exact artifact validated on Beta.
 
 The branch model is:
 
@@ -133,7 +133,7 @@ The WebApp release process is:
 - Successful E2E and Testiny reporting are required before Production promotion.
 - Production preflight is not allowed after any E2E failure, and QA approval cannot override a technically failed E2E gate in this workflow.
 - Failed release gates use the WebApp release failure notification with stage evidence and Playwright report links when available.
-- After a successful E2E gate and Production preflight, `Release WebApp` notifies Deployoholics that the candidate passed and reports whether hosted Production is ready for approval, unnecessary because the release is already tagged, or not requested. Notification delivery is informational and does not gate the release. The reusable precommit workflow's optional failure notification remains disabled to prevent duplicate failure messages.
+- After a successful E2E gate and Production preflight, `Release WebApp` notifies Deployoholics that the candidate passed and reports whether hosted Production is ready for approval or unnecessary because the release is already tagged. Notification delivery is informational and does not gate the release. The reusable precommit workflow's optional failure notification remains disabled to prevent duplicate failure messages.
 - The production deployment job waits for GitHub Environment approval on the production environment.
 - GitHub Environment approval means the workflow pauses before using the production environment until configured reviewers approve or reject the deployment in GitHub.
 - Quality assurance owns the go/no-go quality gate.
@@ -145,7 +145,7 @@ The WebApp release process is:
 - Backend configuration is runtime state and is not inferred from build identity. Beta, precommit, and Production must each satisfy their expected combination of build version, source commit, REST backend, and WebSocket backend.
 - A successful deployment operation alone does not create a Production tag. The workflow creates the production tag `YYYY-MM-DD.N-production` only after all Production runtime assertions pass, so the tag represents a successfully deployed and verified runtime.
 - The hosted-deployment EBS artifact is built once and promoted unchanged through hosted Beta, E2E, and hosted Production.
-- A Production-capable run also preserves the exact public build outputs needed by the Dockerfile. The public Docker image is built from those outputs, from the same release commit, without rebuilding the application.
+- Every normal WebApp release preserves the exact public build outputs needed by the Dockerfile. The public Docker image is built from those outputs, from the same release commit, without rebuilding the application.
 - Docker and Helm publication starts only after Production deployment and runtime verification succeed and the immutable Production tag has been created.
 - `wire-builds/main` is updated only after the immutable image and Helm chart have been published or reused and verified.
 - A Production tag represents verified hosted Production deployment. The release is fully distributed only after the `wire-builds/main` update succeeds.
