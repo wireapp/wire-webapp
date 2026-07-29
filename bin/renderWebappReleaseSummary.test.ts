@@ -192,6 +192,45 @@ function assertOptionalProductionPromotionTermsAreAbsent(summary: string): void 
 }
 
 describe('WebApp release summary renderer', () => {
+  it('documents the exact main commit used to create a release branch', () => {
+    const summary = renderWebappReleaseSummary(baselineWebappReleaseSummaryInput);
+    const detailsContent = technicalEvidence(summary);
+
+    expect(detailsContent).toContain('- Branch creation source: main');
+    expect(detailsContent).toContain(
+      `- Commit used to create the release branch: [${sourceCommitSha}](https://github.com/wireapp/wire-webapp/commit/${sourceCommitSha})`,
+    );
+    expect(detailsContent).toContain(
+      'The release branch was created from the exact main commit selected when the workflow was started.',
+    );
+  });
+
+  it('documents that an existing release branch head is reused without applying main', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      preparation: {
+        ...baselineWebappReleaseSummaryInput.preparation,
+        branchAction: Maybe.just('reused'),
+        sourceCommitSha: Maybe.nothing<string>(),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+    const visibleContent = visibleSummary(summary);
+    const detailsContent = technicalEvidence(summary);
+
+    expect(detailsContent).toContain('- Branch creation source: main');
+    expect(detailsContent).toContain(
+      '- Commit used to create the release branch: not applicable; existing release branch was reused',
+    );
+    expect(detailsContent).toContain(
+      'The existing release branch head was reused. The selected main commit was not merged, reset, or applied.',
+    );
+    expect(visibleContent).toContain(`- Hosted Beta: deployed and verified successfully - tag [${betaTagName}]`);
+    expect(visibleContent).toContain('- E2E system gate: passed successfully - [Playwright report]');
+    expect(visibleContent).toContain('- Hosted Production: not run because Production preflight did not run');
+    expect(visibleContent).toContain('- Release distribution: not run');
+  });
+
   it('reports an unexpected skipped Production preflight as an incomplete release', () => {
     const summary = renderWebappReleaseSummary(baselineWebappReleaseSummaryInput);
     const visibleContent = visibleSummary(summary);
@@ -649,7 +688,7 @@ describe('WebApp release summary renderer', () => {
     expect(visibleSummary(finalSummary)).toContain('- Commit: not available');
     expect(technicalEvidence(finalSummary)).toContain('- Artifact name: not available');
     expect(technicalEvidence(finalSummary)).toContain('- Artifact checksum: not available');
-    expect(technicalEvidence(finalSummary)).toContain('- Source commit used for creation: not available');
+    expect(technicalEvidence(finalSummary)).toContain('- Commit used to create the release branch: not available');
   });
 
   it('keeps an optional manual reason in Release preparation evidence only', () => {
