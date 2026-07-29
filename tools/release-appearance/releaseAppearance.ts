@@ -106,11 +106,17 @@ type ParsedMarkerTag = {
   readonly releaseIdentifier: string;
 };
 
+type ParseOptionalMarkerTagOptions = {
+  readonly parsedMarkerState: ReleaseAppearanceState;
+  readonly markerFieldName: 'beta' | 'production';
+  readonly parseTag: (tagName: string) => ReleaseAppearanceResult<Pick<ParsedMarkerTag, 'releaseIdentifier'>>;
+};
+
 function parseOptionalMarkerTag(
-  parsedMarkerState: ReleaseAppearanceState,
-  markerFieldName: 'beta' | 'production',
-  parseTag: (tagName: string) => ReleaseAppearanceResult<Pick<ParsedMarkerTag, 'releaseIdentifier'>>,
+  parseOptionalMarkerTagOptions: ParseOptionalMarkerTagOptions,
 ): ReleaseAppearanceResult<Maybe<ParsedMarkerTag>> {
+  const {parsedMarkerState, markerFieldName, parseTag} = parseOptionalMarkerTagOptions;
+
   return Maybe.of(parsedMarkerState[markerFieldName]).match({
     Just(markerFieldValue) {
       const parsedTagResult = parseTag(markerFieldValue);
@@ -190,12 +196,20 @@ function parseMarkerState(markerJson: string): ReleaseAppearanceResult<ReleaseAp
     return createFailure(parsedMarkerStateResult.error.message);
   }
 
-  const betaTagResult = parseOptionalMarkerTag(parsedMarkerStateResult.value, 'beta', parseBetaCandidateTag);
+  const betaTagResult = parseOptionalMarkerTag({
+    parsedMarkerState: parsedMarkerStateResult.value,
+    markerFieldName: 'beta',
+    parseTag: parseBetaCandidateTag,
+  });
   if (betaTagResult.isErr) {
     return createFailure(betaTagResult.error.message);
   }
 
-  const productionTagResult = parseOptionalMarkerTag(parsedMarkerStateResult.value, 'production', parseProductionTag);
+  const productionTagResult = parseOptionalMarkerTag({
+    parsedMarkerState: parsedMarkerStateResult.value,
+    markerFieldName: 'production',
+    parseTag: parseProductionTag,
+  });
   if (productionTagResult.isErr) {
     return createFailure(productionTagResult.error.message);
   }
