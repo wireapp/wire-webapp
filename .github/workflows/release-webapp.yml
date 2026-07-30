@@ -478,6 +478,52 @@ jobs:
 
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
 
+  comment_beta_release_appearances:
+    name: Comment Beta release appearances
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, create_beta_tag]
+    if: ${{ needs.create_beta_tag.result == 'success' }}
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+
+    steps:
+      - name: Checkout release history
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Add Beta release appearance comments
+        env:
+          BETA_TAG: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+        run: |
+          node \
+            tools/release-appearance/releaseAppearanceCommand.ts \
+            beta \
+            "${BETA_TAG}" \
+            "${RELEASE_COMMIT_SHA}"
+
   summarize_beta_release:
     name: Summarize Beta release
     runs-on: ubuntu-24.04
@@ -801,6 +847,54 @@ jobs:
           git push origin "refs/tags/$PRODUCTION_TAG_NAME"
 
           echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "$GITHUB_OUTPUT"
+
+  comment_production_release_appearances:
+    name: Comment Production release appearances
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, create_beta_tag, create_production_tag]
+    if: ${{ needs.create_production_tag.result == 'success' }}
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+
+    steps:
+      - name: Checkout release history
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Add Production release appearance comments
+        env:
+          BETA_TAG: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PRODUCTION_TAG: ${{ needs.create_production_tag.outputs.production_tag_name }}
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+        run: |
+          node \
+            tools/release-appearance/releaseAppearanceCommand.ts \
+            production \
+            "${PRODUCTION_TAG}" \
+            "${RELEASE_COMMIT_SHA}" \
+            "${BETA_TAG}"
 
   publish_production_distribution:
     name: Publish Production distribution
