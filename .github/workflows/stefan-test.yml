@@ -37,6 +37,9 @@ jobs:
           echo "Helm version:"
           helm version
 
+          echo "Logging in to Quay with Helm..."
+          echo "${{ secrets.WEBTEAM_QUAY_PASSWORD }}" | helm registry login -u "${{ secrets.WEBTEAM_QUAY_USERNAME }}" --password-stdin quay.io
+
           echo "Attempting to push chart..."
           helm_output=$(helm push ./webapp-*.tgz oci://quay.io/wire/charts/dev/webapp 2>&1) || {
             echo "Helm push failed with exit code $?"
