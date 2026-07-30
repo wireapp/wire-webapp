@@ -272,6 +272,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   return (
     <>
       <FadingScrollbar
+        data-uie-uid={conversation.epoch}
         ref={messageListRef}
         id="message-list"
         className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}

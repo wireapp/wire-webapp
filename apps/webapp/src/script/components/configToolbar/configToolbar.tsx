@@ -31,8 +31,11 @@ import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureTog
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
+import {getLogger} from 'Util/logger';
 
 import {wrapperStyles} from './configToolbar.styles';
+
+const logger = getLogger('ConfigToolbar');
 
 export function createLocationUrl(pathname: string, search: string, hash: string): string {
   return `${pathname}${search}${hash}`;
@@ -60,6 +63,7 @@ export function ConfigToolbar() {
   const alphabeticallySortedStartupFeatureToggleNames = startupFeatureToggleNames.toSorted();
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
+  const [isAdvancingEpoch, setIsAdvancingEpoch] = useState(false);
   const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() ?? false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
   const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
@@ -126,7 +130,7 @@ export function ConfigToolbar() {
         });
         messageCountRef.current++;
       } catch (error: unknown) {
-        console.error('Error sending message:', error);
+        logger.error('Error sending message:', error);
       }
 
       if (isActive) {
@@ -382,9 +386,20 @@ export function ConfigToolbar() {
     try {
       await window.wire?.app?.debug?.resetMLSConversation();
     } catch (error: unknown) {
-      console.error('Error resetting MLS conversation:', error);
+      logger.error('Error resetting MLS conversation:', error);
     } finally {
       setIsResettingMLSConversation(false);
+    }
+  };
+
+  const advanceEpoch = async () => {
+    setIsAdvancingEpoch(true);
+    try {
+      await window.wire?.app?.debug?.updateActiveConversationKeyPackages();
+    } catch (error: unknown) {
+      logger.error('Error advancing epoch:', error);
+    } finally {
+      setIsAdvancingEpoch(false);
     }
   };
 
@@ -408,7 +423,7 @@ export function ConfigToolbar() {
 
       await window.wire?.app?.debug?.downloadNotificationsDump(from, to);
     } catch (error: unknown) {
-      console.error('Error downloading notifications dump:', error);
+      logger.error('Error downloading notifications dump:', error);
     } finally {
       setIsDownloadingNotifications(false);
     }
@@ -496,6 +511,9 @@ export function ConfigToolbar() {
       </Button>
       <Button disabled={isResettingMLSConversation} onClick={resetMLSConversation}>
         Reset MLS Conversation
+      </Button>
+      <Button disabled={isAdvancingEpoch} onClick={advanceEpoch}>
+        {isAdvancingEpoch ? 'Advancing Epoch…' : 'Advance Epoch'}
       </Button>
       <Button onClick={() => window.wire?.app?.debug?.refreshE2EIRevocationData()}>Force CRL expiry</Button>
 
