@@ -62,7 +62,7 @@ jobs:
           cat > build.json <<EOF
           {
             "branch": "${{ env.BRANCH_NAME }}",
-            "ref": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
+            "commit": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
             "tag": "${{ env.IMAGE_TAG }}",
             "digest": "${{ env.CHART_DIGEST }}",
             "repository": "${{ env.CHART_REPO }}"
