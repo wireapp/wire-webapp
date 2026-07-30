@@ -19,6 +19,7 @@
 
 import {useEffect, useMemo, useRef} from 'react';
 
+import {MEETING_EVENT, type MeetingEvent} from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -30,6 +31,7 @@ import {MeetingCallingView} from 'Components/Meeting/MeetingCallingView/meetingC
 import {meetingsContentWrapperStyles} from 'Components/Meeting/MeetingCallingView/meetingCallingView.styles';
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
+import {useMeetingNotificationStore} from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
 import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider, useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {MeetNowModal} from 'Components/Meeting/meetNowModal/meetNowModal';
@@ -38,6 +40,7 @@ import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/Meeting/shared
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/Meeting/shared/service/meetingService';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 const MeetingsContent = () => {
   const {fireAndForgetInvoker} = useApplicationContext();
@@ -47,6 +50,7 @@ const MeetingsContent = () => {
   const hasLoadError = useMeetingStore(state => state.hasLoadError);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
   const removeMeetingByQualifiedId = useMeetingStore(state => state.removeMeetingByQualifiedId);
+  const addNotification = useMeetingNotificationStore(state => state.addNotification);
   const selfUser = container.resolve(UserState).self();
 
   useEffect(() => {
@@ -54,16 +58,29 @@ const MeetingsContent = () => {
   }, [loadMeetings, fireAndForgetInvoker]);
 
   useEffect(() => {
+    const getMeetingTitle = (meetingId: QualifiedId) =>
+      meetingSeries.find(meeting => matchQualifiedIds(meeting.qualified_id, meetingId))?.title ?? 'Meeting Title';
+
+    const onMeetingEvent = (event: MeetingEvent) => {
+      const kind = event.type === MEETING_EVENT.CREATE ? 'invite' : 'update';
+      addNotification({kind, meetingTitle: getMeetingTitle(event.qualified_id)});
+    };
+
     const onMeetingDeleted = (meetingId: QualifiedId) => {
+      addNotification({kind: 'cancelled', meetingTitle: getMeetingTitle(meetingId)});
       removeMeetingByQualifiedId(meetingId);
     };
 
+    amplify.subscribe(MEETING_EVENT.CREATE, onMeetingEvent);
+    amplify.subscribe(MEETING_EVENT.UPDATE, onMeetingEvent);
     amplify.subscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
 
     return () => {
+      amplify.unsubscribe(MEETING_EVENT.CREATE, onMeetingEvent);
+      amplify.unsubscribe(MEETING_EVENT.UPDATE, onMeetingEvent);
       amplify.unsubscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
     };
-  }, [removeMeetingByQualifiedId]);
+  }, [addNotification, meetingSeries, removeMeetingByQualifiedId]);
 
   return (
     <div css={meetingsContentWrapperStyles}>

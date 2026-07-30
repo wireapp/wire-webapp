@@ -34,6 +34,7 @@ import {ChooseScreen} from 'Components/calling/ChooseScreen';
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {ConfigToolbar} from 'Components/configToolbar/configToolbar';
 import {ErrorFallback} from 'Components/errorFallback';
+import {MeetingNotificationHost} from 'Components/Meeting/meetingNotificationHost/meetingNotificationHost';
 import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
 import {FileHistoryModal} from 'Components/Modals/FileHistoryModal/FileHistoryModal';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
@@ -330,6 +331,7 @@ export const AppMain = (properties: AppMainProps) => {
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <ForceReloadModal reloadApplication={app.refresh} />
         {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
+        <MeetingNotificationHost />
         {!locked && (
           <div
             id="app"

@@ -17,13 +17,14 @@
  *
  */
 
-import {useState, useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import keyboardjs from 'keyboardjs';
 import {container} from 'tsyringe';
 
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
+import {useMeetingNotificationStore} from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
 import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/featureToggles/startupFeatureToggleNames';
@@ -490,6 +491,27 @@ export function ConfigToolbar() {
       <h3>Debug Functions</h3>
 
       <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>Reconnect WebSocket</Button>
+      <Button
+        onClick={() =>
+          useMeetingNotificationStore.getState().addNotification({kind: 'invite', meetingTitle: 'Meeting Title'})
+        }
+      >
+        Show Invite Meeting Notification
+      </Button>
+      <Button
+        onClick={() =>
+          useMeetingNotificationStore.getState().addNotification({kind: 'update', meetingTitle: 'Meeting Title'})
+        }
+      >
+        Show Update Meeting Notification
+      </Button>
+      <Button
+        onClick={() =>
+          useMeetingNotificationStore.getState().addNotification({kind: 'cancelled', meetingTitle: 'Meeting Title'})
+        }
+      >
+        Show Cancelled Meeting Notification
+      </Button>
       <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>Enable Press Space To Unmute</Button>
       <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>
         Disable Press Space To Unmute
