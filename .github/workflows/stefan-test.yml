@@ -21,6 +21,11 @@ jobs:
           echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_ENV
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
+          CHART_REPO_BASE="quay.io/wire/charts/dev"
+          CHART_REPO="$CHART_REPO_BASE/webapp"
+          echo "CHART_REPO_BASE=$CHART_REPO_BASE" >> $GITHUB_ENV
+          echo "CHART_REPO=$CHART_REPO" >> $GITHUB_ENV
+
       - name: Set up ORAS
         uses: oras-project/setup-oras@v1
 
@@ -41,7 +46,7 @@ jobs:
           echo "${{ secrets.WEBTEAM_QUAY_PASSWORD }}" | helm registry login -u "${{ secrets.WEBTEAM_QUAY_USERNAME }}" --password-stdin quay.io
 
           echo "Attempting to push chart..."
-          helm_output=$(helm push ./webapp-*.tgz oci://quay.io/wire/charts/dev 2>&1) || {
+          helm_output=$(helm push ./webapp-*.tgz oci://${{ env.CHART_REPO_BASE }} 2>&1) || {
             echo "Helm push failed with exit code $?"
             echo "Output: $helm_output"
             exit 1
@@ -59,7 +64,7 @@ jobs:
             "ref": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
             "tag": "${{ env.IMAGE_TAG }}",
             "digest": "${{ env.CHART_DIGEST }}",
-            "repository": "quay.io/wire/charts/dev/webapp"
+            "repository": "${{ env.CHART_REPO }}"
           }
           EOF
           cat build.json
