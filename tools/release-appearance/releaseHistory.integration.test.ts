@@ -134,7 +134,7 @@ async function createTemporaryGitRepository(scenario: TemporaryRepositoryScenari
 }
 
 describe('release history planning with real Git repositories', (): void => {
-  test('ignores legacy tags and bootstraps without a new-format Production baseline', async (): Promise<void> => {
+  it('ignores legacy tags and bootstraps without a new-format Production baseline', async (): Promise<void> => {
     await createTemporaryGitRepository(async (repositoryPath, executeGitCommand): Promise<void> => {
       const rootCommit = await createCommit({
         repositoryPath,
@@ -182,7 +182,7 @@ describe('release history planning with real Git repositories', (): void => {
     });
   });
 
-  test('starts Beta candidate 1 at the preceding Production tag', async (): Promise<void> => {
+  it('starts Beta candidate 1 at the preceding Production tag', async (): Promise<void> => {
     await createTemporaryGitRepository(async (repositoryPath, executeGitCommand): Promise<void> => {
       const productionCommit = await createCommit({
         repositoryPath,
@@ -225,7 +225,7 @@ describe('release history planning with real Git repositories', (): void => {
     });
   });
 
-  test('starts Beta candidate 2 at candidate 1 and includes only new commits', async (): Promise<void> => {
+  it('starts Beta candidate 2 at candidate 1 and includes only new commits', async (): Promise<void> => {
     await createTemporaryGitRepository(async (repositoryPath, executeGitCommand): Promise<void> => {
       const productionCommit = await createCommit({
         repositoryPath,
@@ -276,7 +276,7 @@ describe('release history planning with real Git repositories', (): void => {
     });
   });
 
-  test('selects Beta candidate 9 before candidate 10 numerically', async (): Promise<void> => {
+  it('selects Beta candidate 9 before candidate 10 numerically', async (): Promise<void> => {
     await createTemporaryGitRepository(async (repositoryPath, executeGitCommand): Promise<void> => {
       const productionCommit = await createCommit({
         repositoryPath,
@@ -326,7 +326,7 @@ describe('release history planning with real Git repositories', (): void => {
     });
   });
 
-  test('selects the preceding Production tag by taggerdate even on a sibling branch', async (): Promise<void> => {
+  it('selects the preceding Production tag by taggerdate even on a sibling branch', async (): Promise<void> => {
     await createTemporaryGitRepository(async (repositoryPath, executeGitCommand): Promise<void> => {
       const rootCommit = await createCommit({
         repositoryPath,
@@ -408,7 +408,7 @@ describe('release history planning with real Git repositories', (): void => {
     });
   });
 
-  test('returns ordered Production ranges for every Beta candidate through the promoted candidate', async (): Promise<void> => {
+  it('returns ordered Production ranges for every Beta candidate through the promoted candidate', async (): Promise<void> => {
     await createTemporaryGitRepository(async (repositoryPath, executeGitCommand): Promise<void> => {
       const productionCommit = await createCommit({
         repositoryPath,
@@ -501,7 +501,7 @@ describe('release history planning with real Git repositories', (): void => {
     });
   });
 
-  test('rejects a promoted Beta tag that does not point to the Production commit', async (): Promise<void> => {
+  it('rejects a promoted Beta tag that does not point to the Production commit', async (): Promise<void> => {
     await createTemporaryGitRepository(async (repositoryPath, executeGitCommand): Promise<void> => {
       const productionCommit = await createCommit({
         repositoryPath,
@@ -554,7 +554,7 @@ describe('release history planning with real Git repositories', (): void => {
     });
   });
 
-  test('rejects lightweight new-format release tags clearly', async (): Promise<void> => {
+  it('rejects lightweight new-format release tags clearly', async (): Promise<void> => {
     await createTemporaryGitRepository(async (repositoryPath, executeGitCommand): Promise<void> => {
       const productionCommit = await createCommit({
         repositoryPath,

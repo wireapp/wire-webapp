@@ -25,14 +25,14 @@ import {
 } from './releaseAppearanceMarkerSchema.ts';
 
 describe('release appearance marker schema', (): void => {
-  test('accepts a valid Beta marker state', (): void => {
+  it('accepts a valid Beta marker state', (): void => {
     const actualResult = parseReleaseAppearanceMarkerState('{"beta":"2026-07-21.3-beta.1"}');
 
     assert(actualResult.isOk);
     expect(actualResult.value).toStrictEqual({beta: '2026-07-21.3-beta.1'});
   });
 
-  test('accepts a valid Beta and Production marker state', (): void => {
+  it('accepts a valid Beta and Production marker state', (): void => {
     const actualResult = releaseAppearanceMarkerStateSchema.safeParse({
       beta: '2026-07-21.3-beta.1',
       production: '2026-07-21.3-production',
@@ -45,22 +45,20 @@ describe('release appearance marker schema', (): void => {
     });
   });
 
-  test('rejects invalid JSON', (): void => {
+  it('rejects invalid JSON', (): void => {
     const invalidJsonResult = parseReleaseAppearanceMarkerState('{"beta":}');
 
     assert(invalidJsonResult.isErr);
   });
 
-  test.each([
-    '{"beta":null}',
-    '{"beta":3}',
-    '{"beta":"2026-07-21-beta.1"}',
-    '{"production":"2026-07-21-production.1"}',
-  ])('rejects invalid marker state %s', (invalidState): void => {
-    assert(parseReleaseAppearanceMarkerState(invalidState).isErr);
-  });
+  it.each(['{"beta":null}', '{"beta":3}', '{"beta":"2026-07-21-beta.1"}', '{"production":"2026-07-21-production.1"}'])(
+    'rejects invalid marker state %s',
+    (invalidState): void => {
+      assert(parseReleaseAppearanceMarkerState(invalidState).isErr);
+    },
+  );
 
-  test('rejects unknown fields because the marker state schema is strict', (): void => {
+  it('rejects unknown fields because the marker state schema is strict', (): void => {
     const actualResult = releaseAppearanceMarkerStateSchema.safeParse({
       beta: '2026-07-21.3-beta.1',
       edge: '2026-07-21.3',

@@ -17,15 +17,29 @@
  *
  */
 
-module.exports = {
-  rootDir: '..',
-  testEnvironment: 'node',
-  testMatch: ['<rootDir>/bin/**/*.test.ts', '<rootDir>/tools/**/*.test.ts'],
-  moduleNameMapper: {
-    '^@enormora/objectory$': '<rootDir>/node_modules/@enormora/objectory/main.js',
-  },
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', {configFile: './apps/server/babel.config.js'}],
-  },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|ky|@enormora/objectory)/)'],
-};
+import {z} from 'zod';
+
+const githubPullRequestBaseSchema = z
+  .object({
+    ref: z.string(),
+  })
+  .passthrough();
+
+export const githubPullRequestResponseSchema = z
+  .object({
+    number: z.number().int().positive(),
+    merged_at: z.string().nullable(),
+    base: githubPullRequestBaseSchema,
+  })
+  .passthrough();
+
+export const githubPullRequestPageResponseSchema = z.array(githubPullRequestResponseSchema);
+
+export const githubIssueCommentResponseSchema = z
+  .object({
+    id: z.number().int().positive(),
+    body: z.string(),
+  })
+  .passthrough();
+
+export const githubIssueCommentPageResponseSchema = z.array(githubIssueCommentResponseSchema);
