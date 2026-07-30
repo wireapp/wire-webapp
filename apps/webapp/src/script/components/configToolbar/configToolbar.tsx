@@ -31,8 +31,11 @@ import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureTog
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
+import {getLogger} from 'Util/logger';
 
 import {wrapperStyles} from './configToolbar.styles';
+
+const logger = getLogger('ConfigToolbar');
 
 export function createLocationUrl(pathname: string, search: string, hash: string): string {
   return `${pathname}${search}${hash}`;
@@ -127,7 +130,7 @@ export function ConfigToolbar() {
         });
         messageCountRef.current++;
       } catch (error: unknown) {
-        console.error('Error sending message:', error);
+        logger.error('Error sending message:', error);
       }
 
       if (isActive) {
@@ -383,7 +386,7 @@ export function ConfigToolbar() {
     try {
       await window.wire?.app?.debug?.resetMLSConversation();
     } catch (error: unknown) {
-      console.error('Error resetting MLS conversation:', error);
+      logger.error('Error resetting MLS conversation:', error);
     } finally {
       setIsResettingMLSConversation(false);
     }
@@ -394,7 +397,7 @@ export function ConfigToolbar() {
     try {
       await window.wire?.app?.debug?.updateActiveConversationKeyPackages();
     } catch (error: unknown) {
-      console.error('Error advancing epoch:', error);
+      logger.error('Error advancing epoch:', error);
     } finally {
       setIsAdvancingEpoch(false);
     }
@@ -420,7 +423,7 @@ export function ConfigToolbar() {
 
       await window.wire?.app?.debug?.downloadNotificationsDump(from, to);
     } catch (error: unknown) {
-      console.error('Error downloading notifications dump:', error);
+      logger.error('Error downloading notifications dump:', error);
     } finally {
       setIsDownloadingNotifications(false);
     }
