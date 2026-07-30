@@ -1332,7 +1332,7 @@
   "meetings.scheduleModal.previousMonthAriaLabel": "Предыдущий месяц",
   "meetings.scheduleModal.recurrence.daily": "Ежедневно",
   "meetings.scheduleModal.recurrence.doesNotRepeat": "Не повторять",
-  "meetings.scheduleModal.recurrence.everyFourWeeks": "Every four weeks",
+  "meetings.scheduleModal.recurrence.everyFourWeeks": "Каждые четыре недели",
   "meetings.scheduleModal.recurrence.everyTwoWeeks": "Каждые две недели",
   "meetings.scheduleModal.recurrence.weekly": "Еженедельно",
   "meetings.scheduleModal.repeatsLabel": "Повторы",
