@@ -298,7 +298,7 @@ describe('TitleBar', () => {
 
       const {queryByText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
 
-      expect(queryByText('guestRoomConversationBadgeService')).toBeInTheDocument();
+      expect(queryByText('guestRoomConversationBadgeApps')).toBeInTheDocument();
     },
   );
 });

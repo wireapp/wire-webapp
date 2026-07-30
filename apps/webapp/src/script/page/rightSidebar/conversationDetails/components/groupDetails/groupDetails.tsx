@@ -47,8 +47,8 @@ const GroupDetails: FC<GroupDetailsProps> = ({
 
   const hasMultipleServiceParticipants = serviceParticipants.length > 1;
   const participantsServiceText = hasMultipleServiceParticipants
-    ? translate('conversationDetailsParticipantsServicesMany')
-    : translate('conversationDetailsParticipantsServicesOne');
+    ? translate('conversationDetailsParticipantsAppsMany')
+    : translate('conversationDetailsParticipantsAppsOne');
 
   return (
     <>

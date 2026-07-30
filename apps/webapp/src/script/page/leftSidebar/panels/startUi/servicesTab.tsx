@@ -79,7 +79,7 @@ export const ServicesTab = ({
                   <span className="left-column-icon">
                     <Icon.ServiceIcon />
                   </span>
-                  <span className="column-center">{translate('searchManageServices')}</span>
+                  <span className="column-center">{translate('searchManageApps')}</span>
                 </button>
               </li>
             </ul>
@@ -97,7 +97,7 @@ export const ServicesTab = ({
           {canManageServices && manageServicesUrl ? (
             <>
               <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
-                {translate('searchNoServicesManager')}
+                {translate('searchNoAppsManager')}
               </div>
 
               <Button
@@ -107,12 +107,12 @@ export const ServicesTab = ({
                 data-uie-name="go-enable-services"
                 style={{marginTop: '1em'}}
               >
-                {translate('searchManageServicesNoResults')}
+                {translate('searchManageAppsNoResults')}
               </Button>
             </>
           ) : (
             <div className="search__no-services__info" data-uie-name="label-no-services-enabled">
-              {translate('searchNoServicesMember')}
+              {translate('searchNoAppsMember')}
             </div>
           )}
         </div>

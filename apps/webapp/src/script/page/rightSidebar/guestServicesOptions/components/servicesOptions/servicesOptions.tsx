@@ -61,7 +61,7 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
   const displayAppsToggle = isAppsFeatureEnabled || isServicesEnabled;
 
   const toggleServicesAccessState = () => {
-    toggleAccessState(ACCESS_TYPES.SERVICE, translate('modalConversationRemoveServicesMessage'), hasService);
+    toggleAccessState(ACCESS_TYPES.SERVICE, translate('modalConversationRemoveAppsMessage'), hasService);
   };
 
   return (
@@ -71,14 +71,14 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
           isChecked={isServicesEnabled}
           setIsChecked={toggleServicesAccessState}
           isDisabled={isToggleDisabled}
-          infoText={translate('servicesRoomToggleInfo')}
-          toggleName={translate('servicesOptionsTitle')}
+          infoText={translate('appsRoomToggleInfo')}
+          toggleName={translate('appsOptionsTitle')}
           toggleId="services"
         />
       ) : (
         <>
-          <h4>{translate('servicesNotEnabledNoteTitle')}</h4>
-          <p>{translate('servicesNotEnabledBody')}</p>
+          <h4>{translate('appsNotEnabledNoteTitle')}</h4>
+          <p>{translate('appsNotEnabledBody')}</p>
         </>
       )}
     </div>
