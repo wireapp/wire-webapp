@@ -34,6 +34,6 @@ jobs:
       - name: Publish to Quay with ORAS
         run: |
           oras push \
-            oci://quay.io/wire/release-streams/webapp:${{ env.BRANCH_NAME }} \
+            quay.io/wire/release-streams/webapp:${{ env.BRANCH_NAME }} \
             build.json:application/vnd.wire.webapp.build+json
 
