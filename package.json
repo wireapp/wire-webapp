@@ -1,12 +1,15 @@
 {
   "dependencies": {
+    "@sindresorhus/is": "4.6.0",
     "axios": "1.18.1",
     "dotenv": "16.6.1",
     "dotenv-extended": "2.9.0",
     "fs-extra": "11.4.0",
     "http-status-codes": "2.3.0",
+    "ky": "2.0.2",
     "logdown": "3.3.1",
     "long": "5.3.2",
+    "true-myth": "9.4.0",
     "ts-pattern": "5.9.0",
     "tslib": "2.8.1",
     "uuid": "14.0.0",
@@ -59,7 +62,6 @@
     "jest-environment-jsdom": "30.4.1",
     "js-yaml": "4.3.0",
     "jsdom": "29.1.1",
-    "ky": "2.0.2",
     "nock": "14.0.16",
     "nx": "22.7.7",
     "playwright": "1.61.1",
