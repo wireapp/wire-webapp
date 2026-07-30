@@ -11,19 +11,42 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set branch name
+      - name: Set branch name and generate versions
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
           echo "BRANCH_NAME=${BRANCH//\//-}" >> $GITHUB_ENV
 
+          CHART_VERSION="0.0.0-$(date +%s)"
+          IMAGE_TAG="v1.0.0-$(openssl rand -hex 4)"
+          echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
       - name: Set up ORAS
         uses: oras-project/setup-oras@v1
+
+      - name: Publish Helm chart
+        shell: bash
+        run: |
+          set -eo pipefail
+
+          chart_patched="$(yq -Mr ".version = \"${{ env.CHART_VERSION }}\" | .appVersion = \"${{ env.IMAGE_TAG }}\"" ./charts/webapp/Chart.yaml)"
+          echo "$chart_patched" > ./charts/webapp/Chart.yaml
+
+          helm package ./charts/webapp
+
+          helm_output=$(helm push ./webapp-*.tgz oci://quay.io/wire/charts/dev/webapp 2>&1)
+          echo "$helm_output"
+
+          digest=$(echo "$helm_output" | grep -oP 'sha256:\K[a-f0-9]{64}' | head -1)
+          echo "CHART_DIGEST=$digest" >> $GITHUB_ENV
 
       - name: Create build artifact
         run: |
           cat > build.json <<EOF
           {
-            "ref": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
+            "ref": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
+            "tag": "${{ env.IMAGE_TAG }}",
+            "digest": "${{ env.CHART_DIGEST }}"
           }
           EOF
           cat build.json
