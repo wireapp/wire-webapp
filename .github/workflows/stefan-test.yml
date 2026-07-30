@@ -1,0 +1,38 @@
+name: Stefan Test
+
+on:
+  push:
+    branches:
+      - smatting/push-to-quay
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set branch name
+        run: |
+          echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Set up ORAS
+        uses: oras-project/setup-oras@v1
+
+      - name: Create build artifact
+        run: |
+          cat > build.json <<EOF
+          {
+            "ref": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
+          }
+          EOF
+          cat build.json
+
+      - name: Login to Quay
+        run: echo "${{ secrets.WEBTEAM_QUAY_PASSWORD }}" | oras login -u "${{ secrets.WEBTEAM_QUAY_USERNAME }}" --password-stdin quay.io
+
+      - name: Publish to Quay with ORAS
+        run: |
+          oras push \
+            oci://quay.io/wire/release-streams/webapp:${{ env.BRANCH_NAME }} \
+            build.json:application/vnd.wire.webapp.build+json
+
