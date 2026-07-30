@@ -1,9 +1,7 @@
 name: Stefan Test
 
 on:
-  push:
-    branches:
-      - smatting/push-to-quay
+  workflow_dispatch:
 
 jobs:
   test:
