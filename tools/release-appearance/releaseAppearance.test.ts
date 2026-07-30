@@ -32,7 +32,7 @@ import {
 import type {ReleaseAppearanceState} from './releaseAppearance.ts';
 
 describe('release appearance', (): void => {
-  test('parses a valid Beta candidate tag', (): void => {
+  it('parses a valid Beta candidate tag', (): void => {
     const actualResult = parseBetaCandidateTag('2026-07-21.3-beta.10');
 
     assert(actualResult.isOk);
@@ -44,7 +44,7 @@ describe('release appearance', (): void => {
     expect(actualValue).toStrictEqual(expectedValue);
   });
 
-  test.each([
+  it.each([
     '2026-07-21-beta.1',
     '2026-07-21.3-beta.0',
     '2026-07-21.3-beta.01',
@@ -55,7 +55,7 @@ describe('release appearance', (): void => {
     assert(parseBetaCandidateTag(invalidBetaTag).isErr);
   });
 
-  test('parses a valid Production tag', (): void => {
+  it('parses a valid Production tag', (): void => {
     const actualResult = parseProductionTag('2026-07-21.3-production');
 
     assert(actualResult.isOk);
@@ -64,7 +64,7 @@ describe('release appearance', (): void => {
     expect(actualValue).toStrictEqual(expectedValue);
   });
 
-  test.each([
+  it.each([
     '2026-07-21-production.1',
     '2026-07-21.0-production',
     '2026-07-21.3-beta.1',
@@ -74,7 +74,7 @@ describe('release appearance', (): void => {
     assert(parseProductionTag(invalidProductionTag).isErr);
   });
 
-  test('compares Beta candidates by numeric candidate number', (): void => {
+  it('compares Beta candidates by numeric candidate number', (): void => {
     const betaNineResult = parseBetaCandidateTag('2026-07-21.3-beta.9');
     const betaTenResult = parseBetaCandidateTag('2026-07-21.3-beta.10');
 
@@ -84,7 +84,7 @@ describe('release appearance', (): void => {
     expect(compareBetaCandidates(betaTenResult.value, betaNineResult.value)).toBe(1);
   });
 
-  test('validates that Beta and Production tags belong to the same release', (): void => {
+  it('validates that Beta and Production tags belong to the same release', (): void => {
     const betaCandidateResult = parseBetaCandidateTag('2026-07-21.3-beta.1');
     const matchingProductionTagResult = parseProductionTag('2026-07-21.3-production');
     const differentProductionTagResult = parseProductionTag('2026-07-22.1-production');
@@ -100,7 +100,7 @@ describe('release appearance', (): void => {
     assert(validateSameReleaseIdentifier(betaCandidateResult.value, differentProductionTagResult.value).isErr);
   });
 
-  test('creates the first Beta appearance comment', (): void => {
+  it('creates the first Beta appearance comment', (): void => {
     const betaState: ReleaseAppearanceState = {beta: '2026-07-21.3-beta.1'};
     const actualResult = mergeReleaseAppearanceComments([], betaState);
 
@@ -112,7 +112,7 @@ describe('release appearance', (): void => {
     expect(actualValue[0]).toMatch(/\| Production \| Not yet deployed \|/);
   });
 
-  test('adds Production to an existing Beta appearance', (): void => {
+  it('adds Production to an existing Beta appearance', (): void => {
     const existingComments = [renderPersistentComment({beta: '2026-07-21.3-beta.1'})];
     const desiredReleaseState: ReleaseAppearanceState = {production: '2026-07-21.3-production'};
 
@@ -128,7 +128,7 @@ describe('release appearance', (): void => {
     expect(actualValue).toStrictEqual(expectedValue);
   });
 
-  test('preserves an existing Beta value while filling another missing value', (): void => {
+  it('preserves an existing Beta value while filling another missing value', (): void => {
     const existingState: ReleaseAppearanceState = {beta: '2026-07-21.3-beta.1'};
     const desiredState: ReleaseAppearanceState = {
       beta: '2026-07-21.3-beta.2',
@@ -144,7 +144,7 @@ describe('release appearance', (): void => {
     expect(actualState).toStrictEqual(expectedState);
   });
 
-  test('preserves an existing Production value', (): void => {
+  it('preserves an existing Production value', (): void => {
     const existingState: ReleaseAppearanceState = {production: '2026-07-21.3-production'};
     const desiredState: ReleaseAppearanceState = {production: '2026-07-21.3-production'};
 
@@ -153,7 +153,7 @@ describe('release appearance', (): void => {
     expect(actualState).toBe(existingState);
   });
 
-  test('returns unchanged state and comments when nothing is missing', (): void => {
+  it('returns unchanged state and comments when nothing is missing', (): void => {
     const existingState: ReleaseAppearanceState = {
       beta: '2026-07-21.3-beta.1',
       production: '2026-07-21.3-production',
@@ -169,7 +169,7 @@ describe('release appearance', (): void => {
     expect(actualResult.value).toBe(existingComments);
   });
 
-  test('ignores unrelated comments while updating the persistent comment', (): void => {
+  it('ignores unrelated comments while updating the persistent comment', (): void => {
     const unrelatedComment = 'This discussion comment is unrelated to release appearance.';
     const existingComments = [unrelatedComment, renderPersistentComment({beta: '2026-07-21.3-beta.1'})];
     const desiredState: ReleaseAppearanceState = {production: '2026-07-21.3-production'};
@@ -181,7 +181,7 @@ describe('release appearance', (): void => {
     expect(actualResult.value[1]).toMatch(/\| Production \| `2026-07-21\.3-production` \|/);
   });
 
-  test.each([
+  it.each([
     '<!-- wire-webapp-release-appearance:v1\n{"beta":"legacy-2026-07-21-beta.1"}\n-->',
     '<!-- wire-webapp-release-appearance:v1\n{"beta":}\n-->',
     '<!-- wire-webapp-release-appearance:v1\n{"beta":"2026-07-21.3-beta.1","production":"2026-07-22.1-production"}\n-->',
@@ -189,13 +189,13 @@ describe('release appearance', (): void => {
     assert(parsePersistentMarkerComment(malformedComment).isErr);
   });
 
-  test('rejects unsupported marker versions', (): void => {
+  it('rejects unsupported marker versions', (): void => {
     const unsupportedMarkerComment = '<!-- wire-webapp-release-appearance:v2\n{"beta":"2026-07-21.3-beta.1"}\n-->';
 
     assert(parsePersistentMarkerComment(unsupportedMarkerComment).isErr);
   });
 
-  test('rejects duplicate marker comments', (): void => {
+  it('rejects duplicate marker comments', (): void => {
     const markerComment = renderPersistentComment({beta: '2026-07-21.3-beta.1'});
     const duplicateComments = [markerComment, markerComment];
 
