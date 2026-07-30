@@ -34,11 +34,20 @@ jobs:
 
           helm package ./charts/webapp
 
-          helm_output=$(helm push ./webapp-*.tgz oci://quay.io/wire/charts/dev/webapp 2>&1)
+          echo "Helm version:"
+          helm version
+
+          echo "Attempting to push chart..."
+          helm_output=$(helm push ./webapp-*.tgz oci://quay.io/wire/charts/dev/webapp 2>&1) || {
+            echo "Helm push failed with exit code $?"
+            echo "Output: $helm_output"
+            exit 1
+          }
           echo "$helm_output"
 
           digest=$(echo "$helm_output" | grep -oP 'sha256:\K[a-f0-9]{64}' | head -1)
           echo "CHART_DIGEST=$digest" >> $GITHUB_ENV
+          echo "Extracted digest: $digest"
 
       - name: Create build artifact
         run: |
