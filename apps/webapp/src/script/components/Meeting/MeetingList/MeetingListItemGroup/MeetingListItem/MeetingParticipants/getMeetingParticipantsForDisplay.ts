@@ -20,5 +20,10 @@
 import type {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-export const getMeetingParticipantsForDisplay = (participants: User[], selfUser: User): User[] =>
-  participants.filter(participant => !matchQualifiedIds(participant.qualifiedId, selfUser.qualifiedId));
+export const getMeetingParticipantsForDisplay = (participants: User[], selfUser: User): User[] => {
+  const otherParticipants = participants.filter(
+    participant => !matchQualifiedIds(participant.qualifiedId, selfUser.qualifiedId),
+  );
+
+  return [selfUser, ...otherParticipants];
+};
