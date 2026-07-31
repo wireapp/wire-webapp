@@ -183,6 +183,57 @@ test('plans Beta history when the annotated tag points to the supplied commit', 
   });
 });
 
+test('plans only the delta introduced by the current Beta candidate', async () => {
+  await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+    await createProductionBaseline(repositoryPath);
+    const betaOneCommit = await createCommit({
+      repositoryPath,
+      fileName: 'beta-one.txt',
+      fileContents: 'beta one',
+      commitDate: '2026-01-02T00:00:00+0000',
+    });
+    const betaOneTag = '2026-01-02.1-beta.1';
+    await createAnnotatedTag({
+      repositoryPath,
+      tagName: betaOneTag,
+      commit: betaOneCommit,
+      taggerDate: '2026-01-02T01:00:00+0000',
+    });
+    const betaTwoCommit = await createCommit({
+      repositoryPath,
+      fileName: 'beta-two.txt',
+      fileContents: 'beta two',
+      commitDate: '2026-01-03T00:00:00+0000',
+    });
+    const betaTwoTag = '2026-01-02.1-beta.2';
+    await createAnnotatedTag({
+      repositoryPath,
+      tagName: betaTwoTag,
+      commit: betaTwoCommit,
+      taggerDate: '2026-01-03T01:00:00+0000',
+    });
+
+    const actualResult = await planBetaReleaseHistory({
+      executeGitCommand,
+      currentBetaTag: betaTwoTag,
+      releaseCommit: betaTwoCommit,
+    });
+
+    assert(actualResult.isOk);
+    assert.equal(actualResult.value.kind, 'beta');
+    if (actualResult.value.kind !== 'beta') {
+      assert.fail('Expected a Beta history plan');
+    }
+    assert.equal(actualResult.value.precedingTag, betaOneTag);
+    assert.equal(actualResult.value.commitRange.startTag, betaOneTag);
+    assert.equal(actualResult.value.commitRange.endTag, betaTwoTag);
+    assert.equal(actualResult.value.commitRange.baseCommit, betaOneCommit);
+    assert.equal(actualResult.value.commitRange.endCommit, betaTwoCommit);
+    assert.deepStrictEqual(actualResult.value.commitRange.commits, [betaTwoCommit]);
+    assert.equal(actualResult.value.commitRange.commits.includes(betaOneCommit), false);
+  });
+});
+
 test('rejects a Beta tag that does not point to the supplied commit', async () => {
   await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
     await createProductionBaseline(repositoryPath);
