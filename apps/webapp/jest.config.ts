@@ -37,6 +37,7 @@ const esmPackagesToTransform = [
   'uuid',
   '@enormora/objectory',
   '@enormora/wall-clock',
+  '@sindresorhus/is',
 ];
 
 const config: Config = {
