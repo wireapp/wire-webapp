@@ -38,18 +38,21 @@ import {planBetaReleaseHistory, planProductionReleaseHistory} from './releaseHis
 import type {CommitRange, ExecuteGitCommand, ReleaseHistoryPlan} from './releaseHistory.ts';
 
 export type ReleaseAppearanceCommandStage = 'beta' | 'production';
+export type ExecutionMode = 'write' | 'dry-run';
 
 export type ParsedCommand =
   | {
       readonly stage: 'beta';
       readonly releaseTag: string;
       readonly releaseCommit: string;
+      readonly executionMode: ExecutionMode;
     }
   | {
       readonly stage: 'production';
       readonly releaseTag: string;
       readonly releaseCommit: string;
       readonly promotedBetaTag: string;
+      readonly executionMode: ExecutionMode;
     };
 
 export type CommandEnvironment = {
@@ -104,16 +107,24 @@ type PullRequestFailure = {
   readonly message: string;
 };
 
+type PlannedCommentOperation = {
+  readonly pullRequestNumber: number;
+  readonly kind: CommentOperation['kind'];
+};
+
 type ProcessingResult = {
   readonly commentsCreated: number;
   readonly commentsUpdated: number;
   readonly commentsUnchanged: number;
+  readonly plannedCommentOperations: readonly PlannedCommentOperation[];
   readonly failures: readonly PullRequestFailure[];
 };
 
 type SummaryOptions = {
+  readonly executionMode: ExecutionMode;
   readonly stage: ReleaseAppearanceCommandStage;
   readonly releaseTag: string;
+  readonly releaseCommit: string;
   readonly bootstrap: boolean;
   readonly precedingProductionTag: string;
   readonly candidateRanges: readonly DiscoveryRange[];
@@ -123,6 +134,7 @@ type SummaryOptions = {
   readonly commentsCreated: number;
   readonly commentsUpdated: number;
   readonly commentsUnchanged: number;
+  readonly plannedCommentOperations: readonly PlannedCommentOperation[];
   readonly generalFailureMessages: readonly string[];
   readonly pullRequestFailures: readonly PullRequestFailure[];
 };
@@ -141,6 +153,7 @@ const stageArgumentIndex = 0;
 const releaseTagArgumentIndex = 1;
 const releaseCommitArgumentIndex = 2;
 const promotedBetaTagArgumentIndex = 3;
+const dryRunFlag = '--dry-run';
 const fullGitCommitPattern = /^[0-9a-f]{40}$/i;
 
 function createSuccess<valueType>(value: valueType): Result<valueType, Error> {
@@ -176,8 +189,28 @@ function formatPullRequestFailure(pullRequestFailure: PullRequestFailure): strin
 
 function usageFailure(): Result<ParsedCommand, Error> {
   return createFailure(
-    'Usage: beta <beta-tag> <release-commit-sha> or production <production-tag> <release-commit-sha> <promoted-beta-tag>',
+    'Usage: beta <beta-tag> <release-commit-sha> [--dry-run] or production <production-tag> <release-commit-sha> <promoted-beta-tag> [--dry-run]',
   );
+}
+
+function parseExecutionMode(
+  commandLineArguments: readonly string[],
+  writeArgumentCount: number,
+): Result<ExecutionMode, Error> {
+  if (commandLineArguments.length === writeArgumentCount) {
+    return createSuccess('write');
+  }
+
+  const dryRunFlagArgument = Maybe.of(commandLineArguments[writeArgumentCount]);
+  if (
+    commandLineArguments.length === writeArgumentCount + 1 &&
+    dryRunFlagArgument.isJust &&
+    dryRunFlagArgument.value === dryRunFlag
+  ) {
+    return createSuccess('dry-run');
+  }
+
+  return createFailure('Dry-run mode requires exactly one final --dry-run argument');
 }
 
 function readRequiredArgument(
@@ -203,18 +236,24 @@ function readReleaseCommit(commandLineArguments: readonly string[]): Result<stri
   );
 }
 
-function parseBetaCommand(commandLineArguments: readonly string[]): Result<ParsedCommand, Error> {
+function parseBetaCommand(
+  commandLineArguments: readonly string[],
+  executionMode: ExecutionMode,
+): Result<ParsedCommand, Error> {
   const betaTagResult = readRequiredArgument(commandLineArguments, releaseTagArgumentIndex, 'Beta tag');
   if (betaTagResult.isErr) {
     return createFailure(betaTagResult.error.message);
   }
 
   return readReleaseCommit(commandLineArguments).map(releaseCommit => {
-    return {stage: 'beta', releaseTag: betaTagResult.value, releaseCommit};
+    return {stage: 'beta', releaseTag: betaTagResult.value, releaseCommit, executionMode};
   });
 }
 
-function parseProductionCommand(commandLineArguments: readonly string[]): Result<ParsedCommand, Error> {
+function parseProductionCommand(
+  commandLineArguments: readonly string[],
+  executionMode: ExecutionMode,
+): Result<ParsedCommand, Error> {
   const productionTagResult = readRequiredArgument(commandLineArguments, releaseTagArgumentIndex, 'Production tag');
   if (productionTagResult.isErr) {
     return createFailure(productionTagResult.error.message);
@@ -232,6 +271,7 @@ function parseProductionCommand(commandLineArguments: readonly string[]): Result
         releaseTag: productionTagResult.value,
         releaseCommit: releaseCommitResult.value,
         promotedBetaTag,
+        executionMode,
       };
     },
   );
@@ -245,13 +285,15 @@ export function parseCommandLineArguments(commandLineArguments: readonly string[
 
   return match(stage.value)
     .with('beta', () => {
-      return commandLineArguments.length === betaCommandArgumentCount
-        ? parseBetaCommand(commandLineArguments)
+      const executionModeResult = parseExecutionMode(commandLineArguments, betaCommandArgumentCount);
+      return executionModeResult.isOk
+        ? parseBetaCommand(commandLineArguments, executionModeResult.value)
         : usageFailure();
     })
     .with('production', () => {
-      return commandLineArguments.length === productionCommandArgumentCount
-        ? parseProductionCommand(commandLineArguments)
+      const executionModeResult = parseExecutionMode(commandLineArguments, productionCommandArgumentCount);
+      return executionModeResult.isOk
+        ? parseProductionCommand(commandLineArguments, executionModeResult.value)
         : usageFailure();
     })
     .otherwise(() => {
@@ -481,12 +523,14 @@ async function processPullRequests(
   pullRequests: readonly PullRequestAppearance[],
   stage: ReleaseAppearanceCommandStage,
   releaseTag: string,
+  executionMode: ExecutionMode,
   dependencies: Pick<ReleaseAppearanceCommandDependencies, 'githubClient' | 'writeOutput'>,
   githubToken: string,
 ): Promise<ProcessingResult> {
   let commentsCreated = 0;
   let commentsUpdated = 0;
   let commentsUnchanged = 0;
+  const plannedCommentOperations: PlannedCommentOperation[] = [];
   const failures: PullRequestFailure[] = [];
 
   for (const pullRequest of pullRequests) {
@@ -518,8 +562,20 @@ async function processPullRequests(
       await writeFailure(dependencies.writeOutput, formatPullRequestFailure(pullRequestFailure));
       continue;
     }
+    plannedCommentOperations.push({
+      pullRequestNumber: pullRequest.number,
+      kind: operationResult.value.kind,
+    });
     if (operationResult.value.kind === 'unchanged') {
       commentsUnchanged += 1;
+      continue;
+    }
+    if (executionMode === 'dry-run') {
+      if (operationResult.value.kind === 'create') {
+        commentsCreated += 1;
+      } else {
+        commentsUpdated += 1;
+      }
       continue;
     }
 
@@ -545,6 +601,7 @@ async function processPullRequests(
     commentsCreated,
     commentsUpdated,
     commentsUnchanged,
+    plannedCommentOperations,
     failures: failures.toSorted((leftFailure, rightFailure) => {
       return leftFailure.pullRequestNumber - rightFailure.pullRequestNumber;
     }),
@@ -553,8 +610,10 @@ async function processPullRequests(
 
 function createEmptySummaryOptions(parsedCommand: ParsedCommand): SummaryOptions {
   return {
+    executionMode: parsedCommand.executionMode,
     stage: parsedCommand.stage,
     releaseTag: parsedCommand.releaseTag,
+    releaseCommit: parsedCommand.releaseCommit,
     bootstrap: false,
     precedingProductionTag: 'unavailable',
     candidateRanges: [],
@@ -564,6 +623,7 @@ function createEmptySummaryOptions(parsedCommand: ParsedCommand): SummaryOptions
     commentsCreated: 0,
     commentsUpdated: 0,
     commentsUnchanged: 0,
+    plannedCommentOperations: [],
     generalFailureMessages: [],
     pullRequestFailures: [],
   };
@@ -638,7 +698,7 @@ function formatFailureSection(summaryOptions: SummaryOptions): readonly string[]
   return ['', '### Failures', '', ...(failureLines.length === 0 ? ['None'] : failureLines)];
 }
 
-function createSummary(summaryOptions: SummaryOptions): string {
+function createWriteSummary(summaryOptions: SummaryOptions): string {
   return [
     '### Release appearance',
     '',
@@ -656,6 +716,63 @@ function createSummary(summaryOptions: SummaryOptions): string {
     `- Commits without associated pull requests: ${formatStringList(summaryOptions.commitsWithoutPullRequests)}`,
     ...formatFailureSection(summaryOptions),
   ].join('\n');
+}
+
+function formatPlannedCommentOperations(
+  plannedCommentOperations: readonly PlannedCommentOperation[],
+): readonly string[] {
+  if (plannedCommentOperations.length === 0) {
+    return ['No pull request comment operations were planned.'];
+  }
+
+  return plannedCommentOperations.map(plannedCommentOperation => {
+    const operationDescription = match(plannedCommentOperation.kind)
+      .with('create', () => {
+        return 'would create';
+      })
+      .with('update', () => {
+        return 'would update';
+      })
+      .with('unchanged', () => {
+        return 'unchanged';
+      })
+      .exhaustive();
+    return `- #${plannedCommentOperation.pullRequestNumber}: ${operationDescription}`;
+  });
+}
+
+function createDryRunSummary(summaryOptions: SummaryOptions): string {
+  return [
+    '### Release appearance',
+    '',
+    '- Mode: dry run',
+    `- Stage: ${summaryOptions.stage}`,
+    `- Release tag: \`${summaryOptions.releaseTag}\``,
+    `- Release commit: \`${summaryOptions.releaseCommit}\``,
+    `- Bootstrap: ${summaryOptions.bootstrap ? 'yes' : 'no'}`,
+    `- Preceding Production tag: ${summaryOptions.precedingProductionTag}`,
+    `- Beta candidate ranges for Production: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
+    `- Commits inspected: ${summaryOptions.commitsInspected.length} (${formatStringList(summaryOptions.commitsInspected)})`,
+    `- Pull requests discovered: ${summaryOptions.pullRequestsDiscovered.length} (${formatPullRequestList(summaryOptions.pullRequestsDiscovered)})`,
+    `- Comments that would be created: ${summaryOptions.commentsCreated}`,
+    `- Comments that would be updated: ${summaryOptions.commentsUpdated}`,
+    `- Unchanged comments: ${summaryOptions.commentsUnchanged}`,
+    `- Failed pull requests: ${formatFailedPullRequests(summaryOptions.pullRequestFailures)}`,
+    `- Commits without associated pull requests: ${formatStringList(summaryOptions.commitsWithoutPullRequests)}`,
+    '',
+    '### Planned comment operations',
+    '',
+    ...formatPlannedCommentOperations(summaryOptions.plannedCommentOperations),
+    '',
+    'No GitHub comments were created or updated.',
+    ...formatFailureSection(summaryOptions),
+  ].join('\n');
+}
+
+function createSummary(summaryOptions: SummaryOptions): string {
+  return summaryOptions.executionMode === 'dry-run'
+    ? createDryRunSummary(summaryOptions)
+    : createWriteSummary(summaryOptions);
 }
 
 async function finalizeSummary(
@@ -774,6 +891,7 @@ export async function executeReleaseAppearanceCommand(
       discoveryResult.pullRequests,
       parsedCommand.stage,
       parsedCommand.releaseTag,
+      parsedCommand.executionMode,
       dependencies,
       githubToken,
     );
@@ -785,6 +903,7 @@ export async function executeReleaseAppearanceCommand(
       commentsCreated: processingResult.commentsCreated,
       commentsUpdated: processingResult.commentsUpdated,
       commentsUnchanged: processingResult.commentsUnchanged,
+      plannedCommentOperations: processingResult.plannedCommentOperations,
       generalFailureMessages: discoveryFailureMessages,
       pullRequestFailures: processingResult.failures,
     };
