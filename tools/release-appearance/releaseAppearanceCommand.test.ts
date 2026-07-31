@@ -59,8 +59,11 @@ const commandEnvironment: NodeJS.ProcessEnv = {
 
 type FakeGitHubClientOptions = {
   readonly pullRequestsByCommit?: ReadonlyMap<string, readonly PullRequestRecord[]>;
+  readonly pullRequestFailuresByCommit?: ReadonlyMap<string, string>;
   readonly commentsByPullRequest?: ReadonlyMap<number, readonly IssueCommentRecord[]>;
-  readonly createFailurePullRequests?: ReadonlySet<number>;
+  readonly commentListFailuresByPullRequest?: ReadonlyMap<number, string>;
+  readonly createFailuresByPullRequest?: ReadonlyMap<number, string>;
+  readonly updateFailuresByCommentId?: ReadonlyMap<number, string>;
 };
 
 type FakeGitHubClientState = {
@@ -79,6 +82,20 @@ type RunCommandOptions = {
   readonly commandLineArguments: readonly string[];
   readonly executeGitCommand: ExecuteGitCommand;
   readonly githubClient: GitHubClient;
+  readonly summaryWriteFailure?: string;
+};
+
+type FakeGitCommandOptions = {
+  readonly bootstrap?: boolean;
+  readonly commits?: readonly string[];
+};
+
+type CreateDependenciesOptions = {
+  readonly executeGitCommand: ExecuteGitCommand;
+  readonly githubClient: GitHubClient;
+  readonly outputMessages: string[];
+  readonly summaries: string[];
+  readonly summaryWriteFailure?: string;
 };
 
 const issueCommentRecordFactory = createFactory<IssueCommentRecord>(
@@ -119,19 +136,32 @@ function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions
     githubClient: {
       async listPullRequestsForCommit(options): Promise<Result<readonly PullRequestRecord[], Error>> {
         state.pullRequestCommits.push(options.commitSha);
+        const failureMessage = Maybe.of(fakeGitHubClientOptions.pullRequestFailuresByCommit?.get(options.commitSha));
+        if (failureMessage.isJust) {
+          return createFailure(failureMessage.value);
+        }
         return createSuccess(
           Maybe.of(fakeGitHubClientOptions.pullRequestsByCommit?.get(options.commitSha)).unwrapOr([]),
         );
       },
       async listIssueComments(options): Promise<Result<readonly IssueCommentRecord[], Error>> {
         state.commentPullRequests.push(options.pullRequestNumber);
+        const failureMessage = Maybe.of(
+          fakeGitHubClientOptions.commentListFailuresByPullRequest?.get(options.pullRequestNumber),
+        );
+        if (failureMessage.isJust) {
+          return createFailure(failureMessage.value);
+        }
         return createSuccess(
           Maybe.of(fakeGitHubClientOptions.commentsByPullRequest?.get(options.pullRequestNumber)).unwrapOr([]),
         );
       },
       async createIssueComment(options): Promise<Result<IssueCommentRecord, Error>> {
-        if (fakeGitHubClientOptions.createFailurePullRequests?.has(options.pullRequestNumber) === true) {
-          return createFailure(`Unable to create comment for #${options.pullRequestNumber}`);
+        const failureMessage = Maybe.of(
+          fakeGitHubClientOptions.createFailuresByPullRequest?.get(options.pullRequestNumber),
+        );
+        if (failureMessage.isJust) {
+          return createFailure(failureMessage.value);
         }
         state.createdComments.push(options);
         return createSuccess(
@@ -139,6 +169,10 @@ function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions
         );
       },
       async updateIssueComment(options): Promise<Result<IssueCommentRecord, Error>> {
+        const failureMessage = Maybe.of(fakeGitHubClientOptions.updateFailuresByCommentId?.get(options.commentId));
+        if (failureMessage.isJust) {
+          return createFailure(failureMessage.value);
+        }
         state.updatedComments.push(options);
         return createSuccess(issueCommentRecordFactory.build({id: options.commentId, body: options.commentBody}));
       },
@@ -146,7 +180,10 @@ function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions
   };
 }
 
-function createFakeGitCommand(bootstrap: boolean = false): ExecuteGitCommand {
+function createFakeGitCommand(fakeGitCommandOptions: FakeGitCommandOptions = {}): ExecuteGitCommand {
+  const bootstrap = fakeGitCommandOptions.bootstrap === true;
+  const commits = Maybe.of(fakeGitCommandOptions.commits).unwrapOr([betaCommit]);
+
   return async function executeFakeGitCommand(commandArguments: readonly string[]): Promise<string> {
     const command = commandArguments.join(' ');
     if (command === 'tag --list -- *-production') {
@@ -174,7 +211,7 @@ function createFakeGitCommand(bootstrap: boolean = false): ExecuteGitCommand {
       return `${previousProductionCommit}\n`;
     }
     if (command.startsWith('rev-list --reverse ')) {
-      return `${betaCommit}\n`;
+      return `${commits.join('\n')}\n`;
     }
 
     throw new Error(`Unexpected fake Git command: ${command}`);
@@ -182,15 +219,18 @@ function createFakeGitCommand(bootstrap: boolean = false): ExecuteGitCommand {
 }
 
 function createDependencies(
-  executeGitCommand: ExecuteGitCommand,
-  githubClient: GitHubClient,
-  outputMessages: string[],
-  summaries: string[],
+  createDependenciesOptions: CreateDependenciesOptions,
 ): ReleaseAppearanceCommandDependencies {
+  const {executeGitCommand, githubClient, outputMessages, summaries, summaryWriteFailure} = createDependenciesOptions;
+
   return {
     executeGitCommand,
     githubClient,
     async writeSummary(summary): Promise<void> {
+      const failureMessage = Maybe.of(summaryWriteFailure);
+      if (failureMessage.isJust) {
+        throw new Error(failureMessage.value);
+      }
       summaries.push(summary);
     },
     async writeOutput(message): Promise<void> {
@@ -209,12 +249,13 @@ async function runCommand(runCommandOptions: RunCommandOptions): Promise<{
   const options: ExecuteReleaseAppearanceCommandOptions = {
     commandLineArguments: runCommandOptions.commandLineArguments,
     environment: commandEnvironment,
-    dependencies: createDependencies(
-      runCommandOptions.executeGitCommand,
-      runCommandOptions.githubClient,
+    dependencies: createDependencies({
+      executeGitCommand: runCommandOptions.executeGitCommand,
+      githubClient: runCommandOptions.githubClient,
       outputMessages,
       summaries,
-    ),
+      summaryWriteFailure: runCommandOptions.summaryWriteFailure,
+    }),
   };
   const result = await executeReleaseAppearanceCommand(options);
   return {result, outputMessages, summaries};
@@ -280,12 +321,55 @@ test('discovers pull requests and creates Beta appearance comments', async () =>
   assert(summary.isJust);
   assert.match(createdComment.value.commentBody, /2026-01-02\.1-beta\.1/);
   assert.match(summary.value, /Pull requests discovered: 1 \(#8\)/);
+  expect(commandRun.result.summary).toContain('- Comments created: 1');
+  expect(commandRun.result.summary).toContain('- Failed pull requests: none');
+  expect(commandRun.result.summary).toContain('### Failures\n\nNone');
 });
 
-test('continues processing after one pull request comment failure', async () => {
+test('includes release-history planning failures in the summary', async () => {
+  const fakeGitHubClient = createFakeGitHubClient();
+
+  const commandRun = await runCommand({
+    commandLineArguments: ['beta', 'invalid-beta-tag', releaseCommit],
+    executeGitCommand: createFakeGitCommand(),
+    githubClient: fakeGitHubClient.githubClient,
+  });
+
+  expect(commandRun.result.exitCode).toBe(1);
+  expect(commandRun.result.summary).toContain('- Release history: Invalid Beta candidate tag: invalid-beta-tag');
+  expect(commandRun.result.summary).not.toContain('### Failures\n\nNone');
+  expect(commandRun.result.summary).toContain('- Pull requests discovered: 0 (none)');
+});
+
+test('continues discovery after one commit failure and includes the reason in the summary', async () => {
+  const failedDiscoveryCommit = 'd'.repeat(40);
+  const discoveryFailureMessage = `Unable to list pull requests for commit ${failedDiscoveryCommit}`;
+  const fakeGitHubClient = createFakeGitHubClient({
+    pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(2)]]]),
+    pullRequestFailuresByCommit: new Map([[failedDiscoveryCommit, discoveryFailureMessage]]),
+  });
+
+  const commandRun = await runCommand({
+    commandLineArguments: ['beta', betaTag, releaseCommit],
+    executeGitCommand: createFakeGitCommand({commits: [failedDiscoveryCommit, betaCommit]}),
+    githubClient: fakeGitHubClient.githubClient,
+  });
+
+  expect(commandRun.result.exitCode).toBe(1);
+  expect(fakeGitHubClient.state.pullRequestCommits).toEqual([failedDiscoveryCommit, betaCommit]);
+  expect(
+    fakeGitHubClient.state.createdComments.map(comment => {
+      return comment.pullRequestNumber;
+    }),
+  ).toEqual([2]);
+  expect(commandRun.result.summary).toContain(`- Discovery: ${discoveryFailureMessage}`);
+});
+
+test('continues after a comment-listing failure and includes the pull request reason', async () => {
+  const commentListFailureMessage = 'Unable to list issue comments';
   const fakeGitHubClient = createFakeGitHubClient({
     pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(1), createPullRequest(2)]]]),
-    createFailurePullRequests: new Set([1]),
+    commentListFailuresByPullRequest: new Map([[1, commentListFailureMessage]]),
   });
 
   const commandRun = await runCommand({
@@ -294,14 +378,113 @@ test('continues processing after one pull request comment failure', async () => 
     githubClient: fakeGitHubClient.githubClient,
   });
 
-  assert.equal(commandRun.result.exitCode, 1);
-  assert.deepStrictEqual(
+  expect(commandRun.result.exitCode).toBe(1);
+  expect(fakeGitHubClient.state.commentPullRequests).toEqual([1, 2]);
+  expect(
     fakeGitHubClient.state.createdComments.map(comment => {
       return comment.pullRequestNumber;
     }),
-    [2],
+  ).toEqual([2]);
+  expect(commandRun.result.summary).toContain(`- Pull request #1: ${commentListFailureMessage}`);
+});
+
+test('continues after a duplicate marker and includes the pull request reason', async () => {
+  const markerComment = renderPersistentComment({
+    beta: Maybe.just(betaTag),
+    production: Maybe.nothing<string>(),
+  });
+  const fakeGitHubClient = createFakeGitHubClient({
+    pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(1), createPullRequest(2)]]]),
+    commentsByPullRequest: new Map([
+      [
+        1,
+        [
+          issueCommentRecordFactory.build({id: 11, body: markerComment}),
+          issueCommentRecordFactory.build({id: 12, body: markerComment}),
+        ],
+      ],
+    ]),
+  });
+
+  const commandRun = await runCommand({
+    commandLineArguments: ['beta', betaTag, releaseCommit],
+    executeGitCommand: createFakeGitCommand(),
+    githubClient: fakeGitHubClient.githubClient,
+  });
+
+  expect(commandRun.result.exitCode).toBe(1);
+  expect(
+    fakeGitHubClient.state.createdComments.map(comment => {
+      return comment.pullRequestNumber;
+    }),
+  ).toEqual([2]);
+  expect(commandRun.result.summary).toContain(
+    '- Pull request #1: More than one release-appearance marker comment exists',
   );
-  assert.match(commandRun.outputMessages.join('\n'), /#1/);
+});
+
+test('continues after one comment mutation failure and includes the reason in the summary', async () => {
+  const createFailureMessage = 'Unable to create release-appearance comment';
+  const fakeGitHubClient = createFakeGitHubClient({
+    pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(1), createPullRequest(2)]]]),
+    createFailuresByPullRequest: new Map([[1, createFailureMessage]]),
+  });
+
+  const commandRun = await runCommand({
+    commandLineArguments: ['beta', betaTag, releaseCommit],
+    executeGitCommand: createFakeGitCommand(),
+    githubClient: fakeGitHubClient.githubClient,
+  });
+
+  expect(commandRun.result.exitCode).toBe(1);
+  expect(
+    fakeGitHubClient.state.createdComments.map(comment => {
+      return comment.pullRequestNumber;
+    }),
+  ).toEqual([2]);
+  expect(commandRun.result.summary).toContain(`- Pull request #1: ${createFailureMessage}`);
+});
+
+test('redacts the GitHub token from output and summary failures', async () => {
+  const githubToken = Maybe.of(commandEnvironment.GITHUB_TOKEN);
+  assert(githubToken.isJust);
+  const fakeGitHubClient = createFakeGitHubClient({
+    pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(1)]]]),
+    createFailuresByPullRequest: new Map([[1, `Request rejected for ${githubToken.value}`]]),
+  });
+
+  const commandRun = await runCommand({
+    commandLineArguments: ['beta', betaTag, releaseCommit],
+    executeGitCommand: createFakeGitCommand(),
+    githubClient: fakeGitHubClient.githubClient,
+  });
+  const output = commandRun.outputMessages.join('\n');
+
+  expect(commandRun.result.exitCode).toBe(1);
+  expect(output).not.toContain(githubToken.value);
+  expect(commandRun.result.summary).not.toContain(githubToken.value);
+  expect(output).toContain('[REDACTED]');
+  expect(commandRun.result.summary).toContain('[REDACTED]');
+});
+
+test('returns a sanitized summary-writing failure', async () => {
+  const githubToken = Maybe.of(commandEnvironment.GITHUB_TOKEN);
+  assert(githubToken.isJust);
+  const fakeGitHubClient = createFakeGitHubClient();
+
+  const commandRun = await runCommand({
+    commandLineArguments: ['beta', betaTag, releaseCommit],
+    executeGitCommand: createFakeGitCommand({bootstrap: true}),
+    githubClient: fakeGitHubClient.githubClient,
+    summaryWriteFailure: `Permission denied for ${githubToken.value}`,
+  });
+
+  expect(commandRun.result.exitCode).toBe(1);
+  expect(commandRun.result.summary).toContain(
+    '- Summary: Unable to write GitHub Actions summary: Permission denied for [REDACTED]',
+  );
+  expect(commandRun.result.summary).not.toContain(githubToken.value);
+  expect(commandRun.outputMessages.join('\n')).not.toContain(githubToken.value);
 });
 
 test('bootstrap performs no GitHub requests', async () => {
@@ -309,7 +492,7 @@ test('bootstrap performs no GitHub requests', async () => {
 
   const commandRun = await runCommand({
     commandLineArguments: ['beta', betaTag, releaseCommit],
-    executeGitCommand: createFakeGitCommand(true),
+    executeGitCommand: createFakeGitCommand({bootstrap: true}),
     githubClient: fakeGitHubClient.githubClient,
   });
 
@@ -318,6 +501,7 @@ test('bootstrap performs no GitHub requests', async () => {
   const summary = Maybe.of(commandRun.summaries[0]);
   assert(summary.isJust);
   assert.match(summary.value, /Bootstrap: yes/);
+  expect(commandRun.result.summary).toContain('### Failures\n\nNone');
 });
 
 test('native command entrypoint loads dependencies and reports usage failure', async () => {

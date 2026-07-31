@@ -96,14 +96,19 @@ type DiscoveryResult = {
   readonly pullRequests: readonly PullRequestAppearance[];
   readonly commitsInspected: readonly string[];
   readonly commitsWithoutPullRequests: readonly string[];
-  readonly errors: readonly string[];
+  readonly failureMessages: readonly string[];
+};
+
+type PullRequestFailure = {
+  readonly pullRequestNumber: number;
+  readonly message: string;
 };
 
 type ProcessingResult = {
   readonly commentsCreated: number;
   readonly commentsUpdated: number;
   readonly commentsUnchanged: number;
-  readonly failedPullRequests: readonly number[];
+  readonly failures: readonly PullRequestFailure[];
 };
 
 type SummaryOptions = {
@@ -118,7 +123,15 @@ type SummaryOptions = {
   readonly commentsCreated: number;
   readonly commentsUpdated: number;
   readonly commentsUnchanged: number;
-  readonly failedPullRequests: readonly number[];
+  readonly generalFailureMessages: readonly string[];
+  readonly pullRequestFailures: readonly PullRequestFailure[];
+};
+
+type FinalizeSummaryOptions = {
+  readonly dependencies: Pick<ReleaseAppearanceCommandDependencies, 'writeSummary' | 'writeOutput'>;
+  readonly summaryOptions: SummaryOptions;
+  readonly githubToken: string;
+  readonly exitCode: number;
 };
 
 const betaCommandArgumentCount = 3;
@@ -144,6 +157,21 @@ function errorMessage(error: unknown): string {
 
 function redactSecret(message: string, secret: string): string {
   return secret.length === 0 ? message : message.replaceAll(secret, '[REDACTED]');
+}
+
+function createGeneralFailureMessage(category: string, message: string, githubToken: string): string {
+  return `${category}: ${redactSecret(message, githubToken)}`;
+}
+
+function createPullRequestFailure(pullRequestNumber: number, message: string, githubToken: string): PullRequestFailure {
+  return {
+    pullRequestNumber,
+    message: redactSecret(message, githubToken),
+  };
+}
+
+function formatPullRequestFailure(pullRequestFailure: PullRequestFailure): string {
+  return `Pull request #${pullRequestFailure.pullRequestNumber}: ${pullRequestFailure.message}`;
 }
 
 function usageFailure(): Result<ParsedCommand, Error> {
@@ -293,34 +321,33 @@ async function writeSummarySafely(
   dependencies: Pick<ReleaseAppearanceCommandDependencies, 'writeSummary' | 'writeOutput'>,
   summary: string,
   githubToken: string,
-): Promise<boolean> {
+): Promise<Maybe<string>> {
   try {
     await dependencies.writeSummary(summary);
-    return true;
+    return Maybe.nothing<string>();
   } catch (error: unknown) {
-    await writeFailure(
-      dependencies.writeOutput,
-      `Unable to write GitHub Actions summary: ${redactSecret(errorMessage(error), githubToken)}`,
-    );
-    return false;
+    const failureMessage = `Unable to write GitHub Actions summary: ${redactSecret(errorMessage(error), githubToken)}`;
+    await writeFailure(dependencies.writeOutput, failureMessage);
+    return Maybe.just(failureMessage);
   }
 }
 
 async function discoverPullRequests(
   ranges: readonly DiscoveryRange[],
   githubClient: GitHubClient,
+  githubToken: string,
 ): Promise<DiscoveryResult> {
   const pullRequestsByNumber = new Map<number, PullRequestAppearance>();
   const commitsInspected = new Set<string>();
   const commitsWithoutPullRequests = new Set<string>();
-  const errors: string[] = [];
+  const failureMessages: string[] = [];
 
   for (const range of ranges) {
     for (const commitSha of range.commitRange.commits) {
       commitsInspected.add(commitSha);
       const pullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha});
       if (pullRequestsResult.isErr) {
-        errors.push(pullRequestsResult.error.message);
+        failureMessages.push(redactSecret(pullRequestsResult.error.message, githubToken));
         continue;
       }
 
@@ -345,7 +372,7 @@ async function discoverPullRequests(
     }),
     commitsInspected: [...commitsInspected],
     commitsWithoutPullRequests: [...commitsWithoutPullRequests],
-    errors,
+    failureMessages,
   };
 }
 
@@ -455,19 +482,25 @@ async function processPullRequests(
   stage: ReleaseAppearanceCommandStage,
   releaseTag: string,
   dependencies: Pick<ReleaseAppearanceCommandDependencies, 'githubClient' | 'writeOutput'>,
+  githubToken: string,
 ): Promise<ProcessingResult> {
   let commentsCreated = 0;
   let commentsUpdated = 0;
   let commentsUnchanged = 0;
-  const failedPullRequests = new Set<number>();
+  const failures: PullRequestFailure[] = [];
 
   for (const pullRequest of pullRequests) {
     const commentsResult = await dependencies.githubClient.listIssueComments({
       pullRequestNumber: pullRequest.number,
     });
     if (commentsResult.isErr) {
-      failedPullRequests.add(pullRequest.number);
-      await writeFailure(dependencies.writeOutput, commentsResult.error.message);
+      const pullRequestFailure = createPullRequestFailure(
+        pullRequest.number,
+        commentsResult.error.message,
+        githubToken,
+      );
+      failures.push(pullRequestFailure);
+      await writeFailure(dependencies.writeOutput, formatPullRequestFailure(pullRequestFailure));
       continue;
     }
 
@@ -476,11 +509,13 @@ async function processPullRequests(
       createDesiredReleaseState(stage, releaseTag, pullRequest.earliestBetaTag),
     );
     if (operationResult.isErr) {
-      failedPullRequests.add(pullRequest.number);
-      await writeFailure(
-        dependencies.writeOutput,
-        `Pull request #${pullRequest.number}: ${operationResult.error.message}`,
+      const pullRequestFailure = createPullRequestFailure(
+        pullRequest.number,
+        operationResult.error.message,
+        githubToken,
       );
+      failures.push(pullRequestFailure);
+      await writeFailure(dependencies.writeOutput, formatPullRequestFailure(pullRequestFailure));
       continue;
     }
     if (operationResult.value.kind === 'unchanged') {
@@ -494,8 +529,9 @@ async function processPullRequests(
       dependencies.githubClient,
     );
     if (writeResult.isErr) {
-      failedPullRequests.add(pullRequest.number);
-      await writeFailure(dependencies.writeOutput, writeResult.error.message);
+      const pullRequestFailure = createPullRequestFailure(pullRequest.number, writeResult.error.message, githubToken);
+      failures.push(pullRequestFailure);
+      await writeFailure(dependencies.writeOutput, formatPullRequestFailure(pullRequestFailure));
       continue;
     }
     if (operationResult.value.kind === 'create') {
@@ -509,8 +545,8 @@ async function processPullRequests(
     commentsCreated,
     commentsUpdated,
     commentsUnchanged,
-    failedPullRequests: [...failedPullRequests].toSorted((leftNumber, rightNumber) => {
-      return leftNumber - rightNumber;
+    failures: failures.toSorted((leftFailure, rightFailure) => {
+      return leftFailure.pullRequestNumber - rightFailure.pullRequestNumber;
     }),
   };
 }
@@ -528,7 +564,8 @@ function createEmptySummaryOptions(parsedCommand: ParsedCommand): SummaryOptions
     commentsCreated: 0,
     commentsUpdated: 0,
     commentsUnchanged: 0,
-    failedPullRequests: [],
+    generalFailureMessages: [],
+    pullRequestFailures: [],
   };
 }
 
@@ -568,12 +605,12 @@ function formatPullRequestList(pullRequests: readonly PullRequestAppearance[]): 
         .join(', ');
 }
 
-function formatFailedPullRequests(pullRequestNumbers: readonly number[]): string {
-  return pullRequestNumbers.length === 0
+function formatFailedPullRequests(pullRequestFailures: readonly PullRequestFailure[]): string {
+  return pullRequestFailures.length === 0
     ? 'none'
-    : pullRequestNumbers
-        .map(pullRequestNumber => {
-          return `#${pullRequestNumber}`;
+    : pullRequestFailures
+        .map(pullRequestFailure => {
+          return `#${pullRequestFailure.pullRequestNumber}`;
         })
         .join(', ');
 }
@@ -586,6 +623,19 @@ function formatCandidateRanges(candidateRanges: readonly DiscoveryRange[]): stri
           return `${candidateRange.candidateTag}: ${candidateRange.commitRange.startTag} -> ${candidateRange.commitRange.endTag}`;
         })
         .join('; ');
+}
+
+function formatFailureSection(summaryOptions: SummaryOptions): readonly string[] {
+  const failureLines = [
+    ...summaryOptions.generalFailureMessages.map(failureMessage => {
+      return `- ${failureMessage}`;
+    }),
+    ...summaryOptions.pullRequestFailures.map(pullRequestFailure => {
+      return `- ${formatPullRequestFailure(pullRequestFailure)}`;
+    }),
+  ];
+
+  return ['', '### Failures', '', ...(failureLines.length === 0 ? ['None'] : failureLines)];
 }
 
 function createSummary(summaryOptions: SummaryOptions): string {
@@ -602,9 +652,32 @@ function createSummary(summaryOptions: SummaryOptions): string {
     `- Comments created: ${summaryOptions.commentsCreated}`,
     `- Comments updated: ${summaryOptions.commentsUpdated}`,
     `- Comments unchanged: ${summaryOptions.commentsUnchanged}`,
-    `- Failed pull requests: ${formatFailedPullRequests(summaryOptions.failedPullRequests)}`,
+    `- Failed pull requests: ${formatFailedPullRequests(summaryOptions.pullRequestFailures)}`,
     `- Commits without associated pull requests: ${formatStringList(summaryOptions.commitsWithoutPullRequests)}`,
+    ...formatFailureSection(summaryOptions),
   ].join('\n');
+}
+
+async function finalizeSummary(
+  finalizeSummaryOptions: FinalizeSummaryOptions,
+): Promise<ReleaseAppearanceCommandResult> {
+  const {dependencies, summaryOptions, githubToken, exitCode} = finalizeSummaryOptions;
+  const summary = createSummary(summaryOptions);
+  const summaryWriteFailure = await writeSummarySafely(dependencies, summary, githubToken);
+  if (summaryWriteFailure.isNothing) {
+    return {exitCode, summary};
+  }
+
+  return {
+    exitCode: 1,
+    summary: createSummary({
+      ...summaryOptions,
+      generalFailureMessages: [
+        ...summaryOptions.generalFailureMessages,
+        createGeneralFailureMessage('Summary', summaryWriteFailure.value, githubToken),
+      ],
+    }),
+  };
 }
 
 async function planReleaseHistory(
@@ -660,13 +733,25 @@ export async function executeReleaseAppearanceCommand(
 
   let summaryOptions = createEmptySummaryOptions(parsedCommand);
   if (historyPlanResult.isErr) {
-    await writeFailure(dependencies.writeOutput, redactSecret(historyPlanResult.error.message, githubToken));
+    const historyFailureMessage = createGeneralFailureMessage(
+      'Release history',
+      historyPlanResult.error.message,
+      githubToken,
+    );
+    summaryOptions = {
+      ...summaryOptions,
+      generalFailureMessages: [historyFailureMessage],
+    };
+    await writeFailure(dependencies.writeOutput, historyFailureMessage);
   } else {
     summaryOptions = addPlanToSummary(summaryOptions, historyPlanResult.value);
     if (historyPlanResult.value.kind === 'bootstrap') {
-      const summary = createSummary(summaryOptions);
-      const summaryWasWritten = await writeSummarySafely(dependencies, summary, githubToken);
-      return {exitCode: summaryWasWritten ? 0 : 1, summary};
+      return finalizeSummary({
+        dependencies,
+        summaryOptions,
+        githubToken,
+        exitCode: 0,
+      });
     }
 
     const discoveryRanges = match(historyPlanResult.value)
@@ -677,9 +762,12 @@ export async function executeReleaseAppearanceCommand(
         return productionPlan.candidateRanges;
       })
       .exhaustive();
-    const discoveryResult = await discoverPullRequests(discoveryRanges, dependencies.githubClient);
-    for (const discoveryError of discoveryResult.errors) {
-      await writeFailure(dependencies.writeOutput, discoveryError);
+    const discoveryResult = await discoverPullRequests(discoveryRanges, dependencies.githubClient, githubToken);
+    const discoveryFailureMessages = discoveryResult.failureMessages.map(failureMessage => {
+      return createGeneralFailureMessage('Discovery', failureMessage, githubToken);
+    });
+    for (const discoveryFailureMessage of discoveryFailureMessages) {
+      await writeFailure(dependencies.writeOutput, discoveryFailureMessage);
     }
 
     const processingResult = await processPullRequests(
@@ -687,23 +775,34 @@ export async function executeReleaseAppearanceCommand(
       parsedCommand.stage,
       parsedCommand.releaseTag,
       dependencies,
+      githubToken,
     );
     summaryOptions = {
       ...summaryOptions,
       commitsInspected: discoveryResult.commitsInspected,
       pullRequestsDiscovered: discoveryResult.pullRequests,
       commitsWithoutPullRequests: discoveryResult.commitsWithoutPullRequests,
-      ...processingResult,
+      commentsCreated: processingResult.commentsCreated,
+      commentsUpdated: processingResult.commentsUpdated,
+      commentsUnchanged: processingResult.commentsUnchanged,
+      generalFailureMessages: discoveryFailureMessages,
+      pullRequestFailures: processingResult.failures,
     };
-    const summary = createSummary(summaryOptions);
-    const summaryWasWritten = await writeSummarySafely(dependencies, summary, githubToken);
-    const hasFailures = discoveryResult.errors.length > 0 || processingResult.failedPullRequests.length > 0;
-    return {exitCode: summaryWasWritten && !hasFailures ? 0 : 1, summary};
+    const hasFailures = discoveryFailureMessages.length > 0 || processingResult.failures.length > 0;
+    return finalizeSummary({
+      dependencies,
+      summaryOptions,
+      githubToken,
+      exitCode: hasFailures ? 1 : 0,
+    });
   }
 
-  const summary = createSummary(summaryOptions);
-  await writeSummarySafely(dependencies, summary, githubToken);
-  return {exitCode: 1, summary};
+  return finalizeSummary({
+    dependencies,
+    summaryOptions,
+    githubToken,
+    exitCode: 1,
+  });
 }
 
 export async function main(
