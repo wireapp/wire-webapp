@@ -61,6 +61,8 @@ import {
   tabsHiddenStyles,
   tabsWrapperStyles,
 } from './Conversation.styles';
+import {getCellsFilesPath} from './ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
+import {getCurrentFolderName} from './ConversationCells/common/getCurrentFolderName/getCurrentFolderName';
 import {ConversationCells} from './ConversationCells/ConversationCells';
 import {ConversationFileDropzone} from './ConversationFileDropzone/ConversationFileDropzone';
 import {ConversationMessagesWrapper} from './ConversationMessagesWrapper/ConversationMessagesWrapper';
@@ -597,6 +599,8 @@ export const Conversation = ({
       translate,
     });
 
+  const currentFolderName = getCurrentFolderName(getCellsFilesPath());
+
   return (
     <ConversationFileDropzone
       isDragAccept={isDragAccept}
@@ -638,7 +642,11 @@ export const Conversation = ({
                 </div>
                 {isSharedDriveSearchViewOpen && (
                   <div css={searchResultsOverlayStyles}>
-                    <h3 css={searchResultsHeadingStyles}>Search results</h3>
+                    <h3 css={searchResultsHeadingStyles}>
+                      {currentFolderName
+                        ? translate('cells.search.resultsIn', {folderName: currentFolderName})
+                        : translate('cells.search.results')}
+                    </h3>
                   </div>
                 )}
               </div>
