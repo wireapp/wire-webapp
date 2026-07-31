@@ -11750,6 +11750,7 @@ __metadata:
   dependencies:
     "@aws-sdk/client-s3": "npm:3.1096.0"
     "@aws-sdk/lib-storage": "npm:3.1096.0"
+    "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:1.15.47"
     "@swc/jest": "npm:0.2.39"
     "@types/jest": "npm:30.0.0"
