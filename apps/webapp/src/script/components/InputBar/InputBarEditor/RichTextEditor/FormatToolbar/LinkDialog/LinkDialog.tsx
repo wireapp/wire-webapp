@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState, FormEvent} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -73,8 +73,8 @@ export const LinkDialog = ({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const textInputRef = useRef<HTMLInputElement>(null);
-  const hasTextError = is.nonEmptyString(errors.text);
-  const hasUrlError = is.nonEmptyString(errors.url);
+  const hasTextError = isNonEmptyString(errors.text);
+  const hasUrlError = isNonEmptyString(errors.url);
 
   const resetForm = useCallback(() => {
     setFormData({url: initialUrl, text: initialText});

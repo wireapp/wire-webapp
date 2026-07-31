@@ -19,7 +19,7 @@
 
 import {useCallback, useMemo} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {Maybe} from 'true-myth';
 import {maybe} from 'true-myth';
 
@@ -67,7 +67,7 @@ const fromDateTimePickerValue = (value: Date | null): Maybe<Date> =>
   value === null ? maybe.nothing() : maybe.just(value);
 
 const firstNonEmptyError = (...errorMessages: Array<string | undefined>): string | undefined =>
-  errorMessages.find(message => is.nonEmptyString(message));
+  errorMessages.find(message => isNonEmptyString(message));
 
 export interface ScheduleMeetingFormProps {
   mode: ScheduleMeetingMode;
@@ -190,15 +190,15 @@ export const ScheduleMeetingForm = ({
           placeholder={translate('meetings.scheduleModal.titlePlaceholder')}
           value={formState.title}
           onChange={event => onTitleChange(event.currentTarget.value)}
-          markInvalid={is.nonEmptyString(errors.title)}
+          markInvalid={isNonEmptyString(errors.title)}
           error={
-            is.nonEmptyString(errors.title) ? (
+            isNonEmptyString(errors.title) ? (
               <ErrorMessage data-uie-name="schedule-meeting-title-error">{errors.title}</ErrorMessage>
             ) : undefined
           }
           wrapperCSS={scheduleMeetingTitleInputWrapperStyles}
           endContent={
-            formState.title.length > 0 && !is.nonEmptyString(errors.title) ? (
+            formState.title.length > 0 && !isNonEmptyString(errors.title) ? (
               <button
                 type="button"
                 onClick={() => onTitleChange('')}
@@ -241,7 +241,7 @@ export const ScheduleMeetingForm = ({
           onChange={date => onStartChange(fromDateTimePickerValue(date))}
           labels={dateTimePickerLabels}
           locale={currentLanguage()}
-          markInvalid={is.nonEmptyString(startErrorText)}
+          markInvalid={isNonEmptyString(startErrorText)}
           errorText={startErrorText}
           minValue={todayValue}
           minTime={startMinTime}
@@ -256,7 +256,7 @@ export const ScheduleMeetingForm = ({
           onChange={date => onEndChange(fromDateTimePickerValue(date))}
           labels={dateTimePickerLabels}
           locale={currentLanguage()}
-          markInvalid={is.nonEmptyString(endErrorText)}
+          markInvalid={isNonEmptyString(endErrorText)}
           errorText={endErrorText}
           minValue={endDateMinValue}
           minTime={endMinTime}

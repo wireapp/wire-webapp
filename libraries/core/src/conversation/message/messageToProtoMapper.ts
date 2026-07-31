@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {Article, Asset, LinkPreview, Mention, Quote, Text, Tweet} from '@wireapp/protocol-messaging';
 
@@ -37,7 +37,7 @@ export class MessageToProtoMapper {
         urlOffset: linkPreview.urlOffset,
       });
 
-      if (!is.nullOrUndefined(linkPreview.tweet)) {
+      if (!isNullOrUndefined(linkPreview.tweet)) {
         linkPreviewMessage.tweet = Tweet.create({
           author: linkPreview.tweet.author,
           username: linkPreview.tweet.username,

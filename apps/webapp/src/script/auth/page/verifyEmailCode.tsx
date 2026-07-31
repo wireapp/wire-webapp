@@ -19,7 +19,7 @@
 
 import React, {useEffect} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {RegisterData} from '@wireapp/api-client/lib/auth/';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
@@ -72,7 +72,7 @@ const VerifyEmailCodeComponent = ({
 
   const resendCode = async (event: React.MouseEvent) => {
     event.preventDefault();
-    if (!is.nonEmptyString(account.email)) {
+    if (!isNonEmptyString(account.email)) {
       return;
     }
 

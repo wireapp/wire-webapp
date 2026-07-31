@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 
@@ -47,7 +47,7 @@ export const transformCellsNodes = ({
     const firstShare = node.Shares?.[0];
     const firstShareUuid = firstShare?.Uuid;
     const publicLink: CellNode['publicLink'] = {
-      alreadyShared: is.nonEmptyString(firstShareUuid),
+      alreadyShared: isNonEmptyString(firstShareUuid),
       uuid: firstShareUuid ?? '',
       url: undefined,
     };
@@ -126,13 +126,13 @@ const getFileSize = (node: RestNode): string => {
 
 const getOwner = (node: RestNode): string => {
   const name = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-owner')?.JsonValue;
-  return is.nonEmptyString(name) ? JSON.parse(name) : '';
+  return isNonEmptyString(name) ? JSON.parse(name) : '';
 };
 
 const getTags = (node: RestNode): string[] => {
   const tags = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-tags')?.JsonValue;
 
-  if (!is.nonEmptyString(tags)) {
+  if (!isNonEmptyString(tags)) {
     return [];
   }
 

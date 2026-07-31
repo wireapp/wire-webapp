@@ -19,7 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
@@ -158,7 +158,7 @@ const SetHandleComponent = ({
               </InputSubmitCombo>
             </InputBlock>
             <Button
-              disabled={!is.nonEmptyString(handle) || isFetching}
+              disabled={!isNonEmptyString(handle) || isFetching}
               type="submit"
               data-uie-name="do-send-handle"
               block

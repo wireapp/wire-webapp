@@ -19,7 +19,7 @@
 
 import {ReactElement} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
@@ -68,7 +68,7 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
         >
           {translate('cells.options.share')}
         </DropdownMenu.Item>
-        {is.nonEmptyString(url) && (
+        {isNonEmptyString(url) && (
           <DropdownMenu.Item
             onClick={() =>
               forcedDownloadFile({

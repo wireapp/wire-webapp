@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {CRUDEngine} from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
@@ -42,7 +42,7 @@ export class MemoryEngine implements CRUDEngine {
     primaryKey: PrimaryKey,
     entity: EntityType,
   ): Promise<PrimaryKey> {
-    if (!is.nullOrUndefined(entity)) {
+    if (!isNullOrUndefined(entity)) {
       this.prepareTable(tableName);
 
       if (primaryKey === undefined) {
@@ -53,7 +53,7 @@ export class MemoryEngine implements CRUDEngine {
       const table = this.getTable(tableName);
       const record = table[primaryKey as PropertyKey];
 
-      if (!is.nullOrUndefined(record)) {
+      if (!isNullOrUndefined(record)) {
         const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
         const error = new RecordAlreadyExistsError(message);
         return Promise.reject(error);

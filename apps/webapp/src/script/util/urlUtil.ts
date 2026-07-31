@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {includesString} from 'Util/stringUtil';
 
@@ -32,7 +32,7 @@ export const getParameter = (parameterName: string, locationSearch = window.loca
     const [parameter, value] = searchParam.split('=');
     const isExpectedParameter = parameter === parameterName;
     if (isExpectedParameter) {
-      if (is.nonEmptyString(value)) {
+      if (isNonEmptyString(value)) {
         const decodedValue = decodeURI(value);
 
         if (decodedValue === 'false') {
@@ -93,7 +93,7 @@ export function getDomainName(url: string): string {
 }
 
 export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
-  if (!is.nonEmptyString(html)) {
+  if (!isNonEmptyString(html)) {
     return [];
   }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isError, isFunction, isNumber, isString, isUndefined} from '@sindresorhus/is';
 import logdown from 'logdown';
 import PartySocketWebSocket, {type CloseEvent, type ErrorEvent, type Options} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
@@ -122,13 +122,13 @@ function normalizeMessageEventForPartysocket(event: Event): Event {
 export function createPartysocketCompatibleWebSocketConstructor(
   WebSocketConstructor: WebSocketConstructor | undefined,
 ): WebSocketConstructor | undefined {
-  if (is.undefined(WebSocketConstructor) || globalThis.WebSocket === WebSocketConstructor) {
+  if (isUndefined(WebSocketConstructor) || globalThis.WebSocket === WebSocketConstructor) {
     return WebSocketConstructor;
   }
 
   return function PartysocketCompatibleWebSocket(url: string, protocols?: string | string[]) {
     const socket = (
-      is.undefined(protocols) ? new WebSocketConstructor(url) : new WebSocketConstructor(url, protocols)
+      isUndefined(protocols) ? new WebSocketConstructor(url) : new WebSocketConstructor(url, protocols)
     ) as WebSocketWithEventListeners;
     const originalAddEventListener = socket.addEventListener.bind(socket) as EventTarget['addEventListener'];
     const originalRemoveEventListener = socket.removeEventListener.bind(socket) as EventTarget['removeEventListener'];
@@ -139,7 +139,7 @@ export function createPartysocketCompatibleWebSocketConstructor(
       listener: EventListenerOrEventListenerObject | null,
       options?: boolean | AddEventListenerOptions,
     ) => {
-      if (type !== 'message' || !is.function(listener)) {
+      if (type !== 'message' || !isFunction(listener)) {
         originalAddEventListener(type, listener, options);
         return;
       }
@@ -156,7 +156,7 @@ export function createPartysocketCompatibleWebSocketConstructor(
       listener: EventListenerOrEventListenerObject | null,
       options?: boolean | EventListenerOptions,
     ) => {
-      if (type !== 'message' || !is.function(listener)) {
+      if (type !== 'message' || !isFunction(listener)) {
         originalRemoveEventListener(type, listener, options);
         return;
       }
@@ -271,9 +271,9 @@ export class ReconnectingWebsocket {
     const reconnectContext = this.getReconnectContext();
     const errorEvent = error as ErrorEvent & {readonly error?: unknown; readonly message?: unknown};
     let errorCandidate: unknown = errorEvent;
-    if (is.error(errorEvent.error)) {
+    if (isError(errorEvent.error)) {
       errorCandidate = errorEvent.error;
-    } else if (is.string(errorEvent.message)) {
+    } else if (isString(errorEvent.message)) {
       errorCandidate = errorEvent.message;
     }
     const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(errorCandidate);
@@ -362,7 +362,7 @@ export class ReconnectingWebsocket {
       return websocketUrl;
     }
 
-    if (!is.undefined(socket) && socket.readyState === WEBSOCKET_STATE.CONNECTING) {
+    if (!isUndefined(socket) && socket.readyState === WEBSOCKET_STATE.CONNECTING) {
       this.startConnectingWatchdog(socket, reconnectContext);
     }
 
@@ -465,7 +465,7 @@ export class ReconnectingWebsocket {
   }
 
   private stopConnectingWatchdog(reason: string): void {
-    if (is.undefined(this.connectingTimeoutId) === false) {
+    if (isUndefined(this.connectingTimeoutId) === false) {
       this.options.wallClock.clearTimeout(this.connectingTimeoutId);
       this.connectingTimeoutId = undefined;
       this.logger.debug(
@@ -510,7 +510,7 @@ export class ReconnectingWebsocket {
 
     const existingSocket = this.socket;
 
-    if (!is.undefined(existingSocket) && !this.isExistingSocketClosed(existingSocket)) {
+    if (!isUndefined(existingSocket) && !this.isExistingSocketClosed(existingSocket)) {
       this.logger.warn(
         `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[existingSocket.readyState]} (${existingSocket.readyState}); reconnecting in place`,
       );
@@ -518,11 +518,11 @@ export class ReconnectingWebsocket {
       return;
     }
 
-    if (!is.undefined(existingSocket)) {
+    if (!isUndefined(existingSocket)) {
       this.logger.info('[WebSocketLifecycle] event=closed-wrapper-replacement');
     }
 
-    this.createAndBindSocketWrapper(is.undefined(existingSocket) ? 'initial-connect' : 'closed-wrapper');
+    this.createAndBindSocketWrapper(isUndefined(existingSocket) ? 'initial-connect' : 'closed-wrapper');
   }
 
   private isExistingSocketClosed(socket: ReconnectingWebsocketWrapper): boolean {
@@ -581,7 +581,7 @@ export class ReconnectingWebsocket {
    */
   public checkHealth(timeoutMs = TimeUtil.TimeInMillis.SECOND * 10): Promise<boolean> {
     const state = this.getState();
-    if (is.undefined(this.socket)) {
+    if (isUndefined(this.socket)) {
       this.logger.debug(
         `[WebSocketLifecycle] event=health-check-no-wrapper state=${getWebSocketStateName(state)} ${this.getActiveLifecycleContext()}`,
       );
@@ -733,7 +733,7 @@ export class ReconnectingWebsocket {
 
     const reconnectSequenceStartTimestamp = this.reconnectSequenceStartTimestamp.unwrapOr(undefined);
 
-    if (!is.number(reconnectSequenceStartTimestamp)) {
+    if (!isNumber(reconnectSequenceStartTimestamp)) {
       return;
     }
 

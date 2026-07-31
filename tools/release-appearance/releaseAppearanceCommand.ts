@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isError, isNonEmptyStringAndNotWhitespace} from '@sindresorhus/is';
 import {Maybe, Result, Unit} from 'true-myth';
 import {match} from 'ts-pattern';
 
@@ -169,7 +169,7 @@ function createFailure<valueType>(message: string, cause?: unknown): Result<valu
 }
 
 function errorMessage(error: unknown): string {
-  return is.error(error) ? error.message : 'Unknown failure';
+  return isError(error) ? error.message : 'Unknown failure';
 }
 
 function redactSecret(message: string, secret: string): string {
@@ -223,7 +223,7 @@ function readRequiredArgument(
   argumentName: string,
 ): Result<string, Error> {
   const argument = Maybe.of(commandLineArguments[argumentIndex]);
-  if (argument.isNothing || !is.nonEmptyStringAndNotWhitespace(argument.value)) {
+  if (argument.isNothing || !isNonEmptyStringAndNotWhitespace(argument.value)) {
     return createFailure(`${argumentName} must not be empty`);
   }
 
@@ -307,7 +307,7 @@ export function parseCommandLineArguments(commandLineArguments: readonly string[
 
 function readRequiredEnvironmentValue(environment: NodeJS.ProcessEnv, variableName: string): Result<string, Error> {
   const environmentValue = environment[variableName];
-  return is.nonEmptyStringAndNotWhitespace(environmentValue)
+  return isNonEmptyStringAndNotWhitespace(environmentValue)
     ? createSuccess(environmentValue)
     : createFailure(`${variableName} must be set`);
 }

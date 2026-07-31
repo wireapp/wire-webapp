@@ -19,7 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isObject, isString} from '@sindresorhus/is';
 import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
@@ -114,7 +114,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
           );
         }
 
-        const eventType = is.object(event.data) && 'type' in event.data ? event.data.type : undefined;
+        const eventType = isObject(event.data) && 'type' in event.data ? event.data.type : undefined;
         switch (eventType) {
           case 'AUTH_SUCCESS': {
             onChildWindowClose();
@@ -128,7 +128,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
             return reject(
               new BackendError(
                 `Authentication error: "${JSON.stringify(event.data.payload)}"`,
-                is.object(event.data.payload) && 'label' in event.data.payload && is.string(event.data.payload.label)
+                isObject(event.data.payload) && 'label' in event.data.payload && isString(event.data.payload.label)
                   ? event.data.payload.label
                   : SyntheticErrorLabel.SSO_GENERIC_ERROR,
                 HTTP_STATUS.UNAUTHORIZED,

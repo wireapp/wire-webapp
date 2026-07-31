@@ -19,7 +19,7 @@
 
 import {useId} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -88,19 +88,19 @@ const RadioGroup = <T extends string | number>({
                 onChange={() => onChange(value)}
                 checked={isChecked}
                 data-uie-name={optionUieName}
-                aria-describedby={is.nonEmptyString(description) ? descriptionId : undefined}
+                aria-describedby={isNonEmptyString(description) ? descriptionId : undefined}
               />
 
               <div>
                 <label css={radioLabelStyles(isDisabled || disabled)} htmlFor={currentId}>
                   <span>{label}</span>
 
-                  {is.nonEmptyString(detailLabel) && isChecked && (
+                  {isNonEmptyString(detailLabel) && isChecked && (
                     <span css={radioHintStyles}>{` · ${detailLabel}`}</span>
                   )}
                 </label>
 
-                {is.nonEmptyString(description) && (
+                {isNonEmptyString(description) && (
                   <div id={descriptionId} css={radioDescriptionStyles}>
                     {description}
                   </div>

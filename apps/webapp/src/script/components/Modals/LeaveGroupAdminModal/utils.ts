@@ -17,12 +17,12 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptyString} from '@sindresorhus/is';
 
 import type {User} from 'Repositories/entity/User';
 
 export const filterUsersByQuery = (users: User[], query: string): User[] => {
-  if (is.emptyString(query.trim())) {
+  if (isEmptyString(query.trim())) {
     return users;
   }
   const lowerQuery = query.toLowerCase();

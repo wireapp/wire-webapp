@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 
 import {ErrorMessage} from '@wireapp/react-ui-kit';
@@ -33,24 +33,24 @@ type MessageInterpolationValue = string | number | boolean | Date | JSX.Element 
 type MessageInterpolationValues = Record<string, MessageInterpolationValue>;
 
 const hasLabel = (value: unknown): value is LabelledErrorValue => {
-  return is.object(value) && 'label' in value && is.string((value as LabelledErrorValue).label);
+  return isObject(value) && 'label' in value && isString((value as LabelledErrorValue).label);
 };
 
 const toMessageInterpolationValues = (value: unknown): MessageInterpolationValues | undefined => {
-  if (!is.object(value)) {
+  if (!isObject(value)) {
     return undefined;
   }
 
   const entries = Object.entries(value).filter((entry): entry is [string, MessageInterpolationValue] => {
     const [entryKey, entryValue] = entry;
     return (
-      is.nonEmptyString(entryKey) &&
+      isNonEmptyString(entryKey) &&
       (entryValue === null ||
         entryValue === undefined ||
-        is.string(entryValue) ||
-        is.number(entryValue) ||
-        is.boolean(entryValue) ||
-        is.date(entryValue))
+        isString(entryValue) ||
+        isNumber(entryValue) ||
+        isBoolean(entryValue) ||
+        isDate(entryValue))
     );
   });
 

@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isError} from '@sindresorhus/is';
 import PromiseQueue from 'p-queue';
 import {Maybe} from 'true-myth';
 
@@ -45,7 +45,7 @@ export function createQueueFlushedError(): Error {
 }
 
 export function isQueueFlushedError(error: unknown): error is Error {
-  return is.error(error) && error.cause === queueFlushedErrorCause;
+  return isError(error) && error.cause === queueFlushedErrorCause;
 }
 
 export function createFlushableQueue(flushableQueueOptions: FlushableQueueOptions): FlushableQueue {

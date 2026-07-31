@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -326,7 +326,7 @@ export class ActionsViewModel {
       return Promise.reject();
     }
 
-    if (is.emptyArray(conversation.participating_user_ets())) {
+    if (isEmptyArray(conversation.participating_user_ets())) {
       this.deleteConversation(conversation);
       return Promise.resolve();
     }
@@ -352,8 +352,8 @@ export class ActionsViewModel {
               !user.isFederated &&
               !user.isService &&
               user.type !== UserType.APP &&
-              is.nonEmptyString(user.name()) &&
-              is.nonEmptyString(user.username()) &&
+              isNonEmptyString(user.name()) &&
+              isNonEmptyString(user.username()) &&
               !user.isTemporaryGuest(),
           );
 

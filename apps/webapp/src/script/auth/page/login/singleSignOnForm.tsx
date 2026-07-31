@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
@@ -110,7 +110,7 @@ const SingleSignOnFormComponent = ({
       await validateSSOCode(strippedCode);
       await doLogin(strippedCode);
       await doFinalizeSSOLogin({clientType});
-      const hasKeyAndCode = is.nonEmptyString(conversationKey) && is.nonEmptyString(conversationCode);
+      const hasKeyAndCode = isNonEmptyString(conversationKey) && isNonEmptyString(conversationCode);
       if (hasKeyAndCode) {
         await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
       }
@@ -141,7 +141,7 @@ const SingleSignOnFormComponent = ({
 
   useEffect(() => {
     const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
-    if (queryAutoLogin === true && is.nonEmptyString(initialCode)) {
+    if (queryAutoLogin === true && isNonEmptyString(initialCode)) {
       setShouldAutoLogin(true);
     }
   }, [initialCode]);
@@ -157,7 +157,7 @@ const SingleSignOnFormComponent = ({
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
-    if (is.nonEmptyString(queryLogoutReason)) {
+    if (isNonEmptyString(queryLogoutReason)) {
       setLogoutReason(queryLogoutReason);
     }
   }, [doCheckConversationCode, doGetConversationInfoByCode]);
@@ -166,7 +166,7 @@ const SingleSignOnFormComponent = ({
     const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
     const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
-    const keyAndCodeExistent = is.nonEmptyString(queryConversationKey) && is.nonEmptyString(queryConversationCode);
+    const keyAndCodeExistent = isNonEmptyString(queryConversationKey) && isNonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
@@ -183,7 +183,7 @@ const SingleSignOnFormComponent = ({
   }, [doCheckConversationCode, doGetConversationInfoByCode]);
 
   useEffect(() => {
-    if (is.nonEmptyString(initialCode) && initialCode !== codeOrMail) {
+    if (isNonEmptyString(initialCode) && initialCode !== codeOrMail) {
       setCodeOrMail(initialCode);
       setDisableInput(true);
     }
@@ -286,7 +286,7 @@ const SingleSignOnFormComponent = ({
   );
 
   useEffect(() => {
-    if (shouldAutoLogin && is.nonEmptyString(initialCode) && initialCode === codeOrMail) {
+    if (shouldAutoLogin && isNonEmptyString(initialCode) && initialCode === codeOrMail) {
       void handleSubmit();
     }
   }, [codeOrMail, handleSubmit, initialCode, shouldAutoLogin]);
@@ -323,7 +323,7 @@ const SingleSignOnFormComponent = ({
     if (ssoError !== null) {
       return parseError(ssoError);
     }
-    if (is.nonEmptyString(logoutReason)) {
+    if (isNonEmptyString(logoutReason)) {
       return (
         <ErrorMessage data-uie-name="status-logout-reason">
           <FormattedMessage
@@ -376,7 +376,7 @@ const SingleSignOnFormComponent = ({
         <Button
           block
           type="submit"
-          disabled={isFetching || !is.nonEmptyString(codeOrMail)}
+          disabled={isFetching || !isNonEmptyString(codeOrMail)}
           formNoValidate
           onClick={handleSubmit}
           aria-label={translate('login.headline')}

@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isString} from '@sindresorhus/is';
 import {escape} from 'underscore';
 
 import type {Substitutions, TranslationKey} from './translationTypes';
@@ -76,7 +76,7 @@ export function translate<Id extends TranslationKey>(
     strings[DEFAULT_LOCALE] !== undefined && Object.hasOwn(strings[DEFAULT_LOCALE], identifier)
       ? strings[DEFAULT_LOCALE][identifier]
       : identifier;
-  const value = is.string(localeValue) ? localeValue : defaultValue;
+  const value = isString(localeValue) ? localeValue : defaultValue;
 
   const replaceDangerously = {
     '/bold': '</strong>',

@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyObject} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -62,7 +62,7 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
   const handleLeave = async () => {
     setIsLoading(true);
     try {
-      if (is.nonEmptyObject(selectedUser)) {
+      if (isNonEmptyObject(selectedUser)) {
         await onLeave(clearContent, selectedUser);
         hide();
       }

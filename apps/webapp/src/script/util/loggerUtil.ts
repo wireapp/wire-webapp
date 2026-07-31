@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {getStorage} from './localStorage';
 
@@ -28,7 +28,7 @@ export function enableLogging(config: Configuration, search = window.location.se
   const namespace = new URLSearchParams(search).get('enableLogging');
   const force = config.FEATURE.ENABLE_DEBUG;
 
-  if (is.nonEmptyString(namespace)) {
+  if (isNonEmptyString(namespace)) {
     storage?.setItem('debug', namespace);
   } else if (force) {
     storage?.setItem('debug', '*');

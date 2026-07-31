@@ -17,14 +17,14 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 
 import type {CapabilityInfo} from '../backgroundEffectsWorkerTypes';
 
 export function isDocumentAvailable(): boolean {
-  return is.undefined(document) === false;
+  return isUndefined(document) === false;
 }
 
 /**
@@ -57,14 +57,14 @@ export function detectCapabilities(): CapabilityInfo {
   const worker = typeof Worker !== 'undefined' && Runtime.isFirefox() === false;
   // Check for requestVideoFrameCallback (better than requestAnimationFrame for video)
   const requestVideoFrameCallback =
-    is.undefined(HTMLVideoElement) === false && 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
+    isUndefined(HTMLVideoElement) === false && 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
   // Check for WebGL2 support (requires DOM for canvas creation)
   const webgl2 = (() => {
     if (isDocumentAvailable() === false) {
       return false;
     }
     const canvas = document.createElement('canvas');
-    return is.nullOrUndefined(canvas.getContext('webgl2')) === false;
+    return isNullOrUndefined(canvas.getContext('webgl2')) === false;
   })();
 
   return {

@@ -19,7 +19,7 @@
 
 import {FC, useEffect} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -112,7 +112,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
   useEffect(() => {
     // Set the author of the Service / App to the name of the team the user is in
-    if (!is.nullOrUndefined(selfUser.teamId) && serviceEntity.author !== undefined) {
+    if (!isNullOrUndefined(selfUser.teamId) && serviceEntity.author !== undefined) {
       void teamRepository.getTeamNameById(selfUser.teamId).then(name => serviceEntity.author?.(name));
     }
   }, [serviceEntity, teamRepository, selfUser.teamId]);

@@ -19,7 +19,7 @@
 
 import {FC, ReactNode} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
@@ -62,7 +62,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
     );
   }
 
-  if (!is.nullOrUndefined(readOnlyState)) {
+  if (!isNullOrUndefined(readOnlyState)) {
     switch (readOnlyState) {
       case CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS:
         return (

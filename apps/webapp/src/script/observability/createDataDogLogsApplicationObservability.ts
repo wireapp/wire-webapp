@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNumber, isString} from '@sindresorhus/is';
 
 import type {ApplicationObservability} from './applicationObservability';
 import type {ApplicationStartupReport} from './applicationStartupReport';
@@ -43,7 +43,7 @@ function addFiniteNumber(
   logFieldName: string,
   value: number | undefined,
 ): void {
-  if (is.number(value) && Number.isFinite(value)) {
+  if (isNumber(value) && Number.isFinite(value)) {
     logContext[logFieldName] = value;
   }
 }
@@ -53,7 +53,7 @@ function addSafeStringOrNumber(
   logFieldName: string,
   value: number | string | undefined,
 ): void {
-  const isSafeValue = is.string(value) || (is.number(value) && Number.isFinite(value));
+  const isSafeValue = isString(value) || (isNumber(value) && Number.isFinite(value));
 
   if (isSafeValue) {
     logContext[logFieldName] = value;
@@ -80,7 +80,7 @@ export function createDataDogApplicationStartupLogContext(
   addSafeStringOrNumber(logContext, 'startup.client_count_bucket', report.statistics.client_count_bucket);
   addSafeStringOrNumber(logContext, 'startup.client_type', report.statistics.client_type);
 
-  if (is.nonEmptyString(report.lastStep)) {
+  if (isNonEmptyString(report.lastStep)) {
     logContext['startup.last_step'] = report.lastStep;
   } else {
     addSafeStringOrNumber(logContext, 'startup.last_step', report.statistics.last_step);

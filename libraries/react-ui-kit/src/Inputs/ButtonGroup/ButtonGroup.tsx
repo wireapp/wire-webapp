@@ -20,7 +20,7 @@
 import {ButtonHTMLAttributes, forwardRef, ReactNode} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {Theme} from '../../Identity/Theme';
 import {Button, ButtonProps, ButtonVariant} from '../Button';
@@ -70,10 +70,10 @@ const GroupedButton = forwardRef<HTMLButtonElement, GroupedButtonProps>(({childr
   return (
     <Button ref={ref} css={(theme: Theme) => groupedButtonStyle(theme, props)} {...props}>
       {icon}
-      {!is.nullOrUndefined(children) ? (
+      {!isNullOrUndefined(children) ? (
         <span
           css={(theme: Theme) => ({
-            marginLeft: !is.nullOrUndefined(icon) ? '6px' : undefined,
+            marginLeft: !isNullOrUndefined(icon) ? '6px' : undefined,
             fontSize: theme.fontSizes.small,
             fontWeight: 'bold',
             lineHeight: '0.875rem',

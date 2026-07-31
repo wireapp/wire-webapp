@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {FILE_TYPE_CATALOG} from './fileTypeCatalog';
 
@@ -64,7 +64,7 @@ export const hasActiveSearchParams = (params: DriveSearchParams): boolean =>
 export const hasActiveGlobalDriveFilters = (filters: GlobalDriveFiltersState): boolean =>
   hasActiveConversationDriveFilters(filters) ||
   filters.selectedConversationIds.length > 0 ||
-  is.nonEmptyString(filters.path);
+  isNonEmptyString(filters.path);
 
 export type ActiveFilterType = 'tags' | 'fileType' | 'createdBy' | 'sharedViaLink' | 'conversation';
 
@@ -105,7 +105,7 @@ const toMimeTypes = (selectedFileTypeIds: string[]): string[] | undefined => {
 // path scopes the recursive search to that conversation only.
 const toConversationPath = (selectedConversationIds: string[]): string | undefined => {
   const [stringifiedQualifiedId] = selectedConversationIds;
-  return is.nonEmptyString(stringifiedQualifiedId) ? stringifiedQualifiedId : undefined;
+  return isNonEmptyString(stringifiedQualifiedId) ? stringifiedQualifiedId : undefined;
 };
 
 const toGlobalSearchRootPath = ({
@@ -113,7 +113,7 @@ const toGlobalSearchRootPath = ({
   path,
 }: Pick<GlobalDriveFiltersState, 'selectedConversationIds' | 'path'>): string | undefined => {
   const conversationPath = toConversationPath(selectedConversationIds);
-  return conversationPath ?? (is.nonEmptyString(path) ? path : undefined);
+  return conversationPath ?? (isNonEmptyString(path) ? path : undefined);
 };
 
 export const toConversationDriveSearchParams = (filters: ConversationDriveFiltersState): DriveSearchParams => ({

@@ -20,7 +20,7 @@
 import {HTMLProps, MouseEvent, FocusEvent, ReactNode, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {createPortal} from 'react-dom';
 
 import {Theme} from '../../Identity';
@@ -79,13 +79,13 @@ interface TooltipArrowProps {
 
 const TooltipArrow = ({wrapperRect}: TooltipArrowProps) => {
   const tooltipArrowRef = (element: HTMLDivElement | null) => {
-    if (is.nullOrUndefined(element)) {
+    if (isNullOrUndefined(element)) {
       return;
     }
 
     const {parentElement} = element;
 
-    if (is.nullOrUndefined(parentElement)) {
+    if (isNullOrUndefined(parentElement)) {
       return;
     }
 
@@ -118,12 +118,12 @@ const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: Portal
   const [isTouchingTop, setIsTouchingTop] = useState(false);
   const targetElement = document.querySelector(selector);
 
-  if (is.nullOrUndefined(targetElement) || is.nullOrUndefined(wrapperRect)) {
+  if (isNullOrUndefined(targetElement) || isNullOrUndefined(wrapperRect)) {
     return null;
   }
 
   const tooltipRef = (element: HTMLDivElement | null) => {
-    if (is.nullOrUndefined(element)) {
+    if (isNullOrUndefined(element)) {
       return;
     }
 

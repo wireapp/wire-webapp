@@ -29,7 +29,7 @@ import {
   KeyboardEvent,
 } from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 
 import {
@@ -144,10 +144,10 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       : '?';
 
   const formatName = (model: string, clazz: string): string | JSX.Element => {
-    if (is.nonEmptyString(model)) {
+    if (isNonEmptyString(model)) {
       return model;
     }
-    if (is.nonEmptyString(clazz)) {
+    if (isNonEmptyString(clazz)) {
       return (
         <Text bold textTransform={'capitalize'}>
           {clazz}
@@ -350,7 +350,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                 <IconButton
                   aria-label={translate('modalAccountRemoveDeviceAction')}
                   data-uie-name="do-remove-device"
-                  disabled={!is.nonEmptyString(password) || isValidPassword !== true}
+                  disabled={!isNonEmptyString(password) || isValidPassword !== true}
                   formNoValidate
                   css={{margin: `0 ${cardIconSpacingPixels}px`}}
                   onClick={handleSubmit}

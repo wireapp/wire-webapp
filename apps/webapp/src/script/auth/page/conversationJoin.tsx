@@ -19,7 +19,7 @@
 
 import {useEffect, useState, useRef, FormEvent} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {connect} from 'react-redux';
@@ -123,8 +123,8 @@ const ConversationJoinComponent = ({
   }, [doCheckConversationCode, doGetAllClients, doGetConversationInfoByCode, doInit]);
 
   const routeToApp = (conversation: string = '', domain: string = '') => {
-    const conversationPath = is.nonEmptyString(conversation)
-      ? `#/conversation/${conversation}${is.nonEmptyString(domain) ? `/${domain}` : ''}`
+    const conversationPath = isNonEmptyString(conversation)
+      ? `#/conversation/${conversation}${isNonEmptyString(domain) ? `/${domain}` : ''}`
       : '';
     const redirectLocation = `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${conversationPath}`;
     window.location.replace(redirectLocation);
@@ -136,7 +136,7 @@ const ConversationJoinComponent = ({
       return;
     }
     try {
-      if (!is.nonEmptyString(conversationCode) || !is.nonEmptyString(conversationKey)) {
+      if (!isNonEmptyString(conversationCode) || !isNonEmptyString(conversationKey)) {
         throw Error('Conversation code or key missing');
       }
       const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
@@ -165,7 +165,7 @@ const ConversationJoinComponent = ({
     }
     setIsSubmitingName(true);
     try {
-      if (!is.nonEmptyString(conversationCode) || !is.nonEmptyString(conversationKey)) {
+      if (!isNonEmptyString(conversationCode) || !isNonEmptyString(conversationKey)) {
         throw Error('Conversation code or key missing');
       }
       const name = enteredName?.trim();
@@ -283,7 +283,7 @@ const ConversationJoinComponent = ({
         </div>
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
-            {is.nonEmptyString(selfName) && hasLoadedClients ? (
+            {isNonEmptyString(selfName) && hasLoadedClients ? (
               <IsLoggedInColumn selfName={selfName} handleLogout={doLogout} handleSubmit={getConversationInfoAndJoin} />
             ) : (
               <Login embedded />

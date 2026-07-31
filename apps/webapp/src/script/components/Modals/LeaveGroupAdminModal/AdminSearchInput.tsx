@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {FormatOptionLabelMeta} from 'react-select';
 
 import {Option, Select} from '@wireapp/react-ui-kit';
@@ -62,12 +62,12 @@ export const AdminSearchInput = ({
   const selectedOption = selectedUser ? (options.find(opt => opt.value === selectedUser.id) ?? null) : null;
 
   const handleChange = (option: Option | null) => {
-    if (is.nullOrUndefined(option)) {
+    if (isNullOrUndefined(option)) {
       onUserSelect(null);
       return;
     }
     const user = eligibleUsers.find(usr => usr.id === option.value);
-    if (!is.nullOrUndefined(user)) {
+    if (!isNullOrUndefined(user)) {
       onUserSelect(user);
     }
   };
@@ -111,7 +111,7 @@ export const AdminSearchInput = ({
         isClearable
       />
 
-      {!is.nullOrUndefined(selectedUser) && (
+      {!isNullOrUndefined(selectedUser) && (
         <div style={clearContentRowStyles} data-uie-name="leave-group-admin-clear-content">
           <input
             type="checkbox"

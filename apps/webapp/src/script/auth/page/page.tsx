@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {TeamData} from '@wireapp/api-client/lib/team';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
@@ -38,11 +38,11 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 }
 
 const hasInvalidAccountData = (account: RegistrationDataState) => {
-  return !is.nonEmptyString(account.name) || !is.nonEmptyString(account.email) || !is.nonEmptyString(account.password);
+  return !isNonEmptyString(account.name) || !isNonEmptyString(account.email) || !isNonEmptyString(account.password);
 };
 
 const hasInvalidTeamData = ({team}: {team?: TeamData}) => {
-  return team === undefined || !is.nonEmptyString(team.name);
+  return team === undefined || !isNonEmptyString(team.name);
 };
 
 const PageComponent = ({

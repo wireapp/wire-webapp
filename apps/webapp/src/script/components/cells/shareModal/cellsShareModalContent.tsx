@@ -20,7 +20,7 @@
 import {ComponentProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {ValidationUtil} from '@wireapp/commons';
 import {
@@ -188,7 +188,7 @@ export const CellsShareModalContent = ({
   switchColors,
 }: CellsShareModalContentProps) => {
   const resolvedLabels = {...getDefaultLabels(translate), ...labels};
-  const hasPublicLink = is.nonEmptyString(publicLink.link);
+  const hasPublicLink = isNonEmptyString(publicLink.link);
   const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && hasPublicLink;
   const areDependentTogglesDisabled = publicLink.isEnabled !== true;
   const publicLinkColors = switchColors?.publicLink ?? DEFAULT_SWITCH_COLORS;

@@ -21,7 +21,7 @@ import {useState, forwardRef, DragEvent} from 'react';
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import {UploadIcon} from '../../DataDisplay/Icon';
 import {COLOR} from '../../Identity';
@@ -118,7 +118,7 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
       event.stopPropagation();
       event.dataTransfer.dropEffect = 'copy';
 
-      if (is.nonEmptyArray(Array.from(event.dataTransfer.items))) {
+      if (isNonEmptyArray(Array.from(event.dataTransfer.items))) {
         setIsDraggedOver(true);
       }
     };
@@ -130,13 +130,13 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
       resetDraggedOver();
 
       const {files} = event.dataTransfer;
-      if (!is.nonEmptyArray(Array.from(files))) {
+      if (!isNonEmptyArray(Array.from(files))) {
         return;
       }
 
       const filesArr = multiple === true ? Array.from(files) : [files[0]];
 
-      const areFilesValid = is.nonEmptyString(accept)
+      const areFilesValid = isNonEmptyString(accept)
         ? filesArr.every(file =>
             accept
               .split(',')
@@ -156,7 +156,7 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const {files} = event.target;
 
-      if (is.nullOrUndefined(files) || !is.nonEmptyArray(Array.from(files))) {
+      if (isNullOrUndefined(files) || !isNonEmptyArray(Array.from(files))) {
         return;
       }
 
@@ -198,7 +198,7 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
             </div>
           </FlexBox>
         </div>
-        {is.nonEmptyString(description) && <p css={dropFileZonDescriptionStyle}>{description}</p>}
+        {isNonEmptyString(description) && <p css={dropFileZonDescriptionStyle}>{description}</p>}
       </div>
     );
   },

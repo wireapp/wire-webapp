@@ -19,7 +19,7 @@
 
 /* eslint-disable no-magic-numbers */
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
 import {once} from 'events';
 import type {CloseEvent, ErrorEvent} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
@@ -203,9 +203,9 @@ describe('ReconnectingWebsocket', () => {
   };
 
   const getServerAddress = () => {
-    if (is.undefined(server) === false) {
+    if (isUndefined(server) === false) {
       const address = server.address();
-      if (is.nullOrUndefined(address) === true || is.string(address) === true) {
+      if (isNullOrUndefined(address) === true || isString(address) === true) {
         throw new Error('Server address is unavailable');
       }
       return Promise.resolve(`ws://127.0.0.1:${address.port}`);
@@ -238,7 +238,7 @@ describe('ReconnectingWebsocket', () => {
     });
     activeConnections.length = 0;
 
-    if (is.undefined(server) === false) {
+    if (isUndefined(server) === false) {
       server.close(() => {
         server = undefined;
         done();

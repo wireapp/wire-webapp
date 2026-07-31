@@ -18,7 +18,7 @@
  */
 
 import {$createLinkNode} from '@lexical/link';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {RangeSelection, $createTextNode} from 'lexical';
 
 import {sanitizeUrl} from '../../../utils/url';
@@ -32,9 +32,9 @@ interface CreateLinkParams {
 export const createNewLink = ({selection, url, text}: CreateLinkParams) => {
   const selectedText = selection.getTextContent();
   let textContent: string;
-  if (is.nonEmptyString(text)) {
+  if (isNonEmptyString(text)) {
     textContent = text;
-  } else if (is.nonEmptyString(selectedText)) {
+  } else if (isNonEmptyString(selectedText)) {
     textContent = selectedText;
   } else {
     textContent = url;

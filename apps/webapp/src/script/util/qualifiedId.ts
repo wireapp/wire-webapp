@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
 interface QualifiedEntity {
   [index: string]: any;
@@ -26,7 +26,7 @@ interface QualifiedEntity {
 }
 
 function isUnqualifiedDomain(domain: string | null | undefined): boolean {
-  return is.nullOrUndefined(domain) || is.emptyString(domain);
+  return isNullOrUndefined(domain) || isEmptyString(domain);
 }
 
 /**
@@ -38,7 +38,7 @@ function isUnqualifiedDomain(domain: string | null | undefined): boolean {
  * @return boolean - do the entities match
  */
 export function matchQualifiedIds(entity1?: QualifiedEntity, entity2?: QualifiedEntity): boolean {
-  if (is.undefined(entity1) || is.undefined(entity2)) {
+  if (isUndefined(entity1) || isUndefined(entity2)) {
     return false;
   }
 

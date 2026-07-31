@@ -20,7 +20,7 @@
 import {forwardRef} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {
   getImageCropZoomInputStyles,
@@ -64,12 +64,12 @@ export const RangeInput = forwardRef<HTMLInputElement, RangeInputProps<HTMLInput
 
     return (
       <div css={wrapperCSS}>
-        {is.nonEmptyString(label) && <InputLabel htmlFor={id}>{label}</InputLabel>}
+        {isNonEmptyString(label) && <InputLabel htmlFor={id}>{label}</InputLabel>}
         <div css={rangeInputWrapperStyles}>
-          {is.nonEmptyString(minValueLabel) && (
+          {isNonEmptyString(minValueLabel) && (
             <span css={(theme: Theme) => getValueLabelStyles(theme, ValueLabelPosition.LEFT)}>{minValueLabel}</span>
           )}
-          {is.nonEmptyString(maxValueLabel) && (
+          {isNonEmptyString(maxValueLabel) && (
             <span css={(theme: Theme) => getValueLabelStyles(theme, ValueLabelPosition.RIGHT)}>{maxValueLabel}</span>
           )}
           <input

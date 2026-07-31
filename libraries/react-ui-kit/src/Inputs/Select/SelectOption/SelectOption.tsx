@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {components, GroupBase, OptionProps, OptionsOrGroups} from 'react-select';
 
 import {CheckIcon} from '../../../DataDisplay/Icon';
@@ -42,7 +42,7 @@ export const SelectOption = <IsMulti extends boolean = false, Group extends Grou
               columnGap: isGroup(options) ? '5px' : '10px',
             }),
           }}
-          {...(is.nonEmptyString(dataUieName) && {
+          {...(isNonEmptyString(dataUieName) && {
             'data-uie-name': `option-${dataUieName}`,
             'data-uie-value': (options as Option[]).find(option => option.label === children)?.value,
             'data-uie-selected': isSelected,
@@ -66,7 +66,7 @@ export const SelectOption = <IsMulti extends boolean = false, Group extends Grou
 
           <div css={{gridArea: 'label', overflowWrap: 'break-word', overflow: 'hidden'}}>{children}</div>
 
-          {is.nonEmptyString(data.description) && (
+          {isNonEmptyString(data.description) && (
             <p
               css={(theme: Theme) => ({
                 marginBottom: 0,
@@ -87,5 +87,5 @@ export const SelectOption = <IsMulti extends boolean = false, Group extends Grou
 };
 
 export const isGroup = (options: OptionsOrGroups<Option, GroupBase<Option>>): options is GroupBase<Option>[] => {
-  return is.nonEmptyArray(options) && 'options' in options[0];
+  return isNonEmptyArray(options) && 'options' in options[0];
 };

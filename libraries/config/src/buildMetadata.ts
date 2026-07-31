@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isPlainObject} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
 export type BuildMetadata = {
@@ -39,11 +39,11 @@ const safeAssetVersionPattern = /^[A-Za-z0-9._~-]+$/;
 const shortCommitShaLength = 7;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return is.plainObject(value);
+  return isPlainObject(value);
 }
 
 function isIsoUtcTimestamp(value: unknown): value is string {
-  if (!is.nonEmptyString(value) || !isoUtcTimestampPattern.test(value)) {
+  if (!isNonEmptyString(value) || !isoUtcTimestampPattern.test(value)) {
     return false;
   }
 
@@ -51,11 +51,11 @@ function isIsoUtcTimestamp(value: unknown): value is string {
 }
 
 function isSafeAssetVersion(value: unknown): value is string {
-  return is.nonEmptyString(value) && safeAssetVersionPattern.test(value);
+  return isNonEmptyString(value) && safeAssetVersionPattern.test(value);
 }
 
 function isLogicalBuildVersion(value: unknown): value is string {
-  return is.nonEmptyString(value) && isSafeAssetVersion(value) && !legacyTimestampVersionPattern.test(value);
+  return isNonEmptyString(value) && isSafeAssetVersion(value) && !legacyTimestampVersionPattern.test(value);
 }
 
 export function isBuildMetadata(value: unknown): value is BuildMetadata {
@@ -73,7 +73,7 @@ export function isBuildMetadataInput(value: unknown): value is BuildMetadataInpu
 function isBuildMetadataInputRecord(
   value: Record<string, unknown>,
 ): value is Record<string, unknown> & BuildMetadataInput {
-  return isLogicalBuildVersion(value.version) && is.nonEmptyString(value.commit) && isIsoUtcTimestamp(value.builtAt);
+  return isLogicalBuildVersion(value.version) && isNonEmptyString(value.commit) && isIsoUtcTimestamp(value.builtAt);
 }
 
 export function parseBuildMetadata(serializedBuildMetadata: string): Maybe<BuildMetadata> {

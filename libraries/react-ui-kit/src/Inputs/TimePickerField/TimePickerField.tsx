@@ -20,7 +20,7 @@
 import {useMemo} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {
   timePickerWrapperStyles,
@@ -98,7 +98,7 @@ export const TimePickerField = ({
       })}
       data-uie-name={dataUieName}
     >
-      {is.nonEmptyString(label) ? (
+      {isNonEmptyString(label) ? (
         <InputLabel htmlFor={id} markInvalid={markInvalid} id={labelId}>
           {label}
         </InputLabel>

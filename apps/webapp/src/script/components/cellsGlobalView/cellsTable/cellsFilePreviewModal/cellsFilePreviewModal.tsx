@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
@@ -47,10 +47,10 @@ export const CellsFilePreviewModal = () => {
       return undefined;
     }
 
-    if (is.nonEmptyString(previewPdfUrl)) {
+    if (isNonEmptyString(previewPdfUrl)) {
       return previewPdfUrl;
     }
-    if (is.nonEmptyString(previewImageUrl)) {
+    if (isNonEmptyString(previewImageUrl)) {
       return previewImageUrl;
     }
     return undefined;
