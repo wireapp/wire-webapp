@@ -2765,7 +2765,7 @@ table th {
   widows: 2;
   text-align: left;
 }
-.c9:has(> span > img) {
+.c9:has(> span:first-child > img) {
   display: flex;
   align-items: center;
 }
