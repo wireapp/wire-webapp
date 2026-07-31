@@ -130,7 +130,7 @@ function readPage(request: HttpRequest): number {
 }
 
 describe('GitHub client', () => {
-  it('maps GitHub pull requests into stripped domain records', async () => {
+  it('maps GitHub pull requests into stripped domain records with titles', async () => {
     const fakeHttpClient = createFakeHttpClient({
       responseForRequest() {
         return [githubPullRequestResponseFactory.build({number: 7})];
@@ -144,8 +144,9 @@ describe('GitHub client', () => {
     expect(actualResult.value).toHaveLength(1);
     const pullRequest = Maybe.of(actualResult.value[0]);
     assert(pullRequest.isJust);
-    expect(Object.keys(pullRequest.value)).toEqual(['number', 'baseBranch', 'mergedAt']);
+    expect(Object.keys(pullRequest.value)).toEqual(['number', 'title', 'baseBranch', 'mergedAt']);
     expect(pullRequest.value.number).toBe(7);
+    expect(pullRequest.value.title).toBe('Pull request');
     expect(pullRequest.value.baseBranch).toBe('main');
     assert(pullRequest.value.mergedAt.isJust);
     expect(pullRequest.value.mergedAt.value).toBe('2026-07-21T00:00:00Z');
@@ -165,7 +166,7 @@ describe('GitHub client', () => {
     });
     const responsesByPage = new Map<number, unknown>([
       [1, firstPage],
-      [2, [githubPullRequestResponseFactory.build({number: 200})]],
+      [2, [githubPullRequestResponseFactory.build({number: 200, title: 'Second page pull request'})]],
     ]);
     const fakeHttpClient = createFakeHttpClient({
       responseForRequest(request) {
@@ -187,6 +188,16 @@ describe('GitHub client', () => {
         return pullRequest.number === 200;
       }),
     ).toBe(true);
+    expect(
+      actualResult.value.some(pullRequest => {
+        return pullRequest.number === 200 && pullRequest.title === 'Second page pull request';
+      }),
+    ).toBe(true);
+    expect(
+      actualResult.value.some(pullRequest => {
+        return pullRequest.number === 1 || pullRequest.number === 2;
+      }),
+    ).toBe(false);
   });
 
   it('paginates issue comments and strips unused properties', async () => {
@@ -249,10 +260,52 @@ describe('GitHub client', () => {
     expect(updateRequest.value.url.toString()).toMatch(/issues\/comments\/11$/);
   });
 
-  it('rejects malformed GitHub responses', async () => {
+  it('rejects a GitHub response without a title as malformed', async () => {
     const fakeHttpClient = createFakeHttpClient({
       responseForRequest() {
-        return [{number: 1, merged_at: 42, base: {ref: 'main'}}];
+        return [{number: 1, merged_at: '2026-07-21T00:00:00Z', base: {ref: 'main'}}];
+      },
+    });
+    const githubClient = createClient(fakeHttpClient.httpClient);
+
+    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'});
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toBe('Malformed GitHub pull request response');
+  });
+
+  it('rejects a GitHub response with a non-string title as malformed', async () => {
+    const fakeHttpClient = createFakeHttpClient({
+      responseForRequest() {
+        return [{number: 1, title: 42, merged_at: '2026-07-21T00:00:00Z', base: {ref: 'main'}}];
+      },
+    });
+    const githubClient = createClient(fakeHttpClient.httpClient);
+
+    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'});
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toBe('Malformed GitHub pull request response');
+  });
+
+  it('rejects a GitHub response with an empty title as malformed', async () => {
+    const fakeHttpClient = createFakeHttpClient({
+      responseForRequest() {
+        return [{number: 1, title: '', merged_at: '2026-07-21T00:00:00Z', base: {ref: 'main'}}];
+      },
+    });
+    const githubClient = createClient(fakeHttpClient.httpClient);
+
+    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'});
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toBe('Malformed GitHub pull request response');
+  });
+
+  it('rejects other malformed GitHub responses', async () => {
+    const fakeHttpClient = createFakeHttpClient({
+      responseForRequest() {
+        return [{number: 1, title: 'Pull request', merged_at: 42, base: {ref: 'main'}}];
       },
     });
     const githubClient = createClient(fakeHttpClient.httpClient);

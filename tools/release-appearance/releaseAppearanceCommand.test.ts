@@ -124,6 +124,7 @@ function createFailure<valueType>(message: string): Result<valueType, Error> {
 function createPullRequest(number: number): PullRequestRecord {
   return {
     number,
+    title: 'Add release appearance test coverage',
     baseBranch: 'main',
     mergedAt: Maybe.just('2026-01-02T00:00:00Z'),
   };
@@ -559,7 +560,14 @@ describe('executeReleaseAppearanceCommand', () => {
         requestJson: async function requestJson(request): Promise<unknown> {
           githubRequests.push(request);
           if (request.url.pathname.endsWith('/pulls')) {
-            return [{number: 7, merged_at: '2026-01-02T00:00:00Z', base: {ref: 'main'}}];
+            return [
+              {
+                number: 7,
+                title: 'Add release appearance test coverage',
+                merged_at: '2026-01-02T00:00:00Z',
+                base: {ref: 'main'},
+              },
+            ];
           }
           if (request.method !== 'get') {
             throw new Error('Dry run attempted a mutation request');

@@ -65,9 +65,14 @@ type PreviewNextBetaState = {
   readonly targetMainCommit: string;
   readonly mergeBase: Maybe<string>;
   readonly commitsInspected: readonly string[];
-  readonly pullRequestNumbers: readonly number[];
+  readonly pullRequests: readonly PreviewPullRequest[];
   readonly commitsWithoutMergedMainPullRequest: readonly string[];
   readonly failureMessages: readonly string[];
+};
+
+type PreviewPullRequest = {
+  readonly number: number;
+  readonly title: string;
 };
 
 type DiscoverPullRequestsOptions = {
@@ -77,7 +82,7 @@ type DiscoverPullRequestsOptions = {
 };
 
 type DiscoverPullRequestsResult = {
-  readonly pullRequestNumbers: readonly number[];
+  readonly pullRequests: readonly PreviewPullRequest[];
   readonly commitsWithoutMergedMainPullRequest: readonly string[];
   readonly failureMessages: readonly string[];
 };
@@ -114,6 +119,7 @@ type WriteSummarySafelyOptions = {
 
 const processArgumentStartIndex = 2;
 const fullGitCommitPattern = /^[0-9a-f]{40}$/i;
+const markdownSpecialCharacterPattern = /[\\`*_\[\]<>~]/gu;
 const executeFile = promisify(execFile);
 const advisoryMessage =
   'This is an advisory preview. These changes are on main but have not been deployed or verified in Beta.';
@@ -189,7 +195,7 @@ async function discoverPullRequests(
   discoverPullRequestsOptions: DiscoverPullRequestsOptions,
 ): Promise<DiscoverPullRequestsResult> {
   const {commits, githubClient, githubToken} = discoverPullRequestsOptions;
-  const pullRequestNumbersByNumber = new Set<number>();
+  const pullRequestsByNumber = new Map<number, PreviewPullRequest>();
   const commitsWithoutMergedMainPullRequest: string[] = [];
   const failureMessages: string[] = [];
 
@@ -219,13 +225,18 @@ async function discoverPullRequests(
     }
 
     for (const pullRequest of mergedMainPullRequests) {
-      pullRequestNumbersByNumber.add(pullRequest.number);
+      if (!pullRequestsByNumber.has(pullRequest.number)) {
+        pullRequestsByNumber.set(pullRequest.number, {
+          number: pullRequest.number,
+          title: pullRequest.title,
+        });
+      }
     }
   }
 
   return {
-    pullRequestNumbers: [...pullRequestNumbersByNumber].toSorted((leftNumber, rightNumber) => {
-      return leftNumber - rightNumber;
+    pullRequests: [...pullRequestsByNumber.values()].toSorted((leftPullRequest, rightPullRequest) => {
+      return leftPullRequest.number - rightPullRequest.number;
     }),
     commitsWithoutMergedMainPullRequest,
     failureMessages,
@@ -241,7 +252,7 @@ function createUnavailableState(
     targetMainCommit,
     mergeBase: Maybe.nothing<string>(),
     commitsInspected: [],
-    pullRequestNumbers: [],
+    pullRequests: [],
     commitsWithoutMergedMainPullRequest: [],
     failureMessages,
   };
@@ -279,7 +290,7 @@ async function createPreviewState(createPreviewStateOptions: CreatePreviewStateO
     targetMainCommit: resolvedTargetMainCommit,
     mergeBase: Maybe.just(mergeBase),
     commitsInspected: commits,
-    pullRequestNumbers: discoveryResult.pullRequestNumbers,
+    pullRequests: discoveryResult.pullRequests,
     commitsWithoutMergedMainPullRequest: discoveryResult.commitsWithoutMergedMainPullRequest,
     failureMessages: discoveryResult.failureMessages,
   };
@@ -302,11 +313,22 @@ function formatPullRequestLines(state: PreviewNextBetaState, githubRepository: s
     return ['Not inspected.'];
   }
 
-  return is.emptyArray(state.pullRequestNumbers)
+  return is.emptyArray(state.pullRequests)
     ? ['No merged pull requests are currently waiting for the next Beta.']
-    : state.pullRequestNumbers.map(pullRequestNumber => {
-        return `- [#${pullRequestNumber}](https://github.com/${githubRepository}/pull/${pullRequestNumber})`;
+    : state.pullRequests.map(pullRequest => {
+        return `- [#${pullRequest.number}](https://github.com/${githubRepository}/pull/${pullRequest.number}) ${normalizePullRequestTitle(
+          pullRequest.title,
+        )}`;
       });
+}
+
+function normalizePullRequestTitle(title: string): string {
+  return title
+    .trim()
+    .replace(/\s+/gu, ' ')
+    .replace(markdownSpecialCharacterPattern, character => {
+      return `\\${character}`;
+    });
 }
 
 function formatDetailValue(value: string, markdown: boolean): string {
@@ -329,7 +351,7 @@ function createDetailLines(state: PreviewNextBetaState, markdown: boolean): read
   const inspectionValues = state.mergeBase.isJust
     ? {
         commitsInspected: state.commitsInspected.length.toString(),
-        pullRequests: state.pullRequestNumbers.length.toString(),
+        pullRequests: state.pullRequests.length.toString(),
         commitsWithoutPullRequests: state.commitsWithoutMergedMainPullRequest.length.toString(),
       }
     : {
@@ -390,7 +412,7 @@ function createReport(createReportOptions: CreateReportOptions): string {
     'Preview next Beta changes',
     ...createDetailLines(state, false),
     ...(is.emptyString(unavailableMessage) ? [] : ['', unavailableMessage]),
-    ...(state.mergeBase.isJust && is.emptyArray(state.pullRequestNumbers)
+    ...(state.mergeBase.isJust && is.emptyArray(state.pullRequests)
       ? ['No merged pull requests are currently waiting for the next Beta.']
       : []),
     ...(is.emptyArray(failureLines) ? [] : ['Failures:', ...failureLines]),
