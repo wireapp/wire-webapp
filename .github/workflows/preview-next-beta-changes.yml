@@ -1,0 +1,68 @@
+---
+name: Preview next Beta changes
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  preview_next_beta_changes:
+    name: Preview next Beta changes
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Check out selected main commit
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Validate workflow ref
+        env:
+          WORKFLOW_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          if [[ "${WORKFLOW_REF}" != 'refs/heads/main' ]]; then
+            echo 'The preview must be started with "Use workflow from: main".' >&2
+            exit 1
+          fi
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Fetch tags
+        run: git fetch --tags origin
+
+      - name: Preview next Beta changes
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TARGET_MAIN_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          node \
+            tools/release-appearance/previewNextBetaCommand.ts \
+            "${TARGET_MAIN_COMMIT}"
+
+      - name: Confirm read-only permissions
+        if: ${{ always() }}
+        run: |
+          {
+            echo ''
+            echo 'The workflow token had read-only repository and pull request permissions. No GitHub state was modified.'
+          } >> "$GITHUB_STEP_SUMMARY"
