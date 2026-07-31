@@ -31,7 +31,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "echo \"workspace-tools has no lint\""
+        "command": "eslint tools/release-appearance"
       }
     },
     "e2e": {
@@ -43,7 +43,7 @@
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --project ./tsconfig.bin.json --noEmit"
+        "command": "tsc --project ./tsconfig.bin.json --noEmit && tsc --project ./tools/release-appearance/tsconfig.json --noEmit"
       }
     }
   },
