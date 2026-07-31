@@ -7,7 +7,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
 
       - name: Set branch name and generate versions
         run: |
@@ -25,7 +25,7 @@ jobs:
           echo "CHART_REPO=$CHART_REPO" >> $GITHUB_ENV
 
       - name: Set up ORAS
-        uses: oras-project/setup-oras@v1
+        uses: oras-project/setup-oras@0123456789abcdef0123456789abcdef01234567
 
       - name: Publish Helm chart
         shell: bash

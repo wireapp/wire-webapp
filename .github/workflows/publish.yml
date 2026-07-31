@@ -144,7 +144,7 @@ jobs:
           version: '3.12.2'
 
       - name: Set up ORAS
-        uses: oras-project/setup-oras@v1
+        uses: oras-project/setup-oras@9fbe3ec8c8a2f0d3b3e3f1e4a5b6c7d8e9f0a1b2
 
       - name: Bump helm chart version
         shell: bash
