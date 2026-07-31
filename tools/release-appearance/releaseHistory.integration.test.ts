@@ -234,6 +234,89 @@ test('plans only the delta introduced by the current Beta candidate', async () =
   });
 });
 
+test('selects the preceding Production tag by annotated creation order across sibling branches', async () => {
+  await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+    const commonBaseCommit = await createCommit({
+      repositoryPath,
+      fileName: 'common-base.txt',
+      fileContents: 'common base',
+      commitDate: '2026-01-01T00:00:00+0000',
+    });
+    const olderAncestorProductionCommit = await createCommit({
+      repositoryPath,
+      fileName: 'older-production.txt',
+      fileContents: 'older production',
+      commitDate: '2026-01-02T00:00:00+0000',
+    });
+    const olderAncestorProductionTag = '2026-01-02.1-production';
+    await createAnnotatedTag({
+      repositoryPath,
+      tagName: olderAncestorProductionTag,
+      commit: olderAncestorProductionCommit,
+      taggerDate: '2026-01-02T01:00:00+0000',
+    });
+
+    await runGitCommand({
+      repositoryPath,
+      commandArguments: ['switch', '--quiet', '--create', 'sibling-release', commonBaseCommit],
+    });
+    const newerSiblingProductionCommit = await createCommit({
+      repositoryPath,
+      fileName: 'newer-sibling-production.txt',
+      fileContents: 'newer sibling production',
+      commitDate: '2026-01-03T00:00:00+0000',
+    });
+    const newerSiblingProductionTag = '2026-01-03.1-production';
+    await createAnnotatedTag({
+      repositoryPath,
+      tagName: newerSiblingProductionTag,
+      commit: newerSiblingProductionCommit,
+      taggerDate: '2026-01-03T01:00:00+0000',
+    });
+
+    await runGitCommand({
+      repositoryPath,
+      commandArguments: ['switch', '--quiet', 'main'],
+    });
+    const currentReleaseCommit = await createCommit({
+      repositoryPath,
+      fileName: 'current-release.txt',
+      fileContents: 'current release',
+      commitDate: '2026-01-04T00:00:00+0000',
+    });
+    const currentBetaTag = '2026-01-04.1-beta.1';
+    await createAnnotatedTag({
+      repositoryPath,
+      tagName: currentBetaTag,
+      commit: currentReleaseCommit,
+      taggerDate: '2026-01-04T01:00:00+0000',
+    });
+
+    const actualResult = await planBetaReleaseHistory({
+      executeGitCommand,
+      currentBetaTag,
+      releaseCommit: currentReleaseCommit,
+    });
+
+    assert(actualResult.isOk);
+    assert.equal(actualResult.value.kind, 'beta');
+    if (actualResult.value.kind !== 'beta') {
+      assert.fail('Expected a Beta history plan');
+    }
+    assert.equal(actualResult.value.precedingProductionTag, newerSiblingProductionTag);
+    assert.equal(actualResult.value.precedingTag, newerSiblingProductionTag);
+    assert.notEqual(actualResult.value.precedingProductionTag, olderAncestorProductionTag);
+    assert.equal(actualResult.value.commitRange.startTag, newerSiblingProductionTag);
+    assert.equal(actualResult.value.commitRange.endTag, currentBetaTag);
+    assert.equal(actualResult.value.commitRange.baseCommit, commonBaseCommit);
+    assert.equal(actualResult.value.commitRange.endCommit, currentReleaseCommit);
+    assert.deepStrictEqual(actualResult.value.commitRange.commits, [
+      olderAncestorProductionCommit,
+      currentReleaseCommit,
+    ]);
+  });
+});
+
 test('rejects a Beta tag that does not point to the supplied commit', async () => {
   await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
     await createProductionBaseline(repositoryPath);
