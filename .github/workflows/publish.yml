@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build:
     name: Build Docker image and Helm Chart
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-24.04
 
     outputs:
       wire_builds_target_branches: ${{ steps.output_target_branches.outputs.targets }}
@@ -143,6 +143,9 @@ jobs:
         with:
           version: '3.12.2'
 
+      - name: Set up ORAS
+        uses: oras-project/setup-oras@v1
+
       - name: Bump helm chart version
         shell: bash
         id: bump_chart_version
@@ -171,6 +174,67 @@ jobs:
           helm package ./charts/webapp
 
           helm s3 push --relative webapp-*.tgz charts-webapp
+
+          # Push to Quay OCI registry
+          echo "Logging in to Quay with Helm..."
+          echo "${{ secrets.WEBTEAM_QUAY_PASSWORD }}" | helm registry login -u "${{ secrets.WEBTEAM_QUAY_USERNAME }}" --password-stdin quay.io
+
+          echo "Pushing chart to OCI Quay..."
+          helm_output=$(helm push ./webapp-*.tgz oci://quay.io/wire/charts/dev 2>&1) || {
+            echo "Helm push to Quay failed with exit code $?"
+            echo "Output: $helm_output"
+            exit 1
+          }
+          echo "$helm_output"
+
+          digest=$(echo "$helm_output" | grep -oP 'sha256:\K[a-f0-9]{64}' | head -1)
+          echo "chart_digest=sha256:$digest" >> $GITHUB_OUTPUT
+
+      - name: Create and push build artifact to Quay
+        shell: bash
+        env:
+          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
+          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
+        run: |
+          set -eo pipefail
+
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          BRANCH_NAME=${BRANCH//\//-}
+
+          echo "Logging in to Quay with ORAS..."
+          echo "${{ secrets.WEBTEAM_QUAY_PASSWORD }}" | oras login -u "${{ secrets.WEBTEAM_QUAY_USERNAME }}" --password-stdin quay.io
+
+          echo "Creating build.json..."
+          cat > build.json <<EOF
+          {
+            "branch": "$BRANCH_NAME",
+            "commit": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
+            "tag": "${{steps.bump_chart_version.outputs.chart_version}}",
+            "digest": "${{steps.bump_chart_version.outputs.chart_digest}}",
+            "repository": "quay.io/wire/charts/dev/webapp"
+          }
+          EOF
+          cat build.json
+
+          echo "Publishing build artifact to Quay..."
+          oras push \
+            quay.io/wire/release-streams/webapp:$BRANCH_NAME \
+            build.json:application/vnd.wire.webapp.build+json
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.WIRE_ONPREM_AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.WIRE_ONPREM_AUTOMATION_PRIVATE_KEY }}
+          owner: wireapp
+
+      - name: Trigger webapp-release-stream-updated dispatch event
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh api repos/wireapp/wire-gov-bundles/dispatches \
+            -f event_type=webapp-release-stream-updated
 
       # generates a mapping between branches/tag to wire-build branches
       - name: Define target branches in wireapp/wire-builds to bump
