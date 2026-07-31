@@ -29,10 +29,23 @@ const createUser = (id: string, name: string) => {
 };
 
 describe('getMeetingParticipantsForDisplay', () => {
-  it('excludes the self user from the displayed participants', () => {
+  it('places the self user first when they are in the participants list', () => {
     const selfUser = createUser('self', 'Kim Organizer');
     const otherUser = createUser('other', 'Jaqueline Olaho');
 
-    expect(getMeetingParticipantsForDisplay([selfUser, otherUser], selfUser)).toEqual([otherUser]);
+    expect(getMeetingParticipantsForDisplay([otherUser, selfUser], selfUser)).toEqual([selfUser, otherUser]);
+  });
+
+  it('prepends the self user when they are not in the participants list', () => {
+    const selfUser = createUser('self', 'Kim Organizer');
+    const otherUser = createUser('other', 'Jaqueline Olaho');
+
+    expect(getMeetingParticipantsForDisplay([otherUser], selfUser)).toEqual([selfUser, otherUser]);
+  });
+
+  it('returns only the self user when there are no other participants', () => {
+    const selfUser = createUser('self', 'Kim Organizer');
+
+    expect(getMeetingParticipantsForDisplay([], selfUser)).toEqual([selfUser]);
   });
 });
