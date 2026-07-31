@@ -6,6 +6,7 @@
     "noUncheckedIndexedAccess": true,
     "outDir": "dist",
     "paths": {
+      "@sindresorhus/is": ["node_modules/@sindresorhus/is/distribution/index.d.ts"],
       "@enormora/objectory": ["node_modules/@enormora/objectory/main.d.ts"]
     },
     "removeComments": true,
