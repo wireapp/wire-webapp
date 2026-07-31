@@ -1,0 +1,130 @@
+---
+name: Dry run release appearance comments
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Release stage to inspect'
+        required: true
+        type: choice
+        options:
+          - beta
+          - production
+      release_tag:
+        description: 'Existing immutable release tag appropriate for the selected stage'
+        required: true
+        type: string
+      promoted_beta_tag:
+        description: 'Existing promoted Beta tag; required only for Production'
+        required: false
+        default: ''
+        type: string
+permissions: {}
+concurrency:
+  group: dry-run-release-appearance-comments
+  cancel-in-progress: false
+jobs:
+  dry_run_release_appearance_comments:
+    name: Plan release appearance comments
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read # required to check out and inspect release history
+      pull-requests: read # required to discover merged pull requests
+      issues: read # required to list existing pull request comments
+    steps:
+      - name: Checkout release history
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Validate workflow ref
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]; then
+            echo 'The dry run must be started with "Use workflow from: main".' >&2
+            exit 1
+          fi
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Fetch tags
+        run: git fetch --tags origin
+
+      - name: Validate stage inputs
+        env:
+          PROMOTED_BETA_TAG: ${{ inputs.promoted_beta_tag }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          STAGE: ${{ inputs.stage }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${RELEASE_TAG//[[:space:]]/}" ]]; then
+            echo 'release_tag must not be empty.' >&2
+            exit 1
+          fi
+
+          case "${STAGE}" in
+            beta)
+              if [[ -n "${PROMOTED_BETA_TAG}" ]]; then
+                echo 'promoted_beta_tag must be empty for Beta.' >&2
+                exit 1
+              fi
+              ;;
+            production)
+              if [[ -z "${PROMOTED_BETA_TAG//[[:space:]]/}" ]]; then
+                echo 'promoted_beta_tag must be provided for Production.' >&2
+                exit 1
+              fi
+              ;;
+            *)
+              echo "Unsupported stage: ${STAGE}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Resolve release commit
+        id: resolve_release_commit
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          release_commit="$(git rev-parse --verify "refs/tags/${RELEASE_TAG}^{commit}")"
+          echo "release_commit=${release_commit}" >> "$GITHUB_OUTPUT"
+
+      - name: Plan release appearance comments
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PROMOTED_BETA_TAG: ${{ inputs.promoted_beta_tag }}
+          RELEASE_COMMIT: ${{ steps.resolve_release_commit.outputs.release_commit }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          STAGE: ${{ inputs.stage }}
+        run: |
+          set -euo pipefail
+          if [[ "${STAGE}" == 'beta' ]]; then
+            release_appearance_command_arguments=(beta "${RELEASE_TAG}" "${RELEASE_COMMIT}" --dry-run)
+          else
+            release_appearance_command_arguments=(production "${RELEASE_TAG}" "${RELEASE_COMMIT}" "${PROMOTED_BETA_TAG}" --dry-run)
+          fi
+          node tools/release-appearance/releaseAppearanceCommand.ts "${release_appearance_command_arguments[@]}"
+
+      - name: Confirm read-only issue permissions
+        if: ${{ always() }}
+        run: |
+          {
+            echo ''
+            echo 'The workflow token had read-only issue permissions; GitHub comment mutations were not authorized.'
+          } >> "$GITHUB_STEP_SUMMARY"

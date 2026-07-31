@@ -34,6 +34,7 @@ import type {
   ExecuteReleaseAppearanceCommandOptions,
   ReleaseAppearanceCommandDependencies,
 } from './releaseAppearanceCommand.ts';
+import {createGitHubClient} from './githubClient.ts';
 import type {
   CreateIssueCommentOptions,
   GitHubClient,
@@ -41,6 +42,7 @@ import type {
   PullRequestRecord,
   UpdateIssueCommentOptions,
 } from './githubClient.ts';
+import type {HttpRequest} from './httpClient.ts';
 import type {ExecuteGitCommand} from './releaseHistory.ts';
 
 const releaseCommit = 'a'.repeat(40);
@@ -262,14 +264,69 @@ async function runCommand(runCommandOptions: RunCommandOptions): Promise<{
 }
 
 describe('parseCommandLineArguments', () => {
-  it('parses supported commands and requires full release commit SHAs', () => {
-    const betaResult = parseCommandLineArguments(['beta', betaTag, releaseCommit]);
-    const productionResult = parseCommandLineArguments(['production', productionTag, releaseCommit, betaTag]);
+  it('normal Beta parsing defaults to write mode', () => {
+    const actualResult = parseCommandLineArguments(['beta', betaTag, releaseCommit]);
+
+    assert(actualResult.isOk);
+    expect(actualResult.value).toEqual({
+      stage: 'beta',
+      releaseTag: betaTag,
+      releaseCommit,
+      executionMode: 'write',
+    });
+  });
+
+  it('normal Production parsing defaults to write mode', () => {
+    const actualResult = parseCommandLineArguments(['production', productionTag, releaseCommit, betaTag]);
+
+    assert(actualResult.isOk);
+    expect(actualResult.value).toEqual({
+      stage: 'production',
+      releaseTag: productionTag,
+      releaseCommit,
+      promotedBetaTag: betaTag,
+      executionMode: 'write',
+    });
+  });
+
+  it('accepts final --dry-run for Beta', () => {
+    const actualResult = parseCommandLineArguments(['beta', betaTag, releaseCommit, '--dry-run']);
+
+    assert(actualResult.isOk);
+    expect(actualResult.value.executionMode).toBe('dry-run');
+  });
+
+  it('accepts final --dry-run for Production', () => {
+    const actualResult = parseCommandLineArguments(['production', productionTag, releaseCommit, betaTag, '--dry-run']);
+
+    assert(actualResult.isOk);
+    expect(actualResult.value.executionMode).toBe('dry-run');
+  });
+
+  it('rejects repeated --dry-run', () => {
+    const actualResult = parseCommandLineArguments(['beta', betaTag, releaseCommit, '--dry-run', '--dry-run']);
+
+    expect(actualResult.isErr).toBe(true);
+  });
+
+  it('rejects unknown options and additional arguments', () => {
+    const unknownOptionResult = parseCommandLineArguments(['beta', betaTag, releaseCommit, '--write']);
+    const additionalArgumentResult = parseCommandLineArguments(['beta', betaTag, releaseCommit, '--dry-run', 'extra']);
+
+    expect(unknownOptionResult.isErr).toBe(true);
+    expect(additionalArgumentResult.isErr).toBe(true);
+  });
+
+  it('rejects misplaced --dry-run', () => {
+    const actualResult = parseCommandLineArguments(['production', productionTag, '--dry-run', releaseCommit, betaTag]);
+
+    expect(actualResult.isErr).toBe(true);
+  });
+
+  it('requires full release commit SHAs', () => {
     const abbreviatedCommitResult = parseCommandLineArguments(['beta', betaTag, 'abcdef0']);
     const longCommitResult = parseCommandLineArguments(['beta', betaTag, 'a'.repeat(64)]);
 
-    expect(betaResult.isOk).toBe(true);
-    expect(productionResult.isOk).toBe(true);
     expect(abbreviatedCommitResult.isErr).toBe(true);
     expect(longCommitResult.isErr).toBe(true);
   });
@@ -328,16 +385,179 @@ describe('executeReleaseAppearanceCommand', () => {
     assert(summary.isJust);
     expect(createdComment.value.commentBody).toMatch(/2026-01-02\.1-beta\.1/);
     expect(summary.value).toMatch(/Pull requests discovered: 1 \(#8\)/);
-    expect(commandRun.result.summary).toContain('- Comments created: 1');
-    expect(commandRun.result.summary).toContain('- Failed pull requests: none');
-    expect(commandRun.result.summary).toContain('### Failures\n\nNone');
+    expect(commandRun.result.summary).toBe(
+      [
+        '### Release appearance',
+        '',
+        '- Stage: beta',
+        `- Release tag: \`${betaTag}\``,
+        '- Bootstrap: no',
+        `- Preceding Production tag: ${previousProductionTag}`,
+        `- Beta candidate ranges for Production: ${betaTag}: ${previousProductionTag} -> ${betaTag}`,
+        `- Commits inspected: 1 (${betaCommit})`,
+        '- Pull requests discovered: 1 (#8)',
+        '- Comments created: 1',
+        '- Comments updated: 0',
+        '- Comments unchanged: 0',
+        '- Failed pull requests: none',
+        '- Commits without associated pull requests: none',
+        '',
+        '### Failures',
+        '',
+        'None',
+      ].join('\n'),
+    );
+  });
+
+  it('updates release appearance comments in write mode', async () => {
+    const existingBetaComment = renderPersistentComment({
+      beta: Maybe.just(betaTag),
+      production: Maybe.nothing<string>(),
+    });
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(9)]]]),
+      commentsByPullRequest: new Map([[9, [issueCommentRecordFactory.build({id: 19, body: existingBetaComment})]]]),
+    });
+
+    const commandRun = await runCommand({
+      commandLineArguments: ['production', productionTag, releaseCommit, betaTag],
+      executeGitCommand: createFakeGitCommand(),
+      githubClient: fakeGitHubClient.githubClient,
+    });
+
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(fakeGitHubClient.state.createdComments).toEqual([]);
+    expect(fakeGitHubClient.state.updatedComments).toHaveLength(1);
+  });
+
+  it('plans create, update, and unchanged comments without mutations in dry-run mode', async () => {
+    const existingBetaComment = renderPersistentComment({
+      beta: Maybe.just(betaTag),
+      production: Maybe.nothing<string>(),
+    });
+    const existingProductionComment = renderPersistentComment({
+      beta: Maybe.just(betaTag),
+      production: Maybe.just(productionTag),
+    });
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(1), createPullRequest(2), createPullRequest(3)]]]),
+      commentsByPullRequest: new Map([
+        [2, [issueCommentRecordFactory.build({id: 12, body: existingBetaComment})]],
+        [3, [issueCommentRecordFactory.build({id: 13, body: existingProductionComment})]],
+      ]),
+    });
+
+    const commandRun = await runCommand({
+      commandLineArguments: ['production', productionTag, releaseCommit, betaTag, '--dry-run'],
+      executeGitCommand: createFakeGitCommand(),
+      githubClient: fakeGitHubClient.githubClient,
+    });
+
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(fakeGitHubClient.state.commentPullRequests).toEqual([1, 2, 3]);
+    expect(fakeGitHubClient.state.createdComments).toEqual([]);
+    expect(fakeGitHubClient.state.updatedComments).toEqual([]);
+    expect(commandRun.result.summary).toContain('- Mode: dry run');
+    expect(commandRun.result.summary).toContain('- Comments that would be created: 1');
+    expect(commandRun.result.summary).toContain('- Comments that would be updated: 1');
+    expect(commandRun.result.summary).toContain('- Unchanged comments: 1');
+    expect(commandRun.result.summary).toContain('- #1: would create');
+    expect(commandRun.result.summary).toContain('- #2: would update');
+    expect(commandRun.result.summary).toContain('- #3: unchanged');
+    expect(commandRun.result.summary).toContain('No GitHub comments were created or updated.');
+  });
+
+  it('uses paginated GitHub comment reads without mutations in dry-run mode', async () => {
+    const githubRequests: HttpRequest[] = [];
+    const firstCommentPage = Array.from({length: 100}, (_, commentIndex) => {
+      return {id: commentIndex + 1, body: `Unrelated comment ${commentIndex + 1}`};
+    });
+    const githubClient = createGitHubClient({
+      githubApiUrl: new URL('https://api.github.example/'),
+      githubRepository: 'wireapp/wire-webapp',
+      githubToken: 'github-token',
+      httpClient: {
+        requestJson: async function requestJson(request): Promise<unknown> {
+          githubRequests.push(request);
+          if (request.url.pathname.endsWith('/pulls')) {
+            return [{number: 7, merged_at: '2026-01-02T00:00:00Z', base: {ref: 'main'}}];
+          }
+          if (request.method !== 'get') {
+            throw new Error('Dry run attempted a mutation request');
+          }
+          return request.url.searchParams.get('page') === '1' ? firstCommentPage : [];
+        },
+      },
+    });
+
+    const commandRun = await runCommand({
+      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      executeGitCommand: createFakeGitCommand(),
+      githubClient,
+    });
+
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(
+      githubRequests
+        .filter(request => {
+          return request.url.pathname.endsWith('/issues/7/comments');
+        })
+        .map(request => {
+          return request.url.searchParams.get('page');
+        }),
+    ).toEqual(['1', '2']);
+    expect(
+      githubRequests.every(request => {
+        return request.method === 'get';
+      }),
+    ).toBe(true);
+  });
+
+  it('continues dry-run planning after malformed markers, duplicate markers, and read failures', async () => {
+    const malformedMarker = '<!-- wire-webapp-release-appearance:v1\n{"beta":}\n-->';
+    const markerComment = renderPersistentComment({
+      beta: Maybe.just(betaTag),
+      production: Maybe.nothing<string>(),
+    });
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByCommit: new Map([
+        [betaCommit, [createPullRequest(1), createPullRequest(2), createPullRequest(3), createPullRequest(4)]],
+      ]),
+      commentsByPullRequest: new Map([
+        [1, [issueCommentRecordFactory.build({body: malformedMarker})]],
+        [
+          2,
+          [
+            issueCommentRecordFactory.build({id: 21, body: markerComment}),
+            issueCommentRecordFactory.build({id: 22, body: markerComment}),
+          ],
+        ],
+      ]),
+      commentListFailuresByPullRequest: new Map([[3, `Unable to read ${commandEnvironment.GITHUB_TOKEN}`]]),
+    });
+
+    const commandRun = await runCommand({
+      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      executeGitCommand: createFakeGitCommand(),
+      githubClient: fakeGitHubClient.githubClient,
+    });
+
+    expect(commandRun.result.exitCode).toBe(1);
+    expect(fakeGitHubClient.state.commentPullRequests).toEqual([1, 2, 3, 4]);
+    expect(fakeGitHubClient.state.createdComments).toEqual([]);
+    expect(fakeGitHubClient.state.updatedComments).toEqual([]);
+    expect(commandRun.result.summary).toContain('Malformed release-appearance marker state');
+    expect(commandRun.result.summary).toContain('More than one release-appearance marker comment exists');
+    expect(commandRun.result.summary).toContain('[REDACTED]');
+    expect(commandRun.result.summary).not.toContain(commandEnvironment.GITHUB_TOKEN);
+    expect(commandRun.result.summary).toContain('- #4: would create');
   });
 
   it('includes release-history planning failures in the summary', async () => {
     const fakeGitHubClient = createFakeGitHubClient();
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', 'invalid-beta-tag', releaseCommit],
+      commandLineArguments: ['beta', 'invalid-beta-tag', releaseCommit, '--dry-run'],
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -357,18 +577,15 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit],
+      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
       executeGitCommand: createFakeGitCommand({commits: [failedDiscoveryCommit, betaCommit]}),
       githubClient: fakeGitHubClient.githubClient,
     });
 
     expect(commandRun.result.exitCode).toBe(1);
     expect(fakeGitHubClient.state.pullRequestCommits).toEqual([failedDiscoveryCommit, betaCommit]);
-    expect(
-      fakeGitHubClient.state.createdComments.map(comment => {
-        return comment.pullRequestNumber;
-      }),
-    ).toEqual([2]);
+    expect(fakeGitHubClient.state.createdComments).toEqual([]);
+    expect(commandRun.result.summary).toContain('- #2: would create');
     expect(commandRun.result.summary).toContain(`- Discovery: ${discoveryFailureMessage}`);
   });
 
@@ -498,7 +715,7 @@ describe('executeReleaseAppearanceCommand', () => {
     const fakeGitHubClient = createFakeGitHubClient();
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit],
+      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
       executeGitCommand: createFakeGitCommand({bootstrap: true}),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -508,6 +725,8 @@ describe('executeReleaseAppearanceCommand', () => {
     const summary = Maybe.of(commandRun.summaries[0]);
     assert(summary.isJust);
     expect(summary.value).toMatch(/Bootstrap: yes/);
+    expect(summary.value).toContain('No pull request comment operations were planned.');
+    expect(summary.value).toContain('No GitHub comments were created or updated.');
     expect(commandRun.result.summary).toContain('### Failures\n\nNone');
   });
 });
