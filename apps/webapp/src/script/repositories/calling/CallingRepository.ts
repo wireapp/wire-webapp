@@ -2055,7 +2055,7 @@ export class CallingRepository {
   }
 
   private getMediaTrackSettings(mediaTrack: MediaStreamTrack): Maybe<MediaTrackSettings> {
-    if (is.function_(mediaTrack.getSettings) === false) {
+    if (is.function(mediaTrack.getSettings) === false) {
       return Maybe.nothing();
     }
 
@@ -2063,7 +2063,7 @@ export class CallingRepository {
   }
 
   private getMediaTrackConstraints(mediaTrack: MediaStreamTrack): Maybe<MediaTrackConstraints> {
-    if (is.function_(mediaTrack.getConstraints) === false) {
+    if (is.function(mediaTrack.getConstraints) === false) {
       return Maybe.nothing();
     }
 
@@ -2071,7 +2071,7 @@ export class CallingRepository {
   }
 
   private getMediaTrackCapabilities(mediaTrack: MediaStreamTrack): Maybe<MediaTrackCapabilities> {
-    if (is.function_(mediaTrack.getCapabilities) === false) {
+    if (is.function(mediaTrack.getCapabilities) === false) {
       return Maybe.nothing();
     }
 

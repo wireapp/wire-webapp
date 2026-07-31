@@ -139,7 +139,7 @@ export function createPartysocketCompatibleWebSocketConstructor(
       listener: EventListenerOrEventListenerObject | null,
       options?: boolean | AddEventListenerOptions,
     ) => {
-      if (type !== 'message' || !is.function_(listener)) {
+      if (type !== 'message' || !is.function(listener)) {
         originalAddEventListener(type, listener, options);
         return;
       }
@@ -156,7 +156,7 @@ export function createPartysocketCompatibleWebSocketConstructor(
       listener: EventListenerOrEventListenerObject | null,
       options?: boolean | EventListenerOptions,
     ) => {
-      if (type !== 'message' || !is.function_(listener)) {
+      if (type !== 'message' || !is.function(listener)) {
         originalRemoveEventListener(type, listener, options);
         return;
       }
