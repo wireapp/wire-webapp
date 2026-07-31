@@ -17,117 +17,72 @@
  *
  */
 
+import assert from 'node:assert';
+import {spawn} from 'node:child_process';
+
 import {createFactory} from '@enormora/objectory';
-import type {ShapeToGeneratorReturnValue} from '@enormora/objectory';
+import {Maybe, Result} from 'true-myth';
 
 import {renderPersistentComment} from './releaseAppearance.ts';
-import {executeReleaseAppearanceCommand, main} from './releaseAppearanceCommand.ts';
+import {
+  executeReleaseAppearanceCommand,
+  parseCommandLineArguments,
+  prepareCommentOperation,
+  readCommandEnvironment,
+} from './releaseAppearanceCommand.ts';
 import type {
   ExecuteReleaseAppearanceCommandOptions,
-  GitHubRequestBehavior,
   ReleaseAppearanceCommandDependencies,
 } from './releaseAppearanceCommand.ts';
+import type {
+  CreateIssueCommentOptions,
+  GitHubClient,
+  IssueCommentRecord,
+  PullRequestRecord,
+  UpdateIssueCommentOptions,
+} from './githubClient.ts';
 import type {ExecuteGitCommand} from './releaseHistory.ts';
 
 const releaseCommit = 'a'.repeat(40);
 const previousProductionCommit = 'b'.repeat(40);
-const betaOneCommit = 'c'.repeat(40);
-const betaTwoCommit = 'd'.repeat(40);
+const betaCommit = 'c'.repeat(40);
 const previousProductionTag = '2026-01-01.1-production';
-const betaOneTag = '2026-01-02.1-beta.1';
-const betaTwoTag = '2026-01-02.1-beta.2';
+const betaTag = '2026-01-02.1-beta.1';
 const productionTag = '2026-01-02.1-production';
-const githubToken = 'test-token-must-not-leak';
 
 const commandEnvironment: NodeJS.ProcessEnv = {
   GITHUB_API_URL: 'https://api.github.com',
   GITHUB_REPOSITORY: 'wireapp/wire-webapp',
   GITHUB_STEP_SUMMARY: '/tmp/release-appearance-summary.md',
-  GITHUB_TOKEN: githubToken,
+  GITHUB_TOKEN: 'github-token',
 };
 
-type FakeGitCommandOptions = {
-  readonly stage: 'beta' | 'production';
-  readonly bootstrap?: boolean;
-  readonly promotedBetaTag?: string;
+type FakeGitHubClientOptions = {
+  readonly pullRequestsByCommit?: ReadonlyMap<string, readonly PullRequestRecord[]>;
+  readonly commentsByPullRequest?: ReadonlyMap<number, readonly IssueCommentRecord[]>;
+  readonly createFailurePullRequests?: ReadonlySet<number>;
 };
 
-type FakeGitHubRequestOptions = {
-  readonly pullRequestPages?: ReadonlyMap<string, ReadonlyMap<number, unknown>>;
-  readonly issueCommentPages?: ReadonlyMap<number, ReadonlyMap<number, unknown>>;
-  readonly createFailureNumbers?: ReadonlySet<number>;
-  readonly updateFailureNumbers?: ReadonlySet<number>;
-  readonly pullRequestFailureMessage?: string;
+type FakeGitHubClientState = {
+  readonly pullRequestCommits: string[];
+  readonly commentPullRequests: number[];
+  readonly createdComments: CreateIssueCommentOptions[];
+  readonly updatedComments: UpdateIssueCommentOptions[];
 };
 
-type FakeGitHubRequestState = {
-  readonly pullRequestCalls: Array<{readonly commitSha: string; readonly page: number}>;
-  readonly issueCommentCalls: Array<{readonly pullRequestNumber: number; readonly page: number}>;
-  readonly createdComments: Array<{readonly pullRequestNumber: number; readonly commentBody: string}>;
-  readonly updatedComments: Array<{readonly commentId: number; readonly commentBody: string}>;
-};
-
-type FakeGitHubRequestFixture = {
-  readonly requests: GitHubRequestBehavior;
-  readonly state: FakeGitHubRequestState;
+type FakeGitHubClientFixture = {
+  readonly githubClient: GitHubClient;
+  readonly state: FakeGitHubClientState;
 };
 
 type RunCommandOptions = {
   readonly commandLineArguments: readonly string[];
-  readonly executeGitCommand?: ExecuteGitCommand;
-  readonly githubRequests: GitHubRequestBehavior;
-  readonly outputMessages?: string[];
-  readonly summaries?: string[];
-};
-
-type CreateTestDependenciesOptions = {
-  readonly githubRequests: GitHubRequestBehavior;
   readonly executeGitCommand: ExecuteGitCommand;
-  readonly outputMessages?: string[];
-  readonly summaries?: string[];
+  readonly githubClient: GitHubClient;
 };
 
-type CreatePullRequestResponseOptions = {
-  readonly pullRequestNumber: number;
-  readonly merged?: boolean;
-  readonly targetBranch?: string;
-};
-
-type PullRequestBaseResponseFixture = {
-  readonly ref: string;
-};
-
-type PullRequestResponseFixture = {
-  readonly number: number;
-  readonly merged_at: string | null;
-  readonly base: PullRequestBaseResponseFixture;
-};
-
-type IssueCommentResponseFixture = {
-  readonly id: number;
-  readonly body: string;
-};
-
-type PullRequestResponseFactoryShape = ShapeToGeneratorReturnValue<PullRequestResponseFixture>;
-
-const pullRequestBaseResponseFactory = createFactory<PullRequestBaseResponseFixture>(
-  function createPullRequestBaseResponse(): PullRequestBaseResponseFixture {
-    return {ref: 'main'};
-  },
-);
-
-const pullRequestResponseFactory = createFactory<PullRequestResponseFixture>(
-  function createPullRequestResponse(): PullRequestResponseFactoryShape {
-    return {
-      number: 1,
-      merged_at: '2026-01-03T00:00:00Z',
-      base: pullRequestBaseResponseFactory,
-    };
-  },
-);
-
-const issueCommentResponseFactory = createFactory<IssueCommentResponseFixture>(
-  function createIssueCommentResponse(): IssueCommentResponseFixture {
+const issueCommentRecordFactory = createFactory<IssueCommentRecord>(
+  function createIssueCommentRecord(): IssueCommentRecord {
     return {
       id: 1,
       body: 'comment',
@@ -135,190 +90,106 @@ const issueCommentResponseFactory = createFactory<IssueCommentResponseFixture>(
   },
 );
 
-type CommandRunResult = {
-  readonly result: Awaited<ReturnType<typeof executeReleaseAppearanceCommand>>;
-  readonly outputMessages: readonly string[];
-  readonly summaries: readonly string[];
-};
-
-function createPullRequestResponse(options: CreatePullRequestResponseOptions): PullRequestResponseFixture {
-  const {pullRequestNumber, merged = true, targetBranch = 'main'} = options;
-
-  return pullRequestResponseFactory.build({
-    number: pullRequestNumber,
-    merged_at: merged ? '2026-01-03T00:00:00Z' : null,
-    base: {ref: targetBranch},
-  });
+function createSuccess<valueType>(value: valueType): Result<valueType, Error> {
+  return Result.ok<valueType, Error>(value);
 }
 
-function createIssueCommentResponse(commentId: number, commentBody: string): IssueCommentResponseFixture {
-  return issueCommentResponseFactory.build({id: commentId, body: commentBody});
+function createFailure<valueType>(message: string): Result<valueType, Error> {
+  return Result.err<valueType, Error>(new Error(message));
 }
 
-function createPageMap(pageResponses: readonly [number, unknown][]): ReadonlyMap<number, unknown> {
-  return new Map(pageResponses);
+function createPullRequest(number: number): PullRequestRecord {
+  return {
+    number,
+    baseBranch: 'main',
+    mergedAt: Maybe.just('2026-01-02T00:00:00Z'),
+  };
 }
 
-function createSinglePageMap(response: unknown): ReadonlyMap<number, unknown> {
-  return createPageMap([[1, response]]);
-}
-
-type GetPageResponseOptions<pageKeyType> = {
-  readonly pageResponses: ReadonlyMap<pageKeyType, ReadonlyMap<number, unknown>> | undefined;
-  readonly key: pageKeyType;
-  readonly page: number;
-};
-
-function getPageResponse<pageKeyType>(getPageResponseOptions: GetPageResponseOptions<pageKeyType>): unknown {
-  const {pageResponses, key, page} = getPageResponseOptions;
-  const responsesForKey = pageResponses?.get(key);
-  if (responsesForKey === undefined) {
-    return [];
-  }
-
-  const response = responsesForKey.get(page);
-  if (response === undefined) {
-    return [];
-  }
-
-  return response;
-}
-
-function createFakeGitHubRequests(fakeGitHubRequestOptions: FakeGitHubRequestOptions = {}): FakeGitHubRequestFixture {
-  const state: FakeGitHubRequestState = {
-    pullRequestCalls: [],
-    issueCommentCalls: [],
+function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions = {}): FakeGitHubClientFixture {
+  const state: FakeGitHubClientState = {
+    pullRequestCommits: [],
+    commentPullRequests: [],
     createdComments: [],
     updatedComments: [],
   };
 
-  const requests: GitHubRequestBehavior = {
-    async listPullRequestsForCommit(options): Promise<unknown> {
-      state.pullRequestCalls.push(options);
-      if (fakeGitHubRequestOptions.pullRequestFailureMessage !== undefined) {
-        throw new Error(fakeGitHubRequestOptions.pullRequestFailureMessage);
-      }
-
-      return getPageResponse({
-        pageResponses: fakeGitHubRequestOptions.pullRequestPages,
-        key: options.commitSha,
-        page: options.page,
-      });
-    },
-    async listIssueComments(options): Promise<unknown> {
-      state.issueCommentCalls.push(options);
-      return getPageResponse({
-        pageResponses: fakeGitHubRequestOptions.issueCommentPages,
-        key: options.pullRequestNumber,
-        page: options.page,
-      });
-    },
-    async createIssueComment(options): Promise<unknown> {
-      if (fakeGitHubRequestOptions.createFailureNumbers?.has(options.pullRequestNumber)) {
-        throw new Error(`Create failed with token ${githubToken}`);
-      }
-
-      state.createdComments.push(options);
-      return createIssueCommentResponse(state.createdComments.length, options.commentBody);
-    },
-    async updateIssueComment(options): Promise<unknown> {
-      if (fakeGitHubRequestOptions.updateFailureNumbers?.has(options.commentId)) {
-        throw new Error(`Update failed with token ${githubToken}`);
-      }
-
-      state.updatedComments.push(options);
-      return createIssueCommentResponse(options.commentId, options.commentBody);
+  return {
+    state,
+    githubClient: {
+      async listPullRequestsForCommit(options): Promise<Result<readonly PullRequestRecord[], Error>> {
+        state.pullRequestCommits.push(options.commitSha);
+        return createSuccess(
+          Maybe.of(fakeGitHubClientOptions.pullRequestsByCommit?.get(options.commitSha)).unwrapOr([]),
+        );
+      },
+      async listIssueComments(options): Promise<Result<readonly IssueCommentRecord[], Error>> {
+        state.commentPullRequests.push(options.pullRequestNumber);
+        return createSuccess(
+          Maybe.of(fakeGitHubClientOptions.commentsByPullRequest?.get(options.pullRequestNumber)).unwrapOr([]),
+        );
+      },
+      async createIssueComment(options): Promise<Result<IssueCommentRecord, Error>> {
+        if (fakeGitHubClientOptions.createFailurePullRequests?.has(options.pullRequestNumber) === true) {
+          return createFailure(`Unable to create comment for #${options.pullRequestNumber}`);
+        }
+        state.createdComments.push(options);
+        return createSuccess(
+          issueCommentRecordFactory.build({id: options.pullRequestNumber, body: options.commentBody}),
+        );
+      },
+      async updateIssueComment(options): Promise<Result<IssueCommentRecord, Error>> {
+        state.updatedComments.push(options);
+        return createSuccess(issueCommentRecordFactory.build({id: options.commentId, body: options.commentBody}));
+      },
     },
   };
-
-  return {requests, state};
 }
 
-function createFakeGitCommand(fakeGitCommandOptions: FakeGitCommandOptions): ExecuteGitCommand {
-  const {stage, bootstrap = false, promotedBetaTag = betaTwoTag} = fakeGitCommandOptions;
-  const currentTag = stage === 'beta' ? (promotedBetaTag === betaOneTag ? betaOneTag : betaTwoTag) : productionTag;
-
+function createFakeGitCommand(bootstrap: boolean = false): ExecuteGitCommand {
   return async function executeFakeGitCommand(commandArguments: readonly string[]): Promise<string> {
-    const [gitOperation, firstArgument, secondArgument] = commandArguments;
-
-    if (gitOperation === 'tag' && firstArgument === '--list') {
-      if (secondArgument === '--' && commandArguments[3] === '*-production') {
-        if (bootstrap) {
-          return '';
-        }
-
-        return stage === 'production' ? `${previousProductionTag}\n${productionTag}\n` : `${previousProductionTag}\n`;
-      }
-
-      if (secondArgument === '--' && commandArguments[3] === '*-beta.*') {
-        return promotedBetaTag === betaOneTag ? `${betaOneTag}\n` : `${betaOneTag}\n${betaTwoTag}\n`;
-      }
+    const command = commandArguments.join(' ');
+    if (command === 'tag --list -- *-production') {
+      return bootstrap ? '' : `${previousProductionTag}\n`;
     }
-
-    if (gitOperation === 'cat-file') {
+    if (command === 'tag --list -- *-beta.*') {
+      return `${betaTag}\n`;
+    }
+    if (command.startsWith('cat-file -t refs/tags/')) {
       return 'tag\n';
     }
-
-    if (gitOperation === 'for-each-ref') {
-      return commandArguments[2]?.includes(currentTag) ? '200\n' : '100\n';
+    if (command.startsWith('for-each-ref --format=%(taggerdate:unix)')) {
+      return command.includes(betaTag) || command.includes(productionTag) ? '200\n' : '100\n';
     }
-
-    if (gitOperation === 'rev-parse') {
-      const tagReference = commandArguments[2] ?? '';
-      if (tagReference.includes(previousProductionTag)) {
-        return `${previousProductionCommit}\n`;
-      }
-
-      if (tagReference.includes(betaOneTag)) {
-        return stage === 'production' && promotedBetaTag === betaOneTag ? `${releaseCommit}\n` : `${betaOneCommit}\n`;
-      }
-
-      if (tagReference.includes(betaTwoTag)) {
-        return stage === 'production' && promotedBetaTag === betaTwoTag ? `${releaseCommit}\n` : `${betaTwoCommit}\n`;
-      }
-
+    if (command.includes(`refs/tags/${previousProductionTag}^{commit}`)) {
+      return `${previousProductionCommit}\n`;
+    }
+    if (command.includes(`refs/tags/${betaTag}^{commit}`)) {
       return `${releaseCommit}\n`;
     }
-
-    if (gitOperation === 'merge-base') {
-      const startTagReference = commandArguments[1] ?? '';
-
-      return startTagReference.includes(betaOneTag) ? `${betaOneCommit}\n` : `${previousProductionCommit}\n`;
+    if (command.includes(`refs/tags/${productionTag}^{commit}`)) {
+      return `${releaseCommit}\n`;
+    }
+    if (command.startsWith('merge-base ')) {
+      return `${previousProductionCommit}\n`;
+    }
+    if (command.startsWith('rev-list --reverse ')) {
+      return `${betaCommit}\n`;
     }
 
-    if (gitOperation === 'rev-list') {
-      const commitRange = commandArguments[2] ?? '';
-      if (commitRange.includes(`${betaOneCommit}..${betaTwoCommit}`)) {
-        return `${betaTwoCommit}\n`;
-      }
-
-      if (commitRange.includes(`${previousProductionCommit}..${betaOneCommit}`)) {
-        return `${betaOneCommit}\n`;
-      }
-
-      if (commitRange.includes(`${previousProductionCommit}..${releaseCommit}`)) {
-        return `${betaOneCommit}\n`;
-      }
-
-      if (commitRange.includes(`${betaOneCommit}..${releaseCommit}`)) {
-        return `${betaTwoCommit}\n`;
-      }
-
-      return `${betaOneCommit}\n`;
-    }
-
-    throw new Error(`Unexpected fake Git command: ${commandArguments.join(' ')}`);
+    throw new Error(`Unexpected fake Git command: ${command}`);
   };
 }
 
-function createTestDependencies(
-  createTestDependenciesOptions: CreateTestDependenciesOptions,
+function createDependencies(
+  executeGitCommand: ExecuteGitCommand,
+  githubClient: GitHubClient,
+  outputMessages: string[],
+  summaries: string[],
 ): ReleaseAppearanceCommandDependencies {
-  const {githubRequests, executeGitCommand, outputMessages = [], summaries = []} = createTestDependenciesOptions;
-
   return {
     executeGitCommand,
-    githubRequests,
+    githubClient,
     async writeSummary(summary): Promise<void> {
       summaries.push(summary);
     },
@@ -328,347 +199,145 @@ function createTestDependencies(
   };
 }
 
-async function runCommand(runCommandOptions: RunCommandOptions): Promise<CommandRunResult> {
-  const outputMessages = runCommandOptions.outputMessages ?? [];
-  const summaries = runCommandOptions.summaries ?? [];
-  const dependencies = createTestDependencies({
-    githubRequests: runCommandOptions.githubRequests,
-    executeGitCommand: runCommandOptions.executeGitCommand ?? createFakeGitCommand({stage: 'beta'}),
-    outputMessages,
-    summaries,
-  });
+async function runCommand(runCommandOptions: RunCommandOptions): Promise<{
+  readonly result: Awaited<ReturnType<typeof executeReleaseAppearanceCommand>>;
+  readonly outputMessages: readonly string[];
+  readonly summaries: readonly string[];
+}> {
+  const outputMessages: string[] = [];
+  const summaries: string[] = [];
   const options: ExecuteReleaseAppearanceCommandOptions = {
     commandLineArguments: runCommandOptions.commandLineArguments,
     environment: commandEnvironment,
-    dependencies,
+    dependencies: createDependencies(
+      runCommandOptions.executeGitCommand,
+      runCommandOptions.githubClient,
+      outputMessages,
+      summaries,
+    ),
   };
   const result = await executeReleaseAppearanceCommand(options);
-
   return {result, outputMessages, summaries};
 }
 
-function createBetaCommandArguments(): readonly string[] {
-  return ['beta', betaOneTag, releaseCommit];
-}
+test('parses supported commands and requires full release commit SHAs', () => {
+  const betaResult = parseCommandLineArguments(['beta', betaTag, releaseCommit]);
+  const productionResult = parseCommandLineArguments(['production', productionTag, releaseCommit, betaTag]);
+  const abbreviatedCommitResult = parseCommandLineArguments(['beta', betaTag, 'abcdef0']);
+  const longCommitResult = parseCommandLineArguments(['beta', betaTag, 'a'.repeat(64)]);
 
-function createProductionCommandArguments(promotedBetaTag: string = betaTwoTag): readonly string[] {
-  return ['production', productionTag, releaseCommit, promotedBetaTag];
-}
+  assert.equal(betaResult.isOk, true);
+  assert.equal(productionResult.isOk, true);
+  assert.equal(abbreviatedCommitResult.isErr, true);
+  assert.equal(longCommitResult.isErr, true);
+});
 
-describe('release appearance command', (): void => {
-  it('supports paginated pull requests associated with a commit', async (): Promise<void> => {
-    const firstPagePullRequests = pullRequestResponseFactory.withOverrides({number: 5}).buildList({length: 100});
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [
-          betaOneCommit,
-          createPageMap([
-            [1, firstPagePullRequests],
-            [2, [createPullRequestResponse({pullRequestNumber: 5})]],
-          ]),
-        ],
-      ]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createBetaCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-    });
-
-    expect(commandResult.result.exitCode).toBe(0);
-    expect(fakeGitHubRequests.state.pullRequestCalls).toStrictEqual([
-      {commitSha: betaOneCommit, page: 1},
-      {commitSha: betaOneCommit, page: 2},
-    ]);
-    expect(
-      fakeGitHubRequests.state.createdComments.map(comment => {
-        return comment.pullRequestNumber;
-      }),
-    ).toStrictEqual([5]);
+test('parses and validates required command environment', () => {
+  const validEnvironmentResult = readCommandEnvironment(commandEnvironment);
+  const invalidRepositoryResult = readCommandEnvironment({
+    ...commandEnvironment,
+    GITHUB_REPOSITORY: 'wire-webapp',
   });
 
-  it('supports paginated issue comments', async (): Promise<void> => {
-    const unrelatedComments = Array.from({length: 100}, (_, commentIndex) => {
-      return createIssueCommentResponse(commentIndex + 1, `unrelated comment ${commentIndex}`);
-    });
-    const existingBetaComment = renderPersistentComment({beta: betaOneTag});
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [betaOneCommit, createSinglePageMap([createPullRequestResponse({pullRequestNumber: 7})])],
-      ]),
-      issueCommentPages: new Map([
-        [
-          7,
-          createPageMap([
-            [1, unrelatedComments],
-            [2, [createIssueCommentResponse(101, existingBetaComment)]],
-          ]),
-        ],
-      ]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createBetaCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-    });
+  assert(validEnvironmentResult.isOk);
+  assert.equal(validEnvironmentResult.value.githubApiUrl.toString(), 'https://api.github.com/');
+  assert(invalidRepositoryResult.isErr);
+  assert.match(invalidRepositoryResult.error.message, /OWNER\/REPOSITORY/);
+});
 
-    expect(commandResult.result.exitCode).toBe(0);
-    expect(fakeGitHubRequests.state.issueCommentCalls).toStrictEqual([
-      {pullRequestNumber: 7, page: 1},
-      {pullRequestNumber: 7, page: 2},
-    ]);
-    expect(fakeGitHubRequests.state.createdComments).toStrictEqual([]);
-    expect(fakeGitHubRequests.state.updatedComments).toStrictEqual([]);
+test('prepares an update while preserving cross-release first appearances', () => {
+  const existingComment = renderPersistentComment({
+    beta: Maybe.just('2026-08-01.1-beta.1'),
+    production: Maybe.just('2026-08-08.1-production'),
   });
 
-  it('filters unmerged pull requests and unsupported target branches', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [
-          betaOneCommit,
-          createPageMap([
-            [
-              1,
-              [
-                createPullRequestResponse({pullRequestNumber: 1, merged: false}),
-                createPullRequestResponse({pullRequestNumber: 2, targetBranch: 'feature/test'}),
-                createPullRequestResponse({pullRequestNumber: 3}),
-              ],
-            ],
-          ]),
-        ],
-      ]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createBetaCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-    });
-
-    expect(commandResult.result.exitCode).toBe(0);
-    expect(
-      fakeGitHubRequests.state.createdComments.map(comment => {
-        return comment.pullRequestNumber;
-      }),
-    ).toStrictEqual([3]);
-    expect(commandResult.summaries[0]).toMatch(/Pull requests discovered: 1 \(#3\)/);
+  const actualResult = prepareCommentOperation([{id: 7, body: existingComment}], {
+    beta: Maybe.just('2026-08-15.1-beta.1'),
+    production: Maybe.just('2026-08-15.1-production'),
   });
 
-  it('deduplicates pull requests and processes them in numeric order', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [
-          betaOneCommit,
-          createPageMap([
-            [
-              1,
-              [
-                createPullRequestResponse({pullRequestNumber: 10}),
-                createPullRequestResponse({pullRequestNumber: 2}),
-                createPullRequestResponse({pullRequestNumber: 10}),
-              ],
-            ],
-          ]),
-        ],
-      ]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createBetaCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-    });
+  assert(actualResult.isOk);
+  assert.deepStrictEqual(actualResult.value, {kind: 'unchanged'});
+});
 
-    expect(commandResult.result.exitCode).toBe(0);
-    expect(
-      fakeGitHubRequests.state.createdComments.map(comment => {
-        return comment.pullRequestNumber;
-      }),
-    ).toStrictEqual([2, 10]);
+test('discovers pull requests and creates Beta appearance comments', async () => {
+  const fakeGitHubClient = createFakeGitHubClient({
+    pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(8)]]]),
   });
 
-  it('creates the first Beta comment', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [betaOneCommit, createSinglePageMap([createPullRequestResponse({pullRequestNumber: 11})])],
-      ]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createBetaCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-    });
-
-    expect(commandResult.result.exitCode).toBe(0);
-    expect(fakeGitHubRequests.state.createdComments).toHaveLength(1);
-    expect(fakeGitHubRequests.state.createdComments[0].commentBody).toMatch(/Beta \| `2026-01-02\.1-beta\.1`/);
+  const commandRun = await runCommand({
+    commandLineArguments: ['beta', betaTag, releaseCommit],
+    executeGitCommand: createFakeGitCommand(),
+    githubClient: fakeGitHubClient.githubClient,
   });
 
-  it('leaves an existing Beta comment unchanged', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [betaOneCommit, createSinglePageMap([createPullRequestResponse({pullRequestNumber: 12})])],
-      ]),
-      issueCommentPages: new Map([
-        [12, createSinglePageMap([createIssueCommentResponse(12, renderPersistentComment({beta: betaOneTag}))])],
-      ]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createBetaCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-    });
+  assert.equal(commandRun.result.exitCode, 0);
+  assert.deepStrictEqual(fakeGitHubClient.state.pullRequestCommits, [betaCommit]);
+  assert.equal(fakeGitHubClient.state.createdComments.length, 1);
+  const createdComment = Maybe.of(fakeGitHubClient.state.createdComments[0]);
+  const summary = Maybe.of(commandRun.summaries[0]);
+  assert(createdComment.isJust);
+  assert(summary.isJust);
+  assert.match(createdComment.value.commentBody, /2026-01-02\.1-beta\.1/);
+  assert.match(summary.value, /Pull requests discovered: 1 \(#8\)/);
+});
 
-    expect(commandResult.result.exitCode).toBe(0);
-    expect(fakeGitHubRequests.state.createdComments).toStrictEqual([]);
-    expect(fakeGitHubRequests.state.updatedComments).toStrictEqual([]);
-    expect(commandResult.summaries[0]).toMatch(/Comments unchanged: 1/);
+test('continues processing after one pull request comment failure', async () => {
+  const fakeGitHubClient = createFakeGitHubClient({
+    pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(1), createPullRequest(2)]]]),
+    createFailurePullRequests: new Set([1]),
   });
 
-  it('adds Production to an existing Beta comment', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [betaOneCommit, createSinglePageMap([createPullRequestResponse({pullRequestNumber: 13})])],
-      ]),
-      issueCommentPages: new Map([
-        [13, createSinglePageMap([createIssueCommentResponse(13, renderPersistentComment({beta: betaOneTag}))])],
-      ]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createProductionCommandArguments(betaOneTag),
-      githubRequests: fakeGitHubRequests.requests,
-      executeGitCommand: createFakeGitCommand({stage: 'production', promotedBetaTag: betaOneTag}),
-    });
-
-    expect(commandResult.result.exitCode).toBe(0);
-    expect(fakeGitHubRequests.state.createdComments).toStrictEqual([]);
-    expect(fakeGitHubRequests.state.updatedComments).toHaveLength(1);
-    expect(fakeGitHubRequests.state.updatedComments[0].commentBody).toMatch(/Production \| `2026-01-02\.1-production`/);
+  const commandRun = await runCommand({
+    commandLineArguments: ['beta', betaTag, releaseCommit],
+    executeGitCommand: createFakeGitCommand(),
+    githubClient: fakeGitHubClient.githubClient,
   });
 
-  it('Production creates both Beta and Production when Beta state is missing', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [betaOneCommit, createSinglePageMap([createPullRequestResponse({pullRequestNumber: 14})])],
-      ]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createProductionCommandArguments(betaOneTag),
-      githubRequests: fakeGitHubRequests.requests,
-      executeGitCommand: createFakeGitCommand({stage: 'production', promotedBetaTag: betaOneTag}),
-    });
+  assert.equal(commandRun.result.exitCode, 1);
+  assert.deepStrictEqual(
+    fakeGitHubClient.state.createdComments.map(comment => {
+      return comment.pullRequestNumber;
+    }),
+    [2],
+  );
+  assert.match(commandRun.outputMessages.join('\n'), /#1/);
+});
 
-    expect(commandResult.result.exitCode).toBe(0);
-    expect(fakeGitHubRequests.state.createdComments).toHaveLength(1);
-    expect(fakeGitHubRequests.state.createdComments[0].commentBody).toMatch(/Beta \| `2026-01-02\.1-beta\.1`/);
-    expect(fakeGitHubRequests.state.createdComments[0].commentBody).toMatch(/Production \| `2026-01-02\.1-production`/);
+test('bootstrap performs no GitHub requests', async () => {
+  const fakeGitHubClient = createFakeGitHubClient();
+
+  const commandRun = await runCommand({
+    commandLineArguments: ['beta', betaTag, releaseCommit],
+    executeGitCommand: createFakeGitCommand(true),
+    githubClient: fakeGitHubClient.githubClient,
   });
 
-  it('retains the earliest Beta candidate across Production ranges', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [betaOneCommit, createSinglePageMap([createPullRequestResponse({pullRequestNumber: 15})])],
-        [betaTwoCommit, createSinglePageMap([createPullRequestResponse({pullRequestNumber: 15})])],
-      ]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createProductionCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-      executeGitCommand: createFakeGitCommand({stage: 'production'}),
-    });
+  assert.equal(commandRun.result.exitCode, 0);
+  assert.deepStrictEqual(fakeGitHubClient.state.pullRequestCommits, []);
+  const summary = Maybe.of(commandRun.summaries[0]);
+  assert(summary.isJust);
+  assert.match(summary.value, /Bootstrap: yes/);
+});
 
-    expect(commandResult.result.exitCode).toBe(0);
-    expect(fakeGitHubRequests.state.createdComments).toHaveLength(1);
-    expect(fakeGitHubRequests.state.createdComments[0].commentBody).toMatch(/Beta \| `2026-01-02\.1-beta\.1`/);
-    expect(fakeGitHubRequests.state.createdComments[0].commentBody).not.toMatch(/beta\.2/);
+test('native command entrypoint loads dependencies and reports usage failure', async () => {
+  const commandProcess = spawn(process.execPath, ['tools/release-appearance/releaseAppearanceCommand.ts'], {
+    cwd: process.cwd(),
+    env: process.env,
+  });
+  let standardError = '';
+  commandProcess.stderr.on('data', (outputChunk: Buffer) => {
+    standardError += outputChunk.toString();
+  });
+  const exitCode = await new Promise<number | null>((resolve, reject) => {
+    commandProcess.once('error', error => {
+      reject(error);
+    });
+    commandProcess.once('exit', processExitCode => {
+      resolve(processExitCode);
+    });
   });
 
-  it('continues after a failed pull request comment operation', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [
-          betaOneCommit,
-          createPageMap([
-            [1, [createPullRequestResponse({pullRequestNumber: 1}), createPullRequestResponse({pullRequestNumber: 2})]],
-          ]),
-        ],
-      ]),
-      createFailureNumbers: new Set([1]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createBetaCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-    });
-
-    expect(commandResult.result.exitCode).toBe(1);
-    expect(
-      fakeGitHubRequests.state.createdComments.map(comment => {
-        return comment.pullRequestNumber;
-      }),
-    ).toStrictEqual([2]);
-    expect(commandResult.outputMessages.join('\n')).toMatch(/pull request #1/i);
-  });
-
-  it('bootstrap performs no GitHub requests and succeeds', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests();
-    const commandResult = await runCommand({
-      commandLineArguments: createBetaCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-      executeGitCommand: createFakeGitCommand({stage: 'beta', bootstrap: true}),
-    });
-
-    expect(commandResult.result.exitCode).toBe(0);
-    expect(fakeGitHubRequests.state.pullRequestCalls).toStrictEqual([]);
-    expect(fakeGitHubRequests.state.issueCommentCalls).toStrictEqual([]);
-    expect(fakeGitHubRequests.state.createdComments).toStrictEqual([]);
-    expect(fakeGitHubRequests.state.updatedComments).toStrictEqual([]);
-    expect(commandResult.summaries[0]).toMatch(/Bootstrap: yes/);
-  });
-
-  it('rejects malformed GitHub responses clearly', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([[betaOneCommit, createSinglePageMap([{}])]]),
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createBetaCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-    });
-
-    expect(commandResult.result.exitCode).toBe(1);
-    expect(commandResult.outputMessages.join('\n')).toMatch(/Malformed GitHub pull request response/);
-  });
-
-  it('does not include the token in reported errors', async (): Promise<void> => {
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestFailureMessage: `request failed with ${githubToken}`,
-    });
-    const commandResult = await runCommand({
-      commandLineArguments: createBetaCommandArguments(),
-      githubRequests: fakeGitHubRequests.requests,
-    });
-    const reportedOutput = [...commandResult.outputMessages, ...commandResult.summaries].join('\n');
-
-    expect(commandResult.result.exitCode).toBe(1);
-    expect(reportedOutput).not.toContain(githubToken);
-    expect(reportedOutput).toContain('[REDACTED]');
-  });
-
-  it('uses process.exitCode in the entrypoint', async (): Promise<void> => {
-    const previousExitCode = process.exitCode;
-    const fakeGitHubRequests = createFakeGitHubRequests({
-      pullRequestPages: new Map([
-        [betaOneCommit, createSinglePageMap([createPullRequestResponse({pullRequestNumber: 16})])],
-      ]),
-      createFailureNumbers: new Set([16]),
-    });
-    const dependencies = createTestDependencies({
-      githubRequests: fakeGitHubRequests.requests,
-      executeGitCommand: createFakeGitCommand({stage: 'beta'}),
-    });
-
-    try {
-      process.exitCode = 0;
-      await main({
-        commandLineArguments: createBetaCommandArguments(),
-        environment: commandEnvironment,
-        dependencies,
-      });
-      expect(process.exitCode).toBe(1);
-    } finally {
-      process.exitCode = previousExitCode;
-    }
-  });
+  assert.equal(exitCode, 1);
+  assert.match(standardError, /Usage: beta/);
 });

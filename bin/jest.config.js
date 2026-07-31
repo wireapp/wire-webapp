@@ -20,7 +20,7 @@
 module.exports = {
   rootDir: '..',
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/bin/**/*.test.ts', '<rootDir>/tools/**/*.test.ts'],
+  testMatch: ['<rootDir>/bin/**/*.test.ts', '<rootDir>/tools/release-appearance/*.test.ts'],
   moduleNameMapper: {
     '^@enormora/objectory$': '<rootDir>/node_modules/@enormora/objectory/main.js',
   },

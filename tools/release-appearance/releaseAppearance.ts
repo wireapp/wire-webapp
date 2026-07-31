@@ -17,18 +17,17 @@
  *
  */
 
-import is from '@sindresorhus/is';
-import {Maybe, Result, Unit} from 'true-myth';
+import {Maybe, Result} from 'true-myth';
+import {z} from 'zod';
 
-import {
-  betaCandidateTagPattern,
-  parseReleaseAppearanceMarkerState,
-  productionTagPattern,
-} from './releaseAppearanceMarkerSchema.ts';
-
-export type ReleaseAppearanceState = {
+export type SerializedReleaseAppearanceState = {
   readonly beta?: string;
   readonly production?: string;
+};
+
+export type ReleaseAppearanceState = {
+  readonly beta: Maybe<string>;
+  readonly production: Maybe<string>;
 };
 
 export type BetaCandidate = {
@@ -40,40 +39,64 @@ export type ProductionTag = {
   readonly releaseIdentifier: string;
 };
 
-export type ReleaseAppearanceResult<valueType> = Result<valueType, Error>;
-
+const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
+const betaCandidateTagPattern = new RegExp(String.raw`^(${releaseIdentifierPattern})-beta\.([1-9]\d*)$`);
+const productionTagPattern = new RegExp(`^(${releaseIdentifierPattern})-production$`);
 const markerPrefixPattern = /<!--\s*wire-webapp-release-appearance:/g;
 const markerHeaderPattern = /<!--\s*wire-webapp-release-appearance:v([^\s\r\n]+)\s*\n/g;
+const releaseIdentifierCaptureIndex = 1;
+const betaCandidateNumberCaptureIndex = 2;
+const markerVersionCaptureIndex = 1;
 
-function createSuccess<valueType>(value: valueType): ReleaseAppearanceResult<valueType> {
+const releaseAppearanceMarkerStateSchema = z
+  .object({
+    beta: z.string().regex(betaCandidateTagPattern).optional(),
+    production: z.string().regex(productionTagPattern).optional(),
+  })
+  .strict();
+
+function createSuccess<valueType>(value: valueType): Result<valueType, Error> {
   return Result.ok<valueType, Error>(value);
 }
 
-function createFailure<valueType>(message: string): ReleaseAppearanceResult<valueType> {
-  return Result.err<valueType, Error>(new Error(message));
+function createFailure<valueType>(message: string, cause?: unknown): Result<valueType, Error> {
+  return Result.err<valueType, Error>(new Error(message, {cause}));
 }
 
-export function parseBetaCandidateTag(betaCandidateTag: string): ReleaseAppearanceResult<BetaCandidate> {
-  const betaCandidateTagMatch = betaCandidateTagPattern.exec(betaCandidateTag);
+function readRegexCapture(regexMatch: RegExpExecArray, captureIndex: number): Maybe<string> {
+  return Maybe.of(regexMatch[captureIndex]);
+}
 
-  if (is.nullOrUndefined(betaCandidateTagMatch)) {
+export function parseBetaCandidateTag(betaCandidateTag: string): Result<BetaCandidate, Error> {
+  const betaCandidateTagMatch = Maybe.of(betaCandidateTagPattern.exec(betaCandidateTag));
+  if (betaCandidateTagMatch.isNothing) {
+    return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`);
+  }
+
+  const releaseIdentifier = readRegexCapture(betaCandidateTagMatch.value, releaseIdentifierCaptureIndex);
+  const candidateNumber = readRegexCapture(betaCandidateTagMatch.value, betaCandidateNumberCaptureIndex);
+  if (releaseIdentifier.isNothing || candidateNumber.isNothing) {
     return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`);
   }
 
   return createSuccess({
-    releaseIdentifier: betaCandidateTagMatch[1],
-    candidateNumber: BigInt(betaCandidateTagMatch[2]),
+    releaseIdentifier: releaseIdentifier.value,
+    candidateNumber: BigInt(candidateNumber.value),
   });
 }
 
-export function parseProductionTag(productionTag: string): ReleaseAppearanceResult<ProductionTag> {
-  const productionTagMatch = productionTagPattern.exec(productionTag);
-
-  if (is.nullOrUndefined(productionTagMatch)) {
+export function parseProductionTag(productionTag: string): Result<ProductionTag, Error> {
+  const productionTagMatch = Maybe.of(productionTagPattern.exec(productionTag));
+  if (productionTagMatch.isNothing) {
     return createFailure(`Invalid Production tag: ${productionTag}`);
   }
 
-  return createSuccess({releaseIdentifier: productionTagMatch[1]});
+  const releaseIdentifier = readRegexCapture(productionTagMatch.value, releaseIdentifierCaptureIndex);
+  if (releaseIdentifier.isNothing) {
+    return createFailure(`Invalid Production tag: ${productionTag}`);
+  }
+
+  return createSuccess({releaseIdentifier: releaseIdentifier.value});
 }
 
 export function compareBetaCandidates(leftCandidate: BetaCandidate, rightCandidate: BetaCandidate): number {
@@ -91,7 +114,7 @@ export function compareBetaCandidates(leftCandidate: BetaCandidate, rightCandida
 export function validateSameReleaseIdentifier(
   betaCandidate: Pick<BetaCandidate, 'releaseIdentifier'>,
   productionTag: Pick<ProductionTag, 'releaseIdentifier'>,
-): ReleaseAppearanceResult<string> {
+): Result<string, Error> {
   if (betaCandidate.releaseIdentifier !== productionTag.releaseIdentifier) {
     return createFailure(
       `Beta candidate and Production tag belong to different releases: ${betaCandidate.releaseIdentifier} and ${productionTag.releaseIdentifier}`,
@@ -101,132 +124,51 @@ export function validateSameReleaseIdentifier(
   return createSuccess(betaCandidate.releaseIdentifier);
 }
 
-type ParsedMarkerTag = {
-  readonly tagName: string;
-  readonly releaseIdentifier: string;
-};
-
-type ParseOptionalMarkerTagOptions = {
-  readonly parsedMarkerState: ReleaseAppearanceState;
-  readonly markerFieldName: 'beta' | 'production';
-  readonly parseTag: (tagName: string) => ReleaseAppearanceResult<Pick<ParsedMarkerTag, 'releaseIdentifier'>>;
-};
-
-function parseOptionalMarkerTag(
-  parseOptionalMarkerTagOptions: ParseOptionalMarkerTagOptions,
-): ReleaseAppearanceResult<Maybe<ParsedMarkerTag>> {
-  const {parsedMarkerState, markerFieldName, parseTag} = parseOptionalMarkerTagOptions;
-
-  return Maybe.of(parsedMarkerState[markerFieldName]).match({
-    Just(markerFieldValue) {
-      const parsedTagResult = parseTag(markerFieldValue);
-      if (parsedTagResult.isErr) {
-        return createFailure(`Malformed release-appearance marker state: ${parsedTagResult.error.message}`);
-      }
-
-      return createSuccess(
-        Maybe.just({tagName: markerFieldValue, releaseIdentifier: parsedTagResult.value.releaseIdentifier}),
-      );
-    },
-    Nothing() {
-      return createSuccess(Maybe.nothing<ParsedMarkerTag>());
-    },
-  });
-}
-
-function validateMatchingMarkerTags(
-  betaTag: Maybe<ParsedMarkerTag>,
-  productionTag: Maybe<ParsedMarkerTag>,
-): ReleaseAppearanceResult<Unit> {
-  return betaTag.match({
-    Just(betaTagValue) {
-      return productionTag.match({
-        Just(productionTagValue) {
-          const sameReleaseResult = validateSameReleaseIdentifier(betaTagValue, productionTagValue);
-
-          if (sameReleaseResult.isErr) {
-            return createFailure(`Malformed release-appearance marker state: ${sameReleaseResult.error.message}`);
-          }
-
-          return createSuccess(Unit);
-        },
-        Nothing() {
-          return createSuccess(Unit);
-        },
-      });
-    },
-    Nothing() {
-      return createSuccess(Unit);
-    },
-  });
-}
-
-function createReleaseAppearanceState(betaTag: Maybe<string>, productionTag: Maybe<string>): ReleaseAppearanceState {
-  const betaState = betaTag
-    .map(tagName => {
-      return {beta: tagName};
-    })
-    .unwrapOr({});
-  const productionState = productionTag
-    .map(tagName => {
-      return {production: tagName};
-    })
-    .unwrapOr({});
-
-  return {...betaState, ...productionState};
-}
-
-function createReleaseAppearanceStateFromMarkerTags(
-  betaTag: Maybe<ParsedMarkerTag>,
-  productionTag: Maybe<ParsedMarkerTag>,
+export function deserializeReleaseAppearanceState(
+  serializedReleaseAppearanceState: SerializedReleaseAppearanceState,
 ): ReleaseAppearanceState {
-  return createReleaseAppearanceState(
-    betaTag.map(parsedTag => {
-      return parsedTag.tagName;
-    }),
-    productionTag.map(parsedTag => {
-      return parsedTag.tagName;
-    }),
-  );
+  return {
+    beta: Maybe.of(serializedReleaseAppearanceState.beta),
+    production: Maybe.of(serializedReleaseAppearanceState.production),
+  };
 }
 
-function parseMarkerState(markerJson: string): ReleaseAppearanceResult<ReleaseAppearanceState> {
-  const parsedMarkerStateResult = parseReleaseAppearanceMarkerState(markerJson);
-  if (parsedMarkerStateResult.isErr) {
-    return createFailure(parsedMarkerStateResult.error.message);
-  }
+export function serializeReleaseAppearanceState(
+  releaseAppearanceState: ReleaseAppearanceState,
+): SerializedReleaseAppearanceState {
+  const serializedBetaState = releaseAppearanceState.beta
+    .map(betaTag => {
+      return {beta: betaTag};
+    })
+    .unwrapOr({});
+  const serializedProductionState = releaseAppearanceState.production
+    .map(productionTag => {
+      return {production: productionTag};
+    })
+    .unwrapOr({});
 
-  const betaTagResult = parseOptionalMarkerTag({
-    parsedMarkerState: parsedMarkerStateResult.value,
-    markerFieldName: 'beta',
-    parseTag: parseBetaCandidateTag,
-  });
-  if (betaTagResult.isErr) {
-    return createFailure(betaTagResult.error.message);
-  }
-
-  const productionTagResult = parseOptionalMarkerTag({
-    parsedMarkerState: parsedMarkerStateResult.value,
-    markerFieldName: 'production',
-    parseTag: parseProductionTag,
-  });
-  if (productionTagResult.isErr) {
-    return createFailure(productionTagResult.error.message);
-  }
-
-  const matchingTagsResult = validateMatchingMarkerTags(betaTagResult.value, productionTagResult.value);
-  if (matchingTagsResult.isErr) {
-    return createFailure(matchingTagsResult.error.message);
-  }
-
-  return createSuccess(createReleaseAppearanceStateFromMarkerTags(betaTagResult.value, productionTagResult.value));
+  return {...serializedBetaState, ...serializedProductionState};
 }
 
-export function parsePersistentMarkerComment(
-  commentBody: string,
-): ReleaseAppearanceResult<Maybe<ReleaseAppearanceState>> {
+function parseMarkerState(markerJson: string): Result<ReleaseAppearanceState, Error> {
+  let parsedMarkerState: unknown;
+
+  try {
+    parsedMarkerState = JSON.parse(markerJson) as unknown;
+  } catch (error: unknown) {
+    return createFailure('Malformed release-appearance marker state: invalid JSON', error);
+  }
+
+  const validationResult = releaseAppearanceMarkerStateSchema.safeParse(parsedMarkerState);
+  if (!validationResult.success) {
+    return createFailure('Malformed release-appearance marker state', validationResult.error);
+  }
+
+  return createSuccess(deserializeReleaseAppearanceState(validationResult.data));
+}
+
+export function parsePersistentMarkerComment(commentBody: string): Result<Maybe<ReleaseAppearanceState>, Error> {
   const markerPrefixMatches = Array.from(commentBody.matchAll(markerPrefixPattern));
-
   if (markerPrefixMatches.length === 0) {
     return createSuccess(Maybe.nothing<ReleaseAppearanceState>());
   }
@@ -240,30 +182,33 @@ export function parsePersistentMarkerComment(
     return createFailure('Malformed release-appearance marker: invalid marker header');
   }
 
-  const markerHeaderMatch = markerHeaderMatches[0];
-  const markerVersionResult = Maybe.of(markerHeaderMatch[1]);
-  if (markerVersionResult.isNothing) {
+  const markerHeaderMatch = Maybe.of(markerHeaderMatches[0]);
+  if (markerHeaderMatch.isNothing) {
+    return createFailure('Malformed release-appearance marker: missing marker header');
+  }
+
+  const markerVersion = readRegexCapture(markerHeaderMatch.value, markerVersionCaptureIndex);
+  if (markerVersion.isNothing) {
     return createFailure('Malformed release-appearance marker: missing marker version');
   }
 
-  const markerVersion = markerVersionResult.value;
-  if (markerVersion !== '1') {
-    return createFailure(`Unsupported release-appearance marker version: ${markerVersion}`);
+  if (markerVersion.value !== '1') {
+    return createFailure(`Unsupported release-appearance marker version: ${markerVersion.value}`);
   }
 
-  return Maybe.of(markerHeaderMatch.index).match({
-    Just(markerHeaderStart) {
-      const markerStateStart = markerHeaderStart + markerHeaderMatch[0].length;
-      const markerStateEnd = commentBody.indexOf('-->', markerStateStart);
-      if (markerStateEnd === -1) {
-        return createFailure('Malformed release-appearance marker: missing marker terminator');
-      }
+  const markerHeaderStart = Maybe.of(markerHeaderMatch.value.index);
+  if (markerHeaderStart.isNothing) {
+    return createFailure('Malformed release-appearance marker: missing marker position');
+  }
 
-      return parseMarkerState(commentBody.slice(markerStateStart, markerStateEnd).trim()).map(Maybe.just);
-    },
-    Nothing() {
-      return createFailure('Malformed release-appearance marker: missing marker position');
-    },
+  const markerStateStart = markerHeaderStart.value + markerHeaderMatch.value[0].length;
+  const markerStateEnd = commentBody.indexOf('-->', markerStateStart);
+  if (markerStateEnd === -1) {
+    return createFailure('Malformed release-appearance marker: missing marker terminator');
+  }
+
+  return parseMarkerState(commentBody.slice(markerStateStart, markerStateEnd).trim()).map(releaseAppearanceState => {
+    return Maybe.just(releaseAppearanceState);
   });
 }
 
@@ -271,16 +216,17 @@ export function mergeReleaseAppearanceState(
   existingReleaseState: ReleaseAppearanceState,
   desiredReleaseState: ReleaseAppearanceState,
 ): ReleaseAppearanceState {
-  const existingBetaTag = Maybe.of(existingReleaseState.beta);
-  const existingProductionTag = Maybe.of(existingReleaseState.production);
-  const mergedBetaTag = existingBetaTag.or(Maybe.of(desiredReleaseState.beta));
-  const mergedProductionTag = existingProductionTag.or(Maybe.of(desiredReleaseState.production));
+  const mergedBetaTag = existingReleaseState.beta.or(desiredReleaseState.beta);
+  const mergedProductionTag = existingReleaseState.production.or(desiredReleaseState.production);
 
-  if (mergedBetaTag === existingBetaTag && mergedProductionTag === existingProductionTag) {
+  if (mergedBetaTag === existingReleaseState.beta && mergedProductionTag === existingReleaseState.production) {
     return existingReleaseState;
   }
 
-  return createReleaseAppearanceState(mergedBetaTag, mergedProductionTag);
+  return {
+    beta: mergedBetaTag,
+    production: mergedProductionTag,
+  };
 }
 
 function renderReleaseValue(releaseTag: Maybe<string>): string {
@@ -294,10 +240,8 @@ function renderReleaseValue(releaseTag: Maybe<string>): string {
   });
 }
 
-export function renderPersistentComment(state: ReleaseAppearanceState): string {
-  const betaTag = Maybe.of(state.beta);
-  const productionTag = Maybe.of(state.production);
-  const serializedState = JSON.stringify(createReleaseAppearanceState(betaTag, productionTag));
+export function renderPersistentComment(releaseAppearanceState: ReleaseAppearanceState): string {
+  const serializedState = JSON.stringify(serializeReleaseAppearanceState(releaseAppearanceState));
 
   return `<!-- wire-webapp-release-appearance:v1
 ${serializedState}
@@ -307,22 +251,26 @@ ${serializedState}
 
 | Environment | Release |
 | --- | --- |
-| Beta | ${renderReleaseValue(betaTag)} |
-| Production | ${renderReleaseValue(productionTag)} |`;
+| Beta | ${renderReleaseValue(releaseAppearanceState.beta)} |
+| Production | ${renderReleaseValue(releaseAppearanceState.production)} |`;
 }
 
 export function mergeReleaseAppearanceComments(
   existingComments: readonly string[],
   desiredReleaseState: ReleaseAppearanceState,
-): ReleaseAppearanceResult<readonly string[]> {
+): Result<readonly string[], Error> {
   let markerCommentIndex: Maybe<number> = Maybe.nothing<number>();
   let existingReleaseState: Maybe<ReleaseAppearanceState> = Maybe.nothing<ReleaseAppearanceState>();
 
   for (let commentIndex = 0; commentIndex < existingComments.length; commentIndex += 1) {
-    const parsedComment = parsePersistentMarkerComment(existingComments[commentIndex]);
+    const existingComment = Maybe.of(existingComments[commentIndex]);
+    if (existingComment.isNothing) {
+      return createFailure('Release-appearance comment was not found');
+    }
 
+    const parsedComment = parsePersistentMarkerComment(existingComment.value);
     if (parsedComment.isErr) {
-      return createFailure(parsedComment.error.message);
+      return createFailure(parsedComment.error.message, parsedComment.error);
     }
 
     if (parsedComment.value.isNothing) {
@@ -337,26 +285,20 @@ export function mergeReleaseAppearanceComments(
     existingReleaseState = parsedComment.value;
   }
 
-  return markerCommentIndex.match({
-    Just(markerCommentIndexValue) {
-      return existingReleaseState.match({
-        Just(existingReleaseStateValue) {
-          const mergedReleaseState = mergeReleaseAppearanceState(existingReleaseStateValue, desiredReleaseState);
-          if (mergedReleaseState === existingReleaseStateValue) {
-            return createSuccess(existingComments);
-          }
+  if (markerCommentIndex.isNothing) {
+    return createSuccess([...existingComments, renderPersistentComment(desiredReleaseState)]);
+  }
 
-          return createSuccess(
-            existingComments.toSpliced(markerCommentIndexValue, 1, renderPersistentComment(mergedReleaseState)),
-          );
-        },
-        Nothing() {
-          return createFailure('Release-appearance marker state is missing');
-        },
-      });
-    },
-    Nothing() {
-      return createSuccess([...existingComments, renderPersistentComment(desiredReleaseState)]);
-    },
-  });
+  if (existingReleaseState.isNothing) {
+    return createFailure('Release-appearance marker state is missing');
+  }
+
+  const mergedReleaseState = mergeReleaseAppearanceState(existingReleaseState.value, desiredReleaseState);
+  if (mergedReleaseState === existingReleaseState.value) {
+    return createSuccess(existingComments);
+  }
+
+  return createSuccess(
+    existingComments.toSpliced(markerCommentIndex.value, 1, renderPersistentComment(mergedReleaseState)),
+  );
 }

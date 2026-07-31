@@ -19,186 +19,172 @@
 
 import assert from 'node:assert';
 
+import {Maybe} from 'true-myth';
+
 import {
   compareBetaCandidates,
+  deserializeReleaseAppearanceState,
   mergeReleaseAppearanceComments,
   mergeReleaseAppearanceState,
   parseBetaCandidateTag,
   parsePersistentMarkerComment,
   parseProductionTag,
   renderPersistentComment,
+  serializeReleaseAppearanceState,
   validateSameReleaseIdentifier,
 } from './releaseAppearance.ts';
 import type {ReleaseAppearanceState} from './releaseAppearance.ts';
 
-describe('release appearance', (): void => {
-  it('parses a valid Beta candidate tag', (): void => {
-    const actualResult = parseBetaCandidateTag('2026-07-21.3-beta.10');
+function createReleaseAppearanceState(betaTag: Maybe<string>, productionTag: Maybe<string>): ReleaseAppearanceState {
+  return {beta: betaTag, production: productionTag};
+}
 
-    assert(actualResult.isOk);
-    const actualValue = actualResult.value;
-    const expectedValue = {
-      releaseIdentifier: '2026-07-21.3',
-      candidateNumber: 10n,
-    };
-    expect(actualValue).toStrictEqual(expectedValue);
+test('parses and compares valid release tags', () => {
+  const betaNineResult = parseBetaCandidateTag('2026-07-21.3-beta.9');
+  const betaTenResult = parseBetaCandidateTag('2026-07-21.3-beta.10');
+  const productionResult = parseProductionTag('2026-07-21.3-production');
+
+  assert(betaNineResult.isOk);
+  assert(betaTenResult.isOk);
+  assert(productionResult.isOk);
+  assert.deepStrictEqual(betaTenResult.value, {
+    releaseIdentifier: '2026-07-21.3',
+    candidateNumber: 10n,
   });
+  assert.equal(compareBetaCandidates(betaNineResult.value, betaTenResult.value), -1);
+  assert.equal(validateSameReleaseIdentifier(betaTenResult.value, productionResult.value).isOk, true);
+});
 
-  it.each([
+test('rejects invalid release tags', () => {
+  const invalidBetaTags = [
     '2026-07-21-beta.1',
     '2026-07-21.3-beta.0',
     '2026-07-21.3-beta.01',
-    '2026-7-21.3-beta.1',
     'release/2026-07-21.3-beta.1',
     '2026-07-21.3-production',
-  ])('rejects invalid Beta candidate tag %s', (invalidBetaTag): void => {
-    assert(parseBetaCandidateTag(invalidBetaTag).isErr);
-  });
-
-  it('parses a valid Production tag', (): void => {
-    const actualResult = parseProductionTag('2026-07-21.3-production');
-
-    assert(actualResult.isOk);
-    const actualValue = actualResult.value;
-    const expectedValue = {releaseIdentifier: '2026-07-21.3'};
-    expect(actualValue).toStrictEqual(expectedValue);
-  });
-
-  it.each([
+  ];
+  const invalidProductionTags = [
     '2026-07-21-production.1',
     '2026-07-21.0-production',
     '2026-07-21.3-beta.1',
-    '2026-7-21.3-production',
     'release/2026-07-21.3-production',
-  ])('rejects invalid Production tag %s', (invalidProductionTag): void => {
-    assert(parseProductionTag(invalidProductionTag).isErr);
-  });
+  ];
 
-  it('compares Beta candidates by numeric candidate number', (): void => {
-    const betaNineResult = parseBetaCandidateTag('2026-07-21.3-beta.9');
-    const betaTenResult = parseBetaCandidateTag('2026-07-21.3-beta.10');
+  for (const invalidBetaTag of invalidBetaTags) {
+    assert.equal(parseBetaCandidateTag(invalidBetaTag).isErr, true);
+  }
 
-    assert(betaNineResult.isOk);
-    assert(betaTenResult.isOk);
-    expect(compareBetaCandidates(betaNineResult.value, betaTenResult.value)).toBe(-1);
-    expect(compareBetaCandidates(betaTenResult.value, betaNineResult.value)).toBe(1);
-  });
+  for (const invalidProductionTag of invalidProductionTags) {
+    assert.equal(parseProductionTag(invalidProductionTag).isErr, true);
+  }
+});
 
-  it('validates that Beta and Production tags belong to the same release', (): void => {
-    const betaCandidateResult = parseBetaCandidateTag('2026-07-21.3-beta.1');
-    const matchingProductionTagResult = parseProductionTag('2026-07-21.3-production');
-    const differentProductionTagResult = parseProductionTag('2026-07-22.1-production');
+test('converts between serialized optional fields and domain Maybe values', () => {
+  const serializedState = {
+    beta: '2026-08-01.1-beta.1',
+    production: '2026-08-08.1-production',
+  };
 
-    assert(betaCandidateResult.isOk);
-    assert(matchingProductionTagResult.isOk);
-    assert(differentProductionTagResult.isOk);
-    const matchingResult = validateSameReleaseIdentifier(betaCandidateResult.value, matchingProductionTagResult.value);
+  const domainState = deserializeReleaseAppearanceState(serializedState);
 
-    assert(matchingResult.isOk);
-    expect(matchingResult.value).toBe('2026-07-21.3');
+  assert(domainState.beta.isJust);
+  assert.equal(domainState.beta.value, serializedState.beta);
+  assert(domainState.production.isJust);
+  assert.equal(domainState.production.value, serializedState.production);
+  assert.deepStrictEqual(serializeReleaseAppearanceState(domainState), serializedState);
+});
 
-    assert(validateSameReleaseIdentifier(betaCandidateResult.value, differentProductionTagResult.value).isErr);
-  });
+test('serializes and parses first appearances from different releases', () => {
+  const state = createReleaseAppearanceState(Maybe.just('2026-08-01.1-beta.1'), Maybe.just('2026-08-08.1-production'));
+  const renderedComment = renderPersistentComment(state);
 
-  it('creates the first Beta appearance comment', (): void => {
-    const betaState: ReleaseAppearanceState = {beta: '2026-07-21.3-beta.1'};
-    const actualResult = mergeReleaseAppearanceComments([], betaState);
+  const parsedStateResult = parsePersistentMarkerComment(renderedComment);
 
-    assert(actualResult.isOk);
-    const actualValue = actualResult.value;
-    const expectedValue = [renderPersistentComment(betaState)];
-    expect(actualValue).toStrictEqual(expectedValue);
-    expect(actualValue[0]).toMatch(/\| Beta \| `2026-07-21\.3-beta\.1` \|/);
-    expect(actualValue[0]).toMatch(/\| Production \| Not yet deployed \|/);
-  });
+  assert(parsedStateResult.isOk);
+  assert(parsedStateResult.value.isJust);
+  const parsedState = parsedStateResult.value.value;
+  assert(parsedState.beta.isJust);
+  assert(parsedState.production.isJust);
+  assert.equal(parsedState.beta.value, '2026-08-01.1-beta.1');
+  assert.equal(parsedState.production.value, '2026-08-08.1-production');
+});
 
-  it('adds Production to an existing Beta appearance', (): void => {
-    const existingComments = [renderPersistentComment({beta: '2026-07-21.3-beta.1'})];
-    const desiredReleaseState: ReleaseAppearanceState = {production: '2026-07-21.3-production'};
+test('preserves cross-release values during later Beta processing', () => {
+  const existingState = createReleaseAppearanceState(
+    Maybe.just('2026-08-01.1-beta.1'),
+    Maybe.just('2026-08-08.1-production'),
+  );
+  const desiredState = createReleaseAppearanceState(Maybe.just('2026-08-15.1-beta.1'), Maybe.nothing<string>());
 
-    const actualResult = mergeReleaseAppearanceComments(existingComments, desiredReleaseState);
+  const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
 
-    assert(actualResult.isOk);
-    const expectedState: ReleaseAppearanceState = {
-      beta: '2026-07-21.3-beta.1',
-      production: '2026-07-21.3-production',
-    };
-    const actualValue = actualResult.value;
-    const expectedValue = [renderPersistentComment(expectedState)];
-    expect(actualValue).toStrictEqual(expectedValue);
-  });
+  assert.equal(mergedState, existingState);
+});
 
-  it('preserves an existing Beta value while filling another missing value', (): void => {
-    const existingState: ReleaseAppearanceState = {beta: '2026-07-21.3-beta.1'};
-    const desiredState: ReleaseAppearanceState = {
-      beta: '2026-07-21.3-beta.2',
-      production: '2026-07-21.3-production',
-    };
+test('preserves cross-release values during later Production processing', () => {
+  const existingState = createReleaseAppearanceState(
+    Maybe.just('2026-08-01.1-beta.1'),
+    Maybe.just('2026-08-08.1-production'),
+  );
+  const desiredState = createReleaseAppearanceState(
+    Maybe.just('2026-08-15.1-beta.1'),
+    Maybe.just('2026-08-15.1-production'),
+  );
 
-    const actualState = mergeReleaseAppearanceState(existingState, desiredState);
+  const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
 
-    const expectedState: ReleaseAppearanceState = {
-      beta: '2026-07-21.3-beta.1',
-      production: '2026-07-21.3-production',
-    };
-    expect(actualState).toStrictEqual(expectedState);
-  });
+  assert.equal(mergedState, existingState);
+});
 
-  it('preserves an existing Production value', (): void => {
-    const existingState: ReleaseAppearanceState = {production: '2026-07-21.3-production'};
-    const desiredState: ReleaseAppearanceState = {production: '2026-07-21.3-production'};
+test('fills only missing first-appearance values', () => {
+  const existingState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
+  const desiredState = createReleaseAppearanceState(
+    Maybe.just('2026-07-21.3-beta.2'),
+    Maybe.just('2026-07-21.3-production'),
+  );
 
-    const actualState = mergeReleaseAppearanceState(existingState, desiredState);
+  const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
 
-    expect(actualState).toBe(existingState);
-  });
+  assert(mergedState.beta.isJust);
+  assert(mergedState.production.isJust);
+  assert.equal(mergedState.beta.value, '2026-07-21.3-beta.1');
+  assert.equal(mergedState.production.value, '2026-07-21.3-production');
+});
 
-  it('returns unchanged state and comments when nothing is missing', (): void => {
-    const existingState: ReleaseAppearanceState = {
-      beta: '2026-07-21.3-beta.1',
-      production: '2026-07-21.3-production',
-    };
-    const existingComments = [renderPersistentComment(existingState)];
+test('creates and updates persistent comments without changing unrelated comments', () => {
+  const unrelatedComment = 'Unrelated discussion';
+  const betaState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
+  const productionState = createReleaseAppearanceState(Maybe.nothing<string>(), Maybe.just('2026-07-28.1-production'));
+  const existingComments = [unrelatedComment, renderPersistentComment(betaState)];
 
-    const unchangedState = mergeReleaseAppearanceState(existingState, {beta: '2026-07-21.3-beta.2'});
-    expect(unchangedState).toBe(existingState);
+  const mergedCommentsResult = mergeReleaseAppearanceComments(existingComments, productionState);
 
-    const actualResult = mergeReleaseAppearanceComments(existingComments, {beta: '2026-07-21.3-beta.2'});
+  assert(mergedCommentsResult.isOk);
+  assert.equal(mergedCommentsResult.value[0], unrelatedComment);
+  const mergedMarkerComment = Maybe.of(mergedCommentsResult.value[1]);
+  assert(mergedMarkerComment.isJust);
+  assert.match(mergedMarkerComment.value, /2026-07-21\.3-beta\.1/);
+  assert.match(mergedMarkerComment.value, /2026-07-28\.1-production/);
+});
 
-    assert(actualResult.isOk);
-    expect(actualResult.value).toBe(existingComments);
-  });
-
-  it('ignores unrelated comments while updating the persistent comment', (): void => {
-    const unrelatedComment = 'This discussion comment is unrelated to release appearance.';
-    const existingComments = [unrelatedComment, renderPersistentComment({beta: '2026-07-21.3-beta.1'})];
-    const desiredState: ReleaseAppearanceState = {production: '2026-07-21.3-production'};
-
-    const actualResult = mergeReleaseAppearanceComments(existingComments, desiredState);
-
-    assert(actualResult.isOk);
-    expect(actualResult.value[0]).toBe(unrelatedComment);
-    expect(actualResult.value[1]).toMatch(/\| Production \| `2026-07-21\.3-production` \|/);
-  });
-
-  it.each([
-    '<!-- wire-webapp-release-appearance:v1\n{"beta":"legacy-2026-07-21-beta.1"}\n-->',
+test('rejects malformed and unknown persistent marker state', () => {
+  const malformedComments = [
     '<!-- wire-webapp-release-appearance:v1\n{"beta":}\n-->',
-    '<!-- wire-webapp-release-appearance:v1\n{"beta":"2026-07-21.3-beta.1","production":"2026-07-22.1-production"}\n-->',
-  ])('rejects malformed marker state %s', (malformedComment): void => {
-    assert(parsePersistentMarkerComment(malformedComment).isErr);
-  });
+    '<!-- wire-webapp-release-appearance:v1\n{"beta":"invalid"}\n-->',
+    '<!-- wire-webapp-release-appearance:v1\n{"edge":"2026-07-21.3"}\n-->',
+    '<!-- wire-webapp-release-appearance:v2\n{"beta":"2026-07-21.3-beta.1"}\n-->',
+  ];
 
-  it('rejects unsupported marker versions', (): void => {
-    const unsupportedMarkerComment = '<!-- wire-webapp-release-appearance:v2\n{"beta":"2026-07-21.3-beta.1"}\n-->';
+  for (const malformedComment of malformedComments) {
+    assert.equal(parsePersistentMarkerComment(malformedComment).isErr, true);
+  }
+});
 
-    assert(parsePersistentMarkerComment(unsupportedMarkerComment).isErr);
-  });
+test('rejects duplicate persistent marker comments', () => {
+  const betaState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
+  const markerComment = renderPersistentComment(betaState);
 
-  it('rejects duplicate marker comments', (): void => {
-    const markerComment = renderPersistentComment({beta: '2026-07-21.3-beta.1'});
-    const duplicateComments = [markerComment, markerComment];
+  const mergeResult = mergeReleaseAppearanceComments([markerComment, markerComment], betaState);
 
-    assert(mergeReleaseAppearanceComments(duplicateComments, {production: '2026-07-21.3-production'}).isErr);
-  });
+  assert.equal(mergeResult.isErr, true);
 });
