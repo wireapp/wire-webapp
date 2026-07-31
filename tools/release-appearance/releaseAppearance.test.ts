@@ -39,152 +39,164 @@ function createReleaseAppearanceState(betaTag: Maybe<string>, productionTag: May
   return {beta: betaTag, production: productionTag};
 }
 
-test('parses and compares valid release tags', () => {
-  const betaNineResult = parseBetaCandidateTag('2026-07-21.3-beta.9');
-  const betaTenResult = parseBetaCandidateTag('2026-07-21.3-beta.10');
-  const productionResult = parseProductionTag('2026-07-21.3-production');
+describe('release tag parsing', () => {
+  it('parses and compares valid release tags', () => {
+    const betaNineResult = parseBetaCandidateTag('2026-07-21.3-beta.9');
+    const betaTenResult = parseBetaCandidateTag('2026-07-21.3-beta.10');
+    const productionResult = parseProductionTag('2026-07-21.3-production');
 
-  assert(betaNineResult.isOk);
-  assert(betaTenResult.isOk);
-  assert(productionResult.isOk);
-  assert.deepStrictEqual(betaTenResult.value, {
-    releaseIdentifier: '2026-07-21.3',
-    candidateNumber: 10n,
+    assert(betaNineResult.isOk);
+    assert(betaTenResult.isOk);
+    assert(productionResult.isOk);
+    expect(betaTenResult.value).toEqual({
+      releaseIdentifier: '2026-07-21.3',
+      candidateNumber: 10n,
+    });
+    expect(compareBetaCandidates(betaNineResult.value, betaTenResult.value)).toBe(-1);
+    expect(validateSameReleaseIdentifier(betaTenResult.value, productionResult.value).isOk).toBe(true);
   });
-  assert.equal(compareBetaCandidates(betaNineResult.value, betaTenResult.value), -1);
-  assert.equal(validateSameReleaseIdentifier(betaTenResult.value, productionResult.value).isOk, true);
+
+  it('rejects invalid release tags', () => {
+    const invalidBetaTags = [
+      '2026-07-21-beta.1',
+      '2026-07-21.3-beta.0',
+      '2026-07-21.3-beta.01',
+      'release/2026-07-21.3-beta.1',
+      '2026-07-21.3-production',
+    ];
+    const invalidProductionTags = [
+      '2026-07-21-production.1',
+      '2026-07-21.0-production',
+      '2026-07-21.3-beta.1',
+      'release/2026-07-21.3-production',
+    ];
+
+    for (const invalidBetaTag of invalidBetaTags) {
+      expect(parseBetaCandidateTag(invalidBetaTag).isErr).toBe(true);
+    }
+
+    for (const invalidProductionTag of invalidProductionTags) {
+      expect(parseProductionTag(invalidProductionTag).isErr).toBe(true);
+    }
+  });
 });
 
-test('rejects invalid release tags', () => {
-  const invalidBetaTags = [
-    '2026-07-21-beta.1',
-    '2026-07-21.3-beta.0',
-    '2026-07-21.3-beta.01',
-    'release/2026-07-21.3-beta.1',
-    '2026-07-21.3-production',
-  ];
-  const invalidProductionTags = [
-    '2026-07-21-production.1',
-    '2026-07-21.0-production',
-    '2026-07-21.3-beta.1',
-    'release/2026-07-21.3-production',
-  ];
+describe('release appearance state', () => {
+  it('converts between serialized optional fields and domain Maybe values', () => {
+    const serializedState = {
+      beta: '2026-08-01.1-beta.1',
+      production: '2026-08-08.1-production',
+    };
 
-  for (const invalidBetaTag of invalidBetaTags) {
-    assert.equal(parseBetaCandidateTag(invalidBetaTag).isErr, true);
-  }
+    const domainState = deserializeReleaseAppearanceState(serializedState);
 
-  for (const invalidProductionTag of invalidProductionTags) {
-    assert.equal(parseProductionTag(invalidProductionTag).isErr, true);
-  }
+    assert(domainState.beta.isJust);
+    expect(domainState.beta.value).toBe(serializedState.beta);
+    assert(domainState.production.isJust);
+    expect(domainState.production.value).toBe(serializedState.production);
+    expect(serializeReleaseAppearanceState(domainState)).toEqual(serializedState);
+  });
+
+  it('serializes and parses first appearances from different releases', () => {
+    const state = createReleaseAppearanceState(
+      Maybe.just('2026-08-01.1-beta.1'),
+      Maybe.just('2026-08-08.1-production'),
+    );
+    const renderedComment = renderPersistentComment(state);
+
+    const parsedStateResult = parsePersistentMarkerComment(renderedComment);
+
+    assert(parsedStateResult.isOk);
+    assert(parsedStateResult.value.isJust);
+    const parsedState = parsedStateResult.value.value;
+    assert(parsedState.beta.isJust);
+    assert(parsedState.production.isJust);
+    expect(parsedState.beta.value).toBe('2026-08-01.1-beta.1');
+    expect(parsedState.production.value).toBe('2026-08-08.1-production');
+  });
+
+  it('preserves cross-release values during later Beta processing', () => {
+    const existingState = createReleaseAppearanceState(
+      Maybe.just('2026-08-01.1-beta.1'),
+      Maybe.just('2026-08-08.1-production'),
+    );
+    const desiredState = createReleaseAppearanceState(Maybe.just('2026-08-15.1-beta.1'), Maybe.nothing<string>());
+
+    const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
+
+    expect(mergedState).toBe(existingState);
+  });
+
+  it('preserves cross-release values during later Production processing', () => {
+    const existingState = createReleaseAppearanceState(
+      Maybe.just('2026-08-01.1-beta.1'),
+      Maybe.just('2026-08-08.1-production'),
+    );
+    const desiredState = createReleaseAppearanceState(
+      Maybe.just('2026-08-15.1-beta.1'),
+      Maybe.just('2026-08-15.1-production'),
+    );
+
+    const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
+
+    expect(mergedState).toBe(existingState);
+  });
+
+  it('fills only missing first-appearance values', () => {
+    const existingState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
+    const desiredState = createReleaseAppearanceState(
+      Maybe.just('2026-07-21.3-beta.2'),
+      Maybe.just('2026-07-21.3-production'),
+    );
+
+    const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
+
+    assert(mergedState.beta.isJust);
+    assert(mergedState.production.isJust);
+    expect(mergedState.beta.value).toBe('2026-07-21.3-beta.1');
+    expect(mergedState.production.value).toBe('2026-07-21.3-production');
+  });
 });
 
-test('converts between serialized optional fields and domain Maybe values', () => {
-  const serializedState = {
-    beta: '2026-08-01.1-beta.1',
-    production: '2026-08-08.1-production',
-  };
+describe('persistent release appearance comments', () => {
+  it('creates and updates persistent comments without changing unrelated comments', () => {
+    const unrelatedComment = 'Unrelated discussion';
+    const betaState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
+    const productionState = createReleaseAppearanceState(
+      Maybe.nothing<string>(),
+      Maybe.just('2026-07-28.1-production'),
+    );
+    const existingComments = [unrelatedComment, renderPersistentComment(betaState)];
 
-  const domainState = deserializeReleaseAppearanceState(serializedState);
+    const mergedCommentsResult = mergeReleaseAppearanceComments(existingComments, productionState);
 
-  assert(domainState.beta.isJust);
-  assert.equal(domainState.beta.value, serializedState.beta);
-  assert(domainState.production.isJust);
-  assert.equal(domainState.production.value, serializedState.production);
-  assert.deepStrictEqual(serializeReleaseAppearanceState(domainState), serializedState);
-});
+    assert(mergedCommentsResult.isOk);
+    expect(mergedCommentsResult.value[0]).toBe(unrelatedComment);
+    const mergedMarkerComment = Maybe.of(mergedCommentsResult.value[1]);
+    assert(mergedMarkerComment.isJust);
+    expect(mergedMarkerComment.value).toMatch(/2026-07-21\.3-beta\.1/);
+    expect(mergedMarkerComment.value).toMatch(/2026-07-28\.1-production/);
+  });
 
-test('serializes and parses first appearances from different releases', () => {
-  const state = createReleaseAppearanceState(Maybe.just('2026-08-01.1-beta.1'), Maybe.just('2026-08-08.1-production'));
-  const renderedComment = renderPersistentComment(state);
+  it('rejects malformed and unknown persistent marker state', () => {
+    const malformedComments = [
+      '<!-- wire-webapp-release-appearance:v1\n{"beta":}\n-->',
+      '<!-- wire-webapp-release-appearance:v1\n{"beta":"invalid"}\n-->',
+      '<!-- wire-webapp-release-appearance:v1\n{"edge":"2026-07-21.3"}\n-->',
+      '<!-- wire-webapp-release-appearance:v2\n{"beta":"2026-07-21.3-beta.1"}\n-->',
+    ];
 
-  const parsedStateResult = parsePersistentMarkerComment(renderedComment);
+    for (const malformedComment of malformedComments) {
+      expect(parsePersistentMarkerComment(malformedComment).isErr).toBe(true);
+    }
+  });
 
-  assert(parsedStateResult.isOk);
-  assert(parsedStateResult.value.isJust);
-  const parsedState = parsedStateResult.value.value;
-  assert(parsedState.beta.isJust);
-  assert(parsedState.production.isJust);
-  assert.equal(parsedState.beta.value, '2026-08-01.1-beta.1');
-  assert.equal(parsedState.production.value, '2026-08-08.1-production');
-});
+  it('rejects duplicate persistent marker comments', () => {
+    const betaState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
+    const markerComment = renderPersistentComment(betaState);
 
-test('preserves cross-release values during later Beta processing', () => {
-  const existingState = createReleaseAppearanceState(
-    Maybe.just('2026-08-01.1-beta.1'),
-    Maybe.just('2026-08-08.1-production'),
-  );
-  const desiredState = createReleaseAppearanceState(Maybe.just('2026-08-15.1-beta.1'), Maybe.nothing<string>());
+    const mergeResult = mergeReleaseAppearanceComments([markerComment, markerComment], betaState);
 
-  const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
-
-  assert.equal(mergedState, existingState);
-});
-
-test('preserves cross-release values during later Production processing', () => {
-  const existingState = createReleaseAppearanceState(
-    Maybe.just('2026-08-01.1-beta.1'),
-    Maybe.just('2026-08-08.1-production'),
-  );
-  const desiredState = createReleaseAppearanceState(
-    Maybe.just('2026-08-15.1-beta.1'),
-    Maybe.just('2026-08-15.1-production'),
-  );
-
-  const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
-
-  assert.equal(mergedState, existingState);
-});
-
-test('fills only missing first-appearance values', () => {
-  const existingState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
-  const desiredState = createReleaseAppearanceState(
-    Maybe.just('2026-07-21.3-beta.2'),
-    Maybe.just('2026-07-21.3-production'),
-  );
-
-  const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
-
-  assert(mergedState.beta.isJust);
-  assert(mergedState.production.isJust);
-  assert.equal(mergedState.beta.value, '2026-07-21.3-beta.1');
-  assert.equal(mergedState.production.value, '2026-07-21.3-production');
-});
-
-test('creates and updates persistent comments without changing unrelated comments', () => {
-  const unrelatedComment = 'Unrelated discussion';
-  const betaState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
-  const productionState = createReleaseAppearanceState(Maybe.nothing<string>(), Maybe.just('2026-07-28.1-production'));
-  const existingComments = [unrelatedComment, renderPersistentComment(betaState)];
-
-  const mergedCommentsResult = mergeReleaseAppearanceComments(existingComments, productionState);
-
-  assert(mergedCommentsResult.isOk);
-  assert.equal(mergedCommentsResult.value[0], unrelatedComment);
-  const mergedMarkerComment = Maybe.of(mergedCommentsResult.value[1]);
-  assert(mergedMarkerComment.isJust);
-  assert.match(mergedMarkerComment.value, /2026-07-21\.3-beta\.1/);
-  assert.match(mergedMarkerComment.value, /2026-07-28\.1-production/);
-});
-
-test('rejects malformed and unknown persistent marker state', () => {
-  const malformedComments = [
-    '<!-- wire-webapp-release-appearance:v1\n{"beta":}\n-->',
-    '<!-- wire-webapp-release-appearance:v1\n{"beta":"invalid"}\n-->',
-    '<!-- wire-webapp-release-appearance:v1\n{"edge":"2026-07-21.3"}\n-->',
-    '<!-- wire-webapp-release-appearance:v2\n{"beta":"2026-07-21.3-beta.1"}\n-->',
-  ];
-
-  for (const malformedComment of malformedComments) {
-    assert.equal(parsePersistentMarkerComment(malformedComment).isErr, true);
-  }
-});
-
-test('rejects duplicate persistent marker comments', () => {
-  const betaState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
-  const markerComment = renderPersistentComment(betaState);
-
-  const mergeResult = mergeReleaseAppearanceComments([markerComment, markerComment], betaState);
-
-  assert.equal(mergeResult.isErr, true);
+    expect(mergeResult.isErr).toBe(true);
+  });
 });
