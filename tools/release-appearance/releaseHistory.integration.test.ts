@@ -23,7 +23,12 @@ import {mkdtemp, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {promisify} from 'node:util';
 
-import {planBetaReleaseHistory, planProductionReleaseHistory} from './releaseHistory.ts';
+import {
+  findLatestBetaReleaseTag,
+  planBetaReleaseHistory,
+  planNextBetaPreviewHistory,
+  planProductionReleaseHistory,
+} from './releaseHistory.ts';
 import type {ExecuteGitCommand} from './releaseHistory.ts';
 
 const executeFile = promisify(execFile);
@@ -94,6 +99,36 @@ async function createAnnotatedTag(createAnnotatedTagOptions: CreateAnnotatedTagO
     commandArguments: ['tag', '--annotate', tagName, '--message', `Release ${tagName}`, commit],
     environmentOverrides: {GIT_COMMITTER_DATE: taggerDate},
   });
+}
+
+type CreateAnnotatedTagsOptions = {
+  readonly repositoryPath: string;
+  readonly commit: string;
+  readonly tagDefinitions: readonly Pick<CreateAnnotatedTagOptions, 'tagName' | 'taggerDate'>[];
+};
+
+type CreateLightweightTagOptions = {
+  readonly repositoryPath: string;
+  readonly tagName: string;
+  readonly commit: string;
+};
+
+async function createLightweightTag(createLightweightTagOptions: CreateLightweightTagOptions): Promise<void> {
+  const {repositoryPath, tagName, commit} = createLightweightTagOptions;
+
+  await runGitCommand({repositoryPath, commandArguments: ['tag', tagName, commit]});
+}
+
+async function createAnnotatedTags(createAnnotatedTagsOptions: CreateAnnotatedTagsOptions): Promise<void> {
+  const {repositoryPath, commit, tagDefinitions} = createAnnotatedTagsOptions;
+
+  for (const tagDefinition of tagDefinitions) {
+    await createAnnotatedTag({...tagDefinition, repositoryPath, commit});
+  }
+}
+
+async function createSelectionCommit(repositoryPath: string, commitDate: string): Promise<string> {
+  return createCommit({repositoryPath, fileName: 'release.txt', fileContents: 'release', commitDate});
 }
 
 async function createTemporaryGitRepository(scenario: TemporaryRepositoryScenario): Promise<void> {
@@ -544,6 +579,289 @@ describe('release history planning', () => {
 
       assert(actualResult.isOk);
       expect(actualResult.value).toEqual({kind: 'bootstrap'});
+    });
+  });
+});
+
+describe('latest Beta release tag selection', () => {
+  it('ignores legacy, malformed, and unrelated tags and selects by annotation timestamp', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const commit = await createSelectionCommit(repositoryPath, '2026-07-31T00:00:00+0000');
+      const selectedTagName = '2026-07-30.1-beta.1';
+      await createAnnotatedTags({
+        repositoryPath,
+        commit,
+        tagDefinitions: [
+          {tagName: '2026-07-31.1-beta.1', taggerDate: '2026-07-31T01:00:00+0000'},
+          {tagName: selectedTagName, taggerDate: '2026-08-01T01:00:00+0000'},
+          {tagName: '2026-07-31.1-production', taggerDate: '2026-08-02T01:00:00+0000'},
+          {tagName: '2026-07-31-staging.0', taggerDate: '2026-08-03T01:00:00+0000'},
+          {tagName: 'other-package-2026-08-03.1-beta.1', taggerDate: '2026-08-04T01:00:00+0000'},
+          {tagName: '2026-08-03.1-beta.0', taggerDate: '2026-08-05T01:00:00+0000'},
+        ],
+      });
+
+      const actualResult = await findLatestBetaReleaseTag(executeGitCommand);
+
+      assert(actualResult.isOk);
+      assert(actualResult.value.isJust);
+      expect(actualResult.value.value.tagName).toBe(selectedTagName);
+    });
+  });
+
+  it('uses numeric release and candidate ordering when annotation timestamps tie', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const commit = await createSelectionCommit(repositoryPath, '2026-08-01T00:00:00+0000');
+      const numericReleaseTag = '2026-08-01.10-beta.2';
+      await createAnnotatedTags({
+        repositoryPath,
+        commit,
+        tagDefinitions: [
+          {tagName: '2026-08-01.2-beta.10', taggerDate: '2026-08-01T01:00:00+0000'},
+          {tagName: numericReleaseTag, taggerDate: '2026-08-01T01:00:00+0000'},
+        ],
+      });
+
+      const numericReleaseResult = await findLatestBetaReleaseTag(executeGitCommand);
+
+      assert(numericReleaseResult.isOk);
+      assert(numericReleaseResult.value.isJust);
+      expect(numericReleaseResult.value.value.tagName).toBe(numericReleaseTag);
+      const numericCandidateTag = '2026-08-02.1-beta.10';
+      await createAnnotatedTags({
+        repositoryPath,
+        commit,
+        tagDefinitions: [
+          {tagName: '2026-08-02.1-beta.2', taggerDate: '2026-08-02T01:00:00+0000'},
+          {tagName: numericCandidateTag, taggerDate: '2026-08-02T01:00:00+0000'},
+        ],
+      });
+
+      const actualResult = await findLatestBetaReleaseTag(executeGitCommand);
+
+      assert(actualResult.isOk);
+      assert(actualResult.value.isJust);
+      expect(actualResult.value.value.tagName).toBe(numericCandidateTag);
+    });
+  });
+
+  it('rejects a matching lightweight Beta tag', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const commit = await createSelectionCommit(repositoryPath, '2026-08-01T00:00:00+0000');
+      const lightweightTagName = '2026-08-01.1-beta.1';
+      await createLightweightTag({repositoryPath, tagName: lightweightTagName, commit});
+
+      const actualResult = await findLatestBetaReleaseTag(executeGitCommand);
+
+      assert(actualResult.isErr);
+      expect(actualResult.error.message).toBe(`Release tag must be annotated: ${lightweightTagName}`);
+    });
+  });
+});
+
+describe('next Beta preview history planning', () => {
+  it('plans changes after an ancestor Beta tag up to the exact target main commit', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const commonCommit = await createCommit({
+        repositoryPath,
+        fileName: 'common.txt',
+        fileContents: 'common',
+        commitDate: '2026-07-01T00:00:00+0000',
+      });
+      const betaCommit = await createCommit({
+        repositoryPath,
+        fileName: 'beta.txt',
+        fileContents: 'beta',
+        commitDate: '2026-07-02T00:00:00+0000',
+      });
+      const betaTag = '2026-07-02.1-beta.1';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: betaTag,
+        commit: betaCommit,
+        taggerDate: '2026-07-02T01:00:00+0000',
+      });
+      const firstMainCommit = await createCommit({
+        repositoryPath,
+        fileName: 'main-one.txt',
+        fileContents: 'main one',
+        commitDate: '2026-07-03T00:00:00+0000',
+      });
+      const secondMainCommit = await createCommit({
+        repositoryPath,
+        fileName: 'main-two.txt',
+        fileContents: 'main two',
+        commitDate: '2026-07-04T00:00:00+0000',
+      });
+      await createCommit({
+        repositoryPath,
+        fileName: 'main-after-target.txt',
+        fileContents: 'after target',
+        commitDate: '2026-07-05T00:00:00+0000',
+      });
+
+      const actualResult = await planNextBetaPreviewHistory({
+        executeGitCommand,
+        targetMainCommit: secondMainCommit,
+      });
+
+      assert(actualResult.isOk);
+      expect(actualResult.value.kind).toBe('preview');
+      if (actualResult.value.kind !== 'preview') {
+        assert.fail('Expected a next Beta preview history plan');
+      }
+      expect(actualResult.value.latestBetaReleaseTag.tagName).toBe(betaTag);
+      expect(actualResult.value.latestBetaReleaseTag.commit).toBe(betaCommit);
+      expect(actualResult.value.targetMainCommit).toBe(secondMainCommit);
+      expect(actualResult.value.mergeBase).toBe(betaCommit);
+      expect(actualResult.value.commits).toEqual([firstMainCommit, secondMainCommit]);
+      expect(actualResult.value.commits).not.toContain(commonCommit);
+      expect(actualResult.value.commits).not.toContain(betaCommit);
+    });
+  });
+
+  it('uses the merge base when the latest Beta tag is on a sibling release branch', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const commonCommit = await createCommit({
+        repositoryPath,
+        fileName: 'common.txt',
+        fileContents: 'common',
+        commitDate: '2026-07-01T00:00:00+0000',
+      });
+      await runGitCommand({
+        repositoryPath,
+        commandArguments: ['switch', '--quiet', '--create', 'beta-release', commonCommit],
+      });
+      const betaOnlyCommit = await createCommit({
+        repositoryPath,
+        fileName: 'beta-only.txt',
+        fileContents: 'beta only',
+        commitDate: '2026-07-02T00:00:00+0000',
+      });
+      const betaTag = '2026-07-02.1-beta.1';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: betaTag,
+        commit: betaOnlyCommit,
+        taggerDate: '2026-07-02T01:00:00+0000',
+      });
+      await runGitCommand({repositoryPath, commandArguments: ['switch', '--quiet', 'main']});
+      const firstMainCommit = await createCommit({
+        repositoryPath,
+        fileName: 'main-one.txt',
+        fileContents: 'main one',
+        commitDate: '2026-07-03T00:00:00+0000',
+      });
+      const secondMainCommit = await createCommit({
+        repositoryPath,
+        fileName: 'main-two.txt',
+        fileContents: 'main two',
+        commitDate: '2026-07-04T00:00:00+0000',
+      });
+
+      const actualResult = await planNextBetaPreviewHistory({
+        executeGitCommand,
+        targetMainCommit: secondMainCommit,
+      });
+
+      assert(actualResult.isOk);
+      expect(actualResult.value.kind).toBe('preview');
+      if (actualResult.value.kind !== 'preview') {
+        assert.fail('Expected a next Beta preview history plan');
+      }
+      expect(actualResult.value.latestBetaReleaseTag.commit).toBe(betaOnlyCommit);
+      expect(actualResult.value.targetMainCommit).toBe(secondMainCommit);
+      expect(actualResult.value.mergeBase).toBe(commonCommit);
+      expect(actualResult.value.commits).toEqual([firstMainCommit, secondMainCommit]);
+      expect(actualResult.value.commits).not.toContain(betaOnlyCommit);
+    });
+  });
+
+  it('returns an empty range when Beta is at the target main commit', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const betaCommit = await createCommit({
+        repositoryPath,
+        fileName: 'beta.txt',
+        fileContents: 'beta',
+        commitDate: '2026-07-02T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: '2026-07-02.1-beta.1',
+        commit: betaCommit,
+        taggerDate: '2026-07-02T01:00:00+0000',
+      });
+
+      const actualResult = await planNextBetaPreviewHistory({
+        executeGitCommand,
+        targetMainCommit: betaCommit,
+      });
+
+      assert(actualResult.isOk);
+      expect(actualResult.value.kind).toBe('preview');
+      if (actualResult.value.kind !== 'preview') {
+        assert.fail('Expected a next Beta preview history plan');
+      }
+      expect(actualResult.value.mergeBase).toBe(betaCommit);
+      expect(actualResult.value.commits).toEqual([]);
+    });
+  });
+
+  it('returns unavailable when no new-format Beta tag exists', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const targetCommit = await createSelectionCommit(repositoryPath, '2026-07-01T00:00:00+0000');
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: '2026-07-01-staging.0',
+        commit: targetCommit,
+        taggerDate: '2026-07-01T01:00:00+0000',
+      });
+      await createAnnotatedTags({
+        repositoryPath,
+        commit: targetCommit,
+        tagDefinitions: [
+          {tagName: '2026-07-01.1-production', taggerDate: '2026-07-01T02:00:00+0000'},
+          {tagName: 'other-package-2026-07-01.1-beta.1', taggerDate: '2026-07-01T03:00:00+0000'},
+          {tagName: '2026-07-01.1-beta', taggerDate: '2026-07-01T04:00:00+0000'},
+        ],
+      });
+
+      const actualResult = await planNextBetaPreviewHistory({
+        executeGitCommand,
+        targetMainCommit: targetCommit,
+      });
+
+      assert(actualResult.isOk);
+      expect(actualResult.value).toEqual({kind: 'unavailable', targetMainCommit: targetCommit});
+    });
+  });
+
+  it('rejects invalid target commits before planning history', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      let gitWasExecuted = false;
+      async function executeTrackedGitCommand(commandArguments: readonly string[]): Promise<string> {
+        gitWasExecuted = true;
+
+        return executeGitCommand(commandArguments);
+      }
+
+      const abbreviatedResult = await planNextBetaPreviewHistory({
+        executeGitCommand: executeTrackedGitCommand,
+        targetMainCommit: 'abcdef0',
+      });
+
+      assert(abbreviatedResult.isErr);
+      expect(abbreviatedResult.error.message).toMatch(/exactly 40 hexadecimal characters/);
+      expect(gitWasExecuted).toBe(false);
+
+      const unresolvedResult = await planNextBetaPreviewHistory({
+        executeGitCommand,
+        targetMainCommit: 'f'.repeat(40),
+      });
+
+      assert(unresolvedResult.isErr);
+      expect(unresolvedResult.error.message).not.toContain('github-token');
+      expect(unresolvedResult.error.message).not.toContain('stack trace');
     });
   });
 });

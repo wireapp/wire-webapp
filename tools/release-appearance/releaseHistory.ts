@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {Maybe, Result, Task, Unit, result, task} from 'true-myth';
 
 import {
@@ -28,6 +29,12 @@ import {
 import type {BetaCandidate, ProductionTag} from './releaseAppearance.ts';
 
 export type ExecuteGitCommand = (commandArguments: readonly string[]) => Promise<string>;
+
+export type BetaReleaseTagReference = {
+  readonly tagName: string;
+  readonly commit: string;
+  readonly taggerTimestamp: bigint;
+};
 
 export type CommitRange = {
   readonly startTag: string;
@@ -73,6 +80,24 @@ export type PlanProductionReleaseHistoryOptions = {
   readonly releaseCommit: string;
 };
 
+export type NextBetaPreviewHistoryPlan =
+  | {
+      readonly kind: 'unavailable';
+      readonly targetMainCommit: string;
+    }
+  | {
+      readonly kind: 'preview';
+      readonly latestBetaReleaseTag: BetaReleaseTagReference;
+      readonly targetMainCommit: string;
+      readonly mergeBase: string;
+      readonly commits: readonly string[];
+    };
+
+export type PlanNextBetaPreviewHistoryOptions = {
+  readonly executeGitCommand: ExecuteGitCommand;
+  readonly targetMainCommit: string;
+};
+
 type TagAnnotation = 'annotated' | 'lightweight';
 
 type ProductionTagRecord = ProductionTag & {
@@ -82,6 +107,11 @@ type ProductionTagRecord = ProductionTag & {
 
 type BetaCandidateRecord = BetaCandidate & {
   readonly tagName: string;
+};
+
+type BetaReleaseTagRecord = BetaCandidateRecord & {
+  readonly commit: string;
+  readonly taggerTimestamp: bigint;
 };
 
 type CompareTagOrderOptions = {
@@ -157,8 +187,12 @@ function executeSingleLineGitCommand(
 ): Task<string, Error> {
   return executeGitCommandWithTask(executeGitCommand, commandArguments).andThen(commandOutput => {
     const trimmedCommandOutput = commandOutput.trim();
-    if (trimmedCommandOutput.length === 0) {
+    if (is.emptyString(trimmedCommandOutput)) {
       return createFailure(`Git command returned no output: git ${commandArguments.join(' ')}`);
+    }
+
+    if (trimmedCommandOutput.split(/\r?\n/).length !== 1) {
+      return createFailure(`Git command returned multiple lines: git ${commandArguments.join(' ')}`);
     }
 
     return createSuccess(trimmedCommandOutput);
@@ -172,7 +206,7 @@ function splitGitLines(commandOutput: string): readonly string[] {
       return line.trim();
     })
     .filter(line => {
-      return line.length > 0;
+      return is.emptyString(line) === false;
     });
 }
 
@@ -376,6 +410,150 @@ async function findPrecedingBetaCandidate(
   }
 
   return createSuccess(precedingBetaCandidate);
+}
+
+export function findLatestBetaReleaseTag(
+  executeGitCommand: ExecuteGitCommand,
+): Task<Maybe<BetaReleaseTagReference>, Error> {
+  return task.tryOrElse(
+    (error: unknown): Error => {
+      if (is.error(error)) {
+        return error;
+      }
+
+      return new Error('Latest Beta tag selection failed', {cause: error});
+    },
+    async (): Promise<Maybe<BetaReleaseTagReference>> => {
+      const betaTagNamesResult = await listTagNames(executeGitCommand, betaTagListPattern);
+      if (betaTagNamesResult.isErr) {
+        throw betaTagNamesResult.error;
+      }
+
+      let latestBetaReleaseTag: Maybe<BetaReleaseTagRecord> = Maybe.nothing<BetaReleaseTagRecord>();
+      for (const betaTagName of betaTagNamesResult.value) {
+        const parsedBetaCandidateResult = parseBetaCandidateTag(betaTagName);
+        if (parsedBetaCandidateResult.isErr) {
+          continue;
+        }
+
+        const tagAnnotationResult = await requireAnnotatedTag(executeGitCommand, betaTagName);
+        if (tagAnnotationResult.isErr) {
+          throw tagAnnotationResult.error;
+        }
+
+        const taggerTimestampResult = await readTaggerTimestamp(executeGitCommand, betaTagName);
+        if (taggerTimestampResult.isErr) {
+          throw taggerTimestampResult.error;
+        }
+
+        const commitResult = await resolveTagCommit(executeGitCommand, betaTagName);
+        if (commitResult.isErr) {
+          throw commitResult.error;
+        }
+
+        const betaReleaseTagRecord: BetaReleaseTagRecord = {
+          ...parsedBetaCandidateResult.value,
+          tagName: betaTagName,
+          commit: commitResult.value,
+          taggerTimestamp: taggerTimestampResult.value,
+        };
+        const shouldReplaceLatestTag = latestBetaReleaseTag
+          .map(existingLatestTag => {
+            const releaseOrder = compareTagOrder({
+              leftTaggerTimestamp: betaReleaseTagRecord.taggerTimestamp,
+              leftReleaseIdentifier: betaReleaseTagRecord.releaseIdentifier,
+              rightTaggerTimestamp: existingLatestTag.taggerTimestamp,
+              rightReleaseIdentifier: existingLatestTag.releaseIdentifier,
+            });
+
+            return (
+              (releaseOrder === 0 ? compareBetaCandidates(betaReleaseTagRecord, existingLatestTag) : releaseOrder) > 0
+            );
+          })
+          .unwrapOr(true);
+        if (shouldReplaceLatestTag) {
+          latestBetaReleaseTag = Maybe.just(betaReleaseTagRecord);
+        }
+      }
+
+      return latestBetaReleaseTag.map(betaReleaseTag => {
+        return {
+          tagName: betaReleaseTag.tagName,
+          commit: betaReleaseTag.commit,
+          taggerTimestamp: betaReleaseTag.taggerTimestamp,
+        };
+      });
+    },
+  );
+}
+
+export function planNextBetaPreviewHistory(
+  planNextBetaPreviewHistoryOptions: PlanNextBetaPreviewHistoryOptions,
+): Task<NextBetaPreviewHistoryPlan, Error> {
+  const {executeGitCommand, targetMainCommit} = planNextBetaPreviewHistoryOptions;
+
+  return task.tryOrElse(
+    (error: unknown): Error => {
+      if (is.error(error)) {
+        return error;
+      }
+
+      return new Error('Next Beta preview history planning failed', {cause: error});
+    },
+    async (): Promise<NextBetaPreviewHistoryPlan> => {
+      const targetMainCommitResult = validateReleaseCommit(targetMainCommit);
+      if (targetMainCommitResult.isErr) {
+        throw new Error('Target main commit SHA must contain exactly 40 hexadecimal characters');
+      }
+
+      const resolvedTargetMainCommitResult = await executeSingleLineGitCommand(executeGitCommand, [
+        'rev-parse',
+        '--verify',
+        `${targetMainCommitResult.value}^{commit}`,
+      ]);
+      if (resolvedTargetMainCommitResult.isErr) {
+        throw resolvedTargetMainCommitResult.error;
+      }
+
+      const latestBetaReleaseTagResult = await findLatestBetaReleaseTag(executeGitCommand);
+      if (latestBetaReleaseTagResult.isErr) {
+        throw latestBetaReleaseTagResult.error;
+      }
+
+      const resolvedTargetMainCommit = resolvedTargetMainCommitResult.value;
+      if (latestBetaReleaseTagResult.value.isNothing) {
+        return {kind: 'unavailable', targetMainCommit: resolvedTargetMainCommit};
+      }
+
+      const latestBetaReleaseTag = latestBetaReleaseTagResult.value.value;
+      const mergeBaseResult = await executeSingleLineGitCommand(executeGitCommand, [
+        'merge-base',
+        latestBetaReleaseTag.commit,
+        resolvedTargetMainCommit,
+      ]);
+      if (mergeBaseResult.isErr) {
+        throw mergeBaseResult.error;
+      }
+
+      const commitsResult = await executeGitCommandWithTask(executeGitCommand, [
+        'rev-list',
+        '--reverse',
+        '--topo-order',
+        `${mergeBaseResult.value}..${resolvedTargetMainCommit}`,
+      ]).map(splitGitLines);
+      if (commitsResult.isErr) {
+        throw commitsResult.error;
+      }
+
+      return {
+        kind: 'preview',
+        latestBetaReleaseTag,
+        targetMainCommit: resolvedTargetMainCommit,
+        mergeBase: mergeBaseResult.value,
+        commits: commitsResult.value,
+      };
+    },
+  );
 }
 
 function createCommitRange(createCommitRangeOptions: CreateCommitRangeOptions): Task<CommitRange, Error> {
