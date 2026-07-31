@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptyArray, isEmptyString, isError} from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
 import type {Task} from 'true-myth';
 
@@ -125,7 +125,7 @@ const advisoryMessage =
   'This is an advisory preview. These changes are on main but have not been deployed or verified in Beta.';
 
 function redactSecret(message: string, secret: string): string {
-  if (is.emptyString(secret)) {
+  if (isEmptyString(secret)) {
     return message;
   }
 
@@ -150,7 +150,7 @@ async function writeInformationSafely(
     return Maybe.nothing<string>();
   } catch (error: unknown) {
     const failureMessage = `Unable to write informational output: ${redactSecret(
-      is.error(error) ? error.message : 'Unknown failure',
+      isError(error) ? error.message : 'Unknown failure',
       githubToken,
     )}`;
     await writeFailureSafely(writeFailure, failureMessage);
@@ -167,7 +167,7 @@ async function writeSummarySafely(writeSummarySafelyOptions: WriteSummarySafelyO
     return Maybe.nothing<string>();
   } catch (error: unknown) {
     const failureMessage = `Unable to write GitHub Actions summary: ${redactSecret(
-      is.error(error) ? error.message : 'Unknown failure',
+      isError(error) ? error.message : 'Unknown failure',
       githubToken,
     )}`;
     await writeFailureSafely(writeFailure, failureMessage);
@@ -205,7 +205,7 @@ async function discoverPullRequests(
       pullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha});
     } catch (error: unknown) {
       failureMessages.push(
-        redactSecret(is.error(error) ? error.message : 'Unknown GitHub pull request discovery failure', githubToken),
+        redactSecret(isError(error) ? error.message : 'Unknown GitHub pull request discovery failure', githubToken),
       );
 
       continue;
@@ -219,7 +219,7 @@ async function discoverPullRequests(
     const mergedMainPullRequests = pullRequestsResult.value.filter(pullRequest => {
       return pullRequest.baseBranch === 'main' && pullRequest.mergedAt.isJust;
     });
-    if (is.emptyArray(mergedMainPullRequests)) {
+    if (isEmptyArray(mergedMainPullRequests)) {
       commitsWithoutMergedMainPullRequest.push(commitSha);
       continue;
     }
@@ -301,7 +301,7 @@ function formatCommitLines(state: PreviewNextBetaState): readonly string[] {
     return ['Not inspected.'];
   }
 
-  return is.emptyArray(state.commitsWithoutMergedMainPullRequest)
+  return isEmptyArray(state.commitsWithoutMergedMainPullRequest)
     ? ['None']
     : state.commitsWithoutMergedMainPullRequest.map(commitSha => {
         return `- \`${commitSha}\``;
@@ -313,7 +313,7 @@ function formatPullRequestLines(state: PreviewNextBetaState, githubRepository: s
     return ['Not inspected.'];
   }
 
-  return is.emptyArray(state.pullRequests)
+  return isEmptyArray(state.pullRequests)
     ? ['No merged pull requests are currently waiting for the next Beta.']
     : state.pullRequests.map(pullRequest => {
         return `- [#${pullRequest.number}](https://github.com/${githubRepository}/pull/${pullRequest.number}) ${normalizePullRequestTitle(
@@ -376,19 +376,19 @@ function createReport(createReportOptions: CreateReportOptions): string {
   let unavailableMessage = '';
   if (state.latestBetaReleaseTag.isNothing) {
     unavailableMessage = 'The preview is unavailable because the latest Beta history could not be evaluated.';
-    if (is.emptyArray(state.failureMessages)) {
+    if (isEmptyArray(state.failureMessages)) {
       unavailableMessage = 'The preview is unavailable because no new-format Beta tag exists yet.';
     }
   }
   const failureLines = state.failureMessages.map(failureMessage => {
     return `- ${failureMessage}`;
   });
-  const markdownFailureLines = is.emptyArray(failureLines) ? ['None'] : failureLines;
+  const markdownFailureLines = isEmptyArray(failureLines) ? ['None'] : failureLines;
   const markdownLines = [
     '### Preview next Beta changes',
     '',
     ...createDetailLines(state, true),
-    ...(is.emptyString(unavailableMessage) ? [] : ['', unavailableMessage]),
+    ...(isEmptyString(unavailableMessage) ? [] : ['', unavailableMessage]),
     '',
     '### Pull requests waiting for Beta',
     '',
@@ -411,11 +411,11 @@ function createReport(createReportOptions: CreateReportOptions): string {
   return [
     'Preview next Beta changes',
     ...createDetailLines(state, false),
-    ...(is.emptyString(unavailableMessage) ? [] : ['', unavailableMessage]),
-    ...(state.mergeBase.isJust && is.emptyArray(state.pullRequests)
+    ...(isEmptyString(unavailableMessage) ? [] : ['', unavailableMessage]),
+    ...(state.mergeBase.isJust && isEmptyArray(state.pullRequests)
       ? ['No merged pull requests are currently waiting for the next Beta.']
       : []),
-    ...(is.emptyArray(failureLines) ? [] : ['Failures:', ...failureLines]),
+    ...(isEmptyArray(failureLines) ? [] : ['Failures:', ...failureLines]),
     advisoryMessage,
   ].join('\n');
 }
@@ -455,7 +455,7 @@ export async function executePreviewNextBetaCommand(
   } catch (error: unknown) {
     previewState = createUnavailableState(targetMainCommit, [
       redactSecret(
-        `Preview failed: ${is.error(error) ? error.message : 'Unknown failure'}`,
+        `Preview failed: ${isError(error) ? error.message : 'Unknown failure'}`,
         commandEnvironmentResult.value.githubToken,
       ),
     ]);
@@ -466,7 +466,7 @@ export async function executePreviewNextBetaCommand(
     githubRepository: commandEnvironmentResult.value.githubRepository,
     markdown: true,
   });
-  let exitCode = is.emptyArray(previewState.failureMessages) ? 0 : 1;
+  let exitCode = isEmptyArray(previewState.failureMessages) ? 0 : 1;
   const summaryFailureResult = await writeSummarySafely({
     writeFailure: dependencies.writeFailure,
     writeSummary: dependencies.writeSummary,
@@ -556,9 +556,7 @@ async function startPreviewNextBetaCommand(): Promise<void> {
     });
     process.exitCode = commandResult.exitCode;
   } catch (error: unknown) {
-    await writeRuntimeFailure(
-      redactSecret(is.error(error) ? error.message : 'Unexpected preview failure', githubToken),
-    );
+    await writeRuntimeFailure(redactSecret(isError(error) ? error.message : 'Unexpected preview failure', githubToken));
     process.exitCode = 1;
   }
 }

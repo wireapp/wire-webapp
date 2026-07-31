@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptyString, isError} from '@sindresorhus/is';
 import {Maybe, Result, Task, Unit, result, task} from 'true-myth';
 
 import {
@@ -187,7 +187,7 @@ function executeSingleLineGitCommand(
 ): Task<string, Error> {
   return executeGitCommandWithTask(executeGitCommand, commandArguments).andThen(commandOutput => {
     const trimmedCommandOutput = commandOutput.trim();
-    if (is.emptyString(trimmedCommandOutput)) {
+    if (isEmptyString(trimmedCommandOutput)) {
       return createFailure(`Git command returned no output: git ${commandArguments.join(' ')}`);
     }
 
@@ -206,7 +206,7 @@ function splitGitLines(commandOutput: string): readonly string[] {
       return line.trim();
     })
     .filter(line => {
-      return is.emptyString(line) === false;
+      return isEmptyString(line) === false;
     });
 }
 
@@ -417,7 +417,7 @@ export function findLatestBetaReleaseTag(
 ): Task<Maybe<BetaReleaseTagReference>, Error> {
   return task.tryOrElse(
     (error: unknown): Error => {
-      if (is.error(error)) {
+      if (isError(error)) {
         return error;
       }
 
@@ -494,7 +494,7 @@ export function planNextBetaPreviewHistory(
 
   return task.tryOrElse(
     (error: unknown): Error => {
-      if (is.error(error)) {
+      if (isError(error)) {
         return error;
       }
 
