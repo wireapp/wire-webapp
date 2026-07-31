@@ -11598,10 +11598,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wireapp/core-crypto@npm:9.3.4":
-  version: 9.3.4
-  resolution: "@wireapp/core-crypto@npm:9.3.4"
-  checksum: 10/a96adfa8c1c5a94dceb7cdaa52c13dda7774acfb5010fc4fbc66fcecff44f5cf1c25df3611a12f99ff3e619ea6c9f960127357d0bc85e9e681de0053c321d143
+"@wireapp/core-crypto@npm:10.2.0":
+  version: 10.2.0
+  resolution: "@wireapp/core-crypto@npm:10.2.0"
+  checksum: 10/adaad59e45d702d951f2c25991cc7488a3dbe2cf7119b8c2ae9dd74c162e881fdeea65abed59eef154366b40452926e2522f75659c0b375314014d1f8496f2b1
   languageName: node
   linkType: hard
 
@@ -11615,7 +11615,7 @@ __metadata:
     "@types/lodash": "npm:4.17.24"
     "@wireapp/api-client": "workspace:^"
     "@wireapp/commons": "workspace:^"
-    "@wireapp/core-crypto": "npm:9.3.4"
+    "@wireapp/core-crypto": "npm:10.2.0"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "workspace:^"
     "@wireapp/protocol-messaging": "npm:1.56.0"
