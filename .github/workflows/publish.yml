@@ -209,7 +209,7 @@ jobs:
           {
             "branch": "$BRANCH_NAME",
             "commit": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
-            "tag": "${{steps.push_docker_image.outputs.image_tag}}",
+            "tag": "${{steps.bump_chart_version.outputs.chart_version}}",
             "digest": "${{steps.bump_chart_version.outputs.chart_digest}}",
             "repository": "quay.io/wire/charts/dev/webapp"
           }
