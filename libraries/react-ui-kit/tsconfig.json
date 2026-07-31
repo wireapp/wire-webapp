@@ -10,6 +10,9 @@
     "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
+    "paths": {
+      "@sindresorhus/is": ["node_modules/@sindresorhus/is/distribution/index.d.ts"]
+    },
     "target": "es2020",
     "lib": ["dom", "es2024"],
     "types": ["node", "jest"]

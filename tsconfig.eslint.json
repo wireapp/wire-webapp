@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noEmit": true,
     "paths": {
+      "@sindresorhus/is": ["node_modules/@sindresorhus/is/distribution/index.d.ts"],
       "@wireapp/core/lib/*": ["libraries/core/src/*"],
       "@wireapp/core": ["libraries/core/src/index.ts"],
       "@wireapp/api-client/lib/*": ["libraries/api-client/src/*"],

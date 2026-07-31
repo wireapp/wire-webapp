@@ -26,10 +26,7 @@
     "lib": ["ES2024", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@sindresorhus/is": ["node_modules/@sindresorhus/is/distribution/index.d.ts"]
-    }
+    "baseUrl": "."
   },
   "exclude": ["node_modules", "tmp"]
 }
