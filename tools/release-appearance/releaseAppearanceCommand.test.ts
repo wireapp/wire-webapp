@@ -84,6 +84,7 @@ type RunCommandOptions = {
   readonly commandLineArguments: readonly string[];
   readonly executeGitCommand: ExecuteGitCommand;
   readonly githubClient: GitHubClient;
+  readonly informationWriteFailure?: string;
   readonly summaryWriteFailure?: string;
 };
 
@@ -94,8 +95,11 @@ type FakeGitCommandOptions = {
 
 type CreateDependenciesOptions = {
   readonly executeGitCommand: ExecuteGitCommand;
+  readonly failureMessages: string[];
   readonly githubClient: GitHubClient;
-  readonly outputMessages: string[];
+  readonly informationMessages: string[];
+  readonly informationWriteAttempts: string[];
+  readonly informationWriteFailure?: string;
   readonly summaries: string[];
   readonly summaryWriteFailure?: string;
 };
@@ -223,11 +227,31 @@ function createFakeGitCommand(fakeGitCommandOptions: FakeGitCommandOptions = {})
 function createDependencies(
   createDependenciesOptions: CreateDependenciesOptions,
 ): ReleaseAppearanceCommandDependencies {
-  const {executeGitCommand, githubClient, outputMessages, summaries, summaryWriteFailure} = createDependenciesOptions;
+  const {
+    executeGitCommand,
+    failureMessages,
+    githubClient,
+    informationMessages,
+    informationWriteAttempts,
+    informationWriteFailure,
+    summaries,
+    summaryWriteFailure,
+  } = createDependenciesOptions;
 
   return {
     executeGitCommand,
     githubClient,
+    async writeFailure(message): Promise<void> {
+      failureMessages.push(message);
+    },
+    async writeInformation(message): Promise<void> {
+      informationWriteAttempts.push(message);
+      const failureMessage = Maybe.of(informationWriteFailure);
+      if (failureMessage.isJust) {
+        throw new Error(failureMessage.value);
+      }
+      informationMessages.push(message);
+    },
     async writeSummary(summary): Promise<void> {
       const failureMessage = Maybe.of(summaryWriteFailure);
       if (failureMessage.isJust) {
@@ -235,32 +259,36 @@ function createDependencies(
       }
       summaries.push(summary);
     },
-    async writeOutput(message): Promise<void> {
-      outputMessages.push(message);
-    },
   };
 }
 
 async function runCommand(runCommandOptions: RunCommandOptions): Promise<{
   readonly result: Awaited<ReturnType<typeof executeReleaseAppearanceCommand>>;
-  readonly outputMessages: readonly string[];
+  readonly failureMessages: readonly string[];
+  readonly informationMessages: readonly string[];
+  readonly informationWriteAttempts: readonly string[];
   readonly summaries: readonly string[];
 }> {
-  const outputMessages: string[] = [];
+  const failureMessages: string[] = [];
+  const informationMessages: string[] = [];
+  const informationWriteAttempts: string[] = [];
   const summaries: string[] = [];
   const options: ExecuteReleaseAppearanceCommandOptions = {
     commandLineArguments: runCommandOptions.commandLineArguments,
     environment: commandEnvironment,
     dependencies: createDependencies({
       executeGitCommand: runCommandOptions.executeGitCommand,
+      failureMessages,
       githubClient: runCommandOptions.githubClient,
-      outputMessages,
+      informationMessages,
+      informationWriteAttempts,
+      informationWriteFailure: runCommandOptions.informationWriteFailure,
       summaries,
       summaryWriteFailure: runCommandOptions.summaryWriteFailure,
     }),
   };
   const result = await executeReleaseAppearanceCommand(options);
-  return {result, outputMessages, summaries};
+  return {result, failureMessages, informationMessages, informationWriteAttempts, summaries};
 }
 
 describe('parseCommandLineArguments', () => {
@@ -385,6 +413,7 @@ describe('executeReleaseAppearanceCommand', () => {
     assert(summary.isJust);
     expect(createdComment.value.commentBody).toMatch(/2026-01-02\.1-beta\.1/);
     expect(summary.value).toMatch(/Pull requests discovered: 1 \(#8\)/);
+    expect(commandRun.informationMessages).toEqual([]);
     expect(commandRun.result.summary).toBe(
       [
         '### Release appearance',
@@ -465,6 +494,56 @@ describe('executeReleaseAppearanceCommand', () => {
     expect(commandRun.result.summary).toContain('- #2: would update');
     expect(commandRun.result.summary).toContain('- #3: unchanged');
     expect(commandRun.result.summary).toContain('No GitHub comments were created or updated.');
+    expect(commandRun.informationMessages).toEqual([
+      [
+        'Release appearance dry run',
+        'Stage: production',
+        `Release tag: ${productionTag}`,
+        `Release commit: ${releaseCommit}`,
+        `Preceding Production tag: ${previousProductionTag}`,
+        'Commits inspected: 1',
+        'Pull requests discovered: 3',
+        'Would create: 1',
+        'Would update: 1',
+        'Unchanged: 1',
+        'Failed pull requests: 0',
+        'No GitHub comments were created or updated.',
+      ].join('\n'),
+    ]);
+    expect(commandRun.informationMessages.join('\n')).not.toContain(existingBetaComment);
+    expect(commandRun.informationMessages.join('\n')).not.toContain(existingProductionComment);
+    expect(commandRun.result.summary).toBe(
+      [
+        '### Release appearance',
+        '',
+        '- Mode: dry run',
+        '- Stage: production',
+        `- Release tag: \`${productionTag}\``,
+        `- Release commit: \`${releaseCommit}\``,
+        '- Bootstrap: no',
+        `- Preceding Production tag: ${previousProductionTag}`,
+        `- Beta candidate ranges for Production: ${betaTag}: ${previousProductionTag} -> ${betaTag}`,
+        `- Commits inspected: 1 (${betaCommit})`,
+        '- Pull requests discovered: 3 (#1, #2, #3)',
+        '- Comments that would be created: 1',
+        '- Comments that would be updated: 1',
+        '- Unchanged comments: 1',
+        '- Failed pull requests: none',
+        '- Commits without associated pull requests: none',
+        '',
+        '### Planned comment operations',
+        '',
+        '- #1: would create',
+        '- #2: would update',
+        '- #3: unchanged',
+        '',
+        'No GitHub comments were created or updated.',
+        '',
+        '### Failures',
+        '',
+        'None',
+      ].join('\n'),
+    );
   });
 
   it('uses paginated GitHub comment reads without mutations in dry-run mode', async () => {
@@ -551,6 +630,15 @@ describe('executeReleaseAppearanceCommand', () => {
     expect(commandRun.result.summary).toContain('[REDACTED]');
     expect(commandRun.result.summary).not.toContain(commandEnvironment.GITHUB_TOKEN);
     expect(commandRun.result.summary).toContain('- #4: would create');
+    const informationOutput = commandRun.informationMessages.join('\n');
+    expect(informationOutput).toContain('Failed pull requests: 3');
+    expect(informationOutput).toContain('Failures:');
+    expect(informationOutput).toContain('- Pull request #1: Malformed release-appearance marker state');
+    expect(informationOutput).toContain('- Pull request #2: More than one release-appearance marker comment exists');
+    expect(informationOutput).toContain('- Pull request #3: Unable to read [REDACTED]');
+    expect(informationOutput).not.toContain(commandEnvironment.GITHUB_TOKEN);
+    expect(informationOutput).not.toContain('Pull request #4');
+    expect(informationOutput).not.toContain(markerComment);
   });
 
   it('includes release-history planning failures in the summary', async () => {
@@ -566,6 +654,9 @@ describe('executeReleaseAppearanceCommand', () => {
     expect(commandRun.result.summary).toContain('- Release history: Invalid Beta candidate tag: invalid-beta-tag');
     expect(commandRun.result.summary).not.toContain('### Failures\n\nNone');
     expect(commandRun.result.summary).toContain('- Pull requests discovered: 0 (none)');
+    expect(commandRun.informationMessages.join('\n')).toContain(
+      '- Release history: Invalid Beta candidate tag: invalid-beta-tag',
+    );
   });
 
   it('continues discovery after one commit failure and includes the reason in the summary', async () => {
@@ -682,12 +773,12 @@ describe('executeReleaseAppearanceCommand', () => {
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
-    const output = commandRun.outputMessages.join('\n');
+    const failureOutput = commandRun.failureMessages.join('\n');
 
     expect(commandRun.result.exitCode).toBe(1);
-    expect(output).not.toContain(githubToken.value);
+    expect(failureOutput).not.toContain(githubToken.value);
     expect(commandRun.result.summary).not.toContain(githubToken.value);
-    expect(output).toContain('[REDACTED]');
+    expect(failureOutput).toContain('[REDACTED]');
     expect(commandRun.result.summary).toContain('[REDACTED]');
   });
 
@@ -708,7 +799,7 @@ describe('executeReleaseAppearanceCommand', () => {
       '- Summary: Unable to write GitHub Actions summary: Permission denied for [REDACTED]',
     );
     expect(commandRun.result.summary).not.toContain(githubToken.value);
-    expect(commandRun.outputMessages.join('\n')).not.toContain(githubToken.value);
+    expect(commandRun.failureMessages.join('\n')).not.toContain(githubToken.value);
   });
 
   it('performs no GitHub requests during bootstrap', async () => {
@@ -728,6 +819,40 @@ describe('executeReleaseAppearanceCommand', () => {
     expect(summary.value).toContain('No pull request comment operations were planned.');
     expect(summary.value).toContain('No GitHub comments were created or updated.');
     expect(commandRun.result.summary).toContain('### Failures\n\nNone');
+    expect(commandRun.informationMessages).toEqual([
+      [
+        'Release appearance dry run',
+        'Stage: beta',
+        `Release tag: ${betaTag}`,
+        `Release commit: ${releaseCommit}`,
+        'Bootstrap: yes',
+        'No preceding new-format Production release exists.',
+        'No commit range was inspected.',
+        'No pull request comment operations were planned.',
+        'No GitHub comments were created or updated.',
+      ].join('\n'),
+    ]);
+  });
+
+  it('does not repeat processing or summary generation when informational output fails', async () => {
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(8)]]]),
+    });
+
+    const commandRun = await runCommand({
+      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      executeGitCommand: createFakeGitCommand(),
+      githubClient: fakeGitHubClient.githubClient,
+      informationWriteFailure: `Unable to write ${commandEnvironment.GITHUB_TOKEN}`,
+    });
+
+    expect(commandRun.result.exitCode).toBe(1);
+    expect(fakeGitHubClient.state.pullRequestCommits).toEqual([betaCommit]);
+    expect(fakeGitHubClient.state.commentPullRequests).toEqual([8]);
+    expect(commandRun.summaries).toHaveLength(1);
+    expect(commandRun.informationWriteAttempts).toHaveLength(1);
+    expect(commandRun.informationMessages).toEqual([]);
+    expect(commandRun.failureMessages).toEqual(['Unable to write dry-run log output: Unable to write [REDACTED]']);
   });
 });
 

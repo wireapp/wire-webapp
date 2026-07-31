@@ -65,8 +65,9 @@ export type CommandEnvironment = {
 export type ReleaseAppearanceCommandDependencies = {
   readonly executeGitCommand: ExecuteGitCommand;
   readonly githubClient: GitHubClient;
+  readonly writeFailure: (message: string) => Promise<void>;
+  readonly writeInformation: (message: string) => Promise<void>;
   readonly writeSummary: (summary: string) => Promise<void>;
-  readonly writeOutput: (message: string) => Promise<void>;
 };
 
 export type ExecuteReleaseAppearanceCommandOptions = {
@@ -140,7 +141,10 @@ type SummaryOptions = {
 };
 
 type FinalizeSummaryOptions = {
-  readonly dependencies: Pick<ReleaseAppearanceCommandDependencies, 'writeSummary' | 'writeOutput'>;
+  readonly dependencies: Pick<
+    ReleaseAppearanceCommandDependencies,
+    'writeFailure' | 'writeInformation' | 'writeSummary'
+  >;
   readonly summaryOptions: SummaryOptions;
   readonly githubToken: string;
   readonly exitCode: number;
@@ -351,16 +355,16 @@ export function readCommandEnvironment(environment: NodeJS.ProcessEnv): Result<C
   });
 }
 
-async function writeFailure(writeOutput: (message: string) => Promise<void>, message: string): Promise<void> {
+async function writeFailureSafely(writeFailure: (message: string) => Promise<void>, message: string): Promise<void> {
   try {
-    await writeOutput(message);
+    await writeFailure(message);
   } catch {
     // Reporting must not stop processing the remaining pull requests.
   }
 }
 
 async function writeSummarySafely(
-  dependencies: Pick<ReleaseAppearanceCommandDependencies, 'writeSummary' | 'writeOutput'>,
+  dependencies: Pick<ReleaseAppearanceCommandDependencies, 'writeFailure' | 'writeSummary'>,
   summary: string,
   githubToken: string,
 ): Promise<Maybe<string>> {
@@ -369,7 +373,7 @@ async function writeSummarySafely(
     return Maybe.nothing<string>();
   } catch (error: unknown) {
     const failureMessage = `Unable to write GitHub Actions summary: ${redactSecret(errorMessage(error), githubToken)}`;
-    await writeFailure(dependencies.writeOutput, failureMessage);
+    await writeFailureSafely(dependencies.writeFailure, failureMessage);
     return Maybe.just(failureMessage);
   }
 }
@@ -524,7 +528,7 @@ async function processPullRequests(
   stage: ReleaseAppearanceCommandStage,
   releaseTag: string,
   executionMode: ExecutionMode,
-  dependencies: Pick<ReleaseAppearanceCommandDependencies, 'githubClient' | 'writeOutput'>,
+  dependencies: Pick<ReleaseAppearanceCommandDependencies, 'githubClient' | 'writeFailure'>,
   githubToken: string,
 ): Promise<ProcessingResult> {
   let commentsCreated = 0;
@@ -544,7 +548,7 @@ async function processPullRequests(
         githubToken,
       );
       failures.push(pullRequestFailure);
-      await writeFailure(dependencies.writeOutput, formatPullRequestFailure(pullRequestFailure));
+      await writeFailureSafely(dependencies.writeFailure, formatPullRequestFailure(pullRequestFailure));
       continue;
     }
 
@@ -559,7 +563,7 @@ async function processPullRequests(
         githubToken,
       );
       failures.push(pullRequestFailure);
-      await writeFailure(dependencies.writeOutput, formatPullRequestFailure(pullRequestFailure));
+      await writeFailureSafely(dependencies.writeFailure, formatPullRequestFailure(pullRequestFailure));
       continue;
     }
     plannedCommentOperations.push({
@@ -587,7 +591,7 @@ async function processPullRequests(
     if (writeResult.isErr) {
       const pullRequestFailure = createPullRequestFailure(pullRequest.number, writeResult.error.message, githubToken);
       failures.push(pullRequestFailure);
-      await writeFailure(dependencies.writeOutput, formatPullRequestFailure(pullRequestFailure));
+      await writeFailureSafely(dependencies.writeFailure, formatPullRequestFailure(pullRequestFailure));
       continue;
     }
     if (operationResult.value.kind === 'create') {
@@ -769,10 +773,76 @@ function createDryRunSummary(summaryOptions: SummaryOptions): string {
   ].join('\n');
 }
 
+function createDryRunLogOutput(summaryOptions: SummaryOptions): string {
+  const releaseDetails = [
+    'Release appearance dry run',
+    `Stage: ${summaryOptions.stage}`,
+    `Release tag: ${summaryOptions.releaseTag}`,
+    `Release commit: ${summaryOptions.releaseCommit}`,
+  ];
+
+  if (summaryOptions.bootstrap) {
+    return [
+      ...releaseDetails,
+      'Bootstrap: yes',
+      'No preceding new-format Production release exists.',
+      'No commit range was inspected.',
+      'No pull request comment operations were planned.',
+      'No GitHub comments were created or updated.',
+    ].join('\n');
+  }
+
+  const failureReasons = [
+    ...summaryOptions.generalFailureMessages,
+    ...summaryOptions.pullRequestFailures.map(pullRequestFailure => {
+      return formatPullRequestFailure(pullRequestFailure);
+    }),
+  ];
+
+  return [
+    ...releaseDetails,
+    `Preceding Production tag: ${summaryOptions.precedingProductionTag}`,
+    `Commits inspected: ${summaryOptions.commitsInspected.length}`,
+    `Pull requests discovered: ${summaryOptions.pullRequestsDiscovered.length}`,
+    `Would create: ${summaryOptions.commentsCreated}`,
+    `Would update: ${summaryOptions.commentsUpdated}`,
+    `Unchanged: ${summaryOptions.commentsUnchanged}`,
+    `Failed pull requests: ${summaryOptions.pullRequestFailures.length}`,
+    ...(failureReasons.length === 0
+      ? []
+      : [
+          'Failures:',
+          ...failureReasons.map(failureReason => {
+            return `- ${failureReason}`;
+          }),
+        ]),
+    'No GitHub comments were created or updated.',
+  ].join('\n');
+}
+
 function createSummary(summaryOptions: SummaryOptions): string {
   return summaryOptions.executionMode === 'dry-run'
     ? createDryRunSummary(summaryOptions)
     : createWriteSummary(summaryOptions);
+}
+
+async function writeDryRunLogOutputSafely(
+  dependencies: Pick<ReleaseAppearanceCommandDependencies, 'writeFailure' | 'writeInformation'>,
+  summaryOptions: SummaryOptions,
+  githubToken: string,
+): Promise<Maybe<string>> {
+  if (summaryOptions.executionMode !== 'dry-run') {
+    return Maybe.nothing<string>();
+  }
+
+  try {
+    await dependencies.writeInformation(createDryRunLogOutput(summaryOptions));
+    return Maybe.nothing<string>();
+  } catch (error: unknown) {
+    const failureMessage = `Unable to write dry-run log output: ${redactSecret(errorMessage(error), githubToken)}`;
+    await writeFailureSafely(dependencies.writeFailure, failureMessage);
+    return Maybe.just(failureMessage);
+  }
 }
 
 async function finalizeSummary(
@@ -781,20 +851,21 @@ async function finalizeSummary(
   const {dependencies, summaryOptions, githubToken, exitCode} = finalizeSummaryOptions;
   const summary = createSummary(summaryOptions);
   const summaryWriteFailure = await writeSummarySafely(dependencies, summary, githubToken);
-  if (summaryWriteFailure.isNothing) {
-    return {exitCode, summary};
+  const dryRunLogOutputWriteFailure = await writeDryRunLogOutputSafely(dependencies, summaryOptions, githubToken);
+  if (summaryWriteFailure.isJust) {
+    return {
+      exitCode: 1,
+      summary: createSummary({
+        ...summaryOptions,
+        generalFailureMessages: [
+          ...summaryOptions.generalFailureMessages,
+          createGeneralFailureMessage('Summary', summaryWriteFailure.value, githubToken),
+        ],
+      }),
+    };
   }
 
-  return {
-    exitCode: 1,
-    summary: createSummary({
-      ...summaryOptions,
-      generalFailureMessages: [
-        ...summaryOptions.generalFailureMessages,
-        createGeneralFailureMessage('Summary', summaryWriteFailure.value, githubToken),
-      ],
-    }),
-  };
+  return {exitCode: dryRunLogOutputWriteFailure.isJust ? 1 : exitCode, summary};
 }
 
 async function planReleaseHistory(
@@ -827,13 +898,16 @@ export async function executeReleaseAppearanceCommand(
   const githubToken = Maybe.of(environment.GITHUB_TOKEN).unwrapOr('');
   const parsedCommandResult = parseCommandLineArguments(commandLineArguments);
   if (parsedCommandResult.isErr) {
-    await writeFailure(dependencies.writeOutput, parsedCommandResult.error.message);
+    await writeFailureSafely(dependencies.writeFailure, parsedCommandResult.error.message);
     return {exitCode: 1, summary: ''};
   }
 
   const commandEnvironmentResult = readCommandEnvironment(environment);
   if (commandEnvironmentResult.isErr) {
-    await writeFailure(dependencies.writeOutput, redactSecret(commandEnvironmentResult.error.message, githubToken));
+    await writeFailureSafely(
+      dependencies.writeFailure,
+      redactSecret(commandEnvironmentResult.error.message, githubToken),
+    );
     return {exitCode: 1, summary: ''};
   }
 
@@ -859,7 +933,7 @@ export async function executeReleaseAppearanceCommand(
       ...summaryOptions,
       generalFailureMessages: [historyFailureMessage],
     };
-    await writeFailure(dependencies.writeOutput, historyFailureMessage);
+    await writeFailureSafely(dependencies.writeFailure, historyFailureMessage);
   } else {
     summaryOptions = addPlanToSummary(summaryOptions, historyPlanResult.value);
     if (historyPlanResult.value.kind === 'bootstrap') {
@@ -884,7 +958,7 @@ export async function executeReleaseAppearanceCommand(
       return createGeneralFailureMessage('Discovery', failureMessage, githubToken);
     });
     for (const discoveryFailureMessage of discoveryFailureMessages) {
-      await writeFailure(dependencies.writeOutput, discoveryFailureMessage);
+      await writeFailureSafely(dependencies.writeFailure, discoveryFailureMessage);
     }
 
     const processingResult = await processPullRequests(
@@ -932,8 +1006,8 @@ export async function main(
     const commandResult = await executeReleaseAppearanceCommand(executeReleaseAppearanceCommandOptions);
     process.exitCode = commandResult.exitCode;
   } catch (error: unknown) {
-    await writeFailure(
-      executeReleaseAppearanceCommandOptions.dependencies.writeOutput,
+    await writeFailureSafely(
+      executeReleaseAppearanceCommandOptions.dependencies.writeFailure,
       redactSecret(errorMessage(error), githubToken),
     );
     process.exitCode = 1;
@@ -946,8 +1020,12 @@ async function executeGitCommand(commandArguments: readonly string[]): Promise<s
   return commandResult.stdout.toString();
 }
 
-async function writeRuntimeOutput(message: string): Promise<void> {
+async function writeRuntimeFailure(message: string): Promise<void> {
   process.stderr.write(`${message}\n`);
+}
+
+async function writeRuntimeInformation(message: string): Promise<void> {
+  process.stdout.write(`${message}\n`);
 }
 
 function createRuntimeDependencies(commandEnvironment: CommandEnvironment): ReleaseAppearanceCommandDependencies {
@@ -962,10 +1040,11 @@ function createRuntimeDependencies(commandEnvironment: CommandEnvironment): Rele
   return {
     executeGitCommand,
     githubClient,
+    writeFailure: writeRuntimeFailure,
+    writeInformation: writeRuntimeInformation,
     async writeSummary(summary): Promise<void> {
       await appendFile(commandEnvironment.githubStepSummary, `${summary}\n`, 'utf8');
     },
-    writeOutput: writeRuntimeOutput,
   };
 }
 
@@ -973,14 +1052,14 @@ async function startReleaseAppearanceCommand(): Promise<void> {
   const commandLineArguments = process.argv.slice(processArgumentStartIndex);
   const parsedCommandResult = parseCommandLineArguments(commandLineArguments);
   if (parsedCommandResult.isErr) {
-    await writeRuntimeOutput(parsedCommandResult.error.message);
+    await writeRuntimeFailure(parsedCommandResult.error.message);
     process.exitCode = 1;
     return;
   }
 
   const commandEnvironmentResult = readCommandEnvironment(process.env);
   if (commandEnvironmentResult.isErr) {
-    await writeRuntimeOutput(commandEnvironmentResult.error.message);
+    await writeRuntimeFailure(commandEnvironmentResult.error.message);
     process.exitCode = 1;
     return;
   }
