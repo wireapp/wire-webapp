@@ -221,6 +221,21 @@ jobs:
             quay.io/wire/release-streams/webapp:$BRANCH_NAME \
             build.json:application/vnd.wire.webapp.build+json
 
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.WIRE_ONPREM_AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.WIRE_ONPREM_AUTOMATION_PRIVATE_KEY }}
+          owner: wireapp
+
+      - name: Trigger webapp-release-stream-updated dispatch event
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh api repos/wireapp/wire-gov-bundles/dispatches \
+            -f event_type=webapp-release-stream-updated
+
       # generates a mapping between branches/tag to wire-build branches
       - name: Define target branches in wireapp/wire-builds to bump
         uses: kanga333/variable-mapper@master
