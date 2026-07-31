@@ -75,6 +75,7 @@ type CreatePullRequestOptions = {
   readonly number: number;
   readonly baseBranch?: string;
   readonly merged?: boolean;
+  readonly title?: string;
 };
 
 type RunCommandOptions = {
@@ -99,10 +100,11 @@ const previewHistoryPlan: NextBetaPreviewHistoryPlan = {
 };
 
 function createPullRequest(createPullRequestOptions: CreatePullRequestOptions): PullRequestRecord {
-  const {number, baseBranch = 'main', merged = true} = createPullRequestOptions;
+  const {number, baseBranch = 'main', merged = true, title = `Pull request #${number}`} = createPullRequestOptions;
 
   return {
     number,
+    title,
     baseBranch,
     mergedAt: merged ? Maybe.just('2026-07-28T00:00:00Z') : Maybe.nothing<string>(),
   };
@@ -302,12 +304,12 @@ describe('executePreviewNextBetaCommand', () => {
         [
           firstMainCommit,
           [
-            createPullRequest({number: 22052}),
+            createPullRequest({number: 22052, title: 'Add next Beta change preview [WPB-26469]'}),
             createPullRequest({number: 22040, baseBranch: 'release/2026-07-27'}),
             createPullRequest({number: 22041, merged: false}),
           ],
         ],
-        [secondMainCommit, [createPullRequest({number: 22052})]],
+        [secondMainCommit, [createPullRequest({number: 22052, title: 'A duplicate title that must be ignored'})]],
         [thirdMainCommit, [createPullRequest({number: 22051, baseBranch: 'release/2026-07-27'})]],
       ]),
     });
@@ -325,10 +327,73 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.result.summary).toContain(`Current main commit: \`${targetMainCommit}\``);
     expect(commandRun.result.summary).toContain(`Merge base: \`${mergeBaseCommit}\``);
     expect(commandRun.result.summary).toContain('Merged pull requests waiting for Beta: 1');
-    expect(commandRun.result.summary).toContain('[#22052](https://github.com/wireapp/wire-webapp/pull/22052)');
+    expect(commandRun.result.summary).toContain(
+      '- [#22052](https://github.com/wireapp/wire-webapp/pull/22052) Add next Beta change preview \\[WPB-26469\\]',
+    );
+    expect(commandRun.result.summary).not.toContain('A duplicate title that must be ignored');
     expect(commandRun.result.summary).toContain(`- \`${thirdMainCommit}\``);
     expect(commandRun.result.summary).toContain('This is an advisory preview. These changes are on main');
     expect(commandRun.writerState.informationMessages[0]).toContain('Merged pull requests waiting for Beta: 1');
+    expect(commandRun.writerState.informationMessages[0]).not.toContain('Add next Beta change preview');
+  });
+
+  test('sorts multiple merged main pull requests numerically', async () => {
+    const githubClientFixture = createFakeGitHubClient({
+      pullRequestsByCommit: new Map([
+        [
+          firstMainCommit,
+          [
+            createPullRequest({number: 22056, title: 'Add next Beta change preview [WPB-26469]'}),
+            createPullRequest({number: 22050, title: 'Add first-appearance release comments [WPB-26469]'}),
+          ],
+        ],
+        [
+          secondMainCommit,
+          [createPullRequest({number: 22052, title: 'Add release appearance comment dry run [WPB-26469]'})],
+        ],
+      ]),
+    });
+
+    const commandRun = await runCommand({
+      commandLineArguments: [targetMainCommit],
+      executeGitCommand: createFakeGitCommand(),
+      githubClient: githubClientFixture.githubClient,
+      historyPlanResult: Result.ok({...previewHistoryPlan, commits: [firstMainCommit, secondMainCommit]}),
+    });
+
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(commandRun.result.summary.indexOf('#22050')).toBeLessThan(commandRun.result.summary.indexOf('#22052'));
+    expect(commandRun.result.summary.indexOf('#22052')).toBeLessThan(commandRun.result.summary.indexOf('#22056'));
+  });
+
+  test('normalizes and escapes hostile pull request titles into one safe list item', async () => {
+    const githubClientFixture = createFakeGitHubClient({
+      pullRequestsByCommit: new Map([
+        [
+          firstMainCommit,
+          [
+            createPullRequest({
+              number: 22060,
+              title:
+                '  Fix [preview] *output*\nfor <Beta>\t_with_ `code`\\path ~draft~\n- forged list\n# forged heading  ',
+            }),
+          ],
+        ],
+      ]),
+    });
+
+    const commandRun = await runCommand({
+      commandLineArguments: [targetMainCommit],
+      executeGitCommand: createFakeGitCommand(),
+      githubClient: githubClientFixture.githubClient,
+      historyPlanResult: Result.ok({...previewHistoryPlan, commits: [firstMainCommit]}),
+    });
+
+    const expectedHostilePullRequestLine =
+      '- [#22060](https://github.com/wireapp/wire-webapp/pull/22060) Fix \\[preview\\] \\*output\\* for \\<Beta\\> \\_with\\_ \\`code\\`\\\\path \\~draft\\~ - forged list # forged heading';
+    expect(commandRun.result.summary).toContain(expectedHostilePullRequestLine);
+    expect(commandRun.result.summary).not.toContain('\n- forged list');
+    expect(commandRun.result.summary).not.toContain('\n# forged heading');
   });
 
   test('continues after a discovery failure, returns non-zero, and sanitizes the failure', async () => {

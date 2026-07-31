@@ -25,6 +25,7 @@ import type {HttpClient, HttpMethod, HttpRequest} from './httpClient.ts';
 
 export type PullRequestRecord = {
   readonly number: number;
+  readonly title: string;
   readonly baseBranch: string;
   readonly mergedAt: Maybe<string>;
 };
@@ -80,6 +81,7 @@ const githubApiVersion = '2022-11-28';
 
 const githubPullRequestResponseSchema = z.object({
   number: z.number().int().positive(),
+  title: z.string().min(1),
   merged_at: z.string().nullable(),
   base: z.object({
     ref: z.string(),
@@ -172,6 +174,7 @@ function parsePullRequestPage(githubResponse: unknown): Result<ParsedPullRequest
   const pullRequests = validationResult.data.map(pullRequest => {
     return {
       number: pullRequest.number,
+      title: pullRequest.title,
       baseBranch: pullRequest.base.ref,
       mergedAt: Maybe.of(pullRequest.merged_at),
     };
