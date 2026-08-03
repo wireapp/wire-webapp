@@ -68,6 +68,7 @@ interface LeftListWrapperProps {
   ariaLabelledBy?: string;
   ariaLabel?: string;
   panelAttributes?: Record<string, string | boolean | undefined>;
+  onTargetRef?: (element: HTMLElement | null) => void;
 }
 
 const ListWrapper = memo(
@@ -89,6 +90,7 @@ const ListWrapper = memo(
     ariaLabelledBy,
     ariaLabel,
     panelAttributes,
+    onTargetRef,
   }: LeftListWrapperProps) => {
     const {translate} = useApplicationContext();
     const defaultHeadingId = hasHeader && !headerElement && header ? getListWrapperHeadingId(id) : undefined;
@@ -126,6 +128,7 @@ const ListWrapper = memo(
         {children !== null ? (
           <section
             id={id}
+            ref={onTargetRef}
             className={`left-list-${id} ${id}`}
             css={style}
             aria-labelledby={sectionAriaLabelledBy}

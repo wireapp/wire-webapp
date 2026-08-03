@@ -34,6 +34,8 @@ import {ChooseScreen} from 'Components/calling/ChooseScreen';
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {ConfigToolbar} from 'Components/configToolbar/configToolbar';
 import {ErrorFallback} from 'Components/errorFallback';
+import {MeetingNotificationHost} from 'Components/Meeting/meetingNotificationHost/meetingNotificationHost';
+import {useMeetingNotificationHostElement} from 'Components/Meeting/meetingNotificationHost/useMeetingNotificationHostElement';
 import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
 import {FileHistoryModal} from 'Components/Modals/FileHistoryModal/FileHistoryModal';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
@@ -133,6 +135,7 @@ export const AppMain = (properties: AppMainProps) => {
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
   const appLockRepository = useMemo(() => new AppLockRepository(translate), [translate]);
+  const {meetingNotificationHostElement, setMeetingNotificationHostElement} = useMeetingNotificationHostElement();
 
   const isScreenshareActive =
     hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.MAIN_WINDOW;
@@ -330,6 +333,7 @@ export const AppMain = (properties: AppMainProps) => {
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <ForceReloadModal reloadApplication={app.refresh} />
         {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
+        <MeetingNotificationHost targetElement={meetingNotificationHostElement} />
         {!locked && (
           <div
             id="app"
@@ -339,7 +343,12 @@ export const AppMain = (properties: AppMainProps) => {
             })}
           >
             {showLeftSidebar && (
-              <LeftSidebar listViewModel={mainView.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
+              <LeftSidebar
+                listViewModel={mainView.list}
+                selfUser={selfUser}
+                isActivatedAccount={isActivatedAccount}
+                onConversationsTargetChange={setMeetingNotificationHostElement}
+              />
             )}
 
             {showMainContent && (
