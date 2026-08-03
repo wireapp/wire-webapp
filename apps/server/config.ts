@@ -97,6 +97,7 @@ function generateUrls() {
 }
 
 const commonConfig = {
+  assetVersion: buildMetadata.assetVersion,
   commit: buildMetadata.commit,
   version: buildMetadata.version,
   env: Boolean(env.NODE_ENV) ? env.NODE_ENV : 'production',

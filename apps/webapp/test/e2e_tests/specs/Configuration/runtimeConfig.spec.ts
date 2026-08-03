@@ -31,6 +31,7 @@ type ConfigDiff = {
 };
 
 const referenceConfigParams: ConfigGeneratorParams = {
+  assetVersion: 'reference-version-reference',
   commit: 'reference-commit',
   version: 'reference-version',
   env: 'production',

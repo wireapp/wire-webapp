@@ -11797,7 +11797,6 @@ __metadata:
     "@types/geolite2": "npm:2.0.2"
     "@types/hbs": "npm:4.0.5"
     "@wireapp/config": "workspace:^"
-    date-fns: "npm:4.4.0"
     dotenv-extended: "npm:2.9.0"
     express: "npm:4.22.2"
     express-sitemap-xml: "npm:3.1.0"

@@ -32,7 +32,6 @@ import path from 'path';
 import type {BuildMetadata, ClientConfig, ServerConfig} from '@wireapp/config';
 
 import {AppleAssociationRoute} from './routes/appleassociation/appleAssociationRoute';
-import {parseClientVersion} from './routes/clientVersionCheck/clientVersion';
 import {createClientVersionCheckRoute} from './routes/clientVersionCheck/clientVersionCheckRoute';
 import {ConfigRoute} from './routes/config/configRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/errorRoutes';
@@ -82,8 +81,7 @@ class Server {
     this.app.use(
       createClientVersionCheckRoute({
         router: Router(),
-        parseClientVersion,
-        deployedClientVersion: this.config.VERSION,
+        deployedAssetVersion: this.buildMetadata.assetVersion,
         isClientVersionEnforcementEnabled: this.config.ENABLE_CLIENT_VERSION_ENFORCEMENT,
       }),
     );

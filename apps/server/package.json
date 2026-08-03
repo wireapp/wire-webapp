@@ -15,7 +15,6 @@
   "dependencies": {
     "@sindresorhus/is": "8.1.0",
     "@wireapp/config": "workspace:^",
-    "date-fns": "4.4.0",
     "dotenv-extended": "2.9.0",
     "express": "4.22.2",
     "express-sitemap-xml": "3.1.0",

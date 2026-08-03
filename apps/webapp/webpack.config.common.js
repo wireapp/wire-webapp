@@ -89,6 +89,7 @@ function generateUrls() {
 }
 
 const commonConfig = {
+  assetVersion: buildMetadata.assetVersion,
   commit: buildMetadata.commit,
   version: buildMetadata.version,
   env: env.NODE_ENV || 'production',
@@ -100,7 +101,7 @@ const serverConfig = generateServerConfig(commonConfig, env);
 
 const templateParameters = {
   VERSION: clientConfig.VERSION,
-  ASSET_VERSION: buildMetadata.assetVersion,
+  ASSET_VERSION: clientConfig.ASSET_VERSION,
   BRAND_NAME: clientConfig.BRAND_NAME,
   APP_BASE: clientConfig.APP_BASE,
   OPEN_GRAPH_TITLE: serverConfig.OPEN_GRAPH.TITLE,

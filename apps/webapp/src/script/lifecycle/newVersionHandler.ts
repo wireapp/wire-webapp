@@ -17,71 +17,93 @@
  *
  */
 
+import {isBuildMetadata, type BuildMetadata} from '@wireapp/config';
+
 import {getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-type OnNewVersionAvailableFn = (serverVersion: string) => void;
+type OnNewAssetVersionAvailable = (serverAssetVersion: string) => void;
 
-interface VersionListener {
-  currentVersion: string;
-  onNewVersionAvailable: OnNewVersionAvailableFn;
+interface AssetVersionListener {
+  currentAssetVersion: string;
+  onNewAssetVersionAvailable: OnNewAssetVersionAvailable;
 }
 
 const logger = getLogger('newVersionHandler');
-const VERSION_URL = '/version/';
-const CHECK_INTERVAL = TIME_IN_MILLIS.MINUTE * 15;
+const buildMetadataUrl = '/version/';
+const checkIntervalMilliseconds = TIME_IN_MILLIS.MINUTE * 15;
 
-let newVersionListeners: VersionListener[] = [];
-let pollInterval: number;
+let assetVersionListeners: AssetVersionListener[] = [];
+let assetVersionPollingInterval: number;
 
-const fetchLatestVersion = async (): Promise<string> => {
-  const response = await fetch(VERSION_URL);
+const fetchLatestBuildMetadata = async (): Promise<BuildMetadata> => {
+  const response = await fetch(buildMetadataUrl);
   if (response.ok) {
-    const {version} = await response.json();
-    return version;
+    const responseBody: unknown = await response.json();
+
+    if (isBuildMetadata(responseBody)) {
+      return responseBody;
+    }
+
+    throw new Error(`Invalid build metadata returned by '${buildMetadataUrl}'`);
   }
-  throw new Error(`Failed to fetch '${VERSION_URL}': ${response.statusText}`);
+  throw new Error(`Failed to fetch '${buildMetadataUrl}': ${response.statusText}`);
 };
 
 /**
- * Check all the registered version listeners if the server version is newer than the version they registered.
+ * Check all registered listeners for a different browser artifact.
  *
- * @param overrideCurrentVersion will ignore the version set for the listener and use this one instead
+ * @param overrideCurrentAssetVersion will ignore the asset version set for the listener and use this one instead
  * @returns Promise that resolves when the check has been done
  */
-export const checkVersion = async (overrideCurrentVersion: string): Promise<string | void> => {
-  if (navigator.onLine) {
-    const serverVersion = await fetchLatestVersion();
-    newVersionListeners.forEach(({currentVersion, onNewVersionAvailable}) => {
-      const baseVersion = overrideCurrentVersion || currentVersion;
-      logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${baseVersion}'`);
-
-      const isOutdatedVersion = serverVersion > baseVersion;
-      return isOutdatedVersion && onNewVersionAvailable(serverVersion);
-    });
-    return serverVersion;
+export const checkVersion = async (overrideCurrentAssetVersion?: string): Promise<string | void> => {
+  if (navigator.onLine !== true) {
+    return;
   }
+
+  let serverBuildMetadata: BuildMetadata;
+  try {
+    serverBuildMetadata = await fetchLatestBuildMetadata();
+  } catch (error: unknown) {
+    logger.info(`Could not check for a new webapp artifact: ${String(error)}`);
+    return;
+  }
+
+  assetVersionListeners.forEach(({currentAssetVersion, onNewAssetVersionAvailable}) => {
+    const localAssetVersion = overrideCurrentAssetVersion ?? currentAssetVersion;
+    logger.info(
+      `Checking current webapp artifact. Server '${serverBuildMetadata.assetVersion}' vs. local '${localAssetVersion}'`,
+    );
+
+    if (serverBuildMetadata.assetVersion !== localAssetVersion) {
+      onNewAssetVersionAvailable(serverBuildMetadata.assetVersion);
+    }
+  });
+
+  return serverBuildMetadata.assetVersion;
 };
 
 /**
- * Will register an interval that will poll the server for the latest version of the app.
- * If a new version is detected, will then call the given callback.
+ * Will register an interval that polls the server for the latest build metadata.
+ * If a different browser artifact is detected, it calls the given callback.
  *
- * @param currentVersion current version of the app
- * @param onNewVersionAvailable callback to be called when a new version is detected
+ * @param currentAssetVersion asset version of the browser artifact
+ * @param onNewAssetVersionAvailable callback to be called when a different artifact is detected
  */
 export const startNewVersionPolling = (
-  currentVersion: string,
-  onNewVersionAvailable: OnNewVersionAvailableFn,
+  currentAssetVersion: string,
+  onNewAssetVersionAvailable: OnNewAssetVersionAvailable,
 ): void => {
-  newVersionListeners.push({currentVersion, onNewVersionAvailable});
-  if (newVersionListeners.length === 1) {
+  assetVersionListeners.push({currentAssetVersion, onNewAssetVersionAvailable});
+  if (assetVersionListeners.length === 1) {
     // starts the interval when we have our first listener
-    pollInterval = window.setInterval(checkVersion, CHECK_INTERVAL);
+    assetVersionPollingInterval = window.setInterval(() => {
+      void checkVersion();
+    }, checkIntervalMilliseconds);
   }
 };
 
 export const stopNewVersionPolling = (): void => {
-  newVersionListeners = [];
-  window.clearInterval(pollInterval);
+  assetVersionListeners = [];
+  window.clearInterval(assetVersionPollingInterval);
 };
