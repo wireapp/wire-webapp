@@ -6662,28 +6662,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/docker@npm:22.7.7":
-  version: 22.7.7
-  resolution: "@nx/docker@npm:22.7.7"
+"@nx/docker@npm:22.7.8":
+  version: 22.7.8
+  resolution: "@nx/docker@npm:22.7.8"
   dependencies:
-    "@nx/devkit": "npm:22.7.7"
+    "@nx/devkit": "npm:22.7.8"
     enquirer: "npm:~2.3.6"
     tslib: "npm:^2.3.0"
-  checksum: 10/b4bc001e70adab1b009c5dc6f0228e54dfb7266ae3a62eec15aec9eda85918f8bb91f199329fb7bffa387fd6c472931588d6e1a38451b9ef5124c27468702980
+  checksum: 10/f6e6c96f2ef6f65627b83f0728fb088d3bd18776ce95d8e7c1a72e34a4d623d800f7c29e9019a778305cf320790432f6a8cc1d3c807d168d9ced9b462cd3408b
   languageName: node
   linkType: hard
 
-"@nx/eslint@npm:22.7.7":
-  version: 22.7.7
-  resolution: "@nx/eslint@npm:22.7.7"
+"@nx/eslint@npm:22.7.8":
+  version: 22.7.8
+  resolution: "@nx/eslint@npm:22.7.8"
   dependencies:
-    "@nx/devkit": "npm:22.7.7"
-    "@nx/js": "npm:22.7.7"
+    "@nx/devkit": "npm:22.7.8"
+    "@nx/js": "npm:22.7.8"
     semver: "npm:^7.6.3"
     tslib: "npm:^2.3.0"
     typescript: "npm:~5.9.2"
   peerDependencies:
-    "@nx/jest": 22.7.7
+    "@nx/jest": 22.7.8
     "@zkochan/js-yaml": 0.0.7
     eslint: ^8.0.0 || ^9.0.0 || ^10.0.0
   peerDependenciesMeta:
@@ -6691,30 +6691,7 @@ __metadata:
       optional: true
     "@zkochan/js-yaml":
       optional: true
-  checksum: 10/7f9e89a7ea2874f719ee30409699a904caced1142a7826cced1a4e0409632f177082af8f5089f10a14636ce750fa48939cf5ecba98db30a70c439d8475c805c1
-  languageName: node
-  linkType: hard
-
-"@nx/jest@npm:22.7.7":
-  version: 22.7.7
-  resolution: "@nx/jest@npm:22.7.7"
-  dependencies:
-    "@jest/reporters": "npm:^30.0.2"
-    "@jest/test-result": "npm:^30.0.2"
-    "@nx/devkit": "npm:22.7.7"
-    "@nx/js": "npm:22.7.7"
-    "@phenomnomnominal/tsquery": "npm:~6.2.0"
-    identity-obj-proxy: "npm:3.0.0"
-    jest-config: "npm:^30.0.2"
-    jest-resolve: "npm:^30.0.2"
-    jest-util: "npm:^30.0.2"
-    minimatch: "npm:10.2.5"
-    picocolors: "npm:^1.1.0"
-    resolve.exports: "npm:2.0.3"
-    semver: "npm:^7.6.3"
-    tslib: "npm:^2.3.0"
-    yargs-parser: "npm:21.1.1"
-  checksum: 10/68ff9682612703bbbbff4a79b15b6d410571f19bfb6617c97ad9b63f0ab50a4d567a4e0878a11b5e2e9408d080f2a59b05a4cf4a50b5343397f826a86aa71178
+  checksum: 10/8c58b37d501df80180bb3e157b13e68e8c9e981f26dfc48c4988d8f20f4e9de9a7e5e89ecf6c6820e06793ab1043cf65a3a8ab6eb03104b18e6003ffaec5c6a4
   languageName: node
   linkType: hard
 
@@ -6819,19 +6796,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/node@npm:22.7.7":
-  version: 22.7.7
-  resolution: "@nx/node@npm:22.7.7"
+"@nx/node@npm:22.7.8":
+  version: 22.7.8
+  resolution: "@nx/node@npm:22.7.8"
   dependencies:
-    "@nx/devkit": "npm:22.7.7"
-    "@nx/docker": "npm:22.7.7"
-    "@nx/eslint": "npm:22.7.7"
-    "@nx/jest": "npm:22.7.7"
-    "@nx/js": "npm:22.7.7"
+    "@nx/devkit": "npm:22.7.8"
+    "@nx/docker": "npm:22.7.8"
+    "@nx/eslint": "npm:22.7.8"
+    "@nx/jest": "npm:22.7.8"
+    "@nx/js": "npm:22.7.8"
     kill-port: "npm:^1.6.1"
     tcp-port-used: "npm:^1.0.2"
     tslib: "npm:^2.3.0"
-  checksum: 10/fabcb7197ad0bdacb797b6a3946e21c2e664a44e8ee65dc32e3a54d5615c6ac810e9c6a6fb05cebc18c4e1411819278519edacf0bb1df53cffb0d12d75a08d2d
+  checksum: 10/e3cf661516223820afb7afc0944548ead7a51372302c8f0ac6fc12b878fc64ba553e2f3667a8c11e76a62187d4c63ae5ba6dcfe660e08896c6b4a87ac1568279
   languageName: node
   linkType: hard
 
@@ -32882,8 +32859,8 @@ __metadata:
     "@inquirer/prompts": "npm:8.5.2"
     "@ls-lint/ls-lint": "npm:2.3.1"
     "@nx/jest": "npm:22.7.8"
-    "@nx/node": "npm:22.7.7"
-    "@nx/workspace": "npm:22.7.7"
+    "@nx/node": "npm:22.7.8"
+    "@nx/workspace": "npm:22.7.8"
     "@sindresorhus/is": "npm:4.6.0"
     "@stylistic/eslint-plugin": "npm:5.10.0"
     "@tony.ganchev/eslint-plugin-header": "npm:3.4.4"
@@ -32933,7 +32910,7 @@ __metadata:
     logdown: "npm:3.3.1"
     long: "npm:5.3.2"
     nock: "npm:14.0.17"
-    nx: "npm:22.7.7"
+    nx: "npm:22.7.8"
     playwright: "npm:1.61.1"
     prettier: "npm:3.9.6"
     rimraf: "npm:6.1.3"
