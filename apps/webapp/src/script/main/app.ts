@@ -735,7 +735,7 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (selfUser.isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
-        startNewVersionPolling(Environment.version(false), this.update);
+        startNewVersionPolling(Config.getConfig().ASSET_VERSION, this.update);
       }
       audioRepository.init();
       await conversationRepository.cleanupEphemeralMessages();

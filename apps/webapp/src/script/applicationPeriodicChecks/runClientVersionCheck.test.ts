@@ -28,7 +28,7 @@ import {runClientVersionCheck} from './runClientVersionCheck';
 
 describe('runClientVersionCheck', () => {
   it('requests the client version check route', async () => {
-    const clientVersion = '2026.02.12.17.51.00';
+    const clientAssetVersion = 'main-aaaaaaa';
     const setDoesApplicationNeedForceReload = jest.fn();
     const kyInstance = {
       get: jest.fn(() => {
@@ -39,12 +39,12 @@ describe('runClientVersionCheck', () => {
       }),
     } as unknown as KyInstance;
 
-    await runClientVersionCheck({ky: kyInstance, clientVersion, setDoesApplicationNeedForceReload});
+    await runClientVersionCheck({ky: kyInstance, clientAssetVersion, setDoesApplicationNeedForceReload});
 
     expect(kyInstance.get).toHaveBeenCalledTimes(1);
     expect(kyInstance.get).toHaveBeenCalledWith('/client-version-check', {
       headers: {
-        'Wire-Client-Version': clientVersion,
+        'Wire-Client-Version': clientAssetVersion,
       },
       throwHttpErrors: false,
     });
@@ -67,7 +67,7 @@ describe('runClientVersionCheck', () => {
 
     await runClientVersionCheck({
       ky: kyInstance,
-      clientVersion: '2026.02.12.17.51.00',
+      clientAssetVersion: 'main-aaaaaaa',
       setDoesApplicationNeedForceReload,
     });
 

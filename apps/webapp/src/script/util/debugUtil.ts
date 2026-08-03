@@ -437,8 +437,8 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  triggerVersionCheck(baseVersion: string): Promise<string | void> {
-    return checkVersion(baseVersion);
+  triggerVersionCheck(baseAssetVersion: string): Promise<string | void> {
+    return checkVersion(baseAssetVersion);
   }
 
   /**

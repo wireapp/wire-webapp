@@ -52,7 +52,7 @@ const nonCacheableResponseTestCaseFactory = createFactory<ServerResponseTestCase
   };
 });
 
-function createServerConfiguration(): ServerConfig {
+function createServerConfiguration(enableClientVersionEnforcement = false): ServerConfig {
   return {
     APP_BASE: 'https://app.example.com',
     BACKEND_REST: 'https://backend.example.com',
@@ -62,7 +62,7 @@ function createServerConfiguration(): ServerConfig {
     CSP: {},
     DEVELOPMENT: false,
     DEVELOPMENT_ENABLE_TLS: false,
-    ENABLE_CLIENT_VERSION_ENFORCEMENT: false,
+    ENABLE_CLIENT_VERSION_ENFORCEMENT: enableClientVersionEnforcement,
     ENABLE_DYNAMIC_HOSTNAME: false,
     ENFORCE_HTTPS: false,
     ENVIRONMENT: 'production',
@@ -86,11 +86,13 @@ function createServerConfiguration(): ServerConfig {
 
 function createClientConfiguration(): ClientConfig {
   return {
+    ASSET_VERSION: mainBuildMetadata.assetVersion,
     BACKEND_REST: 'https://backend.example.com',
     BACKEND_WS: 'wss://backend.example.com',
     FEATURE: {
       ENABLE_CHANNELS: true,
     },
+    VERSION: mainBuildMetadata.version,
   } as unknown as ClientConfig;
 }
 
@@ -130,8 +132,9 @@ async function withHttpServer(
   clientConfiguration: ClientConfig,
   buildMetadata: BuildMetadata,
   runTest: (baseUrl: string) => Promise<void>,
+  serverConfiguration: ServerConfig = createServerConfiguration(),
 ): Promise<void> {
-  const server = new Server(createServerConfiguration(), clientConfiguration, buildMetadata);
+  const server = new Server(serverConfiguration, clientConfiguration, buildMetadata);
   const httpServer = http.createServer(getServerApplication(server));
   let serverIsListening = false;
 
@@ -227,6 +230,21 @@ describe('server response caching', () => {
 
       expect(response.body).toContain(`window.wire.env = ${JSON.stringify(clientConfiguration)};`);
     });
+  });
+
+  it('uses the deployed build asset identity for client-version enforcement', async () => {
+    await withHttpServer(
+      createClientConfiguration(),
+      mainBuildMetadata,
+      async baseUrl => {
+        const response = await fetch(`${baseUrl}/client-version-check`, {
+          headers: {'Wire-Client-Version': mainBuildMetadata.assetVersion},
+        });
+
+        expect(response.status).toBe(200);
+      },
+      createServerConfiguration(true),
+    );
   });
 
   it.each([

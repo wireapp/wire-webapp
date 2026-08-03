@@ -127,10 +127,10 @@ export const AppContainer = (properties: AppProps) => {
 
   const {softLockEnabled} = useAppSoftLock(repositories.calling, repositories.notification);
   const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
-  const clientVersion = Config.getConfig().VERSION;
+  const clientAssetVersion = Config.getConfig().ASSET_VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
-    void runClientVersionCheck({ky, clientVersion, setDoesApplicationNeedForceReload});
-  }, [clientVersion]);
+    void runClientVersionCheck({ky, clientAssetVersion, setDoesApplicationNeedForceReload});
+  }, [clientAssetVersion]);
 
   useEffect(() => {
     return startApplicationPeriodicChecks({

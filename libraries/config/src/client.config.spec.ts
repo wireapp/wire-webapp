@@ -23,6 +23,7 @@ import {Env} from './env';
 
 describe('Client Config', () => {
   const mockParams: ConfigGeneratorParams = {
+    assetVersion: '1.0.0-abc123',
     commit: 'abc123',
     version: '1.0.0',
     env: 'production',
@@ -72,6 +73,7 @@ describe('Client Config', () => {
 
       expect(config).toBeDefined();
       expect(config.VERSION).toBe('1.0.0');
+      expect(config.ASSET_VERSION).toBe('1.0.0-abc123');
       expect(config.ENVIRONMENT).toBe('production');
       expect(config.APP_NAME).toBe('Wire');
       expect(config.BRAND_NAME).toBe('Wire');
