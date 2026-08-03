@@ -478,6 +478,46 @@ jobs:
 
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
 
+  notify_beta_release_success:
+    name: Notify successful Beta release
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, deploy_to_beta, create_beta_tag]
+    if: >-
+      ${{
+        always() &&
+        needs.deploy_to_beta.result == 'success' &&
+        needs.create_beta_tag.result == 'success'
+      }}
+    continue-on-error: true
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Announce successful Beta release
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: success
+          text: |
+            ✅ WebApp Beta release successfully deployed ✅
+
+            Release: ${{ needs.build_artifact.outputs.release_identifier }}
+            Branch: ${{ needs.build_artifact.outputs.release_branch }}
+            Release commit SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+            Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+            Beta URL: ${{ env.BETA_WEBAPP_URL }}
+            Beta deployment result: ${{ needs.deploy_to_beta.result }}
+            Beta runtime-verification result: ${{ needs.deploy_to_beta.outputs.runtime_verification_result }}
+            Beta tag creation result: ${{ needs.create_beta_tag.result }}
+            Triggering actor: ${{ github.actor }}
+            Workflow-run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
   comment_beta_release_appearances:
     name: Comment Beta release appearances
     runs-on: ubuntu-24.04
@@ -916,6 +956,60 @@ jobs:
       CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
       WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
 
+  notify_production_release_success:
+    name: Notify successful Production release
+    runs-on: ubuntu-24.04
+    needs:
+      [
+        build_artifact,
+        create_beta_tag,
+        deploy_to_production,
+        verify_production_runtime,
+        create_production_tag,
+        publish_production_distribution,
+      ]
+    if: >-
+      ${{
+        always() &&
+        needs.deploy_to_production.result == 'success' &&
+        needs.verify_production_runtime.result == 'success' &&
+        needs.create_production_tag.result == 'success' &&
+        needs.publish_production_distribution.result == 'success'
+      }}
+    continue-on-error: true
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Announce successful Production release
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: success
+          text: |
+            ✅ WebApp Production release successfully completed ✅
+
+            Release: ${{ needs.build_artifact.outputs.release_identifier }}
+            Branch: ${{ needs.build_artifact.outputs.release_branch }}
+            Release commit SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+            Promoted Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+            Production tag: ${{ needs.create_production_tag.outputs.production_tag_name }}
+            Production URL: ${{ env.PRODUCTION_WEBAPP_URL }}
+            Production deployment result: ${{ needs.deploy_to_production.result }}
+            Production runtime-verification result: ${{ needs.verify_production_runtime.result }}
+            Production distribution result: ${{ needs.publish_production_distribution.result }}
+            Docker image tag: ${{ needs.publish_production_distribution.outputs.docker_image_tag }}
+            Helm chart version: ${{ needs.publish_production_distribution.outputs.helm_chart_version }}
+            wire-builds commit SHA: ${{ needs.publish_production_distribution.outputs.wire_builds_commit_sha }}
+            Triggering actor: ${{ github.actor }}
+            Workflow-run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
   summarize_release:
     name: Summarize release
     runs-on: ubuntu-24.04
@@ -1010,7 +1104,7 @@ jobs:
         run: node bin/renderWebappReleaseSummary.ts >> "$GITHUB_STEP_SUMMARY"
 
   notify_release_failure:
-    name: Notify release failure
+    name: Notify failed release
     runs-on: ubuntu-24.04
     needs:
       [
@@ -1043,7 +1137,7 @@ jobs:
           webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           status: failure
           text: |
-            ❌ WebApp release blocked Production ❌
+            ❌ WebApp release failed ❌
 
             Release: ${{ needs.build_artifact.outputs.release_identifier || 'unavailable' }}
             Branch: ${{ needs.build_artifact.outputs.release_branch || needs.validate_request.outputs.release_branch || 'unavailable' }}
