@@ -862,7 +862,7 @@ jobs:
       - name: Checkout release commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
       - name: Create and push Production tag
@@ -873,9 +873,20 @@ jobs:
         run: |
           set -euo pipefail
 
-          git fetch --tags origin
+          existing_production_tag_ref="$(
+            git ls-remote \
+              --tags \
+              origin \
+              "refs/tags/${PRODUCTION_TAG_NAME}"
+          )"
 
-          if git rev-parse --quiet --verify "refs/tags/${PRODUCTION_TAG_NAME}" >/dev/null; then
+          if [[ -n "${existing_production_tag_ref}" ]]; then
+            git fetch \
+              --no-tags \
+              --depth=1 \
+              origin \
+              "refs/tags/${PRODUCTION_TAG_NAME}:refs/tags/${PRODUCTION_TAG_NAME}"
+
             existing_production_tag_commit_sha="$(git rev-parse "${PRODUCTION_TAG_NAME}^{commit}")"
             echo "Production tag ${PRODUCTION_TAG_NAME} already exists at ${existing_production_tag_commit_sha}." >&2
             exit 1

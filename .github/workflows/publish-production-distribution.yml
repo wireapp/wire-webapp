@@ -76,7 +76,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          fetch-depth: 0
+          fetch-depth: 1
           ref: ${{ inputs.production_tag }}
 
       - name: Download exact distribution context
