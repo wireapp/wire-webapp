@@ -27,9 +27,8 @@ const configurationDependencyKeyBySemanticProfile = {
  */
 function configurationDependencyKeyForSemanticProfile(semanticProfile) {
   if (!Object.hasOwn(configurationDependencyKeyBySemanticProfile, semanticProfile)) {
-    throw new Error(
-      `Unsupported WIRE_WEBAPP_CONFIGURATION "${semanticProfile}". Set it to "development" or "production".`,
-    );
+    const unsupportedProfileMessage = `Unsupported WIRE_WEBAPP_CONFIGURATION "${semanticProfile}". Set it to "development" or "production".`;
+    throw new Error(unsupportedProfileMessage);
   }
 
   return configurationDependencyKeyBySemanticProfile[semanticProfile];
