@@ -17,13 +17,17 @@
  *
  */
 
-import {useState, useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import keyboardjs from 'keyboardjs';
 import {container} from 'tsyringe';
 
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
+import {
+  MeetingNotificationKind,
+  useMeetingNotificationStore,
+} from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
 import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/featureToggles/startupFeatureToggleNames';
@@ -490,6 +494,53 @@ export function ConfigToolbar() {
       <h3>Debug Functions</h3>
 
       <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>Reconnect WebSocket</Button>
+      <Button
+        onClick={() =>
+          useMeetingNotificationStore.getState().addNotification({
+            kind: MeetingNotificationKind.INVITE,
+            meetingTitle: 'Invite Meeting Title',
+            organizer: 'Organizer',
+            meetingTime: 'Jun 01, 09:00 AM',
+          })
+        }
+      >
+        Show Invite Meeting Notification
+      </Button>
+      <Button
+        onClick={() =>
+          useMeetingNotificationStore.getState().addNotification({
+            kind: MeetingNotificationKind.UPDATE,
+            meetingTitle: 'Update Meeting Title',
+            meetingTime: 'Jun 01, 09:00 AM',
+          })
+        }
+      >
+        Show Update Meeting Notification
+      </Button>
+      <Button
+        onClick={() =>
+          useMeetingNotificationStore.getState().addNotification({
+            kind: MeetingNotificationKind.CANCELLED,
+            meetingTitle: 'Cancelled Meeting Title',
+            organizer: 'Organizer',
+            meetingTime: 'Jun 01, 09:00 AM',
+          })
+        }
+      >
+        Show Cancelled Meeting Notification
+      </Button>
+      <Button
+        onClick={() =>
+          useMeetingNotificationStore.getState().addNotification({
+            kind: MeetingNotificationKind.ONGOING,
+            meetingTitle: 'Ongoing Meeting Title',
+            organizer: 'Organizer',
+            meetingTime: 'Jun 01, 09:00 AM',
+          })
+        }
+      >
+        Show Ongoing Meeting Notification
+      </Button>
       <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>Enable Press Space To Unmute</Button>
       <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>
         Disable Press Space To Unmute
