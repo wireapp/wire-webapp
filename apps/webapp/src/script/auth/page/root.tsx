@@ -20,7 +20,7 @@
 import {FC, ReactNode, useEffect, useMemo} from 'react';
 
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
@@ -171,7 +171,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
     }
 
     const queryString = getOAuthQueryString(window.location);
-    return is.nonEmptyString(queryString) ? (
+    return isNonEmptyString(queryString) ? (
       <Navigate to={`${ROUTE.LOGIN}/${queryString}`} />
     ) : (
       <Navigate to={ROUTE.LOGIN} />

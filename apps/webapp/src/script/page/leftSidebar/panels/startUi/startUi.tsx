@@ -176,7 +176,7 @@ const StartUI = ({
               onClick={() => setActiveTab(Tabs.SERVICES)}
               data-uie-name="do-add-services"
             >
-              {translate('searchServices')}
+              {translate('searchApps')}
             </button>
           </li>
         </ul>

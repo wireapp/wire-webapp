@@ -25,6 +25,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {type Translate} from 'Util/localizerUtil';
+import type {TranslationKey} from 'Util/localizerUtil/translationTypes';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
@@ -38,6 +39,22 @@ import {
 import {ConversationMapper} from './ConversationMapper';
 import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
+
+const ACCESS_FEATURE_TRANSLATION_KEYS: Record<
+  'Guest' | 'Service',
+  {allow: TranslationKey; disable: TranslationKey; toggle: TranslationKey}
+> = {
+  Guest: {
+    allow: 'modalConversationOptionsAllowGuestMessage',
+    disable: 'modalConversationOptionsDisableGuestMessage',
+    toggle: 'modalConversationOptionsToggleGuestMessage',
+  },
+  Service: {
+    allow: 'modalConversationOptionsAllowAppMessage',
+    disable: 'modalConversationOptionsDisableAppMessage',
+    toggle: 'modalConversationOptionsToggleAppMessage',
+  },
+};
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
@@ -78,26 +95,22 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
             conversationEntity.accessState(accessState);
           } catch {
-            let messageString: string;
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
-
-            if (featureInfo.isAvailable) {
-              messageString = this.translate(
-                `modalConversationOptionsAllow${featureName as 'Guest' | 'Service'}Message`,
-              );
-            } else {
-              messageString = this.translate(
-                `modalConversationOptionsDisable${featureName as 'Guest' | 'Service'}Message`,
-              );
+            if (featureName !== undefined) {
+              const messageKey = featureInfo.isAvailable
+                ? ACCESS_FEATURE_TRANSLATION_KEYS[featureName].allow
+                : ACCESS_FEATURE_TRANSLATION_KEYS[featureName].disable;
+              this._showModal(this.translate(messageKey));
             }
-            this._showModal(messageString);
           }
           return;
         }
       }
     }
     const {featureName} = featureFromStateChange(prevAccessState, accessState);
-    this._showModal(this.translate(`modalConversationOptionsToggle${featureName as 'Service' | 'Guest'}Message`));
+    if (featureName !== undefined) {
+      this._showModal(this.translate(ACCESS_FEATURE_TRANSLATION_KEYS[featureName].toggle));
+    }
   }
 
   async getAccessCode(conversationEntity: Conversation): Promise<void> {

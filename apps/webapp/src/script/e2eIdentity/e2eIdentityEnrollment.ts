@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
@@ -95,7 +95,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private createOIDCService() {
     const key = this.core.key;
     const targetURL = OIDCServiceStore.get.targetURL();
-    if (key === undefined || !is.nonEmptyString(targetURL)) {
+    if (key === undefined || !isNonEmptyString(targetURL)) {
       throw new Error('encryption key or targetURL not set');
     }
     return new OIDCService(key, targetURL);
@@ -169,7 +169,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     const {state, session_state, code} = new SigninResponse(searchParams);
 
-    return is.nonEmptyString(state) && is.nonEmptyString(session_state) && is.nonEmptyString(code);
+    return isNonEmptyString(state) && isNonEmptyString(session_state) && isNonEmptyString(code);
   }
 
   public async hasGracePeriodStartedForSelfClient(): Promise<boolean> {
@@ -297,7 +297,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       const handle = this.userState.self()?.username();
       const teamId = this.userState.self()?.teamId;
       // If the user has no username or handle, we cannot enroll
-      if (!is.nonEmptyString(displayName) || !is.nonEmptyString(handle) || !is.nonEmptyString(teamId)) {
+      if (!isNonEmptyString(displayName) || !isNonEmptyString(handle) || !isNonEmptyString(teamId)) {
         throw new Error('Username, handle or teamId not found');
       }
 
@@ -318,17 +318,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         },
         certificateTtl: this.certificateTtl,
         getAllConversations: async () => {
-          if (is.undefined(this.core.service)) {
+          if (isUndefined(this.core.service)) {
             return [];
           }
           const conversations = await this.core.service.conversation.getConversations();
 
-          if (!is.array(conversations.found)) {
+          if (!isArray(conversations.found)) {
             return [];
           }
 
           return conversations.found
-            .filter(conversation => is.nonEmptyString(conversation.group_id))
+            .filter(conversation => isNonEmptyString(conversation.group_id))
             .map(({group_id}) => ({
               group_id: group_id!,
             }));

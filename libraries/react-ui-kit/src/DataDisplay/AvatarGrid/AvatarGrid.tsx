@@ -20,7 +20,7 @@
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {COLOR} from '../../Identity/colors/colors';
 import {IsInViewport} from '../../utils';
@@ -79,7 +79,7 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
       {...filteredAvatarGridProps(allProps)}
     >
       {slicedItems.map(item =>
-        !is.nullOrUndefined(item) ? (
+        !isNullOrUndefined(item) ? (
           <Avatar
             key={Math.random().toString()}
             backgroundColor={item.backgroundColor ?? COLOR.GRAY_DARKEN_80}

@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isObject} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
@@ -68,10 +68,11 @@ import {downloadBlob} from './util';
 import {createUuid} from './uuid';
 
 import {E2EIHandler} from '../e2eIdentity';
-import {checkVersion} from '../lifecycle/newVersionHandler';
+import {checkForNewVersion, createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
+import {Warnings} from '../view_model/WarningsContainer';
 
 export enum CoreCryptoLogLevel {
   Off = 1,
@@ -237,7 +238,7 @@ export class DebugUtil {
         const debugInfo = document.createElement('div');
         debugInfo.classList.add('debug-info');
         const value = el.dataset.uieUid;
-        if (is.nonEmptyString(value)) {
+        if (isNonEmptyString(value)) {
           debugInfo.textContent = value;
           el.appendChild(debugInfo);
         }
@@ -257,7 +258,7 @@ export class DebugUtil {
       removeDebugInfo(debugInfos);
     } else {
       const debugElements = document.querySelectorAll<HTMLElement>(
-        '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=sender-name]',
+        '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=sender-name], #message-list[data-uie-uid]',
       );
       addDebugInfo(debugElements);
     }
@@ -293,7 +294,7 @@ export class DebugUtil {
 
   async updateActiveConversationKeyPackages() {
     const groupId = this.conversationState.activeConversation()?.groupId;
-    if (is.nonEmptyString(groupId)) {
+    if (isNonEmptyString(groupId)) {
       return this.core.service?.mls?.renewKeyMaterial(groupId);
     }
   }
@@ -396,7 +397,7 @@ export class DebugUtil {
     defaultProtocol?: CONVERSATION_PROTOCOL,
   ) {
     const {teamId} = await this.userRepository.getSelf();
-    if (!is.nonEmptyString(teamId)) {
+    if (!isNonEmptyString(teamId)) {
       throw new Error('teamId of self user is undefined');
     }
 
@@ -424,7 +425,7 @@ export class DebugUtil {
   ) {
     const {teamId} = await this.userRepository.getSelf();
 
-    if (!is.nonEmptyString(teamId)) {
+    if (!isNonEmptyString(teamId)) {
       throw new Error('teamId of self user is undefined');
     }
 
@@ -437,8 +438,21 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  triggerVersionCheck(baseVersion: string): Promise<string | void> {
-    return checkVersion(baseVersion);
+  triggerVersionCheck(baseAssetVersion: string): Promise<string | void> {
+    const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
+      fetchBuildMetadata: globalThis.fetch.bind(globalThis),
+    });
+
+    return checkForNewVersion({
+      localAssetVersion: baseAssetVersion,
+      isOnline() {
+        return globalThis.navigator.onLine === true;
+      },
+      fetchLatestBuildMetadata,
+      onNewVersionAvailable() {
+        Warnings.showWarning(Warnings.TYPE.LIFECYCLE_UPDATE);
+      },
+    });
   }
 
   /**
@@ -535,7 +549,7 @@ export class DebugUtil {
   }
 
   private hasEventTime(event: BackendEvent): event is BackendEvent & {time: string} {
-    return 'time' in event && is.nonEmptyString(event.time);
+    return 'time' in event && isNonEmptyString(event.time);
   }
 
   private isEventInTimeRange(event: BackendEvent, from: Date, to: Date): boolean {
@@ -549,7 +563,7 @@ export class DebugUtil {
 
   private async getCurrentClientId(): Promise<string | undefined> {
     const currentClientId = this.clientState.currentClient?.id;
-    if (is.nonEmptyString(currentClientId)) {
+    if (isNonEmptyString(currentClientId)) {
       return currentClientId;
     }
 
@@ -576,7 +590,7 @@ export class DebugUtil {
       }
 
       sinceNotificationId = page.notifications.at(-1)?.id;
-      if (!is.nonEmptyString(sinceNotificationId)) {
+      if (!isNonEmptyString(sinceNotificationId)) {
         break;
       }
     }
@@ -745,10 +759,10 @@ export class DebugUtil {
     navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones) as MediaDeviceInfo[]);
 
     navigator.mediaDevices.getUserMedia = (constraints: MediaStreamConstraints) => {
-      const audioSet = is.object(constraints.audio) ? (constraints.audio as MediaTrackConstraintSet) : undefined;
+      const audioSet = isObject(constraints.audio) ? (constraints.audio as MediaTrackConstraintSet) : undefined;
       const audio = audioSet === undefined ? [] : generateAudioTrack(audioSet);
 
-      const videoSet = is.object(constraints.video) ? (constraints.video as MediaTrackConstraintSet) : undefined;
+      const videoSet = isObject(constraints.video) ? (constraints.video as MediaTrackConstraintSet) : undefined;
       const video = videoSet === undefined ? [] : generateVideoTrack(videoSet);
 
       return Promise.resolve(new MediaStream(audio.concat(video)));

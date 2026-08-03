@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Config, Configuration} from '../Config';
 
@@ -27,7 +27,7 @@ let isDataDogInitialized = false;
 
 export const isDataDogEnabled = () => {
   const config = Config.getConfig();
-  return is.nonEmptyString(config.dataDog?.applicationId) && is.nonEmptyString(config.dataDog?.clientToken);
+  return isNonEmptyString(config.dataDog?.applicationId) && isNonEmptyString(config.dataDog?.clientToken);
 };
 
 export async function initializeDataDog(config: Configuration, user: {id?: string; domain: string}) {
@@ -40,7 +40,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
   const applicationId = config.dataDog?.applicationId;
   const clientToken = config.dataDog?.clientToken;
 
-  if (!is.nonEmptyString(applicationId) || !is.nonEmptyString(clientToken)) {
+  if (!isNonEmptyString(applicationId) || !isNonEmptyString(clientToken)) {
     return;
   }
 
@@ -50,7 +50,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
   const truncateDomain = (value: string) => `${value.substring(0, 3)}***`;
   const replaceAllStrings = (string: string) => string.replaceAll(uuidRegex, replacer);
   const replaceDomains = (string: string) =>
-    is.nonEmptyString(domain) ? string.replaceAll(domain, truncateDomain(domain)) : string;
+    isNonEmptyString(domain) ? string.replaceAll(domain, truncateDomain(domain)) : string;
   const removeColors = (string: string) =>
     string.replaceAll(/%c/g, '').replaceAll(/color:[^;]+; font-weight:[^;]+; /g, '');
   const removeTimestamp = (string: string) => string.replaceAll(/\[\d+-\d+-\d+ \d+:\d+:\d+\] /g, '');
@@ -108,7 +108,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     },
   });
 
-  if (is.nonEmptyString(userId)) {
+  if (isNonEmptyString(userId)) {
     const id = userId.substring(0, 8);
     datadogRum.setUser({id});
     datadogLogs.setUser({id});

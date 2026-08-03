@@ -19,7 +19,7 @@
 
 import {ReactElement} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -76,7 +76,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
   const isError = nodesStatus === 'error';
   const isSuccess = nodesStatus === 'success';
   const hasFiles = nodes.length > 0;
-  const hasActiveSearchCriteria = is.nonEmptyString(searchValue) || hasActiveGlobalDriveFilters(filterState);
+  const hasActiveSearchCriteria = isNonEmptyString(searchValue) || hasActiveGlobalDriveFilters(filterState);
   const emptySearchResults = hasActiveSearchCriteria && nodesStatus === 'success' && nodes.length === 0;
 
   const showTable =

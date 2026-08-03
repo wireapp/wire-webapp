@@ -92,6 +92,6 @@ describe('GuestServicesOptions', () => {
       wrapper: rootProviderWrapper,
     });
 
-    expect(getByText('servicesRoomToggleInfo')).not.toBeNull();
+    expect(getByText('appsRoomToggleInfo')).not.toBeNull();
   });
 });

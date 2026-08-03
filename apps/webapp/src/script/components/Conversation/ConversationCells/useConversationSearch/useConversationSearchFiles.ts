@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyStringAndNotWhitespace} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -61,7 +61,7 @@ type ClearSearchRefreshOptions = {
 
 const DEBOUNCE_TIME = 300;
 
-const normalizeSearchQuery = (query: string): string => (is.nonEmptyStringAndNotWhitespace(query) ? query.trim() : '');
+const normalizeSearchQuery = (query: string): string => (isNonEmptyStringAndNotWhitespace(query) ? query.trim() : '');
 
 export const useConversationSearchFiles = ({
   cellsRepository,
@@ -233,7 +233,7 @@ export const useConversationSearchFiles = ({
   const handleSearch = (value: string): void => {
     setSearchValue(value);
     const isEmpty = value.length === 0;
-    if (!is.nonEmptyStringAndNotWhitespace(value)) {
+    if (!isNonEmptyStringAndNotWhitespace(value)) {
       if (isEmpty) {
         handleClearSearch();
       } else if (searchQuery.length > 0) {

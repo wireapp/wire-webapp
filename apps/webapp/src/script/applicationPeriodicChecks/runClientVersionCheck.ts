@@ -22,18 +22,20 @@ import {result} from 'true-myth';
 
 import {upgradeRequiredHttpStatusCode, validateClientVersionCheckResponse} from './clientVersionCheckResponseSchema';
 
+const clientAssetVersionHeaderName = 'Wire-Client-Version';
+
 interface RunClientVersionCheckOptions {
   readonly ky: KyInstance;
-  readonly clientVersion: string;
+  readonly clientAssetVersion: string;
   readonly setDoesApplicationNeedForceReload: (doesApplicationNeedForceReload: boolean) => void;
 }
 
 export async function runClientVersionCheck(options: RunClientVersionCheckOptions): Promise<void> {
-  const {ky, clientVersion, setDoesApplicationNeedForceReload} = options;
+  const {ky, clientAssetVersion, setDoesApplicationNeedForceReload} = options;
 
   const clientVersionCheckResponse = await ky.get('/client-version-check', {
     headers: {
-      'Wire-Client-Version': clientVersion,
+      [clientAssetVersionHeaderName]: clientAssetVersion,
     },
     throwHttpErrors: false,
   });

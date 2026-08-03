@@ -10,6 +10,9 @@
   "files": [
     "lib"
   ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "main": "lib/apiClient",
   "types": "lib/apiClient.d.ts",
   "browser": {
@@ -18,8 +21,9 @@
     "./lib/shims/node/websocket": "./lib/shims/browser/websocket.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.1095.0",
-    "@aws-sdk/lib-storage": "3.1095.0",
+    "@aws-sdk/client-s3": "3.1100.0",
+    "@aws-sdk/lib-storage": "3.1100.0",
+    "@sindresorhus/is": "8.1.0",
     "@wireapp/commons": "workspace:^",
     "@wireapp/priority-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.56.0",
@@ -34,7 +38,7 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "@swc/core": "1.15.46",
+    "@swc/core": "1.15.47",
     "@swc/jest": "0.2.39",
     "@types/jest": "30.0.0",
     "@types/pako": "2.0.4",
@@ -48,7 +52,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "ts-node": "10.9.2",
-    "webpack": "5.109.0",
+    "webpack": "5.109.2",
     "ws": "8.21.1"
   },
   "scripts": {

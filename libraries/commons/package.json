@@ -17,7 +17,7 @@
     "utils"
   ],
   "dependencies": {
-    "@sindresorhus/is": "4.6.0",
+    "@sindresorhus/is": "8.1.0",
     "ansi-regex": "5.0.1",
     "fs-extra": "11.4.0",
     "logdown": "3.3.1",

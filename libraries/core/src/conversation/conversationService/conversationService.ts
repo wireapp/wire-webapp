@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptySet} from '@sindresorhus/is';
 import {
   Conversation,
   DefaultConversationRoleName,
@@ -786,7 +786,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * notification replay. Called when the connection transitions to LIVE.
    */
   public async runDeferredEpochRecovery(): Promise<void> {
-    if (is.emptySet(this.deferredEpochRecoveries)) {
+    if (isEmptySet(this.deferredEpochRecoveries)) {
       this.logger.info('No deferred MLS epoch mismatch recoveries to run');
       return;
     }

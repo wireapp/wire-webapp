@@ -19,7 +19,7 @@
 
 import {HTMLProps, useEffect, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isBoolean, isString} from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
@@ -84,7 +84,7 @@ const ClientListComponent = ({
       setShowLoading(true);
       await doRemoveClient(clientId, password);
       const persist = await getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
-      const shouldPersist = is.boolean(persist) ? persist : is.string(persist) && persist.length > 0;
+      const shouldPersist = isBoolean(persist) ? persist : isString(persist) && persist.length > 0;
       await doInitializeClient(shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY, password, SFAcode, entropy);
       removeLocalStorage(QUERY_KEY.CONVERSATION_CODE);
       removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);

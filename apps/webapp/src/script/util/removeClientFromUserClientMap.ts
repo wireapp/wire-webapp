@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 
@@ -28,7 +28,7 @@ export const removeClientFromUserClientMap = (
   if (isQualifiedUserClients(userMap)) {
     const {domain, userId} = clientToExclude;
     if (
-      is.nonEmptyString(domain) &&
+      isNonEmptyString(domain) &&
       domain in userMap &&
       userMap[domain] !== undefined &&
       userId in userMap[domain] &&

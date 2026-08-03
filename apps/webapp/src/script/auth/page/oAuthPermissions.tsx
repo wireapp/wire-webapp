@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
@@ -121,7 +121,7 @@ const OAuthPermissionsComponent = ({
   React.useEffect(() => {
     const getUserData = async () => {
       await getSelf();
-      if (is.nonEmptyString(selfTeamId)) {
+      if (isNonEmptyString(selfTeamId)) {
         const team = await getTeam(selfTeamId);
         const teamIcon = new AssetRemoteData({assetKey: team.icon, assetDomain: selfUser.qualified_id?.domain});
         if (teamIcon.identifier === 'default') {
@@ -131,7 +131,7 @@ const OAuthPermissionsComponent = ({
           setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
         }
       }
-      if (is.nonEmptyString(oauthParams.client_id)) {
+      if (isNonEmptyString(oauthParams.client_id)) {
         setOAuthApp(await getOAuthApp(oauthParams.client_id));
       } else {
         throw Error('OAuth client not found');

@@ -20,7 +20,7 @@
 import {ReactElement} from 'react';
 
 import {CSSObject, useTheme} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import ReactSelect, {GroupBase, SelectComponentsConfig, StylesConfig} from 'react-select';
 import type {StateManagerProps} from 'react-select/dist/declarations/src/stateManager';
 
@@ -117,7 +117,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
       })}
       data-uie-name={dataUieName}
     >
-      {is.nonEmptyString(label) && (
+      {isNonEmptyString(label) && (
         <InputLabel htmlFor={id} markInvalid={markInvalid} isRequired={required}>
           {label}
         </InputLabel>
@@ -147,7 +147,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
             ValueContainer: SelectValueContainer,
             IndicatorsContainer: SelectIndicatorsContainer,
             ...(hideControl && {Control: () => null}),
-            ...(is.nonEmptyString(menuListHeading) && {MenuList: SelectMenuList(menuListHeading, dataUieName)}),
+            ...(isNonEmptyString(menuListHeading) && {MenuList: SelectMenuList(menuListHeading, dataUieName)}),
           } as Partial<SelectComponentsConfig<Option, IsMulti, Group>>
         }
         inputId={id}
@@ -162,7 +162,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
         {...props}
       />
 
-      {!hasError && !is.nullOrUndefined(helperText) && (
+      {!hasError && !isNullOrUndefined(helperText) && (
         <p
           css={(theme: Theme) => ({
             fontSize: theme.fontSizes.small,

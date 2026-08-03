@@ -13,9 +13,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "@sindresorhus/is": "4.6.0",
+    "@sindresorhus/is": "8.1.0",
     "@wireapp/config": "workspace:^",
-    "date-fns": "4.4.0",
     "dotenv-extended": "2.9.0",
     "express": "4.22.2",
     "express-sitemap-xml": "3.1.0",
@@ -40,8 +39,5 @@
     "@types/express-useragent": "1.0.5",
     "@types/geolite2": "2.0.2",
     "@types/hbs": "4.0.5"
-  },
-  "engines": {
-    "node": ">= 20.14.0"
   }
 }

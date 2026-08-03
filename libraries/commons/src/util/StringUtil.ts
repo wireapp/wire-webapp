@@ -17,14 +17,14 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isError, isNonEmptyString, isString} from '@sindresorhus/is';
 
 export function capitalize(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 export function pluralize(text: string, times: number, options?: {postfix: string}) {
-  const postfix = is.nonEmptyString(options?.postfix) ? options.postfix : 's';
+  const postfix = isNonEmptyString(options?.postfix) ? options.postfix : 's';
   return `${text}${times === 1 ? '' : postfix}`;
 }
 
@@ -159,14 +159,14 @@ function sanitizeErrorName(errorName: string): string {
 }
 
 export function getSafeErrorDetails(error: unknown): SafeErrorDetails {
-  if (is.error(error)) {
+  if (isError(error)) {
     return {
       errorMessage: formatSafeLogValue(error.message),
       errorName: sanitizeErrorName(error.name),
     };
   }
 
-  if (is.string(error)) {
+  if (isString(error)) {
     return {
       errorMessage: formatSafeLogValue(error),
       errorName: 'UnknownError',

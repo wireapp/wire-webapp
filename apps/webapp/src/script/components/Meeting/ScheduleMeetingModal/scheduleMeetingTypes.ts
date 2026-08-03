@@ -23,7 +23,7 @@ import type {User} from 'Repositories/entity/User';
 
 export type ScheduleMeetingMode = 'create' | 'edit';
 
-export type ScheduleMeetingRecurrenceOption = 'doesNotRepeat' | 'daily' | 'weekly' | 'everyTwoWeeks' | 'monthly';
+export type ScheduleMeetingRecurrenceOption = 'doesNotRepeat' | 'daily' | 'weekly' | 'everyTwoWeeks' | 'everyFourWeeks';
 
 export interface ScheduleMeetingFormState {
   title: string;

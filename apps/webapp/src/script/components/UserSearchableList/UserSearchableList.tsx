@@ -19,7 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
@@ -134,7 +134,7 @@ export const UserSearchableList = ({
             user.username() === normalizedQuery,
         );
 
-    if (is.nonEmptyString(normalizedQuery) && selfInTeam && allowRemoteSearch === true) {
+    if (isNonEmptyString(normalizedQuery) && selfInTeam && allowRemoteSearch === true) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         await fetchMembersFromBackend(filter, results);
       });
@@ -170,7 +170,7 @@ export const UserSearchableList = ({
   ]);
 
   const foundUserEntities = () => {
-    if (remoteTeamMembersFilter.current !== filter || is.emptyArray(remoteTeamMembers)) {
+    if (remoteTeamMembersFilter.current !== filter || isEmptyArray(remoteTeamMembers)) {
       return filteredUsers;
     }
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
@@ -195,7 +195,7 @@ export const UserSearchableList = ({
       user.type === UserType.REGULAR,
   );
   const isEmptyUserList = userList.length === 0;
-  const isSearching = is.nonEmptyString(filter);
+  const isSearching = isNonEmptyString(filter);
   const noResultsDataUieName = !isSearching ? 'status-all-added' : 'status-no-matches';
   const noResultsTranslationText = !isSearching ? 'searchListEveryoneParticipates' : 'searchListNoMatches';
 

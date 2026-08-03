@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useMemo, useState, type RefObject} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {formatISO9075, startOfDay} from 'date-fns';
 
 import {Button, ButtonVariant, Loading} from '@wireapp/react-ui-kit';
@@ -39,6 +39,7 @@ import {getMeetingInstances} from 'Components/Meeting/selectors/getMeetingInstan
 import {getVisibleTimeWindow} from 'Components/Meeting/selectors/getVisibleTimeWindow';
 import {groupMeetingInstancesByDay} from 'Components/Meeting/selectors/groupMeetingInstancesByDay';
 import type {MeetingInstancesByDay} from 'Components/Meeting/selectors/groupMeetingInstancesByDay';
+import {isMeetingInstanceVisibleInMeetingList} from 'Components/Meeting/selectors/isMeetingInstanceVisibleInMeetingList';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {getDaySectionHeader} from 'Components/Meeting/utils/getDaySectionHeader';
 import type {User} from 'Repositories/entity/User';
@@ -58,21 +59,21 @@ export interface MeetingListProps {
 const getCalendarDayKey = (timestampInMilliseconds: number): string =>
   formatISO9075(startOfDay(new Date(timestampInMilliseconds)), {representation: 'date'});
 
-const filterNotEndedMeetingInstances = (
+const filterVisibleMeetingInstances = (
   meetingInstancesByDay: MeetingInstancesByDay[],
   nowMilliseconds: number,
 ): MeetingInstancesByDay[] =>
   meetingInstancesByDay
     .map(dayGroup => ({
       ...dayGroup,
-      meetingInstances: dayGroup.meetingInstances.filter(
-        meetingInstance => meetingInstance.end.getTime() >= nowMilliseconds,
+      meetingInstances: dayGroup.meetingInstances.filter(meetingInstance =>
+        isMeetingInstanceVisibleInMeetingList(meetingInstance, nowMilliseconds),
       ),
     }))
-    .filter(dayGroup => is.nonEmptyArray(dayGroup.meetingInstances));
+    .filter(dayGroup => isNonEmptyArray(dayGroup.meetingInstances));
 
 const getVisibleDayGroups = (meetingInstancesByDay: MeetingInstancesByDay[]): MeetingInstancesByDay[] =>
-  meetingInstancesByDay.filter(dayGroup => is.nonEmptyArray(dayGroup.meetingInstances));
+  meetingInstancesByDay.filter(dayGroup => isNonEmptyArray(dayGroup.meetingInstances));
 
 export const MeetingList = ({
   meetingSeries,
@@ -107,7 +108,7 @@ export const MeetingList = ({
   }, [meetingSeries, visibleDayCount, visibleDayStart]);
 
   const meetingInstancesByDay = useMemo(
-    () => filterNotEndedMeetingInstances(expandedMeetingInstancesByDay, nowMilliseconds),
+    () => filterVisibleMeetingInstances(expandedMeetingInstancesByDay, nowMilliseconds),
     [expandedMeetingInstancesByDay, nowMilliseconds],
   );
 
@@ -151,7 +152,7 @@ export const MeetingList = ({
   const hasVisibleMeetingInstances = visibleDayGroups.length > 0;
   const now = new Date(nowMilliseconds);
 
-  if (isLoading && is.nonEmptyArray(meetingSeries)) {
+  if (isLoading && isNonEmptyArray(meetingSeries)) {
     return (
       <div css={emptyListContainerStyles} data-uie-name="meetings-list-loading">
         <Loading data-uie-name="status-loading" />

@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RestVersion} from 'cells-sdk-ts';
 import {container} from 'tsyringe';
@@ -75,7 +75,7 @@ export const useFileVersions = (
   const [toBeRestoredVersionId, setToBeRestoredVersionId] = useState<string>();
 
   useEffect(() => {
-    if (!is.nonEmptyString(nodeUuid)) {
+    if (!isNonEmptyString(nodeUuid)) {
       setFileInfo(undefined);
       setFileVersions({});
       return;
@@ -111,7 +111,7 @@ export const useFileVersions = (
         const ownerNamesByUserIdMap = getOwnerNamesByUserIdMap(nodeVersions);
         const groupedVersions = groupVersionsByDate(nodeVersions, translate, version => {
           const ownerQualifiedId = parseOwnerQualifiedId(version.OwnerUuid);
-          if (is.undefined(ownerQualifiedId)) {
+          if (isUndefined(ownerQualifiedId)) {
             return undefined;
           }
 
@@ -119,7 +119,7 @@ export const useFileVersions = (
         });
         setFileVersions(groupedVersions);
       } catch (err: unknown) {
-        const errorMessage = is.error(err) ? err.message : failedToLoadVersions;
+        const errorMessage = isError(err) ? err.message : failedToLoadVersions;
         setError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -156,7 +156,7 @@ export const useFileVersions = (
   );
 
   const handleRestore = useCallback(async () => {
-    if (!is.nonEmptyString(toBeRestoredVersionId) || !is.nonEmptyString(nodeUuid)) {
+    if (!isNonEmptyString(toBeRestoredVersionId) || !isNonEmptyString(nodeUuid)) {
       return;
     }
 
@@ -170,7 +170,7 @@ export const useFileVersions = (
         versionId: toBeRestoredVersionId,
       });
     } catch (err: unknown) {
-      const errorMessage = is.error(err) ? err.message : failedToRestore;
+      const errorMessage = isError(err) ? err.message : failedToRestore;
       setError(errorMessage);
     } finally {
       reset();
@@ -190,7 +190,7 @@ export const useFileVersions = (
 };
 
 const parseOwnerQualifiedId = (ownerUuid?: string): QualifiedId | undefined => {
-  if (!is.nonEmptyString(ownerUuid)) {
+  if (!isNonEmptyString(ownerUuid)) {
     return undefined;
   }
 
@@ -206,7 +206,7 @@ const getOwnerNamesByUserIdMap = (versions: Partial<RestVersion>[]): Map<string,
   const ownerIds = new Set(
     versions.flatMap(version => {
       const qualifiedId = parseOwnerQualifiedId(version.OwnerUuid);
-      if (is.undefined(qualifiedId)) {
+      if (isUndefined(qualifiedId)) {
         return [];
       }
 

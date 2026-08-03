@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import * as telemetry from '@wireapp/telemetry';
 
@@ -30,7 +30,7 @@ const REPORTING_DEVICE_ID = 'REPORTING_DEVICE_ID';
 
 const getDeviceId = () => {
   let deviceId = window.localStorage.getItem(REPORTING_DEVICE_ID);
-  if (!is.nonEmptyString(deviceId)) {
+  if (!isNonEmptyString(deviceId)) {
     deviceId = createUuid();
     window.localStorage.setItem(REPORTING_DEVICE_ID, deviceId);
   }
@@ -60,7 +60,7 @@ export enum PageView {
 export const isTelemetryEnabled = () => {
   const {COUNTLY_ENABLE_LOGGING, COUNTLY_API_KEY} = Config.getConfig();
 
-  if (COUNTLY_ENABLE_LOGGING !== true || !is.nonEmptyString(COUNTLY_API_KEY) || telemetry.isLoaded() !== true) {
+  if (COUNTLY_ENABLE_LOGGING !== true || !isNonEmptyString(COUNTLY_API_KEY) || telemetry.isLoaded() !== true) {
     return false;
   }
 

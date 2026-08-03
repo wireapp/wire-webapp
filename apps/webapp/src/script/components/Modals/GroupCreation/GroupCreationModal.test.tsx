@@ -127,10 +127,10 @@ describe('GroupCreationModal', () => {
 
       if (expectedAppsEnabled) {
         expect(servicesCheckbox).toBeEnabled();
-        expect(servicesToggleContainer).not.toHaveTextContent('servicesNotEnabledNoteTitle');
+        expect(servicesToggleContainer).not.toHaveTextContent('appsNotEnabledNoteTitle');
       } else {
         expect(servicesCheckbox).toBeDisabled();
-        expect(servicesToggleContainer).toHaveTextContent('servicesNotEnabledNoteTitle');
+        expect(servicesToggleContainer).toHaveTextContent('appsNotEnabledNoteTitle');
       }
     },
   );

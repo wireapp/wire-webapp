@@ -183,6 +183,34 @@ describe('MeetingList', () => {
     expect(document.querySelectorAll('section')).toHaveLength(1);
   });
 
+  it('renders completed meetings in the today section until local midnight', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: new Date('2026-06-15T16:00:00.000Z').getTime(),
+    });
+
+    const createRelativeSeries = (startHour: number, endHour: number, title: string): MeetingSeries => {
+      const start = new Date(wallClock.currentDate);
+      start.setHours(startHour, 0, 0, 0);
+
+      const end = new Date(start);
+      end.setHours(endHour, 0, 0, 0);
+
+      return createMeetingSeries(start.toISOString(), end.toISOString(), title);
+    };
+
+    const meetingSeries = [
+      createRelativeSeries(14, 15, 'Completed meeting'),
+      createRelativeSeries(17, 18, 'Upcoming meeting'),
+    ];
+
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock);
+
+    const todaySection = screen.getByText(/meetings\.list\.today/).closest('section');
+    expect(todaySection).not.toBeNull();
+    expect(within(todaySection!).getByText('Completed meeting')).toBeInTheDocument();
+    expect(within(todaySection!).getByText('Upcoming meeting')).toBeInTheDocument();
+  });
+
   it('does not render meetings outside the initial visible day window', () => {
     const wallClock = createDeterministicWallClock({
       initialCurrentTimestampInMilliseconds: new Date('2026-06-15T12:00:00.000Z').getTime(),

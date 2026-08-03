@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {AssetAuditData} from '@wireapp/api-client/lib/asset';
 import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -288,7 +288,7 @@ export class MessageRepository {
       messageId,
     );
 
-    if (!isNewTextMessage || !is.nonEmptyString(this.clientState.currentClient?.id)) {
+    if (!isNewTextMessage || !isNonEmptyString(this.clientState.currentClient?.id)) {
       return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
     }
 
@@ -316,7 +316,7 @@ export class MessageRepository {
     function onMessageAdded(messageEntity: Message): void {
       const isMatchingMessage = messageEntity.id === messageId && messageEntity.conversation_id === conversation.id;
 
-      if (isMatchingMessage && !is.undefined(resolveMessage)) {
+      if (isMatchingMessage && !isUndefined(resolveMessage)) {
         dispose();
         resolveMessage(messageEntity);
       }
@@ -343,7 +343,7 @@ export class MessageRepository {
           const updatedStatus = messageEntity.readReceipts().length > 0 ? StatusType.SEEN : StatusType.SENT;
           messageEntity.status(updatedStatus);
 
-          const shouldSynchronizeTimestamp = is.undefined(options.syncTimestamp) || options.syncTimestamp;
+          const shouldSynchronizeTimestamp = isUndefined(options.syncTimestamp) || options.syncTimestamp;
           if (shouldSynchronizeTimestamp) {
             const timestamp = new Date(sendResult.sentAt).getTime();
             if (!isNaN(timestamp)) {
@@ -501,7 +501,7 @@ export class MessageRepository {
     if (attachments && attachments.length > 0) {
       state = (await this.sendMultipartText({...textPayload, attachments})).state;
     } else {
-      state = (await this.sendText(textPayload, undefined, is.undefined(messageId))).state;
+      state = (await this.sendText(textPayload, undefined, isUndefined(messageId))).state;
     }
 
     if (state !== MessageSendingState.CANCELED) {

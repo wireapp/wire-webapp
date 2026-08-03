@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
 import type {FireAndForgetInvoker} from '@wireapp/core';
@@ -69,7 +69,7 @@ export const useCellPublicLink = ({
         },
       });
 
-      if (!is.nonEmptyString(link.LinkUrl) || !is.nonEmptyString(link.Uuid)) {
+      if (!isNonEmptyString(link.LinkUrl) || !isNonEmptyString(link.Uuid)) {
         throw new Error('Link not found');
       }
 
@@ -91,7 +91,7 @@ export const useCellPublicLink = ({
   const getPublicLink = useCallback(async () => {
     const linkId = node?.publicLink?.uuid;
 
-    if (!is.nonEmptyString(linkId) || fetchedLinkId.current === linkId) {
+    if (!isNonEmptyString(linkId) || fetchedLinkId.current === linkId) {
       return;
     }
 
@@ -100,7 +100,7 @@ export const useCellPublicLink = ({
 
       const link = await cellsRepository.getPublicLink({uuid: linkId});
 
-      if (!is.nonEmptyString(link.LinkUrl) || !is.nonEmptyString(link.Uuid)) {
+      if (!isNonEmptyString(link.LinkUrl) || !isNonEmptyString(link.Uuid)) {
         throw new Error('Link not found');
       }
 
@@ -126,7 +126,7 @@ export const useCellPublicLink = ({
   const deletePublicLink = useCallback(async () => {
     const linkUuid = createdLinkUuid.current ?? node?.publicLink?.uuid;
 
-    if (!is.nonEmptyString(linkUuid)) {
+    if (!isNonEmptyString(linkUuid)) {
       return;
     }
 
@@ -156,7 +156,7 @@ export const useCellPublicLink = ({
       passwordEnabled?: boolean;
       accessEnd?: string | null;
     }) => {
-      if (!is.nonEmptyString(node?.publicLink?.uuid)) {
+      if (!isNonEmptyString(node?.publicLink?.uuid)) {
         throw new Error('No public link to update');
       }
 
@@ -166,7 +166,7 @@ export const useCellPublicLink = ({
         const currentLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
 
         const hasExistingPassword = currentLink.PasswordRequired === true;
-        const shouldSetPassword = passwordEnabled === true && is.nonEmptyString(password);
+        const shouldSetPassword = passwordEnabled === true && isNonEmptyString(password);
 
         const updatedLink: typeof currentLink = {
           ...currentLink,
@@ -241,7 +241,7 @@ export const useCellPublicLink = ({
   }, []);
 
   useEffect(() => {
-    const shouldDeleteLink = isEnabled === false && is.nonEmptyString(node?.publicLink?.url);
+    const shouldDeleteLink = isEnabled === false && isNonEmptyString(node?.publicLink?.url);
     const shouldCreateNewLink = isEnabled === true && node?.publicLink?.alreadyShared !== true;
     const shouldGetLink = isEnabled === true && node?.publicLink?.alreadyShared === true;
 
@@ -265,7 +265,7 @@ export const useCellPublicLink = ({
       return;
     }
 
-    if (is.nonEmptyString(node?.publicLink?.url)) {
+    if (isNonEmptyString(node?.publicLink?.url)) {
       setStatus('success');
     }
   }, [node?.publicLink?.url, setStatusOnPublicLinkUrl]);

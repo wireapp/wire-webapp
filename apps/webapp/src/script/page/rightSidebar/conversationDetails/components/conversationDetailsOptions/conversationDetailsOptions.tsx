@@ -252,7 +252,7 @@ const ConversationDetailsOptions = ({
             onClick={canEditGuests ? openServicePanel : undefined}
             dataUieName="go-services-options"
             icon={<Icon.ServiceIcon className="service-icon" />}
-            title={translate('conversationDetailsActionServicesOptions')}
+            title={translate('conversationDetailsActionAppsOptions')}
             statusUieName="status-allow-services"
             statusText={servicesOptionsText}
             disabled={!canEditGuests}

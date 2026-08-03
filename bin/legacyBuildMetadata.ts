@@ -17,10 +17,10 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 const legacyTimestampBuildVersionPattern = /^\d{4}(?:\.\d{2}){4,5}$/;
 
 export function isLegacyTimestampBuildVersion(value: unknown): value is string {
-  return is.nonEmptyString(value) && legacyTimestampBuildVersionPattern.test(value);
+  return isNonEmptyString(value) && legacyTimestampBuildVersionPattern.test(value);
 }

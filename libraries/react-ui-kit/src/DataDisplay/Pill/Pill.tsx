@@ -20,7 +20,7 @@
 import * as React from 'react';
 
 import {CSSObject, keyframes} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {COLOR} from '../../Identity';
 import {DURATION, EASE} from '../../Identity/motions/motions';
@@ -50,7 +50,7 @@ export const pillStyle: <T>(theme: Theme, props: PillProps<T>) => CSSObject = (
   let backgroundColor: string;
   if (active) {
     backgroundColor = '#eee';
-  } else if (!is.nullOrUndefined(type)) {
+  } else if (!isNullOrUndefined(type)) {
     backgroundColor = backgroundColors[type];
   } else {
     backgroundColor = 'transparent';
@@ -78,7 +78,7 @@ export const pillStyle: <T>(theme: Theme, props: PillProps<T>) => CSSObject = (
     display: 'inline-block',
     fontSize: theme.fontSizes.small,
     lineHeight: '1rem',
-    margin: !is.nullOrUndefined(type) ? '12px 0 0 0' : '0 8px',
+    margin: !isNullOrUndefined(type) ? '12px 0 0 0' : '0 8px',
     minHeight: '32px',
     padding: '8px 24px',
     textAlign: 'center',

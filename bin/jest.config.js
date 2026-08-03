@@ -20,9 +20,12 @@
 module.exports = {
   rootDir: '..',
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/bin/**/*.test.ts'],
+  testMatch: ['<rootDir>/bin/**/*.test.ts', '<rootDir>/tools/release-appearance/*.test.ts'],
+  moduleNameMapper: {
+    '^@enormora/objectory$': '<rootDir>/node_modules/@enormora/objectory/main.js',
+  },
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', {configFile: './apps/server/babel.config.js'}],
   },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|ky|@enormora/objectory|@sindresorhus/is)/)'],
 };

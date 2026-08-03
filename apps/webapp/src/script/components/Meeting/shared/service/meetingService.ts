@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptyArray} from '@sindresorhus/is';
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -143,7 +143,7 @@ export const updateMeeting = (
         updatedMeeting.conversation,
         meetingSubmitErrors.conversationSetupFailed,
       ).andThen(() => {
-        if (is.emptyArray(usersToAdd) && is.emptyArray(userIdsToRemove)) {
+        if (isEmptyArray(usersToAdd) && isEmptyArray(userIdsToRemove)) {
           return task.resolve({failedToAdd: []});
         }
 

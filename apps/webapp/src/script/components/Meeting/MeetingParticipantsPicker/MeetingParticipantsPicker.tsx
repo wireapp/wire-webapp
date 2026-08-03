@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useId, useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {Button, Popover} from 'react-aria-components';
 
 import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from '@wireapp/react-ui-kit';
@@ -139,8 +139,8 @@ export const MeetingParticipantsPicker = ({
       const popover = popoverRef.current;
 
       if (
-        (!is.nullOrUndefined(trigger) && trigger.contains(target)) ||
-        (!is.nullOrUndefined(popover) && popover.contains(target))
+        (!isNullOrUndefined(trigger) && trigger.contains(target)) ||
+        (!isNullOrUndefined(popover) && popover.contains(target))
       ) {
         return;
       }
@@ -157,7 +157,7 @@ export const MeetingParticipantsPicker = ({
 
   return (
     <div css={wrapperStyles} data-uie-name={dataUieName}>
-      {is.nonEmptyString(label) && (
+      {isNonEmptyString(label) && (
         <InputLabel htmlFor={id} markInvalid={markInvalid} isRequired={required}>
           {label}
         </InputLabel>

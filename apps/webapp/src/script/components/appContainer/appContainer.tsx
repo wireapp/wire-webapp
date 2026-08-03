@@ -47,6 +47,7 @@ import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVe
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {Config, Configuration} from '../../Config';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
+import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import type {ApplicationObservability} from '../../observability/applicationObservability';
@@ -66,6 +67,8 @@ type AppProps = {
   readonly applicationBootstrapStartedAt: number;
   readonly domContentLoadedAt: number;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
+  readonly fetchLatestBuildMetadata: FetchLatestBuildMetadata;
+  readonly isOnline: () => boolean;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly monotonicClock: MonotonicClock;
   readonly translate: Translate;
@@ -80,6 +83,8 @@ export const AppContainer = (properties: AppProps) => {
     applicationBootstrapStartedAt,
     domContentLoadedAt,
     fireAndForgetInvoker,
+    fetchLatestBuildMetadata,
+    isOnline,
     isFeatureToggleEnabled,
     monotonicClock,
     translate,
@@ -128,10 +133,10 @@ export const AppContainer = (properties: AppProps) => {
 
   const {softLockEnabled} = useAppSoftLock(repositories.calling, repositories.notification);
   const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
-  const clientVersion = Config.getConfig().VERSION;
+  const clientAssetVersion = Config.getConfig().ASSET_VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
-    void runClientVersionCheck({ky, clientVersion, setDoesApplicationNeedForceReload});
-  }, [clientVersion]);
+    void runClientVersionCheck({ky, clientAssetVersion, setDoesApplicationNeedForceReload});
+  }, [clientAssetVersion]);
 
   useEffect(() => {
     return startApplicationPeriodicChecks({
@@ -184,7 +189,11 @@ export const AppContainer = (properties: AppProps) => {
           return app.initApp(clientType, onProgress, {
             dependencies: {
               applicationObservability,
+              fetchLatestBuildMetadata,
+              fireAndForgetInvoker,
+              isOnline,
               monotonicClock,
+              wallClock,
             },
             timing: {
               applicationBootstrapStartedAt,

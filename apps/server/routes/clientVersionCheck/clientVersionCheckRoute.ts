@@ -17,43 +17,33 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptyStringOrWhitespace, isUndefined} from '@sindresorhus/is';
 import {Router} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {result, type Result} from 'true-myth';
 
 import {setNonCacheHeaders} from '../../http/setNonCacheHeaders';
 
+const clientAssetVersionHeaderName = 'Wire-Client-Version';
+
 type ClientVersionCheckRouteDependencies = {
   readonly router: ReturnType<typeof Router>;
-  readonly parseClientVersion: (clientVersionHeaderValue: string) => Result<Date, Error>;
-  readonly deployedClientVersion: string;
+  readonly deployedAssetVersion: string;
   readonly isClientVersionEnforcementEnabled: boolean;
 };
 
 export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRouteDependencies) {
-  const {router, parseClientVersion, deployedClientVersion, isClientVersionEnforcementEnabled} = dependencies;
+  const {router, deployedAssetVersion, isClientVersionEnforcementEnabled} = dependencies;
 
   return router.get('/client-version-check', (request, response) => {
     setNonCacheHeaders(response);
 
-    const clientVersionHeaderValue = request.header('Wire-Client-Version');
+    const clientAssetVersionHeaderValue = request.header(clientAssetVersionHeaderName);
 
-    if (is.undefined(clientVersionHeaderValue) || is.emptyStringOrWhitespace(clientVersionHeaderValue)) {
+    if (isUndefined(clientAssetVersionHeaderValue) || isEmptyStringOrWhitespace(clientAssetVersionHeaderValue)) {
       return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
     }
 
-    const parsedClientVersion = parseClientVersion(clientVersionHeaderValue);
-
-    if (result.isErr(parsedClientVersion)) {
-      return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
-    }
-
-    if (!isClientVersionEnforcementEnabled) {
-      return response.sendStatus(HTTP_STATUS.OK);
-    }
-
-    if (clientVersionHeaderValue === deployedClientVersion) {
+    if (!isClientVersionEnforcementEnabled || clientAssetVersionHeaderValue === deployedAssetVersion) {
       return response.sendStatus(HTTP_STATUS.OK);
     }
 

@@ -17,22 +17,22 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isError, isObject, isString} from '@sindresorhus/is';
 
 export function toError(errorCandidate: unknown): Error {
-  if (is.error(errorCandidate)) {
+  if (isError(errorCandidate)) {
     return errorCandidate;
   }
 
-  if (is.object(errorCandidate)) {
-    if ('message' in errorCandidate && is.string(errorCandidate.message)) {
+  if (isObject(errorCandidate)) {
+    if ('message' in errorCandidate && isString(errorCandidate.message)) {
       return new Error(errorCandidate.message, {cause: errorCandidate});
     }
 
     return new Error('Unknown error', {cause: errorCandidate});
   }
 
-  if (is.string(errorCandidate)) {
+  if (isString(errorCandidate)) {
     return new Error(errorCandidate);
   }
 

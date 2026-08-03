@@ -20,7 +20,7 @@
 import {useMemo} from 'react';
 
 import {CSSObject, useTheme} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import BaseSelect, {components, MenuPosition, MultiValue, MultiValueRemoveProps, NoticeProps} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
@@ -88,7 +88,7 @@ export const ComboboxSelect = ({
 }: ComboboxSelectProps) => {
   return (
     <div css={wrapperStyles} data-uie-name={dataUieName}>
-      {is.nonEmptyString(label) && (
+      {isNonEmptyString(label) && (
         <InputLabel htmlFor={id} isRequired={required} labelCSS={labelCSS({isVisuallyHidden: labelVisuallyHidden})}>
           {label}
         </InputLabel>

@@ -29,7 +29,7 @@ export const SCHEDULE_MEETING_RECURRENCE_OPTIONS = [
   'daily',
   'weekly',
   'everyTwoWeeks',
-  'monthly',
+  'everyFourWeeks',
 ] as const satisfies readonly ScheduleMeetingRecurrenceOption[];
 
 export const SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS = {
@@ -37,7 +37,7 @@ export const SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS = {
   daily: 'meetings.scheduleModal.recurrence.daily',
   weekly: 'meetings.scheduleModal.recurrence.weekly',
   everyTwoWeeks: 'meetings.scheduleModal.recurrence.everyTwoWeeks',
-  monthly: 'meetings.scheduleModal.recurrence.monthly',
+  everyFourWeeks: 'meetings.scheduleModal.recurrence.everyFourWeeks',
 } as const satisfies Record<ScheduleMeetingRecurrenceOption, TranslationKey>;
 
 export const buildUpdateMeetingRecurrence = (
@@ -72,8 +72,8 @@ export const mapRecurrenceOptionToMeetingRecurrence = (
       return {frequency: MeetingRecurrenceFrequency.WEEKLY};
     case 'everyTwoWeeks':
       return {frequency: MeetingRecurrenceFrequency.WEEKLY, interval: 2};
-    case 'monthly':
-      return {frequency: MeetingRecurrenceFrequency.MONTHLY};
+    case 'everyFourWeeks':
+      return {frequency: MeetingRecurrenceFrequency.WEEKLY, interval: 4};
   }
 };
 
@@ -87,13 +87,18 @@ export const mapMeetingRecurrenceToOption = (recurrence?: MeetingRecurrence): Sc
     return 'everyTwoWeeks';
   }
 
+  const everyFourWeeksInterval = 4;
+  if (recurrence.frequency === MeetingRecurrenceFrequency.WEEKLY && recurrence.interval === everyFourWeeksInterval) {
+    return 'everyFourWeeks';
+  }
+
   switch (recurrence.frequency) {
     case MeetingRecurrenceFrequency.DAILY:
       return 'daily';
     case MeetingRecurrenceFrequency.WEEKLY:
       return 'weekly';
     case MeetingRecurrenceFrequency.MONTHLY:
-      return 'monthly';
+      return 'everyFourWeeks';
     default:
       return 'doesNotRepeat';
   }

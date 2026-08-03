@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isFunction, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
@@ -1995,7 +1995,7 @@ export class CallingRepository {
   ): Promise<MediaStream> {
     try {
       const stream = await this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
-      if (is.nullOrUndefined(stream)) {
+      if (isNullOrUndefined(stream)) {
         throw new Error('Failed to get media stream');
       }
 
@@ -2007,7 +2007,7 @@ export class CallingRepository {
         }
 
         const videoTrack = videoTracks[0];
-        if (is.undefined(videoTrack)) {
+        if (isUndefined(videoTrack)) {
           throw new Error('No video tracks found in camera stream');
         }
 
@@ -2029,7 +2029,7 @@ export class CallingRepository {
       if (audio === true) {
         const audioTrack = stream.getAudioTracks()[0];
 
-        if (is.undefined(audioTrack) === false) {
+        if (isUndefined(audioTrack) === false) {
           this.logger.info('Audio track details:', {
             enabled: audioTrack.enabled,
             muted: audioTrack.muted,
@@ -2055,7 +2055,7 @@ export class CallingRepository {
   }
 
   private getMediaTrackSettings(mediaTrack: MediaStreamTrack): Maybe<MediaTrackSettings> {
-    if (is.function_(mediaTrack.getSettings) === false) {
+    if (isFunction(mediaTrack.getSettings) === false) {
       return Maybe.nothing();
     }
 
@@ -2063,7 +2063,7 @@ export class CallingRepository {
   }
 
   private getMediaTrackConstraints(mediaTrack: MediaStreamTrack): Maybe<MediaTrackConstraints> {
-    if (is.function_(mediaTrack.getConstraints) === false) {
+    if (isFunction(mediaTrack.getConstraints) === false) {
       return Maybe.nothing();
     }
 
@@ -2071,7 +2071,7 @@ export class CallingRepository {
   }
 
   private getMediaTrackCapabilities(mediaTrack: MediaStreamTrack): Maybe<MediaTrackCapabilities> {
-    if (is.function_(mediaTrack.getCapabilities) === false) {
+    if (isFunction(mediaTrack.getCapabilities) === false) {
       return Maybe.nothing();
     }
 

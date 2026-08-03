@@ -478,6 +478,92 @@ jobs:
 
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
 
+  notify_beta_release_success:
+    name: Notify successful Beta release
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, deploy_to_beta, create_beta_tag]
+    if: >-
+      ${{
+        always() &&
+        needs.deploy_to_beta.result == 'success' &&
+        needs.create_beta_tag.result == 'success'
+      }}
+    continue-on-error: true
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Announce successful Beta release
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: success
+          text: |
+            ✅ WebApp Beta release successfully deployed ✅
+
+            Release: ${{ needs.build_artifact.outputs.release_identifier }}
+            Branch: ${{ needs.build_artifact.outputs.release_branch }}
+            Release commit SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+            Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+            Beta URL: ${{ env.BETA_WEBAPP_URL }}
+            Beta deployment result: ${{ needs.deploy_to_beta.result }}
+            Beta runtime-verification result: ${{ needs.deploy_to_beta.outputs.runtime_verification_result }}
+            Beta tag creation result: ${{ needs.create_beta_tag.result }}
+            Triggering actor: ${{ github.actor }}
+            Workflow-run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  comment_beta_release_appearances:
+    name: Comment Beta release appearances
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, create_beta_tag]
+    if: ${{ needs.create_beta_tag.result == 'success' }}
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+
+    steps:
+      - name: Checkout release history
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Add Beta release appearance comments
+        env:
+          BETA_TAG: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+        run: |
+          node \
+            tools/release-appearance/releaseAppearanceCommand.ts \
+            beta \
+            "${BETA_TAG}" \
+            "${RELEASE_COMMIT_SHA}"
+
   summarize_beta_release:
     name: Summarize Beta release
     runs-on: ubuntu-24.04
@@ -776,7 +862,7 @@ jobs:
       - name: Checkout release commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
       - name: Create and push Production tag
@@ -787,9 +873,20 @@ jobs:
         run: |
           set -euo pipefail
 
-          git fetch --tags origin
+          existing_production_tag_ref="$(
+            git ls-remote \
+              --tags \
+              origin \
+              "refs/tags/${PRODUCTION_TAG_NAME}"
+          )"
 
-          if git rev-parse --quiet --verify "refs/tags/${PRODUCTION_TAG_NAME}" >/dev/null; then
+          if [[ -n "${existing_production_tag_ref}" ]]; then
+            git fetch \
+              --no-tags \
+              --depth=1 \
+              origin \
+              "refs/tags/${PRODUCTION_TAG_NAME}:refs/tags/${PRODUCTION_TAG_NAME}"
+
             existing_production_tag_commit_sha="$(git rev-parse "${PRODUCTION_TAG_NAME}^{commit}")"
             echo "Production tag ${PRODUCTION_TAG_NAME} already exists at ${existing_production_tag_commit_sha}." >&2
             exit 1
@@ -801,6 +898,54 @@ jobs:
           git push origin "refs/tags/$PRODUCTION_TAG_NAME"
 
           echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "$GITHUB_OUTPUT"
+
+  comment_production_release_appearances:
+    name: Comment Production release appearances
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, create_beta_tag, create_production_tag]
+    if: ${{ needs.create_production_tag.result == 'success' }}
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+
+    steps:
+      - name: Checkout release history
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Add Production release appearance comments
+        env:
+          BETA_TAG: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PRODUCTION_TAG: ${{ needs.create_production_tag.outputs.production_tag_name }}
+          RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+        run: |
+          node \
+            tools/release-appearance/releaseAppearanceCommand.ts \
+            production \
+            "${PRODUCTION_TAG}" \
+            "${RELEASE_COMMIT_SHA}" \
+            "${BETA_TAG}"
 
   publish_production_distribution:
     name: Publish Production distribution
@@ -821,6 +966,60 @@ jobs:
       CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
       CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
       WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
+
+  notify_production_release_success:
+    name: Notify successful Production release
+    runs-on: ubuntu-24.04
+    needs:
+      [
+        build_artifact,
+        create_beta_tag,
+        deploy_to_production,
+        verify_production_runtime,
+        create_production_tag,
+        publish_production_distribution,
+      ]
+    if: >-
+      ${{
+        always() &&
+        needs.deploy_to_production.result == 'success' &&
+        needs.verify_production_runtime.result == 'success' &&
+        needs.create_production_tag.result == 'success' &&
+        needs.publish_production_distribution.result == 'success'
+      }}
+    continue-on-error: true
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Announce successful Production release
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: success
+          text: |
+            ✅ WebApp Production release successfully completed ✅
+
+            Release: ${{ needs.build_artifact.outputs.release_identifier }}
+            Branch: ${{ needs.build_artifact.outputs.release_branch }}
+            Release commit SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+            Promoted Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+            Production tag: ${{ needs.create_production_tag.outputs.production_tag_name }}
+            Production URL: ${{ env.PRODUCTION_WEBAPP_URL }}
+            Production deployment result: ${{ needs.deploy_to_production.result }}
+            Production runtime-verification result: ${{ needs.verify_production_runtime.result }}
+            Production distribution result: ${{ needs.publish_production_distribution.result }}
+            Docker image tag: ${{ needs.publish_production_distribution.outputs.docker_image_tag }}
+            Helm chart version: ${{ needs.publish_production_distribution.outputs.helm_chart_version }}
+            wire-builds commit SHA: ${{ needs.publish_production_distribution.outputs.wire_builds_commit_sha }}
+            Triggering actor: ${{ github.actor }}
+            Workflow-run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
   summarize_release:
     name: Summarize release
@@ -916,7 +1115,7 @@ jobs:
         run: node bin/renderWebappReleaseSummary.ts >> "$GITHUB_STEP_SUMMARY"
 
   notify_release_failure:
-    name: Notify release failure
+    name: Notify failed release
     runs-on: ubuntu-24.04
     needs:
       [
@@ -949,7 +1148,7 @@ jobs:
           webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           status: failure
           text: |
-            ❌ WebApp release blocked Production ❌
+            ❌ WebApp release failed ❌
 
             Release: ${{ needs.build_artifact.outputs.release_identifier || 'unavailable' }}
             Branch: ${{ needs.build_artifact.outputs.release_branch || needs.validate_request.outputs.release_branch || 'unavailable' }}

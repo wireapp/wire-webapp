@@ -23,7 +23,7 @@ export const contentStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   flexDirection: 'column',
-  height: 'calc(100vh - 47px)',
-  overflowY: 'auto',
   flex: 1,
+  minHeight: 0,
+  overflowY: 'auto',
 };

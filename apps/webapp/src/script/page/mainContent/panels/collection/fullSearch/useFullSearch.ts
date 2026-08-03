@@ -19,7 +19,7 @@
 
 import {Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isError} from '@sindresorhus/is';
 import debounceFn from 'debounce-fn';
 
 import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
@@ -47,7 +47,7 @@ type UseFullSearchResult = {
 };
 
 function isAbortError(error: unknown) {
-  if (!is.error(error)) {
+  if (!isError(error)) {
     return false;
   }
 

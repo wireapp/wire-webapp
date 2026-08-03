@@ -20,7 +20,7 @@
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isUndefined} from '@sindresorhus/is';
 
 import {Theme} from '../../Identity/Theme';
 
@@ -57,9 +57,9 @@ export const SVGIcon = ({
   ...props
 }: InternalSVGIconProps) => {
   let newScale = scale;
-  if (!is.undefined(width) || !is.undefined(height)) {
-    const widthScale = !is.undefined(width) ? width / realWidth : Infinity;
-    const heightScale = !is.undefined(height) ? height / realHeight : Infinity;
+  if (!isUndefined(width) || !isUndefined(height)) {
+    const widthScale = !isUndefined(width) ? width / realWidth : Infinity;
+    const heightScale = !isUndefined(height) ? height / realHeight : Infinity;
     newScale = Math.min(widthScale, heightScale);
   }
   const newWidth = Math.ceil(realWidth * newScale);
@@ -73,7 +73,7 @@ export const SVGIcon = ({
       height={newHeight}
       {...props}
     >
-      {!is.undefined(shadowId) && (
+      {!isUndefined(shadowId) && (
         <defs>
           <filter id={shadowId} x="-50%" y="-50%" width="200%" height="200%">
             <feOffset result="offOut" in="SourceAlpha" dx="0" dy="0" />
@@ -82,7 +82,7 @@ export const SVGIcon = ({
           </filter>
         </defs>
       )}
-      <g filter={!is.undefined(shadowId) ? `url(#${shadowId})` : undefined}>{children}</g>
+      <g filter={!isUndefined(shadowId) ? `url(#${shadowId})` : undefined}>{children}</g>
     </svg>
   );
 };

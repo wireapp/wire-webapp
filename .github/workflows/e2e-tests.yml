@@ -10,7 +10,7 @@ on:
         description: Webapp URL to run the tests against
         required: true
         options:
-          - https://wire-webapp-dev.wire.com/
+          - https://wire-webapp-dev.zinfra.io/
           - https://wire-webapp-qa.zinfra.io/
       grep:
         type: string

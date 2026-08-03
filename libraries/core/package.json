@@ -25,7 +25,7 @@
     "./lib/cryptography/assetCryptography/crypto.node": "./lib/cryptography/assetCryptography/crypto.browser.js"
   },
   "dependencies": {
-    "@sindresorhus/is": "4.6.0",
+    "@sindresorhus/is": "8.1.0",
     "@wireapp/api-client": "workspace:^",
     "@wireapp/commons": "workspace:^",
     "@wireapp/core-crypto": "9.3.4",
@@ -41,7 +41,7 @@
     "true-myth": "9.4.0"
   },
   "devDependencies": {
-    "@swc/core": "1.15.46",
+    "@swc/core": "1.15.47",
     "@swc/jest": "0.2.39",
     "@types/lodash": "4.17.24",
     "commander": "14.0.3",

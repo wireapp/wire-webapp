@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isObject} from '@sindresorhus/is';
 
 import {Config} from './Config';
 import {Item} from './Item';
@@ -97,7 +97,7 @@ export class PriorityQueue {
   private async processList(): Promise<void> {
     const item = this.queue.shift();
 
-    if (!is.object(item)) {
+    if (!isObject(item)) {
       this.isRunning = false;
       return;
     }

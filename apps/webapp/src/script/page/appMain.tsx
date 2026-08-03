@@ -226,6 +226,22 @@ export const AppMain = (properties: AppMainProps) => {
         return;
       }
 
+      if (!teamState.isProfileLinkEnabled()) {
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            text: {
+              message: translate('profileLinkDisabled'),
+              title: translate('profileLinkDisabledHeadline'),
+            },
+          },
+          undefined,
+          translate,
+        );
+        navigate('/');
+        return;
+      }
+
       showMostRecentConversation();
       showUserModal({domain, id: userId}, () => navigate('/'));
     };

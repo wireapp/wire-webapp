@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
@@ -58,10 +58,10 @@ export const CellsTableNameColumn = ({node}: CellsTableNameColumnProps) => {
 const FileNameColumn = ({file}: {file: CellFile}) => {
   const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
-  const isImage = is.nonEmptyString(file.mimeType) && file.mimeType.startsWith('image');
-  const isVideo = is.nonEmptyString(file.mimeType) && file.mimeType.startsWith('video');
+  const isImage = isNonEmptyString(file.mimeType) && file.mimeType.startsWith('image');
+  const isVideo = isNonEmptyString(file.mimeType) && file.mimeType.startsWith('video');
 
-  const shouldDisplayImagePreview = (isImage || isVideo) && is.nonEmptyString(file.previewImageUrl);
+  const shouldDisplayImagePreview = (isImage || isVideo) && isNonEmptyString(file.previewImageUrl);
 
   const {previewImageUrl, name} = file;
 

@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import platform from 'platform';
 
 import {BROWSER, WEBAPP_SUPPORTED_BROWSERS} from '../config/CommonConfig';
@@ -70,12 +70,12 @@ export class Runtime {
    */
   public static getBrowserName(): string {
     const name = Runtime.getPlatform().name;
-    return is.nonEmptyString(name) ? name.toLowerCase() : UNKNOWN_PROPERTY;
+    return isNonEmptyString(name) ? name.toLowerCase() : UNKNOWN_PROPERTY;
   }
 
   public static getBrowserVersion(): BrowserVersion {
     const version = Runtime.getPlatform().version;
-    const versionString = is.nonEmptyString(version) ? version : UNKNOWN_PROPERTY;
+    const versionString = isNonEmptyString(version) ? version : UNKNOWN_PROPERTY;
     const [majorVersion = UNKNOWN_PROPERTY, minorVersion = UNKNOWN_PROPERTY] = versionString.split('.');
     return {major: parseInt(majorVersion, 10), minor: parseInt(minorVersion, 10)};
   }
@@ -85,7 +85,7 @@ export class Runtime {
    */
   public static getUserAgent(): string {
     const userAgent = Runtime.getPlatform().ua;
-    return is.nonEmptyString(userAgent) ? userAgent.toLowerCase() : UNKNOWN_PROPERTY;
+    return isNonEmptyString(userAgent) ? userAgent.toLowerCase() : UNKNOWN_PROPERTY;
   }
 
   public static isWebappSupportedBrowser(): boolean {
@@ -186,7 +186,7 @@ export class Runtime {
   public static isSupportingScreensharing = (): boolean => {
     const desktopCapturer = (window as unknown as {desktopCapturer?: unknown}).desktopCapturer;
     const hasScreenCaptureAPI =
-      !is.nullOrUndefined(desktopCapturer) || (Runtime.isSupportingUserMedia() && Runtime.isSupportingDisplayMedia());
+      !isNullOrUndefined(desktopCapturer) || (Runtime.isSupportingUserMedia() && Runtime.isSupportingDisplayMedia());
     return hasScreenCaptureAPI || Runtime.isFirefox();
   };
 

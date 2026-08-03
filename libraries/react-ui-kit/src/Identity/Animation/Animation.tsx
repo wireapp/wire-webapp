@@ -20,7 +20,7 @@
 import {ReactNode, ComponentType, HTMLProps, createElement} from 'react';
 
 import {ClassNames} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {DURATION, EASE} from '../motions/motions';
 
@@ -54,7 +54,7 @@ export const Transition = ({animationStyle, timeout, component = 'div', children
   <ClassNames>
     {({css}) => (
       <CSSTransition timeout={timeout} classNames={css(animationStyle)} {...props}>
-        {!is.nullOrUndefined(component) ? createElement(component, {}, children) : children}
+        {!isNullOrUndefined(component) ? createElement(component, {}, children) : children}
       </CSSTransition>
     )}
   </ClassNames>

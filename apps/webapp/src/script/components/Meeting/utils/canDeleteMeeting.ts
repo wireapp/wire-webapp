@@ -34,8 +34,15 @@ export const canDeleteMeetingForAll = (
   meetingInstance: MeetingInstance,
   selfUser: User,
   nowMilliseconds: number,
-): boolean =>
-  canDeleteMeeting(meetingInstance, nowMilliseconds) && isMeetingHost(meetingInstance.meetingSeries, selfUser);
+): boolean => {
+  const instanceHasNotStarted = nowMilliseconds < meetingInstance.start.getTime();
+
+  return (
+    canDeleteMeeting(meetingInstance, nowMilliseconds) &&
+    isMeetingHost(meetingInstance.meetingSeries, selfUser) &&
+    instanceHasNotStarted
+  );
+};
 
 export const canDeleteMeetingForMe = (
   meetingInstance: MeetingInstance,

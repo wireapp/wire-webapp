@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
@@ -604,7 +604,7 @@ export class Conversation {
           return this.name();
         }
 
-        const hasUserEntities = is.nonEmptyArray(this.participating_user_ets());
+        const hasUserEntities = isNonEmptyArray(this.participating_user_ets());
         if (hasUserEntities) {
           const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
           const joinedNames = this.participating_user_ets()
@@ -623,7 +623,7 @@ export class Conversation {
       }
 
       if (this.isMeeting()) {
-        if (is.nonEmptyString(this.name())) {
+        if (isNonEmptyString(this.name())) {
           return this.name();
         }
 

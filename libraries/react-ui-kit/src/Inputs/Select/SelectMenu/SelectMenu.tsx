@@ -18,7 +18,7 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {components, GroupBase, MenuProps} from 'react-select';
 
 import {Option} from '../Select';
@@ -33,7 +33,7 @@ export const SelectMenu = <IsMulti extends boolean = false, Group extends GroupB
     return (
       <components.Menu {...props} css={css}>
         <div
-          {...(is.nonEmptyString(dataUieName) && {
+          {...(isNonEmptyString(dataUieName) && {
             'data-uie-name': `dropdown-${dataUieName}`,
           })}
         >

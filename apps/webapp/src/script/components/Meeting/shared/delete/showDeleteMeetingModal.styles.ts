@@ -17,27 +17,14 @@
  *
  */
 
-import {parse} from 'date-fns';
-import {Result} from 'true-myth';
-import {z} from 'zod';
+import {CSSObject} from '@emotion/react';
 
-const clientVersionSchema = z
-  .string()
-  .transform(clientVersionString => {
-    return parse(clientVersionString, 'yyyy.MM.dd.HH.mm.ss', new Date());
-  })
-  .pipe(z.date());
+export const deleteMeetingConfirmButtonContentStyles: CSSObject = {
+  alignItems: 'center',
+  display: 'inline-flex',
+  gap: '8px',
+};
 
-export function parseClientVersion(clientVersionHeaderValue: string): Result<Date, Error> {
-  const parseResult = clientVersionSchema.safeParse(clientVersionHeaderValue);
-
-  if (parseResult.success) {
-    return Result.ok(parseResult.data);
-  }
-
-  return Result.err(
-    new Error(`Invalid client version format: "${clientVersionHeaderValue}". Expected format: yyyy.MM.dd.HH.mm.ss`, {
-      cause: parseResult.error,
-    }),
-  );
-}
+export const deleteMeetingConfirmButtonIconStyles: CSSObject = {
+  fill: 'currentColor',
+};

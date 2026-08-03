@@ -27,6 +27,7 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
+  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is)/)'],
   moduleNameMapper: {
     '^@wireapp/store-engine/lib/test/(.*)$': '<rootDir>/../store-engine/src/test/$1',
     '^@wireapp/store-engine$': '<rootDir>/../store-engine/src/index',

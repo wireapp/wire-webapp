@@ -536,8 +536,8 @@ const GroupCreationModal = ({
                   isChecked={isServicesEnabled}
                   setIsChecked={clickOnToggleServicesMode}
                   isDisabled={!isAppsFeatureAvailable}
-                  name={translate('servicesOptionsTitle')}
-                  info={translate('servicesRoomToggleInfo')}
+                  name={translate('appsOptionsTitle')}
+                  info={translate('appsRoomToggleInfo')}
                   footer={!isAppsFeatureAvailable && <AppsDisabledNote />}
                 />
 

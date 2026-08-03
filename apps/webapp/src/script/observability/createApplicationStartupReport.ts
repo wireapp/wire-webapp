@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNumber, isString} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
 import type {ApplicationStartupReport} from './applicationStartupReport';
@@ -37,7 +37,7 @@ type CreateApplicationStartupReportOptions = {
 
 function getTiming(timings: StartupTimings, timingStep: AppInitTimingsStep): Maybe<number> {
   const timing = timings[timingStep];
-  return is.number(timing) && Number.isFinite(timing) ? Maybe.just(timing) : Maybe.nothing();
+  return isNumber(timing) && Number.isFinite(timing) ? Maybe.just(timing) : Maybe.nothing();
 }
 
 function createStartupTimings(timings: StartupTimings): ApplicationStartupReport['timings'] {
@@ -103,7 +103,7 @@ function createStartupStatistics(
 
   statisticMappings.forEach(([reportStatisticName, statisticName]) => {
     const statistic = statistics[statisticName];
-    if (is.string(statistic) || (is.number(statistic) && Number.isFinite(statistic))) {
+    if (isString(statistic) || (isNumber(statistic) && Number.isFinite(statistic))) {
       startupStatistics[reportStatisticName] = statistic;
     }
   });

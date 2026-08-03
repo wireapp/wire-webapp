@@ -21,7 +21,7 @@ import {useEffect, useState} from 'react';
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {COLOR_V2} from '../../Identity';
 import {Theme} from '../../Identity/Theme';
@@ -130,7 +130,7 @@ export const CodeInput = ({
       const valuesCopy = values.slice();
       valuesCopy[fieldIndex] = value;
       setValues(valuesCopy);
-      if (is.nonEmptyString(value)) {
+      if (isNonEmptyString(value)) {
         nextField(fieldIndex);
       }
     }

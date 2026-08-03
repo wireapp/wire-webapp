@@ -21,7 +21,7 @@ import * as React from 'react';
 import {forwardRef} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {styles as actionLinkButtonStyles} from './ActionLinkButton.style';
 
@@ -70,7 +70,7 @@ export const ActionLinkButton = forwardRef<HTMLAnchorElement | HTMLButtonElement
         ...(disabled === true ? actionLinkButtonStyles.link.disabled : actionLinkButtonStyles.link.enabled),
       }) satisfies CSSObject;
 
-    if ('href' in restProps && is.nonEmptyString(restProps.href)) {
+    if ('href' in restProps && isNonEmptyString(restProps.href)) {
       const {href, target, onClick, ...anchorProps} = restProps;
       const linkProps = filterLinkProps(anchorProps as unknown as LinkProps);
 

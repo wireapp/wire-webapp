@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -185,7 +185,7 @@ const LoginComponent = ({
 
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend unless we're following the guest link flow
-    if (is.nonEmptyString(defaultSSOCode) && embedded !== true) {
+    if (isNonEmptyString(defaultSSOCode) && embedded !== true) {
       navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`);
     }
   }, [defaultSSOCode, embedded, navigate]);
@@ -194,7 +194,7 @@ const LoginComponent = ({
     const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
     const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
-    const keyAndCodeExistent = is.nonEmptyString(queryConversationKey) && is.nonEmptyString(queryConversationCode);
+    const keyAndCodeExistent = isNonEmptyString(queryConversationKey) && isNonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
@@ -262,7 +262,7 @@ const LoginComponent = ({
         throw validationErrors[0];
       }
 
-      const hasKeyAndCode = is.nonEmptyString(conversationKey) && is.nonEmptyString(conversationCode);
+      const hasKeyAndCode = isNonEmptyString(conversationKey) && isNonEmptyString(conversationCode);
       if (hasKeyAndCode) {
         try {
           await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
@@ -301,7 +301,7 @@ const LoginComponent = ({
           }
           case BackendErrorLabel.TOO_MANY_CLIENTS: {
             await resetAuthError();
-            if (is.nonEmptyString(formLoginData.verificationCode)) {
+            if (isNonEmptyString(formLoginData.verificationCode)) {
               await doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
             }
             if (entropy.current !== undefined) {
@@ -315,9 +315,9 @@ const LoginComponent = ({
             await resetAuthError();
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
             let twoFactorTarget: string | undefined;
-            if (is.nonEmptyString(login.email)) {
+            if (isNonEmptyString(login.email)) {
               twoFactorTarget = login.email;
-            } else if (is.nonEmptyString(login.handle)) {
+            } else if (isNonEmptyString(login.handle)) {
               twoFactorTarget = login.handle;
             }
             if (twoFactorTarget !== undefined) {
@@ -359,7 +359,7 @@ const LoginComponent = ({
   const resendTwoFactorCode = async () => {
     try {
       const email = twoFactorLoginData?.email;
-      if (is.nonEmptyString(email)) {
+      if (isNonEmptyString(email)) {
         await doSendTwoFactorCode(email);
       }
     } catch {

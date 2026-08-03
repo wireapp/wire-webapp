@@ -19,7 +19,7 @@
 
 import {FC, useCallback, useMemo, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {UserType} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
@@ -278,7 +278,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               }
               data-uie-name="do-add-services"
             >
-              {translate('addParticipantsTabsServices')}
+              {translate('addParticipantsTabsApps')}
             </div>
           </div>
         )}
@@ -303,7 +303,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
           {isAddServiceState && (
             <>
-              {is.nonEmptyArray(servicesList) && (
+              {isNonEmptyArray(servicesList) && (
                 <>
                   {canManageServices() && !!manageServicesUrl && (
                     <ul className="panel-manage-services left-list-items">
@@ -325,7 +325,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                           <Icon.ServiceIcon />
                         </div>
 
-                        <div className="column-center">{translate('addParticipantsManageServices')}</div>
+                        <div className="column-center">{translate('addParticipantsManageApps')}</div>
                       </li>
                     </ul>
                   )}
@@ -341,7 +341,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                   {canManageServices() && !!manageServicesUrl && (
                     <>
                       <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
-                        {translate('addParticipantsNoServicesManager')}
+                        {translate('addParticipantsNoAppsManager')}
                       </div>
 
                       <Button
@@ -359,14 +359,14 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         data-uie-name="go-enable-services"
                         style={{marginTop: '1em'}}
                       >
-                        {translate('addParticipantsManageServicesNoResults')}
+                        {translate('addParticipantsManageAppsNoResults')}
                       </Button>
                     </>
                   )}
 
                   {!canManageServices() && (
                     <div className="search__no-services__info" data-uie-name="label-no-services-enabled">
-                      {translate('addParticipantsNoServicesMember')}
+                      {translate('addParticipantsNoAppsMember')}
                     </div>
                   )}
                 </div>

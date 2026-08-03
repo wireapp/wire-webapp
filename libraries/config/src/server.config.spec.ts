@@ -23,6 +23,7 @@ import {Env} from './env';
 
 describe('Server Config', () => {
   const mockParams: ConfigGeneratorParams = {
+    assetVersion: '1.0.0-abc123',
     commit: 'abc123',
     version: '1.0.0',
     env: 'production',

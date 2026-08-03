@@ -2,7 +2,7 @@ import http from 'http';
 import type {Express} from 'express';
 
 import {createFactory} from '@enormora/objectory';
-import is from '@sindresorhus/is';
+import {isError, isNonEmptyString, isNullOrUndefined, isNumber, isString} from '@sindresorhus/is';
 import type {BuildMetadata, ClientConfig, ServerConfig} from '@wireapp/config';
 
 import {Server} from './Server';
@@ -52,7 +52,7 @@ const nonCacheableResponseTestCaseFactory = createFactory<ServerResponseTestCase
   };
 });
 
-function createServerConfiguration(): ServerConfig {
+function createServerConfiguration(enableClientVersionEnforcement = false): ServerConfig {
   return {
     APP_BASE: 'https://app.example.com',
     BACKEND_REST: 'https://backend.example.com',
@@ -62,7 +62,7 @@ function createServerConfiguration(): ServerConfig {
     CSP: {},
     DEVELOPMENT: false,
     DEVELOPMENT_ENABLE_TLS: false,
-    ENABLE_CLIENT_VERSION_ENFORCEMENT: false,
+    ENABLE_CLIENT_VERSION_ENFORCEMENT: enableClientVersionEnforcement,
     ENABLE_DYNAMIC_HOSTNAME: false,
     ENFORCE_HTTPS: false,
     ENVIRONMENT: 'production',
@@ -86,11 +86,13 @@ function createServerConfiguration(): ServerConfig {
 
 function createClientConfiguration(): ClientConfig {
   return {
+    ASSET_VERSION: mainBuildMetadata.assetVersion,
     BACKEND_REST: 'https://backend.example.com',
     BACKEND_WS: 'wss://backend.example.com',
     FEATURE: {
       ENABLE_CHANNELS: true,
     },
+    VERSION: mainBuildMetadata.version,
   } as unknown as ClientConfig;
 }
 
@@ -103,7 +105,7 @@ function openHttpServer(httpServer: http.Server): Promise<string> {
     httpServer.once('error', reject);
     httpServer.listen(0, '127.0.0.1', () => {
       const address = httpServer.address();
-      if (is.nullOrUndefined(address) || is.string(address)) {
+      if (isNullOrUndefined(address) || isString(address)) {
         reject(new Error('Expected the test HTTP server to listen on a TCP port.'));
         return;
       }
@@ -116,7 +118,7 @@ function openHttpServer(httpServer: http.Server): Promise<string> {
 function closeHttpServer(httpServer: http.Server): Promise<void> {
   return new Promise((resolve, reject) => {
     httpServer.close(error => {
-      if (is.error(error)) {
+      if (isError(error)) {
         reject(error);
         return;
       }
@@ -130,8 +132,9 @@ async function withHttpServer(
   clientConfiguration: ClientConfig,
   buildMetadata: BuildMetadata,
   runTest: (baseUrl: string) => Promise<void>,
+  serverConfiguration: ServerConfig = createServerConfiguration(),
 ): Promise<void> {
-  const server = new Server(createServerConfiguration(), clientConfiguration, buildMetadata);
+  const server = new Server(serverConfiguration, clientConfiguration, buildMetadata);
   const httpServer = http.createServer(getServerApplication(server));
   let serverIsListening = false;
 
@@ -172,7 +175,7 @@ function requestHttpResponse(baseUrl: string, requestPath: string): Promise<Http
 
 function getResponseHeader(response: HttpResponse, headerName: string): string {
   const headerValue = response.headers[headerName];
-  if (!is.string(headerValue)) {
+  if (!isString(headerValue)) {
     throw new Error(`Expected response header '${headerName}' to be a string.`);
   }
 
@@ -180,7 +183,7 @@ function getResponseHeader(response: HttpResponse, headerName: string): string {
 }
 
 function expectNonCacheableResponse(response: HttpResponse): void {
-  if (!is.number(response.statusCode)) {
+  if (!isNumber(response.statusCode)) {
     throw new Error('Expected the HTTP response to have a status code.');
   }
 
@@ -203,7 +206,7 @@ describe('server response caching', () => {
           expect(response.body).toContain(testCase.expectedBody);
         }
 
-        if (is.nonEmptyString(testCase.expectedContentType)) {
+        if (isNonEmptyString(testCase.expectedContentType)) {
           expect(getResponseHeader(response, 'content-type')).toContain(testCase.expectedContentType);
         }
 
@@ -227,6 +230,21 @@ describe('server response caching', () => {
 
       expect(response.body).toContain(`window.wire.env = ${JSON.stringify(clientConfiguration)};`);
     });
+  });
+
+  it('uses the deployed build asset identity for client-version enforcement', async () => {
+    await withHttpServer(
+      createClientConfiguration(),
+      mainBuildMetadata,
+      async baseUrl => {
+        const response = await fetch(`${baseUrl}/client-version-check`, {
+          headers: {'Wire-Client-Version': mainBuildMetadata.assetVersion},
+        });
+
+        expect(response.status).toBe(200);
+      },
+      createServerConfiguration(true),
+    );
   });
 
   it.each([
@@ -284,7 +302,7 @@ describe('server response caching', () => {
     await withHttpServer(createClientConfiguration(), mainBuildMetadata, async baseUrl => {
       const response = await requestHttpResponse(baseUrl, '/_health');
 
-      if (!is.number(response.statusCode)) {
+      if (!isNumber(response.statusCode)) {
         throw new Error('Expected the HTTP response to have a status code.');
       }
 

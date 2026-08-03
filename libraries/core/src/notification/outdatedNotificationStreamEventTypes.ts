@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
 import {NotificationSource} from './notificationSource.types';
@@ -49,7 +49,7 @@ export function isOutdatedNotificationStreamEvent(
     return false;
   }
 
-  if (!is.nonEmptyString(event.time) || is.nullOrUndefined(lastEventDate)) {
+  if (!isNonEmptyString(event.time) || isNullOrUndefined(lastEventDate)) {
     return false;
   }
 

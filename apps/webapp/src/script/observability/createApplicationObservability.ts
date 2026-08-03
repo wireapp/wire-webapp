@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import type {ApplicationObservability} from './applicationObservability';
 
@@ -34,7 +34,7 @@ export type CreateApplicationObservabilityDependencies = {
 };
 
 function isDataDogLogsConfigured(config: ApplicationObservabilityConfiguration): boolean {
-  return is.nonEmptyString(config.dataDog?.clientToken);
+  return isNonEmptyString(config.dataDog?.clientToken);
 }
 
 export function createApplicationObservability(

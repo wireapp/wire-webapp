@@ -21,7 +21,7 @@ import {ReactElement, useState} from 'react';
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {Property} from 'csstype';
 
 import {ErrorIcon, HideIcon, ShowIcon} from '../../DataDisplay/Icon';
@@ -163,7 +163,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
           ...wrapperCSS,
         })}
       >
-        {is.nonEmptyString(label) ? (
+        {isNonEmptyString(label) ? (
           <InputLabel htmlFor={props.id} isRequired={props.required} markInvalid={props.markInvalid}>
             {label}
           </InputLabel>
@@ -206,7 +206,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
           )}
         </div>
 
-        {!hasError && is.nonEmptyString(helperText) ? (
+        {!hasError && isNonEmptyString(helperText) ? (
           <p
             css={(theme: Theme) => ({
               fontSize: theme.fontSizes.small,

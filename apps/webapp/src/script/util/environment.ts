@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -115,7 +115,7 @@ export const Environment: Environment = {
     }
 
     const electronVersion = getElectronVersion(Runtime.getUserAgent());
-    const showElectronVersion = is.nonEmptyString(electronVersion) && showWrapperVersion;
+    const showElectronVersion = isNonEmptyString(electronVersion) && showWrapperVersion;
     return showElectronVersion ? electronVersion : Config.getConfig().VERSION;
   },
   avsVersion: (): string => Config.getConfig().AVS_VERSION,

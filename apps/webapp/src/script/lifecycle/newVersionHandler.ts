@@ -17,71 +17,134 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import {isError} from '@sindresorhus/is';
+import {task, type Task} from 'true-myth';
+
+import {isBuildMetadata, type BuildMetadata} from '@wireapp/config';
+
 import {getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-type OnNewVersionAvailableFn = (serverVersion: string) => void;
+const logger = getLogger('newVersionHandler');
+const buildMetadataUrl = '/version/';
 
-interface VersionListener {
-  currentVersion: string;
-  onNewVersionAvailable: OnNewVersionAvailableFn;
+export const NEW_VERSION_POLLING_INTERVAL_MILLISECONDS = TIME_IN_MILLIS.MINUTE * 15;
+
+export type FetchLatestBuildMetadata = () => Task<BuildMetadata, Error>;
+
+export type CheckForNewVersionOptions = {
+  readonly localAssetVersion: string;
+  readonly isOnline: () => boolean;
+  readonly fetchLatestBuildMetadata: FetchLatestBuildMetadata;
+  readonly onNewVersionAvailable: (serverAssetVersion: string) => void;
+};
+
+export type CreateFetchLatestBuildMetadataOptions = {
+  readonly fetchBuildMetadata: typeof globalThis.fetch;
+};
+
+export type StartNewVersionPollingOptions = {
+  readonly wallClock: WallClock;
+  readonly pollingIntervalMilliseconds: number;
+  readonly runUpdateCheck: () => void;
+};
+
+export type CreateNewVersionPollingCallbackOptions = CheckForNewVersionOptions & {
+  readonly invokeAsynchronously: (asyncOperation: () => Promise<unknown>) => void;
+};
+
+function normalizeFetchError(error: unknown): Error {
+  if (isError(error)) {
+    return error;
+  }
+
+  return new Error(String(error));
 }
 
-const logger = getLogger('newVersionHandler');
-const VERSION_URL = '/version/';
-const CHECK_INTERVAL = TIME_IN_MILLIS.MINUTE * 15;
-
-let newVersionListeners: VersionListener[] = [];
-let pollInterval: number;
-
-const fetchLatestVersion = async (): Promise<string> => {
-  const response = await fetch(VERSION_URL);
-  if (response.ok) {
-    const {version} = await response.json();
-    return version;
-  }
-  throw new Error(`Failed to fetch '${VERSION_URL}': ${response.statusText}`);
-};
-
 /**
- * Check all the registered version listeners if the server version is newer than the version they registered.
- *
- * @param overrideCurrentVersion will ignore the version set for the listener and use this one instead
- * @returns Promise that resolves when the check has been done
+ * Creates the browser boundary that retrieves and validates the server build metadata.
  */
-export const checkVersion = async (overrideCurrentVersion: string): Promise<string | void> => {
-  if (navigator.onLine) {
-    const serverVersion = await fetchLatestVersion();
-    newVersionListeners.forEach(({currentVersion, onNewVersionAvailable}) => {
-      const baseVersion = overrideCurrentVersion || currentVersion;
-      logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${baseVersion}'`);
+export function createFetchLatestBuildMetadata(
+  options: CreateFetchLatestBuildMetadataOptions,
+): FetchLatestBuildMetadata {
+  const {fetchBuildMetadata} = options;
 
-      const isOutdatedVersion = serverVersion > baseVersion;
-      return isOutdatedVersion && onNewVersionAvailable(serverVersion);
+  return function fetchLatestBuildMetadata(): Task<BuildMetadata, Error> {
+    return task.tryOrElse(normalizeFetchError, async (): Promise<BuildMetadata> => {
+      const response = await fetchBuildMetadata(buildMetadataUrl);
+      if (response.ok) {
+        const responseBody: unknown = await response.json();
+
+        if (isBuildMetadata(responseBody)) {
+          return responseBody;
+        }
+
+        throw new Error(`Invalid build metadata returned by '${buildMetadataUrl}'`);
+      }
+
+      throw new Error(`Failed to fetch '${buildMetadataUrl}': ${response.statusText}`);
     });
-    return serverVersion;
-  }
-};
+  };
+}
 
 /**
- * Will register an interval that will poll the server for the latest version of the app.
- * If a new version is detected, will then call the given callback.
- *
- * @param currentVersion current version of the app
- * @param onNewVersionAvailable callback to be called when a new version is detected
+ * Performs one update check without owning browser APIs or scheduling state.
  */
-export const startNewVersionPolling = (
-  currentVersion: string,
-  onNewVersionAvailable: OnNewVersionAvailableFn,
-): void => {
-  newVersionListeners.push({currentVersion, onNewVersionAvailable});
-  if (newVersionListeners.length === 1) {
-    // starts the interval when we have our first listener
-    pollInterval = window.setInterval(checkVersion, CHECK_INTERVAL);
-  }
-};
+export async function checkForNewVersion(options: CheckForNewVersionOptions): Promise<string | void> {
+  const {localAssetVersion, isOnline, fetchLatestBuildMetadata, onNewVersionAvailable} = options;
 
-export const stopNewVersionPolling = (): void => {
-  newVersionListeners = [];
-  window.clearInterval(pollInterval);
-};
+  if (isOnline() === false) {
+    return;
+  }
+
+  const latestServerAssetVersion = await fetchLatestBuildMetadata().match({
+    Resolved: (serverBuildMetadata): string | undefined => {
+      logger.info(
+        `Checking current webapp artifact. Server '${serverBuildMetadata.assetVersion}' vs. local '${localAssetVersion}'`,
+      );
+
+      if (serverBuildMetadata.assetVersion !== localAssetVersion) {
+        onNewVersionAvailable(serverBuildMetadata.assetVersion);
+      }
+
+      return serverBuildMetadata.assetVersion;
+    },
+    Rejected: (error): string | undefined => {
+      logger.info(`Could not check for a new webapp artifact: ${String(error)}`);
+      return undefined;
+    },
+  });
+
+  return latestServerAssetVersion;
+}
+
+/**
+ * Creates the synchronous scheduler callback that invokes one asynchronous update check safely.
+ */
+export function createNewVersionPollingCallback(options: CreateNewVersionPollingCallbackOptions): () => void {
+  const {localAssetVersion, isOnline, fetchLatestBuildMetadata, onNewVersionAvailable, invokeAsynchronously} = options;
+
+  return function runNewVersionCheck(): void {
+    invokeAsynchronously(async () => {
+      await checkForNewVersion({
+        localAssetVersion,
+        isOnline,
+        fetchLatestBuildMetadata,
+        onNewVersionAvailable,
+      });
+    });
+  };
+}
+
+/**
+ * Starts delayed polling for update checks and returns cleanup for this polling instance.
+ */
+export function startNewVersionPolling(options: StartNewVersionPollingOptions): () => void {
+  const {wallClock, pollingIntervalMilliseconds, runUpdateCheck} = options;
+  const intervalIdentifier = wallClock.setInterval(runUpdateCheck, pollingIntervalMilliseconds);
+
+  return function cleanupNewVersionPolling(): void {
+    wallClock.clearInterval(intervalIdentifier);
+  };
+}

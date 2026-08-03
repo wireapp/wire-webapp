@@ -18,7 +18,7 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 
 import {ButtonProps, ButtonVariant} from './Button';
 
@@ -27,7 +27,7 @@ import {defaultTransition} from '../../Identity/motions';
 import {textStyle} from '../../Typography';
 
 const getButtonTheme = (theme: Theme): NonNullable<Theme['Button']> => {
-  if (is.undefined(theme.Button)) {
+  if (isUndefined(theme.Button)) {
     throw new Error('Button theme tokens are not defined');
   }
   return theme.Button;
@@ -47,7 +47,7 @@ const buttonPrimaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActi
       : {
           color: disabled === true ? button.primaryDisabledText : theme.general.contrastColor,
           backgroundColor:
-            is.nonEmptyString(backgroundColor) || disabled === true ? button.primaryDisabledBg : button.primaryBg,
+            isNonEmptyString(backgroundColor) || disabled === true ? button.primaryDisabledBg : button.primaryBg,
         }),
 
     ...(disabled !== true
@@ -80,7 +80,7 @@ const buttonSecondaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isAc
       : {
           color: disabled === true ? theme.Input.placeholderColor : theme.general.color,
           backgroundColor:
-            is.nonEmptyString(backgroundColor) || disabled === true
+            isNonEmptyString(backgroundColor) || disabled === true
               ? theme.IconButton.primaryDisabledBgColor
               : theme.IconButton.primaryBgColor,
         }),
@@ -125,7 +125,7 @@ const buttonTertiaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isAct
       : {
           color: disabled === true ? theme.Input.placeholderColor : theme.general.color,
           backgroundColor:
-            is.nonEmptyString(backgroundColor) || disabled === true ? button.tertiarydisabledBg : button.tertiaryBg,
+            isNonEmptyString(backgroundColor) || disabled === true ? button.tertiarydisabledBg : button.tertiaryBg,
         }),
 
     ...(disabled !== true
@@ -155,7 +155,7 @@ const buttonQuaternaryStyles = <T>({backgroundColor, disabled, isActive}: Button
       ? activeStyles
       : {
           color: disabled === true ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
-          backgroundColor: is.nonEmptyString(backgroundColor) || disabled === true ? COLOR_V2.GRAY_50 : COLOR_V2.GREEN,
+          backgroundColor: isNonEmptyString(backgroundColor) || disabled === true ? COLOR_V2.GRAY_50 : COLOR_V2.GREEN,
         }),
 
     ...(disabled !== true
@@ -184,7 +184,7 @@ const buttonCancelStyles = <T>({backgroundColor, disabled, isActive}: ButtonProp
       ? activeStyles
       : {
           color: disabled === true ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
-          backgroundColor: is.nonEmptyString(backgroundColor) || disabled === true ? COLOR_V2.GRAY_50 : COLOR_V2.RED,
+          backgroundColor: isNonEmptyString(backgroundColor) || disabled === true ? COLOR_V2.GRAY_50 : COLOR_V2.RED,
         }),
 
     ...(disabled !== true
@@ -212,7 +212,7 @@ const buttonSendStyles = <T>({backgroundColor, disabled, isActive}: ButtonProps<
     ...(isActive === true
       ? activeStyles
       : {
-          backgroundColor: is.nonEmptyString(backgroundColor) || disabled === true ? COLOR_V2.GRAY_70 : COLOR_V2.BLUE,
+          backgroundColor: isNonEmptyString(backgroundColor) || disabled === true ? COLOR_V2.GRAY_70 : COLOR_V2.BLUE,
         }),
 
     ...(disabled !== true

@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import express, {type Request, type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Maybe, maybe} from 'true-myth';
@@ -35,7 +35,7 @@ type JoinRedirectQuery = {
 export function createJoinConversationRedirectUrl(query: JoinRedirectQuery): Maybe<string> {
   const {key, code} = query;
 
-  if (!is.nonEmptyString(key) || !is.nonEmptyString(code)) {
+  if (!isNonEmptyString(key) || !isNonEmptyString(code)) {
     return Maybe.nothing();
   }
 
