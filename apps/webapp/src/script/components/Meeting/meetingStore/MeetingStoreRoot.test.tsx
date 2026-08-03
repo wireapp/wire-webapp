@@ -141,6 +141,21 @@ describe('MeetingStoreRoot', () => {
     expect(getMeeting).toHaveBeenCalledWith(meetingId);
   });
 
+  it('syncs a meeting into the store when a meeting member-added event is published', async () => {
+    const {getMeeting} = renderMeetingStoreRoot({
+      getMeetingsList: jest.fn(() => task.resolve([])),
+      getMeeting: jest.fn(() => task.resolve(createApiMeeting('Late joiner meeting'))),
+    });
+
+    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Late joiner meeting');
+    });
+
+    expect(getMeeting).toHaveBeenCalledWith(meetingId);
+  });
+
   it('removes a meeting from the store when a meeting deleted event is published', async () => {
     renderMeetingStoreRoot();
 

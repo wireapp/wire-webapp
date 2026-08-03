@@ -610,6 +610,14 @@ export class EventRepository {
         amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
         return;
       }
+      case MEETING_EVENT.MEMBER_ADD: {
+        if (!hasValidQualifiedId) {
+          this.logger.warn('Ignored meeting.member-add event without a valid qualified_id', event);
+          return;
+        }
+        amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
+        return;
+      }
       default:
         amplify.publish(event.type, event);
     }

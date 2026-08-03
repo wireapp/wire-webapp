@@ -148,8 +148,6 @@ export const useScheduleMeetingSubmit = () => {
         });
       }
 
-      await task.tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings);
-
       setIsSubmitting(false);
 
       return scheduleMeetingSubmitResults.succeeded;
