@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
 
 export const getCurrentFolderName = (currentPath: string): string => {
