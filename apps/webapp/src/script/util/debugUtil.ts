@@ -68,7 +68,7 @@ import {downloadBlob} from './util';
 import {createUuid} from './uuid';
 
 import {E2EIHandler} from '../e2eIdentity';
-import {checkVersion} from '../lifecycle/newVersionHandler';
+import {checkForNewVersion, createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -437,8 +437,19 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  triggerVersionCheck(baseAssetVersion: string): Promise<string | void> {
-    return checkVersion(baseAssetVersion);
+  triggerVersionCheck(baseAssetVersion: string): Promise<void> {
+    const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
+      fetchBuildMetadata: globalThis.fetch.bind(globalThis),
+    });
+
+    return checkForNewVersion({
+      localAssetVersion: baseAssetVersion,
+      isOnline: () => {
+        return globalThis.navigator.onLine === true;
+      },
+      fetchLatestBuildMetadata,
+      onNewVersionAvailable: () => {},
+    });
   }
 
   /**

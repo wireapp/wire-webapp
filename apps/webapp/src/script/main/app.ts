@@ -19,6 +19,7 @@
 
 // Polyfill for "tsyringe" dependency injection
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
@@ -33,7 +34,7 @@ import {pdfjs} from 'react-pdf';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {createFireAndForgetInvoker} from '@wireapp/core';
+import type {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -113,7 +114,12 @@ import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';
 import {CLIENT_ERROR_TYPE, ClientError} from '../error/clientError';
 import {TeamError} from '../error/teamError';
-import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
+import {
+  checkForNewVersion,
+  NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
+  type FetchLatestBuildMetadata,
+  startNewVersionPolling,
+} from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
@@ -147,7 +153,11 @@ type ApplicationStartupTimingInput = {
 
 type ApplicationStartupDependencies = {
   readonly applicationObservability: ApplicationObservability;
+  readonly fetchLatestBuildMetadata: FetchLatestBuildMetadata;
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
+  readonly isOnline: () => boolean;
   readonly monotonicClock: MonotonicClock;
+  readonly wallClock: WallClock;
 };
 
 type ApplicationStartupInput = {
@@ -179,6 +189,7 @@ export class App {
   repository: ViewModelRepositories = {} as ViewModelRepositories;
   debug?: DebugUtil;
   util?: {debug: DebugUtil};
+  private newVersionPollingCleanup: (() => void) | undefined;
 
   static get CONFIG() {
     return {
@@ -432,7 +443,14 @@ export class App {
    */
   async initApp(clientType: ClientType, onProgress: (message?: string) => void, startupInput: ApplicationStartupInput) {
     const application = this;
-    const {applicationObservability, monotonicClock} = startupInput.dependencies;
+    const {
+      applicationObservability,
+      fetchLatestBuildMetadata,
+      fireAndForgetInvoker,
+      isOnline,
+      monotonicClock,
+      wallClock,
+    } = startupInput.dependencies;
     const {applicationBootstrapStartedAt, domContentLoadedAt} = startupInput.timing;
     const appInitStartedAtMilliseconds = monotonicClock.nowMilliseconds;
     const applicationStartupReportingDependencies = {applicationObservability, logger: this.logger};
@@ -597,10 +615,6 @@ export class App {
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
-      const fireAndForgetInvoker = createFireAndForgetInvoker({
-        logger: this.logger,
-      });
-
       fireAndForgetInvoker.fireAndForget(() =>
         bgEffectsHandler.preloadResources().catch((error: unknown) => {
           this.logger.warn('[virtual-background] preload failed, starting without resources', error);
@@ -735,7 +749,22 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (selfUser.isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
-        startNewVersionPolling(Config.getConfig().ASSET_VERSION, this.update);
+        function runNewVersionCheck(): void {
+          fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+            await checkForNewVersion({
+              localAssetVersion: application.config.ASSET_VERSION,
+              isOnline,
+              fetchLatestBuildMetadata,
+              onNewVersionAvailable: application.update,
+            });
+          });
+        }
+
+        this.newVersionPollingCleanup = startNewVersionPolling({
+          wallClock,
+          pollingIntervalMilliseconds: NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
+          runUpdateCheck: runNewVersionCheck,
+        });
       }
       audioRepository.init();
       await conversationRepository.cleanupEphemeralMessages();
@@ -891,6 +920,11 @@ export class App {
       this.logger.info("'window.onunload' was triggered, disconnecting from backend.");
       this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
+
+      if (this.newVersionPollingCleanup !== undefined) {
+        this.newVersionPollingCleanup();
+        this.newVersionPollingCleanup = undefined;
+      }
 
       if (selfUser.isActivatedAccount()) {
         this.repository.storage.terminate('window.onunload');
