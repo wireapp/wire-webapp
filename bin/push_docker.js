@@ -23,7 +23,6 @@ const child = require('child_process');
 const nodeFileSystem = require('fs');
 const path = require('path');
 const appConfigPkg = require('../apps/webapp/app-config/package.json');
-const {configurationDependencyKeyForSemanticProfile} = require('../apps/webapp/configuration-selection');
 
 require('dotenv').config({quiet: true});
 
@@ -156,8 +155,9 @@ function runDockerPublication(
   ].join(' && ');
 
   /** Defines which config version (listed in "app-config/package.json") is going to be used */
-  const configurationProfile = versionTag.includes('production') ? 'production' : 'development';
-  const configurationEntry = configurationDependencyKeyForSemanticProfile(configurationProfile);
+  const configurationEntry = versionTag.includes('production')
+    ? 'wire-web-config-default-master'
+    : 'wire-web-config-default-staging';
   const configurationVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
   const uniqueImageTag = createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha});
 

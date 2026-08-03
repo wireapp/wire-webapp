@@ -84,8 +84,9 @@ describe('push_docker metadata', () => {
     const dockerfilePath = path.join(process.cwd(), 'apps/server/Dockerfile');
     const dockerfileContents = readFileSync(dockerfilePath, 'utf8');
 
-    expect(dockerfileContents).toMatch(
-      /RUN chmod \+x \.\/bin\/yarn && YARN_ENABLE_SCRIPTS=false \.\/bin\/yarn workspaces focus @wireapp\/server --production/,
+    assert.match(
+      dockerfileContents,
+      /RUN chmod \+x \.\/bin\/yarn && \.\/bin\/yarn workspaces focus @wireapp\/server --production/,
     );
   });
 

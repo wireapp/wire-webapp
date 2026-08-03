@@ -83,16 +83,20 @@ describe('selectConfiguration', () => {
     expect(actualSelection.configurationDependencyKey).toBe('wire-web-config-default-master');
   });
 
-  it('retains the Production mapping for legacy Production and staging tags', () => {
-    const actualProductionTagSelection = selectConfiguration({
+  it('retains the Production mapping for a legacy Production tag', () => {
+    const actualSelection = selectConfiguration({
       currentTag: '2026-08-03-production',
     });
-    const actualStagingTagSelection = selectConfiguration({
+
+    expect(actualSelection.configurationDependencyKey).toBe('wire-web-config-default-master');
+  });
+
+  it('retains the Production mapping for a legacy staging tag', () => {
+    const actualSelection = selectConfiguration({
       currentTag: '2026-08-03-staging',
     });
 
-    expect(actualProductionTagSelection.configurationDependencyKey).toBe('wire-web-config-default-master');
-    expect(actualStagingTagSelection.configurationDependencyKey).toBe('wire-web-config-default-master');
+    expect(actualSelection.configurationDependencyKey).toBe('wire-web-config-default-master');
   });
 
   it('selects Development when no explicit profile or relevant tag exists', () => {
