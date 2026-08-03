@@ -3713,60 +3713,60 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/browser-core@npm:7.6.1":
-  version: 7.6.1
-  resolution: "@datadog/browser-core@npm:7.6.1"
+"@datadog/browser-core@npm:7.7.0":
+  version: 7.7.0
+  resolution: "@datadog/browser-core@npm:7.7.0"
   dependencies:
-    "@datadog/js-core": "npm:0.0.7"
-  checksum: 10/80caf15ceb566bec15a60ecf32c3e3157c4272a04ecf9d1e454c001945a52f3d466765a520ffec967514967bebe98198f24161322565b5416cdf662ccc219756
+    "@datadog/js-core": "npm:0.0.8"
+  checksum: 10/9a7e5cc5443748b4630c4d7d73494e70a2c5f15e82d08d90bf59edab34cccc7c2129ce027aaa721cb9a552bfb06ac7cccf6b32c6d7f22a6c460519e9abc22db2
   languageName: node
   linkType: hard
 
-"@datadog/browser-logs@npm:7.6.1":
-  version: 7.6.1
-  resolution: "@datadog/browser-logs@npm:7.6.1"
+"@datadog/browser-logs@npm:7.7.0":
+  version: 7.7.0
+  resolution: "@datadog/browser-logs@npm:7.7.0"
   dependencies:
-    "@datadog/browser-core": "npm:7.6.1"
-    "@datadog/js-core": "npm:0.0.7"
+    "@datadog/browser-core": "npm:7.7.0"
+    "@datadog/js-core": "npm:0.0.8"
   peerDependencies:
-    "@datadog/browser-rum": 7.6.1
+    "@datadog/browser-rum": 7.7.0
   peerDependenciesMeta:
     "@datadog/browser-rum":
       optional: true
-  checksum: 10/7e680d595af9658b94cd85a950de1fd874e23e6c37ce9b30bb65273979d9ee00b029e9585307b2e5badcd309044b77a5dd6ec51b63798778bd0f970464126cbb
+  checksum: 10/cf31845e392294b86816f0d92d949cfaa7f641cdf9ad39393573613df9c1a8394aed463db2605d2ee0865f05e8d4a5b50a7d23b14379cb1b0e900fc7d41e1d6a
   languageName: node
   linkType: hard
 
-"@datadog/browser-rum-core@npm:7.6.1":
-  version: 7.6.1
-  resolution: "@datadog/browser-rum-core@npm:7.6.1"
+"@datadog/browser-rum-core@npm:7.7.0":
+  version: 7.7.0
+  resolution: "@datadog/browser-rum-core@npm:7.7.0"
   dependencies:
-    "@datadog/browser-core": "npm:7.6.1"
-    "@datadog/js-core": "npm:0.0.7"
-  checksum: 10/e26eebe026a08da3e6ce5221812816c43b68a97f7110df90f3bafa6230e08b7fae346aecf4d185673e12adfed22f0932190bc83b2bf983e1c45a2e8dd6b36f0e
+    "@datadog/browser-core": "npm:7.7.0"
+    "@datadog/js-core": "npm:0.0.8"
+  checksum: 10/dd46210ac06fc822b5e893df07c466eb83179d3d4526dc70f07e068dd28096213a07b40f62e07b1b85707b2858ed490068d3c3afce4fc27b904097ee74e543d2
   languageName: node
   linkType: hard
 
-"@datadog/browser-rum@npm:7.6.1":
-  version: 7.6.1
-  resolution: "@datadog/browser-rum@npm:7.6.1"
+"@datadog/browser-rum@npm:7.7.0":
+  version: 7.7.0
+  resolution: "@datadog/browser-rum@npm:7.7.0"
   dependencies:
-    "@datadog/browser-core": "npm:7.6.1"
-    "@datadog/browser-rum-core": "npm:7.6.1"
-    "@datadog/js-core": "npm:0.0.7"
+    "@datadog/browser-core": "npm:7.7.0"
+    "@datadog/browser-rum-core": "npm:7.7.0"
+    "@datadog/js-core": "npm:0.0.8"
   peerDependencies:
-    "@datadog/browser-logs": 7.6.1
+    "@datadog/browser-logs": 7.7.0
   peerDependenciesMeta:
     "@datadog/browser-logs":
       optional: true
-  checksum: 10/558aac6b0e4b3170dddafe5f30f120310bbd2466b44c0fcd87ab7235529b36480c5166cdede2e611d1a4d2515da3b6551ab02eebb87ed7fe342d52f8bf2639e0
+  checksum: 10/a7002baa040c4e0b504e73b3980bc9af6c8b3c1366547bc9573f77fe0391942f8084aa2b7d2cf8b97f325ed14b907029ae64f8309316e3b2497afa697c2c2399
   languageName: node
   linkType: hard
 
-"@datadog/js-core@npm:0.0.7":
-  version: 0.0.7
-  resolution: "@datadog/js-core@npm:0.0.7"
-  checksum: 10/cd125eeee8a30b9a14517186cd4f3354fcb6327dc57d6d7850865f75570f66ab7901c2a8c08ef69b95748f15c1845f8fc041829802fa663bb193505630f96953
+"@datadog/js-core@npm:0.0.8":
+  version: 0.0.8
+  resolution: "@datadog/js-core@npm:0.0.8"
+  checksum: 10/943478d7c0e73b186d64710852dfa330126df0e8663bc024860098fadc6115314a344546b7adce9a50c433c0696839e98c013983dafe9c54dfb681ff9e739f2d
   languageName: node
   linkType: hard
 
@@ -11917,8 +11917,8 @@ __metadata:
     "@babel/preset-env": "npm:7.29.7"
     "@babel/preset-react": "npm:7.29.7"
     "@babel/preset-typescript": "npm:7.29.7"
-    "@datadog/browser-logs": "npm:7.6.1"
-    "@datadog/browser-rum": "npm:7.6.1"
+    "@datadog/browser-logs": "npm:7.7.0"
+    "@datadog/browser-rum": "npm:7.7.0"
     "@emotion/eslint-plugin": "npm:11.12.0"
     "@emotion/react": "npm:11.14.0"
     "@enormora/wall-clock": "npm:0.0.3"
