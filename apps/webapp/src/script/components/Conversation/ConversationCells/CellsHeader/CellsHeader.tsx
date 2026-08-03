@@ -75,7 +75,7 @@ export const CellsHeader = ({
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
   const isRootLevel = breadcrumbs.length === 1;
-  const isRecycleBin = isInRecycleBin();
+  const isInsideRecycleBin = isInRecycleBin();
 
   return (
     <div css={wrapperStyles}>
@@ -96,7 +96,7 @@ export const CellsHeader = ({
           <CellsFiltersBar filters={filters} />
         ) : (
           <div css={actionsStyles}>
-            {!isRecycleBin && (
+            {isInsideRecycleBin === false && (
               <CellsNewMenu
                 cellsRepository={cellsRepository}
                 conversationQualifiedId={conversationQualifiedId}

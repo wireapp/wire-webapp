@@ -63,7 +63,7 @@ describe('CellsHeader', () => {
   });
 
   it('renders the new-item menu outside the recycle bin', () => {
-    window.location.hash = '#/conversation/conversation-id/wire.com/files/folder';
+    window.location.hash = '#/conversation/conversation-id/wire.com/files/';
 
     renderCellsHeader();
 
