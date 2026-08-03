@@ -98,7 +98,9 @@ jobs:
           cache: 'yarn'
 
       - name: Install exact release dependencies
-        run: ./bin/yarn --immutable
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
 
       - name: Validate Production tag and distribution manifest
         id: validate_identity
