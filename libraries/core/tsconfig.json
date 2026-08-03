@@ -12,9 +12,6 @@
     "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",
-    "paths": {
-      "@sindresorhus/is": ["node_modules/@sindresorhus/is/distribution/index.d.ts"]
-    },
     "resolveJsonModule": true
   },
   "exclude": [

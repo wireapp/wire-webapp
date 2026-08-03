@@ -40,8 +40,5 @@
     "@types/express-useragent": "1.0.5",
     "@types/geolite2": "2.0.2",
     "@types/hbs": "4.0.5"
-  },
-  "engines": {
-    "node": ">=24.10.0"
   }
 }
