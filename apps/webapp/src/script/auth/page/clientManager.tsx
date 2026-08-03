@@ -19,7 +19,7 @@
 
 import React, {useEffect} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
@@ -62,7 +62,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
 
   useEffect(() => {
     void doGetAllClients();
-    if (is.nonEmptyString(SFAcode)) {
+    if (isNonEmptyString(SFAcode)) {
       startTimeout();
     }
   }, [SFAcode, doGetAllClients, startTimeout]);

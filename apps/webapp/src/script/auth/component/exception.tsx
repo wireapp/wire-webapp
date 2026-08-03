@@ -19,7 +19,7 @@
 
 import {Fragment} from 'react';
 
-import is from '@sindresorhus/is';
+import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 
 import {ErrorMessage, Link} from '@wireapp/react-ui-kit';
@@ -37,20 +37,20 @@ type MessageInterpolationValue = string | number | boolean | Date | JSX.Element 
 type MessageInterpolationValues = Record<string, MessageInterpolationValue>;
 
 const toMessageInterpolationValues = (value: unknown): MessageInterpolationValues | undefined => {
-  if (!is.object(value)) {
+  if (!isObject(value)) {
     return undefined;
   }
 
   const entries = Object.entries(value).filter((entry): entry is [string, MessageInterpolationValue] => {
     const [entryKey, entryValue] = entry;
     return (
-      is.nonEmptyString(entryKey) &&
+      isNonEmptyString(entryKey) &&
       (entryValue === null ||
         entryValue === undefined ||
-        is.string(entryValue) ||
-        is.number(entryValue) ||
-        is.boolean(entryValue) ||
-        is.date(entryValue))
+        isString(entryValue) ||
+        isNumber(entryValue) ||
+        isBoolean(entryValue) ||
+        isDate(entryValue))
     );
   });
 
@@ -62,10 +62,10 @@ const Exception = ({errors = []}: ExceptionProps) => {
     <Fragment>
       {errors.map(error => {
         const translatedErrors = {...validationErrorStrings, ...errorHandlerStrings};
-        if (!is.object(error) || !('label' in error)) {
+        if (!isObject(error) || !('label' in error)) {
           return null;
         }
-        const errorLabel = is.string(error.label) ? error.label : 'unexpected-error';
+        const errorLabel = isString(error.label) ? error.label : 'unexpected-error';
         return (
           <ErrorMessage data-uie-name="error-message" data-uie-value={errorLabel} key={errorLabel}>
             {Object.hasOwn(translatedErrors, errorLabel) ? (

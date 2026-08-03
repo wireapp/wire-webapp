@@ -19,7 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {useSelector} from 'react-redux';
 
@@ -103,13 +103,13 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
 
   useAutoFocus({
     elementRef: passwordInput,
-    shouldFocus: is.nonEmptyString(defaultEmail),
+    shouldFocus: isNonEmptyString(defaultEmail),
   });
 
   return (
     <div>
       <Input
-        disabled={is.nonEmptyString(defaultEmail)}
+        disabled={isNonEmptyString(defaultEmail)}
         id="email"
         name="email"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,7 +152,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         <Button
           block
           type="submit"
-          disabled={!is.nonEmptyString(email) || !is.nonEmptyString(password)}
+          disabled={!isNonEmptyString(email) || !isNonEmptyString(password)}
           formNoValidate
           onClick={handleSubmit}
           aria-label={translate('login.headline')}

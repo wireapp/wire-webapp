@@ -10,6 +10,9 @@
   "files": [
     "lib"
   ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "main": "lib/apiClient",
   "types": "lib/apiClient.d.ts",
   "browser": {
@@ -20,6 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.1096.0",
     "@aws-sdk/lib-storage": "3.1096.0",
+    "@sindresorhus/is": "8.1.0",
     "@wireapp/commons": "workspace:^",
     "@wireapp/priority-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.56.0",

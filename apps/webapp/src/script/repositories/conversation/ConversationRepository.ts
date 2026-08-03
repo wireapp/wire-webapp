@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {
   ADD_PERMISSION,
   Conversation as BackendConversation,
@@ -2425,7 +2425,7 @@ export class ConversationRepository {
     for (const inccessibleConversation of not_found) {
       // a conversation marked `not_found` could be either non existing on backend or it could mean the self user is not part of it
       const conversationEntity = this.conversationState.findConversation(inccessibleConversation);
-      if (!is.nullOrUndefined(conversationEntity)) {
+      if (!isNullOrUndefined(conversationEntity)) {
         conversationEntity.status(ConversationStatus.PAST_MEMBER);
       }
     }
@@ -2785,7 +2785,7 @@ export class ConversationRepository {
 
         const {groupId} = conversation;
 
-        if (!is.nonEmptyString(groupId)) {
+        if (!isNonEmptyString(groupId)) {
           throw new Error('Cannot add users to MLS conversation without group id');
         }
 
@@ -3911,7 +3911,7 @@ export class ConversationRepository {
         return this.onButtonActionConfirmation(conversationEntity, eventJson);
 
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
-        const isMessageEdit = is.nonEmptyString(eventJson.edited_time);
+        const isMessageEdit = isNonEmptyString(eventJson.edited_time);
         if (isMessageEdit) {
           // in case of an edition, the DB listener will take care of updating the local entity
           return {conversationEntity};
@@ -3922,7 +3922,7 @@ export class ConversationRepository {
         return this.addEventToConversation(conversationEntity, eventJson);
 
       case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD:
-        if (is.nonEmptyString(eventJson.edited_time)) {
+        if (isNonEmptyString(eventJson.edited_time)) {
           return {conversationEntity};
         }
         return this.addEventToConversation(conversationEntity, eventJson);
@@ -4421,7 +4421,7 @@ export class ConversationRepository {
       .conversations()
       .find(conversation => matchQualifiedIds(conversation, conversationId));
 
-    if (is.nullOrUndefined(conversation) || is.nullOrUndefined(userId) || is.nullOrUndefined(conversation_role)) {
+    if (isNullOrUndefined(conversation) || isNullOrUndefined(userId) || isNullOrUndefined(conversation_role)) {
       return;
     }
 

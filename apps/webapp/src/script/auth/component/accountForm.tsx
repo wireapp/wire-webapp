@@ -19,7 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
@@ -152,7 +152,7 @@ const AccountFormComponent = ({
       return onSubmit();
     } catch (error: unknown) {
       const label = (error as BackendError)?.label;
-      if (is.nonEmptyString(label)) {
+      if (isNonEmptyString(label)) {
         switch (label) {
           case BackendErrorLabel.BLACKLISTED_EMAIL:
           case BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION:
@@ -183,11 +183,11 @@ const AccountFormComponent = ({
   };
 
   const hasRequiredRegistrationData =
-    is.nonEmptyString(registrationData.email) &&
-    is.nonEmptyString(registrationData.name) &&
-    is.nonEmptyString(registrationData.password) &&
+    isNonEmptyString(registrationData.email) &&
+    isNonEmptyString(registrationData.name) &&
+    isNonEmptyString(registrationData.password) &&
     registrationData.termsAccepted === true &&
-    is.nonEmptyString(registrationData.confirmPassword);
+    isNonEmptyString(registrationData.confirmPassword);
 
   const isSubmitDisabled = !hasRequiredRegistrationData || isFetching;
 

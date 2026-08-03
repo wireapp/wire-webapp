@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
@@ -66,7 +66,7 @@ const useWindowTitle = (translate: Translate) => {
 
       const iconBadge = unreadCount ? '-badge' : '';
       const existingIconLink = document.querySelector<HTMLLinkElement>("link[rel*='shortcut icon']");
-      const link: HTMLLinkElement = is.nullOrUndefined(existingIconLink)
+      const link: HTMLLinkElement = isNullOrUndefined(existingIconLink)
         ? document.createElement('link')
         : existingIconLink;
       link.type = 'image/x-icon';
@@ -122,7 +122,7 @@ const useWindowTitle = (translate: Translate) => {
       })
 
       .with(ContentState.CONVERSATION, () => {
-        if (!is.nullOrUndefined(activeConversation)) {
+        if (!isNullOrUndefined(activeConversation)) {
           return activeConversation.display_name();
         }
         return '';
@@ -158,7 +158,7 @@ const useWindowTitle = (translate: Translate) => {
 
     specificTitle += contentSpecificTitle;
 
-    const isTitleSet = is.nonEmptyString(specificTitle) && !specificTitle.endsWith(' ');
+    const isTitleSet = isNonEmptyString(specificTitle) && !specificTitle.endsWith(' ');
     window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${Config.getConfig().BRAND_NAME}`;
   }, [
     activeConversation,

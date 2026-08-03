@@ -120,6 +120,23 @@ const strictBooleanExpressionsRule: Linter.RuleEntry = [
   },
 ];
 
+const restrictedSyntaxRule: Linter.RuleEntry = [
+  'error',
+  {
+    selector: "CallExpression[callee.property.name='splice']",
+    message:
+      'Use toSpliced() instead of splice() to avoid mutating arrays. Reassign the toSpliced() result when ordering must be preserved.',
+  },
+  {
+    selector: "ImportDeclaration[source.value='@sindresorhus/is'] > ImportDefaultSpecifier",
+    message: 'Use named imports from @sindresorhus/is instead of its default API object.',
+  },
+  {
+    selector: "ImportDeclaration[source.value='@sindresorhus/is'] > ImportNamespaceSpecifier",
+    message: 'Use named imports from @sindresorhus/is instead of a namespace import.',
+  },
+];
+
 const config: Linter.Config[] = [
   {ignores},
   ...cleanedBase,
@@ -207,14 +224,7 @@ const config: Linter.Config[] = [
         } as HeaderOptions,
       ] as HeaderRuleConfig,
       'id-length': 'warn',
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: "CallExpression[callee.property.name='splice']",
-          message:
-            'Use toSpliced() instead of splice() to avoid mutating arrays. Reassign the toSpliced() result when ordering must be preserved.',
-        },
-      ],
+      'no-restricted-syntax': restrictedSyntaxRule,
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-var-requires': 'off',
@@ -283,14 +293,7 @@ const config: Linter.Config[] = [
       '@typescript-eslint/no-unused-vars': 'off',
       'unicorn/no-array-reverse': 'error',
       'unicorn/no-array-sort': 'error',
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: "CallExpression[callee.property.name='splice']",
-          message:
-            'Use toSpliced() instead of splice() to avoid mutating arrays. Reassign the toSpliced() result when ordering must be preserved.',
-        },
-      ],
+      'no-restricted-syntax': restrictedSyntaxRule,
     },
   },
   {

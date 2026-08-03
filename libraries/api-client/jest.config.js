@@ -27,7 +27,7 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|uuid|noop-esm)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|uuid|noop-esm|@sindresorhus/is)/)'],
   coverageDirectory: '../../coverage/libraries/api-client',
   coverageThreshold: {
     global: {

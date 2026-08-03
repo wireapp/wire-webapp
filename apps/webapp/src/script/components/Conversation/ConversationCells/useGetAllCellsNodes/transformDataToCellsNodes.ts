@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {RestNode, RestPagination} from 'cells-sdk-ts';
 
 import {CellPagination} from 'Components/Conversation/ConversationCells/common/cellPagination/cellPagination';
@@ -37,7 +37,7 @@ export const transformDataToCellsNodes = ({nodes, users}: {nodes: RestNode[]; us
     const uploadedAtTimestamp = getUploadedAtTimestamp(node);
     const firstShareUuid = node.Shares?.[0]?.Uuid;
     const publicLink: CellNode['publicLink'] = {
-      alreadyShared: is.nonEmptyString(firstShareUuid),
+      alreadyShared: isNonEmptyString(firstShareUuid),
       uuid: firstShareUuid ?? '',
       url: undefined,
     };
@@ -125,13 +125,13 @@ const getSize = (node: RestNode): string => {
 
 const getOwner = (node: RestNode): string => {
   const name = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-owner')?.JsonValue;
-  return is.nonEmptyString(name) ? JSON.parse(name) : '';
+  return isNonEmptyString(name) ? JSON.parse(name) : '';
 };
 
 const getTags = (node: RestNode): string[] => {
   const tags = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-tags')?.JsonValue;
 
-  if (!is.nonEmptyString(tags)) {
+  if (!isNonEmptyString(tags)) {
     return [];
   }
 

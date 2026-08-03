@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {Task, task} from 'true-myth';
@@ -67,7 +67,7 @@ const establishWithUsers = (
 ): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> => {
   const {groupId} = conversation;
 
-  if (!is.nonEmptyString(groupId)) {
+  if (!isNonEmptyString(groupId)) {
     return task.reject(meetingConversationSyncErrors.groupIdMissing);
   }
 

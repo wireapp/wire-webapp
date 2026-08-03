@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isString} from '@sindresorhus/is';
 import {DomainRedirect} from '@wireapp/api-client/lib/account/domainRedirect';
 import {ClientType} from '@wireapp/api-client/lib/client';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
@@ -40,7 +40,7 @@ export const requiresPasswordModal = (
 ): boolean =>
   !isOpen &&
   (hasPassword ||
-    (!is.nullOrUndefined(conversationError) &&
+    (!isNullOrUndefined(conversationError) &&
       conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD));
 
 export const buildDomainRedirectUrl = (welcomeUrl: string, existingQuery: string, clientType: ClientType): string => {
@@ -82,7 +82,7 @@ export const handleSSOBackendError = (
     .otherwise(() => {
       setSsoError(error);
       const isValidationError = Object.values(ValidationError.ERROR).some(
-        errorType => is.nonEmptyString(error.label) && error.label.endsWith(errorType),
+        errorType => isNonEmptyString(error.label) && error.label.endsWith(errorType),
       );
       if (!isValidationError) {
         console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
@@ -107,7 +107,7 @@ export const handleEnterpriseLogin = async ({
 }) => {
   const ssoCodeResponse = await apiClient.api.account.getSSOCodeByEmail(email);
 
-  if (is.string(ssoCodeResponse.sso_code)) {
+  if (isString(ssoCodeResponse.sso_code)) {
     return await loginWithSSO(ssoCodeResponse.sso_code, password);
   }
 

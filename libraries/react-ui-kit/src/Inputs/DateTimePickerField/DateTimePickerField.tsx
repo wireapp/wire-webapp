@@ -20,7 +20,7 @@
 import {useCallback, useMemo} from 'react';
 
 import {DateValue} from '@internationalized/date';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {
   dateTimePickerContentStyles,
@@ -120,7 +120,7 @@ export const DateTimePickerField = ({
 
   return (
     <div css={dateTimePickerContentStyles} data-uie-name={dataUieName}>
-      {is.nonEmptyString(label) && (
+      {isNonEmptyString(label) && (
         <InputLabel markInvalid={markInvalid} id={labelId}>
           {label}
         </InputLabel>
@@ -129,7 +129,7 @@ export const DateTimePickerField = ({
       <div
         css={dateTimePickerFieldsRowStyles}
         role="group"
-        aria-labelledby={is.nonEmptyString(label) ? labelId : undefined}
+        aria-labelledby={isNonEmptyString(label) ? labelId : undefined}
       >
         <DatePickerField
           id={dateFieldId}
@@ -159,7 +159,7 @@ export const DateTimePickerField = ({
         />
       </div>
 
-      {markInvalid && is.nonEmptyString(errorText) && (
+      {markInvalid && isNonEmptyString(errorText) && (
         <p css={(theme: Theme) => dateTimePickerErrorTextStyles(theme)}>{errorText}</p>
       )}
     </div>

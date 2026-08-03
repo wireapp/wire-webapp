@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptyStringOrWhitespace, isUndefined} from '@sindresorhus/is';
 import {Router} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {result, type Result} from 'true-myth';
@@ -39,7 +39,7 @@ export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRo
 
     const clientVersionHeaderValue = request.header('Wire-Client-Version');
 
-    if (is.undefined(clientVersionHeaderValue) || is.emptyStringOrWhitespace(clientVersionHeaderValue)) {
+    if (isUndefined(clientVersionHeaderValue) || isEmptyStringOrWhitespace(clientVersionHeaderValue)) {
       return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
     }
 

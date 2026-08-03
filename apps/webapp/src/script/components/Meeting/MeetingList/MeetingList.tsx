@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useMemo, useState, type RefObject} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {formatISO9075, startOfDay} from 'date-fns';
 
 import {Loading} from '@wireapp/react-ui-kit';
@@ -69,10 +69,10 @@ const filterVisibleMeetingInstances = (
         isMeetingInstanceVisibleInMeetingList(meetingInstance, nowMilliseconds),
       ),
     }))
-    .filter(dayGroup => is.nonEmptyArray(dayGroup.meetingInstances));
+    .filter(dayGroup => isNonEmptyArray(dayGroup.meetingInstances));
 
 const getVisibleDayGroups = (meetingInstancesByDay: MeetingInstancesByDay[]): MeetingInstancesByDay[] =>
-  meetingInstancesByDay.filter(dayGroup => is.nonEmptyArray(dayGroup.meetingInstances));
+  meetingInstancesByDay.filter(dayGroup => isNonEmptyArray(dayGroup.meetingInstances));
 
 export const MeetingList = ({
   meetingSeries,
@@ -150,7 +150,7 @@ export const MeetingList = ({
   const hasVisibleMeetingInstances = visibleDayGroups.length > 0;
   const now = new Date(nowMilliseconds);
 
-  if (isLoading && is.nonEmptyArray(meetingSeries)) {
+  if (isLoading && isNonEmptyArray(meetingSeries)) {
     return (
       <div css={emptyListContainerStyles} data-uie-name="meetings-list-loading">
         <Loading data-uie-name="status-loading" />

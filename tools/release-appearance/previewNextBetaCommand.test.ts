@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 
-import is from '@sindresorhus/is';
+import {isError} from '@sindresorhus/is';
 import {Maybe, Result, task} from 'true-myth';
 import type {Task} from 'true-myth';
 
@@ -167,7 +167,7 @@ function createFakeHistoryPlanner(
 
     return task.tryOrElse(
       (error: unknown): Error => {
-        return is.error(error) ? error : new Error('Fake history planner failed');
+        return isError(error) ? error : new Error('Fake history planner failed');
       },
       async (): Promise<NextBetaPreviewHistoryPlan> => {
         if (historyPlanResult.isErr) {

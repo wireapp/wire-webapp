@@ -19,7 +19,7 @@
 
 import React, {useEffect, useLayoutEffect, useRef} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
@@ -78,7 +78,7 @@ export const SearchInput = ({
           <div className="search-icon icon-search" />
 
           <input
-            className={cx('search-input', {'search-input-padding': is.nonEmptyString(input)})}
+            className={cx('search-input', {'search-input-padding': isNonEmptyString(input)})}
             data-uie-name="enter-users"
             maxLength={MAX_HANDLE_LENGTH}
             onChange={event => setInput(event.target.value)}
@@ -98,7 +98,7 @@ export const SearchInput = ({
             aria-label={placeholder}
           />
 
-          {is.nonEmptyString(input) && (
+          {isNonEmptyString(input) && (
             <button
               className="search-input-cancel"
               onClick={() => setInput('')}

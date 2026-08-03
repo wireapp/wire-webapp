@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -135,7 +135,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
     let parsedStoredData: LabelProperty | null = null;
 
-    if (is.nonEmptyString(storedData)) {
+    if (isNonEmptyString(storedData)) {
       try {
         parsedStoredData = JSON.parse(storedData);
       } catch (error: unknown) {
@@ -162,7 +162,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       const conversationLabelJson = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
       let localData: LabelProperty | null = null;
 
-      if (is.nonEmptyString(conversationLabelJson)) {
+      if (isNonEmptyString(conversationLabelJson)) {
         try {
           localData = JSON.parse(conversationLabelJson);
         } catch (error: unknown) {
@@ -365,7 +365,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     this.labels(this.labels().with(folderIndex, updatedFolder));
 
     // Delete folder if it no longer contains any conversation
-    if (is.nonEmptyArray(updatedFolder.conversations())) {
+    if (isNonEmptyArray(updatedFolder.conversations())) {
       // trigger rerender on folders to remove conversation from folder
       setCurrentTab(SidebarTabs.FOLDER);
     } else {

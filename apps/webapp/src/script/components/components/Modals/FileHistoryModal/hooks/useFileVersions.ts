@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -54,7 +54,7 @@ export const useFileVersions = (
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string>();
   const [toBeRestoredVersionId, setToBeRestoredVersionId] = useState<string>();
-  const hasValidNodeUuid = is.nonEmptyString(nodeUuid);
+  const hasValidNodeUuid = isNonEmptyString(nodeUuid);
 
   useEffect(() => {
     if (!hasValidNodeUuid) {
@@ -119,7 +119,7 @@ export const useFileVersions = (
       setError(undefined);
       try {
         const fallbackFileName = 'file';
-        const fileName = is.nonEmptyString(fileInfo?.name) ? fileInfo.name : fallbackFileName;
+        const fileName = isNonEmptyString(fileInfo?.name) ? fileInfo.name : fallbackFileName;
         await forcedDownloadFile({url, name: fileName});
       } finally {
         setIsDownloading(false);
@@ -129,7 +129,7 @@ export const useFileVersions = (
   );
 
   const handleRestore = useCallback(async () => {
-    if (!is.nonEmptyString(toBeRestoredVersionId) || !hasValidNodeUuid) {
+    if (!isNonEmptyString(toBeRestoredVersionId) || !hasValidNodeUuid) {
       return;
     }
     setIsLoading(true);

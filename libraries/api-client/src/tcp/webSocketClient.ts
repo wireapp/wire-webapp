@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isPromise} from '@sindresorhus/is';
 import logdown from 'logdown';
 import type {ErrorEvent} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
@@ -207,7 +207,7 @@ export class WebSocketClient extends EventEmitter {
   }
 
   private async refreshAccessToken(): Promise<void> {
-    if (is.promise(this.accessTokenRefreshPromise)) {
+    if (isPromise(this.accessTokenRefreshPromise)) {
       return this.accessTokenRefreshPromise;
     }
 
@@ -221,7 +221,7 @@ export class WebSocketClient extends EventEmitter {
     const tokenValidationStartTimestampInMilliseconds = this.wallClock.currentTimestampInMilliseconds;
     const tokenIsValid = this.client.hasValidAccessToken();
     this.logger.debug(
-      `[WebSocketLifecycle] event=token-validation-start attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} tokenValid=${tokenIsValid} refreshInFlight=${is.promise(this.accessTokenRefreshPromise)}`,
+      `[WebSocketLifecycle] event=token-validation-start attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} tokenValid=${tokenIsValid} refreshInFlight=${isPromise(this.accessTokenRefreshPromise)}`,
     );
 
     if (tokenIsValid) {

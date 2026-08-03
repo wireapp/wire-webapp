@@ -20,7 +20,7 @@
 import * as React from 'react';
 import {useEffect, useRef} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
 export interface IsInViewportProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   checkViewportOnce?: boolean;
@@ -38,13 +38,13 @@ export const IsInViewport = ({
   useEffect(() => {
     let observer: IntersectionObserver | undefined;
     const elementNode = element.current;
-    if (!is.undefined(onEnterViewport) && !disabled && !is.nullOrUndefined(elementNode)) {
+    if (!isUndefined(onEnterViewport) && !disabled && !isNullOrUndefined(elementNode)) {
       observer = new IntersectionObserver(([{isIntersecting}]) => {
         if (isIntersecting) {
           if (checkViewportOnce) {
             observer?.disconnect();
           }
-          if (!is.undefined(onEnterViewport) && !disabled) {
+          if (!isUndefined(onEnterViewport) && !disabled) {
             onEnterViewport();
           }
         }

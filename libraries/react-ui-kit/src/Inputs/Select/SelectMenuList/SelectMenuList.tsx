@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {components, GroupBase, MenuListProps} from 'react-select';
 
 import {closeButtonStyles, headingContainerStyles} from './SelectMenuList.styles';
@@ -34,7 +34,7 @@ export const SelectMenuList = <IsMulti extends boolean = false, Group extends Gr
     const {selectProps, children} = props;
 
     const handleClose = () => {
-      if (!is.nullOrUndefined(selectProps.onMenuClose)) {
+      if (!isNullOrUndefined(selectProps.onMenuClose)) {
         selectProps.onMenuClose();
       }
     };
@@ -42,7 +42,7 @@ export const SelectMenuList = <IsMulti extends boolean = false, Group extends Gr
     return (
       <components.MenuList {...props}>
         <div
-          {...(is.nonEmptyString(dataUieName) && {
+          {...(isNonEmptyString(dataUieName) && {
             'data-uie-name': `menu-list-${dataUieName}`,
           })}
         >

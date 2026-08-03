@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {
   RegisterData,
   AUTH_COOKIE_KEY,
@@ -1106,7 +1106,7 @@ export class Account extends TypedEventEmitter<Events> {
       const firstEventPayload = notification.data.event.payload[0];
       const notificationTime =
         firstEventPayload !== undefined ? this.getNotificationEventTime(firstEventPayload) : null;
-      if (!this.isConnectionLive() && is.nonEmptyString(notificationTime)) {
+      if (!this.isConnectionLive() && isNonEmptyString(notificationTime)) {
         onNotificationStreamProgress(notificationTime);
       }
 

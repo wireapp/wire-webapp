@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
@@ -203,7 +203,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
   searchNodesDebouncedRef.current = searchNodesDebounced;
 
   const handleSearch = (value: string): void => {
-    if (!is.nonEmptyString(value)) {
+    if (!isNonEmptyString(value)) {
       fireAndForgetInvoker.fireAndForget(handleClearSearch);
       return;
     }

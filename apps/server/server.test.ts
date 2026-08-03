@@ -2,7 +2,7 @@ import http from 'http';
 import type {Express} from 'express';
 
 import {createFactory} from '@enormora/objectory';
-import is from '@sindresorhus/is';
+import {isError, isNonEmptyString, isNullOrUndefined, isNumber, isString} from '@sindresorhus/is';
 import type {BuildMetadata, ClientConfig, ServerConfig} from '@wireapp/config';
 
 import {Server} from './Server';
@@ -103,7 +103,7 @@ function openHttpServer(httpServer: http.Server): Promise<string> {
     httpServer.once('error', reject);
     httpServer.listen(0, '127.0.0.1', () => {
       const address = httpServer.address();
-      if (is.nullOrUndefined(address) || is.string(address)) {
+      if (isNullOrUndefined(address) || isString(address)) {
         reject(new Error('Expected the test HTTP server to listen on a TCP port.'));
         return;
       }
@@ -116,7 +116,7 @@ function openHttpServer(httpServer: http.Server): Promise<string> {
 function closeHttpServer(httpServer: http.Server): Promise<void> {
   return new Promise((resolve, reject) => {
     httpServer.close(error => {
-      if (is.error(error)) {
+      if (isError(error)) {
         reject(error);
         return;
       }
@@ -172,7 +172,7 @@ function requestHttpResponse(baseUrl: string, requestPath: string): Promise<Http
 
 function getResponseHeader(response: HttpResponse, headerName: string): string {
   const headerValue = response.headers[headerName];
-  if (!is.string(headerValue)) {
+  if (!isString(headerValue)) {
     throw new Error(`Expected response header '${headerName}' to be a string.`);
   }
 
@@ -180,7 +180,7 @@ function getResponseHeader(response: HttpResponse, headerName: string): string {
 }
 
 function expectNonCacheableResponse(response: HttpResponse): void {
-  if (!is.number(response.statusCode)) {
+  if (!isNumber(response.statusCode)) {
     throw new Error('Expected the HTTP response to have a status code.');
   }
 
@@ -203,7 +203,7 @@ describe('server response caching', () => {
           expect(response.body).toContain(testCase.expectedBody);
         }
 
-        if (is.nonEmptyString(testCase.expectedContentType)) {
+        if (isNonEmptyString(testCase.expectedContentType)) {
           expect(getResponseHeader(response, 'content-type')).toContain(testCase.expectedContentType);
         }
 
@@ -284,7 +284,7 @@ describe('server response caching', () => {
     await withHttpServer(createClientConfiguration(), mainBuildMetadata, async baseUrl => {
       const response = await requestHttpResponse(baseUrl, '/_health');
 
-      if (!is.number(response.statusCode)) {
+      if (!isNumber(response.statusCode)) {
         throw new Error('Expected the HTTP response to have a status code.');
       }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isObject, isString} from '@sindresorhus/is';
 import {AxiosError} from 'axios';
 
 export enum FederatedBackendsErrorLabel {
@@ -41,11 +41,11 @@ export class FederatedBackendsError extends Error {
 }
 
 export function isFederatedBackendsError(error: unknown): error is FederatedBackendsError {
-  if (!is.object(error) || !('name' in error)) {
+  if (!isObject(error) || !('name' in error)) {
     return false;
   }
 
-  return is.string(error.name) && error.name === 'FederatedBackendsError';
+  return isString(error.name) && error.name === 'FederatedBackendsError';
 }
 
 export function handleFederationErrors(error: AxiosError<any>) {

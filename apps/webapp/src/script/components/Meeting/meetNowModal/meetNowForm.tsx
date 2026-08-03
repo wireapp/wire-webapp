@@ -19,7 +19,7 @@
 
 import type {FormEvent} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {CircleCloseIcon, ErrorMessage, getOverlayPortalContainer, Input} from '@wireapp/react-ui-kit';
 
@@ -74,11 +74,11 @@ export const MeetNowForm = ({
         placeholder={translate('meetings.scheduleModal.titlePlaceholder')}
         value={formState.title}
         onChange={event => onTitleChange(event.currentTarget.value)}
-        markInvalid={is.nonEmptyString(titleError)}
-        error={is.nonEmptyString(titleError) ? <ErrorMessage>{titleError}</ErrorMessage> : undefined}
+        markInvalid={isNonEmptyString(titleError)}
+        error={isNonEmptyString(titleError) ? <ErrorMessage>{titleError}</ErrorMessage> : undefined}
         wrapperCSS={scheduleMeetingTitleInputWrapperStyles}
         endContent={
-          formState.title.length > 0 && !is.nonEmptyString(titleError) ? (
+          formState.title.length > 0 && !isNonEmptyString(titleError) ? (
             <button
               type="button"
               onClick={() => onTitleChange('')}

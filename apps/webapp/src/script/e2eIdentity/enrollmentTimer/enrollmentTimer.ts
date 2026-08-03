@@ -19,7 +19,7 @@
 
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
-import is from '@sindresorhus/is';
+import {isUndefined} from '@sindresorhus/is';
 import {randomInt} from '@wireapp/commons/lib/util/RandomUtil';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
@@ -80,7 +80,7 @@ function getGracePeriod(
   activeWallClock: WallClock,
 ): GracePeriod {
   const isFirstEnrollment =
-    is.undefined(identity) ||
+    isUndefined(identity) ||
     identity.status === MLSStatuses.NOT_ACTIVATED ||
     identity.credentialType === CredentialType.Basic;
 

@@ -21,7 +21,7 @@ import {useMemo} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {DateValue} from '@internationalized/date';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {
   Button,
   Calendar,
@@ -110,7 +110,7 @@ export const DatePickerField = ({
   maxValue,
   wrapperCSS = {},
 }: DatePickerFieldProps) => {
-  const labelId = is.nonEmptyString(id) ? `${id}-label` : undefined;
+  const labelId = isNonEmptyString(id) ? `${id}-label` : undefined;
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
   const getDateGroupStyles = useMemo(
     () => (theme: Theme) => {
@@ -141,7 +141,7 @@ export const DatePickerField = ({
       })}
       data-uie-name={dataUieName}
     >
-      {is.nonEmptyString(label) && (
+      {isNonEmptyString(label) && (
         <InputLabel htmlFor={id} markInvalid={markInvalid} id={labelId}>
           {label}
         </InputLabel>
@@ -150,8 +150,8 @@ export const DatePickerField = ({
       <I18nProvider locale={locale}>
         <DatePicker
           id={id}
-          aria-label={is.nonEmptyString(label) ? undefined : ariaLabel}
-          aria-labelledby={is.nonEmptyString(label) ? labelId : undefined}
+          aria-label={isNonEmptyString(label) ? undefined : ariaLabel}
+          aria-labelledby={isNonEmptyString(label) ? labelId : undefined}
           value={value}
           onChange={onChange}
           isDisabled={disabled}

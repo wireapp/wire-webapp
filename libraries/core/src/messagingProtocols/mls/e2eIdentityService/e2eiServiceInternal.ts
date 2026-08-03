@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
@@ -78,10 +78,10 @@ export class E2EIServiceInternal {
   ) {
     const stashedEnrollmentData = await this.enrollmentStorage.getPendingEnrollmentData();
 
-    if (!is.undefined(stashedEnrollmentData)) {
+    if (!isUndefined(stashedEnrollmentData)) {
       // In case we have stashed data, we continue the enrollment flow (we are coming back from a redirect)
       const oAuthToken = await getOAuthToken();
-      if (is.undefined(oAuthToken) || is.emptyString(oAuthToken)) {
+      if (isUndefined(oAuthToken) || isEmptyString(oAuthToken)) {
         throw new Error('No OAuthToken received for in progress enrollment process');
       }
       return this.continueCertificateGeneration(oAuthToken, stashedEnrollmentData, getAllConversations, ciphersuite);
@@ -104,7 +104,7 @@ export class E2EIServiceInternal {
 
     // At this point we might be redirected to the identity provider. We have
     const oAuthToken = await getOAuthToken(challengeData);
-    if (is.undefined(oAuthToken) || is.emptyString(oAuthToken)) {
+    if (isUndefined(oAuthToken) || isEmptyString(oAuthToken)) {
       throw new Error('No OAuthToken received for in initial enrollment process');
     }
     return this.continueCertificateGeneration(oAuthToken, enrollmentData, getAllConversations, ciphersuite);
@@ -138,7 +138,7 @@ export class E2EIServiceInternal {
   private async getDirectory(identity: E2eiEnrollment, connection: AcmeService): Promise<AcmeDirectory | undefined> {
     const directory = await connection.getDirectory();
 
-    if (!is.undefined(directory)) {
+    if (!isUndefined(directory)) {
       const parsedDirectory = identity.directoryResponse(directory);
       return parsedDirectory;
     }
@@ -147,7 +147,7 @@ export class E2EIServiceInternal {
 
   private async getInitialNonce(directory: AcmeDirectory, connection: AcmeService): Promise<string> {
     const nonce = await connection.getInitialNonce(directory.newNonce);
-    if (is.undefined(nonce) || is.emptyString(nonce)) {
+    if (isUndefined(nonce) || isEmptyString(nonce)) {
       throw new Error('No initial-nonce received');
     }
     return nonce;
@@ -163,13 +163,13 @@ export class E2EIServiceInternal {
     // Get the directory
     const {acmeService: acmeService} = this;
     const directory = await this.getDirectory(identity, acmeService);
-    if (is.undefined(directory)) {
+    if (isUndefined(directory)) {
       throw new Error('Error while trying to start OAuth flow. No directory received');
     }
 
     // Step 1: Get a new nonce from ACME server
     const nonce = await this.getInitialNonce(directory, acmeService);
-    if (is.emptyString(nonce)) {
+    if (isEmptyString(nonce)) {
       throw new Error('Error while trying to start OAuth flow. No nonce received');
     }
 
@@ -225,7 +225,7 @@ export class E2EIServiceInternal {
     });
     this.logger.debug('oidc data', oidcData);
 
-    if (is.nullOrUndefined(oidcData.data.validated)) {
+    if (isNullOrUndefined(oidcData.data.validated)) {
       throw new Error('Error while trying to continue OAuth flow. OIDC challenge not validated');
     }
 
@@ -255,7 +255,7 @@ export class E2EIServiceInternal {
       orderUrl: enrollmentData.orderUrl,
     });
 
-    if (is.emptyString(finalizeOrderData.certificateUrl)) {
+    if (isEmptyString(finalizeOrderData.certificateUrl)) {
       throw new Error('Error while trying to continue OAuth flow. No certificateUrl received');
     }
 
@@ -267,7 +267,7 @@ export class E2EIServiceInternal {
       identity,
     });
 
-    if (is.emptyString(certificate)) {
+    if (isEmptyString(certificate)) {
       throw new Error('Error while trying to continue OAuth flow. No certificate received');
     }
 

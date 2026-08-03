@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isPlainObject} from '@sindresorhus/is';
 import {Result} from 'true-myth';
 
 import {isBuildMetadata} from '@wireapp/config';
@@ -52,7 +52,7 @@ export type RecoveryBuildArtifactMetadataValidationInput = {
 const fullCommitShaPattern = /^[0-9a-f]{40}$/iu;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return is.plainObject(value);
+  return isPlainObject(value);
 }
 
 function hasCurrentMetadataField(metadata: Record<string, unknown>): boolean {
@@ -66,7 +66,7 @@ function hasExactlyLegacyMetadataFields(metadata: Record<string, unknown>): bool
 }
 
 function isFullCommitSha(value: unknown): value is string {
-  return is.nonEmptyString(value) && fullCommitShaPattern.test(value);
+  return isNonEmptyString(value) && fullCommitShaPattern.test(value);
 }
 
 function validateCurrentBuildArtifactMetadata(

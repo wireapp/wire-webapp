@@ -20,7 +20,7 @@
 import {HTMLProps, PropsWithRef, forwardRef, useMemo} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 
 import {containerStyles, dataListOption, headingStyle, rangeStyles} from './IndicatorRangeInput.styles';
 
@@ -75,13 +75,13 @@ export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeIn
       return `${((valueNum - minNum) * 100) / (maxNum - minNum)}% 100%`;
     }, [isCustomSlider, valueNum, minNum, maxNum, listLength]);
 
-    const valueText = !is.undefined(dataListOptions[valueNum]?.heading)
+    const valueText = !isUndefined(dataListOptions[valueNum]?.heading)
       ? `${dataListOptions[valueNum].label} (${dataListOptions[valueNum].heading})`
       : dataListOptions[valueNum].label;
 
     return (
       <div css={{wrapperCSS, width: '100%'}}>
-        {is.nonEmptyString(label) ? (
+        {isNonEmptyString(label) ? (
           <InputLabel css={(theme: Theme) => ({fontSize: theme.fontSizes.base})} htmlFor={id}>
             {label}
           </InputLabel>
@@ -97,14 +97,14 @@ export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeIn
                   role="button"
                   tabIndex={0}
                   onClick={() => {
-                    if (!is.undefined(dataListOption?.heading) && !is.undefined(onOptionClick)) {
+                    if (!isUndefined(dataListOption?.heading) && !isUndefined(onOptionClick)) {
                       onOptionClick(index);
                     }
                   }}
                   onKeyDown={event => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
-                      if (!is.undefined(dataListOption?.heading) && !is.undefined(onOptionClick)) {
+                      if (!isUndefined(dataListOption?.heading) && !isUndefined(onOptionClick)) {
                         onOptionClick(index);
                       }
                     }

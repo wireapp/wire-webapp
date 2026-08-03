@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isUndefined} from '@sindresorhus/is';
 
 import {createFlushableQueue, isQueueFlushedError} from './flushableQueue';
 import {sequentialQueueOptions} from './sequentialQueueOptions';
@@ -33,7 +33,7 @@ function createDeferredPromise<T>(): DeferredPromise<T> {
     resolvePromise = resolve;
   });
 
-  if (is.undefined(resolvePromise)) {
+  if (isUndefined(resolvePromise)) {
     throw new Error('Deferred promise resolver was not created');
   }
 

@@ -19,7 +19,7 @@
 
 import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
@@ -146,7 +146,7 @@ export const VirtualizedMessagesList = ({
     (index: number) => {
       const item = groupedMessages[index];
 
-      if (is.undefined(item)) {
+      if (isUndefined(item)) {
         return `missing-message-list-item-${index}`;
       }
 

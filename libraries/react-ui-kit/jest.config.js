@@ -29,6 +29,7 @@ module.exports = {
   modulePathIgnorePatterns: ['lib/'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
   transform: {
+    '^.+\\.(js|jsx)$': '@swc/jest',
     '^.+\\.(ts|tsx)$': [
       '@swc/jest',
       {
@@ -50,5 +51,6 @@ module.exports = {
       },
     ],
   },
+  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is)/)'],
   snapshotSerializers: ['@emotion/jest/serializer'],
 };

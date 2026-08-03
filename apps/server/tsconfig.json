@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "references": [{"path": "../../libraries/config"}],
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "noUncheckedIndexedAccess": true,
     "outDir": "dist",
     "paths": {

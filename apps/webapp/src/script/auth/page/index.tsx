@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
@@ -61,7 +61,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
-    if (is.nonEmptyString(queryLogoutReason)) {
+    if (isNonEmptyString(queryLogoutReason)) {
       setLogoutReason(queryLogoutReason);
     }
   }, []);
@@ -80,7 +80,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
     }
   }, [immediateLogin]);
 
-  if (is.nonEmptyString(defaultSSOCode) || isEnterpriseLoginV2Enabled) {
+  if (isNonEmptyString(defaultSSOCode) || isEnterpriseLoginV2Enabled) {
     // Redirect to prefilled SSO login if default SSO code is set on backend
     // or if enterprise login v2 is enabled
     return <Navigate to={`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`} />;
@@ -144,7 +144,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
         <Button type="button" onClick={() => navigate(ROUTE.LOGIN)} block data-uie-name="go-login">
           {translate('index.login')}
         </Button>
-        {is.nonEmptyString(logoutReason) && (
+        {isNonEmptyString(logoutReason) && (
           <ErrorMessage data-uie-name="status-logout-reason">
             <FormattedMessage
               id={logoutReasonStrings[logoutReason]}

@@ -19,7 +19,7 @@
 
 import React, {forwardRef, useEffect} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
@@ -77,7 +77,7 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
     textInputRef,
   ) => {
     const {translate} = useApplicationContext();
-    const isFilled = is.nonEmptyString(value);
+    const isFilled = isNonEmptyString(value);
 
     useEffect(() => {
       if (isSuccess === true && onSuccessDismissed !== undefined) {
@@ -97,7 +97,7 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
 
     return (
       <div css={containerCSS} ref={inputWrapperRef}>
-        {isError === true && is.nonEmptyString(errorMessage) && (
+        {isError === true && isNonEmptyString(errorMessage) && (
           <span className="label" css={errorMessageCSS} data-uie-name={errorUieName}>
             {errorMessage}
           </span>

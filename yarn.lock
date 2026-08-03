@@ -8630,10 +8630,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sindresorhus/is@npm:4.6.0":
-  version: 4.6.0
-  resolution: "@sindresorhus/is@npm:4.6.0"
-  checksum: 10/e7f36ed72abfcd5e0355f7423a72918b9748bb1ef370a59f3e5ad8d40b728b85d63b272f65f63eec1faf417cda89dcb0aeebe94015647b6054659c1442fe5ce0
+"@sindresorhus/is@npm:8.1.0":
+  version: 8.1.0
+  resolution: "@sindresorhus/is@npm:8.1.0"
+  checksum: 10/4511f60fa5f21c28694eabff61b4c2fd7b65d7ac895a9330a2e862fd35e880b9b10393c6ccb44c94fa0a1d2320044ac413277ffbdb33e75cffcb0fca8fa56b76
   languageName: node
   linkType: hard
 
@@ -9280,10 +9280,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@swc/core-darwin-arm64@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-darwin-arm64@npm:1.15.46"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
 "@swc/core-darwin-arm64@npm:1.15.47":
   version: 1.15.47
   resolution: "@swc/core-darwin-arm64@npm:1.15.47"
   conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@swc/core-darwin-x64@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-darwin-x64@npm:1.15.46"
+  conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
@@ -9294,10 +9308,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@swc/core-linux-arm-gnueabihf@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-linux-arm-gnueabihf@npm:1.15.46"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
 "@swc/core-linux-arm-gnueabihf@npm:1.15.47":
   version: 1.15.47
   resolution: "@swc/core-linux-arm-gnueabihf@npm:1.15.47"
   conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@swc/core-linux-arm64-gnu@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-linux-arm64-gnu@npm:1.15.46"
+  conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
@@ -9308,10 +9336,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@swc/core-linux-arm64-musl@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-linux-arm64-musl@npm:1.15.46"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
 "@swc/core-linux-arm64-musl@npm:1.15.47":
   version: 1.15.47
   resolution: "@swc/core-linux-arm64-musl@npm:1.15.47"
   conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@swc/core-linux-ppc64-gnu@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-linux-ppc64-gnu@npm:1.15.46"
+  conditions: os=linux & cpu=ppc64 & libc=glibc
   languageName: node
   linkType: hard
 
@@ -9322,10 +9364,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@swc/core-linux-s390x-gnu@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-linux-s390x-gnu@npm:1.15.46"
+  conditions: os=linux & cpu=s390x & libc=glibc
+  languageName: node
+  linkType: hard
+
 "@swc/core-linux-s390x-gnu@npm:1.15.47":
   version: 1.15.47
   resolution: "@swc/core-linux-s390x-gnu@npm:1.15.47"
   conditions: os=linux & cpu=s390x & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@swc/core-linux-x64-gnu@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-linux-x64-gnu@npm:1.15.46"
+  conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
@@ -9336,10 +9392,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@swc/core-linux-x64-musl@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-linux-x64-musl@npm:1.15.46"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
 "@swc/core-linux-x64-musl@npm:1.15.47":
   version: 1.15.47
   resolution: "@swc/core-linux-x64-musl@npm:1.15.47"
   conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@swc/core-win32-arm64-msvc@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-win32-arm64-msvc@npm:1.15.46"
+  conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
@@ -9350,10 +9420,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@swc/core-win32-ia32-msvc@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-win32-ia32-msvc@npm:1.15.46"
+  conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
 "@swc/core-win32-ia32-msvc@npm:1.15.47":
   version: 1.15.47
   resolution: "@swc/core-win32-ia32-msvc@npm:1.15.47"
   conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
+"@swc/core-win32-x64-msvc@npm:1.15.46":
+  version: 1.15.46
+  resolution: "@swc/core-win32-x64-msvc@npm:1.15.46"
+  conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
@@ -9364,7 +9448,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/core@npm:1.15.47, @swc/core@npm:^1.13.5, @swc/core@npm:^1.3.10":
+"@swc/core@npm:1.15.47":
   version: 1.15.47
   resolution: "@swc/core@npm:1.15.47"
   dependencies:
@@ -9413,6 +9497,58 @@ __metadata:
     "@swc/helpers":
       optional: true
   checksum: 10/0562c46c3a5f798a2d8f58a017c89592ea6ca791d153929db0cdce8f8caac46ea78edc5213b9bb222ee6f9d889aa8d05c7bf969cebeff195cab4d84675f03386
+  languageName: node
+  linkType: hard
+
+"@swc/core@npm:^1.13.5, @swc/core@npm:^1.3.10":
+  version: 1.15.46
+  resolution: "@swc/core@npm:1.15.46"
+  dependencies:
+    "@swc/core-darwin-arm64": "npm:1.15.46"
+    "@swc/core-darwin-x64": "npm:1.15.46"
+    "@swc/core-linux-arm-gnueabihf": "npm:1.15.46"
+    "@swc/core-linux-arm64-gnu": "npm:1.15.46"
+    "@swc/core-linux-arm64-musl": "npm:1.15.46"
+    "@swc/core-linux-ppc64-gnu": "npm:1.15.46"
+    "@swc/core-linux-s390x-gnu": "npm:1.15.46"
+    "@swc/core-linux-x64-gnu": "npm:1.15.46"
+    "@swc/core-linux-x64-musl": "npm:1.15.46"
+    "@swc/core-win32-arm64-msvc": "npm:1.15.46"
+    "@swc/core-win32-ia32-msvc": "npm:1.15.46"
+    "@swc/core-win32-x64-msvc": "npm:1.15.46"
+    "@swc/counter": "npm:^0.1.3"
+    "@swc/types": "npm:^0.1.27"
+  peerDependencies:
+    "@swc/helpers": ">=0.5.17"
+  dependenciesMeta:
+    "@swc/core-darwin-arm64":
+      optional: true
+    "@swc/core-darwin-x64":
+      optional: true
+    "@swc/core-linux-arm-gnueabihf":
+      optional: true
+    "@swc/core-linux-arm64-gnu":
+      optional: true
+    "@swc/core-linux-arm64-musl":
+      optional: true
+    "@swc/core-linux-ppc64-gnu":
+      optional: true
+    "@swc/core-linux-s390x-gnu":
+      optional: true
+    "@swc/core-linux-x64-gnu":
+      optional: true
+    "@swc/core-linux-x64-musl":
+      optional: true
+    "@swc/core-win32-arm64-msvc":
+      optional: true
+    "@swc/core-win32-ia32-msvc":
+      optional: true
+    "@swc/core-win32-x64-msvc":
+      optional: true
+  peerDependenciesMeta:
+    "@swc/helpers":
+      optional: true
+  checksum: 10/7345ee1a99729f0082bfe7988bada60c8390bc8642cb06d33514773a0ab1b6a350d0213538058daedbf964871e1056426971c7c1993c8da5d50c52b86c4b6371
   languageName: node
   linkType: hard
 
@@ -11614,6 +11750,7 @@ __metadata:
   dependencies:
     "@aws-sdk/client-s3": "npm:3.1096.0"
     "@aws-sdk/lib-storage": "npm:3.1096.0"
+    "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:1.15.47"
     "@swc/jest": "npm:0.2.39"
     "@types/jest": "npm:30.0.0"
@@ -11690,7 +11827,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/commons@workspace:libraries/commons"
   dependencies:
-    "@sindresorhus/is": "npm:4.6.0"
+    "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:^1.3.10"
     "@swc/jest": "npm:^0.2.23"
     "@types/fs-extra": "npm:11.0.4"
@@ -11710,7 +11847,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/config@workspace:libraries/config"
   dependencies:
-    "@sindresorhus/is": "npm:4.6.0"
+    "@sindresorhus/is": "npm:8.1.0"
     fs-extra: "npm:11.4.0"
     logdown: "npm:3.3.1"
     true-myth: "npm:9.4.0"
@@ -11752,7 +11889,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/core@workspace:libraries/core"
   dependencies:
-    "@sindresorhus/is": "npm:4.6.0"
+    "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:1.15.47"
     "@swc/jest": "npm:0.2.39"
     "@types/lodash": "npm:4.17.24"
@@ -11882,7 +12019,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/priority-queue@workspace:libraries/priority-queue"
   dependencies:
-    "@sindresorhus/is": "npm:4.6.0"
+    "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:^1.3.10"
     "@swc/jest": "npm:^0.2.23"
     "@types/jest": "npm:^29.2.0"
@@ -11934,7 +12071,7 @@ __metadata:
     "@internationalized/date": "npm:3.12.2"
     "@radix-ui/react-accordion": "npm:1.2.20"
     "@radix-ui/react-dropdown-menu": "npm:2.1.24"
-    "@sindresorhus/is": "npm:4.6.0"
+    "@sindresorhus/is": "npm:8.1.0"
     "@storybook/addon-essentials": "npm:^8.5.2"
     "@storybook/addon-interactions": "npm:^8.5.2"
     "@storybook/addon-onboarding": "npm:^8.5.2"
@@ -11987,7 +12124,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/server@workspace:apps/server"
   dependencies:
-    "@sindresorhus/is": "npm:4.6.0"
+    "@sindresorhus/is": "npm:8.1.0"
     "@types/express": "npm:4.17.25"
     "@types/express-sitemap-xml": "npm:3.0.4"
     "@types/express-useragent": "npm:1.0.5"
@@ -12071,7 +12208,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/store-engine@workspace:libraries/store-engine"
   dependencies:
-    "@sindresorhus/is": "npm:4.6.0"
+    "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:^1.3.10"
     "@swc/jest": "npm:^0.2.23"
     "@types/jest": "npm:^29.2.0"
@@ -12131,7 +12268,7 @@ __metadata:
     "@nx/webpack": "npm:22.7.7"
     "@playwright/test": "npm:1.61.1"
     "@roamhq/wrtc": "npm:0.10.0"
-    "@sindresorhus/is": "npm:4.6.0"
+    "@sindresorhus/is": "npm:8.1.0"
     "@tanstack/react-table": "npm:8.21.3"
     "@tanstack/react-virtual": "npm:3.14.9"
     "@testing-library/dom": "npm:10.4.1"
@@ -32861,7 +32998,7 @@ __metadata:
     "@nx/jest": "npm:22.7.8"
     "@nx/node": "npm:22.7.8"
     "@nx/workspace": "npm:22.7.8"
-    "@sindresorhus/is": "npm:4.6.0"
+    "@sindresorhus/is": "npm:8.1.0"
     "@stylistic/eslint-plugin": "npm:5.10.0"
     "@tony.ganchev/eslint-plugin-header": "npm:3.4.4"
     "@types/eslint": "npm:9.6.1"

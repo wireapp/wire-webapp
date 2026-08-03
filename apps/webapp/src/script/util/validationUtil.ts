@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {ValidationError} from '../auth/module/action/validationError';
 
@@ -77,7 +77,7 @@ export const legacyAsset = (assetId: string, conversationId: string): true => {
 export const assetRetentionPolicy = (policyId: number): boolean => policyId > 0 && policyId < 6;
 
 export const isValidAsset = (assetKey: string, assetToken?: string): true => {
-  if (!is.nonEmptyString(assetKey)) {
+  if (!isNonEmptyString(assetKey)) {
     throw new ValidationUtilError('Asset key not defined');
   }
 
@@ -90,7 +90,7 @@ export const isValidAsset = (assetKey: string, assetToken?: string): true => {
   if (!isUUID(uuid.join(SEPARATOR))) {
     throw new ValidationUtilError('Invalid asset key (UUID)');
   }
-  if (is.nonEmptyString(assetToken) && !isBearerToken(assetToken)) {
+  if (isNonEmptyString(assetToken) && !isBearerToken(assetToken)) {
     throw new ValidationUtilError('Invalid asset token');
   }
   return true;

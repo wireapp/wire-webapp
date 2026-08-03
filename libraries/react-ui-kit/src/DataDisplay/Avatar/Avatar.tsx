@@ -20,7 +20,7 @@
 import {useEffect, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {COLOR} from '../../Identity/colors/colors';
 import {DURATION, EASE} from '../../Identity/motions/motions';
@@ -50,7 +50,7 @@ const avatarStyle: <T>(props: AvatarProps<T>) => CSSObject = ({
 }) => {
   const BORDER_SIZE_LIMIT = 32;
   const borderSize = size > BORDER_SIZE_LIMIT ? 2 : 1;
-  const borderWidth = is.nonEmptyString(url) ? 0 : borderSize;
+  const borderWidth = isNonEmptyString(url) ? 0 : borderSize;
   const fontSize = `${Math.ceil(size / 2.2)}px`;
 
   return {
@@ -87,7 +87,7 @@ export const Avatar = (props: AvatarProps) => {
   const {url, forceInitials, name, fetchImage, isAvatarGridItem} = props;
   const [scale, setScale] = useState(0);
   useEffect(() => {
-    if (is.nonEmptyString(url)) {
+    if (isNonEmptyString(url)) {
       requestAnimationFrame(() => setScale(1));
     }
   }, [url]);
@@ -103,14 +103,14 @@ export const Avatar = (props: AvatarProps) => {
     <IsInViewport
       checkViewportOnce
       onEnterViewport={fetchImage}
-      disabled={is.nonEmptyString(url)}
+      disabled={isNonEmptyString(url)}
       css={avatarStyle(props)}
       data-uie-name={
-        forceInitials !== true && is.nonEmptyString(url) ? 'element-avatar-image' : 'element-avatar-initials'
+        forceInitials !== true && isNonEmptyString(url) ? 'element-avatar-image' : 'element-avatar-initials'
       }
       {...filteredAvatarProps(props)}
     >
-      {forceInitials === true || !is.nonEmptyString(url) ? (
+      {forceInitials === true || !isNonEmptyString(url) ? (
         getInitials(name)
       ) : (
         <div

@@ -19,7 +19,7 @@
 
 import {useEffect, useRef} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {createRoot, Root} from 'react-dom/client';
 import {toast, Toaster} from 'sonner';
 
@@ -97,7 +97,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
         const id = toast.custom(
           toastId => (
             <AppNotification
-              message={is.nonEmptyString(options?.message) ? options.message : (props?.message ?? '')}
+              message={isNonEmptyString(options?.message) ? options.message : (props?.message ?? '')}
               icon={props?.icon}
               withCloseButton={props?.withCloseButton}
               onClose={() => toast.dismiss(toastId)}
@@ -127,7 +127,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
 };
 
 const injectToaster = (activeWindow: Window) => {
-  const windowKey = is.nonEmptyString(activeWindow.name) ? activeWindow.name : 'default';
+  const windowKey = isNonEmptyString(activeWindow.name) ? activeWindow.name : 'default';
 
   if (roots[windowKey] !== undefined) {
     return;

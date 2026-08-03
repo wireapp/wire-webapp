@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {FORWARDED_QUERY_KEYS} from '../route';
 
@@ -67,7 +67,7 @@ export function openTab(url: string): Window | null {
 export const SSO_CODE_PREFIX = 'wire-';
 
 export function getPrefixedSSOCode(code?: string) {
-  return is.nonEmptyString(code) ? `${SSO_CODE_PREFIX}${code}` : '';
+  return isNonEmptyString(code) ? `${SSO_CODE_PREFIX}${code}` : '';
 }
 
 export const navigateTo = (url: string) => {

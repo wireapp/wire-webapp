@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isString} from '@sindresorhus/is';
 import type {DomainData} from '@wireapp/api-client/lib/account/domainData';
 import type {LoginData, RegisterData} from '@wireapp/api-client/lib/auth/';
 import {VerificationActionType} from '@wireapp/api-client/lib/auth/verificationActionType';
@@ -110,7 +110,7 @@ export class AuthAction {
         await dispatch(
           clientAction.doInitializeClient(
             loginData.clientType,
-            is.string(loginData.password) ? loginData.password : undefined,
+            isString(loginData.password) ? loginData.password : undefined,
             loginData.verificationCode,
             entropyData,
           ),

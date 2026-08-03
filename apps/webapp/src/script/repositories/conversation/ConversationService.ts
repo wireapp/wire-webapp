@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isArray} from '@sindresorhus/is';
 import type {
   CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
@@ -107,7 +107,7 @@ const TextExtractors: Partial<Record<string, (event: SearchableConversationEvent
   [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => event.data?.content || event.data?.message || '',
   [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => event.data?.text?.content || '',
   [ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD]: event => {
-    const items: CompositeMessageItem[] = is.array(event.data?.items) ? event.data.items : [];
+    const items: CompositeMessageItem[] = isArray(event.data?.items) ? event.data.items : [];
     return items
       .flatMap(item => {
         if (item?.text) {

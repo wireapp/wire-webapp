@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@sindresorhus/is": "4.6.0",
+    "@sindresorhus/is": "8.1.0",
     "axios": "1.18.1",
     "dotenv": "16.6.1",
     "dotenv-extended": "2.9.0",

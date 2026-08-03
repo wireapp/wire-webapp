@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isError} from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
 import {z} from 'zod';
 
@@ -106,7 +106,7 @@ function createFailure<valueType>(message: string): Result<valueType, Error> {
 }
 
 function errorMessage(error: unknown): string {
-  if (is.error(error)) {
+  if (isError(error)) {
     return error.message;
   }
 

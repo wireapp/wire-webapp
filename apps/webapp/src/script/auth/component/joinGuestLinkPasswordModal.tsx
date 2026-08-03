@@ -19,7 +19,7 @@
 
 import {FormEvent, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Button, COLOR, Container, ErrorMessage, Form, H2, Input, Link, Modal, Text} from '@wireapp/react-ui-kit';
@@ -62,7 +62,7 @@ const JoinGuestLinkPasswordModal = ({
     <Modal onClose={onClose}>
       <Container style={{maxWidth: '400px'}}>
         <H2 style={{whiteSpace: 'break-spaces', fontWeight: 500, marginTop: '10px', textAlign: 'center'}}>
-          {is.nonEmptyString(conversationName)
+          {isNonEmptyString(conversationName)
             ? translate('guestLinkPasswordModal.headline', {conversationName})
             : translate('guestLinkPasswordModal.headlineDefault')}
         </H2>
@@ -101,7 +101,7 @@ const JoinGuestLinkPasswordModal = ({
           showLoading={isLoading}
           block
           type="button"
-          disabled={!is.nonEmptyString(passwordValue)}
+          disabled={!isNonEmptyString(passwordValue)}
           onClick={(event: FormEvent<HTMLButtonElement>) => onSubmit(event)}
           data-uie-name="guest-link-join-submit-button"
         >

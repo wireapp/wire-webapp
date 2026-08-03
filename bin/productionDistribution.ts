@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isPlainObject} from '@sindresorhus/is';
 import {Result} from 'true-myth';
 
 import {isBuildMetadata} from '@wireapp/config';
@@ -61,11 +61,11 @@ export type WireBuildsWebappFields = {
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return is.plainObject(value);
+  return isPlainObject(value);
 }
 
 function getNonEmptyString(value: unknown): string | undefined {
-  if (!is.nonEmptyString(value)) {
+  if (!isNonEmptyString(value)) {
     return undefined;
   }
 
@@ -101,9 +101,9 @@ function validateProductionDistributionArtifactMetadata(
 
   if (
     isRecord(artifactMetadata) &&
-    is.nonEmptyString(artifactMetadata.version) &&
+    isNonEmptyString(artifactMetadata.version) &&
     isLegacyTimestampBuildVersion(artifactMetadata.version) &&
-    is.nonEmptyString(artifactMetadata.commit) &&
+    isNonEmptyString(artifactMetadata.commit) &&
     !('assetVersion' in artifactMetadata) &&
     !('builtAt' in artifactMetadata)
   ) {

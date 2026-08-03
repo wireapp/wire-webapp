@@ -5,6 +5,7 @@
     "declaration": false,
     "declarationMap": false,
     "paths": {
+      "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
       "Components/*": ["./src/script/components/*"],
       "Hooks/*": ["./src/script/hooks/*"],
       "I18n/*": ["./src/i18n/*"],

@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {EventEmitter} from 'events';
 
@@ -53,7 +53,7 @@ export class TransientStore extends EventEmitter {
 
   public deleteFromCache(cacheKey: string): string {
     const timeoutID = this.bundles[cacheKey]?.timeoutID;
-    if (!is.nullOrUndefined(timeoutID)) {
+    if (!isNullOrUndefined(timeoutID)) {
       clearTimeout(timeoutID);
     }
     delete this.bundles[cacheKey];
@@ -189,7 +189,7 @@ export class TransientStore extends EventEmitter {
     const timespan: number = expires - Date.now();
     if (expires <= 0) {
       await this.expireBundle(cacheKey);
-    } else if (is.nullOrUndefined(timeoutID)) {
+    } else if (isNullOrUndefined(timeoutID)) {
       bundle.timeoutID = setTimeout(async () => {
         const expiredBundle = await this.expireBundle(cacheKey);
         this.emit(TransientStore.TOPIC.EXPIRED, expiredBundle);

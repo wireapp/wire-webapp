@@ -20,7 +20,7 @@
 import * as React from 'react';
 
 import {keyframes} from '@emotion/react';
-import is from '@sindresorhus/is';
+import {isUndefined} from '@sindresorhus/is';
 
 import {COLOR} from '../../Identity';
 import {ANIMATION, DURATION} from '../../Identity/motions/motions';
@@ -49,7 +49,7 @@ export const Loading = ({progress = undefined, size = 43, color = '#218fd1', ...
       <circle cx="21.5" cy="21.5" r="20" stroke={COLOR.opaque(color, 0.08)} />
       <circle
         css={
-          is.undefined(progress)
+          isUndefined(progress)
             ? {
                 animation: `${fillAnimation} ${DURATION.EXTRA_LONG}ms ease-in-out infinite,
               ${ANIMATION.rotate} ${DURATION.EXTRA_LONG}ms linear ${rotationDelay}ms infinite`,
@@ -64,7 +64,7 @@ export const Loading = ({progress = undefined, size = 43, color = '#218fd1', ...
         stroke={color}
         strokeLinecap="round"
         strokeDasharray={pathLength}
-        strokeDashoffset={!is.undefined(progress) ? `${pathLength - pathLength * progress}` : undefined}
+        strokeDashoffset={!isUndefined(progress) ? `${pathLength - pathLength * progress}` : undefined}
       />
     </svg>
   );

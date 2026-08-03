@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import ansiRegex from 'ansi-regex';
 import * as fs from 'fs-extra';
 import logdown from 'logdown';
@@ -75,7 +75,7 @@ export class LogFactory {
     const [time] = logTransport.args;
     const logMessage = `${time} ${logTransport.msg}`;
 
-    if (is.nonEmptyString(this.logFilePath)) {
+    if (isNonEmptyString(this.logFilePath)) {
       await LogFactory.writeMessage(logMessage, this.logFilePath);
     }
   }

@@ -19,7 +19,7 @@
 
 import * as nodeFileSystem from 'node:fs';
 
-import is from '@sindresorhus/is';
+import {isArray, isNonEmptyString, isPlainObject, isString} from '@sindresorhus/is';
 
 import {
   hasExpectedWireBuildsWebappFields,
@@ -37,7 +37,7 @@ function parseCommandLineOptions(commandLineArguments: readonly string[]): Comma
     const optionName = commandLineArguments[argumentIndex];
     const optionValue = commandLineArguments[argumentIndex + 1];
 
-    if (!is.nonEmptyString(optionName) || !optionName.startsWith('--') || !is.nonEmptyString(optionValue)) {
+    if (!isNonEmptyString(optionName) || !optionName.startsWith('--') || !isNonEmptyString(optionValue)) {
       throw new Error('Options must be supplied as non-empty --name value pairs.');
     }
 
@@ -50,7 +50,7 @@ function parseCommandLineOptions(commandLineArguments: readonly string[]): Comma
 function getRequiredOption(optionValues: CommandLineOptions, optionName: string): string {
   const optionValue = optionValues.get(optionName);
 
-  if (!is.nonEmptyString(optionValue)) {
+  if (!isNonEmptyString(optionValue)) {
     throw new Error(`Missing required option: --${optionName}`);
   }
 
@@ -85,16 +85,16 @@ function readWireBuildsFields(optionValues: CommandLineOptions): WireBuildsWebap
 }
 
 function readPublishedHelmCharts(value: unknown): readonly PublishedHelmChart[] {
-  if (!is.array(value)) {
+  if (!isArray(value)) {
     throw new Error('Published Helm chart search results must be an array.');
   }
 
   return value.map((publishedChart, chartIndex) => {
-    if (!is.plainObject(publishedChart)) {
+    if (!isPlainObject(publishedChart)) {
       throw new Error(`Published Helm chart at index ${chartIndex} must be an object.`);
     }
 
-    if (!is.nonEmptyString(publishedChart.version) || !is.string(publishedChart.app_version)) {
+    if (!isNonEmptyString(publishedChart.version) || !isString(publishedChart.app_version)) {
       throw new Error(`Published Helm chart at index ${chartIndex} has invalid version metadata.`);
     }
 
@@ -164,7 +164,7 @@ function main(): void {
   try {
     const commandName = process.argv[2];
 
-    if (!is.nonEmptyString(commandName)) {
+    if (!isNonEmptyString(commandName)) {
       throw new Error('A production distribution command is required.');
     }
 
