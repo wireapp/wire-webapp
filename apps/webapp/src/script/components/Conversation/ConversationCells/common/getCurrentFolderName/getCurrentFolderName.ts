@@ -20,7 +20,7 @@
 import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
 
 export const getCurrentFolderName = (currentPath: string): string => {
-  if (!currentPath || currentPath === RECYCLE_BIN_PATH) {
+  if (is.emptyString(currentPath) || currentPath === RECYCLE_BIN_PATH) {
     return '';
   }
 
