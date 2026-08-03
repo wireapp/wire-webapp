@@ -14,7 +14,7 @@ COPY libraries/config/package.json ./libraries/config/package.json
 
 # Install only server production deps
 # Artifact downloads do not preserve executable file permissions.
-RUN chmod +x ./bin/yarn && ./bin/yarn workspaces focus @wireapp/server --production
+RUN chmod +x ./bin/yarn && YARN_ENABLE_SCRIPTS=false ./bin/yarn workspaces focus @wireapp/server --production
 
 # Copy built config library artifacts
 COPY libraries/config/lib ./libraries/config/lib

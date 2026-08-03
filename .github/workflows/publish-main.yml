@@ -73,6 +73,8 @@ jobs:
     name: Build main delivery artifacts
     runs-on: ubuntu-24.04
     needs: validate_request
+    env:
+      WIRE_WEBAPP_CONFIGURATION: development
     concurrency:
       group: build-main-delivery
       cancel-in-progress: true
@@ -516,7 +518,9 @@ jobs:
           cache: 'yarn'
 
       - name: Install exact repository dependencies
-        run: ./bin/yarn --immutable
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
 
       - name: Setup Helm
         uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
