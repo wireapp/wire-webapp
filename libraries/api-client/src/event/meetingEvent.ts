@@ -22,6 +22,7 @@ import {QualifiedId} from '../user';
 export enum MEETING_EVENT {
   CREATE = 'meeting.create',
   DELETE = 'meeting.delete',
+  MEMBER_ADD = 'meeting.member-add',
   UPDATE = 'meeting.update',
 }
 
@@ -48,8 +49,12 @@ export interface MeetingDeleteEvent extends BaseMeetingEvent {
   type: MEETING_EVENT.DELETE;
 }
 
+export interface MeetingMemberAddEvent extends BaseMeetingEvent {
+  type: MEETING_EVENT.MEMBER_ADD;
+}
+
 export interface MeetingUpdateEvent extends BaseMeetingEvent {
   type: MEETING_EVENT.UPDATE;
 }
 
-export type MeetingEvent = MeetingCreateEvent | MeetingDeleteEvent | MeetingUpdateEvent;
+export type MeetingEvent = MeetingCreateEvent | MeetingDeleteEvent | MeetingMemberAddEvent | MeetingUpdateEvent;

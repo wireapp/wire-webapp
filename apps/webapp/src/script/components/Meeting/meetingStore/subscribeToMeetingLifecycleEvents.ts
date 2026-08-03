@@ -47,13 +47,19 @@ export const subscribeToMeetingLifecycleEvents = ({
     dispatcher.enqueueMeetingRemoval(meetingId);
   };
 
+  const onMeetingMemberAdded = (meetingId: QualifiedId) => {
+    dispatcher.enqueueMeetingSync(meetingId);
+  };
+
   amplify.subscribe(WebAppEvents.MEETING.CREATED, onMeetingCreated);
   amplify.subscribe(WebAppEvents.MEETING.UPDATED, onMeetingUpdated);
   amplify.subscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
+  amplify.subscribe(WebAppEvents.MEETING.MEMBER_ADDED, onMeetingMemberAdded);
 
   return () => {
     amplify.unsubscribe(WebAppEvents.MEETING.CREATED, onMeetingCreated);
     amplify.unsubscribe(WebAppEvents.MEETING.UPDATED, onMeetingUpdated);
     amplify.unsubscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
+    amplify.unsubscribe(WebAppEvents.MEETING.MEMBER_ADDED, onMeetingMemberAdded);
   };
 };

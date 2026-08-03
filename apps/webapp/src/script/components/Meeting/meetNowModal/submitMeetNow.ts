@@ -141,8 +141,6 @@ export const submitMeetNow = async ({
     });
   }
 
-  await task.tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings);
-
   return joinCreatedMeeting({
     qualifiedConversationId: submitResult.value.qualifiedConversation,
     joinDeps,
