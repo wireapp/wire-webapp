@@ -17,93 +17,134 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import {isError} from '@sindresorhus/is';
+import {task, type Task} from 'true-myth';
+
 import {isBuildMetadata, type BuildMetadata} from '@wireapp/config';
 
 import {getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-type OnNewAssetVersionAvailable = (serverAssetVersion: string) => void;
-
-interface AssetVersionListener {
-  currentAssetVersion: string;
-  onNewAssetVersionAvailable: OnNewAssetVersionAvailable;
-}
-
 const logger = getLogger('newVersionHandler');
 const buildMetadataUrl = '/version/';
-const checkIntervalMilliseconds = TIME_IN_MILLIS.MINUTE * 15;
 
-let assetVersionListeners: AssetVersionListener[] = [];
-let assetVersionPollingInterval: number;
+export const NEW_VERSION_POLLING_INTERVAL_MILLISECONDS = TIME_IN_MILLIS.MINUTE * 15;
 
-const fetchLatestBuildMetadata = async (): Promise<BuildMetadata> => {
-  const response = await fetch(buildMetadataUrl);
-  if (response.ok) {
-    const responseBody: unknown = await response.json();
+export type FetchLatestBuildMetadata = () => Task<BuildMetadata, Error>;
 
-    if (isBuildMetadata(responseBody)) {
-      return responseBody;
-    }
-
-    throw new Error(`Invalid build metadata returned by '${buildMetadataUrl}'`);
-  }
-  throw new Error(`Failed to fetch '${buildMetadataUrl}': ${response.statusText}`);
+export type CheckForNewVersionOptions = {
+  readonly localAssetVersion: string;
+  readonly isOnline: () => boolean;
+  readonly fetchLatestBuildMetadata: FetchLatestBuildMetadata;
+  readonly onNewVersionAvailable: (serverAssetVersion: string) => void;
 };
 
+export type CreateFetchLatestBuildMetadataOptions = {
+  readonly fetchBuildMetadata: typeof globalThis.fetch;
+};
+
+export type StartNewVersionPollingOptions = {
+  readonly wallClock: WallClock;
+  readonly pollingIntervalMilliseconds: number;
+  readonly runUpdateCheck: () => void;
+};
+
+export type CreateNewVersionPollingCallbackOptions = CheckForNewVersionOptions & {
+  readonly invokeAsynchronously: (asyncOperation: () => Promise<unknown>) => void;
+};
+
+function normalizeFetchError(error: unknown): Error {
+  if (isError(error)) {
+    return error;
+  }
+
+  return new Error(String(error));
+}
+
 /**
- * Check all registered listeners for a different browser artifact.
- *
- * @param overrideCurrentAssetVersion will ignore the asset version set for the listener and use this one instead
- * @returns Promise that resolves when the check has been done
+ * Creates the browser boundary that retrieves and validates the server build metadata.
  */
-export const checkVersion = async (overrideCurrentAssetVersion?: string): Promise<string | void> => {
-  if (navigator.onLine !== true) {
+export function createFetchLatestBuildMetadata(
+  options: CreateFetchLatestBuildMetadataOptions,
+): FetchLatestBuildMetadata {
+  const {fetchBuildMetadata} = options;
+
+  return function fetchLatestBuildMetadata(): Task<BuildMetadata, Error> {
+    return task.tryOrElse(normalizeFetchError, async (): Promise<BuildMetadata> => {
+      const response = await fetchBuildMetadata(buildMetadataUrl);
+      if (response.ok) {
+        const responseBody: unknown = await response.json();
+
+        if (isBuildMetadata(responseBody)) {
+          return responseBody;
+        }
+
+        throw new Error(`Invalid build metadata returned by '${buildMetadataUrl}'`);
+      }
+
+      throw new Error(`Failed to fetch '${buildMetadataUrl}': ${response.statusText}`);
+    });
+  };
+}
+
+/**
+ * Performs one update check without owning browser APIs or scheduling state.
+ */
+export async function checkForNewVersion(options: CheckForNewVersionOptions): Promise<string | void> {
+  const {localAssetVersion, isOnline, fetchLatestBuildMetadata, onNewVersionAvailable} = options;
+
+  if (isOnline() === false) {
     return;
   }
 
-  let serverBuildMetadata: BuildMetadata;
-  try {
-    serverBuildMetadata = await fetchLatestBuildMetadata();
-  } catch (error: unknown) {
-    logger.info(`Could not check for a new webapp artifact: ${String(error)}`);
-    return;
-  }
+  const latestServerAssetVersion = await fetchLatestBuildMetadata().match({
+    Resolved: (serverBuildMetadata): string | undefined => {
+      logger.info(
+        `Checking current webapp artifact. Server '${serverBuildMetadata.assetVersion}' vs. local '${localAssetVersion}'`,
+      );
 
-  assetVersionListeners.forEach(({currentAssetVersion, onNewAssetVersionAvailable}) => {
-    const localAssetVersion = overrideCurrentAssetVersion ?? currentAssetVersion;
-    logger.info(
-      `Checking current webapp artifact. Server '${serverBuildMetadata.assetVersion}' vs. local '${localAssetVersion}'`,
-    );
+      if (serverBuildMetadata.assetVersion !== localAssetVersion) {
+        onNewVersionAvailable(serverBuildMetadata.assetVersion);
+      }
 
-    if (serverBuildMetadata.assetVersion !== localAssetVersion) {
-      onNewAssetVersionAvailable(serverBuildMetadata.assetVersion);
-    }
+      return serverBuildMetadata.assetVersion;
+    },
+    Rejected: (error): string | undefined => {
+      logger.info(`Could not check for a new webapp artifact: ${String(error)}`);
+      return undefined;
+    },
   });
 
-  return serverBuildMetadata.assetVersion;
-};
+  return latestServerAssetVersion;
+}
 
 /**
- * Will register an interval that polls the server for the latest build metadata.
- * If a different browser artifact is detected, it calls the given callback.
- *
- * @param currentAssetVersion asset version of the browser artifact
- * @param onNewAssetVersionAvailable callback to be called when a different artifact is detected
+ * Creates the synchronous scheduler callback that invokes one asynchronous update check safely.
  */
-export const startNewVersionPolling = (
-  currentAssetVersion: string,
-  onNewAssetVersionAvailable: OnNewAssetVersionAvailable,
-): void => {
-  assetVersionListeners.push({currentAssetVersion, onNewAssetVersionAvailable});
-  if (assetVersionListeners.length === 1) {
-    // starts the interval when we have our first listener
-    assetVersionPollingInterval = window.setInterval(() => {
-      void checkVersion();
-    }, checkIntervalMilliseconds);
-  }
-};
+export function createNewVersionPollingCallback(options: CreateNewVersionPollingCallbackOptions): () => void {
+  const {localAssetVersion, isOnline, fetchLatestBuildMetadata, onNewVersionAvailable, invokeAsynchronously} = options;
 
-export const stopNewVersionPolling = (): void => {
-  assetVersionListeners = [];
-  window.clearInterval(assetVersionPollingInterval);
-};
+  return function runNewVersionCheck(): void {
+    invokeAsynchronously(async () => {
+      await checkForNewVersion({
+        localAssetVersion,
+        isOnline,
+        fetchLatestBuildMetadata,
+        onNewVersionAvailable,
+      });
+    });
+  };
+}
+
+/**
+ * Starts delayed polling for update checks and returns cleanup for this polling instance.
+ */
+export function startNewVersionPolling(options: StartNewVersionPollingOptions): () => void {
+  const {wallClock, pollingIntervalMilliseconds, runUpdateCheck} = options;
+  const intervalIdentifier = wallClock.setInterval(runUpdateCheck, pollingIntervalMilliseconds);
+
+  return function cleanupNewVersionPolling(): void {
+    wallClock.clearInterval(intervalIdentifier);
+  };
+}

@@ -48,6 +48,7 @@ import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
+import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
@@ -59,6 +60,12 @@ const applicationBootstrapStartedAt = applicationMonotonicClock.nowMilliseconds;
 document.addEventListener('DOMContentLoaded', async () => {
   const domContentLoadedAt = applicationMonotonicClock.nowMilliseconds;
   const config = Config.getConfig();
+  const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
+    fetchBuildMetadata: globalThis.fetch.bind(globalThis),
+  });
+  function isOnline(): boolean {
+    return globalThis.navigator.onLine === true;
+  }
 
   enableLogging(config);
   exposeWrapperGlobals();
@@ -135,6 +142,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       applicationBootstrapStartedAt={applicationBootstrapStartedAt}
       domContentLoadedAt={domContentLoadedAt}
       fireAndForgetInvoker={fireAndForgetInvoker}
+      fetchLatestBuildMetadata={fetchLatestBuildMetadata}
+      isOnline={isOnline}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
       monotonicClock={monotonicClock}
       translate={translate}
