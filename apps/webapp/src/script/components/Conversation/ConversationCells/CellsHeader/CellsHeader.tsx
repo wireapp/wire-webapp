@@ -41,6 +41,7 @@ import type {FilterConfig} from '../common/CellsFiltersBar/filterConfig';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {openBreadcrumb} from '../common/openBreadcrumb/openBreadcrumb';
+import {isInRecycleBin} from '../common/recycleBin/recycleBin';
 
 interface CellsHeaderProps {
   onRefresh: () => void;
@@ -74,6 +75,7 @@ export const CellsHeader = ({
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
   const isRootLevel = breadcrumbs.length === 1;
+  const isInsideRecycleBin = isInRecycleBin();
 
   return (
     <div css={wrapperStyles}>
@@ -94,11 +96,13 @@ export const CellsHeader = ({
           <CellsFiltersBar filters={filters} />
         ) : (
           <div css={actionsStyles}>
-            <CellsNewMenu
-              cellsRepository={cellsRepository}
-              conversationQualifiedId={conversationQualifiedId}
-              onRefresh={onRefresh}
-            />
+            {isInsideRecycleBin === false && (
+              <CellsNewMenu
+                cellsRepository={cellsRepository}
+                conversationQualifiedId={conversationQualifiedId}
+                onRefresh={onRefresh}
+              />
+            )}
             <CellsRefresh onRefresh={onRefresh} />
             <CellsMoreMenu conversationQualifiedId={conversationQualifiedId} />
           </div>
