@@ -115,7 +115,7 @@ import {BaseError} from '../error/baseError';
 import {CLIENT_ERROR_TYPE, ClientError} from '../error/clientError';
 import {TeamError} from '../error/teamError';
 import {
-  checkForNewVersion,
+  createNewVersionPollingCallback,
   NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
   type FetchLatestBuildMetadata,
   startNewVersionPolling,
@@ -749,16 +749,15 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (selfUser.isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
-        function runNewVersionCheck(): void {
-          fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-            await checkForNewVersion({
-              localAssetVersion: application.config.ASSET_VERSION,
-              isOnline,
-              fetchLatestBuildMetadata,
-              onNewVersionAvailable: application.update,
-            });
-          });
-        }
+        const runNewVersionCheck = createNewVersionPollingCallback({
+          localAssetVersion: application.config.ASSET_VERSION,
+          isOnline,
+          fetchLatestBuildMetadata,
+          onNewVersionAvailable() {
+            application.update();
+          },
+          invokeAsynchronously: fireAndForgetInvoker.fireAndForget,
+        });
 
         this.newVersionPollingCleanup = startNewVersionPolling({
           wallClock,

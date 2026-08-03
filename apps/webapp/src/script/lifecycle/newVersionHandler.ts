@@ -18,6 +18,7 @@
  */
 
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import {isError} from '@sindresorhus/is';
 import {task, type Task} from 'true-myth';
 
 import {isBuildMetadata, type BuildMetadata} from '@wireapp/config';
@@ -49,8 +50,12 @@ export type StartNewVersionPollingOptions = {
   readonly runUpdateCheck: () => void;
 };
 
+export type CreateNewVersionPollingCallbackOptions = CheckForNewVersionOptions & {
+  readonly invokeAsynchronously: (asyncOperation: () => Promise<unknown>) => void;
+};
+
 function normalizeFetchError(error: unknown): Error {
-  if (error instanceof Error) {
+  if (isError(error)) {
     return error;
   }
 
@@ -86,15 +91,15 @@ export function createFetchLatestBuildMetadata(
 /**
  * Performs one update check without owning browser APIs or scheduling state.
  */
-export async function checkForNewVersion(options: CheckForNewVersionOptions): Promise<void> {
+export async function checkForNewVersion(options: CheckForNewVersionOptions): Promise<string | void> {
   const {localAssetVersion, isOnline, fetchLatestBuildMetadata, onNewVersionAvailable} = options;
 
-  if (isOnline() !== true) {
+  if (isOnline() === false) {
     return;
   }
 
-  await fetchLatestBuildMetadata().match({
-    Resolved: (serverBuildMetadata: BuildMetadata): void => {
+  const latestServerAssetVersion = await fetchLatestBuildMetadata().match({
+    Resolved: (serverBuildMetadata): string | undefined => {
       logger.info(
         `Checking current webapp artifact. Server '${serverBuildMetadata.assetVersion}' vs. local '${localAssetVersion}'`,
       );
@@ -102,11 +107,34 @@ export async function checkForNewVersion(options: CheckForNewVersionOptions): Pr
       if (serverBuildMetadata.assetVersion !== localAssetVersion) {
         onNewVersionAvailable(serverBuildMetadata.assetVersion);
       }
+
+      return serverBuildMetadata.assetVersion;
     },
-    Rejected: (error: Error): void => {
+    Rejected: (error): string | undefined => {
       logger.info(`Could not check for a new webapp artifact: ${String(error)}`);
+      return undefined;
     },
   });
+
+  return latestServerAssetVersion;
+}
+
+/**
+ * Creates the synchronous scheduler callback that invokes one asynchronous update check safely.
+ */
+export function createNewVersionPollingCallback(options: CreateNewVersionPollingCallbackOptions): () => void {
+  const {localAssetVersion, isOnline, fetchLatestBuildMetadata, onNewVersionAvailable, invokeAsynchronously} = options;
+
+  return function runNewVersionCheck(): void {
+    invokeAsynchronously(async () => {
+      await checkForNewVersion({
+        localAssetVersion,
+        isOnline,
+        fetchLatestBuildMetadata,
+        onNewVersionAvailable,
+      });
+    });
+  };
 }
 
 /**

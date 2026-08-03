@@ -24,8 +24,9 @@ import {task, type Task} from 'true-myth';
 import {
   checkForNewVersion,
   createFetchLatestBuildMetadata,
+  createNewVersionPollingCallback,
   type CheckForNewVersionOptions,
-  type FetchLatestBuildMetadata,
+  NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
   startNewVersionPolling,
 } from './newVersionHandler';
 
@@ -74,7 +75,7 @@ describe('checkForNewVersion', () => {
 
     const onNewVersionAvailable = jest.fn();
     const checkOptions = createCheckOptions({
-      isOnline: () => {
+      isOnline() {
         return false;
       },
       fetchLatestBuildMetadata,
@@ -295,5 +296,51 @@ describe('startNewVersionPolling', () => {
     expect(firstPollingCallback).toHaveBeenCalledTimes(2);
     expect(secondPollingCallback).toHaveBeenCalledTimes(2);
     secondCleanup();
+  });
+});
+
+describe('new version polling composition', () => {
+  it('passes the application clock and asset version to the update warning callback', async function (): Promise<void> {
+    const applicationWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const applicationAssetVersion = 'main-aaaaaaa';
+    const serverBuildMetadata: BuildMetadata = {
+      ...mainBuildMetadata,
+      assetVersion: 'main-bbbbbbb',
+      commit: 'bbbbbbb1234567890',
+    };
+    const pendingAsynchronousOperations: Promise<unknown>[] = [];
+    const onNewVersionAvailable = jest.fn();
+
+    function invokeAsynchronously(asyncOperation: () => Promise<unknown>): void {
+      pendingAsynchronousOperations.push(asyncOperation());
+    }
+
+    function reportBrowserOnlineStatus(): boolean {
+      return true;
+    }
+
+    function fetchLatestBuildMetadata(): Task<BuildMetadata, Error> {
+      return task.resolve(serverBuildMetadata);
+    }
+
+    const runNewVersionCheck = createNewVersionPollingCallback({
+      localAssetVersion: applicationAssetVersion,
+      isOnline: reportBrowserOnlineStatus,
+      fetchLatestBuildMetadata,
+      onNewVersionAvailable,
+      invokeAsynchronously,
+    });
+    const cleanupNewVersionPolling = startNewVersionPolling({
+      wallClock: applicationWallClock,
+      pollingIntervalMilliseconds: NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
+      runUpdateCheck: runNewVersionCheck,
+    });
+
+    applicationWallClock.advanceByMilliseconds(NEW_VERSION_POLLING_INTERVAL_MILLISECONDS);
+    await Promise.all(pendingAsynchronousOperations);
+
+    expect(onNewVersionAvailable).toHaveBeenCalledTimes(1);
+    expect(onNewVersionAvailable).toHaveBeenCalledWith(serverBuildMetadata.assetVersion);
+    cleanupNewVersionPolling();
   });
 });

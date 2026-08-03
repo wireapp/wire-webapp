@@ -72,6 +72,7 @@ import {checkForNewVersion, createFetchLatestBuildMetadata} from '../lifecycle/n
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
+import {Warnings} from '../view_model/WarningsContainer';
 
 export enum CoreCryptoLogLevel {
   Off = 1,
@@ -437,18 +438,20 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  triggerVersionCheck(baseAssetVersion: string): Promise<void> {
+  triggerVersionCheck(baseAssetVersion: string): Promise<string | void> {
     const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
       fetchBuildMetadata: globalThis.fetch.bind(globalThis),
     });
 
     return checkForNewVersion({
       localAssetVersion: baseAssetVersion,
-      isOnline: () => {
+      isOnline() {
         return globalThis.navigator.onLine === true;
       },
       fetchLatestBuildMetadata,
-      onNewVersionAvailable: () => {},
+      onNewVersionAvailable() {
+        Warnings.showWarning(Warnings.TYPE.LIFECYCLE_UPDATE);
+      },
     });
   }
 
