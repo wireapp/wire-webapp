@@ -23,7 +23,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 
 import {transformCellsNodes} from './transformCellsNodes';
 
-const createNode = (properties: Partial<RestNode> = {}): RestNode =>
+const createStubNode = (properties: Partial<RestNode> = {}): RestNode =>
   ({
     Path: 'conversation@example.com/report.pdf',
     Type: 'LEAF',
@@ -34,7 +34,7 @@ const createNode = (properties: Partial<RestNode> = {}): RestNode =>
 
 describe('transformCellsNodes', () => {
   it('preserves backend tag order in the cell model', () => {
-    const nodeWithTags = createNode({
+    const nodeWithTags = createStubNode({
       UserMetadata: [{Namespace: 'usermeta-tags', JsonValue: JSON.stringify('Zulu, alpha, Beta')}],
     });
 
@@ -47,7 +47,7 @@ describe('transformCellsNodes', () => {
     {label: 'null', size: null},
     {label: 'missing', size: undefined},
   ])('presents a $label folder size as zero bytes', ({size}) => {
-    const emptyFolder = createNode({Type: 'COLLECTION', Size: size} as Partial<RestNode>);
+    const emptyFolder = createStubNode({Type: 'COLLECTION', Size: size} as Partial<RestNode>);
 
     const [node] = transformCellsNodes({nodes: [emptyFolder], users: []});
 
@@ -57,13 +57,13 @@ describe('transformCellsNodes', () => {
   it('enriches a node with its conversation when conversations are provided', () => {
     const conversation = {qualifiedId: {domain: 'example.com', id: 'conversation'}} as Conversation;
 
-    const [node] = transformCellsNodes({nodes: [createNode()], users: [], conversations: [conversation]});
+    const [node] = transformCellsNodes({nodes: [createStubNode()], users: [], conversations: [conversation]});
 
     expect(node.conversation).toBe(conversation);
   });
 
   it('leaves the conversation absent when conversations and workspace context are not provided', () => {
-    const nodeWithoutWorkspace = createNode({ContextWorkspace: undefined});
+    const nodeWithoutWorkspace = createStubNode({ContextWorkspace: undefined});
 
     const [node] = transformCellsNodes({nodes: [nodeWithoutWorkspace], users: []});
 
