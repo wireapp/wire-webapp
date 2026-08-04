@@ -51,17 +51,10 @@ const toDeleteMeetingCommand = (meetingInstance: MeetingInstance): DeleteMeeting
 const filterOutMeetingSeries = (meetingSeries: MeetingSeries[], meetingId: QualifiedId): MeetingSeries[] =>
   meetingSeries.filter(series => !matchQualifiedIds(series.qualified_id, meetingId));
 
-const upsertMeetingSeries = (meetingSeries: MeetingSeries[], updatedSeries: MeetingSeries): MeetingSeries[] => {
-  const existingIndex = meetingSeries.findIndex(series =>
-    matchQualifiedIds(series.qualified_id, updatedSeries.qualified_id),
-  );
-
-  if (existingIndex === -1) {
-    return [...meetingSeries, updatedSeries];
-  }
-
-  return meetingSeries.map((series, index) => (index === existingIndex ? updatedSeries : series));
-};
+const upsertMeetingSeries = (meetingSeries: MeetingSeries[], updatedSeries: MeetingSeries): MeetingSeries[] => [
+  ...meetingSeries.filter(series => !matchQualifiedIds(series.qualified_id, updatedSeries.qualified_id)),
+  updatedSeries,
+];
 
 export const syncMeetingErrors = {
   fetchFailed: 'fetchFailed',

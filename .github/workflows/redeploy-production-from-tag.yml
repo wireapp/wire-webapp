@@ -41,7 +41,9 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
 
       - name: Validate input, actor, and tag
         id: validate
@@ -125,7 +127,9 @@ jobs:
 
       - name: Install workflow tool dependencies
         working-directory: workflow-source
-        run: ./bin/yarn --immutable
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
 
       - name: Build workflow tool dependencies
         working-directory: workflow-source
@@ -140,10 +144,14 @@ jobs:
 
       - name: Install selected release dependencies
         working-directory: selected-release
+        env:
+          WIRE_WEBAPP_CONFIGURATION: production
         run: ./bin/yarn --immutable
 
       - name: Update selected release configuration
         working-directory: selected-release
+        env:
+          WIRE_WEBAPP_CONFIGURATION: production
         run: ./bin/yarn nx run webapp:configure
 
       - name: Build and package

@@ -91,6 +91,15 @@ describe('subscribeToMeetingLifecycleEvents', () => {
     expect(dispatcher.enqueueMeetingSync).not.toHaveBeenCalled();
   });
 
+  it('queues a meetings reload when missed events are reported', () => {
+    const dispatcher = createDispatcherDouble();
+    subscribe(dispatcher);
+
+    amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
+
+    expect(dispatcher.enqueueInitialLoad).toHaveBeenCalledTimes(1);
+  });
+
   it('stops handling meeting lifecycle events after unsubscribing', () => {
     const dispatcher = createDispatcherDouble();
     const unsubscribe = subscribe(dispatcher);
@@ -101,7 +110,9 @@ describe('subscribeToMeetingLifecycleEvents', () => {
     amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId);
     amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
     amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+    amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
 
+    expect(dispatcher.enqueueInitialLoad).not.toHaveBeenCalled();
     expect(dispatcher.enqueueMeetingSync).not.toHaveBeenCalled();
     expect(dispatcher.enqueueMeetingRemoval).not.toHaveBeenCalled();
   });

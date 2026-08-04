@@ -88,7 +88,9 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
 
       - name: Validate release request
         id: validate_request
@@ -204,6 +206,8 @@ jobs:
     name: Build release artifact
     runs-on: ubuntu-24.04
     needs: prepare_release_branch
+    env:
+      WIRE_WEBAPP_CONFIGURATION: production
     permissions:
       contents: read
     outputs:
@@ -448,7 +452,9 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
 
       - name: Create and push Beta tag
         id: beta_tag
@@ -526,8 +532,7 @@ jobs:
     continue-on-error: true
     permissions:
       contents: read
-      pull-requests: read
-      issues: write
+      pull-requests: write # required to create and update release-appearance comments
 
     steps:
       - name: Checkout release history
@@ -728,7 +733,9 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
 
       - name: Check Production promotion eligibility
         id: production_preflight
@@ -907,8 +914,7 @@ jobs:
     continue-on-error: true
     permissions:
       contents: read
-      pull-requests: read
-      issues: write
+      pull-requests: write # required to create and update release-appearance comments
 
     steps:
       - name: Checkout release history

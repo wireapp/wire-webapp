@@ -21,6 +21,7 @@ import {isError} from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
 import {z} from 'zod';
 
+import {formatHttpRequestFailure, isHttpRequestFailure} from './httpClient.ts';
 import type {HttpClient, HttpMethod, HttpRequest} from './httpClient.ts';
 
 export type PullRequestRecord = {
@@ -106,6 +107,10 @@ function createFailure<valueType>(message: string): Result<valueType, Error> {
 }
 
 function errorMessage(error: unknown): string {
+  if (isHttpRequestFailure(error)) {
+    return formatHttpRequestFailure(error);
+  }
+
   if (isError(error)) {
     return error.message;
   }

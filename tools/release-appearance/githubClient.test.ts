@@ -27,7 +27,7 @@ import {Maybe} from 'true-myth';
 import {createGitHubClient} from './githubClient.ts';
 import type {GitHubClient} from './githubClient.ts';
 import {createKyHttpClient} from './httpClient.ts';
-import type {HttpClient, HttpRequest} from './httpClient.ts';
+import type {HttpClient, HttpRequest, HttpRequestFailure} from './httpClient.ts';
 
 type GitHubPullRequestResponse = {
   readonly number: number;
@@ -260,6 +260,42 @@ describe('GitHub client', () => {
     expect(updateRequest.value.url.toString()).toMatch(/issues\/comments\/11$/);
   });
 
+  it('exposes GitHub permission diagnostics from a forbidden comment response', async () => {
+    const permissionFailure: HttpRequestFailure = {
+      kind: 'http-response-failure',
+      method: 'post',
+      url: new URL('https://api.github.example/repos/wireapp/wire-webapp/issues/5/comments'),
+      response: {
+        statusCode: 403,
+        githubMessage: Maybe.just('Resource not accessible by integration'),
+        documentationUrl: Maybe.just('https://docs.github.com/rest/issues/comments#create-an-issue-comment'),
+        githubRequestId: Maybe.just('REQUEST-PERMISSION'),
+        acceptedGithubPermissions: Maybe.just('issues=write, pull_requests=read'),
+        retryAfter: Maybe.nothing<string>(),
+        rateLimitRemaining: Maybe.nothing<string>(),
+        rateLimitReset: Maybe.nothing<string>(),
+      },
+    };
+    const fakeHttpClient: HttpClient = {
+      async requestJson(): Promise<unknown> {
+        throw permissionFailure;
+      },
+    };
+    const githubClient = createClient(fakeHttpClient);
+
+    const actualResult = await githubClient.createIssueComment({
+      pullRequestNumber: 5,
+      commentBody: 'release comment',
+    });
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('HTTP status: 403');
+    expect(actualResult.error.message).toContain('Resource not accessible by integration');
+    expect(actualResult.error.message).toContain('GitHub request ID: REQUEST-PERMISSION');
+    expect(actualResult.error.message).toContain('Accepted GitHub permissions: issues=write, pull_requests=read');
+    expect(actualResult.error.message).not.toContain('release comment');
+  });
+
   it('rejects a GitHub response without a title as malformed', async () => {
     const fakeHttpClient = createFakeHttpClient({
       responseForRequest() {
@@ -318,9 +354,24 @@ describe('GitHub client', () => {
 
   it('redacts the GitHub token from transport errors', async () => {
     const githubToken = 'secret-token';
+    const githubResponseFailure: HttpRequestFailure = {
+      kind: 'http-response-failure',
+      method: 'get',
+      url: new URL('https://api.github.example/repos/wireapp/wire-webapp/commits/commit-sha/pulls'),
+      response: {
+        statusCode: 403,
+        githubMessage: Maybe.just(`request failed with ${githubToken}`),
+        documentationUrl: Maybe.nothing<string>(),
+        githubRequestId: Maybe.nothing<string>(),
+        acceptedGithubPermissions: Maybe.nothing<string>(),
+        retryAfter: Maybe.nothing<string>(),
+        rateLimitRemaining: Maybe.nothing<string>(),
+        rateLimitReset: Maybe.nothing<string>(),
+      },
+    };
     const fakeHttpClient: HttpClient = {
       async requestJson(): Promise<unknown> {
-        throw new Error(`request failed with ${githubToken}`);
+        throw githubResponseFailure;
       },
     };
     const githubClient = createClient(fakeHttpClient, githubToken);
@@ -351,7 +402,10 @@ describe('Ky HTTP client', () => {
         headers: {},
         json: Maybe.nothing<NonNullable<unknown>>(),
       }),
-    ).rejects.toThrow();
+    ).rejects.toMatchObject({
+      kind: 'http-response-failure',
+      response: {statusCode: 503},
+    });
     expect(fetchCallCount).toBe(1);
   });
 });

@@ -36,6 +36,7 @@ jobs:
     env:
       BUILD_DIR: apps/server/dist/s3/
       BUILD_ARTIFACT: ebs.zip
+      WIRE_WEBAPP_CONFIGURATION: development
 
     steps:
       - name: Checkout
