@@ -541,7 +541,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
           fetch-tags: true
-          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          ref: ${{ github.sha }}
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -562,6 +562,7 @@ jobs:
           BETA_TAG: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
           GITHUB_TOKEN: ${{ github.token }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          WORKFLOW_TOOLING_COMMIT_SHA: ${{ github.sha }}
         run: |
           node \
             tools/release-appearance/releaseAppearanceCommand.ts \
@@ -923,7 +924,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
           fetch-tags: true
-          ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          ref: ${{ github.sha }}
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -945,6 +946,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           PRODUCTION_TAG: ${{ needs.create_production_tag.outputs.production_tag_name }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
+          WORKFLOW_TOOLING_COMMIT_SHA: ${{ github.sha }}
         run: |
           node \
             tools/release-appearance/releaseAppearanceCommand.ts \

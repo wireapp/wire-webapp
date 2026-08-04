@@ -608,7 +608,8 @@ function createCommitRange(createCommitRangeOptions: CreateCommitRangeOptions): 
 async function listBetaCandidatesThroughPromotedTag(
   listBetaCandidatesThroughPromotedTagOptions: ListBetaCandidatesThroughTagOptions,
 ): Promise<Result<readonly BetaCandidateRecord[], Error>> {
-  const {executeGitCommand, releaseIdentifier, candidateNumber, currentTagName} = listBetaCandidatesThroughPromotedTagOptions;
+  const {executeGitCommand, releaseIdentifier, candidateNumber, currentTagName} =
+    listBetaCandidatesThroughPromotedTagOptions;
   const betaTagNamesResult = await listTagNames(executeGitCommand, betaTagListPattern);
   if (betaTagNamesResult.isErr) {
     return createFailure(betaTagNamesResult.error.message, betaTagNamesResult.error);
