@@ -40,9 +40,15 @@ type LeftSidebarProps = {
   listViewModel: ListViewModel;
   selfUser: User;
   isActivatedAccount: boolean;
+  onConversationsTargetChange?: (element: HTMLElement | null) => void;
 };
 
-export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftSidebarProps) => {
+export const LeftSidebar = ({
+  listViewModel,
+  selfUser,
+  isActivatedAccount,
+  onConversationsTargetChange,
+}: LeftSidebarProps) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
 
@@ -89,6 +95,7 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
       ].includes(listState) && (
         <Conversations
           isConversationListCollapseEnabled={isConversationListCollapseEnabled}
+          onConversationsTargetChange={onConversationsTargetChange}
           selfUser={selfUser}
           listViewModel={listViewModel}
           searchRepository={repositories.search}

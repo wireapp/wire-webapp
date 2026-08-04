@@ -17,52 +17,39 @@
  *
  */
 
-import {act, renderHook, waitFor} from '@testing-library/react';
+import {act, renderHook} from '@testing-library/react';
 
 import {useMeetingNotificationHostElement} from './useMeetingNotificationHostElement';
 
 describe('useMeetingNotificationTarget', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '<div id="wire-main"></div>';
+  it('uses wire-main as the fallback target', () => {
+    const wireMain = document.createElement('div');
+    const {result} = renderHook(() => useMeetingNotificationHostElement(wireMain));
+
+    expect(result.current.meetingNotificationHostElement).toBe(wireMain);
   });
 
-  it('uses wire-main as the fallback target', async () => {
-    const {result} = renderHook(() => useMeetingNotificationHostElement());
-
-    await waitFor(() =>
-      expect(result.current.meetingNotificationHostElement).toBe(document.getElementById('wire-main')),
-    );
-  });
-
-  it('prefers the conversations target and falls back to wire-main', async () => {
+  it('prefers the conversations target and falls back to wire-main', () => {
     const conversations = document.createElement('div');
-    conversations.id = 'conversations';
-    document.body.append(conversations);
+    const wireMain = document.createElement('div');
 
-    const {result} = renderHook(() => useMeetingNotificationHostElement());
-    await waitFor(() =>
-      expect(result.current.meetingNotificationHostElement).toBe(document.getElementById('wire-main')),
-    );
+    const {result} = renderHook(() => useMeetingNotificationHostElement(wireMain));
+
+    expect(result.current.meetingNotificationHostElement).toBe(wireMain);
 
     act(() => result.current.setMeetingNotificationHostElement(conversations));
     expect(result.current.meetingNotificationHostElement).toBe(conversations);
 
     act(() => result.current.setMeetingNotificationHostElement(null));
-    expect(result.current.meetingNotificationHostElement).toBe(document.getElementById('wire-main'));
+    expect(result.current.meetingNotificationHostElement).toBe(wireMain);
   });
 
-  it('tracks wire-main when it mounts after the hook', async () => {
-    document.body.innerHTML = '';
-    const {result} = renderHook(() => useMeetingNotificationHostElement());
+  it('does not discover a fallback target from the document', () => {
+    const wireMain = document.createElement('div');
+    const {result} = renderHook(() => useMeetingNotificationHostElement(null));
 
-    act(() => {
-      const wireMain = document.createElement('div');
-      wireMain.id = 'wire-main';
-      document.body.append(wireMain);
-    });
+    document.body.append(wireMain);
 
-    await waitFor(() =>
-      expect(result.current.meetingNotificationHostElement).toBe(document.getElementById('wire-main')),
-    );
+    expect(result.current.meetingNotificationHostElement).toBeNull();
   });
 });

@@ -17,12 +17,11 @@
  *
  */
 
-import {useLayoutEffect, useState} from 'react';
+import {useState} from 'react';
 
 export const MEETING_NOTIFICATION_HOST_ELEMENT_ID = {
   CONVERSATIONS: 'conversations',
   CENTER_COLUMN: 'center-column',
-  WIRE_MAIN: 'wire-main',
 } as const;
 
 type MeetingNotificationHostElementState = {
@@ -30,28 +29,10 @@ type MeetingNotificationHostElementState = {
   setMeetingNotificationHostElement: (element: HTMLElement | null) => void;
 };
 
-export const useMeetingNotificationHostElement = (): MeetingNotificationHostElementState => {
+export const useMeetingNotificationHostElement = (
+  wireMainElement: HTMLElement | null,
+): MeetingNotificationHostElementState => {
   const [conversationsElement, setConversationsElement] = useState<HTMLElement | null>(null);
-  const [wireMainElement, setWireMainElement] = useState<HTMLElement | null>(null);
-
-  useLayoutEffect(() => {
-    const existing = document.getElementById(MEETING_NOTIFICATION_HOST_ELEMENT_ID.WIRE_MAIN);
-    if (existing) {
-      setWireMainElement(existing);
-      return undefined;
-    }
-
-    const observer = new MutationObserver(() => {
-      const wireMain = document.getElementById(MEETING_NOTIFICATION_HOST_ELEMENT_ID.WIRE_MAIN);
-      if (wireMain) {
-        setWireMainElement(wireMain);
-        observer.disconnect();
-      }
-    });
-    observer.observe(document.body, {childList: true, subtree: true});
-
-    return () => observer.disconnect();
-  }, []);
 
   return {
     meetingNotificationHostElement: conversationsElement ?? wireMainElement,

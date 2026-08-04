@@ -94,6 +94,7 @@ type ConversationsProps = {
   teamRepository: TeamRepository;
   userRepository: UserRepository;
   isConversationListCollapseEnabled: boolean;
+  onConversationsTargetChange?: (element: HTMLElement | null) => void;
 };
 
 export const Conversations = ({
@@ -111,6 +112,7 @@ export const Conversations = ({
   userState = container.resolve(UserState),
   selfUser,
   isConversationListCollapseEnabled,
+  onConversationsTargetChange,
 }: ConversationsProps) => {
   const {translate} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
@@ -510,6 +512,7 @@ export const Conversations = ({
       <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(isScreenLessThanMdBreakpoint)} />
       <ListWrapper
         id="conversations"
+        onTargetRef={onConversationsTargetChange}
         headerElement={
           <ConversationHeader
             currentFolder={currentFolder}
