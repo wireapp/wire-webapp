@@ -41,7 +41,10 @@ export const MeetingsConversationTab = ({
 
   const openMeetings = () => {
     onChangeTab(SidebarTabs.MEETINGS);
-    fireAndForgetInvoker.fireAndForget(loadMeetings);
+
+    if (!isActive) {
+      fireAndForgetInvoker.fireAndForget(loadMeetings);
+    }
   };
 
   return (

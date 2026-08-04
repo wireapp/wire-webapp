@@ -35,9 +35,8 @@ import {MeetingsConversationTab} from './meetingsConversationTab';
 import {SidebarTabs} from '../useSidebarStore';
 
 describe('MeetingsConversationTab', () => {
-  it('refreshes meetings when clicked', async () => {
-    const loadMeetings = jest.fn().mockResolvedValue(undefined);
-    const meetingStore = createStore<MeetingStoreState>(() => ({
+  const createMeetingStoreForTest = (loadMeetings: jest.Mock) =>
+    createStore<MeetingStoreState>(() => ({
       meetingSeries: [],
       isLoading: false,
       hasLoadError: false,
@@ -51,6 +50,10 @@ describe('MeetingsConversationTab', () => {
       syncMeetingByQualifiedId: jest.fn(),
       loadMeetingForEdit: jest.fn(),
     }));
+
+  it('refreshes meetings when switching to the tab from another tab', async () => {
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const meetingStore = createMeetingStoreForTest(loadMeetings);
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
     const rootProviderWrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({
@@ -76,5 +79,35 @@ describe('MeetingsConversationTab', () => {
 
     expect(onChangeTab).toHaveBeenCalledWith(SidebarTabs.MEETINGS);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not refresh meetings when the tab is already active', async () => {
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const meetingStore = createMeetingStoreForTest(loadMeetings);
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const rootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        fireAndForgetInvoker,
+        translate: translateForTest,
+      }),
+    );
+    const onChangeTab = jest.fn();
+
+    render(
+      withThemeAndRootContext(
+        <MeetingStoreProvider store={meetingStore}>
+          <MeetingsConversationTab conversationTabIndex={0} isActive onChangeTab={onChangeTab} />
+        </MeetingStoreProvider>,
+        rootProviderWrapper,
+      ),
+    );
+
+    act(() => {
+      screen.getByRole('tab', {name: 'meetings.navigation.label'}).click();
+    });
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(onChangeTab).toHaveBeenCalledWith(SidebarTabs.MEETINGS);
+    expect(loadMeetings).not.toHaveBeenCalled();
   });
 });

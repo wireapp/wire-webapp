@@ -120,6 +120,39 @@ describe('createMeetingStore', () => {
     expect(store.getState().meetingSeries[0]).toMatchObject(meetingSeriesEntry);
   });
 
+  it('keeps the list visible while reloading meetings that are already shown', async () => {
+    let finishFetch: () => void = () => {};
+    const fetchGate = new Promise<void>(resolve => {
+      finishFetch = resolve;
+    });
+    const getMeetingsList = jest.fn().mockReturnValue(
+      task.tryOrElse(
+        () => new Error('fetch failed'),
+        async () => {
+          await fetchGate;
+          return [{...apiMeeting, title: 'Weekly sync (refreshed)'}];
+        },
+      ),
+    );
+    const store = createMeetingStore(createDeps({getMeetingsList}), {meetingSeries: [meetingSeriesEntry]});
+
+    const pendingReload = store.getState().loadMeetings();
+
+    expect(store.getState()).toMatchObject({
+      isLoading: false,
+      meetingSeries: [meetingSeriesEntry],
+    });
+
+    finishFetch();
+    await pendingReload;
+
+    expect(store.getState()).toMatchObject({
+      isLoading: false,
+      hasLoadError: false,
+    });
+    expect(store.getState().meetingSeries[0]?.title).toBe('Weekly sync (refreshed)');
+  });
+
   it('sets hasLoadError when loading meetings fails', async () => {
     const getMeetingsList = jest.fn().mockReturnValue(task.reject(new Error('network error')));
     const store = createMeetingStore(createDeps({getMeetingsList}));

@@ -101,13 +101,19 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
     meetingStoreMutationVersion += 1;
   };
 
-  return createStore<MeetingStoreState>(set => ({
+  return createStore<MeetingStoreState>((set, get) => ({
     meetingSeries: initialState?.meetingSeries ?? [],
     isLoading: initialState?.isLoading ?? false,
     hasLoadError: initialState?.hasLoadError ?? false,
     loadMeetings: async () => {
       const mutationVersionBeforeFetch = meetingStoreMutationVersion;
-      set({isLoading: true, hasLoadError: false});
+      const hasExistingMeetings = get().meetingSeries.length > 0;
+
+      if (hasExistingMeetings) {
+        set({hasLoadError: false});
+      } else {
+        set({isLoading: true, hasLoadError: false});
+      }
 
       const listResult = await loadMeetingsList(deps.meetingsRepository);
 
