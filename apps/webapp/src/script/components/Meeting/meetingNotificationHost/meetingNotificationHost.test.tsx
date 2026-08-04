@@ -26,6 +26,7 @@ import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
+import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,
@@ -36,16 +37,23 @@ const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
+const translateForCountTest: Translate = (_key, substitutions) => {
+  if (substitutions !== undefined && substitutions.count !== undefined) {
+    return `${substitutions.count}`;
+  }
 
-const renderHost = (target: HTMLElement | null = document.getElementById('wire-main')) =>
+  return '';
+};
+
+const renderHost = (
+  target: HTMLElement | null = document.getElementById('wire-main'),
+  translate: Translate = translateForTest,
+) =>
   render(
     <ThemeProvider>
       <MeetingNotificationHost targetElement={target} />
     </ThemeProvider>,
-    {wrapper: rootProviderWrapper},
+    {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate}))},
   );
 
 describe('MeetingNotificationHost', () => {
@@ -79,9 +87,9 @@ describe('MeetingNotificationHost', () => {
       meetingStartTime,
     });
 
-    renderHost();
+    renderHost(undefined, translateForCountTest);
 
-    expect(screen.getByText('meetings.notifications.total')).toBeInTheDocument();
+    expect(screen.getByText('3')).toBeInTheDocument();
     expect(screen.queryByText('meetings.notifications.title')).not.toBeInTheDocument();
   });
 
