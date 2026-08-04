@@ -532,8 +532,7 @@ jobs:
     continue-on-error: true
     permissions:
       contents: read
-      pull-requests: read
-      issues: write
+      pull-requests: write # required to create and update release-appearance comments
 
     steps:
       - name: Checkout release history
@@ -915,8 +914,7 @@ jobs:
     continue-on-error: true
     permissions:
       contents: read
-      pull-requests: read
-      issues: write
+      pull-requests: write # required to create and update release-appearance comments
 
     steps:
       - name: Checkout release history
