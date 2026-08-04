@@ -18,10 +18,11 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {Task} from 'true-myth';
+import {task, type Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import {loadMeetingsList} from 'Components/Meeting/loadMeetingsList';
+import {mapApiMeetingToSeries} from 'Components/Meeting/mapApiMeetingToSeries';
 import {mapMeetingInstanceToScheduleFormState} from 'Components/Meeting/mapMeetingInstanceToScheduleFormState';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {ScheduleMeetingFormState} from 'Components/Meeting/ScheduleMeetingModal/scheduleMeetingTypes';
@@ -35,9 +36,12 @@ import type {
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
+import {getLogger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import type {MeetingStoreDeps} from './meetingStoreDeps';
+
+const logger = getLogger('createMeetingStore');
 
 const toDeleteMeetingCommand = (meetingInstance: MeetingInstance): DeleteMeetingCommand => ({
   meetingId: meetingInstance.meetingSeries.qualified_id,
@@ -46,6 +50,18 @@ const toDeleteMeetingCommand = (meetingInstance: MeetingInstance): DeleteMeeting
 
 const filterOutMeetingSeries = (meetingSeries: MeetingSeries[], meetingId: QualifiedId): MeetingSeries[] =>
   meetingSeries.filter(series => !matchQualifiedIds(series.qualified_id, meetingId));
+
+const upsertMeetingSeries = (meetingSeries: MeetingSeries[], updatedSeries: MeetingSeries): MeetingSeries[] => [
+  ...meetingSeries.filter(series => !matchQualifiedIds(series.qualified_id, updatedSeries.qualified_id)),
+  updatedSeries,
+];
+
+export const syncMeetingErrors = {
+  fetchFailed: 'fetchFailed',
+  mapFailed: 'mapFailed',
+} as const;
+
+export type SyncMeetingError = (typeof syncMeetingErrors)[keyof typeof syncMeetingErrors];
 
 export type EditMeetingData = {
   formState: ScheduleMeetingFormState;
@@ -64,6 +80,7 @@ export type MeetingStoreState = {
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   deleteMeetingForAll: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
+  syncMeetingByQualifiedId: (meetingId: QualifiedId) => Task<MeetingSeries, SyncMeetingError>;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
 };
 
@@ -94,6 +111,30 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
       set(state => ({
         meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingId),
       })),
+    syncMeetingByQualifiedId: meetingId =>
+      deps.meetingsRepository
+        .getMeeting(meetingId)
+        .mapRejected((error): SyncMeetingError => {
+          logger.warn('Failed to fetch meeting for sync', {error, qualifiedId: meetingId});
+          return syncMeetingErrors.fetchFailed;
+        })
+        .andThen(apiMeeting => {
+          const mapResult = mapApiMeetingToSeries(apiMeeting);
+
+          if (mapResult.isErr) {
+            logger.warn('Failed to map fetched meeting for sync', {
+              error: mapResult.error,
+              qualifiedId: meetingId,
+            });
+            return task.reject<MeetingSeries, SyncMeetingError>(syncMeetingErrors.mapFailed);
+          }
+
+          return task.resolve<MeetingSeries, SyncMeetingError>(mapResult.value);
+        })
+        .map(updatedSeries => {
+          set(state => ({meetingSeries: upsertMeetingSeries(state.meetingSeries, updatedSeries)}));
+          return updatedSeries;
+        }),
     loadMeetingForEdit: meetingInstance => {
       const {meetingSeries} = meetingInstance;
 
