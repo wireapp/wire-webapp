@@ -17,36 +17,27 @@
  *
  */
 import {fireEvent, render, screen} from '@testing-library/react';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
-
-import * as Router from '../../../router/Router';
 
 import {MeetingNotificationCard} from './meetingNotificationCard';
 import {
   type MeetingNotification,
   MeetingNotificationKind,
 } from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
+import {formatLocale} from 'Util/timeUtil';
+import {ReactElement} from 'react';
 
-jest.mock('Util/localizerUtil', () => ({
-  translate: (key: string) => key,
-}));
+const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
+const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
+const meetingStartTime = '2026-06-01T09:00:00.000Z';
+const ongoingMeetingStartTime = '2026-06-01T09:50:00.000Z';
 
-const notificationData = {
-  [MeetingNotificationKind.INVITE]: {organizer: 'Kim Dawson', meetingTime: 'Jun 01, 09:00 AM'},
-  [MeetingNotificationKind.UPDATE]: {meetingTime: 'Jun 01, 09:00 AM'},
-  [MeetingNotificationKind.CANCELLED]: {organizer: 'Kim Dawson', meetingTime: 'Jun 01, 09:00 AM'},
-  [MeetingNotificationKind.ONGOING]: {organizer: 'Kim Dawson', meetingTime: 'Jun 01, 09:50 AM'},
-} as const;
-
-const renderCard = (card: React.ReactElement) => render(<ThemeProvider>{card}</ThemeProvider>);
+const renderCard = (card: ReactElement) => render(<ThemeProvider>{card}</ThemeProvider>);
 
 describe('MeetingNotificationCard', () => {
   beforeEach(() => {
-    jest.spyOn(Router, 'navigate').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
+    window.history.replaceState(null, '', '#/');
   });
 
   const notifications = [
@@ -54,37 +45,39 @@ describe('MeetingNotificationCard', () => {
       id: 'notification-invite',
       kind: MeetingNotificationKind.INVITE,
       meetingTitle: 'Meeting Title',
-      organizer: 'Kim Dawson',
-      meetingTime: 'Jun 01, 09:00 AM',
+      qualifiedId,
+      qualifiedCreator,
+      meetingStartTime,
     },
     {
       id: 'notification-update',
       kind: MeetingNotificationKind.UPDATE,
       meetingTitle: 'Meeting Title',
-      meetingTime: 'Jun 01, 09:00 AM',
+      qualifiedId,
+      meetingStartTime,
     },
     {
       id: 'notification-cancelled',
       kind: MeetingNotificationKind.CANCELLED,
       meetingTitle: 'Meeting Title',
-      organizer: 'Kim Dawson',
-      meetingTime: 'Jun 01, 09:00 AM',
+      qualifiedId,
+      qualifiedCreator,
+      meetingStartTime,
     },
     {
       id: 'notification-ongoing',
       kind: MeetingNotificationKind.ONGOING,
       meetingTitle: 'Meeting Title',
-      organizer: 'Kim Dawson',
-      meetingTime: 'Jun 01, 09:50 AM',
+      qualifiedId,
+      qualifiedCreator,
+      meetingStartTime: ongoingMeetingStartTime,
     },
   ] satisfies readonly MeetingNotification[];
 
-  it.each(notifications)('renders the %s variant', notification => {
-    const props = notification;
+  it.each(notifications)('renders the $kind variant', notification => {
+    renderCard(<MeetingNotificationCard {...notification} onDismiss={jest.fn()} />);
 
-    renderCard(<MeetingNotificationCard {...props} onDismiss={jest.fn()} />);
-
-    expect(screen.getByRole('status')).toHaveTextContent('meetings.notifications.title');
+    expect(screen.getByRole('listitem')).toHaveTextContent('meetings.notifications.title');
     expect(screen.getByRole('button', {name: 'meetings.notifications.dismiss'})).toBeInTheDocument();
 
     if (notification.kind === MeetingNotificationKind.CANCELLED) {
@@ -100,7 +93,9 @@ describe('MeetingNotificationCard', () => {
         id="notification-ongoing"
         kind={MeetingNotificationKind.ONGOING}
         meetingTitle="Meeting Title"
-        {...notificationData[MeetingNotificationKind.ONGOING]}
+        qualifiedId={qualifiedId}
+        qualifiedCreator={qualifiedCreator}
+        meetingStartTime={ongoingMeetingStartTime}
         onDismiss={jest.fn()}
       />,
     );
@@ -114,7 +109,9 @@ describe('MeetingNotificationCard', () => {
         id="notification-cancelled"
         kind={MeetingNotificationKind.CANCELLED}
         meetingTitle="Meeting Title"
-        {...notificationData[MeetingNotificationKind.CANCELLED]}
+        qualifiedId={qualifiedId}
+        qualifiedCreator={qualifiedCreator}
+        meetingStartTime={meetingStartTime}
         onDismiss={onDismiss}
       />,
     );
@@ -127,7 +124,9 @@ describe('MeetingNotificationCard', () => {
           id="notification-invite"
           kind={MeetingNotificationKind.INVITE}
           meetingTitle="Meeting Title"
-          {...notificationData[MeetingNotificationKind.INVITE]}
+          qualifiedId={qualifiedId}
+          qualifiedCreator={qualifiedCreator}
+          meetingStartTime={meetingStartTime}
           onDismiss={onDismiss}
         />
       </ThemeProvider>,
@@ -135,7 +134,23 @@ describe('MeetingNotificationCard', () => {
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.dismiss'}));
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.view'}));
 
-    expect(onDismiss).toHaveBeenCalledTimes(2);
-    expect(Router.navigate).toHaveBeenCalledWith('/meetings');
+    expect(onDismiss).toHaveBeenCalledTimes(3);
+    expect(window.location.hash).toBe('#/meetings');
+  });
+
+  it('renders the creator ID and formatted time from a store-shaped notification', () => {
+    renderCard(
+      <MeetingNotificationCard
+        id="notification-invite"
+        kind={MeetingNotificationKind.INVITE}
+        meetingTitle="Meeting Title"
+        qualifiedId={qualifiedId}
+        qualifiedCreator={qualifiedCreator}
+        meetingStartTime={meetingStartTime}
+        onDismiss={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('listitem')).toHaveTextContent(`creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
   });
 });

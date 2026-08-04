@@ -17,12 +17,17 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match} from 'ts-pattern';
+import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CalendarIcon} from '@wireapp/react-ui-kit';
 
-import {translate} from 'Util/localizerUtil';
+import {UserState} from 'Repositories/user/userState';
 import type {TranslationKey} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {formatLocale} from 'Util/timeUtil';
 
 import {
   meetingNotificationCardActionsStyles,
@@ -35,7 +40,7 @@ import {
 } from './meetingNotificationCard.styles';
 
 import {navigate} from '../../../router/Router';
-import {MeetingNotificationKind, type MeetingNotification} from '../meetingNotificationStore/meetingNotificationStore';
+import {type MeetingNotification, MeetingNotificationKind} from '../meetingNotificationStore/meetingNotificationStore';
 
 type MeetingNotificationCardProps = MeetingNotification & {
   onDismiss: () => void;
@@ -48,34 +53,58 @@ const notificationLabels = {
   [MeetingNotificationKind.ONGOING]: 'meetings.notifications.ongoing',
 } as const satisfies Record<MeetingNotificationKind, TranslationKey>;
 
+const getOrganizer = (qualifiedCreator: QualifiedId) =>
+  container
+    .resolve(UserState)
+    .users()
+    .find(user => matchQualifiedIds(user.qualifiedId, qualifiedCreator))
+    ?.name() ?? qualifiedCreator.id;
+
+const getMeetingTime = (meetingStartTime: string) => formatLocale(meetingStartTime, 'PP, p');
+
 const MeetingNotificationMetadata = ({notification}: {notification: MeetingNotification}) => {
   return match(notification)
-    .with({kind: MeetingNotificationKind.INVITE}, ({organizer, meetingTime}) => (
-      <>
-        {organizer}
-        {organizer && meetingTime && <span aria-hidden="true"> • </span>}
-        {meetingTime}
-      </>
-    ))
-    .with({kind: MeetingNotificationKind.UPDATE}, ({meetingTime}) =>
-      translate('meetings.notifications.newTime', {time: meetingTime}),
+    .with({kind: MeetingNotificationKind.INVITE}, ({qualifiedCreator, meetingStartTime}) => {
+      const organizer = getOrganizer(qualifiedCreator);
+      const meetingTime = getMeetingTime(meetingStartTime);
+
+      return (
+        <>
+          {organizer}
+          {organizer && meetingTime && <span aria-hidden="true"> • </span>}
+          {meetingTime}
+        </>
+      );
+    })
+    .with({kind: MeetingNotificationKind.UPDATE}, ({meetingStartTime}) =>
+      translate('meetings.notifications.newTime', {time: getMeetingTime(meetingStartTime)}),
     )
-    .with({kind: MeetingNotificationKind.CANCELLED}, ({organizer, meetingTime}) => (
-      <>
-        {organizer}
-        {organizer && <span aria-hidden="true"> • </span>}
-        {meetingTime}
-      </>
-    ))
-    .with({kind: MeetingNotificationKind.ONGOING}, ({organizer, meetingTime}) => (
-      <>
-        {organizer}
-        {organizer && <span aria-hidden="true"> • </span>}
-        <span css={meetingNotificationCardOngoingTimeStyles}>
-          {translate('meetings.meetingStatus.startedAt', {time: meetingTime})}
-        </span>
-      </>
-    ))
+    .with({kind: MeetingNotificationKind.CANCELLED}, ({qualifiedCreator, meetingStartTime}) => {
+      const organizer = getOrganizer(qualifiedCreator);
+      const meetingTime = getMeetingTime(meetingStartTime);
+
+      return (
+        <>
+          {organizer}
+          {organizer && <span aria-hidden="true"> • </span>}
+          {meetingTime}
+        </>
+      );
+    })
+    .with({kind: MeetingNotificationKind.ONGOING}, ({qualifiedCreator, meetingStartTime}) => {
+      const organizer = getOrganizer(qualifiedCreator);
+      const meetingTime = getMeetingTime(meetingStartTime);
+
+      return (
+        <>
+          {organizer}
+          {organizer && <span aria-hidden="true"> • </span>}
+          <span css={meetingNotificationCardOngoingTimeStyles}>
+            {translate('meetings.meetingStatus.startedAt', {time: meetingTime})}
+          </span>
+        </>
+      );
+    })
     .exhaustive();
 };
 
@@ -84,8 +113,7 @@ export const MeetingNotificationCard = (notification: MeetingNotificationCardPro
   return (
     <div
       css={meetingNotificationCardContainerStyles}
-      role="status"
-      aria-live="polite"
+      role="listitem"
       data-testid={`meeting-notification-card-${id}`}
       data-uie-name="meeting-notification-card"
     >
@@ -110,7 +138,10 @@ export const MeetingNotificationCard = (notification: MeetingNotificationCardPro
             variant={ButtonVariant.PRIMARY}
             css={meetingNotificationCardActionStyles}
             type="button"
-            onClick={() => navigate('/meetings')}
+            onClick={() => {
+              onDismiss();
+              navigate('/meetings');
+            }}
           >
             <CalendarIcon css={meetingNotificationViewBtnStyles} /> {translate('meetings.notifications.view')}
           </Button>
