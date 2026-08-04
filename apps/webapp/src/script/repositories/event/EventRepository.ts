@@ -581,18 +581,28 @@ export class EventRepository {
   }
 
   private distributeMeetingEvent(event: IncomingEvent): void {
-    if (event.type !== MEETING_EVENT.DELETE) {
+    const webAppEventByMeetingEvent: Partial<Record<MEETING_EVENT, string>> = {
+      [MEETING_EVENT.CREATE]: WebAppEvents.MEETING.CREATED,
+      [MEETING_EVENT.UPDATE]: WebAppEvents.MEETING.UPDATED,
+      [MEETING_EVENT.DELETE]: WebAppEvents.MEETING.DELETED,
+    };
+
+    const webAppEvent = webAppEventByMeetingEvent[event.type as MEETING_EVENT];
+    if (webAppEvent === undefined) {
       amplify.publish(event.type, event);
       return;
     }
 
     const meetingId = 'qualified_id' in event ? event.qualified_id : undefined;
-    if (meetingId === undefined || typeof meetingId.id !== 'string' || typeof meetingId.domain !== 'string') {
-      this.logger.warn('Ignored meeting.delete event without a valid qualified_id', event);
+    const hasValidQualifiedId =
+      meetingId !== undefined && typeof meetingId.id === 'string' && typeof meetingId.domain === 'string';
+
+    if (!hasValidQualifiedId) {
+      this.logger.warn(`Ignored ${event.type} event without a valid qualified_id`, event);
       return;
     }
 
-    amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+    amplify.publish(webAppEvent, meetingId);
   }
 
   /**
