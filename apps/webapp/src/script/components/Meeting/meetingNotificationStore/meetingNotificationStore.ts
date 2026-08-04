@@ -29,60 +29,31 @@ export enum MeetingNotificationKind {
 }
 
 type MeetingNotificationBase = {
-  id: string;
   qualifiedId: QualifiedId;
   meetingTitle: string;
+  meetingStartTime: string;
 };
 
-export type MeetingNotification =
-  | (MeetingNotificationBase & {
-      kind: MeetingNotificationKind.INVITE;
-      qualifiedCreator: QualifiedId;
-      meetingStartTime: string;
-    })
-  | (MeetingNotificationBase & {
-      kind: MeetingNotificationKind.UPDATE;
-      meetingStartTime: string;
-    })
-  | (MeetingNotificationBase & {
-      kind: MeetingNotificationKind.CANCELLED;
-      qualifiedCreator: QualifiedId;
-      meetingStartTime: string;
-    })
-  | (MeetingNotificationBase & {
-      kind: MeetingNotificationKind.ONGOING;
-      qualifiedCreator: QualifiedId;
-      meetingStartTime: string;
-    });
+export type AddNotificationInput = MeetingNotificationBase &
+  (
+    | {
+        kind: MeetingNotificationKind.INVITE;
+        qualifiedCreator: QualifiedId;
+      }
+    | {
+        kind: MeetingNotificationKind.UPDATE;
+      }
+    | {
+        kind: MeetingNotificationKind.CANCELLED;
+        qualifiedCreator: QualifiedId;
+      }
+    | {
+        kind: MeetingNotificationKind.ONGOING;
+        qualifiedCreator: QualifiedId;
+      }
+  );
 
-export type AddNotificationInput =
-  | {
-      kind: MeetingNotificationKind.INVITE;
-      qualifiedId: QualifiedId;
-      meetingTitle: string;
-      qualifiedCreator: QualifiedId;
-      meetingStartTime: string;
-    }
-  | {
-      kind: MeetingNotificationKind.UPDATE;
-      qualifiedId: QualifiedId;
-      meetingTitle: string;
-      meetingStartTime: string;
-    }
-  | {
-      kind: MeetingNotificationKind.CANCELLED;
-      qualifiedId: QualifiedId;
-      meetingTitle: string;
-      qualifiedCreator: QualifiedId;
-      meetingStartTime: string;
-    }
-  | {
-      kind: MeetingNotificationKind.ONGOING;
-      qualifiedId: QualifiedId;
-      meetingTitle: string;
-      qualifiedCreator: QualifiedId;
-      meetingStartTime: string;
-    };
+export type MeetingNotification = AddNotificationInput & {id: string};
 
 type MeetingNotificationStore = {
   notifications: MeetingNotification[];
