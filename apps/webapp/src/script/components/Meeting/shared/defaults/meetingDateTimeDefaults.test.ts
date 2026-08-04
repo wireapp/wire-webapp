@@ -48,23 +48,29 @@ describe('meetingDateTimeDefaults', () => {
     expect(getDefaultMeetingEndDateTime(start)).toEqual(new Date(2026, 6, 13, 18, 0, 0, 0));
   });
 
-  it('caps the end time at midnight when the start is at 11:45 PM', () => {
+  it('caps the end time at 11:45 PM when the start is at 11:45 PM', () => {
     const start = new Date(2026, 6, 13, 23, 45, 0, 0);
 
-    expect(getDefaultMeetingEndDateTime(start)).toEqual(new Date(2026, 6, 14, 0, 0, 0, 0));
+    expect(getDefaultMeetingEndDateTime(start)).toEqual(new Date(2026, 6, 13, 23, 45, 0, 0));
   });
 
-  it('caps the end time at midnight when one hour would cross into the next day', () => {
+  it('caps the end time at 11:45 PM when one hour would cross into the next day', () => {
     const start = new Date(2026, 6, 13, 23, 0, 0, 0);
 
-    expect(getDefaultMeetingEndDateTime(start)).toEqual(new Date(2026, 6, 14, 0, 0, 0, 0));
+    expect(getDefaultMeetingEndDateTime(start)).toEqual(new Date(2026, 6, 13, 23, 45, 0, 0));
   });
 
-  it('caps end times at midnight for late starts', () => {
+  it('caps the end time at 11:45 PM when the start is at 11:30 PM', () => {
+    const start = new Date(2026, 6, 13, 23, 30, 0, 0);
+
+    expect(getDefaultMeetingEndDateTime(start)).toEqual(new Date(2026, 6, 13, 23, 45, 0, 0));
+  });
+
+  it('caps end times at 11:45 PM for late starts', () => {
     const start = new Date(2026, 6, 13, 23, 15, 0, 0);
     const end = new Date(2026, 6, 14, 0, 0, 0, 0);
 
-    expect(capEndForStart(start, end)).toEqual(new Date(2026, 6, 14, 0, 0, 0, 0));
+    expect(capEndForStart(start, end)).toEqual(new Date(2026, 6, 13, 23, 45, 0, 0));
   });
 
   it('shifts the end forward when the start is moved past the current end', () => {
@@ -100,14 +106,14 @@ describe('meetingDateTimeDefaults', () => {
     });
   });
 
-  it('sets the end to midnight when the start is moved to 11:45 PM', () => {
+  it('sets the end to 11:45 PM when the start is moved to 11:45 PM', () => {
     const previousStart = new Date(2026, 6, 13, 22, 45, 0, 0);
     const previousEnd = new Date(2026, 6, 13, 23, 45, 0, 0);
     const nextStart = new Date(2026, 6, 13, 23, 45, 0, 0);
 
     expect(resolveStartChange(previousStart, previousEnd, nextStart)).toEqual({
       start: nextStart,
-      end: new Date(2026, 6, 14, 0, 0, 0, 0),
+      end: new Date(2026, 6, 13, 23, 45, 0, 0),
     });
   });
 
@@ -129,13 +135,13 @@ describe('meetingDateTimeDefaults', () => {
     });
   });
 
-  it('caps meet-now end time at midnight for late starts', () => {
+  it('caps meet-now end time at 11:45 PM for late starts', () => {
     const now = new Date(2026, 6, 13, 23, 45, 0, 0);
     const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: now.getTime()});
 
     expect(getMeetNowMeetingTimes(wallClock)).toEqual({
       start: now,
-      end: new Date(2026, 6, 14, 0, 0, 0, 0),
+      end: new Date(2026, 6, 13, 23, 45, 0, 0),
     });
   });
 });

@@ -24,6 +24,7 @@ const HOURS_PER_DAY = 24;
 const MILLISECONDS_PER_SECOND = 1000;
 const MINUTES_PER_DAY = HOURS_PER_DAY * MINUTES_PER_HOUR;
 const LAST_HOUR_OF_DAY = 23;
+const LAST_MINUTE_OF_DAY = 45;
 const HALF_HOUR_MINUTES = 30;
 const MEETING_DURATION_MILLISECONDS = MINUTES_PER_HOUR * MINUTES_PER_HOUR * MILLISECONDS_PER_SECOND;
 
@@ -32,7 +33,11 @@ const isSameCalendarDay = (left: Date, right: Date): boolean =>
   left.getMonth() === right.getMonth() &&
   left.getDate() === right.getDate();
 
-const isAfter11Pm = (date: Date): boolean => date.getHours() === LAST_HOUR_OF_DAY && date.getMinutes() > 0;
+export const getLatestMeetingEndDateTime = (date: Date): Date => {
+  const latestEnd = new Date(date);
+  latestEnd.setHours(LAST_HOUR_OF_DAY, LAST_MINUTE_OF_DAY, 0, 0);
+  return latestEnd;
+};
 
 export const getNextHalfHourDateTime = (now: Date): Date => {
   const totalMinutes = now.getHours() * MINUTES_PER_HOUR + now.getMinutes();
@@ -51,21 +56,12 @@ export const getNextHalfHourDateTime = (now: Date): Date => {
   return result;
 };
 
-export const getMidnightAfter = (date: Date): Date => {
-  const midnight = new Date(date);
-  midnight.setHours(HOURS_PER_DAY, 0, 0, 0);
-  return midnight;
-};
-
 export const getDefaultMeetingEndDateTime = (start: Date): Date => {
-  if (isAfter11Pm(start)) {
-    return getMidnightAfter(start);
-  }
-
   const end = new Date(start.getTime() + MEETING_DURATION_MILLISECONDS);
+  const latestEnd = getLatestMeetingEndDateTime(start);
 
-  if (!isSameCalendarDay(start, end)) {
-    return getMidnightAfter(start);
+  if (!isSameCalendarDay(start, end) || end.getTime() > latestEnd.getTime()) {
+    return latestEnd;
   }
 
   return end;
@@ -83,8 +79,10 @@ export const getMeetingDurationMilliseconds = (start: Date, end: Date): number =
 };
 
 export const capEndForStart = (start: Date, end: Date): Date => {
-  const midnight = getMidnightAfter(start);
-  return end.getTime() > midnight.getTime() ? midnight : end;
+  const latestEnd = getLatestMeetingEndDateTime(start);
+  const cappedEnd = end.getTime() > latestEnd.getTime() ? latestEnd : end;
+
+  return alignEndTimeToStartDate(start, cappedEnd);
 };
 
 export const resolveStartChange = (
