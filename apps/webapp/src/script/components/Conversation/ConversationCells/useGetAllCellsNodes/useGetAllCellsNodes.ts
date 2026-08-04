@@ -23,11 +23,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
+import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 
 import {getUsersFromNodes} from './getUsersFromNodes';
-import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
+import {transformToCellPagination} from './transformToCellPagination';
 
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
@@ -128,7 +129,7 @@ export const useGetAllCellsNodes = ({
       // filter out draft nodes from results
       const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
 
-      const transformedNodes = transformDataToCellsNodes({nodes: filteredNodes, users});
+      const transformedNodes = transformCellsNodes({nodes: filteredNodes, users});
       setNodes({conversationId: id, nodes: transformedNodes});
 
       const pagination = result.Pagination !== undefined ? transformToCellPagination(result.Pagination) : null;

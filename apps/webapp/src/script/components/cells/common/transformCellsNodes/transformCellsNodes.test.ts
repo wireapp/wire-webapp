@@ -19,24 +19,26 @@
 
 import {RestNode} from 'cells-sdk-ts';
 
+import {Conversation} from 'Repositories/entity/Conversation';
+
 import {transformCellsNodes} from './transformCellsNodes';
 
-const createNodeWithTags = (tags: string): RestNode =>
+const createNode = (properties: Partial<RestNode> = {}): RestNode =>
   ({
     Path: 'conversation@example.com/report.pdf',
     Type: 'LEAF',
     Uuid: 'node-id',
     ContextWorkspace: {Uuid: 'conversation@example.com'},
-    UserMetadata: [{Namespace: 'usermeta-tags', JsonValue: JSON.stringify(tags)}],
+    ...properties,
   }) as RestNode;
 
 describe('transformCellsNodes', () => {
   it('preserves backend tag order in the cell model', () => {
-    const [node] = transformCellsNodes({
-      nodes: [createNodeWithTags('Zulu, alpha, Beta')],
-      users: [],
-      conversations: [],
+    const nodeWithTags = createNode({
+      UserMetadata: [{Namespace: 'usermeta-tags', JsonValue: JSON.stringify('Zulu, alpha, Beta')}],
     });
+
+    const [node] = transformCellsNodes({nodes: [nodeWithTags], users: []});
 
     expect(node.tags).toEqual(['Zulu', 'alpha', 'Beta']);
   });
@@ -45,10 +47,26 @@ describe('transformCellsNodes', () => {
     {label: 'null', size: null},
     {label: 'missing', size: undefined},
   ])('presents a $label folder size as zero bytes', ({size}) => {
-    const emptyFolder = {...createNodeWithTags(''), Type: 'COLLECTION', Size: size} as unknown as RestNode;
+    const emptyFolder = createNode({Type: 'COLLECTION', Size: size} as Partial<RestNode>);
 
-    const [node] = transformCellsNodes({nodes: [emptyFolder], users: [], conversations: []});
+    const [node] = transformCellsNodes({nodes: [emptyFolder], users: []});
 
     expect(node.sizeMb).toBe('0 B');
+  });
+
+  it('enriches a node with its conversation when conversations are provided', () => {
+    const conversation = {qualifiedId: {domain: 'example.com', id: 'conversation'}} as Conversation;
+
+    const [node] = transformCellsNodes({nodes: [createNode()], users: [], conversations: [conversation]});
+
+    expect(node.conversation).toBe(conversation);
+  });
+
+  it('leaves the conversation absent when conversations and workspace context are not provided', () => {
+    const nodeWithoutWorkspace = createNode({ContextWorkspace: undefined});
+
+    const [node] = transformCellsNodes({nodes: [nodeWithoutWorkspace], users: []});
+
+    expect(node.conversation).toBeUndefined();
   });
 });

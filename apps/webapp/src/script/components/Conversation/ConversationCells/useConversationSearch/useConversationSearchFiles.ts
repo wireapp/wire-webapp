@@ -25,6 +25,7 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
+import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 
@@ -42,7 +43,7 @@ import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
 import {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
-import {transformDataToCellsNodes, transformToCellPagination} from '../useGetAllCellsNodes/transformDataToCellsNodes';
+import {transformToCellPagination} from '../useGetAllCellsNodes/transformToCellPagination';
 
 interface UseConversationSearchFilesProps {
   cellsRepository: CellsRepository;
@@ -171,7 +172,7 @@ export const useConversationSearchFiles = ({
 
         // filter out draft nodes from results
         const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
-        const transformedNodes = transformDataToCellsNodes({nodes: filteredNodes, users});
+        const transformedNodes = transformCellsNodes({nodes: filteredNodes, users});
 
         if (append) {
           appendNodes({conversationId: id, nodes: transformedNodes});

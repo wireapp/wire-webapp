@@ -24,6 +24,7 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
+import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
 import {
   GlobalDriveFiltersState,
   toGlobalDriveSearchParams,
@@ -39,7 +40,6 @@ import {getConversationsFromNodes} from './getConversationsFromNodes';
 import {getUsersFromNodes} from './getUsersFromNodes';
 
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
-import {transformCellsNodes} from '../transformCellsNodes/transformCellsNodes';
 import {transformCellsPagination} from '../transformCellsPagination/transformCellsPagination';
 
 type DebouncedSearch = ((value: string) => Promise<void>) & {cancel: () => void};
