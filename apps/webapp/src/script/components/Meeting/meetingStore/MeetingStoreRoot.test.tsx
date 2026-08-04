@@ -155,6 +155,25 @@ describe('MeetingStoreRoot', () => {
     });
   });
 
+  it('reloads meetings when missed events are reported', async () => {
+    const getMeetingsList = jest
+      .fn()
+      .mockReturnValueOnce(task.resolve([createApiMeeting('Weekly sync')]))
+      .mockReturnValueOnce(task.resolve([createApiMeeting('Weekly sync (refreshed)')]));
+    renderMeetingStoreRoot({getMeetingsList});
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync (refreshed)');
+    });
+    expect(getMeetingsList).toHaveBeenCalledTimes(2);
+  });
+
   it('stops handling meeting lifecycle events after unmounting', async () => {
     const {getMeeting, unmount} = renderMeetingStoreRoot();
 
@@ -164,8 +183,11 @@ describe('MeetingStoreRoot', () => {
 
     unmount();
 
-    amplify.publish(WebAppEvents.MEETING.CREATED, meetingId);
-    amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+    await act(async () => {
+      amplify.publish(WebAppEvents.MEETING.CREATED, meetingId);
+      amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+      await Promise.resolve();
+    });
 
     expect(getMeeting).not.toHaveBeenCalled();
   });
