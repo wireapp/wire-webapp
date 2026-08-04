@@ -61,7 +61,7 @@ import {
   iconStyle,
 } from './conversationTabs.styles';
 import {FolderIcon} from './folderIcon';
-import {MeetingsConversationTab} from './MeetingsConversationTab';
+import {MeetingsConversationTab} from './meetingsConversationTab';
 import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 
 import {Config} from '../../../../../Config';

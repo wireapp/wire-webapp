@@ -31,7 +31,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {MeetingsConversationTab} from './MeetingsConversationTab';
+import {MeetingsConversationTab} from './meetingsConversationTab';
 import {SidebarTabs} from '../useSidebarStore';
 
 describe('MeetingsConversationTab', () => {
