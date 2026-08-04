@@ -200,7 +200,7 @@ jobs:
 
   e2e-report:
     runs-on: ubuntu-24.04
-    if: ${{ !cancelled() }}
+    if: ${{ always() && needs.test.result != 'skipped' && needs.test.result != 'cancelled' }}
     needs: [test]
     timeout-minutes: 20
 
@@ -234,7 +234,31 @@ jobs:
           pattern: blob-report-*
           merge-multiple: true
 
+      - name: Check for blob reports
+        id: check_blob_reports
+        run: |
+          blobReportDirectory="${PLAYWRIGHT_REPORT_PATH}/blob-reports"
+          if [ -d "$blobReportDirectory" ] && [ -n "$(find "$blobReportDirectory" -type f -print -quit)" ]; then
+            echo "hasReports=true" >> "$GITHUB_OUTPUT"
+            echo "At least one Playwright blob report was downloaded."
+          else
+            echo "hasReports=false" >> "$GITHUB_OUTPUT"
+            echo "No Playwright blob reports were downloaded."
+          fi
+
+      - name: Summarize missing Playwright report
+        if: ${{ steps.check_blob_reports.outputs.hasReports != 'true' }}
+        run: |
+          {
+            echo "## Playwright report"
+            echo
+            echo "No Playwright blob reports were produced or downloaded."
+            echo "Report merging, upload, and Testiny publication were skipped."
+            echo "The upstream E2E job result was \`${{ needs.test.result }}\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Merge playwright reports
+        if: ${{ steps.check_blob_reports.outputs.hasReports == 'true' }}
         working-directory: apps/webapp
         run: |
           ../../bin/yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
@@ -242,6 +266,7 @@ jobs:
 
       - name: Upload test report
         id: upload_playwright_report
+        if: ${{ steps.check_blob_reports.outputs.hasReports == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: playwright-report
@@ -249,12 +274,13 @@ jobs:
 
       - name: Generate outputs
         id: generate-outputs
+        if: ${{ steps.check_blob_reports.outputs.hasReports == 'true' }}
         run: |
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
 
       - name: Update Testiny Run with results
-        if: ${{ success() && inputs.testinyRunName }}
+        if: ${{ steps.check_blob_reports.outputs.hasReports == 'true' && success() && inputs.testinyRunName }}
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
           TESTINY_RUN_NAME: ${{ inputs.testinyRunName }}
