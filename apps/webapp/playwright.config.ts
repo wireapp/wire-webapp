@@ -32,6 +32,7 @@ const numberOfRetriesOnCI = 2;
  */
 module.exports = defineConfig({
   testDir: './test/e2e_tests',
+  tsconfig: './tsconfig.playwright.json',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

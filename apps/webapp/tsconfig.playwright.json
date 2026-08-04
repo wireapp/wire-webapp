@@ -1,0 +1,41 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "types": ["node"],
+    // Child configurations replace the complete paths object, so keep every alias used by E2E tests here.
+    // @sindresorhus/is is intentionally absent so package exports control its runtime and type resolution.
+    "paths": {
+      "Components/*": ["./src/script/components/*"],
+      "Hooks/*": ["./src/script/hooks/*"],
+      "I18n/*": ["./src/i18n/*"],
+      "Repositories/*": ["./src/script/repositories/*"],
+      "Resource/*": ["./resource/*"],
+      "Util/*": ["./src/script/util/*"],
+      "apps/*": ["apps/*"],
+      "@wireapp/api-client/lib/*": ["../../libraries/api-client/lib/*"],
+      "@wireapp/api-client": ["../../libraries/api-client/lib/apiClient"],
+      "@wireapp/core/lib/*": ["../../libraries/core/src/*"],
+      "@wireapp/core": ["../../libraries/core/src/index.ts"],
+      "@wireapp/react-ui-kit/lib/*": ["../../libraries/react-ui-kit/src/*"],
+      "@wireapp/react-ui-kit/lib": ["../../libraries/react-ui-kit/src/index.ts"],
+      "@wireapp/react-ui-kit": ["../../libraries/react-ui-kit/src/index.ts"],
+      "@wireapp/commons/lib/*": ["../../libraries/commons/src/*"],
+      "@wireapp/commons": ["../../libraries/commons/lib/index"],
+      "@wireapp/webapp-events": ["../../libraries/webapp-events/src/index.ts"],
+      "@wireapp/store-engine/lib/*": ["../../libraries/store-engine/src/*"],
+      "@wireapp/store-engine": ["../../libraries/store-engine/src/index.ts"],
+      "@wireapp/store-engine-dexie": ["../../libraries/store-engine-dexie/src/index.ts"],
+      "@wireapp/config": ["../../libraries/config/lib/index"],
+      "@wireapp/telemetry": ["../../libraries/telemetry/src/index.ts"]
+    }
+  },
+  "include": ["playwright.config.ts", "test/e2e_tests/playwright-globals.d.ts", "test/e2e_tests/**/*.ts", "test/e2e_tests/**/*.tsx"],
+  "exclude": ["node_modules"]
+}
