@@ -17,6 +17,7 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match} from 'ts-pattern';
 import {create} from 'zustand';
 
@@ -29,6 +30,7 @@ export enum MeetingNotificationKind {
 
 type MeetingNotificationBase = {
   id: string;
+  qualifiedId: QualifiedId;
   meetingTitle: string;
 };
 
@@ -56,23 +58,27 @@ export type MeetingNotification =
 export type AddNotificationInput =
   | {
       kind: MeetingNotificationKind.INVITE;
+      qualifiedId: QualifiedId;
       meetingTitle: string;
       organizer: string;
       meetingTime: string;
     }
   | {
       kind: MeetingNotificationKind.UPDATE;
+      qualifiedId: QualifiedId;
       meetingTitle: string;
       meetingTime: string;
     }
   | {
       kind: MeetingNotificationKind.CANCELLED;
+      qualifiedId: QualifiedId;
       meetingTitle: string;
       organizer: string;
       meetingTime: string;
     }
   | {
       kind: MeetingNotificationKind.ONGOING;
+      qualifiedId: QualifiedId;
       meetingTitle: string;
       organizer: string;
       meetingTime: string;
@@ -94,33 +100,46 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
       notifications: [
         ...state.notifications,
         match(input)
-          .with({kind: MeetingNotificationKind.INVITE}, ({kind, meetingTitle, organizer, meetingTime}) => ({
+          .with(
+            {kind: MeetingNotificationKind.INVITE},
+            ({kind, qualifiedId, meetingTitle, organizer, meetingTime}) => ({
+              kind,
+              qualifiedId,
+              meetingTitle,
+              id: `meeting-notification-${nextNotificationId++}`,
+              organizer,
+              meetingTime,
+            }),
+          )
+          .with({kind: MeetingNotificationKind.UPDATE}, ({kind, qualifiedId, meetingTitle, meetingTime}) => ({
             kind,
+            qualifiedId,
             meetingTitle,
             id: `meeting-notification-${nextNotificationId++}`,
-            organizer,
             meetingTime,
           }))
-          .with({kind: MeetingNotificationKind.UPDATE}, ({kind, meetingTitle, meetingTime}) => ({
-            kind,
-            meetingTitle,
-            id: `meeting-notification-${nextNotificationId++}`,
-            meetingTime,
-          }))
-          .with({kind: MeetingNotificationKind.CANCELLED}, ({kind, meetingTitle, organizer, meetingTime}) => ({
-            kind,
-            meetingTitle,
-            id: `meeting-notification-${nextNotificationId++}`,
-            organizer,
-            meetingTime,
-          }))
-          .with({kind: MeetingNotificationKind.ONGOING}, ({kind, meetingTitle, organizer, meetingTime}) => ({
-            kind,
-            meetingTitle,
-            id: `meeting-notification-${nextNotificationId++}`,
-            organizer,
-            meetingTime,
-          }))
+          .with(
+            {kind: MeetingNotificationKind.CANCELLED},
+            ({kind, qualifiedId, meetingTitle, organizer, meetingTime}) => ({
+              kind,
+              qualifiedId,
+              meetingTitle,
+              id: `meeting-notification-${nextNotificationId++}`,
+              organizer,
+              meetingTime,
+            }),
+          )
+          .with(
+            {kind: MeetingNotificationKind.ONGOING},
+            ({kind, qualifiedId, meetingTitle, organizer, meetingTime}) => ({
+              kind,
+              qualifiedId,
+              meetingTitle,
+              id: `meeting-notification-${nextNotificationId++}`,
+              organizer,
+              meetingTime,
+            }),
+          )
           .exhaustive(),
       ],
     })),

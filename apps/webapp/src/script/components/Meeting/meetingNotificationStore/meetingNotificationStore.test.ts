@@ -19,6 +19,8 @@
 
 import {MeetingNotificationKind, useMeetingNotificationStore} from './meetingNotificationStore';
 
+const qualifiedId = {id: 'meeting-id', domain: 'example.com'};
+
 describe('useMeetingNotificationStore', () => {
   beforeEach(() => {
     useMeetingNotificationStore.getState().clearNotifications();
@@ -29,34 +31,40 @@ describe('useMeetingNotificationStore', () => {
 
     addNotification({
       kind: MeetingNotificationKind.CANCELLED,
+      qualifiedId,
       meetingTitle: 'Canceled meeting',
       organizer: 'Organizer',
       meetingTime: 'Jun 01, 09:00 AM',
     });
     addNotification({
       kind: MeetingNotificationKind.UPDATE,
+      qualifiedId,
       meetingTitle: 'Updated meeting',
       meetingTime: 'Jun 01, 09:00 AM',
     });
     addNotification({
       kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
       meetingTitle: 'New meeting',
       organizer: 'Organizer',
       meetingTime: 'Jun 01, 09:00 AM',
     });
     addNotification({
       kind: MeetingNotificationKind.INVITE,
+      qualifiedId: {id: 'another-meeting-id', domain: 'example.com'},
       meetingTitle: 'Another meeting',
       organizer: 'Organizer',
       meetingTime: 'Jun 01, 09:00 AM',
     });
     addNotification({
       kind: MeetingNotificationKind.UPDATE,
+      qualifiedId,
       meetingTitle: 'Updated meeting',
       meetingTime: 'Jun 01, 09:00 AM',
     });
     addNotification({
       kind: MeetingNotificationKind.CANCELLED,
+      qualifiedId,
       meetingTitle: 'Canceled meeting',
       organizer: 'Organizer',
       meetingTime: 'Jun 01, 09:00 AM',
@@ -64,14 +72,17 @@ describe('useMeetingNotificationStore', () => {
 
     expect(useMeetingNotificationStore.getState().notifications).toHaveLength(6);
     expect(
-      useMeetingNotificationStore.getState().notifications.map(({kind, meetingTitle}) => ({kind, meetingTitle})),
+      useMeetingNotificationStore.getState().notifications.map(({kind, qualifiedId: notificationQualifiedId}) => ({
+        kind,
+        qualifiedId: notificationQualifiedId,
+      })),
     ).toEqual([
-      {kind: MeetingNotificationKind.CANCELLED, meetingTitle: 'Canceled meeting'},
-      {kind: MeetingNotificationKind.UPDATE, meetingTitle: 'Updated meeting'},
-      {kind: MeetingNotificationKind.INVITE, meetingTitle: 'New meeting'},
-      {kind: MeetingNotificationKind.INVITE, meetingTitle: 'Another meeting'},
-      {kind: MeetingNotificationKind.UPDATE, meetingTitle: 'Updated meeting'},
-      {kind: MeetingNotificationKind.CANCELLED, meetingTitle: 'Canceled meeting'},
+      {kind: MeetingNotificationKind.CANCELLED, qualifiedId},
+      {kind: MeetingNotificationKind.UPDATE, qualifiedId},
+      {kind: MeetingNotificationKind.INVITE, qualifiedId},
+      {kind: MeetingNotificationKind.INVITE, qualifiedId: {id: 'another-meeting-id', domain: 'example.com'}},
+      {kind: MeetingNotificationKind.UPDATE, qualifiedId},
+      {kind: MeetingNotificationKind.CANCELLED, qualifiedId},
     ]);
     expect(
       new Set(useMeetingNotificationStore.getState().notifications.map(notification => notification.id)).size,
@@ -82,12 +93,14 @@ describe('useMeetingNotificationStore', () => {
     const store = useMeetingNotificationStore.getState();
     store.addNotification({
       kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
       meetingTitle: 'Meeting',
       organizer: 'Organizer',
       meetingTime: 'Jun 01, 09:00 AM',
     });
     store.addNotification({
       kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
       meetingTitle: 'Meeting',
       organizer: 'Organizer',
       meetingTime: 'Jun 01, 09:00 AM',
@@ -102,6 +115,7 @@ describe('useMeetingNotificationStore', () => {
   it('clears all notifications explicitly', () => {
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
       meetingTitle: 'Meeting',
       organizer: 'Organizer',
       meetingTime: 'Jun 01, 09:00 AM',
