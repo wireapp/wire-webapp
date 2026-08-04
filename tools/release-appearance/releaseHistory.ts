@@ -44,7 +44,7 @@ export type CommitRange = {
   readonly commits: readonly string[];
 };
 
-export type ProductionCandidateRange = {
+export type ReleaseCandidateRange = {
   readonly candidateTag: string;
   readonly commitRange: CommitRange;
 };
@@ -55,8 +55,7 @@ export type ReleaseHistoryPlan =
       readonly kind: 'beta';
       readonly currentTag: string;
       readonly precedingProductionTag: string;
-      readonly precedingTag: string;
-      readonly commitRange: CommitRange;
+      readonly candidateRanges: readonly ReleaseCandidateRange[];
     }
   | {
       readonly kind: 'production';
@@ -64,7 +63,7 @@ export type ReleaseHistoryPlan =
       readonly promotedBetaTag: string;
       readonly releaseCommit: string;
       readonly precedingProductionTag: string;
-      readonly candidateRanges: readonly ProductionCandidateRange[];
+      readonly candidateRanges: readonly ReleaseCandidateRange[];
     };
 
 export type PlanBetaReleaseHistoryOptions = {
@@ -114,6 +113,10 @@ type BetaReleaseTagRecord = BetaCandidateRecord & {
   readonly taggerTimestamp: bigint;
 };
 
+type BetaCandidateCommitRecord = BetaCandidateRecord & {
+  readonly commit: string;
+};
+
 type CompareTagOrderOptions = {
   readonly leftTaggerTimestamp: bigint;
   readonly leftReleaseIdentifier: string;
@@ -134,11 +137,11 @@ type CreateCommitRangeOptions = {
   readonly endTag: string;
 };
 
-type ListBetaCandidatesThroughPromotedTagOptions = {
+type ListBetaCandidatesThroughTagOptions = {
   readonly executeGitCommand: ExecuteGitCommand;
   readonly releaseIdentifier: string;
-  readonly promotedBetaCandidate: BetaCandidate;
-  readonly promotedBetaTagName: string;
+  readonly candidateNumber: bigint;
+  readonly currentTagName: string;
 };
 
 const betaTagListPattern = '*-beta.*';
@@ -362,16 +365,17 @@ async function findPrecedingProductionTag(
   return createSuccess(precedingProductionTag);
 }
 
-async function findPrecedingBetaCandidate(
-  executeGitCommand: ExecuteGitCommand,
-  currentBetaCandidate: BetaCandidate,
-): Promise<Result<Maybe<BetaCandidateRecord>, Error>> {
+async function listBetaCandidatesThroughTag(
+  listBetaCandidatesThroughTagOptions: ListBetaCandidatesThroughTagOptions,
+): Promise<Result<readonly BetaCandidateCommitRecord[], Error>> {
+  const {executeGitCommand, releaseIdentifier, candidateNumber, currentTagName} = listBetaCandidatesThroughTagOptions;
   const betaTagNamesResult = await listTagNames(executeGitCommand, betaTagListPattern);
   if (betaTagNamesResult.isErr) {
     return createFailure(betaTagNamesResult.error.message, betaTagNamesResult.error);
   }
 
-  let precedingBetaCandidate: Maybe<BetaCandidateRecord> = Maybe.nothing<BetaCandidateRecord>();
+  const betaCandidateRecords: BetaCandidateCommitRecord[] = [];
+  let currentTagWasFound = false;
   for (const betaTagName of betaTagNamesResult.value) {
     const parsedBetaCandidateResult = parseBetaCandidateTag(betaTagName);
     if (parsedBetaCandidateResult.isErr) {
@@ -380,8 +384,8 @@ async function findPrecedingBetaCandidate(
 
     const parsedBetaCandidate = parsedBetaCandidateResult.value;
     if (
-      parsedBetaCandidate.releaseIdentifier !== currentBetaCandidate.releaseIdentifier ||
-      parsedBetaCandidate.candidateNumber >= currentBetaCandidate.candidateNumber
+      parsedBetaCandidate.releaseIdentifier !== releaseIdentifier ||
+      parsedBetaCandidate.candidateNumber > candidateNumber
     ) {
       continue;
     }
@@ -395,21 +399,42 @@ async function findPrecedingBetaCandidate(
       return createFailure(`Beta candidate tag must be annotated: ${betaTagName}`);
     }
 
-    const betaCandidateRecord: BetaCandidateRecord = {
+    const commitResult = await resolveTagCommit(executeGitCommand, betaTagName);
+    if (commitResult.isErr) {
+      return createFailure(commitResult.error.message, commitResult.error);
+    }
+
+    if (betaTagName === currentTagName) {
+      currentTagWasFound = true;
+    }
+
+    betaCandidateRecords.push({
       ...parsedBetaCandidate,
       tagName: betaTagName,
-    };
-    const shouldReplacePrecedingCandidate = precedingBetaCandidate
-      .map(existingBetaCandidate => {
-        return compareBetaCandidates(betaCandidateRecord, existingBetaCandidate) > 0;
-      })
-      .unwrapOr(true);
-    if (shouldReplacePrecedingCandidate) {
-      precedingBetaCandidate = Maybe.just(betaCandidateRecord);
+      commit: commitResult.value,
+    });
+  }
+
+  if (!currentTagWasFound) {
+    return createFailure(`Current Beta candidate tag was not found in matching tags: ${currentTagName}`);
+  }
+
+  const sortedBetaCandidateRecords = betaCandidateRecords.toSorted((leftCandidate, rightCandidate) => {
+    return compareBetaCandidates(leftCandidate, rightCandidate);
+  });
+  for (let candidateIndex = 0; candidateIndex < sortedBetaCandidateRecords.length; candidateIndex += 1) {
+    const betaCandidate = Maybe.of(sortedBetaCandidateRecords[candidateIndex]);
+    if (betaCandidate.isNothing) {
+      return createFailure('Beta candidate continuity validation failed');
+    }
+
+    const expectedCandidateNumber = BigInt(candidateIndex + 1);
+    if (betaCandidate.value.candidateNumber !== expectedCandidateNumber) {
+      return createFailure(`Missing Beta candidate ${releaseIdentifier}-beta.${expectedCandidateNumber}`);
     }
   }
 
-  return createSuccess(precedingBetaCandidate);
+  return createSuccess(sortedBetaCandidateRecords);
 }
 
 export function findLatestBetaReleaseTag(
@@ -581,10 +606,9 @@ function createCommitRange(createCommitRangeOptions: CreateCommitRangeOptions): 
 }
 
 async function listBetaCandidatesThroughPromotedTag(
-  listBetaCandidatesThroughPromotedTagOptions: ListBetaCandidatesThroughPromotedTagOptions,
+  listBetaCandidatesThroughPromotedTagOptions: ListBetaCandidatesThroughTagOptions,
 ): Promise<Result<readonly BetaCandidateRecord[], Error>> {
-  const {executeGitCommand, releaseIdentifier, promotedBetaCandidate, promotedBetaTagName} =
-    listBetaCandidatesThroughPromotedTagOptions;
+  const {executeGitCommand, releaseIdentifier, candidateNumber, currentTagName} = listBetaCandidatesThroughPromotedTagOptions;
   const betaTagNamesResult = await listTagNames(executeGitCommand, betaTagListPattern);
   if (betaTagNamesResult.isErr) {
     return createFailure(betaTagNamesResult.error.message, betaTagNamesResult.error);
@@ -601,19 +625,19 @@ async function listBetaCandidatesThroughPromotedTag(
     const parsedBetaCandidate = parsedBetaCandidateResult.value;
     if (
       parsedBetaCandidate.releaseIdentifier !== releaseIdentifier ||
-      parsedBetaCandidate.candidateNumber > promotedBetaCandidate.candidateNumber
+      parsedBetaCandidate.candidateNumber > candidateNumber
     ) {
       continue;
     }
 
     betaCandidateRecords.push({...parsedBetaCandidate, tagName: betaTagName});
-    if (betaTagName === promotedBetaTagName) {
+    if (betaTagName === currentTagName) {
       promotedBetaTagWasFound = true;
     }
   }
 
   if (!promotedBetaTagWasFound) {
-    return createFailure(`Promoted Beta tag was not found in matching tags: ${promotedBetaTagName}`);
+    return createFailure(`Promoted Beta tag was not found in matching tags: ${currentTagName}`);
   }
 
   const candidatesThroughPromotedTag = betaCandidateRecords.toSorted((leftCandidate, rightCandidate) => {
@@ -691,34 +715,37 @@ export async function planBetaReleaseHistory(
   }
 
   const precedingProductionTag = precedingProductionTagResult.value.value;
-  const precedingBetaCandidateResult = await findPrecedingBetaCandidate(
+  const betaCandidatesResult = await listBetaCandidatesThroughTag({
     executeGitCommand,
-    parsedBetaCandidateResult.value,
-  );
-  if (precedingBetaCandidateResult.isErr) {
-    return createFailure(precedingBetaCandidateResult.error.message, precedingBetaCandidateResult.error);
+    releaseIdentifier: parsedBetaCandidateResult.value.releaseIdentifier,
+    candidateNumber: parsedBetaCandidateResult.value.candidateNumber,
+    currentTagName: currentBetaTag,
+  });
+  if (betaCandidatesResult.isErr) {
+    return createFailure(betaCandidatesResult.error.message, betaCandidatesResult.error);
   }
 
-  const precedingTag = precedingBetaCandidateResult.value
-    .map(betaCandidate => {
-      return betaCandidate.tagName;
-    })
-    .unwrapOr(precedingProductionTag.tagName);
-  const commitRangeResult = await createCommitRange({
-    executeGitCommand,
-    startTag: precedingTag,
-    endTag: currentBetaTag,
-  });
-  if (commitRangeResult.isErr) {
-    return createFailure(commitRangeResult.error.message, commitRangeResult.error);
+  const candidateRanges: ReleaseCandidateRange[] = [];
+  let precedingTag = precedingProductionTag.tagName;
+  for (const betaCandidate of betaCandidatesResult.value) {
+    const commitRangeResult = await createCommitRange({
+      executeGitCommand,
+      startTag: precedingTag,
+      endTag: betaCandidate.tagName,
+    });
+    if (commitRangeResult.isErr) {
+      return createFailure(commitRangeResult.error.message, commitRangeResult.error);
+    }
+
+    candidateRanges.push({candidateTag: betaCandidate.tagName, commitRange: commitRangeResult.value});
+    precedingTag = betaCandidate.tagName;
   }
 
   return createSuccess({
     kind: 'beta',
     currentTag: currentBetaTag,
     precedingProductionTag: precedingProductionTag.tagName,
-    precedingTag,
-    commitRange: commitRangeResult.value,
+    candidateRanges,
   });
 }
 
@@ -800,14 +827,14 @@ export async function planProductionReleaseHistory(
   const betaCandidatesResult = await listBetaCandidatesThroughPromotedTag({
     executeGitCommand,
     releaseIdentifier: parsedProductionTagResult.value.releaseIdentifier,
-    promotedBetaCandidate: parsedPromotedBetaTagResult.value,
-    promotedBetaTagName: promotedBetaTag,
+    candidateNumber: parsedPromotedBetaTagResult.value.candidateNumber,
+    currentTagName: promotedBetaTag,
   });
   if (betaCandidatesResult.isErr) {
     return createFailure(betaCandidatesResult.error.message, betaCandidatesResult.error);
   }
 
-  const candidateRanges: ProductionCandidateRange[] = [];
+  const candidateRanges: ReleaseCandidateRange[] = [];
   let precedingTag = precedingProductionTag.tagName;
   for (const betaCandidate of betaCandidatesResult.value) {
     const commitRangeResult = await createCommitRange({

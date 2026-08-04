@@ -213,13 +213,14 @@ describe('release history planning', () => {
       if (actualResult.value.kind !== 'beta') {
         assert.fail('Expected a Beta history plan');
       }
-      expect(actualResult.value.commitRange.baseCommit).toBe(productionCommit);
-      expect(actualResult.value.commitRange.endCommit).toBe(betaCommit);
-      expect(actualResult.value.commitRange.commits).toEqual([betaCommit]);
+      expect(actualResult.value.candidateRanges.map(candidateRange => candidateRange.candidateTag)).toEqual([betaTag]);
+      expect(actualResult.value.candidateRanges[0]?.commitRange.baseCommit).toBe(productionCommit);
+      expect(actualResult.value.candidateRanges[0]?.commitRange.endCommit).toBe(betaCommit);
+      expect(actualResult.value.candidateRanges[0]?.commitRange.commits).toEqual([betaCommit]);
     });
   });
 
-  it('plans only the delta introduced by the current Beta candidate', async () => {
+  it('plans every cumulative Beta candidate range through the current candidate', async () => {
     await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
       await createProductionBaseline(repositoryPath);
       const betaOneCommit = await createCommit({
@@ -260,13 +261,58 @@ describe('release history planning', () => {
       if (actualResult.value.kind !== 'beta') {
         assert.fail('Expected a Beta history plan');
       }
-      expect(actualResult.value.precedingTag).toBe(betaOneTag);
-      expect(actualResult.value.commitRange.startTag).toBe(betaOneTag);
-      expect(actualResult.value.commitRange.endTag).toBe(betaTwoTag);
-      expect(actualResult.value.commitRange.baseCommit).toBe(betaOneCommit);
-      expect(actualResult.value.commitRange.endCommit).toBe(betaTwoCommit);
-      expect(actualResult.value.commitRange.commits).toEqual([betaTwoCommit]);
-      expect(actualResult.value.commitRange.commits).not.toContain(betaOneCommit);
+      expect(actualResult.value.candidateRanges.map(candidateRange => candidateRange.candidateTag)).toEqual([
+        betaOneTag,
+        betaTwoTag,
+      ]);
+      expect(actualResult.value.candidateRanges[0]?.commitRange.startTag).toBe('2026-01-01.1-production');
+      expect(actualResult.value.candidateRanges[0]?.commitRange.endTag).toBe(betaOneTag);
+      expect(actualResult.value.candidateRanges[0]?.commitRange.commits).toEqual([betaOneCommit]);
+      expect(actualResult.value.candidateRanges[1]?.commitRange.startTag).toBe(betaOneTag);
+      expect(actualResult.value.candidateRanges[1]?.commitRange.endTag).toBe(betaTwoTag);
+      expect(actualResult.value.candidateRanges[1]?.commitRange.baseCommit).toBe(betaOneCommit);
+      expect(actualResult.value.candidateRanges[1]?.commitRange.endCommit).toBe(betaTwoCommit);
+      expect(actualResult.value.candidateRanges[1]?.commitRange.commits).toEqual([betaTwoCommit]);
+    });
+  });
+
+  it('retains the first non-empty range when repeated Beta candidates point to one commit', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      await createProductionBaseline(repositoryPath);
+      const betaCommit = await createCommit({
+        repositoryPath,
+        fileName: 'beta.txt',
+        fileContents: 'beta',
+        commitDate: '2026-01-02T00:00:00+0000',
+      });
+      const betaOneTag = '2026-01-02.1-beta.1';
+      const betaTwoTag = '2026-01-02.1-beta.2';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: betaOneTag,
+        commit: betaCommit,
+        taggerDate: '2026-01-02T01:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: betaTwoTag,
+        commit: betaCommit,
+        taggerDate: '2026-01-02T02:00:00+0000',
+      });
+
+      const actualResult = await planBetaReleaseHistory({
+        executeGitCommand,
+        currentBetaTag: betaTwoTag,
+        releaseCommit: betaCommit,
+      });
+
+      assert(actualResult.isOk);
+      expect(actualResult.value.kind).toBe('beta');
+      if (actualResult.value.kind !== 'beta') {
+        assert.fail('Expected a Beta history plan');
+      }
+      expect(actualResult.value.candidateRanges[0]?.commitRange.commits).toEqual([betaCommit]);
+      expect(actualResult.value.candidateRanges[1]?.commitRange.commits).toEqual([]);
     });
   });
 
@@ -340,13 +386,15 @@ describe('release history planning', () => {
         assert.fail('Expected a Beta history plan');
       }
       expect(actualResult.value.precedingProductionTag).toBe(newerSiblingProductionTag);
-      expect(actualResult.value.precedingTag).toBe(newerSiblingProductionTag);
       expect(actualResult.value.precedingProductionTag).not.toBe(olderAncestorProductionTag);
-      expect(actualResult.value.commitRange.startTag).toBe(newerSiblingProductionTag);
-      expect(actualResult.value.commitRange.endTag).toBe(currentBetaTag);
-      expect(actualResult.value.commitRange.baseCommit).toBe(commonBaseCommit);
-      expect(actualResult.value.commitRange.endCommit).toBe(currentReleaseCommit);
-      expect(actualResult.value.commitRange.commits).toEqual([olderAncestorProductionCommit, currentReleaseCommit]);
+      expect(actualResult.value.candidateRanges[0]?.commitRange.startTag).toBe(newerSiblingProductionTag);
+      expect(actualResult.value.candidateRanges[0]?.commitRange.endTag).toBe(currentBetaTag);
+      expect(actualResult.value.candidateRanges[0]?.commitRange.baseCommit).toBe(commonBaseCommit);
+      expect(actualResult.value.candidateRanges[0]?.commitRange.endCommit).toBe(currentReleaseCommit);
+      expect(actualResult.value.candidateRanges[0]?.commitRange.commits).toEqual([
+        olderAncestorProductionCommit,
+        currentReleaseCommit,
+      ]);
     });
   });
 
