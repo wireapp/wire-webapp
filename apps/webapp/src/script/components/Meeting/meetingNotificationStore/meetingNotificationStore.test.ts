@@ -111,6 +111,72 @@ describe('useMeetingNotificationStore', () => {
     expect(useMeetingNotificationStore.getState().notifications[0]).not.toHaveProperty('meetingTime');
   });
 
+  it('stores the discriminated fields for every notification kind', () => {
+    const store = useMeetingNotificationStore.getState();
+
+    store.addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Invite meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    store.addNotification({
+      kind: MeetingNotificationKind.UPDATE,
+      qualifiedId,
+      meetingTitle: 'Updated meeting',
+      meetingStartTime,
+    });
+    store.addNotification({
+      kind: MeetingNotificationKind.CANCELLED,
+      qualifiedId,
+      meetingTitle: 'Cancelled meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    store.addNotification({
+      kind: MeetingNotificationKind.ONGOING,
+      qualifiedId,
+      meetingTitle: 'Ongoing meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([
+      {
+        id: 'meeting-notification-0',
+        kind: MeetingNotificationKind.INVITE,
+        qualifiedId,
+        meetingTitle: 'Invite meeting',
+        qualifiedCreator,
+        meetingStartTime,
+      },
+      {
+        id: 'meeting-notification-1',
+        kind: MeetingNotificationKind.UPDATE,
+        qualifiedId,
+        meetingTitle: 'Updated meeting',
+        meetingStartTime,
+      },
+      {
+        id: 'meeting-notification-2',
+        kind: MeetingNotificationKind.CANCELLED,
+        qualifiedId,
+        meetingTitle: 'Cancelled meeting',
+        qualifiedCreator,
+        meetingStartTime,
+      },
+      {
+        id: 'meeting-notification-3',
+        kind: MeetingNotificationKind.ONGOING,
+        qualifiedId,
+        meetingTitle: 'Ongoing meeting',
+        qualifiedCreator,
+        meetingStartTime,
+      },
+    ]);
+  });
+
   it('dismisses only the selected notification by ID', () => {
     const store = useMeetingNotificationStore.getState();
     store.addNotification({
