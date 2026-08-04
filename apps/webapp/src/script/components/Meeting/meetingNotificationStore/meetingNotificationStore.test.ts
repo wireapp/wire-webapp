@@ -20,6 +20,8 @@
 import {MeetingNotificationKind, useMeetingNotificationStore} from './meetingNotificationStore';
 
 const qualifiedId = {id: 'meeting-id', domain: 'example.com'};
+const qualifiedCreator = {id: 'creator-id', domain: 'example.com'};
+const meetingStartTime = '2026-06-01T09:00:00.000Z';
 
 describe('useMeetingNotificationStore', () => {
   beforeEach(() => {
@@ -33,41 +35,41 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.CANCELLED,
       qualifiedId,
       meetingTitle: 'Canceled meeting',
-      organizer: 'Organizer',
-      meetingTime: 'Jun 01, 09:00 AM',
+      qualifiedCreator,
+      meetingStartTime,
     });
     addNotification({
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
       meetingTitle: 'Updated meeting',
-      meetingTime: 'Jun 01, 09:00 AM',
+      meetingStartTime,
     });
     addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'New meeting',
-      organizer: 'Organizer',
-      meetingTime: 'Jun 01, 09:00 AM',
+      qualifiedCreator,
+      meetingStartTime,
     });
     addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId: {id: 'another-meeting-id', domain: 'example.com'},
       meetingTitle: 'Another meeting',
-      organizer: 'Organizer',
-      meetingTime: 'Jun 01, 09:00 AM',
+      qualifiedCreator,
+      meetingStartTime,
     });
     addNotification({
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
       meetingTitle: 'Updated meeting',
-      meetingTime: 'Jun 01, 09:00 AM',
+      meetingStartTime,
     });
     addNotification({
       kind: MeetingNotificationKind.CANCELLED,
       qualifiedId,
       meetingTitle: 'Canceled meeting',
-      organizer: 'Organizer',
-      meetingTime: 'Jun 01, 09:00 AM',
+      qualifiedCreator,
+      meetingStartTime,
     });
 
     expect(useMeetingNotificationStore.getState().notifications).toHaveLength(6);
@@ -89,21 +91,41 @@ describe('useMeetingNotificationStore', () => {
     ).toBe(6);
   });
 
+  it('stores raw meeting data for formatting at render time', () => {
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications[0]).toMatchObject({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    expect(useMeetingNotificationStore.getState().notifications[0]).not.toHaveProperty('organizer');
+    expect(useMeetingNotificationStore.getState().notifications[0]).not.toHaveProperty('meetingTime');
+  });
+
   it('dismisses only the selected notification by ID', () => {
     const store = useMeetingNotificationStore.getState();
     store.addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
-      organizer: 'Organizer',
-      meetingTime: 'Jun 01, 09:00 AM',
+      qualifiedCreator,
+      meetingStartTime,
     });
     store.addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
-      organizer: 'Organizer',
-      meetingTime: 'Jun 01, 09:00 AM',
+      qualifiedCreator,
+      meetingStartTime,
     });
     const [first, second] = useMeetingNotificationStore.getState().notifications;
 
@@ -117,8 +139,8 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
-      organizer: 'Organizer',
-      meetingTime: 'Jun 01, 09:00 AM',
+      qualifiedCreator,
+      meetingStartTime,
     });
 
     useMeetingNotificationStore.getState().clearNotifications();

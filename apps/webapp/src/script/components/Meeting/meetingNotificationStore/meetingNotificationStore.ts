@@ -37,22 +37,22 @@ type MeetingNotificationBase = {
 export type MeetingNotification =
   | (MeetingNotificationBase & {
       kind: MeetingNotificationKind.INVITE;
-      organizer: string;
-      meetingTime: string;
+      qualifiedCreator: QualifiedId;
+      meetingStartTime: string;
     })
   | (MeetingNotificationBase & {
       kind: MeetingNotificationKind.UPDATE;
-      meetingTime: string;
+      meetingStartTime: string;
     })
   | (MeetingNotificationBase & {
       kind: MeetingNotificationKind.CANCELLED;
-      organizer: string;
-      meetingTime: string;
+      qualifiedCreator: QualifiedId;
+      meetingStartTime: string;
     })
   | (MeetingNotificationBase & {
       kind: MeetingNotificationKind.ONGOING;
-      organizer: string;
-      meetingTime: string;
+      qualifiedCreator: QualifiedId;
+      meetingStartTime: string;
     });
 
 export type AddNotificationInput =
@@ -60,28 +60,28 @@ export type AddNotificationInput =
       kind: MeetingNotificationKind.INVITE;
       qualifiedId: QualifiedId;
       meetingTitle: string;
-      organizer: string;
-      meetingTime: string;
+      qualifiedCreator: QualifiedId;
+      meetingStartTime: string;
     }
   | {
       kind: MeetingNotificationKind.UPDATE;
       qualifiedId: QualifiedId;
       meetingTitle: string;
-      meetingTime: string;
+      meetingStartTime: string;
     }
   | {
       kind: MeetingNotificationKind.CANCELLED;
       qualifiedId: QualifiedId;
       meetingTitle: string;
-      organizer: string;
-      meetingTime: string;
+      qualifiedCreator: QualifiedId;
+      meetingStartTime: string;
     }
   | {
       kind: MeetingNotificationKind.ONGOING;
       qualifiedId: QualifiedId;
       meetingTitle: string;
-      organizer: string;
-      meetingTime: string;
+      qualifiedCreator: QualifiedId;
+      meetingStartTime: string;
     };
 
 type MeetingNotificationStore = {
@@ -102,42 +102,42 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
         match(input)
           .with(
             {kind: MeetingNotificationKind.INVITE},
-            ({kind, qualifiedId, meetingTitle, organizer, meetingTime}) => ({
+            ({kind, qualifiedId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
               kind,
               qualifiedId,
               meetingTitle,
               id: `meeting-notification-${nextNotificationId++}`,
-              organizer,
-              meetingTime,
+              qualifiedCreator,
+              meetingStartTime,
             }),
           )
-          .with({kind: MeetingNotificationKind.UPDATE}, ({kind, qualifiedId, meetingTitle, meetingTime}) => ({
+          .with({kind: MeetingNotificationKind.UPDATE}, ({kind, qualifiedId, meetingTitle, meetingStartTime}) => ({
             kind,
             qualifiedId,
             meetingTitle,
             id: `meeting-notification-${nextNotificationId++}`,
-            meetingTime,
+            meetingStartTime,
           }))
           .with(
             {kind: MeetingNotificationKind.CANCELLED},
-            ({kind, qualifiedId, meetingTitle, organizer, meetingTime}) => ({
+            ({kind, qualifiedId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
               kind,
               qualifiedId,
               meetingTitle,
               id: `meeting-notification-${nextNotificationId++}`,
-              organizer,
-              meetingTime,
+              qualifiedCreator,
+              meetingStartTime,
             }),
           )
           .with(
             {kind: MeetingNotificationKind.ONGOING},
-            ({kind, qualifiedId, meetingTitle, organizer, meetingTime}) => ({
+            ({kind, qualifiedId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
               kind,
               qualifiedId,
               meetingTitle,
               id: `meeting-notification-${nextNotificationId++}`,
-              organizer,
-              meetingTime,
+              qualifiedCreator,
+              meetingStartTime,
             }),
           )
           .exhaustive(),
