@@ -147,4 +147,26 @@ describe('useMeetingNotificationStore', () => {
 
     expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
   });
+
+  it('resets notification IDs when clearing notifications', () => {
+    const store = useMeetingNotificationStore.getState();
+    store.addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+
+    store.clearNotifications();
+    store.addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications[0]?.id).toBe('meeting-notification-0');
+  });
 });
