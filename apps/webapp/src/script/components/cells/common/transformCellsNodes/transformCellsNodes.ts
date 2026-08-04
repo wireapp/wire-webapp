@@ -131,6 +131,12 @@ const getUploadedAtTimestamp = (node: RestNode): number => {
 };
 
 const getFileSize = (node: RestNode): string => {
+  const isSizeMissing = node.Size === null || node.Size === undefined;
+
+  if (isSizeMissing && node.Type !== 'COLLECTION') {
+    return '-';
+  }
+
   return formatBytes((node.Size ?? 0) as unknown as number);
 };
 

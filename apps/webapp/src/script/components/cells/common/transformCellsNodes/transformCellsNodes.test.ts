@@ -54,6 +54,17 @@ describe('transformCellsNodes', () => {
     expect(node.sizeMb).toBe('0 B');
   });
 
+  it.each([
+    {label: 'null', size: null},
+    {label: 'missing', size: undefined},
+  ])('preserves a $label file size as unknown', ({size}) => {
+    const fileWithoutSize = createStubNode({Size: size} as Partial<RestNode>);
+
+    const [node] = transformCellsNodes({nodes: [fileWithoutSize], users: []});
+
+    expect(node.sizeMb).toBe('-');
+  });
+
   it('enriches a node with its conversation when conversations are provided', () => {
     const conversation = {qualifiedId: {domain: 'example.com', id: 'conversation'}} as Conversation;
 
