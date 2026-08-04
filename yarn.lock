@@ -2840,7 +2840,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.22.6, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.22.6, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
   version: 7.28.4
   resolution: "@babel/runtime@npm:7.28.4"
   checksum: 10/6c9a70452322ea80b3c9b2a412bcf60771819213a67576c8cec41e88a95bb7bf01fc983754cda35dc19603eef52df22203ccbf7777b9d6316932f9fb77c25163
@@ -16829,11 +16829,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest-dom@npm:5.7.0":
-  version: 5.7.0
-  resolution: "eslint-plugin-jest-dom@npm:5.7.0"
+"eslint-plugin-jest-dom@npm:5.9.0":
+  version: 5.9.0
+  resolution: "eslint-plugin-jest-dom@npm:5.9.0"
   dependencies:
-    "@babel/runtime": "npm:^7.16.3"
     requireindex: "npm:^1.2.0"
   peerDependencies:
     "@testing-library/dom": ^8.0.0 || ^9.0.0 || ^10.0.0
@@ -16841,7 +16840,7 @@ __metadata:
   peerDependenciesMeta:
     "@testing-library/dom":
       optional: true
-  checksum: 10/bbba0a151c011a6135955d463a2fc51938951a51262f2cd20416cacbd7db53ff16b5780238a8bc7c0a816f4cc5504315b8e20e28a5bd73342754ee681d7011d0
+  checksum: 10/0433b0759194a8c0d9990692ba9b643c8721678a0f50321b55e528d6ac4af758ace96bbe474b2053f134d10ac55aef160c902f59772b17b8fdcdf3b249db32e5
   languageName: node
   linkType: hard
 
@@ -32557,7 +32556,7 @@ __metadata:
     eslint-plugin-header: "npm:3.1.1"
     eslint-plugin-import: "npm:2.32.0"
     eslint-plugin-jest: "npm:29.16.0"
-    eslint-plugin-jest-dom: "npm:5.7.0"
+    eslint-plugin-jest-dom: "npm:5.9.0"
     eslint-plugin-jsdoc: "npm:61.7.1"
     eslint-plugin-jsx-a11y: "npm:6.10.2"
     eslint-plugin-no-unsanitized: "npm:4.1.5"
