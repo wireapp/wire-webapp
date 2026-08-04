@@ -98,9 +98,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:3.1100.0":
-  version: 3.1100.0
-  resolution: "@aws-sdk/client-s3@npm:3.1100.0"
+"@aws-sdk/client-s3@npm:3.1101.0":
+  version: 3.1101.0
+  resolution: "@aws-sdk/client-s3@npm:3.1101.0"
   dependencies:
     "@aws-sdk/checksums": "npm:^3.1000.24"
     "@aws-sdk/core": "npm:^3.977.4"
@@ -113,7 +113,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.9.13"
     "@smithy/types": "npm:^4.16.1"
     tslib: "npm:^2.6.2"
-  checksum: 10/f00221303fbe0c1f63c76f32b71ae47b0cb6b30136a86d219aa33caf26a58bdd30cd217e79189b0388c09506e9f88a1309b9bcc804f42f175451c43facb2e20a
+  checksum: 10/4c1056bb16694d88a53cf8a6467ee7dcd6af07f0de0cbdf6975af0cee422ab495fe990087a75f6774d134b7586d7e56cea6eec02e824e7f8236f74900d6fe04a
   languageName: node
   linkType: hard
 
@@ -257,9 +257,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.1100.0":
-  version: 3.1100.0
-  resolution: "@aws-sdk/lib-storage@npm:3.1100.0"
+"@aws-sdk/lib-storage@npm:3.1101.0":
+  version: 3.1101.0
+  resolution: "@aws-sdk/lib-storage@npm:3.1101.0"
   dependencies:
     "@smithy/core": "npm:^3.31.1"
     "@smithy/types": "npm:^4.16.1"
@@ -268,8 +268,8 @@ __metadata:
     stream-browserify: "npm:3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
-    "@aws-sdk/client-s3": ^3.1100.0
-  checksum: 10/3ba213f1be8a7e42743c1e99ff922de3be819daf72c2d75b408134d68fd2f951dda4d1bc9a86bec7b837c4f5d948d5ee3d96c044264d734326347d317dbaf2a7
+    "@aws-sdk/client-s3": ^3.1101.0
+  checksum: 10/f20cef5d4012835dce523b8b6550db207dd5f5b55caae767eab57136495186d3e921f55bac86f0aaf1780a0e611f27be268b008455b32d25e7fdbeefdc89e87f
   languageName: node
   linkType: hard
 
@@ -11414,8 +11414,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/api-client@workspace:libraries/api-client"
   dependencies:
-    "@aws-sdk/client-s3": "npm:3.1100.0"
-    "@aws-sdk/lib-storage": "npm:3.1100.0"
+    "@aws-sdk/client-s3": "npm:3.1101.0"
+    "@aws-sdk/lib-storage": "npm:3.1101.0"
     "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:1.15.47"
     "@swc/jest": "npm:0.2.39"
