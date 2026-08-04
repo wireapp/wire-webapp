@@ -143,7 +143,7 @@ describe('useMeetNowSubmit', () => {
     });
   });
 
-  it('returns joined, refreshes meetings, and joins the created conversation after a successful submit', async () => {
+  it('returns joined and joins the created conversation after a successful submit', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
@@ -161,7 +161,7 @@ describe('useMeetNowSubmit', () => {
 
     expect(submitResult).toBe(meetNowSubmitResults.joined);
     expect(meetNowMeeting).toHaveBeenCalledWith(meetNowCommand);
-    expect(loadMeetings).toHaveBeenCalledTimes(1);
+    expect(loadMeetings).not.toHaveBeenCalled();
     expect(findConversation).toHaveBeenCalledWith(qualifiedConversation);
     expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversation);
     expect(startAudio).toHaveBeenCalledTimes(1);
@@ -249,7 +249,7 @@ describe('useMeetNowSubmit', () => {
     });
 
     expect(submitResult).toBe(meetNowSubmitResults.joinBlocked);
-    expect(loadMeetings).toHaveBeenCalledTimes(1);
+    expect(loadMeetings).not.toHaveBeenCalled();
     expect(startAudio).not.toHaveBeenCalled();
     expect(showModalSpy).toHaveBeenCalledWith(
       PrimaryModal.type.ACKNOWLEDGE,

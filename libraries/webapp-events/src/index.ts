@@ -160,6 +160,7 @@ export const WebAppEvents = {
   MEETING: {
     CREATED: 'wire.webapp.meeting.created',
     DELETED: 'wire.webapp.meeting.deleted',
+    MEMBER_ADDED: 'wire.webapp.meeting.member_added',
     UPDATED: 'wire.webapp.meeting.updated',
   },
   NOTIFICATION: {

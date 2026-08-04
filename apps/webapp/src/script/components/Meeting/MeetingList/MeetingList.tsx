@@ -22,7 +22,7 @@ import {useCallback, useEffect, useMemo, useState, type RefObject} from 'react';
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {formatISO9075, startOfDay} from 'date-fns';
 
-import {Loading} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Loading} from '@wireapp/react-ui-kit';
 
 import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
 import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeetingList';
@@ -50,6 +50,7 @@ export interface MeetingListProps {
   meetingSeries: MeetingSeries[];
   isLoading: boolean;
   hasLoadError: boolean;
+  onRefresh: () => void;
   selfUser: User | undefined;
   scrollElementRef?: RefObject<HTMLElement | null>;
   useMeetingDayGroupVirtualizer?: UseMeetingDayGroupVirtualizer;
@@ -78,6 +79,7 @@ export const MeetingList = ({
   meetingSeries,
   isLoading,
   hasLoadError,
+  onRefresh,
   selfUser,
   scrollElementRef,
   useMeetingDayGroupVirtualizer: useMeetingDayGroupVirtualizerDependency = useMeetingDayGroupVirtualizer,
@@ -161,7 +163,10 @@ export const MeetingList = ({
   if (hasLoadError) {
     return (
       <div css={meetingListContainerStyles} data-uie-name="meetings-list-error">
-        {translate('meetings.list.loadError')}
+        <p>{translate('meetings.list.loadError')}</p>
+        <Button variant={ButtonVariant.TERTIARY} onClick={onRefresh} data-uie-name="do-refresh-meetings">
+          {translate('meetings.list.refresh')}
+        </Button>
       </div>
     );
   }

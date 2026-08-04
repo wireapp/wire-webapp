@@ -71,6 +71,16 @@ describe('subscribeToMeetingLifecycleEvents', () => {
     expect(dispatcher.enqueueMeetingRemoval).not.toHaveBeenCalled();
   });
 
+  it('queues a meeting sync when a meeting member-added event is published', () => {
+    const dispatcher = createDispatcherDouble();
+    subscribe(dispatcher);
+
+    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
+
+    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId);
+    expect(dispatcher.enqueueMeetingRemoval).not.toHaveBeenCalled();
+  });
+
   it('queues a meeting removal when a meeting deleted event is published', () => {
     const dispatcher = createDispatcherDouble();
     subscribe(dispatcher);
@@ -98,6 +108,7 @@ describe('subscribeToMeetingLifecycleEvents', () => {
 
     amplify.publish(WebAppEvents.MEETING.CREATED, meetingId);
     amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId);
+    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
     amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
     amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
 

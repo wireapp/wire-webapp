@@ -585,6 +585,7 @@ export class EventRepository {
       [MEETING_EVENT.CREATE]: WebAppEvents.MEETING.CREATED,
       [MEETING_EVENT.UPDATE]: WebAppEvents.MEETING.UPDATED,
       [MEETING_EVENT.DELETE]: WebAppEvents.MEETING.DELETED,
+      [MEETING_EVENT.MEMBER_ADD]: WebAppEvents.MEETING.MEMBER_ADDED,
     };
 
     const webAppEvent = webAppEventByMeetingEvent[event.type as MEETING_EVENT];

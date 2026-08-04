@@ -276,6 +276,7 @@ describe('EventRepository', () => {
       [MEETING_EVENT.CREATE, WebAppEvents.MEETING.CREATED],
       [MEETING_EVENT.UPDATE, WebAppEvents.MEETING.UPDATED],
       [MEETING_EVENT.DELETE, WebAppEvents.MEETING.DELETED],
+      [MEETING_EVENT.MEMBER_ADD, WebAppEvents.MEETING.MEMBER_ADDED],
     ] as const;
 
     it.each(meetingLifecycleCases)(
@@ -343,6 +344,7 @@ describe('EventRepository', () => {
       expect(amplify.publish).not.toHaveBeenCalledWith(WebAppEvents.MEETING.CREATED, expect.anything());
       expect(amplify.publish).not.toHaveBeenCalledWith(WebAppEvents.MEETING.UPDATED, expect.anything());
       expect(amplify.publish).not.toHaveBeenCalledWith(WebAppEvents.MEETING.DELETED, expect.anything());
+      expect(amplify.publish).not.toHaveBeenCalledWith(WebAppEvents.MEETING.MEMBER_ADDED, expect.anything());
     });
   });
 

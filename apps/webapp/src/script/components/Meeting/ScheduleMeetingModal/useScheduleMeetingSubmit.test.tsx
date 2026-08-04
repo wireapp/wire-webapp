@@ -111,7 +111,7 @@ describe('useScheduleMeetingSubmit', () => {
     useScheduleMeetingModal.getState().reset(testWallClock);
   });
 
-  it('refreshes meetings after a successful submit', async () => {
+  it('does not refresh meetings after a successful submit', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
@@ -125,7 +125,7 @@ describe('useScheduleMeetingSubmit', () => {
 
     expect(submitResult).toBe(scheduleMeetingSubmitResults.succeeded);
     expect(scheduleMeeting).toHaveBeenCalledWith(scheduleCommand);
-    expect(loadMeetings).toHaveBeenCalledTimes(1);
+    expect(loadMeetings).not.toHaveBeenCalled();
   });
 
   it('returns setupFailed and refreshes meetings after a partial create failure', async () => {
