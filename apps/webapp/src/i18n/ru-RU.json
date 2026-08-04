@@ -1298,6 +1298,7 @@
   "meetings.error.conversationSetupFailed": "Информация о встрече была сохранена, но при настройке что-то пошло не так. Пожалуйста, попробуйте еще раз.",
   "meetings.error.setupFailedTitle": "Не удалось завершить настройку встречи",
   "meetings.list.loadError": "Не удалось загрузить встречи. Попробуйте еще раз.",
+  "meetings.list.refresh": "Обновить",
   "meetings.list.today": "Сегодня",
   "meetings.list.tomorrow": "Завтра",
   "meetings.meetNowModal.closeAriaLabel": "Закрыть",
