@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, CalendarIcon} from '@wireapp/react-ui-kit';
 
 import {UserState} from 'Repositories/user/userState';
-import type {TranslationKey} from 'Util/localizerUtil';
-import {translate} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {Translate, TranslationKey} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {formatLocale} from 'Util/timeUtil';
 
@@ -62,7 +62,13 @@ const getOrganizer = (qualifiedCreator: QualifiedId) =>
 
 const getMeetingTime = (meetingStartTime: string) => formatLocale(meetingStartTime, 'PP, p');
 
-const MeetingNotificationMetadata = ({notification}: {notification: MeetingNotification}) => {
+const MeetingNotificationMetadata = ({
+  notification,
+  translate,
+}: {
+  notification: MeetingNotification;
+  translate: Translate;
+}) => {
   return match(notification)
     .with({kind: MeetingNotificationKind.INVITE}, ({qualifiedCreator, meetingStartTime}) => {
       const organizer = getOrganizer(qualifiedCreator);
@@ -109,6 +115,7 @@ const MeetingNotificationMetadata = ({notification}: {notification: MeetingNotif
 };
 
 export const MeetingNotificationCard = (notification: MeetingNotificationCardProps) => {
+  const {translate} = useApplicationContext();
   const {kind, meetingTitle, id, onDismiss} = notification;
   return (
     <div
@@ -121,7 +128,7 @@ export const MeetingNotificationCard = (notification: MeetingNotificationCardPro
         {translate('meetings.notifications.title', {label: translate(notificationLabels[kind]), meetingTitle})}
       </div>
       <div css={meetingNotificationCardMetadataStyles}>
-        <MeetingNotificationMetadata notification={notification} />
+        <MeetingNotificationMetadata notification={notification} translate={translate} />
       </div>
       <div css={meetingNotificationCardActionsStyles}>
         <Button

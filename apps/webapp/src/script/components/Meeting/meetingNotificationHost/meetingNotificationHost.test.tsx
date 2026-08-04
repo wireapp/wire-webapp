@@ -17,24 +17,35 @@
  *
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
-import { ThemeProvider } from "@wireapp/react-ui-kit";
+import {fireEvent, render, screen} from '@testing-library/react';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ThemeProvider} from '@wireapp/react-ui-kit';
 
+import {MeetingNotificationHost} from './meetingNotificationHost';
 import {
   MeetingNotificationKind,
-  useMeetingNotificationStore
-} from "../meetingNotificationStore/meetingNotificationStore";
-import { MeetingNotificationHost } from "./meetingNotificationHost";
+  useMeetingNotificationStore,
+} from '../meetingNotificationStore/meetingNotificationStore';
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
-jest.mock('Util/localizerUtil', () => ({
-  translate: (key: string) => key,
-}));
+const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
+const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
+const meetingStartTime = '2026-06-01T09:00:00.000Z';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const renderHost = (target: HTMLElement | null = document.getElementById('wire-main')) =>
   render(
     <ThemeProvider>
       <MeetingNotificationHost targetElement={target} />
     </ThemeProvider>,
+    {wrapper: rootProviderWrapper},
   );
 
 describe('MeetingNotificationHost', () => {
@@ -50,15 +61,23 @@ describe('MeetingNotificationHost', () => {
   });
 
   it('shows the active card count in the collapsed header', () => {
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.CANCELLED,
+      qualifiedId,
+      meetingTitle: 'Canceled',
+      qualifiedCreator,
+      meetingStartTime,
+    });
     useMeetingNotificationStore
       .getState()
-      .addNotification({kind: MeetingNotificationKind.CANCELLED, meetingTitle: 'Canceled', organizer: 'Organizer', meetingTime: 'Jun 01, 09:00 AM'});
-    useMeetingNotificationStore
-      .getState()
-      .addNotification({kind: MeetingNotificationKind.UPDATE, meetingTitle: 'Updated', meetingTime: 'Jun 01, 09:00 AM'});
-    useMeetingNotificationStore
-      .getState()
-      .addNotification({kind: MeetingNotificationKind.INVITE, meetingTitle: 'Invited', organizer: 'Organizer', meetingTime: 'Jun 01, 09:00 AM'});
+      .addNotification({kind: MeetingNotificationKind.UPDATE, qualifiedId, meetingTitle: 'Updated', meetingStartTime});
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Invited',
+      qualifiedCreator,
+      meetingStartTime,
+    });
 
     renderHost();
 
@@ -67,7 +86,13 @@ describe('MeetingNotificationHost', () => {
   });
 
   it('dismisses all notifications from the collapsed view', () => {
-    useMeetingNotificationStore.getState().addNotification({kind: MeetingNotificationKind.INVITE, meetingTitle: 'One', organizer: 'Organizer', meetingTime: 'Jun 01, 09:00 AM'});
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'One',
+      qualifiedCreator,
+      meetingStartTime,
+    });
 
     renderHost();
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.dismissAll'}));
@@ -77,26 +102,54 @@ describe('MeetingNotificationHost', () => {
 
   it('expands to individual cards and dismisses only the selected card', () => {
     const {addNotification} = useMeetingNotificationStore.getState();
-    addNotification({kind: MeetingNotificationKind.INVITE, meetingTitle: 'One', organizer: 'Organizer', meetingTime: 'Jun 01, 09:00 AM'});
-    addNotification({kind: MeetingNotificationKind.INVITE, meetingTitle: 'Two', organizer: 'Organizer', meetingTime: 'Jun 01, 09:00 AM'});
-    addNotification({kind: MeetingNotificationKind.INVITE, meetingTitle: 'Three', organizer: 'Organizer', meetingTime: 'Jun 01, 09:00 AM'});
-    addNotification({kind: MeetingNotificationKind.INVITE, meetingTitle: 'Four', organizer: 'Organizer', meetingTime: 'Jun 01, 09:00 AM'});
-    addNotification({kind: MeetingNotificationKind.UPDATE, meetingTitle: 'Updated', meetingTime: 'Jun 01, 09:00 AM'});
+    addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'One',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Two',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Three',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Four',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    addNotification({kind: MeetingNotificationKind.UPDATE, qualifiedId, meetingTitle: 'Updated', meetingStartTime});
 
     renderHost();
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.expand'}));
 
-    expect(screen.getAllByRole('status')).toHaveLength(5);
+    expect(screen.getAllByRole('listitem')).toHaveLength(5);
     expect(screen.getByTestId('meeting-notification-list')).toHaveStyle({overflowY: 'auto'});
     fireEvent.click(screen.getAllByRole('button', {name: 'meetings.notifications.dismiss'})[0]);
-    expect(screen.getAllByRole('status')).toHaveLength(4);
+    expect(screen.getAllByRole('listitem')).toHaveLength(4);
     expect(screen.getAllByText('meetings.notifications.title')).toHaveLength(4);
   });
 
   it('dismisses all cards and collapse preserves cards', () => {
-    useMeetingNotificationStore
-      .getState()
-      .addNotification({kind: MeetingNotificationKind.INVITE, meetingTitle: 'Meeting', organizer: 'Organizer', meetingTime: 'Jun 01, 09:00 AM'});
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
 
     renderHost();
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.expand'}));
@@ -110,9 +163,13 @@ describe('MeetingNotificationHost', () => {
 
   it('moves the panel to the current route target without a new notification', () => {
     document.body.innerHTML = '<div id="wire-main"><div id="conversations"></div></div>';
-    useMeetingNotificationStore
-      .getState()
-      .addNotification({kind: MeetingNotificationKind.INVITE, meetingTitle: 'Meeting', organizer: 'Organizer', meetingTime: 'Jun 01, 09:00 AM'});
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
 
     const {rerender} = renderHost(document.getElementById('conversations'));
     const conversations = document.getElementById('conversations');

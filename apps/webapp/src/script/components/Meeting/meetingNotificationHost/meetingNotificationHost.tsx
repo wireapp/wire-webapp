@@ -25,7 +25,7 @@ import {ChevronIcon} from '@wireapp/react-ui-kit';
 
 import {MeetingNotificationCard} from 'Components/Meeting/meetingNotificationCard/meetingNotificationCard';
 import {useMeetingNotificationStore} from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
-import {translate} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   meetingNotificationHostButtonStyles,
@@ -45,6 +45,7 @@ type MeetingNotificationHostProps = {
 };
 
 export const MeetingNotificationHost = ({targetElement = null}: MeetingNotificationHostProps) => {
+  const {translate} = useApplicationContext();
   const notifications = useMeetingNotificationStore(state => state.notifications);
   const [isExpanded, setIsExpanded] = useState(false);
   const [fallbackDimensions, setFallbackDimensions] = useState({left: 16, width: 320});
