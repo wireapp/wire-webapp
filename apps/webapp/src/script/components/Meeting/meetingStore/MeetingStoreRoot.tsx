@@ -24,10 +24,13 @@ import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStore
 import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/Meeting/shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/Meeting/shared/service/meetingService';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {getLogger} from 'Util/logger';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
 import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEvents';
+
+const logger = getLogger('MeetingStoreRoot');
 
 type MeetingStoreRootProps = {
   children: ReactNode;
@@ -70,6 +73,9 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       loadMeetings: () => store.getState().loadMeetings(),
       syncMeeting: meetingId => store.getState().syncMeetingByQualifiedId(meetingId),
       removeMeeting: meetingId => store.getState().removeMeetingByQualifiedId(meetingId),
+      reportOperationFailure: operationName => {
+        logger.warn('Meeting lifecycle operation failed', {operationName});
+      },
     });
 
     const unsubscribeFromMeetingLifecycleEvents = subscribeToMeetingLifecycleEvents({dispatcher});

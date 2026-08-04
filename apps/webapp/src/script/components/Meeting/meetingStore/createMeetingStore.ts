@@ -88,15 +88,33 @@ export type MeetingStore = StoreApi<MeetingStoreState>;
 
 type MeetingStoreInitialState = Partial<Pick<MeetingStoreState, 'meetingSeries' | 'isLoading' | 'hasLoadError'>>;
 
-export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: MeetingStoreInitialState): MeetingStore =>
-  createStore<MeetingStoreState>(set => ({
+const toQualifiedIdKey = (qualifiedId: QualifiedId): string => `${qualifiedId.domain}:${qualifiedId.id}`;
+
+export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: MeetingStoreInitialState): MeetingStore => {
+  const meetingMutationVersions = new Map<string, number>();
+  let meetingStoreMutationVersion = 0;
+  const getMeetingMutationVersion = (meetingId: QualifiedId): number =>
+    meetingMutationVersions.get(toQualifiedIdKey(meetingId)) ?? 0;
+  const incrementMeetingMutationVersion = (meetingId: QualifiedId): void => {
+    const meetingIdKey = toQualifiedIdKey(meetingId);
+    meetingMutationVersions.set(meetingIdKey, getMeetingMutationVersion(meetingId) + 1);
+    meetingStoreMutationVersion += 1;
+  };
+
+  return createStore<MeetingStoreState>(set => ({
     meetingSeries: initialState?.meetingSeries ?? [],
     isLoading: initialState?.isLoading ?? false,
     hasLoadError: initialState?.hasLoadError ?? false,
     loadMeetings: async () => {
+      const mutationVersionBeforeFetch = meetingStoreMutationVersion;
       set({isLoading: true, hasLoadError: false});
 
       const listResult = await loadMeetingsList(deps.meetingsRepository);
+
+      if (meetingStoreMutationVersion !== mutationVersionBeforeFetch) {
+        set({isLoading: false});
+        return;
+      }
 
       set({meetingSeries: listResult.meetingSeries, hasLoadError: listResult.hasLoadError, isLoading: false});
     },
@@ -107,12 +125,16 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
       deps.serviceTasks.deleteMeetingForMe(toDeleteMeetingCommand(meetingInstance)),
     deleteMeetingForAll: meetingInstance =>
       deps.serviceTasks.deleteMeetingForAll(toDeleteMeetingCommand(meetingInstance)),
-    removeMeetingByQualifiedId: meetingId =>
+    removeMeetingByQualifiedId: meetingId => {
+      incrementMeetingMutationVersion(meetingId);
       set(state => ({
         meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingId),
-      })),
-    syncMeetingByQualifiedId: meetingId =>
-      deps.meetingsRepository
+      }));
+    },
+    syncMeetingByQualifiedId: meetingId => {
+      const mutationVersionBeforeFetch = getMeetingMutationVersion(meetingId);
+
+      return deps.meetingsRepository
         .getMeeting(meetingId)
         .mapRejected((error): SyncMeetingError => {
           logger.warn('Failed to fetch meeting for sync', {error, qualifiedId: meetingId});
@@ -132,9 +154,14 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
           return task.resolve<MeetingSeries, SyncMeetingError>(mapResult.value);
         })
         .map(updatedSeries => {
-          set(state => ({meetingSeries: upsertMeetingSeries(state.meetingSeries, updatedSeries)}));
+          if (getMeetingMutationVersion(meetingId) === mutationVersionBeforeFetch) {
+            set(state => ({meetingSeries: upsertMeetingSeries(state.meetingSeries, updatedSeries)}));
+            meetingStoreMutationVersion += 1;
+          }
+
           return updatedSeries;
-        }),
+        });
+    },
     loadMeetingForEdit: meetingInstance => {
       const {meetingSeries} = meetingInstance;
 
@@ -153,3 +180,4 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
         });
     },
   }));
+};

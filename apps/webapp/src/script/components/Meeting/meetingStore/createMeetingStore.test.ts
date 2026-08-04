@@ -134,6 +134,60 @@ describe('createMeetingStore', () => {
     });
   });
 
+  it('does not restore a removed meeting when an older list reload finishes', async () => {
+    let finishFetch: () => void = () => {};
+    const fetchGate = new Promise<void>(resolve => {
+      finishFetch = resolve;
+    });
+    const getMeetingsList = jest.fn().mockReturnValue(
+      task.tryOrElse(
+        () => new Error('fetch failed'),
+        async () => {
+          await fetchGate;
+          return [apiMeeting];
+        },
+      ),
+    );
+    const store = createMeetingStore(createDeps({getMeetingsList}), {meetingSeries: [meetingSeriesEntry]});
+
+    const pendingReload = store.getState().loadMeetings();
+    store.getState().removeMeetingByQualifiedId(apiMeeting.qualified_id);
+    finishFetch();
+
+    await pendingReload;
+
+    expect(store.getState()).toMatchObject({
+      isLoading: false,
+      meetingSeries: [],
+    });
+  });
+
+  it('does not remove a newly synchronized meeting when an older list reload finishes', async () => {
+    let finishFetch: () => void = () => {};
+    const fetchGate = new Promise<void>(resolve => {
+      finishFetch = resolve;
+    });
+    const getMeetingsList = jest.fn().mockReturnValue(
+      task.tryOrElse(
+        () => new Error('fetch failed'),
+        async () => {
+          await fetchGate;
+          return [];
+        },
+      ),
+    );
+    const store = createMeetingStore(createDeps({getMeetingsList}));
+
+    const pendingReload = store.getState().loadMeetings();
+    const syncResult = await store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
+    finishFetch();
+
+    await pendingReload;
+
+    expect(syncResult.isOk).toBe(true);
+    expect(store.getState().meetingSeries).toEqual([expect.objectContaining(meetingSeriesEntry)]);
+  });
+
   it('schedules a meeting without refreshing the meetings list', async () => {
     const scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
@@ -301,6 +355,30 @@ describe('createMeetingStore', () => {
       expect(unwrap(result).title).toBe('Weekly sync (updated)');
       expect(store.getState().meetingSeries).toHaveLength(1);
       expect(store.getState().meetingSeries[0]?.title).toBe('Weekly sync (updated)');
+    });
+
+    it('does not restore a locally removed meeting when an older sync finishes', async () => {
+      let finishFetch: () => void = () => {};
+      const fetchGate = new Promise<void>(resolve => {
+        finishFetch = resolve;
+      });
+      const getMeeting = jest.fn().mockReturnValue(
+        task.tryOrElse(
+          () => new Error('fetch failed'),
+          async () => {
+            await fetchGate;
+            return apiMeeting;
+          },
+        ),
+      );
+      const store = createMeetingStore(createDeps({getMeeting}), {meetingSeries: [meetingSeriesEntry]});
+
+      const pendingSync = store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
+      store.getState().removeMeetingByQualifiedId(apiMeeting.qualified_id);
+      finishFetch();
+
+      expect((await pendingSync).isOk).toBe(true);
+      expect(store.getState().meetingSeries).toEqual([]);
     });
 
     it('leaves an entry with the same bare id in another domain untouched', async () => {
