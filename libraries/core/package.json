@@ -43,7 +43,7 @@
   "devDependencies": {
     "@swc/core": "1.15.47",
     "@swc/jest": "0.2.39",
-    "@types/lodash": "4.17.24",
+    "@types/lodash": "4.17.25",
     "commander": "14.0.3",
     "dotenv-defaults": "5.0.2",
     "jest-websocket-mock": "2.5.0"
