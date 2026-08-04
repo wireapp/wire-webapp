@@ -1,3 +1,4 @@
+// Keep this declaration local to avoid importing the complete application type graph into Playwright.
 type PlaywrightNotification = {
   readonly title?: string;
   readonly body?: string;
