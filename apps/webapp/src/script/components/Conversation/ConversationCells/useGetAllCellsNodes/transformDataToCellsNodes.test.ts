@@ -35,4 +35,15 @@ describe('transformDataToCellsNodes', () => {
 
     expect(node.tags).toEqual(['Zulu', 'alpha', 'Beta']);
   });
+
+  it.each([
+    {label: 'null', size: null},
+    {label: 'missing', size: undefined},
+  ])('presents a $label folder size as zero bytes', ({size}) => {
+    const emptyFolder = {...createNodeWithTags(''), Type: 'COLLECTION', Size: size} as unknown as RestNode;
+
+    const [node] = transformDataToCellsNodes({nodes: [emptyFolder], users: []});
+
+    expect(node.sizeMb).toBe('0 B');
+  });
 });
