@@ -60,6 +60,7 @@ export type CommandEnvironment = {
   readonly githubRepository: string;
   readonly githubStepSummary: string;
   readonly githubToken: string;
+  readonly workflowToolingCommitSha: string;
 };
 
 export type ReleaseAppearanceCommandDependencies = {
@@ -126,6 +127,7 @@ type SummaryOptions = {
   readonly stage: ReleaseAppearanceCommandStage;
   readonly releaseTag: string;
   readonly releaseCommit: string;
+  readonly workflowToolingCommitSha: string;
   readonly bootstrap: boolean;
   readonly precedingProductionTag: string;
   readonly candidateRanges: readonly DiscoveryRange[];
@@ -312,6 +314,24 @@ function readRequiredEnvironmentValue(environment: NodeJS.ProcessEnv, variableNa
     : createFailure(`${variableName} must be set`);
 }
 
+function readWorkflowToolingCommitSha(environment: NodeJS.ProcessEnv): Result<string, Error> {
+  const configuredWorkflowToolingCommitSha = environment.WORKFLOW_TOOLING_COMMIT_SHA;
+  const githubSha = environment.GITHUB_SHA;
+  const workflowToolingCommitSha = isNonEmptyStringAndNotWhitespace(configuredWorkflowToolingCommitSha)
+    ? configuredWorkflowToolingCommitSha
+    : githubSha;
+
+  if (!isNonEmptyStringAndNotWhitespace(workflowToolingCommitSha)) {
+    return createSuccess('unavailable');
+  }
+
+  if (!fullGitCommitPattern.test(workflowToolingCommitSha)) {
+    return createFailure('Workflow tooling commit SHA must contain exactly 40 hexadecimal characters');
+  }
+
+  return createSuccess(workflowToolingCommitSha);
+}
+
 export function readCommandEnvironment(environment: NodeJS.ProcessEnv): Result<CommandEnvironment, Error> {
   const githubApiUrlResult = readRequiredEnvironmentValue(environment, 'GITHUB_API_URL');
   if (githubApiUrlResult.isErr) {
@@ -340,11 +360,15 @@ export function readCommandEnvironment(environment: NodeJS.ProcessEnv): Result<C
 
   const githubStepSummaryResult = readRequiredEnvironmentValue(environment, 'GITHUB_STEP_SUMMARY');
   const githubTokenResult = readRequiredEnvironmentValue(environment, 'GITHUB_TOKEN');
+  const workflowToolingCommitShaResult = readWorkflowToolingCommitSha(environment);
   if (githubStepSummaryResult.isErr) {
     return createFailure(githubStepSummaryResult.error.message);
   }
   if (githubTokenResult.isErr) {
     return createFailure(githubTokenResult.error.message);
+  }
+  if (workflowToolingCommitShaResult.isErr) {
+    return createFailure(workflowToolingCommitShaResult.error.message);
   }
 
   return createSuccess({
@@ -352,6 +376,7 @@ export function readCommandEnvironment(environment: NodeJS.ProcessEnv): Result<C
     githubRepository: githubRepositoryResult.value,
     githubStepSummary: githubStepSummaryResult.value,
     githubToken: githubTokenResult.value,
+    workflowToolingCommitSha: workflowToolingCommitShaResult.value,
   });
 }
 
@@ -390,6 +415,10 @@ async function discoverPullRequests(
 
   for (const range of ranges) {
     for (const commitSha of range.commitRange.commits) {
+      if (commitsInspected.has(commitSha)) {
+        continue;
+      }
+
       commitsInspected.add(commitSha);
       const pullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha});
       if (pullRequestsResult.isErr) {
@@ -491,7 +520,7 @@ function createDesiredReleaseState(
 ): ReleaseAppearanceState {
   return match(stage)
     .with('beta', () => {
-      return {beta: Maybe.just(releaseTag), production: Maybe.nothing<string>()};
+      return {beta: Maybe.just(earliestBetaTag), production: Maybe.nothing<string>()};
     })
     .with('production', () => {
       return {beta: Maybe.just(earliestBetaTag), production: Maybe.just(releaseTag)};
@@ -612,12 +641,13 @@ async function processPullRequests(
   };
 }
 
-function createEmptySummaryOptions(parsedCommand: ParsedCommand): SummaryOptions {
+function createEmptySummaryOptions(parsedCommand: ParsedCommand, workflowToolingCommitSha: string): SummaryOptions {
   return {
     executionMode: parsedCommand.executionMode,
     stage: parsedCommand.stage,
     releaseTag: parsedCommand.releaseTag,
     releaseCommit: parsedCommand.releaseCommit,
+    workflowToolingCommitSha,
     bootstrap: false,
     precedingProductionTag: 'unavailable',
     candidateRanges: [],
@@ -642,7 +672,7 @@ function addPlanToSummary(summaryOptions: SummaryOptions, releaseHistoryPlan: Re
       return {
         ...summaryOptions,
         precedingProductionTag: betaPlan.precedingProductionTag,
-        candidateRanges: [{candidateTag: betaPlan.currentTag, commitRange: betaPlan.commitRange}],
+        candidateRanges: betaPlan.candidateRanges,
       };
     })
     .with({kind: 'production'}, productionPlan => {
@@ -707,10 +737,12 @@ function createWriteSummary(summaryOptions: SummaryOptions): string {
     '### Release appearance',
     '',
     `- Stage: ${summaryOptions.stage}`,
+    `- Workflow/tooling commit: \`${summaryOptions.workflowToolingCommitSha}\``,
     `- Release tag: \`${summaryOptions.releaseTag}\``,
+    `- Release commit: \`${summaryOptions.releaseCommit}\``,
     `- Bootstrap: ${summaryOptions.bootstrap ? 'yes' : 'no'}`,
     `- Preceding Production tag: ${summaryOptions.precedingProductionTag}`,
-    `- Beta candidate ranges for Production: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
+    `- Candidate ranges: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
     `- Commits inspected: ${summaryOptions.commitsInspected.length} (${formatStringList(summaryOptions.commitsInspected)})`,
     `- Pull requests discovered: ${summaryOptions.pullRequestsDiscovered.length} (${formatPullRequestList(summaryOptions.pullRequestsDiscovered)})`,
     `- Comments created: ${summaryOptions.commentsCreated}`,
@@ -751,11 +783,12 @@ function createDryRunSummary(summaryOptions: SummaryOptions): string {
     '',
     '- Mode: dry run',
     `- Stage: ${summaryOptions.stage}`,
+    `- Workflow/tooling commit: \`${summaryOptions.workflowToolingCommitSha}\``,
     `- Release tag: \`${summaryOptions.releaseTag}\``,
     `- Release commit: \`${summaryOptions.releaseCommit}\``,
     `- Bootstrap: ${summaryOptions.bootstrap ? 'yes' : 'no'}`,
     `- Preceding Production tag: ${summaryOptions.precedingProductionTag}`,
-    `- Beta candidate ranges for Production: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
+    `- Candidate ranges: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
     `- Commits inspected: ${summaryOptions.commitsInspected.length} (${formatStringList(summaryOptions.commitsInspected)})`,
     `- Pull requests discovered: ${summaryOptions.pullRequestsDiscovered.length} (${formatPullRequestList(summaryOptions.pullRequestsDiscovered)})`,
     `- Comments that would be created: ${summaryOptions.commentsCreated}`,
@@ -922,7 +955,10 @@ export async function executeReleaseAppearanceCommand(
     );
   }
 
-  let summaryOptions = createEmptySummaryOptions(parsedCommand);
+  let summaryOptions = createEmptySummaryOptions(
+    parsedCommand,
+    commandEnvironmentResult.value.workflowToolingCommitSha,
+  );
   if (historyPlanResult.isErr) {
     const historyFailureMessage = createGeneralFailureMessage(
       'Release history',
@@ -947,7 +983,7 @@ export async function executeReleaseAppearanceCommand(
 
     const discoveryRanges = match(historyPlanResult.value)
       .with({kind: 'beta'}, betaPlan => {
-        return [{candidateTag: betaPlan.currentTag, commitRange: betaPlan.commitRange}];
+        return betaPlan.candidateRanges;
       })
       .with({kind: 'production'}, productionPlan => {
         return productionPlan.candidateRanges;

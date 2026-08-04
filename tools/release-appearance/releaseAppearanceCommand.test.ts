@@ -50,6 +50,8 @@ const previousProductionCommit = 'b'.repeat(40);
 const betaCommit = 'c'.repeat(40);
 const previousProductionTag = '2026-01-01.1-production';
 const betaTag = '2026-01-02.1-beta.1';
+const betaTwoTag = '2026-01-02.1-beta.2';
+const betaTwoCommit = 'f'.repeat(40);
 const productionTag = '2026-01-02.1-production';
 
 const commandEnvironment: NodeJS.ProcessEnv = {
@@ -57,6 +59,7 @@ const commandEnvironment: NodeJS.ProcessEnv = {
   GITHUB_REPOSITORY: 'wireapp/wire-webapp',
   GITHUB_STEP_SUMMARY: '/tmp/release-appearance-summary.md',
   GITHUB_TOKEN: 'github-token',
+  WORKFLOW_TOOLING_COMMIT_SHA: 'e'.repeat(40),
 };
 
 type FakeGitHubClientOptions = {
@@ -91,6 +94,14 @@ type RunCommandOptions = {
 type FakeGitCommandOptions = {
   readonly bootstrap?: boolean;
   readonly commits?: readonly string[];
+  readonly betaTags?: readonly FakeBetaTag[];
+  readonly mergeBasesByRange?: ReadonlyMap<string, string>;
+  readonly commitsByRange?: ReadonlyMap<string, readonly string[]>;
+};
+
+type FakeBetaTag = {
+  readonly tagName: string;
+  readonly commit: string;
 };
 
 type CreateDependenciesOptions = {
@@ -190,6 +201,7 @@ function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions
 function createFakeGitCommand(fakeGitCommandOptions: FakeGitCommandOptions = {}): ExecuteGitCommand {
   const bootstrap = fakeGitCommandOptions.bootstrap === true;
   const commits = Maybe.of(fakeGitCommandOptions.commits).unwrapOr([betaCommit]);
+  const betaTags = Maybe.of(fakeGitCommandOptions.betaTags).unwrapOr([{tagName: betaTag, commit: releaseCommit}]);
 
   return async function executeFakeGitCommand(commandArguments: readonly string[]): Promise<string> {
     const command = commandArguments.join(' ');
@@ -197,28 +209,38 @@ function createFakeGitCommand(fakeGitCommandOptions: FakeGitCommandOptions = {})
       return bootstrap ? '' : `${previousProductionTag}\n`;
     }
     if (command === 'tag --list -- *-beta.*') {
-      return `${betaTag}\n`;
+      return `${betaTags.map(betaTagDefinition => betaTagDefinition.tagName).join('\n')}\n`;
     }
     if (command.startsWith('cat-file -t refs/tags/')) {
       return 'tag\n';
     }
     if (command.startsWith('for-each-ref --format=%(taggerdate:unix)')) {
-      return command.includes(betaTag) || command.includes(productionTag) ? '200\n' : '100\n';
+      const isBetaTagCommand = betaTags.some(betaTagDefinition => {
+        return command.includes(betaTagDefinition.tagName);
+      });
+      return isBetaTagCommand || command.includes(productionTag) ? '200\n' : '100\n';
     }
     if (command.includes(`refs/tags/${previousProductionTag}^{commit}`)) {
       return `${previousProductionCommit}\n`;
     }
-    if (command.includes(`refs/tags/${betaTag}^{commit}`)) {
-      return `${releaseCommit}\n`;
+    const betaTagDefinition = betaTags.find(betaTagDefinition => {
+      return command.includes(`refs/tags/${betaTagDefinition.tagName}^{commit}`);
+    });
+    if (betaTagDefinition !== undefined) {
+      return `${betaTagDefinition.commit}\n`;
     }
     if (command.includes(`refs/tags/${productionTag}^{commit}`)) {
       return `${releaseCommit}\n`;
     }
     if (command.startsWith('merge-base ')) {
-      return `${previousProductionCommit}\n`;
+      const range = command.slice('merge-base '.length).replaceAll('refs/tags/', '').replaceAll('^{}', '');
+      const mergeBase = fakeGitCommandOptions.mergeBasesByRange?.get(range);
+      return `${mergeBase ?? previousProductionCommit}\n`;
     }
     if (command.startsWith('rev-list --reverse ')) {
-      return `${commits.join('\n')}\n`;
+      const range = command.slice('rev-list --reverse '.length);
+      const rangeCommits = fakeGitCommandOptions.commitsByRange?.get(range) ?? commits;
+      return `${rangeCommits.join('\n')}\n`;
     }
 
     throw new Error(`Unexpected fake Git command: ${command}`);
@@ -420,10 +442,12 @@ describe('executeReleaseAppearanceCommand', () => {
         '### Release appearance',
         '',
         '- Stage: beta',
+        `- Workflow/tooling commit: \`${commandEnvironment.WORKFLOW_TOOLING_COMMIT_SHA}\``,
         `- Release tag: \`${betaTag}\``,
+        `- Release commit: \`${releaseCommit}\``,
         '- Bootstrap: no',
         `- Preceding Production tag: ${previousProductionTag}`,
-        `- Beta candidate ranges for Production: ${betaTag}: ${previousProductionTag} -> ${betaTag}`,
+        `- Candidate ranges: ${betaTag}: ${previousProductionTag} -> ${betaTag}`,
         `- Commits inspected: 1 (${betaCommit})`,
         '- Pull requests discovered: 1 (#8)',
         '- Comments created: 1',
@@ -437,6 +461,109 @@ describe('executeReleaseAppearanceCommand', () => {
         'None',
       ].join('\n'),
     );
+  });
+
+  it('backfills a missing Beta 1 comment during Beta 2 with the earliest Beta tag', async () => {
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(10)]]]),
+    });
+    const fakeGitCommand = createFakeGitCommand({
+      betaTags: [
+        {tagName: betaTag, commit: betaCommit},
+        {tagName: betaTwoTag, commit: betaCommit},
+      ],
+      mergeBasesByRange: new Map([
+        [`${previousProductionTag} ${betaTag}`, previousProductionCommit],
+        [`${betaTag} ${betaTwoTag}`, betaCommit],
+      ]),
+      commitsByRange: new Map([[`${previousProductionCommit}..${betaCommit}`, [betaCommit]]]),
+    });
+
+    const commandRun = await runCommand({
+      commandLineArguments: ['beta', betaTwoTag, betaCommit],
+      executeGitCommand: fakeGitCommand,
+      githubClient: fakeGitHubClient.githubClient,
+    });
+
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(fakeGitHubClient.state.pullRequestCommits).toEqual([betaCommit]);
+    expect(fakeGitHubClient.state.createdComments).toHaveLength(1);
+    const createdComment = Maybe.of(fakeGitHubClient.state.createdComments[0]);
+    assert(createdComment.isJust);
+    expect(createdComment.value.commentBody).toContain(betaTag);
+    expect(createdComment.value.commentBody).not.toContain(betaTwoTag);
+    expect(commandRun.result.summary).toContain(
+      `- Candidate ranges: ${betaTag}: ${previousProductionTag} -> ${betaTag}; ${betaTwoTag}: ${betaTag} -> ${betaTwoTag}`,
+    );
+  });
+
+  it('records Beta 2 for a pull request introduced only in Beta 2', async () => {
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByCommit: new Map([[betaTwoCommit, [createPullRequest(12)]]]),
+    });
+    const fakeGitCommand = createFakeGitCommand({
+      betaTags: [
+        {tagName: betaTag, commit: betaCommit},
+        {tagName: betaTwoTag, commit: betaTwoCommit},
+      ],
+      mergeBasesByRange: new Map([
+        [`${previousProductionTag} ${betaTag}`, previousProductionCommit],
+        [`${betaTag} ${betaTwoTag}`, betaCommit],
+      ]),
+      commitsByRange: new Map([
+        [`${previousProductionCommit}..${betaCommit}`, [betaCommit]],
+        [`${betaCommit}..${betaTwoCommit}`, [betaTwoCommit]],
+      ]),
+    });
+
+    const commandRun = await runCommand({
+      commandLineArguments: ['beta', betaTwoTag, betaTwoCommit],
+      executeGitCommand: fakeGitCommand,
+      githubClient: fakeGitHubClient.githubClient,
+    });
+
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(fakeGitHubClient.state.createdComments).toHaveLength(1);
+    const createdComment = Maybe.of(fakeGitHubClient.state.createdComments[0]);
+    assert(createdComment.isJust);
+    expect(createdComment.value.commentBody).toContain(betaTwoTag);
+  });
+
+  it('deduplicates a pull request discovered in multiple cumulative Beta ranges', async () => {
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByCommit: new Map([
+        [betaCommit, [createPullRequest(13)]],
+        [betaTwoCommit, [createPullRequest(13)]],
+      ]),
+    });
+    const fakeGitCommand = createFakeGitCommand({
+      betaTags: [
+        {tagName: betaTag, commit: betaCommit},
+        {tagName: betaTwoTag, commit: betaTwoCommit},
+      ],
+      mergeBasesByRange: new Map([
+        [`${previousProductionTag} ${betaTag}`, previousProductionCommit],
+        [`${betaTag} ${betaTwoTag}`, betaCommit],
+      ]),
+      commitsByRange: new Map([
+        [`${previousProductionCommit}..${betaCommit}`, [betaCommit]],
+        [`${betaCommit}..${betaTwoCommit}`, [betaTwoCommit]],
+      ]),
+    });
+
+    const commandRun = await runCommand({
+      commandLineArguments: ['beta', betaTwoTag, betaTwoCommit],
+      executeGitCommand: fakeGitCommand,
+      githubClient: fakeGitHubClient.githubClient,
+    });
+
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(fakeGitHubClient.state.pullRequestCommits).toEqual([betaCommit, betaTwoCommit]);
+    expect(fakeGitHubClient.state.commentPullRequests).toEqual([13]);
+    expect(fakeGitHubClient.state.createdComments).toHaveLength(1);
+    const createdComment = Maybe.of(fakeGitHubClient.state.createdComments[0]);
+    assert(createdComment.isJust);
+    expect(createdComment.value.commentBody).toContain(betaTag);
   });
 
   it('updates release appearance comments in write mode', async () => {
@@ -519,11 +646,12 @@ describe('executeReleaseAppearanceCommand', () => {
         '',
         '- Mode: dry run',
         '- Stage: production',
+        `- Workflow/tooling commit: \`${commandEnvironment.WORKFLOW_TOOLING_COMMIT_SHA}\``,
         `- Release tag: \`${productionTag}\``,
         `- Release commit: \`${releaseCommit}\``,
         '- Bootstrap: no',
         `- Preceding Production tag: ${previousProductionTag}`,
-        `- Beta candidate ranges for Production: ${betaTag}: ${previousProductionTag} -> ${betaTag}`,
+        `- Candidate ranges: ${betaTag}: ${previousProductionTag} -> ${betaTag}`,
         `- Commits inspected: 1 (${betaCommit})`,
         '- Pull requests discovered: 3 (#1, #2, #3)',
         '- Comments that would be created: 1',
