@@ -17,7 +17,7 @@
  *
  */
 
-export const INITIAL_VISIBLE_DAY_COUNT = 14;
+export const INITIAL_VISIBLE_DAY_COUNT = 365;
 export const LOAD_MORE_DAY_COUNT = 14;
 export const MEETING_LIST_ITEM_HEIGHT = 75;
 export const MEETING_DAY_GROUP_SECTION_TOP_PADDING = 16;

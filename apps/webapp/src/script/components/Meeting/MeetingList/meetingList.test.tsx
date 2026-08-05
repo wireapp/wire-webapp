@@ -218,7 +218,7 @@ describe('MeetingList', () => {
 
     const meetingSeries = [
       createMeetingSeries('2026-06-15T14:00:00.000Z', '2026-06-15T15:00:00.000Z', 'Today meeting'),
-      createMeetingSeries('2026-07-10T10:00:00.000Z', '2026-07-10T11:00:00.000Z', 'Far future meeting'),
+      createMeetingSeries('2027-07-10T10:00:00.000Z', '2027-07-10T11:00:00.000Z', 'Far future meeting'),
     ];
 
     renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock);
