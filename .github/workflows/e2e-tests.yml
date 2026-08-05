@@ -145,7 +145,7 @@ jobs:
     timeout-minutes: 45
     needs: [bootstrap_smoke_test, compute_shards]
     container:
-      image: quay.io/wire/mirror-images/playwright:v1.61.1-noble
+      image: quay.io/wire/mirror-images/playwright:v1.62.0-noble
       options: --ipc=host
 
     strategy:
