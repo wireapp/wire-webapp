@@ -16829,22 +16829,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest-dom@npm:5.9.0":
-  version: 5.9.0
-  resolution: "eslint-plugin-jest-dom@npm:5.9.0"
-  dependencies:
-    requireindex: "npm:^1.2.0"
-  peerDependencies:
-    "@testing-library/dom": ^8.0.0 || ^9.0.0 || ^10.0.0
-    eslint: ^6.8.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
-  peerDependenciesMeta:
-    "@testing-library/dom":
-      optional: true
-  checksum: 10/0433b0759194a8c0d9990692ba9b643c8721678a0f50321b55e528d6ac4af758ace96bbe474b2053f134d10ac55aef160c902f59772b17b8fdcdf3b249db32e5
-  languageName: node
-  linkType: hard
-
-"eslint-plugin-jest-dom@npm:^5.0.2":
+"eslint-plugin-jest-dom@npm:5.10.1, eslint-plugin-jest-dom@npm:^5.0.2":
   version: 5.10.1
   resolution: "eslint-plugin-jest-dom@npm:5.10.1"
   dependencies:
@@ -32556,7 +32541,7 @@ __metadata:
     eslint-plugin-header: "npm:3.1.1"
     eslint-plugin-import: "npm:2.32.0"
     eslint-plugin-jest: "npm:29.16.0"
-    eslint-plugin-jest-dom: "npm:5.9.0"
+    eslint-plugin-jest-dom: "npm:5.10.1"
     eslint-plugin-jsdoc: "npm:61.7.1"
     eslint-plugin-jsx-a11y: "npm:6.10.2"
     eslint-plugin-no-unsanitized: "npm:4.1.5"
