@@ -17,19 +17,14 @@
  *
  */
 
-module.exports = {
-  rootDir: '..',
-  testEnvironment: 'node',
-  testMatch: [
-    '<rootDir>/bin/**/*.test.ts',
-    '<rootDir>/tools/release-appearance/*.test.ts',
-    '<rootDir>/tools/workflow-tests/*.test.ts',
-  ],
-  moduleNameMapper: {
-    '^@enormora/objectory$': '<rootDir>/node_modules/@enormora/objectory/main.js',
-  },
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', {configFile: './apps/server/babel.config.js'}],
-  },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|ky|p-map|@enormora/objectory|@sindresorhus/is)/)'],
-};
+import {isNonEmptyString} from '@sindresorhus/is';
+
+export function readRequiredEnvironmentVariable(name: string): string {
+  const value = process.env[name];
+
+  if (isNonEmptyString(value) === false) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+
+  return value;
+}

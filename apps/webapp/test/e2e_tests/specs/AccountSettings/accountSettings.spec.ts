@@ -18,6 +18,7 @@
  */
 
 import {getUser, User} from 'test/e2e_tests/data/user';
+import {readRequiredEnvironmentVariable} from 'test/e2e_tests/environment/readRequiredEnvironmentVariable';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {connectWithUser, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
@@ -162,12 +163,13 @@ test.describe('account settings', () => {
     'Verify links to manage and create teams are shown when logged in as team owner',
     {tag: ['@TC-1723', '@regression']},
     async ({createPage}) => {
+      const expectedManageTeamUrl = new URL(readRequiredEnvironmentVariable('EXPECTED_MANAGE_TEAM_URL')).toString();
       const {components} = PageManager.from(await createPage(withLogin(owner))).webapp;
 
       await expect(components.conversationSidebar().manageTeamButton).toBeVisible();
-      expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toMatch(
-        /^https:\/\/wire-teams-.+\.zinfra\.io\/login\/$/,
-      );
+      const actualManageTeamUrl = await components.conversationSidebar().manageTeamButton.getAttribute('href');
+
+      expect(actualManageTeamUrl).toBe(expectedManageTeamUrl);
     },
   );
 

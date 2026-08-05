@@ -40,6 +40,7 @@ INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection staging/inbucketPas
 INBUCKET_URL=op://Test Automation/BackendConnection staging/inbucketUrl
 BACKEND_URL=op://Test Automation/BackendConnection staging/backendUrl
 WEBAPP_URL=op://Test Automation/BackendConnection staging/webappUrl
+EXPECTED_MANAGE_TEAM_URL=https://wire-teams-staging.zinfra.io/login/
 DOMAIN=op://Test Automation/BackendConnection staging/domain
 BASIC_AUTH=op://Test Automation/BackendConnection staging/basicAuth
 

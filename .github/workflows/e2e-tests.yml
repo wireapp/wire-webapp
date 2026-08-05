@@ -12,6 +12,10 @@ on:
         options:
           - https://wire-webapp-dev.zinfra.io/
           - https://wire-webapp-qa.zinfra.io/
+      expectedManageTeamUrl:
+        type: string
+        required: true
+        description: Exact manage-team URL expected from the deployed WebApp artifact
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
@@ -29,6 +33,10 @@ on:
       webappUrl:
         type: string
         required: true
+      expectedManageTeamUrl:
+        type: string
+        required: true
+        description: Exact manage-team URL expected from the deployed WebApp artifact
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
@@ -185,6 +193,7 @@ jobs:
       - name: Run tests
         env:
           WEBAPP_URL: ${{ inputs.webappUrl }}
+          EXPECTED_MANAGE_TEAM_URL: ${{ inputs.expectedManageTeamUrl }}
           TEST_SERVICE_URL: http://testservice:8080
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
