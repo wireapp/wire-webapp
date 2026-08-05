@@ -160,6 +160,20 @@ function createInitialProgressReporterState(progressSnapshot: ProgressSnapshot):
   };
 }
 
+function hasAlreadyEmittedCompletedProgress(
+  progressReporterState: ProgressReporterState,
+  progressSnapshot: ProgressSnapshot,
+): boolean {
+  const currentProgressBoundary = progressBoundary(
+    progressCompletedItems(progressSnapshot),
+    progressTotalItems(progressSnapshot),
+  );
+  return (
+    currentProgressBoundary === completeProgressPercentage &&
+    progressReporterState.lastEmittedProgressBoundary === completeProgressPercentage
+  );
+}
+
 export function createGitHubActionsProgressReporter(
   createGitHubActionsProgressReporterOptions: CreateGitHubActionsProgressReporterOptions,
 ): ReleaseAppearanceProgressReporter {
@@ -200,7 +214,9 @@ export function createGitHubActionsProgressReporter(
     }
 
     try {
-      actionsCoreAdapter.info(createProgressMessage(progressSnapshot));
+      if (!hasAlreadyEmittedCompletedProgress(progressReporterState.value, progressSnapshot)) {
+        actionsCoreAdapter.info(createProgressMessage(progressSnapshot));
+      }
     } finally {
       try {
         if (progressReporterState.value.isGroupOpen) {
