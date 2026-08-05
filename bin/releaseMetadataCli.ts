@@ -109,7 +109,7 @@ function readMaintenanceTagMetadata(
 
   if (
     maintenanceLineKey === undefined ||
-    currentCommitHash === undefined ||
+    !isNonEmptyStringAndNotWhitespace(currentCommitHash) ||
     tagAndCommitValues.length === 0 ||
     tagAndCommitValues.length % 2 !== 0
   ) {
@@ -132,11 +132,11 @@ function readMaintenanceTagMetadata(
       return Result.err(tagNameResult.error);
     }
 
-    maintenanceTagMetadata.push({tagName: tagNameResult.value, commitHash: commitHash as CommitHash});
+    maintenanceTagMetadata.push({tagName: tagNameResult.value, commitHash: commitHash as unknown as CommitHash});
   }
 
   return maintenanceTagPointsToCommit({
-    currentCommitHash: currentCommitHash as CommitHash,
+    currentCommitHash: currentCommitHash as unknown as CommitHash,
     maintenanceLineKey,
     maintenanceTagMetadata,
   });

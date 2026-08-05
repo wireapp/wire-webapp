@@ -155,9 +155,10 @@ function runDockerPublication(
   ].join(' && ');
 
   /** Defines which config version (listed in "app-config/package.json") is going to be used */
-  const configurationEntry = versionTag.includes('production')
-    ? 'wire-web-config-default-master'
-    : 'wire-web-config-default-staging';
+  const configurationEntry =
+    environment.WIRE_WEBAPP_CONFIGURATION === 'production' || versionTag.includes('production')
+      ? 'wire-web-config-default-master'
+      : 'wire-web-config-default-staging';
   const configurationVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
   const uniqueImageTag = createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha});
 

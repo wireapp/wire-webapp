@@ -260,6 +260,20 @@ describe('releaseMetadataCli', () => {
     });
   });
 
+  it('rejects a blank selected commit', () => {
+    const actualResult = runCommand([
+      'maintenance-tag-points-to-commit',
+      '2026-07-27.1-airgap-a',
+      '   ',
+      '2026-07-27.1-airgap-a-maintenance.1',
+      '1234567890abcdef',
+    ]);
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.outputs).toEqual([]);
+    expect(actualResult.errors[0]).toContain('Usage:');
+  });
+
   it('validates that a maintenance source belongs to the same release', () => {
     const actualResult = runCommand([
       'validate-maintenance-source',

@@ -80,6 +80,15 @@ describe('push_docker metadata', () => {
     assert.equal(actualImageTag, expectedImageTag);
   });
 
+  it('uses the production configuration identity for a maintenance tag when requested explicitly', () => {
+    const actualImageTag = runDockerPublication(['2026-07-27.1-airgap-a-maintenance.1', '--print-image-tag'], {
+      WIRE_WEBAPP_CONFIGURATION: 'production',
+      WIRE_WEBAPP_RELEASE_COMMIT_SHA: '1234567890abcdef',
+    });
+
+    expect(actualImageTag).toBe('2026-07-27.1-airgap-a-maintenance.1-v0.34.9-0-1234567');
+  });
+
   it('makes the Yarn wrapper executable after artifact download before invoking it', () => {
     const dockerfilePath = path.join(process.cwd(), 'apps/server/Dockerfile');
     const dockerfileContents = readFileSync(dockerfilePath, 'utf8');
