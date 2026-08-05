@@ -17,7 +17,7 @@
  *
  */
 
-import {CloseIcon, EditIcon, TrashIcon} from '@wireapp/react-ui-kit';
+import {EditIcon, TrashIcon} from '@wireapp/react-ui-kit';
 
 import {
   contextMenuDangerItemIconStyles,
@@ -58,7 +58,7 @@ export const getMeetingActionEntries = ({
 
   const deleteForMeEntry: ContextMenuEntry = {
     css: contextMenuDangerItemStyles,
-    icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
+    icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForMe),
     click: onDeleteForMe,
   };
