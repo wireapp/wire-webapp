@@ -1,0 +1,192 @@
+---
+name: Publish maintenance distribution
+
+on:
+  workflow_call:
+    inputs:
+      maintenance_line_key:
+        description: 'Validated maintenance line key'
+        required: true
+        type: string
+      maintenance_branch:
+        description: 'Validated maintenance branch name'
+        required: true
+        type: string
+      source_production_tag:
+        description: 'Validated source Production tag'
+        required: true
+        type: string
+      source_production_commit_sha:
+        description: 'Commit resolved from the source Production tag'
+        required: true
+        type: string
+      maintenance_commit_sha:
+        description: 'Exact maintenance branch commit to distribute'
+        required: true
+        type: string
+      maintenance_tag:
+        description: 'Existing immutable maintenance tag'
+        required: true
+        type: string
+      source_run_id:
+        description: 'Workflow run containing the exact distribution context'
+        required: true
+        type: string
+      source_run_attempt:
+        description: 'Workflow run attempt containing the exact distribution context'
+        required: true
+        type: string
+      distribution_artifact_name:
+        description: 'Exact maintenance distribution context artifact'
+        required: true
+        type: string
+    outputs:
+      docker_image_tag:
+        description: 'Immutable Quay image identity'
+        value: ${{ jobs.publish_distribution.outputs.docker_image_tag }}
+      helm_chart_version:
+        description: 'Immutable Helm chart identity'
+        value: ${{ jobs.publish_distribution.outputs.helm_chart_version }}
+      distribution_result:
+        description: 'Maintenance distribution result'
+        value: ${{ jobs.publish_distribution.outputs.distribution_result }}
+    secrets:
+      WEBTEAM_QUAY_USERNAME:
+        required: true
+      WEBTEAM_QUAY_PASSWORD:
+        required: true
+      CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID:
+        required: true
+      CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY:
+        required: true
+
+permissions: {}
+
+env:
+  CHART_REPOSITORY_NAME: charts-webapp
+  CHART_REPOSITORY_URL: s3://public.wire.com/charts-webapp
+  DOCKER_REPOSITORY: quay.io/wire/webapp
+  DISTRIBUTION_CONTEXT_PATH: distribution-context
+
+jobs:
+  publish_distribution:
+    name: Publish immutable Docker and Helm artifacts
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+    concurrency:
+      group: publish-webapp-distribution
+      cancel-in-progress: false
+      queue: max
+    outputs:
+      docker_image_tag: ${{ steps.publish_docker.outputs.docker_image_tag }}
+      helm_chart_version: ${{ steps.publish_helm.outputs.helm_chart_version }}
+      distribution_result: ${{ steps.distribution_result.outputs.distribution_result }}
+
+    steps:
+      - name: Checkout exact maintenance tag
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ inputs.maintenance_tag }}
+
+      - name: Verify maintenance tag commit
+        env:
+          EXPECTED_MAINTENANCE_COMMIT_SHA: ${{ inputs.maintenance_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          maintenance_commit_sha="$(git rev-parse HEAD)"
+          if [[ "${maintenance_commit_sha}" != "${EXPECTED_MAINTENANCE_COMMIT_SHA}" ]]; then
+            echo "Checked out ${maintenance_commit_sha} from maintenance tag, expected ${EXPECTED_MAINTENANCE_COMMIT_SHA}." >&2
+            exit 1
+          fi
+
+      - name: Download exact maintenance distribution context
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ inputs.distribution_artifact_name }}
+          path: ${{ env.DISTRIBUTION_CONTEXT_PATH }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_run_id }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install exact distribution dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Validate exact maintenance distribution context
+        id: validate_identity
+        env:
+          DISTRIBUTION_CONTEXT_PATH: ${{ env.DISTRIBUTION_CONTEXT_PATH }}
+          MAINTENANCE_BRANCH: ${{ inputs.maintenance_branch }}
+          MAINTENANCE_COMMIT_SHA: ${{ inputs.maintenance_commit_sha }}
+          MAINTENANCE_LINE_KEY: ${{ inputs.maintenance_line_key }}
+          MAINTENANCE_TAG: ${{ inputs.maintenance_tag }}
+          SOURCE_PRODUCTION_COMMIT_SHA: ${{ inputs.source_production_commit_sha }}
+          SOURCE_PRODUCTION_TAG: ${{ inputs.source_production_tag }}
+          WORKFLOW_RUN_ATTEMPT: ${{ inputs.source_run_attempt }}
+          WORKFLOW_RUN_ID: ${{ inputs.source_run_id }}
+        run: ./bin/validate-maintenance-distribution.sh
+
+      - name: Setup Helm
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
+        with:
+          version: '3.21.3'
+
+      - name: Publish or reuse immutable Docker image
+        id: publish_docker
+        env:
+          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+          DOCKER_REPOSITORY: ${{ env.DOCKER_REPOSITORY }}
+          DOCKER_IMAGE_TAG_OUTPUT_PATH: ${{ runner.temp }}/maintenance-image-tag.txt
+          IMMUTABLE_ARTIFACT_TAG: ${{ inputs.maintenance_tag }}
+          RELEASE_COMMIT_SHA: ${{ inputs.maintenance_commit_sha }}
+          STABLE_IMAGE_REFERENCE: ${{ env.DOCKER_REPOSITORY }}:${{ inputs.maintenance_tag }}
+          WIRE_WEBAPP_CONFIGURATION: production
+          WIRE_WEBAPP_DOCKER_CONTEXT_PATH: ${{ env.DISTRIBUTION_CONTEXT_PATH }}
+          WIRE_WEBAPP_RELEASE_COMMIT_SHA: ${{ inputs.maintenance_commit_sha }}
+        run: ./bin/publish-immutable-docker.sh
+
+      - name: Publish or reuse immutable Helm chart
+        id: publish_helm
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+          CHART_REPOSITORY_NAME: ${{ env.CHART_REPOSITORY_NAME }}
+          CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+        run: ./bin/publish-immutable-helm.sh
+
+      - name: Mark maintenance distribution complete
+        id: distribution_result
+        env:
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
+        run: |
+          set -euo pipefail
+
+          echo 'distribution_result=success' >> "$GITHUB_OUTPUT"
+          {
+            echo '## Maintenance distribution'
+            echo
+            echo "- Maintenance tag: ${{ inputs.maintenance_tag }}"
+            echo "- Maintenance commit: ${{ inputs.maintenance_commit_sha }}"
+            echo "- Docker image: ${DOCKER_IMAGE_TAG}"
+            echo "- Helm chart: ${HELM_CHART_VERSION}"
+            echo '- Hosted Beta/Production deployment: not performed'
+            echo '- wire-builds/main and wire-builds/dev: not updated'
+          } >> "$GITHUB_STEP_SUMMARY"

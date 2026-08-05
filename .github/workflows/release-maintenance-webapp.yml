@@ -1,0 +1,813 @@
+---
+name: Release Maintenance WebApp
+
+on:
+  workflow_dispatch:
+    inputs:
+      maintenance_line_key:
+        description: 'Public Git metadata: YYYY-MM-DD.N-qualifier[-qualifier...]. Do not include customer names or sensitive information.'
+        required: true
+        type: string
+      source_production_tag:
+        description: 'Existing annotated ADR Production tag from which the maintenance line starts'
+        required: true
+        type: string
+      confirm_maintenance_release:
+        description: 'Confirm that this creates or reuses the maintenance branch, validates the artifact separately, creates an immutable tag, and publishes customer-managed artifacts without hosted deployment'
+        required: true
+        default: false
+        type: boolean
+      reason:
+        description: 'Required non-sensitive reason for this maintenance release'
+        required: true
+        type: string
+
+concurrency:
+  group: release-maintenance-${{ inputs.maintenance_line_key }}
+  cancel-in-progress: false
+  queue: max
+
+permissions: {}
+
+env:
+  AWS_REGION: eu-central-1
+  ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
+  CHART_REPOSITORY_URL: s3://public.wire.com/charts-webapp
+  DOCKER_REPOSITORY: quay.io/wire/webapp
+  E2E_RUNTIME_BACKEND_REST: https://staging-nginz-https.zinfra.io/
+  E2E_RUNTIME_BACKEND_WS: wss://staging-nginz-ssl.zinfra.io/
+  MAINTENANCE_VALIDATION_ENVIRONMENT_NAME: wire-webapp-precommit
+  MAINTENANCE_VALIDATION_URL: https://wire-webapp-precommit.zinfra.io/
+
+jobs:
+  validate_request:
+    name: Validate maintenance release request
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      maintenance_line_key: ${{ steps.validate_request.outputs.maintenance_line_key }}
+      maintenance_branch: ${{ steps.validate_request.outputs.maintenance_branch }}
+      source_production_tag: ${{ steps.validate_request.outputs.source_production_tag }}
+
+    steps:
+      - name: Checkout workflow tools from main
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: main
+
+      - name: Validate workflow ref
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]; then
+            echo 'Release Maintenance WebApp must be started with "Use workflow from: main".' >&2
+            echo "Received workflow ref: ${GITHUB_REF}" >&2
+            exit 1
+          fi
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Validate maintenance request
+        id: validate_request
+        env:
+          CONFIRM_MAINTENANCE_RELEASE: ${{ inputs.confirm_maintenance_release }}
+          MAINTENANCE_LINE_KEY: ${{ inputs.maintenance_line_key }}
+          REASON: ${{ inputs.reason }}
+          SOURCE_PRODUCTION_TAG: ${{ inputs.source_production_tag }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${CONFIRM_MAINTENANCE_RELEASE}" != 'true' ]]; then
+            echo 'confirm_maintenance_release must be true to start a maintenance release.' >&2
+            exit 1
+          fi
+
+          if [[ -z "${REASON//[[:space:]]/}" ]]; then
+            echo 'reason must contain meaningful non-whitespace text.' >&2
+            exit 1
+          fi
+
+          maintenance_branch="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts maintenance-branch "${MAINTENANCE_LINE_KEY}")"
+          ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-source "${MAINTENANCE_LINE_KEY}" "${SOURCE_PRODUCTION_TAG}" >/dev/null
+
+          {
+            echo "maintenance_line_key=${MAINTENANCE_LINE_KEY}"
+            echo "maintenance_branch=${maintenance_branch}"
+            echo "source_production_tag=${SOURCE_PRODUCTION_TAG}"
+          } >> "$GITHUB_OUTPUT"
+
+  prepare_maintenance_branch:
+    name: Prepare maintenance branch
+    runs-on: ubuntu-24.04
+    needs: validate_request
+    permissions:
+      contents: write
+    concurrency:
+      group: prepare-maintenance-branch-${{ needs.validate_request.outputs.maintenance_line_key }}
+      cancel-in-progress: false
+      queue: max
+    outputs:
+      maintenance_branch: ${{ steps.prepare_branch.outputs.maintenance_branch }}
+      branch_action: ${{ steps.prepare_branch.outputs.branch_action }}
+      maintenance_commit_sha: ${{ steps.prepare_branch.outputs.maintenance_commit_sha }}
+      maintenance_line_key: ${{ steps.prepare_branch.outputs.maintenance_line_key }}
+      source_production_commit_sha: ${{ steps.prepare_branch.outputs.source_production_commit_sha }}
+      source_production_tag: ${{ steps.prepare_branch.outputs.source_production_tag }}
+
+    steps:
+      - name: Checkout main as workflow tooling
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+          ref: main
+
+      - name: Create or reuse maintenance branch from the exact Production commit
+        id: prepare_branch
+        env:
+          MAINTENANCE_BRANCH: ${{ needs.validate_request.outputs.maintenance_branch }}
+          MAINTENANCE_LINE_KEY: ${{ needs.validate_request.outputs.maintenance_line_key }}
+          SOURCE_PRODUCTION_TAG: ${{ needs.validate_request.outputs.source_production_tag }}
+        run: |
+          set -euo pipefail
+
+          git ls-remote --exit-code --tags origin "refs/tags/${SOURCE_PRODUCTION_TAG}" >/dev/null
+          git fetch --no-tags origin "refs/tags/${SOURCE_PRODUCTION_TAG}:refs/tags/${SOURCE_PRODUCTION_TAG}"
+
+          if [[ "$(git cat-file -t "refs/tags/${SOURCE_PRODUCTION_TAG}")" != 'tag' ]]; then
+            echo "Source Production tag ${SOURCE_PRODUCTION_TAG} is not an annotated tag." >&2
+            exit 1
+          fi
+
+          source_production_commit_sha="$(git rev-parse "refs/tags/${SOURCE_PRODUCTION_TAG}^{commit}")"
+          branch_remote_ref="refs/remotes/origin/${MAINTENANCE_BRANCH}"
+          branch_action='reused'
+
+          if git ls-remote --exit-code --heads origin "refs/heads/${MAINTENANCE_BRANCH}" >/dev/null; then
+            git fetch --no-tags origin "+refs/heads/${MAINTENANCE_BRANCH}:${branch_remote_ref}"
+          else
+            if git push origin "${source_production_commit_sha}:refs/heads/${MAINTENANCE_BRANCH}"; then
+              branch_action='created'
+            elif git ls-remote --exit-code --heads origin "refs/heads/${MAINTENANCE_BRANCH}" >/dev/null; then
+              echo "Maintenance branch ${MAINTENANCE_BRANCH} was created concurrently; resolving the remote branch." >&2
+              branch_action='reused'
+            else
+              echo "Unable to create or resolve maintenance branch ${MAINTENANCE_BRANCH}." >&2
+              exit 1
+            fi
+
+            git fetch --no-tags origin "+refs/heads/${MAINTENANCE_BRANCH}:${branch_remote_ref}"
+          fi
+
+          maintenance_commit_sha="$(git rev-parse "${branch_remote_ref}")"
+
+          if [[ "${branch_action}" == 'created' && "${maintenance_commit_sha}" != "${source_production_commit_sha}" ]]; then
+            echo "Created maintenance branch ${MAINTENANCE_BRANCH} resolved to ${maintenance_commit_sha}, expected ${source_production_commit_sha}." >&2
+            exit 1
+          fi
+
+          if ! git merge-base --is-ancestor "${source_production_commit_sha}" "${maintenance_commit_sha}"; then
+            echo "Maintenance branch ${MAINTENANCE_BRANCH} at ${maintenance_commit_sha} is unrelated to source Production commit ${source_production_commit_sha}." >&2
+            exit 1
+          fi
+
+          {
+            echo "maintenance_branch=${MAINTENANCE_BRANCH}"
+            echo "branch_action=${branch_action}"
+            echo "maintenance_commit_sha=${maintenance_commit_sha}"
+            echo "maintenance_line_key=${MAINTENANCE_LINE_KEY}"
+            echo "source_production_commit_sha=${source_production_commit_sha}"
+            echo "source_production_tag=${SOURCE_PRODUCTION_TAG}"
+          } >> "$GITHUB_OUTPUT"
+
+  preflight_maintenance_tag:
+    name: Preflight maintenance tag
+    runs-on: ubuntu-24.04
+    needs: prepare_maintenance_branch
+    permissions:
+      contents: read
+    outputs:
+      maintenance_tag: ${{ steps.preflight_tag.outputs.maintenance_tag }}
+      tag_action: ${{ steps.preflight_tag.outputs.tag_action }}
+
+    steps:
+      - name: Checkout exact maintenance branch head
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Resolve immutable maintenance tag target
+        id: preflight_tag
+        env:
+          MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+          MAINTENANCE_LINE_KEY: ${{ needs.prepare_maintenance_branch.outputs.maintenance_line_key }}
+        run: |
+          set -euo pipefail
+
+          git fetch --tags origin
+
+          mapfile -t existing_tag_names < <(
+            git ls-remote --tags --refs origin "${MAINTENANCE_LINE_KEY}-maintenance.*" |
+              awk '{ sub("^refs/tags/", "", $2); print $2; }'
+          )
+          matching_tag_names=()
+
+          for tag_name in "${existing_tag_names[@]}"; do
+            ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-tag "${tag_name}" >/dev/null
+
+            if [[ "$(git cat-file -t "refs/tags/${tag_name}")" != 'tag' ]]; then
+              echo "Maintenance tag ${tag_name} is not annotated." >&2
+              exit 1
+            fi
+
+            tag_commit_sha="$(git rev-parse "refs/tags/${tag_name}^{commit}")"
+            if [[ "${tag_commit_sha}" == "${MAINTENANCE_COMMIT_SHA}" ]]; then
+              matching_tag_names+=("${tag_name}")
+            fi
+          done
+
+          if (( ${#matching_tag_names[@]} > 1 )); then
+            echo "Multiple maintenance tags from ${MAINTENANCE_LINE_KEY} point to ${MAINTENANCE_COMMIT_SHA}: ${matching_tag_names[*]}" >&2
+            exit 1
+          fi
+
+          if (( ${#matching_tag_names[@]} == 1 )); then
+            existing_tag_name="${matching_tag_names[0]}"
+            echo "Maintenance tag ${existing_tag_name} already points to the current branch head. Run Repair Maintenance distribution to verify or repair its immutable distribution." >&2
+            {
+              echo "maintenance_tag=${existing_tag_name}"
+              echo 'tag_action=existing'
+            } >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+          if (( ${#existing_tag_names[@]} == 0 )); then
+            maintenance_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts next-maintenance-tag "${MAINTENANCE_LINE_KEY}")"
+          else
+            maintenance_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts next-maintenance-tag "${MAINTENANCE_LINE_KEY}" "${existing_tag_names[@]}")"
+          fi
+
+          {
+            echo "maintenance_tag=${maintenance_tag}"
+            echo 'tag_action=create'
+          } >> "$GITHUB_OUTPUT"
+
+  build_maintenance_artifact:
+    name: Build exact maintenance artifact
+    runs-on: ubuntu-24.04
+    needs: [prepare_maintenance_branch, preflight_maintenance_tag]
+    if: ${{ needs.preflight_maintenance_tag.outputs.tag_action == 'create' }}
+    env:
+      WIRE_WEBAPP_CONFIGURATION: production
+    permissions:
+      contents: read
+    outputs:
+      artifact_asset_version: ${{ steps.validate_artifact_metadata.outputs.artifact_asset_version }}
+      artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
+      artifact_checksum: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
+      artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
+      artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
+      artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      distribution_artifact_name: ${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
+
+    steps:
+      - name: Checkout exact maintenance branch head
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Verify exact maintenance commit
+        id: maintenance_metadata
+        env:
+          EXPECTED_MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          maintenance_commit_sha="$(git rev-parse HEAD)"
+          if [[ "${maintenance_commit_sha}" != "${EXPECTED_MAINTENANCE_COMMIT_SHA}" ]]; then
+            echo "Checked out ${maintenance_commit_sha}, expected maintenance commit ${EXPECTED_MAINTENANCE_COMMIT_SHA}." >&2
+            exit 1
+          fi
+
+          echo "maintenance_commit_sha=${maintenance_commit_sha}" >> "$GITHUB_OUTPUT"
+
+      - name: Update configuration
+        run: ./bin/yarn nx run webapp:configure
+
+      - name: Build and package public production
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.maintenance_metadata.outputs.maintenance_commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ needs.preflight_maintenance_tag.outputs.maintenance_tag }}
+        run: ./bin/yarn build:prod:public
+
+      - name: Validate maintenance artifact metadata
+        id: validate_artifact_metadata
+        env:
+          BUILD_ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
+          EXPECTED_COMMIT: ${{ steps.maintenance_metadata.outputs.maintenance_commit_sha }}
+          EXPECTED_VERSION: ${{ needs.preflight_maintenance_tag.outputs.maintenance_tag }}
+        run: node ./bin/validateBuildArtifact.mts
+
+      - name: Compute artifact metadata
+        id: artifact_metadata
+        env:
+          MAINTENANCE_LINE_KEY: ${{ needs.prepare_maintenance_branch.outputs.maintenance_line_key }}
+        run: |
+          set -euo pipefail
+
+          artifact_name="release-maintenance-ebs-${MAINTENANCE_LINE_KEY}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          artifact_checksum="$(sha256sum "${ARTIFACT_PATH}" | awk '{print $1}')"
+
+          {
+            echo "artifact_name=${artifact_name}"
+            echo "artifact_checksum=${artifact_checksum}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Prepare exact maintenance Docker distribution context
+        id: distribution_artifact
+        env:
+          ARTIFACT_CHECKSUM: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
+          ARTIFACT_VERSION: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+          MAINTENANCE_BRANCH: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch }}
+          MAINTENANCE_COMMIT_SHA: ${{ steps.maintenance_metadata.outputs.maintenance_commit_sha }}
+          MAINTENANCE_LINE_KEY: ${{ needs.prepare_maintenance_branch.outputs.maintenance_line_key }}
+          MAINTENANCE_TAG: ${{ needs.preflight_maintenance_tag.outputs.maintenance_tag }}
+          SOURCE_PRODUCTION_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.source_production_commit_sha }}
+          SOURCE_PRODUCTION_TAG: ${{ needs.prepare_maintenance_branch.outputs.source_production_tag }}
+        run: |
+          set -euo pipefail
+
+          distribution_artifact_name="release-maintenance-distribution-context-${MAINTENANCE_LINE_KEY}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          distribution_context_directory="${RUNNER_TEMP}/${distribution_artifact_name}"
+          mkdir -p \
+            "${distribution_context_directory}/apps/server" \
+            "${distribution_context_directory}/libraries/config" \
+            "${distribution_context_directory}/bin"
+
+          cp -a package.json yarn.lock .yarnrc.yml .npmrc run.sh .env.defaults "${distribution_context_directory}/"
+          cp -a .yarn "${distribution_context_directory}/.yarn"
+          cp -a bin/yarn "${distribution_context_directory}/bin/yarn"
+          cp -a apps/server/Dockerfile apps/server/package.json "${distribution_context_directory}/apps/server/"
+          cp -a apps/server/dist "${distribution_context_directory}/apps/server/dist"
+          cp -a libraries/config/package.json libraries/config/lib "${distribution_context_directory}/libraries/config/"
+
+          jq -n \
+            --arg maintenance_line_key "${MAINTENANCE_LINE_KEY}" \
+            --arg maintenance_branch "${MAINTENANCE_BRANCH}" \
+            --arg source_production_tag "${SOURCE_PRODUCTION_TAG}" \
+            --arg source_production_commit_sha "${SOURCE_PRODUCTION_COMMIT_SHA}" \
+            --arg maintenance_commit_sha "${MAINTENANCE_COMMIT_SHA}" \
+            --arg maintenance_tag "${MAINTENANCE_TAG}" \
+            --arg artifact_version "${ARTIFACT_VERSION}" \
+            --arg artifact_checksum "${ARTIFACT_CHECKSUM}" \
+            --arg workflow_run_id "${GITHUB_RUN_ID}" \
+            --arg workflow_run_attempt "${GITHUB_RUN_ATTEMPT}" \
+            '{
+              maintenanceLineKey: $maintenance_line_key,
+              maintenanceBranch: $maintenance_branch,
+              sourceProductionTag: $source_production_tag,
+              sourceProductionCommitSha: $source_production_commit_sha,
+              maintenanceCommitSha: $maintenance_commit_sha,
+              maintenanceTag: $maintenance_tag,
+              artifactVersion: $artifact_version,
+              artifactChecksum: $artifact_checksum,
+              workflowRunId: $workflow_run_id,
+              workflowRunAttempt: $workflow_run_attempt
+            }' > "${distribution_context_directory}/distribution-manifest.json"
+
+          echo "distribution_artifact_name=${distribution_artifact_name}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload exact maintenance distribution context
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
+          path: ${{ runner.temp }}/${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
+          if-no-files-found: error
+          include-hidden-files: true
+
+      - name: Upload maintenance validation artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ${{ steps.artifact_metadata.outputs.artifact_name }}
+          path: ${{ env.ARTIFACT_PATH }}
+          if-no-files-found: error
+
+  validate_maintenance_artifact:
+    name: Validate maintenance artifact in dedicated slot
+    needs: [build_maintenance_artifact, preflight_maintenance_tag]
+    if: ${{ needs.build_maintenance_artifact.result == 'success' }}
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/precommit-slot-run.yml
+    with:
+      env_name: wire-webapp-precommit
+      expectedManageTeamUrl: https://teams.wire.com/login/
+      artifact_name: ${{ needs.build_maintenance_artifact.outputs.artifact_name }}
+      expectedBackendRest: https://staging-nginz-https.zinfra.io/
+      expectedBackendWs: wss://staging-nginz-ssl.zinfra.io/
+      expectedVersion: ${{ needs.build_maintenance_artifact.outputs.artifact_version }}
+      expectedAssetVersion: ${{ needs.build_maintenance_artifact.outputs.artifact_asset_version }}
+      expectedCommit: ${{ needs.build_maintenance_artifact.outputs.artifact_commit }}
+      expectedBuiltAt: ${{ needs.build_maintenance_artifact.outputs.artifact_built_at }}
+      grep: '@regression|@crit-flow-web'
+      testinyRunName: WebApp maintenance ${{ needs.preflight_maintenance_tag.outputs.maintenance_tag }}
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+      WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+      TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+
+  create_maintenance_tag:
+    name: Create immutable maintenance tag
+    runs-on: ubuntu-24.04
+    needs:
+      [build_maintenance_artifact, prepare_maintenance_branch, preflight_maintenance_tag, validate_maintenance_artifact]
+    if: ${{ needs.validate_maintenance_artifact.result == 'success' }}
+    permissions:
+      contents: write
+    outputs:
+      maintenance_tag: ${{ steps.create_tag.outputs.maintenance_tag }}
+      tag_action: ${{ steps.create_tag.outputs.tag_action }}
+
+    steps:
+      - name: Checkout exact maintenance commit
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+          ref: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Create or reuse the immutable maintenance tag
+        id: create_tag
+        env:
+          MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+          MAINTENANCE_LINE_KEY: ${{ needs.prepare_maintenance_branch.outputs.maintenance_line_key }}
+          MAINTENANCE_TAG: ${{ needs.preflight_maintenance_tag.outputs.maintenance_tag }}
+          SOURCE_PRODUCTION_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.source_production_commit_sha }}
+          SOURCE_PRODUCTION_TAG: ${{ needs.prepare_maintenance_branch.outputs.source_production_tag }}
+        run: |
+          set -euo pipefail
+
+          git fetch --tags origin
+
+          mapfile -t existing_tag_names < <(
+            git ls-remote --tags --refs origin "${MAINTENANCE_LINE_KEY}-maintenance.*" |
+              awk '{ sub("^refs/tags/", "", $2); print $2; }'
+          )
+          matching_tag_names=()
+
+          for tag_name in "${existing_tag_names[@]}"; do
+            ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-tag "${tag_name}" >/dev/null
+            if [[ "$(git cat-file -t "refs/tags/${tag_name}")" != 'tag' ]]; then
+              echo "Maintenance tag ${tag_name} is not annotated." >&2
+              exit 1
+            fi
+
+            tag_commit_sha="$(git rev-parse "refs/tags/${tag_name}^{commit}")"
+            if [[ "${tag_commit_sha}" == "${MAINTENANCE_COMMIT_SHA}" ]]; then
+              matching_tag_names+=("${tag_name}")
+            fi
+          done
+
+          if (( ${#matching_tag_names[@]} > 1 )); then
+            echo "Multiple maintenance tags from ${MAINTENANCE_LINE_KEY} point to ${MAINTENANCE_COMMIT_SHA}: ${matching_tag_names[*]}" >&2
+            exit 1
+          fi
+
+          if (( ${#matching_tag_names[@]} == 1 )); then
+            existing_tag_name="${matching_tag_names[0]}"
+            echo "Maintenance tag ${existing_tag_name} was created concurrently at the expected commit; reusing it." >&2
+            {
+              echo "maintenance_tag=${existing_tag_name}"
+              echo 'tag_action=reused'
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${MAINTENANCE_TAG}" >/dev/null; then
+            git fetch --no-tags origin "refs/tags/${MAINTENANCE_TAG}:refs/tags/${MAINTENANCE_TAG}"
+
+            if [[ "$(git cat-file -t "refs/tags/${MAINTENANCE_TAG}")" != 'tag' ]]; then
+              echo "Maintenance tag ${MAINTENANCE_TAG} is not annotated." >&2
+              exit 1
+            fi
+
+            existing_tag_commit_sha="$(git rev-parse "refs/tags/${MAINTENANCE_TAG}^{commit}")"
+            if [[ "${existing_tag_commit_sha}" != "${MAINTENANCE_COMMIT_SHA}" ]]; then
+              echo "Maintenance tag ${MAINTENANCE_TAG} already points to ${existing_tag_commit_sha}, expected ${MAINTENANCE_COMMIT_SHA}." >&2
+              exit 1
+            fi
+
+            echo "Maintenance tag ${MAINTENANCE_TAG} already exists but was not associated with the current branch head." >&2
+            exit 1
+          fi
+
+          git config user.email "zebot@users.noreply.github.com"
+          git config user.name "Zebot"
+          git tag --annotate "${MAINTENANCE_TAG}" \
+            --message "Maintenance release ${MAINTENANCE_TAG}" \
+            --message "Line: ${MAINTENANCE_LINE_KEY}" \
+            --message "Maintenance branch: maintenance/${MAINTENANCE_LINE_KEY}" \
+            --message "Source Production tag: ${SOURCE_PRODUCTION_TAG}" \
+            --message "Source Production commit: ${SOURCE_PRODUCTION_COMMIT_SHA}" \
+            --message "Maintenance commit: ${MAINTENANCE_COMMIT_SHA}" \
+            --message "Workflow: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            "${MAINTENANCE_COMMIT_SHA}"
+
+          if git push origin "refs/tags/${MAINTENANCE_TAG}"; then
+            {
+              echo "maintenance_tag=${MAINTENANCE_TAG}"
+              echo 'tag_action=created'
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git tag --delete "${MAINTENANCE_TAG}" >/dev/null 2>&1 || true
+          if ! git ls-remote --exit-code --tags origin "refs/tags/${MAINTENANCE_TAG}" >/dev/null; then
+            echo "Unable to create or resolve maintenance tag ${MAINTENANCE_TAG}." >&2
+            exit 1
+          fi
+
+          git fetch --no-tags origin "refs/tags/${MAINTENANCE_TAG}:refs/tags/${MAINTENANCE_TAG}"
+          if [[ "$(git cat-file -t "refs/tags/${MAINTENANCE_TAG}")" != 'tag' || "$(git rev-parse "refs/tags/${MAINTENANCE_TAG}^{commit}")" != "${MAINTENANCE_COMMIT_SHA}" ]]; then
+            echo "Concurrent maintenance tag ${MAINTENANCE_TAG} does not point to the expected commit." >&2
+            exit 1
+          fi
+
+          {
+            echo "maintenance_tag=${MAINTENANCE_TAG}"
+            echo 'tag_action=reused'
+          } >> "$GITHUB_OUTPUT"
+
+  publish_maintenance_distribution:
+    name: Publish customer-managed maintenance distribution
+    needs: [build_maintenance_artifact, create_maintenance_tag, prepare_maintenance_branch]
+    if: ${{ needs.create_maintenance_tag.result == 'success' }}
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/publish-maintenance-distribution.yml
+    with:
+      maintenance_line_key: ${{ needs.prepare_maintenance_branch.outputs.maintenance_line_key }}
+      maintenance_branch: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch }}
+      source_production_tag: ${{ needs.prepare_maintenance_branch.outputs.source_production_tag }}
+      source_production_commit_sha: ${{ needs.prepare_maintenance_branch.outputs.source_production_commit_sha }}
+      maintenance_commit_sha: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+      maintenance_tag: ${{ needs.create_maintenance_tag.outputs.maintenance_tag }}
+      source_run_id: ${{ github.run_id }}
+      source_run_attempt: ${{ github.run_attempt }}
+      distribution_artifact_name: ${{ needs.build_maintenance_artifact.outputs.distribution_artifact_name }}
+    secrets:
+      WEBTEAM_QUAY_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+      WEBTEAM_QUAY_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+
+  notify_maintenance_validated:
+    name: Notify maintenance artifact validated and tagged
+    runs-on: ubuntu-24.04
+    needs:
+      [build_maintenance_artifact, create_maintenance_tag, prepare_maintenance_branch, validate_maintenance_artifact]
+    if: ${{ always() && needs.validate_maintenance_artifact.result == 'success' && needs.create_maintenance_tag.result == 'success' }}
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: main
+          sparse-checkout: .github/actions/notify-deployoholics
+
+      - name: Announce validated maintenance artifact
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: success
+          text: |
+            ✅ WebApp maintenance artifact successfully validated and immutably tagged ✅
+
+            Maintenance line: ${{ needs.prepare_maintenance_branch.outputs.maintenance_line_key }}
+            Maintenance branch: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch }}
+            Source Production tag: ${{ needs.prepare_maintenance_branch.outputs.source_production_tag }}
+            Maintenance tag: ${{ needs.create_maintenance_tag.outputs.maintenance_tag }}
+            Validation environment: ${{ env.MAINTENANCE_VALIDATION_ENVIRONMENT_NAME }}
+            Playwright report: ${{ needs.validate_maintenance_artifact.outputs.reportUrl || 'unavailable' }}
+            Workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  notify_maintenance_distribution_success:
+    name: Notify maintenance distribution completed
+    runs-on: ubuntu-24.04
+    needs: [create_maintenance_tag, prepare_maintenance_branch, publish_maintenance_distribution]
+    if: ${{ always() && needs.publish_maintenance_distribution.result == 'success' }}
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: main
+          sparse-checkout: .github/actions/notify-deployoholics
+
+      - name: Announce completed maintenance distribution
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: success
+          text: |
+            ✅ Customer-managed WebApp maintenance distribution completed ✅
+
+            Maintenance line: ${{ needs.prepare_maintenance_branch.outputs.maintenance_line_key }}
+            Maintenance tag: ${{ needs.create_maintenance_tag.outputs.maintenance_tag }}
+            Docker image: ${{ needs.publish_maintenance_distribution.outputs.docker_image_tag }}
+            Helm chart: ${{ needs.publish_maintenance_distribution.outputs.helm_chart_version }}
+            Customer deployment is outside this workflow; hosted Beta and Production were not touched.
+            Workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  summarize_maintenance_release:
+    name: Summarize maintenance release
+    runs-on: ubuntu-24.04
+    needs:
+      - validate_request
+      - build_maintenance_artifact
+      - create_maintenance_tag
+      - prepare_maintenance_branch
+      - preflight_maintenance_tag
+      - publish_maintenance_distribution
+      - validate_maintenance_artifact
+    if: ${{ always() }}
+    permissions:
+      contents: read
+    steps:
+      - name: Write maintenance release summary
+        env:
+          ARTIFACT_ASSET_VERSION: ${{ needs.build_maintenance_artifact.outputs.artifact_asset_version }}
+          ARTIFACT_BUILT_AT: ${{ needs.build_maintenance_artifact.outputs.artifact_built_at }}
+          ARTIFACT_CHECKSUM: ${{ needs.build_maintenance_artifact.outputs.artifact_checksum }}
+          ARTIFACT_COMMIT: ${{ needs.build_maintenance_artifact.outputs.artifact_commit }}
+          ARTIFACT_VERSION: ${{ needs.build_maintenance_artifact.outputs.artifact_version }}
+          BRANCH_ACTION: ${{ needs.prepare_maintenance_branch.outputs.branch_action }}
+          DOCKER_IMAGE_TAG: ${{ needs.publish_maintenance_distribution.outputs.docker_image_tag }}
+          HELM_CHART_VERSION: ${{ needs.publish_maintenance_distribution.outputs.helm_chart_version }}
+          MAINTENANCE_BRANCH: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch }}
+          MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+          MAINTENANCE_LINE_KEY: ${{ needs.prepare_maintenance_branch.outputs.maintenance_line_key || inputs.maintenance_line_key }}
+          MAINTENANCE_TAG: ${{ needs.create_maintenance_tag.outputs.maintenance_tag || needs.preflight_maintenance_tag.outputs.maintenance_tag }}
+          PUBLISH_RESULT: ${{ needs.publish_maintenance_distribution.result }}
+          REASON: ${{ inputs.reason }}
+          SOURCE_PRODUCTION_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.source_production_commit_sha }}
+          SOURCE_PRODUCTION_TAG: ${{ needs.prepare_maintenance_branch.outputs.source_production_tag || inputs.source_production_tag }}
+          TAG_RESULT: ${{ needs.create_maintenance_tag.result }}
+          TESTINY_RUN_NAME: WebApp maintenance ${{ needs.preflight_maintenance_tag.outputs.maintenance_tag }}
+          VALIDATION_RESULT: ${{ needs.validate_maintenance_artifact.result }}
+          VALIDATION_RUNTIME_RESULT: ${{ needs.validate_maintenance_artifact.outputs.runtime_verification_result }}
+          VALIDATION_REPORT_URL: ${{ needs.validate_maintenance_artifact.outputs.reportUrl }}
+        run: |
+          {
+            echo '## Maintenance release'
+            echo
+            echo "- Maintenance line key: ${MAINTENANCE_LINE_KEY:-unavailable}"
+            echo "- Maintenance branch: ${MAINTENANCE_BRANCH:-unavailable}"
+            echo "- Branch action: ${BRANCH_ACTION:-unavailable}"
+            echo "- Source Production tag: ${SOURCE_PRODUCTION_TAG:-unavailable}"
+            echo "- Source Production commit: ${SOURCE_PRODUCTION_COMMIT_SHA:-unavailable}"
+            echo "- Maintenance commit: ${MAINTENANCE_COMMIT_SHA:-unavailable}"
+            echo "- Target or existing maintenance tag: ${MAINTENANCE_TAG:-unavailable}"
+            echo "- Build version: ${ARTIFACT_VERSION:-unavailable}"
+            echo "- Build asset version: ${ARTIFACT_ASSET_VERSION:-unavailable}"
+            echo "- Build commit: ${ARTIFACT_COMMIT:-unavailable}"
+            echo "- Built at: ${ARTIFACT_BUILT_AT:-unavailable}"
+            echo "- Artifact checksum: ${ARTIFACT_CHECKSUM:-unavailable}"
+            echo "- Validation environment: ${MAINTENANCE_VALIDATION_ENVIRONMENT_NAME}"
+            echo "- Validation URL: ${MAINTENANCE_VALIDATION_URL}"
+            echo "- Runtime verification result: ${VALIDATION_RUNTIME_RESULT:-unavailable}"
+            echo "- E2E result: ${VALIDATION_RESULT:-unavailable}"
+            echo "- Testiny run name: ${TESTINY_RUN_NAME:-unavailable}"
+            echo "- Playwright report link: ${VALIDATION_REPORT_URL:-unavailable}"
+            echo "- Docker image identity: ${DOCKER_IMAGE_TAG:-unavailable}"
+            echo "- Helm chart identity: ${HELM_CHART_VERSION:-unavailable}"
+            echo "- Maintenance tag result: ${TAG_RESULT:-unavailable}"
+            echo "- Distribution result: ${PUBLISH_RESULT:-unavailable}"
+            echo "- Dispatch reason: ${REASON}"
+            echo "- Hosted Beta/Production deployment: not performed"
+            echo "- wire-builds/main and wire-builds/dev: not updated"
+            echo "- Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  notify_maintenance_release_failure:
+    name: Notify maintenance release failure
+    runs-on: ubuntu-24.04
+    needs:
+      - validate_request
+      - build_maintenance_artifact
+      - create_maintenance_tag
+      - prepare_maintenance_branch
+      - preflight_maintenance_tag
+      - publish_maintenance_distribution
+      - validate_maintenance_artifact
+    if: >-
+      ${{
+        always() &&
+        (
+          needs.validate_request.result == 'failure' ||
+          needs.prepare_maintenance_branch.result == 'failure' ||
+          needs.preflight_maintenance_tag.result == 'failure' ||
+          needs.build_maintenance_artifact.result == 'failure' ||
+          needs.validate_maintenance_artifact.result == 'failure' ||
+          needs.create_maintenance_tag.result == 'failure' ||
+          needs.publish_maintenance_distribution.result == 'failure'
+        )
+      }}
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: main
+          sparse-checkout: .github/actions/notify-deployoholics
+
+      - name: Announce failed maintenance release
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: failure
+          text: |
+            ❌ WebApp maintenance release failed ❌
+
+            Maintenance line: ${{ inputs.maintenance_line_key }}
+            Source Production tag: ${{ inputs.source_production_tag }}
+            Target maintenance tag: ${{ needs.create_maintenance_tag.outputs.maintenance_tag || needs.preflight_maintenance_tag.outputs.maintenance_tag || 'unresolved' }}
+            Validation result: ${{ needs.validate_maintenance_artifact.result }}
+            Distribution result: ${{ needs.publish_maintenance_distribution.result }}
+            No hosted Beta or Production deployment was performed by this workflow.
+            Dispatch reason: ${{ inputs.reason }}
+            Workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

@@ -23,7 +23,13 @@ on:
       expectedVersion:
         type: string
         required: false
+      expectedAssetVersion:
+        type: string
+        required: false
       expectedCommit:
+        type: string
+        required: false
+      expectedBuiltAt:
         type: string
         required: false
       grep:
@@ -57,6 +63,9 @@ on:
       reportUrl:
         description: URL of the playwright report artifact
         value: ${{ jobs.e2e_tests.outputs.reportUrl }}
+      runtime_verification_result:
+        description: Result of the optional runtime identity and backend verification
+        value: ${{ jobs.deploy_to_aws.outputs.runtime_verification_result }}
 
 concurrency:
   group: precommit-slot-${{ inputs.env_name }}
@@ -72,6 +81,7 @@ jobs:
 
     outputs:
       precommit_url: ${{ steps.fetch_url.outputs.url }}
+      runtime_verification_result: ${{ steps.verify_precommit_runtime.outcome }}
 
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
@@ -121,10 +131,13 @@ jobs:
           echo "url=https://$ENV_NAME.zinfra.io/" >> "$GITHUB_OUTPUT"
 
       - name: Verify precommit runtime
-        if: ${{ inputs.expectedVersion || inputs.expectedCommit || inputs.expectedBackendRest || inputs.expectedBackendWs }}
+        id: verify_precommit_runtime
+        if: ${{ inputs.expectedVersion || inputs.expectedAssetVersion || inputs.expectedCommit || inputs.expectedBuiltAt || inputs.expectedBackendRest || inputs.expectedBackendWs }}
         env:
           EXPECTED_BACKEND_REST: ${{ inputs.expectedBackendRest }}
           EXPECTED_BACKEND_WS: ${{ inputs.expectedBackendWs }}
+          EXPECTED_ASSET_VERSION: ${{ inputs.expectedAssetVersion }}
+          EXPECTED_BUILT_AT: ${{ inputs.expectedBuiltAt }}
           EXPECTED_COMMIT: ${{ inputs.expectedCommit }}
           EXPECTED_VERSION: ${{ inputs.expectedVersion }}
           PRECOMMIT_URL: ${{ steps.fetch_url.outputs.url }}
@@ -147,6 +160,14 @@ jobs:
               printf '%s' "${version_response}" |
                 jq --raw-output '.version'
             )" || actual_version=''
+            actual_asset_version="$(
+              printf '%s' "${version_response}" |
+                jq --raw-output '.assetVersion'
+            )" || actual_asset_version=''
+            actual_built_at="$(
+              printf '%s' "${version_response}" |
+                jq --raw-output '.builtAt'
+            )" || actual_built_at=''
             actual_commit="$(
               printf '%s' "${commit_response}" |
                 tr -d '\r\n'
@@ -156,14 +177,16 @@ jobs:
 
             if [[
               ( -z "${EXPECTED_VERSION}" || "${actual_version}" == "${EXPECTED_VERSION}" ) &&
+              ( -z "${EXPECTED_ASSET_VERSION}" || "${actual_asset_version}" == "${EXPECTED_ASSET_VERSION}" ) &&
               ( -z "${EXPECTED_COMMIT}" || "${actual_commit}" == "${EXPECTED_COMMIT}" ) &&
+              ( -z "${EXPECTED_BUILT_AT}" || "${actual_built_at}" == "${EXPECTED_BUILT_AT}" ) &&
               ( -z "${EXPECTED_BACKEND_REST}" || "$(normalize_url "${actual_backend_rest}")" == "${expected_backend_rest}" ) &&
               ( -z "${EXPECTED_BACKEND_WS}" || "$(normalize_url "${actual_backend_ws}")" == "${expected_backend_ws}" )
             ]]; then
               exit 0
             fi
 
-            echo "Precommit runtime verification mismatch on attempt ${attempt_number}: VERSION=${actual_version:-missing}, COMMIT=${actual_commit:-missing}, REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}." >&2
+            echo "Precommit runtime verification mismatch on attempt ${attempt_number}: VERSION=${actual_version:-missing}, ASSET_VERSION=${actual_asset_version:-missing}, COMMIT=${actual_commit:-missing}, BUILT_AT=${actual_built_at:-missing}, REST=${actual_backend_rest:-missing}, WS=${actual_backend_ws:-missing}." >&2
 
             if [[ "${attempt_number}" -lt 10 ]]; then
               sleep 6

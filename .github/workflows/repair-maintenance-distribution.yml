@@ -1,0 +1,277 @@
+---
+name: Repair Maintenance WebApp distribution
+
+on:
+  workflow_dispatch:
+    inputs:
+      maintenance_tag:
+        description: 'Existing annotated immutable maintenance tag to verify or repair'
+        required: true
+        type: string
+      source_run_id:
+        description: 'Workflow run containing the exact maintenance distribution context'
+        required: true
+        type: string
+      distribution_artifact_name:
+        description: 'Exact maintenance distribution context artifact from the source run'
+        required: true
+        type: string
+      confirm_repair:
+        description: 'Confirm repair publication for the existing maintenance tag; no new or moved tag will be created'
+        required: true
+        default: false
+        type: boolean
+      reason:
+        description: 'Required non-sensitive reason for repairing the maintenance distribution'
+        required: true
+        type: string
+
+concurrency:
+  group: repair-maintenance-${{ inputs.maintenance_tag }}
+  cancel-in-progress: false
+  queue: max
+
+permissions: {}
+
+jobs:
+  validate_repair:
+    name: Validate maintenance distribution repair
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      maintenance_branch: ${{ steps.resolve_identity.outputs.maintenance_branch }}
+      maintenance_commit_sha: ${{ steps.resolve_identity.outputs.maintenance_commit_sha }}
+      maintenance_line_key: ${{ steps.resolve_identity.outputs.maintenance_line_key }}
+      maintenance_tag: ${{ steps.resolve_identity.outputs.maintenance_tag }}
+      source_production_commit_sha: ${{ steps.resolve_identity.outputs.source_production_commit_sha }}
+      source_production_tag: ${{ steps.resolve_identity.outputs.source_production_tag }}
+      source_run_attempt: ${{ steps.resolve_identity.outputs.source_run_attempt }}
+
+    steps:
+      - name: Checkout workflow tools from main
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: main
+
+      - name: Validate workflow ref
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]; then
+            echo 'Repair Maintenance WebApp distribution must be started with "Use workflow from: main".' >&2
+            echo "Received workflow ref: ${GITHUB_REF}" >&2
+            exit 1
+          fi
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Download exact maintenance distribution context
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ inputs.distribution_artifact_name }}
+          path: repair-context
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_run_id }}
+
+      - name: Validate existing tag and distribution identity
+        id: resolve_identity
+        env:
+          CONFIRM_REPAIR: ${{ inputs.confirm_repair }}
+          DISTRIBUTION_CONTEXT_PATH: repair-context
+          MAINTENANCE_TAG: ${{ inputs.maintenance_tag }}
+          REASON: ${{ inputs.reason }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${CONFIRM_REPAIR}" != 'true' ]]; then
+            echo 'confirm_repair must be true for a maintenance distribution repair.' >&2
+            exit 1
+          fi
+
+          if [[ -z "${REASON//[[:space:]]/}" ]]; then
+            echo 'reason must contain meaningful non-whitespace text.' >&2
+            exit 1
+          fi
+
+          ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-tag "${MAINTENANCE_TAG}" >/dev/null
+          git ls-remote --exit-code --tags origin "refs/tags/${MAINTENANCE_TAG}" >/dev/null
+          git fetch --no-tags origin "refs/tags/${MAINTENANCE_TAG}:refs/tags/${MAINTENANCE_TAG}"
+
+          if [[ "$(git cat-file -t "refs/tags/${MAINTENANCE_TAG}")" != 'tag' ]]; then
+            echo "Maintenance tag ${MAINTENANCE_TAG} is not annotated." >&2
+            exit 1
+          fi
+
+          maintenance_tag_commit_sha="$(git rev-parse "refs/tags/${MAINTENANCE_TAG}^{commit}")"
+          manifest_path="${DISTRIBUTION_CONTEXT_PATH}/distribution-manifest.json"
+          artifact_metadata_path="${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist/version.json"
+
+          if [[ ! -f "${manifest_path}" || ! -f "${artifact_metadata_path}" ]]; then
+            echo 'The repair artifact is missing distribution-manifest.json or version.json.' >&2
+            exit 1
+          fi
+
+          manifest_maintenance_line_key="$(jq -er '.maintenanceLineKey | strings | select(length > 0)' "${manifest_path}")"
+          manifest_maintenance_branch="$(jq -er '.maintenanceBranch | strings | select(length > 0)' "${manifest_path}")"
+          manifest_source_production_tag="$(jq -er '.sourceProductionTag | strings | select(length > 0)' "${manifest_path}")"
+          manifest_source_production_commit_sha="$(jq -er '.sourceProductionCommitSha | strings | select(length > 0)' "${manifest_path}")"
+          manifest_maintenance_commit_sha="$(jq -er '.maintenanceCommitSha | strings | select(length > 0)' "${manifest_path}")"
+          manifest_maintenance_tag="$(jq -er '.maintenanceTag | strings | select(length > 0)' "${manifest_path}")"
+          manifest_workflow_run_id="$(jq -er '.workflowRunId | strings | select(length > 0)' "${manifest_path}")"
+          manifest_workflow_run_attempt="$(jq -er '.workflowRunAttempt | strings | select(length > 0)' "${manifest_path}")"
+
+          if [[ "${manifest_maintenance_tag}" != "${MAINTENANCE_TAG}" ]]; then
+            echo "Distribution manifest tag ${manifest_maintenance_tag} does not match requested tag ${MAINTENANCE_TAG}." >&2
+            exit 1
+          fi
+
+          if [[ "${manifest_workflow_run_id}" != "${SOURCE_RUN_ID}" ]]; then
+            echo "Distribution manifest source run ${manifest_workflow_run_id} does not match requested source run ${SOURCE_RUN_ID}." >&2
+            exit 1
+          fi
+
+          if [[ "${maintenance_tag_commit_sha}" != "${manifest_maintenance_commit_sha}" ]]; then
+            echo "Maintenance tag ${MAINTENANCE_TAG} points to ${maintenance_tag_commit_sha}, manifest expects ${manifest_maintenance_commit_sha}." >&2
+            exit 1
+          fi
+
+          ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-source "${manifest_maintenance_line_key}" "${manifest_source_production_tag}" >/dev/null
+          git ls-remote --exit-code --tags origin "refs/tags/${manifest_source_production_tag}" >/dev/null
+          git fetch --no-tags origin "refs/tags/${manifest_source_production_tag}:refs/tags/${manifest_source_production_tag}"
+
+          if [[ "$(git cat-file -t "refs/tags/${manifest_source_production_tag}")" != 'tag' ]]; then
+            echo "Source Production tag ${manifest_source_production_tag} is not annotated." >&2
+            exit 1
+          fi
+
+          source_production_commit_sha="$(git rev-parse "refs/tags/${manifest_source_production_tag}^{commit}")"
+          if [[ "${source_production_commit_sha}" != "${manifest_source_production_commit_sha}" ]]; then
+            echo "Source Production tag ${manifest_source_production_tag} resolves to ${source_production_commit_sha}, manifest expects ${manifest_source_production_commit_sha}." >&2
+            exit 1
+          fi
+
+          ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/maintenanceDistributionCli.ts \
+            validate-manifest \
+            --artifact-metadata-path "${artifact_metadata_path}" \
+            --manifest-path "${manifest_path}" \
+            --maintenance-line-key "${manifest_maintenance_line_key}" \
+            --maintenance-branch "${manifest_maintenance_branch}" \
+            --source-production-tag "${manifest_source_production_tag}" \
+            --source-production-commit-sha "${manifest_source_production_commit_sha}" \
+            --maintenance-commit-sha "${manifest_maintenance_commit_sha}" \
+            --maintenance-tag "${manifest_maintenance_tag}" \
+            --workflow-run-id "${manifest_workflow_run_id}" \
+            --workflow-run-attempt "${manifest_workflow_run_attempt}"
+
+          {
+            echo "maintenance_branch=${manifest_maintenance_branch}"
+            echo "maintenance_commit_sha=${manifest_maintenance_commit_sha}"
+            echo "maintenance_line_key=${manifest_maintenance_line_key}"
+            echo "maintenance_tag=${manifest_maintenance_tag}"
+            echo "source_production_commit_sha=${manifest_source_production_commit_sha}"
+            echo "source_production_tag=${manifest_source_production_tag}"
+            echo "source_run_attempt=${manifest_workflow_run_attempt}"
+          } >> "$GITHUB_OUTPUT"
+
+  publish_maintenance_distribution:
+    name: Repair customer-managed maintenance distribution
+    needs: validate_repair
+    if: ${{ needs.validate_repair.result == 'success' }}
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/publish-maintenance-distribution.yml
+    with:
+      maintenance_line_key: ${{ needs.validate_repair.outputs.maintenance_line_key }}
+      maintenance_branch: ${{ needs.validate_repair.outputs.maintenance_branch }}
+      source_production_tag: ${{ needs.validate_repair.outputs.source_production_tag }}
+      source_production_commit_sha: ${{ needs.validate_repair.outputs.source_production_commit_sha }}
+      maintenance_commit_sha: ${{ needs.validate_repair.outputs.maintenance_commit_sha }}
+      maintenance_tag: ${{ needs.validate_repair.outputs.maintenance_tag }}
+      source_run_id: ${{ inputs.source_run_id }}
+      source_run_attempt: ${{ needs.validate_repair.outputs.source_run_attempt }}
+      distribution_artifact_name: ${{ inputs.distribution_artifact_name }}
+    secrets:
+      WEBTEAM_QUAY_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+      WEBTEAM_QUAY_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+
+  summarize_repair:
+    name: Summarize maintenance distribution repair
+    runs-on: ubuntu-24.04
+    needs: [publish_maintenance_distribution, validate_repair]
+    if: ${{ always() }}
+    permissions:
+      contents: read
+    steps:
+      - name: Write repair summary
+        env:
+          DOCKER_IMAGE_TAG: ${{ needs.publish_maintenance_distribution.outputs.docker_image_tag }}
+          HELM_CHART_VERSION: ${{ needs.publish_maintenance_distribution.outputs.helm_chart_version }}
+        run: |
+          {
+            echo '## Maintenance distribution repair'
+            echo
+            echo "- Maintenance line key: ${{ needs.validate_repair.outputs.maintenance_line_key || 'unavailable' }}"
+            echo "- Maintenance tag: ${{ needs.validate_repair.outputs.maintenance_tag || inputs.maintenance_tag }}"
+            echo "- Source workflow: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${{ inputs.source_run_id }}"
+            echo "- Distribution artifact: ${{ inputs.distribution_artifact_name }}"
+            echo "- Docker image: ${DOCKER_IMAGE_TAG:-unavailable}"
+            echo "- Helm chart: ${HELM_CHART_VERSION:-unavailable}"
+            echo "- Distribution result: ${{ needs.publish_maintenance_distribution.result }}"
+            echo '- New or moved maintenance tag: not performed'
+            echo '- Hosted Beta/Production deployment: not performed'
+            echo '- wire-builds/main and wire-builds/dev: not updated'
+            echo "- Repair reason: ${{ inputs.reason }}"
+            echo "- Workflow URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  notify_repair_failure:
+    name: Notify maintenance distribution repair failure
+    runs-on: ubuntu-24.04
+    needs: [publish_maintenance_distribution, validate_repair]
+    if: ${{ always() && (needs.validate_repair.result == 'failure' || needs.publish_maintenance_distribution.result == 'failure') }}
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout notification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: main
+          sparse-checkout: .github/actions/notify-deployoholics
+
+      - name: Announce failed maintenance distribution repair
+        uses: ./.github/actions/notify-deployoholics
+        with:
+          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          status: failure
+          text: |
+            ❌ WebApp maintenance distribution repair failed ❌
+
+            Maintenance tag: ${{ inputs.maintenance_tag }}
+            Source workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ inputs.source_run_id }}
+            No new or moved tag was created, and no hosted deployment was performed.
+            Repair reason: ${{ inputs.reason }}
+            Workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
