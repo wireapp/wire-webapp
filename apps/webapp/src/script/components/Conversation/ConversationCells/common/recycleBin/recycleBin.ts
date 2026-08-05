@@ -29,12 +29,13 @@ export const isRootRecycleBinPath = () => {
   return path === RECYCLE_BIN_PATH;
 };
 
-export const isInRecycleBin = () => {
+export const isInRecycleBin = (): boolean => {
   const hash = window.location.hash.replace('#', '');
 
   const parts = hash.split('/files/');
+  const path = parts[1];
 
-  return parts[1]?.includes(RECYCLE_BIN_PATH);
+  return path === RECYCLE_BIN_PATH || path?.startsWith(`${RECYCLE_BIN_PATH}/`) === true;
 };
 
 export const getNodeRootParentPath = ({nodePath}: {nodePath: string}) => {
