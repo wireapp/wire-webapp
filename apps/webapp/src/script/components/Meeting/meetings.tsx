@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -51,33 +51,44 @@ export const Meetings = () => {
   const addNotification = useMeetingNotificationStore(state => state.addNotification);
   const selfUser = container.resolve(UserState).self();
 
+  const refreshMeetings = useCallback(
+    () => fireAndForgetInvoker.fireAndForget(loadMeetings),
+    [fireAndForgetInvoker, loadMeetings],
+  );
+
   useEffect(() => {
-    fireAndForgetInvoker.fireAndForget(loadMeetings);
-  }, [loadMeetings, fireAndForgetInvoker]);
+    refreshMeetings();
+  }, [refreshMeetings]);
 
   const meetingSeriesRef = useRef(meetingSeries);
   meetingSeriesRef.current = meetingSeries;
 
+  const notificationHandlersRef = useRef<ReturnType<typeof createMeetingNotificationEventHandlers> | null>(null);
+
   useEffect(() => {
-    const {onMeetingCreated, onMeetingUpdated, onMeetingDeleted} = createMeetingNotificationEventHandlers({
+    const handlers = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => meetingSeriesRef.current,
       addNotification,
       removeMeetingByQualifiedId,
       logger,
     });
+    notificationHandlersRef.current = handlers;
 
-    amplify.subscribe(WebAppEvents.MEETING.CREATED, onMeetingCreated);
-    amplify.subscribe(WebAppEvents.MEETING.UPDATED, onMeetingUpdated);
-    amplify.subscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
+    amplify.subscribe(WebAppEvents.MEETING.CREATED, handlers.onMeetingCreated);
+    amplify.subscribe(WebAppEvents.MEETING.UPDATED, handlers.onMeetingUpdated);
+    amplify.subscribe(WebAppEvents.MEETING.DELETED, handlers.onMeetingDeleted);
 
     return () => {
-      amplify.unsubscribe(WebAppEvents.MEETING.CREATED, onMeetingCreated);
-      amplify.unsubscribe(WebAppEvents.MEETING.UPDATED, onMeetingUpdated);
-      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
+      notificationHandlersRef.current = null;
+      amplify.unsubscribe(WebAppEvents.MEETING.CREATED, handlers.onMeetingCreated);
+      amplify.unsubscribe(WebAppEvents.MEETING.UPDATED, handlers.onMeetingUpdated);
+      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, handlers.onMeetingDeleted);
     };
   }, [addNotification, removeMeetingByQualifiedId]);
 
-  const refreshMeetings = () => fireAndForgetInvoker.fireAndForget(loadMeetings);
+  useEffect(() => {
+    notificationHandlersRef.current?.retryPendingNotifications();
+  }, [meetingSeries]);
 
   return (
     <div css={meetingsContentWrapperStyles}>

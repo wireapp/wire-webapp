@@ -42,6 +42,8 @@ export type MeetingNotificationEventHandlers = {
   onMeetingCreated: (meetingId: QualifiedId) => void;
   onMeetingUpdated: (meetingId: QualifiedId) => void;
   onMeetingDeleted: (meetingId: QualifiedId) => void;
+  /** Retries notifications that couldn't be sent because the meeting wasn't in the store yet. */
+  retryPendingNotifications: () => void;
 };
 
 export const createMeetingNotificationEventHandlers = ({
@@ -53,13 +55,12 @@ export const createMeetingNotificationEventHandlers = ({
   const getMeeting = (meetingId: QualifiedId) =>
     getMeetingSeries().find(meeting => matchQualifiedIds(meeting.qualified_id, meetingId));
 
-  const addNotificationForMeeting = (meetingId: QualifiedId, kind: MeetingNotificationKind): boolean => {
-    const meeting = getMeeting(meetingId);
-    if (!meeting) {
-      logger.warn('Skipping meeting notification because the meeting is missing', {kind, meetingId});
-      return false;
-    }
+  // MEETING.CREATED/DELETED amplify events only carry the meetingId and can fire before the
+  // meeting store has synced, so a lookup miss is retried once the store updates rather than dropped.
+  const pending = new Map<string, {meetingId: QualifiedId; kind: MeetingNotificationKind}>();
+  const pendingKey = (meetingId: QualifiedId) => `${meetingId.domain}@${meetingId.id}`;
 
+  const notifyForMeeting = (meetingId: QualifiedId, kind: MeetingNotificationKind, meeting: MeetingSeries) => {
     const notificationBase = {
       meetingTitle: meeting.title,
       meetingStartTime: meeting.series_start_date,
@@ -70,30 +71,46 @@ export const createMeetingNotificationEventHandlers = ({
       .with(MeetingNotificationKind.UPDATE, kind => {
         addNotification({...notificationBase, kind});
       })
-      .with(MeetingNotificationKind.INVITE, kind => {
-        addNotification({
-          ...notificationBase,
-          kind,
-          qualifiedCreator: meeting.qualified_creator,
-        });
-      })
-      .with(MeetingNotificationKind.CANCELLED, kind => {
-        addNotification({
-          ...notificationBase,
-          kind,
-          qualifiedCreator: meeting.qualified_creator,
-        });
-      })
-      .with(MeetingNotificationKind.ONGOING, kind => {
-        addNotification({
-          ...notificationBase,
-          kind,
-          qualifiedCreator: meeting.qualified_creator,
-        });
-      })
+      .with(
+        MeetingNotificationKind.INVITE,
+        MeetingNotificationKind.CANCELLED,
+        MeetingNotificationKind.ONGOING,
+        kind => {
+          addNotification({
+            ...notificationBase,
+            kind,
+            qualifiedCreator: meeting.qualified_creator,
+          });
+        },
+      )
       .exhaustive();
+  };
 
+  const addNotificationForMeeting = (meetingId: QualifiedId, kind: MeetingNotificationKind): boolean => {
+    const meeting = getMeeting(meetingId);
+    if (!meeting) {
+      logger.warn('Meeting notification pending because the meeting is not in the store yet', {kind, meetingId});
+      pending.set(pendingKey(meetingId), {meetingId, kind});
+      return false;
+    }
+
+    notifyForMeeting(meetingId, kind, meeting);
     return true;
+  };
+
+  const retryPendingNotifications = () => {
+    for (const [key, {meetingId, kind}] of pending) {
+      const meeting = getMeeting(meetingId);
+      if (!meeting) {
+        continue;
+      }
+
+      notifyForMeeting(meetingId, kind, meeting);
+      pending.delete(key);
+      if (kind === MeetingNotificationKind.CANCELLED) {
+        removeMeetingByQualifiedId(meetingId);
+      }
+    }
   };
 
   return {
@@ -104,5 +121,6 @@ export const createMeetingNotificationEventHandlers = ({
         removeMeetingByQualifiedId(meetingId);
       }
     },
+    retryPendingNotifications,
   };
 };
