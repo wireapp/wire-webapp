@@ -25,15 +25,24 @@ import {
   type MeetingNotification,
   MeetingNotificationKind,
 } from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
+import {translateForTest} from 'Util/test/translateForTest';
 import {formatLocale} from 'Util/timeUtil';
-import {ReactElement} from 'react';
+import type {ReactElement} from 'react';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 const ongoingMeetingStartTime = '2026-06-01T09:50:00.000Z';
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
-const renderCard = (card: ReactElement) => render(<ThemeProvider>{card}</ThemeProvider>);
+const renderCard = (card: ReactElement) =>
+  render(<ThemeProvider>{card}</ThemeProvider>, {wrapper: rootProviderWrapper});
 
 describe('MeetingNotificationCard', () => {
   beforeEach(() => {

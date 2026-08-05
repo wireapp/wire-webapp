@@ -68,6 +68,7 @@ interface LeftListWrapperProps {
   ariaLabelledBy?: string;
   ariaLabel?: string;
   panelAttributes?: Record<string, string | boolean | undefined>;
+  notificationHost?: ReactNode;
 }
 
 const ListWrapper = memo(
@@ -89,6 +90,7 @@ const ListWrapper = memo(
     ariaLabelledBy,
     ariaLabel,
     panelAttributes,
+    notificationHost,
   }: LeftListWrapperProps) => {
     const {translate} = useApplicationContext();
     const defaultHeadingId = hasHeader && !headerElement && header ? getListWrapperHeadingId(id) : undefined;
@@ -178,6 +180,7 @@ const ListWrapper = memo(
             </FadingScrollbar>
 
             {!hideFooter && (footer ?? null)}
+            {notificationHost}
           </section>
         ) : null}
       </>
