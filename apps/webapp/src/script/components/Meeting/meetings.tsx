@@ -19,8 +19,6 @@
 
 import {useEffect, useRef} from 'react';
 
-import {MEETING_EVENT, type MeetingEvent} from '@wireapp/api-client/lib/event';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -31,20 +29,16 @@ import {MeetingCallingView} from 'Components/Meeting/MeetingCallingView/meetingC
 import {meetingsContentWrapperStyles} from 'Components/Meeting/MeetingCallingView/meetingCallingView.styles';
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
-import {
-  MeetingNotificationKind,
-  useMeetingNotificationStore,
-} from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
+import {createMeetingNotificationEventHandlers} from 'Components/Meeting/meetingNotificationEventHandlers';
+import {useMeetingNotificationStore} from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {MeetNowModal} from 'Components/Meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {getLogger} from 'Util/logger';
 
-const getOrganizer = (meetingCreator: QualifiedId) =>
-  container.resolve(UserState).users().find(user => matchQualifiedIds(user.qualifiedId, meetingCreator))?.name() ??
-  meetingCreator.id;
+const logger = getLogger('Meetings');
 
 export const Meetings = () => {
   const {fireAndForgetInvoker} = useApplicationContext();
@@ -65,57 +59,20 @@ export const Meetings = () => {
   meetingSeriesRef.current = meetingSeries;
 
   useEffect(() => {
-    const getMeeting = (meetingId: QualifiedId) =>
-      meetingSeriesRef.current.find(meeting => matchQualifiedIds(meeting.qualified_id, meetingId));
+    const {onMeetingCreated, onMeetingUpdated, onMeetingDeleted} = createMeetingNotificationEventHandlers({
+      getMeetingSeries: () => meetingSeriesRef.current,
+      addNotification,
+      removeMeetingByQualifiedId,
+      logger,
+    });
 
-    const onMeetingEvent = (event: MeetingEvent) => {
-      const meeting = getMeeting(event.qualified_id);
-      if (!meeting) {
-        return;
-      }
-
-      if (event.type === MEETING_EVENT.CREATE) {
-        addNotification({
-          kind: MeetingNotificationKind.INVITE,
-          meetingTitle: meeting.title,
-          meetingStartTime: meeting.series_start_date,
-          qualifiedId: meeting.qualified_id,
-          qualifiedCreator: meeting.qualified_creator,
-        });
-        return;
-      }
-
-      addNotification({
-        kind: MeetingNotificationKind.UPDATE,
-        meetingTitle: meeting.title,
-        meetingStartTime: meeting.series_start_date,
-        qualifiedId: meeting.qualified_id,
-      });
-    };
-
-    const onMeetingDeleted = (meetingId: QualifiedId) => {
-      const meeting = getMeeting(meetingId);
-      if (!meeting) {
-        return;
-      }
-
-      addNotification({
-        kind: MeetingNotificationKind.CANCELLED,
-        meetingTitle: meeting.title,
-        meetingStartTime: meeting.series_start_date,
-        qualifiedId: meeting.qualified_id,
-        qualifiedCreator: meeting.qualified_creator,
-      });
-      removeMeetingByQualifiedId(meetingId);
-    };
-
-    amplify.subscribe(MEETING_EVENT.CREATE, onMeetingEvent);
-    amplify.subscribe(MEETING_EVENT.UPDATE, onMeetingEvent);
+    amplify.subscribe(WebAppEvents.MEETING.CREATED, onMeetingCreated);
+    amplify.subscribe(WebAppEvents.MEETING.UPDATED, onMeetingUpdated);
     amplify.subscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
 
     return () => {
-      amplify.unsubscribe(MEETING_EVENT.CREATE, onMeetingEvent);
-      amplify.unsubscribe(MEETING_EVENT.UPDATE, onMeetingEvent);
+      amplify.unsubscribe(WebAppEvents.MEETING.CREATED, onMeetingCreated);
+      amplify.unsubscribe(WebAppEvents.MEETING.UPDATED, onMeetingUpdated);
       amplify.unsubscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
     };
   }, [addNotification, removeMeetingByQualifiedId]);
