@@ -1206,8 +1206,11 @@ describe('native release appearance command entrypoint', () => {
     commandProcess.stderr.on('data', (outputChunk: Buffer) => {
       standardError += outputChunk.toString();
     });
-    const {promise: exitCodePromise, resolve: resolveExitCode, reject: rejectExitCode} =
-      Promise.withResolvers<number | null>();
+    const {
+      promise: exitCodePromise,
+      resolve: resolveExitCode,
+      reject: rejectExitCode,
+    } = Promise.withResolvers<number | null>();
     commandProcess.once('error', error => {
       rejectExitCode(error);
     });
