@@ -46,16 +46,12 @@ const meetingSeries: MeetingSeries = {
 describe('createMeetingNotificationEventHandlers', () => {
   it('creates meeting notifications from the current meeting series snapshot', () => {
     const notifications: AddNotificationInput[] = [];
-    const removedMeetingIds: QualifiedId[] = [];
     const warnings: Array<{message: string; context?: unknown}> = [];
 
     const {onMeetingCreated, onMeetingUpdated, onMeetingDeleted} = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => [meetingSeries],
       addNotification: notification => {
         notifications.push(notification);
-      },
-      removeMeetingByQualifiedId: id => {
-        removedMeetingIds.push(id);
       },
       logger: {
         warn: (message, context) => {
@@ -91,22 +87,17 @@ describe('createMeetingNotificationEventHandlers', () => {
       },
     ]);
 
-    expect(removedMeetingIds).toEqual([meetingId]);
     expect(warnings).toEqual([]);
   });
 
   it('warns and queues notification creation when a meeting is missing', () => {
     const notifications: AddNotificationInput[] = [];
-    const removedMeetingIds: QualifiedId[] = [];
     const warnings: Array<{message: string; context?: unknown}> = [];
 
     const {onMeetingCreated, onMeetingDeleted} = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => [],
       addNotification: notification => {
         notifications.push(notification);
-      },
-      removeMeetingByQualifiedId: id => {
-        removedMeetingIds.push(id);
       },
       logger: {
         warn: (message, context) => {
@@ -119,7 +110,6 @@ describe('createMeetingNotificationEventHandlers', () => {
     onMeetingDeleted(meetingId);
 
     expect(notifications).toEqual([]);
-    expect(removedMeetingIds).toEqual([]);
     expect(warnings).toEqual([
       {
         message: 'Meeting notification pending because the meeting is not in the store yet',

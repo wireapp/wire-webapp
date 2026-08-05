@@ -34,7 +34,6 @@ type MeetingNotificationLogger = {
 export type MeetingNotificationEventHandlersDependencies = {
   getMeetingSeries: () => readonly MeetingSeries[];
   addNotification: (input: AddNotificationInput) => void;
-  removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
   logger: MeetingNotificationLogger;
 };
 
@@ -49,7 +48,6 @@ export type MeetingNotificationEventHandlers = {
 export const createMeetingNotificationEventHandlers = ({
   getMeetingSeries,
   addNotification,
-  removeMeetingByQualifiedId,
   logger,
 }: MeetingNotificationEventHandlersDependencies): MeetingNotificationEventHandlers => {
   const getMeeting = (meetingId: QualifiedId) =>
@@ -107,9 +105,6 @@ export const createMeetingNotificationEventHandlers = ({
 
       notifyForMeeting(meetingId, kind, meeting);
       pending.delete(key);
-      if (kind === MeetingNotificationKind.CANCELLED) {
-        removeMeetingByQualifiedId(meetingId);
-      }
     }
   };
 
@@ -121,9 +116,7 @@ export const createMeetingNotificationEventHandlers = ({
       addNotificationForMeeting(meetingId, MeetingNotificationKind.UPDATE);
     },
     onMeetingDeleted: meetingId => {
-      if (addNotificationForMeeting(meetingId, MeetingNotificationKind.CANCELLED)) {
-        removeMeetingByQualifiedId(meetingId);
-      }
+      addNotificationForMeeting(meetingId, MeetingNotificationKind.CANCELLED);
     },
     retryPendingNotifications,
   };

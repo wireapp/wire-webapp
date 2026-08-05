@@ -87,7 +87,6 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     const notificationHandlers = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => store.getState().meetingSeries,
       addNotification: useMeetingNotificationStore.getState().addNotification,
-      removeMeetingByQualifiedId: meetingId => store.getState().removeMeetingByQualifiedId(meetingId),
       logger,
     });
 
