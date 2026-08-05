@@ -24,11 +24,13 @@ import {match} from 'ts-pattern';
 import type {
   CommentProgress,
   DiscoveryProgress,
-  ReleaseAppearanceClock,
   ReleaseAppearanceProgressReporter,
-  ReleaseAppearanceProgressScheduler,
 } from './releaseAppearanceProgress.ts';
-import {maximumProgressSilenceMilliseconds, progressPercentageStep} from './releaseAppearanceProgress.ts';
+import {
+  commentProcessingConcurrency,
+  progressPercentageStep,
+  pullRequestDiscoveryConcurrency,
+} from './releaseAppearanceProgress.ts';
 
 type ActionsCoreProgressAdapter = Pick<typeof actionsCore, 'endGroup' | 'info' | 'startGroup'>;
 
@@ -44,19 +46,14 @@ type ProgressSnapshot =
       readonly progress: CommentProgress;
     };
 
-type ProgressReporterState<TimerHandle extends {}> = {
+type ProgressReporterState = {
   readonly phase: ProgressPhase;
-  readonly startedAtMilliseconds: number;
-  readonly lastEmittedAtMilliseconds: number;
   readonly lastEmittedProgressBoundary: number;
-  readonly snapshot: ProgressSnapshot;
-  readonly timerHandle: Maybe<TimerHandle>;
+  readonly isGroupOpen: boolean;
 };
 
-export type CreateGitHubActionsProgressReporterOptions<TimerHandle extends {}> = {
+export type CreateGitHubActionsProgressReporterOptions = {
   readonly actionsCore: ActionsCoreProgressAdapter;
-  readonly clock: ReleaseAppearanceClock;
-  readonly scheduler: ReleaseAppearanceProgressScheduler<TimerHandle>;
 };
 
 const completeProgressPercentage = 100;
@@ -107,14 +104,14 @@ function createProgressStartMessage(progressSnapshot: ProgressSnapshot): string 
         return 'Release appearance: no commits require pull-request discovery';
       }
 
-      return `Release appearance: discovering pull requests for ${progress.totalCommits} commits`;
+      return `Release appearance: discovering pull requests for ${progress.totalCommits} commits with concurrency ${pullRequestDiscoveryConcurrency}`;
     })
     .with({phase: 'comments'}, ({progress}) => {
       if (progress.totalPullRequests === 0) {
         return 'Release appearance: no pull-request comments require processing';
       }
 
-      return `Release appearance: processing comments for ${progress.totalPullRequests} PRs`;
+      return `Release appearance: processing comments for ${progress.totalPullRequests} PRs with concurrency ${commentProcessingConcurrency}`;
     })
     .exhaustive();
 }
@@ -144,24 +141,6 @@ function createProgressMessage(progressSnapshot: ProgressSnapshot): string {
     .exhaustive();
 }
 
-function updateProgressElapsed(progressSnapshot: ProgressSnapshot, elapsedMilliseconds: number): ProgressSnapshot {
-  return match(progressSnapshot)
-    .returnType<ProgressSnapshot>()
-    .with({phase: 'discovery'}, ({progress}) => {
-      return {
-        phase: 'discovery',
-        progress: {...progress, elapsedMilliseconds},
-      };
-    })
-    .with({phase: 'comments'}, ({progress}) => {
-      return {
-        phase: 'comments',
-        progress: {...progress, elapsedMilliseconds},
-      };
-    })
-    .exhaustive();
-}
-
 function createProgressGroupName(phase: ProgressPhase): string {
   return match(phase)
     .with('discovery', () => {
@@ -173,102 +152,26 @@ function createProgressGroupName(phase: ProgressPhase): string {
     .exhaustive();
 }
 
-function createInitialProgressReporterState<TimerHandle extends {}>(
-  progressSnapshot: ProgressSnapshot,
-  startedAtMilliseconds: number,
-): ProgressReporterState<TimerHandle> {
+function createInitialProgressReporterState(progressSnapshot: ProgressSnapshot): ProgressReporterState {
   return {
     phase: progressSnapshot.phase,
-    startedAtMilliseconds,
-    lastEmittedAtMilliseconds: startedAtMilliseconds,
     lastEmittedProgressBoundary: 0,
-    snapshot: progressSnapshot,
-    timerHandle: Maybe.nothing<TimerHandle>(),
+    isGroupOpen: false,
   };
 }
 
-function clearProgressTimer<TimerHandle extends {}>(
-  progressReporterState: ProgressReporterState<TimerHandle>,
-  scheduler: ReleaseAppearanceProgressScheduler<TimerHandle>,
-): ProgressReporterState<TimerHandle> {
-  if (progressReporterState.timerHandle.isNothing) {
-    return progressReporterState;
-  }
-
-  scheduler.cancel(progressReporterState.timerHandle.value);
-  return {
-    ...progressReporterState,
-    timerHandle: Maybe.nothing<TimerHandle>(),
-  };
-}
-
-export function createGitHubActionsProgressReporter<TimerHandle extends {}>(
-  createGitHubActionsProgressReporterOptions: CreateGitHubActionsProgressReporterOptions<TimerHandle>,
+export function createGitHubActionsProgressReporter(
+  createGitHubActionsProgressReporterOptions: CreateGitHubActionsProgressReporterOptions,
 ): ReleaseAppearanceProgressReporter {
-  const {actionsCore, clock, scheduler} = createGitHubActionsProgressReporterOptions;
-  let progressReporterState: Maybe<ProgressReporterState<TimerHandle>> =
-    Maybe.nothing<ProgressReporterState<TimerHandle>>();
-
-  function emitProgressMessage(progressSnapshot: ProgressSnapshot, emittedAtMilliseconds: number): void {
-    if (progressReporterState.isNothing) {
-      return;
-    }
-
-    actionsCore.info(createProgressMessage(progressSnapshot));
-    progressReporterState = Maybe.just({
-      ...progressReporterState.value,
-      lastEmittedAtMilliseconds: emittedAtMilliseconds,
-      lastEmittedProgressBoundary: Math.max(
-        progressReporterState.value.lastEmittedProgressBoundary,
-        progressBoundary(progressCompletedItems(progressSnapshot), progressTotalItems(progressSnapshot)),
-      ),
-      snapshot: progressSnapshot,
-    });
-  }
-
-  function scheduleSilenceProgress(): void {
-    if (progressReporterState.isNothing) {
-      return;
-    }
-
-    const currentTimeMilliseconds = clock();
-    const currentSnapshot = updateProgressElapsed(
-      progressReporterState.value.snapshot,
-      currentTimeMilliseconds - progressReporterState.value.startedAtMilliseconds,
-    );
-    if (
-      currentTimeMilliseconds - progressReporterState.value.lastEmittedAtMilliseconds >=
-      maximumProgressSilenceMilliseconds
-    ) {
-      emitProgressMessage(currentSnapshot, currentTimeMilliseconds);
-    } else {
-      progressReporterState = Maybe.just({
-        ...progressReporterState.value,
-        snapshot: currentSnapshot,
-      });
-    }
-
-    if (progressReporterState.isJust) {
-      progressReporterState = Maybe.just({
-        ...progressReporterState.value,
-        timerHandle: Maybe.just(scheduler.schedule(scheduleSilenceProgress, maximumProgressSilenceMilliseconds)),
-      });
-    }
-  }
+  const {actionsCore: actionsCoreAdapter} = createGitHubActionsProgressReporterOptions;
+  let progressReporterState: Maybe<ProgressReporterState> = Maybe.nothing<ProgressReporterState>();
 
   function startProgress(progressSnapshot: ProgressSnapshot): void {
-    const startedAtMilliseconds = clock();
-    const initialProgressReporterState = createInitialProgressReporterState<TimerHandle>(
-      progressSnapshot,
-      startedAtMilliseconds,
-    );
+    const initialProgressReporterState = createInitialProgressReporterState(progressSnapshot);
     progressReporterState = Maybe.just(initialProgressReporterState);
-    actionsCore.startGroup(createProgressGroupName(progressSnapshot.phase));
-    actionsCore.info(createProgressStartMessage(progressSnapshot));
-    progressReporterState = Maybe.just({
-      ...initialProgressReporterState,
-      timerHandle: Maybe.just(scheduler.schedule(scheduleSilenceProgress, maximumProgressSilenceMilliseconds)),
-    });
+    actionsCoreAdapter.startGroup(createProgressGroupName(progressSnapshot.phase));
+    progressReporterState = Maybe.just({...initialProgressReporterState, isGroupOpen: true});
+    actionsCoreAdapter.info(createProgressStartMessage(progressSnapshot));
   }
 
   function reportProgress(progressSnapshot: ProgressSnapshot): void {
@@ -276,20 +179,19 @@ export function createGitHubActionsProgressReporter<TimerHandle extends {}>(
       return;
     }
 
-    const currentTimeMilliseconds = clock();
-    const hasCrossedProgressBoundary =
-      progressBoundary(progressCompletedItems(progressSnapshot), progressTotalItems(progressSnapshot)) >
-      progressReporterState.value.lastEmittedProgressBoundary;
-    const hasExceededMaximumSilence =
-      currentTimeMilliseconds - progressReporterState.value.lastEmittedAtMilliseconds >=
-      maximumProgressSilenceMilliseconds;
+    const currentProgressBoundary = progressBoundary(
+      progressCompletedItems(progressSnapshot),
+      progressTotalItems(progressSnapshot),
+    );
+    if (currentProgressBoundary <= progressReporterState.value.lastEmittedProgressBoundary) {
+      return;
+    }
+
+    actionsCoreAdapter.info(createProgressMessage(progressSnapshot));
     progressReporterState = Maybe.just({
       ...progressReporterState.value,
-      snapshot: progressSnapshot,
+      lastEmittedProgressBoundary: currentProgressBoundary,
     });
-    if (hasCrossedProgressBoundary || hasExceededMaximumSilence) {
-      emitProgressMessage(progressSnapshot, currentTimeMilliseconds);
-    }
   }
 
   function finishProgress(progressSnapshot: ProgressSnapshot): void {
@@ -297,22 +199,15 @@ export function createGitHubActionsProgressReporter<TimerHandle extends {}>(
       return;
     }
 
-    progressReporterState = Maybe.just(
-      clearProgressTimer(
-        {
-          ...progressReporterState.value,
-          snapshot: progressSnapshot,
-        },
-        scheduler,
-      ),
-    );
     try {
-      emitProgressMessage(progressSnapshot, clock());
+      actionsCoreAdapter.info(createProgressMessage(progressSnapshot));
     } finally {
       try {
-        actionsCore.endGroup();
+        if (progressReporterState.value.isGroupOpen) {
+          actionsCoreAdapter.endGroup();
+        }
       } finally {
-        progressReporterState = Maybe.nothing<ProgressReporterState<TimerHandle>>();
+        progressReporterState = Maybe.nothing<ProgressReporterState>();
       }
     }
   }
@@ -339,19 +234,6 @@ export function createGitHubActionsProgressReporter<TimerHandle extends {}>(
   };
 }
 
-export function createDefaultGitHubActionsProgressReporter(
-  clock: ReleaseAppearanceClock,
-): ReleaseAppearanceProgressReporter {
-  return createGitHubActionsProgressReporter<ReturnType<typeof setTimeout>>({
-    actionsCore,
-    clock,
-    scheduler: {
-      schedule(callback, delayMilliseconds) {
-        return setTimeout(callback, delayMilliseconds);
-      },
-      cancel(timerHandle) {
-        clearTimeout(timerHandle);
-      },
-    },
-  });
+export function createDefaultGitHubActionsProgressReporter(): ReleaseAppearanceProgressReporter {
+  return createGitHubActionsProgressReporter({actionsCore});
 }

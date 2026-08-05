@@ -19,52 +19,51 @@
 
 import assert from 'node:assert';
 
-import {createNoOpReleaseAppearanceProgressReporter} from './releaseAppearanceProgress.ts';
+import {createGitHubActionsProgressReporter} from './githubActionsProgressReporter.ts';
+import {
+  createNoOpReleaseAppearanceProgressReporter,
+  commentProcessingConcurrency,
+  pullRequestDiscoveryConcurrency,
+} from './releaseAppearanceProgress.ts';
 import type {
   CommentProgress,
   DiscoveryProgress,
   ReleaseAppearanceProgressReporter,
-  ReleaseAppearanceProgressScheduler,
 } from './releaseAppearanceProgress.ts';
-import {createGitHubActionsProgressReporter as createActionsProgressReporter} from './githubActionsProgressReporter.ts';
 
 type FakeActionsCore = {
   readonly groups: string[];
   readonly informationMessages: string[];
   readonly endedGroups: number[];
-};
-
-type FakeProgressScheduler = {
-  readonly scheduler: ReleaseAppearanceProgressScheduler<number>;
-  readonly callbacks: Array<() => void>;
-  readonly cancelledTimerHandles: number[];
+  shouldFailInformation: boolean;
 };
 
 function createFakeActionsCore(): FakeActionsCore {
-  const state: FakeActionsCore = {
+  return {
     groups: [],
     informationMessages: [],
     endedGroups: [],
+    shouldFailInformation: false,
   };
-  return state;
 }
 
-function createFakeProgressScheduler(): FakeProgressScheduler {
-  const callbacks: Array<() => void> = [];
-  const cancelledTimerHandles: number[] = [];
-  return {
-    callbacks,
-    cancelledTimerHandles,
-    scheduler: {
-      schedule(callback) {
-        callbacks.push(callback);
-        return callbacks.length;
+function createTestReporter(fakeActionsCore: FakeActionsCore): ReleaseAppearanceProgressReporter {
+  return createGitHubActionsProgressReporter({
+    actionsCore: {
+      info(message) {
+        if (fakeActionsCore.shouldFailInformation) {
+          throw new Error('progress output failed');
+        }
+        fakeActionsCore.informationMessages.push(message);
       },
-      cancel(timerHandle) {
-        cancelledTimerHandles.push(timerHandle);
+      startGroup(groupName) {
+        fakeActionsCore.groups.push(groupName);
+      },
+      endGroup() {
+        fakeActionsCore.endedGroups.push(fakeActionsCore.groups.length);
       },
     },
-  };
+  });
 }
 
 function createDiscoveryProgress(
@@ -76,7 +75,7 @@ function createDiscoveryProgress(
   return {
     completedCommits,
     totalCommits,
-    activeRequests: completedCommits === totalCommits ? 0 : 8,
+    activeRequests: completedCommits === totalCommits ? 0 : pullRequestDiscoveryConcurrency,
     pullRequestsDiscovered: completedCommits,
     failures: 0,
     elapsedMilliseconds,
@@ -93,7 +92,7 @@ function createCommentProgress(
   return {
     completedPullRequests,
     totalPullRequests,
-    activeRequests: completedPullRequests === totalPullRequests ? 0 : 4,
+    activeRequests: completedPullRequests === totalPullRequests ? 0 : commentProcessingConcurrency,
     commentsCreated: 0,
     commentsUpdated: 0,
     commentsUnchanged: 0,
@@ -103,50 +102,21 @@ function createCommentProgress(
   };
 }
 
-function createTestReporter(
-  currentTimeMilliseconds: () => number,
-  fakeActionsCore: FakeActionsCore,
-  fakeProgressScheduler: FakeProgressScheduler,
-): ReleaseAppearanceProgressReporter {
-  return createActionsProgressReporter({
-    actionsCore: {
-      info(message) {
-        fakeActionsCore.informationMessages.push(message);
-      },
-      startGroup(groupName) {
-        fakeActionsCore.groups.push(groupName);
-      },
-      endGroup() {
-        fakeActionsCore.endedGroups.push(fakeActionsCore.groups.length);
-      },
-    },
-    clock: currentTimeMilliseconds,
-    scheduler: fakeProgressScheduler.scheduler,
-  });
-}
-
-describe('release appearance Actions progress reporter', (): void => {
-  it('opens and closes the discovery group and reports boundary progress', (): void => {
+describe('release appearance Actions progress reporter', () => {
+  it('reports discovery start, percentage boundaries, and completion', () => {
     const fakeActionsCore = createFakeActionsCore();
-    const fakeProgressScheduler = createFakeProgressScheduler();
-    let currentTimeMilliseconds = 0;
-    const reporter = createTestReporter(
-      function readCurrentTimeMilliseconds(): number {
-        return currentTimeMilliseconds;
-      },
-      fakeActionsCore,
-      fakeProgressScheduler,
-    );
+    const reporter = createTestReporter(fakeActionsCore);
 
     reporter.reportDiscoveryStarted(createDiscoveryProgress(0, 20, 0));
-    currentTimeMilliseconds = 1_000;
-    reporter.reportDiscoveryProgress(createDiscoveryProgress(1, 20, currentTimeMilliseconds));
-    reporter.reportDiscoveryProgress(createDiscoveryProgress(2, 20, currentTimeMilliseconds));
+    reporter.reportDiscoveryProgress(createDiscoveryProgress(1, 20, 1_000));
+    reporter.reportDiscoveryProgress(createDiscoveryProgress(2, 20, 1_000));
     reporter.reportDiscoveryCompleted(createDiscoveryProgress(20, 20, 2_000));
 
     expect(fakeActionsCore.groups).toEqual(['Discover pull requests']);
     expect(fakeActionsCore.endedGroups).toHaveLength(1);
-    expect(fakeActionsCore.informationMessages[0]).toBe('Release appearance: discovering pull requests for 20 commits');
+    expect(fakeActionsCore.informationMessages[0]).toBe(
+      `Release appearance: discovering pull requests for 20 commits with concurrency ${pullRequestDiscoveryConcurrency}`,
+    );
     expect(fakeActionsCore.informationMessages).toContain(
       'Release appearance: discovery 2/20 (10%) · 2 PRs · 0 failures · 8 active · elapsed 1s',
     );
@@ -156,16 +126,9 @@ describe('release appearance Actions progress reporter', (): void => {
     expect(fakeActionsCore.informationMessages.join('\n')).not.toMatch(/\x1B|::group::|::endgroup::/u);
   });
 
-  it('opens and closes the comment-processing group with operation counters', (): void => {
+  it('reports comment operation counters and closes the group', () => {
     const fakeActionsCore = createFakeActionsCore();
-    const fakeProgressScheduler = createFakeProgressScheduler();
-    const reporter = createTestReporter(
-      function readCurrentTimeMilliseconds(): number {
-        return 0;
-      },
-      fakeActionsCore,
-      fakeProgressScheduler,
-    );
+    const reporter = createTestReporter(fakeActionsCore);
 
     reporter.reportCommentProcessingStarted(createCommentProgress(0, 10, 0));
     reporter.reportCommentProcessingProgress(
@@ -188,7 +151,9 @@ describe('release appearance Actions progress reporter', (): void => {
 
     expect(fakeActionsCore.groups).toEqual(['Process release-appearance comments']);
     expect(fakeActionsCore.endedGroups).toHaveLength(1);
-    expect(fakeActionsCore.informationMessages[0]).toBe('Release appearance: processing comments for 10 PRs');
+    expect(fakeActionsCore.informationMessages[0]).toBe(
+      `Release appearance: processing comments for 10 PRs with concurrency ${commentProcessingConcurrency}`,
+    );
     expect(fakeActionsCore.informationMessages).toContain(
       'Release appearance: comments 1/10 (10%) · created 1 · updated 2 · unchanged 3 · failed 4 · 4 active · elapsed 3s',
     );
@@ -197,16 +162,9 @@ describe('release appearance Actions progress reporter', (): void => {
     );
   });
 
-  it('renders zero-item phases without dividing by zero', (): void => {
+  it('renders zero-item phases without dividing by zero', () => {
     const fakeActionsCore = createFakeActionsCore();
-    const fakeProgressScheduler = createFakeProgressScheduler();
-    const reporter = createTestReporter(
-      function readCurrentTimeMilliseconds(): number {
-        return 0;
-      },
-      fakeActionsCore,
-      fakeProgressScheduler,
-    );
+    const reporter = createTestReporter(fakeActionsCore);
 
     reporter.reportDiscoveryStarted(createDiscoveryProgress(0, 0, 0, {activeRequests: 0}));
     reporter.reportDiscoveryCompleted(createDiscoveryProgress(0, 0, 0, {activeRequests: 0}));
@@ -228,39 +186,9 @@ describe('release appearance Actions progress reporter', (): void => {
     expect(fakeActionsCore.endedGroups).toHaveLength(2);
   });
 
-  it('emits a silence-threshold update from the injected scheduler and clock', (): void => {
+  it('does not emit a line for every completed item', () => {
     const fakeActionsCore = createFakeActionsCore();
-    const fakeProgressScheduler = createFakeProgressScheduler();
-    let currentTimeMilliseconds = 0;
-    const reporter = createTestReporter(
-      function readCurrentTimeMilliseconds(): number {
-        return currentTimeMilliseconds;
-      },
-      fakeActionsCore,
-      fakeProgressScheduler,
-    );
-
-    reporter.reportDiscoveryStarted(createDiscoveryProgress(0, 100, 0));
-    currentTimeMilliseconds = 15_000;
-    const silenceCallback = fakeProgressScheduler.callbacks[0];
-    assert.equal(typeof silenceCallback, 'function');
-    silenceCallback();
-
-    expect(fakeActionsCore.informationMessages).toHaveLength(2);
-    expect(fakeActionsCore.informationMessages.at(-1)).toContain('elapsed 15s');
-    expect(fakeProgressScheduler.callbacks).toHaveLength(2);
-  });
-
-  it('throttles item updates while still reporting the final 100 percent snapshot', (): void => {
-    const fakeActionsCore = createFakeActionsCore();
-    const fakeProgressScheduler = createFakeProgressScheduler();
-    const reporter = createTestReporter(
-      function readCurrentTimeMilliseconds(): number {
-        return 0;
-      },
-      fakeActionsCore,
-      fakeProgressScheduler,
-    );
+    const reporter = createTestReporter(fakeActionsCore);
 
     reporter.reportDiscoveryStarted(createDiscoveryProgress(0, 100, 0));
     for (let completedCommits = 1; completedCommits <= 100; completedCommits += 1) {
@@ -272,7 +200,19 @@ describe('release appearance Actions progress reporter', (): void => {
     expect(fakeActionsCore.informationMessages.at(-1)).toContain('(100%)');
   });
 
-  it('provides a no-operation reporter for callers without Actions output', (): void => {
+  it('closes an Actions group when completion output fails', () => {
+    const fakeActionsCore = createFakeActionsCore();
+    const reporter = createTestReporter(fakeActionsCore);
+    reporter.reportDiscoveryStarted(createDiscoveryProgress(0, 1, 0));
+    fakeActionsCore.shouldFailInformation = true;
+
+    assert.throws(() => {
+      reporter.reportDiscoveryCompleted(createDiscoveryProgress(1, 1, 0));
+    }, /progress output failed/u);
+    expect(fakeActionsCore.endedGroups).toHaveLength(1);
+  });
+
+  it('provides a no-operation reporter', () => {
     const reporter = createNoOpReleaseAppearanceProgressReporter();
     const discoveryProgress = createDiscoveryProgress(0, 0, 0, {activeRequests: 0});
     const commentProgress = createCommentProgress(0, 0, 0, {activeRequests: 0});

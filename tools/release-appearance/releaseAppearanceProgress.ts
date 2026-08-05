@@ -17,8 +17,6 @@
  *
  */
 
-import {noop} from 'noop-esm';
-
 export type DiscoveryProgress = {
   readonly completedCommits: number;
   readonly totalCommits: number;
@@ -50,35 +48,17 @@ export type ReleaseAppearanceProgressReporter = {
 
 export type ReleaseAppearanceClock = () => number;
 
-export type ReleaseAppearanceProgressScheduler<TimerHandle extends {}> = {
-  readonly schedule: (callback: () => void, delayMilliseconds: number) => TimerHandle;
-  readonly cancel: (timerHandle: TimerHandle) => void;
-};
-
 export const pullRequestDiscoveryConcurrency = 8;
 export const commentProcessingConcurrency = 4;
 export const progressPercentageStep = 10;
-export const maximumProgressSilenceMilliseconds = 15_000;
 
 export function createNoOpReleaseAppearanceProgressReporter(): ReleaseAppearanceProgressReporter {
   return {
-    reportDiscoveryStarted(progress) {
-      noop(progress);
-    },
-    reportDiscoveryProgress(progress) {
-      noop(progress);
-    },
-    reportDiscoveryCompleted(progress) {
-      noop(progress);
-    },
-    reportCommentProcessingStarted(progress) {
-      noop(progress);
-    },
-    reportCommentProcessingProgress(progress) {
-      noop(progress);
-    },
-    reportCommentProcessingCompleted(progress) {
-      noop(progress);
-    },
+    reportDiscoveryStarted() {},
+    reportDiscoveryProgress() {},
+    reportDiscoveryCompleted() {},
+    reportCommentProcessingStarted() {},
+    reportCommentProcessingProgress() {},
+    reportCommentProcessingCompleted() {},
   };
 }
