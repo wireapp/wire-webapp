@@ -114,8 +114,12 @@ export const createMeetingNotificationEventHandlers = ({
   };
 
   return {
-    onMeetingCreated: meetingId => addNotificationForMeeting(meetingId, MeetingNotificationKind.INVITE),
-    onMeetingUpdated: meetingId => addNotificationForMeeting(meetingId, MeetingNotificationKind.UPDATE),
+    onMeetingCreated: meetingId => {
+      addNotificationForMeeting(meetingId, MeetingNotificationKind.INVITE);
+    },
+    onMeetingUpdated: meetingId => {
+      addNotificationForMeeting(meetingId, MeetingNotificationKind.UPDATE);
+    },
     onMeetingDeleted: meetingId => {
       if (addNotificationForMeeting(meetingId, MeetingNotificationKind.CANCELLED)) {
         removeMeetingByQualifiedId(meetingId);

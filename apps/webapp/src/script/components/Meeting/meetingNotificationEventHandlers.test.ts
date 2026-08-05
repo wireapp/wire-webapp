@@ -95,7 +95,7 @@ describe('createMeetingNotificationEventHandlers', () => {
     expect(warnings).toEqual([]);
   });
 
-  it('warns and skips notification creation when a meeting is missing', () => {
+  it('warns and queues notification creation when a meeting is missing', () => {
     const notifications: AddNotificationInput[] = [];
     const removedMeetingIds: QualifiedId[] = [];
     const warnings: Array<{message: string; context?: unknown}> = [];
@@ -122,14 +122,14 @@ describe('createMeetingNotificationEventHandlers', () => {
     expect(removedMeetingIds).toEqual([]);
     expect(warnings).toEqual([
       {
-        message: 'Skipping meeting notification because the meeting is missing',
+        message: 'Meeting notification pending because the meeting is not in the store yet',
         context: {
           kind: MeetingNotificationKind.INVITE,
           meetingId,
         },
       },
       {
-        message: 'Skipping meeting notification because the meeting is missing',
+        message: 'Meeting notification pending because the meeting is not in the store yet',
         context: {
           kind: MeetingNotificationKind.CANCELLED,
           meetingId,
