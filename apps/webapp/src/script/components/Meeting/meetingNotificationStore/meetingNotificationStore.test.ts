@@ -200,6 +200,24 @@ describe('useMeetingNotificationStore', () => {
     expect(useMeetingNotificationStore.getState().notifications).toEqual([second]);
   });
 
+  it('resets the expanded state when dismissing the last notification', () => {
+    const store = useMeetingNotificationStore.getState();
+    store.addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    store.setIsExpanded(true);
+    const [notification] = useMeetingNotificationStore.getState().notifications;
+
+    store.dismissNotification(notification.id);
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(false);
+  });
+
   it('clears all notifications explicitly', () => {
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.INVITE,

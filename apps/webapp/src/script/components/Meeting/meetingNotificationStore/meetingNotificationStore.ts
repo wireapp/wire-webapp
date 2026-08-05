@@ -118,7 +118,14 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
       ],
     })),
   dismissNotification: id =>
-    set(state => ({notifications: state.notifications.filter(notification => notification.id !== id)})),
+    set(state => {
+      const notifications = state.notifications.filter(notification => notification.id !== id);
+
+      return {
+        notifications,
+        ...(state.notifications.length > 0 && notifications.length === 0 ? {isExpanded: false} : {}),
+      };
+    }),
   clearNotifications: () => {
     nextNotificationId = 0;
     set({notifications: [], isExpanded: false});
