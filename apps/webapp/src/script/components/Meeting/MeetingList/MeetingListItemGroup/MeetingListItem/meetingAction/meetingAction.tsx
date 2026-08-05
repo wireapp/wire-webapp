@@ -39,9 +39,10 @@ import {showContextMenu} from '../../../../../../ui/contextMenu';
 interface MeetingActionProps {
   meetingInstance: MeetingInstance;
   selfUser: User | undefined;
+  joinMeeting: () => void;
 }
 
-export const MeetingAction = ({meetingInstance, selfUser}: MeetingActionProps) => {
+export const MeetingAction = ({meetingInstance, selfUser, joinMeeting}: MeetingActionProps) => {
   const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const {openDeleteMeetingModal} = useDeleteMeeting();
@@ -60,6 +61,7 @@ export const MeetingAction = ({meetingInstance, selfUser}: MeetingActionProps) =
         selfUser,
         nowMilliseconds,
         translate,
+        onJoin: joinMeeting,
         onEdit: () => {
           if (canEditMeeting(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
             fireAndForgetInvoker.fireAndForget(() => editMeeting(meetingInstance));
