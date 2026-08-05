@@ -79,6 +79,13 @@ describe('MeetingNotificationHost', () => {
       .getState()
       .addNotification({kind: MeetingNotificationKind.UPDATE, qualifiedId, meetingTitle: 'Updated', meetingStartTime});
     useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.ONGOING,
+      qualifiedId,
+      meetingTitle: 'Ongoing',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Invited',
@@ -88,7 +95,7 @@ describe('MeetingNotificationHost', () => {
 
     renderHost(true, translateForCountTest);
 
-    expect(screen.getByText('3')).toBeInTheDocument();
+    expect(screen.getByText('4')).toBeInTheDocument();
     expect(screen.queryByText('meetings.notifications.title')).not.toBeInTheDocument();
   });
 
@@ -117,6 +124,13 @@ describe('MeetingNotificationHost', () => {
       meetingStartTime,
     });
     addNotification({
+      kind: MeetingNotificationKind.ONGOING,
+      qualifiedId,
+      meetingTitle: 'Ongoing',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Two',
@@ -124,16 +138,9 @@ describe('MeetingNotificationHost', () => {
       meetingStartTime,
     });
     addNotification({
-      kind: MeetingNotificationKind.INVITE,
+      kind: MeetingNotificationKind.CANCELLED,
       qualifiedId,
-      meetingTitle: 'Three',
-      qualifiedCreator,
-      meetingStartTime,
-    });
-    addNotification({
-      kind: MeetingNotificationKind.INVITE,
-      qualifiedId,
-      meetingTitle: 'Four',
+      meetingTitle: 'Canceled',
       qualifiedCreator,
       meetingStartTime,
     });
