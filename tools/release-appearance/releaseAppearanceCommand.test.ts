@@ -39,10 +39,13 @@ import type {
   CreateIssueCommentOptions,
   GitHubClient,
   IssueCommentRecord,
+  ListIssueCommentsOptions,
+  ListPullRequestsForCommitOptions,
   PullRequestRecord,
   UpdateIssueCommentOptions,
 } from './githubClient.ts';
 import type {HttpRequest} from './httpClient.ts';
+import {createNoOpReleaseAppearanceProgressReporter} from './releaseAppearanceProgress.ts';
 import type {ExecuteGitCommand} from './releaseHistory.ts';
 
 const releaseCommit = 'a'.repeat(40);
@@ -65,8 +68,14 @@ const commandEnvironment: NodeJS.ProcessEnv = {
 type FakeGitHubClientOptions = {
   readonly pullRequestsByCommit?: ReadonlyMap<string, readonly PullRequestRecord[]>;
   readonly pullRequestFailuresByCommit?: ReadonlyMap<string, string>;
+  readonly listPullRequestsForCommit?: (
+    options: ListPullRequestsForCommitOptions,
+  ) => Promise<Result<readonly PullRequestRecord[], Error>>;
   readonly commentsByPullRequest?: ReadonlyMap<number, readonly IssueCommentRecord[]>;
   readonly commentListFailuresByPullRequest?: ReadonlyMap<number, string>;
+  readonly listIssueComments?: (
+    options: ListIssueCommentsOptions,
+  ) => Promise<Result<readonly IssueCommentRecord[], Error>>;
   readonly createFailuresByPullRequest?: ReadonlyMap<number, string>;
   readonly updateFailuresByCommentId?: ReadonlyMap<number, string>;
 };
@@ -104,6 +113,11 @@ type FakeBetaTag = {
   readonly commit: string;
 };
 
+type DeferredValue<valueType> = {
+  readonly promise: Promise<valueType>;
+  readonly resolve: (value: valueType | PromiseLike<valueType>) => void;
+};
+
 type CreateDependenciesOptions = {
   readonly executeGitCommand: ExecuteGitCommand;
   readonly failureMessages: string[];
@@ -132,6 +146,14 @@ function createFailure<valueType>(message: string): Result<valueType, Error> {
   return Result.err<valueType, Error>(new Error(message));
 }
 
+function createDeferredValue<valueType>(): DeferredValue<valueType> {
+  const {promise, resolve} = Promise.withResolvers<valueType>();
+  return {
+    promise,
+    resolve,
+  };
+}
+
 function createPullRequest(number: number): PullRequestRecord {
   return {
     number,
@@ -154,6 +176,10 @@ function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions
     githubClient: {
       async listPullRequestsForCommit(options): Promise<Result<readonly PullRequestRecord[], Error>> {
         state.pullRequestCommits.push(options.commitSha);
+        const pullRequestHandler = fakeGitHubClientOptions.listPullRequestsForCommit;
+        if (pullRequestHandler !== undefined) {
+          return pullRequestHandler(options);
+        }
         const failureMessage = Maybe.of(fakeGitHubClientOptions.pullRequestFailuresByCommit?.get(options.commitSha));
         if (failureMessage.isJust) {
           return createFailure(failureMessage.value);
@@ -164,6 +190,10 @@ function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions
       },
       async listIssueComments(options): Promise<Result<readonly IssueCommentRecord[], Error>> {
         state.commentPullRequests.push(options.pullRequestNumber);
+        const commentHandler = fakeGitHubClientOptions.listIssueComments;
+        if (commentHandler !== undefined) {
+          return commentHandler(options);
+        }
         const failureMessage = Maybe.of(
           fakeGitHubClientOptions.commentListFailuresByPullRequest?.get(options.pullRequestNumber),
         );
@@ -264,6 +294,10 @@ function createDependencies(
   return {
     executeGitCommand,
     githubClient,
+    now(): number {
+      return 0;
+    },
+    progressReporter: createNoOpReleaseAppearanceProgressReporter(),
     async writeFailure(message): Promise<void> {
       failureMessages.push(message);
     },
@@ -416,6 +450,160 @@ describe('prepareCommentOperation', () => {
 });
 
 describe('executeReleaseAppearanceCommand', () => {
+  it('discovers 253 commits with bounded concurrent lookups', async () => {
+    const commitShas = Array.from({length: 253}, (_, commitIndex) => {
+      return `commit-${commitIndex}`;
+    });
+    const deferredLookups = new Map<string, DeferredValue<Result<readonly PullRequestRecord[], Error>>>();
+    const resolvedCommitShas = new Set<string>();
+    let activeLookups = 0;
+    let maximumActiveLookups = 0;
+    const fakeGitHubClient = createFakeGitHubClient({
+      listPullRequestsForCommit: async options => {
+        activeLookups += 1;
+        maximumActiveLookups = Math.max(maximumActiveLookups, activeLookups);
+        const deferredLookup = createDeferredValue<Result<readonly PullRequestRecord[], Error>>();
+        deferredLookups.set(options.commitSha, deferredLookup);
+        try {
+          return await deferredLookup.promise;
+        } finally {
+          activeLookups -= 1;
+        }
+      },
+    });
+    const commandPromise = runCommand({
+      commandLineArguments: ['beta', betaTag, releaseCommit],
+      executeGitCommand: createFakeGitCommand({commits: commitShas}),
+      githubClient: fakeGitHubClient.githubClient,
+    });
+
+    const resolveAvailableLookups = (): void => {
+      for (const [commitSha, deferredLookup] of deferredLookups) {
+        if (resolvedCommitShas.has(commitSha)) {
+          continue;
+        }
+        resolvedCommitShas.add(commitSha);
+        deferredLookup.resolve(createSuccess([]));
+      }
+    };
+    resolveAvailableLookups();
+    while (resolvedCommitShas.size < commitShas.length) {
+      await Promise.resolve();
+      resolveAvailableLookups();
+    }
+
+    const commandRun = await commandPromise;
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(maximumActiveLookups).toBeGreaterThan(1);
+    expect(maximumActiveLookups).toBeLessThanOrEqual(8);
+    expect(fakeGitHubClient.state.pullRequestCommits).toHaveLength(commitShas.length);
+    expect(commandRun.result.summary).toContain(`- Unique commit count: ${commitShas.length}`);
+  });
+
+  it('preserves deterministic discovery results when lookups complete out of order', async () => {
+    const commitShas = Array.from({length: 12}, (_, commitIndex) => {
+      return `ordered-commit-${commitIndex}`;
+    });
+    const pullRequestByCommit = new Map(
+      commitShas.map((commitSha, commitIndex) => {
+        return [commitSha, createPullRequest(commitIndex + 1)] as const;
+      }),
+    );
+    const deferredLookups = new Map<string, DeferredValue<Result<readonly PullRequestRecord[], Error>>>();
+    const resolvedCommitShas = new Set<string>();
+    const fakeGitHubClient = createFakeGitHubClient({
+      listPullRequestsForCommit: async options => {
+        const deferredLookup = createDeferredValue<Result<readonly PullRequestRecord[], Error>>();
+        deferredLookups.set(options.commitSha, deferredLookup);
+        const result = await deferredLookup.promise;
+        return result;
+      },
+      listIssueComments: async () => {
+        return createSuccess([]);
+      },
+    });
+    const commandPromise = runCommand({
+      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      executeGitCommand: createFakeGitCommand({commits: commitShas}),
+      githubClient: fakeGitHubClient.githubClient,
+    });
+
+    const resolveAvailableLookupsInReverse = (): void => {
+      const pendingLookups = [...deferredLookups.entries()].toReversed();
+      for (const [commitSha, deferredLookup] of pendingLookups) {
+        if (resolvedCommitShas.has(commitSha)) {
+          continue;
+        }
+        resolvedCommitShas.add(commitSha);
+        const pullRequest = Maybe.of(pullRequestByCommit.get(commitSha));
+        assert(pullRequest.isJust);
+        deferredLookup.resolve(createSuccess([pullRequest.value]));
+      }
+    };
+    while (resolvedCommitShas.size < commitShas.length) {
+      await Promise.resolve();
+      resolveAvailableLookupsInReverse();
+    }
+
+    const commandRun = await commandPromise;
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(commandRun.result.summary).toContain(`- Commits inspected: 12 (${commitShas.join(', ')})`);
+    expect(commandRun.result.summary).toContain(
+      '- Pull requests discovered: 12 (#1, #2, #3, #4, #5, #6, #7, #8, #9, #10, #11, #12)',
+    );
+  });
+
+  it('processes pull-request comments with bounded concurrent operations', async () => {
+    const pullRequests = Array.from({length: 80}, (_, pullRequestIndex) => {
+      return createPullRequest(pullRequestIndex + 1);
+    });
+    const deferredReads = new Map<number, DeferredValue<Result<readonly IssueCommentRecord[], Error>>>();
+    const resolvedPullRequestNumbers = new Set<number>();
+    let activeReads = 0;
+    let maximumActiveReads = 0;
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByCommit: new Map([[betaCommit, pullRequests]]),
+      listIssueComments: async options => {
+        activeReads += 1;
+        maximumActiveReads = Math.max(maximumActiveReads, activeReads);
+        const deferredRead = createDeferredValue<Result<readonly IssueCommentRecord[], Error>>();
+        deferredReads.set(options.pullRequestNumber, deferredRead);
+        try {
+          return await deferredRead.promise;
+        } finally {
+          activeReads -= 1;
+        }
+      },
+    });
+    const commandPromise = runCommand({
+      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      executeGitCommand: createFakeGitCommand(),
+      githubClient: fakeGitHubClient.githubClient,
+    });
+
+    const resolveAvailableReads = (): void => {
+      for (const [pullRequestNumber, deferredRead] of deferredReads) {
+        if (resolvedPullRequestNumbers.has(pullRequestNumber)) {
+          continue;
+        }
+        resolvedPullRequestNumbers.add(pullRequestNumber);
+        deferredRead.resolve(createSuccess([]));
+      }
+    };
+    while (resolvedPullRequestNumbers.size < pullRequests.length) {
+      await Promise.resolve();
+      resolveAvailableReads();
+    }
+
+    const commandRun = await commandPromise;
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(maximumActiveReads).toBeGreaterThan(1);
+    expect(maximumActiveReads).toBeLessThanOrEqual(4);
+    expect(commandRun.result.summary.indexOf('- #1: would create')).toBeLessThan(
+      commandRun.result.summary.indexOf('- #80: would create'),
+    );
+  });
+
   it('discovers pull requests and creates Beta appearance comments', async () => {
     const fakeGitHubClient = createFakeGitHubClient({
       pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(8)]]]),
@@ -447,6 +635,14 @@ describe('executeReleaseAppearanceCommand', () => {
         `- Release commit: \`${releaseCommit}\``,
         '- Bootstrap: no',
         `- Preceding Production tag: ${previousProductionTag}`,
+        '- Release-history planning duration: 0 ms',
+        '- Pull-request discovery duration: 0 ms',
+        '- Comment-processing duration: 0 ms',
+        '- Total command duration: 0 ms',
+        '- Candidate range count: 1',
+        '- Unique commit count: 1',
+        '- Discovered PR count: 1',
+        '- Failure count: 0',
         `- Candidate ranges: ${betaTag}: ${previousProductionTag} -> ${betaTag}`,
         `- Commits inspected: 1 (${betaCommit})`,
         '- Pull requests discovered: 1 (#8)',
@@ -547,7 +743,7 @@ describe('executeReleaseAppearanceCommand', () => {
       ]),
       commitsByRange: new Map([
         [`${previousProductionCommit}..${betaCommit}`, [betaCommit]],
-        [`${betaCommit}..${betaTwoCommit}`, [betaTwoCommit]],
+        [`${betaCommit}..${betaTwoCommit}`, [betaCommit, betaTwoCommit]],
       ]),
     });
 
@@ -651,6 +847,14 @@ describe('executeReleaseAppearanceCommand', () => {
         `- Release commit: \`${releaseCommit}\``,
         '- Bootstrap: no',
         `- Preceding Production tag: ${previousProductionTag}`,
+        '- Release-history planning duration: 0 ms',
+        '- Pull-request discovery duration: 0 ms',
+        '- Comment-processing duration: 0 ms',
+        '- Total command duration: 0 ms',
+        '- Candidate range count: 1',
+        '- Unique commit count: 1',
+        '- Discovered PR count: 3',
+        '- Failure count: 0',
         `- Candidate ranges: ${betaTag}: ${previousProductionTag} -> ${betaTag}`,
         `- Commits inspected: 1 (${betaCommit})`,
         '- Pull requests discovered: 3 (#1, #2, #3)',
@@ -1002,14 +1206,15 @@ describe('native release appearance command entrypoint', () => {
     commandProcess.stderr.on('data', (outputChunk: Buffer) => {
       standardError += outputChunk.toString();
     });
-    const exitCode = await new Promise<number | null>((resolve, reject) => {
-      commandProcess.once('error', error => {
-        reject(error);
-      });
-      commandProcess.once('exit', processExitCode => {
-        resolve(processExitCode);
-      });
+    const {promise: exitCodePromise, resolve: resolveExitCode, reject: rejectExitCode} =
+      Promise.withResolvers<number | null>();
+    commandProcess.once('error', error => {
+      rejectExitCode(error);
     });
+    commandProcess.once('exit', processExitCode => {
+      resolveExitCode(processExitCode);
+    });
+    const exitCode = await exitCodePromise;
 
     expect(exitCode).toBe(1);
     expect(standardError).toMatch(/Usage: beta/);

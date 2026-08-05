@@ -17,16 +17,18 @@
  *
  */
 
+import * as actionsCore from '@actions/core';
 import {isError, isNonEmptyStringAndNotWhitespace} from '@sindresorhus/is';
+import pMap from 'p-map';
 import {Maybe, Result, Unit} from 'true-myth';
 import {match} from 'ts-pattern';
 
 import {execFile} from 'node:child_process';
-import {appendFile} from 'node:fs/promises';
 import {promisify} from 'node:util';
 
+import {createDefaultGitHubActionsProgressReporter} from './githubActionsProgressReporter.ts';
 import {createGitHubClient} from './githubClient.ts';
-import type {GitHubClient, IssueCommentRecord} from './githubClient.ts';
+import type {GitHubClient, IssueCommentRecord, PullRequestRecord} from './githubClient.ts';
 import {createRuntimeKyHttpClient} from './httpClient.ts';
 import {
   mergeReleaseAppearanceComments,
@@ -34,8 +36,19 @@ import {
   renderPersistentComment,
 } from './releaseAppearance.ts';
 import type {ReleaseAppearanceState} from './releaseAppearance.ts';
+import type {
+  CommentProgress,
+  DiscoveryProgress,
+  ReleaseAppearanceClock,
+  ReleaseAppearanceProgressReporter,
+} from './releaseAppearanceProgress.ts';
+import {commentProcessingConcurrency, pullRequestDiscoveryConcurrency} from './releaseAppearanceProgress.ts';
 import {planBetaReleaseHistory, planProductionReleaseHistory} from './releaseHistory.ts';
 import type {CommitRange, ExecuteGitCommand, ReleaseHistoryPlan} from './releaseHistory.ts';
+
+import {createMonotonicClock} from '../../apps/webapp/src/script/time/monotonicClock.ts';
+import type {MonotonicClock} from '../../apps/webapp/src/script/time/monotonicClock.ts';
+import {createFireAndForgetInvoker} from '../../libraries/core/src/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker.ts';
 
 export type ReleaseAppearanceCommandStage = 'beta' | 'production';
 export type ExecutionMode = 'write' | 'dry-run';
@@ -66,6 +79,8 @@ export type CommandEnvironment = {
 export type ReleaseAppearanceCommandDependencies = {
   readonly executeGitCommand: ExecuteGitCommand;
   readonly githubClient: GitHubClient;
+  readonly now: ReleaseAppearanceClock;
+  readonly progressReporter: ReleaseAppearanceProgressReporter;
   readonly writeFailure: (message: string) => Promise<void>;
   readonly writeInformation: (message: string) => Promise<void>;
   readonly writeSummary: (summary: string) => Promise<void>;
@@ -97,6 +112,42 @@ type DiscoveryRange = {
   readonly commitRange: CommitRange;
 };
 
+type CommitDiscoveryWorkItem = {
+  readonly commitSha: string;
+  readonly candidateTag: string;
+};
+
+type CommitDiscoveryOutcome =
+  | {
+      readonly kind: 'success';
+      readonly workItem: CommitDiscoveryWorkItem;
+      readonly pullRequests: readonly PullRequestRecord[];
+    }
+  | {
+      readonly kind: 'failure';
+      readonly workItem: CommitDiscoveryWorkItem;
+      readonly message: string;
+    };
+
+type DiscoverPullRequestsOptions = {
+  readonly ranges: readonly DiscoveryRange[];
+  readonly githubClient: GitHubClient;
+  readonly githubToken: string;
+  readonly now: ReleaseAppearanceClock;
+  readonly progressReporter: ReleaseAppearanceProgressReporter;
+  readonly writeFailure: (message: string) => Promise<void>;
+};
+
+type CreateDiscoveryProgressOptions = {
+  readonly completedCommits: number;
+  readonly totalCommits: number;
+  readonly activeRequests: number;
+  readonly pullRequestsDiscovered: number;
+  readonly failures: number;
+  readonly phaseStartedAtMilliseconds: number;
+  readonly now: ReleaseAppearanceClock;
+};
+
 type DiscoveryResult = {
   readonly pullRequests: readonly PullRequestAppearance[];
   readonly commitsInspected: readonly string[];
@@ -122,6 +173,72 @@ type ProcessingResult = {
   readonly failures: readonly PullRequestFailure[];
 };
 
+type ProcessPullRequestsOptions = {
+  readonly pullRequests: readonly PullRequestAppearance[];
+  readonly stage: ReleaseAppearanceCommandStage;
+  readonly releaseTag: string;
+  readonly executionMode: ExecutionMode;
+  readonly githubClient: GitHubClient;
+  readonly githubToken: string;
+  readonly now: ReleaseAppearanceClock;
+  readonly progressReporter: ReleaseAppearanceProgressReporter;
+  readonly writeFailure: (message: string) => Promise<void>;
+};
+
+type ProcessSinglePullRequestOptions = {
+  readonly pullRequest: PullRequestAppearance;
+  readonly stage: ReleaseAppearanceCommandStage;
+  readonly releaseTag: string;
+  readonly executionMode: ExecutionMode;
+  readonly githubClient: GitHubClient;
+  readonly githubToken: string;
+};
+
+type CreateCommentProgressOptions = {
+  readonly completedPullRequests: number;
+  readonly totalPullRequests: number;
+  readonly activeRequests: number;
+  readonly commentsCreated: number;
+  readonly commentsUpdated: number;
+  readonly commentsUnchanged: number;
+  readonly failures: number;
+  readonly phaseStartedAtMilliseconds: number;
+  readonly now: ReleaseAppearanceClock;
+};
+
+type PullRequestProcessingOutcome =
+  | {
+      readonly kind: 'created';
+      readonly pullRequestNumber: number;
+      readonly plannedCommentOperation: PlannedCommentOperation;
+    }
+  | {
+      readonly kind: 'updated';
+      readonly pullRequestNumber: number;
+      readonly plannedCommentOperation: PlannedCommentOperation;
+    }
+  | {
+      readonly kind: 'unchanged';
+      readonly pullRequestNumber: number;
+      readonly plannedCommentOperation: PlannedCommentOperation;
+    }
+  | {
+      readonly kind: 'planned-create';
+      readonly pullRequestNumber: number;
+      readonly plannedCommentOperation: PlannedCommentOperation;
+    }
+  | {
+      readonly kind: 'planned-update';
+      readonly pullRequestNumber: number;
+      readonly plannedCommentOperation: PlannedCommentOperation;
+    }
+  | {
+      readonly kind: 'failure';
+      readonly pullRequestNumber: number;
+      readonly message: string;
+      readonly plannedCommentOperation: Maybe<PlannedCommentOperation>;
+    };
+
 type SummaryOptions = {
   readonly executionMode: ExecutionMode;
   readonly stage: ReleaseAppearanceCommandStage;
@@ -140,16 +257,26 @@ type SummaryOptions = {
   readonly plannedCommentOperations: readonly PlannedCommentOperation[];
   readonly generalFailureMessages: readonly string[];
   readonly pullRequestFailures: readonly PullRequestFailure[];
+  readonly releaseHistoryPlanningDurationMilliseconds: number;
+  readonly pullRequestDiscoveryDurationMilliseconds: number;
+  readonly commentProcessingDurationMilliseconds: number;
+  readonly totalCommandDurationMilliseconds: number;
 };
 
 type FinalizeSummaryOptions = {
   readonly dependencies: Pick<
     ReleaseAppearanceCommandDependencies,
-    'writeFailure' | 'writeInformation' | 'writeSummary'
+    'now' | 'writeFailure' | 'writeInformation' | 'writeSummary'
   >;
   readonly summaryOptions: SummaryOptions;
   readonly githubToken: string;
   readonly exitCode: number;
+  readonly commandStartedAtMilliseconds: number;
+};
+
+type CreateRuntimeDependenciesOptions = {
+  readonly commandEnvironment: CommandEnvironment;
+  readonly monotonicClock: MonotonicClock;
 };
 
 const betaCommandArgumentCount = 3;
@@ -180,13 +307,6 @@ function redactSecret(message: string, secret: string): string {
 
 function createGeneralFailureMessage(category: string, message: string, githubToken: string): string {
   return `${category}: ${redactSecret(message, githubToken)}`;
-}
-
-function createPullRequestFailure(pullRequestNumber: number, message: string, githubToken: string): PullRequestFailure {
-  return {
-    pullRequestNumber,
-    message: redactSecret(message, githubToken),
-  };
 }
 
 function formatPullRequestFailure(pullRequestFailure: PullRequestFailure): string {
@@ -403,41 +523,96 @@ async function writeSummarySafely(
   }
 }
 
-async function discoverPullRequests(
-  ranges: readonly DiscoveryRange[],
-  githubClient: GitHubClient,
-  githubToken: string,
-): Promise<DiscoveryResult> {
-  const pullRequestsByNumber = new Map<number, PullRequestAppearance>();
-  const commitsInspected = new Set<string>();
-  const commitsWithoutPullRequests = new Set<string>();
-  const failureMessages: string[] = [];
-
+function buildCommitDiscoveryWorkItems(ranges: readonly DiscoveryRange[]): readonly CommitDiscoveryWorkItem[] {
+  const discoveredCommitShas = new Set<string>();
+  const workItems: CommitDiscoveryWorkItem[] = [];
   for (const range of ranges) {
     for (const commitSha of range.commitRange.commits) {
-      if (commitsInspected.has(commitSha)) {
+      if (discoveredCommitShas.has(commitSha)) {
         continue;
       }
 
-      commitsInspected.add(commitSha);
-      const pullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha});
-      if (pullRequestsResult.isErr) {
-        failureMessages.push(redactSecret(pullRequestsResult.error.message, githubToken));
+      discoveredCommitShas.add(commitSha);
+      workItems.push({commitSha, candidateTag: range.candidateTag});
+    }
+  }
+  return workItems;
+}
+
+function createDiscoveryProgress(createDiscoveryProgressOptions: CreateDiscoveryProgressOptions): DiscoveryProgress {
+  const {
+    completedCommits,
+    totalCommits,
+    activeRequests,
+    pullRequestsDiscovered,
+    failures,
+    phaseStartedAtMilliseconds,
+    now,
+  } = createDiscoveryProgressOptions;
+  return {
+    completedCommits,
+    totalCommits,
+    activeRequests,
+    pullRequestsDiscovered,
+    failures,
+    elapsedMilliseconds: now() - phaseStartedAtMilliseconds,
+  };
+}
+
+async function resolveCommitDiscoveryOutcome(
+  workItem: CommitDiscoveryWorkItem,
+  githubClient: GitHubClient,
+  githubToken: string,
+): Promise<CommitDiscoveryOutcome> {
+  try {
+    const pullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha: workItem.commitSha});
+    if (pullRequestsResult.isErr) {
+      return {
+        kind: 'failure',
+        workItem,
+        message: redactSecret(pullRequestsResult.error.message, githubToken),
+      };
+    }
+
+    return {
+      kind: 'success',
+      workItem,
+      pullRequests: pullRequestsResult.value,
+    };
+  } catch (error: unknown) {
+    return {
+      kind: 'failure',
+      workItem,
+      message: redactSecret(errorMessage(error), githubToken),
+    };
+  }
+}
+
+function reduceCommitDiscoveryOutcomes(commitDiscoveryOutcomes: readonly CommitDiscoveryOutcome[]): DiscoveryResult {
+  const pullRequestsByNumber = new Map<number, PullRequestAppearance>();
+  const commitsInspected: string[] = [];
+  const commitsWithoutPullRequests: string[] = [];
+  const failureMessages: string[] = [];
+
+  for (const commitDiscoveryOutcome of commitDiscoveryOutcomes) {
+    commitsInspected.push(commitDiscoveryOutcome.workItem.commitSha);
+    if (commitDiscoveryOutcome.kind === 'failure') {
+      failureMessages.push(commitDiscoveryOutcome.message);
+      continue;
+    }
+
+    if (commitDiscoveryOutcome.pullRequests.length === 0) {
+      commitsWithoutPullRequests.push(commitDiscoveryOutcome.workItem.commitSha);
+    }
+    for (const pullRequest of commitDiscoveryOutcome.pullRequests) {
+      if (pullRequestsByNumber.has(pullRequest.number)) {
         continue;
       }
 
-      if (pullRequestsResult.value.length === 0) {
-        commitsWithoutPullRequests.add(commitSha);
-      }
-
-      for (const pullRequest of pullRequestsResult.value) {
-        if (!pullRequestsByNumber.has(pullRequest.number)) {
-          pullRequestsByNumber.set(pullRequest.number, {
-            number: pullRequest.number,
-            earliestBetaTag: range.candidateTag,
-          });
-        }
-      }
+      pullRequestsByNumber.set(pullRequest.number, {
+        number: pullRequest.number,
+        earliestBetaTag: commitDiscoveryOutcome.workItem.candidateTag,
+      });
     }
   }
 
@@ -445,10 +620,100 @@ async function discoverPullRequests(
     pullRequests: [...pullRequestsByNumber.values()].toSorted((leftPullRequest, rightPullRequest) => {
       return leftPullRequest.number - rightPullRequest.number;
     }),
-    commitsInspected: [...commitsInspected],
-    commitsWithoutPullRequests: [...commitsWithoutPullRequests],
+    commitsInspected,
+    commitsWithoutPullRequests,
     failureMessages,
   };
+}
+
+async function discoverPullRequests(
+  discoverPullRequestsOptions: DiscoverPullRequestsOptions,
+): Promise<DiscoveryResult> {
+  const {githubClient, githubToken, now, progressReporter, ranges, writeFailure} = discoverPullRequestsOptions;
+  const workItems = buildCommitDiscoveryWorkItems(ranges);
+  const phaseStartedAtMilliseconds = now();
+  let completedCommits = 0;
+  let activeRequests = 0;
+  let failedRequests = 0;
+  const discoveredPullRequestNumbers = new Set<number>();
+  progressReporter.reportDiscoveryStarted(
+    createDiscoveryProgress({
+      completedCommits,
+      totalCommits: workItems.length,
+      activeRequests,
+      pullRequestsDiscovered: discoveredPullRequestNumbers.size,
+      failures: failedRequests,
+      phaseStartedAtMilliseconds,
+      now,
+    }),
+  );
+
+  let commitDiscoveryOutcomes: readonly CommitDiscoveryOutcome[] = [];
+  try {
+    commitDiscoveryOutcomes = await pMap(
+      workItems,
+      async (workItem): Promise<CommitDiscoveryOutcome> => {
+        activeRequests += 1;
+        progressReporter.reportDiscoveryProgress(
+          createDiscoveryProgress({
+            completedCommits,
+            totalCommits: workItems.length,
+            activeRequests,
+            pullRequestsDiscovered: discoveredPullRequestNumbers.size,
+            failures: failedRequests,
+            phaseStartedAtMilliseconds,
+            now,
+          }),
+        );
+        const outcome = await resolveCommitDiscoveryOutcome(workItem, githubClient, githubToken);
+        if (outcome.kind === 'failure') {
+          failedRequests += 1;
+        } else {
+          for (const pullRequest of outcome.pullRequests) {
+            discoveredPullRequestNumbers.add(pullRequest.number);
+          }
+        }
+        activeRequests -= 1;
+        completedCommits += 1;
+        progressReporter.reportDiscoveryProgress(
+          createDiscoveryProgress({
+            completedCommits,
+            totalCommits: workItems.length,
+            activeRequests,
+            pullRequestsDiscovered: discoveredPullRequestNumbers.size,
+            failures: failedRequests,
+            phaseStartedAtMilliseconds,
+            now,
+          }),
+        );
+        if (outcome.kind === 'failure') {
+          await writeFailureSafely(
+            writeFailure,
+            createGeneralFailureMessage('Discovery', outcome.message, githubToken),
+          );
+        }
+        return outcome;
+      },
+      {
+        concurrency: pullRequestDiscoveryConcurrency,
+        stopOnError: false,
+      },
+    );
+  } finally {
+    progressReporter.reportDiscoveryCompleted(
+      createDiscoveryProgress({
+        completedCommits,
+        totalCommits: workItems.length,
+        activeRequests,
+        pullRequestsDiscovered: discoveredPullRequestNumbers.size,
+        failures: failedRequests,
+        phaseStartedAtMilliseconds,
+        now,
+      }),
+    );
+  }
+
+  return reduceCommitDiscoveryOutcomes(commitDiscoveryOutcomes);
 }
 
 function findPersistentCommentIndex(existingComments: readonly IssueCommentRecord[]): Result<Maybe<number>, Error> {
@@ -552,33 +817,71 @@ async function writePullRequestComment(
   });
 }
 
-async function processPullRequests(
-  pullRequests: readonly PullRequestAppearance[],
-  stage: ReleaseAppearanceCommandStage,
-  releaseTag: string,
-  executionMode: ExecutionMode,
-  dependencies: Pick<ReleaseAppearanceCommandDependencies, 'githubClient' | 'writeFailure'>,
-  githubToken: string,
-): Promise<ProcessingResult> {
-  let commentsCreated = 0;
-  let commentsUpdated = 0;
-  let commentsUnchanged = 0;
-  const plannedCommentOperations: PlannedCommentOperation[] = [];
-  const failures: PullRequestFailure[] = [];
+function createCommentProgress(createCommentProgressOptions: CreateCommentProgressOptions): CommentProgress {
+  const {
+    completedPullRequests,
+    totalPullRequests,
+    activeRequests,
+    commentsCreated,
+    commentsUpdated,
+    commentsUnchanged,
+    failures,
+    phaseStartedAtMilliseconds,
+    now,
+  } = createCommentProgressOptions;
+  return {
+    completedPullRequests,
+    totalPullRequests,
+    activeRequests,
+    commentsCreated,
+    commentsUpdated,
+    commentsUnchanged,
+    failures,
+    elapsedMilliseconds: now() - phaseStartedAtMilliseconds,
+  };
+}
 
+function deduplicatePullRequests(pullRequests: readonly PullRequestAppearance[]): readonly PullRequestAppearance[] {
+  const pullRequestsByNumber = new Map<number, PullRequestAppearance>();
   for (const pullRequest of pullRequests) {
-    const commentsResult = await dependencies.githubClient.listIssueComments({
-      pullRequestNumber: pullRequest.number,
-    });
+    if (pullRequestsByNumber.has(pullRequest.number)) {
+      continue;
+    }
+    pullRequestsByNumber.set(pullRequest.number, pullRequest);
+  }
+  return [...pullRequestsByNumber.values()].toSorted((leftPullRequest, rightPullRequest) => {
+    return leftPullRequest.number - rightPullRequest.number;
+  });
+}
+
+function createProcessingFailure(
+  pullRequestNumber: number,
+  message: string,
+  githubToken: string,
+  plannedCommentOperation: Maybe<PlannedCommentOperation>,
+): PullRequestProcessingOutcome {
+  return {
+    kind: 'failure',
+    pullRequestNumber,
+    message: redactSecret(message, githubToken),
+    plannedCommentOperation,
+  };
+}
+
+async function processSinglePullRequest(
+  processPullRequestOptions: ProcessSinglePullRequestOptions,
+): Promise<PullRequestProcessingOutcome> {
+  const {executionMode, githubClient, githubToken, pullRequest, releaseTag, stage} = processPullRequestOptions;
+  let plannedCommentOperation: Maybe<PlannedCommentOperation> = Maybe.nothing<PlannedCommentOperation>();
+  try {
+    const commentsResult = await githubClient.listIssueComments({pullRequestNumber: pullRequest.number});
     if (commentsResult.isErr) {
-      const pullRequestFailure = createPullRequestFailure(
+      return createProcessingFailure(
         pullRequest.number,
         commentsResult.error.message,
         githubToken,
+        plannedCommentOperation,
       );
-      failures.push(pullRequestFailure);
-      await writeFailureSafely(dependencies.writeFailure, formatPullRequestFailure(pullRequestFailure));
-      continue;
     }
 
     const operationResult = prepareCommentOperation(
@@ -586,48 +889,175 @@ async function processPullRequests(
       createDesiredReleaseState(stage, releaseTag, pullRequest.earliestBetaTag),
     );
     if (operationResult.isErr) {
-      const pullRequestFailure = createPullRequestFailure(
+      return createProcessingFailure(
         pullRequest.number,
         operationResult.error.message,
         githubToken,
+        plannedCommentOperation,
       );
-      failures.push(pullRequestFailure);
-      await writeFailureSafely(dependencies.writeFailure, formatPullRequestFailure(pullRequestFailure));
-      continue;
     }
-    plannedCommentOperations.push({
+
+    const plannedOperation: PlannedCommentOperation = {
       pullRequestNumber: pullRequest.number,
       kind: operationResult.value.kind,
-    });
+    };
+    plannedCommentOperation = Maybe.just(plannedOperation);
     if (operationResult.value.kind === 'unchanged') {
-      commentsUnchanged += 1;
-      continue;
+      return {kind: 'unchanged', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation};
     }
     if (executionMode === 'dry-run') {
-      if (operationResult.value.kind === 'create') {
-        commentsCreated += 1;
-      } else {
-        commentsUpdated += 1;
+      return operationResult.value.kind === 'create'
+        ? {kind: 'planned-create', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation}
+        : {kind: 'planned-update', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation};
+    }
+
+    const writeResult = await writePullRequestComment(pullRequest.number, operationResult.value, githubClient);
+    if (writeResult.isErr) {
+      return createProcessingFailure(
+        pullRequest.number,
+        writeResult.error.message,
+        githubToken,
+        plannedCommentOperation,
+      );
+    }
+    return operationResult.value.kind === 'create'
+      ? {kind: 'created', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation}
+      : {kind: 'updated', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation};
+  } catch (error: unknown) {
+    return createProcessingFailure(pullRequest.number, errorMessage(error), githubToken, plannedCommentOperation);
+  }
+}
+
+async function processPullRequests(processPullRequestsOptions: ProcessPullRequestsOptions): Promise<ProcessingResult> {
+  const {
+    executionMode,
+    githubClient,
+    githubToken,
+    now,
+    progressReporter,
+    pullRequests,
+    releaseTag,
+    stage,
+    writeFailure,
+  } = processPullRequestsOptions;
+  const uniquePullRequests = deduplicatePullRequests(pullRequests);
+  const phaseStartedAtMilliseconds = now();
+  let completedPullRequests = 0;
+  let activeRequests = 0;
+  let commentsCreated = 0;
+  let commentsUpdated = 0;
+  let commentsUnchanged = 0;
+  let failedRequests = 0;
+  progressReporter.reportCommentProcessingStarted(
+    createCommentProgress({
+      completedPullRequests,
+      totalPullRequests: uniquePullRequests.length,
+      activeRequests,
+      commentsCreated,
+      commentsUpdated,
+      commentsUnchanged,
+      failures: failedRequests,
+      phaseStartedAtMilliseconds,
+      now,
+    }),
+  );
+
+  let processingOutcomes: readonly PullRequestProcessingOutcome[] = [];
+  try {
+    processingOutcomes = await pMap(
+      uniquePullRequests,
+      async (pullRequest): Promise<PullRequestProcessingOutcome> => {
+        activeRequests += 1;
+        progressReporter.reportCommentProcessingProgress(
+          createCommentProgress({
+            completedPullRequests,
+            totalPullRequests: uniquePullRequests.length,
+            activeRequests,
+            commentsCreated,
+            commentsUpdated,
+            commentsUnchanged,
+            failures: failedRequests,
+            phaseStartedAtMilliseconds,
+            now,
+          }),
+        );
+        const outcome = await processSinglePullRequest({
+          executionMode,
+          githubClient,
+          githubToken,
+          pullRequest,
+          releaseTag,
+          stage,
+        });
+        if (outcome.kind === 'failure') {
+          failedRequests += 1;
+        } else if (outcome.kind === 'created' || outcome.kind === 'planned-create') {
+          commentsCreated += 1;
+        } else if (outcome.kind === 'updated' || outcome.kind === 'planned-update') {
+          commentsUpdated += 1;
+        } else {
+          commentsUnchanged += 1;
+        }
+        activeRequests -= 1;
+        completedPullRequests += 1;
+        progressReporter.reportCommentProcessingProgress(
+          createCommentProgress({
+            completedPullRequests,
+            totalPullRequests: uniquePullRequests.length,
+            activeRequests,
+            commentsCreated,
+            commentsUpdated,
+            commentsUnchanged,
+            failures: failedRequests,
+            phaseStartedAtMilliseconds,
+            now,
+          }),
+        );
+        if (outcome.kind === 'failure') {
+          await writeFailureSafely(
+            writeFailure,
+            formatPullRequestFailure({
+              pullRequestNumber: outcome.pullRequestNumber,
+              message: outcome.message,
+            }),
+          );
+        }
+        return outcome;
+      },
+      {
+        concurrency: commentProcessingConcurrency,
+        stopOnError: false,
+      },
+    );
+  } finally {
+    progressReporter.reportCommentProcessingCompleted(
+      createCommentProgress({
+        completedPullRequests,
+        totalPullRequests: uniquePullRequests.length,
+        activeRequests,
+        commentsCreated,
+        commentsUpdated,
+        commentsUnchanged,
+        failures: failedRequests,
+        phaseStartedAtMilliseconds,
+        now,
+      }),
+    );
+  }
+
+  const plannedCommentOperations: PlannedCommentOperation[] = [];
+  const failures: PullRequestFailure[] = [];
+  for (const processingOutcome of processingOutcomes.toSorted((leftOutcome, rightOutcome) => {
+    return leftOutcome.pullRequestNumber - rightOutcome.pullRequestNumber;
+  })) {
+    if (processingOutcome.kind === 'failure') {
+      failures.push({pullRequestNumber: processingOutcome.pullRequestNumber, message: processingOutcome.message});
+      if (processingOutcome.plannedCommentOperation.isJust) {
+        plannedCommentOperations.push(processingOutcome.plannedCommentOperation.value);
       }
       continue;
     }
-
-    const writeResult = await writePullRequestComment(
-      pullRequest.number,
-      operationResult.value,
-      dependencies.githubClient,
-    );
-    if (writeResult.isErr) {
-      const pullRequestFailure = createPullRequestFailure(pullRequest.number, writeResult.error.message, githubToken);
-      failures.push(pullRequestFailure);
-      await writeFailureSafely(dependencies.writeFailure, formatPullRequestFailure(pullRequestFailure));
-      continue;
-    }
-    if (operationResult.value.kind === 'create') {
-      commentsCreated += 1;
-    } else {
-      commentsUpdated += 1;
-    }
+    plannedCommentOperations.push(processingOutcome.plannedCommentOperation);
   }
 
   return {
@@ -635,9 +1065,7 @@ async function processPullRequests(
     commentsUpdated,
     commentsUnchanged,
     plannedCommentOperations,
-    failures: failures.toSorted((leftFailure, rightFailure) => {
-      return leftFailure.pullRequestNumber - rightFailure.pullRequestNumber;
-    }),
+    failures,
   };
 }
 
@@ -660,6 +1088,10 @@ function createEmptySummaryOptions(parsedCommand: ParsedCommand, workflowTooling
     plannedCommentOperations: [],
     generalFailureMessages: [],
     pullRequestFailures: [],
+    releaseHistoryPlanningDurationMilliseconds: 0,
+    pullRequestDiscoveryDurationMilliseconds: 0,
+    commentProcessingDurationMilliseconds: 0,
+    totalCommandDurationMilliseconds: 0,
   };
 }
 
@@ -719,6 +1151,27 @@ function formatCandidateRanges(candidateRanges: readonly DiscoveryRange[]): stri
         .join('; ');
 }
 
+function formatDuration(durationMilliseconds: number): string {
+  return `${Math.round(durationMilliseconds)} ms`;
+}
+
+function countSummaryFailures(summaryOptions: SummaryOptions): number {
+  return summaryOptions.generalFailureMessages.length + summaryOptions.pullRequestFailures.length;
+}
+
+function formatExecutionMetrics(summaryOptions: SummaryOptions): readonly string[] {
+  return [
+    `- Release-history planning duration: ${formatDuration(summaryOptions.releaseHistoryPlanningDurationMilliseconds)}`,
+    `- Pull-request discovery duration: ${formatDuration(summaryOptions.pullRequestDiscoveryDurationMilliseconds)}`,
+    `- Comment-processing duration: ${formatDuration(summaryOptions.commentProcessingDurationMilliseconds)}`,
+    `- Total command duration: ${formatDuration(summaryOptions.totalCommandDurationMilliseconds)}`,
+    `- Candidate range count: ${summaryOptions.candidateRanges.length}`,
+    `- Unique commit count: ${summaryOptions.commitsInspected.length}`,
+    `- Discovered PR count: ${summaryOptions.pullRequestsDiscovered.length}`,
+    `- Failure count: ${countSummaryFailures(summaryOptions)}`,
+  ];
+}
+
 function formatFailureSection(summaryOptions: SummaryOptions): readonly string[] {
   const failureLines = [
     ...summaryOptions.generalFailureMessages.map(failureMessage => {
@@ -742,6 +1195,7 @@ function createWriteSummary(summaryOptions: SummaryOptions): string {
     `- Release commit: \`${summaryOptions.releaseCommit}\``,
     `- Bootstrap: ${summaryOptions.bootstrap ? 'yes' : 'no'}`,
     `- Preceding Production tag: ${summaryOptions.precedingProductionTag}`,
+    ...formatExecutionMetrics(summaryOptions),
     `- Candidate ranges: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
     `- Commits inspected: ${summaryOptions.commitsInspected.length} (${formatStringList(summaryOptions.commitsInspected)})`,
     `- Pull requests discovered: ${summaryOptions.pullRequestsDiscovered.length} (${formatPullRequestList(summaryOptions.pullRequestsDiscovered)})`,
@@ -788,6 +1242,7 @@ function createDryRunSummary(summaryOptions: SummaryOptions): string {
     `- Release commit: \`${summaryOptions.releaseCommit}\``,
     `- Bootstrap: ${summaryOptions.bootstrap ? 'yes' : 'no'}`,
     `- Preceding Production tag: ${summaryOptions.precedingProductionTag}`,
+    ...formatExecutionMetrics(summaryOptions),
     `- Candidate ranges: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
     `- Commits inspected: ${summaryOptions.commitsInspected.length} (${formatStringList(summaryOptions.commitsInspected)})`,
     `- Pull requests discovered: ${summaryOptions.pullRequestsDiscovered.length} (${formatPullRequestList(summaryOptions.pullRequestsDiscovered)})`,
@@ -881,17 +1336,21 @@ async function writeDryRunLogOutputSafely(
 async function finalizeSummary(
   finalizeSummaryOptions: FinalizeSummaryOptions,
 ): Promise<ReleaseAppearanceCommandResult> {
-  const {dependencies, summaryOptions, githubToken, exitCode} = finalizeSummaryOptions;
-  const summary = createSummary(summaryOptions);
+  const {commandStartedAtMilliseconds, dependencies, summaryOptions, githubToken, exitCode} = finalizeSummaryOptions;
+  const finalSummaryOptions = {
+    ...summaryOptions,
+    totalCommandDurationMilliseconds: dependencies.now() - commandStartedAtMilliseconds,
+  };
+  const summary = createSummary(finalSummaryOptions);
   const summaryWriteFailure = await writeSummarySafely(dependencies, summary, githubToken);
-  const dryRunLogOutputWriteFailure = await writeDryRunLogOutputSafely(dependencies, summaryOptions, githubToken);
+  const dryRunLogOutputWriteFailure = await writeDryRunLogOutputSafely(dependencies, finalSummaryOptions, githubToken);
   if (summaryWriteFailure.isJust) {
     return {
       exitCode: 1,
       summary: createSummary({
-        ...summaryOptions,
+        ...finalSummaryOptions,
         generalFailureMessages: [
-          ...summaryOptions.generalFailureMessages,
+          ...finalSummaryOptions.generalFailureMessages,
           createGeneralFailureMessage('Summary', summaryWriteFailure.value, githubToken),
         ],
       }),
@@ -928,6 +1387,7 @@ export async function executeReleaseAppearanceCommand(
   executeReleaseAppearanceCommandOptions: ExecuteReleaseAppearanceCommandOptions,
 ): Promise<ReleaseAppearanceCommandResult> {
   const {commandLineArguments, environment, dependencies} = executeReleaseAppearanceCommandOptions;
+  const commandStartedAtMilliseconds = dependencies.now();
   const githubToken = Maybe.of(environment.GITHUB_TOKEN).unwrapOr('');
   const parsedCommandResult = parseCommandLineArguments(commandLineArguments);
   if (parsedCommandResult.isErr) {
@@ -945,6 +1405,7 @@ export async function executeReleaseAppearanceCommand(
   }
 
   const parsedCommand = parsedCommandResult.value;
+  const releaseHistoryPlanningStartedAtMilliseconds = dependencies.now();
   let historyPlanResult: Result<ReleaseHistoryPlan, Error>;
   try {
     historyPlanResult = await planReleaseHistory(parsedCommand, dependencies.executeGitCommand);
@@ -954,11 +1415,13 @@ export async function executeReleaseAppearanceCommand(
       error,
     );
   }
+  const releaseHistoryPlanningDurationMilliseconds = dependencies.now() - releaseHistoryPlanningStartedAtMilliseconds;
 
   let summaryOptions = createEmptySummaryOptions(
     parsedCommand,
     commandEnvironmentResult.value.workflowToolingCommitSha,
   );
+  summaryOptions = {...summaryOptions, releaseHistoryPlanningDurationMilliseconds};
   if (historyPlanResult.isErr) {
     const historyFailureMessage = createGeneralFailureMessage(
       'Release history',
@@ -978,6 +1441,7 @@ export async function executeReleaseAppearanceCommand(
         summaryOptions,
         githubToken,
         exitCode: 0,
+        commandStartedAtMilliseconds,
       });
     }
 
@@ -989,22 +1453,32 @@ export async function executeReleaseAppearanceCommand(
         return productionPlan.candidateRanges;
       })
       .exhaustive();
-    const discoveryResult = await discoverPullRequests(discoveryRanges, dependencies.githubClient, githubToken);
+    const discoveryStartedAtMilliseconds = dependencies.now();
+    const discoveryResult = await discoverPullRequests({
+      githubClient: dependencies.githubClient,
+      githubToken,
+      now: dependencies.now,
+      progressReporter: dependencies.progressReporter,
+      ranges: discoveryRanges,
+      writeFailure: dependencies.writeFailure,
+    });
+    const pullRequestDiscoveryDurationMilliseconds = dependencies.now() - discoveryStartedAtMilliseconds;
+    const commentProcessingStartedAtMilliseconds = dependencies.now();
+    const processingResult = await processPullRequests({
+      executionMode: parsedCommand.executionMode,
+      githubClient: dependencies.githubClient,
+      githubToken,
+      now: dependencies.now,
+      progressReporter: dependencies.progressReporter,
+      pullRequests: discoveryResult.pullRequests,
+      releaseTag: parsedCommand.releaseTag,
+      stage: parsedCommand.stage,
+      writeFailure: dependencies.writeFailure,
+    });
+    const commentProcessingDurationMilliseconds = dependencies.now() - commentProcessingStartedAtMilliseconds;
     const discoveryFailureMessages = discoveryResult.failureMessages.map(failureMessage => {
       return createGeneralFailureMessage('Discovery', failureMessage, githubToken);
     });
-    for (const discoveryFailureMessage of discoveryFailureMessages) {
-      await writeFailureSafely(dependencies.writeFailure, discoveryFailureMessage);
-    }
-
-    const processingResult = await processPullRequests(
-      discoveryResult.pullRequests,
-      parsedCommand.stage,
-      parsedCommand.releaseTag,
-      parsedCommand.executionMode,
-      dependencies,
-      githubToken,
-    );
     summaryOptions = {
       ...summaryOptions,
       commitsInspected: discoveryResult.commitsInspected,
@@ -1016,6 +1490,8 @@ export async function executeReleaseAppearanceCommand(
       plannedCommentOperations: processingResult.plannedCommentOperations,
       generalFailureMessages: discoveryFailureMessages,
       pullRequestFailures: processingResult.failures,
+      pullRequestDiscoveryDurationMilliseconds,
+      commentProcessingDurationMilliseconds,
     };
     const hasFailures = discoveryFailureMessages.length > 0 || processingResult.failures.length > 0;
     return finalizeSummary({
@@ -1023,6 +1499,7 @@ export async function executeReleaseAppearanceCommand(
       summaryOptions,
       githubToken,
       exitCode: hasFailures ? 1 : 0,
+      commandStartedAtMilliseconds,
     });
   }
 
@@ -1031,6 +1508,7 @@ export async function executeReleaseAppearanceCommand(
     summaryOptions,
     githubToken,
     exitCode: 1,
+    commandStartedAtMilliseconds,
   });
 }
 
@@ -1064,7 +1542,18 @@ async function writeRuntimeInformation(message: string): Promise<void> {
   process.stdout.write(`${message}\n`);
 }
 
-function createRuntimeDependencies(commandEnvironment: CommandEnvironment): ReleaseAppearanceCommandDependencies {
+function writeRuntimeFireAndForgetFailure(message: string): void {
+  process.stderr.write(`${message}\n`);
+}
+
+function createRuntimeDependencies(
+  createRuntimeDependenciesOptions: CreateRuntimeDependenciesOptions,
+): ReleaseAppearanceCommandDependencies {
+  const {commandEnvironment, monotonicClock} = createRuntimeDependenciesOptions;
+  function readMonotonicTime(): number {
+    return monotonicClock.nowMilliseconds;
+  }
+  actionsCore.setSecret(commandEnvironment.githubToken);
   const httpClient = createRuntimeKyHttpClient();
   const githubClient = createGitHubClient({
     httpClient,
@@ -1076,10 +1565,14 @@ function createRuntimeDependencies(commandEnvironment: CommandEnvironment): Rele
   return {
     executeGitCommand,
     githubClient,
+    now(): number {
+      return monotonicClock.nowMilliseconds;
+    },
+    progressReporter: createDefaultGitHubActionsProgressReporter(readMonotonicTime),
     writeFailure: writeRuntimeFailure,
     writeInformation: writeRuntimeInformation,
     async writeSummary(summary): Promise<void> {
-      await appendFile(commandEnvironment.githubStepSummary, `${summary}\n`, 'utf8');
+      await actionsCore.summary.addRaw(`${summary}\n`).write();
     },
   };
 }
@@ -1100,10 +1593,14 @@ async function startReleaseAppearanceCommand(): Promise<void> {
     return;
   }
 
+  const monotonicClock = createMonotonicClock({performance: globalThis.performance});
   await main({
     commandLineArguments,
     environment: process.env,
-    dependencies: createRuntimeDependencies(commandEnvironmentResult.value),
+    dependencies: createRuntimeDependencies({
+      commandEnvironment: commandEnvironmentResult.value,
+      monotonicClock,
+    }),
   });
 }
 
@@ -1116,5 +1613,10 @@ function isReleaseAppearanceCommandEntrypoint(): boolean {
 }
 
 if (isReleaseAppearanceCommandEntrypoint()) {
-  void startReleaseAppearanceCommand();
+  const fireAndForgetInvoker = createFireAndForgetInvoker({
+    logger: {
+      error: writeRuntimeFireAndForgetFailure,
+    },
+  });
+  fireAndForgetInvoker.fireAndForget(startReleaseAppearanceCommand);
 }
