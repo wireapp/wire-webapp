@@ -539,9 +539,42 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          fetch-depth: 0
-          fetch-tags: true
+          fetch-depth: 1
+          fetch-tags: false
           ref: ${{ github.sha }}
+
+      - name: Fetch release history
+        env:
+          WORKFLOW_TOOLING_COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          release_tag_listing="$(
+            git ls-remote \
+              --refs \
+              --tags \
+              origin \
+              'refs/tags/*-production' \
+              'refs/tags/*-beta.*'
+          )"
+          release_tag_refspecs=()
+          while IFS=$'\t' read -r tag_object_sha tag_reference; do
+            if [[ -n "${tag_reference}" ]]; then
+              release_tag_refspecs+=("${tag_reference}:${tag_reference}")
+            fi
+          done <<< "${release_tag_listing}"
+
+          if [[ "${#release_tag_refspecs[@]}" -eq 0 ]]; then
+            echo 'No release tags were found on origin.' >&2
+            exit 1
+          fi
+
+          git fetch \
+            --no-tags \
+            --unshallow \
+            origin \
+            "${WORKFLOW_TOOLING_COMMIT_SHA}" \
+            "${release_tag_refspecs[@]}"
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -922,9 +955,42 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          fetch-depth: 0
-          fetch-tags: true
+          fetch-depth: 1
+          fetch-tags: false
           ref: ${{ github.sha }}
+
+      - name: Fetch release history
+        env:
+          WORKFLOW_TOOLING_COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          release_tag_listing="$(
+            git ls-remote \
+              --refs \
+              --tags \
+              origin \
+              'refs/tags/*-production' \
+              'refs/tags/*-beta.*'
+          )"
+          release_tag_refspecs=()
+          while IFS=$'\t' read -r tag_object_sha tag_reference; do
+            if [[ -n "${tag_reference}" ]]; then
+              release_tag_refspecs+=("${tag_reference}:${tag_reference}")
+            fi
+          done <<< "${release_tag_listing}"
+
+          if [[ "${#release_tag_refspecs[@]}" -eq 0 ]]; then
+            echo 'No release tags were found on origin.' >&2
+            exit 1
+          fi
+
+          git fetch \
+            --no-tags \
+            --unshallow \
+            origin \
+            "${WORKFLOW_TOOLING_COMMIT_SHA}" \
+            "${release_tag_refspecs[@]}"
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
