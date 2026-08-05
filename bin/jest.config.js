@@ -28,6 +28,6 @@ module.exports = {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', {configFile: './apps/server/babel.config.js'}],
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(true-myth|ky|p-map|@actions/core|@enormora/objectory|@sindresorhus/is)/)',
+    '/node_modules/(?!(true-myth|ky|p-map|noop-esm|@actions/core|@enormora/objectory|@sindresorhus/is)/)',
   ],
 };

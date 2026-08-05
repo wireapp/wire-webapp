@@ -146,9 +146,7 @@ describe('release appearance Actions progress reporter', (): void => {
 
     expect(fakeActionsCore.groups).toEqual(['Discover pull requests']);
     expect(fakeActionsCore.endedGroups).toHaveLength(1);
-    expect(fakeActionsCore.informationMessages[0]).toBe(
-      'Release appearance: discovering pull requests for 20 commits with concurrency 8',
-    );
+    expect(fakeActionsCore.informationMessages[0]).toBe('Release appearance: discovering pull requests for 20 commits');
     expect(fakeActionsCore.informationMessages).toContain(
       'Release appearance: discovery 2/20 (10%) · 2 PRs · 0 failures · 8 active · elapsed 1s',
     );
@@ -190,9 +188,7 @@ describe('release appearance Actions progress reporter', (): void => {
 
     expect(fakeActionsCore.groups).toEqual(['Process release-appearance comments']);
     expect(fakeActionsCore.endedGroups).toHaveLength(1);
-    expect(fakeActionsCore.informationMessages[0]).toBe(
-      'Release appearance: processing comments for 10 PRs with concurrency 4',
-    );
+    expect(fakeActionsCore.informationMessages[0]).toBe('Release appearance: processing comments for 10 PRs');
     expect(fakeActionsCore.informationMessages).toContain(
       'Release appearance: comments 1/10 (10%) · created 1 · updated 2 · unchanged 3 · failed 4 · 4 active · elapsed 3s',
     );

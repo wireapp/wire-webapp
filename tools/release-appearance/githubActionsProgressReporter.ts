@@ -28,12 +28,7 @@ import type {
   ReleaseAppearanceProgressReporter,
   ReleaseAppearanceProgressScheduler,
 } from './releaseAppearanceProgress.ts';
-import {
-  commentProcessingConcurrency,
-  maximumProgressSilenceMilliseconds,
-  progressPercentageStep,
-  pullRequestDiscoveryConcurrency,
-} from './releaseAppearanceProgress.ts';
+import {maximumProgressSilenceMilliseconds, progressPercentageStep} from './releaseAppearanceProgress.ts';
 
 type ActionsCoreProgressAdapter = Pick<typeof actionsCore, 'endGroup' | 'info' | 'startGroup'>;
 
@@ -112,14 +107,14 @@ function createProgressStartMessage(progressSnapshot: ProgressSnapshot): string 
         return 'Release appearance: no commits require pull-request discovery';
       }
 
-      return `Release appearance: discovering pull requests for ${progress.totalCommits} commits with concurrency ${pullRequestDiscoveryConcurrency}`;
+      return `Release appearance: discovering pull requests for ${progress.totalCommits} commits`;
     })
     .with({phase: 'comments'}, ({progress}) => {
       if (progress.totalPullRequests === 0) {
         return 'Release appearance: no pull-request comments require processing';
       }
 
-      return `Release appearance: processing comments for ${progress.totalPullRequests} PRs with concurrency ${commentProcessingConcurrency}`;
+      return `Release appearance: processing comments for ${progress.totalPullRequests} PRs`;
     })
     .exhaustive();
 }

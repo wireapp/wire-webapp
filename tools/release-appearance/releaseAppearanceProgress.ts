@@ -17,6 +17,8 @@
  *
  */
 
+import {noop} from 'noop-esm';
+
 export type DiscoveryProgress = {
   readonly completedCommits: number;
   readonly totalCommits: number;
@@ -61,22 +63,22 @@ export const maximumProgressSilenceMilliseconds = 15_000;
 export function createNoOpReleaseAppearanceProgressReporter(): ReleaseAppearanceProgressReporter {
   return {
     reportDiscoveryStarted(progress) {
-      void progress;
+      noop(progress);
     },
     reportDiscoveryProgress(progress) {
-      void progress;
+      noop(progress);
     },
     reportDiscoveryCompleted(progress) {
-      void progress;
+      noop(progress);
     },
     reportCommentProcessingStarted(progress) {
-      void progress;
+      noop(progress);
     },
     reportCommentProcessingProgress(progress) {
-      void progress;
+      noop(progress);
     },
     reportCommentProcessingCompleted(progress) {
-      void progress;
+      noop(progress);
     },
   };
 }
