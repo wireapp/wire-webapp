@@ -15,6 +15,11 @@ concurrency:
 
 permissions: {}
 
+# Keep Nx task caching disabled in pull_request and merge_group runs because
+# repository-controlled code is untrusted and could poison task results (CVE-2025-36852, CREEP).
+env:
+  NX_SKIP_NX_CACHE: 'true'
+
 jobs:
   workflow-security:
     runs-on: ubuntu-24.04
@@ -95,16 +100,6 @@ jobs:
           test -f libraries/config/lib/index.js
           test -f libraries/config/lib/index.d.ts
 
-      - name: Restore Nx and ESLint caches
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: |
-            .nx/cache
-            node_modules/.cache/eslint
-          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
-
       - name: Verify generated i18n artifacts are committed
         run: |
           ./bin/yarn nx run webapp:translate-merge
@@ -140,16 +135,6 @@ jobs:
       - name: Install dependencies
         run: ./bin/yarn --immutable
 
-      - name: Restore Nx and ESLint caches
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: |
-            .nx/cache
-            node_modules/.cache/eslint
-          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
-
       - name: Build libraries
         run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
 
@@ -178,16 +163,6 @@ jobs:
       - name: Install dependencies
         run: ./bin/yarn --immutable
 
-      - name: Restore Nx and ESLint caches
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: |
-            .nx/cache
-            node_modules/.cache/eslint
-          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
-
       - name: Type check
         run: ./bin/yarn type-check
 
@@ -215,16 +190,6 @@ jobs:
 
       - name: Install dependencies
         run: ./bin/yarn --immutable
-
-      - name: Restore Nx and ESLint caches
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: |
-            .nx/cache
-            node_modules/.cache/eslint
-          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
 
       - name: Lint file names
         run: ./bin/yarn lint:fileNames
@@ -263,16 +228,6 @@ jobs:
 
       - name: Install dependencies
         run: ./bin/yarn --immutable
-
-      - name: Restore Nx and ESLint caches
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: |
-            .nx/cache
-            node_modules/.cache/eslint
-          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
 
       - name: Build libraries for lint import resolution
         run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
@@ -330,16 +285,6 @@ jobs:
       - name: Install dependencies
         run: ./bin/yarn --immutable
 
-      - name: Restore Nx and ESLint caches
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: |
-            .nx/cache
-            node_modules/.cache/eslint
-          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
-
       - name: Test
         run: ./bin/run-with-network-isolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
@@ -388,16 +333,6 @@ jobs:
 
       - name: Install dependencies
         run: ./bin/yarn --immutable
-
-      - name: Restore Nx and ESLint caches
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: |
-            .nx/cache
-            node_modules/.cache/eslint
-          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
 
       - name: Build and verify public production package
         env:
