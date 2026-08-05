@@ -21,18 +21,31 @@ import cx from 'classnames';
 
 import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 
-interface ConversationTabProps {
+type ConversationTabActionProps =
+  | {
+      onChangeTab: (tab: SidebarTabs) => void;
+      onClick?: never;
+    }
+  | {
+      onChangeTab?: never;
+      onClick: React.MouseEventHandler<HTMLButtonElement>;
+    };
+
+type ConversationTabProps = {
   title: string;
   label?: string;
   type: SidebarTabs;
   conversationTabIndex: number;
-  onChangeTab: (tab: SidebarTabs) => void;
   Icon: JSX.Element;
   unreadConversations?: number;
   dataUieName: string;
   isActive?: boolean;
   showNotificationsBadge?: boolean;
-}
+  onMouseEnter?: React.MouseEventHandler<HTMLButtonElement>;
+  onMouseLeave?: React.MouseEventHandler<HTMLButtonElement>;
+  onFocus?: React.FocusEventHandler<HTMLButtonElement>;
+  onBlur?: React.FocusEventHandler<HTMLButtonElement>;
+} & ConversationTabActionProps;
 
 export const ConversationTab = ({
   title,
@@ -40,11 +53,16 @@ export const ConversationTab = ({
   type,
   conversationTabIndex,
   onChangeTab,
+  onClick,
   Icon,
   unreadConversations = 0,
   dataUieName,
   isActive = false,
   showNotificationsBadge = false,
+  onMouseEnter,
+  onMouseLeave,
+  onFocus,
+  onBlur,
 }: ConversationTabProps) => {
   return (
     <button
@@ -52,7 +70,18 @@ export const ConversationTab = ({
       type="button"
       role="tab"
       className={cx(`conversations-sidebar-btn`, {active: isActive})}
-      onClick={() => onChangeTab(type)}
+      onClick={event => {
+        if (onClick) {
+          onClick(event);
+          return;
+        }
+
+        onChangeTab(type);
+      }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onFocus={onFocus}
+      onBlur={onBlur}
       title={title}
       data-uie-name={dataUieName}
       data-uie-status={isActive ? 'active' : 'inactive'}
