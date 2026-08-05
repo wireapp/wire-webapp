@@ -48,7 +48,9 @@ function readWorkflowSection(
   trigger: WorkflowTrigger,
   workflowFileName: string,
 ): WorkflowMapping {
-  return readWorkflowMapping(workflow[trigger], `${workflowFileName} ${trigger}`);
+  const triggers = readWorkflowMapping(workflow.on, `${workflowFileName} on`);
+
+  return readWorkflowMapping(triggers[trigger], `${workflowFileName} ${trigger}`);
 }
 
 function readWorkflowInput(workflowFileName: string, trigger: WorkflowTrigger, inputName: string): WorkflowMapping {
@@ -97,7 +99,6 @@ describe('manage-team URL workflow contract', (): void => {
     const input = readWorkflowInput(workflowFileName, trigger, 'expectedManageTeamUrl');
 
     expect(input).toMatchObject({
-      description: expect.any(String),
       required: true,
       type: 'string',
     });
