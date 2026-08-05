@@ -23,7 +23,7 @@ import {resolve} from 'node:path';
 import {isArray, isPlainObject, isUndefined} from '@sindresorhus/is';
 import {load} from 'js-yaml';
 
-import {readRequiredEnvironmentVariable} from '../../apps/webapp/test/e2e_tests/utils/environment.util';
+import {readRequiredEnvironmentVariable} from '../../apps/webapp/test/e2e_tests/environment/readRequiredEnvironmentVariable';
 
 type WorkflowMapping = Record<string, unknown>;
 type WorkflowTrigger = 'workflow_call' | 'workflow_dispatch';

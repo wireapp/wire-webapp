@@ -18,8 +18,8 @@
  */
 
 import {getUser, User} from 'test/e2e_tests/data/user';
+import {readRequiredEnvironmentVariable} from 'test/e2e_tests/environment/readRequiredEnvironmentVariable';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {readRequiredEnvironmentVariable} from 'test/e2e_tests/utils/environment.util';
 import {connectWithUser, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect, LOGIN_TIMEOUT, withLogin} from '../../test.fixtures';
