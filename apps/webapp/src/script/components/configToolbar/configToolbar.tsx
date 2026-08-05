@@ -33,7 +33,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
 import {getLogger} from 'Util/logger';
 
-import {messagePreprocessingSwitchStyles, wrapperStyles} from './configToolbar.styles';
+import {wrapperStyles} from './configToolbar.styles';
 import {openDebugToolbarEventName} from './debugToolbarEvents';
 
 const logger = getLogger('ConfigToolbar');
@@ -78,9 +78,6 @@ export function ConfigToolbar() {
   const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(window.wire?.app?.debug?.isEnabledAvsRustSFT() ?? false);
   const [isPerformancePanelEnabled, setIsPerformancePanelEnabled] = useState(
     window.wire?.app?.debug?.isPerformancePanelEnabled() ?? false,
-  );
-  const [isMessagePreprocessingDisabled, setIsMessagePreprocessingDisabled] = useState(
-    window.wire?.app?.debug?.isMessagePreprocessingDisabled() ?? false,
   );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
   const [notificationDumpFrom, setNotificationDumpFrom] = useState(() => toDateInputValue(getStartOfToday()));
@@ -304,23 +301,6 @@ export function ConfigToolbar() {
               window.wire?.app?.debug?.toggleGzipping(!previousIsGzipEnabled);
               return !previousIsGzipEnabled;
             });
-          }}
-        />
-      </div>
-    );
-  };
-
-  const renderMessagePreprocessingSwitch = () => {
-    return (
-      <div css={messagePreprocessingSwitchStyles}>
-        <label htmlFor="message-preprocessing-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
-          DISABLE MESSAGE PREPROCESSING
-        </label>
-        <Switch
-          id="message-preprocessing-checkbox"
-          checked={isMessagePreprocessingDisabled}
-          onToggle={isChecked => {
-            setIsMessagePreprocessingDisabled(window.wire?.app?.debug?.disableMessagePreprocessing(isChecked) === true);
           }}
         />
       </div>
@@ -566,10 +546,6 @@ export function ConfigToolbar() {
       <hr />
 
       <div>{renderGzipSwitch()}</div>
-
-      <hr />
-
-      <div>{renderMessagePreprocessingSwitch()}</div>
 
       <hr />
 
