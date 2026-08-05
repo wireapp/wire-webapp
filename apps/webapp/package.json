@@ -111,7 +111,7 @@
     "@emotion/eslint-plugin": "11.12.0",
     "@formatjs/cli": "6.16.15",
     "@nx/webpack": "22.7.8",
-    "@playwright/test": "1.61.1",
+    "@playwright/test": "1.62.1",
     "@roamhq/wrtc": "0.10.0",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
