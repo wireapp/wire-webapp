@@ -13,6 +13,10 @@ on:
         options:
           - https://wire-webapp-dev.wire.com/
           - https://wire-webapp-qa.zinfra.io/
+      expectedManageTeamUrl:
+        description: Exact manage-team URL expected from the selected WebApp
+        required: true
+        type: string
 
 # Only allow one instance of this workflow to run per branch at a time
 concurrency:
@@ -25,6 +29,7 @@ jobs:
     uses: ./.github/workflows/e2e-tests.yml
     with:
       webappUrl: ${{ inputs.webappUrl }}
+      expectedManageTeamUrl: ${{ inputs.expectedManageTeamUrl }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       WIRE_E2E_TEST_BOT_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
