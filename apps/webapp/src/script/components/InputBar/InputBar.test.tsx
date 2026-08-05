@@ -34,8 +34,9 @@ import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {Config} from 'src/script/Config';
+import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {translate} from 'Util/localizerUtil';
 import {
   createRootContextValueForTest,
@@ -147,6 +148,22 @@ describe('InputBar', () => {
     expect(inputBar.textContent).toBe(testMessage);
   });
 
+  it('checks whether message preprocessing is disabled by the startup feature toggle', async () => {
+    const isFeatureToggleEnabled = jest.fn(() => false);
+    const featureToggleRootContextValue = createRootContextValueForTest({
+      isFeatureToggleEnabled,
+      translate: translateForTest,
+    });
+    const featureToggleRootProviderWrapper = createRootProviderWrapperForTest(featureToggleRootContextValue);
+
+    render(withThemeAndRootContext(<InputBar {...getDefaultProps()} />, featureToggleRootProviderWrapper));
+
+    await waitFor(() => {
+      expect(isFeatureToggleEnabled).toHaveBeenCalledWith(disableMessagePreprocessingFeatureToggleName);
+    });
+  });
+
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('typing request is sent if the typing indicator mode is enabled and user is typing', async () => {
     const props = getDefaultProps();
     const {getByTestId, container} = renderInputBar(props);

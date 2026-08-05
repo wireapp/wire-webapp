@@ -17,9 +17,8 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 
-import {isBoolean} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
@@ -45,8 +44,8 @@ import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
+import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {DISABLE_MESSAGE_PREPROCESSING_EVENT, isMessagePreprocessingDisabled} from 'Util/debugMessagePreprocessingUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageContent} from './common/messageContent/messageContent';
@@ -117,7 +116,7 @@ export const InputBar = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: InputBarProps) => {
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
@@ -151,7 +150,7 @@ export const InputBar = ({
    * It's directly derived from the editor state
    */
   const [messageContent, setMessageContent] = useState<MessageContent>({text: ''});
-  const [disableMessagePreprocessing, setDisableMessagePreprocessing] = useState(isMessagePreprocessingDisabled);
+  const disableMessagePreprocessing = isFeatureToggleEnabled(disableMessagePreprocessingFeatureToggleName);
 
   const formatToolbar = useFormatToolbar();
 
@@ -219,21 +218,6 @@ export const InputBar = ({
   );
   const effectiveShowMarkdownPreview = showMarkdownPreview && !disableMessagePreprocessing;
 
-  useEffect(() => {
-    const handleMessagePreprocessingChange = (event: Event) => {
-      const isDisabled =
-        event instanceof CustomEvent && isBoolean(event.detail) ? event.detail : isMessagePreprocessingDisabled();
-
-      setDisableMessagePreprocessing(isDisabled);
-    };
-
-    window.addEventListener(DISABLE_MESSAGE_PREPROCESSING_EVENT, handleMessagePreprocessingChange);
-
-    return () => {
-      window.removeEventListener(DISABLE_MESSAGE_PREPROCESSING_EVENT, handleMessagePreprocessingChange);
-    };
-  }, []);
-
   const {
     editedMessage,
     replyMessageEntity,
@@ -260,7 +244,6 @@ export const InputBar = ({
     pastedFile: fileHandling.pastedFile,
     sendPastedFile: fileHandling.sendPastedFile,
     translate,
-    disableMessagePreprocessing,
   });
 
   if (fileHandling.pastedFile && !!isCellsEnabled) {
