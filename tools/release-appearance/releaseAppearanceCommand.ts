@@ -46,10 +46,6 @@ import {commentProcessingConcurrency, pullRequestDiscoveryConcurrency} from './r
 import {planBetaReleaseHistory, planProductionReleaseHistory} from './releaseHistory.ts';
 import type {CommitRange, ExecuteGitCommand, ReleaseHistoryPlan} from './releaseHistory.ts';
 
-import {createMonotonicClock} from '../../apps/webapp/src/script/time/monotonicClock.ts';
-import type {MonotonicClock} from '../../apps/webapp/src/script/time/monotonicClock.ts';
-import {createFireAndForgetInvoker} from '../../libraries/core/src/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker.ts';
-
 export type ReleaseAppearanceCommandStage = 'beta' | 'production';
 export type ExecutionMode = 'write' | 'dry-run';
 
@@ -272,11 +268,6 @@ type FinalizeSummaryOptions = {
   readonly githubToken: string;
   readonly exitCode: number;
   readonly commandStartedAtMilliseconds: number;
-};
-
-type CreateRuntimeDependenciesOptions = {
-  readonly commandEnvironment: CommandEnvironment;
-  readonly monotonicClock: MonotonicClock;
 };
 
 const betaCommandArgumentCount = 3;
@@ -564,28 +555,20 @@ async function resolveCommitDiscoveryOutcome(
   githubClient: GitHubClient,
   githubToken: string,
 ): Promise<CommitDiscoveryOutcome> {
-  try {
-    const pullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha: workItem.commitSha});
-    if (pullRequestsResult.isErr) {
-      return {
-        kind: 'failure',
-        workItem,
-        message: redactSecret(pullRequestsResult.error.message, githubToken),
-      };
-    }
-
-    return {
-      kind: 'success',
-      workItem,
-      pullRequests: pullRequestsResult.value,
-    };
-  } catch (error: unknown) {
+  const pullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha: workItem.commitSha});
+  if (pullRequestsResult.isErr) {
     return {
       kind: 'failure',
       workItem,
-      message: redactSecret(errorMessage(error), githubToken),
+      message: redactSecret(pullRequestsResult.error.message, githubToken),
     };
   }
+
+  return {
+    kind: 'success',
+    workItem,
+    pullRequests: pullRequestsResult.value,
+  };
 }
 
 function reduceCommitDiscoveryOutcomes(commitDiscoveryOutcomes: readonly CommitDiscoveryOutcome[]): DiscoveryResult {
@@ -654,17 +637,6 @@ async function discoverPullRequests(
       workItems,
       async (workItem): Promise<CommitDiscoveryOutcome> => {
         activeRequests += 1;
-        progressReporter.reportDiscoveryProgress(
-          createDiscoveryProgress({
-            completedCommits,
-            totalCommits: workItems.length,
-            activeRequests,
-            pullRequestsDiscovered: discoveredPullRequestNumbers.size,
-            failures: failedRequests,
-            phaseStartedAtMilliseconds,
-            now,
-          }),
-        );
         const outcome = await resolveCommitDiscoveryOutcome(workItem, githubClient, githubToken);
         if (outcome.kind === 'failure') {
           failedRequests += 1;
@@ -696,7 +668,6 @@ async function discoverPullRequests(
       },
       {
         concurrency: pullRequestDiscoveryConcurrency,
-        stopOnError: false,
       },
     );
   } finally {
@@ -873,59 +844,50 @@ async function processSinglePullRequest(
 ): Promise<PullRequestProcessingOutcome> {
   const {executionMode, githubClient, githubToken, pullRequest, releaseTag, stage} = processPullRequestOptions;
   let plannedCommentOperation: Maybe<PlannedCommentOperation> = Maybe.nothing<PlannedCommentOperation>();
-  try {
-    const commentsResult = await githubClient.listIssueComments({pullRequestNumber: pullRequest.number});
-    if (commentsResult.isErr) {
-      return createProcessingFailure(
-        pullRequest.number,
-        commentsResult.error.message,
-        githubToken,
-        plannedCommentOperation,
-      );
-    }
-
-    const operationResult = prepareCommentOperation(
-      commentsResult.value,
-      createDesiredReleaseState(stage, releaseTag, pullRequest.earliestBetaTag),
+  const commentsResult = await githubClient.listIssueComments({pullRequestNumber: pullRequest.number});
+  if (commentsResult.isErr) {
+    return createProcessingFailure(
+      pullRequest.number,
+      commentsResult.error.message,
+      githubToken,
+      plannedCommentOperation,
     );
-    if (operationResult.isErr) {
-      return createProcessingFailure(
-        pullRequest.number,
-        operationResult.error.message,
-        githubToken,
-        plannedCommentOperation,
-      );
-    }
-
-    const plannedOperation: PlannedCommentOperation = {
-      pullRequestNumber: pullRequest.number,
-      kind: operationResult.value.kind,
-    };
-    plannedCommentOperation = Maybe.just(plannedOperation);
-    if (operationResult.value.kind === 'unchanged') {
-      return {kind: 'unchanged', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation};
-    }
-    if (executionMode === 'dry-run') {
-      return operationResult.value.kind === 'create'
-        ? {kind: 'planned-create', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation}
-        : {kind: 'planned-update', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation};
-    }
-
-    const writeResult = await writePullRequestComment(pullRequest.number, operationResult.value, githubClient);
-    if (writeResult.isErr) {
-      return createProcessingFailure(
-        pullRequest.number,
-        writeResult.error.message,
-        githubToken,
-        plannedCommentOperation,
-      );
-    }
-    return operationResult.value.kind === 'create'
-      ? {kind: 'created', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation}
-      : {kind: 'updated', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation};
-  } catch (error: unknown) {
-    return createProcessingFailure(pullRequest.number, errorMessage(error), githubToken, plannedCommentOperation);
   }
+
+  const operationResult = prepareCommentOperation(
+    commentsResult.value,
+    createDesiredReleaseState(stage, releaseTag, pullRequest.earliestBetaTag),
+  );
+  if (operationResult.isErr) {
+    return createProcessingFailure(
+      pullRequest.number,
+      operationResult.error.message,
+      githubToken,
+      plannedCommentOperation,
+    );
+  }
+
+  const plannedOperation: PlannedCommentOperation = {
+    pullRequestNumber: pullRequest.number,
+    kind: operationResult.value.kind,
+  };
+  plannedCommentOperation = Maybe.just(plannedOperation);
+  if (operationResult.value.kind === 'unchanged') {
+    return {kind: 'unchanged', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation};
+  }
+  if (executionMode === 'dry-run') {
+    return operationResult.value.kind === 'create'
+      ? {kind: 'planned-create', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation}
+      : {kind: 'planned-update', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation};
+  }
+
+  const writeResult = await writePullRequestComment(pullRequest.number, operationResult.value, githubClient);
+  if (writeResult.isErr) {
+    return createProcessingFailure(pullRequest.number, writeResult.error.message, githubToken, plannedCommentOperation);
+  }
+  return operationResult.value.kind === 'create'
+    ? {kind: 'created', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation}
+    : {kind: 'updated', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation};
 }
 
 async function processPullRequests(processPullRequestsOptions: ProcessPullRequestsOptions): Promise<ProcessingResult> {
@@ -968,19 +930,6 @@ async function processPullRequests(processPullRequestsOptions: ProcessPullReques
       uniquePullRequests,
       async (pullRequest): Promise<PullRequestProcessingOutcome> => {
         activeRequests += 1;
-        progressReporter.reportCommentProcessingProgress(
-          createCommentProgress({
-            completedPullRequests,
-            totalPullRequests: uniquePullRequests.length,
-            activeRequests,
-            commentsCreated,
-            commentsUpdated,
-            commentsUnchanged,
-            failures: failedRequests,
-            phaseStartedAtMilliseconds,
-            now,
-          }),
-        );
         const outcome = await processSinglePullRequest({
           executionMode,
           githubClient,
@@ -1026,7 +975,6 @@ async function processPullRequests(processPullRequestsOptions: ProcessPullReques
       },
       {
         concurrency: commentProcessingConcurrency,
-        stopOnError: false,
       },
     );
   } finally {
@@ -1161,6 +1109,8 @@ function countSummaryFailures(summaryOptions: SummaryOptions): number {
 
 function formatExecutionMetrics(summaryOptions: SummaryOptions): readonly string[] {
   return [
+    `- Pull-request discovery concurrency: ${pullRequestDiscoveryConcurrency}`,
+    `- Comment-processing concurrency: ${commentProcessingConcurrency}`,
     `- Release-history planning duration: ${formatDuration(summaryOptions.releaseHistoryPlanningDurationMilliseconds)}`,
     `- Pull-request discovery duration: ${formatDuration(summaryOptions.pullRequestDiscoveryDurationMilliseconds)}`,
     `- Comment-processing duration: ${formatDuration(summaryOptions.commentProcessingDurationMilliseconds)}`,
@@ -1515,17 +1465,8 @@ export async function executeReleaseAppearanceCommand(
 export async function main(
   executeReleaseAppearanceCommandOptions: ExecuteReleaseAppearanceCommandOptions,
 ): Promise<void> {
-  const githubToken = Maybe.of(executeReleaseAppearanceCommandOptions.environment.GITHUB_TOKEN).unwrapOr('');
-  try {
-    const commandResult = await executeReleaseAppearanceCommand(executeReleaseAppearanceCommandOptions);
-    process.exitCode = commandResult.exitCode;
-  } catch (error: unknown) {
-    await writeFailureSafely(
-      executeReleaseAppearanceCommandOptions.dependencies.writeFailure,
-      redactSecret(errorMessage(error), githubToken),
-    );
-    process.exitCode = 1;
-  }
+  const commandResult = await executeReleaseAppearanceCommand(executeReleaseAppearanceCommandOptions);
+  process.exitCode = commandResult.exitCode;
 }
 
 async function executeGitCommand(commandArguments: readonly string[]): Promise<string> {
@@ -1542,17 +1483,11 @@ async function writeRuntimeInformation(message: string): Promise<void> {
   process.stdout.write(`${message}\n`);
 }
 
-function writeRuntimeFireAndForgetFailure(message: string): void {
-  process.stderr.write(`${message}\n`);
+function readMonotonicTime(): number {
+  return performance.now();
 }
 
-function createRuntimeDependencies(
-  createRuntimeDependenciesOptions: CreateRuntimeDependenciesOptions,
-): ReleaseAppearanceCommandDependencies {
-  const {commandEnvironment, monotonicClock} = createRuntimeDependenciesOptions;
-  function readMonotonicTime(): number {
-    return monotonicClock.nowMilliseconds;
-  }
+function createRuntimeDependencies(commandEnvironment: CommandEnvironment): ReleaseAppearanceCommandDependencies {
   actionsCore.setSecret(commandEnvironment.githubToken);
   const httpClient = createRuntimeKyHttpClient();
   const githubClient = createGitHubClient({
@@ -1565,10 +1500,8 @@ function createRuntimeDependencies(
   return {
     executeGitCommand,
     githubClient,
-    now(): number {
-      return monotonicClock.nowMilliseconds;
-    },
-    progressReporter: createDefaultGitHubActionsProgressReporter(readMonotonicTime),
+    now: readMonotonicTime,
+    progressReporter: createDefaultGitHubActionsProgressReporter(),
     writeFailure: writeRuntimeFailure,
     writeInformation: writeRuntimeInformation,
     async writeSummary(summary): Promise<void> {
@@ -1581,27 +1514,25 @@ async function startReleaseAppearanceCommand(): Promise<void> {
   const commandLineArguments = process.argv.slice(processArgumentStartIndex);
   const parsedCommandResult = parseCommandLineArguments(commandLineArguments);
   if (parsedCommandResult.isErr) {
-    await writeRuntimeFailure(parsedCommandResult.error.message);
-    process.exitCode = 1;
-    return;
+    throw parsedCommandResult.error;
   }
 
   const commandEnvironmentResult = readCommandEnvironment(process.env);
   if (commandEnvironmentResult.isErr) {
-    await writeRuntimeFailure(commandEnvironmentResult.error.message);
-    process.exitCode = 1;
-    return;
+    throw commandEnvironmentResult.error;
   }
 
-  const monotonicClock = createMonotonicClock({performance: globalThis.performance});
   await main({
     commandLineArguments,
     environment: process.env,
-    dependencies: createRuntimeDependencies({
-      commandEnvironment: commandEnvironmentResult.value,
-      monotonicClock,
-    }),
+    dependencies: createRuntimeDependencies(commandEnvironmentResult.value),
   });
+}
+
+async function handleReleaseAppearanceCommandFailure(error: unknown): Promise<void> {
+  const githubToken = Maybe.of(process.env.GITHUB_TOKEN).unwrapOr('');
+  await writeRuntimeFailure(redactSecret(errorMessage(error), githubToken));
+  process.exitCode = 1;
 }
 
 function isReleaseAppearanceCommandEntrypoint(): boolean {
@@ -1613,10 +1544,5 @@ function isReleaseAppearanceCommandEntrypoint(): boolean {
 }
 
 if (isReleaseAppearanceCommandEntrypoint()) {
-  const fireAndForgetInvoker = createFireAndForgetInvoker({
-    logger: {
-      error: writeRuntimeFireAndForgetFailure,
-    },
-  });
-  fireAndForgetInvoker.fireAndForget(startReleaseAppearanceCommand);
+  startReleaseAppearanceCommand().catch(handleReleaseAppearanceCommandFailure);
 }
