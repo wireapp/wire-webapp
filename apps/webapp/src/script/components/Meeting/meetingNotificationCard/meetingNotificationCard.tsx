@@ -118,12 +118,7 @@ export const MeetingNotificationCard = (notification: MeetingNotificationCardPro
   const {translate} = useApplicationContext();
   const {kind, meetingTitle, id, onDismiss} = notification;
   return (
-    <div
-      css={meetingNotificationCardContainerStyles}
-      role="listitem"
-      data-testid={`meeting-notification-card-${id}`}
-      data-uie-name="meeting-notification-card"
-    >
+    <div css={meetingNotificationCardContainerStyles} role="listitem" data-uie-name={`meeting-notification-card-${id}`}>
       <div css={meetingNotificationCardTitleStyles}>
         {translate('meetings.notifications.title', {label: translate(notificationLabels[kind]), meetingTitle})}
       </div>

@@ -25,30 +25,25 @@ import cx from 'classnames';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {MeetingNotificationHost} from 'Components/Meeting/meetingNotificationHost/meetingNotificationHost';
 import {User} from 'Repositories/entity/User';
 import {conversationListCollapseFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Conversations} from './panels/conversations';
-import {getIsConversationListCollapsed, useSidebarStore} from './panels/conversations/useSidebarStore';
+import {getIsConversationListCollapsed, SidebarTabs, useSidebarStore} from './panels/conversations/useSidebarStore';
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
 import {ListViewModel} from '../../view_model/ListViewModel';
-import {useAppState, ListState} from '../useAppState';
+import {ListState, useAppState} from '../useAppState';
 
 type LeftSidebarProps = {
   listViewModel: ListViewModel;
   selfUser: User;
   isActivatedAccount: boolean;
-  onConversationsTargetChange?: (element: HTMLElement | null) => void;
 };
 
-export const LeftSidebar = ({
-  listViewModel,
-  selfUser,
-  isActivatedAccount,
-  onConversationsTargetChange,
-}: LeftSidebarProps) => {
+export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftSidebarProps) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
 
@@ -63,6 +58,7 @@ export const LeftSidebar = ({
     isScreenLessThanMdBreakpoint,
     conversationListStatus,
   });
+  const isStandalone = currentTab === SidebarTabs.CELLS || currentTab === SidebarTabs.MEETINGS;
 
   useEffect(() => {
     function openCreateGroupModal() {
@@ -95,7 +91,6 @@ export const LeftSidebar = ({
       ].includes(listState) && (
         <Conversations
           isConversationListCollapseEnabled={isConversationListCollapseEnabled}
-          onConversationsTargetChange={onConversationsTargetChange}
           selfUser={selfUser}
           listViewModel={listViewModel}
           searchRepository={repositories.search}
@@ -115,6 +110,7 @@ export const LeftSidebar = ({
           selfUser={selfUser}
         />
       )}
+      {isStandalone && <MeetingNotificationHost isStandalone />}
     </aside>
   );
 };

@@ -22,7 +22,7 @@ import type {CSSObject} from '@emotion/react';
 export const meetingNotificationHostStyles: CSSObject = {
   position: 'absolute',
   bottom: 0,
-  zIndex: 100000001,
+  zIndex: 'var(--z-index-panel)',
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
@@ -31,9 +31,8 @@ export const meetingNotificationHostStyles: CSSObject = {
 };
 
 export const meetingNotificationHostFallbackStyles: CSSObject = {
-  position: 'fixed',
-  right: 'auto',
-  maxWidth: 320,
+  left: '100%',
+  width: 320,
 };
 
 export const meetingNotificationHostContainerStyles: CSSObject = {
@@ -88,7 +87,7 @@ export const meetingNotificationHostListStyles: CSSObject = {
   overflowY: 'auto',
 };
 
-export const meetingNotificationHostExpandIconStyles = (isExpanded: Boolean): CSSObject => ({
+export const meetingNotificationHostExpandIconStyles = (isExpanded: boolean): CSSObject => ({
   transform: isExpanded ? 'rotate(90deg)' : 'rotate(270deg)',
   transition: 'all 500ms var(--ease-out-expo)',
   marginRight: '2px',

@@ -45,27 +45,26 @@ const translateForCountTest: Translate = (_key, substitutions) => {
   return '';
 };
 
-const renderHost = (
-  target: HTMLElement | null = document.getElementById('wire-main'),
-  translate: Translate = translateForTest,
-) =>
+const getHost = () => document.querySelector('[data-uie-name="meeting-notification-host"]');
+const getList = () => document.getElementById('meeting-notification-list');
+
+const renderHost = (isStandalone = true, translate: Translate = translateForTest) =>
   render(
     <ThemeProvider>
-      <MeetingNotificationHost targetElement={target} />
+      <MeetingNotificationHost isStandalone={isStandalone} />
     </ThemeProvider>,
     {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate}))},
   );
 
 describe('MeetingNotificationHost', () => {
   beforeEach(() => {
-    document.body.innerHTML = '<div id="wire-main"></div>';
     useMeetingNotificationStore.getState().clearNotifications();
   });
 
   it('renders nothing when there are no notifications', () => {
     renderHost();
 
-    expect(screen.queryByTestId('meeting-notification-host')).not.toBeInTheDocument();
+    expect(getHost()).not.toBeInTheDocument();
   });
 
   it('shows the active card count in the collapsed header', () => {
@@ -87,7 +86,7 @@ describe('MeetingNotificationHost', () => {
       meetingStartTime,
     });
 
-    renderHost(undefined, translateForCountTest);
+    renderHost(true, translateForCountTest);
 
     expect(screen.getByText('3')).toBeInTheDocument();
     expect(screen.queryByText('meetings.notifications.title')).not.toBeInTheDocument();
@@ -105,7 +104,7 @@ describe('MeetingNotificationHost', () => {
     renderHost();
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.dismissAll'}));
 
-    expect(screen.queryByTestId('meeting-notification-host')).not.toBeInTheDocument();
+    expect(getHost()).not.toBeInTheDocument();
   });
 
   it('expands to individual cards and dismisses only the selected card', () => {
@@ -144,7 +143,7 @@ describe('MeetingNotificationHost', () => {
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.expand'}));
 
     expect(screen.getAllByRole('listitem')).toHaveLength(5);
-    expect(screen.getByTestId('meeting-notification-list')).toHaveStyle({overflowY: 'auto'});
+    expect(getList()).toHaveStyle({overflowY: 'auto'});
     fireEvent.click(screen.getAllByRole('button', {name: 'meetings.notifications.dismiss'})[0]);
     expect(screen.getAllByRole('listitem')).toHaveLength(4);
     expect(screen.getAllByText('meetings.notifications.title')).toHaveLength(4);
@@ -166,11 +165,10 @@ describe('MeetingNotificationHost', () => {
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.expand'}));
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.dismissAll'}));
 
-    expect(screen.queryByTestId('meeting-notification-host')).not.toBeInTheDocument();
+    expect(getHost()).not.toBeInTheDocument();
   });
 
-  it('moves the panel to the current route target without a new notification', () => {
-    document.body.innerHTML = '<div id="wire-main"><div id="conversations"></div></div>';
+  it('resets the expanded state when all notifications are dismissed', () => {
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
@@ -179,17 +177,54 @@ describe('MeetingNotificationHost', () => {
       meetingStartTime,
     });
 
-    const {rerender} = renderHost(document.getElementById('conversations'));
-    const conversations = document.getElementById('conversations');
-    expect(conversations).toContainElement(screen.getByTestId('meeting-notification-host'));
+    renderHost();
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.expand'}));
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(true);
 
-    conversations?.remove();
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.dismissAll'}));
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(false);
+  });
+
+  it('shares the expanded state across multiple rendered hosts', () => {
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+
+    render(
+      <ThemeProvider>
+        <MeetingNotificationHost isStandalone={false} />
+        <MeetingNotificationHost isStandalone />
+      </ThemeProvider>,
+      {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}))},
+    );
+
+    fireEvent.click(screen.getAllByRole('button', {name: 'meetings.notifications.expand'})[0]);
+
+    expect(screen.getAllByRole('button', {name: 'meetings.notifications.collapse'})).toHaveLength(2);
+  });
+
+  it('switches between overlay and standalone styles as isStandalone toggles', () => {
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+
+    const {rerender} = renderHost(false);
+    expect(getHost()).not.toHaveStyle({left: '100%'});
+
     rerender(
       <ThemeProvider>
-        <MeetingNotificationHost targetElement={document.getElementById('wire-main')} />
+        <MeetingNotificationHost isStandalone />
       </ThemeProvider>,
     );
 
-    expect(document.getElementById('wire-main')).toContainElement(screen.getByTestId('meeting-notification-host'));
+    expect(getHost()).toHaveStyle({left: '100%'});
   });
 });

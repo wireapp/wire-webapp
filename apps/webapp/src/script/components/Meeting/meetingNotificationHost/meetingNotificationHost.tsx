@@ -17,10 +17,6 @@
  *
  */
 
-import {useLayoutEffect, useState} from 'react';
-
-import {createPortal} from 'react-dom';
-
 import {ChevronIcon} from '@wireapp/react-ui-kit';
 
 import {MeetingNotificationCard} from 'Components/Meeting/meetingNotificationCard/meetingNotificationCard';
@@ -38,64 +34,26 @@ import {
   meetingNotificationHostListStyles,
   meetingNotificationHostStyles,
 } from './meetingNotificationHost.styles';
-import {MEETING_NOTIFICATION_HOST_ELEMENT_ID} from './useMeetingNotificationHostElement';
 
 type MeetingNotificationHostProps = {
-  targetElement?: HTMLElement | null;
+  isStandalone: boolean;
 };
 
-export const MeetingNotificationHost = ({targetElement = null}: MeetingNotificationHostProps) => {
+export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostProps) => {
   const {translate} = useApplicationContext();
   const notifications = useMeetingNotificationStore(state => state.notifications);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [fallbackDimensions, setFallbackDimensions] = useState({left: 16, width: 320});
+  const isExpanded = useMeetingNotificationStore(state => state.isExpanded);
 
-  useLayoutEffect(() => {
-    if (targetElement?.id === MEETING_NOTIFICATION_HOST_ELEMENT_ID.CONVERSATIONS) {
-      return;
-    }
-
-    const centerColumn = document.getElementById(MEETING_NOTIFICATION_HOST_ELEMENT_ID.CENTER_COLUMN);
-    if (!centerColumn) {
-      return;
-    }
-
-    const updateFallbackDimensions = () => {
-      const {left, width} = centerColumn.getBoundingClientRect();
-      if (width === 0) {
-        return;
-      }
-
-      setFallbackDimensions({
-        left: Math.max(0, left),
-        width: 320,
-      });
-    };
-
-    updateFallbackDimensions();
-    window.addEventListener('resize', updateFallbackDimensions);
-    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(updateFallbackDimensions);
-    resizeObserver?.observe(centerColumn);
-
-    return () => {
-      window.removeEventListener('resize', updateFallbackDimensions);
-      resizeObserver?.disconnect();
-    };
-  }, [targetElement]);
-
-  if (!targetElement || notifications.length === 0) {
+  if (notifications.length === 0) {
     return null;
   }
 
-  return createPortal(
+  return (
     <div
       css={{
         ...meetingNotificationHostStyles,
-        ...(targetElement.id === MEETING_NOTIFICATION_HOST_ELEMENT_ID.CONVERSATIONS
-          ? {}
-          : {...meetingNotificationHostFallbackStyles, ...fallbackDimensions}),
+        ...(isStandalone ? meetingNotificationHostFallbackStyles : {}),
       }}
-      data-testid="meeting-notification-host"
       data-uie-name="meeting-notification-host"
     >
       <div css={meetingNotificationHostContainerStyles}>
@@ -115,7 +73,6 @@ export const MeetingNotificationHost = ({targetElement = null}: MeetingNotificat
           <div
             id="meeting-notification-list"
             css={meetingNotificationHostListStyles}
-            data-testid="meeting-notification-list"
             data-uie-name="meeting-notification-list"
           >
             {notifications.map(notification => (
@@ -133,14 +90,13 @@ export const MeetingNotificationHost = ({targetElement = null}: MeetingNotificat
             css={meetingNotificationHostButtonStyles}
             aria-expanded={isExpanded}
             aria-controls="meeting-notification-list"
-            onClick={() => setIsExpanded(expanded => !expanded)}
+            onClick={() => useMeetingNotificationStore.getState().setIsExpanded(!isExpanded)}
           >
             <ChevronIcon css={meetingNotificationHostExpandIconStyles(isExpanded)} />
             {translate(isExpanded ? 'meetings.notifications.collapse' : 'meetings.notifications.expand')}
           </button>
         </div>
       </div>
-    </div>,
-    targetElement,
+    </div>
   );
 };

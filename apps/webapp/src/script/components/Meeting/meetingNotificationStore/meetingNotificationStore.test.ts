@@ -235,4 +235,25 @@ describe('useMeetingNotificationStore', () => {
 
     expect(useMeetingNotificationStore.getState().notifications[0]?.id).toBe('meeting-notification-0');
   });
+
+  it('toggles the expanded state', () => {
+    const store = useMeetingNotificationStore.getState();
+
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(false);
+
+    store.setIsExpanded(true);
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(true);
+
+    store.setIsExpanded(false);
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(false);
+  });
+
+  it('resets the expanded state when clearing notifications', () => {
+    const store = useMeetingNotificationStore.getState();
+    store.setIsExpanded(true);
+
+    store.clearNotifications();
+
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(false);
+  });
 });

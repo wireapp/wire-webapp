@@ -57,15 +57,18 @@ export type MeetingNotification = AddNotificationInput & {id: string};
 
 type MeetingNotificationStore = {
   notifications: MeetingNotification[];
+  isExpanded: boolean;
   addNotification: (input: AddNotificationInput) => void;
   dismissNotification: (id: string) => void;
   clearNotifications: () => void;
+  setIsExpanded: (isExpanded: boolean) => void;
 };
 
 let nextNotificationId = 0;
 
 export const useMeetingNotificationStore = create<MeetingNotificationStore>(set => ({
   notifications: [],
+  isExpanded: false,
   addNotification: input =>
     set(state => ({
       notifications: [
@@ -118,6 +121,7 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
     set(state => ({notifications: state.notifications.filter(notification => notification.id !== id)})),
   clearNotifications: () => {
     nextNotificationId = 0;
-    set({notifications: []});
+    set({notifications: [], isExpanded: false});
   },
+  setIsExpanded: isExpanded => set({isExpanded}),
 }));

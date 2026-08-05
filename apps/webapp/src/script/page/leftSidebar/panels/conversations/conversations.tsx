@@ -26,6 +26,7 @@ import {useShallow} from 'zustand/react/shallow';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {MeetingNotificationHost} from 'Components/Meeting/meetingNotificationHost/meetingNotificationHost';
 import {useConversationFocus} from 'Hooks/useConversationFocus';
 import {CallState} from 'Repositories/calling/CallState';
 import {createLabel} from 'Repositories/conversation/ConversationLabelRepository';
@@ -94,7 +95,6 @@ type ConversationsProps = {
   teamRepository: TeamRepository;
   userRepository: UserRepository;
   isConversationListCollapseEnabled: boolean;
-  onConversationsTargetChange?: (element: HTMLElement | null) => void;
 };
 
 export const Conversations = ({
@@ -112,7 +112,6 @@ export const Conversations = ({
   userState = container.resolve(UserState),
   selfUser,
   isConversationListCollapseEnabled,
-  onConversationsTargetChange,
 }: ConversationsProps) => {
   const {translate} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
@@ -512,7 +511,6 @@ export const Conversations = ({
       <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(isScreenLessThanMdBreakpoint)} />
       <ListWrapper
         id="conversations"
-        onTargetRef={onConversationsTargetChange}
         headerElement={
           <ConversationHeader
             currentFolder={currentFolder}
@@ -576,6 +574,7 @@ export const Conversations = ({
             propertiesRepository={propertiesRepository}
           />
         }
+        notificationHost={<MeetingNotificationHost isStandalone={false} />}
       >
         {conversationsPanelContent}
       </ListWrapper>
