@@ -279,6 +279,7 @@ const releaseCommitArgumentIndex = 2;
 const promotedBetaTagArgumentIndex = 3;
 const dryRunFlag = '--dry-run';
 const fullGitCommitPattern = /^[0-9a-f]{40}$/i;
+const millisecondsPerSecond = 1000;
 
 function createSuccess<valueType>(value: valueType): Result<valueType, Error> {
   return Result.ok<valueType, Error>(value);
@@ -1065,30 +1066,6 @@ function addPlanToSummary(summaryOptions: SummaryOptions, releaseHistoryPlan: Re
     .exhaustive();
 }
 
-function formatStringList(values: readonly string[]): string {
-  return values.length === 0 ? 'none' : values.join(', ');
-}
-
-function formatPullRequestList(pullRequests: readonly PullRequestAppearance[]): string {
-  return pullRequests.length === 0
-    ? 'none'
-    : pullRequests
-        .map(pullRequest => {
-          return `#${pullRequest.number}`;
-        })
-        .join(', ');
-}
-
-function formatFailedPullRequests(pullRequestFailures: readonly PullRequestFailure[]): string {
-  return pullRequestFailures.length === 0
-    ? 'none'
-    : pullRequestFailures
-        .map(pullRequestFailure => {
-          return `#${pullRequestFailure.pullRequestNumber}`;
-        })
-        .join(', ');
-}
-
 function formatCandidateRanges(candidateRanges: readonly DiscoveryRange[]): string {
   return candidateRanges.length === 0
     ? 'not applicable'
@@ -1100,7 +1077,9 @@ function formatCandidateRanges(candidateRanges: readonly DiscoveryRange[]): stri
 }
 
 function formatDuration(durationMilliseconds: number): string {
-  return `${Math.round(durationMilliseconds)} ms`;
+  return durationMilliseconds < millisecondsPerSecond
+    ? `${Math.round(durationMilliseconds)} ms`
+    : `${(durationMilliseconds / millisecondsPerSecond).toFixed(1)} s`;
 }
 
 function countSummaryFailures(summaryOptions: SummaryOptions): number {
@@ -1108,17 +1087,35 @@ function countSummaryFailures(summaryOptions: SummaryOptions): number {
 }
 
 function formatExecutionMetrics(summaryOptions: SummaryOptions): readonly string[] {
+  const commentCountLines =
+    summaryOptions.executionMode === 'dry-run'
+      ? [
+          `- Comments that would be created: ${summaryOptions.commentsCreated}`,
+          `- Comments that would be updated: ${summaryOptions.commentsUpdated}`,
+          `- Unchanged comments: ${summaryOptions.commentsUnchanged}`,
+        ]
+      : [
+          `- Comments created: ${summaryOptions.commentsCreated}`,
+          `- Comments updated: ${summaryOptions.commentsUpdated}`,
+          `- Comments unchanged: ${summaryOptions.commentsUnchanged}`,
+        ];
+
   return [
-    `- Pull-request discovery concurrency: ${pullRequestDiscoveryConcurrency}`,
-    `- Comment-processing concurrency: ${commentProcessingConcurrency}`,
-    `- Release-history planning duration: ${formatDuration(summaryOptions.releaseHistoryPlanningDurationMilliseconds)}`,
-    `- Pull-request discovery duration: ${formatDuration(summaryOptions.pullRequestDiscoveryDurationMilliseconds)}`,
-    `- Comment-processing duration: ${formatDuration(summaryOptions.commentProcessingDurationMilliseconds)}`,
+    '',
+    '### Result',
+    '',
+    `- Commits inspected: ${summaryOptions.commitsInspected.length}`,
+    `- Pull requests discovered: ${summaryOptions.pullRequestsDiscovered.length}`,
+    ...commentCountLines,
+    `- Commits without associated pull requests: ${summaryOptions.commitsWithoutPullRequests.length}`,
+    `- Failures: ${countSummaryFailures(summaryOptions)}`,
+    '',
+    '### Performance',
+    '',
+    `- Release-history planning: ${formatDuration(summaryOptions.releaseHistoryPlanningDurationMilliseconds)}`,
+    `- Pull-request discovery: ${formatDuration(summaryOptions.pullRequestDiscoveryDurationMilliseconds)} (concurrency ${pullRequestDiscoveryConcurrency})`,
+    `- Comment processing: ${formatDuration(summaryOptions.commentProcessingDurationMilliseconds)} (concurrency ${commentProcessingConcurrency})`,
     `- Total command duration: ${formatDuration(summaryOptions.totalCommandDurationMilliseconds)}`,
-    `- Candidate range count: ${summaryOptions.candidateRanges.length}`,
-    `- Unique commit count: ${summaryOptions.commitsInspected.length}`,
-    `- Discovered PR count: ${summaryOptions.pullRequestsDiscovered.length}`,
-    `- Failure count: ${countSummaryFailures(summaryOptions)}`,
   ];
 }
 
@@ -1132,7 +1129,7 @@ function formatFailureSection(summaryOptions: SummaryOptions): readonly string[]
     }),
   ];
 
-  return ['', '### Failures', '', ...(failureLines.length === 0 ? ['None'] : failureLines)];
+  return failureLines.length === 0 ? [] : ['', '### Failures', '', ...failureLines];
 }
 
 function createWriteSummary(summaryOptions: SummaryOptions): string {
@@ -1143,17 +1140,10 @@ function createWriteSummary(summaryOptions: SummaryOptions): string {
     `- Workflow/tooling commit: \`${summaryOptions.workflowToolingCommitSha}\``,
     `- Release tag: \`${summaryOptions.releaseTag}\``,
     `- Release commit: \`${summaryOptions.releaseCommit}\``,
-    `- Bootstrap: ${summaryOptions.bootstrap ? 'yes' : 'no'}`,
+    ...(summaryOptions.bootstrap ? ['- Bootstrap: yes', '- No preceding new-format Production release exists.'] : []),
     `- Preceding Production tag: ${summaryOptions.precedingProductionTag}`,
-    ...formatExecutionMetrics(summaryOptions),
     `- Candidate ranges: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
-    `- Commits inspected: ${summaryOptions.commitsInspected.length} (${formatStringList(summaryOptions.commitsInspected)})`,
-    `- Pull requests discovered: ${summaryOptions.pullRequestsDiscovered.length} (${formatPullRequestList(summaryOptions.pullRequestsDiscovered)})`,
-    `- Comments created: ${summaryOptions.commentsCreated}`,
-    `- Comments updated: ${summaryOptions.commentsUpdated}`,
-    `- Comments unchanged: ${summaryOptions.commentsUnchanged}`,
-    `- Failed pull requests: ${formatFailedPullRequests(summaryOptions.pullRequestFailures)}`,
-    `- Commits without associated pull requests: ${formatStringList(summaryOptions.commitsWithoutPullRequests)}`,
+    ...formatExecutionMetrics(summaryOptions),
     ...formatFailureSection(summaryOptions),
   ].join('\n');
 }
@@ -1161,27 +1151,26 @@ function createWriteSummary(summaryOptions: SummaryOptions): string {
 function formatPlannedCommentOperations(
   plannedCommentOperations: readonly PlannedCommentOperation[],
 ): readonly string[] {
-  if (plannedCommentOperations.length === 0) {
-    return ['No pull request comment operations were planned.'];
+  const plannedChangeLines: string[] = [];
+  for (const plannedCommentOperation of plannedCommentOperations) {
+    if (plannedCommentOperation.kind === 'unchanged') {
+      continue;
+    }
+
+    const operationDescription = plannedCommentOperation.kind === 'create' ? 'would create' : 'would update';
+    plannedChangeLines.push(`- #${plannedCommentOperation.pullRequestNumber}: ${operationDescription}`);
   }
 
-  return plannedCommentOperations.map(plannedCommentOperation => {
-    const operationDescription = match(plannedCommentOperation.kind)
-      .with('create', () => {
-        return 'would create';
-      })
-      .with('update', () => {
-        return 'would update';
-      })
-      .with('unchanged', () => {
-        return 'unchanged';
-      })
-      .exhaustive();
-    return `- #${plannedCommentOperation.pullRequestNumber}: ${operationDescription}`;
-  });
+  return plannedChangeLines;
 }
 
 function createDryRunSummary(summaryOptions: SummaryOptions): string {
+  const plannedCommentOperationLines = formatPlannedCommentOperations(summaryOptions.plannedCommentOperations);
+  const plannedChanges =
+    plannedCommentOperationLines.length === 0
+      ? ['', 'No GitHub comments would be created or updated.']
+      : ['', '### Planned changes', '', ...plannedCommentOperationLines];
+
   return [
     '### Release appearance',
     '',
@@ -1190,23 +1179,11 @@ function createDryRunSummary(summaryOptions: SummaryOptions): string {
     `- Workflow/tooling commit: \`${summaryOptions.workflowToolingCommitSha}\``,
     `- Release tag: \`${summaryOptions.releaseTag}\``,
     `- Release commit: \`${summaryOptions.releaseCommit}\``,
-    `- Bootstrap: ${summaryOptions.bootstrap ? 'yes' : 'no'}`,
+    ...(summaryOptions.bootstrap ? ['- Bootstrap: yes', '- No preceding new-format Production release exists.'] : []),
     `- Preceding Production tag: ${summaryOptions.precedingProductionTag}`,
-    ...formatExecutionMetrics(summaryOptions),
     `- Candidate ranges: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
-    `- Commits inspected: ${summaryOptions.commitsInspected.length} (${formatStringList(summaryOptions.commitsInspected)})`,
-    `- Pull requests discovered: ${summaryOptions.pullRequestsDiscovered.length} (${formatPullRequestList(summaryOptions.pullRequestsDiscovered)})`,
-    `- Comments that would be created: ${summaryOptions.commentsCreated}`,
-    `- Comments that would be updated: ${summaryOptions.commentsUpdated}`,
-    `- Unchanged comments: ${summaryOptions.commentsUnchanged}`,
-    `- Failed pull requests: ${formatFailedPullRequests(summaryOptions.pullRequestFailures)}`,
-    `- Commits without associated pull requests: ${formatStringList(summaryOptions.commitsWithoutPullRequests)}`,
-    '',
-    '### Planned comment operations',
-    '',
-    ...formatPlannedCommentOperations(summaryOptions.plannedCommentOperations),
-    '',
-    'No GitHub comments were created or updated.',
+    ...formatExecutionMetrics(summaryOptions),
+    ...plannedChanges,
     ...formatFailureSection(summaryOptions),
   ].join('\n');
 }

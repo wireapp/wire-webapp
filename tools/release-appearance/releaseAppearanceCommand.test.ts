@@ -46,6 +46,7 @@ import type {
 } from './githubClient.ts';
 import type {HttpRequest} from './httpClient.ts';
 import {createNoOpReleaseAppearanceProgressReporter} from './releaseAppearanceProgress.ts';
+import type {ReleaseAppearanceClock} from './releaseAppearanceProgress.ts';
 import type {ExecuteGitCommand} from './releaseHistory.ts';
 
 const releaseCommit = 'a'.repeat(40);
@@ -97,6 +98,7 @@ type RunCommandOptions = {
   readonly executeGitCommand: ExecuteGitCommand;
   readonly githubClient: GitHubClient;
   readonly informationWriteFailure?: string;
+  readonly now: ReleaseAppearanceClock;
   readonly summaryWriteFailure?: string;
 };
 
@@ -125,6 +127,7 @@ type CreateDependenciesOptions = {
   readonly informationMessages: string[];
   readonly informationWriteAttempts: string[];
   readonly informationWriteFailure?: string;
+  readonly now: ReleaseAppearanceClock;
   readonly summaries: string[];
   readonly summaryWriteFailure?: string;
 };
@@ -152,6 +155,22 @@ function createDeferredValue<valueType>(): DeferredValue<valueType> {
     promise,
     resolve,
   };
+}
+
+function createTimestampSequence(timestampValues: readonly number[]): ReleaseAppearanceClock {
+  let timestampIndex = 0;
+  const finalTimestamp = timestampValues[timestampValues.length - 1] ?? 0;
+
+  return function readNextTimestamp(): number {
+    const timestamp = timestampValues[timestampIndex] ?? finalTimestamp;
+    timestampIndex += 1;
+
+    return timestamp;
+  };
+}
+
+function readZeroTimestamp(): number {
+  return 0;
 }
 
 function createPullRequest(number: number): PullRequestRecord {
@@ -287,6 +306,7 @@ function createDependencies(
     informationMessages,
     informationWriteAttempts,
     informationWriteFailure,
+    now,
     summaries,
     summaryWriteFailure,
   } = createDependenciesOptions;
@@ -294,9 +314,7 @@ function createDependencies(
   return {
     executeGitCommand,
     githubClient,
-    now(): number {
-      return 0;
-    },
+    now,
     progressReporter: createNoOpReleaseAppearanceProgressReporter(),
     async writeFailure(message): Promise<void> {
       failureMessages.push(message);
@@ -340,6 +358,7 @@ async function runCommand(runCommandOptions: RunCommandOptions): Promise<{
       informationMessages,
       informationWriteAttempts,
       informationWriteFailure: runCommandOptions.informationWriteFailure,
+      now: runCommandOptions.now,
       summaries,
       summaryWriteFailure: runCommandOptions.summaryWriteFailure,
     }),
@@ -473,6 +492,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
     const commandPromise = runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand({commits: commitShas}),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -497,7 +517,24 @@ describe('executeReleaseAppearanceCommand', () => {
     expect(maximumActiveLookups).toBeGreaterThan(1);
     expect(maximumActiveLookups).toBeLessThanOrEqual(8);
     expect(fakeGitHubClient.state.pullRequestCommits).toHaveLength(commitShas.length);
-    expect(commandRun.result.summary).toContain(`- Unique commit count: ${commitShas.length}`);
+    expect(commandRun.result.summary).toContain(`- Commits inspected: ${commitShas.length}`);
+    expect(commandRun.result.summary).toContain(`- Commits without associated pull requests: ${commitShas.length}`);
+    expect(commandRun.result.summary).not.toContain(commitShas[0]);
+  });
+
+  it('formats summary durations in milliseconds below one second and seconds otherwise', async () => {
+    const commandRun = await runCommand({
+      commandLineArguments: ['beta', betaTag, releaseCommit],
+      executeGitCommand: createFakeGitCommand(),
+      githubClient: createFakeGitHubClient().githubClient,
+      now: createTimestampSequence([0, 0, 250, 250, 250, 250, 250, 250, 1500, 1500, 1500, 1500, 1500, 6537, 15618]),
+    });
+
+    expect(commandRun.result.exitCode).toBe(0);
+    expect(commandRun.result.summary).toContain('- Release-history planning: 250 ms');
+    expect(commandRun.result.summary).toContain('- Pull-request discovery: 1.3 s (concurrency 8)');
+    expect(commandRun.result.summary).toContain('- Comment processing: 5.0 s (concurrency 4)');
+    expect(commandRun.result.summary).toContain('- Total command duration: 15.6 s');
   });
 
   it('preserves deterministic discovery results when lookups complete out of order', async () => {
@@ -524,6 +561,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
     const commandPromise = runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand({commits: commitShas}),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -547,10 +585,10 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await commandPromise;
     expect(commandRun.result.exitCode).toBe(0);
-    expect(commandRun.result.summary).toContain(`- Commits inspected: 12 (${commitShas.join(', ')})`);
-    expect(commandRun.result.summary).toContain(
-      '- Pull requests discovered: 12 (#1, #2, #3, #4, #5, #6, #7, #8, #9, #10, #11, #12)',
-    );
+    expect(commandRun.result.summary).toContain('- Commits inspected: 12');
+    expect(commandRun.result.summary).not.toContain(commitShas.join(', '));
+    expect(commandRun.result.summary).toContain('- Pull requests discovered: 12');
+    expect(commandRun.result.summary).not.toContain('#1, #2, #3, #4, #5, #6, #7, #8, #9, #10, #11, #12');
   });
 
   it('processes pull-request comments with bounded concurrent operations', async () => {
@@ -577,6 +615,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
     const commandPromise = runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -606,24 +645,26 @@ describe('executeReleaseAppearanceCommand', () => {
 
   it('discovers pull requests and creates Beta appearance comments', async () => {
     const fakeGitHubClient = createFakeGitHubClient({
-      pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(8)]]]),
+      pullRequestsByCommit: new Map([[betaCommit, [createPullRequest(8), createPullRequest(9)]]]),
     });
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
 
     expect(commandRun.result.exitCode).toBe(0);
     expect(fakeGitHubClient.state.pullRequestCommits).toEqual([betaCommit]);
-    expect(fakeGitHubClient.state.createdComments).toHaveLength(1);
+    expect(fakeGitHubClient.state.createdComments).toHaveLength(2);
     const createdComment = Maybe.of(fakeGitHubClient.state.createdComments[0]);
     const summary = Maybe.of(commandRun.summaries[0]);
     assert(createdComment.isJust);
     assert(summary.isJust);
     expect(createdComment.value.commentBody).toMatch(/2026-01-02\.1-beta\.1/);
-    expect(summary.value).toMatch(/Pull requests discovered: 1 \(#8\)/);
+    expect(summary.value).toMatch(/Pull requests discovered: 2/);
+    expect(summary.value).not.toContain('#8, #9');
     expect(commandRun.informationMessages).toEqual([]);
     expect(commandRun.result.summary).toBe(
       [
@@ -633,32 +674,28 @@ describe('executeReleaseAppearanceCommand', () => {
         `- Workflow/tooling commit: \`${commandEnvironment.WORKFLOW_TOOLING_COMMIT_SHA}\``,
         `- Release tag: \`${betaTag}\``,
         `- Release commit: \`${releaseCommit}\``,
-        '- Bootstrap: no',
         `- Preceding Production tag: ${previousProductionTag}`,
-        '- Pull-request discovery concurrency: 8',
-        '- Comment-processing concurrency: 4',
-        '- Release-history planning duration: 0 ms',
-        '- Pull-request discovery duration: 0 ms',
-        '- Comment-processing duration: 0 ms',
-        '- Total command duration: 0 ms',
-        '- Candidate range count: 1',
-        '- Unique commit count: 1',
-        '- Discovered PR count: 1',
-        '- Failure count: 0',
         `- Candidate ranges: ${betaTag}: ${previousProductionTag} -> ${betaTag}`,
-        `- Commits inspected: 1 (${betaCommit})`,
-        '- Pull requests discovered: 1 (#8)',
-        '- Comments created: 1',
+        '',
+        '### Result',
+        '',
+        '- Commits inspected: 1',
+        '- Pull requests discovered: 2',
+        '- Comments created: 2',
         '- Comments updated: 0',
         '- Comments unchanged: 0',
-        '- Failed pull requests: none',
-        '- Commits without associated pull requests: none',
+        '- Commits without associated pull requests: 0',
+        '- Failures: 0',
         '',
-        '### Failures',
+        '### Performance',
         '',
-        'None',
+        '- Release-history planning: 0 ms',
+        '- Pull-request discovery: 0 ms (concurrency 8)',
+        '- Comment processing: 0 ms (concurrency 4)',
+        '- Total command duration: 0 ms',
       ].join('\n'),
     );
+    expect(commandRun.result.summary).not.toContain('### Failures');
   });
 
   it('backfills a missing Beta 1 comment during Beta 2 with the earliest Beta tag', async () => {
@@ -679,6 +716,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTwoTag, betaCommit],
+      now: readZeroTimestamp,
       executeGitCommand: fakeGitCommand,
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -716,6 +754,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTwoTag, betaTwoCommit],
+      now: readZeroTimestamp,
       executeGitCommand: fakeGitCommand,
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -751,6 +790,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTwoTag, betaTwoCommit],
+      now: readZeroTimestamp,
       executeGitCommand: fakeGitCommand,
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -776,6 +816,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['production', productionTag, releaseCommit, betaTag],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -804,6 +845,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['production', productionTag, releaseCommit, betaTag, '--dry-run'],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -818,8 +860,8 @@ describe('executeReleaseAppearanceCommand', () => {
     expect(commandRun.result.summary).toContain('- Unchanged comments: 1');
     expect(commandRun.result.summary).toContain('- #1: would create');
     expect(commandRun.result.summary).toContain('- #2: would update');
-    expect(commandRun.result.summary).toContain('- #3: unchanged');
-    expect(commandRun.result.summary).toContain('No GitHub comments were created or updated.');
+    expect(commandRun.result.summary).not.toContain('- #3: unchanged');
+    expect(commandRun.result.summary).not.toContain('No GitHub comments would be created or updated.');
     expect(commandRun.informationMessages).toEqual([
       [
         'Release appearance dry run',
@@ -847,38 +889,30 @@ describe('executeReleaseAppearanceCommand', () => {
         `- Workflow/tooling commit: \`${commandEnvironment.WORKFLOW_TOOLING_COMMIT_SHA}\``,
         `- Release tag: \`${productionTag}\``,
         `- Release commit: \`${releaseCommit}\``,
-        '- Bootstrap: no',
         `- Preceding Production tag: ${previousProductionTag}`,
-        '- Pull-request discovery concurrency: 8',
-        '- Comment-processing concurrency: 4',
-        '- Release-history planning duration: 0 ms',
-        '- Pull-request discovery duration: 0 ms',
-        '- Comment-processing duration: 0 ms',
-        '- Total command duration: 0 ms',
-        '- Candidate range count: 1',
-        '- Unique commit count: 1',
-        '- Discovered PR count: 3',
-        '- Failure count: 0',
         `- Candidate ranges: ${betaTag}: ${previousProductionTag} -> ${betaTag}`,
-        `- Commits inspected: 1 (${betaCommit})`,
-        '- Pull requests discovered: 3 (#1, #2, #3)',
+        '',
+        '### Result',
+        '',
+        '- Commits inspected: 1',
+        '- Pull requests discovered: 3',
         '- Comments that would be created: 1',
         '- Comments that would be updated: 1',
         '- Unchanged comments: 1',
-        '- Failed pull requests: none',
-        '- Commits without associated pull requests: none',
+        '- Commits without associated pull requests: 0',
+        '- Failures: 0',
         '',
-        '### Planned comment operations',
+        '### Performance',
+        '',
+        '- Release-history planning: 0 ms',
+        '- Pull-request discovery: 0 ms (concurrency 8)',
+        '- Comment processing: 0 ms (concurrency 4)',
+        '- Total command duration: 0 ms',
+        '',
+        '### Planned changes',
         '',
         '- #1: would create',
         '- #2: would update',
-        '- #3: unchanged',
-        '',
-        'No GitHub comments were created or updated.',
-        '',
-        '### Failures',
-        '',
-        'None',
       ].join('\n'),
     );
   });
@@ -915,6 +949,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient,
     });
@@ -961,6 +996,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -990,14 +1026,16 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', 'invalid-beta-tag', releaseCommit, '--dry-run'],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
 
     expect(commandRun.result.exitCode).toBe(1);
     expect(commandRun.result.summary).toContain('- Release history: Invalid Beta candidate tag: invalid-beta-tag');
-    expect(commandRun.result.summary).not.toContain('### Failures\n\nNone');
-    expect(commandRun.result.summary).toContain('- Pull requests discovered: 0 (none)');
+    expect(commandRun.result.summary).toContain('- Pull requests discovered: 0');
+    expect(commandRun.result.summary).toContain('- Failures: 1');
+    expect(commandRun.result.summary).toContain('### Failures');
     expect(commandRun.informationMessages.join('\n')).toContain(
       '- Release history: Invalid Beta candidate tag: invalid-beta-tag',
     );
@@ -1013,6 +1051,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand({commits: [failedDiscoveryCommit, betaCommit]}),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -1020,6 +1059,8 @@ describe('executeReleaseAppearanceCommand', () => {
     expect(commandRun.result.exitCode).toBe(1);
     expect(fakeGitHubClient.state.pullRequestCommits).toEqual([failedDiscoveryCommit, betaCommit]);
     expect(fakeGitHubClient.state.createdComments).toEqual([]);
+    expect(commandRun.result.summary).toContain('- Failures: 1');
+    expect(commandRun.result.summary).toContain('### Failures');
     expect(commandRun.result.summary).toContain('- #2: would create');
     expect(commandRun.result.summary).toContain(`- Discovery: ${discoveryFailureMessage}`);
   });
@@ -1033,6 +1074,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -1044,6 +1086,8 @@ describe('executeReleaseAppearanceCommand', () => {
         return comment.pullRequestNumber;
       }),
     ).toEqual([2]);
+    expect(commandRun.result.summary).toContain('- Failures: 1');
+    expect(commandRun.result.summary).toContain('### Failures');
     expect(commandRun.result.summary).toContain(`- Pull request #1: ${commentListFailureMessage}`);
   });
 
@@ -1067,6 +1111,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -1077,6 +1122,8 @@ describe('executeReleaseAppearanceCommand', () => {
         return comment.pullRequestNumber;
       }),
     ).toEqual([2]);
+    expect(commandRun.result.summary).toContain('- Failures: 1');
+    expect(commandRun.result.summary).toContain('### Failures');
     expect(commandRun.result.summary).toContain(
       '- Pull request #1: More than one release-appearance marker comment exists',
     );
@@ -1091,6 +1138,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -1101,6 +1149,8 @@ describe('executeReleaseAppearanceCommand', () => {
         return comment.pullRequestNumber;
       }),
     ).toEqual([2]);
+    expect(commandRun.result.summary).toContain('- Failures: 1');
+    expect(commandRun.result.summary).toContain('### Failures');
     expect(commandRun.result.summary).toContain(`- Pull request #1: ${createFailureMessage}`);
   });
 
@@ -1114,6 +1164,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -1133,6 +1184,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand({bootstrap: true}),
       githubClient: fakeGitHubClient.githubClient,
       summaryWriteFailure: `Permission denied for ${githubToken.value}`,
@@ -1151,6 +1203,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand({bootstrap: true}),
       githubClient: fakeGitHubClient.githubClient,
     });
@@ -1160,9 +1213,11 @@ describe('executeReleaseAppearanceCommand', () => {
     const summary = Maybe.of(commandRun.summaries[0]);
     assert(summary.isJust);
     expect(summary.value).toMatch(/Bootstrap: yes/);
-    expect(summary.value).toContain('No pull request comment operations were planned.');
-    expect(summary.value).toContain('No GitHub comments were created or updated.');
-    expect(commandRun.result.summary).toContain('### Failures\n\nNone');
+    expect(summary.value).toContain('No preceding new-format Production release exists.');
+    expect(summary.value).toContain('No GitHub comments would be created or updated.');
+    expect(summary.value).not.toContain('### Planned changes');
+    expect(summary.value).not.toContain('### Failures');
+    expect(commandRun.result.summary).not.toContain('Bootstrap: no');
     expect(commandRun.informationMessages).toEqual([
       [
         'Release appearance dry run',
@@ -1185,6 +1240,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
     const commandRun = await runCommand({
       commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
       informationWriteFailure: `Unable to write ${commandEnvironment.GITHUB_TOKEN}`,
