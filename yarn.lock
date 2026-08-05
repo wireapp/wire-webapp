@@ -32629,6 +32629,7 @@ __metadata:
     logdown: "npm:3.3.1"
     long: "npm:5.3.2"
     nock: "npm:14.0.17"
+    noop-esm: "npm:1.1.0"
     nx: "npm:22.7.8"
     p-map: "npm:7.0.3"
     playwright: "npm:1.61.1"
