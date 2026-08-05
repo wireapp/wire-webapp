@@ -6,7 +6,7 @@
     "target": "es2024",
     "lib": ["ES2024"],
     "types": ["node", "jest"],
-    "rootDir": "../..",
+    "rootDir": ".",
     "allowImportingTsExtensions": true,
     "erasableSyntaxOnly": true
   },

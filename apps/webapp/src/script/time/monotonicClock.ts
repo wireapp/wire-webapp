@@ -22,9 +22,7 @@ export type MonotonicClock = {
 };
 
 type MonotonicClockDependencies = {
-  readonly performance: {
-    readonly now: () => number;
-  };
+  readonly performance: Pick<Performance, 'now'>;
 };
 
 export function createMonotonicClock(dependencies: MonotonicClockDependencies): MonotonicClock {

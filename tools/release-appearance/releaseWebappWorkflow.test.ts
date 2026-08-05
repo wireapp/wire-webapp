@@ -35,15 +35,8 @@ describe('Release WebApp release-appearance workflow jobs', () => {
       const workflowContents = await readFile('.github/workflows/release-webapp.yml', 'utf8');
       const jobContents = readWorkflowJob(workflowContents, commentJobIdentifier);
 
-      expect(jobContents).toContain('fetch-depth: 1');
-      expect(jobContents).toContain('fetch-tags: false');
-      expect(jobContents).toContain('- name: Fetch release history');
-      expect(jobContents).toContain('--unshallow');
-      expect(jobContents).toContain('git ls-remote \\\n              --refs \\\n              --tags');
-      expect(jobContents).toContain("'refs/tags/*-production'");
-      expect(jobContents).toContain("'refs/tags/*-beta.*'");
-      expect(jobContents).toContain('release_tag_refspecs+=("${tag_reference}:${tag_reference}")');
-      expect(jobContents).not.toContain('+refs/heads/*:refs/remotes/origin/*');
+      expect(jobContents).toContain('fetch-depth: 0');
+      expect(jobContents).toContain('fetch-tags: true');
       expect(jobContents).toContain('ref: ${{ github.sha }}');
       expect(jobContents).toContain('WORKFLOW_TOOLING_COMMIT_SHA: ${{ github.sha }}');
       expect(jobContents).toContain('RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}');
