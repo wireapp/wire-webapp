@@ -30,6 +30,9 @@ export type ReleaseBranchName = NonEmptyString<`release/${ReleaseIdentifier}`>;
 export type BetaTagName = NonEmptyString<`${ReleaseIdentifier}-beta.${number}`>;
 export type ProductionTagName = NonEmptyString<`${ReleaseIdentifier}-production`>;
 export type ReleaseTagName = BetaTagName | ProductionTagName;
+export type MaintenanceLineKey = NonEmptyString<`${ReleaseIdentifier}-${string}`>;
+export type MaintenanceBranchName = NonEmptyString<`maintenance/${MaintenanceLineKey}`>;
+export type MaintenanceTagName = NonEmptyString<`${MaintenanceLineKey}-maintenance.${number}`>;
 export type CommitHash = string & {readonly [commitHashBrand]: 'CommitHash'};
 export type WebappBuildChannel = 'main' | 'development' | 'production';
 
@@ -44,11 +47,28 @@ export type ProductionTagPointsToCommitParameters = {
   readonly releaseTagMetadata: readonly ReleaseTagMetadata[];
 };
 
+export type MaintenanceTagMetadata = {
+  readonly commitHash: CommitHash;
+  readonly tagName: MaintenanceTagName;
+};
+
+export type MaintenanceTagNameMetadata = {
+  readonly lineKey: MaintenanceLineKey;
+  readonly sequence: number;
+};
+
 const releaseDatePattern = String.raw`\d{4}-\d{2}-\d{2}`;
 const releaseIdentifierPattern = String.raw`${releaseDatePattern}\.[1-9]\d*`;
 const releaseBranchNamePattern = new RegExp(`^release/(${releaseIdentifierPattern})$`);
 const productionTagNamePattern = new RegExp(`^(${releaseIdentifierPattern})-production$`);
 const legacyProductionTagNamePattern = new RegExp(String.raw`^${releaseDatePattern}-production\.\d+$`);
+const maintenanceLineKeyPattern = new RegExp(String.raw`^(${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*)$`);
+const maintenanceBranchNamePattern = new RegExp(
+  String.raw`^maintenance/(${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*)$`,
+);
+const maintenanceTagNamePattern = new RegExp(
+  String.raw`^(${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*)-maintenance\.([1-9]\d*)$`,
+);
 
 function isWebappBuildChannel(value: string): value is WebappBuildChannel {
   return value === 'main' || value === 'development' || value === 'production';
@@ -110,6 +130,162 @@ export function validateProductionTagName(productionTagName: string): Result<Pro
   }
 
   return Result.ok(productionTagName as ProductionTagName);
+}
+
+export function validateMaintenanceLineKey(maintenanceLineKey: string): Result<MaintenanceLineKey, Error> {
+  if (!maintenanceLineKeyPattern.test(maintenanceLineKey)) {
+    return Result.err(new Error(`Invalid maintenance line key: ${maintenanceLineKey}`));
+  }
+
+  return Result.ok(maintenanceLineKey as MaintenanceLineKey);
+}
+
+export function createMaintenanceBranchName(maintenanceLineKey: string): Result<MaintenanceBranchName, Error> {
+  const maintenanceLineKeyResult = validateMaintenanceLineKey(maintenanceLineKey);
+
+  if (maintenanceLineKeyResult.isErr) {
+    return Result.err(maintenanceLineKeyResult.error);
+  }
+
+  return Result.ok(`maintenance/${maintenanceLineKeyResult.value}` as MaintenanceBranchName);
+}
+
+export function isMaintenanceBranchName(branchName: string): boolean {
+  return maintenanceBranchNamePattern.test(branchName);
+}
+
+export function validateMaintenanceBranchName(branchName: string): Result<MaintenanceBranchName, Error> {
+  if (!isMaintenanceBranchName(branchName)) {
+    return Result.err(new Error(`Invalid maintenance branch name: ${branchName}`));
+  }
+
+  return Result.ok(branchName as MaintenanceBranchName);
+}
+
+export function extractMaintenanceLineKeyFromBranchName(branchName: string): Result<MaintenanceLineKey, Error> {
+  const branchNameMatch = maintenanceBranchNamePattern.exec(branchName);
+
+  if (branchNameMatch === null) {
+    return Result.err(new Error(`Invalid maintenance branch name: ${branchName}`));
+  }
+
+  return Result.ok(branchNameMatch[1] as MaintenanceLineKey);
+}
+
+export function validateMaintenanceTagName(maintenanceTagName: string): Result<MaintenanceTagName, Error> {
+  if (!maintenanceTagNamePattern.test(maintenanceTagName)) {
+    return Result.err(new Error(`Invalid maintenance tag name: ${maintenanceTagName}`));
+  }
+
+  return Result.ok(maintenanceTagName as MaintenanceTagName);
+}
+
+export function extractMaintenanceTagNameMetadata(
+  maintenanceTagName: string,
+): Result<MaintenanceTagNameMetadata, Error> {
+  const maintenanceTagNameMatch = maintenanceTagNamePattern.exec(maintenanceTagName);
+
+  if (maintenanceTagNameMatch === null) {
+    return Result.err(new Error(`Invalid maintenance tag name: ${maintenanceTagName}`));
+  }
+
+  const sequence = Number(maintenanceTagNameMatch[2]);
+
+  if (!Number.isSafeInteger(sequence)) {
+    return Result.err(new Error(`Maintenance tag sequence is too large: ${maintenanceTagName}`));
+  }
+
+  return Result.ok({lineKey: maintenanceTagNameMatch[1] as MaintenanceLineKey, sequence});
+}
+
+export function createNextMaintenanceTagName(
+  maintenanceLineKey: string,
+  existingTagNames: readonly string[],
+): Result<MaintenanceTagName, Error> {
+  const maintenanceLineKeyResult = validateMaintenanceLineKey(maintenanceLineKey);
+
+  if (maintenanceLineKeyResult.isErr) {
+    return Result.err(maintenanceLineKeyResult.error);
+  }
+
+  const escapedMaintenanceLineKey = escapeRegularExpression(maintenanceLineKeyResult.value);
+  const existingMaintenanceTagPattern = new RegExp(`^${escapedMaintenanceLineKey}-maintenance\\.([1-9]\\d*)$`);
+  const existingMaintenanceTagSequences = existingTagNames.flatMap(existingTagName => {
+    const existingTagNameMatch = existingMaintenanceTagPattern.exec(existingTagName);
+
+    if (existingTagNameMatch === null) {
+      return [];
+    }
+
+    const sequence = Number(existingTagNameMatch[1]);
+
+    return Number.isSafeInteger(sequence) ? [sequence] : [];
+  });
+  const latestMaintenanceTagSequence =
+    existingMaintenanceTagSequences.length > 0 ? Math.max(...existingMaintenanceTagSequences) : 0;
+  const nextMaintenanceTagSequence = latestMaintenanceTagSequence + 1;
+
+  return Result.ok(`${maintenanceLineKeyResult.value}-maintenance.${nextMaintenanceTagSequence}` as MaintenanceTagName);
+}
+
+export type MaintenanceTagPointsToCommitParameters = {
+  readonly currentCommitHash: CommitHash;
+  readonly maintenanceLineKey: string;
+  readonly maintenanceTagMetadata: readonly MaintenanceTagMetadata[];
+};
+
+export function maintenanceTagPointsToCommit(
+  parameters: MaintenanceTagPointsToCommitParameters,
+): Result<boolean, Error> {
+  const maintenanceLineKeyResult = validateMaintenanceLineKey(parameters.maintenanceLineKey);
+
+  if (maintenanceLineKeyResult.isErr) {
+    return Result.err(maintenanceLineKeyResult.error);
+  }
+
+  return Result.ok(
+    parameters.maintenanceTagMetadata.some(tagMetadata => {
+      const tagMetadataResult = extractMaintenanceTagNameMetadata(tagMetadata.tagName);
+
+      return (
+        tagMetadataResult.isOk &&
+        tagMetadataResult.value.lineKey === maintenanceLineKeyResult.value &&
+        tagMetadata.commitHash === parameters.currentCommitHash
+      );
+    }),
+  );
+}
+
+export function validateMaintenanceSourceProductionTag(
+  maintenanceLineKey: string,
+  sourceProductionTag: string,
+): Result<ReleaseIdentifier, Error> {
+  const maintenanceLineKeyResult = validateMaintenanceLineKey(maintenanceLineKey);
+
+  if (maintenanceLineKeyResult.isErr) {
+    return Result.err(maintenanceLineKeyResult.error);
+  }
+
+  const sourceProductionTagResult = validateProductionTagName(sourceProductionTag);
+
+  if (sourceProductionTagResult.isErr) {
+    return Result.err(sourceProductionTagResult.error);
+  }
+
+  const maintenanceReleaseIdentifier = maintenanceLineKeyResult.value.match(
+    new RegExp(`^(${releaseIdentifierPattern})-`),
+  )?.[1] as ReleaseIdentifier | undefined;
+  const sourceReleaseIdentifier = sourceProductionTagResult.value.replace(/-production$/u, '') as ReleaseIdentifier;
+
+  if (maintenanceReleaseIdentifier !== sourceReleaseIdentifier) {
+    return Result.err(
+      new Error(
+        `Maintenance line key ${maintenanceLineKeyResult.value} does not belong to source Production tag ${sourceProductionTagResult.value}`,
+      ),
+    );
+  }
+
+  return Result.ok(sourceReleaseIdentifier);
 }
 
 export function resolveWebappBuildVersion(

@@ -20,17 +20,27 @@
 import assert from 'node:assert';
 
 import {
+  createMaintenanceBranchName,
   createNextBetaTagName,
+  createNextMaintenanceTagName,
   createProductionTagName,
   createReleaseBranchName,
+  extractMaintenanceLineKeyFromBranchName,
+  extractMaintenanceTagNameMetadata,
   extractReleaseIdentifierFromBranchName,
+  isMaintenanceBranchName,
   isReleaseBranchName,
+  maintenanceTagPointsToCommit,
   productionTagExists,
   productionTagPointsToCommit,
   resolveWebappBuildVersion,
+  validateMaintenanceBranchName,
+  validateMaintenanceLineKey,
+  validateMaintenanceSourceProductionTag,
+  validateMaintenanceTagName,
   validateProductionTagName,
 } from './releaseMetadata';
-import type {CommitHash, ReleaseTagMetadata} from './releaseMetadata';
+import type {CommitHash, MaintenanceTagMetadata, ReleaseTagMetadata} from './releaseMetadata';
 
 function createCommitHash(commitHash: string): CommitHash {
   return commitHash as CommitHash;
@@ -349,5 +359,201 @@ describe('releaseMetadata', () => {
     assert(actualProductionTagPointsToCommit.isOk === true);
 
     expect(actualProductionTagPointsToCommit.value).toBe(false);
+  });
+
+  it.each(['2026-07-27.1-airgap-a', '2026-07-27.10-customer-managed'])(
+    'validateMaintenanceLineKey() accepts a valid public maintenance line key "%s"',
+    maintenanceLineKey => {
+      const actualMaintenanceLineKey = validateMaintenanceLineKey(maintenanceLineKey);
+
+      assert(actualMaintenanceLineKey.isOk === true);
+
+      expect(actualMaintenanceLineKey.value).toBe(maintenanceLineKey);
+    },
+  );
+
+  it.each([
+    '2026-07-27.0-airgap-a',
+    '2026-07-27-airgap-a',
+    '2026-07-27.1',
+    '2026-07-27.1-Airgap-a',
+    '2026-07-27.1-airgap/a',
+    '2026-07-27.1-airgap.a',
+    '2026-07-27.1-airgap--a',
+    '2026-07-27.1--airgap',
+    '2026-07-27.1-airgap-',
+    '2026-07-27.1-air gap',
+    '2026-07-27.1-customer_name',
+  ])('validateMaintenanceLineKey() rejects unsafe or malformed line key "%s"', invalidMaintenanceLineKey => {
+    const actualMaintenanceLineKey = validateMaintenanceLineKey(invalidMaintenanceLineKey);
+
+    assert(actualMaintenanceLineKey.isErr === true);
+
+    expect(actualMaintenanceLineKey.error.message).toBe(`Invalid maintenance line key: ${invalidMaintenanceLineKey}`);
+  });
+
+  it('createMaintenanceBranchName() creates a maintenance branch from a valid line key', () => {
+    const actualMaintenanceBranchName = createMaintenanceBranchName('2026-07-27.1-airgap-a');
+
+    assert(actualMaintenanceBranchName.isOk === true);
+
+    expect(actualMaintenanceBranchName.value).toBe('maintenance/2026-07-27.1-airgap-a');
+  });
+
+  it.each([
+    'maintenance/2026-07-27.0-airgap-a',
+    'maintenance/2026-07-27.1',
+    'maintenance/2026-07-27.1-airgap/a',
+    'release/2026-07-27.1-airgap-a',
+  ])('maintenance branch helpers reject invalid branch name "%s"', invalidMaintenanceBranchName => {
+    const actualIsMaintenanceBranchName = isMaintenanceBranchName(invalidMaintenanceBranchName);
+    const actualMaintenanceBranchName = validateMaintenanceBranchName(invalidMaintenanceBranchName);
+    const actualLineKey = extractMaintenanceLineKeyFromBranchName(invalidMaintenanceBranchName);
+
+    expect(actualIsMaintenanceBranchName).toBe(false);
+    expect(actualMaintenanceBranchName.isErr).toBe(true);
+    expect(actualLineKey.isErr).toBe(true);
+  });
+
+  it('maintenance branch helpers validate and extract a maintenance line key', () => {
+    const maintenanceBranchName = 'maintenance/2026-07-27.1-airgap-a';
+    const actualMaintenanceBranchName = validateMaintenanceBranchName(maintenanceBranchName);
+    const actualLineKey = extractMaintenanceLineKeyFromBranchName(maintenanceBranchName);
+
+    assert(actualMaintenanceBranchName.isOk === true);
+    assert(actualLineKey.isOk === true);
+
+    expect(actualMaintenanceBranchName.value).toBe(maintenanceBranchName);
+    expect(actualLineKey.value).toBe('2026-07-27.1-airgap-a');
+  });
+
+  it('validateMaintenanceTagName() accepts a valid maintenance tag', () => {
+    const maintenanceTagName = '2026-07-27.1-airgap-a-maintenance.1';
+
+    const actualMaintenanceTagName = validateMaintenanceTagName(maintenanceTagName);
+
+    assert(actualMaintenanceTagName.isOk === true);
+
+    expect(actualMaintenanceTagName.value).toBe(maintenanceTagName);
+  });
+
+  it.each([
+    '2026-07-27.0-airgap-a-maintenance.1',
+    '2026-07-27.1-airgap-a-maintenance.0',
+    '2026-07-27.1-airgap-a-maintenance.1-extra',
+    '2026-07-27.1-airgap/a-maintenance.1',
+    '2026-07-27.1-airgap-a-maintenance.01',
+  ])('validateMaintenanceTagName() rejects malformed maintenance tag "%s"', invalidMaintenanceTagName => {
+    const actualMaintenanceTagName = validateMaintenanceTagName(invalidMaintenanceTagName);
+
+    assert(actualMaintenanceTagName.isErr === true);
+
+    expect(actualMaintenanceTagName.error.message).toBe(`Invalid maintenance tag name: ${invalidMaintenanceTagName}`);
+  });
+
+  it('extractMaintenanceTagNameMetadata() extracts the line key and sequence', () => {
+    const actualMaintenanceTagMetadata = extractMaintenanceTagNameMetadata('2026-07-27.1-airgap-a-maintenance.12');
+
+    assert(actualMaintenanceTagMetadata.isOk === true);
+
+    expect(actualMaintenanceTagMetadata.value).toEqual({lineKey: '2026-07-27.1-airgap-a', sequence: 12});
+  });
+
+  it('createNextMaintenanceTagName() starts at maintenance.1 for an empty tag history', () => {
+    const actualNextMaintenanceTagName = createNextMaintenanceTagName('2026-07-27.1-airgap-a', []);
+
+    assert(actualNextMaintenanceTagName.isOk === true);
+
+    expect(actualNextMaintenanceTagName.value).toBe('2026-07-27.1-airgap-a-maintenance.1');
+  });
+
+  it('createNextMaintenanceTagName() ignores unrelated tags and orders numeric sequences beyond maintenance.9', () => {
+    const actualNextMaintenanceTagName = createNextMaintenanceTagName('2026-07-27.1-airgap-a', [
+      '2026-07-27.1-airgap-b-maintenance.99',
+      '2026-07-27.1-airgap-a-maintenance.9',
+      '2026-07-27.1-airgap-a-maintenance.10',
+      '2026-07-27.1-airgap-a-production',
+      'unrelated-tag',
+    ]);
+
+    assert(actualNextMaintenanceTagName.isOk === true);
+
+    expect(actualNextMaintenanceTagName.value).toBe('2026-07-27.1-airgap-a-maintenance.11');
+  });
+
+  it('maintenanceTagPointsToCommit() detects a matching maintenance tag and ignores other lines', () => {
+    const currentCommitHash = createCommitHash('1234567890abcdef');
+    const maintenanceTagMetadata: MaintenanceTagMetadata[] = [
+      {
+        tagName: '2026-07-27.1-airgap-b-maintenance.1',
+        commitHash: currentCommitHash,
+      },
+      {
+        tagName: '2026-07-27.1-airgap-a-maintenance.1',
+        commitHash: currentCommitHash,
+      },
+    ];
+
+    const actualTagPointsToCommit = maintenanceTagPointsToCommit({
+      currentCommitHash,
+      maintenanceLineKey: '2026-07-27.1-airgap-a',
+      maintenanceTagMetadata,
+    });
+
+    assert(actualTagPointsToCommit.isOk === true);
+
+    expect(actualTagPointsToCommit.value).toBe(true);
+  });
+
+  it('maintenanceTagPointsToCommit() distinguishes a tag pointing to another commit', () => {
+    const actualTagPointsToCommit = maintenanceTagPointsToCommit({
+      currentCommitHash: createCommitHash('1234567890abcdef'),
+      maintenanceLineKey: '2026-07-27.1-airgap-a',
+      maintenanceTagMetadata: [
+        {
+          tagName: '2026-07-27.1-airgap-a-maintenance.1',
+          commitHash: createCommitHash('fedcba0987654321'),
+        },
+      ],
+    });
+
+    assert(actualTagPointsToCommit.isOk === true);
+
+    expect(actualTagPointsToCommit.value).toBe(false);
+  });
+
+  it('validateMaintenanceSourceProductionTag() accepts a matching ADR Production tag', () => {
+    const actualReleaseIdentifier = validateMaintenanceSourceProductionTag(
+      '2026-07-27.1-airgap-a',
+      '2026-07-27.1-production',
+    );
+
+    assert(actualReleaseIdentifier.isOk === true);
+
+    expect(actualReleaseIdentifier.value).toBe('2026-07-27.1');
+  });
+
+  it('validateMaintenanceSourceProductionTag() rejects a mismatched source Production release', () => {
+    const actualReleaseIdentifier = validateMaintenanceSourceProductionTag(
+      '2026-07-27.1-airgap-a',
+      '2026-07-28.1-production',
+    );
+
+    assert(actualReleaseIdentifier.isErr === true);
+
+    expect(actualReleaseIdentifier.error.message).toBe(
+      'Maintenance line key 2026-07-27.1-airgap-a does not belong to source Production tag 2026-07-28.1-production',
+    );
+  });
+
+  it('validateMaintenanceSourceProductionTag() rejects a legacy Production tag', () => {
+    const actualReleaseIdentifier = validateMaintenanceSourceProductionTag(
+      '2026-07-27.1-airgap-a',
+      '2026-07-27-production.1',
+    );
+
+    assert(actualReleaseIdentifier.isErr === true);
+
+    expect(actualReleaseIdentifier.error.message).toBe('Invalid production tag name: 2026-07-27-production.1');
   });
 });
