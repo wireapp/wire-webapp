@@ -204,6 +204,15 @@ describe('useConversationSearchFiles', () => {
     );
   });
 
+  it('requests deleted nodes when searching inside a nested recycle-bin path', async () => {
+    window.location.hash = `#/conversation/${CONV_ID}/${DOMAIN}/files/recycle_bin/folder`;
+    const cellsRepository = createFakeCellsRepository();
+    const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.searchNodes).toHaveBeenCalledWith(expect.objectContaining({deleted: true}));
+  });
+
   it('clears the previous browse rows as soon as search opens', async () => {
     const search = createDeferred<RestNodeCollection>();
     const cellsRepository = {searchNodes: jest.fn().mockReturnValue(search.promise)} as FakeCellsRepository;

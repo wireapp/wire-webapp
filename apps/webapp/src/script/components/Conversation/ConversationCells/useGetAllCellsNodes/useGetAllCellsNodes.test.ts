@@ -192,4 +192,13 @@ describe('useGetAllCellsNodes', () => {
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('new-file.txt');
   });
+
+  it('requests deleted nodes inside a nested recycle-bin path', async () => {
+    window.location.hash = `#/conversation/${CONV_ID}/${DOMAIN}/files/recycle_bin/folder`;
+    const cellsRepository = createFakeCellsRepository();
+    const {fireAndForgetInvoker} = renderGetAllNodesHook({cellsRepository});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.getAllNodes).toHaveBeenCalledWith(expect.objectContaining({deleted: true}));
+  });
 });

@@ -30,8 +30,7 @@ import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
 
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
-import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
-import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
+import {isInRecycleBin} from '../common/recycleBin/recycleBin';
 import {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {createRequestVersionGate} from '../useConversationSearch/requestVersionGate';
@@ -103,7 +102,7 @@ export const useGetAllCellsNodes = ({
         path: getCellsApiPath({conversationQualifiedId: {domain, id}}),
         limit: pageSize,
         offset,
-        deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
+        deleted: isInRecycleBin(),
         sortBy: sort?.field,
         sortDirection: sort?.direction,
       });

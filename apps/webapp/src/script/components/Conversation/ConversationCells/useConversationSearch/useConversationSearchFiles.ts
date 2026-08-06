@@ -36,9 +36,8 @@ import {
   toConversationDriveSearchParams,
 } from '../common/driveFilters/driveFilters';
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
-import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {LOAD_MORE_INCREMENT, LOAD_MORE_INITIAL_SIZE} from '../common/loadMorePagination/loadMorePagination';
-import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
+import {isInRecycleBin} from '../common/recycleBin/recycleBin';
 import {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
@@ -130,7 +129,7 @@ export const useConversationSearchFiles = ({
         // matches the browse view: folders first, then files.
         const hasQuery = query.length > 0;
         const hasFilters = hasActiveSearchParams(searchParams);
-        const isRecycleBin = getCellsFilesPath() === RECYCLE_BIN_PATH;
+        const deleted = isInRecycleBin();
         const isSearchingOrFiltering = hasQuery || hasFilters;
 
         // search scopes to the folder the user is browsing
@@ -146,7 +145,7 @@ export const useConversationSearchFiles = ({
           // the empty view (no query, no filters) sends no sort to preserve browse/folders-first order.
           sortBy: sort?.field ?? (isSearchingOrFiltering ? 'mtime' : undefined),
           sortDirection: sort?.direction ?? (isSearchingOrFiltering ? 'desc' : undefined),
-          deleted: isRecycleBin,
+          deleted,
           ...searchParams,
         });
 
