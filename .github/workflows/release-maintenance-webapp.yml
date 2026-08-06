@@ -1,0 +1,694 @@
+name: Release Maintenance WebApp
+
+on:
+  workflow_dispatch:
+    inputs:
+      maintenance_line_key:
+        description: 'Maintenance line key, for example 2026-07-27.1-airgap-a. This becomes public Git metadata and must not contain customer-identifying or sensitive information.'
+        required: true
+        type: string
+      source_production_tag:
+        description: 'Annotated Production tag from which the maintenance line starts, for example 2026-07-27.1-production'
+        required: true
+        type: string
+      confirm_maintenance_release:
+        description: 'I understand that this creates or reuses a maintenance branch and, when a maintenance fix exists, builds, validates, and tags its artifact without touching hosted Beta or Production.'
+        required: true
+        default: false
+        type: boolean
+      reason:
+        description: 'Required non-sensitive reason. Included in public Git tag metadata and the workflow summary.'
+        required: true
+        type: string
+
+concurrency:
+  group: release-maintenance-${{ inputs.maintenance_line_key }}
+  cancel-in-progress: false
+  queue: max
+
+permissions: {}
+
+env:
+  AWS_REGION: eu-central-1
+  ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
+
+jobs:
+  validate_request:
+    name: Validate maintenance request
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      maintenance_line_key: ${{ steps.validate_request.outputs.maintenance_line_key }}
+      maintenance_branch: ${{ steps.validate_request.outputs.maintenance_branch }}
+      source_production_tag: ${{ steps.validate_request.outputs.source_production_tag }}
+
+    steps:
+      - name: Checkout main workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.sha }}
+
+      - name: Validate workflow ref
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]; then
+            echo 'Release Maintenance WebApp must be started with "Use workflow from: main".' >&2
+            echo "Received workflow ref: ${GITHUB_REF}" >&2
+            exit 1
+          fi
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Validate maintenance request
+        id: validate_request
+        env:
+          CONFIRM_MAINTENANCE_RELEASE: ${{ inputs.confirm_maintenance_release }}
+          MAINTENANCE_LINE_KEY: ${{ inputs.maintenance_line_key }}
+          REASON: ${{ inputs.reason }}
+          SOURCE_PRODUCTION_TAG: ${{ inputs.source_production_tag }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${CONFIRM_MAINTENANCE_RELEASE}" != 'true' ]]; then
+            echo 'confirm_maintenance_release must be true to start a WebApp maintenance release.' >&2
+            exit 1
+          fi
+
+          if [[ -z "${REASON//[[:space:]]/}" ]]; then
+            echo 'reason must contain non-whitespace text.' >&2
+            exit 1
+          fi
+
+          maintenance_branch="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts maintenance-branch "${MAINTENANCE_LINE_KEY}")"
+          source_production_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-source "${MAINTENANCE_LINE_KEY}" "${SOURCE_PRODUCTION_TAG}")"
+
+          {
+            echo "maintenance_line_key=${MAINTENANCE_LINE_KEY}"
+            echo "maintenance_branch=${maintenance_branch}"
+            echo "source_production_tag=${source_production_tag}"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Maintenance line key: ${MAINTENANCE_LINE_KEY}"
+          echo "Maintenance branch: ${maintenance_branch}"
+          echo "Source Production tag: ${source_production_tag}"
+
+  prepare_maintenance_branch:
+    name: Prepare maintenance branch
+    runs-on: ubuntu-24.04
+    needs: validate_request
+    permissions:
+      contents: write
+    outputs:
+      maintenance_line_key: ${{ steps.prepare_maintenance_branch.outputs.maintenance_line_key }}
+      maintenance_branch: ${{ steps.prepare_maintenance_branch.outputs.maintenance_branch }}
+      maintenance_branch_action: ${{ steps.prepare_maintenance_branch.outputs.maintenance_branch_action }}
+      source_production_tag: ${{ steps.prepare_maintenance_branch.outputs.source_production_tag }}
+      source_commit_sha: ${{ steps.prepare_maintenance_branch.outputs.source_commit_sha }}
+      maintenance_commit_sha: ${{ steps.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+
+    steps:
+      - name: Checkout main workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Validate Production tag format
+        env:
+          SOURCE_PRODUCTION_TAG: ${{ needs.validate_request.outputs.source_production_tag }}
+        run: |
+          set -euo pipefail
+
+          validated_source_production_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-production-tag "${SOURCE_PRODUCTION_TAG}")"
+
+          if [[ "${validated_source_production_tag}" != "${SOURCE_PRODUCTION_TAG}" ]]; then
+            echo "Validated source Production tag does not match the requested tag: ${SOURCE_PRODUCTION_TAG}" >&2
+            exit 1
+          fi
+
+      - name: Fetch and verify source Production tag
+        id: source_tag
+        env:
+          SOURCE_PRODUCTION_TAG: ${{ needs.validate_request.outputs.source_production_tag }}
+        run: |
+          set -euo pipefail
+
+          if ! git fetch --no-tags origin "refs/tags/${SOURCE_PRODUCTION_TAG}:refs/tags/${SOURCE_PRODUCTION_TAG}"; then
+            echo "Unable to fetch source Production tag: ${SOURCE_PRODUCTION_TAG}" >&2
+            exit 1
+          fi
+
+          if ! git rev-parse --verify "refs/tags/${SOURCE_PRODUCTION_TAG}^{tag}" > /dev/null; then
+            echo "Source Production tag is missing or is not an annotated tag: ${SOURCE_PRODUCTION_TAG}" >&2
+            exit 1
+          fi
+
+          source_commit_sha="$(git rev-parse --verify "refs/tags/${SOURCE_PRODUCTION_TAG}^{commit}")"
+
+          if [[ -z "${source_commit_sha}" ]]; then
+            echo "Source Production tag has no resolvable peeled commit: ${SOURCE_PRODUCTION_TAG}" >&2
+            exit 1
+          fi
+
+          echo "source_commit_sha=${source_commit_sha}" >> "$GITHUB_OUTPUT"
+          echo "Source Production tag: ${SOURCE_PRODUCTION_TAG}"
+          echo "Source Production commit: ${source_commit_sha}"
+
+      - name: Prepare maintenance branch
+        id: prepare_maintenance_branch
+        env:
+          MAINTENANCE_BRANCH: ${{ needs.validate_request.outputs.maintenance_branch }}
+          MAINTENANCE_LINE_KEY: ${{ needs.validate_request.outputs.maintenance_line_key }}
+          SOURCE_COMMIT_SHA: ${{ steps.source_tag.outputs.source_commit_sha }}
+          SOURCE_PRODUCTION_TAG: ${{ needs.validate_request.outputs.source_production_tag }}
+        run: |
+          set -euo pipefail
+
+          maintenance_branch_remote_ref="refs/remotes/origin/${MAINTENANCE_BRANCH}"
+          maintenance_branch_was_created='false'
+
+          if git ls-remote --exit-code --heads origin "${MAINTENANCE_BRANCH}" > /dev/null; then
+            :
+          else
+            branch_lookup_exit_code="$?"
+
+            if [[ "${branch_lookup_exit_code}" -ne 2 ]]; then
+              echo "Unable to check whether maintenance branch exists on origin: ${MAINTENANCE_BRANCH}" >&2
+              exit "${branch_lookup_exit_code}"
+            fi
+
+            if git push origin "${SOURCE_COMMIT_SHA}:refs/heads/${MAINTENANCE_BRANCH}"; then
+              maintenance_branch_was_created='true'
+            else
+              push_exit_code="$?"
+
+              if ! git ls-remote --exit-code --heads origin "${MAINTENANCE_BRANCH}" > /dev/null; then
+                echo "Unable to resolve the maintenance branch after an unsuccessful push: ${MAINTENANCE_BRANCH}" >&2
+                exit "${push_exit_code}"
+              fi
+
+            fi
+          fi
+
+          git fetch --no-tags origin "+refs/heads/${MAINTENANCE_BRANCH}:${maintenance_branch_remote_ref}"
+          maintenance_commit_sha="$(git rev-parse --verify "${maintenance_branch_remote_ref}^{commit}")"
+
+          if [[ "${maintenance_branch_was_created}" == 'true' ]]; then
+            maintenance_branch_action='created'
+
+            if [[ "${maintenance_commit_sha}" != "${SOURCE_COMMIT_SHA}" ]]; then
+              echo "Created maintenance branch ${MAINTENANCE_BRANCH} resolved to ${maintenance_commit_sha}, expected source Production commit ${SOURCE_COMMIT_SHA}." >&2
+              exit 1
+            fi
+          else
+            if ! git merge-base --is-ancestor "${SOURCE_COMMIT_SHA}" "${maintenance_commit_sha}"; then
+              echo "Existing maintenance branch ${MAINTENANCE_BRANCH} is unrelated to source Production commit ${SOURCE_COMMIT_SHA}." >&2
+              exit 1
+            fi
+
+            if [[ "${maintenance_commit_sha}" == "${SOURCE_COMMIT_SHA}" ]]; then
+              maintenance_branch_action='awaiting-fix'
+            else
+              maintenance_branch_action='reused'
+            fi
+          fi
+
+          {
+            echo "maintenance_line_key=${MAINTENANCE_LINE_KEY}"
+            echo "maintenance_branch=${MAINTENANCE_BRANCH}"
+            echo "maintenance_branch_action=${maintenance_branch_action}"
+            echo "source_production_tag=${SOURCE_PRODUCTION_TAG}"
+            echo "source_commit_sha=${SOURCE_COMMIT_SHA}"
+            echo "maintenance_commit_sha=${maintenance_commit_sha}"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Maintenance line key: ${MAINTENANCE_LINE_KEY}"
+          echo "Maintenance branch: ${MAINTENANCE_BRANCH}"
+          echo "Branch action: ${maintenance_branch_action}"
+          echo "Source Production tag: ${SOURCE_PRODUCTION_TAG}"
+          echo "Source Production commit: ${SOURCE_COMMIT_SHA}"
+          echo "Maintenance commit: ${maintenance_commit_sha}"
+
+  select_maintenance_tag:
+    name: Select maintenance tag
+    runs-on: ubuntu-24.04
+    needs: [validate_request, prepare_maintenance_branch]
+    if: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch_action == 'reused' }}
+    permissions:
+      contents: read
+    outputs:
+      candidate_tag: ${{ steps.select_maintenance_tag.outputs.candidate_tag }}
+
+    steps:
+      - name: Checkout main workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Select next maintenance tag
+        id: select_maintenance_tag
+        env:
+          MAINTENANCE_LINE_KEY: ${{ needs.validate_request.outputs.maintenance_line_key }}
+          MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          mapfile -t remote_tag_names < <(
+            git ls-remote --tags --refs origin "refs/tags/${MAINTENANCE_LINE_KEY}-maintenance.*" |
+              awk '{sub("refs/tags/", "", $2); print $2}'
+          )
+          valid_tag_names=()
+
+          for remote_tag_name in "${remote_tag_names[@]}"; do
+            validated_tag_name="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-tag "${remote_tag_name}" 2> /dev/null)" || continue
+            valid_tag_names+=("${validated_tag_name}")
+
+            git fetch --no-tags origin "refs/tags/${validated_tag_name}:refs/tags/${validated_tag_name}"
+            tag_commit_sha="$(git rev-parse --verify "refs/tags/${validated_tag_name}^{commit}")"
+
+            if [[ "${tag_commit_sha}" == "${MAINTENANCE_COMMIT_SHA}" ]]; then
+              echo "Maintenance commit ${MAINTENANCE_COMMIT_SHA} has already been released as ${validated_tag_name}." >&2
+              exit 1
+            fi
+          done
+
+          candidate_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts next-maintenance-tag "${MAINTENANCE_LINE_KEY}" "${valid_tag_names[@]}")"
+
+          ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-tag "${candidate_tag}" > /dev/null
+          echo "candidate_tag=${candidate_tag}" >> "$GITHUB_OUTPUT"
+          echo "Candidate maintenance tag: ${candidate_tag}"
+
+  build_maintenance_artifact:
+    name: Build exact maintenance artifact
+    runs-on: ubuntu-24.04
+    needs: [validate_request, prepare_maintenance_branch, select_maintenance_tag]
+    if: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch_action == 'reused' }}
+    env:
+      WIRE_WEBAPP_CONFIGURATION: production
+    permissions:
+      contents: read
+    outputs:
+      artifact_checksum: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
+      artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
+      artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+      artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
+
+    steps:
+      - name: Checkout exact maintenance application commit
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+
+      - name: Verify exact maintenance application commit
+        env:
+          EXPECTED_MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          maintenance_commit_sha="$(git rev-parse HEAD)"
+
+          if [[ "${maintenance_commit_sha}" != "${EXPECTED_MAINTENANCE_COMMIT_SHA}" ]]; then
+            echo "Checked out ${maintenance_commit_sha}, expected maintenance commit ${EXPECTED_MAINTENANCE_COMMIT_SHA}." >&2
+            exit 1
+          fi
+
+          echo "Building application source from maintenance commit ${maintenance_commit_sha}."
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install maintenance source dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Update WebApp configuration
+        run: ./bin/yarn nx run webapp:configure
+
+      - name: Build and package public production artifact
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ needs.select_maintenance_tag.outputs.candidate_tag }}
+        run: ./bin/yarn build:prod:public
+
+      - name: Validate maintenance artifact metadata
+        id: validate_artifact_metadata
+        env:
+          BUILD_ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
+          EXPECTED_COMMIT: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+          EXPECTED_VERSION: ${{ needs.select_maintenance_tag.outputs.candidate_tag }}
+        run: node ./bin/validateBuildArtifact.mts
+
+      - name: Compute maintenance artifact metadata
+        id: artifact_metadata
+        env:
+          ARTIFACT_COMMIT: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
+          ARTIFACT_VERSION: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+          MAINTENANCE_LINE_KEY: ${{ needs.validate_request.outputs.maintenance_line_key }}
+        run: |
+          set -euo pipefail
+
+          artifact_name="maintenance-ebs-${MAINTENANCE_LINE_KEY}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          artifact_checksum="$(sha256sum "${ARTIFACT_PATH}" | awk '{print $1}')"
+
+          {
+            echo "artifact_name=${artifact_name}"
+            echo "artifact_checksum=${artifact_checksum}"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Artifact name: ${artifact_name}"
+          echo "Artifact version: ${ARTIFACT_VERSION}"
+          echo "Artifact commit: ${ARTIFACT_COMMIT}"
+          echo "Artifact checksum: ${artifact_checksum}"
+
+      - name: Upload maintenance artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ${{ steps.artifact_metadata.outputs.artifact_name }}
+          path: ${{ env.ARTIFACT_PATH }}
+          if-no-files-found: error
+
+  validate_maintenance:
+    name: Validate through maintenance precommit path
+    needs: [prepare_maintenance_branch, build_maintenance_artifact]
+    if: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch_action == 'reused' }}
+    permissions:
+      contents: read
+    uses: ./.github/workflows/precommit-slot-run.yml
+    with:
+      env_name: wire-webapp-precommit
+      expectedManageTeamUrl: https://teams.wire.com/login/
+      artifact_name: ${{ needs.build_maintenance_artifact.outputs.artifact_name }}
+      expectedBackendRest: https://staging-nginz-https.zinfra.io/
+      expectedBackendWs: wss://staging-nginz-ssl.zinfra.io/
+      expectedVersion: ${{ needs.build_maintenance_artifact.outputs.artifact_version }}
+      expectedCommit: ${{ needs.build_maintenance_artifact.outputs.artifact_commit }}
+      grep: '@regression|@crit-flow-web'
+      testinyRunName: WebApp maintenance ${{ needs.build_maintenance_artifact.outputs.artifact_version }}
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+      WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+      TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+
+  create_maintenance_tag:
+    name: Create immutable maintenance tag
+    runs-on: ubuntu-24.04
+    if: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch_action == 'reused' }}
+    needs:
+      [
+        validate_request,
+        prepare_maintenance_branch,
+        select_maintenance_tag,
+        build_maintenance_artifact,
+        validate_maintenance,
+      ]
+    permissions:
+      contents: write
+    outputs:
+      maintenance_tag: ${{ steps.create_maintenance_tag.outputs.maintenance_tag }}
+      maintenance_tag_action: ${{ steps.create_maintenance_tag.outputs.maintenance_tag_action }}
+
+    steps:
+      - name: Checkout main workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Recompute tag from current remote state
+        id: create_maintenance_tag
+        env:
+          DISPATCH_REASON: ${{ inputs.reason }}
+          EXPECTED_CANDIDATE_TAG: ${{ needs.select_maintenance_tag.outputs.candidate_tag }}
+          MAINTENANCE_BRANCH: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch }}
+          MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+          MAINTENANCE_LINE_KEY: ${{ needs.validate_request.outputs.maintenance_line_key }}
+          SOURCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.source_commit_sha }}
+          SOURCE_PRODUCTION_TAG: ${{ needs.prepare_maintenance_branch.outputs.source_production_tag }}
+        run: |
+          set -euo pipefail
+
+          maintenance_branch_remote_ref="refs/remotes/origin/${MAINTENANCE_BRANCH}"
+          git fetch --no-tags origin "+refs/heads/${MAINTENANCE_BRANCH}:${maintenance_branch_remote_ref}"
+
+          current_maintenance_branch_commit="$(git rev-parse --verify "${maintenance_branch_remote_ref}^{commit}")"
+
+          if [[ "${current_maintenance_branch_commit}" != "${MAINTENANCE_COMMIT_SHA}" ]]; then
+            echo "Maintenance branch ${MAINTENANCE_BRANCH} moved from the validated commit ${MAINTENANCE_COMMIT_SHA} to ${current_maintenance_branch_commit}; start a fresh workflow run." >&2
+            exit 1
+          fi
+
+          if ! git cat-file -e "${MAINTENANCE_COMMIT_SHA}^{commit}"; then
+            echo "Maintenance commit is not available after fetching the maintenance branch: ${MAINTENANCE_COMMIT_SHA}" >&2
+            exit 1
+          fi
+
+          mapfile -t remote_tag_names < <(
+            git ls-remote --tags --refs origin "refs/tags/${MAINTENANCE_LINE_KEY}-maintenance.*" |
+              awk '{sub("refs/tags/", "", $2); print $2}'
+          )
+          valid_tag_names=()
+          candidate_tag_exists='false'
+          candidate_tag_commit_sha=''
+
+          for remote_tag_name in "${remote_tag_names[@]}"; do
+            validated_tag_name="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-tag "${remote_tag_name}" 2> /dev/null)" || continue
+            valid_tag_names+=("${validated_tag_name}")
+
+            git fetch --no-tags origin "refs/tags/${validated_tag_name}:refs/tags/${validated_tag_name}"
+            tag_commit_sha="$(git rev-parse --verify "refs/tags/${validated_tag_name}^{commit}")"
+
+            if [[ "${validated_tag_name}" == "${EXPECTED_CANDIDATE_TAG}" ]]; then
+              candidate_tag_exists='true'
+              candidate_tag_commit_sha="${tag_commit_sha}"
+            elif [[ "${tag_commit_sha}" == "${MAINTENANCE_COMMIT_SHA}" ]]; then
+              echo "Maintenance commit ${MAINTENANCE_COMMIT_SHA} is already tagged as ${validated_tag_name}; start a fresh workflow run." >&2
+              exit 1
+            fi
+          done
+
+          if [[ "${candidate_tag_exists}" == 'true' ]] && [[ "${candidate_tag_commit_sha}" != "${MAINTENANCE_COMMIT_SHA}" ]]; then
+            echo "Candidate tag ${EXPECTED_CANDIDATE_TAG} already exists for ${candidate_tag_commit_sha}, not ${MAINTENANCE_COMMIT_SHA}." >&2
+            exit 1
+          fi
+
+          tag_names_for_next_candidate=("${valid_tag_names[@]}")
+
+          if [[ "${candidate_tag_exists}" == 'true' ]]; then
+            tag_names_for_next_candidate=()
+
+            for valid_tag_name in "${valid_tag_names[@]}"; do
+              if [[ "${valid_tag_name}" != "${EXPECTED_CANDIDATE_TAG}" ]]; then
+                tag_names_for_next_candidate+=("${valid_tag_name}")
+              fi
+            done
+          fi
+
+          recomputed_candidate_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts next-maintenance-tag "${MAINTENANCE_LINE_KEY}" "${tag_names_for_next_candidate[@]}")"
+
+          if [[ "${recomputed_candidate_tag}" != "${EXPECTED_CANDIDATE_TAG}" ]]; then
+            echo "Remote maintenance tags advanced to ${recomputed_candidate_tag}; expected ${EXPECTED_CANDIDATE_TAG}. Start a fresh workflow run." >&2
+            exit 1
+          fi
+
+          if [[ "${candidate_tag_exists}" == 'true' ]]; then
+            if ! git rev-parse --verify "refs/tags/${EXPECTED_CANDIDATE_TAG}^{tag}" > /dev/null; then
+              echo "Candidate tag ${EXPECTED_CANDIDATE_TAG} exists but is not annotated." >&2
+              exit 1
+            fi
+
+            maintenance_tag_action='reused'
+          else
+            workflow_run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            tag_message="$(
+              printf '%s\n' \
+                "Maintenance line key: ${MAINTENANCE_LINE_KEY}" \
+                "Maintenance branch: ${MAINTENANCE_BRANCH}" \
+                "Source Production tag: ${SOURCE_PRODUCTION_TAG}" \
+                "Source Production commit: ${SOURCE_COMMIT_SHA}" \
+                "Maintenance commit: ${MAINTENANCE_COMMIT_SHA}" \
+                "Workflow run URL: ${workflow_run_url}" \
+                "Dispatch reason: ${DISPATCH_REASON}"
+            )"
+
+            git tag --annotate "${EXPECTED_CANDIDATE_TAG}" "${MAINTENANCE_COMMIT_SHA}" --message "${tag_message}"
+
+            if git push origin "refs/tags/${EXPECTED_CANDIDATE_TAG}"; then
+              maintenance_tag_action='created'
+            else
+              push_exit_code="$?"
+
+              if ! git fetch --no-tags origin "refs/tags/${EXPECTED_CANDIDATE_TAG}:refs/maintenance-tags/${EXPECTED_CANDIDATE_TAG}"; then
+                echo "Unable to resolve maintenance tag after an unsuccessful push: ${EXPECTED_CANDIDATE_TAG}" >&2
+                exit "${push_exit_code}"
+              fi
+
+              pushed_tag_commit_sha="$(git rev-parse --verify "refs/maintenance-tags/${EXPECTED_CANDIDATE_TAG}^{commit}")"
+
+              if [[ "${pushed_tag_commit_sha}" != "${MAINTENANCE_COMMIT_SHA}" ]] || ! git rev-parse --verify "refs/maintenance-tags/${EXPECTED_CANDIDATE_TAG}^{tag}" > /dev/null; then
+                echo "Maintenance tag ${EXPECTED_CANDIDATE_TAG} was created concurrently for a different commit or with a different tag type." >&2
+                exit "${push_exit_code}"
+              fi
+
+              maintenance_tag_action='reused'
+            fi
+          fi
+
+          git fetch --no-tags origin "refs/tags/${EXPECTED_CANDIDATE_TAG}:refs/maintenance-tags/${EXPECTED_CANDIDATE_TAG}"
+          final_tag_commit_sha="$(git rev-parse --verify "refs/maintenance-tags/${EXPECTED_CANDIDATE_TAG}^{commit}")"
+
+          if [[ "${final_tag_commit_sha}" != "${MAINTENANCE_COMMIT_SHA}" ]] || ! git rev-parse --verify "refs/maintenance-tags/${EXPECTED_CANDIDATE_TAG}^{tag}" > /dev/null; then
+            echo "Maintenance tag ${EXPECTED_CANDIDATE_TAG} does not point to the expected annotated maintenance commit." >&2
+            exit 1
+          fi
+
+          {
+            echo "maintenance_tag=${EXPECTED_CANDIDATE_TAG}"
+            echo "maintenance_tag_action=${maintenance_tag_action}"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Maintenance tag: ${EXPECTED_CANDIDATE_TAG}"
+          echo "Tag action: ${maintenance_tag_action}"
+
+  maintenance_summary:
+    name: Write maintenance release summary
+    runs-on: ubuntu-24.04
+    if: ${{ always() }}
+    needs:
+      - validate_request
+      - prepare_maintenance_branch
+      - select_maintenance_tag
+      - build_maintenance_artifact
+      - validate_maintenance
+      - create_maintenance_tag
+    permissions:
+      contents: read
+    env:
+      ARTIFACT_CHECKSUM: ${{ needs.build_maintenance_artifact.outputs.artifact_checksum || 'unavailable' }}
+      ARTIFACT_NAME: ${{ needs.build_maintenance_artifact.outputs.artifact_name || 'not built' }}
+      ARTIFACT_VERSION: ${{ needs.build_maintenance_artifact.outputs.artifact_version || 'not built' }}
+      BRANCH_ACTION: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch_action || 'unavailable' }}
+      MAINTENANCE_BRANCH: ${{ needs.validate_request.outputs.maintenance_branch || 'unavailable' }}
+      MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha || 'unavailable' }}
+      MAINTENANCE_LINE_KEY: ${{ needs.validate_request.outputs.maintenance_line_key || inputs.maintenance_line_key }}
+      MAINTENANCE_TAG: ${{ needs.create_maintenance_tag.outputs.maintenance_tag || 'not created' }}
+      PLAYWRIGHT_REPORT_URL: ${{ needs.validate_maintenance.outputs.reportUrl || 'unavailable' }}
+      REASON: ${{ inputs.reason }}
+      SOURCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.source_commit_sha || 'unavailable' }}
+      SOURCE_PRODUCTION_TAG: ${{ needs.validate_request.outputs.source_production_tag || inputs.source_production_tag }}
+      TESTINY_RUN_NAME: WebApp maintenance ${{ needs.select_maintenance_tag.outputs.candidate_tag || 'unavailable' }}
+      VALIDATION_RESULT: ${{ needs.validate_maintenance.result }}
+      VALIDATION_URL: ${{ needs.validate_maintenance.outputs.precommit_url || 'unavailable' }}
+      WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Write GitHub Actions summary
+        run: |
+          validation_result="${VALIDATION_RESULT}"
+
+          if [[ "${validation_result}" == 'skipped' ]]; then
+            validation_result='not run'
+          fi
+
+          {
+            echo '# WebApp maintenance release summary'
+            echo
+            echo "- Maintenance line key: ${MAINTENANCE_LINE_KEY}"
+            echo "- Maintenance branch: ${MAINTENANCE_BRANCH}"
+            echo "- Branch action: ${BRANCH_ACTION}"
+            echo "- Source Production tag: ${SOURCE_PRODUCTION_TAG}"
+            echo "- Source Production commit: ${SOURCE_COMMIT_SHA}"
+            echo "- Maintenance commit: ${MAINTENANCE_COMMIT_SHA}"
+            echo "- Maintenance tag: ${MAINTENANCE_TAG}"
+            echo "- Artifact: ${ARTIFACT_NAME}"
+            echo "- Artifact version: ${ARTIFACT_VERSION}"
+            echo "- Artifact checksum: ${ARTIFACT_CHECKSUM}"
+            echo '- Validation environment: wire-webapp-precommit'
+            echo "- Validation URL: ${VALIDATION_URL}"
+            echo "- Validation result: ${validation_result}"
+            echo "- Testiny run name: ${TESTINY_RUN_NAME}"
+            echo "- Playwright report URL: ${PLAYWRIGHT_REPORT_URL}"
+            echo "- Dispatch reason: ${REASON}"
+            echo "- Workflow run URL: ${WORKFLOW_RUN_URL}"
+            echo
+            echo 'Hosted Beta and Production were not touched.'
+            echo 'wire-builds/main and wire-builds/dev were not touched.'
+            echo 'Docker and Helm were not published.'
+
+            if [[ "${BRANCH_ACTION}" == 'created' ]]; then
+              echo '- Maintenance branch was created from the source Production commit.'
+              echo "- Next action: merge the maintenance fix through a reviewed pull request targeting ${MAINTENANCE_BRANCH}, then rerun this workflow."
+            elif [[ "${BRANCH_ACTION}" == 'awaiting-fix' ]]; then
+              echo '- Maintenance branch already exists and still points to the source Production commit.'
+              echo '- No maintenance change is present yet.'
+              echo "- Next action: merge a reviewed maintenance fix targeting ${MAINTENANCE_BRANCH} before rerunning this workflow."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

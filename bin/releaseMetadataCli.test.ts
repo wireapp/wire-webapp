@@ -186,6 +186,116 @@ describe('releaseMetadataCli', () => {
     });
   });
 
+  it('prints a maintenance branch name for a valid maintenance line key', () => {
+    const actualResult = runCommand(['maintenance-branch', '2026-07-27.1-airgap-a']);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['maintenance/2026-07-27.1-airgap-a'],
+    });
+  });
+
+  it('rejects an invalid maintenance line key', () => {
+    const actualResult = runCommand(['maintenance-branch', '2026-07-27.0-airgap-a']);
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid maintenance line key: 2026-07-27.0-airgap-a'],
+      exitCode: 1,
+      outputs: [],
+    });
+  });
+
+  it('validates a maintenance tag name', () => {
+    const actualResult = runCommand(['validate-maintenance-tag', '2026-07-27.1-airgap-a-maintenance.1']);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['2026-07-27.1-airgap-a-maintenance.1'],
+    });
+  });
+
+  it('rejects a malformed maintenance tag name', () => {
+    const actualResult = runCommand(['validate-maintenance-tag', '2026-07-27.1-airgap-a-maintenance.0']);
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid maintenance tag name: 2026-07-27.1-airgap-a-maintenance.0'],
+      exitCode: 1,
+      outputs: [],
+    });
+  });
+
+  it('prints the next maintenance tag name and ignores unrelated tags', () => {
+    const actualResult = runCommand([
+      'next-maintenance-tag',
+      '2026-07-27.1-airgap-a',
+      '2026-07-27.1-airgap-b-maintenance.9',
+      '2026-07-27.1-airgap-a-maintenance.9',
+      '2026-07-27.1-production',
+    ]);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['2026-07-27.1-airgap-a-maintenance.10'],
+    });
+  });
+
+  it('prints the next maintenance tag name when there is no existing tag', () => {
+    const actualResult = runCommand(['next-maintenance-tag', '2026-07-27.1-airgap-a']);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['2026-07-27.1-airgap-a-maintenance.1'],
+    });
+  });
+
+  it('validates a matching maintenance source Production tag', () => {
+    const actualResult = runCommand([
+      'validate-maintenance-source',
+      '2026-07-27.1-airgap-a',
+      '2026-07-27.1-production',
+    ]);
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['2026-07-27.1-production'],
+    });
+  });
+
+  it('rejects a mismatching maintenance source Production tag', () => {
+    const actualResult = runCommand([
+      'validate-maintenance-source',
+      '2026-07-27.1-airgap-a',
+      '2026-07-28.1-production',
+    ]);
+
+    expect(actualResult).toEqual({
+      errors: [
+        'Source production tag 2026-07-28.1-production does not belong to maintenance line 2026-07-27.1-airgap-a',
+      ],
+      exitCode: 1,
+      outputs: [],
+    });
+  });
+
+  it('rejects a legacy maintenance source Production tag', () => {
+    const actualResult = runCommand([
+      'validate-maintenance-source',
+      '2026-07-27.1-airgap-a',
+      '2026-07-27-production.1',
+    ]);
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid production tag name: 2026-07-27-production.1'],
+      exitCode: 1,
+      outputs: [],
+    });
+  });
+
   it('prints usage text for missing command arguments', () => {
     const actualResult = runCommand(['next-beta-tag']);
 
