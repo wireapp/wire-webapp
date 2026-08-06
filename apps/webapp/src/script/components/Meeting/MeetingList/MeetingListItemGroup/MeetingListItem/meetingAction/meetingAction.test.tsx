@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
@@ -68,7 +68,11 @@ const createMeetingStoreForTest = () =>
     } as MeetingStoreServiceTasks,
   });
 
-const renderAction = (now: string, user = selfUser) =>
+const renderAction = (
+  now: string,
+  user = selfUser,
+  wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: Date.parse(now)}),
+) =>
   render(
     <MeetingStoreProvider store={createMeetingStoreForTest()}>
       <ThemeProvider>
@@ -79,7 +83,7 @@ const renderAction = (now: string, user = selfUser) =>
       wrapper: createRootProviderWrapperForTest(
         createRootContextValueForTest({
           translate: translateForTest,
-          wallClock: createDeterministicWallClock({initialCurrentTimestampInMilliseconds: Date.parse(now)}),
+          wallClock,
         }),
       ),
     },
@@ -118,5 +122,27 @@ describe('MeetingAction', () => {
     renderAction('2026-06-15T16:00:00.000Z', new User('invitee-id', 'example.com', translateForTest));
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('closes the context menu when the meeting becomes past', async () => {
+    const initialTime = new Date('2026-06-15T13:30:00.000Z');
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: initialTime.getTime()});
+    const view = renderAction(initialTime.toISOString(), selfUser, wallClock);
+
+    fireEvent.click(screen.getByRole('button'));
+    await waitFor(() => expect(screen.getByRole('menu')).toBeInTheDocument());
+
+    await act(async () => {
+      wallClock.advanceByMilliseconds(end.getTime() - initialTime.getTime() + 1);
+      view.rerender(
+        <MeetingStoreProvider store={createMeetingStoreForTest()}>
+          <ThemeProvider>
+            <MeetingAction meetingInstance={meetingInstance} selfUser={selfUser} />
+          </ThemeProvider>
+        </MeetingStoreProvider>,
+      );
+    });
+
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   });
 });

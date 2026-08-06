@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent} from 'react';
+import {MouseEvent, useEffect} from 'react';
 
 import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
 
@@ -35,7 +35,7 @@ import {getMeetingTemporalStatusAt, MeetingTemporalStatuses} from 'Components/Me
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {showContextMenu} from '../../../../../../ui/contextMenu';
+import {closeContextMenu, showContextMenu} from '../../../../../../ui/contextMenu';
 
 interface MeetingActionProps {
   meetingInstance: MeetingInstance;
@@ -52,6 +52,12 @@ export const MeetingAction = ({meetingInstance, selfUser}: MeetingActionProps) =
     meetingInstance.start,
     meetingInstance.end,
   );
+
+  useEffect(() => {
+    if (temporalStatus === MeetingTemporalStatuses.PAST) {
+      closeContextMenu();
+    }
+  }, [temporalStatus]);
 
   if (temporalStatus === MeetingTemporalStatuses.PAST) {
     return null;
