@@ -121,7 +121,7 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 - `wire-builds/dev` remains the development distribution consumed by downstream internal integration environments; it is separate from the hosted Dev frontend deployment.
 - The legacy tag-driven `publish-and-deploy-webapp.yml` workflow has been deleted. Its obsolete `dev`, `master`, staging-tag, Production-tag, and maintenance publication paths are not restored.
 - The arbitrary manual release-artifact workflow and local staging and Production tag commands have been deleted. `q1-2024` and `q2-2025` publication handling was retired rather than migrated; recovery from existing historical Production tags remains available, and maintenance-release automation remains separate from the normal cloud release path.
-- The legacy path was retired before the first complete Production run of the final workflow. Any issue discovered during the next release will be repaired in the new pipeline rather than falling back to the retired path.
+- The legacy path was retired before the first complete Production run of the final workflow. The final workflow was subsequently proven by release `2026-07-27.1`.
 - `wire-builds/main` remains Production-only and is never updated by an ordinary `main` push.
 - Development and Production distributions share the same Helm repository and prerelease version namespace. Their Docker, Helm, and `wire-builds` publications use one shared, non-cancellable distribution lock.
 - Edge verifies that its artifact still belongs to the current `main` commit after acquiring the deployment slot; stale Edge builds skip instead of moving Edge backwards.
@@ -243,7 +243,7 @@ Production tag: 2026-07-27.1-production
 Commit: 770c6a14cdd2e10c8e32b251b16fab106cec0e1c
 ```
 
-Phase 11 uses the matching immutable Production tag as its source, keeps orchestration tooling on `main`, and builds the exact maintenance branch head once. Fixes land on `main` first and reach the maintenance branch through reviewed cherry-pick pull requests. The artifact is validated through `wire-webapp-precommit` with Staging backends before its immutable maintenance tag is created; hosted Beta and Production, `wire-builds`, Docker, Helm, and customer deployment remain outside this workflow.
+Phase 11 first creates a missing maintenance branch from the matching immutable Production tag and stops. Fixes arrive through reviewed pull requests; a later run builds and validates the patched branch head through `wire-webapp-precommit` before creating its first `<maintenance-line-key>-maintenance.1` tag. Orchestration tooling comes from the dispatch commit on `main`, while the artifact comes from the maintenance branch; hosted Beta and Production, `wire-builds`, Docker, Helm, and customer deployment remain outside this workflow.
 
 Branch and tag cleanup follows these rules:
 

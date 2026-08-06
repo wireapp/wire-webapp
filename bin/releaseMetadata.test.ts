@@ -81,7 +81,7 @@ describe('releaseMetadata', () => {
 
     const actualReleaseIdentifier = extractReleaseIdentifierFromBranchName(branchName);
 
-    assert(actualReleaseIdentifier.isOk);
+    assert(actualReleaseIdentifier.isOk === true);
 
     expect(actualReleaseIdentifier.value).toBe('2026-06-19.1');
   });
@@ -91,7 +91,7 @@ describe('releaseMetadata', () => {
 
     const actualReleaseIdentifier = extractReleaseIdentifierFromBranchName(invalidBranchName);
 
-    assert(actualReleaseIdentifier.isErr);
+    assert(actualReleaseIdentifier.isErr === true);
 
     expect(actualReleaseIdentifier.error.message).toBe('Invalid release branch name: release/2026-06-01');
   });
@@ -101,7 +101,7 @@ describe('releaseMetadata', () => {
 
     const actualReleaseBranchName = createReleaseBranchName(releaseIdentifier);
 
-    assert(actualReleaseBranchName.isOk);
+    assert(actualReleaseBranchName.isOk === true);
 
     expect(actualReleaseBranchName.value).toBe('release/2026-06-19.1');
   });
@@ -111,7 +111,7 @@ describe('releaseMetadata', () => {
     invalidReleaseIdentifier => {
       const actualReleaseBranchName = createReleaseBranchName(invalidReleaseIdentifier);
 
-      assert(actualReleaseBranchName.isErr);
+      assert(actualReleaseBranchName.isErr === true);
 
       expect(actualReleaseBranchName.error.message).toBe(`Invalid release identifier: ${invalidReleaseIdentifier}`);
     },
@@ -122,7 +122,7 @@ describe('releaseMetadata', () => {
 
     const actualProductionTagName = createProductionTagName(releaseIdentifier);
 
-    assert(actualProductionTagName.isOk);
+    assert(actualProductionTagName.isOk === true);
 
     expect(actualProductionTagName.value).toBe('2026-06-19.1-production');
   });
@@ -132,7 +132,7 @@ describe('releaseMetadata', () => {
 
     const actualProductionTagName = createProductionTagName(invalidReleaseIdentifier);
 
-    assert(actualProductionTagName.isErr);
+    assert(actualProductionTagName.isErr === true);
 
     expect(actualProductionTagName.error.message).toBe('Invalid release identifier: 2026-06-19');
   });
@@ -142,12 +142,12 @@ describe('releaseMetadata', () => {
 
     const actualProductionTagName = validateProductionTagName(productionTagName);
 
-    assert(actualProductionTagName.isOk);
+    assert(actualProductionTagName.isOk === true);
 
     expect(actualProductionTagName.value).toBe(productionTagName);
   });
 
-  it.each(['2026-07-27.1-airgap-a', '2026-07-27.1-customer2-hotfix'])(
+  it.each(['2026-07-27.1-airgap-a', '2026-07-27.1-airgap-hotfix'])(
     'validateMaintenanceLineKey() accepts valid maintenance line key "%s"',
     maintenanceLineKey => {
       const actualMaintenanceLineKey = validateMaintenanceLineKey(maintenanceLineKey);
@@ -302,7 +302,7 @@ describe('releaseMetadata', () => {
   ])('validateProductionTagName() rejects invalid production tag name "%s"', invalidProductionTagName => {
     const actualProductionTagName = validateProductionTagName(invalidProductionTagName);
 
-    assert(actualProductionTagName.isErr);
+    assert(actualProductionTagName.isErr === true);
 
     expect(actualProductionTagName.error.message).toBe(`Invalid production tag name: ${invalidProductionTagName}`);
   });
@@ -319,7 +319,7 @@ describe('releaseMetadata', () => {
         'development',
       );
 
-      assert(actualBuildVersion.isOk);
+      assert(actualBuildVersion.isOk === true);
 
       expect(actualBuildVersion.value).toBe(expectedVersion);
     },
@@ -338,7 +338,7 @@ describe('releaseMetadata', () => {
         buildChannel,
       );
 
-      assert(actualBuildVersion.isOk);
+      assert(actualBuildVersion.isOk === true);
 
       expect(actualBuildVersion.value).toBe(expectedVersion);
     },
@@ -347,7 +347,7 @@ describe('releaseMetadata', () => {
   it('resolveWebappBuildVersion() uses the explicit unknown fallback without a commit', () => {
     const actualBuildVersion = resolveWebappBuildVersion('', '', 'development');
 
-    assert(actualBuildVersion.isOk);
+    assert(actualBuildVersion.isOk === true);
 
     expect(actualBuildVersion.value).toBe('dev-unknown');
   });
@@ -355,7 +355,7 @@ describe('releaseMetadata', () => {
   it('resolveWebappBuildVersion() rejects unknown non-empty tags', () => {
     const actualBuildVersion = resolveWebappBuildVersion('2026-06-19.1-production.unknown', '025edc6', 'development');
 
-    assert(actualBuildVersion.isErr);
+    assert(actualBuildVersion.isErr === true);
 
     expect(actualBuildVersion.error.message).toBe('Invalid production tag name: 2026-06-19.1-production.unknown');
   });
@@ -363,7 +363,7 @@ describe('releaseMetadata', () => {
   it('resolveWebappBuildVersion() requires a production tag on the production channel', () => {
     const actualBuildVersion = resolveWebappBuildVersion('', '025edc663787b3d2da366f21a5958013201e6cd4', 'production');
 
-    assert(actualBuildVersion.isErr);
+    assert(actualBuildVersion.isErr === true);
 
     expect(actualBuildVersion.error.message).toBe('A production webapp build requires a production tag name');
   });
@@ -375,7 +375,7 @@ describe('releaseMetadata', () => {
       'production',
     );
 
-    assert(actualBuildVersion.isErr);
+    assert(actualBuildVersion.isErr === true);
 
     expect(actualBuildVersion.error.message).toBe('Invalid production tag name: 2026-07-20-staging.1');
   });
@@ -386,7 +386,7 @@ describe('releaseMetadata', () => {
 
     const actualNextBetaTagName = createNextBetaTagName(releaseIdentifier, existingTagNames);
 
-    assert(actualNextBetaTagName.isOk);
+    assert(actualNextBetaTagName.isOk === true);
 
     expect(actualNextBetaTagName.value).toBe('2026-06-19.1-beta.3');
   });
@@ -403,7 +403,7 @@ describe('releaseMetadata', () => {
 
     const actualNextBetaTagName = createNextBetaTagName(releaseIdentifier, existingTagNames);
 
-    assert(actualNextBetaTagName.isOk);
+    assert(actualNextBetaTagName.isOk === true);
 
     expect(actualNextBetaTagName.value).toBe('2026-06-19.1-beta.2');
   });
@@ -414,7 +414,7 @@ describe('releaseMetadata', () => {
 
     const actualNextBetaTagName = createNextBetaTagName(releaseIdentifier, existingTagNames);
 
-    assert(actualNextBetaTagName.isOk);
+    assert(actualNextBetaTagName.isOk === true);
 
     expect(actualNextBetaTagName.value).toBe('2026-06-19.1-beta.1');
   });
@@ -424,7 +424,7 @@ describe('releaseMetadata', () => {
 
     const actualNextBetaTagName = createNextBetaTagName(invalidReleaseIdentifier, []);
 
-    assert(actualNextBetaTagName.isErr);
+    assert(actualNextBetaTagName.isErr === true);
 
     expect(actualNextBetaTagName.error.message).toBe('Invalid release identifier: 2026-06-19');
   });
@@ -435,7 +435,7 @@ describe('releaseMetadata', () => {
 
     const actualProductionTagExists = productionTagExists(releaseIdentifier, existingTagNames);
 
-    assert(actualProductionTagExists.isOk);
+    assert(actualProductionTagExists.isOk === true);
 
     expect(actualProductionTagExists.value).toBe(true);
   });
@@ -446,7 +446,7 @@ describe('releaseMetadata', () => {
 
     const actualProductionTagExists = productionTagExists(releaseIdentifier, existingTagNames);
 
-    assert(actualProductionTagExists.isOk);
+    assert(actualProductionTagExists.isOk === true);
 
     expect(actualProductionTagExists.value).toBe(false);
   });
@@ -465,7 +465,7 @@ describe('releaseMetadata', () => {
       releaseTagMetadata,
     });
 
-    assert(actualProductionTagPointsToCommit.isOk);
+    assert(actualProductionTagPointsToCommit.isOk === true);
 
     expect(actualProductionTagPointsToCommit.value).toBe(true);
   });
@@ -483,7 +483,7 @@ describe('releaseMetadata', () => {
       releaseTagMetadata,
     });
 
-    assert(actualProductionTagPointsToCommit.isOk);
+    assert(actualProductionTagPointsToCommit.isOk === true);
 
     expect(actualProductionTagPointsToCommit.value).toBe(false);
   });
@@ -499,7 +499,7 @@ describe('releaseMetadata', () => {
       releaseTagMetadata,
     });
 
-    assert(actualProductionTagPointsToCommit.isOk);
+    assert(actualProductionTagPointsToCommit.isOk === true);
 
     expect(actualProductionTagPointsToCommit.value).toBe(false);
   });
