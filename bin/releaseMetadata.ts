@@ -303,6 +303,7 @@ export function resolveWebappBuildVersion(
     }
 
     const versionPrefix = buildChannel === 'main' ? 'main' : 'dev';
+
     return Result.ok(`${versionPrefix}-${commitSha.slice(0, 7) || 'unknown'}`);
   }
 

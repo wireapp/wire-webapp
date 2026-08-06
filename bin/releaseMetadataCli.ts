@@ -95,10 +95,12 @@ function formatResultValue(value: string | boolean | MaintenanceTagNameMetadata)
 function writeResult(result: ReleaseMetadataCliResult, dependencies: ReleaseMetadataCliDependencies): number {
   if (result.isErr) {
     dependencies.writeError(result.error.message);
+
     return 1;
   }
 
   dependencies.writeOutput(formatResultValue(result.value));
+
   return 0;
 }
 
@@ -203,6 +205,7 @@ export function runReleaseMetadataCli(
   if (commandName === 'maintenance-tag-points-to-commit') {
     const maintenanceTagPointsToCommitArguments =
       primaryValue === undefined ? remainingValues : [primaryValue, ...remainingValues];
+
     return writeResult(readMaintenanceTagMetadata(maintenanceTagPointsToCommitArguments), dependencies);
   }
 
@@ -215,6 +218,7 @@ export function runReleaseMetadataCli(
   }
 
   dependencies.writeError(usageText);
+
   return 1;
 }
 

@@ -26,6 +26,11 @@ import {validateMaintenanceDistributionManifest} from './maintenanceDistribution
 
 type CommandLineOptions = ReadonlyMap<string, string>;
 
+export type MaintenanceDistributionCliDependencies = {
+  readonly readFile: (filePath: string) => string;
+  readonly writeError: (message: string) => void;
+};
+
 function parseCommandLineOptions(commandLineArguments: readonly string[]): CommandLineOptions {
   const optionValues = new Map<string, string>();
 
@@ -62,14 +67,17 @@ function parseJson(jsonText: string): unknown {
   }
 }
 
-function readJsonFile(filePath: string): unknown {
-  return parseJson(readFileSync(filePath, 'utf8'));
+function readJsonFile(filePath: string, dependencies: MaintenanceDistributionCliDependencies): unknown {
+  return parseJson(dependencies.readFile(filePath));
 }
 
-function runValidateManifest(optionValues: CommandLineOptions): Result<void, Error> {
+function runValidateManifest(
+  optionValues: CommandLineOptions,
+  dependencies: MaintenanceDistributionCliDependencies,
+): Result<void, Error> {
   const validationResult = validateMaintenanceDistributionManifest({
-    artifactMetadata: readJsonFile(getRequiredOption(optionValues, 'artifact-metadata-path')),
-    manifest: readJsonFile(getRequiredOption(optionValues, 'manifest-path')),
+    artifactMetadata: readJsonFile(getRequiredOption(optionValues, 'artifact-metadata-path'), dependencies),
+    manifest: readJsonFile(getRequiredOption(optionValues, 'manifest-path'), dependencies),
     maintenanceLineKey: getRequiredOption(optionValues, 'maintenance-line-key'),
     maintenanceBranch: getRequiredOption(optionValues, 'maintenance-branch'),
     sourceProductionTag: getRequiredOption(optionValues, 'source-production-tag'),
@@ -87,33 +95,55 @@ function runValidateManifest(optionValues: CommandLineOptions): Result<void, Err
   return Result.ok(undefined);
 }
 
-function runCommand(commandName: string, optionValues: CommandLineOptions): Result<void, Error> {
+function runCommand(
+  commandName: string,
+  optionValues: CommandLineOptions,
+  dependencies: MaintenanceDistributionCliDependencies,
+): Result<void, Error> {
   if (commandName === 'validate-manifest') {
-    return runValidateManifest(optionValues);
+    return runValidateManifest(optionValues, dependencies);
   }
 
   return Result.err(new Error(`Unknown maintenance distribution command: ${commandName}`));
 }
 
-function main(): void {
+export function runMaintenanceDistributionCli(
+  commandLineArguments: readonly string[],
+  dependencies: MaintenanceDistributionCliDependencies,
+): number {
   try {
-    const commandName = process.argv[2];
+    const [commandName, ...optionArguments] = commandLineArguments;
 
     if (!isNonEmptyString(commandName)) {
       throw new Error('A maintenance distribution command is required.');
     }
 
-    const commandResult = runCommand(commandName, parseCommandLineOptions(process.argv.slice(3)));
+    const commandResult = runCommand(commandName, parseCommandLineOptions(optionArguments), dependencies);
 
     if (commandResult.isErr) {
-      console.error(commandResult.error.message);
-      process.exitCode = 1;
+      dependencies.writeError(commandResult.error.message);
+
+      return 1;
     }
+
+    return 0;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(errorMessage);
-    process.exitCode = 1;
+    dependencies.writeError(errorMessage);
+
+    return 1;
   }
+}
+
+function main(): void {
+  process.exitCode = runMaintenanceDistributionCli(process.argv.slice(2), {
+    readFile(filePath) {
+      return readFileSync(filePath, 'utf8');
+    },
+    writeError(message) {
+      console.error(message);
+    },
+  });
 }
 
 if (process.argv[1]?.endsWith('maintenanceDistributionCli.ts')) {
