@@ -449,6 +449,40 @@ describe('updateMeeting', () => {
     expect(renameConversation).toHaveBeenCalledWith(conversation, 'New title');
   });
 
+  it('heals a drifted conversation name on a non-title meeting update', async () => {
+    const conversation = createMeetingConversation({name: 'Stale call name'});
+    const laterStart = new Date('2026-06-23T18:00:00.000Z');
+    const laterEnd = new Date('2026-06-23T19:00:00.000Z');
+    const {deps, updateMeetingMock, renameConversation} = createDeps({
+      updateMeetingMock: jest.fn().mockReturnValue(
+        task.resolve({
+          title: 'Weekly sync',
+          qualified_conversation: qualifiedConversation,
+          qualified_id: meetingId,
+          conversation: meetingConversationResponse,
+        }),
+      ),
+      safeGetConversationById: jest.fn().mockReturnValue(task.resolve(conversation)),
+    });
+
+    const result = await updateMeeting(
+      updateCommand({
+        title: 'Weekly sync',
+        start: laterStart,
+        end: laterEnd,
+      }),
+      deps,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(updateMeetingMock).toHaveBeenCalledWith(meetingId, {
+      title: 'Weekly sync',
+      start_time: laterStart.toISOString(),
+      end_time: laterEnd.toISOString(),
+    });
+    expect(renameConversation).toHaveBeenCalledWith(conversation, 'Weekly sync');
+  });
+
   it('returns conversationRenameFailed when renaming the conversation fails after a successful update', async () => {
     const conversation = createMeetingConversation({name: 'Old title'});
     const {deps} = createDeps({
