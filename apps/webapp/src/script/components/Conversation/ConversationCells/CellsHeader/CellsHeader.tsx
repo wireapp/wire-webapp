@@ -41,7 +41,6 @@ import type {FilterConfig} from '../common/CellsFiltersBar/filterConfig';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {openBreadcrumb} from '../common/openBreadcrumb/openBreadcrumb';
-import {isInRecycleBin} from '../common/recycleBin/recycleBin';
 
 interface CellsHeaderProps {
   onRefresh: () => void;
@@ -49,6 +48,7 @@ interface CellsHeaderProps {
   conversationQualifiedId: QualifiedId;
   cellsRepository: CellsRepository;
   isSearchViewOpen: boolean;
+  isInRecycleBin: boolean;
   onOpenSearchView: () => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
@@ -62,6 +62,7 @@ export const CellsHeader = ({
   conversationQualifiedId,
   cellsRepository,
   isSearchViewOpen,
+  isInRecycleBin,
   onOpenSearchView,
   searchValue,
   onSearchChange,
@@ -75,28 +76,29 @@ export const CellsHeader = ({
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
   const isRootLevel = breadcrumbs.length === 1;
-  const isInsideRecycleBin = isInRecycleBin();
 
   return (
     <div css={wrapperStyles}>
       <div css={contentStyles}>
-        <div css={searchWrapperStyles}>
-          <CellsSearchInput
-            value={searchValue}
-            placeholder={translate('cells.search.placeholder')}
-            onChange={onSearchChange}
-            onClear={onSearchClear}
-            onFocus={onOpenSearchView}
-            clearAriaLabel={translate('fullsearchCancelCloseBtn')}
-            uieName="full-search-header-input"
-          />
-        </div>
+        {!isInRecycleBin && (
+          <div css={searchWrapperStyles}>
+            <CellsSearchInput
+              value={searchValue}
+              placeholder={translate('cells.search.placeholder')}
+              onChange={onSearchChange}
+              onClear={onSearchClear}
+              onFocus={onOpenSearchView}
+              clearAriaLabel={translate('fullsearchCancelCloseBtn')}
+              uieName="full-search-header-input"
+            />
+          </div>
+        )}
 
-        {isSearchViewOpen ? (
+        {isSearchViewOpen && !isInRecycleBin ? (
           <CellsFiltersBar filters={filters} />
         ) : (
           <div css={actionsStyles}>
-            {isInsideRecycleBin === false && (
+            {!isInRecycleBin && (
               <CellsNewMenu
                 cellsRepository={cellsRepository}
                 conversationQualifiedId={conversationQualifiedId}
