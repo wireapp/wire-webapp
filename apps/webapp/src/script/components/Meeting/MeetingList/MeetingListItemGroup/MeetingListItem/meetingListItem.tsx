@@ -39,6 +39,7 @@ import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {useJoinMeetingCall} from 'Components/Meeting/useJoinMeetingCall';
 import {
   getMeetingTemporalStatusAt,
+  isAttendingMeetingInstance,
   isMeetingListItemOngoing,
   MeetingTemporalStatuses,
 } from 'Components/Meeting/utils/meetingStatusUtil';
@@ -61,11 +62,16 @@ const MeetingListItemComponent = ({
   const {title, recurrence} = meetingSeries;
   const {translate, wallClock} = useApplicationContext();
   const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
-  const {joinMeeting, isJoinDisabled, isCallActive} = useJoinMeetingCall(meetingSeries.qualified_conversation);
+  const {
+    joinMeeting,
+    isJoinDisabled,
+    isCallActive: isConversationCallActive,
+  } = useJoinMeetingCall(meetingSeries.qualified_conversation);
 
   const now = useMemo(() => new Date(nowMilliseconds), [nowMilliseconds]);
 
   const temporalStatus = useMemo(() => getMeetingTemporalStatusAt(now, start, end), [now, start, end]);
+  const isCallActive = isAttendingMeetingInstance(isConversationCallActive, temporalStatus);
 
   const time = useMemo(() => {
     if (temporalStatus === MeetingTemporalStatuses.PAST) {

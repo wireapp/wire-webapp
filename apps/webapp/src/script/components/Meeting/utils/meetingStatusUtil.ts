@@ -40,5 +40,16 @@ export const getMeetingTemporalStatusAt = (now: Date, start: Date, end: Date): M
   return MeetingTemporalStatuses.UPCOMING;
 };
 
+/**
+ * Whether this concrete occurrence should show as Attending.
+ *
+ * Recurring instances share one conversation, so a joined call must not mark every
+ * future occurrence — only the current or just-ended instance.
+ */
+export const isAttendingMeetingInstance = (
+  isConversationCallActive: boolean,
+  temporalStatus: MeetingTemporalStatuses,
+): boolean => isConversationCallActive && temporalStatus !== MeetingTemporalStatuses.UPCOMING;
+
 export const isMeetingListItemOngoing = (temporalStatus: MeetingTemporalStatuses, isCallActive: boolean): boolean =>
   temporalStatus === MeetingTemporalStatuses.ON_GOING || isCallActive;
