@@ -21,22 +21,21 @@ import {render, screen} from '@testing-library/react';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
+import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingStore';
+import type {MeetingStoreServiceTasks} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {MeetingAction} from './meetingAction';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-
-jest.mock('Components/Meeting/useEditMeeting', () => ({
-  useEditMeeting: () => ({editMeeting: jest.fn()}),
-}));
-jest.mock('Components/Meeting/useDeleteMeeting', () => ({
-  useDeleteMeeting: () => ({openDeleteMeetingModal: jest.fn()}),
-}));
 
 const start = new Date('2026-06-15T14:00:00.000Z');
 const end = new Date('2026-06-15T15:00:00.000Z');
@@ -54,11 +53,28 @@ const series: MeetingSeries = {
 const meetingInstance: MeetingInstance = {meetingSeries: series, start, end};
 const selfUser = new User('host-id', 'example.com', translateForTest);
 
+const createMeetingStoreForTest = () =>
+  createMeetingStore({
+    meetingsRepository: {} as MeetingsRepository,
+    conversationRepository: {} as ConversationRepository,
+    callingRepository: {} as CallingRepository,
+    wallClock: createDeterministicWallClock(),
+    serviceTasks: {
+      scheduleMeeting: jest.fn(),
+      meetNowMeeting: jest.fn(),
+      updateMeeting: jest.fn(),
+      deleteMeetingForMe: jest.fn(),
+      deleteMeetingForAll: jest.fn(),
+    } as MeetingStoreServiceTasks,
+  });
+
 const renderAction = (now: string, user = selfUser) =>
   render(
-    <ThemeProvider>
-      <MeetingAction meetingInstance={meetingInstance} selfUser={user} />
-    </ThemeProvider>,
+    <MeetingStoreProvider store={createMeetingStoreForTest()}>
+      <ThemeProvider>
+        <MeetingAction meetingInstance={meetingInstance} selfUser={user} />
+      </ThemeProvider>
+    </MeetingStoreProvider>,
     {
       wrapper: createRootProviderWrapperForTest(
         createRootContextValueForTest({
