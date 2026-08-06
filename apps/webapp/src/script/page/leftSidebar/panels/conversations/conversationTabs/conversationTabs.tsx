@@ -31,6 +31,7 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
+import {openDebugToolbar} from 'Components/configToolbar/debugToolbarEvents';
 import * as Icon from 'Components/icon';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -62,6 +63,7 @@ import {
 } from './conversationTabs.styles';
 import {FolderIcon} from './folderIcon';
 import {MeetingsConversationTab} from './meetingsConversationTab';
+import {SettingsTab} from './settingsTab';
 import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 
 import {Config} from '../../../../../Config';
@@ -110,6 +112,7 @@ export const ConversationTabs = ({
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const isDebugEnabled = Config.getConfig().FEATURE.ENABLE_DEBUG;
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
     favoriteConversation.hasUnread(),
@@ -382,17 +385,14 @@ export const ConversationTabs = ({
           </div>
         )}
 
-        <ConversationTab
-          title={translate('preferencesHeadline')}
-          label={translate('preferencesHeadline')}
-          type={SidebarTabs.PREFERENCES}
-          Icon={<Icon.SettingsIcon />}
-          onChangeTab={tab => {
-            onChangeTab(tab);
+        <SettingsTab
+          settingsLabel={translate('preferencesHeadline')}
+          isDebugEnabled={isDebugEnabled}
+          onOpenDeveloperMenu={openDebugToolbar}
+          onOpenPreferences={() => {
+            onChangeTab(SidebarTabs.PREFERENCES);
             onClickPreferences(ContentState.PREFERENCES_ACCOUNT);
           }}
-          conversationTabIndex={1}
-          dataUieName="go-preferences"
           showNotificationsBadge={showNotificationsBadge}
           isActive={currentTab === SidebarTabs.PREFERENCES}
         />

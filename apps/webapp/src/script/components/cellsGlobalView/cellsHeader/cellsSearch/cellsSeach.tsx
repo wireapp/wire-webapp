@@ -35,7 +35,7 @@ export const CellsSearch = ({searchValue, onSearch, onClearSearch}: CellsSearchP
     <div css={wrapperStyles}>
       <CellsSearchInput
         value={searchValue}
-        placeholder={translate('cells.search.placeholder')}
+        placeholder={translate('cells.search.allFilesPlaceholder')}
         onChange={onSearch}
         onClear={onClearSearch}
         clearAriaLabel={translate('cells.search.closeButton')}

@@ -19,6 +19,7 @@
 
 import {
   getMeetingTemporalStatusAt,
+  isAttendingMeetingInstance,
   isMeetingListItemOngoing,
   MeetingTemporalStatuses,
 } from 'Components/Meeting/utils/meetingStatusUtil';
@@ -44,8 +45,22 @@ describe('meetingStatusUtil', () => {
     );
   });
 
-  it('treats active calls as ongoing regardless of the scheduled interval', () => {
-    expect(isMeetingListItemOngoing(MeetingTemporalStatuses.UPCOMING, true)).toBe(true);
+  it('does not treat future recurring instances as attending when the series call is active', () => {
+    expect(isAttendingMeetingInstance(true, MeetingTemporalStatuses.UPCOMING)).toBe(false);
+  });
+
+  it('treats the current or just-ended instance as attending when the series call is active', () => {
+    expect(isAttendingMeetingInstance(true, MeetingTemporalStatuses.ON_GOING)).toBe(true);
+    expect(isAttendingMeetingInstance(true, MeetingTemporalStatuses.PAST)).toBe(true);
+  });
+
+  it('does not treat any instance as attending when there is no active series call', () => {
+    expect(isAttendingMeetingInstance(false, MeetingTemporalStatuses.ON_GOING)).toBe(false);
+    expect(isAttendingMeetingInstance(false, MeetingTemporalStatuses.PAST)).toBe(false);
+    expect(isAttendingMeetingInstance(false, MeetingTemporalStatuses.UPCOMING)).toBe(false);
+  });
+
+  it('treats attending instances as ongoing even outside the scheduled interval', () => {
     expect(isMeetingListItemOngoing(MeetingTemporalStatuses.PAST, true)).toBe(true);
     expect(isMeetingListItemOngoing(MeetingTemporalStatuses.ON_GOING, false)).toBe(true);
     expect(isMeetingListItemOngoing(MeetingTemporalStatuses.UPCOMING, false)).toBe(false);

@@ -27,6 +27,7 @@ import {
   calendarIconStyles,
   itemStyles,
   leftStyles,
+  MEETING_LIST_ITEM_ONGOING_ATTR,
   metaStyles,
   onGoingMeetingStyles,
   rightStyles,
@@ -39,6 +40,7 @@ import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {useJoinMeetingCall} from 'Components/Meeting/useJoinMeetingCall';
 import {
   getMeetingTemporalStatusAt,
+  isAttendingMeetingInstance,
   isMeetingListItemOngoing,
   MeetingTemporalStatuses,
 } from 'Components/Meeting/utils/meetingStatusUtil';
@@ -61,11 +63,16 @@ const MeetingListItemComponent = ({
   const {title, recurrence} = meetingSeries;
   const {translate, wallClock} = useApplicationContext();
   const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
-  const {joinMeeting, isJoinDisabled, isCallActive} = useJoinMeetingCall(meetingSeries.qualified_conversation);
+  const {
+    joinMeeting,
+    isJoinDisabled,
+    isCallActive: isConversationCallActive,
+  } = useJoinMeetingCall(meetingSeries.qualified_conversation);
 
   const now = useMemo(() => new Date(nowMilliseconds), [nowMilliseconds]);
 
   const temporalStatus = useMemo(() => getMeetingTemporalStatusAt(now, start, end), [now, start, end]);
+  const isCallActive = isAttendingMeetingInstance(isConversationCallActive, temporalStatus);
 
   const time = useMemo(() => {
     if (temporalStatus === MeetingTemporalStatuses.PAST) {
@@ -90,7 +97,10 @@ const MeetingListItemComponent = ({
   const isOngoing = isMeetingListItemOngoing(temporalStatus, isCallActive);
 
   return (
-    <div css={[itemStyles, isOngoing && onGoingMeetingStyles]}>
+    <div
+      css={[itemStyles, isOngoing && onGoingMeetingStyles]}
+      {...(isOngoing ? {[MEETING_LIST_ITEM_ONGOING_ATTR]: ''} : {})}
+    >
       <div css={leftStyles}>
         <div css={calendarIconStyles}>
           <CalendarIcon />
@@ -115,7 +125,12 @@ const MeetingListItemComponent = ({
           isJoinDisabled={isJoinDisabled}
           isCallActive={isCallActive}
         />
-        <MeetingAction meetingInstance={meetingInstance} selfUser={selfUser} />
+        <MeetingAction
+          meetingInstance={meetingInstance}
+          selfUser={selfUser}
+          joinMeeting={joinMeeting}
+          isJoinDisabled={isJoinDisabled}
+        />
       </div>
     </div>
   );

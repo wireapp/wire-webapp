@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+export const MEETING_LIST_ITEM_ONGOING_ATTR = 'data-meeting-list-item-ongoing';
+
 export const itemStyles: CSSObject = {
   fontSize: '14px',
   display: 'flex',
@@ -42,16 +44,28 @@ export const itemStyles: CSSObject = {
     borderBottomRightRadius: 8,
     marginBottom: 0,
   },
+  // Let the ongoing item below own the shared edge so its top accent border is a single line.
+  [`&:has(+ [${MEETING_LIST_ITEM_ONGOING_ATTR}])`]: {
+    borderBottomColor: 'transparent',
+  },
 };
 
 export const onGoingMeetingStyles: CSSObject = {
   background: 'var(--accent-color-highlight)',
-  borderLeftColor: 'var(--accent-color)',
-  borderRightColor: 'var(--accent-color)',
-  borderBottomColor: 'var(--accent-color)',
+  // Full accent outline; overrides collapsed `borderTop: none` from itemStyles.
+  border: '1px solid var(--accent-color)',
 
   '&:first-of-type': {
-    borderTopColor: 'var(--accent-color)',
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  '&:last-of-type': {
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  // Keep a single shared accent edge between stacked ongoing items.
+  [`&:has(+ [${MEETING_LIST_ITEM_ONGOING_ATTR}])`]: {
+    borderBottomColor: 'transparent',
   },
 };
 

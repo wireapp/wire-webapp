@@ -35,6 +35,7 @@ import {
 } from 'Components/Meeting/meetingConversationSync';
 import type {MeetingServiceDeps} from 'Components/Meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
+import {syncMeetingConversationName} from 'Components/Meeting/shared/service/syncMeetingConversationName';
 import type {
   MeetNowMeetingCommand,
   ScheduleMeetingCommand,
@@ -125,8 +126,32 @@ export const meetNowMeeting = (
     deps,
   );
 
+const syncParticipantsAfterMeetingUpdate = (
+  command: UpdateMeetingCommand,
+  deps: MeetingServiceDeps,
+  usersToAdd: User[],
+  userIdsToRemove: QualifiedId[],
+): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+  if (isEmptyArray(usersToAdd) && isEmptyArray(userIdsToRemove)) {
+    return task.resolve({failedToAdd: []});
+  }
+
+  if (command.qualifiedConversation.isNothing) {
+    return task.reject(meetingSubmitErrors.addParticipantsFailed);
+  }
+
+  return syncMeetingConversationParticipants(deps.conversationRepository, {
+    qualifiedConversationId: command.qualifiedConversation.value,
+    selectedUsers: command.selectedUsers,
+    usersToAdd,
+    userIdsToRemove,
+    isCreate: false,
+  }).mapRejected(mapSyncErrorToSubmitError);
+};
+
 /**
- * Updates meeting metadata and syncs conversation participants.
+ * Updates meeting metadata, syncs conversation participants, then heals the
+ * dedicated meeting conversation name when it differs from the meeting title.
  */
 export const updateMeeting = (
   command: UpdateMeetingCommand,
@@ -142,22 +167,13 @@ export const updateMeeting = (
         deps.conversationRepository,
         updatedMeeting.conversation,
         meetingSubmitErrors.conversationSetupFailed,
-      ).andThen(() => {
-        if (isEmptyArray(usersToAdd) && isEmptyArray(userIdsToRemove)) {
-          return task.resolve({failedToAdd: []});
-        }
-
-        if (command.qualifiedConversation.isNothing) {
-          return task.reject(meetingSubmitErrors.addParticipantsFailed);
-        }
-
-        return syncMeetingConversationParticipants(deps.conversationRepository, {
-          qualifiedConversationId: command.qualifiedConversation.value,
-          selectedUsers: command.selectedUsers,
-          usersToAdd,
-          userIdsToRemove,
-          isCreate: false,
-        }).mapRejected(mapSyncErrorToSubmitError);
-      }),
+      )
+        .andThen(() => syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove))
+        .andThen(submitSuccess =>
+          syncMeetingConversationName(deps.conversationRepository, {
+            qualifiedConversationId: updatedMeeting.qualified_conversation,
+            title: updatedMeeting.title,
+          }).map(() => submitSuccess),
+        ),
     );
 };

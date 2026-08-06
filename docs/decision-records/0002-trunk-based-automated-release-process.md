@@ -120,8 +120,8 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 - The development distribution retains the external channel name `dev`: it publishes the Docker image and a matching prerelease Helm chart, then updates `wire-builds/dev`.
 - `wire-builds/dev` remains the development distribution consumed by downstream internal integration environments; it is separate from the hosted Dev frontend deployment.
 - The legacy tag-driven `publish-and-deploy-webapp.yml` workflow has been deleted. Its obsolete `dev`, `master`, staging-tag, Production-tag, and maintenance publication paths are not restored.
-- The arbitrary manual release-artifact workflow and local staging and Production tag commands have been deleted. `q1-2024` and `q2-2025` publication handling was retired rather than migrated; recovery from existing historical Production tags remains available, and maintenance-release automation remains separate future work for Phase 11.
-- The legacy path was retired before the first complete Production run of the final workflow. Any issue discovered during the next release will be repaired in the new pipeline rather than falling back to the retired path.
+- The arbitrary manual release-artifact workflow and local staging and Production tag commands have been deleted. `q1-2024` and `q2-2025` publication handling was retired rather than migrated; recovery from existing historical Production tags remains available, and maintenance-release automation remains separate from the normal cloud release path.
+- The legacy path was retired before the first complete Production run of the final workflow. The final workflow was subsequently proven by release `2026-07-27.1`.
 - `wire-builds/main` remains Production-only and is never updated by an ordinary `main` push.
 - Development and Production distributions share the same Helm repository and prerelease version namespace. Their Docker, Helm, and `wire-builds` publications use one shared, non-cancellable distribution lock.
 - Edge verifies that its artifact still belongs to the current `main` commit after acquiring the deployment slot; stale Edge builds skip instead of moving Edge backwards.
@@ -232,6 +232,18 @@ On-premises maintenance releases replace the previous "long-term-support release
 - The webapp team produces the branch, artifact, and tags; customer deployment is handled outside this workflow by the integration or customer deployment process.
 - Maintenance branches do not implicitly deploy to the normal Beta or Production environments.
 - Maintenance validation happens in a dedicated maintenance validation path before a maintenance artifact is handed off.
+
+The final normal cloud workflow was proven with the following release:
+
+```text
+Release identifier: 2026-07-27.1
+Workflow run: 30271304258
+Beta tag: 2026-07-27.1-beta.1
+Production tag: 2026-07-27.1-production
+Commit: 770c6a14cdd2e10c8e32b251b16fab106cec0e1c
+```
+
+Phase 11 creates a missing maintenance branch and stops; an existing branch still pointing to its source Production commit also stops. Build, validation, and tagging begin only after a reviewed fix advances the branch, and the first patched artifact receives `<maintenance-line-key>-maintenance.1` through `wire-webapp-precommit`. Orchestration tooling comes from the dispatch commit on `main`, while the artifact comes from the maintenance branch; hosted Beta and Production, `wire-builds`, Docker, Helm, and customer deployment remain outside this workflow.
 
 Branch and tag cleanup follows these rules:
 

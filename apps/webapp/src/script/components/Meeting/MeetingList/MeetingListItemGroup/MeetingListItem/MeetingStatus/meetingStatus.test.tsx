@@ -70,14 +70,14 @@ describe('MeetingStatus', () => {
     expect(screen.queryByRole('button', {name: translateForTest('callJoin')})).not.toBeInTheDocument();
   });
 
-  it('shows Participating even when the meeting is outside its scheduled interval', () => {
+  it('shows Participating even when the meeting is past its scheduled end', () => {
     const {joinMeeting: _joinMeeting, ...props} = createTestProps();
 
     render(
       withThemeAndRootContext(
         <MeetingStatus
           {...props}
-          temporalStatus={MeetingTemporalStatuses.UPCOMING}
+          temporalStatus={MeetingTemporalStatuses.PAST}
           joinMeeting={jest.fn()}
           isJoinDisabled
           isCallActive

@@ -32,7 +32,7 @@ export type VisibleTimeWindow = {
  * Builds the half-open time range `[from, to)` used when expanding meeting series into list instances.
  *
  * `from` is the start of the calendar day containing `now`. `to` is `from + dayCount` days.
- * The UI chooses `dayCount` (e.g. 14 now; larger when infinite scroll widens the window).
+ * The UI chooses `dayCount` (e.g. 365 initially; larger when infinite scroll widens the window).
  *
  * @param now - Reference time, typically `wallClock.currentDate`.
  * @param options.dayCount - Number of calendar days to include from the start of today.

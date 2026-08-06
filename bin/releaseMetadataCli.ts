@@ -20,11 +20,15 @@
 import process from 'node:process';
 
 import {
+  createMaintenanceBranchName,
+  createNextMaintenanceTagName,
   createNextBetaTagName,
   createProductionTagName,
   createReleaseBranchName,
   extractReleaseIdentifierFromBranchName,
   resolveWebappBuildVersion,
+  validateMaintenanceSource,
+  validateMaintenanceTagName,
   validateProductionTagName,
 } from './releaseMetadata';
 
@@ -42,6 +46,10 @@ const usageText = [
   '  releaseMetadataCli.ts next-beta-tag <YYYY-MM-DD.N> [existing-tag ...]',
   '  releaseMetadataCli.ts production-tag <YYYY-MM-DD.N>',
   '  releaseMetadataCli.ts validate-production-tag <YYYY-MM-DD.N-production>',
+  '  releaseMetadataCli.ts maintenance-branch <YYYY-MM-DD.N-qualifier[-qualifier ...]>',
+  '  releaseMetadataCli.ts validate-maintenance-tag <maintenance-line-key-maintenance.X>',
+  '  releaseMetadataCli.ts next-maintenance-tag <maintenance-line-key> [existing-tag ...]',
+  '  releaseMetadataCli.ts validate-maintenance-source <maintenance-line-key> <YYYY-MM-DD.N-production>',
   '  releaseMetadataCli.ts webapp-build-version <build-reference-or-empty> <full-commit-sha> <main|development|production>',
 ].join('\n');
 
@@ -50,8 +58,12 @@ function writeResult(
     | ReturnType<typeof extractReleaseIdentifierFromBranchName>
     | ReturnType<typeof createReleaseBranchName>
     | ReturnType<typeof createNextBetaTagName>
+    | ReturnType<typeof createMaintenanceBranchName>
+    | ReturnType<typeof createNextMaintenanceTagName>
     | ReturnType<typeof createProductionTagName>
     | ReturnType<typeof resolveWebappBuildVersion>
+    | ReturnType<typeof validateMaintenanceSource>
+    | ReturnType<typeof validateMaintenanceTagName>
     | ReturnType<typeof validateProductionTagName>,
   dependencies: ReleaseMetadataCliDependencies,
 ): number {
@@ -80,6 +92,22 @@ export function runReleaseMetadataCli(
 
   if (commandName === 'next-beta-tag' && primaryValue !== undefined) {
     return writeResult(createNextBetaTagName(primaryValue, remainingValues), dependencies);
+  }
+
+  if (commandName === 'maintenance-branch' && primaryValue !== undefined && remainingValues.length === 0) {
+    return writeResult(createMaintenanceBranchName(primaryValue), dependencies);
+  }
+
+  if (commandName === 'validate-maintenance-tag' && primaryValue !== undefined && remainingValues.length === 0) {
+    return writeResult(validateMaintenanceTagName(primaryValue), dependencies);
+  }
+
+  if (commandName === 'next-maintenance-tag' && primaryValue !== undefined) {
+    return writeResult(createNextMaintenanceTagName(primaryValue, remainingValues), dependencies);
+  }
+
+  if (commandName === 'validate-maintenance-source' && primaryValue !== undefined && remainingValues.length === 1) {
+    return writeResult(validateMaintenanceSource(primaryValue, remainingValues[0]), dependencies);
   }
 
   if (commandName === 'production-tag' && primaryValue !== undefined) {
