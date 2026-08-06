@@ -243,7 +243,7 @@ Production tag: 2026-07-27.1-production
 Commit: 770c6a14cdd2e10c8e32b251b16fab106cec0e1c
 ```
 
-Phase 11 first creates a missing maintenance branch from the matching immutable Production tag and stops. Fixes arrive through reviewed pull requests; a later run builds and validates the patched branch head through `wire-webapp-precommit` before creating its first `<maintenance-line-key>-maintenance.1` tag. Orchestration tooling comes from the dispatch commit on `main`, while the artifact comes from the maintenance branch; hosted Beta and Production, `wire-builds`, Docker, Helm, and customer deployment remain outside this workflow.
+Phase 11 creates a missing maintenance branch and stops; an existing branch still pointing to its source Production commit also stops. Build, validation, and tagging begin only after a reviewed fix advances the branch, and the first patched artifact receives `<maintenance-line-key>-maintenance.1` through `wire-webapp-precommit`. Orchestration tooling comes from the dispatch commit on `main`, while the artifact comes from the maintenance branch; hosted Beta and Production, `wire-builds`, Docker, Helm, and customer deployment remain outside this workflow.
 
 Branch and tag cleanup follows these rules:
 

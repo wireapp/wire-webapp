@@ -12,7 +12,7 @@ on:
         required: true
         type: string
       confirm_maintenance_release:
-        description: 'I understand that this builds and validates a maintenance artifact without touching hosted Beta or Production.'
+        description: 'I understand that this creates or reuses a maintenance branch and, when a maintenance fix exists, builds, validates, and tags its artifact without touching hosted Beta or Production.'
         required: true
         default: false
         type: boolean
@@ -196,10 +196,10 @@ jobs:
           set -euo pipefail
 
           maintenance_branch_remote_ref="refs/remotes/origin/${MAINTENANCE_BRANCH}"
-          maintenance_branch_action=''
+          maintenance_branch_was_created='false'
 
           if git ls-remote --exit-code --heads origin "${MAINTENANCE_BRANCH}" > /dev/null; then
-            maintenance_branch_action='reused'
+            :
           else
             branch_lookup_exit_code="$?"
 
@@ -209,7 +209,7 @@ jobs:
             fi
 
             if git push origin "${SOURCE_COMMIT_SHA}:refs/heads/${MAINTENANCE_BRANCH}"; then
-              maintenance_branch_action='created'
+              maintenance_branch_was_created='true'
             else
               push_exit_code="$?"
 
@@ -218,21 +218,30 @@ jobs:
                 exit "${push_exit_code}"
               fi
 
-              maintenance_branch_action='reused'
             fi
           fi
 
           git fetch --no-tags origin "+refs/heads/${MAINTENANCE_BRANCH}:${maintenance_branch_remote_ref}"
           maintenance_commit_sha="$(git rev-parse --verify "${maintenance_branch_remote_ref}^{commit}")"
 
-          if [[ "${maintenance_branch_action}" == 'created' && "${maintenance_commit_sha}" != "${SOURCE_COMMIT_SHA}" ]]; then
-            echo "Created maintenance branch ${MAINTENANCE_BRANCH} resolved to ${maintenance_commit_sha}, expected source Production commit ${SOURCE_COMMIT_SHA}." >&2
-            exit 1
-          fi
+          if [[ "${maintenance_branch_was_created}" == 'true' ]]; then
+            maintenance_branch_action='created'
 
-          if [[ "${maintenance_branch_action}" == 'reused' ]] && ! git merge-base --is-ancestor "${SOURCE_COMMIT_SHA}" "${maintenance_commit_sha}"; then
-            echo "Existing maintenance branch ${MAINTENANCE_BRANCH} is unrelated to source Production commit ${SOURCE_COMMIT_SHA}." >&2
-            exit 1
+            if [[ "${maintenance_commit_sha}" != "${SOURCE_COMMIT_SHA}" ]]; then
+              echo "Created maintenance branch ${MAINTENANCE_BRANCH} resolved to ${maintenance_commit_sha}, expected source Production commit ${SOURCE_COMMIT_SHA}." >&2
+              exit 1
+            fi
+          else
+            if ! git merge-base --is-ancestor "${SOURCE_COMMIT_SHA}" "${maintenance_commit_sha}"; then
+              echo "Existing maintenance branch ${MAINTENANCE_BRANCH} is unrelated to source Production commit ${SOURCE_COMMIT_SHA}." >&2
+              exit 1
+            fi
+
+            if [[ "${maintenance_commit_sha}" == "${SOURCE_COMMIT_SHA}" ]]; then
+              maintenance_branch_action='awaiting-fix'
+            else
+              maintenance_branch_action='reused'
+            fi
           fi
 
           {
@@ -626,7 +635,7 @@ jobs:
     env:
       ARTIFACT_CHECKSUM: ${{ needs.build_maintenance_artifact.outputs.artifact_checksum || 'unavailable' }}
       ARTIFACT_NAME: ${{ needs.build_maintenance_artifact.outputs.artifact_name || 'not built' }}
-      ARTIFACT_VERSION: ${{ needs.build_maintenance_artifact.outputs.artifact_version || 'unavailable' }}
+      ARTIFACT_VERSION: ${{ needs.build_maintenance_artifact.outputs.artifact_version || 'not built' }}
       BRANCH_ACTION: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch_action || 'unavailable' }}
       MAINTENANCE_BRANCH: ${{ needs.validate_request.outputs.maintenance_branch || 'unavailable' }}
       MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha || 'unavailable' }}
@@ -675,6 +684,11 @@ jobs:
             echo 'Docker and Helm were not published.'
 
             if [[ "${BRANCH_ACTION}" == 'created' ]]; then
+              echo '- Maintenance branch was created from the source Production commit.'
               echo "- Next action: merge the maintenance fix through a reviewed pull request targeting ${MAINTENANCE_BRANCH}, then rerun this workflow."
+            elif [[ "${BRANCH_ACTION}" == 'awaiting-fix' ]]; then
+              echo '- Maintenance branch already exists and still points to the source Production commit.'
+              echo '- No maintenance change is present yet.'
+              echo "- Next action: merge a reviewed maintenance fix targeting ${MAINTENANCE_BRANCH} before rerunning this workflow."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
