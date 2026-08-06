@@ -27,6 +27,7 @@ import {
   calendarIconStyles,
   itemStyles,
   leftStyles,
+  MEETING_LIST_ITEM_ONGOING_ATTR,
   metaStyles,
   onGoingMeetingStyles,
   rightStyles,
@@ -96,7 +97,10 @@ const MeetingListItemComponent = ({
   const isOngoing = isMeetingListItemOngoing(temporalStatus, isCallActive);
 
   return (
-    <div css={[itemStyles, isOngoing && onGoingMeetingStyles]}>
+    <div
+      css={[itemStyles, isOngoing && onGoingMeetingStyles]}
+      {...(isOngoing ? {[MEETING_LIST_ITEM_ONGOING_ATTR]: ''} : {})}
+    >
       <div css={leftStyles}>
         <div css={calendarIconStyles}>
           <CalendarIcon />

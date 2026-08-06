@@ -29,6 +29,7 @@ describe('shouldRefreshMeetingsListAfterSubmitError', () => {
     expect(shouldRefreshMeetingsListAfterSubmitError(meetingSubmitErrors.addParticipantsFailed)).toBe(true);
     expect(shouldRefreshMeetingsListAfterSubmitError(meetingSubmitErrors.removeParticipantsFailed)).toBe(true);
     expect(shouldRefreshMeetingsListAfterSubmitError(meetingSubmitErrors.conversationSetupFailed)).toBe(true);
+    expect(shouldRefreshMeetingsListAfterSubmitError(meetingSubmitErrors.conversationRenameFailed)).toBe(true);
   });
 
   it('returns false for failures before server state changed', () => {

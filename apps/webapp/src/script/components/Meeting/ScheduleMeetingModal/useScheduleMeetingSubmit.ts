@@ -28,16 +28,18 @@ import {mapScheduleFormToUpdateMeetingCommand} from 'Components/Meeting/mapSched
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
 import type {MeetingSubmitSuccess} from 'Components/Meeting/shared/service/meetingService';
+import {syncMeetingConversationName} from 'Components/Meeting/shared/service/syncMeetingConversationName';
 import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/Meeting/shared/submit/meetingSubmitErrorKeys';
 import {
   isMeetingPersistedDespiteSubmitError,
   shouldRefreshMeetingsListAfterSubmitError,
 } from 'Components/Meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
+import {showMeetingConversationRenameFailedModal} from 'Components/Meeting/shared/submit/showMeetingConversationRenameFailedModal';
 import {showMeetingPartialAddFailureModal} from 'Components/Meeting/shared/submit/showMeetingPartialAddFailureModal';
 import {showMeetingSubmitError} from 'Components/Meeting/shared/submit/showMeetingSubmitError';
 import type {ScheduleMeetingCommand, UpdateMeetingCommand} from 'Components/Meeting/shared/types/meetingCommandTypes';
 import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 
 import {
   scheduleMeetingSubmitResults,
@@ -103,6 +105,8 @@ const submitMeeting = ({
 export const useScheduleMeetingSubmit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {translate, wallClock} = useApplicationContext();
+  const {content} = useMainViewModel();
+  const conversationRepository = content.repositories.conversation;
   const scheduleMeeting = useMeetingStore(state => state.scheduleMeeting);
   const updateMeeting = useMeetingStore(state => state.updateMeeting);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
@@ -134,7 +138,20 @@ export const useScheduleMeetingSubmit = () => {
         }
 
         setIsSubmitting(false);
-        showMeetingSubmitError(translate, submitResult.error, getScheduleMeetingSubmitErrorTranslationKeys(mode));
+
+        if (submitResult.error === meetingSubmitErrors.conversationRenameFailed && qualifiedConversation.isJust) {
+          showMeetingConversationRenameFailedModal({
+            translate,
+            retryRename: () =>
+              syncMeetingConversationName(conversationRepository, {
+                qualifiedConversationId: qualifiedConversation.value,
+                title: formState.title.trim(),
+              }),
+          });
+        } else {
+          showMeetingSubmitError(translate, submitResult.error, getScheduleMeetingSubmitErrorTranslationKeys(mode));
+        }
+
         return isMeetingPersistedDespiteSubmitError(submitResult.error)
           ? scheduleMeetingSubmitResults.setupFailed
           : scheduleMeetingSubmitResults.submitFailed;
@@ -153,6 +170,7 @@ export const useScheduleMeetingSubmit = () => {
       return scheduleMeetingSubmitResults.succeeded;
     },
     [
+      conversationRepository,
       editingMeetingId,
       loadMeetings,
       mode,

@@ -44,6 +44,11 @@ const persistedSetupFailureKeys = {
   },
 } satisfies Pick<MeetingSubmitErrorTranslationMap, 'conversationSetupFailed' | 'addParticipantsFailed'>;
 
+const conversationRenameFailedKeys: MeetingSubmitErrorTranslationKeys = {
+  titleKey: 'meetings.scheduleModal.error.conversationRenameFailedTitle',
+  messageKey: 'meetings.scheduleModal.error.conversationRenameFailed',
+};
+
 export const MEET_NOW_ERROR_TRANSLATION_KEYS = {
   missingTimes: meetNowCreateFailureKeys,
   startInPast: meetNowCreateFailureKeys,
@@ -54,6 +59,7 @@ export const MEET_NOW_ERROR_TRANSLATION_KEYS = {
   editMeetingIdMissing: meetNowCreateFailureKeys,
   addParticipantsFailed: persistedSetupFailureKeys.addParticipantsFailed,
   removeParticipantsFailed: meetNowCreateFailureKeys,
+  conversationRenameFailed: conversationRenameFailedKeys,
   deleteFailed: meetNowCreateFailureKeys,
   deleteSucceededButLocalCleanupFailed: meetNowCreateFailureKeys,
   leaveConversationFailed: meetNowCreateFailureKeys,
@@ -104,6 +110,7 @@ export const getScheduleMeetingSubmitErrorTranslationKeys = (
       titleKey: updateFailureTitleKey,
       messageKey: 'meetings.scheduleModal.error.removeParticipantsFailed',
     },
+    conversationRenameFailed: conversationRenameFailedKeys,
     deleteFailed: {
       titleKey: 'meetings.deleteModal.error.deleteFailedTitle',
       messageKey: 'meetings.deleteModal.error.deleteFailed',

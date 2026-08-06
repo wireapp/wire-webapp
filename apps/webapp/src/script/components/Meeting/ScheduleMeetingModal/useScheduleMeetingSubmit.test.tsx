@@ -21,16 +21,21 @@ import type {ReactNode} from 'react';
 
 import {act, renderHook} from '@testing-library/react';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/Meeting/meetingSubmitErrors';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import type {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
@@ -78,9 +83,23 @@ const updateCommand = {
   qualifiedConversation: maybe.just({id: 'conversation-id', domain: 'example.com'}),
 };
 
-const RootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest, wallClock: testWallClock}),
-);
+const createMainViewModel = ({
+  renameConversation = jest.fn().mockResolvedValue(undefined),
+  safeGetConversationById = jest.fn().mockReturnValue(task.reject(new Error('unused'))),
+}: {
+  renameConversation?: jest.Mock;
+  safeGetConversationById?: jest.Mock;
+} = {}) =>
+  ({
+    content: {
+      repositories: {
+        conversation: {
+          renameConversation,
+          safeGetConversationById,
+        },
+      },
+    },
+  }) as unknown as MainViewModel;
 
 const createMeetingStore = ({
   loadMeetings = jest.fn().mockResolvedValue(undefined),
@@ -95,20 +114,39 @@ const createMeetingStore = ({
     scheduleMeeting,
     meetNowMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     updateMeeting,
+    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+    removeMeetingByQualifiedId: jest.fn(),
+    syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
     loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
   }));
 
 const createWrapper =
-  (store: ReturnType<typeof createMeetingStore>) =>
-  ({children}: {children: ReactNode}) => (
-    <RootProviderWrapper>
-      <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>
-    </RootProviderWrapper>
-  );
+  (store: ReturnType<typeof createMeetingStore>, mainViewModel: MainViewModel = createMainViewModel()) =>
+  ({children}: {children: ReactNode}) => {
+    const RootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        wallClock: testWallClock,
+        mainViewModel,
+      }),
+    );
+
+    return (
+      <RootProviderWrapper>
+        <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>
+      </RootProviderWrapper>
+    );
+  };
 
 describe('useScheduleMeetingSubmit', () => {
   beforeEach(() => {
     useScheduleMeetingModal.getState().reset(testWallClock);
+    jest.spyOn(PrimaryModal, 'show').mockImplementation(jest.fn());
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('does not refresh meetings after a successful submit', async () => {
@@ -195,5 +233,95 @@ describe('useScheduleMeetingSubmit', () => {
     expect(submitResult).toBe(scheduleMeetingSubmitResults.submitFailed);
     expect(wasScheduleMeetingPersisted(submitResult)).toBe(false);
     expect(loadMeetings).not.toHaveBeenCalled();
+  });
+
+  const openEditMeetingModal = () => {
+    useScheduleMeetingModal.getState().openEdit(
+      {
+        title: formState.title,
+        qualified_id: {id: 'meeting-id', domain: 'example.com'},
+        qualified_creator: {id: 'creator-id', domain: 'example.com'},
+        qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+        series_start_date: '2026-06-16T10:00:00.000Z',
+        series_end_date: '2026-06-16T11:00:00.000Z',
+        duration_ms: 3_600_000,
+        recurrence: 'doesNotRepeat',
+        conversation_id: 'conversation-id',
+      },
+      formState,
+      {id: 'conversation-id', domain: 'example.com'},
+      [],
+    );
+  };
+
+  it('shows rename retry modal and refreshes meetings when conversation rename fails after update', async () => {
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const updateMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.conversationRenameFailed));
+    const store = createMeetingStore({loadMeetings, updateMeeting});
+
+    openEditMeetingModal();
+
+    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.setupFailed);
+    expect(wasScheduleMeetingPersisted(submitResult)).toBe(true);
+    expect(loadMeetings).toHaveBeenCalledTimes(1);
+    expect(updateMeeting).toHaveBeenCalledWith(updateCommand);
+    expect(PrimaryModal.show).toHaveBeenCalledWith(
+      PrimaryModal.type.CONFIRM,
+      expect.objectContaining({
+        text: {
+          title: translateForTest('meetings.scheduleModal.error.conversationRenameFailedTitle'),
+          message: translateForTest('meetings.scheduleModal.error.conversationRenameFailed'),
+        },
+      }),
+      undefined,
+      translateForTest,
+    );
+  });
+
+  it('retries rename only from the confirm primary action without calling updateMeeting again', async () => {
+    const loadMeetings = jest.fn().mockResolvedValue(undefined);
+    const updateMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.conversationRenameFailed));
+    const store = createMeetingStore({loadMeetings, updateMeeting});
+
+    const conversation = new Conversation(
+      'conversation-id',
+      'example.com',
+      CONVERSATION_PROTOCOL.MLS,
+      translateForTest,
+    );
+    conversation.name('Stale call name');
+    conversation.groupConversationType(GROUP_CONVERSATION_TYPE.MEETING);
+
+    const renameConversation = jest.fn().mockResolvedValue(undefined);
+    const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
+    const mainViewModel = createMainViewModel({renameConversation, safeGetConversationById});
+
+    openEditMeetingModal();
+
+    const {result} = renderHook(() => useScheduleMeetingSubmit(), {
+      wrapper: createWrapper(store, mainViewModel),
+    });
+
+    await act(async () => {
+      await result.current.submit(formState);
+    });
+
+    expect(updateMeeting).toHaveBeenCalledTimes(1);
+
+    const modalOptions = (PrimaryModal.show as jest.Mock).mock.calls[0][1];
+    await act(async () => {
+      await modalOptions.primaryAction.action();
+    });
+
+    expect(updateMeeting).toHaveBeenCalledTimes(1);
+    expect(safeGetConversationById).toHaveBeenCalledWith({id: 'conversation-id', domain: 'example.com'});
+    expect(renameConversation).toHaveBeenCalledWith(conversation, 'Weekly sync');
   });
 });
