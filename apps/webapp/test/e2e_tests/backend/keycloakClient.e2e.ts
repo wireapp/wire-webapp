@@ -68,7 +68,7 @@ export class KeycloakClientE2E {
         attributes: {
           'display.on.consent.screen': 'false',
           'saml.encrypt': 'false',
-          'saml_assertion_consumer_url_post': finalizeUrl,
+          saml_assertion_consumer_url_post: finalizeUrl,
           'saml.client.signature': 'false',
           'saml.artifact.binding': 'false',
           'saml.assertion.signature': 'true',
