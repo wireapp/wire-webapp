@@ -17,43 +17,43 @@
  *
  */
 
-import {isInRecycleBin} from './recycleBin';
+import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
 
-describe('isInRecycleBin', () => {
-  afterEach(() => {
-    window.location.hash = '';
-  });
+import {isPathInRecycleBin} from './recycleBin';
 
-  it('returns true for a recycle bin path', () => {
-    window.location.hash = '#/conversation/conversation-id/wire.com/files/recycle_bin/folder';
-
-    expect(isInRecycleBin()).toBe(true);
-  });
-
-  it('returns false for a path outside the recycle bin', () => {
-    window.location.hash = '#/conversation/conversation-id/wire.com/files/folder';
-
-    expect(isInRecycleBin()).toBe(false);
-  });
-
-  it.each(['test_recycle_bin', 'recycle_bin_test', 'foobar/recycle_bin'])(
-    'returns false when a regular path contains the recycle bin name: %s',
+describe('isPathInRecycleBin', () => {
+  it.each(['recycle_bin', 'recycle_bin/folder', 'recycle_bin/recycle_bin', 'recycle_bin/deleted-file/nested-folder'])(
+    'recognizes a recycle bin path: %s',
     path => {
-      window.location.hash = `#/conversation/conversation-id/wire.com/files/${path}`;
-
-      expect(isInRecycleBin()).toBe(false);
+      expect(isPathInRecycleBin(path)).toBe(true);
     },
   );
 
-  it('returns true when a recycle-bin descendant is also named recycle_bin', () => {
-    window.location.hash = '#/conversation/conversation-id/wire.com/files/recycle_bin/recycle_bin';
+  it.each([
+    'folder',
+    'test_recycle_bin',
+    'recycle_bin_test',
+    'foobar/recycle_bin',
+    'recycle_bin_notes',
+    'recycle_bin archive',
+  ])('does not match a folder name: %s', path => {
+    expect(isPathInRecycleBin(path)).toBe(false);
+  });
+});
 
-    expect(isInRecycleBin()).toBe(true);
+describe('recycle bin detection from a URL-encoded files path', () => {
+  // getCellsFilesPath accepts the hash directly, so the decode + validation
+  // pipeline is exercised without mutating window.location.
+  it.each([
+    {encodedPath: 'recycle_bin%2Fdeleted-file', isInBin: true},
+    {encodedPath: 'recycle_bin%20archive', isInBin: false},
+  ])('decodes $encodedPath before validating', ({encodedPath, isInBin}) => {
+    const hash = `#/conversation/conversation-id/wire.com/files/${encodedPath}`;
+
+    expect(isPathInRecycleBin(getCellsFilesPath(hash))).toBe(isInBin);
   });
 
   it('returns false when the hash has no files path', () => {
-    window.location.hash = '#/conversation/conversation-id/wire.com';
-
-    expect(isInRecycleBin()).toBe(false);
+    expect(isPathInRecycleBin(getCellsFilesPath('#/conversation/conversation-id/wire.com'))).toBe(false);
   });
 });
