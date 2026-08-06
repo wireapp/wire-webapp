@@ -35,6 +35,10 @@ SSO_CLAIMED_USER_EMAIL=op://Test Automation/Staging Claimed Domain User/email
 SSO_CLAIMED_USER_PASSWORD=op://Test Automation/Staging Claimed Domain User/password
 SSO_CLAIMED_DOMAIN_CODE=op://Test Automation/Staging Claimed Domain User/SSO code
 
+KEYCLOAK_URL=op://Test Automation/KEYCLOAK_QA_AUTOMATION/website
+KEYCLOAK_USERNAME=op://Test Automation/KEYCLOAK_QA_AUTOMATION/username
+KEYCLOAK_PASSWORD=op://Test Automation/KEYCLOAK_QA_AUTOMATION/password
+
 INBUCKET_USERNAME=op://Test Automation/BackendConnection staging/inbucketUsername
 INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection staging/inbucketPassword }}"
 INBUCKET_URL=op://Test Automation/BackendConnection staging/inbucketUrl

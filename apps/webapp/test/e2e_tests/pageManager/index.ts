@@ -118,7 +118,7 @@ export class PageManager {
   };
 
   openSSOPage = async (baseUrl: string = webAppPath) => {
-    await this.page.goto(new URL(`/auth/#/sso`, baseUrl).toString());
+    await this.page.goto(new URL(`/auth/#/sso`, baseUrl).toString(), {waitUntil: 'commit', timeout: 120_000});
   };
 
   openUrl = (url: string) => {

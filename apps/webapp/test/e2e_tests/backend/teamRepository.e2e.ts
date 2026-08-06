@@ -23,7 +23,6 @@ import {Service} from '../data/serviceInfo';
 import {User} from '../data/user';
 import {Role} from '@wireapp/api-client/lib/team';
 import {faker} from '@faker-js/faker';
-
 export class TeamRepositoryE2E extends BackendClientE2E {
   async inviteUserToTeam(emailOfInvitee: string, teamOwner: User, role: Role = Role.MEMBER): Promise<string> {
     const response = this.axiosInstance.post(
