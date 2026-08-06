@@ -19,6 +19,12 @@
 
 import {type ReactNode, useEffect, useMemo} from 'react';
 
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {createMeetingNotificationEventHandlers} from 'Components/Meeting/meetingNotificationEventHandlers';
+import {useMeetingNotificationStore} from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
 import {createMeetingStore} from 'Components/Meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/Meeting/shared/service/deleteMeeting';
@@ -78,11 +84,32 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       },
     });
 
+    const notificationHandlers = createMeetingNotificationEventHandlers({
+      getMeetingSeries: () => store.getState().meetingSeries,
+      addNotification: useMeetingNotificationStore.getState().addNotification,
+      logger,
+    });
+
+    amplify.subscribe(WebAppEvents.MEETING.CREATED, notificationHandlers.onMeetingCreated);
+    amplify.subscribe(WebAppEvents.MEETING.UPDATED, notificationHandlers.onMeetingUpdated);
+    amplify.subscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingDeleted);
+
     const unsubscribeFromMeetingLifecycleEvents = subscribeToMeetingLifecycleEvents({dispatcher});
+    const unsubscribeFromMeetingStore = store.subscribe((state, previousState) => {
+      if (state.meetingSeries !== previousState.meetingSeries) {
+        notificationHandlers.retryPendingNotifications();
+      }
+    });
 
     dispatcher.enqueueInitialLoad();
 
-    return unsubscribeFromMeetingLifecycleEvents;
+    return () => {
+      unsubscribeFromMeetingLifecycleEvents();
+      unsubscribeFromMeetingStore();
+      amplify.unsubscribe(WebAppEvents.MEETING.CREATED, notificationHandlers.onMeetingCreated);
+      amplify.unsubscribe(WebAppEvents.MEETING.UPDATED, notificationHandlers.onMeetingUpdated);
+      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingDeleted);
+    };
   }, [isMeetingsEnabled, store]);
 
   return <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>;

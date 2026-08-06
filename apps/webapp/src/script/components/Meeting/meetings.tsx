@@ -17,28 +17,20 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {contentStyles} from 'Components/Meeting/meeting.styles';
 import {MeetingCallingView} from 'Components/Meeting/MeetingCallingView/meetingCallingView';
 import {meetingsContentWrapperStyles} from 'Components/Meeting/MeetingCallingView/meetingCallingView.styles';
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
-import {createMeetingNotificationEventHandlers} from 'Components/Meeting/meetingNotificationEventHandlers';
-import {useMeetingNotificationStore} from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
 import {MeetNowModal} from 'Components/Meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-
-const logger = getLogger('Meetings');
 
 export const Meetings = () => {
   const {fireAndForgetInvoker} = useApplicationContext();
@@ -47,37 +39,16 @@ export const Meetings = () => {
   const isLoading = useMeetingStore(state => state.isLoading);
   const hasLoadError = useMeetingStore(state => state.hasLoadError);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
-  const removeMeetingByQualifiedId = useMeetingStore(state => state.removeMeetingByQualifiedId);
-  const addNotification = useMeetingNotificationStore(state => state.addNotification);
   const selfUser = container.resolve(UserState).self();
 
-  useEffect(() => {
-    fireAndForgetInvoker.fireAndForget(loadMeetings);
-  }, [loadMeetings, fireAndForgetInvoker]);
-
-  const meetingSeriesRef = useRef(meetingSeries);
-  meetingSeriesRef.current = meetingSeries;
+  const refreshMeetings = useCallback(
+    () => fireAndForgetInvoker.fireAndForget(loadMeetings),
+    [fireAndForgetInvoker, loadMeetings],
+  );
 
   useEffect(() => {
-    const {onMeetingCreated, onMeetingUpdated, onMeetingDeleted} = createMeetingNotificationEventHandlers({
-      getMeetingSeries: () => meetingSeriesRef.current,
-      addNotification,
-      removeMeetingByQualifiedId,
-      logger,
-    });
-
-    amplify.subscribe(WebAppEvents.MEETING.CREATED, onMeetingCreated);
-    amplify.subscribe(WebAppEvents.MEETING.UPDATED, onMeetingUpdated);
-    amplify.subscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
-
-    return () => {
-      amplify.unsubscribe(WebAppEvents.MEETING.CREATED, onMeetingCreated);
-      amplify.unsubscribe(WebAppEvents.MEETING.UPDATED, onMeetingUpdated);
-      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, onMeetingDeleted);
-    };
-  }, [addNotification, removeMeetingByQualifiedId]);
-
-  const refreshMeetings = () => fireAndForgetInvoker.fireAndForget(loadMeetings);
+    refreshMeetings();
+  }, [refreshMeetings]);
 
   return (
     <div css={meetingsContentWrapperStyles}>
