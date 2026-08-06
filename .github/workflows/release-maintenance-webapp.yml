@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       source_production_tag:
-        description: 'Annotated ADR Production tag from which the maintenance line starts, for example 2026-07-27.1-production'
+        description: 'Annotated Production tag from which the maintenance line starts, for example 2026-07-27.1-production'
         required: true
         type: string
       confirm_maintenance_release:
@@ -144,7 +144,7 @@ jobs:
           YARN_ENABLE_SCRIPTS: 'false'
         run: ./bin/yarn install --immutable --mode=skip-build
 
-      - name: Validate ADR Production tag format
+      - name: Validate Production tag format
         env:
           SOURCE_PRODUCTION_TAG: ${{ needs.validate_request.outputs.source_production_tag }}
         run: |

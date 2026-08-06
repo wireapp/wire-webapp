@@ -243,7 +243,7 @@ Production tag: 2026-07-27.1-production
 Commit: 770c6a14cdd2e10c8e32b251b16fab106cec0e1c
 ```
 
-Phase 11 uses the matching immutable ADR Production tag as its source, keeps orchestration tooling on `main`, and builds the exact maintenance branch head once. Fixes land on `main` first and reach the maintenance branch through reviewed cherry-pick pull requests. The artifact is validated through `wire-webapp-precommit` with Staging backends before its immutable maintenance tag is created; hosted Beta and Production, `wire-builds`, Docker, Helm, and customer deployment remain outside this workflow.
+Phase 11 uses the matching immutable Production tag as its source, keeps orchestration tooling on `main`, and builds the exact maintenance branch head once. Fixes land on `main` first and reach the maintenance branch through reviewed cherry-pick pull requests. The artifact is validated through `wire-webapp-precommit` with Staging backends before its immutable maintenance tag is created; hosted Beta and Production, `wire-builds`, Docker, Helm, and customer deployment remain outside this workflow.
 
 Branch and tag cleanup follows these rules:
 

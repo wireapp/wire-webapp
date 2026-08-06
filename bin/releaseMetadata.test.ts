@@ -268,7 +268,7 @@ describe('releaseMetadata', () => {
     expect(actualNextMaintenanceTagName.value).toBe('2026-07-27.1-airgap-a-maintenance.3');
   });
 
-  it('validateMaintenanceSource() accepts a matching ADR Production tag', () => {
+  it('validateMaintenanceSource() accepts a matching Production tag', () => {
     const actualSourceProductionTag = validateMaintenanceSource('2026-07-27.1-airgap-a', '2026-07-27.1-production');
 
     assert(actualSourceProductionTag.isOk);
