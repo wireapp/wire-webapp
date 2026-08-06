@@ -276,6 +276,12 @@ export type Env = {
 
   URL_PATH_PASSWORD_RESET: string;
 
+  /**
+   * When set to "true", overrides the support/terms/what's-new URLs below with
+   * the on-prem webapp's own `/support` page.
+   */
+  URL_SUPPORT_SELF_HOSTED: string;
+
   /** Sets Support URLs to specific pages */
   URL_SUPPORT_INDEX: string;
 
