@@ -17,12 +17,12 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isEmptyString} from '@sindresorhus/is';
 
 import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
 
 export const getCurrentFolderName = (currentPath: string): string => {
-  if (is.emptyString(currentPath) || currentPath === RECYCLE_BIN_PATH) {
+  if (isEmptyString(currentPath) || currentPath === RECYCLE_BIN_PATH) {
     return '';
   }
 
