@@ -76,6 +76,8 @@ const cleanUp = () => {
   }
 };
 
+export const closeContextMenu = () => queueMicrotask(cleanUp);
+
 // Clamping the value between min and max
 const clampValue = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max));
 
