@@ -50,7 +50,7 @@ export class KeycloakClientE2E {
       throw new Error('BACKEND_URL is not defined');
     }
 
-    const finalizeUrl = `${this.backendUrl}sso/finalize-login/${user.teamId}`;
+    const finalizeUrl = new URL(`sso/finalize-login/${user.teamId}`, this.backendUrl).toString();
 
     const response = await this.axiosInstance.post(
       `admin/realms/${this.keycloakRealm}/clients`,
@@ -68,7 +68,7 @@ export class KeycloakClientE2E {
         attributes: {
           'display.on.consent.screen': 'false',
           'saml.encrypt': 'false',
-          saml_assertion_consumer_url_post: finalizeUrl,
+          'saml_assertion_consumer_url_post': finalizeUrl,
           'saml.client.signature': 'false',
           'saml.artifact.binding': 'false',
           'saml.assertion.signature': 'true',
