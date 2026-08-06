@@ -37,6 +37,7 @@ type GetMeetingActionEntriesParams = {
   nowMilliseconds: number;
   translate: Translate;
   onJoin: () => void;
+  isJoinDisabled?: boolean;
   onEdit: () => void;
   onDeleteForAll: () => void;
   onDeleteForMe: () => void;
@@ -48,6 +49,7 @@ export const getMeetingActionEntries = ({
   nowMilliseconds,
   translate,
   onJoin,
+  isJoinDisabled = false,
   onEdit,
   onDeleteForAll,
   onDeleteForMe,
@@ -55,6 +57,7 @@ export const getMeetingActionEntries = ({
   const joinEntry: ContextMenuEntry = {
     icon: () => <CallIcon />,
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.joinNow),
+    isDisabled: isJoinDisabled,
     click: onJoin,
   };
 

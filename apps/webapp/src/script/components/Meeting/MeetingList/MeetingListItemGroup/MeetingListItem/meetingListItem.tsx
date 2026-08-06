@@ -115,7 +115,12 @@ const MeetingListItemComponent = ({
           isJoinDisabled={isJoinDisabled}
           isCallActive={isCallActive}
         />
-        <MeetingAction meetingInstance={meetingInstance} selfUser={selfUser} joinMeeting={joinMeeting} />
+        <MeetingAction
+          meetingInstance={meetingInstance}
+          selfUser={selfUser}
+          joinMeeting={joinMeeting}
+          isJoinDisabled={isJoinDisabled}
+        />
       </div>
     </div>
   );

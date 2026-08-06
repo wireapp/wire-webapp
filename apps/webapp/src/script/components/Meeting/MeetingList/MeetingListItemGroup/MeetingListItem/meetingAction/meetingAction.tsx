@@ -40,9 +40,10 @@ interface MeetingActionProps {
   meetingInstance: MeetingInstance;
   selfUser: User | undefined;
   joinMeeting: () => void;
+  isJoinDisabled: boolean;
 }
 
-export const MeetingAction = ({meetingInstance, selfUser, joinMeeting}: MeetingActionProps) => {
+export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDisabled}: MeetingActionProps) => {
   const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const {openDeleteMeetingModal} = useDeleteMeeting();
@@ -62,6 +63,7 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting}: MeetingA
         nowMilliseconds,
         translate,
         onJoin: joinMeeting,
+        isJoinDisabled,
         onEdit: () => {
           if (canEditMeeting(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
             fireAndForgetInvoker.fireAndForget(() => editMeeting(meetingInstance));

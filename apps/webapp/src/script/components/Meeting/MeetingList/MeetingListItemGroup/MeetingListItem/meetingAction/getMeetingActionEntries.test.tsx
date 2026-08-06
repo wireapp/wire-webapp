@@ -83,6 +83,7 @@ describe('getMeetingActionEntries', () => {
       nowMilliseconds: futureNowMilliseconds,
       translate,
       onJoin: noop,
+      isJoinDisabled: false,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -106,6 +107,7 @@ describe('getMeetingActionEntries', () => {
         nowMilliseconds,
         translate,
         onJoin,
+        isJoinDisabled: false,
         onEdit: noop,
         onDeleteForAll: noop,
         onDeleteForMe: noop,
@@ -279,5 +281,23 @@ describe('getMeetingActionEntries', () => {
 
     expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
     expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('keeps Join now visible but disables it while joining or in a call', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser(),
+      nowMilliseconds: futureNowMilliseconds,
+      translate,
+      onJoin: noop,
+      isJoinDisabled: true,
+      onEdit: noop,
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    const joinEntry = getJoinEntry(entries);
+    expect(joinEntry).toBeDefined();
+    expect(joinEntry?.isDisabled).toBe(true);
   });
 });
