@@ -22,12 +22,6 @@ import {User} from '../data/user';
 
 export class ScimRepositoryE2E extends BackendClientE2E {
   async createSCIMAccessToken(user: User, identityProviderId: string) {
-    const backendUrl = process.env.BACKEND_URL;
-
-    if (!backendUrl) {
-      throw new Error('BACKEND_URL is not defined');
-    }
-
     const response = await this.axiosInstance.post(
       'scim/auth-tokens',
       {
