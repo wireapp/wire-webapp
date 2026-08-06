@@ -64,6 +64,7 @@ test.describe('SSO and SCIM', () => {
 
       const {pages, modals, components} = pageManager.webapp;
       await pageManager.openSSOPage();
+      await pages.singleSignOn().isSSOPageVisible();
 
       await test.step('User enters SSO code into SSO field and clicks login', async () => {
         [idpPage] = await Promise.all([
@@ -105,6 +106,7 @@ test.describe('SSO and SCIM', () => {
 
       const {pages, modals, components} = pageManager.webapp;
       await pageManager.openSSOPage();
+      await pages.singleSignOn().isSSOPageVisible();
 
       await test.step('Precondition: User B is created as SCIM user', async () => {
         const scimToken = await api.scim.createSCIMAccessToken(userA, identityProviderId);
