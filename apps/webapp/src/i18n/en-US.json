@@ -1278,6 +1278,7 @@
   "meetings.action.deleteMeetingForAll": "Delete meeting for everyone",
   "meetings.action.deleteMeetingForMe": "Delete meeting for me",
   "meetings.action.editMeeting": "Edit meeting",
+  "meetings.action.joinNow": "Join now",
   "meetings.action.meetNow": "Meet Now",
   "meetings.action.scheduleMeeting": "Schedule Meeting",
   "meetings.deleteModal.cancel": "Cancel",

@@ -70,6 +70,9 @@ const getDeleteForMeEntryLabel = (entries: ReturnType<typeof getMeetingActionEnt
 const getDeleteForAllEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
   entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll);
 
+const getJoinEntry = (entries: ReturnType<typeof getMeetingActionEntries>) =>
+  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.joinNow);
+
 const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) => entries.map(entry => entry.label);
 
 describe('getMeetingActionEntries', () => {
@@ -79,17 +82,43 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser(),
       nowMilliseconds: futureNowMilliseconds,
       translate,
+      onJoin: noop,
+      isJoinDisabled: false,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
 
     expect(getEntryLabels(entries)).toEqual([
+      MEETING_ACTION_TRANSLATION_KEYS.joinNow,
       MEETING_ACTION_TRANSLATION_KEYS.editMeeting,
       MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll,
     ]);
     expect(getEntryLabels(entries)).not.toContain('meetings.action.startMeeting');
   });
+
+  it.each([futureNowMilliseconds, ongoingNowMilliseconds, pastNowMilliseconds])(
+    'always includes Join now regardless of meeting state',
+    nowMilliseconds => {
+      const onJoin = jest.fn();
+      const entries = getMeetingActionEntries({
+        meetingInstance: createMeetingInstance(),
+        selfUser: createSelfUser(),
+        nowMilliseconds,
+        translate,
+        onJoin,
+        isJoinDisabled: false,
+        onEdit: noop,
+        onDeleteForAll: noop,
+        onDeleteForMe: noop,
+      });
+
+      const joinEntry = getJoinEntry(entries);
+      expect(joinEntry).toBeDefined();
+      joinEntry?.click?.();
+      expect(onJoin).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it('includes Edit meeting for an eligible host', () => {
     const entries = getMeetingActionEntries({
@@ -97,6 +126,7 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser(),
       nowMilliseconds: futureNowMilliseconds,
       translate,
+      onJoin: noop,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -111,6 +141,7 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser('invitee-id'),
       nowMilliseconds: futureNowMilliseconds,
       translate,
+      onJoin: noop,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -125,6 +156,7 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser(),
       nowMilliseconds: ongoingNowMilliseconds,
       translate,
+      onJoin: noop,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -139,6 +171,7 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser(),
       nowMilliseconds: pastNowMilliseconds,
       translate,
+      onJoin: noop,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -161,6 +194,7 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser(),
       nowMilliseconds: futureNowMilliseconds,
       translate,
+      onJoin: noop,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -175,6 +209,7 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser(),
       nowMilliseconds: futureNowMilliseconds,
       translate,
+      onJoin: noop,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -190,6 +225,7 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser(),
       nowMilliseconds: ongoingNowMilliseconds,
       translate,
+      onJoin: noop,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -205,6 +241,7 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser('invitee-id'),
       nowMilliseconds: futureNowMilliseconds,
       translate,
+      onJoin: noop,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -220,6 +257,7 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser('invitee-id'),
       nowMilliseconds: ongoingNowMilliseconds,
       translate,
+      onJoin: noop,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -235,6 +273,7 @@ describe('getMeetingActionEntries', () => {
       selfUser: createSelfUser(),
       nowMilliseconds: pastNowMilliseconds,
       translate,
+      onJoin: noop,
       onEdit: jest.fn(),
       onDeleteForAll: noop,
       onDeleteForMe: noop,
@@ -242,5 +281,23 @@ describe('getMeetingActionEntries', () => {
 
     expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
     expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('keeps Join now visible but disables it while joining or in a call', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser(),
+      nowMilliseconds: futureNowMilliseconds,
+      translate,
+      onJoin: noop,
+      isJoinDisabled: true,
+      onEdit: noop,
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    const joinEntry = getJoinEntry(entries);
+    expect(joinEntry).toBeDefined();
+    expect(joinEntry?.isDisabled).toBe(true);
   });
 });
