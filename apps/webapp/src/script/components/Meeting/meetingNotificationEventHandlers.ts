@@ -33,13 +33,14 @@ type MeetingNotificationLogger = {
 
 export type MeetingNotificationEventHandlersDependencies = {
   getMeetingSeries: () => readonly MeetingSeries[];
+  getSelfUserQualifiedId: () => QualifiedId;
   addNotification: (input: AddNotificationInput) => void;
   logger: MeetingNotificationLogger;
 };
 
 export type MeetingNotificationEventHandlers = {
-  onMeetingCreated: (meetingId: QualifiedId) => void;
-  onMeetingUpdated: (meetingId: QualifiedId) => void;
+  onMeetingUpdated: (meetingId: QualifiedId, actorId: QualifiedId) => void;
+  onMeetingMemberAdded: (meetingId: QualifiedId) => void;
   onMeetingDeleted: (meetingId: QualifiedId) => void;
   /** Retries notifications that couldn't be sent because the meeting wasn't in the store yet. */
   retryPendingNotifications: () => void;
@@ -47,18 +48,19 @@ export type MeetingNotificationEventHandlers = {
 
 export const createMeetingNotificationEventHandlers = ({
   getMeetingSeries,
+  getSelfUserQualifiedId,
   addNotification,
   logger,
 }: MeetingNotificationEventHandlersDependencies): MeetingNotificationEventHandlers => {
   const getMeeting = (meetingId: QualifiedId) =>
     getMeetingSeries().find(meeting => matchQualifiedIds(meeting.qualified_id, meetingId));
 
-  // MEETING.CREATED/DELETED amplify events only carry the meetingId and can fire before the
+  // Meeting notification events only carry the meetingId and can fire before the
   // meeting store has synced, so a lookup miss is retried once the store updates rather than dropped.
   const pending = new Map<string, {meetingId: QualifiedId; kind: MeetingNotificationKind}>();
   const pendingKey = (meetingId: QualifiedId) => `${meetingId.domain}@${meetingId.id}`;
 
-  const notifyForMeeting = (meetingId: QualifiedId, kind: MeetingNotificationKind, meeting: MeetingSeries) => {
+  const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries) => {
     const notificationBase = {
       meetingTitle: meeting.title,
       meetingStartTime: meeting.series_start_date,
@@ -92,7 +94,7 @@ export const createMeetingNotificationEventHandlers = ({
       return false;
     }
 
-    notifyForMeeting(meetingId, kind, meeting);
+    notifyForMeeting(kind, meeting);
     return true;
   };
 
@@ -103,16 +105,20 @@ export const createMeetingNotificationEventHandlers = ({
         continue;
       }
 
-      notifyForMeeting(meetingId, kind, meeting);
+      notifyForMeeting(kind, meeting);
       pending.delete(key);
     }
   };
 
   return {
-    onMeetingCreated: meetingId => {
-      addNotificationForMeeting(meetingId, MeetingNotificationKind.INVITE);
+    onMeetingUpdated: (meetingId, actorId) => {
+      if (matchQualifiedIds(actorId, getSelfUserQualifiedId())) {
+        return;
+      }
+
+      addNotificationForMeeting(meetingId, MeetingNotificationKind.UPDATE);
     },
-    onMeetingUpdated: meetingId => {
+    onMeetingMemberAdded: meetingId => {
       addNotificationForMeeting(meetingId, MeetingNotificationKind.UPDATE);
     },
     onMeetingDeleted: meetingId => {

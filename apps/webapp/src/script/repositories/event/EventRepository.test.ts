@@ -280,7 +280,7 @@ describe('EventRepository', () => {
     ] as const;
 
     it.each(meetingLifecycleCases)(
-      'publishes %s as normalized WebApp event with qualified_id only',
+      'publishes %s as normalized WebApp event with qualified meeting and actor IDs',
       async (eventType, webAppEvent) => {
         const event = {
           ...meetingLifecycleEventBase,
@@ -289,7 +289,7 @@ describe('EventRepository', () => {
 
         await eventRepository['distributeEvent'](event as any, EventSource.WEBSOCKET);
 
-        expect(amplify.publish).toHaveBeenCalledWith(webAppEvent, meetingId);
+        expect(amplify.publish).toHaveBeenCalledWith(webAppEvent, meetingId, meetingLifecycleEventBase.qualified_from);
         expect(amplify.publish).not.toHaveBeenCalledWith(eventType, expect.anything());
         expect(amplify.publish).not.toHaveBeenCalledWith(
           WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND,
