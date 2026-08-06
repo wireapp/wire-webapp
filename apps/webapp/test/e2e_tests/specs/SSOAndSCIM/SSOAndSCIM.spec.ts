@@ -97,7 +97,7 @@ test.describe('SSO and SCIM', () => {
   );
 
   test(
-    'I should not be able to change name, unique username, profile color, email of user managed by SCIM',
+    'I should not be able to change name, unique username, email of user managed by SCIM',
     {tag: ['@TC-1756', '@regression']},
     async ({context, api, createPage}) => {
       const page = await createPage(context);
