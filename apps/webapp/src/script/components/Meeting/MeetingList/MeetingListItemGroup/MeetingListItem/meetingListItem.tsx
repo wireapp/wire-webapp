@@ -62,9 +62,11 @@ const MeetingListItemComponent = ({
   const {title, recurrence} = meetingSeries;
   const {translate, wallClock} = useApplicationContext();
   const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
-  const {joinMeeting, isJoinDisabled, isCallActive: isConversationCallActive} = useJoinMeetingCall(
-    meetingSeries.qualified_conversation,
-  );
+  const {
+    joinMeeting,
+    isJoinDisabled,
+    isCallActive: isConversationCallActive,
+  } = useJoinMeetingCall(meetingSeries.qualified_conversation);
 
   const now = useMemo(() => new Date(nowMilliseconds), [nowMilliseconds]);
 
