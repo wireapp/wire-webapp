@@ -311,16 +311,33 @@ describe('meetNowMeeting', () => {
 });
 
 describe('updateMeeting', () => {
+  const createMeetingConversation = ({
+    name = 'Weekly sync',
+    groupConversationType = GROUP_CONVERSATION_TYPE.MEETING,
+    epoch = 1,
+  }: {
+    name?: string;
+    groupConversationType?: GROUP_CONVERSATION_TYPE;
+    epoch?: number;
+  } = {}) => {
+    const conversation = createConversation(epoch);
+    conversation.name(name);
+    conversation.groupConversationType(groupConversationType);
+    return conversation;
+  };
+
   const createDeps = ({
     updateMeetingMock = jest.fn().mockReturnValue(
       task.resolve({
+        title: 'Weekly sync',
         qualified_conversation: qualifiedConversation,
         qualified_id: meetingId,
         conversation: meetingConversationResponse,
       }),
     ),
     saveMeetingConversationFromBackend = jest.fn().mockReturnValue(task.resolve(undefined)),
-    safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation(1))),
+    safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createMeetingConversation())),
+    renameConversation = jest.fn().mockResolvedValue(undefined),
     safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     safeRemoveMembers = jest.fn().mockReturnValue(task.resolve(undefined)),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
@@ -328,6 +345,7 @@ describe('updateMeeting', () => {
     updateMeetingMock?: jest.Mock;
     saveMeetingConversationFromBackend?: jest.Mock;
     safeGetConversationById?: jest.Mock;
+    renameConversation?: jest.Mock;
     safeAddUsers?: jest.Mock;
     safeRemoveMembers?: jest.Mock;
     establishMeetingConversation?: jest.Mock;
@@ -340,6 +358,7 @@ describe('updateMeeting', () => {
     const conversationRepository = {
       saveMeetingConversationFromBackend,
       safeGetConversationById,
+      renameConversation,
       safeAddUsers,
       safeRemoveMembers,
       establishMeetingConversation,
@@ -355,6 +374,7 @@ describe('updateMeeting', () => {
       updateMeetingMock,
       saveMeetingConversationFromBackend,
       safeGetConversationById,
+      renameConversation,
       safeAddUsers,
       safeRemoveMembers,
       establishMeetingConversation,
@@ -365,7 +385,7 @@ describe('updateMeeting', () => {
     const alice = createUser('1');
     const bob = createUser('2');
     const charlie = createUser('3');
-    const establishedConversation = createConversation(1);
+    const establishedConversation = createMeetingConversation();
     const {deps, updateMeetingMock, saveMeetingConversationFromBackend, safeRemoveMembers, safeAddUsers} = createDeps({
       safeGetConversationById: jest.fn().mockReturnValue(task.resolve(establishedConversation)),
     });
@@ -392,7 +412,7 @@ describe('updateMeeting', () => {
   it('does not sync participants when the selection is unchanged', async () => {
     const alice = createUser('1');
     const bob = createUser('2');
-    const {deps, updateMeetingMock, safeGetConversationById, safeAddUsers, safeRemoveMembers} = createDeps();
+    const {deps, updateMeetingMock, safeAddUsers, safeRemoveMembers, renameConversation} = createDeps();
 
     const result = await updateMeeting(
       updateCommand({
@@ -404,9 +424,50 @@ describe('updateMeeting', () => {
 
     expect(result.isOk).toBe(true);
     expect(updateMeetingMock).toHaveBeenCalled();
-    expect(safeGetConversationById).not.toHaveBeenCalled();
     expect(safeRemoveMembers).not.toHaveBeenCalled();
     expect(safeAddUsers).not.toHaveBeenCalled();
+    expect(renameConversation).not.toHaveBeenCalled();
+  });
+
+  it('renames the dedicated meeting conversation when the live name differs from the title', async () => {
+    const conversation = createMeetingConversation({name: 'Old title'});
+    const {deps, renameConversation} = createDeps({
+      updateMeetingMock: jest.fn().mockReturnValue(
+        task.resolve({
+          title: 'New title',
+          qualified_conversation: qualifiedConversation,
+          qualified_id: meetingId,
+          conversation: meetingConversationResponse,
+        }),
+      ),
+      safeGetConversationById: jest.fn().mockReturnValue(task.resolve(conversation)),
+    });
+
+    const result = await updateMeeting(updateCommand({title: 'New title'}), deps);
+
+    expect(result.isOk).toBe(true);
+    expect(renameConversation).toHaveBeenCalledWith(conversation, 'New title');
+  });
+
+  it('returns conversationRenameFailed when renaming the conversation fails after a successful update', async () => {
+    const conversation = createMeetingConversation({name: 'Old title'});
+    const {deps} = createDeps({
+      updateMeetingMock: jest.fn().mockReturnValue(
+        task.resolve({
+          title: 'New title',
+          qualified_conversation: qualifiedConversation,
+          qualified_id: meetingId,
+          conversation: meetingConversationResponse,
+        }),
+      ),
+      safeGetConversationById: jest.fn().mockReturnValue(task.resolve(conversation)),
+      renameConversation: jest.fn().mockRejectedValue(new Error('rename failed')),
+    });
+
+    const result = await updateMeeting(updateCommand({title: 'New title'}), deps);
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.conversationRenameFailed);
   });
 
   it('returns updateFailed when updateMeeting fails', async () => {

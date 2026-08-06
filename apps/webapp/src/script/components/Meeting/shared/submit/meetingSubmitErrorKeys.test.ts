@@ -56,5 +56,9 @@ describe('meetingSubmitErrorKeys', () => {
     expect(editKeys[meetingSubmitErrors.removeParticipantsFailed].messageKey).toBe(
       'meetings.scheduleModal.error.removeParticipantsFailed',
     );
+    expect(editKeys[meetingSubmitErrors.conversationRenameFailed]).toEqual({
+      titleKey: 'meetings.scheduleModal.error.conversationRenameFailedTitle',
+      messageKey: 'meetings.scheduleModal.error.conversationRenameFailed',
+    });
   });
 });
