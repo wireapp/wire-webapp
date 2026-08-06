@@ -7,7 +7,9 @@ import {FlatCompat} from '@eslint/eslintrc';
 // @ts-ignore - No types available for @emotion/eslint-plugin with ESLint 9
 import emotionPlugin from '@emotion/eslint-plugin';
 import stylisticPlugin from '@stylistic/eslint-plugin';
+import typescriptPlugin from '@typescript-eslint/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
+import jestPlugin from 'eslint-plugin-jest';
 import unicornPlugin from 'eslint-plugin-unicorn';
 import tsParser from '@typescript-eslint/parser';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
@@ -34,10 +36,11 @@ const ignores = [
   '**/node_modules/',
   'apps/webapp/assets/',
   'resource/',
+  '**/dist/**',
+  '**/build/**',
+  '**/coverage/**',
   'apps/webapp/resource/',
-  'apps/webapp/test/',
-  '**/__mocks__/**',
-  '**/setupTests.*',
+  'apps/webapp/bin/',
   '**/*.config.*',
   'apps/webapp/*.config.*',
   'apps/webapp/src/sw.js',
@@ -49,21 +52,15 @@ const ignores = [
   'apps/webapp/src/script/localization/**/webapp*.js',
   'apps/webapp/src/worker/',
   'apps/webapp/src/script/components/icon.tsx',
-  '**/*.test.*',
-  '**/*.spec.*',
-  '**/*.stories.*',
   '**/storybook-static/',
   '**/.storybook/',
-  '*.js',
   'apps/webapp/playwright-report/',
   'libraries/core/lib/',
   'libraries/api-client/lib/',
   'libraries/core/.tmp/',
-  'libraries/core/src/test/',
   'libraries/config/lib/',
   'libraries/react-ui-kit/lib/',
   'libraries/*/lib/',
-  '**/jest.setup.ts',
 ];
 
 const base = compat.extends('@wireapp/eslint-config');
@@ -82,6 +79,29 @@ const cleanedBase = base.map(cfg => {
   }
   return cfg;
 });
+const baseRuleConfigs = cleanedBase.slice(1);
+
+const productionFileIgnorePatterns = [
+  'apps/webapp/test/**',
+  'libraries/core/src/test/**',
+  '**/test/**',
+  '**/__mocks__/**',
+  '*.js',
+  '**/setupTests.*',
+  '**/*.test.*',
+  '**/*.spec.*',
+  '**/*.stories.*',
+  '**/jest.setup.*',
+  'apps/webapp/.copyconfigrc.js',
+  'libraries/react-ui-kit/emotion.d.ts',
+];
+
+function addProductionFileIgnores(configuration: Linter.Config): Linter.Config {
+  return {
+    ...configuration,
+    ignores: [...(configuration.ignores ?? []), ...productionFileIgnorePatterns],
+  };
+}
 const webappImportOrderRule: Linter.RuleEntry = [
   'error',
   {
@@ -137,9 +157,15 @@ const restrictedSyntaxRule: Linter.RuleEntry = [
   },
 ];
 
-const config: Linter.Config[] = [
-  {ignores},
-  ...cleanedBase,
+const jestMockRestrictionRule: Linter.RuleEntry = [
+  'warn',
+  {
+    mock: 'Do not use jest.mock(). Pass dependencies explicitly instead of intercepting modules.',
+  },
+];
+
+const productionConfigs: Linter.Config[] = [
+  ...baseRuleConfigs,
   {
     // Adjust legacy bits from extended config
     rules: {
@@ -419,6 +445,74 @@ const config: Linter.Config[] = [
     rules: {
       '@typescript-eslint/no-floating-promises': 'error',
       'no-void': 'error',
+    },
+  },
+].map(addProductionFileIgnores);
+
+const testFilePatterns = [
+  'apps/**/test/**/*',
+  'libraries/**/test/**/*',
+  'apps/**/__mocks__/**/*',
+  'libraries/**/__mocks__/**/*',
+  'apps/**/*.test.*',
+  'libraries/**/*.test.*',
+  'apps/**/*.spec.*',
+  'libraries/**/*.spec.*',
+  'apps/**/*.stories.*',
+  'libraries/**/*.stories.*',
+  'apps/**/setupTests.*',
+  'libraries/**/setupTests.*',
+  'apps/**/jest.setup.*',
+  'libraries/**/jest.setup.*',
+];
+
+const config: Linter.Config[] = [
+  {ignores},
+  ...productionConfigs,
+  {
+    files: testFilePatterns,
+    linterOptions: {
+      reportUnusedDisableDirectives: 'off',
+      reportUnusedInlineConfigs: 'off',
+    },
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    plugins: {
+      jest: jestPlugin,
+      '@typescript-eslint': typescriptPlugin,
+      import: importPlugin,
+    },
+    rules: {
+      'jest/no-restricted-jest-methods': jestMockRestrictionRule,
+    },
+  },
+  {
+    files: ['apps/**/*.{js,jsx,ts,tsx,cjs,mjs}', 'libraries/**/*.{js,jsx,ts,tsx,cjs,mjs}'],
+    plugins: {
+      jest: jestPlugin,
+      '@typescript-eslint': typescriptPlugin,
+      import: importPlugin,
+    },
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    rules: {
+      'jest/no-restricted-jest-methods': jestMockRestrictionRule,
     },
   },
 ];
