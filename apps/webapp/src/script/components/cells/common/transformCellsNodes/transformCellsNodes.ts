@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 
@@ -131,7 +131,7 @@ const getUploadedAtTimestamp = (node: RestNode): number => {
 };
 
 const getFileSize = (node: RestNode): string => {
-  const isSizeMissing = node.Size === null || node.Size === undefined;
+  const isSizeMissing = isNullOrUndefined(node.Size);
 
   if (isSizeMissing && node.Type !== 'COLLECTION') {
     return '-';
