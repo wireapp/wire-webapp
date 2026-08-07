@@ -37,7 +37,7 @@ export type MeetingLifecycleDispatcher = {
   /** Queues the initial meetings list load. */
   enqueueInitialLoad: () => void;
   /** Queues a refetch of a single meeting, used for created and updated events. */
-  enqueueMeetingSync: (meetingId: QualifiedId) => void;
+  enqueueMeetingSync: (meetingId: QualifiedId, onSuccess?: (meeting: MeetingSeries) => void) => void;
   /** Queues the removal of a single meeting from the store. */
   enqueueMeetingRemoval: (meetingId: QualifiedId) => void;
   /** Resolves once all work queued before this call has settled. */
@@ -68,13 +68,16 @@ export const createMeetingLifecycleDispatcher = (
     enqueueInitialLoad: () => {
       enqueue('initialLoad', dependencies.loadMeetings);
     },
-    enqueueMeetingSync: meetingId => {
+    enqueueMeetingSync: (meetingId, onSuccess) => {
       enqueue('meetingSync', async () => {
         const syncResult = await dependencies.syncMeeting(meetingId);
 
         if (syncResult.isErr) {
           dependencies.reportOperationFailure('meetingSync');
+          return;
         }
+
+        onSuccess?.(syncResult.value);
       });
     },
     enqueueMeetingRemoval: meetingId => {

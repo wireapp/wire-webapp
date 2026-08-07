@@ -33,14 +33,12 @@ type MeetingNotificationLogger = {
 
 export type MeetingNotificationEventHandlersDependencies = {
   getMeetingSeries: () => readonly MeetingSeries[];
-  getSelfUserQualifiedId: () => QualifiedId;
   addNotification: (input: AddNotificationInput) => void;
   logger: MeetingNotificationLogger;
 };
 
 export type MeetingNotificationEventHandlers = {
-  onMeetingUpdated: (meetingId: QualifiedId, actorId: QualifiedId) => void;
-  onMeetingMemberAdded: (meetingId: QualifiedId) => void;
+  notifyUpdate: (meeting: MeetingSeries) => void;
   onMeetingDeleted: (meetingId: QualifiedId) => void;
   /** Retries notifications that couldn't be sent because the meeting wasn't in the store yet. */
   retryPendingNotifications: () => void;
@@ -48,16 +46,14 @@ export type MeetingNotificationEventHandlers = {
 
 export const createMeetingNotificationEventHandlers = ({
   getMeetingSeries,
-  getSelfUserQualifiedId,
   addNotification,
   logger,
 }: MeetingNotificationEventHandlersDependencies): MeetingNotificationEventHandlers => {
   const getMeeting = (meetingId: QualifiedId) =>
     getMeetingSeries().find(meeting => matchQualifiedIds(meeting.qualified_id, meetingId));
 
-  // Meeting notification events only carry the meetingId and can fire before the
-  // meeting store has synced, so a lookup miss is retried once the store updates rather than dropped.
-  const pending = new Map<string, {meetingId: QualifiedId; kind: MeetingNotificationKind}>();
+  // Only deleted events can fire before the meeting store has synced.
+  const pending = new Map<string, QualifiedId>();
   const pendingKey = (meetingId: QualifiedId) => `${meetingId.domain}@${meetingId.id}`;
 
   const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries) => {
@@ -86,43 +82,36 @@ export const createMeetingNotificationEventHandlers = ({
       .exhaustive();
   };
 
-  const addNotificationForMeeting = (meetingId: QualifiedId, kind: MeetingNotificationKind): boolean => {
+  const addCancellationNotificationForMeeting = (meetingId: QualifiedId): void => {
     const meeting = getMeeting(meetingId);
     if (!meeting) {
-      logger.warn('Meeting notification pending because the meeting is not in the store yet', {kind, meetingId});
-      pending.set(pendingKey(meetingId), {meetingId, kind});
-      return false;
+      logger.warn('Meeting notification pending because the meeting is not in the store yet', {
+        kind: MeetingNotificationKind.CANCELLED,
+        meetingId,
+      });
+      pending.set(pendingKey(meetingId), meetingId);
+      return;
     }
 
-    notifyForMeeting(kind, meeting);
-    return true;
+    notifyForMeeting(MeetingNotificationKind.CANCELLED, meeting);
   };
 
   const retryPendingNotifications = () => {
-    for (const [key, {meetingId, kind}] of pending) {
+    for (const [key, meetingId] of pending) {
       const meeting = getMeeting(meetingId);
       if (!meeting) {
         continue;
       }
 
-      notifyForMeeting(kind, meeting);
+      notifyForMeeting(MeetingNotificationKind.CANCELLED, meeting);
       pending.delete(key);
     }
   };
 
   return {
-    onMeetingUpdated: (meetingId, actorId) => {
-      if (matchQualifiedIds(actorId, getSelfUserQualifiedId())) {
-        return;
-      }
-
-      addNotificationForMeeting(meetingId, MeetingNotificationKind.UPDATE);
-    },
-    onMeetingMemberAdded: meetingId => {
-      addNotificationForMeeting(meetingId, MeetingNotificationKind.UPDATE);
-    },
+    notifyUpdate: meeting => notifyForMeeting(MeetingNotificationKind.UPDATE, meeting),
     onMeetingDeleted: meetingId => {
-      addNotificationForMeeting(meetingId, MeetingNotificationKind.CANCELLED);
+      addCancellationNotificationForMeeting(meetingId);
     },
     retryPendingNotifications,
   };

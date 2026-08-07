@@ -88,16 +88,17 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
 
     const notificationHandlers = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => store.getState().meetingSeries,
-      getSelfUserQualifiedId: () => container.resolve(UserState).self().qualifiedId,
       addNotification: useMeetingNotificationStore.getState().addNotification,
       logger,
     });
 
-    amplify.subscribe(WebAppEvents.MEETING.UPDATED, notificationHandlers.onMeetingUpdated);
-    amplify.subscribe(WebAppEvents.MEETING.MEMBER_ADDED, notificationHandlers.onMeetingMemberAdded);
     amplify.subscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingDeleted);
 
-    const unsubscribeFromMeetingLifecycleEvents = subscribeToMeetingLifecycleEvents({dispatcher});
+    const unsubscribeFromMeetingLifecycleEvents = subscribeToMeetingLifecycleEvents({
+      dispatcher,
+      getSelfUserQualifiedId: () => container.resolve(UserState).self().qualifiedId,
+      notifyUpdate: notificationHandlers.notifyUpdate,
+    });
     const unsubscribeFromMeetingStore = store.subscribe((state, previousState) => {
       if (state.meetingSeries !== previousState.meetingSeries) {
         notificationHandlers.retryPendingNotifications();
@@ -109,8 +110,6 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     return () => {
       unsubscribeFromMeetingLifecycleEvents();
       unsubscribeFromMeetingStore();
-      amplify.unsubscribe(WebAppEvents.MEETING.UPDATED, notificationHandlers.onMeetingUpdated);
-      amplify.unsubscribe(WebAppEvents.MEETING.MEMBER_ADDED, notificationHandlers.onMeetingMemberAdded);
       amplify.unsubscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingDeleted);
     };
   }, [isMeetingsEnabled, store]);

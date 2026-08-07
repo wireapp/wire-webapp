@@ -22,10 +22,15 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+
 import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
 
 export type SubscribeToMeetingLifecycleEventsDependencies = {
   dispatcher: MeetingLifecycleDispatcher;
+  getSelfUserQualifiedId: () => QualifiedId;
+  notifyUpdate: (meeting: MeetingSeries) => void;
 };
 
 /**
@@ -34,21 +39,32 @@ export type SubscribeToMeetingLifecycleEventsDependencies = {
  */
 export const subscribeToMeetingLifecycleEvents = ({
   dispatcher,
+  getSelfUserQualifiedId,
+  notifyUpdate,
 }: SubscribeToMeetingLifecycleEventsDependencies): (() => void) => {
   const onMeetingCreated = (meetingId: QualifiedId) => {
     dispatcher.enqueueMeetingSync(meetingId);
   };
 
-  const onMeetingUpdated = (meetingId: QualifiedId) => {
-    dispatcher.enqueueMeetingSync(meetingId);
+  const enqueueMeetingSyncWithUpdateNotification = (meetingId: QualifiedId) => {
+    dispatcher.enqueueMeetingSync(meetingId, notifyUpdate);
+  };
+
+  const onMeetingUpdated = (meetingId: QualifiedId, actorId: QualifiedId) => {
+    if (matchQualifiedIds(actorId, getSelfUserQualifiedId())) {
+      dispatcher.enqueueMeetingSync(meetingId);
+      return;
+    }
+
+    enqueueMeetingSyncWithUpdateNotification(meetingId);
+  };
+
+  const onMeetingMemberAdded = (meetingId: QualifiedId) => {
+    enqueueMeetingSyncWithUpdateNotification(meetingId);
   };
 
   const onMeetingDeleted = (meetingId: QualifiedId) => {
     dispatcher.enqueueMeetingRemoval(meetingId);
-  };
-
-  const onMeetingMemberAdded = (meetingId: QualifiedId) => {
-    dispatcher.enqueueMeetingSync(meetingId);
   };
 
   const onMissedEvents = () => {

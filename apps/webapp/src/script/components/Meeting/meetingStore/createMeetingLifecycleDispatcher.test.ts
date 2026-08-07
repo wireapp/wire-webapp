@@ -215,6 +215,28 @@ describe('createMeetingLifecycleDispatcher', () => {
     expect(reportOperationFailure).toHaveBeenCalledWith('meetingSync');
   });
 
+  it('invokes the sync success callback with the fetched meeting', async () => {
+    const onSuccess = jest.fn();
+    const dispatcher = createMeetingLifecycleDispatcher(createDependencies());
+
+    dispatcher.enqueueMeetingSync(meetingId, onSuccess);
+    await dispatcher.waitUntilAllSettled();
+
+    expect(onSuccess).toHaveBeenCalledWith(meetingSeries);
+  });
+
+  it('does not invoke the sync success callback when syncing fails', async () => {
+    const onSuccess = jest.fn();
+    const dispatcher = createMeetingLifecycleDispatcher(
+      createDependencies({syncMeeting: () => task.reject(syncMeetingErrors.fetchFailed)}),
+    );
+
+    dispatcher.enqueueMeetingSync(meetingId, onSuccess);
+    await dispatcher.waitUntilAllSettled();
+
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
   it('keeps running queued work after the initial load throws', async () => {
     const removeMeeting = jest.fn();
     const dispatcher = createMeetingLifecycleDispatcher(
