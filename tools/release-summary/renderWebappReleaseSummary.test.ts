@@ -30,6 +30,7 @@ const releaseCommitSha = '1234567890abcdef1234567890abcdef12345678';
 const sourceCommitSha = 'abcdef1234567890abcdef1234567890abcdef12';
 const betaTagName = '2026-07-17.1-beta.1';
 const productionTagName = '2026-07-17.1-production';
+const githubReleaseUrl = `https://github.com/wireapp/wire-webapp/releases/tag/${productionTagName}`;
 
 const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
   beta: {
@@ -66,6 +67,13 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     runId: Maybe.just('123456789'),
     serverUrl: Maybe.just('https://github.com'),
     wireBuildsRepository: Maybe.just('wireapp/wire-builds'),
+  },
+  githubRelease: {
+    action: Maybe.nothing(),
+    jobResult: Maybe.just('skipped'),
+    state: Maybe.nothing(),
+    tagName: Maybe.nothing<string>(),
+    url: Maybe.nothing<string>(),
   },
   preparation: {
     branchAction: Maybe.just('created'),
@@ -124,7 +132,7 @@ function assertMarkdownContract(summary: string, includesDistribution: boolean):
   expect(detailsContent).toContain('\n\n</details>');
   expect(summary).not.toContain(']();');
   expect(summary).not.toContain(']()');
-  expect(summary).not.toContain('/releases/tag/');
+  expect(summary).not.toContain('/releases/tag/undefined');
   expect(summary).not.toContain('undefined');
   expect(summary).not.toContain('null');
   expect(countOccurrences(visibleContent, '- Webapp version:')).toBe(1);
@@ -294,6 +302,13 @@ describe('WebApp release summary renderer', () => {
         runtimeVerificationResult: Maybe.just('success'),
         tagCreationResult: Maybe.just('success'),
       },
+      githubRelease: {
+        action: Maybe.just('created'),
+        jobResult: Maybe.just('success'),
+        state: Maybe.just('draft'),
+        tagName: Maybe.just(productionTagName),
+        url: Maybe.just(githubReleaseUrl),
+      },
     };
     const summary = renderWebappReleaseSummary(input);
     const visibleContent = visibleSummary(summary);
@@ -301,7 +316,9 @@ describe('WebApp release summary renderer', () => {
 
     assertMarkdownContract(summary, true);
     assertVisibleIdentity(summary);
-    expect(visibleContent).toContain('- Outcome: Release completed successfully');
+    expect(visibleContent).toContain(
+      '- Outcome: Automated release completed successfully; GitHub Release draft is ready for changelog completion',
+    );
     expect(visibleContent).toContain(
       `Hosted Production: deployed, verified, and tagged successfully - tag [${productionTagName}]`,
     );
@@ -312,6 +329,161 @@ describe('WebApp release summary renderer', () => {
     expect(detailsContent).toContain('- Production tag creation result: created successfully');
     expect(detailsContent).toContain('- Docker image: quay.io/wire/webapp:2026-07-17.1-production-v0.34.9-0-1234567');
     expect(detailsContent).toContain('- Helm chart repository: https://charts.example.com/webapp');
+    expect(visibleContent).toContain(
+      `- GitHub Release handoff: completed successfully; action: new draft created; state: draft; URL: [GitHub Release](${githubReleaseUrl})`,
+    );
+    expect(detailsContent).toContain('- Action: new draft created');
+    expect(detailsContent).toContain(`- Release URL: [GitHub Release](${githubReleaseUrl})`);
+    expect(detailsContent).toContain(
+      '- Manual follow-up: Customer-facing changelog completion and GitHub Release publication remain manual.',
+    );
+  });
+
+  it('renders an existing GitHub Release draft as a successful handoff', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      distribution: {
+        ...baselineWebappReleaseSummaryInput.distribution,
+        distributionJobResult: Maybe.just('success'),
+        distributionResult: Maybe.just('success'),
+      },
+      production: {
+        ...baselineWebappReleaseSummaryInput.production,
+        createdTagName: Maybe.just(productionTagName),
+        deploymentResult: Maybe.just('success'),
+        deploymentRequired: Maybe.just(true),
+        preflightJobResult: Maybe.just('success'),
+        preflightResult: Maybe.just('ready'),
+        runtimeVerificationResult: Maybe.just('success'),
+        tagCreationResult: Maybe.just('success'),
+      },
+      githubRelease: {
+        action: Maybe.just('already_draft'),
+        jobResult: Maybe.just('success'),
+        state: Maybe.just('draft'),
+        tagName: Maybe.just(productionTagName),
+        url: Maybe.just(githubReleaseUrl),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+    const visibleContent = visibleSummary(summary);
+    const detailsContent = technicalEvidence(summary);
+
+    expect(visibleContent).toContain(
+      '- Outcome: Automated release completed successfully; GitHub Release draft is ready for changelog completion',
+    );
+    expect(visibleContent).toContain(
+      `- GitHub Release handoff: completed successfully; action: existing draft verified; state: draft; URL: [GitHub Release](${githubReleaseUrl})`,
+    );
+    expect(detailsContent).toContain(
+      '- Manual follow-up: Customer-facing changelog completion and GitHub Release publication remain manual.',
+    );
+  });
+
+  it('renders an existing published GitHub Release as a successful handoff', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      distribution: {
+        ...baselineWebappReleaseSummaryInput.distribution,
+        distributionJobResult: Maybe.just('success'),
+        distributionResult: Maybe.just('success'),
+      },
+      production: {
+        ...baselineWebappReleaseSummaryInput.production,
+        createdTagName: Maybe.just(productionTagName),
+        deploymentResult: Maybe.just('success'),
+        deploymentRequired: Maybe.just(true),
+        preflightJobResult: Maybe.just('success'),
+        preflightResult: Maybe.just('ready'),
+        runtimeVerificationResult: Maybe.just('success'),
+        tagCreationResult: Maybe.just('success'),
+      },
+      githubRelease: {
+        action: Maybe.just('already_published'),
+        jobResult: Maybe.just('success'),
+        state: Maybe.just('published'),
+        tagName: Maybe.just(productionTagName),
+        url: Maybe.just(githubReleaseUrl),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+    const visibleContent = visibleSummary(summary);
+    const detailsContent = technicalEvidence(summary);
+
+    expect(visibleContent).toContain(
+      '- Outcome: Automated release completed successfully; existing GitHub Release is already published',
+    );
+    expect(visibleContent).toContain(
+      `- GitHub Release handoff: completed successfully; action: existing published release verified; state: published; URL: [GitHub Release](${githubReleaseUrl})`,
+    );
+    expect(detailsContent).toContain(
+      '- Manual follow-up: The existing published GitHub Release was preserved; no automated publication was performed.',
+    );
+  });
+
+  it('does not report complete success when GitHub Release handoff fails after distribution', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      distribution: {
+        ...baselineWebappReleaseSummaryInput.distribution,
+        distributionJobResult: Maybe.just('success'),
+        distributionResult: Maybe.just('success'),
+      },
+      production: {
+        ...baselineWebappReleaseSummaryInput.production,
+        createdTagName: Maybe.just(productionTagName),
+        deploymentResult: Maybe.just('success'),
+        deploymentRequired: Maybe.just(true),
+        preflightJobResult: Maybe.just('success'),
+        preflightResult: Maybe.just('ready'),
+        runtimeVerificationResult: Maybe.just('success'),
+        tagCreationResult: Maybe.just('success'),
+      },
+      githubRelease: {
+        action: Maybe.nothing(),
+        jobResult: Maybe.just('failure'),
+        state: Maybe.nothing(),
+        tagName: Maybe.just(productionTagName),
+        url: Maybe.nothing<string>(),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+    const visibleContent = visibleSummary(summary);
+    const detailsContent = technicalEvidence(summary);
+
+    expect(visibleContent).toContain(
+      '- Outcome: Hosted Production and release distribution completed, but GitHub Release handoff failed',
+    );
+    expect(visibleContent).not.toContain('- Outcome: Release completed successfully');
+    expect(visibleContent).toContain(
+      '- GitHub Release handoff: failed; action: not available; state: not available; URL: not available',
+    );
+    expect(detailsContent).toContain('- Job result: failed');
+    expect(detailsContent).toContain(`- Production tag: [${productionTagName}]`);
+  });
+
+  it('reports that the GitHub Release stage was not reached after an earlier gate failed', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      e2e: {
+        ...baselineWebappReleaseSummaryInput.e2e,
+        result: Maybe.just('failure'),
+      },
+      production: {
+        ...baselineWebappReleaseSummaryInput.production,
+        deploymentRequired: Maybe.nothing<boolean>(),
+        preflightJobResult: Maybe.just('skipped'),
+        preflightResult: Maybe.nothing(),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+    const visibleContent = visibleSummary(summary);
+
+    expect(visibleContent).toContain('Release stopped because the E2E system gate failed');
+    expect(visibleContent).toContain(
+      '- GitHub Release handoff: not run; action: not available; state: not available; URL: not available',
+    );
+    expect(visibleContent).not.toContain('Automated release completed successfully');
   });
 
   it('renders an already-tagged Production release without linking a nonexistent tag', () => {
@@ -322,6 +494,13 @@ describe('WebApp release summary renderer', () => {
         deploymentRequired: Maybe.just(false),
         preflightJobResult: Maybe.just('success'),
         preflightResult: Maybe.just('already_tagged'),
+      },
+      githubRelease: {
+        action: Maybe.just('already_draft'),
+        jobResult: Maybe.just('success'),
+        state: Maybe.just('draft'),
+        tagName: Maybe.just(productionTagName),
+        url: Maybe.just(githubReleaseUrl),
       },
     };
     const summary = renderWebappReleaseSummary(input);
@@ -334,6 +513,11 @@ describe('WebApp release summary renderer', () => {
       `Hosted Production: already tagged; deployment not required - tag [${productionTagName}](https://github.com/wireapp/wire-webapp/tree/${productionTagName})`,
     );
     expect(visibleContent).toContain('- Release distribution: not run; Production tag already exists');
+    expect(visibleContent).toContain(
+      `- GitHub Release handoff: completed successfully; action: existing draft verified; state: draft; URL: [GitHub Release](${githubReleaseUrl})`,
+    );
+    expect(detailsContent).toContain('- Production tag: [2026-07-17.1-production]');
+    expect(detailsContent).toContain('- Action: existing draft verified');
     expect(detailsContent).toContain('- Production tag creation result: not required; tag already exists');
     expect(summary).not.toContain('created-production-tag');
   });
@@ -710,6 +894,11 @@ describe('WebApp release summary renderer', () => {
     const input = readWebappReleaseSummaryInput({
       ARTIFACT_ASSET_VERSION: '2026-07-17.1-1234567',
       ARTIFACT_BUILT_AT: '2026-07-20T06:18:03.123Z',
+      GITHUB_RELEASE_ACTION: 'created',
+      GITHUB_RELEASE_JOB_RESULT: 'success',
+      GITHUB_RELEASE_STATE: 'draft',
+      GITHUB_RELEASE_TAG_NAME: productionTagName,
+      GITHUB_RELEASE_URL: githubReleaseUrl,
       PRODUCTION_DEPLOYMENT_REQUIRED: 'true',
       RELEASE_ACTOR: 'release-captain',
       RELEASE_BRANCH_ACTION: 'created',
@@ -724,6 +913,11 @@ describe('WebApp release summary renderer', () => {
     expect(input.preparation.sourceCommitSha.unwrapOr('not available')).toBe(sourceCommitSha);
     expect(input.preparation.sourceRef.unwrapOr('not available')).toBe('main');
     expect(input.production.deploymentRequired.unwrapOr(false)).toBe(true);
+    expect(input.githubRelease.action.unwrapOr('already_published')).toBe('created');
+    expect(input.githubRelease.jobResult.unwrapOr('failure')).toBe('success');
+    expect(input.githubRelease.state.unwrapOr('published')).toBe('draft');
+    expect(input.githubRelease.tagName.unwrapOr('not available')).toBe(productionTagName);
+    expect(input.githubRelease.url.unwrapOr('not available')).toBe(githubReleaseUrl);
   });
 
   it('does not create a link for an invalid E2E report URL', () => {
