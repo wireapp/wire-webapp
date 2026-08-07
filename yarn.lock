@@ -18406,10 +18406,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:17.6.0, globals@npm:^17.4.0":
-  version: 17.6.0
-  resolution: "globals@npm:17.6.0"
-  checksum: 10/2bf0febf31c942edee6f4eca7e939a9c885f8ecfb767048b1c4dd2a32008d0ab136e6076665d76b44b29c2571bbbc1681371caab05fd8ee0067c7618e841b89d
+"globals@npm:17.9.0":
+  version: 17.9.0
+  resolution: "globals@npm:17.9.0"
+  checksum: 10/8619386d449e8cbb81e242eced8bca0a42e5c3633a3a35996b8b1618beb17ff9fb33bfe703d60d83d4b7f6f8a996dede4faf02f9e966e50ff895e0cf6122ae15
   languageName: node
   linkType: hard
 
@@ -18417,6 +18417,13 @@ __metadata:
   version: 14.0.0
   resolution: "globals@npm:14.0.0"
   checksum: 10/03939c8af95c6df5014b137cac83aa909090c3a3985caef06ee9a5a669790877af8698ab38007e4c0186873adc14c0b13764acc754b16a754c216cc56aa5f021
+  languageName: node
+  linkType: hard
+
+"globals@npm:^17.4.0":
+  version: 17.6.0
+  resolution: "globals@npm:17.6.0"
+  checksum: 10/2bf0febf31c942edee6f4eca7e939a9c885f8ecfb767048b1c4dd2a32008d0ab136e6076665d76b44b29c2571bbbc1681371caab05fd8ee0067c7618e841b89d
   languageName: node
   linkType: hard
 
@@ -32132,7 +32139,7 @@ __metadata:
     eslint-plugin-unused-imports: "npm:4.4.1"
     fake-indexeddb: "npm:6.2.5"
     fs-extra: "npm:11.4.0"
-    globals: "npm:17.6.0"
+    globals: "npm:17.9.0"
     http-status-codes: "npm:2.3.0"
     jest: "npm:30.4.2"
     jest-environment-jsdom: "npm:30.4.1"
