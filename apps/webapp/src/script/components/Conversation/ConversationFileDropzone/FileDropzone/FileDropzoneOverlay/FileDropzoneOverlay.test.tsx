@@ -42,18 +42,22 @@ const renderOverlay = (mode: 'upload' | 'restricted') =>
   );
 
 describe('FileDropzoneOverlay', () => {
-  it('explains how to upload files when sharing is allowed', () => {
-    renderOverlay('upload');
+  it('announces how to upload files while hiding the decorative icon', () => {
+    const {container} = renderOverlay('upload');
 
+    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
     expect(screen.getByText('conversationFileUploadOverlayTitle')).toBeInTheDocument();
     expect(screen.getByText('conversationFileUploadOverlayDescription')).toBeInTheDocument();
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('explains why files cannot be shared when viewer drags files', () => {
-    renderOverlay('restricted');
+  it('announces why files cannot be shared while hiding the decorative icon', () => {
+    const {container} = renderOverlay('restricted');
 
+    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
     expect(screen.getByText('conversationFileUploadRestrictedOverlayTitle')).toBeInTheDocument();
     expect(screen.getByText('conversationFileUploadRestrictedOverlayDescription')).toBeInTheDocument();
     expect(screen.queryByText('conversationFileUploadOverlayTitle')).not.toBeInTheDocument();
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 });
