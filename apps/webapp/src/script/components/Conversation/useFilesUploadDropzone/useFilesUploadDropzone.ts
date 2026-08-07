@@ -28,6 +28,7 @@ import type {RootContextValue} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
+import {createFileDropHandler} from './createFileDropHandler/createFileDropHandler';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 import {transformAcceptedFiles} from './transformAcceptedFiles/transformAcceptedFiles';
@@ -46,6 +47,7 @@ interface UseFilesUploadDropzoneParams {
   isTeam: boolean;
   isCellsEnabled: boolean;
   isDisabled: boolean;
+  isFileDropAllowed: boolean;
   cellsRepository: CellsRepository;
   translate: RootContextValue['translate'];
   conversation?: Pick<Conversation, 'id' | 'qualifiedId'>;
@@ -55,6 +57,7 @@ export const useFilesUploadDropzone = ({
   isTeam,
   isDisabled,
   isCellsEnabled,
+  isFileDropAllowed,
   cellsRepository,
   translate,
   conversation = {id: '', qualifiedId: {id: '', domain: ''}},
@@ -74,13 +77,16 @@ export const useFilesUploadDropzone = ({
     noKeyboard: true,
     disabled: isDisabled,
     accept,
-    onDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      void processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id).catch(
-        (error: unknown) => {
-          logger.error('Processing incoming files failed', error);
-        },
-      );
-    }, translate),
+    onDrop: createFileDropHandler({
+      isFileDropAllowed,
+      onFileDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+        void processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id).catch(
+          (error: unknown) => {
+            logger.error('Processing incoming files failed', error);
+          },
+        );
+      }, translate),
+    }),
     onError: (error: Error) => {
       logger.error('Dropping files failed', error);
       showFileDropzoneErrorModal({

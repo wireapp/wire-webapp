@@ -65,6 +65,7 @@ import {getCellsFilesPath} from './ConversationCells/common/getCellsFilesPath/ge
 import {getCurrentFolderName} from './ConversationCells/common/getCurrentFolderName/getCurrentFolderName';
 import {ConversationCells} from './ConversationCells/ConversationCells';
 import {ConversationFileDropzone} from './ConversationFileDropzone/ConversationFileDropzone';
+import {isConversationFileDropAllowed} from './ConversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
 import {ConversationMessagesWrapper} from './ConversationMessagesWrapper/ConversationMessagesWrapper';
 import {ConversationTabPanel} from './ConversationTabPanel/ConversationTabPanel';
 import {ConversationTabs} from './ConversationTabs/ConversationTabs';
@@ -582,6 +583,7 @@ export const Conversation = ({
 
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isFileDropAllowed = isConversationFileDropAllowed({conversation: activeConversation, isCellsEnabled});
 
   useEffect(() => {
     if (!isFileTabActive && isSharedDriveSearchViewOpen) {
@@ -596,6 +598,7 @@ export const Conversation = ({
       conversation: activeConversation,
       isCellsEnabled: isCellsEnabled,
       isDisabled: isFileTabActive,
+      isFileDropAllowed,
       translate,
     });
 
@@ -604,6 +607,7 @@ export const Conversation = ({
   return (
     <ConversationFileDropzone
       isDragAccept={isDragAccept}
+      isFileDropAllowed={isFileDropAllowed}
       isCellsEnabled={isCellsEnabled}
       isConversationLoaded={isConversationLoaded}
       activeConversationId={activeConversation?.id}
