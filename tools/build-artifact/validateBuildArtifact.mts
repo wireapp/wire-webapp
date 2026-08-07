@@ -29,9 +29,9 @@ import {formatBuildArtifactMetadataOutputs} from './buildArtifactMetadataOutput.
 import type {BuildMetadata} from '@wireapp/config';
 
 function readRequiredEnvironmentValue(environmentVariableName: string): string {
-  const environmentValue = Maybe.of(process.env[environmentVariableName]).andThen(value => {
+  const environmentValue = Maybe.of<string>(process.env[environmentVariableName]).andThen(value => {
     if (value.trim().length === 0) {
-      return Maybe.nothing();
+      return Maybe.nothing<string>();
     }
 
     return Maybe.just(value);
@@ -45,9 +45,9 @@ function readRequiredEnvironmentValue(environmentVariableName: string): string {
 }
 
 function writeMetadataOutputs(metadata: BuildMetadata): void {
-  const githubOutputPath = Maybe.of(process.env.GITHUB_OUTPUT).andThen(value => {
+  const githubOutputPath = Maybe.of<string>(process.env.GITHUB_OUTPUT).andThen(value => {
     if (value.trim().length === 0) {
-      return Maybe.nothing();
+      return Maybe.nothing<string>();
     }
 
     return Maybe.just(value);
