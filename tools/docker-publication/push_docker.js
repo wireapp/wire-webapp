@@ -22,7 +22,7 @@
 const child = require('child_process');
 const nodeFileSystem = require('fs');
 const path = require('path');
-const appConfigPkg = require('../apps/webapp/app-config/package.json');
+const appConfigPkg = require('../../apps/webapp/app-config/package.json');
 
 require('dotenv').config({quiet: true});
 

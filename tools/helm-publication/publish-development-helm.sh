@@ -17,7 +17,7 @@ helm search repo "${CHART_REPOSITORY_NAME}/webapp" --devel --versions --output j
   jq '[.[] | select(.version | contains("-pre."))]' > "${published_charts_path}"
 
 helm_action="$(
-  "${script_directory}/run-production-distribution-cli.sh" \
+  "${script_directory}/../production-distribution/run-production-distribution-cli.sh" \
     select-helm-chart --charts-path "${published_charts_path}" --image-tag "${DOCKER_IMAGE_TAG}"
 )"
 
@@ -27,7 +27,7 @@ case "${helm_action}" in
     echo "Reusing existing matching prerelease Helm chart version ${chart_version}."
     ;;
   publish)
-    chart_version="$(./bin/chart-next-version.sh prerelease)"
+    chart_version="$("${script_directory}/chart-next-version.sh" prerelease)"
     CHART_VERSION="${chart_version}" IMAGE_TAG="${DOCKER_IMAGE_TAG}" \
       yq -i '.version = strenv(CHART_VERSION) | .appVersion = strenv(IMAGE_TAG)' charts/webapp/Chart.yaml
     chart_package_directory="${RUNNER_TEMP}/development-webapp-chart"
