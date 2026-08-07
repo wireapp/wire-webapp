@@ -22,8 +22,6 @@ import {Heading} from './Heading';
 import {THEME_ID} from '../../Identity';
 import {matchComponent} from '../../utils/testUtil';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"Heading"', () => {
   it('renders H1 as default', () => matchComponent(<Heading>H1</Heading>));
   it('renders H! (dark theme)', () => matchComponent(<Heading>H1</Heading>, THEME_ID.DARK));

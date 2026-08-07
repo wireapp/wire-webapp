@@ -52,8 +52,6 @@ const pngFile = new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'
 const jpegFile = new File(['(⌐□_□)'], 'chucknorris.jpg', {type: 'image/jpeg'});
 const xlsxFile = new File(['(⌐□_□)'], 'chucknorris.xlsx', {type: '.xlsx'});
 
-/* eslint-disable jest/expect-expect */
-
 describe('"DropFileInput"', () => {
   it('matches snapshot', () =>
     matchComponent(<ThemedDropFileInput {...getDefaultProps({accept: 'image/png, image/jpeg'})} />));

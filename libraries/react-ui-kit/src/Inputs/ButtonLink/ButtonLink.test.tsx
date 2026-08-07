@@ -22,8 +22,6 @@ import {ButtonLink} from './ButtonLink';
 import {THEME_ID} from '../../Identity';
 import {matchComponent} from '../../utils/testUtil';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"ButtonLink"', () => {
   it('renders', () => matchComponent(<ButtonLink>Submit</ButtonLink>));
   it('renders (dark theme)', () => matchComponent(<ButtonLink>ButtonLink</ButtonLink>, THEME_ID.DARK));

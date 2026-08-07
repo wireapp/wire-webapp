@@ -54,10 +54,8 @@
     {
       "matchPackageNames": [
         "eslint",
-        "@types/eslint",
         "@stylistic/**",
         "@tony.ganchev/eslint-plugin-header",
-        "@wireapp/eslint-config",
         "eslint-import-resolver-typescript",
         "eslint-plugin-header",
         "eslint-plugin-import",

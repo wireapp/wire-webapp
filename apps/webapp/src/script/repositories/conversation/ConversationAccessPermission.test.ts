@@ -119,7 +119,6 @@ describe('ConversationAccessPermissions', () => {
         const result = featureFromStateChange(prev, team);
 
         if (prev === team) {
-          // eslint-disable-next-line jest/no-conditional-expect
           return Object.values(result).forEach(value => expect(value).toBeFalsy());
         }
         expect(['guest', 'service']).toContain(result.feature);

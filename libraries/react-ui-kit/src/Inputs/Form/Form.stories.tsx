@@ -40,7 +40,6 @@ export const Default: Story = {
     <Form
       onSubmit={event => {
         event.preventDefault();
-        // eslint-disable-next-line no-console
         console.log('Form submitted');
       }}
     >

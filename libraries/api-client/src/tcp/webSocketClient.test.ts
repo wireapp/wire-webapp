@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable dot-notation */
-
 import {WebSocketClient} from './webSocketClient';
 import {ReconnectingWebsocketWallClock, WebSocketReconnectContext} from './reconnectingWebsocket';
 import {noop} from 'noop-esm';
@@ -337,7 +335,6 @@ describe('WebSocketClient', () => {
   });
 
   describe('refreshAccessToken', () => {
-    // eslint-disable-next-line jest/expect-expect
     it('emits the correct message for invalid tokens', async () => {
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, invalidTokenHttpClient);
       webSocketClients.push(websocketClient);

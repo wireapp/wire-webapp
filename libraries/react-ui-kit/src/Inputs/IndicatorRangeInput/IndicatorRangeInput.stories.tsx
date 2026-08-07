@@ -48,9 +48,7 @@ export const Default: Story = {
     label: 'Font size',
     value: 3,
     dataListOptions,
-    // eslint-disable-next-line no-console
     onChange: event => console.log('Value changed:', event.currentTarget.value),
-    // eslint-disable-next-line no-console
     onOptionClick: value => console.log('Option clicked:', value),
   },
 };

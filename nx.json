@@ -16,7 +16,7 @@
     "lint": {
       "dependsOn": [],
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/eslint.config.ts"]
+      "inputs": ["default", "{workspaceRoot}/eslint.config.mjs"]
     },
     "type-check": {
       "dependsOn": ["^build"],

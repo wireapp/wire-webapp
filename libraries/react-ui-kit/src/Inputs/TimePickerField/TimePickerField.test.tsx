@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable jest/expect-expect */
-
 import {TimePickerField} from './TimePickerField';
 import {buildTimeOptions} from './timePickerUtils';
 

@@ -102,8 +102,6 @@ const waitFor = (assertion: () => void) => {
   });
 };
 
-/* eslint-disable jest/no-conditional-expect */
-
 describe('Account', () => {
   const CLIENT_ID = '4e37b32f57f6da55';
 

@@ -68,7 +68,7 @@ graph LR
         F1[libraries/core/]
         G[nx.json]
         H[tsconfig.base.json]
-        I[eslint.config.ts]
+        I[eslint.config.mjs]
         J[.github/labeler.yml]
     end
 
@@ -98,7 +98,7 @@ wire-webapp/
 ├── tsconfig.base.json   # Base TypeScript config
 ├── tsconfig.json        # Project references
 ├── tsconfig.eslint.json # ESLint TypeScript config
-├── eslint.config.ts     # ESLint 9+ flat config
+├── eslint.config.mjs    # ESLint 9+ flat config
 ├── jest.preset.js       # Shared Jest preset
 ├── Jenkinsfile          # Jenkins deployment pipeline
 └── .nx/                # Nx cache & workspace data
@@ -119,7 +119,7 @@ wire-webapp/
 | [`tsconfig.json`](tsconfig.json) | Project references | ⭐⭐⭐ Critical |
 | [`tsconfig.eslint.json`](tsconfig.eslint.json) | TypeScript config for type-aware linting | ⭐⭐⭐ Critical |
 | [`jest.preset.js`](jest.preset.js) | Shared Jest configuration | ⭐⭐⭐ Critical |
-| [`eslint.config.ts`](eslint.config.ts) | ESLint 9+ flat config | ⭐⭐⭐ Critical |
+| [`eslint.config.mjs`](eslint.config.mjs) | ESLint 9+ flat config | ⭐⭐⭐ Critical |
 | [`package.json`](package.json) | Root package with workspaces | ⭐⭐⭐ Critical |
 | [`.github/labeler.yml`](.github/labeler.yml) | PR auto-labeling | ⭐⭐ High |
 
@@ -157,7 +157,7 @@ wire-webapp/
     },
     "lint": {
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/eslint.config.ts"]
+      "inputs": ["default", "{workspaceRoot}/eslint.config.mjs"]
     }
   },
   "namedInputs": {
@@ -252,11 +252,11 @@ wire-webapp/
 
 **Why `paths` in [`tsconfig.eslint.json`](tsconfig.eslint.json) is critical for type-aware linting:**
 
-The ESLint TypeScript Project Service (enabled via `projectService: true` in [`eslint.config.ts`](eslint.config.ts)) needs to understand how to resolve module imports to provide accurate type checking during linting. Without these path mappings:
+The ESLint TypeScript Project Service (enabled via `projectService: true` in [`eslint.config.mjs`](eslint.config.mjs)) needs to understand how to resolve module imports to provide accurate type checking during linting. Without these path mappings:
 
 1. ESLint would fail to resolve imports like `import { ConnectionService } from '@wireapp/core/lib/connection'`
 2. Type-aware rules would not work correctly
-3. The `projectService` option in [`eslint.config.ts`](eslint.config.ts) uses this file, so paths defined here are used by TypeScript language service
+3. The `projectService` option in [`eslint.config.mjs`](eslint.config.mjs) uses this file, so paths defined here are used by TypeScript language service
 
 **Path Mappings for Libraries:**
 
@@ -954,263 +954,60 @@ The deployment bundle includes all pre-bundled libraries, which can be large. To
 
 ## ESLint Configuration
 
-This project uses ESLint 9+ with the new flat config format. The configuration is centralized in [`eslint.config.ts`](eslint.config.ts) and provides type-aware linting across the entire monorepo.
+This project uses ESLint 9+ with the new flat config format. The configuration is centralized in [`eslint.config.mjs`](eslint.config.mjs) and provides type-aware linting across the entire monorepo.
 
 ### Single Config File Approach
 
-Unlike traditional ESLint setups that use multiple `.eslintrc.*` files, this project uses a single [`eslint.config.ts`](eslint.config.ts) file with the flat config format introduced in ESLint 9.
+Unlike traditional ESLint setups that use multiple `.eslintrc.*` files, this project uses a single [`eslint.config.mjs`](eslint.config.mjs) file with the flat config format introduced in ESLint 9.
 
 **Benefits of flat config:**
-- Better TypeScript support (config is written in TypeScript)
+- Better TypeScript source support
 - More predictable configuration merging
 - Easier to maintain and debug
 - No need for multiple config files across the project
 
-### Config Structure
+### Configuration structure
 
-The ESLint configuration is structured into multiple config objects:
+The single root configuration is an ordered flat-config array with these conceptual layers:
 
-```typescript
-const config: Linter.Config[] = [
-  {ignores},                    // 1. Ignore patterns
-  ...cleanedBase,               // 2. Base config from @wireapp/eslint-config
-  {rules: {...}},               // 3. Adjust legacy bits from extended config
-  {                             // 4. TypeScript/React config
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: {...},
-    plugins: {...},
-    rules: {...}
-  },
-  {                             // 5. JavaScript config
-    files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs'],
-    languageOptions: {...},
-    rules: {...}
-  },
-  {                             // 6. Test config
-    files: ['**/*.test.tsx', '**/*.test.ts', '**/*.spec.tsx', '**/*.spec.ts'],
-    rules: {...}
-  }
-];
-```
+1. Global ignores for generated output, dependencies, coverage and other non-source directories.
+2. Native plugin presets and the remaining production rules translated from the former legacy configuration.
+3. Production-only ignore patterns that exclude the legacy test suite, mocks, stories and setup files from normal production rules.
+4. A type-aware TypeScript production configuration using `@typescript-eslint/parser` and `projectService: true`.
+5. A JavaScript production configuration that keeps the repository's JavaScript options and globals while relying on ESLint's default `espree` parser.
+6. Narrow test parsing configurations for TypeScript/TSX and JavaScript/JSX. These configurations do not apply the full production rule set.
+7. A repository-wide Jest policy for files under `apps` and `libraries` that warns on new `jest.mock()` calls.
+8. Repository-wide lint hygiene that reports unused ESLint disable directives as errors.
 
-### 1. Ignore Patterns
+Tests remain parseable for targeted repository policies even though production rules intentionally do not run across the legacy test suite. This separation prevents a broad test-suite cleanup while still allowing policies such as the Jest mock restriction and unused-directive reporting to apply.
 
-The first config object defines files and directories to ignore:
+The exact file patterns and ignore lists belong in `eslint.config.mjs`; they are intentionally not duplicated here.
 
-```typescript
-const ignores = [
-  '.git/',
-  'docs/',
-  'bin/',
-  '**/node_modules/',
-  'apps/webapp/assets/',
-  'resource/',
-  'apps/webapp/resource/',
-  'apps/webapp/test/',
-  '**/__mocks__/**',
-  '**/setupTests.*',
-  '**/*.config.*',
-  'apps/webapp/*.config.*',
-  'apps/webapp/src/sw.js',
-  'apps/server/bin/',
-  'apps/server/dist/',
-  'apps/server/node_modules/',
-  'apps/webapp/src/ext/',
-  'apps/webapp/src/script/localization/**/webapp*.js',
-  'apps/webapp/src/worker/',
-  'apps/webapp/src/script/components/Icon.tsx',
-  '**/*.test.*',
-  '**/*.spec.*',
-  '*.js',
-  'apps/webapp/playwright-report/',
-  'libraries/core/lib/',
-  'libraries/api-client/lib/',
-  'libraries/core/.tmp/',
-  'libraries/core/src/test/',
-  'libraries/config/lib/',
-  '**/jest.setup.ts',
-];
-```
+### Production configurations
 
-### 2. Base Config from @wireapp/eslint-config
+The root configuration imports native flat presets where plugins provide them and translates the remaining legacy rules into ordinary flat configuration objects. TypeScript production files retain type-aware project-service parsing and the existing import-resolution settings. JavaScript production files use ESLint's default parser, `espree`, with the JavaScript-specific options and globals required by the repository.
 
-The configuration extends [`@wireapp/eslint-config`](eslint.config.ts) using the `FlatCompat` utility:
+### TypeScript production linting
 
-```typescript
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  resolvePluginsRelativeTo: __dirname,
-});
+Production TypeScript and TSX files use `@typescript-eslint/parser` with `projectService: true`, so the existing type-aware rules continue to use the repository's TypeScript projects and import-resolution settings. React, Emotion, accessibility, header and other production plugin behavior remains in this production layer.
 
-const base = compat.extends('@wireapp/eslint-config');
-```
+TypeScript project discovery is delegated to the TypeScript language service through `projectService`, which preserves the existing multi-project and path-mapping behavior without a second configuration source.
 
-**Important:** The base config is cleaned to remove the `project` option from parser options to avoid conflicts with `projectService`:
+### JavaScript production linting
 
-```typescript
-const cleanedBase = base.map(cfg => {
-  if (cfg.languageOptions?.parserOptions) {
-    const parserOptions = cfg.languageOptions.parserOptions as Record<string, unknown>;
-    const {project, ...rest} = parserOptions;
-    return {
-      ...cfg,
-      languageOptions: {
-        ...cfg.languageOptions,
-        parserOptions: rest,
-      },
-    };
-  }
-  return cfg;
-});
-```
+Production JavaScript, JSX, CJS and MJS files retain their JavaScript-specific parser options, globals and rule adjustments. They rely on ESLint's default `espree` parser; the configuration does not import or assign a separate JavaScript parser.
 
-### 3. Legacy Config Adjustments
+### Narrow test parsing and repository policies
 
-Some rules from the extended config are adjusted for compatibility:
+Test, mock, story and setup files are intentionally excluded from the normal production rules. They still receive narrow parsing configurations: TypeScript and TSX use `@typescript-eslint/parser` without type-aware project service, while JavaScript and JSX use ordinary JavaScript parsing.
 
-```typescript
-{
-  rules: {
-    'no-unsanitized/DOM': 'off', // deprecated config variant
-    'valid-jsdoc': 'off', // rule removed in ESLint 9
-    'header/header': 'off', // disable existing header rule to use our own
-  },
-}
-```
-
-### 4. TypeScript/React Config
-
-The main configuration for TypeScript and React files:
-
-```typescript
-{
-  files: ['**/*.{ts,tsx}'],
-  languageOptions: {
-    parser: tsParser,
-    parserOptions: {
-      // Enable type-aware linting for TypeScript sources with project references support
-      projectService: true,
-      tsconfigRootDir: __dirname,
-    },
-    globals: {
-      ...globals.browser,
-      ...globals.node,
-      React: 'readonly',
-      JSX: 'readonly',
-      amplify: 'readonly',
-      NodeJS: 'readonly',
-    },
-  },
-  plugins: {
-    '@emotion': emotionPlugin,
-    import: importPlugin,
-    'react-hooks': reactHooksPlugin,
-    'header-tony': headerPlugin,
-  },
-  rules: {
-    // ... rules
-  },
-  settings: {
-    'import/resolver': {
-      typescript: {
-        alwaysTryTypes: true,
-      },
-      node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
-      },
-    },
-  },
-}
-```
-
-### Type-Aware Linting with projectService
-
-The key feature enabling type-aware linting is `projectService: true`:
-
-```typescript
-parserOptions: {
-  projectService: true,
-  tsconfigRootDir: __dirname,
-}
-```
-
-**How it works:**
-
-1. **Automatic Project Discovery:** ESLint automatically discovers all TypeScript projects in the workspace using [`tsconfig.json`](tsconfig.json) references
-2. **TypeScript Language Service:** Uses the TypeScript language service for accurate type information
-3. **Multi-Project Support:** Handles multiple projects (apps and libraries) seamlessly
-4. **Path Mapping Resolution:** Uses [`tsconfig.eslint.json`](tsconfig.eslint.json) for path mappings
-
-**Why `projectService` instead of `project`:**
-
-- `projectService` automatically discovers projects from `tsconfig.json` references
-- No need to manually specify which `tsconfig.json` to use
-- Better support for monorepos with multiple projects
-- Handles project references automatically
-
-### Path Mappings and Import Resolution
-
-The `import/resolver` settings configure how imports are resolved:
-
-```typescript
-settings: {
-  'import/resolver': {
-    typescript: {
-      alwaysTryTypes: true,
-    },
-    node: {
-      extensions: ['.js', '.jsx', '.ts', '.tsx'],
-    },
-  },
-}
-```
-
-This enables:
-- TypeScript path mapping resolution (e.g., `@wireapp/core/lib/connection`)
-- Node module resolution
-- Type-aware import checking
-
-### 5. JavaScript Config
-
-JavaScript files have a separate configuration:
-
-```typescript
-{
-  files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs'],
-  languageOptions: {
-    parser: require('espree'),
-    parserOptions: {
-      project: null,
-      tsconfigRootDir: __dirname,
-    },
-  },
-  rules: {
-    // Disable TS-only rules on JS mocks/shims
-    '@typescript-eslint/require-array-sort-compare': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
-  },
-}
-```
-
-### 6. Test Config
-
-Test files have relaxed rules:
-
-```typescript
-{
-  files: ['**/*.test.tsx', '**/*.test.ts', '**/*.spec.tsx', '**/*.spec.ts', '**/test/**/*', '**/mocks/**/*'],
-  rules: {
-    'no-magic-numbers': 'off',
-    'id-length': 'off',
-  },
-}
-```
+The narrow configurations do not load unrelated production plugins. A separate repository-wide policy applies only the Jest plugin and `jest/no-restricted-jest-methods` to source files under `apps` and `libraries`, warning on `jest.mock()` while leaving other Jest APIs unchanged. The repository-wide `reportUnusedDisableDirectives: 'error'` setting also ensures stale `eslint-disable`, `eslint-disable-next-line`, `eslint-disable-line` and matching enable directives fail linting.
 
 ### Copyright Headers
 
 The configuration enforces copyright headers using the `@tony.ganchev/eslint-plugin-header` plugin:
 
-```typescript
+```javascript
 'header-tony/header': [
   'error',
   'block',
@@ -1244,7 +1041,7 @@ The configuration uses several custom plugins:
 
 Several rules are customized for the project:
 
-```typescript
+```javascript
 rules: {
   '@emotion/pkg-renaming': 'error',
   '@emotion/no-vanilla': 'error',
@@ -1296,13 +1093,13 @@ nx lint webapp --fix
 
 1. Ensure [`tsconfig.eslint.json`](tsconfig.eslint.json) is properly configured
 2. Check that path mappings are correct for library imports
-3. Verify that `projectService: true` is set in [`eslint.config.ts`](eslint.config.ts)
+3. Verify that `projectService: true` is set in [`eslint.config.mjs`](eslint.config.mjs)
 4. Run `tsc --build` to ensure all projects are compiled
 
 **Import resolution errors:**
 
 1. Check path mappings in [`tsconfig.eslint.json`](tsconfig.eslint.json)
-2. Verify `import/resolver` settings in [`eslint.config.ts`](eslint.config.ts)
+2. Verify `import/resolver` settings in [`eslint.config.mjs`](eslint.config.mjs)
 3. Ensure `alwaysTryTypes: true` is set for TypeScript resolver
 
 **Performance issues:**

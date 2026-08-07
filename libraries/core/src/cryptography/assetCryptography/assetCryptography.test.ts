@@ -50,7 +50,6 @@ describe('AssetCrypto', () => {
   });
 
   it('should expose the lower-case browser mapping for asset cryptography', () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const packageJson = require('../../../package.json');
 
     expect(packageJson.browser['./lib/cryptography/assetCryptography/crypto.node']).toBe(

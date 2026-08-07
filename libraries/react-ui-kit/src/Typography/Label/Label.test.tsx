@@ -22,8 +22,6 @@ import {Label, LabelLink} from './Label';
 import {THEME_ID} from '../../Identity';
 import {matchComponent} from '../../utils/testUtil';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"InputLabel"', () => {
   it('renders', () => matchComponent(<Label>Label</Label>));
   it('renders (dark theme)', () => matchComponent(<Label>Label</Label>, THEME_ID.DARK));

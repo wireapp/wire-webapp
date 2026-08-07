@@ -22,8 +22,6 @@ import {Line} from './Line';
 import {COLOR, THEME_ID} from '../../Identity';
 import {matchComponent} from '../../utils/testUtil';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"Line"', () => {
   it('renders', () => matchComponent(<Line>Line</Line>));
   it('renders (dark theme)', () => matchComponent(<Line>Line</Line>, THEME_ID.DARK));

@@ -39,9 +39,7 @@ export const Default: Story = {
     labelText: 'select one from your device',
     accept: 'image/png, image/jpeg',
     description: 'Image (JPG/PNG) size up to 1 MB, minimum 200 x 600 px',
-    // eslint-disable-next-line no-console
     onFilesUploaded: files => console.log('Files uploaded:', files),
-    // eslint-disable-next-line no-console
     onInvalidFilesDropError: () => console.log('Invalid file type'),
   },
 };

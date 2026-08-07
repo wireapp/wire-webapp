@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable no-magic-numbers */
-
 import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
 import {once} from 'events';
 import type {CloseEvent, ErrorEvent} from 'partysocket/ws';
@@ -177,8 +175,6 @@ async function startEchoServer(): Promise<WebSocketServer> {
   await once(server, 'listening');
   return server;
 }
-
-/* eslint-disable jest/no-done-callback */
 
 describe('ReconnectingWebsocket', () => {
   let server: WebSocketServer | undefined;

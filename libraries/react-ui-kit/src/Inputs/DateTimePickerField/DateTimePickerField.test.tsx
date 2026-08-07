@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable jest/expect-expect */
-
 import {DateTimePickerField} from './DateTimePickerField';
 
 const fixedDateTime = new Date(2026, 5, 15, 15, 0, 0, 0);

@@ -35,7 +35,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    // eslint-disable-next-line no-console
     onCodeComplete: code => console.log('Code entered:', code),
   },
 };
@@ -43,7 +42,6 @@ export const Default: Story = {
 export const Invalid: Story = {
   args: {
     markInvalid: true,
-    // eslint-disable-next-line no-console
     onCodeComplete: code => console.log('Code entered:', code),
   },
 };
@@ -51,7 +49,6 @@ export const Invalid: Story = {
 export const CustomLength: Story = {
   args: {
     digits: 4,
-    // eslint-disable-next-line no-console
     onCodeComplete: code => console.log('Code entered:', code),
   },
 };

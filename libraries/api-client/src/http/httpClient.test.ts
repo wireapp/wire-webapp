@@ -80,7 +80,6 @@ describe('HttpClient', () => {
   };
 
   describe('"_sendRequest"', () => {
-    // eslint-disable-next-line jest/expect-expect
     it('retries on 403 token expired error', async () => {
       nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).once().reply(StatusCode.FORBIDDEN, {
         code: StatusCode.FORBIDDEN,

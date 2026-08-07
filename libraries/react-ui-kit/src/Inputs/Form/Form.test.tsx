@@ -20,8 +20,6 @@
 import {matchComponent} from '../../utils/testUtil';
 import {Form} from '../Form';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"Form"', () => {
   it('renders', () => matchComponent(<Form>Form</Form>));
 });

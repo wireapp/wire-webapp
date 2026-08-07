@@ -147,7 +147,6 @@ describe('InputBar', () => {
     expect(inputBar.textContent).toBe(testMessage);
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('typing request is sent if the typing indicator mode is enabled and user is typing', async () => {
     const props = getDefaultProps();
     const {getByTestId, container} = renderInputBar(props);
