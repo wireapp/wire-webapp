@@ -508,7 +508,9 @@ describe('WebApp release summary renderer', () => {
     const detailsContent = technicalEvidence(summary);
 
     assertMarkdownContract(summary, true);
-    expect(visibleContent).toContain('Release already has the matching Production tag; deployment was not repeated');
+    expect(visibleContent).toContain(
+      'Release already has the matching Production tag; deployment was not repeated and the GitHub Release draft was verified',
+    );
     expect(visibleContent).toContain(
       `Hosted Production: already tagged; deployment not required - tag [${productionTagName}](https://github.com/wireapp/wire-webapp/tree/${productionTagName})`,
     );
@@ -520,6 +522,67 @@ describe('WebApp release summary renderer', () => {
     expect(detailsContent).toContain('- Action: existing draft verified');
     expect(detailsContent).toContain('- Production tag creation result: not required; tag already exists');
     expect(summary).not.toContain('created-production-tag');
+  });
+
+  it('reports a GitHub Release handoff failure during an already-tagged Production recovery', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      production: {
+        ...baselineWebappReleaseSummaryInput.production,
+        deploymentRequired: Maybe.just(false),
+        preflightJobResult: Maybe.just('success'),
+        preflightResult: Maybe.just('already_tagged'),
+      },
+      githubRelease: {
+        action: Maybe.nothing(),
+        jobResult: Maybe.just('failure'),
+        state: Maybe.nothing(),
+        tagName: Maybe.just(productionTagName),
+        url: Maybe.nothing<string>(),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+    const visibleContent = visibleSummary(summary);
+
+    expect(visibleContent).toContain(
+      '- Outcome: Release already has the matching Production tag; deployment was not repeated, but GitHub Release handoff failed',
+    );
+    expect(visibleContent).toContain(
+      '- GitHub Release handoff: failed; action: not available; state: not available; URL: not available',
+    );
+    expect(visibleContent).not.toContain('Automated release completed successfully');
+  });
+
+  it('preserves an existing published GitHub Release during an already-tagged Production recovery', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      production: {
+        ...baselineWebappReleaseSummaryInput.production,
+        deploymentRequired: Maybe.just(false),
+        preflightJobResult: Maybe.just('success'),
+        preflightResult: Maybe.just('already_tagged'),
+      },
+      githubRelease: {
+        action: Maybe.just('already_published'),
+        jobResult: Maybe.just('success'),
+        state: Maybe.just('published'),
+        tagName: Maybe.just(productionTagName),
+        url: Maybe.just(githubReleaseUrl),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+    const visibleContent = visibleSummary(summary);
+    const detailsContent = technicalEvidence(summary);
+
+    expect(visibleContent).toContain(
+      '- Outcome: Release already has the matching Production tag; deployment was not repeated and the existing published GitHub Release was preserved',
+    );
+    expect(visibleContent).toContain(
+      `- GitHub Release handoff: completed successfully; action: existing published release verified; state: published; URL: [GitHub Release](${githubReleaseUrl})`,
+    );
+    expect(detailsContent).toContain(
+      '- Manual follow-up: The existing published GitHub Release was preserved; no automated publication was performed.',
+    );
   });
 
   it('stops a release when Hosted Beta deployment fails', () => {

@@ -983,6 +983,32 @@ function hasHostedProductionCompleted(input: ProductionSummaryInput): boolean {
   );
 }
 
+function formatAlreadyTaggedReleaseOutcome(input: WebappReleaseSummaryInput): string {
+  const alreadyTaggedProductionOutcome = 'Release already has the matching Production tag; deployment was not repeated';
+
+  if (hasWorkflowJobResult(input.githubRelease.jobResult, 'failure')) {
+    return `${alreadyTaggedProductionOutcome}, but GitHub Release handoff failed`;
+  }
+
+  if (hasWorkflowJobResult(input.githubRelease.jobResult, 'cancelled')) {
+    return `${alreadyTaggedProductionOutcome}, but GitHub Release handoff was cancelled`;
+  }
+
+  if (hasWorkflowJobResult(input.githubRelease.jobResult, 'skipped')) {
+    return `${alreadyTaggedProductionOutcome}; automated release lifecycle is incomplete because GitHub Release handoff did not run`;
+  }
+
+  if (hasSuccessfulGitHubReleaseHandoff(input)) {
+    if (hasDraftGitHubReleaseHandoff(input)) {
+      return `${alreadyTaggedProductionOutcome} and the GitHub Release draft was verified`;
+    }
+
+    return `${alreadyTaggedProductionOutcome} and the existing published GitHub Release was preserved`;
+  }
+
+  return `${alreadyTaggedProductionOutcome}; GitHub Release handoff result is unavailable`;
+}
+
 function formatBetaReleaseOutcome(input: WebappReleaseSummaryInput): string {
   if (hasWorkflowJobResult(input.beta.deploymentResult, 'failure')) {
     return 'Beta release stopped because Hosted Beta deployment failed';
@@ -1056,7 +1082,7 @@ function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
   }
 
   if (hasProductionPreflightResult(input.production.preflightResult, 'already_tagged')) {
-    return 'Release already has the matching Production tag; deployment was not repeated';
+    return formatAlreadyTaggedReleaseOutcome(input);
   }
 
   if (hasProductionPreflightFailure(input.production)) {
