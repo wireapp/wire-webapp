@@ -11,7 +11,7 @@ on:
         required: true
         type: string
       confirm_release:
-        description: 'I understand that this creates or reuses the release branch, automatically deploys and verifies Beta, runs the blocking E2E gate, and then waits for separate Production approval before deploying Production and publishing the release'
+        description: 'I understand that this creates or reuses the release branch, automatically deploys and verifies Beta, runs the blocking E2E gate, and then waits for separate Production approval before deploying Production and creating a draft GitHub Release for manual changelog completion and publication'
         required: true
         default: false
         type: boolean
@@ -976,6 +976,124 @@ jobs:
       CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
       WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
 
+  ensure_github_release:
+    name: Ensure GitHub Release draft
+    runs-on: ubuntu-24.04
+    # This job is intentionally independent of Production distribution. Both
+    # jobs consume the immutable Production tag, so a GitHub metadata failure
+    # must not prevent Docker, Helm or wire-builds publication.
+    needs: [production_preflight, create_production_tag]
+    if: >-
+      ${{
+        always() &&
+        needs.production_preflight.result == 'success' &&
+        (
+          needs.create_production_tag.result == 'success' ||
+          needs.production_preflight.outputs.production_preflight_result == 'already_tagged'
+        )
+      }}
+    permissions:
+      contents: write
+    outputs:
+      production_tag_name: ${{ steps.ensure_github_release.outputs.production_tag_name }}
+      github_release_action: ${{ steps.ensure_github_release.outputs.github_release_action }}
+      github_release_state: ${{ steps.ensure_github_release.outputs.github_release_state }}
+      github_release_url: ${{ steps.ensure_github_release.outputs.github_release_url }}
+
+    steps:
+      - name: Ensure GitHub Release for immutable Production tag
+        id: ensure_github_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRODUCTION_TAG_NAME: ${{ needs.create_production_tag.outputs.production_tag_name || needs.production_preflight.outputs.production_tag_name }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${PRODUCTION_TAG_NAME}" ]]; then
+            echo 'The authoritative Production tag name is unavailable.' >&2
+            exit 1
+          fi
+
+          echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "${GITHUB_OUTPUT}"
+
+          release_lookup_response_path="${RUNNER_TEMP}/github-release-lookup-response"
+          release_lookup_error_path="${RUNNER_TEMP}/github-release-lookup-error"
+          release_lookup_exit_code=0
+
+          set +e
+          gh api \
+            --include \
+            --header 'Accept: application/vnd.github+json' \
+            "repos/${GITHUB_REPOSITORY}/releases/tags/${PRODUCTION_TAG_NAME}" \
+            > "${release_lookup_response_path}" \
+            2> "${release_lookup_error_path}"
+          release_lookup_exit_code="$?"
+          set -e
+
+          http_status="$(
+            awk '$1 ~ /^HTTP\/[0-9.]+$/ { status = $2 } END { print status }' \
+              "${release_lookup_response_path}"
+          )"
+
+          if [[ "${http_status}" == '404' ]]; then
+            manual_changelog_placeholder='Customer-facing changelog must be added manually before publication.'
+            github_release_url="$(
+              gh release create \
+                "${PRODUCTION_TAG_NAME}" \
+                --verify-tag \
+                --draft \
+                --title "${PRODUCTION_TAG_NAME}" \
+                --notes "${manual_changelog_placeholder}"
+            )"
+
+            if [[ -z "${github_release_url}" ]]; then
+              echo 'GitHub CLI created the release but returned no release URL.' >&2
+              exit 1
+            fi
+
+            {
+              echo 'github_release_action=created'
+              echo 'github_release_state=draft'
+              echo "github_release_url=${github_release_url}"
+            } >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          if [[ "${release_lookup_exit_code}" -ne 0 || "${http_status}" != '200' ]]; then
+            echo "Unable to look up the GitHub Release for ${PRODUCTION_TAG_NAME}." >&2
+            echo "HTTP status: ${http_status:-unavailable}" >&2
+            cat "${release_lookup_error_path}" >&2
+            cat "${release_lookup_response_path}" >&2
+            exit 1
+          fi
+
+          release_json="$(sed -n '/^{/,$p' "${release_lookup_response_path}")"
+          release_tag_name="$(jq -r '.tag_name // empty' <<< "${release_json}")"
+          github_release_url="$(jq -r '.html_url // empty' <<< "${release_json}")"
+          is_draft="$(jq -r '.draft // empty' <<< "${release_json}")"
+
+          if [[ "${release_tag_name}" != "${PRODUCTION_TAG_NAME}" || -z "${github_release_url}" ]]; then
+            echo "The GitHub Release lookup did not return a valid release for ${PRODUCTION_TAG_NAME}." >&2
+            exit 1
+          fi
+
+          if [[ "${is_draft}" == 'true' ]]; then
+            github_release_action='already_draft'
+            github_release_state='draft'
+          elif [[ "${is_draft}" == 'false' ]]; then
+            github_release_action='already_published'
+            github_release_state='published'
+          else
+            echo "The GitHub Release for ${PRODUCTION_TAG_NAME} has an invalid draft state." >&2
+            exit 1
+          fi
+
+          {
+            echo "github_release_action=${github_release_action}"
+            echo "github_release_state=${github_release_state}"
+            echo "github_release_url=${github_release_url}"
+          } >> "${GITHUB_OUTPUT}"
+
   notify_production_release_success:
     name: Notify successful Production release
     runs-on: ubuntu-24.04
@@ -987,6 +1105,7 @@ jobs:
         verify_production_runtime,
         create_production_tag,
         publish_production_distribution,
+        ensure_github_release,
       ]
     if: >-
       ${{
@@ -994,7 +1113,8 @@ jobs:
         needs.deploy_to_production.result == 'success' &&
         needs.verify_production_runtime.result == 'success' &&
         needs.create_production_tag.result == 'success' &&
-        needs.publish_production_distribution.result == 'success'
+        needs.publish_production_distribution.result == 'success' &&
+        needs.ensure_github_release.result == 'success'
       }}
     continue-on-error: true
     permissions:
@@ -1027,6 +1147,11 @@ jobs:
             Docker image tag: ${{ needs.publish_production_distribution.outputs.docker_image_tag }}
             Helm chart version: ${{ needs.publish_production_distribution.outputs.helm_chart_version }}
             wire-builds commit SHA: ${{ needs.publish_production_distribution.outputs.wire_builds_commit_sha }}
+            GitHub Release handoff result: ${{ needs.ensure_github_release.result }}
+            GitHub Release state: ${{ needs.ensure_github_release.outputs.github_release_state }}
+            GitHub Release URL: ${{ needs.ensure_github_release.outputs.github_release_url }}
+            GitHub Release handoff: ${{ needs.ensure_github_release.outputs.github_release_action }}
+            ${{ needs.ensure_github_release.outputs.github_release_state == 'draft' && 'The GitHub Release is a draft. Add the customer-facing changelog and publish it manually.' || 'The existing published GitHub Release was preserved.' }}
             Triggering actor: ${{ github.actor }}
             Workflow-run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
@@ -1044,6 +1169,7 @@ jobs:
         verify_production_runtime,
         create_production_tag,
         publish_production_distribution,
+        ensure_github_release,
       ]
     if: ${{ always() }}
     permissions:
@@ -1097,6 +1223,11 @@ jobs:
           PRODUCTION_DEPLOYMENT_RESULT: ${{ needs.deploy_to_production.result }}
           PRODUCTION_DISTRIBUTION_JOB_RESULT: ${{ needs.publish_production_distribution.result }}
           PRODUCTION_DISTRIBUTION_RESULT: ${{ needs.publish_production_distribution.outputs.distribution_result }}
+          GITHUB_RELEASE_JOB_RESULT: ${{ needs.ensure_github_release.result }}
+          GITHUB_RELEASE_ACTION: ${{ needs.ensure_github_release.outputs.github_release_action }}
+          GITHUB_RELEASE_STATE: ${{ needs.ensure_github_release.outputs.github_release_state }}
+          GITHUB_RELEASE_TAG_NAME: ${{ needs.ensure_github_release.outputs.production_tag_name }}
+          GITHUB_RELEASE_URL: ${{ needs.ensure_github_release.outputs.github_release_url }}
           PRODUCTION_DEPLOYMENT_REQUIRED: ${{ needs.production_preflight.outputs.should_deploy }}
           PRODUCTION_ENVIRONMENT_NAME: ${{ env.PRODUCTION_ENVIRONMENT_NAME }}
           PRODUCTION_PREFLIGHT_JOB_RESULT: ${{ needs.production_preflight.result }}
@@ -1139,6 +1270,7 @@ jobs:
         verify_production_runtime,
         create_production_tag,
         publish_production_distribution,
+        ensure_github_release,
       ]
     if: ${{ always() && contains(join(needs.*.result, ','), 'failure') }}
     permissions:
@@ -1173,6 +1305,11 @@ jobs:
             Production runtime verification: ${{ needs.verify_production_runtime.result }}
             Production tag: ${{ needs.create_production_tag.result }}
             Production distribution: ${{ needs.publish_production_distribution.result }}
+            GitHub Release handoff: ${{ needs.ensure_github_release.result }}
+            GitHub Release tag: ${{ needs.ensure_github_release.outputs.production_tag_name || needs.create_production_tag.outputs.production_tag_name || needs.production_preflight.outputs.production_tag_name || 'unavailable' }}
+            GitHub Release URL: ${{ needs.ensure_github_release.outputs.github_release_url || 'unavailable' }}
+            GitHub Release state: ${{ needs.ensure_github_release.outputs.github_release_state || 'unavailable' }}
+            GitHub Release action: ${{ needs.ensure_github_release.outputs.github_release_action || 'unavailable' }}
 
             Production runtime verification result: ${{ needs.verify_production_runtime.result }}
             Expected Production webapp version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
@@ -1185,8 +1322,8 @@ jobs:
             Playwright report: ${{ needs.run_e2e.outputs.reportUrl || 'unavailable' }}
             Source workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'Hosted Production deployment and verification succeeded.' || 'Production was blocked because a release gate failed.' }}
-            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'The Production tag exists.' || 'Production tag creation was blocked by the failed release gate.' }}
-            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'Docker, Helm, or wire-builds publication failed.' || '' }}
-            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'The release is incomplete for on-premises distribution.' || '' }}
-            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'No Production tag was moved or deleted.' || '' }}
+            ${{ needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'Hosted Production deployment and verification succeeded.' || 'Production was blocked because a release gate failed.' }}
+            ${{ needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'The Production tag exists.' || 'Production tag creation was blocked by the failed release gate.' }}
+            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'Docker, Helm, or wire-builds publication failed.' || needs.ensure_github_release.result == 'failure' && needs.create_production_tag.result == 'success' && 'GitHub Release draft creation or verification failed.' || '' }}
+            ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'The release is incomplete for on-premises distribution.' || needs.ensure_github_release.result == 'failure' && needs.create_production_tag.result == 'success' && 'The automated release lifecycle is incomplete until the GitHub Release handoff succeeds.' || '' }}
+            ${{ (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && needs.create_production_tag.result == 'success' && 'No Production tag was moved or deleted.' || '' }}
