@@ -54,7 +54,7 @@ import {ListItemTabIndentationPlugin} from './plugins/ListIndentationPlugin/List
 import {ListMaxIndentLevelPlugin} from './plugins/ListMaxIndentLevelPlugin/ListMaxIndentLevelPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {PastePlugin} from './plugins/PastePlugin/PastePlugin';
-import {PlainTextPastePlugin} from './plugins/PlainTextPastePlugin';
+import {PlainTextPastePlugin} from './plugins/PlainTextPastePlugin/PlainTextPastePlugin';
 import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin/ReplaceCarriageReturnPlugin';
 import {SendPlugin} from './plugins/SendPlugin/SendPlugin';
 import {markdownTransformers} from './utils/markdownTransformers';
