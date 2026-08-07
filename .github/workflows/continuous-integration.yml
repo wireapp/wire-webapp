@@ -4,10 +4,10 @@ name: Continuous integration
 on:
   pull_request:
     # we want to run the continuous integration on every pull request targetting those branches
-    branches: [main, release/*]
+    branches: [main, release/*, maintenance/*]
 
   merge_group:
-    branches: [main, release/*]
+    branches: [main, release/*, maintenance/*]
 
 concurrency:
   group: ci-${{ github.ref }}
