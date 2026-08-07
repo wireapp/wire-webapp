@@ -95,8 +95,8 @@ jobs:
             exit 1
           fi
 
-          maintenance_branch="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts maintenance-branch "${MAINTENANCE_LINE_KEY}")"
-          source_production_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-source "${MAINTENANCE_LINE_KEY}" "${SOURCE_PRODUCTION_TAG}")"
+          maintenance_branch="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts maintenance-branch "${MAINTENANCE_LINE_KEY}")"
+          source_production_tag="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts validate-maintenance-source "${MAINTENANCE_LINE_KEY}" "${SOURCE_PRODUCTION_TAG}")"
 
           {
             echo "maintenance_line_key=${MAINTENANCE_LINE_KEY}"
@@ -150,7 +150,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          validated_source_production_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-production-tag "${SOURCE_PRODUCTION_TAG}")"
+          validated_source_production_tag="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts validate-production-tag "${SOURCE_PRODUCTION_TAG}")"
 
           if [[ "${validated_source_production_tag}" != "${SOURCE_PRODUCTION_TAG}" ]]; then
             echo "Validated source Production tag does not match the requested tag: ${SOURCE_PRODUCTION_TAG}" >&2
@@ -307,7 +307,7 @@ jobs:
           valid_tag_names=()
 
           for remote_tag_name in "${remote_tag_names[@]}"; do
-            validated_tag_name="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-tag "${remote_tag_name}" 2> /dev/null)" || continue
+            validated_tag_name="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts validate-maintenance-tag "${remote_tag_name}" 2> /dev/null)" || continue
             valid_tag_names+=("${validated_tag_name}")
 
             git fetch --no-tags origin "refs/tags/${validated_tag_name}:refs/tags/${validated_tag_name}"
@@ -319,9 +319,9 @@ jobs:
             fi
           done
 
-          candidate_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts next-maintenance-tag "${MAINTENANCE_LINE_KEY}" "${valid_tag_names[@]}")"
+          candidate_tag="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts next-maintenance-tag "${MAINTENANCE_LINE_KEY}" "${valid_tag_names[@]}")"
 
-          ./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-tag "${candidate_tag}" > /dev/null
+          ./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts validate-maintenance-tag "${candidate_tag}" > /dev/null
           echo "candidate_tag=${candidate_tag}" >> "$GITHUB_OUTPUT"
           echo "Candidate maintenance tag: ${candidate_tag}"
 
@@ -390,7 +390,7 @@ jobs:
           BUILD_ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
           EXPECTED_COMMIT: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
           EXPECTED_VERSION: ${{ needs.select_maintenance_tag.outputs.candidate_tag }}
-        run: node ./bin/validateBuildArtifact.mts
+        run: node ./tools/build-artifact/validateBuildArtifact.mts
 
       - name: Compute maintenance artifact metadata
         id: artifact_metadata
@@ -521,7 +521,7 @@ jobs:
           candidate_tag_commit_sha=''
 
           for remote_tag_name in "${remote_tag_names[@]}"; do
-            validated_tag_name="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts validate-maintenance-tag "${remote_tag_name}" 2> /dev/null)" || continue
+            validated_tag_name="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts validate-maintenance-tag "${remote_tag_name}" 2> /dev/null)" || continue
             valid_tag_names+=("${validated_tag_name}")
 
             git fetch --no-tags origin "refs/tags/${validated_tag_name}:refs/tags/${validated_tag_name}"
@@ -553,7 +553,7 @@ jobs:
             done
           fi
 
-          recomputed_candidate_tag="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts next-maintenance-tag "${MAINTENANCE_LINE_KEY}" "${tag_names_for_next_candidate[@]}")"
+          recomputed_candidate_tag="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts next-maintenance-tag "${MAINTENANCE_LINE_KEY}" "${tag_names_for_next_candidate[@]}")"
 
           if [[ "${recomputed_candidate_tag}" != "${EXPECTED_CANDIDATE_TAG}" ]]; then
             echo "Remote maintenance tags advanced to ${recomputed_candidate_tag}; expected ${EXPECTED_CANDIDATE_TAG}. Start a fresh workflow run." >&2

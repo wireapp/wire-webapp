@@ -5,7 +5,7 @@
     "docker": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node ./bin/push_docker.js"
+        "command": "node ./tools/docker-publication/push_docker.js"
       }
     },
     "clean-jest": {
@@ -18,7 +18,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "jest --config ./bin/jest.config.js"
+        "command": "jest --config ./tools/jest.config.js"
       }
     },
     "build": {
@@ -31,7 +31,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint tools/release-appearance"
+        "command": "eslint tools"
       }
     },
     "e2e": {
@@ -43,7 +43,7 @@
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --project ./tsconfig.bin.json --noEmit && tsc --project ./tools/release-appearance/tsconfig.json --noEmit"
+        "command": "tsc --project ./tsconfig.tools.json --noEmit && tsc --project ./tools/release-appearance/tsconfig.json --noEmit"
       }
     }
   },

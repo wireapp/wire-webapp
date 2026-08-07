@@ -1,7 +1,7 @@
 ls:
-  bin/verifyPublicProductionBundle.ts:
+  tools/build-artifact/verifyPublicProductionBundle.ts:
     .ts: camelCase
-  bin/verifyPublicProductionBundle.test.ts:
+  tools/build-artifact/verifyPublicProductionBundle.test.ts:
     .test.ts: camelCase
   libraries/config/src:
     .dir: camelCase

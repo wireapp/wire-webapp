@@ -36,6 +36,7 @@ const ignores = [
   'docs/',
   'bin/',
   '**/node_modules/',
+  'tools/jest.config.js',
   'apps/webapp/assets/',
   'resource/',
   '**/dist/**',
@@ -284,7 +285,7 @@ const jestMockRestrictionRule = [
 
 const jestRecommendedProductionConfig = {
   ...jestPlugin.configs['flat/recommended'],
-  plugins: {},
+  plugins: {jest: jestPlugin},
 };
 
 const productionConfigs = [
@@ -736,6 +737,56 @@ const config = [
     files: ['tools/**/*.{js,jsx,ts,tsx,cjs,mjs}'],
     plugins: {
       jest: jestPlugin,
+    },
+  },
+  {
+    files: ['tools/**/*.{ts,tsx,mts}'],
+    languageOptions: {
+      parser: tsParser,
+      globals: runtimeGlobals,
+      parserOptions: {
+        project: ['./tsconfig.tools.json', './tools/release-appearance/tsconfig.json'],
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: [
+      'tools/build-artifact/**/*.test.ts',
+      'tools/docker-publication/**/*.test.ts',
+      'tools/production-distribution/**/*.test.ts',
+      'tools/release-metadata/**/*.test.ts',
+      'tools/release-summary/**/*.test.ts',
+      'tools/runtime-verification/**/*.test.ts',
+      'tools/test-reporting/**/*.test.ts',
+      'tools/workflow-tests/**/*.test.ts',
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: null,
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: [
+      'tools/build-artifact/**/*.{ts,tsx,mts}',
+      'tools/development/**/*.{ts,tsx,mts}',
+      'tools/docker-publication/**/*.{js,jsx,ts,tsx,cjs,mjs}',
+      'tools/production-distribution/**/*.{ts,tsx,mts}',
+      'tools/release-metadata/**/*.{ts,tsx,mts}',
+      'tools/release-summary/**/*.{ts,tsx,mts}',
+      'tools/runtime-verification/**/*.{ts,tsx,mts}',
+      'tools/server-packaging/**/*.{js,jsx,ts,tsx,cjs,mjs}',
+      'tools/test-reporting/**/*.{ts,tsx,mts}',
+    ],
+    rules: {
+      'import/order': 'off',
+      'no-console': 'off',
+      'no-magic-numbers': 'off',
+      'prefer-template': 'off',
+      'unicorn/no-array-sort': 'off',
+      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
     },
   },
   {

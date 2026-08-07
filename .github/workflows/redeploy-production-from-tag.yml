@@ -58,7 +58,7 @@ jobs:
             exit 1
           fi
 
-          webapp_build_version="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts webapp-build-version "${TAG}" "${GITHUB_SHA}" production)"
+          webapp_build_version="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts webapp-build-version "${TAG}" "${GITHUB_SHA}" production)"
 
           {
             echo "webapp_build_version=${webapp_build_version}"
@@ -173,7 +173,7 @@ jobs:
           BUILD_ARTIFACT_PATH: ${{ github.workspace }}/selected-release/apps/server/dist/s3/ebs.zip
           EXPECTED_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
           EXPECTED_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
-        run: node ./bin/validateRecoveryBuildArtifact.mts
+        run: node ./tools/build-artifact/validateRecoveryBuildArtifact.mts
 
       - name: Upload build artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

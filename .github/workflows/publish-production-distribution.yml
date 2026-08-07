@@ -109,7 +109,7 @@ jobs:
           EXPECTED_COMMIT_SHA: ${{ inputs.expected_commit_sha }}
           PRODUCTION_TAG: ${{ inputs.production_tag }}
           SOURCE_RUN_ID: ${{ inputs.source_run_id }}
-        run: ./bin/validate-production-distribution.sh
+        run: ./tools/production-distribution/validate-production-distribution.sh
 
       - name: Setup Helm
         uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
@@ -127,7 +127,7 @@ jobs:
           RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
           WIRE_WEBAPP_DOCKER_CONTEXT_PATH: ${{ env.DISTRIBUTION_CONTEXT_PATH }}
           WIRE_WEBAPP_RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
-        run: ./bin/publish-production-docker.sh
+        run: ./tools/docker-publication/publish-production-docker.sh
 
       - name: Publish or reuse Helm chart
         id: publish_helm
@@ -137,7 +137,7 @@ jobs:
           DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
           CHART_REPOSITORY_NAME: ${{ env.CHART_REPOSITORY_NAME }}
           CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
-        run: ./bin/publish-production-helm.sh
+        run: ./tools/helm-publication/publish-production-helm.sh
 
       - name: Check out wire-builds main
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -155,7 +155,7 @@ jobs:
           HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
           RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
         working-directory: wire-builds
-        run: ../bin/update-wire-builds.sh
+        run: ../tools/wire-builds/update-wire-builds.sh
 
       - name: Mark distribution complete
         id: distribution_result

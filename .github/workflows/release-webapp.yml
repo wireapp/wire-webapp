@@ -105,7 +105,7 @@ jobs:
             exit 1
           fi
 
-          release_branch="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts release-branch "${RELEASE_IDENTIFIER}")"
+          release_branch="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts release-branch "${RELEASE_IDENTIFIER}")"
 
           {
             echo "release_identifier=${RELEASE_IDENTIFIER}"
@@ -282,7 +282,7 @@ jobs:
           BUILD_ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
           EXPECTED_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
           EXPECTED_VERSION: ${{ steps.release_metadata.outputs.release_identifier }}
-        run: node ./bin/validateBuildArtifact.mts
+        run: node ./tools/build-artifact/validateBuildArtifact.mts
 
       - name: Compute artifact metadata
         id: artifact_metadata
@@ -475,7 +475,7 @@ jobs:
                 print $2;
               }'
           )
-          beta_tag_name="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts next-beta-tag "${RELEASE_IDENTIFIER}" "${existing_beta_tag_names[@]}")"
+          beta_tag_name="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts next-beta-tag "${RELEASE_IDENTIFIER}" "${existing_beta_tag_names[@]}")"
 
           git config user.email "zebot@users.noreply.github.com"
           git config user.name "Zebot"
@@ -626,7 +626,7 @@ jobs:
           RELEASE_REASON: ${{ inputs.reason }}
           SOURCE_COMMIT_SHA: ${{ needs.build_artifact.outputs.source_commit_sha }}
           SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
-        run: node bin/renderWebappReleaseSummary.ts --beta-release >> "$GITHUB_STEP_SUMMARY"
+        run: node tools/release-summary/renderWebappReleaseSummary.ts --beta-release >> "$GITHUB_STEP_SUMMARY"
 
   # WebApp release owns release-specific success and failure notifications.
   # The reusable workflow's optional failure-only notification is intentionally
@@ -750,7 +750,7 @@ jobs:
 
           git fetch --tags origin
 
-          production_tag_name="$(./bin/yarn ts-node --project ./tsconfig.bin.json ./bin/releaseMetadataCli.ts production-tag "${RELEASE_IDENTIFIER}")"
+          production_tag_name="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts production-tag "${RELEASE_IDENTIFIER}")"
           beta_tag_commit_sha="$(git rev-parse "${BETA_TAG_NAME}^{commit}")"
 
           if [[ "${beta_tag_commit_sha}" != "${RELEASE_COMMIT_SHA}" ]]; then
@@ -1121,7 +1121,7 @@ jobs:
           SOURCE_COMMIT_SHA: ${{ needs.build_artifact.outputs.source_commit_sha }}
           SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
           TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
-        run: node bin/renderWebappReleaseSummary.ts >> "$GITHUB_STEP_SUMMARY"
+        run: node tools/release-summary/renderWebappReleaseSummary.ts >> "$GITHUB_STEP_SUMMARY"
 
   notify_release_failure:
     name: Notify failed release
