@@ -21,16 +21,8 @@ import {isEmptyArray, isEmptyString, isError} from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
 import type {Task} from 'true-myth';
 
-import {execFile} from 'node:child_process';
-import {appendFile} from 'node:fs/promises';
-import {promisify} from 'node:util';
-
-import {createGitHubClient} from './githubClient.ts';
 import type {GitHubClient, PullRequestRecord} from './githubClient.ts';
-import {createRuntimeKyHttpClient} from './httpClient.ts';
 import {readCommandEnvironment} from './releaseAppearanceCommand.ts';
-import type {CommandEnvironment} from './releaseAppearanceCommand.ts';
-import {planNextBetaPreviewHistory} from './releaseHistory.ts';
 import type {
   BetaReleaseTagReference,
   ExecuteGitCommand,
@@ -50,7 +42,7 @@ export type PreviewNextBetaCommandDependencies = {
 };
 
 export type ExecutePreviewNextBetaCommandOptions = {
-  readonly commandLineArguments: readonly string[];
+  readonly targetMainCommit: string;
   readonly environment: NodeJS.ProcessEnv;
   readonly dependencies: PreviewNextBetaCommandDependencies;
 };
@@ -117,10 +109,8 @@ type WriteSummarySafelyOptions = {
   readonly githubToken: string;
 };
 
-const processArgumentStartIndex = 2;
 const fullGitCommitPattern = /^[0-9a-f]{40}$/i;
 const markdownSpecialCharacterPattern = /[\\`*_\[\]<>~]/gu;
-const executeFile = promisify(execFile);
 const advisoryMessage =
   'This is an advisory preview. These changes are on main but have not been deployed or verified in Beta.';
 
@@ -176,19 +166,12 @@ async function writeSummarySafely(writeSummarySafelyOptions: WriteSummarySafelyO
   }
 }
 
-export function parseCommandLineArguments(commandLineArguments: readonly string[]): Result<string, Error> {
-  if (commandLineArguments.length !== 1) {
-    return Result.err(
-      new Error('Usage: node tools/release-appearance/previewNextBetaCommand.ts <target-main-commit-sha>'),
-    );
-  }
-
-  const targetMainCommit = Maybe.of(commandLineArguments[0]);
-  if (targetMainCommit.isNothing || !fullGitCommitPattern.test(targetMainCommit.value)) {
+export function validateTargetMainCommit(targetMainCommit: string): Result<string, Error> {
+  if (!fullGitCommitPattern.test(targetMainCommit)) {
     return Result.err(new Error('Target main commit SHA must contain exactly 40 hexadecimal characters'));
   }
 
-  return Result.ok(targetMainCommit.value);
+  return Result.ok(targetMainCommit);
 }
 
 async function discoverPullRequests(
@@ -423,11 +406,11 @@ function createReport(createReportOptions: CreateReportOptions): string {
 export async function executePreviewNextBetaCommand(
   executePreviewNextBetaCommandOptions: ExecutePreviewNextBetaCommandOptions,
 ): Promise<PreviewNextBetaCommandResult> {
-  const {commandLineArguments, environment, dependencies} = executePreviewNextBetaCommandOptions;
+  const {targetMainCommit, environment, dependencies} = executePreviewNextBetaCommandOptions;
   const githubToken = Maybe.of(environment.GITHUB_TOKEN).unwrapOr('');
-  const parsedCommandResult = parseCommandLineArguments(commandLineArguments);
-  if (parsedCommandResult.isErr) {
-    await writeFailureSafely(dependencies.writeFailure, parsedCommandResult.error.message);
+  const targetMainCommitResult = validateTargetMainCommit(targetMainCommit);
+  if (targetMainCommitResult.isErr) {
+    await writeFailureSafely(dependencies.writeFailure, targetMainCommitResult.error.message);
 
     return {exitCode: 1, summary: ''};
   }
@@ -442,7 +425,6 @@ export async function executePreviewNextBetaCommand(
     return {exitCode: 1, summary: ''};
   }
 
-  const targetMainCommit = parsedCommandResult.value;
   let previewState: PreviewNextBetaState;
   try {
     previewState = await createPreviewState({
@@ -501,74 +483,4 @@ export async function executePreviewNextBetaCommand(
   }
 
   return {exitCode, summary};
-}
-
-async function executeRuntimeGitCommand(commandArguments: readonly string[]): Promise<string> {
-  const commandResult = await executeFile('git', commandArguments, {encoding: 'utf8'});
-
-  return commandResult.stdout.toString();
-}
-
-async function writeRuntimeFailure(message: string): Promise<void> {
-  process.stderr.write(`${message}\n`);
-}
-
-async function writeRuntimeInformation(message: string): Promise<void> {
-  process.stdout.write(`${message}\n`);
-}
-
-function createRuntimeDependencies(commandEnvironment: CommandEnvironment): PreviewNextBetaCommandDependencies {
-  const httpClient = createRuntimeKyHttpClient();
-  const githubClient = createGitHubClient({
-    httpClient,
-    githubApiUrl: commandEnvironment.githubApiUrl,
-    githubRepository: commandEnvironment.githubRepository,
-    githubToken: commandEnvironment.githubToken,
-  });
-
-  return {
-    executeGitCommand: executeRuntimeGitCommand,
-    githubClient,
-    planNextBetaPreviewHistory,
-    writeFailure: writeRuntimeFailure,
-    writeInformation: writeRuntimeInformation,
-    async writeSummary(summary): Promise<void> {
-      await appendFile(commandEnvironment.githubStepSummary, `${summary}\n`, 'utf8');
-    },
-  };
-}
-
-async function startPreviewNextBetaCommand(): Promise<void> {
-  const githubToken = Maybe.of(process.env.GITHUB_TOKEN).unwrapOr('');
-  try {
-    const commandEnvironmentResult = readCommandEnvironment(process.env);
-    if (commandEnvironmentResult.isErr) {
-      await writeRuntimeFailure(redactSecret(commandEnvironmentResult.error.message, githubToken));
-      process.exitCode = 1;
-
-      return;
-    }
-
-    const commandResult = await executePreviewNextBetaCommand({
-      commandLineArguments: process.argv.slice(processArgumentStartIndex),
-      environment: process.env,
-      dependencies: createRuntimeDependencies(commandEnvironmentResult.value),
-    });
-    process.exitCode = commandResult.exitCode;
-  } catch (error: unknown) {
-    await writeRuntimeFailure(redactSecret(isError(error) ? error.message : 'Unexpected preview failure', githubToken));
-    process.exitCode = 1;
-  }
-}
-
-function isPreviewNextBetaCommandEntrypoint(): boolean {
-  return Maybe.of(process.argv[1])
-    .map(entrypointPath => {
-      return /(?:^|[\\/])previewNextBetaCommand\.ts$/.test(entrypointPath);
-    })
-    .unwrapOr(false);
-}
-
-if (isPreviewNextBetaCommandEntrypoint()) {
-  void startPreviewNextBetaCommand();
 }

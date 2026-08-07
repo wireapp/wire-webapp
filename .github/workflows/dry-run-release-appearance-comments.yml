@@ -119,7 +119,7 @@ jobs:
           else
             release_appearance_command_arguments=(production "${RELEASE_TAG}" "${RELEASE_COMMIT}" "${PROMOTED_BETA_TAG}" --dry-run)
           fi
-          node tools/release-appearance/releaseAppearanceCommand.ts "${release_appearance_command_arguments[@]}"
+          node tools/release-cli/releaseAppearanceCommand.mts "${release_appearance_command_arguments[@]}"
 
       - name: Confirm read-only issue permissions
         if: ${{ always() }}

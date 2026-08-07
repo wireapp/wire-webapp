@@ -42,7 +42,7 @@ type ValidateManifestOptionValues = {
   readonly manifestPath: string;
   readonly productionTag: string;
   readonly productionTagCommitSha: string;
-  readonly expectedCommitSha?: string;
+  readonly expectedCommitSha: string | undefined;
   readonly sourceRunId: string;
 };
 

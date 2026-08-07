@@ -1,10 +1,8 @@
-import assert from 'node:assert';
-
 import {isError} from '@sindresorhus/is';
 import {Maybe, Result, task} from 'true-myth';
 import type {Task} from 'true-myth';
 
-import {executePreviewNextBetaCommand, parseCommandLineArguments} from './previewNextBetaCommand.ts';
+import {executePreviewNextBetaCommand} from './previewNextBetaCommand.ts';
 import type {
   ExecutePreviewNextBetaCommandOptions,
   PreviewNextBetaCommandDependencies,
@@ -79,7 +77,7 @@ type CreatePullRequestOptions = {
 };
 
 type RunCommandOptions = {
-  readonly commandLineArguments: readonly string[];
+  readonly targetMainCommit: string;
   readonly executeGitCommand: ExecuteGitCommand;
   readonly githubClient: GitHubClient;
   readonly historyPlanResult?: Result<NextBetaPreviewHistoryPlan, Error>;
@@ -184,7 +182,7 @@ function createFakeHistoryPlanner(
 
 async function runCommand(runCommandOptions: RunCommandOptions): Promise<CommandRun> {
   const {
-    commandLineArguments,
+    targetMainCommit,
     executeGitCommand,
     githubClient,
     historyPlanResult = Result.ok(previewHistoryPlan),
@@ -218,7 +216,7 @@ async function runCommand(runCommandOptions: RunCommandOptions): Promise<Command
     },
   };
   const options: ExecutePreviewNextBetaCommandOptions = {
-    commandLineArguments,
+    targetMainCommit,
     environment: commandEnvironment,
     dependencies,
   };
@@ -227,31 +225,12 @@ async function runCommand(runCommandOptions: RunCommandOptions): Promise<Command
   return {result, historyPlannerState: historyPlannerFixture.state, writerState};
 }
 
-describe('parseCommandLineArguments', () => {
-  test('accepts exactly one full target commit argument', () => {
-    const actualResult = parseCommandLineArguments([targetMainCommit]);
-    const abbreviatedResult = parseCommandLineArguments(['abcdef0']);
-    const missingResult = parseCommandLineArguments([]);
-    const additionalResult = parseCommandLineArguments([targetMainCommit, targetMainCommit]);
-    const flagResult = parseCommandLineArguments(['--target-main-commit']);
-    const malformedResult = parseCommandLineArguments(['g'.repeat(40)]);
-
-    assert(actualResult.isOk);
-    expect(actualResult.value).toBe(targetMainCommit);
-    expect(abbreviatedResult.isErr).toBe(true);
-    expect(missingResult.isErr).toBe(true);
-    expect(additionalResult.isErr).toBe(true);
-    expect(flagResult.isErr).toBe(true);
-    expect(malformedResult.isErr).toBe(true);
-  });
-});
-
 describe('executePreviewNextBetaCommand', () => {
   test('delegates history planning with the exact target commit', async () => {
     const githubClientFixture = createFakeGitHubClient();
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
     });
@@ -269,7 +248,7 @@ describe('executePreviewNextBetaCommand', () => {
     };
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       historyPlanResult: Result.ok(unavailableHistory),
@@ -286,7 +265,7 @@ describe('executePreviewNextBetaCommand', () => {
     const githubClientFixture = createFakeGitHubClient();
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       historyPlanResult: Result.err(new Error(`GitHub token ${githubToken} history failure`)),
@@ -315,7 +294,7 @@ describe('executePreviewNextBetaCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
     });
@@ -355,7 +334,7 @@ describe('executePreviewNextBetaCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       historyPlanResult: Result.ok({...previewHistoryPlan, commits: [firstMainCommit, secondMainCommit]}),
@@ -383,7 +362,7 @@ describe('executePreviewNextBetaCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       historyPlanResult: Result.ok({...previewHistoryPlan, commits: [firstMainCommit]}),
@@ -404,7 +383,7 @@ describe('executePreviewNextBetaCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       historyPlanResult: Result.ok({
@@ -429,7 +408,7 @@ describe('executePreviewNextBetaCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       historyPlanResult: Result.ok({
@@ -449,7 +428,7 @@ describe('executePreviewNextBetaCommand', () => {
     const githubClientFixture = createFakeGitHubClient();
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       historyPlanResult: Result.ok({...previewHistoryPlan, commits: []}),
@@ -468,7 +447,7 @@ describe('executePreviewNextBetaCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       informationFailureMessage: `token ${githubToken} in information writer`,
@@ -489,7 +468,7 @@ describe('executePreviewNextBetaCommand', () => {
     const githubClientFixture = createFakeGitHubClient();
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       summaryFailureMessage: `token ${githubToken} in summary writer`,
@@ -510,7 +489,7 @@ describe('executePreviewNextBetaCommand', () => {
     const githubClientFixture = createFakeGitHubClient();
 
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       informationFailureMessage: `token ${githubToken} in information writer`,
@@ -530,7 +509,7 @@ describe('executePreviewNextBetaCommand', () => {
   test('returns non-zero when the history planner fails', async () => {
     const githubClientFixture = createFakeGitHubClient();
     const commandRun = await runCommand({
-      commandLineArguments: [targetMainCommit],
+      targetMainCommit,
       executeGitCommand: createFakeGitCommand(),
       githubClient: githubClientFixture.githubClient,
       historyPlanResult: Result.err(new Error('target commit does not exist')),

@@ -565,7 +565,7 @@ jobs:
           WORKFLOW_TOOLING_COMMIT_SHA: ${{ github.sha }}
         run: |
           node \
-            tools/release-appearance/releaseAppearanceCommand.ts \
+            tools/release-cli/releaseAppearanceCommand.mts \
             beta \
             "${BETA_TAG}" \
             "${RELEASE_COMMIT_SHA}"
@@ -950,7 +950,7 @@ jobs:
           WORKFLOW_TOOLING_COMMIT_SHA: ${{ github.sha }}
         run: |
           node \
-            tools/release-appearance/releaseAppearanceCommand.ts \
+            tools/release-cli/releaseAppearanceCommand.mts \
             production \
             "${PRODUCTION_TAG}" \
             "${RELEASE_COMMIT_SHA}" \
