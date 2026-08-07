@@ -21,6 +21,7 @@ import Axios, {AxiosRequestConfig} from 'axios';
 
 import {NewAppRequest} from './app/newAppRequest';
 import {NewAppResponse} from './app/newAppResponse';
+import {TeamCollaborator} from './collaborator/teamCollaborator';
 import {LeadData} from './leadData';
 import {TeamSizeData} from './teamSizeData';
 import {UpdateTeamData} from './updateTeamData';
@@ -34,6 +35,7 @@ export class TeamAPI {
 
   public static readonly URL = {
     APPS: 'apps',
+    COLLABORATORS: 'collaborators',
     SIZE: 'size',
     TEAMS: '/teams',
     CONSENT: '/consent',
@@ -140,6 +142,16 @@ export class TeamAPI {
     };
 
     const response = await this.client.sendJSON<any>(config);
+    return response.data;
+  }
+
+  public async getCollaborators(teamId: string): Promise<TeamCollaborator[]> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.COLLABORATORS}`,
+    };
+
+    const response = await this.client.sendJSON<TeamCollaborator[]>(config);
     return response.data;
   }
 
