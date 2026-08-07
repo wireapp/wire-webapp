@@ -76,8 +76,8 @@ export function ConfigToolbar() {
     window.wire?.app?.debug?.isEnabledAvsDebugger() ?? false,
   );
   const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(window.wire?.app?.debug?.isEnabledAvsRustSFT() ?? false);
-  const [videoBackgroundEffectsFeatureEnabled, setVideoBackgroundEffectsFeatureEnabled] = useState(
-    window.wire?.app?.debug?.isVideoBackgroundEffectsFeatureEnabled() ?? false,
+  const [isPerformancePanelEnabled, setIsPerformancePanelEnabled] = useState(
+    window.wire?.app?.debug?.isPerformancePanelEnabled() ?? false,
   );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
   const [notificationDumpFrom, setNotificationDumpFrom] = useState(() => toDateInputValue(getStartOfToday()));
@@ -266,21 +266,22 @@ export function ConfigToolbar() {
     );
   };
 
-  const handleBackgroundEffectsFeature = (isChecked: boolean) => {
-    setVideoBackgroundEffectsFeatureEnabled(
-      window.wire?.app?.debug?.enableVideoBackgroundEffectsFeature(isChecked) === true,
-    );
+  const handlePerformancePanel = (isChecked: boolean) => {
+    setIsPerformancePanelEnabled(window.wire?.app?.debug?.enablePerformancePanel(isChecked) === true);
   };
   const renderBackgroundEffectsFeatureSelect = () => {
     return (
       <div style={{marginBottom: '10px'}}>
-        <label htmlFor="video-background-effects-feature-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
-          ENABLE VIDEO BACKGROUND EFFECTS
+        <label
+          htmlFor="video-background-effects-performance-panel-checkbox"
+          style={{display: 'block', fontWeight: 'bold'}}
+        >
+          Enable BGE Performance Panel
         </label>
         <Switch
-          id="video-background-effects-feature-checkbox"
-          checked={videoBackgroundEffectsFeatureEnabled}
-          onToggle={isChecked => handleBackgroundEffectsFeature(isChecked)}
+          id="video-background-effects-performance-panel-checkbox"
+          checked={isPerformancePanelEnabled}
+          onToggle={isChecked => handlePerformancePanel(isChecked)}
         />
       </div>
     );

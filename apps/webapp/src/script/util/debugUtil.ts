@@ -317,12 +317,12 @@ export class DebugUtil {
     );
   }
 
-  isVideoBackgroundEffectsFeatureEnabled(): boolean {
-    return this.callingRepository.getBackgroundEffectsHandler().readFeatureEnabledStateFromStore();
+  isPerformancePanelEnabled(): boolean {
+    return this.callingRepository.getBackgroundEffectsHandler().readPerformancePanelEnabledFromStore();
   }
 
-  enableVideoBackgroundEffectsFeature(flag: boolean) {
-    return this.callingRepository.getBackgroundEffectsHandler().saveFeatureEnabledStateInStore(flag);
+  enablePerformancePanel(flag: boolean) {
+    return this.callingRepository.getBackgroundEffectsHandler().savePerformancePanelEnabledStateInStore(flag);
   }
 
   setupAvsDebugger() {

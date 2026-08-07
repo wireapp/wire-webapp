@@ -44,7 +44,6 @@ export interface RenderMetrics extends Metrics {
 export type BackgroundEffectsQuality = 'privacy' | 'balanced' | 'performance';
 
 export type BackgroundEffectsState = {
-  isFeatureEnabled: boolean;
   isPerformancePanelEnabled: boolean;
   preferredEffect: BackgroundEffectSelection;
   metrics: RenderMetrics | undefined;
@@ -54,7 +53,6 @@ export type BackgroundEffectsState = {
   effectiveQualityTier: BackgroundEffectsQuality;
   isInitializing: boolean;
 
-  setIsFeatureEnabled(value: boolean): void;
   setIsPerformancePanelEnabled(value: boolean): void;
   setPreferredEffect(effect: BackgroundEffectSelection): void;
   setLastVirtualBackgroundId(backgroundId: string): void;
@@ -67,7 +65,6 @@ export type BackgroundEffectsState = {
 
 export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
   immer<BackgroundEffectsState>(set => ({
-    isFeatureEnabled: false,
     isPerformancePanelEnabled: false,
     preferredEffect: DEFAULT_BACKGROUND_EFFECT,
     metrics: undefined,
@@ -76,10 +73,6 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     qualityTier: 'privacy',
     effectiveQualityTier: 'privacy',
 
-    setIsFeatureEnabled: value =>
-      set(state => {
-        state.isFeatureEnabled = value;
-      }),
     setIsPerformancePanelEnabled: value =>
       set(state => {
         state.isPerformancePanelEnabled = value;

@@ -226,7 +226,6 @@ export const VideoControls = ({
     useBackgroundEffectsStore(state => state.preferredEffect) ?? DEFAULT_BACKGROUND_EFFECT;
   const lastVirtualBackgroundId =
     useBackgroundEffectsStore(state => state.lastVirtualBackgroundId) ?? DEFAULT_BUILTIN_BACKGROUND_ID;
-  const isVideoBackgroundEffectsFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
 
   const {participants} = useKoSubscribableChildren(call, ['participants']);
 
@@ -431,11 +430,8 @@ export const VideoControls = ({
     [getEffectOptions, translate],
   );
 
-  /** Merged options: camera group + (if enabled) background group. */
-  const options = useMemo(
-    () => (isVideoBackgroundEffectsFeatureEnabled ? [...cameraOptions, ...backgroundOptions] : cameraOptions),
-    [cameraOptions, backgroundOptions, isVideoBackgroundEffectsFeatureEnabled],
-  );
+  /** Merged options: camera group + background group. */
+  const options = useMemo(() => [...cameraOptions, ...backgroundOptions], [cameraOptions, backgroundOptions]);
 
   const handleBackgroundSelect = useCallback(
     (effect: BackgroundEffectSelection) => {
