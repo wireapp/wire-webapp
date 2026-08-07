@@ -17,8 +17,6 @@
  *
  */
 
-import {container} from 'tsyringe';
-
 import {detectCapabilities, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
@@ -32,17 +30,16 @@ import {
   DEFAULT_BUILTIN_BACKGROUND_ID,
   loadBackgroundSource,
 } from 'Repositories/media/VideoBackgroundEffects';
-import {TeamState} from 'Repositories/team/TeamState';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 
-import {backgroundEffectsStore, BackgroundEffectsQuality, RenderMetrics} from './useBackgroundEffectsStore';
+import {BackgroundEffectsQuality, backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
 
 export const TARGET_FPS = 15;
 export const DEBOUNCE_TIMER = 500;
 
 const VIDEO_BACKGROUND_EFFECT_STORAGE_KEY = 'video-background-effects';
-export const VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY = 'video-background-effects-feature-enabled';
+export const VIDEO_BACKGROUND_EFFECTS_PERFORMANCE_PANEL_STORAGE_KEY = 'video-background-effects-feature-enabled';
 const VIDEO_BACKGROUND_LAST_VIRTUAL_ID_STORAGE_KEY = 'video-background-effects-last-virtual-id';
 
 const isVirtualEffect = (effect: BackgroundEffectSelection): boolean => {
@@ -96,18 +93,9 @@ export class BackgroundEffectsHandler {
   private saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private currentReleasableStream: ReleasableMediaStream | undefined = undefined;
 
-  constructor(
-    private readonly controller: BackgroundEffectsController,
-    private readonly teamState = container.resolve(TeamState),
-  ) {
+  constructor(private readonly controller: BackgroundEffectsController) {
     this.storage = getStorage();
-    const isFeatureEnabled = this.readFeatureEnabledStateFromStore();
-    backgroundEffectsStore.getState().setIsFeatureEnabled(isFeatureEnabled);
-    backgroundEffectsStore.getState().setIsPerformancePanelEnabled(this.readDebugFeatureEnabledStateFromStore());
-
-    this.teamState.isBackgroundEffectsEnabled.subscribe(() => {
-      backgroundEffectsStore.getState().setIsFeatureEnabled(this.readFeatureEnabledStateFromStore());
-    });
+    backgroundEffectsStore.getState().setIsPerformancePanelEnabled(this.readPerformancePanelEnabledFromStore());
 
     const storedEffect = this.readPreferredBackgroundEffectFromStore();
     const isWebGLAvailable = detectCapabilities().webgl2;
@@ -217,37 +205,23 @@ export class BackgroundEffectsHandler {
   }
 
   public isBackgroundEffectEnabled(): boolean {
-    const {isFeatureEnabled, preferredEffect} = backgroundEffectsStore.getState();
-    return isFeatureEnabled && preferredEffect.type !== 'none';
+    return backgroundEffectsStore.getState().preferredEffect.type !== 'none';
   }
 
-  public readFeatureEnabledStateFromStore(): boolean {
-    const isEnabledByTeam = this.teamState.isBackgroundEffectsEnabled();
-
-    if (isEnabledByTeam) {
-      return true;
-    }
-
-    return this.readDebugFeatureEnabledStateFromStore();
-  }
-
-  private readDebugFeatureEnabledStateFromStore(): boolean {
+  public readPerformancePanelEnabledFromStore(): boolean {
     if (this.storage === undefined) {
       return false;
     }
 
     try {
-      return this.storage.getItem(VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY) === 'true';
+      return this.storage.getItem(VIDEO_BACKGROUND_EFFECTS_PERFORMANCE_PANEL_STORAGE_KEY) === 'true';
     } catch (error) {
-      this.logger.error('Failed to read video background effect feature state', error);
+      this.logger.error('Failed to read video background effects performance panel state', error);
       return false;
     }
   }
 
-  public saveFeatureEnabledStateInStore(flag: boolean): boolean {
-    const isEnabled = this.teamState.isBackgroundEffectsEnabled() || flag;
-
-    backgroundEffectsStore.getState().setIsFeatureEnabled(isEnabled);
+  public savePerformancePanelEnabledStateInStore(flag: boolean): boolean {
     backgroundEffectsStore.getState().setIsPerformancePanelEnabled(flag);
 
     if (this.storage === undefined) {
@@ -255,10 +229,10 @@ export class BackgroundEffectsHandler {
     }
 
     try {
-      this.storage.setItem(VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY, `${flag}`);
+      this.storage.setItem(VIDEO_BACKGROUND_EFFECTS_PERFORMANCE_PANEL_STORAGE_KEY, `${flag}`);
       return flag;
     } catch (error) {
-      this.logger.error('Failed to persist video background effect feature state', error);
+      this.logger.error('Failed to persist video background effects performance panel state', error);
       return false;
     }
   }
@@ -363,19 +337,17 @@ export class BackgroundEffectsHandler {
   };
 
   public async preloadResources(): Promise<void> {
-    if (backgroundEffectsStore.getState().isFeatureEnabled) {
-      const {wasmLoaderPath, wasmBinaryPath, modelPath} = defaultOpts;
-      // preload media pipe resources
-      this.prefetch(wasmLoaderPath);
-      this.prefetch(wasmBinaryPath);
-      this.prefetch(modelPath);
-      // preload default bg image
-      await loadBackgroundSource(DEFAULT_BUILTIN_BACKGROUND_ID);
+    const {wasmLoaderPath, wasmBinaryPath, modelPath} = defaultOpts;
+    // preload media pipe resources
+    this.prefetch(wasmLoaderPath);
+    this.prefetch(wasmBinaryPath);
+    this.prefetch(modelPath);
+    // preload default bg image
+    await loadBackgroundSource(DEFAULT_BUILTIN_BACKGROUND_ID);
 
-      const {preferredEffect} = backgroundEffectsStore.getState();
-      if (preferredEffect.type === 'virtual') {
-        await loadBackgroundSource(preferredEffect.backgroundId);
-      }
+    const {preferredEffect} = backgroundEffectsStore.getState();
+    if (preferredEffect.type === 'virtual') {
+      await loadBackgroundSource(preferredEffect.backgroundId);
     }
   }
 

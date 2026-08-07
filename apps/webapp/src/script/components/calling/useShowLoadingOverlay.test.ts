@@ -36,14 +36,12 @@ const createProcessedVideoStream = (stream: MediaStream) => ({
 describe('useShowLoadingOverlay', () => {
   beforeEach(() => {
     backgroundEffectsStore.setState({
-      isFeatureEnabled: false,
       isInitializing: false,
     });
   });
 
   it('should show loading overlay when background effect is initializing', () => {
     backgroundEffectsStore.setState({
-      isFeatureEnabled: true,
       isInitializing: true,
     });
 

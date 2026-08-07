@@ -17,11 +17,7 @@
  *
  */
 
-import {
-  BackgroundEffectsHandler,
-  ReleasableMediaStream,
-  VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY,
-} from './backgroundEffectsHandler';
+import {BackgroundEffectsHandler, ReleasableMediaStream} from './backgroundEffectsHandler';
 import {backgroundEffectsStore} from './useBackgroundEffectsStore';
 import {DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/VideoBackgroundEffects';
 import {
@@ -29,9 +25,6 @@ import {
   SELFIE_SEGMENTER_MODEL_PATH,
 } from 'Repositories/media/backgroundEffects/pipe/options';
 import {detectCapabilities} from 'Repositories/media/backgroundEffects';
-import {UserState} from 'Repositories/user/userState';
-import {TeamState} from 'Repositories/team/TeamState';
-import {FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
 
 // Mocks
 jest.mock('Util/localStorage', () => ({
@@ -53,17 +46,12 @@ describe('BackgroundEffectsHandler', () => {
   let mockController: any;
   let mockStorage: any;
 
-  const userState = new UserState();
-  const teamState = new TeamState(userState);
-
   afterEach(() => {
-    backgroundEffectsStore.getState().setIsFeatureEnabled(false);
     backgroundEffectsStore.getState().setIsPerformancePanelEnabled(false);
     backgroundEffectsStore.getState().setPreferredEffect({type: 'none'});
     backgroundEffectsStore.getState().setMetrics(undefined);
     backgroundEffectsStore.getState().setLastVirtualBackgroundId(DEFAULT_BUILTIN_BACKGROUND_ID);
     backgroundEffectsStore.getState().setQualityTier('privacy');
-    teamState.teamFeatures(undefined);
   });
 
   beforeEach(() => {
@@ -206,22 +194,22 @@ describe('BackgroundEffectsHandler', () => {
     expect(backgroundEffectsStore.getState().preferredEffect.type).toBe('virtual');
   });
 
-  it('saves feature flag to storage', () => {
+  it('saves the performance panel preference to the existing storage key', () => {
     const handler = new BackgroundEffectsHandler(mockController);
 
-    handler.saveFeatureEnabledStateInStore(true);
+    handler.savePerformancePanelEnabledStateInStore(true);
 
     expect(mockStorage.setItem).toHaveBeenCalledWith('video-background-effects-feature-enabled', 'true');
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
     expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(true);
   });
 
-  it('reads feature flag from storage', () => {
+  it('reads the performance panel preference from storage', () => {
     mockStorage.getItem.mockReturnValue('true');
 
-    new BackgroundEffectsHandler(mockController);
+    const handler = new BackgroundEffectsHandler(mockController);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
 
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+    expect(handler.isBackgroundEffectEnabled()).toBe(true);
     expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(true);
   });
 
@@ -324,10 +312,9 @@ describe('BackgroundEffectsHandler', () => {
     });
 
     const handler = new BackgroundEffectsHandler(mockController);
-    const result = handler.saveFeatureEnabledStateInStore(true);
+    const result = handler.savePerformancePanelEnabledStateInStore(true);
 
     expect(result).toBe(false);
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
   });
 
   it('restores last virtual background ID from storage on init', () => {
@@ -463,44 +450,7 @@ describe('BackgroundEffectsHandler', () => {
     expect(preferredEffectWrites).toHaveLength(0);
   });
 
-  it('enables feature when background effects feature is enabled', () => {
-    const features: Partial<FeatureList> = {
-      backgroundEffects: {
-        status: FEATURE_STATUS.ENABLED,
-      },
-    };
-
-    teamState.teamFeatures(features);
-
-    new BackgroundEffectsHandler(mockController, teamState);
-
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
-    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
-  });
-
-  it('enables feature from TeamState even when storage flag is false', () => {
-    mockStorage.getItem.mockImplementation((key: string) => {
-      if (key === VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY) {
-        return 'false';
-      }
-      return null;
-    });
-
-    const features: Partial<FeatureList> = {
-      backgroundEffects: {
-        status: FEATURE_STATUS.ENABLED,
-      },
-    };
-
-    teamState.teamFeatures(features);
-
-    new BackgroundEffectsHandler(mockController, teamState);
-
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
-    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
-  });
-
-  it('falls back to storage flag when TeamState background effects feature is not enabled', () => {
+  it('always enables background effects independently of debug storage', () => {
     mockStorage.getItem.mockImplementation((key: string) => {
       if (key === 'video-background-effects-feature-enabled') {
         return 'true';
@@ -508,15 +458,14 @@ describe('BackgroundEffectsHandler', () => {
       return null;
     });
 
-    teamState.teamFeatures(undefined);
+    const handler = new BackgroundEffectsHandler(mockController);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
 
-    new BackgroundEffectsHandler(mockController, teamState);
-
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+    expect(handler.isBackgroundEffectEnabled()).toBe(true);
     expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(true);
   });
 
-  it('disables feature when neither TeamState nor storage flag is enabled', () => {
+  it('keeps the performance panel disabled when its stored preference is false', () => {
     mockStorage.getItem.mockImplementation((key: string) => {
       if (key === 'video-background-effects-feature-enabled') {
         return 'false';
@@ -524,31 +473,10 @@ describe('BackgroundEffectsHandler', () => {
       return null;
     });
 
-    teamState.teamFeatures(undefined);
+    const handler = new BackgroundEffectsHandler(mockController);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
 
-    new BackgroundEffectsHandler(mockController, teamState);
-
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(false);
-    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
-  });
-
-  it('updates feature enabled state when TeamState background effects feature changes', () => {
-    teamState.teamFeatures(undefined);
-
-    new BackgroundEffectsHandler(mockController, teamState);
-
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(false);
-    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
-
-    const features: Partial<FeatureList> = {
-      backgroundEffects: {
-        status: FEATURE_STATUS.ENABLED,
-      },
-    };
-
-    teamState.teamFeatures(features);
-
-    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+    expect(handler.isBackgroundEffectEnabled()).toBe(true);
     expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
   });
 });
