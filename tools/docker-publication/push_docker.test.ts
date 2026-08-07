@@ -21,6 +21,7 @@ import assert from 'node:assert';
 import {readFileSync} from 'node:fs';
 import path from 'node:path';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const {
   createUniqueImageTag,
   resolveDockerContextPath,

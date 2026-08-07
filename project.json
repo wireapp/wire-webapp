@@ -31,7 +31,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint tools"
+        "command": "eslint tools/release-appearance"
       }
     },
     "e2e": {
