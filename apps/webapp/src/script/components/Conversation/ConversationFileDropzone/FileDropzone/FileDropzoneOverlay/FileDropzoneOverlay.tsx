@@ -37,9 +37,19 @@ interface FileDropzoneOverlayProps {
   mode: FileDropzoneOverlayMode;
 }
 
-const getOverlayContent = (mode: FileDropzoneOverlayMode, translate: RootContextValue['translate']) => {
+const getOverlayProperties = (
+  mode: FileDropzoneOverlayMode,
+  isActive: boolean,
+  translate: RootContextValue['translate'],
+) => {
+  let styles = overlayStyles;
+  if (isActive) {
+    styles = overlayActiveStyles;
+  }
+
   if (mode === 'restricted') {
     return {
+      styles,
       icon: <BlockIcon width={24} height={24} css={iconStyles} aria-hidden="true" />,
       title: translate('conversationFileUploadRestrictedOverlayTitle'),
       description: translate('conversationFileUploadRestrictedOverlayDescription'),
@@ -47,26 +57,19 @@ const getOverlayContent = (mode: FileDropzoneOverlayMode, translate: RootContext
   }
 
   return {
+    styles,
     icon: <SaveIcon width={24} height={24} css={[iconStyles, uploadIconStyles]} aria-hidden="true" />,
     title: translate('conversationFileUploadOverlayTitle'),
     description: translate('conversationFileUploadOverlayDescription'),
   };
 };
 
-const getOverlayStyles = (isActive: boolean) => {
-  if (isActive) {
-    return overlayActiveStyles;
-  }
-
-  return overlayStyles;
-};
-
 export const FileDropzoneOverlay = ({isActive, mode}: FileDropzoneOverlayProps) => {
   const {translate} = useApplicationContext();
-  const {icon, title, description} = getOverlayContent(mode, translate);
+  const {styles, icon, title, description} = getOverlayProperties(mode, isActive, translate);
 
   return (
-    <div css={getOverlayStyles(isActive)} aria-hidden={!isActive} role="status" aria-live="polite">
+    <div css={styles} aria-hidden={!isActive} role="status" aria-live="polite">
       {icon}
       <p css={titleStyles}>{title}</p>
       <p css={descriptionStyles}>{description}</p>
