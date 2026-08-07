@@ -6,7 +6,7 @@ set -euo pipefail
 : "${HELM_CHART_VERSION:?HELM_CHART_VERSION is required}"
 : "${RELEASE_COMMIT_SHA:?RELEASE_COMMIT_SHA is required}"
 
-webapp_repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+webapp_repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 wire_builds_target_branch="${WIRE_BUILDS_TARGET_BRANCH:-main}"
 case "${wire_builds_target_branch}" in
   main | dev)
@@ -29,7 +29,7 @@ wire_builds_field_options=(
 run_distribution_cli() {
   (
     cd "${webapp_repository_root}"
-    ./bin/run-production-distribution-cli.sh \
+    "${webapp_repository_root}/tools/production-distribution/run-production-distribution-cli.sh" \
       "$@"
   )
 }

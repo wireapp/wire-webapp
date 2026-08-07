@@ -8,6 +8,6 @@
     "rootDir": ".",
     "allowImportingTsExtensions": true
   },
-  "include": ["bin/**/*.ts"],
-  "exclude": ["node_modules", "dist", "tmp", "bin/**/*.test.ts", "bin/jest.config.js"]
+  "include": ["tools/**/*.ts", "tools/**/*.mts"],
+  "exclude": ["node_modules", "dist", "tmp", "tools/**/*.test.ts", "tools/jest.config.js", "tools/release-appearance"]
 }

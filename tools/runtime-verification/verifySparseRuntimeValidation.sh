@@ -3,7 +3,7 @@
 set -euo pipefail
 
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-repository_root="$(cd "${script_directory}/.." && pwd)"
+repository_root="$(cd "${script_directory}/../.." && pwd)"
 sparse_fixture_directory="$(mktemp -d)"
 runtime_fixture_directory="${sparse_fixture_directory}/runtime"
 
@@ -12,7 +12,7 @@ trap 'rm -rf "${sparse_fixture_directory}"' EXIT
 function copy_sparse_runtime_files() {
   mkdir -p \
     "${sparse_fixture_directory}/.github/actions/verify-webapp-runtime" \
-    "${sparse_fixture_directory}/bin" \
+    "${sparse_fixture_directory}/tools/runtime-verification" \
     "${runtime_fixture_directory}" \
     "${sparse_fixture_directory}/test-bin"
 
@@ -26,11 +26,11 @@ function copy_sparse_runtime_files() {
     "${repository_root}/.github/actions/verify-webapp-runtime/verify-webapp-runtime.sh" \
     "${sparse_fixture_directory}/.github/actions/verify-webapp-runtime/verify-webapp-runtime.sh"
   cp \
-    "${repository_root}/bin/validateRuntimeResponses.mts" \
-    "${sparse_fixture_directory}/bin/validateRuntimeResponses.mts"
+    "${repository_root}/tools/runtime-verification/validateRuntimeResponses.mts" \
+    "${sparse_fixture_directory}/tools/runtime-verification/validateRuntimeResponses.mts"
   cp \
-    "${repository_root}/bin/validateRuntimeResponses.ts" \
-    "${sparse_fixture_directory}/bin/validateRuntimeResponses.ts"
+    "${repository_root}/tools/runtime-verification/validateRuntimeResponses.ts" \
+    "${sparse_fixture_directory}/tools/runtime-verification/validateRuntimeResponses.ts"
 
   printf '%s\n' '#!/usr/bin/env bash' 'exit 0' > "${sparse_fixture_directory}/test-bin/sleep"
   chmod +x "${sparse_fixture_directory}/test-bin/sleep"

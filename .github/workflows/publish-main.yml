@@ -133,7 +133,7 @@ jobs:
           BUILD_ARTIFACT_PATH: ${{ env.BUILD_ARTIFACT_PATH }}
           EXPECTED_COMMIT: ${{ steps.build_metadata_inputs.outputs.commit }}
           EXPECTED_VERSION: ${{ steps.build_metadata_inputs.outputs.version }}
-        run: node ./bin/validateBuildArtifact.mts
+        run: node ./tools/build-artifact/validateBuildArtifact.mts
 
       - name: Prepare shared main artifact metadata and exact development Docker context
         id: prepare_artifact
@@ -369,8 +369,8 @@ jobs:
           sparse-checkout: |
             .nvmrc
             .github/actions/verify-webapp-runtime
-            bin/validateRuntimeResponses.mts
-            bin/validateRuntimeResponses.ts
+            tools/runtime-verification/validateRuntimeResponses.mts
+            tools/runtime-verification/validateRuntimeResponses.ts
           sparse-checkout-cone-mode: false
 
       - name: Setup Node.js for runtime verification
@@ -559,7 +559,7 @@ jobs:
           DOCKER_IMAGE_TAG_OUTPUT_PATH: ${{ runner.temp }}/main-development-image-tag.txt
           WIRE_WEBAPP_RELEASE_COMMIT_SHA: ${{ github.sha }}
           WIRE_WEBAPP_DOCKER_CONTEXT_PATH: ${{ github.workspace }}/main-development-context
-        run: ./bin/publish-development-docker.sh
+        run: ./tools/docker-publication/publish-development-docker.sh
 
       - name: Publish or reuse dev Helm chart
         id: publish_helm
@@ -570,7 +570,7 @@ jobs:
           DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
           CHART_REPOSITORY_NAME: ${{ env.CHART_REPOSITORY_NAME }}
           CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
-        run: ./bin/publish-development-helm.sh
+        run: ./tools/helm-publication/publish-development-helm.sh
 
       - name: Check out wire-builds dev
         if: ${{ steps.check_latest_main.outputs.publish_allowed == 'true' }}
@@ -590,7 +590,7 @@ jobs:
           HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
           RELEASE_COMMIT_SHA: ${{ github.sha }}
         working-directory: wire-builds
-        run: ../bin/update-development-wire-builds.sh
+        run: ../tools/wire-builds/update-development-wire-builds.sh
 
       - name: Summarize development channel
         if: always()

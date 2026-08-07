@@ -22,7 +22,7 @@ const path = require('path');
 const archiver = require('archiver');
 const archive = archiver('zip');
 
-const ROOT_PATH = path.resolve(__dirname, '..');
+const ROOT_PATH = path.resolve(__dirname, '../..');
 const SERVER_PATH = path.resolve(ROOT_PATH, 'apps/server');
 const DIST_PATH = path.resolve(SERVER_PATH, 'dist');
 const S3_PATH = path.resolve(DIST_PATH, 's3');

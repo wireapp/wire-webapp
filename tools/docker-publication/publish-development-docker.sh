@@ -9,7 +9,9 @@ set -euo pipefail
 : "${WIRE_WEBAPP_RELEASE_COMMIT_SHA:?WIRE_WEBAPP_RELEASE_COMMIT_SHA is required}"
 : "${WIRE_WEBAPP_DOCKER_CONTEXT_PATH:?WIRE_WEBAPP_DOCKER_CONTEXT_PATH is required}"
 
-expected_image_tag="$(node ./bin/push_docker.js dev --print-image-tag)"
+script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+expected_image_tag="$(node "${script_directory}/push_docker.js" dev --print-image-tag)"
 immutable_image_reference="${DOCKER_REPOSITORY}:${expected_image_tag}"
 stable_image_reference="${DOCKER_REPOSITORY}:dev"
 
@@ -25,7 +27,7 @@ if docker manifest inspect "${immutable_image_reference}" >/dev/null 2>&1; then
 else
   echo "Building immutable image ${immutable_image_reference} from the exact downloaded context."
   rm -f "${DOCKER_IMAGE_TAG_OUTPUT_PATH}"
-  node ./bin/push_docker.js dev "${DOCKER_IMAGE_TAG_OUTPUT_PATH}"
+  node "${script_directory}/push_docker.js" dev "${DOCKER_IMAGE_TAG_OUTPUT_PATH}"
   captured_image_tag="$(<"${DOCKER_IMAGE_TAG_OUTPUT_PATH}")"
 
   if [[ "${captured_image_tag}" != "${expected_image_tag}" ]]; then

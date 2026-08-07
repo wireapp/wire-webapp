@@ -36,7 +36,7 @@ version_endpoint="${normalized_webapp_url}/version"
 runtime_config_endpoint="${normalized_webapp_url}/config.js"
 expected_backend_rest="$(normalize_url "${EXPECTED_BACKEND_REST}")"
 expected_backend_ws="$(normalize_url "${EXPECTED_BACKEND_WS}")"
-validation_script_path="${GITHUB_WORKSPACE}/bin/validateRuntimeResponses.mts"
+validation_script_path="${GITHUB_WORKSPACE}/tools/runtime-verification/validateRuntimeResponses.mts"
 
 for attempt_number in {1..10}; do
   version_response="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${version_endpoint}" || true)"
