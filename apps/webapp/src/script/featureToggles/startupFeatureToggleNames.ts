@@ -20,11 +20,13 @@
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
 export const meetingsFeatureToggleName = 'meetings';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
+export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
   meetingsFeatureToggleName,
   conversationListCollapseFeatureToggleName,
+  disableMessagePreprocessingFeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

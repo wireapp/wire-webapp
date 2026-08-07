@@ -44,6 +44,7 @@ import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
+import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -115,7 +116,7 @@ export const InputBar = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: InputBarProps) => {
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
@@ -149,6 +150,7 @@ export const InputBar = ({
    * It's directly derived from the editor state
    */
   const [messageContent, setMessageContent] = useState<MessageContent>({text: ''});
+  const disableMessagePreprocessing = isFeatureToggleEnabled(disableMessagePreprocessingFeatureToggleName);
 
   const formatToolbar = useFormatToolbar();
 
@@ -214,6 +216,7 @@ export const InputBar = ({
     () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
     WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
   );
+  const effectiveShowMarkdownPreview = showMarkdownPreview && !disableMessagePreprocessing;
 
   const {
     editedMessage,
@@ -290,7 +293,7 @@ export const InputBar = ({
         <div
           className={cx(`conversation-input-bar__input input-bar-container`, {
             [`conversation-input-bar__input--editing`]: isEditing,
-            'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
+            'input-bar-container--with-toolbar': formatToolbar.open && effectiveShowMarkdownPreview,
             'input-bar-container--with-files': !!files.length,
           })}
         >
@@ -312,7 +315,7 @@ export const InputBar = ({
                   editedMessage={editedMessage}
                   inputPlaceholder={inputPlaceholder}
                   hasLocalEphemeralTimer={hasLocalEphemeralTimer}
-                  showMarkdownPreview={showMarkdownPreview}
+                  showMarkdownPreview={effectiveShowMarkdownPreview}
                   formatToolbar={formatToolbar}
                   onSetup={editor => {
                     editorRef.current = editor;
@@ -330,6 +333,7 @@ export const InputBar = ({
                   getMentionCandidates={getMentionCandidates}
                   saveDraftState={draftState.save}
                   loadDraftState={draftState.load}
+                  disableMessagePreprocessing={disableMessagePreprocessing}
                   replaceEmojis={shouldReplaceEmoji}
                 >
                   {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
@@ -341,7 +345,7 @@ export const InputBar = ({
                     messageContent={messageContent}
                     isEditing={isEditing}
                     isSendingDisabled={isSendingDisabled}
-                    showMarkdownPreview={showMarkdownPreview}
+                    showMarkdownPreview={effectiveShowMarkdownPreview}
                     showGiphyButton={giphy.showGiphyButton}
                     formatToolbar={formatToolbar}
                     emojiPicker={emojiPicker}

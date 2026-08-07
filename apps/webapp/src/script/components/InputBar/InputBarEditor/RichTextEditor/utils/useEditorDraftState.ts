@@ -24,7 +24,7 @@ import {LexicalEditor} from 'lexical';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {markdownTransformers} from './markdownTransformers';
-import {transformMessage} from './transformMessage';
+import {getRawMessageText, transformMessage} from './transformMessage';
 
 const DRAFT_SAVE_DELAY = 800;
 
@@ -32,9 +32,15 @@ interface UseEditorDraftStateProps {
   editorRef: RefObject<LexicalEditor | null>;
   saveDraftState: (editorState: string, plainMessage: string, replyId?: string) => void;
   replaceEmojis: boolean;
+  disableMessagePreprocessing: boolean;
 }
 
-export const useEditorDraftState = ({editorRef, saveDraftState, replaceEmojis}: UseEditorDraftStateProps) => {
+export const useEditorDraftState = ({
+  editorRef,
+  saveDraftState,
+  replaceEmojis,
+  disableMessagePreprocessing,
+}: UseEditorDraftStateProps) => {
   const saveDraft = useCallback(() => {
     const editor = editorRef.current;
     if (!editor) {
@@ -42,14 +48,16 @@ export const useEditorDraftState = ({editorRef, saveDraftState, replaceEmojis}: 
     }
 
     editor.getEditorState().read(() => {
-      const markdown = $convertToMarkdownString(markdownTransformers, undefined, true);
+      const markdown = disableMessagePreprocessing
+        ? ''
+        : $convertToMarkdownString(markdownTransformers, undefined, true);
       saveDraftState(
         JSON.stringify(editor.getEditorState().toJSON()),
-        transformMessage({replaceEmojis, markdown}),
+        disableMessagePreprocessing ? getRawMessageText() : transformMessage({replaceEmojis, markdown}),
         undefined,
       );
     });
-  }, [editorRef, saveDraftState, replaceEmojis]);
+  }, [editorRef, saveDraftState, replaceEmojis, disableMessagePreprocessing]);
 
   const debouncedSaveDraftState = useDebouncedCallback(saveDraft, DRAFT_SAVE_DELAY);
 
