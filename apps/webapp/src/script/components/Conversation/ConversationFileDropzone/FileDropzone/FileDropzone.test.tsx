@@ -36,12 +36,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 const renderFileDropzone = (isFileDropAllowed: boolean) => {
   const result = render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
-      <FileDropzone
-        isDragAccept
-        isFileDropAllowed={isFileDropAllowed}
-        rootProps={{}}
-        inputProps={{}}
-      >
+      <FileDropzone isDragAccept isFileDropAllowed={isFileDropAllowed} rootProps={{}} inputProps={{}}>
         <div>Conversation content</div>
       </FileDropzone>
     </StyledApp>,

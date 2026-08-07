@@ -40,14 +40,14 @@ interface FileDropzoneOverlayProps {
 const getOverlayContent = (mode: FileDropzoneOverlayMode, translate: RootContextValue['translate']) => {
   if (mode === 'restricted') {
     return {
-      icon: <BlockIcon width={24} height={24} css={iconStyles} />,
+      icon: <BlockIcon width={24} height={24} css={iconStyles} aria-hidden="true" />,
       title: translate('conversationFileUploadRestrictedOverlayTitle'),
       description: translate('conversationFileUploadRestrictedOverlayDescription'),
     };
   }
 
   return {
-    icon: <SaveIcon width={24} height={24} css={[iconStyles, uploadIconStyles]} />,
+    icon: <SaveIcon width={24} height={24} css={[iconStyles, uploadIconStyles]} aria-hidden="true" />,
     title: translate('conversationFileUploadOverlayTitle'),
     description: translate('conversationFileUploadOverlayDescription'),
   };
@@ -66,7 +66,7 @@ export const FileDropzoneOverlay = ({isActive, mode}: FileDropzoneOverlayProps) 
   const {icon, title, description} = getOverlayContent(mode, translate);
 
   return (
-    <div css={getOverlayStyles(isActive)} aria-hidden={!isActive}>
+    <div css={getOverlayStyles(isActive)} aria-hidden={!isActive} role="status" aria-live="polite">
       {icon}
       <p css={titleStyles}>{title}</p>
       <p css={descriptionStyles}>{description}</p>
