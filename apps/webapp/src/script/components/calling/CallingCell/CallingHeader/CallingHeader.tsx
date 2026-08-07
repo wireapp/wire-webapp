@@ -40,6 +40,7 @@ import {
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 
 interface CallingHeaderProps {
+  isMeeting: boolean;
   isOngoing: boolean;
   isGroupCall: boolean;
   isChannel: boolean;
@@ -61,6 +62,7 @@ interface CallingHeaderProps {
 }
 
 export const CallingHeader = ({
+  isMeeting,
   isGroupCall,
   isChannel,
   isOngoing,
@@ -108,13 +110,13 @@ export const CallingHeader = ({
           }
         }}
         css={callingHeaderWrapper}
-        onClick={createNavigate(conversationUrl)}
+        onClick={!isMeeting ? createNavigate(conversationUrl) : undefined}
         onBlur={() => {
           if (isGroupCall || isOngoing) {
             clearShowAlert();
           }
         }}
-        onKeyDown={createNavigateKeyboard(conversationUrl)}
+        onKeyDown={!isMeeting ? createNavigateKeyboard(conversationUrl) : undefined}
         tabIndex={TabIndex.FOCUSABLE}
         role="button"
         aria-label={ariaLabel}
