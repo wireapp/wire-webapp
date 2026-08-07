@@ -17,26 +17,16 @@
  *
  */
 
+import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
+
 export const RECYCLE_BIN_PATH = 'recycle_bin';
 
-export const isRootRecycleBinPath = () => {
-  const hash = window.location.hash.replace('#', '');
+export const isPathInRecycleBin = (path: string): boolean =>
+  path === RECYCLE_BIN_PATH || path.startsWith(`${RECYCLE_BIN_PATH}/`);
 
-  const parts = hash.split('/files/');
+export const isRootRecycleBinPath = (): boolean => getCellsFilesPath() === RECYCLE_BIN_PATH;
 
-  const path = decodeURIComponent(parts[1]);
-
-  return path === RECYCLE_BIN_PATH;
-};
-
-export const isInRecycleBin = (): boolean => {
-  const hash = window.location.hash.replace('#', '');
-
-  const parts = hash.split('/files/');
-  const path = parts[1];
-
-  return path === RECYCLE_BIN_PATH || path?.startsWith(`${RECYCLE_BIN_PATH}/`) === true;
-};
+export const isInRecycleBin = (): boolean => isPathInRecycleBin(getCellsFilesPath());
 
 export const getNodeRootParentPath = ({nodePath}: {nodePath: string}) => {
   const segments = nodePath.split('/');

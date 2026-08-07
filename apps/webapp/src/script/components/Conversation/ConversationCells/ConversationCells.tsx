@@ -36,7 +36,7 @@ import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
-import {isInRecycleBin} from './common/recycleBin/recycleBin';
+import {isInRecycleBin as isCurrentPathInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsSorting} from './common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
@@ -89,8 +89,10 @@ export const ConversationCells = memo(
 
     const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
     const isCellsStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
+    const isInRecycleBin = isCurrentPathInRecycleBin();
+    const isSearchMode = isSearchViewOpen && !isInRecycleBin;
 
-    const sortScopeKey = `${conversationId}:${isSearchViewOpen ? 'search' : 'browse'}`;
+    const sortScopeKey = `${conversationId}:${isSearchMode ? 'search' : 'browse'}`;
     const {sort, setSort, getDirectionFor, toggleSort} = useCellsSorting(sortScopeKey);
 
     const {refresh, setOffset} = useGetAllCellsNodes({
@@ -98,7 +100,7 @@ export const ConversationCells = memo(
       conversationQualifiedId,
       //Without this, the browse hook's hashchange handler would compete with
       // (and flap against) search results.
-      enabled: isCellsStateReady && !isSearchViewOpen,
+      enabled: isCellsStateReady && !isSearchMode,
       fireAndForgetInvoker,
       userRepository,
       sort,
@@ -119,7 +121,7 @@ export const ConversationCells = memo(
     } = useConversationSearchFiles({
       cellsRepository,
       conversationQualifiedId,
-      enabled: isCellsStateReady && isSearchViewOpen,
+      enabled: isCellsStateReady && isSearchMode,
       fireAndForgetInvoker,
       userRepository,
       filters: filterState,
@@ -129,40 +131,49 @@ export const ConversationCells = memo(
 
     // Search view open ⇒ load-more UI + search-hook data; closed ⇒ page-nav UI + browse-hook data.
     // The mode is owned by the view, not by whether the user has typed/filtered yet.
-    const isInSearchMode = isSearchViewOpen;
-    const wasSearchViewOpen = useRef(isSearchViewOpen);
+    const wasSearchViewOpen = useRef(isSearchMode);
 
     const handleClearSearch = useCallback((): void => {
       clearSearch();
     }, [clearSearch]);
 
     useEffect(() => {
-      if (wasSearchViewOpen.current && !isSearchViewOpen) {
+      if (wasSearchViewOpen.current && !isSearchMode) {
         // Search view just closed — reset any active search/filter and restore the
         // browse-mode dataset (handled by clearSearch's onClear callback → refresh).
         clearAll({conversationId});
         clearAllFilters();
         clearSearch({preserveFilters: false});
       }
-      wasSearchViewOpen.current = isSearchViewOpen;
-    }, [clearAll, clearAllFilters, clearSearch, conversationId, isSearchViewOpen]);
+      wasSearchViewOpen.current = isSearchMode;
+    }, [clearAll, clearAllFilters, clearSearch, conversationId, isSearchMode]);
 
     // Navigating into a folder or the recycle bin happens via the URL hash without
     // remounting; reset the sort on those transitions too.
     useEffect(() => {
-      const handleHashChange = (): void => setSort(null);
+      const closeSearchInRecycleBin = (): void => {
+        if (isSearchViewOpen && isCurrentPathInRecycleBin()) {
+          onCloseSearchView();
+        }
+      };
+      const handleHashChange = (): void => {
+        setSort(null);
+        closeSearchInRecycleBin();
+      };
+
+      closeSearchInRecycleBin();
       window.addEventListener('hashchange', handleHashChange);
       return () => window.removeEventListener('hashchange', handleHashChange);
-    }, [setSort]);
+    }, [isSearchViewOpen, onCloseSearchView, setSort]);
 
     const handleRefresh = useCallback((): void => {
-      if (isInSearchMode) {
+      if (isSearchMode) {
         fireAndForgetInvoker.fireAndForget(handleReload);
         return;
       }
 
       fireAndForgetInvoker.fireAndForget(refresh);
-    }, [fireAndForgetInvoker, handleReload, isInSearchMode, refresh]);
+    }, [fireAndForgetInvoker, handleReload, isSearchMode, refresh]);
 
     const nodes = getNodes({conversationId});
     const pagination = getPagination({conversationId});
@@ -182,7 +193,7 @@ export const ConversationCells = memo(
       });
     }, [loadMoreOffset, loadMoreSearchResults]);
 
-    const handleSearchViewClosure = isSearchViewOpen ? onCloseSearchView : undefined;
+    const handleSearchViewClosure = isSearchMode ? onCloseSearchView : undefined;
 
     useOnPresignedUrlExpired({conversationId, refreshCallback: handleRefresh});
 
@@ -196,18 +207,18 @@ export const ConversationCells = memo(
 
     const isLoadingVisible = isLoading && isCellsStateReady;
     const isFetchingMoreVisible = isFetchingMore && isCellsStateReady && hasNodes;
-    const isNoNodesVisible = !isLoading && !isFetchingMore && emptyView && !isInRecycleBin();
-    const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading && !isFetchingMore;
-    const isEmptySearchResultsVisible = isInSearchMode && isNoNodesVisible;
+    const isNoNodesVisible = !isLoading && !isFetchingMore && emptyView && !isInRecycleBin;
+    const isEmptyRecycleBin = isInRecycleBin && emptyView && !isLoading && !isFetchingMore;
+    const isEmptySearchResultsVisible = isSearchMode && isNoNodesVisible;
     const isTableVisible =
       (isSuccess || isLoading || isFetchingMore) && isCellsStateReady && !isEmptySearchResultsVisible;
     const hasMorePages = loadMoreOffset.isJust;
     const hasAppendError = isSuccess && hasNodes && storeError !== null;
 
-    const isPaginationVisible = !isInSearchMode && !emptyView;
+    const isPaginationVisible = !isSearchMode && !emptyView;
     const isLoadMoreVisible =
-      isInSearchMode && !isLoading && !isFetchingMore && !emptyView && isSuccess && hasMorePages && !hasAppendError;
-    const isLoadMoreErrorVisible = isInSearchMode && hasAppendError && hasMorePages;
+      isSearchMode && !isLoading && !isFetchingMore && !emptyView && isSuccess && hasMorePages && !hasAppendError;
+    const isLoadMoreErrorVisible = isSearchMode && hasAppendError && hasMorePages;
 
     return (
       <div css={wrapperStyles}>
@@ -216,7 +227,8 @@ export const ConversationCells = memo(
           conversationName={name}
           conversationQualifiedId={conversationQualifiedId}
           cellsRepository={cellsRepository}
-          isSearchViewOpen={isSearchViewOpen}
+          isSearchViewOpen={isSearchMode}
+          isInRecycleBin={isInRecycleBin}
           onOpenSearchView={onOpenSearchView}
           searchValue={searchValue}
           onSearchChange={handleSearch}
@@ -234,7 +246,7 @@ export const ConversationCells = memo(
             // with that folder (and breadcrumbs)
             onCloseSearchView={handleSearchViewClosure}
             getDirectionFor={getDirectionFor}
-            isSortingEnabled
+            isSortingEnabled={!isInRecycleBin}
             onToggleSort={toggleSort}
           />
         )}

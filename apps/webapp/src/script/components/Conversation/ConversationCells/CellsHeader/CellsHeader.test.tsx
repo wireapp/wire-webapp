@@ -17,63 +17,78 @@
  *
  */
 
-import {ReactNode} from 'react';
-
 import {render, screen} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsHeader} from './CellsHeader';
 
 const cellsNewItemButtonLabel = 'cells.newItemMenu.button';
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: key => key}));
+const filter = {
+  type: 'toggle' as const,
+  id: 'hasPublicLink' as const,
+  label: 'Public links',
+  isActive: false,
+  onToggle: jest.fn(),
+};
 
-const withTheme = (component: ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+const defaultProperties = {
+  onRefresh: jest.fn(),
+  conversationName: 'Project Alpha',
+  conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
+  cellsRepository: {} as CellsRepository,
+  isSearchViewOpen: true,
+  isInRecycleBin: false,
+  onOpenSearchView: jest.fn(),
+  searchValue: '',
+  onSearchChange: jest.fn(),
+  onSearchClear: jest.fn(),
+  filters: [filter],
+};
 
-const renderCellsHeader = () => {
+const renderCellsHeader = (properties: Partial<typeof defaultProperties> = {}) => {
   return render(
-    withTheme(
-      <CellsHeader
-        onRefresh={jest.fn()}
-        conversationName="Conversation"
-        conversationQualifiedId={{id: 'conversation-id', domain: 'wire.com'}}
-        cellsRepository={{} as CellsRepository}
-        isSearchViewOpen={false}
-        onOpenSearchView={jest.fn()}
-        searchValue=""
-        onSearchChange={jest.fn()}
-        onSearchClear={jest.fn()}
-        filters={[]}
-      />,
-    ),
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <CellsHeader {...defaultProperties} {...properties} />
+    </StyledApp>,
     {wrapper: rootProviderWrapper},
   );
 };
 
 describe('CellsHeader', () => {
-  afterEach(() => {
-    window.location.hash = '';
+  it('hides search and filters while viewing the recycle bin', () => {
+    renderCellsHeader({isInRecycleBin: true});
+
+    expect(screen.queryByRole('textbox', {name: 'cells.search.placeholder'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Public links'})).not.toBeInTheDocument();
+  });
+
+  it('keeps search and filters available outside the recycle bin', () => {
+    renderCellsHeader();
+
+    expect(screen.getByRole('textbox', {name: 'cells.search.placeholder'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Public links'})).toBeInTheDocument();
   });
 
   it('renders the new-item menu outside the recycle bin', () => {
-    window.location.hash = '#/conversation/conversation-id/wire.com/files/';
-
-    renderCellsHeader();
+    renderCellsHeader({isSearchViewOpen: false});
 
     expect(screen.getByRole('button', {name: cellsNewItemButtonLabel})).toBeInTheDocument();
   });
 
   it('does not render the new-item menu in the recycle bin', () => {
-    window.location.hash = '#/conversation/conversation-id/wire.com/files/recycle_bin';
-
-    renderCellsHeader();
+    renderCellsHeader({isInRecycleBin: true, isSearchViewOpen: false});
 
     expect(screen.queryByRole('button', {name: cellsNewItemButtonLabel})).not.toBeInTheDocument();
   });

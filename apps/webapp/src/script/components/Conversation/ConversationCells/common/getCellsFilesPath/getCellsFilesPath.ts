@@ -19,10 +19,10 @@
 
 const MIN_PARTS_LENGTH = 2;
 
-export const getCellsFilesPath = () => {
-  const hash = window.location.hash.replace('#', '');
+export const getCellsFilesPath = (hash = window.location.hash) => {
+  const normalizedHash = hash.replace('#', '');
 
-  const parts = hash.split('/files/');
+  const parts = normalizedHash.split('/files/');
   const hasFilesPath = parts.length >= MIN_PARTS_LENGTH;
 
   if (!hasFilesPath) {
