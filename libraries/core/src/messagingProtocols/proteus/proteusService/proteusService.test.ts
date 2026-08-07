@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable import/order */
 import * as Recipients from '../utility/recipients';
 
 import {

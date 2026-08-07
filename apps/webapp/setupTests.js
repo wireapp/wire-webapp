@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable import/order */
-
 /**
  * ---------------------------------------------------------------------------
  * Global polyfills required by the application runtime inside the Jest env

@@ -3,31 +3,34 @@
  * Flat ESLint configuration (ESLint 9+)
  */
 
-import {FlatCompat} from '@eslint/eslintrc';
-// @ts-ignore - No types available for @emotion/eslint-plugin with ESLint 9
-import emotionPlugin from '@emotion/eslint-plugin';
+import * as emotionPlugin from '@emotion/eslint-plugin';
 import stylisticPlugin from '@stylistic/eslint-plugin';
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import betterStyledComponentsPlugin from 'eslint-plugin-better-styled-components';
 import importPlugin from 'eslint-plugin-import';
 import jestPlugin from 'eslint-plugin-jest';
+import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
+import noUnsanitizedPlugin from 'eslint-plugin-no-unsanitized';
+import prettierPlugin from 'eslint-plugin-prettier';
+import reactPlugin from 'eslint-plugin-react';
 import unicornPlugin from 'eslint-plugin-unicorn';
+import unusedImportsPlugin from 'eslint-plugin-unused-imports';
 import tsParser from '@typescript-eslint/parser';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import headerPlugin, {HeaderOptions, HeaderRuleConfig} from '@tony.ganchev/eslint-plugin-header';
+import headerPlugin from '@tony.ganchev/eslint-plugin-header';
+import * as espree from 'espree';
 import globals from 'globals';
-import type {Linter} from 'eslint';
+import {dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
 
 const year = new Date().getFullYear();
+const repositoryRootDirectory = dirname(fileURLToPath(import.meta.url));
 const runtimeGlobals = {
   ...globals.es2020,
   ...globals.browser,
   ...globals.node,
 };
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  resolvePluginsRelativeTo: __dirname,
-});
 
 const ignores = [
   '.git/',
@@ -61,25 +64,8 @@ const ignores = [
   'libraries/config/lib/',
   'libraries/react-ui-kit/lib/',
   'libraries/*/lib/',
+  'libraries/react-ui-kit/emotion.d.ts',
 ];
-
-const base = compat.extends('@wireapp/eslint-config');
-// Remove 'project' from parserOptions in all base configs to avoid conflict with projectService
-const cleanedBase = base.map(cfg => {
-  if (cfg.languageOptions?.parserOptions) {
-    const parserOptions = cfg.languageOptions.parserOptions as Record<string, unknown>;
-    const {project, ...rest} = parserOptions;
-    return {
-      ...cfg,
-      languageOptions: {
-        ...cfg.languageOptions,
-        parserOptions: rest,
-      },
-    };
-  }
-  return cfg;
-});
-const baseRuleConfigs = cleanedBase.slice(1);
 
 const productionFileIgnorePatterns = [
   'apps/webapp/test/**',
@@ -96,13 +82,146 @@ const productionFileIgnorePatterns = [
   'libraries/react-ui-kit/emotion.d.ts',
 ];
 
-function addProductionFileIgnores(configuration: Linter.Config): Linter.Config {
+function addProductionFileIgnores(configuration) {
   return {
     ...configuration,
     ignores: [...(configuration.ignores ?? []), ...productionFileIgnorePatterns],
   };
 }
-const webappImportOrderRule: Linter.RuleEntry = [
+
+const legacySettings = {
+  react: {
+    version: 'detect',
+  },
+  'import/parsers': {
+    '@typescript-eslint/parser': ['.js', '.jsx', '.ts', '.tsx'],
+  },
+  'import/resolver': {
+    typescript: {
+      alwaysTryTypes: true,
+      paths: './tsconfig.json',
+    },
+  },
+};
+
+const legacyRules = {
+  'constructor-super': 'error',
+  curly: 'error',
+  'header-tony/header': 'off',
+  'no-cond-assign': 'error',
+  'no-console': [
+    'error',
+    {
+      allow: ['error', 'info', 'warn'],
+    },
+  ],
+  'no-const-assign': 'error',
+  'no-dupe-class-members': 'error',
+  'no-duplicate-case': 'error',
+  'no-else-return': 'error',
+  'no-inner-declarations': 'error',
+  'no-lonely-if': 'error',
+  'no-magic-numbers': [
+    'warn',
+    {
+      ignore: [-1, 0, 1],
+      ignoreArrayIndexes: true,
+      ignoreDefaultValues: true,
+    },
+  ],
+  'no-restricted-globals': [
+    'warn',
+    {
+      message: 'Do not commit `fit`. Use `it` instead.',
+      name: 'fit',
+    },
+    {
+      message: 'Do not commit `fdescribe`. Use `describe` instead.',
+      name: 'fdescribe',
+    },
+  ],
+  'no-sequences': 'error',
+  'no-sparse-arrays': 'error',
+  'no-trailing-spaces': 'error',
+  'no-undef': 'error',
+  'no-nested-ternary': 'error',
+  'no-unneeded-ternary': 'error',
+  'no-unused-expressions': 'error',
+  '@typescript-eslint/no-unused-vars': [
+    'error',
+    {
+      args: 'none',
+    },
+  ],
+  'no-useless-return': 'error',
+  'no-var': 'error',
+  'one-var': ['error', 'never'],
+  'prefer-arrow-callback': 'error',
+  'prefer-const': 'error',
+  'prefer-object-spread': 'error',
+  'prefer-promise-reject-errors': 'error',
+  'prefer-spread': 'error',
+  'prefer-template': 'error',
+  'prettier/prettier': 'error',
+  'jest/no-jasmine-globals': 'error',
+  'jest/no-identical-title': 'warn',
+  'jest/no-done-callback': 'warn',
+  'jest/no-disabled-tests': 'warn',
+  'jest/no-conditional-expect': 'warn',
+  'jsx-a11y/media-has-caption': 'warn',
+  'jsx-a11y/no-noninteractive-tabindex': 'warn',
+  'react/jsx-uses-react': 'error',
+  'react/jsx-uses-vars': 'error',
+  'react/prefer-stateless-function': 'error',
+  'react-hooks/rules-of-hooks': 'error',
+  'react-hooks/exhaustive-deps': 'warn',
+  'react/no-unknown-property': ['error', {ignore: ['css']}],
+  'sort-vars': 'error',
+  '@typescript-eslint/require-array-sort-compare': 'warn',
+  strict: ['error', 'global'],
+  'unused-imports/no-unused-imports': 'error',
+  'import/no-unresolved': 'error',
+  'import/no-default-export': 'error',
+  'import/order': [
+    'error',
+    {
+      groups: ['external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
+      pathGroups: [
+        {
+          pattern: 'react',
+          group: 'external',
+          position: 'before',
+        },
+        {
+          pattern: '@wireapp/*',
+          group: 'internal',
+          position: 'before',
+        },
+      ],
+      pathGroupsExcludedImportTypes: ['react', '@wireapp/*'],
+      'newlines-between': 'always',
+      alphabetize: {
+        order: 'asc',
+        caseInsensitive: true,
+      },
+      warnOnUnassignedImports: true,
+    },
+  ],
+  'better-styled-components/sort-declarations-alphabetically': 2,
+};
+
+const productionPlugins = {
+  '@typescript-eslint': typescriptPlugin,
+  '@emotion': emotionPlugin,
+  'better-styled-components': betterStyledComponentsPlugin,
+  'no-unsanitized': noUnsanitizedPlugin,
+  prettier: prettierPlugin,
+  'react-hooks': reactHooksPlugin,
+  unicorn: unicornPlugin,
+  'unused-imports': unusedImportsPlugin,
+  'header-tony': headerPlugin,
+};
+const webappImportOrderRule = [
   'error',
   {
     groups: ['external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
@@ -126,7 +245,7 @@ const webappImportOrderRule: Linter.RuleEntry = [
   },
 ];
 
-const strictBooleanExpressionsRule: Linter.RuleEntry = [
+const strictBooleanExpressionsRule = [
   'error',
   {
     allowAny: false,
@@ -140,7 +259,7 @@ const strictBooleanExpressionsRule: Linter.RuleEntry = [
   },
 ];
 
-const restrictedSyntaxRule: Linter.RuleEntry = [
+const restrictedSyntaxRule = [
   'error',
   {
     selector: "CallExpression[callee.property.name='splice']",
@@ -157,23 +276,38 @@ const restrictedSyntaxRule: Linter.RuleEntry = [
   },
 ];
 
-const jestMockRestrictionRule: Linter.RuleEntry = [
+const jestMockRestrictionRule = [
   'warn',
   {
     mock: 'Do not use jest.mock(). Pass dependencies explicitly instead of intercepting modules.',
   },
 ];
 
-const productionConfigs: Linter.Config[] = [
-  ...baseRuleConfigs,
-  {
-    // Adjust legacy bits from extended config
-    rules: {
-      'no-unsanitized/DOM': 'off', // deprecated config variant; rely on recommended defaults instead
-      'valid-jsdoc': 'off', // rule removed in ESLint 9
-      'header/header': 'off', // disable existing header rule to use our own
+const jestRecommendedProductionConfig = {
+  ...jestPlugin.configs['flat/recommended'],
+  plugins: {},
+};
+
+const productionConfigs = [
+  ...[
+    jestRecommendedProductionConfig,
+    jsxA11yPlugin.flatConfigs.recommended,
+    typescriptPlugin.configs['flat/eslint-recommended'],
+    importPlugin.flatConfigs.recommended,
+    importPlugin.flatConfigs.typescript,
+    reactPlugin.configs.flat.recommended,
+    reactPlugin.configs.flat['jsx-runtime'],
+    eslintConfigPrettier,
+    {
+      plugins: productionPlugins,
+      settings: legacySettings,
+      rules: {
+        ...legacyRules,
+        'no-unsanitized/property': 'error',
+        'no-unsanitized/method': 'error',
+      },
     },
-  },
+  ].map(addProductionFileIgnores),
   {
     files: ['**/*.{ts,tsx,js,jsx,cjs,mjs}'],
     plugins: {
@@ -190,7 +324,12 @@ const productionConfigs: Linter.Config[] = [
       parserOptions: {
         // Enable type-aware linting for TypeScript sources with project references support
         projectService: true,
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
       },
       globals: {
         ...runtimeGlobals,
@@ -200,10 +339,8 @@ const productionConfigs: Linter.Config[] = [
         NodeJS: 'readonly',
       },
     },
-    // @ts-ignore - Plugin type compatibility issues with ESLint 9 flat config
     plugins: {
       '@emotion': emotionPlugin,
-      import: importPlugin,
       'react-hooks': reactHooksPlugin,
       unicorn: unicornPlugin,
       'header-tony': headerPlugin,
@@ -247,8 +384,8 @@ const productionConfigs: Linter.Config[] = [
           trailingEmptyLines: {
             minimum: 2,
           },
-        } as HeaderOptions,
-      ] as HeaderRuleConfig,
+        },
+      ],
       'id-length': 'warn',
       'no-restricted-syntax': restrictedSyntaxRule,
       '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -306,10 +443,12 @@ const productionConfigs: Linter.Config[] = [
       unicorn: unicornPlugin,
     },
     languageOptions: {
-      parser: require('espree'),
+      parser: espree,
       parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
         project: null,
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: repositoryRootDirectory,
       },
       globals: runtimeGlobals,
     },
@@ -449,32 +588,108 @@ const productionConfigs: Linter.Config[] = [
   },
 ].map(addProductionFileIgnores);
 
-const testFilePatterns = [
-  'apps/**/test/**/*',
-  'libraries/**/test/**/*',
-  'apps/**/__mocks__/**/*',
-  'libraries/**/__mocks__/**/*',
-  'apps/**/*.test.*',
-  'libraries/**/*.test.*',
-  'apps/**/*.spec.*',
-  'libraries/**/*.spec.*',
-  'apps/**/*.stories.*',
-  'libraries/**/*.stories.*',
-  'apps/**/setupTests.*',
-  'libraries/**/setupTests.*',
-  'apps/**/jest.setup.*',
-  'libraries/**/jest.setup.*',
+const testTypeScriptFilePatterns = [
+  'apps/**/test/**/*.ts',
+  'libraries/**/test/**/*.ts',
+  'apps/**/__mocks__/**/*.ts',
+  'libraries/**/__mocks__/**/*.ts',
+  'apps/**/*.test.ts',
+  'libraries/**/*.test.ts',
+  'apps/**/*.test.*.ts',
+  'libraries/**/*.test.*.ts',
+  'apps/**/*.spec.ts',
+  'libraries/**/*.spec.ts',
+  'apps/**/*.spec.*.ts',
+  'libraries/**/*.spec.*.ts',
+  'apps/**/*.stories.ts',
+  'libraries/**/*.stories.ts',
+  'apps/**/*.stories.*.ts',
+  'libraries/**/*.stories.*.ts',
+  'apps/**/setupTests.ts',
+  'libraries/**/setupTests.ts',
+  'apps/**/jest.setup.ts',
+  'libraries/**/jest.setup.ts',
+  'tools/**/*.test.ts',
 ];
 
-const config: Linter.Config[] = [
+const testTsxFilePatterns = testTypeScriptFilePatterns.map(filePattern => filePattern.replaceAll('.ts', '.tsx'));
+
+const testJavaScriptFilePatterns = [
+  'apps/**/test/**/*.js',
+  'libraries/**/test/**/*.js',
+  'apps/**/__mocks__/**/*.js',
+  'libraries/**/__mocks__/**/*.js',
+  'apps/**/*.test.js',
+  'libraries/**/*.test.js',
+  'apps/**/*.test.*.js',
+  'libraries/**/*.test.*.js',
+  'apps/**/*.spec.js',
+  'libraries/**/*.spec.js',
+  'apps/**/*.spec.*.js',
+  'libraries/**/*.spec.*.js',
+  'apps/**/*.stories.js',
+  'libraries/**/*.stories.js',
+  'apps/**/*.stories.*.js',
+  'libraries/**/*.stories.*.js',
+  'apps/**/setupTests.js',
+  'libraries/**/setupTests.js',
+  'apps/**/jest.setup.js',
+  'libraries/**/jest.setup.js',
+  'apps/**/test/**/*.cjs',
+  'libraries/**/test/**/*.cjs',
+  'apps/**/__mocks__/**/*.cjs',
+  'libraries/**/__mocks__/**/*.cjs',
+  'apps/**/*.test.cjs',
+  'libraries/**/*.test.cjs',
+  'apps/**/*.test.*.cjs',
+  'libraries/**/*.test.*.cjs',
+  'apps/**/*.spec.cjs',
+  'libraries/**/*.spec.cjs',
+  'apps/**/*.spec.*.cjs',
+  'libraries/**/*.spec.*.cjs',
+  'apps/**/*.stories.cjs',
+  'libraries/**/*.stories.cjs',
+  'apps/**/*.stories.*.cjs',
+  'libraries/**/*.stories.*.cjs',
+  'apps/**/setupTests.cjs',
+  'libraries/**/setupTests.cjs',
+  'apps/**/jest.setup.cjs',
+  'libraries/**/jest.setup.cjs',
+  'apps/**/test/**/*.mjs',
+  'libraries/**/test/**/*.mjs',
+  'apps/**/__mocks__/**/*.mjs',
+  'libraries/**/__mocks__/**/*.mjs',
+  'apps/**/*.test.mjs',
+  'libraries/**/*.test.mjs',
+  'apps/**/*.test.*.mjs',
+  'libraries/**/*.test.*.mjs',
+  'apps/**/*.spec.mjs',
+  'libraries/**/*.spec.mjs',
+  'apps/**/*.spec.*.mjs',
+  'libraries/**/*.spec.*.mjs',
+  'apps/**/*.stories.mjs',
+  'libraries/**/*.stories.mjs',
+  'apps/**/*.stories.*.mjs',
+  'libraries/**/*.stories.*.mjs',
+  'apps/**/setupTests.mjs',
+  'libraries/**/setupTests.mjs',
+  'apps/**/jest.setup.mjs',
+  'libraries/**/jest.setup.mjs',
+];
+
+const testJsxFilePatterns = testJavaScriptFilePatterns.map(filePattern => filePattern.replaceAll('.js', '.jsx'));
+
+const testLinterOptions = {
+  reportUnusedDisableDirectives: 'off',
+  reportUnusedInlineConfigs: 'off',
+};
+
+const config = [
   {ignores},
   ...productionConfigs,
   {
-    files: testFilePatterns,
-    linterOptions: {
-      reportUnusedDisableDirectives: 'off',
-      reportUnusedInlineConfigs: 'off',
-    },
+    files: testTypeScriptFilePatterns,
+    linterOptions: testLinterOptions,
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -485,31 +700,48 @@ const config: Linter.Config[] = [
         },
       },
     },
+  },
+  {
+    files: testTsxFilePatterns,
+    linterOptions: testLinterOptions,
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+  },
+  {
+    files: testJavaScriptFilePatterns,
+    linterOptions: testLinterOptions,
+  },
+  {
+    files: testJsxFilePatterns,
+    linterOptions: testLinterOptions,
+    languageOptions: {
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+  },
+  {
+    files: ['tools/**/*.{js,jsx,ts,tsx,cjs,mjs}'],
     plugins: {
       jest: jestPlugin,
-      '@typescript-eslint': typescriptPlugin,
-      import: importPlugin,
-    },
-    rules: {
-      'jest/no-restricted-jest-methods': jestMockRestrictionRule,
     },
   },
   {
     files: ['apps/**/*.{js,jsx,ts,tsx,cjs,mjs}', 'libraries/**/*.{js,jsx,ts,tsx,cjs,mjs}'],
     plugins: {
       jest: jestPlugin,
-      '@typescript-eslint': typescriptPlugin,
-      import: importPlugin,
-    },
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
     },
     rules: {
       'jest/no-restricted-jest-methods': jestMockRestrictionRule,

@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable import/order */
 import * as GenericMessageParams from '../utility/getGenericMessageParams';
 
 import {APIClient} from '@wireapp/api-client';

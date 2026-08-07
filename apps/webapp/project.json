@@ -95,7 +95,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=853 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
+        "command": "eslint --config eslint.config.mjs --max-warnings=853 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
       }
     },
     "lint:full": {

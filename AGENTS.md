@@ -43,7 +43,7 @@ Library Nx project names end with `-lib`, such as `core-lib` or `api-client-lib`
 For investigation, run ESLint once with JSON to `/tmp`, then analyze with `jq`, `rg`, or `node` — do not re-run ESLint for each query.
 
 ```bash
-yarn eslint --config eslint.config.ts --no-cache -f json -o /tmp/eslint-output.json apps/webapp/src
+yarn eslint --config eslint.config.mjs --no-cache -f json -o /tmp/eslint-output.json apps/webapp/src
 ```
 
 Per-file checks: pass a single file path as the last argument, not `yarn nx run webapp:lint`.
