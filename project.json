@@ -43,7 +43,7 @@
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --project ./tsconfig.tools.json --noEmit && tsc --project ./tools/release-appearance/tsconfig.json --noEmit"
+        "command": "tsc --project ./tsconfig.tools.json --noEmit && tsc --project ./tools/release-appearance/tsconfig.json --noEmit && tsc --project ./tsconfig.release-cli.json --noEmit"
       }
     }
   },

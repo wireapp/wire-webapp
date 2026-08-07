@@ -17,70 +17,66 @@
  *
  */
 
-import * as nodeFileSystem from 'node:fs';
-
-import {isArray, isNonEmptyString, isPlainObject, isString} from '@sindresorhus/is';
+import {isArray, isError, isNonEmptyString, isPlainObject, isString} from '@sindresorhus/is';
+import {match} from 'ts-pattern';
 
 import {
   hasExpectedWireBuildsWebappFields,
   selectHelmChartVersion,
   validateProductionDistributionManifest,
-} from './productionDistribution';
-import type {PublishedHelmChart, WireBuildsWebappFields} from './productionDistribution';
+} from './productionDistribution.ts';
+import type {PublishedHelmChart, WireBuildsWebappFields} from './productionDistribution.ts';
 
-type CommandLineOptions = ReadonlyMap<string, string>;
+export type ProductionDistributionCommandDependencies = {
+  readonly readFile: (filePath: string) => string;
+  readonly readStandardInput: () => string;
+  readonly writeOutput: (message: string) => void;
+};
 
-function parseCommandLineOptions(commandLineArguments: readonly string[]): CommandLineOptions {
-  const optionValues = new Map<string, string>();
+type ValidateManifestCommand = {
+  readonly kind: 'validate-manifest';
+  readonly artifactMetadataPath: string;
+  readonly manifestPath: string;
+  readonly productionTag: string;
+  readonly productionTagCommitSha: string;
+  readonly expectedCommitSha: string | undefined;
+  readonly sourceRunId: string;
+};
 
-  for (let argumentIndex = 0; argumentIndex < commandLineArguments.length; argumentIndex += 2) {
-    const optionName = commandLineArguments[argumentIndex];
-    const optionValue = commandLineArguments[argumentIndex + 1];
+type SelectHelmChartCommand = {
+  readonly kind: 'select-helm-chart';
+  readonly chartsPath: string;
+  readonly imageTag: string;
+};
 
-    if (!isNonEmptyString(optionName) || !optionName.startsWith('--') || !isNonEmptyString(optionValue)) {
-      throw new Error('Options must be supplied as non-empty --name value pairs.');
-    }
+type WireBuildsFieldsMatchCommand = {
+  readonly kind: 'wire-builds-fields-match';
+  readonly version: string;
+  readonly repository: string;
+  readonly applicationVersion: string;
+  readonly commitUrl: string;
+  readonly commit: string;
+};
 
-    optionValues.set(optionName.slice(2), optionValue);
-  }
-
-  return optionValues;
-}
-
-function getRequiredOption(optionValues: CommandLineOptions, optionName: string): string {
-  const optionValue = optionValues.get(optionName);
-
-  if (!isNonEmptyString(optionValue)) {
-    throw new Error(`Missing required option: --${optionName}`);
-  }
-
-  return optionValue;
-}
+export type ProductionDistributionCommand =
+  ValidateManifestCommand | SelectHelmChartCommand | WireBuildsFieldsMatchCommand;
 
 function parseJson(jsonText: string): unknown {
   try {
     return JSON.parse(jsonText);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorMessage = isError(error) ? error.message : String(error);
     throw new Error(`Invalid JSON: ${errorMessage}`);
   }
 }
 
-function readJsonFile(filePath: string): unknown {
-  return parseJson(nodeFileSystem.readFileSync(filePath, 'utf8'));
-}
-
-function readJsonFromStandardInput(): unknown {
-  return parseJson(nodeFileSystem.readFileSync(0, 'utf8'));
-}
-
-function readWireBuildsFields(optionValues: CommandLineOptions): WireBuildsWebappFields {
+function readWireBuildsFields(command: WireBuildsFieldsMatchCommand): WireBuildsWebappFields {
   return {
-    version: getRequiredOption(optionValues, 'version'),
-    repo: getRequiredOption(optionValues, 'repo'),
-    appVersion: getRequiredOption(optionValues, 'app-version'),
-    commitUrl: getRequiredOption(optionValues, 'commit-url'),
-    commit: getRequiredOption(optionValues, 'commit'),
+    version: command.version,
+    repo: command.repository,
+    appVersion: command.applicationVersion,
+    commitUrl: command.commitUrl,
+    commit: command.commit,
   };
 }
 
@@ -105,77 +101,52 @@ function readPublishedHelmCharts(value: unknown): readonly PublishedHelmChart[] 
   });
 }
 
-function runCommand(commandName: string, optionValues: CommandLineOptions): void {
-  switch (commandName) {
-    case 'validate-manifest': {
-      const expectedCommitSha = optionValues.get('expected-commit-sha');
+export function executeProductionDistributionCommand(
+  command: ProductionDistributionCommand,
+  dependencies: ProductionDistributionCommandDependencies,
+): number {
+  return match(command)
+    .with({kind: 'validate-manifest'}, validateManifestCommand => {
       const validationResult = validateProductionDistributionManifest({
-        artifactMetadata: readJsonFile(getRequiredOption(optionValues, 'artifact-metadata-path')),
-        manifest: readJsonFile(getRequiredOption(optionValues, 'manifest-path')),
-        productionTag: getRequiredOption(optionValues, 'production-tag'),
-        productionTagCommitSha: getRequiredOption(optionValues, 'production-tag-commit-sha'),
-        expectedCommitSha,
-        sourceRunId: getRequiredOption(optionValues, 'source-run-id'),
+        artifactMetadata: parseJson(dependencies.readFile(validateManifestCommand.artifactMetadataPath)),
+        manifest: parseJson(dependencies.readFile(validateManifestCommand.manifestPath)),
+        productionTag: validateManifestCommand.productionTag,
+        productionTagCommitSha: validateManifestCommand.productionTagCommitSha,
+        expectedCommitSha: validateManifestCommand.expectedCommitSha,
+        sourceRunId: validateManifestCommand.sourceRunId,
       });
 
       if (validationResult.isErr) {
         throw validationResult.error;
       }
 
-      return;
-    }
-
-    case 'select-helm-chart': {
-      const publishedCharts = readPublishedHelmCharts(readJsonFile(getRequiredOption(optionValues, 'charts-path')));
-      const selectionResult = selectHelmChartVersion(publishedCharts, getRequiredOption(optionValues, 'image-tag'));
+      return 0;
+    })
+    .with({kind: 'select-helm-chart'}, selectHelmChartCommand => {
+      const publishedCharts = readPublishedHelmCharts(
+        parseJson(dependencies.readFile(selectHelmChartCommand.chartsPath)),
+      );
+      const selectionResult = selectHelmChartVersion(publishedCharts, selectHelmChartCommand.imageTag);
 
       if (selectionResult.isErr) {
         throw selectionResult.error;
       }
 
       if (selectionResult.value.kind === 'reuse') {
-        console.log(`reuse:${selectionResult.value.version}`);
+        dependencies.writeOutput(`reuse:${selectionResult.value.version}`);
       } else {
-        console.log('publish');
+        dependencies.writeOutput('publish');
       }
 
-      return;
-    }
-
-    case 'wire-builds-fields-match': {
+      return 0;
+    })
+    .with({kind: 'wire-builds-fields-match'}, wireBuildsFieldsMatchCommand => {
       const fieldsMatch = hasExpectedWireBuildsWebappFields(
-        readJsonFromStandardInput(),
-        readWireBuildsFields(optionValues),
+        parseJson(dependencies.readStandardInput()),
+        readWireBuildsFields(wireBuildsFieldsMatchCommand),
       );
 
-      if (!fieldsMatch) {
-        process.exitCode = 1;
-      }
-
-      return;
-    }
-
-    default:
-      throw new Error(`Unknown production distribution command: ${commandName}`);
-  }
-}
-
-function main(): void {
-  try {
-    const commandName = process.argv[2];
-
-    if (!isNonEmptyString(commandName)) {
-      throw new Error('A production distribution command is required.');
-    }
-
-    runCommand(commandName, parseCommandLineOptions(process.argv.slice(3)));
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(errorMessage);
-    process.exitCode = 1;
-  }
-}
-
-if (process.argv[1]?.endsWith('productionDistributionCli.ts')) {
-  main();
+      return fieldsMatch ? 0 : 1;
+    })
+    .exhaustive();
 }

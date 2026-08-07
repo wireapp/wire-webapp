@@ -9,5 +9,12 @@
     "allowImportingTsExtensions": true
   },
   "include": ["tools/**/*.ts", "tools/**/*.mts"],
-  "exclude": ["node_modules", "dist", "tmp", "tools/**/*.test.ts", "tools/jest.config.js", "tools/release-appearance"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tmp",
+    "tools/**/*.test.ts",
+    "tools/release-appearance",
+    "tools/release-cli"
+  ]
 }
