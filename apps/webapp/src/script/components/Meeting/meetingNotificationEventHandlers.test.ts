@@ -30,7 +30,6 @@ import {createMeetingNotificationEventHandlers} from './meetingNotificationEvent
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const creatorId: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const conversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
-const currentUserId: QualifiedId = {id: 'current-user-id', domain: 'example.com'};
 
 const meetingSeries: MeetingSeries = {
   conversation_id: '',
@@ -49,9 +48,8 @@ describe('createMeetingNotificationEventHandlers', () => {
     const notifications: AddNotificationInput[] = [];
     const warnings: Array<{message: string; context?: unknown}> = [];
 
-    const {onMeetingUpdated, onMeetingMemberAdded, onMeetingDeleted} = createMeetingNotificationEventHandlers({
+    const {notifyUpdate, onMeetingDeleted} = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => [meetingSeries],
-      getSelfUserQualifiedId: () => currentUserId,
       addNotification: notification => {
         notifications.push(notification);
       },
@@ -62,8 +60,8 @@ describe('createMeetingNotificationEventHandlers', () => {
       },
     });
 
-    onMeetingUpdated(meetingId, creatorId);
-    onMeetingMemberAdded(meetingId);
+    notifyUpdate(meetingSeries);
+    notifyUpdate(meetingSeries);
     onMeetingDeleted(meetingId);
 
     expect(notifications).toEqual([
@@ -95,9 +93,8 @@ describe('createMeetingNotificationEventHandlers', () => {
     const notifications: AddNotificationInput[] = [];
     const warnings: Array<{message: string; context?: unknown}> = [];
 
-    const {onMeetingMemberAdded, onMeetingDeleted} = createMeetingNotificationEventHandlers({
+    const {onMeetingDeleted} = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => [],
-      getSelfUserQualifiedId: () => currentUserId,
       addNotification: notification => {
         notifications.push(notification);
       },
@@ -108,18 +105,10 @@ describe('createMeetingNotificationEventHandlers', () => {
       },
     });
 
-    onMeetingMemberAdded(meetingId);
     onMeetingDeleted(meetingId);
 
     expect(notifications).toEqual([]);
     expect(warnings).toEqual([
-      {
-        message: 'Meeting notification pending because the meeting is not in the store yet',
-        context: {
-          kind: MeetingNotificationKind.UPDATE,
-          meetingId,
-        },
-      },
       {
         message: 'Meeting notification pending because the meeting is not in the store yet',
         context: {
@@ -130,21 +119,20 @@ describe('createMeetingNotificationEventHandlers', () => {
     ]);
   });
 
-  it('discards update notifications originated by the current user', () => {
+  it('notifies using the meeting passed by the successful sync', () => {
     const notifications: AddNotificationInput[] = [];
-    const {onMeetingUpdated} = createMeetingNotificationEventHandlers({
-      getMeetingSeries: () => [meetingSeries],
-      getSelfUserQualifiedId: () => currentUserId,
+    const {notifyUpdate} = createMeetingNotificationEventHandlers({
+      getMeetingSeries: () => [],
       addNotification: notification => {
         notifications.push(notification);
       },
-      logger: {
-        warn: () => {},
-      },
+      logger: {warn: () => {}},
     });
 
-    onMeetingUpdated(meetingId, currentUserId);
+    notifyUpdate({...meetingSeries, title: 'Fresh title'});
 
-    expect(notifications).toEqual([]);
+    expect(notifications).toEqual([
+      expect.objectContaining({kind: MeetingNotificationKind.UPDATE, meetingTitle: 'Fresh title'}),
+    ]);
   });
 });
