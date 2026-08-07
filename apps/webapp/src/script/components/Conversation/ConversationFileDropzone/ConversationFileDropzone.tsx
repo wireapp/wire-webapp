@@ -33,6 +33,7 @@ interface ConversationFileDropzoneProps {
   activeConversationId?: string;
   onFileDropped: (files: File[]) => void;
   isDragAccept: boolean;
+  isFileDropAllowed: boolean;
   rootProps: DropzoneRootProps;
   inputProps: DropzoneInputProps;
   children: ReactNode;
@@ -44,13 +45,19 @@ export const ConversationFileDropzone = ({
   activeConversationId,
   onFileDropped,
   isDragAccept,
+  isFileDropAllowed,
   rootProps,
   inputProps,
   children,
 }: ConversationFileDropzoneProps) => {
   if (isCellsEnabled) {
     return (
-      <FileDropzone isDragAccept={isDragAccept} rootProps={rootProps} inputProps={inputProps}>
+      <FileDropzone
+        isDragAccept={isDragAccept}
+        isFileDropAllowed={isFileDropAllowed}
+        rootProps={rootProps}
+        inputProps={inputProps}
+      >
         <div
           id="conversation"
           className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}

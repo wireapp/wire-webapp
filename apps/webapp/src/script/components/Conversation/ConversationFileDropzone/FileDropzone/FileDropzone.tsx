@@ -27,19 +27,21 @@ import {useIsDragging} from './useIsDragging/useIsDragging';
 
 interface FileDropzoneProps {
   isDragAccept: boolean;
+  isFileDropAllowed: boolean;
   rootProps: DropzoneRootProps;
   inputProps: DropzoneInputProps;
   children: ReactNode;
 }
 
-export const FileDropzone = ({isDragAccept, rootProps, inputProps, children}: FileDropzoneProps) => {
+export const FileDropzone = ({isDragAccept, isFileDropAllowed, rootProps, inputProps, children}: FileDropzoneProps) => {
   const {isDragging, wrapperRef} = useIsDragging();
+  const overlayMode = isFileDropAllowed ? 'upload' : 'restricted';
 
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
       <div {...rootProps}>
         <input {...inputProps} />
-        <FileDropzoneOverlay isActive={isDragging && isDragAccept} />
+        <FileDropzoneOverlay isActive={isDragging && isDragAccept} mode={overlayMode} />
         {children}
       </div>
     </div>

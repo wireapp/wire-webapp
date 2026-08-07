@@ -17,30 +17,46 @@
  *
  */
 
-import {SaveIcon} from '@wireapp/react-ui-kit';
+import {BlockIcon, SaveIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   iconStyles,
+  uploadIconStyles,
   overlayActiveStyles,
   overlayStyles,
   descriptionStyles,
   titleStyles,
 } from './FileDropzoneOverlay.styles';
 
+export type FileDropzoneOverlayMode = 'upload' | 'restricted';
+
 interface FileDropzoneOverlayProps {
   isActive: boolean;
+  mode: FileDropzoneOverlayMode;
 }
 
-export const FileDropzoneOverlay = ({isActive}: FileDropzoneOverlayProps) => {
+export const FileDropzoneOverlay = ({isActive, mode}: FileDropzoneOverlayProps) => {
   const {translate} = useApplicationContext();
+
+  const isRestricted = mode === 'restricted';
+  const title = isRestricted
+    ? translate('conversationFileUploadRestrictedOverlayTitle')
+    : translate('conversationFileUploadOverlayTitle');
+  const description = isRestricted
+    ? translate('conversationFileUploadRestrictedOverlayDescription')
+    : translate('conversationFileUploadOverlayDescription');
 
   return (
     <div css={isActive ? overlayActiveStyles : overlayStyles} aria-hidden={!isActive}>
-      <SaveIcon width={24} height={24} css={iconStyles} />
-      <p css={titleStyles}>{translate('conversationFileUploadOverlayTitle')}</p>
-      <p css={descriptionStyles}>{translate('conversationFileUploadOverlayDescription')}</p>
+      {isRestricted ? (
+        <BlockIcon width={24} height={24} css={iconStyles} />
+      ) : (
+        <SaveIcon width={24} height={24} css={[iconStyles, uploadIconStyles]} />
+      )}
+      <p css={titleStyles}>{title}</p>
+      <p css={descriptionStyles}>{description}</p>
     </div>
   );
 };
