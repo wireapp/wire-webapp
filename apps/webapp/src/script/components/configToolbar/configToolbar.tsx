@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import keyboardjs from 'keyboardjs';
 import {container} from 'tsyringe';

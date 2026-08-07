@@ -17,7 +17,7 @@
  *
  */
 
-import {useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -40,7 +40,15 @@ export const Meetings = () => {
   const hasLoadError = useMeetingStore(state => state.hasLoadError);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
   const selfUser = container.resolve(UserState).self();
-  const refreshMeetings = () => fireAndForgetInvoker.fireAndForget(loadMeetings);
+
+  const refreshMeetings = useCallback(
+    () => fireAndForgetInvoker.fireAndForget(loadMeetings),
+    [fireAndForgetInvoker, loadMeetings],
+  );
+
+  useEffect(() => {
+    refreshMeetings();
+  }, [refreshMeetings]);
 
   return (
     <div css={meetingsContentWrapperStyles}>

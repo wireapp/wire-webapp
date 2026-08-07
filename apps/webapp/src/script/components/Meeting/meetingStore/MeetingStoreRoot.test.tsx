@@ -27,7 +27,13 @@ import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import {
+  MeetingNotificationKind,
+  useMeetingNotificationStore,
+} from 'Components/Meeting/meetingNotificationStore/meetingNotificationStore';
+import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/userState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -38,6 +44,8 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {MeetingStoreRoot} from './MeetingStoreRoot';
 
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
+const selfUserId: QualifiedId = {id: 'self-user-id', domain: 'example.com'};
+const otherUserId: QualifiedId = {id: 'other-user-id', domain: 'example.com'};
 
 const createApiMeeting = (title: string, qualifiedId: QualifiedId = meetingId) => ({
   created_at: '2026-06-15T09:00:00.000Z',
@@ -77,6 +85,7 @@ const renderMeetingStoreRoot = ({
   isMeetingsFeatureEnabled = true,
 }: RenderParameters = {}) => {
   setMeetingsTeamFeature(isMeetingsFeatureEnabled ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED);
+  container.resolve(UserState).self(new User(selfUserId.id, selfUserId.domain, translateForTest));
 
   const mainViewModel = {
     content: {
@@ -111,6 +120,7 @@ const getRenderedMeetingTitles = () => screen.getByTestId(meetingTitlesTestId).t
 
 describe('MeetingStoreRoot', () => {
   afterEach(() => {
+    useMeetingNotificationStore.getState().clearNotifications();
     act(() => {
       container.resolve(TeamState).teamFeatures(undefined);
     });
@@ -141,6 +151,58 @@ describe('MeetingStoreRoot', () => {
     expect(getMeeting).toHaveBeenCalledWith(meetingId);
   });
 
+  it('does not create a notification for the host when a meeting is created', async () => {
+    const {getMeeting} = renderMeetingStoreRoot({
+      getMeetingsList: jest.fn(() => task.resolve([])),
+      getMeeting: jest.fn(() => task.resolve(createApiMeeting('Newly created meeting'))),
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.CREATED, meetingId);
+    });
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Newly created meeting');
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+    expect(getMeeting).toHaveBeenCalledWith(meetingId);
+  });
+
+  it('creates notifications while the meetings view is not mounted', async () => {
+    renderMeetingStoreRoot();
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([
+      expect.objectContaining({
+        kind: MeetingNotificationKind.UPDATE,
+        meetingTitle: 'Weekly sync',
+        qualifiedId: meetingId,
+      }),
+    ]);
+  });
+
+  it('does not notify the user who updated the meeting', async () => {
+    renderMeetingStoreRoot();
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, selfUserId);
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+  });
+
   it('syncs a meeting into the store when a meeting member-added event is published', async () => {
     const {getMeeting} = renderMeetingStoreRoot({
       getMeetingsList: jest.fn(() => task.resolve([])),
@@ -156,6 +218,29 @@ describe('MeetingStoreRoot', () => {
     expect(getMeeting).toHaveBeenCalledWith(meetingId);
   });
 
+  it('retries a pending update notification after a member-added meeting is synced', async () => {
+    const {getMeeting} = renderMeetingStoreRoot({
+      getMeetingsList: jest.fn(() => task.resolve([])),
+      getMeeting: jest.fn(() => task.resolve(createApiMeeting('Late joiner meeting'))),
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
+    });
+
+    await waitFor(() => {
+      expect(useMeetingNotificationStore.getState().notifications).toEqual([
+        expect.objectContaining({
+          kind: MeetingNotificationKind.UPDATE,
+          meetingTitle: 'Late joiner meeting',
+          qualifiedId: meetingId,
+        }),
+      ]);
+    });
+
+    expect(getMeeting).toHaveBeenCalledWith(meetingId);
+  });
+
   it('removes a meeting from the store when a meeting deleted event is published', async () => {
     renderMeetingStoreRoot();
 
@@ -164,6 +249,30 @@ describe('MeetingStoreRoot', () => {
     });
 
     amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('');
+    });
+  });
+
+  it('creates a cancellation notification before removing a deleted meeting', async () => {
+    renderMeetingStoreRoot();
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([
+      expect.objectContaining({
+        kind: MeetingNotificationKind.CANCELLED,
+        meetingTitle: 'Weekly sync',
+        qualifiedId: meetingId,
+      }),
+    ]);
 
     await waitFor(() => {
       expect(getRenderedMeetingTitles()).toBe('');

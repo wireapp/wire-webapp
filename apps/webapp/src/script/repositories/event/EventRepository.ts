@@ -595,15 +595,18 @@ export class EventRepository {
     }
 
     const meetingId = 'qualified_id' in event ? event.qualified_id : undefined;
+    const actorId = 'qualified_from' in event ? event.qualified_from : undefined;
     const hasValidQualifiedId =
       meetingId !== undefined && typeof meetingId.id === 'string' && typeof meetingId.domain === 'string';
+    const hasValidActorId =
+      actorId !== undefined && typeof actorId.id === 'string' && typeof actorId.domain === 'string';
 
-    if (!hasValidQualifiedId) {
-      this.logger.warn(`Ignored ${event.type} event without a valid qualified_id`, event);
+    if (!hasValidQualifiedId || !hasValidActorId) {
+      this.logger.warn(`Ignored ${event.type} event without valid qualified IDs`, event);
       return;
     }
 
-    amplify.publish(webAppEvent, meetingId);
+    amplify.publish(webAppEvent, meetingId, actorId);
   }
 
   /**
