@@ -38,20 +38,6 @@ jest.mock('Util/useChannelsFeatureFlag', () => ({
   })),
 }));
 
-jest.mock('Repositories/team/TeamState', () => ({
-  TeamState: class {
-    isCellsEnabled = () => false;
-  },
-}));
-
-jest.mock('Util/componentUtil', () => ({
-  useKoSubscribableChildren: () => ({isCellsEnabled: false}),
-}));
-
-jest.mock('Components/icon', () => ({
-  SettingsIcon: () => <div data-testid="settings-icon" />,
-}));
-
 describe('TabAndFilterSettings', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),

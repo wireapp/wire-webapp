@@ -32,12 +32,6 @@ import {
 import {useGetAssetUrl} from './useGetAssetUrl';
 import {translateForTest} from 'Util/test/translateForTest';
 
-jest.mock('Util/logger', () => ({
-  getLogger: jest.fn(() => ({
-    error: jest.fn(),
-  })),
-}));
-
 type Result = {current: {url: string | undefined; isLoading: boolean; isError: boolean}} | undefined;
 type UseGetAssetUrlEnabledState = {
   isEnabled: boolean;

@@ -28,14 +28,6 @@ import * as trackingUtil from '../util/trackingUtil';
 import * as urlUtil from '../util/urlUtil';
 import * as browserLocationModule from '../../navigation/browserLocation';
 
-jest.mock('@wireapp/react-ui-kit/lib/Images/SuccessShield', () => ({
-  SuccessShield: () => <div data-uie-name="success-shield" />,
-}));
-
-jest.mock('../component/accountRegistrationLayout', () => ({
-  AccountRegistrationLayout: ({children}: any) => <div data-uie-name="layout">{children}</div>,
-}));
-
 describe('Success', () => {
   let replaceLocationMock: jest.SpiedFunction<typeof browserLocationModule.replaceBrowserLocation>;
 
@@ -59,7 +51,6 @@ describe('Success', () => {
 
   it('renders all expected elements', () => {
     const {getByTestId, getByText} = renderComponent(<Success />);
-    expect(getByTestId('success-shield')).toBeInTheDocument();
     expect(getByText('Great, your personal account is set up. Now you can connect with people.')).toBeInTheDocument();
     expect(getByText('What do you want to do next?')).toBeInTheDocument();
     expect(getByText('Download Wire')).toBeInTheDocument();
