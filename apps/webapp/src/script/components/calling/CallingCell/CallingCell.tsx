@@ -384,6 +384,7 @@ export const CallingCell = ({
           )}
 
           <CallingHeader
+            isMeeting={isMeeting}
             isGroupCall={isGroupCall}
             isChannel={isChannel}
             isOngoing={isOngoing}
