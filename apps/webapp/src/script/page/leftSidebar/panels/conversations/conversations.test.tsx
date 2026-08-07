@@ -47,10 +47,6 @@ jest.mock('./conversationSidebar/conversationSidebar', () => ({
   },
 }));
 
-jest.mock('./conversationHeader', () => ({
-  ConversationHeader: () => null,
-}));
-
 const defaultParams: Omit<React.ComponentProps<typeof Conversations>, 'conversationRepository' | 'searchRepository'> = {
   listViewModel: {
     switchList: jest.fn(),

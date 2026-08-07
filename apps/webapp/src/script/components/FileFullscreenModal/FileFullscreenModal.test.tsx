@@ -63,47 +63,20 @@ jest.mock('./PdfViewer/PdfViewer', () => ({
   PDFViewer: () => <div data-uie-name="pdf-viewer">PDF Viewer</div>,
 }));
 
-jest.mock('Util/fileTypeUtil', () => ({
-  isFileEditable: (extension: string) => ['txt', 'md', 'json'].includes(extension),
-}));
-
-jest.mock('Util/getFileTypeFromExtension/getFileTypeFromExtension', () => ({
-  getFileTypeFromExtension: (extension: string) => {
-    if (extension === 'pdf') {
-      return 'pdf';
-    }
-    if (['jpg', 'png', 'gif'].includes(extension)) {
-      return 'image';
-    }
-    return 'unknown';
-  },
-}));
-
-jest.mock('Util/util', () => ({
-  getFileExtensionFromUrl: (url: string) => {
-    const match = url.match(/\.([^.]+)$/);
-    return match ? match[1] : '';
-  },
-}));
-
 describe('FileFullscreenModal - File Version Restore', () => {
   const defaultProps = {
     id: 'test-file-id',
     isOpen: true,
     onClose: jest.fn(),
     fileName: 'document',
-    fileExtension: 'txt',
-    fileUrl: 'https://example.com/file.txt',
-    filePreviewUrl: 'https://example.com/preview.txt',
+    fileExtension: 'csv',
+    fileUrl: 'https://example.com/file.csv',
+    filePreviewUrl: 'https://example.com/preview.csv',
     status: 'success' as const,
     senderName: 'John Doe',
     timestamp: Date.now(),
     badges: ['badge1'],
   };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   describe('Modal Rendering', () => {
     it('should render file header when modal is open', () => {

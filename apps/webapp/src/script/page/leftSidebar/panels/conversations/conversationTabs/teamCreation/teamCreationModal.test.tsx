@@ -19,7 +19,7 @@
 
 import {act} from 'react';
 
-import {render, fireEvent, waitFor} from '@testing-library/react';
+import {fireEvent, render, waitFor} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
@@ -32,14 +32,6 @@ import {useTeamCreationModal} from './useTeamCreationModal';
 import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Repositories/team/TeamService');
-jest.mock('@wireapp/react-ui-kit', () => {
-  const actualModule = jest.requireActual('@wireapp/react-ui-kit');
-
-  return {
-    ...actualModule,
-    Loading: () => null,
-  };
-});
 
 const testIdentifiers = {
   doContinue: 'do-continue',

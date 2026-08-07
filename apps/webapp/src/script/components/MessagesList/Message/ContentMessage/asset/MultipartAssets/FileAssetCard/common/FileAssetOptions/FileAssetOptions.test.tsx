@@ -30,13 +30,6 @@ import {isFileEditable} from 'Util/fileTypeUtil';
 
 import {FileAssetOptions} from './FileAssetOptions';
 
-jest.mock('Util/util', () => ({
-  forcedDownloadFile: jest.fn(),
-  getFileNameWithExtension: jest.fn((name: string, ext: string) => `${name}.${ext}`),
-}));
-
-jest.unmock('Util/fileTypeUtil');
-
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({
     translate: key => {

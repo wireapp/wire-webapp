@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {render, fireEvent} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -30,26 +30,6 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {CellsShareModalContent} from './cellsShareModalContent';
-
-jest.mock('@wireapp/react-ui-kit', () => {
-  const actualModule = jest.requireActual('@wireapp/react-ui-kit');
-
-  return {
-    ...actualModule,
-    Input: ({wrapperCSS, showTogglePasswordLabel, hideTogglePasswordLabel, ...properties}: any) => (
-      <input {...properties} />
-    ),
-  };
-});
-
-jest.mock('src/script/Config', () => ({
-  Config: {
-    getConfig: () => ({
-      MINIMUM_PASSWORD_LENGTH: 8,
-      NEW_PASSWORD_MINIMUM_LENGTH: 8,
-    }),
-  },
-}));
 
 const withTheme = (component: ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -63,12 +43,6 @@ jest.mock('Components/cells/shareModal/cellsShareExpirationFields', () => ({
 
 jest.mock('Components/Conversation/ConversationCells/common/CellsTableLoader/CellsTableLoader', () => ({
   CellsTableLoader: () => <div data-uie-name="cells-table-loader">Loading...</div>,
-}));
-
-jest.mock('Components/copyToClipboardButton/copyToClipboardButton', () => ({
-  CopyToClipboardButton: ({textToCopy, displayText}: {textToCopy: string; displayText: string}) => (
-    <button data-uie-name="copy-to-clipboard-button">{displayText}</button>
-  ),
 }));
 
 jest.mock('Components/PasswordGeneratorButton', () => ({
