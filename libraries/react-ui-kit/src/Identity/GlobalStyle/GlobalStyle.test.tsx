@@ -21,8 +21,6 @@ import {GlobalStyle} from './GlobalStyle';
 
 import {matchComponent} from '../../utils/testUtil';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"GlobalStyle"', () => {
   it('renders', () => matchComponent(<GlobalStyle />));
 });

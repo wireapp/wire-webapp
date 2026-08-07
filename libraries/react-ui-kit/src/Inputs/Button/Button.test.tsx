@@ -22,8 +22,6 @@ import {Button} from './Button';
 import {THEME_ID} from '../../Identity';
 import {matchComponent} from '../../utils/testUtil';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"Button"', () => {
   it('renders', () => matchComponent(<Button>Submit</Button>));
   it('renders (dark theme)', () => matchComponent(<Button>Button</Button>, THEME_ID.DARK));

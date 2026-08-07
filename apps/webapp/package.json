@@ -108,7 +108,6 @@
     "@babel/preset-env": "7.29.7",
     "@babel/preset-react": "7.29.7",
     "@babel/preset-typescript": "7.29.7",
-    "@emotion/eslint-plugin": "11.12.0",
     "@formatjs/cli": "6.16.16",
     "@nx/webpack": "22.7.8",
     "@playwright/test": "1.62.1",

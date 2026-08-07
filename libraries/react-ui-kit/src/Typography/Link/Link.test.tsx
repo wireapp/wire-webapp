@@ -22,8 +22,6 @@ import {matchComponent} from '../../utils/testUtil';
 
 import {Link} from '.';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"Link"', () => {
   it('renders', () => matchComponent(<Link>Link</Link>));
   it('renders (dark theme)', () => matchComponent(<Link>Link</Link>, THEME_ID.DARK));

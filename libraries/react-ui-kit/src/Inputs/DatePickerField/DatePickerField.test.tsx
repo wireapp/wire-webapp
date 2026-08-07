@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable jest/expect-expect */
-
 import {parseDate} from '@internationalized/date';
 
 import {DatePickerField} from './DatePickerField';

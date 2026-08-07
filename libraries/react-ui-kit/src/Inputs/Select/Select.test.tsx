@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable jest/expect-expect */
-
 import * as React from 'react';
 
 import {Select} from './Select';

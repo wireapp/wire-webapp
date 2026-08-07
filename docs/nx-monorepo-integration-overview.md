@@ -966,202 +966,42 @@ Unlike traditional ESLint setups that use multiple `.eslintrc.*` files, this pro
 - Easier to maintain and debug
 - No need for multiple config files across the project
 
-### Config Structure
+### Configuration structure
 
-The ESLint configuration is structured into multiple config objects:
+The single root configuration is an ordered flat-config array with these conceptual layers:
 
-```javascript
-const config = [
-  {ignores},                    // 1. Ignore patterns
-  ...productionConfigs,         // 2. Native production presets and rules
-  {                             // 3. TypeScript/React config
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: {...},
-    plugins: {...},
-    rules: {...}
-  },
-  {                             // 4. JavaScript config
-    files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs'],
-    languageOptions: {...},
-    rules: {...}
-  },
-  {                             // 5. Narrow Jest mock restriction for tests
-    files: ['**/*.test.tsx', '**/*.test.ts', '**/*.spec.tsx', '**/*.spec.ts'],
-    rules: {...}
-  }
-];
-```
+1. Global ignores for generated output, dependencies, coverage and other non-source directories.
+2. Native plugin presets and the remaining production rules translated from the former legacy configuration.
+3. Production-only ignore patterns that exclude the legacy test suite, mocks, stories and setup files from normal production rules.
+4. A type-aware TypeScript production configuration using `@typescript-eslint/parser` and `projectService: true`.
+5. A JavaScript production configuration that keeps the repository's JavaScript options and globals while relying on ESLint's default `espree` parser.
+6. Narrow test parsing configurations for TypeScript/TSX and JavaScript/JSX. These configurations do not apply the full production rule set.
+7. A repository-wide Jest policy for files under `apps` and `libraries` that warns on new `jest.mock()` calls.
+8. Repository-wide lint hygiene that reports unused ESLint disable directives as errors.
 
-### 1. Ignore Patterns
+Tests remain parseable for targeted repository policies even though production rules intentionally do not run across the legacy test suite. This separation prevents a broad test-suite cleanup while still allowing policies such as the Jest mock restriction and unused-directive reporting to apply.
 
-The first config object defines files and directories to ignore:
+The exact file patterns and ignore lists belong in `eslint.config.mjs`; they are intentionally not duplicated here.
 
-```javascript
-const ignores = [
-  '.git/',
-  'docs/',
-  'bin/',
-  '**/node_modules/',
-  'apps/webapp/assets/',
-  'resource/',
-  'apps/webapp/resource/',
-  'apps/webapp/test/',
-  '**/__mocks__/**',
-  '**/setupTests.*',
-  '**/*.config.*',
-  'apps/webapp/*.config.*',
-  'apps/webapp/src/sw.js',
-  'apps/server/bin/',
-  'apps/server/dist/',
-  'apps/server/node_modules/',
-  'apps/webapp/src/ext/',
-  'apps/webapp/src/script/localization/**/webapp*.js',
-  'apps/webapp/src/worker/',
-  'apps/webapp/src/script/components/Icon.tsx',
-  '**/*.test.*',
-  '**/*.spec.*',
-  '*.js',
-  'apps/webapp/playwright-report/',
-  'libraries/core/lib/',
-  'libraries/api-client/lib/',
-  'libraries/core/.tmp/',
-  'libraries/core/src/test/',
-  'libraries/config/lib/',
-  '**/jest.setup.ts',
-];
-```
+### Production configurations
 
-### 2. Native Production Presets
+The root configuration imports native flat presets where plugins provide them and translates the remaining legacy rules into ordinary flat configuration objects. TypeScript production files retain type-aware project-service parsing and the existing import-resolution settings. JavaScript production files use ESLint's default parser, `espree`, with the JavaScript-specific options and globals required by the repository.
 
-The root configuration imports the native flat presets exposed by the installed ESLint plugins and translates the remaining legacy rules into ordinary flat configuration objects. Production configurations ignore test files, mocks, stories and setup files so they do not receive the production rule set.
+### TypeScript production linting
 
-### 3. TypeScript/React Config
+Production TypeScript and TSX files use `@typescript-eslint/parser` with `projectService: true`, so the existing type-aware rules continue to use the repository's TypeScript projects and import-resolution settings. React, Emotion, accessibility, header and other production plugin behavior remains in this production layer.
 
-The main configuration for TypeScript and React files:
+TypeScript project discovery is delegated to the TypeScript language service through `projectService`, which preserves the existing multi-project and path-mapping behavior without a second configuration source.
 
-```javascript
-{
-  files: ['**/*.{ts,tsx}'],
-  languageOptions: {
-    parser: tsParser,
-    parserOptions: {
-      // Enable type-aware linting for TypeScript sources with project references support
-      projectService: true,
-      tsconfigRootDir: repositoryRootDirectory,
-    },
-    globals: {
-      ...globals.browser,
-      ...globals.node,
-      React: 'readonly',
-      JSX: 'readonly',
-      amplify: 'readonly',
-      NodeJS: 'readonly',
-    },
-  },
-  plugins: {
-    '@emotion': emotionPlugin,
-    import: importPlugin,
-    'react-hooks': reactHooksPlugin,
-    'header-tony': headerPlugin,
-  },
-  rules: {
-    // ... rules
-  },
-  settings: {
-    'import/resolver': {
-      typescript: {
-        alwaysTryTypes: true,
-      },
-      node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
-      },
-    },
-  },
-}
-```
+### JavaScript production linting
 
-### Type-Aware Linting with projectService
+Production JavaScript, JSX, CJS and MJS files retain their JavaScript-specific parser options, globals and rule adjustments. They rely on ESLint's default `espree` parser; the configuration does not import or assign a separate JavaScript parser.
 
-The key feature enabling type-aware linting is `projectService: true`:
+### Narrow test parsing and repository policies
 
-```javascript
-parserOptions: {
-  projectService: true,
-  tsconfigRootDir: repositoryRootDirectory,
-}
-```
+Test, mock, story and setup files are intentionally excluded from the normal production rules. They still receive narrow parsing configurations: TypeScript and TSX use `@typescript-eslint/parser` without type-aware project service, while JavaScript and JSX use ordinary JavaScript parsing.
 
-**How it works:**
-
-1. **Automatic Project Discovery:** ESLint automatically discovers all TypeScript projects in the workspace using [`tsconfig.json`](tsconfig.json) references
-2. **TypeScript Language Service:** Uses the TypeScript language service for accurate type information
-3. **Multi-Project Support:** Handles multiple projects (apps and libraries) seamlessly
-4. **Path Mapping Resolution:** Uses [`tsconfig.eslint.json`](tsconfig.eslint.json) for path mappings
-
-**Why `projectService` instead of `project`:**
-
-- `projectService` automatically discovers projects from `tsconfig.json` references
-- No need to manually specify which `tsconfig.json` to use
-- Better support for monorepos with multiple projects
-- Handles project references automatically
-
-### Path Mappings and Import Resolution
-
-The `import/resolver` settings configure how imports are resolved:
-
-```javascript
-settings: {
-  'import/resolver': {
-    typescript: {
-      alwaysTryTypes: true,
-    },
-    node: {
-      extensions: ['.js', '.jsx', '.ts', '.tsx'],
-    },
-  },
-}
-```
-
-This enables:
-- TypeScript path mapping resolution (e.g., `@wireapp/core/lib/connection`)
-- Node module resolution
-- Type-aware import checking
-
-### 5. JavaScript Config
-
-JavaScript files have a separate configuration:
-
-```javascript
-{
-  files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs'],
-  languageOptions: {
-    parser: espree,
-    parserOptions: {
-      project: null,
-      tsconfigRootDir: repositoryRootDirectory,
-    },
-  },
-  rules: {
-    // Disable TS-only rules on JS mocks/shims
-    '@typescript-eslint/require-array-sort-compare': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
-  },
-}
-```
-
-### 6. Test Config
-
-Test files have relaxed rules:
-
-```javascript
-{
-  files: ['**/*.test.tsx', '**/*.test.ts', '**/*.spec.tsx', '**/*.spec.ts', '**/test/**/*', '**/mocks/**/*'],
-  rules: {
-    'no-magic-numbers': 'off',
-    'id-length': 'off',
-  },
-}
-```
+The narrow configurations do not load unrelated production plugins. A separate repository-wide policy applies only the Jest plugin and `jest/no-restricted-jest-methods` to source files under `apps` and `libraries`, warning on `jest.mock()` while leaving other Jest APIs unchanged. The repository-wide `reportUnusedDisableDirectives: 'error'` setting also ensures stale `eslint-disable`, `eslint-disable-next-line`, `eslint-disable-line` and matching enable directives fail linting.
 
 ### Copyright Headers
 

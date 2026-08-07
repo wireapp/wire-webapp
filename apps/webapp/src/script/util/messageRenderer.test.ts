@@ -180,7 +180,6 @@ describe('renderMessage', () => {
   });
 
   it('renders an emoticon of someone shrugging', () => {
-    /* eslint-disable no-useless-escape */
     expect(renderMessage('¯_(ツ)_/¯')).toBe('¯<em>(ツ)</em>/¯');
   });
 
@@ -413,7 +412,6 @@ describe('renderMessage', () => {
         return mentionEntity;
       });
 
-      // eslint-disable-next-line jest/valid-title
       it(testCase, () => {
         const result = renderMessage(text, {domain: '', id: 'self-id'}, mentionEntities);
 

@@ -19,7 +19,6 @@
 
 // @ts-check
 
-/* eslint no-undef: "off" */
 import 'core-js/full/reflect';
 
 // Polyfill for "tsyringe" dependency injection

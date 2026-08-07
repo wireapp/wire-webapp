@@ -34,8 +34,6 @@ const STORE_NAME = 'store-name';
 
 let engine: CRUDEngine;
 
-/* eslint-disable jest/expect-expect, jest/valid-title */
-
 async function initEngine(shouldCreateNewEngine = true): Promise<MemoryEngine | CRUDEngine> {
   const storeEngine = shouldCreateNewEngine ? new MemoryEngine() : engine;
   await storeEngine.init(STORE_NAME);

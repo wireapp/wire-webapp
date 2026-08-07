@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable */
 import {MediaDeviceType} from './MediaDeviceType';
 import {MediaDevicesHandler} from './MediaDevicesHandler';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';

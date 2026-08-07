@@ -89,7 +89,6 @@ describe('PriorityQueue', () => {
       try {
         await queue.add(() => notHappyFn());
       } catch (error) {
-        // eslint-disable-next-line jest/no-conditional-expect
         expect((error as Error).message).toBe('not so happy');
       }
     });

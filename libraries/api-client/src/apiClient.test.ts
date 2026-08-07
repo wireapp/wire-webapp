@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable no-magic-numbers, dot-notation */
-
 import {AccentColor} from '@wireapp/commons/lib';
 import nock from 'nock';
 
@@ -290,7 +288,6 @@ describe('APIClient', () => {
       expect(client['accessTokenStore'].accessTokenData?.access_token).toBe(accessTokenData.access_token);
     });
 
-    // eslint-disable-next-line jest/expect-expect
     it('can login after a logout', async () => {
       const client = new APIClient(testConfig);
       apiClients.push(client);
@@ -328,7 +325,6 @@ describe('APIClient', () => {
       nock(baseUrl).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(StatusCode.OK);
     });
 
-    // eslint-disable-next-line jest/expect-expect
     it('can logout a user', async () => {
       const client = new APIClient(testConfig);
       apiClients.push(client);

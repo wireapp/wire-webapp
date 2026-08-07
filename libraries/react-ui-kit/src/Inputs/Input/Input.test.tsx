@@ -20,8 +20,6 @@
 import {matchComponent} from '../../utils/testUtil';
 import {Input} from '../Input';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"Input"', () => {
   it('renders', () => matchComponent(<Input />));
   it('renders as invalid', () => matchComponent(<Input markInvalid />));

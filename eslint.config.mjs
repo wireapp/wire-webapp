@@ -19,7 +19,6 @@ import unusedImportsPlugin from 'eslint-plugin-unused-imports';
 import tsParser from '@typescript-eslint/parser';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import headerPlugin from '@tony.ganchev/eslint-plugin-header';
-import * as espree from 'espree';
 import globals from 'globals';
 import {dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -289,25 +288,23 @@ const jestRecommendedProductionConfig = {
 };
 
 const productionConfigs = [
-  ...[
-    jestRecommendedProductionConfig,
-    jsxA11yPlugin.flatConfigs.recommended,
-    typescriptPlugin.configs['flat/eslint-recommended'],
-    importPlugin.flatConfigs.recommended,
-    importPlugin.flatConfigs.typescript,
-    reactPlugin.configs.flat.recommended,
-    reactPlugin.configs.flat['jsx-runtime'],
-    eslintConfigPrettier,
-    {
-      plugins: productionPlugins,
-      settings: legacySettings,
-      rules: {
-        ...legacyRules,
-        'no-unsanitized/property': 'error',
-        'no-unsanitized/method': 'error',
-      },
+  jestRecommendedProductionConfig,
+  jsxA11yPlugin.flatConfigs.recommended,
+  typescriptPlugin.configs['flat/eslint-recommended'],
+  importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.typescript,
+  reactPlugin.configs.flat.recommended,
+  reactPlugin.configs.flat['jsx-runtime'],
+  eslintConfigPrettier,
+  {
+    plugins: productionPlugins,
+    settings: legacySettings,
+    rules: {
+      ...legacyRules,
+      'no-unsanitized/property': 'error',
+      'no-unsanitized/method': 'error',
     },
-  ].map(addProductionFileIgnores),
+  },
   {
     files: ['**/*.{ts,tsx,js,jsx,cjs,mjs}'],
     plugins: {
@@ -443,7 +440,6 @@ const productionConfigs = [
       unicorn: unicornPlugin,
     },
     languageOptions: {
-      parser: espree,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
@@ -679,13 +675,17 @@ const testJavaScriptFilePatterns = [
 
 const testJsxFilePatterns = testJavaScriptFilePatterns.map(filePattern => filePattern.replaceAll('.js', '.jsx'));
 
+const repositoryLinterOptions = {
+  reportUnusedDisableDirectives: 'error',
+};
+
 const testLinterOptions = {
-  reportUnusedDisableDirectives: 'off',
-  reportUnusedInlineConfigs: 'off',
+  reportUnusedInlineConfigs: 'error',
 };
 
 const config = [
   {ignores},
+  {linterOptions: repositoryLinterOptions},
   ...productionConfigs,
   {
     files: testTypeScriptFilePatterns,

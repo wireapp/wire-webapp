@@ -22,8 +22,6 @@ import {Bold, Large, Muted, Small, Text, Uppercase} from './Text';
 import {COLOR, THEME_ID} from '../../Identity';
 import {matchComponent} from '../../utils/testUtil';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"Text"', () => {
   it('renders', () => matchComponent(<Text>Text</Text>));
   it('renders (dark theme)', () => matchComponent(<Text>Text</Text>, THEME_ID.DARK));

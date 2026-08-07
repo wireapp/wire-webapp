@@ -27,7 +27,6 @@ import {createUuid} from 'Util/uuid';
 import {TestFactory} from '../../helper/TestFactory';
 
 const testEventServiceClass = (testedServiceName, className) => {
-  // eslint-disable-next-line jest/valid-title
   describe(className, () => {
     const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
     const senderId = '8b497692-7a38-4a5d-8287-e3d1006577d6';
@@ -38,7 +37,6 @@ const testEventServiceClass = (testedServiceName, className) => {
     beforeEach(() => testFactory.exposeEventActors());
 
     describe('loadEvent', () => {
-      /* eslint-disable  quotes */
       const events = [
         {
           conversation: conversationId,
@@ -57,7 +55,6 @@ const testEventServiceClass = (testedServiceName, className) => {
           type: 'conversation.message-add',
         },
       ];
-      /* eslint-enable comma-spacing, key-spacing, quotes */
 
       beforeEach(() => {
         // feed database before each test
@@ -238,7 +235,6 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('loadEventsWithCategory', () => {
-      /* eslint-disable comma-spacing, key-spacing,  quotes */
       const events = [
         {
           conversation: conversationId,
@@ -267,7 +263,6 @@ const testEventServiceClass = (testedServiceName, className) => {
           category: 128,
         },
       ];
-      /* eslint-enable comma-spacing, key-spacing,  quotes */
 
       beforeEach(() => {
         return Promise.all(events.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)));
@@ -658,7 +653,6 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('updateEvent', () => {
-      /* eslint-disable comma-spacing, key-spacing,  quotes */
       const messageEntity = {
         conversation: conversationId,
         id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
@@ -667,8 +661,6 @@ const testEventServiceClass = (testedServiceName, className) => {
         data: {content: 'Second message', previews: []},
         type: 'conversation.message-add',
       };
-      /* eslint-enable comma-spacing, key-spacing,  quotes */
-
       it('updated event in the database', () => {
         spyOn(testFactory[testedServiceName], 'replaceEvent').and.returnValue(Promise.resolve());
 
@@ -694,5 +686,4 @@ const testEventServiceClass = (testedServiceName, className) => {
   });
 };
 
-// eslint-disable-next-line jest/no-export
 export {testEventServiceClass};

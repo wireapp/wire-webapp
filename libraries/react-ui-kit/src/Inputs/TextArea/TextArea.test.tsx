@@ -21,8 +21,6 @@ import {TextArea} from './TextArea';
 
 import {matchComponent} from '../../utils/testUtil';
 
-/* eslint-disable jest/expect-expect */
-
 describe('"TextArea"', () => {
   it('renders', () => matchComponent(<TextArea>TextArea</TextArea>));
   it('renders as invalid', () => matchComponent(<TextArea markInvalid>TextArea</TextArea>));

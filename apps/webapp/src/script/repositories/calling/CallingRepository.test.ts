@@ -1100,7 +1100,6 @@ describe('CallingRepository ISO', () => {
   });
 });
 
-// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('E2E audio call', () => {
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: () => {}} as unknown as EventRepository,

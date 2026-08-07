@@ -403,8 +403,6 @@ describe('ProteusService', () => {
   describe('sendGenericMessage', () => {
     describe('targetted messages', () => {
       const message = buildTextMessage({text: 'test'});
-      // eslint-disable-next-line jest/no-done-callback
-
       it('fails if no userIds are given', async () => {
         const [proteusService] = await buildProteusService();
 
