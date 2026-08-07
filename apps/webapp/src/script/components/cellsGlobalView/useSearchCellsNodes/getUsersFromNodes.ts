@@ -20,9 +20,8 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RestNode} from 'cells-sdk-ts';
 
+import {getUserQualifiedIdFromNode} from 'Components/cells/common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 import {UserRepository} from 'Repositories/user/userRepository';
-
-import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
 export const getUsersFromNodes = async ({
   nodes,

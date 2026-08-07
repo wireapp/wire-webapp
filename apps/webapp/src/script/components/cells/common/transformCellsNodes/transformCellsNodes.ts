@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 
@@ -27,16 +27,16 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {formatBytes, getFileExtension, getName} from 'Util/util';
 
-import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
+import {getUserQualifiedIdFromNode} from '../getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
 export const transformCellsNodes = ({
   nodes,
   users,
-  conversations,
+  conversations = [],
 }: {
   nodes: RestNode[];
   users: User[];
-  conversations: Conversation[];
+  conversations?: Conversation[];
 }): CellNode[] => {
   return nodes.map(node => {
     const id = node.Uuid;
@@ -59,8 +59,7 @@ export const transformCellsNodes = ({
     const presignedUrlExpiresAt =
       presignedGetExpiresAt !== undefined ? new Date(Number(presignedGetExpiresAt) * TIME_IN_MILLIS.SECOND) : null;
 
-    const conversationQualifiedId = parseQualifiedId(node.ContextWorkspace?.Uuid ?? '');
-    const conversation = conversations.find(conversation => conversation.qualifiedId.id === conversationQualifiedId.id);
+    const conversation = getConversation(node, conversations);
 
     const userQualifiedId = getUserQualifiedIdFromNode(node);
     const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) ?? null;
@@ -108,6 +107,17 @@ export const transformCellsNodes = ({
   });
 };
 
+const getConversation = (node: RestNode, conversations: Conversation[]): Conversation | undefined => {
+  const conversationUuid = node.ContextWorkspace?.Uuid;
+
+  if (!isNonEmptyString(conversationUuid) || conversations.length === 0) {
+    return undefined;
+  }
+
+  const conversationQualifiedId = parseQualifiedId(conversationUuid);
+  return conversations.find(conversation => conversation.qualifiedId.id === conversationQualifiedId.id);
+};
+
 const getPreviewImageUrl = (node: RestNode): string | undefined => {
   return node.Previews?.find(preview => preview.ContentType?.startsWith('image/') === true)?.PreSignedGET?.Url;
 };
@@ -121,7 +131,13 @@ const getUploadedAtTimestamp = (node: RestNode): number => {
 };
 
 const getFileSize = (node: RestNode): string => {
-  return node.Size !== undefined ? formatBytes(node.Size as unknown as number) : '-';
+  const isSizeMissing = isNullOrUndefined(node.Size);
+
+  if (isSizeMissing && node.Type !== 'COLLECTION') {
+    return '-';
+  }
+
+  return formatBytes((node.Size ?? 0) as unknown as number);
 };
 
 const getOwner = (node: RestNode): string => {

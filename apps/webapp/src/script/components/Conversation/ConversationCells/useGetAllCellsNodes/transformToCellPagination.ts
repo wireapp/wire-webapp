@@ -17,21 +17,18 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
-import {RestNode} from 'cells-sdk-ts';
+import {RestPagination} from 'cells-sdk-ts';
 
-export const getUserQualifiedIdFromNode = (node: RestNode): QualifiedId | null => {
-  const userQualifiedIdJson = node.UserMetadata?.find(
-    metadata => metadata.Namespace === 'usermeta-owner-uuid',
-  )?.JsonValue;
+import {CellPagination} from 'Components/Conversation/ConversationCells/common/cellPagination/cellPagination';
 
-  if (!isNonEmptyString(userQualifiedIdJson)) {
-    return null;
-  }
-
-  const userQualifiedId = JSON.parse(userQualifiedIdJson) as string;
-
-  return parseQualifiedId(userQualifiedId);
+export const transformToCellPagination = (pagination: RestPagination): CellPagination => {
+  return {
+    limit: pagination.Limit,
+    total: pagination.Total,
+    totalPages: pagination.TotalPages,
+    currentOffset: pagination.CurrentOffset,
+    prevOffset: pagination.PrevOffset,
+    nextOffset: pagination.NextOffset,
+    currentPage: pagination.CurrentPage,
+  };
 };
