@@ -176,7 +176,6 @@ describe('InputBar', () => {
     expect(preprocessingDisabled.container.querySelector('[data-uie-name="format-text"]')).toBeNull();
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('typing request is sent if the typing indicator mode is enabled and user is typing', async () => {
     const props = getDefaultProps();
     const {getByTestId, container} = renderInputBar(props);
