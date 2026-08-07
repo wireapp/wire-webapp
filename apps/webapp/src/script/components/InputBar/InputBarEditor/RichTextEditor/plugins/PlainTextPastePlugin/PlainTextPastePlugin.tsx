@@ -25,27 +25,18 @@ import {$getSelection, $isRangeSelection, COMMAND_PRIORITY_HIGH, PASTE_COMMAND} 
 export const PlainTextPastePlugin = (): null => {
   const [editor] = useLexicalComposerContext();
 
-  const handlePaste = useCallback(
-    (event: ClipboardEvent) => {
-      const plainText = event.clipboardData?.getData('text/plain');
+  const handlePaste = useCallback((event: ClipboardEvent) => {
+    const plainText = event.clipboardData?.getData('text/plain');
+    const selection = $getSelection();
 
-      if (plainText === undefined) {
-        return false;
-      }
+    if (!plainText || !$isRangeSelection(selection)) {
+      return false;
+    }
 
-      editor.update(() => {
-        const selection = $getSelection();
-
-        if ($isRangeSelection(selection)) {
-          selection.insertText(plainText);
-        }
-      });
-
-      event.preventDefault();
-      return true;
-    },
-    [editor],
-  );
+    selection.insertText(plainText);
+    event.preventDefault();
+    return true;
+  }, []);
 
   useEffect(() => {
     return editor.registerCommand(PASTE_COMMAND, handlePaste, COMMAND_PRIORITY_HIGH);
