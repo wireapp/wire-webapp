@@ -54,8 +54,13 @@ jest.mock('Components/avatar', () => ({
 }));
 
 const testFactory = new TestFactory();
+const defaultConfig = {
+  ALLOWED_IMAGE_TYPES: [],
+  FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
+};
 
 let eventRepository: EventRepository;
+let getConfigSpy: jasmine.Spy;
 let searchRepository: SearchRepository;
 let storageRepository: StorageRepository;
 
@@ -75,10 +80,7 @@ beforeAll(async () => {
     return storageRepository;
   });
 
-  spyOn(Config, 'getConfig').and.returnValue({
-    ALLOWED_IMAGE_TYPES: [],
-    FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
-  });
+  getConfigSpy = spyOn(Config, 'getConfig').and.returnValue(defaultConfig);
 });
 
 describe('InputBar', () => {
@@ -120,6 +122,7 @@ describe('InputBar', () => {
   });
 
   afterEach(() => {
+    getConfigSpy.and.returnValue(defaultConfig);
     jest.clearAllMocks();
   });
 
@@ -148,19 +151,29 @@ describe('InputBar', () => {
     expect(inputBar.textContent).toBe(testMessage);
   });
 
-  it('checks whether message preprocessing is disabled by the startup feature toggle', async () => {
-    const isFeatureToggleEnabled = jest.fn(() => false);
-    const featureToggleRootContextValue = createRootContextValueForTest({
-      isFeatureToggleEnabled,
-      translate: translateForTest,
+  it('hides markdown formatting controls when message preprocessing is disabled', () => {
+    getConfigSpy.and.returnValue({
+      ...defaultConfig,
+      FEATURE: {...defaultConfig.FEATURE, ENABLE_MESSAGE_FORMAT_BUTTONS: true},
     });
-    const featureToggleRootProviderWrapper = createRootProviderWrapperForTest(featureToggleRootContextValue);
 
-    render(withThemeAndRootContext(<InputBar {...getDefaultProps()} />, featureToggleRootProviderWrapper));
+    const renderWithMessagePreprocessingDisabled = (isDisabled: boolean) => {
+      const featureToggleRootContextValue = createRootContextValueForTest({
+        isFeatureToggleEnabled: (featureToggleName: string) =>
+          featureToggleName === disableMessagePreprocessingFeatureToggleName && isDisabled,
+        translate: translateForTest,
+      });
+      const featureToggleRootProviderWrapper = createRootProviderWrapperForTest(featureToggleRootContextValue);
 
-    await waitFor(() => {
-      expect(isFeatureToggleEnabled).toHaveBeenCalledWith(disableMessagePreprocessingFeatureToggleName);
-    });
+      return render(withThemeAndRootContext(<InputBar {...getDefaultProps()} />, featureToggleRootProviderWrapper));
+    };
+
+    const preprocessingEnabled = renderWithMessagePreprocessingDisabled(false);
+    expect(preprocessingEnabled.container.querySelector('[data-uie-name="format-text"]')).not.toBeNull();
+    preprocessingEnabled.unmount();
+
+    const preprocessingDisabled = renderWithMessagePreprocessingDisabled(true);
+    expect(preprocessingDisabled.container.querySelector('[data-uie-name="format-text"]')).toBeNull();
   });
 
   // eslint-disable-next-line jest/no-disabled-tests
