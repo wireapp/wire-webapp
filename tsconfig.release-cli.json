@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "es2024",
+    "lib": ["ES2024"],
+    "types": ["node"],
+    "rootDir": ".",
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true
+  },
+  "include": ["tools/release-cli/**/*.mts"],
+  "exclude": ["node_modules", "dist", "tmp"]
+}

@@ -17,7 +17,8 @@
  *
  */
 
-import {runReleaseMetadataCli} from './releaseMetadataCli';
+import {executeReleaseMetadataCommand} from './releaseMetadataCli';
+import type {ReleaseMetadataCommand} from './releaseMetadataCli';
 
 type ReleaseMetadataCliTestResult = {
   readonly errors: readonly string[];
@@ -25,10 +26,10 @@ type ReleaseMetadataCliTestResult = {
   readonly outputs: readonly string[];
 };
 
-function runCommand(commandLineArguments: readonly string[]): ReleaseMetadataCliTestResult {
+function runCommand(command: ReleaseMetadataCommand): ReleaseMetadataCliTestResult {
   const errors: string[] = [];
   const outputs: string[] = [];
-  const exitCode = runReleaseMetadataCli(commandLineArguments, {
+  const exitCode = executeReleaseMetadataCommand(command, {
     writeError(message) {
       errors.push(message);
     },
@@ -42,7 +43,7 @@ function runCommand(commandLineArguments: readonly string[]): ReleaseMetadataCli
 
 describe('releaseMetadataCli', () => {
   it('prints the release identifier from a valid release branch name', () => {
-    const actualResult = runCommand(['release-identifier-from-branch', 'release/2026-06-19.1']);
+    const actualResult = runCommand({kind: 'release-identifier-from-branch', releaseBranch: 'release/2026-06-19.1'});
 
     expect(actualResult).toEqual({
       errors: [],
@@ -52,7 +53,7 @@ describe('releaseMetadataCli', () => {
   });
 
   it('rejects an invalid release branch name', () => {
-    const actualResult = runCommand(['release-identifier-from-branch', 'release/2026-06-19.0']);
+    const actualResult = runCommand({kind: 'release-identifier-from-branch', releaseBranch: 'release/2026-06-19.0'});
 
     expect(actualResult).toEqual({
       errors: ['Invalid release branch name: release/2026-06-19.0'],
@@ -62,7 +63,7 @@ describe('releaseMetadataCli', () => {
   });
 
   it('prints the release branch name for the release identifier', () => {
-    const actualResult = runCommand(['release-branch', '2026-06-19.1']);
+    const actualResult = runCommand({kind: 'release-branch', releaseIdentifier: '2026-06-19.1'});
 
     expect(actualResult).toEqual({
       errors: [],
@@ -72,7 +73,7 @@ describe('releaseMetadataCli', () => {
   });
 
   it('rejects an invalid release branch release identifier', () => {
-    const actualResult = runCommand(['release-branch', 'release/2026-06-19.1']);
+    const actualResult = runCommand({kind: 'release-branch', releaseIdentifier: 'release/2026-06-19.1'});
 
     expect(actualResult).toEqual({
       errors: ['Invalid release identifier: release/2026-06-19.1'],
@@ -82,14 +83,16 @@ describe('releaseMetadataCli', () => {
   });
 
   it('prints the next beta tag name for the release identifier', () => {
-    const actualResult = runCommand([
-      'next-beta-tag',
-      '2026-06-19.1',
-      '2026-06-18.1-beta.9',
-      '2026-06-19.1-beta.1',
-      '2026-06-19.1-beta.2',
-      '2026-06-19.1-production',
-    ]);
+    const actualResult = runCommand({
+      kind: 'next-beta-tag',
+      releaseIdentifier: '2026-06-19.1',
+      existingTagNames: [
+        '2026-06-18.1-beta.9',
+        '2026-06-19.1-beta.1',
+        '2026-06-19.1-beta.2',
+        '2026-06-19.1-production',
+      ],
+    });
 
     expect(actualResult).toEqual({
       errors: [],
@@ -99,7 +102,7 @@ describe('releaseMetadataCli', () => {
   });
 
   it('prints the production tag name for the release identifier', () => {
-    const actualResult = runCommand(['production-tag', '2026-06-19.1']);
+    const actualResult = runCommand({kind: 'production-tag', releaseIdentifier: '2026-06-19.1'});
 
     expect(actualResult).toEqual({
       errors: [],
@@ -109,7 +112,7 @@ describe('releaseMetadataCli', () => {
   });
 
   it('rejects an invalid production tag release identifier', () => {
-    const actualResult = runCommand(['production-tag', '2026-06-19']);
+    const actualResult = runCommand({kind: 'production-tag', releaseIdentifier: '2026-06-19'});
 
     expect(actualResult).toEqual({
       errors: ['Invalid release identifier: 2026-06-19'],
@@ -119,7 +122,7 @@ describe('releaseMetadataCli', () => {
   });
 
   it('validates a production tag name', () => {
-    const actualResult = runCommand(['validate-production-tag', '2026-06-19.1-production']);
+    const actualResult = runCommand({kind: 'validate-production-tag', productionTag: '2026-06-19.1-production'});
 
     expect(actualResult).toEqual({
       errors: [],
@@ -129,12 +132,12 @@ describe('releaseMetadataCli', () => {
   });
 
   it('prints the ADR webapp build version', () => {
-    const actualResult = runCommand([
-      'webapp-build-version',
-      '2026-06-19.1-production',
-      '025edc663787b3d2da366f21a5958013201e6cd4',
-      'development',
-    ]);
+    const actualResult = runCommand({
+      kind: 'webapp-build-version',
+      buildReference: '2026-06-19.1-production',
+      fullCommitSha: '025edc663787b3d2da366f21a5958013201e6cd4',
+      environmentName: 'development',
+    });
 
     expect(actualResult).toEqual({
       errors: [],
@@ -144,12 +147,12 @@ describe('releaseMetadataCli', () => {
   });
 
   it('prints the complete legacy webapp build version', () => {
-    const actualResult = runCommand([
-      'webapp-build-version',
-      '2026-06-19-production.1',
-      '025edc663787b3d2da366f21a5958013201e6cd4',
-      'development',
-    ]);
+    const actualResult = runCommand({
+      kind: 'webapp-build-version',
+      buildReference: '2026-06-19-production.1',
+      fullCommitSha: '025edc663787b3d2da366f21a5958013201e6cd4',
+      environmentName: 'development',
+    });
 
     expect(actualResult).toEqual({
       errors: [],
@@ -161,12 +164,12 @@ describe('releaseMetadataCli', () => {
   it.each(['2026-07-20-staging.1'])(
     'prints the development webapp build version for non-production reference "%s"',
     buildReferenceName => {
-      const actualResult = runCommand([
-        'webapp-build-version',
-        buildReferenceName,
-        '025edc663787b3d2da366f21a5958013201e6cd4',
-        'development',
-      ]);
+      const actualResult = runCommand({
+        kind: 'webapp-build-version',
+        buildReference: buildReferenceName,
+        fullCommitSha: '025edc663787b3d2da366f21a5958013201e6cd4',
+        environmentName: 'development',
+      });
 
       expect(actualResult).toEqual({
         errors: [],
@@ -177,7 +180,7 @@ describe('releaseMetadataCli', () => {
   );
 
   it('rejects an invalid production tag name', () => {
-    const actualResult = runCommand(['validate-production-tag', '2026-06-19.0-production']);
+    const actualResult = runCommand({kind: 'validate-production-tag', productionTag: '2026-06-19.0-production'});
 
     expect(actualResult).toEqual({
       errors: ['Invalid production tag name: 2026-06-19.0-production'],
@@ -187,7 +190,7 @@ describe('releaseMetadataCli', () => {
   });
 
   it('prints a maintenance branch name for a valid maintenance line key', () => {
-    const actualResult = runCommand(['maintenance-branch', '2026-07-27.1-airgap-a']);
+    const actualResult = runCommand({kind: 'maintenance-branch', maintenanceLineKey: '2026-07-27.1-airgap-a'});
 
     expect(actualResult).toEqual({
       errors: [],
@@ -197,7 +200,7 @@ describe('releaseMetadataCli', () => {
   });
 
   it('rejects an invalid maintenance line key', () => {
-    const actualResult = runCommand(['maintenance-branch', '2026-07-27.0-airgap-a']);
+    const actualResult = runCommand({kind: 'maintenance-branch', maintenanceLineKey: '2026-07-27.0-airgap-a'});
 
     expect(actualResult).toEqual({
       errors: ['Invalid maintenance line key: 2026-07-27.0-airgap-a'],
@@ -207,7 +210,10 @@ describe('releaseMetadataCli', () => {
   });
 
   it('validates a maintenance tag name', () => {
-    const actualResult = runCommand(['validate-maintenance-tag', '2026-07-27.1-airgap-a-maintenance.1']);
+    const actualResult = runCommand({
+      kind: 'validate-maintenance-tag',
+      maintenanceTag: '2026-07-27.1-airgap-a-maintenance.1',
+    });
 
     expect(actualResult).toEqual({
       errors: [],
@@ -217,7 +223,10 @@ describe('releaseMetadataCli', () => {
   });
 
   it('rejects a malformed maintenance tag name', () => {
-    const actualResult = runCommand(['validate-maintenance-tag', '2026-07-27.1-airgap-a-maintenance.0']);
+    const actualResult = runCommand({
+      kind: 'validate-maintenance-tag',
+      maintenanceTag: '2026-07-27.1-airgap-a-maintenance.0',
+    });
 
     expect(actualResult).toEqual({
       errors: ['Invalid maintenance tag name: 2026-07-27.1-airgap-a-maintenance.0'],
@@ -227,13 +236,15 @@ describe('releaseMetadataCli', () => {
   });
 
   it('prints the next maintenance tag name and ignores unrelated tags', () => {
-    const actualResult = runCommand([
-      'next-maintenance-tag',
-      '2026-07-27.1-airgap-a',
-      '2026-07-27.1-airgap-b-maintenance.9',
-      '2026-07-27.1-airgap-a-maintenance.9',
-      '2026-07-27.1-production',
-    ]);
+    const actualResult = runCommand({
+      kind: 'next-maintenance-tag',
+      maintenanceLineKey: '2026-07-27.1-airgap-a',
+      existingTagNames: [
+        '2026-07-27.1-airgap-b-maintenance.9',
+        '2026-07-27.1-airgap-a-maintenance.9',
+        '2026-07-27.1-production',
+      ],
+    });
 
     expect(actualResult).toEqual({
       errors: [],
@@ -243,7 +254,11 @@ describe('releaseMetadataCli', () => {
   });
 
   it('prints the next maintenance tag name when there is no existing tag', () => {
-    const actualResult = runCommand(['next-maintenance-tag', '2026-07-27.1-airgap-a']);
+    const actualResult = runCommand({
+      kind: 'next-maintenance-tag',
+      maintenanceLineKey: '2026-07-27.1-airgap-a',
+      existingTagNames: [],
+    });
 
     expect(actualResult).toEqual({
       errors: [],
@@ -253,11 +268,11 @@ describe('releaseMetadataCli', () => {
   });
 
   it('validates a matching maintenance source Production tag', () => {
-    const actualResult = runCommand([
-      'validate-maintenance-source',
-      '2026-07-27.1-airgap-a',
-      '2026-07-27.1-production',
-    ]);
+    const actualResult = runCommand({
+      kind: 'validate-maintenance-source',
+      maintenanceLineKey: '2026-07-27.1-airgap-a',
+      sourceProductionTag: '2026-07-27.1-production',
+    });
 
     expect(actualResult).toEqual({
       errors: [],
@@ -267,11 +282,11 @@ describe('releaseMetadataCli', () => {
   });
 
   it('rejects a mismatching maintenance source Production tag', () => {
-    const actualResult = runCommand([
-      'validate-maintenance-source',
-      '2026-07-27.1-airgap-a',
-      '2026-07-28.1-production',
-    ]);
+    const actualResult = runCommand({
+      kind: 'validate-maintenance-source',
+      maintenanceLineKey: '2026-07-27.1-airgap-a',
+      sourceProductionTag: '2026-07-28.1-production',
+    });
 
     expect(actualResult).toEqual({
       errors: [
@@ -283,24 +298,16 @@ describe('releaseMetadataCli', () => {
   });
 
   it('rejects a legacy maintenance source Production tag', () => {
-    const actualResult = runCommand([
-      'validate-maintenance-source',
-      '2026-07-27.1-airgap-a',
-      '2026-07-27-production.1',
-    ]);
+    const actualResult = runCommand({
+      kind: 'validate-maintenance-source',
+      maintenanceLineKey: '2026-07-27.1-airgap-a',
+      sourceProductionTag: '2026-07-27-production.1',
+    });
 
     expect(actualResult).toEqual({
       errors: ['Invalid production tag name: 2026-07-27-production.1'],
       exitCode: 1,
       outputs: [],
     });
-  });
-
-  it('prints usage text for missing command arguments', () => {
-    const actualResult = runCommand(['next-beta-tag']);
-
-    expect(actualResult.exitCode).toBe(1);
-    expect(actualResult.outputs).toEqual([]);
-    expect(actualResult.errors[0]).toContain('Usage:');
   });
 });

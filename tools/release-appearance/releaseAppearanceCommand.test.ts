@@ -26,12 +26,12 @@ import {Maybe, Result} from 'true-myth';
 import {renderPersistentComment} from './releaseAppearance.ts';
 import {
   executeReleaseAppearanceCommand,
-  parseCommandLineArguments,
   prepareCommentOperation,
   readCommandEnvironment,
 } from './releaseAppearanceCommand.ts';
 import type {
   ExecuteReleaseAppearanceCommandOptions,
+  ParsedCommand,
   ReleaseAppearanceCommandDependencies,
 } from './releaseAppearanceCommand.ts';
 import {createGitHubClient} from './githubClient.ts';
@@ -57,6 +57,33 @@ const betaTag = '2026-01-02.1-beta.1';
 const betaTwoTag = '2026-01-02.1-beta.2';
 const betaTwoCommit = 'f'.repeat(40);
 const productionTag = '2026-01-02.1-production';
+
+type CreateBetaTestCommandOptions = {
+  readonly releaseTag: string;
+  readonly releaseCommit: string;
+  readonly executionMode: 'write' | 'dry-run';
+};
+
+type CreateProductionTestCommandOptions = {
+  readonly releaseTag: string;
+  readonly releaseCommit: string;
+  readonly promotedBetaTag: string;
+  readonly executionMode: 'write' | 'dry-run';
+};
+
+function createBetaTestCommand(createBetaTestCommandOptions: CreateBetaTestCommandOptions): ParsedCommand {
+  const {releaseTag, releaseCommit, executionMode} = createBetaTestCommandOptions;
+
+  return {stage: 'beta', releaseTag, releaseCommit, executionMode};
+}
+
+function createProductionTestCommand(
+  createProductionTestCommandOptions: CreateProductionTestCommandOptions,
+): ParsedCommand {
+  const {releaseTag, releaseCommit, promotedBetaTag, executionMode} = createProductionTestCommandOptions;
+
+  return {stage: 'production', releaseTag, releaseCommit, promotedBetaTag, executionMode};
+}
 
 const commandEnvironment: NodeJS.ProcessEnv = {
   GITHUB_API_URL: 'https://api.github.com',
@@ -94,7 +121,7 @@ type FakeGitHubClientFixture = {
 };
 
 type RunCommandOptions = {
-  readonly commandLineArguments: readonly string[];
+  readonly command: ParsedCommand;
   readonly executeGitCommand: ExecuteGitCommand;
   readonly githubClient: GitHubClient;
   readonly informationWriteFailure?: string;
@@ -349,7 +376,7 @@ async function runCommand(runCommandOptions: RunCommandOptions): Promise<{
   const informationWriteAttempts: string[] = [];
   const summaries: string[] = [];
   const options: ExecuteReleaseAppearanceCommandOptions = {
-    commandLineArguments: runCommandOptions.commandLineArguments,
+    command: runCommandOptions.command,
     environment: commandEnvironment,
     dependencies: createDependencies({
       executeGitCommand: runCommandOptions.executeGitCommand,
@@ -366,75 +393,6 @@ async function runCommand(runCommandOptions: RunCommandOptions): Promise<{
   const result = await executeReleaseAppearanceCommand(options);
   return {result, failureMessages, informationMessages, informationWriteAttempts, summaries};
 }
-
-describe('parseCommandLineArguments', () => {
-  it('normal Beta parsing defaults to write mode', () => {
-    const actualResult = parseCommandLineArguments(['beta', betaTag, releaseCommit]);
-
-    assert(actualResult.isOk);
-    expect(actualResult.value).toEqual({
-      stage: 'beta',
-      releaseTag: betaTag,
-      releaseCommit,
-      executionMode: 'write',
-    });
-  });
-
-  it('normal Production parsing defaults to write mode', () => {
-    const actualResult = parseCommandLineArguments(['production', productionTag, releaseCommit, betaTag]);
-
-    assert(actualResult.isOk);
-    expect(actualResult.value).toEqual({
-      stage: 'production',
-      releaseTag: productionTag,
-      releaseCommit,
-      promotedBetaTag: betaTag,
-      executionMode: 'write',
-    });
-  });
-
-  it('accepts final --dry-run for Beta', () => {
-    const actualResult = parseCommandLineArguments(['beta', betaTag, releaseCommit, '--dry-run']);
-
-    assert(actualResult.isOk);
-    expect(actualResult.value.executionMode).toBe('dry-run');
-  });
-
-  it('accepts final --dry-run for Production', () => {
-    const actualResult = parseCommandLineArguments(['production', productionTag, releaseCommit, betaTag, '--dry-run']);
-
-    assert(actualResult.isOk);
-    expect(actualResult.value.executionMode).toBe('dry-run');
-  });
-
-  it('rejects repeated --dry-run', () => {
-    const actualResult = parseCommandLineArguments(['beta', betaTag, releaseCommit, '--dry-run', '--dry-run']);
-
-    expect(actualResult.isErr).toBe(true);
-  });
-
-  it('rejects unknown options and additional arguments', () => {
-    const unknownOptionResult = parseCommandLineArguments(['beta', betaTag, releaseCommit, '--write']);
-    const additionalArgumentResult = parseCommandLineArguments(['beta', betaTag, releaseCommit, '--dry-run', 'extra']);
-
-    expect(unknownOptionResult.isErr).toBe(true);
-    expect(additionalArgumentResult.isErr).toBe(true);
-  });
-
-  it('rejects misplaced --dry-run', () => {
-    const actualResult = parseCommandLineArguments(['production', productionTag, '--dry-run', releaseCommit, betaTag]);
-
-    expect(actualResult.isErr).toBe(true);
-  });
-
-  it('requires full release commit SHAs', () => {
-    const abbreviatedCommitResult = parseCommandLineArguments(['beta', betaTag, 'abcdef0']);
-    const longCommitResult = parseCommandLineArguments(['beta', betaTag, 'a'.repeat(64)]);
-
-    expect(abbreviatedCommitResult.isErr).toBe(true);
-    expect(longCommitResult.isErr).toBe(true);
-  });
-});
 
 describe('readCommandEnvironment', () => {
   it('parses and validates required command environment', () => {
@@ -491,7 +449,7 @@ describe('executeReleaseAppearanceCommand', () => {
       },
     });
     const commandPromise = runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'write'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand({commits: commitShas}),
       githubClient: fakeGitHubClient.githubClient,
@@ -524,7 +482,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
   it('formats summary durations in milliseconds below one second and seconds otherwise', async () => {
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'write'}),
       executeGitCommand: createFakeGitCommand(),
       githubClient: createFakeGitHubClient().githubClient,
       now: createTimestampSequence([0, 0, 250, 250, 250, 250, 250, 250, 1500, 1500, 1500, 1500, 1500, 6537, 15618]),
@@ -560,7 +518,7 @@ describe('executeReleaseAppearanceCommand', () => {
       },
     });
     const commandPromise = runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'dry-run'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand({commits: commitShas}),
       githubClient: fakeGitHubClient.githubClient,
@@ -614,7 +572,7 @@ describe('executeReleaseAppearanceCommand', () => {
       },
     });
     const commandPromise = runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'dry-run'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -649,7 +607,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'write'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -715,7 +673,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTwoTag, betaCommit],
+      command: createBetaTestCommand({releaseTag: betaTwoTag, releaseCommit: betaCommit, executionMode: 'write'}),
       now: readZeroTimestamp,
       executeGitCommand: fakeGitCommand,
       githubClient: fakeGitHubClient.githubClient,
@@ -753,7 +711,11 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTwoTag, betaTwoCommit],
+      command: createBetaTestCommand({
+        releaseTag: betaTwoTag,
+        releaseCommit: betaTwoCommit,
+        executionMode: 'write',
+      }),
       now: readZeroTimestamp,
       executeGitCommand: fakeGitCommand,
       githubClient: fakeGitHubClient.githubClient,
@@ -789,7 +751,11 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTwoTag, betaTwoCommit],
+      command: createBetaTestCommand({
+        releaseTag: betaTwoTag,
+        releaseCommit: betaTwoCommit,
+        executionMode: 'write',
+      }),
       now: readZeroTimestamp,
       executeGitCommand: fakeGitCommand,
       githubClient: fakeGitHubClient.githubClient,
@@ -815,7 +781,12 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['production', productionTag, releaseCommit, betaTag],
+      command: createProductionTestCommand({
+        releaseTag: productionTag,
+        releaseCommit,
+        promotedBetaTag: betaTag,
+        executionMode: 'write',
+      }),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -844,7 +815,12 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['production', productionTag, releaseCommit, betaTag, '--dry-run'],
+      command: createProductionTestCommand({
+        releaseTag: productionTag,
+        releaseCommit,
+        promotedBetaTag: betaTag,
+        executionMode: 'dry-run',
+      }),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -948,7 +924,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'dry-run'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient,
@@ -995,7 +971,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'dry-run'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -1025,7 +1001,7 @@ describe('executeReleaseAppearanceCommand', () => {
     const fakeGitHubClient = createFakeGitHubClient();
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', 'invalid-beta-tag', releaseCommit, '--dry-run'],
+      command: createBetaTestCommand({releaseTag: 'invalid-beta-tag', releaseCommit, executionMode: 'dry-run'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -1050,7 +1026,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'dry-run'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand({commits: [failedDiscoveryCommit, betaCommit]}),
       githubClient: fakeGitHubClient.githubClient,
@@ -1073,7 +1049,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'write'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -1110,7 +1086,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'write'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -1137,7 +1113,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'write'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -1163,7 +1139,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'write'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -1183,7 +1159,7 @@ describe('executeReleaseAppearanceCommand', () => {
     const fakeGitHubClient = createFakeGitHubClient();
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'write'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand({bootstrap: true}),
       githubClient: fakeGitHubClient.githubClient,
@@ -1202,7 +1178,7 @@ describe('executeReleaseAppearanceCommand', () => {
     const fakeGitHubClient = createFakeGitHubClient();
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'dry-run'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand({bootstrap: true}),
       githubClient: fakeGitHubClient.githubClient,
@@ -1239,7 +1215,7 @@ describe('executeReleaseAppearanceCommand', () => {
     });
 
     const commandRun = await runCommand({
-      commandLineArguments: ['beta', betaTag, releaseCommit, '--dry-run'],
+      command: createBetaTestCommand({releaseTag: betaTag, releaseCommit, executionMode: 'dry-run'}),
       now: readZeroTimestamp,
       executeGitCommand: createFakeGitCommand(),
       githubClient: fakeGitHubClient.githubClient,
@@ -1257,8 +1233,8 @@ describe('executeReleaseAppearanceCommand', () => {
 });
 
 describe('native release appearance command entrypoint', () => {
-  it('loads dependencies and reports usage failure', async () => {
-    const commandProcess = spawn(process.execPath, ['tools/release-appearance/releaseAppearanceCommand.ts'], {
+  it('reports missing required arguments through the Commander entrypoint', async () => {
+    const commandProcess = spawn(process.execPath, ['tools/release-cli/releaseAppearanceCommand.mts', 'beta'], {
       cwd: process.cwd(),
       env: process.env,
     });
@@ -1280,6 +1256,6 @@ describe('native release appearance command entrypoint', () => {
     const exitCode = await exitCodePromise;
 
     expect(exitCode).toBe(1);
-    expect(standardError).toMatch(/Usage: beta/);
+    expect(standardError).toMatch(/error: missing required argument 'beta-tag'/);
   });
 });

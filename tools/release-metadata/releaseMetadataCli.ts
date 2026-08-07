@@ -17,7 +17,7 @@
  *
  */
 
-import process from 'node:process';
+import {match} from 'ts-pattern';
 
 import {
   createMaintenanceBranchName,
@@ -30,28 +30,59 @@ import {
   validateMaintenanceSource,
   validateMaintenanceTagName,
   validateProductionTagName,
-} from './releaseMetadata';
+} from './releaseMetadata.ts';
 
-type ReleaseMetadataCliDependencies = {
+export type ReleaseMetadataCliDependencies = {
   readonly writeError: (message: string) => void;
   readonly writeOutput: (message: string) => void;
 };
 
-const nodeExecutableAndScriptPathArgumentCount = 2;
-
-const usageText = [
-  'Usage:',
-  '  releaseMetadataCli.ts release-identifier-from-branch <release/YYYY-MM-DD.N>',
-  '  releaseMetadataCli.ts release-branch <YYYY-MM-DD.N>',
-  '  releaseMetadataCli.ts next-beta-tag <YYYY-MM-DD.N> [existing-tag ...]',
-  '  releaseMetadataCli.ts production-tag <YYYY-MM-DD.N>',
-  '  releaseMetadataCli.ts validate-production-tag <YYYY-MM-DD.N-production>',
-  '  releaseMetadataCli.ts maintenance-branch <YYYY-MM-DD.N-qualifier[-qualifier ...]>',
-  '  releaseMetadataCli.ts validate-maintenance-tag <maintenance-line-key-maintenance.X>',
-  '  releaseMetadataCli.ts next-maintenance-tag <maintenance-line-key> [existing-tag ...]',
-  '  releaseMetadataCli.ts validate-maintenance-source <maintenance-line-key> <YYYY-MM-DD.N-production>',
-  '  releaseMetadataCli.ts webapp-build-version <build-reference-or-empty> <full-commit-sha> <main|development|production>',
-].join('\n');
+export type ReleaseMetadataCommand =
+  | {
+      readonly kind: 'release-identifier-from-branch';
+      readonly releaseBranch: string;
+    }
+  | {
+      readonly kind: 'release-branch';
+      readonly releaseIdentifier: string;
+    }
+  | {
+      readonly kind: 'next-beta-tag';
+      readonly releaseIdentifier: string;
+      readonly existingTagNames: readonly string[];
+    }
+  | {
+      readonly kind: 'maintenance-branch';
+      readonly maintenanceLineKey: string;
+    }
+  | {
+      readonly kind: 'validate-maintenance-tag';
+      readonly maintenanceTag: string;
+    }
+  | {
+      readonly kind: 'next-maintenance-tag';
+      readonly maintenanceLineKey: string;
+      readonly existingTagNames: readonly string[];
+    }
+  | {
+      readonly kind: 'validate-maintenance-source';
+      readonly maintenanceLineKey: string;
+      readonly sourceProductionTag: string;
+    }
+  | {
+      readonly kind: 'production-tag';
+      readonly releaseIdentifier: string;
+    }
+  | {
+      readonly kind: 'validate-production-tag';
+      readonly productionTag: string;
+    }
+  | {
+      readonly kind: 'webapp-build-version';
+      readonly buildReference: string;
+      readonly fullCommitSha: string;
+      readonly environmentName: string;
+    };
 
 function writeResult(
   result:
@@ -76,63 +107,62 @@ function writeResult(
   return 0;
 }
 
-export function runReleaseMetadataCli(
-  commandLineArguments: readonly string[],
+export function executeReleaseMetadataCommand(
+  command: ReleaseMetadataCommand,
   dependencies: ReleaseMetadataCliDependencies,
 ): number {
-  const [commandName, primaryValue, ...remainingValues] = commandLineArguments;
-
-  if (commandName === 'release-identifier-from-branch' && primaryValue !== undefined) {
-    return writeResult(extractReleaseIdentifierFromBranchName(primaryValue), dependencies);
-  }
-
-  if (commandName === 'release-branch' && primaryValue !== undefined) {
-    return writeResult(createReleaseBranchName(primaryValue), dependencies);
-  }
-
-  if (commandName === 'next-beta-tag' && primaryValue !== undefined) {
-    return writeResult(createNextBetaTagName(primaryValue, remainingValues), dependencies);
-  }
-
-  if (commandName === 'maintenance-branch' && primaryValue !== undefined && remainingValues.length === 0) {
-    return writeResult(createMaintenanceBranchName(primaryValue), dependencies);
-  }
-
-  if (commandName === 'validate-maintenance-tag' && primaryValue !== undefined && remainingValues.length === 0) {
-    return writeResult(validateMaintenanceTagName(primaryValue), dependencies);
-  }
-
-  if (commandName === 'next-maintenance-tag' && primaryValue !== undefined) {
-    return writeResult(createNextMaintenanceTagName(primaryValue, remainingValues), dependencies);
-  }
-
-  if (commandName === 'validate-maintenance-source' && primaryValue !== undefined && remainingValues.length === 1) {
-    return writeResult(validateMaintenanceSource(primaryValue, remainingValues[0]), dependencies);
-  }
-
-  if (commandName === 'production-tag' && primaryValue !== undefined) {
-    return writeResult(createProductionTagName(primaryValue), dependencies);
-  }
-
-  if (commandName === 'validate-production-tag' && primaryValue !== undefined) {
-    return writeResult(validateProductionTagName(primaryValue), dependencies);
-  }
-
-  if (commandName === 'webapp-build-version' && primaryValue !== undefined && remainingValues.length === 2) {
-    return writeResult(resolveWebappBuildVersion(primaryValue, remainingValues[0], remainingValues[1]), dependencies);
-  }
-
-  dependencies.writeError(usageText);
-  return 1;
-}
-
-if (require.main === module) {
-  process.exitCode = runReleaseMetadataCli(process.argv.slice(nodeExecutableAndScriptPathArgumentCount), {
-    writeError(message): void {
-      console.error(message);
-    },
-    writeOutput(message): void {
-      console.log(message);
-    },
-  });
+  return match(command)
+    .with({kind: 'release-identifier-from-branch'}, releaseIdentifierCommand => {
+      return writeResult(extractReleaseIdentifierFromBranchName(releaseIdentifierCommand.releaseBranch), dependencies);
+    })
+    .with({kind: 'release-branch'}, releaseBranchCommand => {
+      return writeResult(createReleaseBranchName(releaseBranchCommand.releaseIdentifier), dependencies);
+    })
+    .with({kind: 'next-beta-tag'}, nextBetaTagCommand => {
+      return writeResult(
+        createNextBetaTagName(nextBetaTagCommand.releaseIdentifier, nextBetaTagCommand.existingTagNames),
+        dependencies,
+      );
+    })
+    .with({kind: 'maintenance-branch'}, maintenanceBranchCommand => {
+      return writeResult(createMaintenanceBranchName(maintenanceBranchCommand.maintenanceLineKey), dependencies);
+    })
+    .with({kind: 'validate-maintenance-tag'}, validateMaintenanceTagCommand => {
+      return writeResult(validateMaintenanceTagName(validateMaintenanceTagCommand.maintenanceTag), dependencies);
+    })
+    .with({kind: 'next-maintenance-tag'}, nextMaintenanceTagCommand => {
+      return writeResult(
+        createNextMaintenanceTagName(
+          nextMaintenanceTagCommand.maintenanceLineKey,
+          nextMaintenanceTagCommand.existingTagNames,
+        ),
+        dependencies,
+      );
+    })
+    .with({kind: 'validate-maintenance-source'}, validateMaintenanceSourceCommand => {
+      return writeResult(
+        validateMaintenanceSource(
+          validateMaintenanceSourceCommand.maintenanceLineKey,
+          validateMaintenanceSourceCommand.sourceProductionTag,
+        ),
+        dependencies,
+      );
+    })
+    .with({kind: 'production-tag'}, productionTagCommand => {
+      return writeResult(createProductionTagName(productionTagCommand.releaseIdentifier), dependencies);
+    })
+    .with({kind: 'validate-production-tag'}, validateProductionTagCommand => {
+      return writeResult(validateProductionTagName(validateProductionTagCommand.productionTag), dependencies);
+    })
+    .with({kind: 'webapp-build-version'}, webappBuildVersionCommand => {
+      return writeResult(
+        resolveWebappBuildVersion(
+          webappBuildVersionCommand.buildReference,
+          webappBuildVersionCommand.fullCommitSha,
+          webappBuildVersionCommand.environmentName,
+        ),
+        dependencies,
+      );
+    })
+    .exhaustive();
 }

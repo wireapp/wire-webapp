@@ -105,7 +105,7 @@ jobs:
             exit 1
           fi
 
-          release_branch="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts release-branch "${RELEASE_IDENTIFIER}")"
+          release_branch="$(node ./tools/release-cli/releaseMetadataCli.mts release-branch "${RELEASE_IDENTIFIER}")"
 
           {
             echo "release_identifier=${RELEASE_IDENTIFIER}"
@@ -475,7 +475,7 @@ jobs:
                 print $2;
               }'
           )
-          beta_tag_name="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts next-beta-tag "${RELEASE_IDENTIFIER}" "${existing_beta_tag_names[@]}")"
+          beta_tag_name="$(node ./tools/release-cli/releaseMetadataCli.mts next-beta-tag "${RELEASE_IDENTIFIER}" "${existing_beta_tag_names[@]}")"
 
           git config user.email "zebot@users.noreply.github.com"
           git config user.name "Zebot"
@@ -565,7 +565,7 @@ jobs:
           WORKFLOW_TOOLING_COMMIT_SHA: ${{ github.sha }}
         run: |
           node \
-            tools/release-appearance/releaseAppearanceCommand.ts \
+            tools/release-cli/releaseAppearanceCommand.mts \
             beta \
             "${BETA_TAG}" \
             "${RELEASE_COMMIT_SHA}"
@@ -750,7 +750,7 @@ jobs:
 
           git fetch --tags origin
 
-          production_tag_name="$(./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/release-metadata/releaseMetadataCli.ts production-tag "${RELEASE_IDENTIFIER}")"
+          production_tag_name="$(node ./tools/release-cli/releaseMetadataCli.mts production-tag "${RELEASE_IDENTIFIER}")"
           beta_tag_commit_sha="$(git rev-parse "${BETA_TAG_NAME}^{commit}")"
 
           if [[ "${beta_tag_commit_sha}" != "${RELEASE_COMMIT_SHA}" ]]; then
@@ -950,7 +950,7 @@ jobs:
           WORKFLOW_TOOLING_COMMIT_SHA: ${{ github.sha }}
         run: |
           node \
-            tools/release-appearance/releaseAppearanceCommand.ts \
+            tools/release-cli/releaseAppearanceCommand.mts \
             production \
             "${PRODUCTION_TAG}" \
             "${RELEASE_COMMIT_SHA}" \

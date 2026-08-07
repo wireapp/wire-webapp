@@ -17,19 +17,12 @@
  *
  */
 
-import * as actionsCore from '@actions/core';
 import {isError, isNonEmptyStringAndNotWhitespace} from '@sindresorhus/is';
 import pMap from 'p-map';
 import {Maybe, Result, Unit} from 'true-myth';
 import {match} from 'ts-pattern';
 
-import {execFile} from 'node:child_process';
-import {promisify} from 'node:util';
-
-import {createDefaultGitHubActionsProgressReporter} from './githubActionsProgressReporter.ts';
-import {createGitHubClient} from './githubClient.ts';
 import type {GitHubClient, IssueCommentRecord, PullRequestRecord} from './githubClient.ts';
-import {createRuntimeKyHttpClient} from './httpClient.ts';
 import {
   mergeReleaseAppearanceComments,
   parsePersistentMarkerComment,
@@ -83,7 +76,7 @@ export type ReleaseAppearanceCommandDependencies = {
 };
 
 export type ExecuteReleaseAppearanceCommandOptions = {
-  readonly commandLineArguments: readonly string[];
+  readonly command: ParsedCommand;
   readonly environment: NodeJS.ProcessEnv;
   readonly dependencies: ReleaseAppearanceCommandDependencies;
 };
@@ -270,14 +263,6 @@ type FinalizeSummaryOptions = {
   readonly commandStartedAtMilliseconds: number;
 };
 
-const betaCommandArgumentCount = 3;
-const productionCommandArgumentCount = 4;
-const processArgumentStartIndex = 2;
-const stageArgumentIndex = 0;
-const releaseTagArgumentIndex = 1;
-const releaseCommitArgumentIndex = 2;
-const promotedBetaTagArgumentIndex = 3;
-const dryRunFlag = '--dry-run';
 const fullGitCommitPattern = /^[0-9a-f]{40}$/i;
 const millisecondsPerSecond = 1000;
 
@@ -293,7 +278,7 @@ function errorMessage(error: unknown): string {
   return isError(error) ? error.message : 'Unknown failure';
 }
 
-function redactSecret(message: string, secret: string): string {
+export function redactSecret(message: string, secret: string): string {
   return secret.length === 0 ? message : message.replaceAll(secret, '[REDACTED]');
 }
 
@@ -305,118 +290,70 @@ function formatPullRequestFailure(pullRequestFailure: PullRequestFailure): strin
   return `Pull request #${pullRequestFailure.pullRequestNumber}: ${pullRequestFailure.message}`;
 }
 
-function usageFailure(): Result<ParsedCommand, Error> {
-  return createFailure(
-    'Usage: beta <beta-tag> <release-commit-sha> [--dry-run] or production <production-tag> <release-commit-sha> <promoted-beta-tag> [--dry-run]',
-  );
-}
+type CreateBetaCommandOptions = {
+  readonly betaTag: string;
+  readonly releaseCommit: string;
+  readonly executionMode: ExecutionMode;
+};
 
-function parseExecutionMode(
-  commandLineArguments: readonly string[],
-  writeArgumentCount: number,
-): Result<ExecutionMode, Error> {
-  if (commandLineArguments.length === writeArgumentCount) {
-    return createSuccess('write');
+type CreateProductionCommandOptions = {
+  readonly productionTag: string;
+  readonly releaseCommit: string;
+  readonly promotedBetaTag: string;
+  readonly executionMode: ExecutionMode;
+};
+
+function validateRequiredCommandValue(value: string, valueName: string): Result<string, Error> {
+  if (!isNonEmptyStringAndNotWhitespace(value)) {
+    return createFailure(`${valueName} must not be empty`);
   }
 
-  const dryRunFlagArgument = Maybe.of(commandLineArguments[writeArgumentCount]);
-  if (
-    commandLineArguments.length === writeArgumentCount + 1 &&
-    dryRunFlagArgument.isJust &&
-    dryRunFlagArgument.value === dryRunFlag
-  ) {
-    return createSuccess('dry-run');
+  return createSuccess(value);
+}
+
+function validateReleaseCommit(releaseCommit: string): Result<string, Error> {
+  if (!fullGitCommitPattern.test(releaseCommit)) {
+    return createFailure('Release commit SHA must contain exactly 40 hexadecimal characters');
   }
 
-  return createFailure('Dry-run mode requires exactly one final --dry-run argument');
+  return createSuccess(releaseCommit);
 }
 
-function readRequiredArgument(
-  commandLineArguments: readonly string[],
-  argumentIndex: number,
-  argumentName: string,
-): Result<string, Error> {
-  const argument = Maybe.of(commandLineArguments[argumentIndex]);
-  if (argument.isNothing || !isNonEmptyStringAndNotWhitespace(argument.value)) {
-    return createFailure(`${argumentName} must not be empty`);
-  }
-
-  return createSuccess(argument.value);
-}
-
-function readReleaseCommit(commandLineArguments: readonly string[]): Result<string, Error> {
-  return readRequiredArgument(commandLineArguments, releaseCommitArgumentIndex, 'Release commit SHA').andThen(
-    releaseCommit => {
-      return fullGitCommitPattern.test(releaseCommit)
-        ? createSuccess(releaseCommit)
-        : createFailure('Release commit SHA must contain exactly 40 hexadecimal characters');
-    },
-  );
-}
-
-function parseBetaCommand(
-  commandLineArguments: readonly string[],
-  executionMode: ExecutionMode,
-): Result<ParsedCommand, Error> {
-  const betaTagResult = readRequiredArgument(commandLineArguments, releaseTagArgumentIndex, 'Beta tag');
+export function createBetaCommand(createBetaCommandOptions: CreateBetaCommandOptions): Result<ParsedCommand, Error> {
+  const {betaTag, releaseCommit, executionMode} = createBetaCommandOptions;
+  const betaTagResult = validateRequiredCommandValue(betaTag, 'Beta tag');
   if (betaTagResult.isErr) {
     return createFailure(betaTagResult.error.message);
   }
 
-  return readReleaseCommit(commandLineArguments).map(releaseCommit => {
-    return {stage: 'beta', releaseTag: betaTagResult.value, releaseCommit, executionMode};
+  return validateReleaseCommit(releaseCommit).map(validatedReleaseCommit => {
+    return {stage: 'beta', releaseTag: betaTagResult.value, releaseCommit: validatedReleaseCommit, executionMode};
   });
 }
 
-function parseProductionCommand(
-  commandLineArguments: readonly string[],
-  executionMode: ExecutionMode,
+export function createProductionCommand(
+  createProductionCommandOptions: CreateProductionCommandOptions,
 ): Result<ParsedCommand, Error> {
-  const productionTagResult = readRequiredArgument(commandLineArguments, releaseTagArgumentIndex, 'Production tag');
+  const {productionTag, releaseCommit, promotedBetaTag, executionMode} = createProductionCommandOptions;
+  const productionTagResult = validateRequiredCommandValue(productionTag, 'Production tag');
   if (productionTagResult.isErr) {
     return createFailure(productionTagResult.error.message);
   }
 
-  const releaseCommitResult = readReleaseCommit(commandLineArguments);
+  const releaseCommitResult = validateReleaseCommit(releaseCommit);
   if (releaseCommitResult.isErr) {
     return createFailure(releaseCommitResult.error.message);
   }
 
-  return readRequiredArgument(commandLineArguments, promotedBetaTagArgumentIndex, 'Promoted Beta tag').map(
-    promotedBetaTag => {
-      return {
-        stage: 'production',
-        releaseTag: productionTagResult.value,
-        releaseCommit: releaseCommitResult.value,
-        promotedBetaTag,
-        executionMode,
-      };
-    },
-  );
-}
-
-export function parseCommandLineArguments(commandLineArguments: readonly string[]): Result<ParsedCommand, Error> {
-  const stage = Maybe.of(commandLineArguments[stageArgumentIndex]);
-  if (stage.isNothing) {
-    return usageFailure();
-  }
-
-  return match(stage.value)
-    .with('beta', () => {
-      const executionModeResult = parseExecutionMode(commandLineArguments, betaCommandArgumentCount);
-      return executionModeResult.isOk
-        ? parseBetaCommand(commandLineArguments, executionModeResult.value)
-        : usageFailure();
-    })
-    .with('production', () => {
-      const executionModeResult = parseExecutionMode(commandLineArguments, productionCommandArgumentCount);
-      return executionModeResult.isOk
-        ? parseProductionCommand(commandLineArguments, executionModeResult.value)
-        : usageFailure();
-    })
-    .otherwise(() => {
-      return usageFailure();
-    });
+  return validateRequiredCommandValue(promotedBetaTag, 'Promoted Beta tag').map(validatedPromotedBetaTag => {
+    return {
+      stage: 'production',
+      releaseTag: productionTagResult.value,
+      releaseCommit: releaseCommitResult.value,
+      promotedBetaTag: validatedPromotedBetaTag,
+      executionMode,
+    };
+  });
 }
 
 function readRequiredEnvironmentValue(environment: NodeJS.ProcessEnv, variableName: string): Result<string, Error> {
@@ -1313,14 +1250,9 @@ async function planReleaseHistory(
 export async function executeReleaseAppearanceCommand(
   executeReleaseAppearanceCommandOptions: ExecuteReleaseAppearanceCommandOptions,
 ): Promise<ReleaseAppearanceCommandResult> {
-  const {commandLineArguments, environment, dependencies} = executeReleaseAppearanceCommandOptions;
+  const {command, environment, dependencies} = executeReleaseAppearanceCommandOptions;
   const commandStartedAtMilliseconds = dependencies.now();
   const githubToken = Maybe.of(environment.GITHUB_TOKEN).unwrapOr('');
-  const parsedCommandResult = parseCommandLineArguments(commandLineArguments);
-  if (parsedCommandResult.isErr) {
-    await writeFailureSafely(dependencies.writeFailure, parsedCommandResult.error.message);
-    return {exitCode: 1, summary: ''};
-  }
 
   const commandEnvironmentResult = readCommandEnvironment(environment);
   if (commandEnvironmentResult.isErr) {
@@ -1331,11 +1263,10 @@ export async function executeReleaseAppearanceCommand(
     return {exitCode: 1, summary: ''};
   }
 
-  const parsedCommand = parsedCommandResult.value;
   const releaseHistoryPlanningStartedAtMilliseconds = dependencies.now();
   let historyPlanResult: Result<ReleaseHistoryPlan, Error>;
   try {
-    historyPlanResult = await planReleaseHistory(parsedCommand, dependencies.executeGitCommand);
+    historyPlanResult = await planReleaseHistory(command, dependencies.executeGitCommand);
   } catch (error: unknown) {
     historyPlanResult = createFailure(
       `Unable to plan release history: ${redactSecret(errorMessage(error), githubToken)}`,
@@ -1344,10 +1275,7 @@ export async function executeReleaseAppearanceCommand(
   }
   const releaseHistoryPlanningDurationMilliseconds = dependencies.now() - releaseHistoryPlanningStartedAtMilliseconds;
 
-  let summaryOptions = createEmptySummaryOptions(
-    parsedCommand,
-    commandEnvironmentResult.value.workflowToolingCommitSha,
-  );
+  let summaryOptions = createEmptySummaryOptions(command, commandEnvironmentResult.value.workflowToolingCommitSha);
   summaryOptions = {...summaryOptions, releaseHistoryPlanningDurationMilliseconds};
   if (historyPlanResult.isErr) {
     const historyFailureMessage = createGeneralFailureMessage(
@@ -1392,14 +1320,14 @@ export async function executeReleaseAppearanceCommand(
     const pullRequestDiscoveryDurationMilliseconds = dependencies.now() - discoveryStartedAtMilliseconds;
     const commentProcessingStartedAtMilliseconds = dependencies.now();
     const processingResult = await processPullRequests({
-      executionMode: parsedCommand.executionMode,
+      executionMode: command.executionMode,
       githubClient: dependencies.githubClient,
       githubToken,
       now: dependencies.now,
       progressReporter: dependencies.progressReporter,
       pullRequests: discoveryResult.pullRequests,
-      releaseTag: parsedCommand.releaseTag,
-      stage: parsedCommand.stage,
+      releaseTag: command.releaseTag,
+      stage: command.stage,
       writeFailure: dependencies.writeFailure,
     });
     const commentProcessingDurationMilliseconds = dependencies.now() - commentProcessingStartedAtMilliseconds;
@@ -1437,89 +1365,4 @@ export async function executeReleaseAppearanceCommand(
     exitCode: 1,
     commandStartedAtMilliseconds,
   });
-}
-
-export async function main(
-  executeReleaseAppearanceCommandOptions: ExecuteReleaseAppearanceCommandOptions,
-): Promise<void> {
-  const commandResult = await executeReleaseAppearanceCommand(executeReleaseAppearanceCommandOptions);
-  process.exitCode = commandResult.exitCode;
-}
-
-async function executeGitCommand(commandArguments: readonly string[]): Promise<string> {
-  const executeFile = promisify(execFile);
-  const commandResult = await executeFile('git', commandArguments, {encoding: 'utf8'});
-  return commandResult.stdout.toString();
-}
-
-async function writeRuntimeFailure(message: string): Promise<void> {
-  process.stderr.write(`${message}\n`);
-}
-
-async function writeRuntimeInformation(message: string): Promise<void> {
-  process.stdout.write(`${message}\n`);
-}
-
-function readMonotonicTime(): number {
-  return performance.now();
-}
-
-function createRuntimeDependencies(commandEnvironment: CommandEnvironment): ReleaseAppearanceCommandDependencies {
-  actionsCore.setSecret(commandEnvironment.githubToken);
-  const httpClient = createRuntimeKyHttpClient();
-  const githubClient = createGitHubClient({
-    httpClient,
-    githubApiUrl: commandEnvironment.githubApiUrl,
-    githubRepository: commandEnvironment.githubRepository,
-    githubToken: commandEnvironment.githubToken,
-  });
-
-  return {
-    executeGitCommand,
-    githubClient,
-    now: readMonotonicTime,
-    progressReporter: createDefaultGitHubActionsProgressReporter(),
-    writeFailure: writeRuntimeFailure,
-    writeInformation: writeRuntimeInformation,
-    async writeSummary(summary): Promise<void> {
-      await actionsCore.summary.addRaw(`${summary}\n`).write();
-    },
-  };
-}
-
-async function startReleaseAppearanceCommand(): Promise<void> {
-  const commandLineArguments = process.argv.slice(processArgumentStartIndex);
-  const parsedCommandResult = parseCommandLineArguments(commandLineArguments);
-  if (parsedCommandResult.isErr) {
-    throw parsedCommandResult.error;
-  }
-
-  const commandEnvironmentResult = readCommandEnvironment(process.env);
-  if (commandEnvironmentResult.isErr) {
-    throw commandEnvironmentResult.error;
-  }
-
-  await main({
-    commandLineArguments,
-    environment: process.env,
-    dependencies: createRuntimeDependencies(commandEnvironmentResult.value),
-  });
-}
-
-async function handleReleaseAppearanceCommandFailure(error: unknown): Promise<void> {
-  const githubToken = Maybe.of(process.env.GITHUB_TOKEN).unwrapOr('');
-  await writeRuntimeFailure(redactSecret(errorMessage(error), githubToken));
-  process.exitCode = 1;
-}
-
-function isReleaseAppearanceCommandEntrypoint(): boolean {
-  return Maybe.of(process.argv[1])
-    .map(entrypointPath => {
-      return /(?:^|[\\/])releaseAppearanceCommand\.ts$/.test(entrypointPath);
-    })
-    .unwrapOr(false);
-}
-
-if (isReleaseAppearanceCommandEntrypoint()) {
-  startReleaseAppearanceCommand().catch(handleReleaseAppearanceCommandFailure);
 }

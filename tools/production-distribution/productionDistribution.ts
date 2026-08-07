@@ -23,8 +23,8 @@ import {Result} from 'true-myth';
 import {isBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
 
-import {isLegacyTimestampBuildVersion} from '../build-artifact/legacyBuildMetadata';
-import {validateProductionTagName} from '../release-metadata/releaseMetadata';
+import {isLegacyTimestampBuildVersion} from '../build-artifact/legacyBuildMetadata.ts';
+import {validateProductionTagName} from '../release-metadata/releaseMetadata.ts';
 
 export type ProductionDistributionManifest = {
   readonly productionTag: null;

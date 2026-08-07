@@ -14195,6 +14195,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:15.0.0":
+  version: 15.0.0
+  resolution: "commander@npm:15.0.0"
+  checksum: 10/a5dab1f5c3f1bf2ea19e8089f650f7fb65c3ed88e13ddde62e490d34b20057bcb2cd3de5b6ddc8aae93286083f8256ca0b812df842f574cbebe0e40f5b2f98f7
+  languageName: node
+  linkType: hard
+
 "commander@npm:^11.1.0":
   version: 11.1.0
   resolution: "commander@npm:11.1.0"
@@ -32116,6 +32123,7 @@ __metadata:
     archiver: "npm:7.0.1"
     axios: "npm:1.19.0"
     babel-jest: "npm:30.4.1"
+    commander: "npm:15.0.0"
     cross-env: "npm:10.1.0"
     dotenv: "npm:16.6.1"
     dotenv-extended: "npm:2.9.0"
