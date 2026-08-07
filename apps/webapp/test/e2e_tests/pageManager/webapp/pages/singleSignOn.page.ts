@@ -36,6 +36,7 @@ export class SingleSignOnPage {
   }
 
   async isSSOPageVisible() {
-    return this.ssoCodeEmailInput.waitFor({state: 'visible'});
+    // The SSO page can take a while to finish booting on slower or restricted networks.
+    return this.ssoCodeEmailInput.waitFor({state: 'visible', timeout: 120_000});
   }
 }

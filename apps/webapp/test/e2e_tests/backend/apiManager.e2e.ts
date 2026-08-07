@@ -31,6 +31,9 @@ import {PropertiesRepositoryE2E} from './propertiesRepostitory.e2e';
 import {TeamRepositoryE2E} from './teamRepository.e2e';
 import {TestServiceClientE2E} from './testServiceClient.e2e';
 import {UserRepositoryE2E} from './userRepository.e2e';
+import {KeycloakClientE2E} from './keycloakClient.e2e';
+import {IdentityProvidersRepositoryE2E} from './identityProvidersRepository.e2e';
+import {ScimRepositoryE2E} from './scimRepository.e2e';
 
 import {User} from '../data/user';
 
@@ -45,14 +48,18 @@ export class ApiManagerE2E {
   conversation: ConversationRepositoryE2E;
   featureConfig: FeatureConfigRepositoryE2E;
   inbucket: InbucketClientE2E;
+  keycloak: KeycloakClientE2E;
   connection: ConnectionRepositoryE2E;
   callingService: CallingServiceClientE2E;
   properties: PropertiesRepositoryE2E;
+  identityProviders: IdentityProvidersRepositoryE2E;
+  scim: ScimRepositoryE2E;
 
   constructor(config: {backendUrl: string; basicAuth: string}) {
     const backendConfig = {backendUrl: config.backendUrl, apiVersion: TEST_API_VERSION};
 
     this.inbucket = new InbucketClientE2E();
+    this.keycloak = new KeycloakClientE2E();
     this.testService = new TestServiceClientE2E();
     this.callingService = new CallingServiceClientE2E();
 
@@ -64,6 +71,8 @@ export class ApiManagerE2E {
     this.featureConfig = new FeatureConfigRepositoryE2E(backendConfig);
     this.connection = new ConnectionRepositoryE2E(backendConfig);
     this.properties = new PropertiesRepositoryE2E(backendConfig);
+    this.identityProviders = new IdentityProvidersRepositoryE2E(backendConfig);
+    this.scim = new ScimRepositoryE2E(backendConfig);
   }
 
   async addDevicesToUser(user: User, numberOfDevices: number) {
