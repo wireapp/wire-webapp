@@ -19,7 +19,7 @@
 
 import {BlockIcon, SaveIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
 
 import {
   iconStyles,
@@ -37,24 +37,37 @@ interface FileDropzoneOverlayProps {
   mode: FileDropzoneOverlayMode;
 }
 
+const getOverlayContent = (mode: FileDropzoneOverlayMode, translate: RootContextValue['translate']) => {
+  if (mode === 'restricted') {
+    return {
+      icon: <BlockIcon width={24} height={24} css={iconStyles} />,
+      title: translate('conversationFileUploadRestrictedOverlayTitle'),
+      description: translate('conversationFileUploadRestrictedOverlayDescription'),
+    };
+  }
+
+  return {
+    icon: <SaveIcon width={24} height={24} css={[iconStyles, uploadIconStyles]} />,
+    title: translate('conversationFileUploadOverlayTitle'),
+    description: translate('conversationFileUploadOverlayDescription'),
+  };
+};
+
+const getOverlayStyles = (isActive: boolean) => {
+  if (isActive) {
+    return overlayActiveStyles;
+  }
+
+  return overlayStyles;
+};
+
 export const FileDropzoneOverlay = ({isActive, mode}: FileDropzoneOverlayProps) => {
   const {translate} = useApplicationContext();
-
-  const isRestricted = mode === 'restricted';
-  const title = isRestricted
-    ? translate('conversationFileUploadRestrictedOverlayTitle')
-    : translate('conversationFileUploadOverlayTitle');
-  const description = isRestricted
-    ? translate('conversationFileUploadRestrictedOverlayDescription')
-    : translate('conversationFileUploadOverlayDescription');
+  const {icon, title, description} = getOverlayContent(mode, translate);
 
   return (
-    <div css={isActive ? overlayActiveStyles : overlayStyles} aria-hidden={!isActive}>
-      {isRestricted ? (
-        <BlockIcon width={24} height={24} css={iconStyles} />
-      ) : (
-        <SaveIcon width={24} height={24} css={[iconStyles, uploadIconStyles]} />
-      )}
+    <div css={getOverlayStyles(isActive)} aria-hidden={!isActive}>
+      {icon}
       <p css={titleStyles}>{title}</p>
       <p css={descriptionStyles}>{description}</p>
     </div>
