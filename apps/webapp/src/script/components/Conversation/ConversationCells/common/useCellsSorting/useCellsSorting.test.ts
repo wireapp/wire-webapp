@@ -106,6 +106,18 @@ describe('useCellsSorting', () => {
     expect(result.current.getDirectionFor('name')).toBeUndefined();
   });
 
+  it('supports a visual-only default sort when configured', () => {
+    const {result} = renderHook(() => useCellsSorting('default', {field: 'mtime', direction: 'desc'}));
+
+    expect(result.current.sort).toBeNull();
+    expect(result.current.getDirectionFor('mtime')).toBe('desc');
+
+    act(() => result.current.toggleSort('mtime'));
+
+    expect(result.current.sort).toEqual({field: 'mtime', direction: 'asc'});
+    expect(result.current.getDirectionFor('mtime')).toBe('asc');
+  });
+
   it('keeps setSort stable across sort changes', () => {
     const {result} = renderHook(() => useCellsSorting());
     const setSort = result.current.setSort;
