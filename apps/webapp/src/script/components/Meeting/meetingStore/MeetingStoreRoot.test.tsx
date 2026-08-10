@@ -215,7 +215,7 @@ describe('MeetingStoreRoot', () => {
       getMeeting: jest.fn(() => task.resolve(createApiMeeting('Late joiner meeting'))),
     });
 
-    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
+    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, otherUserId);
 
     await waitFor(() => {
       expect(getRenderedMeetingTitles()).toBe('Late joiner meeting');
@@ -231,7 +231,7 @@ describe('MeetingStoreRoot', () => {
     });
 
     act(() => {
-      amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
+      amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, otherUserId);
     });
 
     await waitFor(() => {

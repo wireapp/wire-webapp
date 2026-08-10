@@ -189,10 +189,7 @@ describe('createMeetingStore', () => {
 
     await pendingReload;
 
-    expect(store.getState()).toMatchObject({
-      isLoading: false,
-      meetingSeries: [],
-    });
+    expect(store.getState()).toMatchObject({isLoading: false, meetingSeries: []});
   });
 
   it('does not remove a newly synchronized meeting when an older list reload finishes', async () => {

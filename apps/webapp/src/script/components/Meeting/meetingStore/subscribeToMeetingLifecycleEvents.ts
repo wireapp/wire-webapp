@@ -59,7 +59,12 @@ export const subscribeToMeetingLifecycleEvents = ({
     enqueueMeetingSyncWithUpdateNotification(meetingId);
   };
 
-  const onMeetingMemberAdded = (meetingId: QualifiedId) => {
+  const onMeetingMemberAdded = (meetingId: QualifiedId, actorId: QualifiedId) => {
+    if (matchQualifiedIds(actorId, getSelfUserQualifiedId())) {
+      dispatcher.enqueueMeetingSync(meetingId);
+      return;
+    }
+
     enqueueMeetingSyncWithUpdateNotification(meetingId);
   };
 

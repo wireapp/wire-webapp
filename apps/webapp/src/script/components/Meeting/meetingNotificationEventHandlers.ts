@@ -54,7 +54,7 @@ export const createMeetingNotificationEventHandlers = ({
 
   // Only deleted events can fire before the meeting store has synced.
   const pending = new Map<string, QualifiedId>();
-  const pendingKey = (meetingId: QualifiedId) => `${meetingId.domain}@${meetingId.id}`;
+  const pendingKey = (meetingId: QualifiedId) => `${meetingId.domain}:${meetingId.id}`;
 
   const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries) => {
     const notificationBase = {

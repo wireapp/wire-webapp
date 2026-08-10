@@ -81,7 +81,7 @@ describe('subscribeToMeetingLifecycleEvents', () => {
     const dispatcher = createDispatcherDouble();
     subscribe(dispatcher);
 
-    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
+    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, otherUserId);
 
     expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId, expect.any(Function));
     expect(dispatcher.enqueueMeetingRemoval).not.toHaveBeenCalled();
@@ -102,6 +102,16 @@ describe('subscribeToMeetingLifecycleEvents', () => {
     subscribe(dispatcher);
 
     amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, selfUserId);
+
+    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId);
+    expect(dispatcher.enqueueMeetingSync).not.toHaveBeenCalledWith(meetingId, expect.any(Function));
+  });
+
+  it('queues a sync without a notification callback for a member-added event authored by the current user', () => {
+    const dispatcher = createDispatcherDouble();
+    subscribe(dispatcher);
+
+    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, selfUserId);
 
     expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId);
     expect(dispatcher.enqueueMeetingSync).not.toHaveBeenCalledWith(meetingId, expect.any(Function));
