@@ -285,6 +285,44 @@ describe('MeetingStoreRoot', () => {
     });
   });
 
+  it('does not add an update notification when a queued sync is followed by deletion', async () => {
+    let resolveMeeting: () => void = () => undefined;
+    const meetingFetch = new Promise<void>(resolve => {
+      resolveMeeting = resolve;
+    });
+    const getMeeting = jest.fn(() =>
+      task.tryOrElse(
+        () => new Error('fetch failed'),
+        async () => {
+          await meetingFetch;
+          return createApiMeeting('Weekly sync (updated)');
+        },
+      ),
+    );
+    renderMeetingStoreRoot({getMeeting});
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
+      amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+      resolveMeeting();
+    });
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('');
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([
+      expect.objectContaining({
+        kind: MeetingNotificationKind.CANCELLED,
+        qualifiedId: meetingId,
+      }),
+    ]);
+  });
+
   it('reloads meetings when missed events are reported', async () => {
     const getMeetingsList = jest
       .fn()

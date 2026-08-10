@@ -65,7 +65,7 @@ const createDependencies = (
   overrides: Partial<MeetingLifecycleDispatcherDependencies> = {},
 ): MeetingLifecycleDispatcherDependencies => ({
   loadMeetings: async () => undefined,
-  syncMeeting: () => task.resolve(meetingSeries),
+  syncMeeting: () => task.resolve({meeting: meetingSeries, applied: true}),
   removeMeeting: () => undefined,
   reportOperationFailure: jest.fn(),
   ...overrides,
@@ -84,7 +84,7 @@ describe('createMeetingLifecycleDispatcher', () => {
         },
         syncMeeting: id => {
           completedSteps.push(`sync:${id.id}`);
-          return task.resolve(meetingSeries);
+          return task.resolve({meeting: meetingSeries, applied: true});
         },
       }),
     );
@@ -115,7 +115,7 @@ describe('createMeetingLifecycleDispatcher', () => {
               await pendingSync.promise;
               completedSteps.push(`sync:${id.id}:finished`);
 
-              return meetingSeries;
+              return {meeting: meetingSeries, applied: true};
             },
           ),
         removeMeeting: id => {
@@ -158,7 +158,7 @@ describe('createMeetingLifecycleDispatcher', () => {
 
               completedSteps.push(`sync:${id.id}:finished`);
 
-              return meetingSeries;
+              return {meeting: meetingSeries, applied: true};
             },
           ),
       }),
@@ -232,6 +232,42 @@ describe('createMeetingLifecycleDispatcher', () => {
     );
 
     dispatcher.enqueueMeetingSync(meetingId, onSuccess);
+    await dispatcher.waitUntilAllSettled();
+
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  it('does not invoke the sync success callback when the store did not apply the result', async () => {
+    const onSuccess = jest.fn();
+    const dispatcher = createMeetingLifecycleDispatcher(
+      createDependencies({syncMeeting: () => task.resolve({meeting: meetingSeries, applied: false})}),
+    );
+
+    dispatcher.enqueueMeetingSync(meetingId, onSuccess);
+    await dispatcher.waitUntilAllSettled();
+
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  it('does not invoke a sync success callback after a removal is queued for the same meeting', async () => {
+    const onSuccess = jest.fn();
+    const pendingSync = createDeferred();
+    const dispatcher = createMeetingLifecycleDispatcher(
+      createDependencies({
+        syncMeeting: () =>
+          task.tryOrElse(
+            () => syncMeetingErrors.fetchFailed,
+            async () => {
+              await pendingSync.promise;
+              return {meeting: meetingSeries, applied: true};
+            },
+          ),
+      }),
+    );
+
+    dispatcher.enqueueMeetingSync(meetingId, onSuccess);
+    dispatcher.enqueueMeetingRemoval(meetingId);
+    pendingSync.resolve();
     await dispatcher.waitUntilAllSettled();
 
     expect(onSuccess).not.toHaveBeenCalled();

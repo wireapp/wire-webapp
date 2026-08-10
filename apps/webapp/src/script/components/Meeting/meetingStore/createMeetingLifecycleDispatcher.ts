@@ -22,13 +22,13 @@ import {task, type Task} from 'true-myth';
 
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 
-import type {SyncMeetingError} from './createMeetingStore';
+import type {SyncMeetingError, SyncMeetingResult} from './createMeetingStore';
 
 const dispatcherOperationFailed = 'dispatcherOperationFailed';
 
 export type MeetingLifecycleDispatcherDependencies = {
   loadMeetings: () => Promise<void>;
-  syncMeeting: (meetingId: QualifiedId) => Task<MeetingSeries, SyncMeetingError>;
+  syncMeeting: (meetingId: QualifiedId) => Task<SyncMeetingResult, SyncMeetingError>;
   removeMeeting: (meetingId: QualifiedId) => void;
   reportOperationFailure: (operationName: string) => void;
 };
@@ -53,6 +53,15 @@ export const createMeetingLifecycleDispatcher = (
   dependencies: MeetingLifecycleDispatcherDependencies,
 ): MeetingLifecycleDispatcher => {
   let queuedOperations: Promise<void> = Promise.resolve();
+  const latestOperationVersions = new Map<string, number>();
+
+  const meetingIdKey = (meetingId: QualifiedId): string => `${meetingId.domain}:${meetingId.id}`;
+  const bumpOperationVersion = (meetingId: QualifiedId): number => {
+    const key = meetingIdKey(meetingId);
+    const version = (latestOperationVersions.get(key) ?? 0) + 1;
+    latestOperationVersions.set(key, version);
+    return version;
+  };
 
   const enqueue = (operationName: string, operation: () => Promise<unknown>): void => {
     queuedOperations = queuedOperations.then(async () => {
@@ -69,6 +78,8 @@ export const createMeetingLifecycleDispatcher = (
       enqueue('initialLoad', dependencies.loadMeetings);
     },
     enqueueMeetingSync: (meetingId, onSuccess) => {
+      const operationVersion = bumpOperationVersion(meetingId);
+
       enqueue('meetingSync', async () => {
         const syncResult = await dependencies.syncMeeting(meetingId);
 
@@ -77,10 +88,15 @@ export const createMeetingLifecycleDispatcher = (
           return;
         }
 
-        onSuccess?.(syncResult.value);
+        const currentVersion = latestOperationVersions.get(meetingIdKey(meetingId));
+        if (syncResult.value.applied && currentVersion === operationVersion) {
+          onSuccess?.(syncResult.value.meeting);
+        }
       });
     },
     enqueueMeetingRemoval: meetingId => {
+      bumpOperationVersion(meetingId);
+
       enqueue('meetingRemoval', async () => {
         dependencies.removeMeeting(meetingId);
       });
