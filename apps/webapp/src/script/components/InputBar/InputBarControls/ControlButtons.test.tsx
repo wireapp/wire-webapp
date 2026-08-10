@@ -105,6 +105,40 @@ describe('ControlButtons', () => {
     expect(queryByTitle('tooltipConversationFile')).toBe(null);
   });
 
+  const renderCellsControls = (cellsState: CONVERSATION_CELLS_STATE) => {
+    spyOn(Config, 'getConfig').and.returnValue({
+      FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*'], ENABLE_CELLS: true},
+    });
+    const conversation = {cellsState: () => cellsState} as Conversation;
+
+    return render(
+      withTheme(
+        <ControlButtons
+          {...defaultParams}
+          conversation={conversation}
+          input="message"
+          isCellsFeatureEnabled
+          isCellsUploadAllowed
+        />,
+      ),
+      {wrapper: rootProviderWrapper},
+    );
+  };
+
+  it('shows cells upload buttons when input has content in a cells conversation', () => {
+    const {getByTitle} = renderCellsControls(CONVERSATION_CELLS_STATE.READY);
+
+    expect(getByTitle('tooltipConversationAddImage')).toBeInTheDocument();
+    expect(getByTitle('tooltipConversationFile')).toBeInTheDocument();
+  });
+
+  it('hides cells upload buttons when input has content outside a cells conversation', () => {
+    const {queryByTitle} = renderCellsControls(CONVERSATION_CELLS_STATE.DISABLED);
+
+    expect(queryByTitle('tooltipConversationAddImage')).not.toBeInTheDocument();
+    expect(queryByTitle('tooltipConversationFile')).not.toBeInTheDocument();
+  });
+
   it.each<[string, string[]]>([
     ['', allButtonTitles.filter(button => button != 'extensionsBubbleButtonGif')],
     ['hello', ['extensionsBubbleButtonGif']],

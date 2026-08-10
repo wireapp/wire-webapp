@@ -86,7 +86,7 @@ const ControlButtons = ({
   const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsFeatureEnabled === true;
   const isCellsConversation = isCellsEnabled && conversation.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
   const isFilesharingEnabled = disableFilesharing !== true;
-  const isCellsUploadEnabled = isFilesharingEnabled && isCellsUploadAllowed;
+  const isCellsUploadEnabled = isCellsConversation && isFilesharingEnabled && isCellsUploadAllowed;
 
   if (isEditing === true) {
     return (
@@ -128,7 +128,7 @@ const ControlButtons = ({
             <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
           </li>
         )}
-        {isFilesharingEnabled && isCellsConversation && isCellsUploadEnabled && (
+        {isCellsUploadEnabled && (
           <>
             <li>
               <CellImageUploadButton onClick={onCellImageUpload} />
@@ -183,12 +183,12 @@ const ControlButtons = ({
               <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
             </li>
           )}
-          {isCellsUploadEnabled && isCellsEnabled && (
+          {isCellsUploadEnabled && (
             <li>
               <CellImageUploadButton onClick={onCellImageUpload} />
             </li>
           )}
-          {isCellsUploadEnabled && isCellsEnabled && (
+          {isCellsUploadEnabled && (
             <li>
               <CellAssetUploadButton onClick={onCellAssetUpload} />
             </li>
