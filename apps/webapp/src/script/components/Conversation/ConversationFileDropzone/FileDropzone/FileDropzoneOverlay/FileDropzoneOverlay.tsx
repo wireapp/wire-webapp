@@ -17,30 +17,62 @@
  *
  */
 
-import {SaveIcon} from '@wireapp/react-ui-kit';
+import {BlockIcon, SaveIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
 
 import {
   iconStyles,
+  uploadIconStyles,
   overlayActiveStyles,
   overlayStyles,
   descriptionStyles,
   titleStyles,
 } from './FileDropzoneOverlay.styles';
 
+export type FileDropzoneOverlayMode = 'upload' | 'restricted';
+
 interface FileDropzoneOverlayProps {
   isActive: boolean;
+  mode: FileDropzoneOverlayMode;
 }
 
-export const FileDropzoneOverlay = ({isActive}: FileDropzoneOverlayProps) => {
+const getOverlayProperties = (
+  mode: FileDropzoneOverlayMode,
+  isActive: boolean,
+  translate: RootContextValue['translate'],
+) => {
+  let styles = overlayStyles;
+  if (isActive) {
+    styles = overlayActiveStyles;
+  }
+
+  if (mode === 'restricted') {
+    return {
+      styles,
+      icon: <BlockIcon width={24} height={24} css={iconStyles} aria-hidden="true" />,
+      title: translate('conversationFileUploadRestrictedOverlayTitle'),
+      description: translate('conversationFileUploadRestrictedOverlayDescription'),
+    };
+  }
+
+  return {
+    styles,
+    icon: <SaveIcon width={24} height={24} css={[iconStyles, uploadIconStyles]} aria-hidden="true" />,
+    title: translate('conversationFileUploadOverlayTitle'),
+    description: translate('conversationFileUploadOverlayDescription'),
+  };
+};
+
+export const FileDropzoneOverlay = ({isActive, mode}: FileDropzoneOverlayProps) => {
   const {translate} = useApplicationContext();
+  const {styles, icon, title, description} = getOverlayProperties(mode, isActive, translate);
 
   return (
-    <div css={isActive ? overlayActiveStyles : overlayStyles} aria-hidden={!isActive}>
-      <SaveIcon width={24} height={24} css={iconStyles} />
-      <p css={titleStyles}>{translate('conversationFileUploadOverlayTitle')}</p>
-      <p css={descriptionStyles}>{translate('conversationFileUploadOverlayDescription')}</p>
+    <div css={styles} aria-hidden={!isActive} role="status" aria-live="polite">
+      {icon}
+      <p css={titleStyles}>{title}</p>
+      <p css={descriptionStyles}>{description}</p>
     </div>
   );
 };

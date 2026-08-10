@@ -63,9 +63,14 @@ export const titleStyles: CSSObject = {
 
 export const descriptionStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
+  maxWidth: '240px',
+  textAlign: 'center',
 };
 
 export const iconStyles: CSSObject = {
-  transform: 'rotate(180deg)',
   marginBottom: '16px',
+};
+
+export const uploadIconStyles: CSSObject = {
+  transform: 'rotate(180deg)',
 };
