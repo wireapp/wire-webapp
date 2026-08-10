@@ -35,8 +35,12 @@ export const getSelfUserDriveRole = ({
   conversationTeamId,
   selfUserTeamId,
 }: GetSelfUserDriveRoleParams): CellsSelfUserDriveRole => {
-  if (!conversationTeamId || !selfUserTeamId) {
+  if (!conversationTeamId) {
     return CELLS_SELF_USER_DRIVE_ROLE.EDITOR;
+  }
+
+  if (!selfUserTeamId) {
+    return CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
   }
 
   return conversationTeamId === selfUserTeamId ? CELLS_SELF_USER_DRIVE_ROLE.EDITOR : CELLS_SELF_USER_DRIVE_ROLE.VIEWER;

@@ -32,12 +32,15 @@ describe('getSelfUserDriveRole', () => {
     );
   });
 
-  it('defaults to editor when local team data is missing', () => {
+  it('defaults to editor when the conversation has no owning team', () => {
     expect(getSelfUserDriveRole({conversationTeamId: undefined, selfUserTeamId: 'team-a'})).toBe(
       CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
     );
+  });
+
+  it('returns viewer when a team-owned conversation is accessed by a user without a team', () => {
     expect(getSelfUserDriveRole({conversationTeamId: 'team-a', selfUserTeamId: undefined})).toBe(
-      CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+      CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
     );
   });
 });
