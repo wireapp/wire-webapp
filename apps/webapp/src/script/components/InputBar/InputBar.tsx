@@ -28,6 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
+import {isConversationFileDropAllowed} from 'Components/Conversation/ConversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
@@ -167,6 +168,11 @@ export const InputBar = ({
     : translate('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
+  const isCellsUploadAllowed = isConversationFileDropAllowed({
+    conversationTeamId: conversation.teamId,
+    selfUserTeamId: selfUser.teamId,
+    isCellsEnabled,
+  });
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
@@ -336,6 +342,7 @@ export const InputBar = ({
                   <InputBarControls
                     conversation={conversation}
                     isCellsFeatureEnabled={isCellsEnabled}
+                    isCellsUploadAllowed={isCellsUploadAllowed}
                     isFileSharingSendingEnabled={isFileSharingSendingEnabled}
                     pingDisabled={ping.isPingDisabled}
                     messageContent={messageContent}

@@ -19,6 +19,9 @@
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/InputBar/index';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -45,7 +48,6 @@ import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {translateForTest} from 'Util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('Components/avatar', () => ({
   AVATAR_SIZE: {X_LARGE: 'avatar-xl'},
@@ -76,7 +78,7 @@ beforeAll(async () => {
 
   spyOn(Config, 'getConfig').and.returnValue({
     ALLOWED_IMAGE_TYPES: [],
-    FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
+    FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*'], ENABLE_CELLS: true},
   });
 });
 
@@ -130,6 +132,32 @@ describe('InputBar', () => {
       wrapper: rootProviderWrapper,
     });
   }
+
+  it('hides cells upload buttons for viewers', () => {
+    const props = getDefaultProps();
+    props.isCellsEnabled = true;
+    props.conversation.teamId = 'conversation-team';
+    props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    props.selfUser.teamId = 'guest-team';
+
+    const {queryByTitle} = renderInputBar(props);
+
+    expect(queryByTitle('tooltipConversationAddImage')).toBe(null);
+    expect(queryByTitle('tooltipConversationFile')).toBe(null);
+  });
+
+  it('shows cells upload buttons for editors', () => {
+    const props = getDefaultProps();
+    props.isCellsEnabled = true;
+    props.conversation.teamId = 'conversation-team';
+    props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    props.selfUser.teamId = 'conversation-team';
+
+    const {getByTitle} = renderInputBar(props);
+
+    expect(getByTitle('tooltipConversationAddImage')).not.toBe(null);
+    expect(getByTitle('tooltipConversationFile')).not.toBe(null);
+  });
 
   it('has passed value', async () => {
     const props = getDefaultProps();

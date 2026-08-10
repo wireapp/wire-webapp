@@ -37,6 +37,7 @@ interface InputBarControlsProps {
   pingDisabled: boolean;
   messageContent: MessageContent;
   isCellsFeatureEnabled: boolean;
+  isCellsUploadAllowed: boolean;
   isEditing: boolean;
   isSendingDisabled: boolean;
   showMarkdownPreview: boolean;
@@ -66,6 +67,7 @@ export const InputBarControls = ({
   pingDisabled,
   messageContent,
   isCellsFeatureEnabled: isCellsFeatureEnabled,
+  isCellsUploadAllowed,
   isEditing,
   isSendingDisabled,
   showMarkdownPreview,
@@ -101,6 +103,7 @@ export const InputBarControls = ({
           disablePing={pingDisabled}
           input={messageContent.text}
           isCellsFeatureEnabled={isCellsFeatureEnabled}
+          isCellsUploadAllowed={isCellsUploadAllowed}
           isEditing={isEditing}
           onCancelEditing={onEscape}
           onClickPing={onClickPing}
