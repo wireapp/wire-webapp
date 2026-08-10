@@ -76,11 +76,18 @@ describe('canEditMeeting', () => {
     expect(canEditMeeting(meetingInstance, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(false);
   });
 
-  it('returns false when the instance has started', () => {
+  it('returns true while the instance is ongoing', () => {
     const meetingInstance = createMeetingInstance();
     const selfUser = createSelfUser();
 
-    expect(canEditMeeting(meetingInstance, selfUser, ONGOING_MEETING_TIMESTAMP)).toBe(false);
+    expect(canEditMeeting(meetingInstance, selfUser, ONGOING_MEETING_TIMESTAMP)).toBe(true);
+  });
+
+  it('returns true at the scheduled end time', () => {
+    const meetingInstance = createMeetingInstance();
+    const selfUser = createSelfUser();
+
+    expect(canEditMeeting(meetingInstance, selfUser, Date.parse('2026-06-15T15:00:00.000Z'))).toBe(true);
   });
 
   it('returns false when the instance is in the past', () => {
