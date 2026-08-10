@@ -80,7 +80,6 @@ const createMediaStream = () =>
 describe('GroupVideoGrid', () => {
   beforeEach(() => {
     backgroundEffectsStore.setState({
-      isFeatureEnabled: false,
       isInitializing: false,
     });
   });
