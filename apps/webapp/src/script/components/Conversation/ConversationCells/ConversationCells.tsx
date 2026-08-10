@@ -35,6 +35,10 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
+import {
+  CellsSelfUserDriveRoleProvider,
+  getSelfUserDriveRole,
+} from './common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
 import {isInRecycleBin as isCurrentPathInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsSorting} from './common/useCellsSorting/useCellsSorting';
@@ -73,7 +77,11 @@ export const ConversationCells = memo(
     onCloseSearchView,
   }: ConversationCellsProps) => {
     const {fireAndForgetInvoker, translate} = useApplicationContext();
-    const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
+    const {
+      cellsState: initialCellState,
+      name,
+      selfUser,
+    } = useKoSubscribableChildren(activeConversation, ['cellsState', 'name', 'selfUser']);
 
     const {getNodes, status: nodesStatus, getPagination, error: storeError, clearAll} = useCellsStore();
 
@@ -219,81 +227,87 @@ export const ConversationCells = memo(
     const isLoadMoreVisible =
       isSearchMode && !isLoading && !isFetchingMore && !emptyView && isSuccess && hasMorePages && !hasAppendError;
     const isLoadMoreErrorVisible = isSearchMode && hasAppendError && hasMorePages;
+    const selfUserDriveRole = getSelfUserDriveRole({
+      conversationTeamId: activeConversation.teamId,
+      selfUserTeamId: selfUser?.teamId,
+    });
 
     return (
-      <div css={wrapperStyles}>
-        <CellsHeader
-          onRefresh={handleRefresh}
-          conversationName={name}
-          conversationQualifiedId={conversationQualifiedId}
-          cellsRepository={cellsRepository}
-          isSearchViewOpen={isSearchMode}
-          isInRecycleBin={isInRecycleBin}
-          onOpenSearchView={onOpenSearchView}
-          searchValue={searchValue}
-          onSearchChange={handleSearch}
-          onSearchClear={handleClearSearch}
-          filters={filters}
-        />
-        {isTableVisible && (
-          <CellsTable
-            nodes={isLoading ? [] : nodes}
-            cellsRepository={cellsRepository}
-            conversationQualifiedId={conversationQualifiedId}
-            conversationName={name}
+      <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
+        <div css={wrapperStyles}>
+          <CellsHeader
             onRefresh={handleRefresh}
-            // opening a folder must close search view and open the browse view
-            // with that folder (and breadcrumbs)
-            onCloseSearchView={handleSearchViewClosure}
-            getDirectionFor={getDirectionFor}
-            isSortingEnabled={!isInRecycleBin}
-            onToggleSort={toggleSort}
+            conversationName={name}
+            conversationQualifiedId={conversationQualifiedId}
+            cellsRepository={cellsRepository}
+            isSearchViewOpen={isSearchMode}
+            isInRecycleBin={isInRecycleBin}
+            onOpenSearchView={onOpenSearchView}
+            searchValue={searchValue}
+            onSearchChange={handleSearch}
+            onSearchClear={handleClearSearch}
+            filters={filters}
           />
-        )}
-        {isCellsStatePending && !isRefreshing && (
-          <CellsStateInfo
-            heading={translate('cells.pending.heading')}
-            description={translate('cells.pending.description')}
-          />
-        )}
-        {isNoNodesVisible && !isEmptySearchResultsVisible && (
-          <CellsStateInfo
-            heading={translate('cells.noNodes.heading')}
-            description={translate('cells.noNodes.description')}
-          />
-        )}
-        {isEmptySearchResultsVisible && (
-          <CellsStateInfo
-            variant="search"
-            heading={translate('cells.emptySearchResults.heading')}
-            description={translate('cells.emptySearchResults.description')}
-          />
-        )}
-        {isEmptyRecycleBin && <CellsStateInfo description={translate('cells.emptyRecycleBin.description')} />}
-        {(isLoadingVisible || isRefreshing || isFetchingMoreVisible) && <CellsLoader />}
-        {isError && (
-          <CellsStateInfo
-            heading={translate('cells.error.heading')}
-            description={translate('cells.error.description')}
-          />
-        )}
-        {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
-        {isLoadMoreVisible && (
-          <div css={loadMoreWrapperStyles}>
-            <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
-              {translate('cells.pagination.loadMoreResults')}
-            </Button>
-          </div>
-        )}
-        {isLoadMoreErrorVisible && (
-          <div css={loadMoreErrorWrapperStyles} role="alert">
-            <span css={loadMoreErrorMessageStyles}>{translate('cells.pagination.loadMoreError.heading')}</span>
-            <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
-              {translate('cells.pagination.loadMoreError.retry')}
-            </Button>
-          </div>
-        )}
-      </div>
+          {isTableVisible && (
+            <CellsTable
+              nodes={isLoading ? [] : nodes}
+              cellsRepository={cellsRepository}
+              conversationQualifiedId={conversationQualifiedId}
+              conversationName={name}
+              onRefresh={handleRefresh}
+              // opening a folder must close search view and open the browse view
+              // with that folder (and breadcrumbs)
+              onCloseSearchView={handleSearchViewClosure}
+              getDirectionFor={getDirectionFor}
+              isSortingEnabled={!isInRecycleBin}
+              onToggleSort={toggleSort}
+            />
+          )}
+          {isCellsStatePending && !isRefreshing && (
+            <CellsStateInfo
+              heading={translate('cells.pending.heading')}
+              description={translate('cells.pending.description')}
+            />
+          )}
+          {isNoNodesVisible && !isEmptySearchResultsVisible && (
+            <CellsStateInfo
+              heading={translate('cells.noNodes.heading')}
+              description={translate('cells.noNodes.description')}
+            />
+          )}
+          {isEmptySearchResultsVisible && (
+            <CellsStateInfo
+              variant="search"
+              heading={translate('cells.emptySearchResults.heading')}
+              description={translate('cells.emptySearchResults.description')}
+            />
+          )}
+          {isEmptyRecycleBin && <CellsStateInfo description={translate('cells.emptyRecycleBin.description')} />}
+          {(isLoadingVisible || isRefreshing || isFetchingMoreVisible) && <CellsLoader />}
+          {isError && (
+            <CellsStateInfo
+              heading={translate('cells.error.heading')}
+              description={translate('cells.error.description')}
+            />
+          )}
+          {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
+          {isLoadMoreVisible && (
+            <div css={loadMoreWrapperStyles}>
+              <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
+                {translate('cells.pagination.loadMoreResults')}
+              </Button>
+            </div>
+          )}
+          {isLoadMoreErrorVisible && (
+            <div css={loadMoreErrorWrapperStyles} role="alert">
+              <span css={loadMoreErrorMessageStyles}>{translate('cells.pagination.loadMoreError.heading')}</span>
+              <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
+                {translate('cells.pagination.loadMoreError.retry')}
+              </Button>
+            </div>
+          )}
+        </div>
+      </CellsSelfUserDriveRoleProvider>
     );
   },
 );
