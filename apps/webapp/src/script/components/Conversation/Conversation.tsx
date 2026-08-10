@@ -130,6 +130,7 @@ export const Conversation = ({
       'connection',
       'isReadOnlyConversation',
       'isSelfUserRemoved',
+      'selfUser',
     ],
   );
 
@@ -583,7 +584,11 @@ export const Conversation = ({
 
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
-  const isFileDropAllowed = isConversationFileDropAllowed({conversation: activeConversation, isCellsEnabled});
+  const isFileDropAllowed = isConversationFileDropAllowed({
+    conversationTeamId: activeConversation?.teamId,
+    selfUserTeamId: activeConversation?.selfUser()?.teamId,
+    isCellsEnabled,
+  });
 
   useEffect(() => {
     if (!isFileTabActive && isSharedDriveSearchViewOpen) {

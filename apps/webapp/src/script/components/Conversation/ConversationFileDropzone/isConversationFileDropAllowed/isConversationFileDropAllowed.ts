@@ -17,14 +17,25 @@
  *
  */
 
-import type {Conversation} from 'Repositories/entity/Conversation';
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  getSelfUserDriveRole,
+} from '../../ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 
 interface IsConversationFileDropAllowedParams {
-  conversation?: Pick<Conversation, 'isGuest'>;
+  conversationTeamId?: string;
+  selfUserTeamId?: string;
   isCellsEnabled: boolean;
 }
 
 export const isConversationFileDropAllowed = ({
-  conversation,
+  conversationTeamId,
+  selfUserTeamId,
   isCellsEnabled,
-}: IsConversationFileDropAllowedParams): boolean => !isCellsEnabled || !conversation?.isGuest();
+}: IsConversationFileDropAllowedParams): boolean => {
+  if (!isCellsEnabled) {
+    return true;
+  }
+
+  return getSelfUserDriveRole({conversationTeamId, selfUserTeamId}) === CELLS_SELF_USER_DRIVE_ROLE.EDITOR;
+};

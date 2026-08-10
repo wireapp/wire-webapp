@@ -20,21 +20,27 @@
 import {isConversationFileDropAllowed} from './isConversationFileDropAllowed';
 
 describe('isConversationFileDropAllowed', () => {
-  it('allows conversation guests to drop files when Cells is disabled', () => {
-    const conversation = {isGuest: () => true};
-
-    expect(isConversationFileDropAllowed({conversation, isCellsEnabled: false})).toBe(true);
+  it('allows file drops when Cells is disabled', () => {
+    expect(isConversationFileDropAllowed({isCellsEnabled: false})).toBe(true);
   });
 
-  it('allows conversation editors to drop files when Cells is enabled', () => {
-    const conversation = {isGuest: () => false};
-
-    expect(isConversationFileDropAllowed({conversation, isCellsEnabled: true})).toBe(true);
+  it('allows editor file drops when Cells is enabled', () => {
+    expect(
+      isConversationFileDropAllowed({
+        conversationTeamId: 'team-a',
+        selfUserTeamId: 'team-a',
+        isCellsEnabled: true,
+      }),
+    ).toBe(true);
   });
 
-  it('prevents conversation guests from dropping files when Cells is enabled', () => {
-    const conversation = {isGuest: () => true};
-
-    expect(isConversationFileDropAllowed({conversation, isCellsEnabled: true})).toBe(false);
+  it('prevents viewer file drops when Cells is enabled', () => {
+    expect(
+      isConversationFileDropAllowed({
+        conversationTeamId: 'team-a',
+        selfUserTeamId: 'team-b',
+        isCellsEnabled: true,
+      }),
+    ).toBe(false);
   });
 });
