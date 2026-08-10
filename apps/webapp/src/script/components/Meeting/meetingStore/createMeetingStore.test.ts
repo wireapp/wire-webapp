@@ -372,7 +372,7 @@ describe('createMeetingStore', () => {
 
       const result = await store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
 
-      expect(unwrap(result)).toMatchObject(meetingSeriesEntry);
+      expect(unwrap(result)).toEqual({meeting: expect.objectContaining(meetingSeriesEntry), applied: true});
       expect(getMeeting).toHaveBeenCalledWith(apiMeeting.qualified_id);
       expect(store.getState().meetingSeries).toHaveLength(1);
       expect(store.getState().meetingSeries[0]).toMatchObject(meetingSeriesEntry);
@@ -385,7 +385,7 @@ describe('createMeetingStore', () => {
 
       const result = await store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
 
-      expect(unwrap(result).title).toBe('Weekly sync (updated)');
+      expect(unwrap(result).meeting.title).toBe('Weekly sync (updated)');
       expect(store.getState().meetingSeries).toHaveLength(1);
       expect(store.getState().meetingSeries[0]?.title).toBe('Weekly sync (updated)');
     });
@@ -410,7 +410,9 @@ describe('createMeetingStore', () => {
       store.getState().removeMeetingByQualifiedId(apiMeeting.qualified_id);
       finishFetch();
 
-      expect((await pendingSync).isOk).toBe(true);
+      const result = await pendingSync;
+
+      expect(unwrap(result)).toEqual({meeting: expect.objectContaining(meetingSeriesEntry), applied: false});
       expect(store.getState().meetingSeries).toEqual([]);
     });
 
