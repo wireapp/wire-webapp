@@ -757,6 +757,8 @@
   "conversationFileUploadFailedTooManyFilesMessage": "Bitte wählen Sie ein Maximum an {maxFiles} Dateien.",
   "conversationFileUploadOverlayDescription": "Drag and Drop nutzen, um Dateien hinzuzufügen",
   "conversationFileUploadOverlayTitle": "Dateien hochladen",
+  "conversationFileUploadRestrictedOverlayDescription": "You have view access for this conversation, but you can’t upload, edit, or manage files",
+  "conversationFileUploadRestrictedOverlayTitle": "Files not sharable",
   "conversationFileVideoPreviewLabel": "Vorschau der Videodatei für: {src}",
   "conversationFoldersEmptyText": "Fügen Sie Ihre Unterhaltungen Ordnern hinzu, um organisiert zu bleiben.",
   "conversationFoldersEmptyTextLearnMore": "Mehr erfahren",

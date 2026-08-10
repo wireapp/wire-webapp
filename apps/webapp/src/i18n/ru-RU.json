@@ -757,6 +757,8 @@
   "conversationFileUploadFailedTooManyFilesMessage": "Пожалуйста, выберите не более {maxFiles} файлов.",
   "conversationFileUploadOverlayDescription": "Перетаскивайте и добавляйте файлы",
   "conversationFileUploadOverlayTitle": "Загрузить файлы",
+  "conversationFileUploadRestrictedOverlayDescription": "У вас есть доступ для просмотра этой беседы, но вы не можете загружать, редактировать или управлять файлами",
+  "conversationFileUploadRestrictedOverlayTitle": "Файлами нельзя поделиться",
   "conversationFileVideoPreviewLabel": "Предпросмотр видео для: {src}",
   "conversationFoldersEmptyText": "Добавляйте беседы в папки, чтобы сохранять их упорядоченность.",
   "conversationFoldersEmptyTextLearnMore": "Подробнее",
