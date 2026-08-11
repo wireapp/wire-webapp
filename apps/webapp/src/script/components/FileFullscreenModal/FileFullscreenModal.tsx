@@ -42,6 +42,7 @@ interface FileFullscreenModalProps {
   isOpen: boolean;
   onClose: () => void;
   filePreviewUrl?: string;
+  isImagePreview?: boolean;
   fileName: string;
   fileExtension: string;
   fileUrl?: string;
@@ -58,6 +59,7 @@ export const FileFullscreenModal = ({
   isOpen,
   onClose,
   filePreviewUrl,
+  isImagePreview,
   fileUrl,
   status = 'success',
   fileName,
@@ -109,6 +111,7 @@ export const FileFullscreenModal = ({
           key={refreshKey}
           fileExtension={fileExtension}
           filePreviewUrl={filePreviewUrl}
+          isImagePreview={isImagePreview}
           fileName={fileName}
           fileUrl={fileUrl}
           senderName={senderName}
@@ -127,34 +130,38 @@ interface ModalContentProps {
   senderName: string;
   timestamp: number;
   filePreviewUrl?: string;
+  isImagePreview?: boolean;
   fileUrl?: string;
 }
 
 const ModalContent = ({
   fileExtension,
   filePreviewUrl,
+  isImagePreview,
   fileName,
   fileUrl,
   senderName,
   timestamp,
   status,
 }: ModalContentProps) => {
-  if (status === 'loading' && (filePreviewUrl === undefined || filePreviewUrl.length === 0)) {
+  const fileType = isImagePreview ? 'image' : getFileTypeFromExtension(fileExtension);
+  const previewUrl = fileType === 'pdf' ? (filePreviewUrl ?? fileUrl) : filePreviewUrl;
+
+  if (status === 'loading' && (previewUrl === undefined || previewUrl.length === 0)) {
     return <FileLoader />;
   }
 
-  if (status === 'unavailable' || filePreviewUrl === undefined || filePreviewUrl.length === 0) {
+  if ((status === 'unavailable' && fileType !== 'pdf') || previewUrl === undefined || previewUrl.length === 0) {
     return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
   }
 
-  const extension = getFileExtensionFromUrl(filePreviewUrl);
-  const type = getFileTypeFromExtension(extension);
-
-  if (type === 'pdf') {
-    return <PDFViewer src={filePreviewUrl} />;
+  if (fileType === 'pdf') {
+    return <PDFViewer src={previewUrl} />;
   }
 
-  if (type === 'image') {
+  const type = getFileTypeFromExtension(getFileExtensionFromUrl(previewUrl));
+
+  if (isImagePreview || type === 'image') {
     const imageSrc = getBestPreviewSource({
       fileExtension,
       fileUrl: Maybe.of(fileUrl),

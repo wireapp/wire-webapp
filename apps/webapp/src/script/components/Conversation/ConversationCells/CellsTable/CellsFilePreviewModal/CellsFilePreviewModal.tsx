@@ -17,8 +17,10 @@
  *
  */
 
+import {getFilePreviewUrl} from 'Components/cells/common/getFilePreviewUrl/getFilePreviewUrl';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {sortTagsAlphabetically} from '../../common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
@@ -27,6 +29,7 @@ import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/C
 // TODO: Abstract when it starts to grow / feels right
 export const CellsFilePreviewModal = () => {
   const {selectedFile, handleCloseFile, isEditMode} = useCellsFilePreviewModal();
+  const {isFeatureToggleEnabled} = useApplicationContext();
   const isModalOpen = selectedFile !== null;
 
   if (!isModalOpen) {
@@ -35,21 +38,14 @@ export const CellsFilePreviewModal = () => {
 
   const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags} = selectedFile;
 
-  const getFileUrl = () => {
-    const type = getFileTypeFromExtension(extension);
-
-    if (['pdf', 'image'].includes(type)) {
-      return url;
-    }
-
-    if (['audio', 'video'].includes(type)) {
-      return undefined;
-    }
-
-    return previewPdfUrl ?? previewImageUrl;
-  };
-
-  const filePreviewUrl = getFileUrl();
+  const filePreviewUrl = getFilePreviewUrl({
+    extension,
+    url,
+    previewPdfUrl,
+    previewImageUrl,
+    enableGuestPdfImagePreview: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
+  });
+  const isImagePreview = filePreviewUrl !== undefined && filePreviewUrl === previewImageUrl;
 
   return (
     <FileFullscreenModal
@@ -57,6 +53,7 @@ export const CellsFilePreviewModal = () => {
       isOpen={isModalOpen}
       onClose={handleCloseFile}
       filePreviewUrl={filePreviewUrl}
+      isImagePreview={isImagePreview}
       fileName={name}
       fileExtension={extension}
       fileUrl={url}

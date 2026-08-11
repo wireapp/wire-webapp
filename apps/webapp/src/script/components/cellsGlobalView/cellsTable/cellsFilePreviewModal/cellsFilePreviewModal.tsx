@@ -17,10 +17,10 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
-
+import {getFilePreviewUrl} from 'Components/cells/common/getFilePreviewUrl/getFilePreviewUrl';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {sortTagsAlphabetically} from '../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
@@ -29,6 +29,7 @@ import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/c
 // TODO: Abstract when it starts to grow / feels right
 export const CellsFilePreviewModal = () => {
   const {selectedFile, handleCloseFile, isEditMode} = useCellsFilePreviewModal();
+  const {isFeatureToggleEnabled} = useApplicationContext();
 
   if (selectedFile === null) {
     return null;
@@ -36,36 +37,26 @@ export const CellsFilePreviewModal = () => {
 
   const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags} = selectedFile;
 
-  const getFileUrl = () => {
-    const type = getFileTypeFromExtension(extension);
-
-    if (['pdf', 'image'].includes(type)) {
-      return url;
-    }
-
-    if (['audio', 'video'].includes(type)) {
-      return undefined;
-    }
-
-    if (isNonEmptyString(previewPdfUrl)) {
-      return previewPdfUrl;
-    }
-    if (isNonEmptyString(previewImageUrl)) {
-      return previewImageUrl;
-    }
-    return undefined;
-  };
+  const filePreviewUrl = getFilePreviewUrl({
+    extension,
+    url,
+    previewPdfUrl,
+    previewImageUrl,
+    enableGuestPdfImagePreview: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
+  });
+  const isImagePreview = filePreviewUrl !== undefined && filePreviewUrl === previewImageUrl;
 
   return (
     <FileFullscreenModal
       id={selectedFile.id}
       isOpen={selectedFile !== null}
       onClose={handleCloseFile}
-      filePreviewUrl={getFileUrl()}
+      filePreviewUrl={filePreviewUrl}
+      isImagePreview={isImagePreview}
       fileUrl={url}
       fileName={name}
       fileExtension={extension}
-      status={getFileUrl() === undefined ? 'unavailable' : 'success'}
+      status={filePreviewUrl === undefined ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
       badges={sortTagsAlphabetically(tags)}

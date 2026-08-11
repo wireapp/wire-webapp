@@ -149,6 +149,45 @@ describe('FileFullscreenModal - File Version Restore', () => {
       expect(screen.getByTestId('image-view')).toBeInTheDocument();
     });
 
+    it('should render PDF viewer when its preview URL has no file extension', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          filePreviewUrl="https://storage.example.com/download?node=123"
+          fileExtension="pdf"
+        />,
+      );
+
+      expect(screen.getByTestId('pdf-viewer')).toBeInTheDocument();
+    });
+
+    it('should render PDF viewer from the file URL when no preview URL is available', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          fileExtension="pdf"
+          filePreviewUrl={undefined}
+          fileUrl="https://storage.example.com/download?node=123"
+          status="unavailable"
+        />,
+      );
+
+      expect(screen.getByTestId('pdf-viewer')).toBeInTheDocument();
+    });
+
+    it('should render an image preview for a PDF when the server provides one', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          fileExtension="pdf"
+          filePreviewUrl="https://storage.example.com/preview?node=123"
+          isImagePreview
+        />,
+      );
+
+      expect(screen.getByTestId('image-view')).toBeInTheDocument();
+    });
+
     it('should show loader when loading', () => {
       render(<FileFullscreenModal {...defaultProps} status="loading" filePreviewUrl={undefined} />);
 
