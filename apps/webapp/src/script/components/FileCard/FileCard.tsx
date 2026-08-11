@@ -66,7 +66,7 @@ import {FileCardType} from './FileCardType/FileCardType';
  *
  * @example Error state
  * ```tsx
- * <FileCard.Root variant="small" extension="mp3" name="Meeting recording" size="2.6 MB">
+ * <FileCard.Root variant="small" extension="mp3" name="meeting recording" size="2.6 MB">
  *   <FileCard.Header>
  *     <FileCard.Icon />
  *     <FileCard.Type />

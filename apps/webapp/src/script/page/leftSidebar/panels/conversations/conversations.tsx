@@ -26,7 +26,7 @@ import {useShallow} from 'zustand/react/shallow';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {MeetingNotificationHost} from 'Components/Meeting/meetingNotificationHost/meetingNotificationHost';
+import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost';
 import {useConversationFocus} from 'Hooks/useConversationFocus';
 import {CallState} from 'Repositories/calling/CallState';
 import {createLabel} from 'Repositories/conversation/ConversationLabelRepository';

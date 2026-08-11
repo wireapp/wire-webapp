@@ -1,0 +1,186 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {isEmptyArray} from '@sindresorhus/is';
+import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
+import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
+import {Task, task} from 'true-myth';
+
+import {computeParticipantDiff} from 'Components/meeting/computeMeetingParticipantDiff';
+import {mapMeetNowCommandToCreateMeeting} from 'Components/meeting/mapMeetNowCommandToCreateMeeting';
+import {mapScheduleCommandToCreateMeeting} from 'Components/meeting/mapScheduleCommandToCreateMeeting';
+import {mapUpdateCommandToUpdateMeeting} from 'Components/meeting/mapUpdateCommandToUpdateMeeting';
+import {
+  meetingConversationSyncErrors,
+  syncMeetingConversationParticipants,
+  type MeetingConversationSyncError,
+} from 'Components/meeting/meetingConversationSync';
+import type {MeetingServiceDeps} from 'Components/meeting/meetingStore/meetingStoreDeps';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
+import {syncMeetingConversationName} from 'Components/meeting/shared/service/syncMeetingConversationName';
+import type {
+  MeetNowMeetingCommand,
+  ScheduleMeetingCommand,
+  UpdateMeetingCommand,
+} from 'Components/meeting/shared/types/meetingCommandTypes';
+import type {User} from 'Repositories/entity/User';
+
+export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
+
+export type CreateMeetingSuccess = MeetingSubmitSuccess & {
+  qualifiedConversation: QualifiedId;
+  qualifiedMeetingId: QualifiedId;
+};
+
+export type ScheduleMeetingSuccess = MeetingSubmitSuccess & {qualifiedMeetingId: QualifiedId};
+
+const mapSyncErrorToSubmitError = (error: MeetingConversationSyncError): MeetingSubmitErrors => {
+  switch (error) {
+    case meetingConversationSyncErrors.removeFailed:
+      return meetingSubmitErrors.removeParticipantsFailed;
+    case meetingConversationSyncErrors.addFailed:
+    case meetingConversationSyncErrors.establishFailed:
+      return meetingSubmitErrors.addParticipantsFailed;
+    case meetingConversationSyncErrors.conversationNotFound:
+    case meetingConversationSyncErrors.groupIdMissing:
+      return meetingSubmitErrors.addParticipantsFailed;
+    default:
+      return meetingSubmitErrors.addParticipantsFailed;
+  }
+};
+
+const saveMeetingConversationFromResponse = (
+  conversationRepository: MeetingServiceDeps['conversationRepository'],
+  conversation: MeetingWithConversation['conversation'] | undefined,
+  onFailure: MeetingSubmitErrors,
+): Task<void, MeetingSubmitErrors> =>
+  conversation
+    ? conversationRepository.saveMeetingConversationFromBackend(conversation).mapRejected(() => onFailure)
+    : task.resolve(undefined);
+
+const createMeetingAndSyncParticipants = (
+  createPayload: CreateMeeting,
+  selectedUsers: User[],
+  deps: MeetingServiceDeps,
+): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
+  deps.meetingsRepository
+    .createMeeting(createPayload)
+    .mapRejected(() => meetingSubmitErrors.createFailed)
+    .andThen(createdMeeting =>
+      saveMeetingConversationFromResponse(
+        deps.conversationRepository,
+        createdMeeting.conversation,
+        meetingSubmitErrors.conversationSetupFailed,
+      ).andThen(() =>
+        syncMeetingConversationParticipants(deps.conversationRepository, {
+          qualifiedConversationId: createdMeeting.qualified_conversation,
+          selectedUsers,
+          usersToAdd: selectedUsers,
+          userIdsToRemove: [],
+          isCreate: true,
+        })
+          .mapRejected(mapSyncErrorToSubmitError)
+          .map(syncResult => ({
+            ...syncResult,
+            qualifiedConversation: createdMeeting.qualified_conversation,
+            qualifiedMeetingId: createdMeeting.qualified_id,
+          })),
+      ),
+    );
+
+/**
+ * Schedules a meeting and establishes the MLS conversation with selected participants.
+ */
+export const scheduleMeeting = (
+  command: ScheduleMeetingCommand,
+  deps: MeetingServiceDeps,
+): Task<ScheduleMeetingSuccess, MeetingSubmitErrors> =>
+  createMeetingAndSyncParticipants(mapScheduleCommandToCreateMeeting(command), command.selectedUsers, deps).map(
+    ({failedToAdd, qualifiedMeetingId}) => ({
+      failedToAdd,
+      qualifiedMeetingId,
+    }),
+  );
+
+/**
+ * Creates an instant meeting and establishes the MLS conversation with selected participants.
+ */
+export const meetNowMeeting = (
+  command: MeetNowMeetingCommand,
+  deps: MeetingServiceDeps,
+): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
+  createMeetingAndSyncParticipants(
+    mapMeetNowCommandToCreateMeeting(command, deps.wallClock),
+    command.selectedUsers,
+    deps,
+  );
+
+const syncParticipantsAfterMeetingUpdate = (
+  command: UpdateMeetingCommand,
+  deps: MeetingServiceDeps,
+  usersToAdd: User[],
+  userIdsToRemove: QualifiedId[],
+): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+  if (isEmptyArray(usersToAdd) && isEmptyArray(userIdsToRemove)) {
+    return task.resolve({failedToAdd: []});
+  }
+
+  if (command.qualifiedConversation.isNothing) {
+    return task.reject(meetingSubmitErrors.addParticipantsFailed);
+  }
+
+  return syncMeetingConversationParticipants(deps.conversationRepository, {
+    qualifiedConversationId: command.qualifiedConversation.value,
+    selectedUsers: command.selectedUsers,
+    usersToAdd,
+    userIdsToRemove,
+    isCreate: false,
+  }).mapRejected(mapSyncErrorToSubmitError);
+};
+
+/**
+ * Updates meeting metadata, syncs conversation participants, then heals the
+ * dedicated meeting conversation name when it differs from the meeting title.
+ */
+export const updateMeeting = (
+  command: UpdateMeetingCommand,
+  deps: MeetingServiceDeps,
+): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+  const {usersToAdd, userIdsToRemove} = computeParticipantDiff(command.originalSelectedUsers, command.selectedUsers);
+
+  return deps.meetingsRepository
+    .updateMeeting(command.meetingId, mapUpdateCommandToUpdateMeeting(command))
+    .mapRejected(() => meetingSubmitErrors.updateFailed)
+    .andThen(updatedMeeting =>
+      saveMeetingConversationFromResponse(
+        deps.conversationRepository,
+        updatedMeeting.conversation,
+        meetingSubmitErrors.conversationSetupFailed,
+      )
+        .andThen(() => syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove))
+        .andThen(submitSuccess =>
+          syncMeetingConversationName(deps.conversationRepository, {
+            qualifiedConversationId: updatedMeeting.qualified_conversation,
+            title: updatedMeeting.title,
+          }).map(() => submitSuccess),
+        ),
+    );
+};

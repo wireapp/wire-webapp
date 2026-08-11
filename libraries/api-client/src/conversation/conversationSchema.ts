@@ -144,7 +144,7 @@ export const conversationSchema = z.object({
 
 /**
  * Embedded meeting conversation returned with meeting create/update responses.
- * Meeting conversations are always MLS-backed with group_conv_type "meeting".
+ * meeting conversations are always MLS-backed with group_conv_type "meeting".
  */
 export const meetingConversationSchema = conversationSchema.extend({
   group_conv_type: z.literal(GROUP_CONVERSATION_TYPE.MEETING),

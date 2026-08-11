@@ -19,7 +19,7 @@
 
 import {CallIcon} from '@wireapp/react-ui-kit';
 
-import {useMeetingStore} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {ConversationTab} from '../conversationTab';
