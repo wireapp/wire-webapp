@@ -183,8 +183,10 @@ export const ScheduleMeetingForm = ({
   return (
     <div css={scheduleMeetingFormLayoutCss} data-uie-name="schedule-meeting-form" data-uie-mode={mode}>
       <div css={scheduleMeetingFormLeftColumnCss}>
+        {/* eslint jsx-a11y/no-autofocus : "off" */}
         <Input
           id="schedule-meeting-title"
+          autoFocus
           data-uie-name="schedule-meeting-title"
           label={translate('meetings.scheduleModal.titleLabel')}
           placeholder={translate('meetings.scheduleModal.titlePlaceholder')}

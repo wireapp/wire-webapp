@@ -68,8 +68,10 @@ export const MeetNowForm = ({
 
   return (
     <form id={MEET_NOW_FORM_ID} css={meetNowFormLayoutStyles} onSubmit={onSubmit} noValidate>
+      {/* eslint jsx-a11y/no-autofocus : "off" */}
       <Input
         id="meet-now-title"
+        autoFocus
         label={translate('meetings.scheduleModal.titleLabel')}
         placeholder={translate('meetings.scheduleModal.titlePlaceholder')}
         value={formState.title}
