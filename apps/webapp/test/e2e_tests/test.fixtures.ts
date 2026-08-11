@@ -203,6 +203,7 @@ export const createTeam = async (
     features?: {
       conferenceCalling?: boolean;
       channels?: boolean;
+      meetings?: boolean;
       mls?: boolean | Parameters<BrigRepositoryE2E['configureMLSFeature']>[1];
       cells?: boolean;
     };
@@ -259,6 +260,12 @@ export const createTeam = async (
       await api.brig.unlockChannelFeature(teamId);
       await api.brig.enableChannelsFeature(teamId);
       await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
+    }
+
+    if (options.features.meetings) {
+      await api.brig.unlockMeetingsFeature(teamId);
+      await api.brig.enableMeetingsFeature(teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.MEETINGS, teamId, owner.token);
     }
 
     if (options.features.cells) {
