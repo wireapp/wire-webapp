@@ -33,6 +33,50 @@ const loginWithMeetingsEnabled = (user: {email: string; password: string}) => as
   await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
 };
 
+const scheduleMeeting = async (ownerPage: Page, title: string, participantNames: string[]) => {
+  await ownerPage.locator('[data-uie-name="go-meetings"]').click();
+  await ownerPage.locator('[data-uie-name="schedule-meeting"]').click();
+
+  const modal = ownerPage.locator('[data-uie-name="schedule-meeting-modal"]');
+  await modal.locator('[data-uie-name="schedule-meeting-title"]').fill(title);
+
+  const participants = modal.locator('[data-uie-name="schedule-meeting-participants"]');
+  for (const participantName of participantNames) {
+    await participants.locator('[data-uie-name="schedule-meeting-participants-input"]').fill(participantName);
+    await ownerPage.locator('[data-uie-name="item-user"]').filter({hasText: participantName}).click();
+  }
+
+  await modal.locator('[data-uie-name="schedule-meeting-modal-submit"]').click();
+  await expect(modal).toBeHidden();
+};
+
+const meetingNotificationCards = (page: Page) =>
+  page.locator('[data-uie-name="meeting-notification-host"] [data-uie-name^="meeting-notification-card-"]');
+
+const expectInvitationCard = async (page: Page, title: string) => {
+  const host = page.locator('[data-uie-name="meeting-notification-host"]');
+  await expect.poll(() => host.count(), {timeout: 30_000}).toBe(1);
+  await host.getByTestId('meeting-notification-expand').click();
+
+  const cards = meetingNotificationCards(page);
+  await expect(cards).toHaveCount(1);
+  await expect(cards).toContainText(`Invitation: ${title}`);
+  await expect(cards).not.toContainText(`Update: ${title}`);
+};
+
+const editMeetingToAddParticipant = async (ownerPage: Page, title: string, participantName: string) => {
+  const meeting = ownerPage.locator('[data-uie-name="meetings-list"]').getByText(title).locator('xpath=../../..');
+  await meeting.getByRole('button').last().click();
+  await ownerPage.getByRole('menuitem').getByText('Edit meeting').click();
+
+  const modal = ownerPage.locator('[data-uie-name="schedule-meeting-modal"]');
+  const participants = modal.locator('[data-uie-name="schedule-meeting-participants"]');
+  await participants.locator('[data-uie-name="schedule-meeting-participants-input"]').fill(participantName);
+  await ownerPage.locator('[data-uie-name="item-user"]').filter({hasText: participantName}).click();
+  await modal.locator('[data-uie-name="schedule-meeting-modal-submit"]').click();
+  await expect(modal).toBeHidden();
+};
+
 test('single participant meeting notification', async ({createUser, createTeam, createPage}) => {
   const member = await createUser();
   const team = await createTeam('Meetings', {users: [member], features: {meetings: true}});
@@ -43,25 +87,59 @@ test('single participant meeting notification', async ({createUser, createTeam, 
     createPage(loginWithMeetingsEnabled(member)),
   ]);
 
-  await ownerPage.locator('[data-uie-name="go-meetings"]').click();
-  await ownerPage.locator('[data-uie-name="schedule-meeting"]').click();
+  await scheduleMeeting(ownerPage, 'Single participant meeting', [member.fullName]);
+  await expectInvitationCard(memberPage, 'Single participant meeting');
+});
 
-  const modal = ownerPage.locator('[data-uie-name="schedule-meeting-modal"]');
-  await modal.locator('[data-uie-name="schedule-meeting-title"]').fill('Single participant meeting');
+test('two participant meeting sends exactly one invitation to each participant', async ({
+  createUser,
+  createTeam,
+  createPage,
+}) => {
+  const firstParticipant = await createUser();
+  const secondParticipant = await createUser();
+  const team = await createTeam('Meetings', {
+    users: [firstParticipant, secondParticipant],
+    features: {meetings: true},
+  });
 
-  const participants = modal.locator('[data-uie-name="schedule-meeting-participants"]');
-  await participants.locator('[data-uie-name="schedule-meeting-participants-input"]').fill(member.fullName);
-  await modal.locator('[data-uie-name="item-user"]').filter({hasText: member.fullName}).click();
+  const [ownerPage, firstParticipantPage, secondParticipantPage] = await Promise.all([
+    createPage(loginWithMeetingsEnabled(team.owner)),
+    createPage(loginWithMeetingsEnabled(firstParticipant)),
+    createPage(loginWithMeetingsEnabled(secondParticipant)),
+  ]);
 
-  await modal.locator('[data-uie-name="schedule-meeting-modal-submit"]').click();
-  await expect(modal).toBeHidden();
+  await scheduleMeeting(ownerPage, 'Two participant meeting', [firstParticipant.fullName, secondParticipant.fullName]);
 
-  const host = memberPage.locator('[data-uie-name="meeting-notification-host"]');
-  await expect.poll(() => host.count(), {timeout: 30_000}).toBe(1);
-  await expect(host).toBeVisible();
-  await host.getByTestId('meeting-notification-expand').click();
+  await Promise.all([
+    expectInvitationCard(firstParticipantPage, 'Two participant meeting'),
+    expectInvitationCard(secondParticipantPage, 'Two participant meeting'),
+  ]);
+});
 
-  const cards = host.locator('[data-uie-name^="meeting-notification-card-"]');
-  await expect(cards).toHaveCount(1);
-  await expect(cards).toContainText('Update: Single participant meeting');
+test('adding a participant sends only one invitation to the newly added participant', async ({
+  createUser,
+  createTeam,
+  createPage,
+}) => {
+  const originalParticipant = await createUser();
+  const newParticipant = await createUser();
+  const team = await createTeam('Meetings', {users: [originalParticipant, newParticipant], features: {meetings: true}});
+
+  const [ownerPage, originalParticipantPage, newParticipantPage] = await Promise.all([
+    createPage(loginWithMeetingsEnabled(team.owner)),
+    createPage(loginWithMeetingsEnabled(originalParticipant)),
+    createPage(loginWithMeetingsEnabled(newParticipant)),
+  ]);
+
+  const title = 'Updated participants meeting';
+  await scheduleMeeting(ownerPage, title, [originalParticipant.fullName]);
+  await expectInvitationCard(originalParticipantPage, title);
+
+  await editMeetingToAddParticipant(ownerPage, title, newParticipant.fullName);
+
+  await expect(meetingNotificationCards(originalParticipantPage).filter({hasText: `Invitation: ${title}`})).toHaveCount(
+    1,
+  );
+  await expectInvitationCard(newParticipantPage, title);
 });

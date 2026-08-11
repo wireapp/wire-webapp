@@ -169,7 +169,7 @@ describe('MeetingStoreRoot', () => {
     expect(getMeeting).toHaveBeenCalledWith(meetingId);
   });
 
-  it('creates notifications while the meetings view is not mounted', async () => {
+  it('creates invite notifications while the meetings view is not mounted', async () => {
     renderMeetingStoreRoot();
 
     await waitFor(() => {
@@ -183,7 +183,7 @@ describe('MeetingStoreRoot', () => {
     await waitFor(() => {
       expect(useMeetingNotificationStore.getState().notifications).toEqual([
         expect.objectContaining({
-          kind: MeetingNotificationKind.UPDATE,
+          kind: MeetingNotificationKind.INVITE,
           meetingTitle: 'Weekly sync (updated)',
           qualifiedId: meetingId,
         }),
@@ -224,7 +224,7 @@ describe('MeetingStoreRoot', () => {
     expect(getMeeting).toHaveBeenCalledWith(meetingId);
   });
 
-  it('creates an update notification from the freshly synced member-added meeting', async () => {
+  it('creates an invite notification from the freshly synced member-added meeting', async () => {
     const {getMeeting} = renderMeetingStoreRoot({
       getMeetingsList: jest.fn(() => task.resolve([])),
       getMeeting: jest.fn(() => task.resolve(createApiMeeting('Late joiner meeting'))),
@@ -237,7 +237,7 @@ describe('MeetingStoreRoot', () => {
     await waitFor(() => {
       expect(useMeetingNotificationStore.getState().notifications).toEqual([
         expect.objectContaining({
-          kind: MeetingNotificationKind.UPDATE,
+          kind: MeetingNotificationKind.INVITE,
           meetingTitle: 'Late joiner meeting',
           qualifiedId: meetingId,
         }),

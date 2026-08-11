@@ -97,7 +97,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     const unsubscribeFromMeetingLifecycleEvents = subscribeToMeetingLifecycleEvents({
       dispatcher,
       getSelfUserQualifiedId: () => container.resolve(UserState).self().qualifiedId,
-      notifyUpdate: notificationHandlers.notifyUpdate,
+      notifyMeetingChange: notificationHandlers.notifyMeetingChange,
     });
     const unsubscribeFromMeetingStore = store.subscribe((state, previousState) => {
       if (state.meetingSeries !== previousState.meetingSeries) {

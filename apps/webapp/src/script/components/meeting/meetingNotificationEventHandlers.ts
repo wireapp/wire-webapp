@@ -40,6 +40,7 @@ export type MeetingNotificationEventHandlersDependencies = {
 };
 
 export type MeetingNotificationEventHandlers = {
+  notifyMeetingChange: (meeting: MeetingSeries) => void;
   notifyUpdate: (meeting: MeetingSeries) => void;
   onMeetingDeleted: (meetingId: QualifiedId) => void;
   /** Retries notifications that couldn't be sent because the meeting wasn't in the store yet. */
@@ -56,6 +57,7 @@ export const createMeetingNotificationEventHandlers = ({
 
   // Only deleted events can fire before the meeting store has synced.
   const pending = new Map<string, QualifiedId>();
+  const notifiedMeetings = new Set<string>();
 
   const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries) => {
     const notificationBase = {
@@ -110,6 +112,12 @@ export const createMeetingNotificationEventHandlers = ({
   };
 
   return {
+    notifyMeetingChange: meeting => {
+      const meetingKey = toMeetingIdKey(meeting.qualified_id);
+      const kind = notifiedMeetings.has(meetingKey) ? MeetingNotificationKind.UPDATE : MeetingNotificationKind.INVITE;
+      notifiedMeetings.add(meetingKey);
+      notifyForMeeting(kind, meeting);
+    },
     notifyUpdate: meeting => notifyForMeeting(MeetingNotificationKind.UPDATE, meeting),
     onMeetingDeleted: meetingId => {
       addCancellationNotificationForMeeting(meetingId);
