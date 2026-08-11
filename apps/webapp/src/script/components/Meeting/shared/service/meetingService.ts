@@ -45,7 +45,12 @@ import type {User} from 'Repositories/entity/User';
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 
-export type CreateMeetingSuccess = MeetingSubmitSuccess & {qualifiedConversation: QualifiedId};
+export type CreateMeetingSuccess = MeetingSubmitSuccess & {
+  qualifiedConversation: QualifiedId;
+  qualifiedMeetingId: QualifiedId;
+};
+
+export type ScheduleMeetingSuccess = MeetingSubmitSuccess & {qualifiedMeetingId: QualifiedId};
 
 const mapSyncErrorToSubmitError = (error: MeetingConversationSyncError): MeetingSubmitErrors => {
   switch (error) {
@@ -96,6 +101,7 @@ const createMeetingAndSyncParticipants = (
           .map(syncResult => ({
             ...syncResult,
             qualifiedConversation: createdMeeting.qualified_conversation,
+            qualifiedMeetingId: createdMeeting.qualified_id,
           })),
       ),
     );
@@ -106,10 +112,11 @@ const createMeetingAndSyncParticipants = (
 export const scheduleMeeting = (
   command: ScheduleMeetingCommand,
   deps: MeetingServiceDeps,
-): Task<MeetingSubmitSuccess, MeetingSubmitErrors> =>
+): Task<ScheduleMeetingSuccess, MeetingSubmitErrors> =>
   createMeetingAndSyncParticipants(mapScheduleCommandToCreateMeeting(command), command.selectedUsers, deps).map(
-    ({failedToAdd}) => ({
+    ({failedToAdd, qualifiedMeetingId}) => ({
       failedToAdd,
+      qualifiedMeetingId,
     }),
   );
 
