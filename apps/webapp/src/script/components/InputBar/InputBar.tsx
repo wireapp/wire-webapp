@@ -65,6 +65,7 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
+import {viewerPermissionFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../page/rootProvider';
 
 const CONFIG = {
@@ -116,7 +117,7 @@ export const InputBar = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: InputBarProps) => {
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
@@ -168,10 +169,12 @@ export const InputBar = ({
     : translate('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
+  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
   const isCellsUploadAllowed = isConversationFileDropAllowed({
     conversationTeamId: conversation.teamId,
     selfUserTeamId: selfUser.teamId,
     isCellsEnabled,
+    isViewerPermissionFeatureEnabled,
   });
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);

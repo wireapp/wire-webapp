@@ -37,7 +37,7 @@ import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {Config} from 'src/script/Config';
 import {translate} from 'Util/localizerUtil';
 import {
@@ -84,8 +84,13 @@ beforeAll(async () => {
 
 describe('InputBar', () => {
   let propertiesRepository: PropertiesRepository;
-  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
-  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+  const createRootProviderWrapper = (isViewerPermissionFeatureEnabled = false) =>
+    createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
+      }),
+    );
 
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(),
@@ -127,20 +132,36 @@ describe('InputBar', () => {
   const testMessage = 'text';
   const pngFile = new File(['(⌐□_□)'], 'wire-example-image.png', {type: 'image/png'});
 
-  function renderInputBar(properties: ReturnType<typeof getDefaultProps>): ReturnType<typeof render> {
-    return render(withTheme(<InputBar {...properties} />), {
-      wrapper: rootProviderWrapper,
-    });
+  function renderInputBar(
+    properties: ReturnType<typeof getDefaultProps>,
+    isViewerPermissionFeatureEnabled = false,
+  ): ReturnType<typeof render> {
+    return render(
+      withThemeAndRootContext(<InputBar {...properties} />, createRootProviderWrapper(isViewerPermissionFeatureEnabled)),
+    );
   }
 
-  it('hides cells upload buttons for viewers', () => {
+  it('shows cells upload buttons for viewers when the viewer permission feature is disabled', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'guest-team';
 
-    const {queryByTitle} = renderInputBar(props);
+    const {getByTitle} = renderInputBar(props);
+
+    expect(getByTitle('tooltipConversationAddImage')).not.toBe(null);
+    expect(getByTitle('tooltipConversationFile')).not.toBe(null);
+  });
+
+  it('hides cells upload buttons for viewers when the viewer permission feature is enabled', () => {
+    const props = getDefaultProps();
+    props.isCellsEnabled = true;
+    props.conversation.teamId = 'conversation-team';
+    props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    props.selfUser.teamId = 'guest-team';
+
+    const {queryByTitle} = renderInputBar(props, true);
 
     expect(queryByTitle('tooltipConversationAddImage')).toBe(null);
     expect(queryByTitle('tooltipConversationFile')).toBe(null);
