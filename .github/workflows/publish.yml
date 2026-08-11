@@ -152,10 +152,9 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+          IMAGE_TAG: ${{ steps.push_docker_image.outputs.image_tag }}
         run: |
           set -eo pipefail
-
-          image_tag="${{steps.push_docker_image.outputs.image_tag}}"
 
           helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
 
@@ -168,9 +167,9 @@ jobs:
           fi
           echo "chart_version=$chart_version" >> $GITHUB_OUTPUT
 
-          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
+          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$IMAGE_TAG\"" ./charts/webapp/Chart.yaml)"
           echo "$chart_patched" > ./charts/webapp/Chart.yaml
-          sed -i "s/:do-not-use/:$image_tag/g" ./charts/webapp/Chart.yaml
+          sed -i "s/:do-not-use/:$IMAGE_TAG/g" ./charts/webapp/Chart.yaml
 
           helm package ./charts/webapp
 
