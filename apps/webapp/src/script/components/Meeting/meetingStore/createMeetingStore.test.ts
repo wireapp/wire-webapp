@@ -74,12 +74,16 @@ describe('createMeetingStore', () => {
   });
 
   const createServiceTasks = (overrides: Partial<MeetingStoreServiceTasks> = {}): MeetingStoreServiceTasks => ({
-    scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    meetNowMeeting: jest
+    scheduleMeeting: jest
       .fn()
-      .mockReturnValue(
-        task.resolve({failedToAdd: [], qualifiedConversation: {id: 'conversation-id', domain: 'example.com'}}),
-      ),
+      .mockReturnValue(task.resolve({failedToAdd: [], qualifiedMeetingId: apiMeeting.qualified_id})),
+    meetNowMeeting: jest.fn().mockReturnValue(
+      task.resolve({
+        failedToAdd: [],
+        qualifiedConversation: {id: 'conversation-id', domain: 'example.com'},
+        qualifiedMeetingId: apiMeeting.qualified_id,
+      }),
+    ),
     updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
     deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
@@ -218,11 +222,14 @@ describe('createMeetingStore', () => {
     expect(store.getState().meetingSeries).toEqual([expect.objectContaining(meetingSeriesEntry)]);
   });
 
-  it('schedules a meeting without refreshing the meetings list', async () => {
-    const scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
+  it('syncs a newly scheduled meeting into the store without reloading the meetings list', async () => {
+    const scheduleMeeting = jest
+      .fn()
+      .mockReturnValue(task.resolve({failedToAdd: [], qualifiedMeetingId: apiMeeting.qualified_id}));
     const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
+    const getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting));
     const store = createMeetingStore(
-      createDeps({getMeetingsList, serviceTasks: createServiceTasks({scheduleMeeting})}),
+      createDeps({getMeetingsList, getMeeting, serviceTasks: createServiceTasks({scheduleMeeting})}),
     );
     const scheduleCommand = {
       title: 'Weekly sync',
@@ -237,7 +244,9 @@ describe('createMeetingStore', () => {
     expect(result.isOk).toBe(true);
     expect(scheduleMeeting).toHaveBeenCalledTimes(1);
     expect(scheduleMeeting).toHaveBeenCalledWith(scheduleCommand);
+    expect(getMeeting).toHaveBeenCalledWith(apiMeeting.qualified_id);
     expect(getMeetingsList).not.toHaveBeenCalled();
+    expect(store.getState().meetingSeries).toEqual([expect.objectContaining(meetingSeriesEntry)]);
   });
 
   it('loads meeting data for edit via safeGetConversationById', async () => {

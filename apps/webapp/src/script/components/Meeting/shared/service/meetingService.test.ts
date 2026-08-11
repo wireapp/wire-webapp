@@ -173,7 +173,10 @@ describe('scheduleMeeting', () => {
     const result = await scheduleMeeting(scheduleCommand, deps);
 
     expect(result.isOk).toBe(true);
-    expect(result.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual([]);
+    expect(result.match({Ok: value => value, Err: () => null})).toEqual({
+      failedToAdd: [],
+      qualifiedMeetingId: meetingId,
+    });
     expect(createMeetingMock).toHaveBeenCalledWith({
       title: 'Weekly sync',
       start_time: futureStartIso,
@@ -301,6 +304,7 @@ describe('meetNowMeeting', () => {
     expect(result.match({Ok: value => value, Err: () => null})).toEqual({
       failedToAdd: [],
       qualifiedConversation,
+      qualifiedMeetingId: meetingId,
     });
     expect(createMeetingMock).toHaveBeenCalledWith({
       title: 'Standup',

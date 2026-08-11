@@ -129,7 +129,13 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
 
       set({meetingSeries: listResult.meetingSeries, hasLoadError: listResult.hasLoadError, isLoading: false});
     },
-    scheduleMeeting: deps.serviceTasks.scheduleMeeting,
+    scheduleMeeting: command =>
+      deps.serviceTasks.scheduleMeeting(command).andThen(result =>
+        get()
+          .syncMeetingByQualifiedId(result.qualifiedMeetingId)
+          .map(() => ({failedToAdd: result.failedToAdd}))
+          .orElse(() => task.resolve({failedToAdd: result.failedToAdd})),
+      ),
     meetNowMeeting: deps.serviceTasks.meetNowMeeting,
     updateMeeting: deps.serviceTasks.updateMeeting,
     deleteMeetingForMe: meetingInstance =>
