@@ -547,7 +547,7 @@
   "cells.sidebar.title": "Файлы",
   "cells.tableRow.actions": "Больше вариантов",
   "cells.tableRow.conversationName": "Беседа",
-  "cells.tableRow.created": "Создана",
+  "cells.tableRow.modified": "Изменено",
   "cells.tableRow.name": "Название",
   "cells.tableRow.owner": "Загружено",
   "cells.tableRow.publicLink": "Общий доступ",
