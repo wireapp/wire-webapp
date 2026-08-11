@@ -83,16 +83,7 @@ export const CellsTableRowOptions = ({
   onRefresh,
   onCloseSearchView,
 }: CellsTableRowOptionsProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const selfUserDriveRole = useCellsSelfUserDriveRole();
-  const shouldHideRestrictedActions = shouldHideViewerRestrictedActions({
-    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
-    selfUserDriveRole,
-  });
-
-  if (shouldHideRestrictedActions && isInRecycleBin()) {
-    return null;
-  }
+  const {translate} = useApplicationContext();
 
   return (
     <DropdownMenu>
@@ -172,41 +163,50 @@ const CellsTableRowOptionsContent = ({
   }, [handleOpenFile, node, onRefresh]);
 
   if (isRootRecycleBin || isNestedRecycleBin) {
-    if (shouldHideRestrictedActions) {
-      return null;
-    }
-
     return (
       <DropdownMenu.Content>
         <DropdownMenu.Item
           onClick={() =>
-            isRootRecycleBin
-              ? showRestoreRootNodeModal({
-                  node,
-                  onRestoreNode: restoreNestedNode,
-                  translate,
-                })
-              : showRestoreNestedNodeModal({
-                  node,
-                  onRestoreNode: restoreParentNode,
-                  parentNodeName: rootParentName,
-                  translate,
-                })
+            node.type === CellNodeType.FOLDER
+              ? openFolder({path: node.path, onBeforeNavigate: onCloseSearchView})
+              : handleOpenFile(node)
           }
         >
-          {translate('cells.options.restore')}
+          {translate('cells.options.open')}
         </DropdownMenu.Item>
-        <DropdownMenu.Item
-          onClick={() =>
-            showDeletePermanentlyModal({
-              node,
-              onDeletePermanently: () => deleteNode({uuid: node.id, permanently: true}),
-              translate,
-            })
-          }
-        >
-          {translate('cells.options.deletePermanently')}
-        </DropdownMenu.Item>
+        {!shouldHideRestrictedActions && (
+          <>
+            <DropdownMenu.Item
+              onClick={() =>
+                isRootRecycleBin
+                  ? showRestoreRootNodeModal({
+                      node,
+                      onRestoreNode: restoreNestedNode,
+                      translate,
+                    })
+                  : showRestoreNestedNodeModal({
+                      node,
+                      onRestoreNode: restoreParentNode,
+                      parentNodeName: rootParentName,
+                      translate,
+                    })
+              }
+            >
+              {translate('cells.options.restore')}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onClick={() =>
+                showDeletePermanentlyModal({
+                  node,
+                  onDeletePermanently: () => deleteNode({uuid: node.id, permanently: true}),
+                  translate,
+                })
+              }
+            >
+              {translate('cells.options.deletePermanently')}
+            </DropdownMenu.Item>
+          </>
+        )}
       </DropdownMenu.Content>
     );
   }
