@@ -26,14 +26,16 @@ interface IsConversationFileDropAllowedParams {
   conversationTeamId?: string;
   selfUserTeamId?: string;
   isCellsEnabled: boolean;
+  isViewerPermissionFeatureEnabled: boolean;
 }
 
 export const isConversationFileDropAllowed = ({
   conversationTeamId,
   selfUserTeamId,
   isCellsEnabled,
+  isViewerPermissionFeatureEnabled,
 }: IsConversationFileDropAllowedParams): boolean => {
-  if (!isCellsEnabled) {
+  if (!isCellsEnabled || !isViewerPermissionFeatureEnabled) {
     return true;
   }
 
