@@ -188,6 +188,7 @@ export const ScheduleMeetingForm = ({
         <Input
           id="schedule-meeting-title"
           autoFocus
+          autoComplete="off"
           data-uie-name="schedule-meeting-title"
           label={translate('meetings.scheduleModal.titleLabel')}
           placeholder={translate('meetings.scheduleModal.titlePlaceholder')}

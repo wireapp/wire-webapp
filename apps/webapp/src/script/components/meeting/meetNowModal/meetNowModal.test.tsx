@@ -222,6 +222,16 @@ describe('MeetNowModal', () => {
     jest.restoreAllMocks();
   });
 
+  it('disables browser autocomplete for the meeting title', async () => {
+    renderMeetNowModal();
+
+    act(() => {
+      useMeetNowModal.getState().open();
+    });
+
+    expect(screen.getByLabelText('meetings.scheduleModal.titleLabel')).toHaveAttribute('autocomplete', 'off');
+  });
+
   it('does not dismiss the modal while submission is pending', async () => {
     const {fireAndForgetInvoker, resolveMeetNowMeeting} = renderMeetNowModal();
 
