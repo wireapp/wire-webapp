@@ -63,6 +63,11 @@ export const syncMeetingErrors = {
 
 export type SyncMeetingError = (typeof syncMeetingErrors)[keyof typeof syncMeetingErrors];
 
+export type SyncMeetingResult = {
+  meeting: MeetingSeries;
+  applied: boolean;
+};
+
 export type EditMeetingData = {
   formState: ScheduleMeetingFormState;
   qualifiedConversation: MeetingSeries['qualified_conversation'];
@@ -80,7 +85,7 @@ export type MeetingStoreState = {
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   deleteMeetingForAll: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
-  syncMeetingByQualifiedId: (meetingId: QualifiedId) => Task<MeetingSeries, SyncMeetingError>;
+  syncMeetingByQualifiedId: (meetingId: QualifiedId) => Task<SyncMeetingResult, SyncMeetingError>;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
 };
 
@@ -154,18 +159,19 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
               error: mapResult.error,
               qualifiedId: meetingId,
             });
-            return task.reject<MeetingSeries, SyncMeetingError>(syncMeetingErrors.mapFailed);
+            return task.reject<SyncMeetingResult, SyncMeetingError>(syncMeetingErrors.mapFailed);
           }
 
-          return task.resolve<MeetingSeries, SyncMeetingError>(mapResult.value);
+          return task.resolve<SyncMeetingResult, SyncMeetingError>({meeting: mapResult.value, applied: false});
         })
-        .map(updatedSeries => {
-          if (getMeetingMutationVersion(meetingId) === mutationVersionBeforeFetch) {
-            set(state => ({meetingSeries: upsertMeetingSeries(state.meetingSeries, updatedSeries)}));
+        .map(({meeting}) => {
+          const applied = getMeetingMutationVersion(meetingId) === mutationVersionBeforeFetch;
+          if (applied) {
+            set(state => ({meetingSeries: upsertMeetingSeries(state.meetingSeries, meeting)}));
             meetingStoreMutationVersion += 1;
           }
 
-          return updatedSeries;
+          return {meeting, applied};
         });
     },
     loadMeetingForEdit: meetingInstance => {

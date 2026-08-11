@@ -180,13 +180,15 @@ describe('MeetingStoreRoot', () => {
       amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
     });
 
-    expect(useMeetingNotificationStore.getState().notifications).toEqual([
-      expect.objectContaining({
-        kind: MeetingNotificationKind.UPDATE,
-        meetingTitle: 'Weekly sync',
-        qualifiedId: meetingId,
-      }),
-    ]);
+    await waitFor(() => {
+      expect(useMeetingNotificationStore.getState().notifications).toEqual([
+        expect.objectContaining({
+          kind: MeetingNotificationKind.UPDATE,
+          meetingTitle: 'Weekly sync (updated)',
+          qualifiedId: meetingId,
+        }),
+      ]);
+    });
   });
 
   it('does not notify the user who updated the meeting', async () => {
@@ -200,6 +202,10 @@ describe('MeetingStoreRoot', () => {
       amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, selfUserId);
     });
 
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync (updated)');
+    });
+
     expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
   });
 
@@ -209,7 +215,7 @@ describe('MeetingStoreRoot', () => {
       getMeeting: jest.fn(() => task.resolve(createApiMeeting('Late joiner meeting'))),
     });
 
-    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
+    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, otherUserId);
 
     await waitFor(() => {
       expect(getRenderedMeetingTitles()).toBe('Late joiner meeting');
@@ -218,14 +224,14 @@ describe('MeetingStoreRoot', () => {
     expect(getMeeting).toHaveBeenCalledWith(meetingId);
   });
 
-  it('retries a pending update notification after a member-added meeting is synced', async () => {
+  it('creates an update notification from the freshly synced member-added meeting', async () => {
     const {getMeeting} = renderMeetingStoreRoot({
       getMeetingsList: jest.fn(() => task.resolve([])),
       getMeeting: jest.fn(() => task.resolve(createApiMeeting('Late joiner meeting'))),
     });
 
     act(() => {
-      amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
+      amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, otherUserId);
     });
 
     await waitFor(() => {
@@ -277,6 +283,44 @@ describe('MeetingStoreRoot', () => {
     await waitFor(() => {
       expect(getRenderedMeetingTitles()).toBe('');
     });
+  });
+
+  it('does not add an update notification when a queued sync is followed by deletion', async () => {
+    let resolveMeeting: () => void = () => undefined;
+    const meetingFetch = new Promise<void>(resolve => {
+      resolveMeeting = resolve;
+    });
+    const getMeeting = jest.fn(() =>
+      task.tryOrElse(
+        () => new Error('fetch failed'),
+        async () => {
+          await meetingFetch;
+          return createApiMeeting('Weekly sync (updated)');
+        },
+      ),
+    );
+    renderMeetingStoreRoot({getMeeting});
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
+      amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+      resolveMeeting();
+    });
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('');
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([
+      expect.objectContaining({
+        kind: MeetingNotificationKind.CANCELLED,
+        qualifiedId: meetingId,
+      }),
+    ]);
   });
 
   it('reloads meetings when missed events are reported', async () => {

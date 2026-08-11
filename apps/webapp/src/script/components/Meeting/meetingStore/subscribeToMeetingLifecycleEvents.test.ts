@@ -25,6 +25,8 @@ import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatche
 import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEvents';
 
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
+const selfUserId: QualifiedId = {id: 'self-user-id', domain: 'example.com'};
+const otherUserId: QualifiedId = {id: 'other-user-id', domain: 'example.com'};
 
 type MeetingLifecycleDispatcherDouble = {
   [Key in keyof MeetingLifecycleDispatcher]: jest.Mock;
@@ -41,7 +43,11 @@ describe('subscribeToMeetingLifecycleEvents', () => {
   const activeUnsubscribeCallbacks: (() => void)[] = [];
 
   const subscribe = (dispatcher: MeetingLifecycleDispatcherDouble) => {
-    const unsubscribe = subscribeToMeetingLifecycleEvents({dispatcher});
+    const unsubscribe = subscribeToMeetingLifecycleEvents({
+      dispatcher,
+      getSelfUserQualifiedId: () => selfUserId,
+      notifyUpdate: jest.fn(),
+    });
     activeUnsubscribeCallbacks.push(unsubscribe);
 
     return unsubscribe;
@@ -65,9 +71,9 @@ describe('subscribeToMeetingLifecycleEvents', () => {
     const dispatcher = createDispatcherDouble();
     subscribe(dispatcher);
 
-    amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId);
+    amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
 
-    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId);
+    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId, expect.any(Function));
     expect(dispatcher.enqueueMeetingRemoval).not.toHaveBeenCalled();
   });
 
@@ -75,9 +81,9 @@ describe('subscribeToMeetingLifecycleEvents', () => {
     const dispatcher = createDispatcherDouble();
     subscribe(dispatcher);
 
-    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId);
+    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, otherUserId);
 
-    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId);
+    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId, expect.any(Function));
     expect(dispatcher.enqueueMeetingRemoval).not.toHaveBeenCalled();
   });
 
@@ -89,6 +95,26 @@ describe('subscribeToMeetingLifecycleEvents', () => {
 
     expect(dispatcher.enqueueMeetingRemoval).toHaveBeenCalledWith(meetingId);
     expect(dispatcher.enqueueMeetingSync).not.toHaveBeenCalled();
+  });
+
+  it('queues a sync without a notification callback for an update authored by the current user', () => {
+    const dispatcher = createDispatcherDouble();
+    subscribe(dispatcher);
+
+    amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, selfUserId);
+
+    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId);
+    expect(dispatcher.enqueueMeetingSync).not.toHaveBeenCalledWith(meetingId, expect.any(Function));
+  });
+
+  it('queues a sync without a notification callback for a member-added event authored by the current user', () => {
+    const dispatcher = createDispatcherDouble();
+    subscribe(dispatcher);
+
+    amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, selfUserId);
+
+    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId);
+    expect(dispatcher.enqueueMeetingSync).not.toHaveBeenCalledWith(meetingId, expect.any(Function));
   });
 
   it('queues a meetings reload when missed events are reported', () => {
