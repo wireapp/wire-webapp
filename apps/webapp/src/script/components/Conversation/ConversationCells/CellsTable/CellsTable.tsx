@@ -89,7 +89,7 @@ export const CellsTable = ({
   const {translate} = useApplicationContext();
   const labels = {
     actions: translate('cells.tableRow.actions'),
-    created: translate('cells.tableRow.created'),
+    created: translate('cells.tableRow.modified'),
     name: translate('cells.tableRow.name'),
     owner: translate('cells.tableRow.owner'),
     publicLink: translate('cells.tableRow.publicLink'),
