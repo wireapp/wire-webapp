@@ -27,12 +27,14 @@ import {
   conversationListCollapseFeatureToggleName,
   meetingsFeatureToggleName,
   startupFeatureToggleNames,
+  viewerPermissionFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
   meetingsFeatureToggleName,
   conversationListCollapseFeatureToggleName,
+  viewerPermissionFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -101,6 +103,14 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(conversationListCollapseFeatureToggleName)).toBe(true);
   });
 
+  it('enables the viewer permission feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${viewerPermissionFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(viewerPermissionFeatureToggleName)).toBe(true);
+  });
+
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${applockRefactoredFeatureToggleName} `,
@@ -142,6 +152,7 @@ describe('startupFeatureToggles', function () {
       applockRefactoredFeatureToggleName,
       meetingsFeatureToggleName,
       conversationListCollapseFeatureToggleName,
+      viewerPermissionFeatureToggleName,
     ]);
   });
 
