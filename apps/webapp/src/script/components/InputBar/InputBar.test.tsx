@@ -19,6 +19,9 @@
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/InputBar/index';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -34,7 +37,7 @@ import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {Config} from 'src/script/Config';
 import {translate} from 'Util/localizerUtil';
 import {
@@ -45,7 +48,6 @@ import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {translateForTest} from 'Util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('Components/avatar', () => ({
   AVATAR_SIZE: {X_LARGE: 'avatar-xl'},
@@ -76,14 +78,19 @@ beforeAll(async () => {
 
   spyOn(Config, 'getConfig').and.returnValue({
     ALLOWED_IMAGE_TYPES: [],
-    FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
+    FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*'], ENABLE_CELLS: true},
   });
 });
 
 describe('InputBar', () => {
   let propertiesRepository: PropertiesRepository;
-  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
-  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+  const createRootProviderWrapper = (isViewerPermissionFeatureEnabled = false) =>
+    createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
+      }),
+    );
 
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(),
@@ -125,11 +132,56 @@ describe('InputBar', () => {
   const testMessage = 'text';
   const pngFile = new File(['(⌐□_□)'], 'wire-example-image.png', {type: 'image/png'});
 
-  function renderInputBar(properties: ReturnType<typeof getDefaultProps>): ReturnType<typeof render> {
-    return render(withTheme(<InputBar {...properties} />), {
-      wrapper: rootProviderWrapper,
-    });
+  function renderInputBar(
+    properties: ReturnType<typeof getDefaultProps>,
+    isViewerPermissionFeatureEnabled = false,
+  ): ReturnType<typeof render> {
+    return render(
+      withThemeAndRootContext(
+        <InputBar {...properties} />,
+        createRootProviderWrapper(isViewerPermissionFeatureEnabled),
+      ),
+    );
   }
+
+  it('shows cells upload buttons for viewers when the viewer permission feature is disabled', () => {
+    const props = getDefaultProps();
+    props.isCellsEnabled = true;
+    props.conversation.teamId = 'conversation-team';
+    props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    props.selfUser.teamId = 'guest-team';
+
+    const {getByTitle} = renderInputBar(props);
+
+    expect(getByTitle('tooltipConversationAddImage')).not.toBe(null);
+    expect(getByTitle('tooltipConversationFile')).not.toBe(null);
+  });
+
+  it('hides cells upload buttons for viewers when the viewer permission feature is enabled', () => {
+    const props = getDefaultProps();
+    props.isCellsEnabled = true;
+    props.conversation.teamId = 'conversation-team';
+    props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    props.selfUser.teamId = 'guest-team';
+
+    const {queryByTitle} = renderInputBar(props, true);
+
+    expect(queryByTitle('tooltipConversationAddImage')).toBe(null);
+    expect(queryByTitle('tooltipConversationFile')).toBe(null);
+  });
+
+  it('shows cells upload buttons for editors', () => {
+    const props = getDefaultProps();
+    props.isCellsEnabled = true;
+    props.conversation.teamId = 'conversation-team';
+    props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    props.selfUser.teamId = 'conversation-team';
+
+    const {getByTitle} = renderInputBar(props);
+
+    expect(getByTitle('tooltipConversationAddImage')).not.toBe(null);
+    expect(getByTitle('tooltipConversationFile')).not.toBe(null);
+  });
 
   it('has passed value', async () => {
     const props = getDefaultProps();

@@ -42,6 +42,7 @@ interface ControlButtonsProps {
   disablePing?: boolean;
   disableFilesharing?: boolean;
   isCellsFeatureEnabled?: boolean;
+  isCellsUploadAllowed?: boolean;
   isEditing?: boolean;
   isFormatActive: boolean;
   isEmojiActive: boolean;
@@ -65,6 +66,7 @@ const ControlButtons = ({
   disableFilesharing,
   input,
   isCellsFeatureEnabled,
+  isCellsUploadAllowed = true,
   isEditing,
   isFormatActive,
   isEmojiActive,
@@ -84,6 +86,7 @@ const ControlButtons = ({
   const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsFeatureEnabled === true;
   const isCellsConversation = isCellsEnabled && conversation.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
   const isFilesharingEnabled = disableFilesharing !== true;
+  const isCellsUploadEnabled = isCellsConversation && isFilesharingEnabled && isCellsUploadAllowed;
 
   if (isEditing === true) {
     return (
@@ -125,28 +128,29 @@ const ControlButtons = ({
             <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
           </li>
         )}
-        {isFilesharingEnabled && (
+        {isCellsUploadEnabled && (
           <>
             <li>
-              {isCellsConversation ? (
-                <CellImageUploadButton onClick={onCellImageUpload} />
-              ) : (
-                <ImageUploadButton
-                  onSelectImages={onSelectImages}
-                  acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
-                />
-              )}
+              <CellImageUploadButton onClick={onCellImageUpload} />
             </li>
-
             <li>
-              {isCellsConversation ? (
-                <CellAssetUploadButton onClick={onCellAssetUpload} />
-              ) : (
-                <AssetUploadButton
-                  onSelectFiles={onSelectFiles}
-                  acceptedFileTypes={Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS}
-                />
-              )}
+              <CellAssetUploadButton onClick={onCellAssetUpload} />
+            </li>
+          </>
+        )}
+        {isFilesharingEnabled && !isCellsConversation && (
+          <>
+            <li>
+              <ImageUploadButton
+                onSelectImages={onSelectImages}
+                acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
+              />
+            </li>
+            <li>
+              <AssetUploadButton
+                onSelectFiles={onSelectFiles}
+                acceptedFileTypes={Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS}
+              />
             </li>
           </>
         )}
@@ -179,12 +183,12 @@ const ControlButtons = ({
               <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
             </li>
           )}
-          {isFilesharingEnabled && isCellsEnabled && (
+          {isCellsUploadEnabled && (
             <li>
               <CellImageUploadButton onClick={onCellImageUpload} />
             </li>
           )}
-          {isFilesharingEnabled && isCellsEnabled && (
+          {isCellsUploadEnabled && (
             <li>
               <CellAssetUploadButton onClick={onCellAssetUpload} />
             </li>
