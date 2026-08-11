@@ -547,7 +547,7 @@
   "cells.sidebar.title": "Dateien",
   "cells.tableRow.actions": "Weitere Optionen",
   "cells.tableRow.conversationName": "Unterhaltung",
-  "cells.tableRow.created": "Erstellt",
+  "cells.tableRow.modified": "Modified",
   "cells.tableRow.name": "Name",
   "cells.tableRow.owner": "Hochgeladen von",
   "cells.tableRow.publicLink": "Geteilt",

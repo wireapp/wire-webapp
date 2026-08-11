@@ -547,7 +547,7 @@
   "cells.sidebar.title": "Files",
   "cells.tableRow.actions": "More options",
   "cells.tableRow.conversationName": "Conversation",
-  "cells.tableRow.created": "Created",
+  "cells.tableRow.modified": "Modified",
   "cells.tableRow.name": "Name",
   "cells.tableRow.owner": "Uploaded by",
   "cells.tableRow.publicLink": "Shared",
