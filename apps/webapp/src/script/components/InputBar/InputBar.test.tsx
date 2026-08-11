@@ -137,7 +137,10 @@ describe('InputBar', () => {
     isViewerPermissionFeatureEnabled = false,
   ): ReturnType<typeof render> {
     return render(
-      withThemeAndRootContext(<InputBar {...properties} />, createRootProviderWrapper(isViewerPermissionFeatureEnabled)),
+      withThemeAndRootContext(
+        <InputBar {...properties} />,
+        createRootProviderWrapper(isViewerPermissionFeatureEnabled),
+      ),
     );
   }
 
