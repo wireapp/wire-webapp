@@ -29,6 +29,7 @@ import {useCellsSorting} from 'Components/Conversation/ConversationCells/common/
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/UserState';
 
 import {loadMoreWrapperStyles, wrapperStyles} from './cellsGlobalView.styles';
 import {CellsHeader} from './cellsHeader/cellsHeader';
@@ -46,6 +47,7 @@ interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;
   userRepository?: UserRepository;
   conversationRepository?: ConversationRepository;
+  userState?: UserState;
 }
 
 export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement => {
@@ -54,6 +56,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
     cellsRepository = container.resolve(CellsRepository),
     userRepository = container.resolve(UserRepository),
     conversationRepository = container.resolve(ConversationRepository),
+    userState = container.resolve(UserState),
   } = properties;
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
@@ -68,6 +71,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
     fireAndForgetInvoker,
     filters: filterState,
     sort,
+    selfUserTeamId: userState.self().teamId,
   });
 
   useOnPresignedUrlExpired({refreshCallback: handleReload});

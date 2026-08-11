@@ -21,6 +21,7 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 
+import {getSelfUserDriveRole} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
@@ -33,10 +34,12 @@ export const transformCellsNodes = ({
   nodes,
   users,
   conversations = [],
+  selfUserTeamId,
 }: {
   nodes: RestNode[];
   users: User[];
   conversations?: Conversation[];
+  selfUserTeamId?: string;
 }): CellNode[] => {
   return nodes.map(node => {
     const id = node.Uuid;
@@ -60,6 +63,10 @@ export const transformCellsNodes = ({
       presignedGetExpiresAt !== undefined ? new Date(Number(presignedGetExpiresAt) * TIME_IN_MILLIS.SECOND) : null;
 
     const conversation = getConversation(node, conversations);
+    const selfUserDriveRole = getSelfUserDriveRole({
+      conversationTeamId: conversation?.teamId,
+      selfUserTeamId,
+    });
 
     const userQualifiedId = getUserQualifiedIdFromNode(node);
     const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) ?? null;
@@ -81,6 +88,7 @@ export const transformCellsNodes = ({
         presignedUrlExpiresAt,
         user,
         conversation,
+        selfUserDriveRole,
       };
     }
 
@@ -103,6 +111,7 @@ export const transformCellsNodes = ({
       presignedUrlExpiresAt,
       user,
       conversation,
+      selfUserDriveRole,
     };
   });
 };

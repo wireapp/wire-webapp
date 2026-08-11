@@ -19,6 +19,7 @@
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {CellsSelfUserDriveRole} from 'src/script/components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 
 export enum CellNodeType {
   FILE = 'file',
@@ -46,6 +47,7 @@ interface CellNodeGeneral {
   presignedUrlExpiresAt: Date | null;
   user: User | null;
   conversation?: Conversation;
+  selfUserDriveRole: CellsSelfUserDriveRole;
 }
 
 export interface CellFolder extends CellNodeGeneral {

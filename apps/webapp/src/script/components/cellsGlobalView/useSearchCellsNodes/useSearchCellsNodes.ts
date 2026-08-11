@@ -53,6 +53,7 @@ interface UseSearchCellsNodesProps {
   fireAndForgetInvoker: FireAndForgetInvoker;
   filters: GlobalDriveFiltersState;
   sort: CellsSort | null;
+  selfUserTeamId?: string;
   createDebouncedSearch?: CreateDebouncedSearch;
   logger?: Logger;
 }
@@ -87,6 +88,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     fireAndForgetInvoker,
     filters,
     sort,
+    selfUserTeamId,
     createDebouncedSearch,
     logger = defaultLogger,
   } = properties;
@@ -151,6 +153,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
           nodes: filteredNodes,
           users,
           conversations,
+          selfUserTeamId,
         });
 
         setNodes(transformedNodes);
@@ -184,7 +187,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pageSize, setNodes, setPagination, setStatus, filters, sort, logger],
+    [pageSize, setNodes, setPagination, setStatus, filters, sort, logger, selfUserTeamId],
   );
 
   const runDebouncedSearch = useCallback(
