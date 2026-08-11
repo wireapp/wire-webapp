@@ -51,14 +51,15 @@ test('single participant meeting notification', async ({createUser, createTeam, 
 
   const participants = modal.locator('[data-uie-name="schedule-meeting-participants"]');
   await participants.locator('[data-uie-name="schedule-meeting-participants-input"]').fill(member.fullName);
-  await ownerPage.locator('[data-uie-name="item-user"]').filter({hasText: member.fullName}).click();
+  await modal.locator('[data-uie-name="item-user"]').filter({hasText: member.fullName}).click();
 
   await modal.locator('[data-uie-name="schedule-meeting-modal-submit"]').click();
+  await expect(modal).toBeHidden();
 
   const host = memberPage.locator('[data-uie-name="meeting-notification-host"]');
   await expect.poll(() => host.count(), {timeout: 30_000}).toBe(1);
   await expect(host).toBeVisible();
-  await host.getByRole('button', {name: 'Expand'}).click();
+  await host.getByTestId('meeting-notification-expand').click();
 
   const cards = host.locator('[data-uie-name^="meeting-notification-card-"]');
   await expect(cards).toHaveCount(1);
