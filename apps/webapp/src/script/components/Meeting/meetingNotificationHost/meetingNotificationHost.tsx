@@ -90,6 +90,7 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
             css={meetingNotificationHostButtonStyles}
             aria-expanded={isExpanded}
             aria-controls="meeting-notification-list"
+            data-uie-name="meeting-notification-expand"
             onClick={() => useMeetingNotificationStore.getState().setIsExpanded(!isExpanded)}
           >
             <ChevronIcon css={meetingNotificationHostExpandIconStyles(isExpanded)} />
