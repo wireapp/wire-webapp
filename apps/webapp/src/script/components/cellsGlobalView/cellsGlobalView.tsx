@@ -29,7 +29,7 @@ import {useCellsSorting} from 'Components/Conversation/ConversationCells/common/
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 
 import {loadMoreWrapperStyles, wrapperStyles} from './cellsGlobalView.styles';
 import {CellsHeader} from './cellsHeader/cellsHeader';
