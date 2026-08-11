@@ -170,6 +170,7 @@ jobs:
 
           chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
           echo "$chart_patched" > ./charts/webapp/Chart.yaml
+          sed -i "s/:do-not-use/:$image_tag/g" ./charts/webapp/Chart.yaml
 
           helm package ./charts/webapp
 
