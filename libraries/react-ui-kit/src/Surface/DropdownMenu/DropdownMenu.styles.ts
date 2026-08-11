@@ -113,6 +113,12 @@ export const itemStyle: CSSObject = {
   '&[data-highlighted]': {
     backgroundColor: 'var(--foreground-fade-16)',
   },
+
+  '&[data-disabled]': {
+    backgroundColor: 'var(--button-tertiary-disabled-bg)',
+    cursor: 'not-allowed',
+    opacity: 0.56,
+  },
 };
 
 export const textStyles: CSSObject = {

@@ -23,6 +23,7 @@ import {render} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {createFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
@@ -50,6 +51,7 @@ describe('CellsShareModal', () => {
     presignedUrlExpiresAt: null,
     user: null,
     type: CellNodeType.FILE,
+    selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
   });
 
   const createCellsRepository = (): CellsRepository =>
