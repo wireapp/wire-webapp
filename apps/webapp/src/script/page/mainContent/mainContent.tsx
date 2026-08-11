@@ -29,7 +29,7 @@ import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/historyExport';
 import {HistoryImport} from 'Components/historyImport';
 import * as Icon from 'Components/icon';
-import {Meetings} from 'Components/Meeting/meetings';
+import {Meetings} from 'Components/meeting/meetings';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';

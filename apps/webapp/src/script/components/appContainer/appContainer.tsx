@@ -29,7 +29,7 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {MeetingStoreRoot} from 'Components/Meeting/meetingStore/MeetingStoreRoot';
+import {MeetingStoreRoot} from 'Components/meeting/meetingStore/meetingStoreRoot';
 import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';

@@ -21,8 +21,8 @@ import {act, render, screen} from '@testing-library/react';
 import {task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
 
-import type {MeetingStoreState} from 'Components/Meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/Meeting/meetingStore/MeetingStoreProvider';
+import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createExecutingFireAndForgetInvokerForTest,

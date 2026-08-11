@@ -27,8 +27,8 @@ export enum MEETING_EVENT {
 }
 
 /**
- * Meeting lifecycle events carry the meeting id at the top level as `qualified_id`
- * (no `data` wrapper), matching the backend Meeting event schema.
+ * meeting lifecycle events carry the meeting id at the top level as `qualified_id`
+ * (no `data` wrapper), matching the backend meeting event schema.
  */
 export interface BaseMeetingEvent {
   conversation?: string;
