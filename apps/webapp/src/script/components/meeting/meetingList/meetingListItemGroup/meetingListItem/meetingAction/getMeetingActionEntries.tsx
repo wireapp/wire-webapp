@@ -22,6 +22,7 @@ import {CallIcon, EditIcon, TrashIcon} from '@wireapp/react-ui-kit';
 import {
   contextMenuDangerItemIconStyles,
   contextMenuDangerItemStyles,
+  contextMenuDisabledItemIconStyles,
 } from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingAction.styles';
 import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingActionTranslationKeys';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
@@ -55,7 +56,7 @@ export const getMeetingActionEntries = ({
   onDeleteForMe,
 }: GetMeetingActionEntriesParams): ContextMenuEntry[] => {
   const joinEntry: ContextMenuEntry = {
-    icon: () => <CallIcon />,
+    icon: () => <CallIcon css={isJoinDisabled ? contextMenuDisabledItemIconStyles : undefined} />,
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.joinNow),
     isDisabled: isJoinDisabled,
     click: onJoin,

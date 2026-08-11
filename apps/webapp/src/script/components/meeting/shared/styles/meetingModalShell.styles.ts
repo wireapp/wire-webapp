@@ -80,4 +80,5 @@ export const submitButtonStyles: CSSObject = {
 
 export const submitButtonIconStyles: CSSObject = {
   marginRight: '8px',
+  fill: 'currentColor',
 };
