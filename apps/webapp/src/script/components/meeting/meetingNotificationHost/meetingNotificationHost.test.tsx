@@ -147,7 +147,7 @@ describe('MeetingNotificationHost', () => {
     addNotification({kind: MeetingNotificationKind.UPDATE, qualifiedId, meetingTitle: 'Updated', meetingStartTime});
 
     renderHost();
-    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.expand'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.showAll'}));
 
     expect(screen.getAllByRole('listitem')).toHaveLength(5);
     expect(getList()).toHaveStyle({overflowY: 'auto'});
@@ -166,10 +166,10 @@ describe('MeetingNotificationHost', () => {
     });
 
     renderHost();
-    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.expand'}));
-    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.collapse'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.showAll'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.hide'}));
     expect(screen.getByText('meetings.notifications.total')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.expand'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.showAll'}));
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.dismissAll'}));
 
     expect(getHost()).not.toBeInTheDocument();
@@ -185,7 +185,7 @@ describe('MeetingNotificationHost', () => {
     });
 
     renderHost();
-    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.expand'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.showAll'}));
     expect(useMeetingNotificationStore.getState().isExpanded).toBe(true);
 
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.dismissAll'}));
@@ -209,9 +209,9 @@ describe('MeetingNotificationHost', () => {
       {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}))},
     );
 
-    fireEvent.click(screen.getAllByRole('button', {name: 'meetings.notifications.expand'})[0]);
+    fireEvent.click(screen.getAllByRole('button', {name: 'meetings.notifications.showAll'})[0]);
 
-    expect(screen.getAllByRole('button', {name: 'meetings.notifications.collapse'})).toHaveLength(2);
+    expect(screen.getAllByRole('button', {name: 'meetings.notifications.hide'})).toHaveLength(2);
   });
 
   it('switches between overlay and standalone styles as isStandalone toggles', () => {
