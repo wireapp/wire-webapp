@@ -63,7 +63,7 @@ interface CellsSortingState {
 
 const DEFAULT_SCOPE_KEY = 'default';
 
-export const useCellsSorting = (scopeKey = DEFAULT_SCOPE_KEY) => {
+export const useCellsSorting = (scopeKey = DEFAULT_SCOPE_KEY, displayedSort?: CellsSort) => {
   const [state, setSortState] = useState<CellsSortingState>({scopeKey, sort: null});
 
   // Scope changes must clear synchronously so request hooks never receive a stale sort.
@@ -72,6 +72,7 @@ export const useCellsSorting = (scopeKey = DEFAULT_SCOPE_KEY) => {
   }
 
   const sort = state.scopeKey === scopeKey ? state.sort : null;
+  const visibleSort = sort !== null ? sort : displayedSort;
 
   const setSort = useCallback(
     (nextSort: CellsSort | null) => {
@@ -83,7 +84,7 @@ export const useCellsSorting = (scopeKey = DEFAULT_SCOPE_KEY) => {
   const toggleSort = useCallback(
     (field: CellsSortField) => {
       setSortState(current => {
-        const currentSort = current.scopeKey === scopeKey ? current.sort : null;
+        const currentSort = (current.scopeKey === scopeKey ? current.sort : null) ?? displayedSort;
 
         // Selecting a different column starts at that column's default direction.
         if (currentSort?.field !== field) {
@@ -94,12 +95,13 @@ export const useCellsSorting = (scopeKey = DEFAULT_SCOPE_KEY) => {
         return {scopeKey, sort: {field, direction: currentSort.direction === 'asc' ? 'desc' : 'asc'}};
       });
     },
-    [scopeKey],
+    [displayedSort, scopeKey],
   );
 
   const getDirectionFor = useCallback(
-    (field: CellsSortField): CellsSortDirection | undefined => (sort?.field === field ? sort.direction : undefined),
-    [sort],
+    (field: CellsSortField): CellsSortDirection | undefined =>
+      visibleSort?.field === field ? visibleSort.direction : undefined,
+    [visibleSort],
   );
 
   return {sort, setSort, toggleSort, getDirectionFor};

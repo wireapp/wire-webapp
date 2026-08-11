@@ -39,7 +39,7 @@ const columnHelper = createColumnHelper<CellNode>();
 const getCellsTableColumnLabels = (translate: RootContextValue['translate']) => ({
   actions: translate('cells.tableRow.actions'),
   conversationName: translate('cells.tableRow.conversationName'),
-  created: translate('cells.tableRow.created'),
+  created: translate('cells.tableRow.modified'),
   name: translate('cells.tableRow.name'),
   owner: translate('cells.tableRow.owner'),
   publicLink: translate('cells.tableRow.publicLink'),

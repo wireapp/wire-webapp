@@ -49,6 +49,7 @@ interface CellsGlobalViewProps {
 }
 
 export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement => {
+  const defaultGlobalFilesSort = {field: 'mtime', direction: 'desc'} as const;
   const {
     cellsRepository = container.resolve(CellsRepository),
     userRepository = container.resolve(UserRepository),
@@ -58,7 +59,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
 
   const {filters, filterState} = useGlobalDriveFilters({cellsRepository, conversationRepository, translate});
-  const {sort, getDirectionFor, toggleSort} = useCellsSorting();
+  const {sort, getDirectionFor, toggleSort} = useCellsSorting('default', defaultGlobalFilesSort);
 
   const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsNodes({
     cellsRepository,
