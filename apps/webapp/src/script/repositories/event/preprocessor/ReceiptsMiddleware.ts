@@ -98,7 +98,11 @@ export class ReceiptsMiddleware implements EventMiddleware {
     const commonUpdates = {status};
     const readReceiptUpdate =
       status === StatusType.SEEN
-        ? {read_receipts: currentReceipts.concat([{time: confirmationEvent.time, userId: confirmationEvent.from}])}
+        ? {
+            read_receipts: currentReceipts.concat([
+              {time: confirmationEvent.time, userId: confirmationEvent.from ?? ''},
+            ]),
+          }
         : {};
 
     const updatedEvent = {...originalEvent, ...commonUpdates, ...readReceiptUpdate};

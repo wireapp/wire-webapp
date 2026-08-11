@@ -716,7 +716,7 @@ export class DebugUtil {
   ): Promise<{conversation: Conversation; event: ConversationEvent; user: User}> {
     const conversationId = event.qualified_conversation ?? {domain: '', id: event.conversation};
     const conversation = await this.conversationRepository.getConversationById(conversationId);
-    const user = await this.userRepository.getUserById(event.qualified_from ?? {domain: '', id: event.from});
+    const user = await this.userRepository.getUserById(event.qualified_from ?? {domain: '', id: event.from ?? ''});
 
     const debugInformation = {
       conversation,

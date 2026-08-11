@@ -20,6 +20,7 @@
 import {ConversationSettingsIcon, MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
+import {AdminlessDeleteReminderMessage} from 'Repositories/entity/message/adminlessDeleteReminderMessage';
 import {E2EIVerificationMessage} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
 import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
@@ -34,6 +35,7 @@ import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/
 
 import {SystemMessageBase} from './SystemMessageBase';
 
+import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageComponent} from '../AdminlessDeleteReminderMessage';
 import {messageBodyWrapper} from '../ContentMessage/ContentMessage.styles';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
 
@@ -87,6 +89,10 @@ export const SystemMessage = ({message}: SystemMessageProps) => {
 
   if (message instanceof MLSMigrationFinalisationOngoingCallMessage) {
     return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
+  }
+
+  if (message instanceof AdminlessDeleteReminderMessage) {
+    return <AdminlessDeleteReminderMessageComponent message={message} />;
   }
 
   return <SystemMessageBase message={message} />;
