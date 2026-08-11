@@ -35,6 +35,7 @@ import type {
 } from 'Components/Meeting/shared/types/meetingCommandTypes';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
+import {toMeetingIdKey} from 'Components/Meeting/utils/toMeetingIdKey';
 import type {User} from 'Repositories/entity/User';
 import {getLogger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -93,15 +94,13 @@ export type MeetingStore = StoreApi<MeetingStoreState>;
 
 type MeetingStoreInitialState = Partial<Pick<MeetingStoreState, 'meetingSeries' | 'isLoading' | 'hasLoadError'>>;
 
-const toQualifiedIdKey = (qualifiedId: QualifiedId): string => `${qualifiedId.domain}:${qualifiedId.id}`;
-
 export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: MeetingStoreInitialState): MeetingStore => {
   const meetingMutationVersions = new Map<string, number>();
   let meetingStoreMutationVersion = 0;
   const getMeetingMutationVersion = (meetingId: QualifiedId): number =>
-    meetingMutationVersions.get(toQualifiedIdKey(meetingId)) ?? 0;
+    meetingMutationVersions.get(toMeetingIdKey(meetingId)) ?? 0;
   const incrementMeetingMutationVersion = (meetingId: QualifiedId): void => {
-    const meetingIdKey = toQualifiedIdKey(meetingId);
+    const meetingIdKey = toMeetingIdKey(meetingId);
     meetingMutationVersions.set(meetingIdKey, getMeetingMutationVersion(meetingId) + 1);
     meetingStoreMutationVersion += 1;
   };

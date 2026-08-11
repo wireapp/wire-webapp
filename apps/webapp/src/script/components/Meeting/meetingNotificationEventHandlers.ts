@@ -27,6 +27,8 @@ import {
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
+import {toMeetingIdKey} from './utils/toMeetingIdKey';
+
 type MeetingNotificationLogger = {
   warn: (message: string, context?: unknown) => void;
 };
@@ -54,7 +56,6 @@ export const createMeetingNotificationEventHandlers = ({
 
   // Only deleted events can fire before the meeting store has synced.
   const pending = new Map<string, QualifiedId>();
-  const pendingKey = (meetingId: QualifiedId) => `${meetingId.domain}:${meetingId.id}`;
 
   const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries) => {
     const notificationBase = {
@@ -89,7 +90,7 @@ export const createMeetingNotificationEventHandlers = ({
         kind: MeetingNotificationKind.CANCELLED,
         meetingId,
       });
-      pending.set(pendingKey(meetingId), meetingId);
+      pending.set(toMeetingIdKey(meetingId), meetingId);
       return;
     }
 

@@ -21,6 +21,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Task} from 'true-myth';
 
 import type {MeetingSeries} from 'Components/Meeting/types/meetingSeries';
+import {toMeetingIdKey} from 'Components/Meeting/utils/toMeetingIdKey';
 
 import type {SyncMeetingError, SyncMeetingResult} from './createMeetingStore';
 
@@ -55,9 +56,8 @@ export const createMeetingLifecycleDispatcher = (
   let queuedOperations: Promise<void> = Promise.resolve();
   const latestOperationVersions = new Map<string, number>();
 
-  const meetingIdKey = (meetingId: QualifiedId): string => `${meetingId.domain}:${meetingId.id}`;
   const bumpOperationVersion = (meetingId: QualifiedId): number => {
-    const key = meetingIdKey(meetingId);
+    const key = toMeetingIdKey(meetingId);
     const version = (latestOperationVersions.get(key) ?? 0) + 1;
     latestOperationVersions.set(key, version);
     return version;
@@ -88,7 +88,7 @@ export const createMeetingLifecycleDispatcher = (
           return;
         }
 
-        const currentVersion = latestOperationVersions.get(meetingIdKey(meetingId));
+        const currentVersion = latestOperationVersions.get(toMeetingIdKey(meetingId));
         if (syncResult.value.applied && currentVersion === operationVersion) {
           onSuccess?.(syncResult.value.meeting);
         }

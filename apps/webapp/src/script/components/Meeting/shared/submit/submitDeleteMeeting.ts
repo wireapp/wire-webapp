@@ -28,13 +28,12 @@ import {isMeetingDeletedDespiteSubmitError} from 'Components/Meeting/shared/subm
 import {showMeetingSubmitError} from 'Components/Meeting/shared/submit/showMeetingSubmitError';
 import type {MeetingInstance} from 'Components/Meeting/types/meetingInstance';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/Meeting/utils/canDeleteMeeting';
+import {toMeetingIdKey} from 'Components/Meeting/utils/toMeetingIdKey';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {User} from 'Repositories/entity/User';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
 
 const inFlightDeleteMeetingIds = new Set<string>();
-
-const toMeetingIdKey = (meetingId: QualifiedId): string => `${meetingId.domain}:${meetingId.id}`;
 
 export const deleteMeetingSubmitResults = {
   succeeded: 'succeeded',
