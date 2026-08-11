@@ -94,7 +94,7 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
             onClick={() => useMeetingNotificationStore.getState().setIsExpanded(!isExpanded)}
           >
             <ChevronIcon css={meetingNotificationHostExpandIconStyles(isExpanded)} />
-            {translate(isExpanded ? 'meetings.notifications.collapse' : 'meetings.notifications.expand')}
+            {translate(isExpanded ? 'meetings.notifications.hide' : 'meetings.notifications.showAll')}
           </button>
         </div>
       </div>
