@@ -38,6 +38,10 @@ export const scheduleMeetingRecurrenceSelectWrapperStyles = scheduleMeetingLabel
 
 export const scheduleMeetingTitleInputWrapperStyles = scheduleMeetingLabeledFieldWrapperStyles;
 
+export const scheduleMeetingTitleInputStyles: CSSObject = {
+  paddingRight: '38px',
+};
+
 export const scheduleMeetingTitleClearButtonStyles: CSSObject = {
   alignItems: 'center',
   background: 'transparent',

@@ -28,6 +28,7 @@ import {useMeetingParticipants} from 'Components/meeting/shared/participants/use
 import {
   scheduleMeetingParticipantsSectionCss,
   scheduleMeetingTitleClearButtonStyles,
+  scheduleMeetingTitleInputStyles,
   scheduleMeetingTitleInputWrapperStyles,
 } from 'Components/meeting/shared/styles/meetingForm.styles';
 import type {User} from 'Repositories/entity/User';
@@ -78,6 +79,7 @@ export const MeetNowForm = ({
         onChange={event => onTitleChange(event.currentTarget.value)}
         markInvalid={isNonEmptyString(titleError)}
         error={isNonEmptyString(titleError) ? <ErrorMessage>{titleError}</ErrorMessage> : undefined}
+        inputCSS={scheduleMeetingTitleInputStyles}
         wrapperCSS={scheduleMeetingTitleInputWrapperStyles}
         endContent={
           formState.title.length > 0 && !isNonEmptyString(titleError) ? (

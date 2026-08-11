@@ -44,6 +44,7 @@ import {
   scheduleMeetingRecurrenceSelectWrapperStyles,
   scheduleMeetingSelectMenuPortalStyles,
   scheduleMeetingTitleClearButtonStyles,
+  scheduleMeetingTitleInputStyles,
   scheduleMeetingTitleInputWrapperStyles,
 } from 'Components/meeting/shared/styles/meetingForm.styles';
 import type {User} from 'Repositories/entity/User';
@@ -198,6 +199,7 @@ export const ScheduleMeetingForm = ({
               <ErrorMessage data-uie-name="schedule-meeting-title-error">{errors.title}</ErrorMessage>
             ) : undefined
           }
+          inputCSS={scheduleMeetingTitleInputStyles}
           wrapperCSS={scheduleMeetingTitleInputWrapperStyles}
           endContent={
             formState.title.length > 0 && !isNonEmptyString(errors.title) ? (
