@@ -36,7 +36,7 @@ import {
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {MeetingList, type MeetingListProps} from './meetingList';
+import {isMeetingListItemLastInDay, MeetingList, type MeetingListProps} from './meetingList';
 
 const createMeetingListVirtualizerForTest = (
   itemCount: number,
@@ -182,9 +182,8 @@ describe('MeetingList', () => {
     expect(screen.getByText('Ongoing meeting')).toBeInTheDocument();
     expect(screen.getByText('Upcoming meeting')).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /meetings\.list\.today/})).toBeInTheDocument();
-    expect(screen.getAllByRole('listitem')).toHaveLength(2);
-    expect(screen.getAllByRole('listitem')[0]).toHaveAttribute('aria-posinset', '1');
-    expect(screen.getAllByRole('listitem')[0]).toHaveAttribute('aria-setsize', '2');
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    expect(document.querySelectorAll('[data-uie-name="item-meeting"]')).toHaveLength(2);
   });
 
   it('renders completed meetings in the today section until local midnight', () => {
@@ -239,11 +238,7 @@ describe('MeetingList', () => {
     const useFirstVirtualEntryOnly: UseMeetingListVirtualizer = ({getEstimatedItemHeight}) =>
       createMeetingListVirtualizerForTest(1, getEstimatedItemHeight);
 
-    renderMeetingList(
-      {meetingSeries, isLoading: false, hasLoadError: false},
-      wallClock,
-      useFirstVirtualEntryOnly,
-    );
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock, useFirstVirtualEntryOnly);
 
     expect(screen.queryByText('First meeting')).not.toBeInTheDocument();
     expect(screen.queryByText('Second meeting')).not.toBeInTheDocument();
@@ -262,9 +257,28 @@ describe('MeetingList', () => {
     renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock, useMeetingRowOnly);
 
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-    const describedBy = screen.getByRole('listitem').getAttribute('aria-describedby');
-    expect(describedBy).not.toBeNull();
+    const meetingItem = screen.getByText('Visible meeting').closest('[aria-describedby]');
+    const describedBy = meetingItem?.getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
     expect(document.getElementById(describedBy!)).toHaveTextContent(/meetings\.list\.today/);
+  });
+
+  it('does not treat the page tail as last-in-day while more occurrences remain', () => {
+    const dayHeader = {type: 'dayHeader' as const, day: new Date('2026-06-15T00:00:00.000Z')};
+    const meetingItem = {
+      type: 'meetingInstance' as const,
+      day: dayHeader.day,
+      meetingInstance: {
+        meetingSeries: createMeetingSeries('2026-06-15T14:00:00.000Z', '2026-06-15T15:00:00.000Z', 'Boundary meeting'),
+        start: new Date('2026-06-15T14:00:00.000Z'),
+        end: new Date('2026-06-15T15:00:00.000Z'),
+      },
+    };
+
+    expect(isMeetingListItemLastInDay(undefined, true)).toBe(false);
+    expect(isMeetingListItemLastInDay(undefined, false)).toBe(true);
+    expect(isMeetingListItemLastInDay(dayHeader, true)).toBe(true);
+    expect(isMeetingListItemLastInDay(meetingItem, false)).toBe(false);
   });
 
   it('loads another occurrence page when the virtualized tail is reached', () => {
@@ -287,10 +301,7 @@ describe('MeetingList', () => {
     const scrollElementRef = createRef<HTMLElement>();
     scrollElementRef.current = scrollElement;
 
-    renderMeetingList(
-      {meetingSeries, isLoading: false, hasLoadError: false, scrollElementRef},
-      wallClock,
-    );
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false, scrollElementRef}, wallClock);
     expect(screen.queryByText('Meeting 51')).not.toBeInTheDocument();
 
     act(() => {

@@ -50,7 +50,10 @@ import {
   getNextMeetingInstancePage,
   type MeetingInstancePage,
 } from 'Components/meeting/selectors/getMeetingInstancePage';
-import {getMeetingListTimelineItems} from 'Components/meeting/selectors/getMeetingListTimelineItems';
+import {
+  getMeetingListTimelineItems,
+  type MeetingListTimelineItem,
+} from 'Components/meeting/selectors/getMeetingListTimelineItems';
 import {groupMeetingInstancesByDay} from 'Components/meeting/selectors/groupMeetingInstancesByDay';
 import type {MeetingInstancesByDay} from 'Components/meeting/selectors/groupMeetingInstancesByDay';
 import {isMeetingInstanceVisibleInMeetingList} from 'Components/meeting/selectors/isMeetingInstanceVisibleInMeetingList';
@@ -87,12 +90,13 @@ const filterVisibleMeetingInstances = (
 const getVisibleDayGroups = (meetingInstancesByDay: MeetingInstancesByDay[]): MeetingInstancesByDay[] =>
   meetingInstancesByDay.filter(dayGroup => isNonEmptyArray(dayGroup.meetingInstances));
 
-const getDayHeaderId = (day: Date): string => `meeting-day-${day.getTime()}`;
-
 const getMeetingDayDescriptionId = (meetingInstance: MeetingInstance): string => {
   const {meetingSeries, start} = meetingInstance;
   return `meeting-day-description-${meetingSeries.qualified_id.domain}-${meetingSeries.qualified_id.id}-${start.getTime()}`;
 };
+
+export const isMeetingListItemLastInDay = (nextItem: MeetingListTimelineItem | undefined, hasMore: boolean): boolean =>
+  nextItem?.type === 'dayHeader' || (nextItem === undefined && !hasMore);
 
 export const MeetingList = ({
   meetingSeries,
@@ -173,10 +177,6 @@ export const MeetingList = ({
 
   const visibleDayGroups = useMemo(() => getVisibleDayGroups(meetingInstancesByDay), [meetingInstancesByDay]);
   const timelineItems = useMemo(() => getMeetingListTimelineItems(visibleDayGroups), [visibleDayGroups]);
-  const visibleMeetingInstanceCount = useMemo(
-    () => visibleDayGroups.reduce((count, dayGroup) => count + dayGroup.meetingInstances.length, 0),
-    [visibleDayGroups],
-  );
 
   const getScrollElement = useCallback(() => scrollElementRef?.current ?? null, [scrollElementRef]);
 
@@ -255,7 +255,6 @@ export const MeetingList = ({
   return (
     <div css={meetingListContainerStyles} data-uie-name="meetings-list">
       <div
-        role="list"
         style={{
           height: `${listVirtualizer.getTotalSize()}px`,
           width: '100%',
@@ -286,7 +285,7 @@ export const MeetingList = ({
               }}
             >
               {item.type === 'dayHeader' ? (
-                <div css={meetingDayHeaderStyles} id={getDayHeaderId(item.day)} role="heading" aria-level={2}>
+                <div css={meetingDayHeaderStyles} role="heading" aria-level={2}>
                   {getDaySectionHeader(item.day, now, translate)}
                 </div>
               ) : (
@@ -296,17 +295,14 @@ export const MeetingList = ({
                   </span>
                   <div
                     css={meetingListItemWrapperStyles}
-                    role="listitem"
                     aria-describedby={getMeetingDayDescriptionId(item.meetingInstance)}
-                    aria-posinset={item.positionInSet}
-                    aria-setsize={meetingInstancePage.hasMore ? -1 : visibleMeetingInstanceCount}
                   >
                     <MeetingListItem
                       meetingInstance={item.meetingInstance}
                       nowMilliseconds={nowMilliseconds}
                       selfUser={selfUser}
                       isFirstInDay={previousItem?.type === 'dayHeader'}
-                      isLastInDay={nextItem === undefined || nextItem.type === 'dayHeader'}
+                      isLastInDay={isMeetingListItemLastInDay(nextItem, meetingInstancePage.hasMore)}
                     />
                   </div>
                 </>

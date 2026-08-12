@@ -21,21 +21,16 @@ import type {MeetingInstancesByDay} from 'Components/meeting/selectors/groupMeet
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 
 export type MeetingListTimelineItem =
-  | {type: 'dayHeader'; day: Date}
-  | {type: 'meetingInstance'; day: Date; meetingInstance: MeetingInstance; positionInSet: number};
+  {type: 'dayHeader'; day: Date} | {type: 'meetingInstance'; day: Date; meetingInstance: MeetingInstance};
 
 export const getMeetingListTimelineItems = (
   meetingInstancesByDay: MeetingInstancesByDay[],
-): MeetingListTimelineItem[] => {
-  let positionInSet = 0;
-
-  return meetingInstancesByDay.flatMap(({day, meetingInstances}) => [
+): MeetingListTimelineItem[] =>
+  meetingInstancesByDay.flatMap(({day, meetingInstances}) => [
     {type: 'dayHeader' as const, day},
     ...meetingInstances.map(meetingInstance => ({
       type: 'meetingInstance' as const,
       day,
       meetingInstance,
-      positionInSet: ++positionInSet,
     })),
   ]);
-};

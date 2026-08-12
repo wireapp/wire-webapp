@@ -98,11 +98,7 @@ describe('getMeetingInstancePage', () => {
   });
 
   it('keeps an unbounded recurring series pageable', () => {
-    const firstPage = getMeetingInstancePage(
-      [createMeetingSeries({recurrence: 'weekly'})],
-      from,
-      2,
-    );
+    const firstPage = getMeetingInstancePage([createMeetingSeries({recurrence: 'weekly'})], from, 2);
     const secondPage = getNextMeetingInstancePage(firstPage.cursor, 2);
 
     expect(firstPage.meetingInstances.map(({start}) => start.toISOString())).toEqual([
