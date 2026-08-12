@@ -184,6 +184,7 @@ describe('MeetingList', () => {
     expect(screen.getByRole('heading', {name: /meetings\.list\.today/})).toBeInTheDocument();
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
     expect(document.querySelectorAll('[data-uie-name="item-meeting"]')).toHaveLength(2);
+    expect(screen.getByText(/meetings\.meetingStatus\.startedAt.*meetings\.meetingStatus\.endsAt/)).toBeInTheDocument();
   });
 
   it('renders completed meetings in the today section until local midnight', () => {
@@ -211,6 +212,9 @@ describe('MeetingList', () => {
     expect(screen.getByRole('heading', {name: /meetings\.list\.today/})).toBeInTheDocument();
     expect(screen.getByText('Completed meeting')).toBeInTheDocument();
     expect(screen.getByText('Upcoming meeting')).toBeInTheDocument();
+    expect(
+      screen.getByText(/meetings\.meetingStatus\.startedAt.*meetings\.meetingStatus\.endedAt/),
+    ).toBeInTheDocument();
   });
 
   it('renders the next meeting even when it is more than one year away', () => {

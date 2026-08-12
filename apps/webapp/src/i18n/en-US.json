@@ -1312,6 +1312,8 @@
   "meetings.meetNowModal.error.createFailedTitle": "Could not start meeting",
   "meetings.meetNowModal.startMeeting": "Start Meeting",
   "meetings.meetNowModal.title": "Meet now",
+  "meetings.meetingStatus.endedAt": "Ended at {time}",
+  "meetings.meetingStatus.endsAt": "Ends at {time}",
   "meetings.meetingStatus.participating": "Attending",
   "meetings.meetingStatus.startedAt": "Started at {time}",
   "meetings.navigation.label": "Meetings",
