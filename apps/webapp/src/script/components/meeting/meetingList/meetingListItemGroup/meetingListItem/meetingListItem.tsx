@@ -99,6 +99,8 @@ const MeetingListItemComponent = ({
   return (
     <div
       css={[itemStyles, isOngoing && onGoingMeetingStyles]}
+      data-uie-name="item-meeting"
+      data-uie-value={title}
       {...(isOngoing ? {[MEETING_LIST_ITEM_ONGOING_ATTR]: ''} : {})}
     >
       <div css={leftStyles}>

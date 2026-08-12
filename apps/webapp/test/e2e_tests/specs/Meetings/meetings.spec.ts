@@ -66,8 +66,9 @@ test.describe('Meetings CRUD', () => {
     await ownerMeetings.openMeetingsTab();
     await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
 
-    await memberMeetings.waitForNotificationContaining(`Update: ${MEETING_TITLE}`);
+    await memberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
     await expect(memberMeetings.notificationCards()).toHaveCount(1);
+    await expect(memberMeetings.notificationCards()).not.toContainText(`Update: ${MEETING_TITLE}`);
   });
 
   test('host can edit meeting info', async ({createUser, createTeam, createPage}) => {
@@ -202,5 +203,59 @@ test.describe('Meetings CRUD', () => {
 
     await memberMeetings.waitForMeetingAbsentFromList(MEETING_TITLE);
     await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
+  });
+});
+
+test.describe('Meeting notifications', () => {
+  test('two participants each receive exactly one invitation', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
+    const [firstMember, secondMember] = members;
+
+    const [ownerPage, firstMemberPage, secondMemberPage] = await loginMeetingsUsers(createPage, [
+      owner,
+      firstMember,
+      secondMember,
+    ]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const firstMemberMeetings = PageManager.from(firstMemberPage).webapp.pages.meetings();
+    const secondMemberMeetings = PageManager.from(secondMemberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [firstMember.fullName, secondMember.fullName]);
+
+    await Promise.all([
+      firstMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`),
+      secondMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`),
+    ]);
+
+    await expect(firstMemberMeetings.notificationCards()).toHaveCount(1);
+    await expect(secondMemberMeetings.notificationCards()).toHaveCount(1);
+  });
+
+  test('adding a participant sends only one invitation to the newly added participant', async ({
+    createUser,
+    createTeam,
+    createPage,
+  }) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
+    const [firstMember, secondMember] = members;
+
+    const [ownerPage, firstMemberPage, secondMemberPage] = await loginMeetingsUsers(createPage, [
+      owner,
+      firstMember,
+      secondMember,
+    ]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const firstMemberMeetings = PageManager.from(firstMemberPage).webapp.pages.meetings();
+    const secondMemberMeetings = PageManager.from(secondMemberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [firstMember.fullName]);
+    await firstMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
+
+    await ownerMeetings.editMeeting(MEETING_TITLE, {addParticipants: [secondMember.fullName]});
+
+    await expect(firstMemberMeetings.notificationCardContaining(`Invitation: ${MEETING_TITLE}`)).toHaveCount(1);
+    await secondMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
   });
 });
