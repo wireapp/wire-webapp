@@ -26,6 +26,24 @@ export const meetingListContainerStyles: CSSObject = {
   paddingLeft: 'auto',
 };
 
-export const showAllButtonStyles: CSSObject = {
-  padding: '16px',
+export const meetingDayHeaderStyles: CSSObject = {
+  padding: '16px 16px 8px',
+  color: 'var(--main-color)',
+  fontWeight: 'var(--font-weight-semibold)',
+};
+
+export const meetingListItemWrapperStyles: CSSObject = {
+  padding: '0 16px',
+};
+
+export const screenReaderOnlyStyles: CSSObject = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0, 0, 0, 0)',
+  whiteSpace: 'nowrap',
+  border: 0,
 };

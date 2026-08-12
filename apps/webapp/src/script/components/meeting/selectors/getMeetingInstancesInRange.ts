@@ -90,6 +90,37 @@ export const getUpcomingMeetingInstanceStart = (meetingSeries: MeetingSeries, no
   return advanceToFirstInstanceOnOrAfter(anchor, now, meetingSeries.recurrence);
 };
 
+export const getFirstMeetingInstanceOnOrAfter = (
+  meetingSeries: MeetingSeries,
+  from: Date,
+): MeetingInstance | undefined => {
+  const anchor = new Date(meetingSeries.series_start_date);
+
+  if (meetingSeries.recurrence === 'doesNotRepeat') {
+    return anchor.getTime() >= from.getTime() ? createMeetingInstance(meetingSeries, anchor) : undefined;
+  }
+
+  const start = advanceToFirstInstanceOnOrAfter(anchor, from, meetingSeries.recurrence);
+
+  return isAfterRecurrenceUntil(start, meetingSeries.recurrence_until)
+    ? undefined
+    : createMeetingInstance(meetingSeries, start);
+};
+
+export const getNextMeetingInstance = (meetingInstance: MeetingInstance): MeetingInstance | undefined => {
+  const {meetingSeries} = meetingInstance;
+
+  if (meetingSeries.recurrence === 'doesNotRepeat') {
+    return undefined;
+  }
+
+  const start = advanceInstanceStart(meetingInstance.start, meetingSeries.recurrence);
+
+  return isAfterRecurrenceUntil(start, meetingSeries.recurrence_until)
+    ? undefined
+    : createMeetingInstance(meetingSeries, start);
+};
+
 const getRecurringMeetingInstancesInRange = (meetingSeries: MeetingSeries, from: Date, to: Date): MeetingInstance[] => {
   const anchor = new Date(meetingSeries.series_start_date);
   const meetingInstances: MeetingInstance[] = [];

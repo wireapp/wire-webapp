@@ -32,8 +32,8 @@ export type MeetingInstancesByDay = {
  * meeting instances must be sortable by start; output days are in chronological order. Each group's `day`
  * is the start of the calendar day of the instance's `start`.
  *
- * @param meetingInstances - Flat list from {@link getMeetingInstances}.
- * @returns Day buckets ready for one `meetingListItemGroup` per entry.
+ * @param meetingInstances - Flat chronological meeting instances.
+ * @returns Day buckets used to add date headers to the virtualized timeline.
  */
 export const groupMeetingInstancesByDay = (meetingInstances: MeetingInstance[]): MeetingInstancesByDay[] => {
   const sortedMeetingInstances = [...meetingInstances].toSorted(
