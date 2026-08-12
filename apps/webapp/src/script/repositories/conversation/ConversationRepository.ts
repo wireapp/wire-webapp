@@ -161,6 +161,7 @@ import {
   TeamMemberLeaveEvent,
 } from './EventBuilder';
 import {EventMapper} from './EventMapper';
+import {isSelfInitiatedConversationLeave} from './isSelfInitiatedConversationLeave';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
@@ -4311,7 +4312,7 @@ export class ConversationRepository {
     }
 
     const removesSelfUser = eventData.user_ids.includes(selfUser.id);
-    const initiatedBySelf = removesSelfUser && eventJson.from === selfUser.id;
+    const initiatedBySelf = removesSelfUser && isSelfInitiatedConversationLeave(eventJson.from, selfUser.id);
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);

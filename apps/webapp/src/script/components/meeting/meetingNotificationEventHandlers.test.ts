@@ -24,6 +24,7 @@ import {
   MeetingNotificationKind,
 } from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {createMeetingNotificationEventHandlers} from './meetingNotificationEventHandlers';
 
@@ -44,6 +45,23 @@ const meetingSeries: MeetingSeries = {
 };
 
 describe('createMeetingNotificationEventHandlers', () => {
+  const dismissNotificationsFromList = (
+    notifications: AddNotificationInput[],
+    meetingId: QualifiedId,
+    kinds?: readonly MeetingNotificationKind[],
+  ) => {
+    for (let index = notifications.length - 1; index >= 0; index -= 1) {
+      const notification = notifications[index];
+      if (!matchQualifiedIds(notification.qualifiedId, meetingId)) {
+        continue;
+      }
+
+      if (kinds === undefined || kinds.includes(notification.kind)) {
+        notifications.splice(index, 1);
+      }
+    }
+  };
+
   const createHandlers = ({
     getMeetingSeries = () => [meetingSeries],
     notifications = [] as AddNotificationInput[],
@@ -199,13 +217,38 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('creates only one cancellation notification when cancelled twice', () => {
     const notifications: AddNotificationInput[] = [];
-    const {onMeetingCancelled} = createHandlers({notifications});
+    const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
+    const {onMeetingCancelled} = createMeetingNotificationEventHandlers({
+      getMeetingSeries: () => [meetingSeries],
+      addNotification: notification => {
+        notifications.push(notification);
+      },
+      dismissNotificationsForMeeting: (dismissedMeetingId, kinds) => {
+        dismissedMeetings.push({meetingId: dismissedMeetingId, kinds});
+        dismissNotificationsFromList(notifications, dismissedMeetingId, kinds);
+      },
+      logger: {warn: jest.fn()},
+    });
 
     onMeetingCancelled(meetingId);
     onMeetingCancelled(meetingId);
 
     expect(notifications).toEqual([
       expect.objectContaining({kind: MeetingNotificationKind.CANCELLED, qualifiedId: meetingId}),
+    ]);
+    expect(dismissedMeetings).toEqual([
+      {
+        meetingId,
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+        ],
+      },
+      {
+        meetingId,
+        kinds: [MeetingNotificationKind.CANCELLED],
+      },
     ]);
   });
 

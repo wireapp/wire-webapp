@@ -100,12 +100,6 @@ export const createMeetingNotificationEventHandlers = ({
 
   const addCancellationNotificationForMeeting = (meetingId: QualifiedId): void => {
     const meetingKey = toMeetingIdKey(meetingId);
-
-    if (cancelledMeetings.has(meetingKey)) {
-      pending.delete(meetingKey);
-      return;
-    }
-
     const meeting = getMeeting(meetingId);
     if (!meeting) {
       logger.warn('meeting notification pending because the meeting is not in the store yet', {
@@ -122,6 +116,13 @@ export const createMeetingNotificationEventHandlers = ({
   };
 
   const notifyMeetingCancellation = (meetingId: QualifiedId): void => {
+    const meetingKey = toMeetingIdKey(meetingId);
+
+    if (cancelledMeetings.has(meetingKey)) {
+      pending.delete(meetingKey);
+      return;
+    }
+
     dismissStaleNotificationsForMeeting(meetingId);
     dismissNotificationsForMeeting(meetingId, [MeetingNotificationKind.CANCELLED]);
     addCancellationNotificationForMeeting(meetingId);
