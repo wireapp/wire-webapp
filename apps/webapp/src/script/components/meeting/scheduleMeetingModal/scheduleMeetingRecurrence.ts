@@ -57,7 +57,7 @@ export const buildUpdateMeetingRecurrence = (
 
   const mappedRecurrence = mapRecurrenceOptionToMeetingRecurrence(recurrence);
 
-  return mappedRecurrence === undefined ? {recurrence: null} : {recurrence: mappedRecurrence};
+  return mappedRecurrence === undefined ? {} : {recurrence: mappedRecurrence};
 };
 
 export const mapRecurrenceOptionToMeetingRecurrence = (
