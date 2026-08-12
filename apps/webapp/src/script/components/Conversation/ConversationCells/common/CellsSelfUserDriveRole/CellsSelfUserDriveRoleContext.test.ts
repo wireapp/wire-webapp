@@ -17,7 +17,11 @@
  *
  */
 
-import {CELLS_SELF_USER_DRIVE_ROLE, getSelfUserDriveRole} from './CellsSelfUserDriveRoleContext';
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  getSelfUserDriveRole,
+  shouldRestrictCellsViewerActions,
+} from './CellsSelfUserDriveRoleContext';
 
 describe('getSelfUserDriveRole', () => {
   it('returns editor when conversation and self user are in the same team', () => {
@@ -42,5 +46,34 @@ describe('getSelfUserDriveRole', () => {
     expect(getSelfUserDriveRole({conversationTeamId: 'team-a', selfUserTeamId: undefined})).toBe(
       CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
     );
+  });
+});
+
+describe('shouldRestrictCellsViewerActions', () => {
+  it('returns true for viewer access when the feature flag is enabled', () => {
+    expect(
+      shouldRestrictCellsViewerActions({
+        isViewerPermissionFeatureEnabled: true,
+        selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      }),
+    ).toBe(true);
+  });
+
+  it('returns false for viewer access when the feature flag is disabled', () => {
+    expect(
+      shouldRestrictCellsViewerActions({
+        isViewerPermissionFeatureEnabled: false,
+        selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      }),
+    ).toBe(false);
+  });
+
+  it('returns false for editor access when the feature flag is enabled', () => {
+    expect(
+      shouldRestrictCellsViewerActions({
+        isViewerPermissionFeatureEnabled: true,
+        selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+      }),
+    ).toBe(false);
   });
 });

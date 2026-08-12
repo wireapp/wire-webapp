@@ -46,6 +46,18 @@ export const getSelfUserDriveRole = ({
   return conversationTeamId === selfUserTeamId ? CELLS_SELF_USER_DRIVE_ROLE.EDITOR : CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
 };
 
+interface ShouldRestrictCellsViewerActionsParams {
+  isViewerPermissionFeatureEnabled: boolean;
+  selfUserDriveRole: CellsSelfUserDriveRole;
+}
+
+export const shouldRestrictCellsViewerActions = ({
+  isViewerPermissionFeatureEnabled,
+  selfUserDriveRole,
+}: ShouldRestrictCellsViewerActionsParams): boolean => {
+  return isViewerPermissionFeatureEnabled && selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
+};
+
 const CellsSelfUserDriveRoleContext = createContext<CellsSelfUserDriveRole>(CELLS_SELF_USER_DRIVE_ROLE.EDITOR);
 
 interface CellsSelfUserDriveRoleProviderProps {
