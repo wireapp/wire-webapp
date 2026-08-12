@@ -98,7 +98,7 @@ describe('mapUpdateCommandToUpdateMeeting', () => {
     });
   });
 
-  it('clears recurrence when changed to doesNotRepeat', () => {
+  it('omits recurrence when changed to doesNotRepeat', () => {
     expect(
       mapUpdateCommandToUpdateMeeting(
         baseUpdateCommand({
@@ -110,7 +110,6 @@ describe('mapUpdateCommandToUpdateMeeting', () => {
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
-      recurrence: null,
     });
   });
 });
