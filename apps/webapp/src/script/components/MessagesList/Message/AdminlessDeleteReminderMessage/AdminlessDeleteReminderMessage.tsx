@@ -17,16 +17,19 @@
  *
  */
 
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+
 import * as Icon from 'Components/icon';
 import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageEntity} from 'Repositories/entity/message/adminlessDeleteReminderMessage';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {replaceLink} from 'Util/localizerUtil';
+import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 import {formatLocale} from 'Util/timeUtil';
 
 import {
   adminlessDeleteReminderContainerCss,
   adminlessDeleteReminderIconCss,
+  adminlessDeleteReminderLinkCss,
   adminlessDeleteReminderTextContainerCss,
 } from './AdminlessDeleteReminderMessage.styles';
 
@@ -40,15 +43,36 @@ export const AdminlessDeleteReminderMessage = ({message}: AdminlessDeleteReminde
   const caption = translate(
     'conversationAdminlessDeleteReminder',
     {date: formatLocale(message.deletionScheduledFor, 'MMMM d, p')},
-    replaceLink(Config.getConfig().URL.SUPPORT.ADMINLESS_GROUP_DELETE, '', 'go-adminless-group-delete-learn-more'),
+    {},
+    true,
   );
+
+  const content = replaceReactComponents(caption, [
+    {start: '<strong>', end: '</strong>', render: text => <strong key={text}>{text}</strong>},
+    {
+      start: '[link]',
+      end: '[/link]',
+      render: text => (
+        <Link
+          key={text}
+          css={adminlessDeleteReminderLinkCss}
+          variant={LinkVariant.PRIMARY}
+          href={Config.getConfig().URL.SUPPORT.ADMINLESS_GROUP_DELETE}
+          targetBlank
+          data-uie-name="go-adminless-group-delete-learn-more"
+        >
+          {text}
+        </Link>
+      ),
+    },
+  ]);
 
   return (
     <div css={adminlessDeleteReminderContainerCss} data-uie-name="element-message-adminless-delete-reminder">
       <div css={adminlessDeleteReminderIconCss} aria-hidden="true">
         <Icon.InfoIcon width={16} height={16} />
       </div>
-      <span css={adminlessDeleteReminderTextContainerCss} dangerouslySetInnerHTML={{__html: caption}} />
+      <span css={adminlessDeleteReminderTextContainerCss}>{content}</span>
     </div>
   );
 };

@@ -48,10 +48,12 @@ export const adminlessDeleteReminderTextContainerCss: CSSObject = {
   '& strong': {
     fontWeight: 'var(--font-weight-bold)',
   },
+};
 
-  '& a': {
-    color: 'var(--main-color)',
-    fontWeight: 'var(--font-weight-regular)',
-    textDecoration: 'underline',
-  },
+export const adminlessDeleteReminderLinkCss: CSSObject = {
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-small)',
+  fontWeight: 'var(--font-weight-regular)',
+  lineHeight: 'var(--line-height-small-plus)',
+  textDecoration: 'underline',
 };
