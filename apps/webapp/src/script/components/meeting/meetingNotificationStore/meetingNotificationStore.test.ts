@@ -255,10 +255,12 @@ describe('useMeetingNotificationStore', () => {
       MeetingNotificationKind.ONGOING,
     ]);
 
-    expect(useMeetingNotificationStore.getState().notifications.map(({kind, qualifiedId: id}) => ({kind, id}))).toEqual([
-      {kind: MeetingNotificationKind.UPDATE, id: otherMeetingId},
-      {kind: MeetingNotificationKind.CANCELLED, id: qualifiedId},
-    ]);
+    expect(useMeetingNotificationStore.getState().notifications.map(({kind, qualifiedId: id}) => ({kind, id}))).toEqual(
+      [
+        {kind: MeetingNotificationKind.UPDATE, id: otherMeetingId},
+        {kind: MeetingNotificationKind.CANCELLED, id: qualifiedId},
+      ],
+    );
   });
 
   it('resets the expanded state when dismissing the last notification for a meeting', () => {
