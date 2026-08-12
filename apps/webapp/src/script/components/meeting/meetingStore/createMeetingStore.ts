@@ -136,7 +136,13 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
           .orElse(() => task.resolve({failedToAdd: result.failedToAdd})),
       ),
     meetNowMeeting: deps.serviceTasks.meetNowMeeting,
-    updateMeeting: deps.serviceTasks.updateMeeting,
+    updateMeeting: command =>
+      deps.serviceTasks.updateMeeting(command).andThen(result =>
+        get()
+          .syncMeetingByQualifiedId(command.meetingId)
+          .map(() => ({failedToAdd: result.failedToAdd}))
+          .orElse(() => task.resolve({failedToAdd: result.failedToAdd})),
+      ),
     deleteMeetingForMe: meetingInstance =>
       deps.serviceTasks.deleteMeetingForMe(toDeleteMeetingCommand(meetingInstance)),
     deleteMeetingForAll: meetingInstance =>
