@@ -35,7 +35,7 @@ import {
   ConversationMLSMessageAddData,
 } from '../conversation/data/';
 import {ConversationAddPermissionUpdateData} from '../conversation/data/conversationAddPermissionUpdateData';
-import {ConversationAdminlessDeleteReminderData} from '../conversation/data/ConversationAdminlessDeleteReminderData';
+import {ConversationAdminlessDeleteReminderData} from '../conversation/data/conversationAdminlessDeleteReminderData';
 import {ConversationMLSResetData} from '../conversation/data/conversationMlsResetData';
 import {ConversationProtocolUpdateData} from '../conversation/data/conversationProtocolUpdateData';
 import {QualifiedId} from '../user';
