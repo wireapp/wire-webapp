@@ -46,6 +46,7 @@ import {MeetingStoreRoot} from './meetingStoreRoot';
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const selfUserId: QualifiedId = {id: 'self-user-id', domain: 'example.com'};
 const otherUserId: QualifiedId = {id: 'other-user-id', domain: 'example.com'};
+const conversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
 
 const createApiMeeting = (title: string, qualifiedId: QualifiedId = meetingId) => ({
   created_at: '2026-06-15T09:00:00.000Z',
@@ -321,6 +322,42 @@ describe('MeetingStoreRoot', () => {
         qualifiedId: meetingId,
       }),
     ]);
+  });
+
+  it('replaces update notifications with cancellation when self is removed from the meeting conversation', async () => {
+    renderMeetingStoreRoot();
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
+    });
+
+    await waitFor(() => {
+      expect(useMeetingNotificationStore.getState().notifications).toEqual([
+        expect.objectContaining({
+          kind: MeetingNotificationKind.INVITE,
+          qualifiedId: meetingId,
+        }),
+      ]);
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.CONVERSATION.SELF_REMOVED, conversationId);
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([
+      expect.objectContaining({
+        kind: MeetingNotificationKind.CANCELLED,
+        qualifiedId: meetingId,
+      }),
+    ]);
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('');
+    });
   });
 
   it('reloads meetings when missed events are reported', async () => {

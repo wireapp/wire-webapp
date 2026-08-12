@@ -44,14 +44,19 @@ const meetingSeries: MeetingSeries = {
 };
 
 describe('createMeetingNotificationEventHandlers', () => {
-  it('creates meeting notifications from the current meeting series snapshot', () => {
-    const notifications: AddNotificationInput[] = [];
-    const warnings: Array<{message: string; context?: unknown}> = [];
-
-    const {notifyUpdate, onMeetingDeleted} = createMeetingNotificationEventHandlers({
-      getMeetingSeries: () => [meetingSeries],
+  const createHandlers = ({
+    getMeetingSeries = () => [meetingSeries],
+    notifications = [] as AddNotificationInput[],
+    dismissedMeetings = [] as Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}>,
+    warnings = [] as Array<{message: string; context?: unknown}>,
+  } = {}) =>
+    createMeetingNotificationEventHandlers({
+      getMeetingSeries,
       addNotification: notification => {
         notifications.push(notification);
+      },
+      dismissNotificationsForMeeting: (meetingId, kinds) => {
+        dismissedMeetings.push({meetingId, kinds});
       },
       logger: {
         warn: (message, context) => {
@@ -59,6 +64,13 @@ describe('createMeetingNotificationEventHandlers', () => {
         },
       },
     });
+
+  it('creates meeting notifications from the current meeting series snapshot', () => {
+    const notifications: AddNotificationInput[] = [];
+    const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
+    const warnings: Array<{message: string; context?: unknown}> = [];
+
+    const {notifyUpdate, onMeetingDeleted} = createHandlers({notifications, dismissedMeetings, warnings});
 
     notifyUpdate(meetingSeries);
     notifyUpdate(meetingSeries);
@@ -86,6 +98,7 @@ describe('createMeetingNotificationEventHandlers', () => {
       },
     ]);
 
+    expect(dismissedMeetings).toEqual([{meetingId, kinds: expect.arrayContaining([MeetingNotificationKind.UPDATE])}]);
     expect(warnings).toEqual([]);
   });
 
@@ -93,16 +106,10 @@ describe('createMeetingNotificationEventHandlers', () => {
     const notifications: AddNotificationInput[] = [];
     const warnings: Array<{message: string; context?: unknown}> = [];
 
-    const {onMeetingDeleted} = createMeetingNotificationEventHandlers({
+    const {onMeetingDeleted} = createHandlers({
       getMeetingSeries: () => [],
-      addNotification: notification => {
-        notifications.push(notification);
-      },
-      logger: {
-        warn: (message, context) => {
-          warnings.push({message, context});
-        },
-      },
+      notifications,
+      warnings,
     });
 
     onMeetingDeleted(meetingId);
@@ -121,13 +128,7 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('notifies using the meeting passed by the successful sync', () => {
     const notifications: AddNotificationInput[] = [];
-    const {notifyUpdate} = createMeetingNotificationEventHandlers({
-      getMeetingSeries: () => [],
-      addNotification: notification => {
-        notifications.push(notification);
-      },
-      logger: {warn: () => {}},
-    });
+    const {notifyUpdate} = createHandlers({getMeetingSeries: () => [], notifications});
 
     notifyUpdate({...meetingSeries, title: 'Fresh title'});
 
@@ -139,13 +140,7 @@ describe('createMeetingNotificationEventHandlers', () => {
   it('notifies with INVITE on first change and UPDATE on subsequent changes for the same meeting', () => {
     const notifications: AddNotificationInput[] = [];
 
-    const {notifyMeetingChange} = createMeetingNotificationEventHandlers({
-      getMeetingSeries: () => [meetingSeries],
-      addNotification: notification => {
-        notifications.push(notification);
-      },
-      logger: {warn: () => {}},
-    });
+    const {notifyMeetingChange} = createHandlers({notifications});
 
     notifyMeetingChange(meetingSeries);
     notifyMeetingChange(meetingSeries);
@@ -162,6 +157,34 @@ describe('createMeetingNotificationEventHandlers', () => {
         kind: MeetingNotificationKind.UPDATE,
         meetingStartTime: meetingSeries.series_start_date,
         meetingTitle: meetingSeries.title,
+        qualifiedId: meetingSeries.qualified_id,
+      },
+    ]);
+  });
+
+  it('dismisses stale notifications before creating a cancellation for self-removal', () => {
+    const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
+    const notifications: AddNotificationInput[] = [];
+    const {onMeetingRemovedForSelf} = createHandlers({notifications, dismissedMeetings});
+
+    onMeetingRemovedForSelf(meetingId);
+
+    expect(dismissedMeetings).toEqual([
+      {
+        meetingId,
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+        ],
+      },
+    ]);
+    expect(notifications).toEqual([
+      {
+        kind: MeetingNotificationKind.CANCELLED,
+        meetingStartTime: meetingSeries.series_start_date,
+        meetingTitle: meetingSeries.title,
+        qualifiedCreator: meetingSeries.qualified_creator,
         qualifiedId: meetingSeries.qualified_id,
       },
     ]);

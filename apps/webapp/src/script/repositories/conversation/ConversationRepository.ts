@@ -4345,6 +4345,10 @@ export class ConversationRepository {
 
     this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
 
+    if (removesSelfUser) {
+      amplify.publish(WebAppEvents.CONVERSATION.SELF_REMOVED, conversationEntity.qualifiedId);
+    }
+
     return {conversationEntity, messageEntity};
   }
 

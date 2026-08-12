@@ -33,9 +33,16 @@ type MeetingNotificationLogger = {
   warn: (message: string, context?: unknown) => void;
 };
 
+export const staleMeetingNotificationKinds = [
+  MeetingNotificationKind.UPDATE,
+  MeetingNotificationKind.INVITE,
+  MeetingNotificationKind.ONGOING,
+] as const;
+
 export type MeetingNotificationEventHandlersDependencies = {
   getMeetingSeries: () => readonly MeetingSeries[];
   addNotification: (input: AddNotificationInput) => void;
+  dismissNotificationsForMeeting: (meetingId: QualifiedId, kinds?: readonly MeetingNotificationKind[]) => void;
   logger: MeetingNotificationLogger;
 };
 
@@ -43,6 +50,7 @@ export type MeetingNotificationEventHandlers = {
   notifyMeetingChange: (meeting: MeetingSeries) => void;
   notifyUpdate: (meeting: MeetingSeries) => void;
   onMeetingDeleted: (meetingId: QualifiedId) => void;
+  onMeetingRemovedForSelf: (meetingId: QualifiedId) => void;
   /** Retries notifications that couldn't be sent because the meeting wasn't in the store yet. */
   retryPendingNotifications: () => void;
 };
@@ -50,6 +58,7 @@ export type MeetingNotificationEventHandlers = {
 export const createMeetingNotificationEventHandlers = ({
   getMeetingSeries,
   addNotification,
+  dismissNotificationsForMeeting,
   logger,
 }: MeetingNotificationEventHandlersDependencies): MeetingNotificationEventHandlers => {
   const getMeeting = (meetingId: QualifiedId) =>
@@ -85,6 +94,10 @@ export const createMeetingNotificationEventHandlers = ({
       .exhaustive();
   };
 
+  const dismissStaleNotificationsForMeeting = (meetingId: QualifiedId): void => {
+    dismissNotificationsForMeeting(meetingId, staleMeetingNotificationKinds);
+  };
+
   const addCancellationNotificationForMeeting = (meetingId: QualifiedId): void => {
     const meeting = getMeeting(meetingId);
     if (!meeting) {
@@ -97,6 +110,11 @@ export const createMeetingNotificationEventHandlers = ({
     }
 
     notifyForMeeting(MeetingNotificationKind.CANCELLED, meeting);
+  };
+
+  const notifyMeetingCancellation = (meetingId: QualifiedId): void => {
+    dismissStaleNotificationsForMeeting(meetingId);
+    addCancellationNotificationForMeeting(meetingId);
   };
 
   const retryPendingNotifications = () => {
@@ -120,7 +138,10 @@ export const createMeetingNotificationEventHandlers = ({
     },
     notifyUpdate: meeting => notifyForMeeting(MeetingNotificationKind.UPDATE, meeting),
     onMeetingDeleted: meetingId => {
-      addCancellationNotificationForMeeting(meetingId);
+      notifyMeetingCancellation(meetingId);
+    },
+    onMeetingRemovedForSelf: meetingId => {
+      notifyMeetingCancellation(meetingId);
     },
     retryPendingNotifications,
   };
