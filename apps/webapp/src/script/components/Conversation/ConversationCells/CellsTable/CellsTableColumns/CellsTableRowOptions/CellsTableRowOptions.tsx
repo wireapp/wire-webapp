@@ -25,7 +25,7 @@ import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useAppNotification} from 'Components/appNotification/appNotification';
 import {
-  CELLS_SELF_USER_DRIVE_ROLE,
+  shouldRestrictCellsViewerActions,
   useCellsSelfUserDriveRole,
 } from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
@@ -64,16 +64,6 @@ interface CellsTableRowOptionsProps {
   onRefresh: () => void;
   onCloseSearchView?: () => void;
 }
-
-export const shouldHideViewerRestrictedActions = ({
-  isViewerPermissionFeatureEnabled,
-  selfUserDriveRole,
-}: {
-  isViewerPermissionFeatureEnabled: boolean;
-  selfUserDriveRole: ReturnType<typeof useCellsSelfUserDriveRole>;
-}): boolean => {
-  return isViewerPermissionFeatureEnabled && selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
-};
 
 export const CellsTableRowOptions = ({
   node,
@@ -150,7 +140,7 @@ const CellsTableRowOptionsContent = ({
 
   const isRootRecycleBin = isRootRecycleBinPath();
   const isNestedRecycleBin = isInRecycleBin();
-  const shouldHideRestrictedActions = shouldHideViewerRestrictedActions({
+  const shouldHideRestrictedActions = shouldRestrictCellsViewerActions({
     isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
     selfUserDriveRole,
   });

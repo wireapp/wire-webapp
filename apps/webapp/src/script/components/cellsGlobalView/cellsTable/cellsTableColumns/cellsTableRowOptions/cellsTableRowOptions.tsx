@@ -24,7 +24,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {shouldRestrictCellsViewerActions} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -41,16 +41,6 @@ interface CellsTableRowOptionsProps {
   cellsRepository: CellsRepository;
 }
 
-export const shouldDisableViewerRestrictedActions = ({
-  isViewerPermissionFeatureEnabled,
-  selfUserDriveRole,
-}: {
-  isViewerPermissionFeatureEnabled: boolean;
-  selfUserDriveRole: CellNode['selfUserDriveRole'];
-}): boolean => {
-  return isViewerPermissionFeatureEnabled && selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
-};
-
 export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): ReactElement => {
   const {node, cellsRepository} = properties;
   const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
@@ -58,7 +48,7 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
 
   const url = node.url;
   const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
-  const shouldDisableRestrictedActions = shouldDisableViewerRestrictedActions({
+  const shouldDisableRestrictedActions = shouldRestrictCellsViewerActions({
     isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
     selfUserDriveRole: node.selfUserDriveRole,
   });
