@@ -122,6 +122,7 @@ export const MeetNowModal = () => {
 
         <div css={bodyStyles}>
           <MeetNowForm
+            isOpen={isOpen}
             formState={formState}
             titleError={titleError}
             onTitleChange={setTitle}

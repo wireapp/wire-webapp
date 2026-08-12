@@ -129,6 +129,7 @@ export const ScheduleMeetingModal = () => {
 
         <div css={bodyStyles}>
           <ScheduleMeetingForm
+            isOpen={isOpen}
             mode={mode}
             formState={formState}
             errors={displayErrors}

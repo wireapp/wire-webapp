@@ -44,9 +44,10 @@ describe('ScheduleMeetingForm', () => {
       },
     };
 
-    render(
+    const {rerender} = render(
       withThemeAndRootContext(
         <ScheduleMeetingForm
+          isOpen={false}
           mode="create"
           formState={{
             title: '',
@@ -75,5 +76,39 @@ describe('ScheduleMeetingForm', () => {
     );
 
     expect(screen.getByLabelText('meetings.scheduleModal.titleLabel')).toHaveAttribute('autocomplete', 'off');
+
+    const titleInput = screen.getByLabelText('meetings.scheduleModal.titleLabel');
+    rerender(
+      withThemeAndRootContext(
+        <ScheduleMeetingForm
+          isOpen
+          mode="create"
+          formState={{
+            title: '',
+            start: maybe.nothing(),
+            end: maybe.nothing(),
+            recurrence: 'doesNotRepeat',
+            selectedUsers: [],
+            participantsFilter: '',
+          }}
+          errors={{...emptyScheduleMeetingFormErrors(), title: undefined}}
+          onTitleChange={jest.fn()}
+          onStartChange={jest.fn()}
+          onEndChange={jest.fn()}
+          onRecurrenceChange={jest.fn()}
+          onSelectedUsersChange={jest.fn()}
+          onParticipantsFilterChange={jest.fn()}
+          selfUser={{} as User}
+        />,
+        createRootProviderWrapperForTest(
+          createRootContextValueForTest({
+            translate: translateForTest,
+            mainViewModel: mainViewModel as unknown as MainViewModel,
+          }),
+        ),
+      ),
+    );
+
+    expect(titleInput).toHaveFocus();
   });
 });

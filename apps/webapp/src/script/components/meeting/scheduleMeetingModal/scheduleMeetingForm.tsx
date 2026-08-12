@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useMemo} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {Maybe} from 'true-myth';
@@ -71,6 +71,7 @@ const firstNonEmptyError = (...errorMessages: Array<string | undefined>): string
   errorMessages.find(message => isNonEmptyString(message));
 
 export interface ScheduleMeetingFormProps {
+  isOpen: boolean;
   mode: ScheduleMeetingMode;
   formState: ScheduleMeetingFormState;
   errors: ScheduleMeetingFormDisplayErrors;
@@ -84,6 +85,7 @@ export interface ScheduleMeetingFormProps {
 }
 
 export const ScheduleMeetingForm = ({
+  isOpen,
   mode,
   formState,
   errors,
@@ -95,6 +97,7 @@ export const ScheduleMeetingForm = ({
   onParticipantsFilterChange,
   selfUser,
 }: ScheduleMeetingFormProps) => {
+  const titleInputRef = useRef<HTMLInputElement>(null);
   const {mainViewModel, translate, wallClock} = useApplicationContext();
   const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
@@ -181,13 +184,18 @@ export const ScheduleMeetingForm = ({
     formState.end.isNothing ? errors.missingTimes : undefined,
   );
 
+  useEffect(() => {
+    if (isOpen) {
+      titleInputRef.current?.focus();
+    }
+  }, [isOpen]);
+
   return (
     <div css={scheduleMeetingFormLayoutCss} data-uie-name="schedule-meeting-form" data-uie-mode={mode}>
       <div css={scheduleMeetingFormLeftColumnCss}>
-        {/* eslint jsx-a11y/no-autofocus : "off" */}
         <Input
           id="schedule-meeting-title"
-          autoFocus
+          ref={titleInputRef}
           autoComplete="off"
           data-uie-name="schedule-meeting-title"
           label={translate('meetings.scheduleModal.titleLabel')}

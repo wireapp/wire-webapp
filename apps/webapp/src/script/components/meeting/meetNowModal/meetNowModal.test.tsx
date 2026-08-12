@@ -232,6 +232,16 @@ describe('MeetNowModal', () => {
     expect(screen.getByLabelText('meetings.scheduleModal.titleLabel')).toHaveAttribute('autocomplete', 'off');
   });
 
+  it('focuses the title when the modal opens', () => {
+    renderMeetNowModal();
+
+    act(() => {
+      useMeetNowModal.getState().open();
+    });
+
+    expect(screen.getByLabelText('meetings.scheduleModal.titleLabel')).toHaveFocus();
+  });
+
   it('does not dismiss the modal while submission is pending', async () => {
     const {fireAndForgetInvoker, resolveMeetNowMeeting} = renderMeetNowModal();
 

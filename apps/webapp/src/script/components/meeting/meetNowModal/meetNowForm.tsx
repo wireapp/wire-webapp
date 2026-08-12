@@ -17,7 +17,7 @@
  *
  */
 
-import type {FormEvent} from 'react';
+import {useEffect, useRef, type FormEvent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
@@ -40,6 +40,7 @@ import type {MeetNowFormState} from './meetNowTypes';
 export const MEET_NOW_FORM_ID = 'meet-now-form';
 
 export interface MeetNowFormProps {
+  isOpen: boolean;
   formState: MeetNowFormState;
   titleError?: string;
   onTitleChange: (title: string) => void;
@@ -50,6 +51,7 @@ export interface MeetNowFormProps {
 }
 
 export const MeetNowForm = ({
+  isOpen,
   formState,
   titleError,
   onTitleChange,
@@ -58,6 +60,7 @@ export const MeetNowForm = ({
   onSubmit,
   selfUser,
 }: MeetNowFormProps) => {
+  const titleInputRef = useRef<HTMLInputElement>(null);
   const {mainViewModel, translate} = useApplicationContext();
   const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
@@ -67,12 +70,17 @@ export const MeetNowForm = ({
   const searchRepository = contentViewModel.repositories.search;
   const teamRepository = contentViewModel.repositories.team;
 
+  useEffect(() => {
+    if (isOpen) {
+      titleInputRef.current?.focus();
+    }
+  }, [isOpen]);
+
   return (
     <form id={MEET_NOW_FORM_ID} css={meetNowFormLayoutStyles} onSubmit={onSubmit} noValidate>
-      {/* eslint jsx-a11y/no-autofocus : "off" */}
       <Input
         id="meet-now-title"
-        autoFocus
+        ref={titleInputRef}
         autoComplete="off"
         label={translate('meetings.scheduleModal.titleLabel')}
         placeholder={translate('meetings.scheduleModal.titlePlaceholder')}

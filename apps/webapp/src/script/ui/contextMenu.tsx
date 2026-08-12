@@ -205,7 +205,7 @@ const ContextMenu = ({
         setSelected(entries[nextIndex]);
       }
       if (isEnterKey(event) || isSpaceKey(event)) {
-        if (selected) {
+        if (selected && !selected.isDisabled) {
           cleanUp();
           resetMsgMenuStates();
           selected.click?.();
@@ -279,6 +279,7 @@ const ContextMenu = ({
                     type="button"
                     data-uie-name={entry.identifier || defaultIdentifier}
                     title={entry.title || entry.label}
+                    aria-disabled={entry.isDisabled}
                     {...(entry.css ? {css: entry.css} : {})}
                     {...(entry.isDisabled
                       ? undefined
