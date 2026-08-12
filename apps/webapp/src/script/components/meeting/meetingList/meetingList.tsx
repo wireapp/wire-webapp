@@ -20,7 +20,7 @@
 import {type RefObject, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
-import {startOfDay} from 'date-fns';
+import {isSameDay, startOfDay} from 'date-fns';
 
 import {Button, ButtonVariant, Loading} from '@wireapp/react-ui-kit';
 
@@ -95,8 +95,42 @@ const getMeetingDayDescriptionId = (meetingInstance: MeetingInstance): string =>
   return `meeting-day-description-${meetingSeries.qualified_id.domain}-${meetingSeries.qualified_id.id}-${start.getTime()}`;
 };
 
-export const isMeetingListItemLastInDay = (nextItem: MeetingListTimelineItem | undefined, hasMore: boolean): boolean =>
-  nextItem?.type === 'dayHeader' || (nextItem === undefined && !hasMore);
+export type IsMeetingListItemLastInDayParams = {
+  nextItem: MeetingListTimelineItem | undefined;
+  hasMore: boolean;
+  currentDay: Date;
+  nextPendingOccurrenceStart?: Date;
+};
+
+/**
+ * Bottom-of-day chrome should apply when the next loaded timeline item starts a new day,
+ * when paging is exhausted, or when the next unloaded occurrence is already known to fall
+ * on a later calendar day (page cut lands exactly on a day boundary).
+ */
+export const isMeetingListItemLastInDay = ({
+  nextItem,
+  hasMore,
+  currentDay,
+  nextPendingOccurrenceStart,
+}: IsMeetingListItemLastInDayParams): boolean => {
+  if (nextItem?.type === 'dayHeader') {
+    return true;
+  }
+
+  if (nextItem !== undefined) {
+    return false;
+  }
+
+  if (!hasMore) {
+    return true;
+  }
+
+  if (nextPendingOccurrenceStart === undefined) {
+    return false;
+  }
+
+  return !isSameDay(currentDay, nextPendingOccurrenceStart);
+};
 
 export const MeetingList = ({
   meetingSeries,
@@ -302,7 +336,12 @@ export const MeetingList = ({
                       nowMilliseconds={nowMilliseconds}
                       selfUser={selfUser}
                       isFirstInDay={previousItem?.type === 'dayHeader'}
-                      isLastInDay={isMeetingListItemLastInDay(nextItem, meetingInstancePage.hasMore)}
+                      isLastInDay={isMeetingListItemLastInDay({
+                        nextItem,
+                        hasMore: meetingInstancePage.hasMore,
+                        currentDay: item.day,
+                        nextPendingOccurrenceStart: meetingInstancePage.cursor.candidates[0]?.start,
+                      })}
                     />
                   </div>
                 </>

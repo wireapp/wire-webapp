@@ -263,11 +263,12 @@ describe('MeetingList', () => {
     expect(document.getElementById(describedBy!)).toHaveTextContent(/meetings\.list\.today/);
   });
 
-  it('does not treat the page tail as last-in-day while more occurrences remain', () => {
-    const dayHeader = {type: 'dayHeader' as const, day: new Date('2026-06-15T00:00:00.000Z')};
+  it('does not treat the page tail as last-in-day while more occurrences remain on the same day', () => {
+    const day = new Date('2026-06-15T00:00:00.000Z');
+    const dayHeader = {type: 'dayHeader' as const, day};
     const meetingItem = {
       type: 'meetingInstance' as const,
-      day: dayHeader.day,
+      day,
       meetingInstance: {
         meetingSeries: createMeetingSeries('2026-06-15T14:00:00.000Z', '2026-06-15T15:00:00.000Z', 'Boundary meeting'),
         start: new Date('2026-06-15T14:00:00.000Z'),
@@ -275,10 +276,43 @@ describe('MeetingList', () => {
       },
     };
 
-    expect(isMeetingListItemLastInDay(undefined, true)).toBe(false);
-    expect(isMeetingListItemLastInDay(undefined, false)).toBe(true);
-    expect(isMeetingListItemLastInDay(dayHeader, true)).toBe(true);
-    expect(isMeetingListItemLastInDay(meetingItem, false)).toBe(false);
+    expect(
+      isMeetingListItemLastInDay({
+        nextItem: undefined,
+        hasMore: true,
+        currentDay: day,
+        nextPendingOccurrenceStart: new Date('2026-06-15T16:00:00.000Z'),
+      }),
+    ).toBe(false);
+    expect(
+      isMeetingListItemLastInDay({
+        nextItem: undefined,
+        hasMore: true,
+        currentDay: day,
+        nextPendingOccurrenceStart: new Date('2026-06-16T10:00:00.000Z'),
+      }),
+    ).toBe(true);
+    expect(
+      isMeetingListItemLastInDay({
+        nextItem: undefined,
+        hasMore: false,
+        currentDay: day,
+      }),
+    ).toBe(true);
+    expect(
+      isMeetingListItemLastInDay({
+        nextItem: dayHeader,
+        hasMore: true,
+        currentDay: day,
+      }),
+    ).toBe(true);
+    expect(
+      isMeetingListItemLastInDay({
+        nextItem: meetingItem,
+        hasMore: false,
+        currentDay: day,
+      }),
+    ).toBe(false);
   });
 
   it('loads another occurrence page when the virtualized tail is reached', () => {
