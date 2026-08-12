@@ -33,7 +33,7 @@ export const SCHEDULE_MEETING_RECURRENCE_OPTIONS = [
 ] as const satisfies readonly ScheduleMeetingRecurrenceOption[];
 
 export const SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS = {
-  doesNotRepeat: 'meetings.scheduleModal.recurrence.doesNotRepeat',
+  doesNotRepeat: 'meetings.scheduleModal.recurrence.never',
   daily: 'meetings.scheduleModal.recurrence.daily',
   weekly: 'meetings.scheduleModal.recurrence.weekly',
   everyTwoWeeks: 'meetings.scheduleModal.recurrence.everyTwoWeeks',

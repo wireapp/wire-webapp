@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useMemo} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {Maybe} from 'true-myth';
@@ -44,6 +44,7 @@ import {
   scheduleMeetingRecurrenceSelectWrapperStyles,
   scheduleMeetingSelectMenuPortalStyles,
   scheduleMeetingTitleClearButtonStyles,
+  scheduleMeetingTitleInputStyles,
   scheduleMeetingTitleInputWrapperStyles,
 } from 'Components/meeting/shared/styles/meetingForm.styles';
 import type {User} from 'Repositories/entity/User';
@@ -70,6 +71,7 @@ const firstNonEmptyError = (...errorMessages: Array<string | undefined>): string
   errorMessages.find(message => isNonEmptyString(message));
 
 export interface ScheduleMeetingFormProps {
+  isOpen: boolean;
   mode: ScheduleMeetingMode;
   formState: ScheduleMeetingFormState;
   errors: ScheduleMeetingFormDisplayErrors;
@@ -83,6 +85,7 @@ export interface ScheduleMeetingFormProps {
 }
 
 export const ScheduleMeetingForm = ({
+  isOpen,
   mode,
   formState,
   errors,
@@ -94,6 +97,7 @@ export const ScheduleMeetingForm = ({
   onParticipantsFilterChange,
   selfUser,
 }: ScheduleMeetingFormProps) => {
+  const titleInputRef = useRef<HTMLInputElement>(null);
   const {mainViewModel, translate, wallClock} = useApplicationContext();
   const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
@@ -180,11 +184,19 @@ export const ScheduleMeetingForm = ({
     formState.end.isNothing ? errors.missingTimes : undefined,
   );
 
+  useEffect(() => {
+    if (isOpen) {
+      titleInputRef.current?.focus();
+    }
+  }, [isOpen]);
+
   return (
     <div css={scheduleMeetingFormLayoutCss} data-uie-name="schedule-meeting-form" data-uie-mode={mode}>
       <div css={scheduleMeetingFormLeftColumnCss}>
         <Input
           id="schedule-meeting-title"
+          ref={titleInputRef}
+          autoComplete="off"
           data-uie-name="schedule-meeting-title"
           label={translate('meetings.scheduleModal.titleLabel')}
           placeholder={translate('meetings.scheduleModal.titlePlaceholder')}
@@ -196,6 +208,7 @@ export const ScheduleMeetingForm = ({
               <ErrorMessage data-uie-name="schedule-meeting-title-error">{errors.title}</ErrorMessage>
             ) : undefined
           }
+          inputCSS={scheduleMeetingTitleInputStyles}
           wrapperCSS={scheduleMeetingTitleInputWrapperStyles}
           endContent={
             formState.title.length > 0 && !isNonEmptyString(errors.title) ? (

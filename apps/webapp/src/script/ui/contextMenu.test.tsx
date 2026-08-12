@@ -18,7 +18,7 @@
  */
 
 import '@testing-library/jest-dom';
-import {act, waitFor} from '@testing-library/react';
+import {act, screen, waitFor} from '@testing-library/react';
 
 import {showContextMenu} from './contextMenu';
 
@@ -167,5 +167,26 @@ describe('ContextMenu positioning', () => {
     });
 
     await waitFor(() => expect(clickSpy).toHaveBeenCalledTimes(1));
+  });
+
+  it('exposes disabled entries and does not invoke their action', async () => {
+    setMenuOffsetSize(10, 10);
+    const clickSpy = jest.fn();
+
+    await openMenu({
+      event: new MouseEvent('click', {clientX: 10, clientY: 10}),
+      entries: [{label: 'Unavailable', isDisabled: true, click: clickSpy}],
+      identifier: 'message-options-menu',
+    });
+
+    const button = screen.getByRole('menuitem').querySelector('button')!;
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+
+    await act(async () => {
+      window.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
+    });
+    button.click();
+
+    expect(clickSpy).not.toHaveBeenCalled();
   });
 });

@@ -17,7 +17,7 @@
  *
  */
 
-import type {FormEvent} from 'react';
+import {useEffect, useRef, type FormEvent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
@@ -28,6 +28,7 @@ import {useMeetingParticipants} from 'Components/meeting/shared/participants/use
 import {
   scheduleMeetingParticipantsSectionCss,
   scheduleMeetingTitleClearButtonStyles,
+  scheduleMeetingTitleInputStyles,
   scheduleMeetingTitleInputWrapperStyles,
 } from 'Components/meeting/shared/styles/meetingForm.styles';
 import type {User} from 'Repositories/entity/User';
@@ -39,6 +40,7 @@ import type {MeetNowFormState} from './meetNowTypes';
 export const MEET_NOW_FORM_ID = 'meet-now-form';
 
 export interface MeetNowFormProps {
+  isOpen: boolean;
   formState: MeetNowFormState;
   titleError?: string;
   onTitleChange: (title: string) => void;
@@ -49,6 +51,7 @@ export interface MeetNowFormProps {
 }
 
 export const MeetNowForm = ({
+  isOpen,
   formState,
   titleError,
   onTitleChange,
@@ -57,6 +60,7 @@ export const MeetNowForm = ({
   onSubmit,
   selfUser,
 }: MeetNowFormProps) => {
+  const titleInputRef = useRef<HTMLInputElement>(null);
   const {mainViewModel, translate} = useApplicationContext();
   const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
@@ -66,16 +70,25 @@ export const MeetNowForm = ({
   const searchRepository = contentViewModel.repositories.search;
   const teamRepository = contentViewModel.repositories.team;
 
+  useEffect(() => {
+    if (isOpen) {
+      titleInputRef.current?.focus();
+    }
+  }, [isOpen]);
+
   return (
     <form id={MEET_NOW_FORM_ID} css={meetNowFormLayoutStyles} onSubmit={onSubmit} noValidate>
       <Input
         id="meet-now-title"
+        ref={titleInputRef}
+        autoComplete="off"
         label={translate('meetings.scheduleModal.titleLabel')}
         placeholder={translate('meetings.scheduleModal.titlePlaceholder')}
         value={formState.title}
         onChange={event => onTitleChange(event.currentTarget.value)}
         markInvalid={isNonEmptyString(titleError)}
         error={isNonEmptyString(titleError) ? <ErrorMessage>{titleError}</ErrorMessage> : undefined}
+        inputCSS={scheduleMeetingTitleInputStyles}
         wrapperCSS={scheduleMeetingTitleInputWrapperStyles}
         endContent={
           formState.title.length > 0 && !isNonEmptyString(titleError) ? (

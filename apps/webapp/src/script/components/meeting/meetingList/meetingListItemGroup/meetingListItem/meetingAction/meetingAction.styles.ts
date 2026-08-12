@@ -38,3 +38,7 @@ export const contextMenuDangerItemStyles: CSSObject = {
 export const contextMenuDangerItemIconStyles: CSSObject = {
   fill: 'var(--danger-color)',
 };
+
+export const contextMenuDisabledItemIconStyles: CSSObject = {
+  fill: 'var(--foreground-fade-48)',
+};

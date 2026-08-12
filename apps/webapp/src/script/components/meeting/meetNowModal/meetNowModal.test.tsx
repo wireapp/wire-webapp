@@ -222,6 +222,38 @@ describe('MeetNowModal', () => {
     jest.restoreAllMocks();
   });
 
+  it('disables browser autocomplete for the meeting title', async () => {
+    renderMeetNowModal();
+
+    act(() => {
+      useMeetNowModal.getState().open();
+    });
+
+    expect(screen.getByLabelText('meetings.scheduleModal.titleLabel')).toHaveAttribute('autocomplete', 'off');
+  });
+
+  it('focuses the title when the modal opens', () => {
+    renderMeetNowModal();
+
+    act(() => {
+      useMeetNowModal.getState().open();
+    });
+
+    expect(screen.getByLabelText('meetings.scheduleModal.titleLabel')).toHaveFocus();
+  });
+
+  it('closes the modal when Escape is pressed after opening', () => {
+    renderMeetNowModal();
+
+    act(() => {
+      useMeetNowModal.getState().open();
+    });
+
+    fireEvent.keyDown(screen.getByLabelText('meetings.scheduleModal.titleLabel'), {key: KEY.ESC});
+
+    expect(useMeetNowModal.getState().isOpen).toBe(false);
+  });
+
   it('does not dismiss the modal while submission is pending', async () => {
     const {fireAndForgetInvoker, resolveMeetNowMeeting} = renderMeetNowModal();
 

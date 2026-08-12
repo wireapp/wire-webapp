@@ -77,6 +77,10 @@ export const ScheduleMeetingModal = () => {
   );
 
   const handleClose = () => {
+    if (isSubmitting) {
+      return;
+    }
+
     close();
     reset(wallClock);
   };
@@ -117,6 +121,7 @@ export const ScheduleMeetingModal = () => {
             type="button"
             css={closeButtonStyles}
             onClick={handleClose}
+            disabled={isSubmitting}
             aria-label={translate('meetings.scheduleModal.closeAriaLabel')}
             data-uie-name="schedule-meeting-modal-close"
           >
@@ -129,6 +134,7 @@ export const ScheduleMeetingModal = () => {
 
         <div css={bodyStyles}>
           <ScheduleMeetingForm
+            isOpen={isOpen}
             mode={mode}
             formState={formState}
             errors={displayErrors}
