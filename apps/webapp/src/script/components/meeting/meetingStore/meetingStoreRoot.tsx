@@ -95,7 +95,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       logger,
     });
 
-    amplify.subscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingDeleted);
+    amplify.subscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingCancelled);
 
     const getSelfUserQualifiedId = () => container.resolve(UserState).self().qualifiedId;
 
@@ -107,7 +107,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     const unsubscribeFromMeetingConversationEvents = subscribeToMeetingConversationEvents({
       dispatcher,
       getMeetingSeries: () => store.getState().meetingSeries,
-      onMeetingRemovedForSelf: notificationHandlers.onMeetingRemovedForSelf,
+      onMeetingCancelled: notificationHandlers.onMeetingCancelled,
     });
     const unsubscribeFromMeetingStore = store.subscribe((state, previousState) => {
       if (state.meetingSeries !== previousState.meetingSeries) {
@@ -121,7 +121,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       unsubscribeFromMeetingLifecycleEvents();
       unsubscribeFromMeetingConversationEvents();
       unsubscribeFromMeetingStore();
-      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingDeleted);
+      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingCancelled);
     };
   }, [isMeetingsEnabled, store]);
 

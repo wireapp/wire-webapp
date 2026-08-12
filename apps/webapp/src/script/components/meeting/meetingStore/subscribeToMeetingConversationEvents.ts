@@ -20,7 +20,7 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents, type ConversationSelfRemovedPayload} from '@wireapp/webapp-events';
 
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {findMeetingSeriesByQualifiedConversation} from 'Components/meeting/utils/findMeetingSeriesByQualifiedConversation';
@@ -30,7 +30,7 @@ import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatche
 export type SubscribeToMeetingConversationEventsDependencies = {
   dispatcher: MeetingLifecycleDispatcher;
   getMeetingSeries: () => readonly MeetingSeries[];
-  onMeetingRemovedForSelf: (meetingId: QualifiedId) => void;
+  onMeetingCancelled: (meetingId: QualifiedId) => void;
 };
 
 /**
@@ -40,16 +40,19 @@ export type SubscribeToMeetingConversationEventsDependencies = {
 export const subscribeToMeetingConversationEvents = ({
   dispatcher,
   getMeetingSeries,
-  onMeetingRemovedForSelf,
+  onMeetingCancelled,
 }: SubscribeToMeetingConversationEventsDependencies): (() => void) => {
-  const onSelfRemovedFromConversation = (qualifiedConversationId: QualifiedId) => {
+  const onSelfRemovedFromConversation = ({qualifiedConversationId, initiatedBySelf}: ConversationSelfRemovedPayload) => {
     const meeting = findMeetingSeriesByQualifiedConversation(getMeetingSeries(), qualifiedConversationId);
-    if (meeting === undefined) {
+    if (meeting.isNothing) {
       return;
     }
 
-    onMeetingRemovedForSelf(meeting.qualified_id);
-    dispatcher.enqueueMeetingRemoval(meeting.qualified_id);
+    if (!initiatedBySelf) {
+      onMeetingCancelled(meeting.value.qualified_id);
+    }
+
+    dispatcher.enqueueMeetingRemoval(meeting.value.qualified_id);
   };
 
   amplify.subscribe(WebAppEvents.CONVERSATION.SELF_REMOVED, onSelfRemovedFromConversation);

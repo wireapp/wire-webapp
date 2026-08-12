@@ -70,11 +70,11 @@ describe('createMeetingNotificationEventHandlers', () => {
     const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
     const warnings: Array<{message: string; context?: unknown}> = [];
 
-    const {notifyUpdate, onMeetingDeleted} = createHandlers({notifications, dismissedMeetings, warnings});
+    const {notifyUpdate, onMeetingCancelled} = createHandlers({notifications, dismissedMeetings, warnings});
 
     notifyUpdate(meetingSeries);
     notifyUpdate(meetingSeries);
-    onMeetingDeleted(meetingId);
+    onMeetingCancelled(meetingId);
 
     expect(notifications).toEqual([
       {
@@ -98,7 +98,10 @@ describe('createMeetingNotificationEventHandlers', () => {
       },
     ]);
 
-    expect(dismissedMeetings).toEqual([{meetingId, kinds: expect.arrayContaining([MeetingNotificationKind.UPDATE])}]);
+    expect(dismissedMeetings).toEqual([
+      {meetingId, kinds: expect.arrayContaining([MeetingNotificationKind.UPDATE])},
+      {meetingId, kinds: [MeetingNotificationKind.CANCELLED]},
+    ]);
     expect(warnings).toEqual([]);
   });
 
@@ -106,13 +109,13 @@ describe('createMeetingNotificationEventHandlers', () => {
     const notifications: AddNotificationInput[] = [];
     const warnings: Array<{message: string; context?: unknown}> = [];
 
-    const {onMeetingDeleted} = createHandlers({
+    const {onMeetingCancelled} = createHandlers({
       getMeetingSeries: () => [],
       notifications,
       warnings,
     });
 
-    onMeetingDeleted(meetingId);
+    onMeetingCancelled(meetingId);
 
     expect(notifications).toEqual([]);
     expect(warnings).toEqual([
@@ -162,12 +165,12 @@ describe('createMeetingNotificationEventHandlers', () => {
     ]);
   });
 
-  it('dismisses stale notifications before creating a cancellation for self-removal', () => {
+  it('dismisses stale notifications before creating a cancellation for involuntary self-removal', () => {
     const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
     const notifications: AddNotificationInput[] = [];
-    const {onMeetingRemovedForSelf} = createHandlers({notifications, dismissedMeetings});
+    const {onMeetingCancelled} = createHandlers({notifications, dismissedMeetings});
 
-    onMeetingRemovedForSelf(meetingId);
+    onMeetingCancelled(meetingId);
 
     expect(dismissedMeetings).toEqual([
       {
@@ -178,6 +181,10 @@ describe('createMeetingNotificationEventHandlers', () => {
           MeetingNotificationKind.ONGOING,
         ],
       },
+      {
+        meetingId,
+        kinds: [MeetingNotificationKind.CANCELLED],
+      },
     ]);
     expect(notifications).toEqual([
       {
@@ -187,6 +194,80 @@ describe('createMeetingNotificationEventHandlers', () => {
         qualifiedCreator: meetingSeries.qualified_creator,
         qualifiedId: meetingSeries.qualified_id,
       },
+    ]);
+  });
+
+  it('creates only one cancellation notification when cancelled twice', () => {
+    const notifications: AddNotificationInput[] = [];
+    const {onMeetingCancelled} = createHandlers({notifications});
+
+    onMeetingCancelled(meetingId);
+    onMeetingCancelled(meetingId);
+
+    expect(notifications).toEqual([
+      expect.objectContaining({kind: MeetingNotificationKind.CANCELLED, qualifiedId: meetingId}),
+    ]);
+  });
+
+  it('retries pending cancellations with the full cancellation path', () => {
+    const notifications: AddNotificationInput[] = [];
+    const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
+    let meetingSeriesSnapshot: MeetingSeries[] = [];
+
+    const {onMeetingCancelled, retryPendingNotifications} = createHandlers({
+      getMeetingSeries: () => meetingSeriesSnapshot,
+      notifications,
+      dismissedMeetings,
+    });
+
+    onMeetingCancelled(meetingId);
+    expect(dismissedMeetings).toEqual([
+      {
+        meetingId,
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+        ],
+      },
+      {
+        meetingId,
+        kinds: [MeetingNotificationKind.CANCELLED],
+      },
+    ]);
+    expect(notifications).toEqual([]);
+
+    meetingSeriesSnapshot = [meetingSeries];
+    retryPendingNotifications();
+
+    expect(dismissedMeetings).toEqual([
+      {
+        meetingId,
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+        ],
+      },
+      {
+        meetingId,
+        kinds: [MeetingNotificationKind.CANCELLED],
+      },
+      {
+        meetingId,
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+        ],
+      },
+      {
+        meetingId,
+        kinds: [MeetingNotificationKind.CANCELLED],
+      },
+    ]);
+    expect(notifications).toEqual([
+      expect.objectContaining({kind: MeetingNotificationKind.CANCELLED, qualifiedId: meetingId}),
     ]);
   });
 });

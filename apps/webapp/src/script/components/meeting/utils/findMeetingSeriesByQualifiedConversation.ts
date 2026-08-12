@@ -18,6 +18,7 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Maybe} from 'true-myth';
 
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -25,5 +26,5 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 export const findMeetingSeriesByQualifiedConversation = (
   meetingSeries: readonly MeetingSeries[],
   qualifiedConversationId: QualifiedId,
-): MeetingSeries | undefined =>
-  meetingSeries.find(series => matchQualifiedIds(series.qualified_conversation, qualifiedConversationId));
+): Maybe<MeetingSeries> =>
+  Maybe.of(meetingSeries.find(series => matchQualifiedIds(series.qualified_conversation, qualifiedConversationId)));

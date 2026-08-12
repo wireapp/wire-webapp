@@ -202,6 +202,7 @@ test.describe('Meetings CRUD', () => {
     await memberMeetings.deleteMeetingForMe(MEETING_TITLE);
 
     await memberMeetings.waitForMeetingAbsentFromList(MEETING_TITLE);
+    await memberMeetings.expectNoNotificationContaining(`Canceled: ${MEETING_TITLE}`);
     await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
   });
 });

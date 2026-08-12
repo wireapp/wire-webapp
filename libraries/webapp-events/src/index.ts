@@ -273,3 +273,11 @@ export const WebAppEvents = {
     SHOW: 'wire.webapp.warning.show',
   },
 };
+
+export type ConversationSelfRemovedPayload = {
+  qualifiedConversationId: {
+    domain: string;
+    id: string;
+  };
+  initiatedBySelf: boolean;
+};

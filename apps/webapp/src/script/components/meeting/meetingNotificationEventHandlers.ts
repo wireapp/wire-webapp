@@ -49,8 +49,7 @@ export type MeetingNotificationEventHandlersDependencies = {
 export type MeetingNotificationEventHandlers = {
   notifyMeetingChange: (meeting: MeetingSeries) => void;
   notifyUpdate: (meeting: MeetingSeries) => void;
-  onMeetingDeleted: (meetingId: QualifiedId) => void;
-  onMeetingRemovedForSelf: (meetingId: QualifiedId) => void;
+  onMeetingCancelled: (meetingId: QualifiedId) => void;
   /** Retries notifications that couldn't be sent because the meeting wasn't in the store yet. */
   retryPendingNotifications: () => void;
 };
@@ -67,6 +66,7 @@ export const createMeetingNotificationEventHandlers = ({
   // Only deleted events can fire before the meeting store has synced.
   const pending = new Map<string, QualifiedId>();
   const notifiedMeetings = new Set<string>();
+  const cancelledMeetings = new Set<string>();
 
   const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries) => {
     const notificationBase = {
@@ -99,21 +99,31 @@ export const createMeetingNotificationEventHandlers = ({
   };
 
   const addCancellationNotificationForMeeting = (meetingId: QualifiedId): void => {
+    const meetingKey = toMeetingIdKey(meetingId);
+
+    if (cancelledMeetings.has(meetingKey)) {
+      pending.delete(meetingKey);
+      return;
+    }
+
     const meeting = getMeeting(meetingId);
     if (!meeting) {
       logger.warn('meeting notification pending because the meeting is not in the store yet', {
         kind: MeetingNotificationKind.CANCELLED,
         meetingId,
       });
-      pending.set(toMeetingIdKey(meetingId), meetingId);
+      pending.set(meetingKey, meetingId);
       return;
     }
 
+    cancelledMeetings.add(meetingKey);
+    pending.delete(meetingKey);
     notifyForMeeting(MeetingNotificationKind.CANCELLED, meeting);
   };
 
   const notifyMeetingCancellation = (meetingId: QualifiedId): void => {
     dismissStaleNotificationsForMeeting(meetingId);
+    dismissNotificationsForMeeting(meetingId, [MeetingNotificationKind.CANCELLED]);
     addCancellationNotificationForMeeting(meetingId);
   };
 
@@ -124,7 +134,7 @@ export const createMeetingNotificationEventHandlers = ({
         continue;
       }
 
-      notifyForMeeting(MeetingNotificationKind.CANCELLED, meeting);
+      notifyMeetingCancellation(meetingId);
       pending.delete(key);
     }
   };
@@ -137,10 +147,7 @@ export const createMeetingNotificationEventHandlers = ({
       notifyForMeeting(kind, meeting);
     },
     notifyUpdate: meeting => notifyForMeeting(MeetingNotificationKind.UPDATE, meeting),
-    onMeetingDeleted: meetingId => {
-      notifyMeetingCancellation(meetingId);
-    },
-    onMeetingRemovedForSelf: meetingId => {
+    onMeetingCancelled: meetingId => {
       notifyMeetingCancellation(meetingId);
     },
     retryPendingNotifications,

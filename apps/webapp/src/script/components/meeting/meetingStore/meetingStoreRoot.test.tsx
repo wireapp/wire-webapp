@@ -345,7 +345,10 @@ describe('MeetingStoreRoot', () => {
     });
 
     act(() => {
-      amplify.publish(WebAppEvents.CONVERSATION.SELF_REMOVED, conversationId);
+      amplify.publish(WebAppEvents.CONVERSATION.SELF_REMOVED, {
+        qualifiedConversationId: conversationId,
+        initiatedBySelf: false,
+      });
     });
 
     expect(useMeetingNotificationStore.getState().notifications).toEqual([

@@ -4311,6 +4311,7 @@ export class ConversationRepository {
     }
 
     const removesSelfUser = eventData.user_ids.includes(selfUser.id);
+    const initiatedBySelf = removesSelfUser && eventJson.from === selfUser.id;
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
@@ -4346,7 +4347,10 @@ export class ConversationRepository {
     this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
 
     if (removesSelfUser) {
-      amplify.publish(WebAppEvents.CONVERSATION.SELF_REMOVED, conversationEntity.qualifiedId);
+      amplify.publish(WebAppEvents.CONVERSATION.SELF_REMOVED, {
+        qualifiedConversationId: conversationEntity.qualifiedId,
+        initiatedBySelf,
+      });
     }
 
     return {conversationEntity, messageEntity};
