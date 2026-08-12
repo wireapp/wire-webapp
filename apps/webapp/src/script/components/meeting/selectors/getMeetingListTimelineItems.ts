@@ -17,19 +17,20 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import type {MeetingInstancesByDay} from 'Components/meeting/selectors/groupMeetingInstancesByDay';
+import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 
-export const sectionStyles: CSSObject = {
-  padding: '16px 16px 0',
-};
+export type MeetingListTimelineItem =
+  {type: 'dayHeader'; day: Date} | {type: 'meetingInstance'; day: Date; meetingInstance: MeetingInstance};
 
-export const sectionHeaderStyles: CSSObject = {
-  marginBottom: 8,
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-};
-
-export const listStyles: CSSObject = {
-  display: 'flex',
-  flexDirection: 'column',
-};
+export const getMeetingListTimelineItems = (
+  meetingInstancesByDay: MeetingInstancesByDay[],
+): MeetingListTimelineItem[] =>
+  meetingInstancesByDay.flatMap(({day, meetingInstances}) => [
+    {type: 'dayHeader' as const, day},
+    ...meetingInstances.map(meetingInstance => ({
+      type: 'meetingInstance' as const,
+      day,
+      meetingInstance,
+    })),
+  ]);

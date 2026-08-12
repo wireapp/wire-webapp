@@ -33,40 +33,24 @@ export const itemStyles: CSSObject = {
   borderColor: 'var(--border-color)',
   borderTop: 'none',
   borderRadius: 0,
+};
 
-  '&:first-of-type': {
-    borderTop: '1px solid var(--border-color)',
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  '&:last-of-type': {
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-    marginBottom: 0,
-  },
-  // Let the ongoing item below own the shared edge so its top accent border is a single line.
-  [`&:has(+ [${MEETING_LIST_ITEM_ONGOING_ATTR}])`]: {
-    borderBottomColor: 'transparent',
-  },
+export const firstMeetingListItemStyles: CSSObject = {
+  borderTop: '1px solid var(--border-color)',
+  borderTopLeftRadius: 8,
+  borderTopRightRadius: 8,
+};
+
+export const lastMeetingListItemStyles: CSSObject = {
+  borderBottomLeftRadius: 8,
+  borderBottomRightRadius: 8,
+  marginBottom: 0,
 };
 
 export const onGoingMeetingStyles: CSSObject = {
   background: 'var(--accent-color-highlight)',
   // Full accent outline; overrides collapsed `borderTop: none` from itemStyles.
   border: '1px solid var(--accent-color)',
-
-  '&:first-of-type': {
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  '&:last-of-type': {
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-  },
-  // Keep a single shared accent edge between stacked ongoing items.
-  [`&:has(+ [${MEETING_LIST_ITEM_ONGOING_ATTR}])`]: {
-    borderBottomColor: 'transparent',
-  },
 };
 
 export const leftStyles: CSSObject = {

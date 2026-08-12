@@ -25,7 +25,9 @@ import {MeetingAction} from 'Components/meeting/meetingList/meetingListItemGroup
 import {
   badgeWrapperStyles,
   calendarIconStyles,
+  firstMeetingListItemStyles,
   itemStyles,
+  lastMeetingListItemStyles,
   leftStyles,
   MEETING_LIST_ITEM_ONGOING_ATTR,
   metaStyles,
@@ -52,12 +54,16 @@ interface MeetingListItemProps {
   meetingInstance: MeetingInstance;
   selfUser: User | undefined;
   nowMilliseconds?: number;
+  isFirstInDay?: boolean;
+  isLastInDay?: boolean;
 }
 
 const MeetingListItemComponent = ({
   meetingInstance,
   selfUser,
   nowMilliseconds: providedNowMilliseconds,
+  isFirstInDay = false,
+  isLastInDay = false,
 }: MeetingListItemProps) => {
   const {meetingSeries, start, end} = meetingInstance;
   const {title, recurrence} = meetingSeries;
@@ -98,7 +104,12 @@ const MeetingListItemComponent = ({
 
   return (
     <div
-      css={[itemStyles, isOngoing && onGoingMeetingStyles]}
+      css={[
+        itemStyles,
+        isFirstInDay && firstMeetingListItemStyles,
+        isLastInDay && lastMeetingListItemStyles,
+        isOngoing && onGoingMeetingStyles,
+      ]}
       data-uie-name="item-meeting"
       data-uie-value={title}
       {...(isOngoing ? {[MEETING_LIST_ITEM_ONGOING_ATTR]: ''} : {})}

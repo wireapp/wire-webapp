@@ -21,28 +21,26 @@ import {useVirtualizer, type Virtualizer} from '@tanstack/react-virtual';
 
 import {MEETING_LIST_OVERSCAN} from 'Components/meeting/meetingList/meetingListConstants';
 
-export type UseMeetingDayGroupVirtualizerParams = {
-  visibleDayGroupCount: number;
+export type UseMeetingListVirtualizerParams = {
+  itemCount: number;
   getScrollElement: () => HTMLElement | null;
-  getEstimatedDayGroupHeight: (dayGroupIndex: number) => number;
-  getDayGroupKey: (dayGroupIndex: number) => string;
+  getEstimatedItemHeight: (itemIndex: number) => number;
+  getItemKey: (itemIndex: number) => string;
 };
 
-export type UseMeetingDayGroupVirtualizer = (
-  params: UseMeetingDayGroupVirtualizerParams,
-) => Virtualizer<HTMLElement, Element>;
+export type UseMeetingListVirtualizer = (params: UseMeetingListVirtualizerParams) => Virtualizer<HTMLElement, Element>;
 
-export const useMeetingDayGroupVirtualizer: UseMeetingDayGroupVirtualizer = ({
-  visibleDayGroupCount,
+export const useMeetingListVirtualizer: UseMeetingListVirtualizer = ({
+  itemCount,
   getScrollElement,
-  getEstimatedDayGroupHeight,
-  getDayGroupKey,
+  getEstimatedItemHeight,
+  getItemKey,
 }) =>
   useVirtualizer({
-    count: visibleDayGroupCount,
+    count: itemCount,
     getScrollElement,
-    estimateSize: dayGroupIndex => getEstimatedDayGroupHeight(dayGroupIndex),
-    getItemKey: dayGroupIndex => getDayGroupKey(dayGroupIndex),
+    estimateSize: itemIndex => getEstimatedItemHeight(itemIndex),
+    getItemKey: itemIndex => getItemKey(itemIndex),
     measureElement: element => element.getBoundingClientRect().height,
     overscan: MEETING_LIST_OVERSCAN,
   });
