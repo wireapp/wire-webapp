@@ -135,4 +135,35 @@ describe('createMeetingNotificationEventHandlers', () => {
       expect.objectContaining({kind: MeetingNotificationKind.UPDATE, meetingTitle: 'Fresh title'}),
     ]);
   });
+
+  it('notifies with INVITE on first change and UPDATE on subsequent changes for the same meeting', () => {
+    const notifications: AddNotificationInput[] = [];
+
+    const {notifyMeetingChange} = createMeetingNotificationEventHandlers({
+      getMeetingSeries: () => [meetingSeries],
+      addNotification: notification => {
+        notifications.push(notification);
+      },
+      logger: {warn: () => {}},
+    });
+
+    notifyMeetingChange(meetingSeries);
+    notifyMeetingChange(meetingSeries);
+
+    expect(notifications).toEqual([
+      {
+        kind: MeetingNotificationKind.INVITE,
+        meetingStartTime: meetingSeries.series_start_date,
+        meetingTitle: meetingSeries.title,
+        qualifiedCreator: meetingSeries.qualified_creator,
+        qualifiedId: meetingSeries.qualified_id,
+      },
+      {
+        kind: MeetingNotificationKind.UPDATE,
+        meetingStartTime: meetingSeries.series_start_date,
+        meetingTitle: meetingSeries.title,
+        qualifiedId: meetingSeries.qualified_id,
+      },
+    ]);
+  });
 });
