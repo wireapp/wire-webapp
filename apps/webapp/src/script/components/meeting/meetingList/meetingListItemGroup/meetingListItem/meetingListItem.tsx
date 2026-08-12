@@ -86,12 +86,20 @@ const MeetingListItemComponent = ({
       const month = formatLocale(start, 'MMMM');
       const day = formatLocale(start, 'd');
       const startedAtTime = formatLocale(start, 'h:mm a');
-      return `${dayOfWeek}, ${month} ${day} • ${translate('meetings.meetingStatus.startedAt', {time: startedAtTime})}`;
+      const endedAtTime = formatLocale(end, 'h:mm a');
+      return `${dayOfWeek}, ${month} ${day} • ${translate('meetings.meetingStatus.startedAt', {time: startedAtTime})} • ${translate(
+        'meetings.meetingStatus.endedAt',
+        {time: endedAtTime},
+      )}`;
     }
 
     if (temporalStatus === MeetingTemporalStatuses.ON_GOING) {
       const startedAtTime = formatLocale(start, 'h:mm a');
-      return translate('meetings.meetingStatus.startedAt', {time: startedAtTime});
+      const endsAtTime = formatLocale(end, 'h:mm a');
+      return `${translate('meetings.meetingStatus.startedAt', {time: startedAtTime})} • ${translate(
+        'meetings.meetingStatus.endsAt',
+        {time: endsAtTime},
+      )}`;
     }
 
     const sameMeridiem = formatLocale(start, 'a') === formatLocale(end, 'a');
