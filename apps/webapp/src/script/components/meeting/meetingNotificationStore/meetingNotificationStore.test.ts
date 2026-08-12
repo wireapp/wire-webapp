@@ -218,6 +218,67 @@ describe('useMeetingNotificationStore', () => {
     expect(useMeetingNotificationStore.getState().isExpanded).toBe(false);
   });
 
+  it('dismisses all matching notifications for a meeting and keeps other meetings untouched', () => {
+    const store = useMeetingNotificationStore.getState();
+    const otherMeetingId = {id: 'other-meeting-id', domain: 'example.com'};
+
+    store.addNotification({
+      kind: MeetingNotificationKind.UPDATE,
+      qualifiedId,
+      meetingTitle: 'Updated meeting',
+      meetingStartTime,
+    });
+    store.addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Invited meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+    store.addNotification({
+      kind: MeetingNotificationKind.UPDATE,
+      qualifiedId: otherMeetingId,
+      meetingTitle: 'Other meeting',
+      meetingStartTime,
+    });
+    store.addNotification({
+      kind: MeetingNotificationKind.CANCELLED,
+      qualifiedId,
+      meetingTitle: 'Cancelled meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+
+    store.dismissNotificationsForMeeting(qualifiedId, [
+      MeetingNotificationKind.UPDATE,
+      MeetingNotificationKind.INVITE,
+      MeetingNotificationKind.ONGOING,
+    ]);
+
+    expect(useMeetingNotificationStore.getState().notifications.map(({kind, qualifiedId: id}) => ({kind, id}))).toEqual(
+      [
+        {kind: MeetingNotificationKind.UPDATE, id: otherMeetingId},
+        {kind: MeetingNotificationKind.CANCELLED, id: qualifiedId},
+      ],
+    );
+  });
+
+  it('resets the expanded state when dismissing the last notification for a meeting', () => {
+    const store = useMeetingNotificationStore.getState();
+    store.addNotification({
+      kind: MeetingNotificationKind.UPDATE,
+      qualifiedId,
+      meetingTitle: 'Updated meeting',
+      meetingStartTime,
+    });
+    store.setIsExpanded(true);
+
+    store.dismissNotificationsForMeeting(qualifiedId, [MeetingNotificationKind.UPDATE]);
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(false);
+  });
+
   it('clears all notifications explicitly', () => {
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.INVITE,

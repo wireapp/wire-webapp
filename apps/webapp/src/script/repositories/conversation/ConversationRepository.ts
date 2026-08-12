@@ -161,6 +161,7 @@ import {
   TeamMemberLeaveEvent,
 } from './EventBuilder';
 import {EventMapper} from './EventMapper';
+import {isSelfInitiatedConversationLeave} from './isSelfInitiatedConversationLeave';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
@@ -4311,6 +4312,7 @@ export class ConversationRepository {
     }
 
     const removesSelfUser = eventData.user_ids.includes(selfUser.id);
+    const initiatedBySelf = removesSelfUser && isSelfInitiatedConversationLeave(eventJson.from, selfUser.id);
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
@@ -4344,6 +4346,13 @@ export class ConversationRepository {
     await this.clearUsersFromConversation(conversationEntity, usersToRemove);
 
     this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
+
+    if (removesSelfUser) {
+      amplify.publish(WebAppEvents.CONVERSATION.SELF_REMOVED, {
+        qualifiedConversationId: conversationEntity.qualifiedId,
+        initiatedBySelf,
+      });
+    }
 
     return {conversationEntity, messageEntity};
   }

@@ -33,16 +33,23 @@ type MeetingNotificationLogger = {
   warn: (message: string, context?: unknown) => void;
 };
 
+export const staleMeetingNotificationKinds = [
+  MeetingNotificationKind.UPDATE,
+  MeetingNotificationKind.INVITE,
+  MeetingNotificationKind.ONGOING,
+] as const;
+
 export type MeetingNotificationEventHandlersDependencies = {
   getMeetingSeries: () => readonly MeetingSeries[];
   addNotification: (input: AddNotificationInput) => void;
+  dismissNotificationsForMeeting: (meetingId: QualifiedId, kinds?: readonly MeetingNotificationKind[]) => void;
   logger: MeetingNotificationLogger;
 };
 
 export type MeetingNotificationEventHandlers = {
   notifyMeetingChange: (meeting: MeetingSeries) => void;
   notifyUpdate: (meeting: MeetingSeries) => void;
-  onMeetingDeleted: (meetingId: QualifiedId) => void;
+  onMeetingCancelled: (meetingId: QualifiedId) => void;
   /** Retries notifications that couldn't be sent because the meeting wasn't in the store yet. */
   retryPendingNotifications: () => void;
 };
@@ -50,6 +57,7 @@ export type MeetingNotificationEventHandlers = {
 export const createMeetingNotificationEventHandlers = ({
   getMeetingSeries,
   addNotification,
+  dismissNotificationsForMeeting,
   logger,
 }: MeetingNotificationEventHandlersDependencies): MeetingNotificationEventHandlers => {
   const getMeeting = (meetingId: QualifiedId) =>
@@ -58,6 +66,7 @@ export const createMeetingNotificationEventHandlers = ({
   // Only deleted events can fire before the meeting store has synced.
   const pending = new Map<string, QualifiedId>();
   const notifiedMeetings = new Set<string>();
+  const cancelledMeetings = new Set<string>();
 
   const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries) => {
     const notificationBase = {
@@ -85,18 +94,38 @@ export const createMeetingNotificationEventHandlers = ({
       .exhaustive();
   };
 
+  const dismissStaleNotificationsForMeeting = (meetingId: QualifiedId): void => {
+    dismissNotificationsForMeeting(meetingId, staleMeetingNotificationKinds);
+  };
+
   const addCancellationNotificationForMeeting = (meetingId: QualifiedId): void => {
+    const meetingKey = toMeetingIdKey(meetingId);
     const meeting = getMeeting(meetingId);
     if (!meeting) {
       logger.warn('meeting notification pending because the meeting is not in the store yet', {
         kind: MeetingNotificationKind.CANCELLED,
         meetingId,
       });
-      pending.set(toMeetingIdKey(meetingId), meetingId);
+      pending.set(meetingKey, meetingId);
       return;
     }
 
+    cancelledMeetings.add(meetingKey);
+    pending.delete(meetingKey);
     notifyForMeeting(MeetingNotificationKind.CANCELLED, meeting);
+  };
+
+  const notifyMeetingCancellation = (meetingId: QualifiedId): void => {
+    const meetingKey = toMeetingIdKey(meetingId);
+
+    if (cancelledMeetings.has(meetingKey)) {
+      pending.delete(meetingKey);
+      return;
+    }
+
+    dismissStaleNotificationsForMeeting(meetingId);
+    dismissNotificationsForMeeting(meetingId, [MeetingNotificationKind.CANCELLED]);
+    addCancellationNotificationForMeeting(meetingId);
   };
 
   const retryPendingNotifications = () => {
@@ -106,7 +135,7 @@ export const createMeetingNotificationEventHandlers = ({
         continue;
       }
 
-      notifyForMeeting(MeetingNotificationKind.CANCELLED, meeting);
+      notifyMeetingCancellation(meetingId);
       pending.delete(key);
     }
   };
@@ -119,8 +148,8 @@ export const createMeetingNotificationEventHandlers = ({
       notifyForMeeting(kind, meeting);
     },
     notifyUpdate: meeting => notifyForMeeting(MeetingNotificationKind.UPDATE, meeting),
-    onMeetingDeleted: meetingId => {
-      addCancellationNotificationForMeeting(meetingId);
+    onMeetingCancelled: meetingId => {
+      notifyMeetingCancellation(meetingId);
     },
     retryPendingNotifications,
   };

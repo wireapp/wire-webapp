@@ -21,6 +21,8 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match} from 'ts-pattern';
 import {create} from 'zustand';
 
+import {matchQualifiedIds} from 'Util/qualifiedId';
+
 export enum MeetingNotificationKind {
   INVITE = 'invite',
   UPDATE = 'update',
@@ -60,6 +62,7 @@ type MeetingNotificationStore = {
   isExpanded: boolean;
   addNotification: (input: AddNotificationInput) => void;
   dismissNotification: (id: string) => void;
+  dismissNotificationsForMeeting: (meetingId: QualifiedId, kinds?: readonly MeetingNotificationKind[]) => void;
   clearNotifications: () => void;
   setIsExpanded: (isExpanded: boolean) => void;
 };
@@ -120,6 +123,21 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
   dismissNotification: id =>
     set(state => {
       const notifications = state.notifications.filter(notification => notification.id !== id);
+
+      return {
+        notifications,
+        ...(state.notifications.length > 0 && notifications.length === 0 ? {isExpanded: false} : {}),
+      };
+    }),
+  dismissNotificationsForMeeting: (meetingId, kinds) =>
+    set(state => {
+      const notifications = state.notifications.filter(notification => {
+        if (!matchQualifiedIds(notification.qualifiedId, meetingId)) {
+          return true;
+        }
+
+        return kinds !== undefined && !kinds.includes(notification.kind);
+      });
 
       return {
         notifications,

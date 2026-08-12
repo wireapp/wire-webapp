@@ -118,6 +118,7 @@ export const WebAppEvents = {
       HIDE: 'wire.webapp.conversation.people.hide',
     },
     PERSIST_STATE: 'wire.webapp.conversation.persist_state',
+    SELF_REMOVED: 'wire.webapp.conversation.self_removed',
     SHOW: 'wire.webapp.conversation.show',
     VERIFICATION_STATE_CHANGED: 'wire.webapp.conversation.verification_state_changed',
   },
@@ -271,4 +272,12 @@ export const WebAppEvents = {
     MODAL: 'wire.webapp.warning.modal',
     SHOW: 'wire.webapp.warning.show',
   },
+};
+
+export type ConversationSelfRemovedPayload = {
+  qualifiedConversationId: {
+    domain: string;
+    id: string;
+  };
+  initiatedBySelf: boolean;
 };

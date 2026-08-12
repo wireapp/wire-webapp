@@ -307,4 +307,8 @@ export class MeetingsPage {
     await this.expandNotifications();
     await expect(this.notificationCardContaining(text)).toBeVisible({timeout: MEETINGS_LIST_TIMEOUT_MS});
   }
+
+  async expectNoNotificationContaining(text: string) {
+    await expect(this.notificationCardContaining(text)).toHaveCount(0, {timeout: MEETINGS_LIST_TIMEOUT_MS});
+  }
 }

@@ -36,6 +36,7 @@ import {getLogger} from 'Util/logger';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
+import {subscribeToMeetingConversationEvents} from './subscribeToMeetingConversationEvents';
 import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEvents';
 
 const logger = getLogger('MeetingStoreRoot');
@@ -86,18 +87,27 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       },
     });
 
+    const notificationStore = useMeetingNotificationStore.getState();
     const notificationHandlers = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => store.getState().meetingSeries,
-      addNotification: useMeetingNotificationStore.getState().addNotification,
+      addNotification: notificationStore.addNotification,
+      dismissNotificationsForMeeting: notificationStore.dismissNotificationsForMeeting,
       logger,
     });
 
-    amplify.subscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingDeleted);
+    amplify.subscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingCancelled);
+
+    const getSelfUserQualifiedId = () => container.resolve(UserState).self().qualifiedId;
 
     const unsubscribeFromMeetingLifecycleEvents = subscribeToMeetingLifecycleEvents({
       dispatcher,
-      getSelfUserQualifiedId: () => container.resolve(UserState).self().qualifiedId,
+      getSelfUserQualifiedId,
       notifyMeetingChange: notificationHandlers.notifyMeetingChange,
+    });
+    const unsubscribeFromMeetingConversationEvents = subscribeToMeetingConversationEvents({
+      dispatcher,
+      getMeetingSeries: () => store.getState().meetingSeries,
+      onMeetingCancelled: notificationHandlers.onMeetingCancelled,
     });
     const unsubscribeFromMeetingStore = store.subscribe((state, previousState) => {
       if (state.meetingSeries !== previousState.meetingSeries) {
@@ -109,8 +119,9 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
 
     return () => {
       unsubscribeFromMeetingLifecycleEvents();
+      unsubscribeFromMeetingConversationEvents();
       unsubscribeFromMeetingStore();
-      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingDeleted);
+      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingCancelled);
     };
   }, [isMeetingsEnabled, store]);
 
