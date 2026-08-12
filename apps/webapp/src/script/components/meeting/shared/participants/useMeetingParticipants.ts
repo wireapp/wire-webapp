@@ -25,19 +25,20 @@ import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 export const useMeetingParticipants = (): {users: User[]} => {
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
 
-  const {isTeam, teamUsers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamUsers']);
+  const {isTeam, teamMembers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamMembers']);
   const {connectedUsers} = useKoSubscribableChildren(userState, ['connectedUsers']);
 
   const users = useMemo(() => {
-    const contacts = isTeam ? teamUsers : connectedUsers;
+    const contacts = isTeam ? teamMembers.toSorted(sortUsersByPriority) : connectedUsers;
 
     return contacts.filter(user => user.isAvailable());
-  }, [connectedUsers, isTeam, teamUsers]);
+  }, [connectedUsers, isTeam, teamMembers]);
 
   return {users};
 };

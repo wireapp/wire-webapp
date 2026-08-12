@@ -20,9 +20,12 @@
 import type {User} from 'Repositories/entity/User';
 import type {TeamState} from 'Repositories/team/TeamState';
 import type {UserState} from 'Repositories/user/userState';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 export const getScheduleMeetingParticipantPool = (userState: UserState, teamState: TeamState): User[] => {
-  const contacts = teamState.isTeam() ? teamState.teamUsers() : userState.connectedUsers();
+  const contacts = teamState.isTeam()
+    ? teamState.teamMembers().toSorted(sortUsersByPriority)
+    : userState.connectedUsers();
 
   return contacts.filter(user => user.isAvailable());
 };
