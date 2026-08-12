@@ -713,10 +713,13 @@ export class DebugUtil {
 
   async getEventInfo(
     event: ConversationEvent,
-  ): Promise<{conversation: Conversation; event: ConversationEvent; user: User}> {
+  ): Promise<{conversation: Conversation; event: ConversationEvent; user?: User}> {
     const conversationId = event.qualified_conversation ?? {domain: '', id: event.conversation};
     const conversation = await this.conversationRepository.getConversationById(conversationId);
-    const user = await this.userRepository.getUserById(event.qualified_from ?? {domain: '', id: event.from ?? ''});
+
+    // Some events (e.g. system-initiated conversation deletions/reminders) have no sender.
+    const senderId = event.qualified_from ?? (event.from ? {domain: '', id: event.from} : undefined);
+    const user = senderId ? await this.userRepository.getUserById(senderId) : undefined;
 
     const debugInformation = {
       conversation,
@@ -727,7 +730,7 @@ export class DebugUtil {
     const logMessage = `Hey ${this.userState.self().name()}, this is for you:`;
     this.logger.warn(logMessage, debugInformation);
     this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
-    this.logger.warn(`From: ${debugInformation.user.name()}`, debugInformation.user);
+    this.logger.warn(`From: ${debugInformation.user ? debugInformation.user.name() : 'system'}`, debugInformation.user);
 
     return debugInformation;
   }

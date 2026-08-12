@@ -98,6 +98,7 @@ import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {APIClient} from '../../service/apiClientSingleton';
+import is from '@sindresorhus/is';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -824,7 +825,17 @@ export class EventMapper {
   private _mapEventAdminlessDeleteReminder(
     event: ConversationAdminlessDeleteReminderEvent,
   ): AdminlessDeleteReminderMessage {
-    return new AdminlessDeleteReminderMessage(new Date(event.data.deletion_scheduled_for), this.translate);
+    const deletionScheduledFor = new Date(event.data.deletion_scheduled_for);
+    if (!is.validDate(deletionScheduledFor)) {
+      this.logger.warn(
+        `Could not parse "deletion_scheduled_for" for adminless delete reminder event in conversation '${event.conversation}'.`,
+      );
+      throw new ConversationError(
+        ConversationError.TYPE.INVALID_PARAMETER,
+        ConversationError.MESSAGE.INVALID_PARAMETER,
+      );
+    }
+    return new AdminlessDeleteReminderMessage(deletionScheduledFor, this.translate);
   }
 
   /**

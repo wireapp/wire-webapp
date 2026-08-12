@@ -3664,6 +3664,8 @@ export class ConversationRepository {
             CONVERSATION_EVENT.MEMBER_JOIN,
             CONVERSATION_EVENT.DELETE,
             CONVERSATION_EVENT.SYSTEM_DELETE,
+            CONVERSATION_EVENT.ADMINLESS_DELETE_REMINDER,
+            CONVERSATION_EVENT.SYSTEM_ADMINLESS_DELETE_REMINDER,
           ];
 
           const shouldUpdateTimestampServer = !eventsToSkip.includes(type);
