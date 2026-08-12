@@ -97,9 +97,17 @@ const DropdownMenuContent = ({children}: {children: ReactNode}) => {
 
 DropdownMenu.Content = DropdownMenuContent;
 
-const DropdownMenuItem = ({children, onClick}: {children: ReactNode; onClick: () => void}) => {
+const DropdownMenuItem = ({
+  children,
+  disabled = false,
+  onClick,
+}: {
+  children: ReactNode;
+  disabled?: boolean;
+  onClick?: () => void;
+}) => {
   return (
-    <DropdownMenuPrimitive.Item css={itemStyle} onClick={onClick}>
+    <DropdownMenuPrimitive.Item css={itemStyle} disabled={disabled} onClick={onClick}>
       <span css={textStyles}>{children}</span>
     </DropdownMenuPrimitive.Item>
   );

@@ -24,7 +24,9 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
+import {shouldRestrictCellsViewerActions} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {forcedDownloadFile} from 'Util/util';
@@ -41,11 +43,15 @@ interface CellsTableRowOptionsProps {
 
 export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): ReactElement => {
   const {node, cellsRepository} = properties;
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   const {handleOpenFile} = useCellsFilePreviewModal();
 
   const url = node.url;
   const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
+  const shouldDisableRestrictedActions = shouldRestrictCellsViewerActions({
+    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
+    selfUserDriveRole: node.selfUserDriveRole,
+  });
 
   return (
     <DropdownMenu>
@@ -62,6 +68,7 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
           {translate('cells.options.open')}
         </DropdownMenu.Item>
         <DropdownMenu.Item
+          disabled={shouldDisableRestrictedActions}
           onClick={() =>
             showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker, translate})
           }
@@ -70,6 +77,7 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
         </DropdownMenu.Item>
         {isNonEmptyString(url) && (
           <DropdownMenu.Item
+            disabled={shouldDisableRestrictedActions}
             onClick={() =>
               forcedDownloadFile({
                 url,

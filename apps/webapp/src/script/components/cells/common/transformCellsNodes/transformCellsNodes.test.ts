@@ -19,6 +19,7 @@
 
 import {RestNode} from 'cells-sdk-ts';
 
+import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {Conversation} from 'Repositories/entity/Conversation';
 
 import {transformCellsNodes} from './transformCellsNodes';
@@ -73,11 +74,44 @@ describe('transformCellsNodes', () => {
     expect(node.conversation).toBe(conversation);
   });
 
+  it('marks a node as editor when the conversation and self user belong to the same team', () => {
+    const conversation = {
+      qualifiedId: {domain: 'example.com', id: 'conversation'},
+      teamId: 'team-a',
+    } as Conversation;
+
+    const [node] = transformCellsNodes({
+      nodes: [createStubNode()],
+      users: [],
+      conversations: [conversation],
+      selfUserTeamId: 'team-a',
+    });
+
+    expect(node.selfUserDriveRole).toBe(CELLS_SELF_USER_DRIVE_ROLE.EDITOR);
+  });
+
+  it('marks a node as viewer when the conversation and self user belong to different teams', () => {
+    const conversation = {
+      qualifiedId: {domain: 'example.com', id: 'conversation'},
+      teamId: 'team-a',
+    } as Conversation;
+
+    const [node] = transformCellsNodes({
+      nodes: [createStubNode()],
+      users: [],
+      conversations: [conversation],
+      selfUserTeamId: 'team-b',
+    });
+
+    expect(node.selfUserDriveRole).toBe(CELLS_SELF_USER_DRIVE_ROLE.VIEWER);
+  });
+
   it('leaves the conversation absent when conversations and workspace context are not provided', () => {
     const nodeWithoutWorkspace = createStubNode({ContextWorkspace: undefined});
 
     const [node] = transformCellsNodes({nodes: [nodeWithoutWorkspace], users: []});
 
     expect(node.conversation).toBeUndefined();
+    expect(node.selfUserDriveRole).toBe(CELLS_SELF_USER_DRIVE_ROLE.EDITOR);
   });
 });

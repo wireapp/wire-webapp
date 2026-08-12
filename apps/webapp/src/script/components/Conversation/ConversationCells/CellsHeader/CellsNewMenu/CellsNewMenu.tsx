@@ -23,7 +23,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
+import {
+  shouldRestrictCellsViewerActions,
+  useCellsSelfUserDriveRole,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CellsNewFileModal} from './CellsNewFileModal/CellsNewFileModal';
@@ -41,10 +46,15 @@ interface CellsNewMenuProps {
 export type CellsNewFileType = 'document' | 'spreadsheet' | 'presentation';
 
 export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const selfUserDriveRole = useCellsSelfUserDriveRole();
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [isFileModalOpen, setIsFileModalOpen] = useState(false);
   const [fileType, setFileType] = useState<CellsNewFileType>('document');
+  const shouldHideRestrictedActions = shouldRestrictCellsViewerActions({
+    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
+    selfUserDriveRole,
+  });
 
   const openFolderModal = () => setIsFolderModalOpen(true);
 
@@ -61,31 +71,33 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenu.Trigger asChild>
-          <Button variant={ButtonVariant.TERTIARY} css={buttonStyles}>
-            <PlusIcon css={iconStyles} />
-            {translate('cells.newItemMenu.button')}
-          </Button>
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content>
-          <DropdownMenu.Item onClick={openFolderModal}>{translate('cells.newItemMenu.folder')}</DropdownMenu.Item>
-          <DropdownMenu.Sub>
-            <DropdownMenu.SubTrigger>{translate('cells.newItemMenu.file')}</DropdownMenu.SubTrigger>
-            <DropdownMenu.SubContent>
-              <DropdownMenu.Item onClick={() => openFileModal('document')}>
-                {translate('cells.newItemMenu.document')}
-              </DropdownMenu.Item>
-              <DropdownMenu.Item onClick={() => openFileModal('spreadsheet')}>
-                {translate('cells.newItemMenu.spreadsheet')}
-              </DropdownMenu.Item>
-              <DropdownMenu.Item onClick={() => openFileModal('presentation')}>
-                {translate('cells.newItemMenu.presentation')}
-              </DropdownMenu.Item>
-            </DropdownMenu.SubContent>
-          </DropdownMenu.Sub>
-        </DropdownMenu.Content>
-      </DropdownMenu>
+      {!shouldHideRestrictedActions && (
+        <DropdownMenu>
+          <DropdownMenu.Trigger asChild>
+            <Button variant={ButtonVariant.TERTIARY} css={buttonStyles}>
+              <PlusIcon css={iconStyles} />
+              {translate('cells.newItemMenu.button')}
+            </Button>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content>
+            <DropdownMenu.Item onClick={openFolderModal}>{translate('cells.newItemMenu.folder')}</DropdownMenu.Item>
+            <DropdownMenu.Sub>
+              <DropdownMenu.SubTrigger>{translate('cells.newItemMenu.file')}</DropdownMenu.SubTrigger>
+              <DropdownMenu.SubContent>
+                <DropdownMenu.Item onClick={() => openFileModal('document')}>
+                  {translate('cells.newItemMenu.document')}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => openFileModal('spreadsheet')}>
+                  {translate('cells.newItemMenu.spreadsheet')}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => openFileModal('presentation')}>
+                  {translate('cells.newItemMenu.presentation')}
+                </DropdownMenu.Item>
+              </DropdownMenu.SubContent>
+            </DropdownMenu.Sub>
+          </DropdownMenu.Content>
+        </DropdownMenu>
+      )}
       <CellsNewFolderModal
         {...commonProps}
         isOpen={isFolderModalOpen}
