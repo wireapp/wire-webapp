@@ -66,6 +66,7 @@ interface FileHeaderProps {
   fileUrl?: string;
   isEditable?: boolean;
   isInEditMode?: boolean;
+  isDownloadRestricted?: boolean;
   onEditModeChange: (isEditable: boolean) => void;
   onFileContentRefresh: () => void;
 }
@@ -81,6 +82,7 @@ export const FileHeader = ({
   badges,
   isEditable,
   isInEditMode,
+  isDownloadRestricted = false,
   onEditModeChange,
   onFileContentRefresh,
 }: FileHeaderProps) => {
@@ -152,7 +154,7 @@ export const FileHeader = ({
         </div>
       )}
       <div css={actionButtonsStyles}>
-        {!isRecycleBin && (
+        {!isRecycleBin && !isDownloadRestricted && (
           <Button
             variant={ButtonVariant.TERTIARY}
             css={downloadButtonStyles}

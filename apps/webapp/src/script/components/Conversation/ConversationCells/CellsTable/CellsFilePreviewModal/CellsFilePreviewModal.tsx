@@ -17,7 +17,13 @@
  *
  */
 
+import {
+  shouldRestrictCellsViewerActions,
+  useCellsSelfUserDriveRole,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
+import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
 import {sortTagsAlphabetically} from '../../common/sortTagsAlphabetically/sortTagsAlphabetically';
@@ -27,6 +33,8 @@ import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/C
 // TODO: Abstract when it starts to grow / feels right
 export const CellsFilePreviewModal = () => {
   const {selectedFile, handleCloseFile, isEditMode} = useCellsFilePreviewModal();
+  const {isFeatureToggleEnabled} = useApplicationContext();
+  const selfUserDriveRole = useCellsSelfUserDriveRole();
   const isModalOpen = selectedFile !== null;
 
   if (!isModalOpen) {
@@ -50,6 +58,10 @@ export const CellsFilePreviewModal = () => {
   };
 
   const filePreviewUrl = getFileUrl();
+  const isDownloadRestricted = shouldRestrictCellsViewerActions({
+    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
+    selfUserDriveRole,
+  });
 
   return (
     <FileFullscreenModal
@@ -65,6 +77,7 @@ export const CellsFilePreviewModal = () => {
       timestamp={uploadedAtTimestamp}
       badges={sortTagsAlphabetically(tags)}
       isEditMode={isEditMode}
+      isDownloadRestricted={isDownloadRestricted}
     />
   );
 };

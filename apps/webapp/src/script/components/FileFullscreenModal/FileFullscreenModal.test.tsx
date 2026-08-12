@@ -26,7 +26,11 @@ jest.mock('Components/fullscreenModal/fullscreenModal', () => ({
 }));
 
 jest.mock('./FileHeader/FileHeader', () => ({
-  FileHeader: () => <div data-uie-name="file-header">Header</div>,
+  FileHeader: ({isDownloadRestricted}: {isDownloadRestricted?: boolean}) => (
+    <div data-uie-name="file-header" data-download-restricted={String(isDownloadRestricted === true)}>
+      Header
+    </div>
+  ),
 }));
 
 jest.mock('./FileEditor/FileEditor', () => {
@@ -56,7 +60,11 @@ jest.mock('./ImageFileView/ImageFileView', () => ({
 }));
 
 jest.mock('./NoPreviewAvailable/NoPreviewAvailable', () => ({
-  NoPreviewAvailable: () => <div data-uie-name="no-preview">No preview available</div>,
+  NoPreviewAvailable: ({isDownloadRestricted}: {isDownloadRestricted?: boolean}) => (
+    <div data-uie-name="no-preview" data-download-restricted={String(isDownloadRestricted === true)}>
+      No preview available
+    </div>
+  ),
 }));
 
 jest.mock('./PdfViewer/PdfViewer', () => ({
@@ -143,6 +151,15 @@ describe('FileFullscreenModal - File Version Restore', () => {
       expect(screen.getByTestId('pdf-viewer')).toBeInTheDocument();
     });
 
+    it('keeps rendering PDF preview when download is restricted', () => {
+      render(
+        <FileFullscreenModal {...defaultProps} filePreviewUrl="file.pdf" fileExtension="pdf" isDownloadRestricted />,
+      );
+
+      expect(screen.getByTestId('pdf-viewer')).toBeInTheDocument();
+      expect(screen.getByTestId('file-header')).toHaveAttribute('data-download-restricted', 'true');
+    });
+
     it('should render image viewer for image files', () => {
       render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.png" fileExtension="png" />);
 
@@ -159,6 +176,12 @@ describe('FileFullscreenModal - File Version Restore', () => {
       render(<FileFullscreenModal {...defaultProps} status="unavailable" />);
 
       expect(screen.getByTestId('no-preview')).toBeInTheDocument();
+    });
+
+    it('restricts download when preview is unavailable', () => {
+      render(<FileFullscreenModal {...defaultProps} status="unavailable" isDownloadRestricted />);
+
+      expect(screen.getByTestId('no-preview')).toHaveAttribute('data-download-restricted', 'true');
     });
 
     it('should show no preview when filePreviewUrl is missing', () => {

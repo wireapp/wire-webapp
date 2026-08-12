@@ -50,6 +50,7 @@ interface FileFullscreenModalProps {
   timestamp: number;
   badges?: string[];
   isEditMode?: boolean;
+  isDownloadRestricted?: boolean;
   checkIsInRecycleBin?: () => boolean;
 }
 
@@ -66,6 +67,7 @@ export const FileFullscreenModal = ({
   timestamp,
   badges,
   isEditMode = false,
+  isDownloadRestricted = false,
   checkIsInRecycleBin = isInRecycleBin,
 }: FileFullscreenModalProps) => {
   const notInRecycleBin = !checkIsInRecycleBin();
@@ -101,6 +103,7 @@ export const FileFullscreenModal = ({
         isEditable={isEditable}
         id={id}
         onFileContentRefresh={refreshModalContent}
+        isDownloadRestricted={isDownloadRestricted}
       />
       {isEditableState && isEditable ? (
         <FileEditor key={refreshKey} id={id} />
@@ -114,6 +117,7 @@ export const FileFullscreenModal = ({
           senderName={senderName}
           timestamp={timestamp}
           status={status}
+          isDownloadRestricted={isDownloadRestricted}
         />
       )}
     </FullscreenModal>
@@ -128,6 +132,7 @@ interface ModalContentProps {
   timestamp: number;
   filePreviewUrl?: string;
   fileUrl?: string;
+  isDownloadRestricted: boolean;
 }
 
 const ModalContent = ({
@@ -138,13 +143,21 @@ const ModalContent = ({
   senderName,
   timestamp,
   status,
+  isDownloadRestricted,
 }: ModalContentProps) => {
   if (status === 'loading' && (filePreviewUrl === undefined || filePreviewUrl.length === 0)) {
     return <FileLoader />;
   }
 
   if (status === 'unavailable' || filePreviewUrl === undefined || filePreviewUrl.length === 0) {
-    return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
+    return (
+      <NoPreviewAvailable
+        fileUrl={fileUrl}
+        fileName={fileName}
+        fileExtension={fileExtension}
+        isDownloadRestricted={isDownloadRestricted}
+      />
+    );
   }
 
   const extension = getFileExtensionFromUrl(filePreviewUrl);
@@ -164,5 +177,12 @@ const ModalContent = ({
     return <ImageFileView src={imageSrc} senderName={senderName} timestamp={timestamp} />;
   }
 
-  return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
+  return (
+    <NoPreviewAvailable
+      fileUrl={fileUrl}
+      fileName={fileName}
+      fileExtension={fileExtension}
+      isDownloadRestricted={isDownloadRestricted}
+    />
+  );
 };
