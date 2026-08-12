@@ -16,130 +16,246 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import type {Page} from '@playwright/test';
-
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {expect, LOGIN_TIMEOUT, test} from 'test/e2e_tests/test.fixtures';
+import {expect, test} from 'test/e2e_tests/test.fixtures';
+import {createMeetingsTeam, loginMeetingsUsers} from 'test/e2e_tests/utils/meetings.util';
 
-const loginWithMeetingsEnabled = (user: {email: string; password: string}) => async (page: Page) => {
-  const pageManager = PageManager.from(page);
-  const {pages, components} = pageManager.webapp;
-  await pageManager.openLoginPage();
-  await pages.login().login(user);
-  await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-  const clientUrl = new URL('/?enabled-features=meetings#/clients', page.url());
-  await page.goto(clientUrl.href, {waitUntil: 'domcontentloaded'});
-  await expect.poll(() => new URL(page.url()).searchParams.get('enabled-features')).toBe('meetings');
-  await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-};
+const MEETING_TITLE = 'Team sync';
+const UPDATED_MEETING_TITLE = 'Updated team sync';
 
-const scheduleMeeting = async (ownerPage: Page, title: string, participantNames: string[]) => {
-  await ownerPage.locator('[data-uie-name="go-meetings"]').click();
-  await ownerPage.locator('[data-uie-name="schedule-meeting"]').click();
+test.describe.configure({mode: 'serial'});
 
-  const modal = ownerPage.locator('[data-uie-name="schedule-meeting-modal"]');
-  await modal.locator('[data-uie-name="schedule-meeting-title"]').fill(title);
+test.describe('Meetings CRUD', () => {
+  test('create meeting — host sees it in the list', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+    const member = members[0];
 
-  const participants = modal.locator('[data-uie-name="schedule-meeting-participants"]');
-  for (const participantName of participantNames) {
-    await participants.locator('[data-uie-name="schedule-meeting-participants-input"]').fill(participantName);
-    await ownerPage.locator('[data-uie-name="item-user"]').filter({hasText: participantName}).click();
-  }
+    const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
+    const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
 
-  await modal.locator('[data-uie-name="schedule-meeting-modal-submit"]').click();
-  await expect(modal).toBeHidden();
-};
-
-const meetingNotificationCards = (page: Page) =>
-  page.locator('[data-uie-name="meeting-notification-host"] [data-uie-name^="meeting-notification-card-"]');
-
-const expectInvitationCard = async (page: Page, title: string) => {
-  const host = page.locator('[data-uie-name="meeting-notification-host"]');
-  await expect.poll(() => host.count(), {timeout: 30_000}).toBe(1);
-  await host.getByTestId('meeting-notification-expand').click();
-
-  const cards = meetingNotificationCards(page);
-  await expect(cards).toHaveCount(1);
-  await expect(cards).toContainText(`Invitation: ${title}`);
-  await expect(cards).not.toContainText(`Update: ${title}`);
-};
-
-const editMeetingToAddParticipant = async (ownerPage: Page, title: string, participantName: string) => {
-  const meeting = ownerPage.locator('[data-uie-name="item-meeting"]').filter({hasText: title});
-  await meeting.getByRole('button').last().click();
-  await ownerPage.getByRole('menuitem').getByText('Edit meeting').click();
-
-  const modal = ownerPage.locator('[data-uie-name="schedule-meeting-modal"]');
-  const participants = modal.locator('[data-uie-name="schedule-meeting-participants"]');
-  await participants.locator('[data-uie-name="schedule-meeting-participants-input"]').fill(participantName);
-  await ownerPage.locator('[data-uie-name="item-user"]').filter({hasText: participantName}).click();
-  await modal.locator('[data-uie-name="schedule-meeting-modal-submit"]').click();
-  await expect(modal).toBeHidden();
-};
-
-test('single participant meeting notification', async ({createUser, createTeam, createPage}) => {
-  const member = await createUser();
-  const team = await createTeam('Meetings', {users: [member], features: {meetings: true}});
-  const owner = team.owner;
-
-  const [ownerPage, memberPage] = await Promise.all([
-    createPage(loginWithMeetingsEnabled(owner)),
-    createPage(loginWithMeetingsEnabled(member)),
-  ]);
-
-  await scheduleMeeting(ownerPage, 'Single participant meeting', [member.fullName]);
-  await expectInvitationCard(memberPage, 'Single participant meeting');
-});
-
-test('two participant meeting sends exactly one invitation to each participant', async ({
-  createUser,
-  createTeam,
-  createPage,
-}) => {
-  const firstParticipant = await createUser();
-  const secondParticipant = await createUser();
-  const team = await createTeam('Meetings', {
-    users: [firstParticipant, secondParticipant],
-    features: {meetings: true},
+    await meetings.openMeetingsTab();
+    await meetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+    await meetings.waitForMeetingInList(MEETING_TITLE);
+    await expect(meetings.meetingListItem(MEETING_TITLE)).toBeVisible();
   });
 
-  const [ownerPage, firstParticipantPage, secondParticipantPage] = await Promise.all([
-    createPage(loginWithMeetingsEnabled(team.owner)),
-    createPage(loginWithMeetingsEnabled(firstParticipant)),
-    createPage(loginWithMeetingsEnabled(secondParticipant)),
-  ]);
+  test('invitee sees meeting in the list', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+    const member = members[0];
 
-  await scheduleMeeting(ownerPage, 'Two participant meeting', [firstParticipant.fullName, secondParticipant.fullName]);
+    const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
 
-  await Promise.all([
-    expectInvitationCard(firstParticipantPage, 'Two participant meeting'),
-    expectInvitationCard(secondParticipantPage, 'Two participant meeting'),
-  ]);
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+
+    await memberMeetings.openMeetingsTab();
+    await memberMeetings.waitForMeetingInList(MEETING_TITLE);
+    await expect(memberMeetings.meetingListItem(MEETING_TITLE)).toBeVisible();
+  });
+
+  test('invitee sees invite notification', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+    const member = members[0];
+
+    const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+
+    await memberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
+    await expect(memberMeetings.notificationCards()).toHaveCount(1);
+    await expect(memberMeetings.notificationCards()).not.toContainText(`Update: ${MEETING_TITLE}`);
+  });
+
+  test('host can edit meeting info', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+    const member = members[0];
+
+    const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
+    const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
+
+    await meetings.openMeetingsTab();
+    await meetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+    await meetings.waitForMeetingInList(MEETING_TITLE);
+
+    await meetings.editMeeting(MEETING_TITLE, {newTitle: UPDATED_MEETING_TITLE});
+    await meetings.waitForMeetingInList(UPDATED_MEETING_TITLE);
+    await expect(meetings.meetingListItem(UPDATED_MEETING_TITLE)).toBeVisible();
+  });
+
+  test('edited meeting info syncs to invitee list', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+    const member = members[0];
+
+    const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+    await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
+
+    await ownerMeetings.editMeeting(MEETING_TITLE, {newTitle: UPDATED_MEETING_TITLE});
+
+    await memberMeetings.openMeetingsTab();
+    await memberMeetings.waitForMeetingInList(UPDATED_MEETING_TITLE);
+    await expect(memberMeetings.meetingListItem(UPDATED_MEETING_TITLE)).toBeVisible();
+  });
+
+  test('invitee sees update notification after edit', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+    const member = members[0];
+
+    const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+    await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
+
+    await ownerMeetings.editMeeting(MEETING_TITLE, {newTitle: UPDATED_MEETING_TITLE});
+
+    await memberMeetings.waitForNotificationContaining(`Update: ${UPDATED_MEETING_TITLE}`);
+  });
+
+  test('host can add a participant', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
+    const [firstMember, secondMember] = members;
+
+    const [ownerPage, , secondMemberPage] = await loginMeetingsUsers(createPage, [owner, firstMember, secondMember]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const secondMemberMeetings = PageManager.from(secondMemberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [firstMember.fullName]);
+    await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
+
+    await ownerMeetings.editMeeting(MEETING_TITLE, {addParticipants: [secondMember.fullName]});
+
+    await secondMemberMeetings.openMeetingsTab();
+    await secondMemberMeetings.waitForMeetingInList(MEETING_TITLE);
+    await expect(secondMemberMeetings.meetingListItem(MEETING_TITLE)).toBeVisible();
+  });
+
+  test('host can remove a participant', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
+    const [firstMember, secondMember] = members;
+
+    const [ownerPage, firstMemberPage] = await loginMeetingsUsers(createPage, [owner, firstMember, secondMember]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const firstMemberMeetings = PageManager.from(firstMemberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [firstMember.fullName, secondMember.fullName]);
+    await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
+
+    await firstMemberMeetings.openMeetingsTab();
+    await firstMemberMeetings.waitForMeetingInList(MEETING_TITLE);
+
+    await ownerMeetings.editMeeting(MEETING_TITLE, {removeParticipants: [firstMember.fullName]});
+
+    await firstMemberMeetings.waitForMeetingAbsentFromList(MEETING_TITLE);
+  });
+
+  test('host can delete meeting for everyone', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+    const member = members[0];
+
+    const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+    await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
+
+    await memberMeetings.openMeetingsTab();
+    await memberMeetings.waitForMeetingInList(MEETING_TITLE);
+
+    await ownerMeetings.deleteMeetingForAll(MEETING_TITLE);
+
+    await ownerMeetings.waitForMeetingAbsentFromList(MEETING_TITLE);
+    await memberMeetings.waitForMeetingAbsentFromList(MEETING_TITLE);
+    await memberMeetings.waitForNotificationContaining(`Canceled: ${MEETING_TITLE}`);
+  });
+
+  test('invitee can delete meeting for themselves', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+    const member = members[0];
+
+    const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+    await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
+
+    await memberMeetings.openMeetingsTab();
+    await memberMeetings.waitForMeetingInList(MEETING_TITLE);
+
+    await memberMeetings.deleteMeetingForMe(MEETING_TITLE);
+
+    await memberMeetings.waitForMeetingAbsentFromList(MEETING_TITLE);
+    await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
+  });
 });
 
-test('adding a participant sends only one invitation to the newly added participant', async ({
-  createUser,
-  createTeam,
-  createPage,
-}) => {
-  const originalParticipant = await createUser();
-  const newParticipant = await createUser();
-  const team = await createTeam('Meetings', {users: [originalParticipant, newParticipant], features: {meetings: true}});
+test.describe('Meeting notifications', () => {
+  test('two participants each receive exactly one invitation', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
+    const [firstMember, secondMember] = members;
 
-  const [ownerPage, originalParticipantPage, newParticipantPage] = await Promise.all([
-    createPage(loginWithMeetingsEnabled(team.owner)),
-    createPage(loginWithMeetingsEnabled(originalParticipant)),
-    createPage(loginWithMeetingsEnabled(newParticipant)),
-  ]);
+    const [ownerPage, firstMemberPage, secondMemberPage] = await loginMeetingsUsers(createPage, [
+      owner,
+      firstMember,
+      secondMember,
+    ]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const firstMemberMeetings = PageManager.from(firstMemberPage).webapp.pages.meetings();
+    const secondMemberMeetings = PageManager.from(secondMemberPage).webapp.pages.meetings();
 
-  const title = 'Updated participants meeting';
-  await scheduleMeeting(ownerPage, title, [originalParticipant.fullName]);
-  await expectInvitationCard(originalParticipantPage, title);
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [firstMember.fullName, secondMember.fullName]);
 
-  await editMeetingToAddParticipant(ownerPage, title, newParticipant.fullName);
+    await Promise.all([
+      firstMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`),
+      secondMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`),
+    ]);
 
-  await expect(meetingNotificationCards(originalParticipantPage).filter({hasText: `Invitation: ${title}`})).toHaveCount(
-    1,
-  );
-  await expectInvitationCard(newParticipantPage, title);
+    await expect(firstMemberMeetings.notificationCards()).toHaveCount(1);
+    await expect(secondMemberMeetings.notificationCards()).toHaveCount(1);
+  });
+
+  test('adding a participant sends only one invitation to the newly added participant', async ({
+    createUser,
+    createTeam,
+    createPage,
+  }) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
+    const [firstMember, secondMember] = members;
+
+    const [ownerPage, firstMemberPage, secondMemberPage] = await loginMeetingsUsers(createPage, [
+      owner,
+      firstMember,
+      secondMember,
+    ]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const firstMemberMeetings = PageManager.from(firstMemberPage).webapp.pages.meetings();
+    const secondMemberMeetings = PageManager.from(secondMemberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [firstMember.fullName]);
+    await firstMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
+
+    await ownerMeetings.editMeeting(MEETING_TITLE, {addParticipants: [secondMember.fullName]});
+
+    await expect(firstMemberMeetings.notificationCardContaining(`Invitation: ${MEETING_TITLE}`)).toHaveCount(1);
+    await secondMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
+  });
 });
