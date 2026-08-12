@@ -65,7 +65,7 @@ const expectInvitationCard = async (page: Page, title: string) => {
 };
 
 const editMeetingToAddParticipant = async (ownerPage: Page, title: string, participantName: string) => {
-  const meeting = ownerPage.locator('[data-uie-name="meetings-list"]').getByText(title).locator('xpath=../../..');
+  const meeting = ownerPage.locator('[data-uie-name="item-meeting"]').filter({hasText: title});
   await meeting.getByRole('button').last().click();
   await ownerPage.getByRole('menuitem').getByText('Edit meeting').click();
 
