@@ -145,11 +145,7 @@ test.describe('Meetings CRUD', () => {
     const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
     const [firstMember, secondMember] = members;
 
-    const [ownerPage, firstMemberPage] = await loginMeetingsUsers(createPage, [
-      owner,
-      firstMember,
-      secondMember,
-    ]);
+    const [ownerPage, firstMemberPage] = await loginMeetingsUsers(createPage, [owner, firstMember, secondMember]);
     const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
     const firstMemberMeetings = PageManager.from(firstMemberPage).webapp.pages.meetings();
 

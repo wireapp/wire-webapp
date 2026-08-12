@@ -168,9 +168,7 @@ export class MeetingsPage {
   }
 
   startDateOpenCalendarButton() {
-    return this.scheduleMeetingModal
-      .getByRole('group', {name: 'Starts'})
-      .getByRole('button', {name: 'Open calendar'});
+    return this.scheduleMeetingModal.getByRole('group', {name: 'Starts'}).getByRole('button', {name: 'Open calendar'});
   }
 
   async selectLatestAvailableStartTime() {
@@ -242,7 +240,10 @@ export class MeetingsPage {
     return this.page.getByRole('menu');
   }
 
-  async editMeeting(title: string, updates: {newTitle?: string; addParticipants?: string[]; removeParticipants?: string[]}) {
+  async editMeeting(
+    title: string,
+    updates: {newTitle?: string; addParticipants?: string[]; removeParticipants?: string[]},
+  ) {
     const menu = await this.openMeetingContextMenu(title);
     await menu.getByRole('button', {name: 'Edit meeting'}).click();
     await expect(this.scheduleMeetingModal).toBeVisible();

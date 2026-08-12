@@ -36,10 +36,7 @@ export const loginWithMeetingsEnabled = (user: Pick<User, 'email' | 'password'>)
 
 export const createMeetingsTeam = async (
   createUser: () => Promise<User>,
-  createTeam: (
-    name: string,
-    options: {users: User[]; features: {meetings: true; mls: true}},
-  ) => Promise<Team>,
+  createTeam: (name: string, options: {users: User[]; features: {meetings: true; mls: true}}) => Promise<Team>,
   memberCount: number,
 ) => {
   const members = await Promise.all(Array.from({length: memberCount}, () => createUser()));
