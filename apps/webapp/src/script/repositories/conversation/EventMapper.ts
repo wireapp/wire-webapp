@@ -17,7 +17,13 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationEvent, ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event/';
+import {isValidDate} from '@sindresorhus/is';
+import {
+  CONVERSATION_EVENT,
+  ConversationAdminlessDeleteReminderEvent,
+  ConversationEvent,
+  ConversationProtocolUpdateEvent,
+} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
@@ -27,6 +33,7 @@ import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import {AssetData} from 'Repositories/cryptography/CryptographyMapper';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import {AdminlessDeleteReminderMessage} from 'Repositories/entity/message/adminlessDeleteReminderMessage';
 import {Button} from 'Repositories/entity/message/button';
 import {CallingTimeoutMessage} from 'Repositories/entity/message/callingTimeoutMessage';
 import {CallMessage} from 'Repositories/entity/message/callMessage';
@@ -61,7 +68,7 @@ import type {Text as TextAsset} from 'Repositories/entity/message/text';
 import {Text} from 'Repositories/entity/message/text';
 import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
 import {ClientEvent} from 'Repositories/event/Client';
-import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
+import type {EventRecord, LegacyEventRecord, WithSender} from 'Repositories/storage';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {userReactionMapToReactionMap} from 'Util/reactionUtil';
@@ -303,6 +310,12 @@ export class EventMapper {
         break;
       }
 
+      case CONVERSATION_EVENT.ADMINLESS_DELETE_REMINDER:
+      case CONVERSATION_EVENT.SYSTEM_ADMINLESS_DELETE_REMINDER: {
+        messageEntity = this._mapEventAdminlessDeleteReminder(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.MEMBER_ROLE_UPDATE: {
         messageEntity = this._mapEventMemberRoleUpdate();
         break;
@@ -504,7 +517,7 @@ export class EventMapper {
     }
 
     return isContentMessage(messageEntity)
-      ? this.updateMessageEvent(messageEntity, event as EventRecord)
+      ? this.updateMessageEvent(messageEntity, event as WithSender<ConversationEvent | ClientConversationEvent>)
       : messageEntity;
   }
 
@@ -801,6 +814,28 @@ export class EventMapper {
    */
   private _mapEventProtocolUpdate(event: ConversationProtocolUpdateEvent): ProtocolUpdateMessage {
     return new ProtocolUpdateMessage(event.data.protocol, this.translate);
+  }
+
+  /**
+   * Maps JSON data of conversation.adminless-reminder message into message entity.
+   *
+   * @param event Message data
+   * @returns Adminless delete reminder message entity
+   */
+  private _mapEventAdminlessDeleteReminder(
+    event: ConversationAdminlessDeleteReminderEvent,
+  ): AdminlessDeleteReminderMessage {
+    const deletionScheduledFor = new Date(event.data.deletion_scheduled_for);
+    if (!isValidDate(deletionScheduledFor)) {
+      this.logger.warn(
+        `Could not parse "deletion_scheduled_for" for adminless delete reminder event in conversation '${event.conversation}'.`,
+      );
+      throw new ConversationError(
+        ConversationError.TYPE.INVALID_PARAMETER,
+        ConversationError.MESSAGE.INVALID_PARAMETER,
+      );
+    }
+    return new AdminlessDeleteReminderMessage(deletionScheduledFor, this.translate);
   }
 
   /**

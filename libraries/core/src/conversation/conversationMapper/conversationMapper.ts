@@ -30,7 +30,7 @@ export class ConversationMapper {
       conversation: event.conversation,
       qualifiedConversation: event.qualified_conversation,
       qualifiedFrom: event.qualified_from,
-      from: event.from,
+      from: event.from ?? '',
       id: createId(),
       messageTimer: 0,
       source,

@@ -155,7 +155,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
 
     const quoteData: ProcessedQuoteData = {
       message_id: messageId,
-      user_id: quotedMessage.from,
+      user_id: quotedMessage.from ?? '',
       hash: quote.quotedMessageSha256,
     };
 
