@@ -208,11 +208,7 @@ describe('MeetingsAPI', () => {
         meetings.deleteMeeting({id: 'meeting-id', domain: 'example.com'}),
       undefined,
     ],
-    [
-      'getMeetingsList',
-      async (meetings: APIClient['api']['meetings']) => meetings.getMeetingsList(),
-      [validMeeting],
-    ],
+    ['getMeetingsList', async (meetings: APIClient['api']['meetings']) => meetings.getMeetingsList(), [validMeeting]],
     [
       'getMeeting',
       async (meetings: APIClient['api']['meetings']) => meetings.getMeeting({id: 'meeting-id', domain: 'example.com'}),
@@ -226,9 +222,7 @@ describe('MeetingsAPI', () => {
 
     await client.useVersion(MINIMUM_API_VERSION, 16);
 
-    const sendJSONSpy = jest
-      .spyOn(client.transport.http, 'sendJSON')
-      .mockResolvedValue({data: responseData} as never);
+    const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: responseData} as never);
 
     await callMeetingsApi(client.api.meetings);
 
