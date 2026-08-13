@@ -120,7 +120,12 @@ export const MeetingNotificationCard = (notification: MeetingNotificationCardPro
   return (
     <div css={meetingNotificationCardContainerStyles} role="listitem" data-uie-name={`meeting-notification-card-${id}`}>
       <div css={meetingNotificationCardTitleStyles}>
-        {translate('meetings.notifications.title', {label: translate(notificationLabels[kind]), meetingTitle})}
+        {translate(
+          'meetings.notifications.title',
+          {label: translate(notificationLabels[kind]), meetingTitle},
+          undefined,
+          true,
+        )}
       </div>
       <div css={meetingNotificationCardMetadataStyles}>
         <MeetingNotificationMetadata notification={notification} translate={translate} />
