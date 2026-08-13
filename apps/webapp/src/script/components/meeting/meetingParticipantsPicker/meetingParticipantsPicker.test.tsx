@@ -337,9 +337,7 @@ describe('MeetingParticipantsPicker', () => {
 
   it('keeps search available after selecting multiple participants', async () => {
     const user = userEvent.setup();
-    render(
-      withThemeAndRootContext(<ControlledPicker initialSelected={users.slice(0, 2)} />, rootProviderWrapper),
-    );
+    render(withThemeAndRootContext(<ControlledPicker initialSelected={users.slice(0, 2)} />, rootProviderWrapper));
 
     const input = getSearchInput();
 
