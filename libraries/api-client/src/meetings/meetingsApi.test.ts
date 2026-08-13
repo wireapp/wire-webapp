@@ -184,4 +184,52 @@ describe('MeetingsAPI', () => {
       }),
     );
   });
+
+  it.each([
+    [
+      'createMeeting',
+      async (meetings: APIClient['api']['meetings']) =>
+        meetings.createMeeting({
+          title: validMeeting.title,
+          start_time: validMeeting.start_time,
+          end_time: validMeeting.end_time,
+        }),
+      validMeetingWithConversation,
+    ],
+    [
+      'updateMeeting',
+      async (meetings: APIClient['api']['meetings']) =>
+        meetings.updateMeeting({id: 'meeting-id', domain: 'example.com'}, {title: 'Updated title'}),
+      validMeetingWithConversation,
+    ],
+    [
+      'deleteMeeting',
+      async (meetings: APIClient['api']['meetings']) =>
+        meetings.deleteMeeting({id: 'meeting-id', domain: 'example.com'}),
+      undefined,
+    ],
+    ['getMeetingsList', async (meetings: APIClient['api']['meetings']) => meetings.getMeetingsList(), [validMeeting]],
+    [
+      'getMeeting',
+      async (meetings: APIClient['api']['meetings']) => meetings.getMeeting({id: 'meeting-id', domain: 'example.com'}),
+      validMeeting,
+    ],
+  ] as const)('disables infinite network retries for %s', async (_name, callMeetingsApi, responseData) => {
+    const client = new APIClient(testConfig);
+    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
+      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+    } as never);
+
+    await client.useVersion(MINIMUM_API_VERSION, 16);
+
+    const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: responseData} as never);
+
+    await callMeetingsApi(client.api.meetings);
+
+    expect(sendJSONSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        'axios-retry': {retries: 0},
+      }),
+    );
+  });
 });

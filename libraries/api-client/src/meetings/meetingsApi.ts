@@ -27,6 +27,13 @@ import {UpdateMeeting} from './updateMeeting';
 import {HttpClient} from '../http';
 import {QualifiedId} from '../user/qualifiedId';
 
+const disableInfiniteNetworkRetries = {
+  // Disable infinite retries so offline Meetings actions fail promptly into existing error UI.
+  'axios-retry': {
+    retries: 0,
+  },
+} as const;
+
 export class MeetingsAPI {
   constructor(private readonly client: HttpClient) {}
 
@@ -59,6 +66,7 @@ export class MeetingsAPI {
       data: newMeeting,
       method: 'post',
       url: MeetingsAPI.URL.MEETINGS,
+      ...disableInfiniteNetworkRetries,
     };
 
     const response = await this.client.sendJSON<MeetingWithConversation>(config);
@@ -73,6 +81,7 @@ export class MeetingsAPI {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: MeetingsAPI.URL.LIST,
+      ...disableInfiniteNetworkRetries,
     };
 
     const response = await this.client.sendJSON<Meeting[]>(config);
@@ -86,6 +95,7 @@ export class MeetingsAPI {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: this.generateMeetingUrl(meetingId),
+      ...disableInfiniteNetworkRetries,
     };
 
     await this.client.sendJSON<void>(config);
@@ -98,6 +108,7 @@ export class MeetingsAPI {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: this.generateMeetingUrl(meetingId),
+      ...disableInfiniteNetworkRetries,
     };
 
     const response = await this.client.sendJSON<Meeting>(config);
@@ -112,6 +123,7 @@ export class MeetingsAPI {
       data: updateMeeting,
       method: 'put',
       url: this.generateMeetingUrl(meetingId),
+      ...disableInfiniteNetworkRetries,
     };
 
     const response = await this.client.sendJSON<MeetingWithConversation>(config);
