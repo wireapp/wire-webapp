@@ -636,6 +636,7 @@
   "conversation.E2EIVerificationDegraded": "Conversation is no longer verified",
   "conversationAccessDisclaimer": "A private channel can not be changed to public.",
   "conversationAccessTitle": "Access",
+  "conversationAdminlessDeleteReminder": "This group will be automatically deleted on [bold]{date},[/bold] as there are no eligible group admins. [link]Read more[/link]",
   "conversationAllWelcomeMessage": "Welcome to Wire 👋",
   "conversationAppsWarning": "Apps have access to the content of this conversation",
   "conversationAssetDownloading": "Downloading…",

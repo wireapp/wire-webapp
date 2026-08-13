@@ -89,7 +89,7 @@ import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
-import type {EventRecord} from 'Repositories/storage';
+import type {EventRecord, WithSender} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -3664,6 +3664,9 @@ export class ConversationRepository {
             CONVERSATION_EVENT.MEMBER_LEAVE,
             CONVERSATION_EVENT.MEMBER_JOIN,
             CONVERSATION_EVENT.DELETE,
+            CONVERSATION_EVENT.SYSTEM_DELETE,
+            CONVERSATION_EVENT.ADMINLESS_DELETE_REMINDER,
+            CONVERSATION_EVENT.SYSTEM_ADMINLESS_DELETE_REMINDER,
           ];
 
           const shouldUpdateTimestampServer = !eventsToSkip.includes(type);
@@ -3837,6 +3840,7 @@ export class ConversationRepository {
 
     switch (eventJson.type) {
       case CONVERSATION_EVENT.DELETE:
+      case CONVERSATION_EVENT.SYSTEM_DELETE:
         return this.deleteConversationLocally({domain: conversationEntity.domain, id: eventJson.conversation}, false);
 
       case CONVERSATION_EVENT.MEMBER_JOIN:
@@ -3929,6 +3933,8 @@ export class ConversationRepository {
         return this.addEventToConversation(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
+      case CONVERSATION_EVENT.ADMINLESS_DELETE_REMINDER:
+      case CONVERSATION_EVENT.SYSTEM_ADMINLESS_DELETE_REMINDER:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
       case ClientEvent.CONVERSATION.MEMBER_ROLE_UPDATE:
       case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
@@ -4486,7 +4492,7 @@ export class ConversationRepository {
       const contentType = event.data.content_type;
       if (!isAllowedFile(fileName, contentType)) {
         // TODO(Federation): Update code once sending assets is implemented on the backend
-        const user = await this.userRepository.getUserById({domain: '', id: event.from});
+        const user = await this.userRepository.getUserById({domain: '', id: event.from ?? ''});
         return this.injectFileTypeRestrictedMessage(
           conversationEntity,
           user,
@@ -4871,7 +4877,7 @@ export class ConversationRepository {
     }
     const replacedMessageEntity = await this.event_mapper.updateMessageEvent(
       originalMessage as ContentMessage,
-      newData,
+      newData as WithSender<EventRecord>,
     );
     await this.ephemeralHandler.validateMessage(replacedMessageEntity);
     return replacedMessageEntity;
