@@ -194,9 +194,7 @@ describe('MeetingNotificationCard', () => {
 
   it('renders an apostrophe in the meeting title instead of an HTML entity', () => {
     setStrings({en});
-    const productionTranslateWrapper = createRootProviderWrapperForTest(
-      createRootContextValueForTest({translate}),
-    );
+    const productionTranslateWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
     render(
       <ThemeProvider>
