@@ -249,6 +249,38 @@ describe('createMeetingStore', () => {
     expect(store.getState().meetingSeries).toEqual([expect.objectContaining(meetingSeriesEntry)]);
   });
 
+  it('syncs a newly created Meet now meeting into the store without reloading the meetings list', async () => {
+    const meetNowMeeting = jest.fn().mockReturnValue(
+      task.resolve({
+        failedToAdd: [],
+        qualifiedConversation: apiMeeting.qualified_conversation,
+        qualifiedMeetingId: apiMeeting.qualified_id,
+      }),
+    );
+    const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
+    const getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting));
+    const store = createMeetingStore(
+      createDeps({getMeetingsList, getMeeting, serviceTasks: createServiceTasks({meetNowMeeting})}),
+    );
+    const meetNowCommand = {
+      title: 'Standup',
+      selectedUsers: [],
+    };
+
+    const result = await store.getState().meetNowMeeting(meetNowCommand);
+
+    expect(unwrap(result)).toEqual({
+      failedToAdd: [],
+      qualifiedConversation: apiMeeting.qualified_conversation,
+      qualifiedMeetingId: apiMeeting.qualified_id,
+    });
+    expect(meetNowMeeting).toHaveBeenCalledTimes(1);
+    expect(meetNowMeeting).toHaveBeenCalledWith(meetNowCommand);
+    expect(getMeeting).toHaveBeenCalledWith(apiMeeting.qualified_id);
+    expect(getMeetingsList).not.toHaveBeenCalled();
+    expect(store.getState().meetingSeries).toEqual([expect.objectContaining(meetingSeriesEntry)]);
+  });
+
   it('loads meeting data for edit via safeGetConversationById', async () => {
     const conversation = new Conversation(
       'conversation-id',
