@@ -103,7 +103,6 @@ export const MeetNowModal = () => {
       wrapperCSS={{...modalWrapperStyles, ...meetNowModalWrapperStyles}}
       isShown={isOpen}
       onClosed={handleClose}
-      onBgClick={handleClose}
       onKeyDown={event => handleEscDown(event, handleClose)}
     >
       <div css={wrapperStyles}>
