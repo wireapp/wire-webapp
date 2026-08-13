@@ -8,26 +8,27 @@
  * (at your option) any later version.
  */
 
-import {render} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import {container} from 'tsyringe';
 
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
 } from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
-import * as RootProvider from 'src/script/page/rootProvider';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FilePreviewModal} from './FilePreviewModal';
 
-jest.mock('Components/FileFullscreenModal/FileFullscreenModal', () => ({
-  FileFullscreenModal: jest.fn(() => null),
-}));
-
 const defaultProps = {
   id: 'file-id',
-  fileUrl: 'https://example.com/file.pdf',
+  fileUrl: 'https://example.com/file.txt',
   fileName: 'file',
-  fileExtension: 'pdf',
+  fileExtension: 'txt',
   senderName: 'Sender',
   timestamp: 1700000000000,
   isOpen: true,
@@ -36,45 +37,44 @@ const defaultProps = {
   isError: false,
 };
 
-const mockedFileFullscreenModal = jest.mocked(FileFullscreenModal);
+const renderFilePreviewModal = ({isViewerPermissionFeatureEnabled}: {isViewerPermissionFeatureEnabled: boolean}) => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
+      translate: key => key,
+    }),
+  );
+
+  return render(
+    withThemeAndRootContext(
+      <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
+        <FilePreviewModal {...defaultProps} />
+      </CellsSelfUserDriveRoleProvider>,
+      rootProviderWrapper,
+    ),
+  );
+};
 
 describe('FilePreviewModal', () => {
+  beforeEach(() => {
+    container.registerInstance(CellsRepository, {} as CellsRepository);
+  });
+
   afterEach(() => {
-    jest.restoreAllMocks();
-    mockedFileFullscreenModal.mockClear();
+    container.reset();
   });
 
-  it('restricts download for a conversation viewer when viewer permissions are enabled', () => {
-    jest.spyOn(RootProvider, 'useApplicationContext').mockReturnValue({
-      isFeatureToggleEnabled: jest.fn(() => true),
-    } as unknown as RootProvider.RootContextValue);
+  it('hides download for a conversation viewer when viewer permissions are enabled', async () => {
+    renderFilePreviewModal({isViewerPermissionFeatureEnabled: true});
 
-    render(
-      <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
-        <FilePreviewModal {...defaultProps} />
-      </CellsSelfUserDriveRoleProvider>,
-    );
+    await screen.findByRole('dialog');
 
-    expect(mockedFileFullscreenModal).toHaveBeenCalledWith(
-      expect.objectContaining({isDownloadRestricted: true}),
-      expect.anything(),
-    );
+    expect(screen.queryByRole('button', {name: 'cells.imageFullScreenModal.downloadButton'})).not.toBeInTheDocument();
   });
 
-  it('allows download when viewer permissions are disabled', () => {
-    jest.spyOn(RootProvider, 'useApplicationContext').mockReturnValue({
-      isFeatureToggleEnabled: jest.fn(() => false),
-    } as unknown as RootProvider.RootContextValue);
+  it('shows download when viewer permissions are disabled', async () => {
+    renderFilePreviewModal({isViewerPermissionFeatureEnabled: false});
 
-    render(
-      <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
-        <FilePreviewModal {...defaultProps} />
-      </CellsSelfUserDriveRoleProvider>,
-    );
-
-    expect(mockedFileFullscreenModal).toHaveBeenCalledWith(
-      expect.objectContaining({isDownloadRestricted: false}),
-      expect.anything(),
-    );
+    expect(await screen.findByRole('button', {name: 'cells.imageFullScreenModal.downloadButton'})).toBeInTheDocument();
   });
 });
