@@ -18,56 +18,60 @@
  */
 
 import {render, screen} from '@testing-library/react';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {container} from 'tsyringe';
 
-import {ConversationFileDownloadPermissionProvider} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
 
 import {FileHeader} from './FileHeader';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
+const translate = (key: string) =>
+  ({
+    'cells.imageFullScreenModal.closeButton': 'Close',
+    'cells.imageFullScreenModal.downloadButton': 'Download',
+    'cells.options.label': 'More options',
+    'cells.options.versionHistory': 'Version History',
+  })[key] ?? key;
 
 const defaultProps = {
   id: 'file-id',
   onClose: jest.fn(),
   fileName: 'document',
   fileExtension: 'pdf',
-  senderName: 'Alice',
-  timestamp: 1_700_000_000_000,
   fileUrl: 'https://example.com/document.pdf',
+  senderName: 'John Doe',
+  timestamp: 1700000000000,
   onEditModeChange: jest.fn(),
   onFileContentRefresh: jest.fn(),
 };
 
-const renderFileHeader = (isDownloadAllowed: boolean) =>
-  render(
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      {rootProviderWrapper({
-        children: (
-          <ConversationFileDownloadPermissionProvider isDownloadAllowed={isDownloadAllowed}>
-            <FileHeader {...defaultProps} />
-          </ConversationFileDownloadPermissionProvider>
-        ),
-      })}
-    </StyledApp>,
-  );
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 describe('FileHeader', () => {
-  it('shows download button when downloads are allowed', () => {
-    renderFileHeader(true);
-
-    expect(screen.getByRole('button', {name: 'cells.imageFullScreenModal.downloadButton'})).toBeInTheDocument();
+  beforeEach(() => {
+    container.registerInstance(CellsRepository, {} as CellsRepository);
   });
 
-  it('hides download button when downloads are not allowed', () => {
-    renderFileHeader(false);
+  afterEach(() => {
+    container.reset();
+  });
 
-    expect(screen.queryByRole('button', {name: 'cells.imageFullScreenModal.downloadButton'})).not.toBeInTheDocument();
+  const renderHeader = (props: Partial<Parameters<typeof FileHeader>[0]> = {}) =>
+    render(withThemeAndRootContext(<FileHeader {...defaultProps} {...props} />, rootProviderWrapper));
+
+  it('hides download action when download is restricted', () => {
+    renderHeader({isDownloadRestricted: true});
+
+    expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
+  });
+
+  it('shows download action when download is allowed', () => {
+    renderHeader({isDownloadRestricted: false});
+
+    expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
   });
 });

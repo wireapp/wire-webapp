@@ -197,8 +197,6 @@ export class CallingViewModel {
     });
 
     const showE2EICallModal = (conversationEntity: Conversation) => {
-      const memberCount = conversationEntity.participating_user_ets().length;
-
       PrimaryModal.show(
         PrimaryModal.type.CONFIRM,
         {
@@ -206,7 +204,7 @@ export class CallingViewModel {
             action: async () => {
               conversationEntity.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
 
-              if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+              if (shouldShowMaxUsersToCallModal(conversationEntity)) {
                 showMaxUsersToCallModalWithoutConfirm(conversationEntity);
               } else {
                 await startCall(conversationEntity);
@@ -254,13 +252,16 @@ export class CallingViewModel {
       );
     };
 
+    const shouldShowMaxUsersToCallModal = (conversationEntity: Conversation): boolean =>
+      !conversationEntity.isMeeting() &&
+      conversationEntity.participating_user_ets().length > MAX_USERS_TO_CALL_WITHOUT_CONFIRM;
+
     const handleCallAction = async (conversationEntity: Conversation): Promise<void> => {
-      const memberCount = conversationEntity.participating_user_ets().length;
       const isE2EIDegraded = conversationEntity.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
       if (isE2EIDegraded) {
         showE2EICallModal(conversationEntity);
-      } else if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+      } else if (shouldShowMaxUsersToCallModal(conversationEntity)) {
         showMaxUsersToCallModalWithoutConfirm(conversationEntity);
       } else {
         await startCall(conversationEntity);

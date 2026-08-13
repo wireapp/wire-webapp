@@ -19,8 +19,12 @@
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {useConversationFileDownloadPermission} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
+import {
+  shouldRestrictCellsViewerActions,
+  useCellsSelfUserDriveRole,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
@@ -36,11 +40,15 @@ interface FileAssetOptionsProps {
 }
 
 export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOptionsProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const selfUserDriveRole = useCellsSelfUserDriveRole();
   const fileNameWithExtension = getFileNameWithExtension(name, extension);
   const isEditable = isFileEditable(extension);
   const {showModal} = useFileHistoryModal();
-  const isDownloadAllowed = useConversationFileDownloadPermission();
+  const isDownloadRestricted = shouldRestrictCellsViewerActions({
+    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
+    selfUserDriveRole,
+  });
 
   return (
     <DropdownMenu>
@@ -54,12 +62,12 @@ export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOp
         {isEditable && (
           <>
             <DropdownMenu.Item onClick={() => onOpen(true)}>{translate('cells.options.edit')}</DropdownMenu.Item>
-            <DropdownMenu.Item onClick={() => showModal(id, () => onOpen(false), isDownloadAllowed)}>
+            <DropdownMenu.Item onClick={() => showModal(id, () => onOpen(false), !isDownloadRestricted)}>
               {translate('cells.options.versionHistory')}
             </DropdownMenu.Item>
           </>
         )}
-        {isDownloadAllowed && src !== undefined && src !== '' && (
+        {!isDownloadRestricted && src !== undefined && src !== '' && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url: src, name: fileNameWithExtension})}>
             {translate('cells.options.download')}
           </DropdownMenu.Item>

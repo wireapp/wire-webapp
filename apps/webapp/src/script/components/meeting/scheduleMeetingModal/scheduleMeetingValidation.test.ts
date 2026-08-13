@@ -20,6 +20,11 @@
 import {maybe} from 'true-myth';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
+import {
+  MEETING_TITLE_MAX_LENGTH,
+  meetingTitleErrorKeys,
+} from 'Components/meeting/shared/validation/meetingTitleValidation';
+
 import {getScheduleMeetingFormErrors, hasScheduleMeetingFormErrors} from './scheduleMeetingValidation';
 
 describe('scheduleMeetingValidation', () => {
@@ -35,7 +40,7 @@ describe('scheduleMeetingValidation', () => {
   it('returns titleRequired when title is empty', () => {
     const errors = getScheduleMeetingFormErrors({title: '   ', start: futureStart, end: futureEnd, wallClock});
 
-    expect(errors.title).toBe('meetings.scheduleModal.error.titleRequired');
+    expect(errors.title).toBe(meetingTitleErrorKeys.required);
     expect(errors.startInPast).toBeUndefined();
     expect(errors.endBeforeStart).toBeUndefined();
   });
@@ -86,6 +91,18 @@ describe('scheduleMeetingValidation', () => {
     });
 
     expect(errors.endBeforeStart).toBe('meetings.scheduleModal.error.endBeforeStart');
+  });
+
+  it('returns titleTooLong when the title exceeds the maximum length', () => {
+    const errors = getScheduleMeetingFormErrors({
+      title: 'a'.repeat(MEETING_TITLE_MAX_LENGTH + 1),
+      start: futureStart,
+      end: futureEnd,
+      wallClock,
+    });
+
+    expect(errors.title).toBe(meetingTitleErrorKeys.tooLong);
+    expect(hasScheduleMeetingFormErrors(errors)).toBe(true);
   });
 
   it('returns no errors for valid input', () => {

@@ -62,6 +62,10 @@ import {
   tabsHiddenStyles,
   tabsWrapperStyles,
 } from './Conversation.styles';
+import {
+  CellsSelfUserDriveRoleProvider,
+  getSelfUserDriveRole,
+} from './ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {getCellsFilesPath} from './ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {getCurrentFolderName} from './ConversationCells/common/getCurrentFolderName/getCurrentFolderName';
 import {ConversationCells} from './ConversationCells/ConversationCells';
@@ -611,159 +615,165 @@ export const Conversation = ({
     });
 
   const currentFolderName = getCurrentFolderName(getCellsFilesPath());
+  const selfUserDriveRole = getSelfUserDriveRole({
+    conversationTeamId: activeConversation?.teamId,
+    selfUserTeamId: selfUser.teamId,
+  });
 
   return (
-    <ConversationFileDropzone
-      isDragAccept={isDragAccept}
-      isFileDropAllowed={isFileDropAllowed}
-      isCellsEnabled={isCellsEnabled}
-      isConversationLoaded={isConversationLoaded}
-      activeConversationId={activeConversation?.id}
-      onFileDropped={checkFileSharingPermission(uploadDroppedFiles, translate)}
-      rootProps={getRootProps()}
-      inputProps={getInputProps()}
-    >
-      {activeConversation && (
-        <>
-          <TitleBar
-            repositories={repositories}
-            conversation={activeConversation}
-            selfUser={selfUser}
-            teamState={teamState}
-            callActions={mainViewModel.calling.callActions}
-            openRightSidebar={openRightSidebar}
-            isRightSidebarOpen={isRightSidebarOpen}
-            isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
-            withBottomDivider={!isCellsEnabled || isSharedDriveSearchViewOpen}
-            isSharedDriveSearchViewOpen={isSharedDriveSearchViewOpen}
-            onCloseSharedDriveSearchView={() => setIsSharedDriveSearchViewOpen(false)}
-          />
-
-          {isCellsEnabled && (
-            <>
-              <div css={tabsWrapperStyles}>
-                <div
-                  aria-hidden={isSharedDriveSearchViewOpen || undefined}
-                  css={isSharedDriveSearchViewOpen ? tabsHiddenStyles : undefined}
-                >
-                  <ConversationTabs
-                    activeTabIndex={activeTabIndex}
-                    onIndexChange={setActiveTabIndex}
-                    conversationQualifiedId={activeConversation.qualifiedId}
-                  />
-                </div>
-                {isSharedDriveSearchViewOpen && (
-                  <div css={searchResultsOverlayStyles}>
-                    <h3 css={searchResultsHeadingStyles}>
-                      {currentFolderName
-                        ? translate('cells.search.resultsIn', {folderName: currentFolderName})
-                        : translate('cells.search.results')}
-                    </h3>
-                  </div>
-                )}
-              </div>
-              <ConversationTabPanel id="files" isActive={isFileTabActive}>
-                {isFileTabActive && (
-                  <ConversationCells
-                    activeConversation={activeConversation}
-                    userRepository={repositories.user}
-                    cellsRepository={repositories.cells}
-                    conversationRepository={conversationRepository}
-                    isSearchViewOpen={isSharedDriveSearchViewOpen}
-                    onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
-                    onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
-                  />
-                )}
-              </ConversationTabPanel>
-            </>
-          )}
-
-          <ConversationMessagesWrapper isCellsEnabled={isCellsEnabled} isPanelHidden={isFileTabActive}>
-            {activeCalls.map(call => {
-              const {conversation} = call;
-              const callingViewModel = mainViewModel.calling;
-              const callingRepository = callingViewModel.callingRepository;
-
-              if (!smBreakpoint) {
-                return null;
-              }
-
-              return (
-                <CallingCell
-                  key={conversation.id}
-                  classifiedDomains={classifiedDomains}
-                  call={call}
-                  callActions={callingViewModel.callActions}
-                  callingRepository={callingRepository}
-                  propertiesRepository={repositories.properties}
-                />
-              );
-            })}
-
-            <MessageListWrapper
+    <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
+      <ConversationFileDropzone
+        isDragAccept={isDragAccept}
+        isFileDropAllowed={isFileDropAllowed}
+        isCellsEnabled={isCellsEnabled}
+        isConversationLoaded={isConversationLoaded}
+        activeConversationId={activeConversation?.id}
+        onFileDropped={checkFileSharingPermission(uploadDroppedFiles, translate)}
+        rootProps={getRootProps()}
+        inputProps={getInputProps()}
+      >
+        {activeConversation && (
+          <>
+            <TitleBar
+              repositories={repositories}
               conversation={activeConversation}
               selfUser={selfUser}
-              conversationRepository={conversationRepository}
-              assetRepository={repositories.asset}
-              messageRepository={repositories.message}
-              messageActions={mainViewModel.actions}
-              invitePeople={clickOnInvitePeople}
-              cancelConnectionRequest={clickOnCancelRequest}
-              showUserDetails={showUserDetails}
-              showMessageDetails={showMessageDetails}
-              showMessageReactions={showMessageReactions}
-              showParticipants={showParticipants}
-              showImageDetails={showDetail}
-              resetSession={onSessionResetClick}
-              onClickMessage={handleClickOnMessage}
-              isConversationLoaded={isConversationLoaded}
-              onLoading={loading => setIsConversationLoaded(!loading)}
-              getVisibleCallback={getInViewportCallback}
-              isMsgElementsFocusable={isMsgElementsFocusable}
-              setMsgElementsFocusable={setMsgElementsFocusable}
+              teamState={teamState}
+              callActions={mainViewModel.calling.callActions}
+              openRightSidebar={openRightSidebar}
               isRightSidebarOpen={isRightSidebarOpen}
-              updateConversationLastRead={updateConversationLastRead}
+              isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
+              withBottomDivider={!isCellsEnabled || isSharedDriveSearchViewOpen}
+              isSharedDriveSearchViewOpen={isSharedDriveSearchViewOpen}
+              onCloseSharedDriveSearchView={() => setIsSharedDriveSearchViewOpen(false)}
             />
 
-            {isConversationLoaded &&
-              !isSelfUserRemoved &&
-              (isReadOnlyConversation ? (
-                <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
-              ) : (
-                <InputBar
-                  key={activeConversation?.id}
-                  conversation={activeConversation}
-                  conversationRepository={repositories.conversation}
-                  cellsRepository={repositories.cells}
-                  eventRepository={repositories.event}
-                  messageRepository={repositories.message}
-                  openGiphy={openGiphy}
-                  propertiesRepository={repositories.properties}
-                  searchRepository={repositories.search}
-                  storageRepository={repositories.storage}
-                  teamState={teamState}
-                  selfUser={selfUser}
-                  isCellsEnabled={isCellsEnabled}
-                  onShiftTab={() => setMsgElementsFocusable(false)}
-                  uploadDroppedFiles={uploadDroppedFiles}
-                  uploadImages={uploadImages}
-                  uploadFiles={uploadFiles}
-                  uploadPastedFiles={checkFileSharingPermission(handlePastedFile, translate)}
-                  onCellImageUpload={openImageFilesView}
-                  onCellAssetUpload={openAllFilesView}
-                />
-              ))}
+            {isCellsEnabled && (
+              <>
+                <div css={tabsWrapperStyles}>
+                  <div
+                    aria-hidden={isSharedDriveSearchViewOpen || undefined}
+                    css={isSharedDriveSearchViewOpen ? tabsHiddenStyles : undefined}
+                  >
+                    <ConversationTabs
+                      activeTabIndex={activeTabIndex}
+                      onIndexChange={setActiveTabIndex}
+                      conversationQualifiedId={activeConversation.qualifiedId}
+                    />
+                  </div>
+                  {isSharedDriveSearchViewOpen && (
+                    <div css={searchResultsOverlayStyles}>
+                      <h3 css={searchResultsHeadingStyles}>
+                        {currentFolderName
+                          ? translate('cells.search.resultsIn', {folderName: currentFolderName})
+                          : translate('cells.search.results')}
+                      </h3>
+                    </div>
+                  )}
+                </div>
+                <ConversationTabPanel id="files" isActive={isFileTabActive}>
+                  {isFileTabActive && (
+                    <ConversationCells
+                      activeConversation={activeConversation}
+                      userRepository={repositories.user}
+                      cellsRepository={repositories.cells}
+                      conversationRepository={conversationRepository}
+                      isSearchViewOpen={isSharedDriveSearchViewOpen}
+                      onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
+                      onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
+                    />
+                  )}
+                </ConversationTabPanel>
+              </>
+            )}
 
-            <div className="conversation-loading">
-              <div className="icon-spinner spin accent-text"></div>
-            </div>
-          </ConversationMessagesWrapper>
-        </>
-      )}
+            <ConversationMessagesWrapper isCellsEnabled={isCellsEnabled} isPanelHidden={isFileTabActive}>
+              {activeCalls.map(call => {
+                const {conversation} = call;
+                const callingViewModel = mainViewModel.calling;
+                const callingRepository = callingViewModel.callingRepository;
 
-      {isGiphyModalOpen && inputValue && (
-        <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
-      )}
-    </ConversationFileDropzone>
+                if (!smBreakpoint) {
+                  return null;
+                }
+
+                return (
+                  <CallingCell
+                    key={conversation.id}
+                    classifiedDomains={classifiedDomains}
+                    call={call}
+                    callActions={callingViewModel.callActions}
+                    callingRepository={callingRepository}
+                    propertiesRepository={repositories.properties}
+                  />
+                );
+              })}
+
+              <MessageListWrapper
+                conversation={activeConversation}
+                selfUser={selfUser}
+                conversationRepository={conversationRepository}
+                assetRepository={repositories.asset}
+                messageRepository={repositories.message}
+                messageActions={mainViewModel.actions}
+                invitePeople={clickOnInvitePeople}
+                cancelConnectionRequest={clickOnCancelRequest}
+                showUserDetails={showUserDetails}
+                showMessageDetails={showMessageDetails}
+                showMessageReactions={showMessageReactions}
+                showParticipants={showParticipants}
+                showImageDetails={showDetail}
+                resetSession={onSessionResetClick}
+                onClickMessage={handleClickOnMessage}
+                isConversationLoaded={isConversationLoaded}
+                onLoading={loading => setIsConversationLoaded(!loading)}
+                getVisibleCallback={getInViewportCallback}
+                isMsgElementsFocusable={isMsgElementsFocusable}
+                setMsgElementsFocusable={setMsgElementsFocusable}
+                isRightSidebarOpen={isRightSidebarOpen}
+                updateConversationLastRead={updateConversationLastRead}
+              />
+
+              {isConversationLoaded &&
+                !isSelfUserRemoved &&
+                (isReadOnlyConversation ? (
+                  <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
+                ) : (
+                  <InputBar
+                    key={activeConversation?.id}
+                    conversation={activeConversation}
+                    conversationRepository={repositories.conversation}
+                    cellsRepository={repositories.cells}
+                    eventRepository={repositories.event}
+                    messageRepository={repositories.message}
+                    openGiphy={openGiphy}
+                    propertiesRepository={repositories.properties}
+                    searchRepository={repositories.search}
+                    storageRepository={repositories.storage}
+                    teamState={teamState}
+                    selfUser={selfUser}
+                    isCellsEnabled={isCellsEnabled}
+                    onShiftTab={() => setMsgElementsFocusable(false)}
+                    uploadDroppedFiles={uploadDroppedFiles}
+                    uploadImages={uploadImages}
+                    uploadFiles={uploadFiles}
+                    uploadPastedFiles={checkFileSharingPermission(handlePastedFile, translate)}
+                    onCellImageUpload={openImageFilesView}
+                    onCellAssetUpload={openAllFilesView}
+                  />
+                ))}
+
+              <div className="conversation-loading">
+                <div className="icon-spinner spin accent-text"></div>
+              </div>
+            </ConversationMessagesWrapper>
+          </>
+        )}
+
+        {isGiphyModalOpen && inputValue && (
+          <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
+        )}
+      </ConversationFileDropzone>
+    </CellsSelfUserDriveRoleProvider>
   );
 };

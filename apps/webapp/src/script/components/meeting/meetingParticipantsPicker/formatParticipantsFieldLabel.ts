@@ -17,16 +17,15 @@
  *
  */
 
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import type {Translate} from 'Util/localizerUtil';
 
-import {isConversationFileDownloadAllowed} from './ConversationFileDownloadPermission';
+export function formatParticipantsFieldLabel(label: string, selectedCount: number, translate: Translate): string {
+  if (selectedCount === 0) {
+    return label;
+  }
 
-describe('isConversationFileDownloadAllowed', () => {
-  it('does not allow a viewer to download conversation files', () => {
-    expect(isConversationFileDownloadAllowed(CELLS_SELF_USER_DRIVE_ROLE.VIEWER)).toBe(false);
+  return translate('meetings.scheduleModal.participantsLabelWithCount', {
+    label,
+    count: selectedCount,
   });
-
-  it('allows an editor to download conversation files', () => {
-    expect(isConversationFileDownloadAllowed(CELLS_SELF_USER_DRIVE_ROLE.EDITOR)).toBe(true);
-  });
-});
+}

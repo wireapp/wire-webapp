@@ -18,9 +18,10 @@
  */
 
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
-import {isEmptyString} from '@sindresorhus/is';
 import type {Maybe, Result} from 'true-myth';
 import {result} from 'true-myth';
+
+import {getMeetingTitleError} from 'Components/meeting/shared/validation/meetingTitleValidation';
 
 import {type ScheduleMeetingFormErrors} from './scheduleMeetingTypes';
 
@@ -45,7 +46,7 @@ export const getScheduleMeetingFormErrors = ({
       : undefined;
 
   return {
-    title: isEmptyString(title.trim()) ? 'meetings.scheduleModal.error.titleRequired' : undefined,
+    title: getMeetingTitleError(title),
     missingTimes,
     startInPast:
       missingTimes === undefined && start.isJust && start.value.getTime() <= currentTimestampInMilliseconds

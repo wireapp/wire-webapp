@@ -28,6 +28,10 @@ import type {CreateMeetingSuccess} from 'Components/meeting/shared/service/meeti
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
+import {
+  MEETING_TITLE_MAX_LENGTH,
+  meetingTitleErrorKeys,
+} from 'Components/meeting/shared/validation/meetingTitleValidation';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -254,6 +258,30 @@ describe('MeetNowModal', () => {
     expect(useMeetNowModal.getState().isOpen).toBe(false);
   });
 
+  it('stays open when the overlay is clicked', () => {
+    renderMeetNowModal();
+
+    act(() => {
+      useMeetNowModal.getState().open();
+    });
+
+    fireEvent.click(getModalOverlay());
+
+    expect(useMeetNowModal.getState().isOpen).toBe(true);
+  });
+
+  it('closes when the close button is clicked', () => {
+    renderMeetNowModal();
+
+    act(() => {
+      useMeetNowModal.getState().open();
+    });
+
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
+
+    expect(useMeetNowModal.getState().isOpen).toBe(false);
+  });
+
   it('does not dismiss the modal while submission is pending', async () => {
     const {fireAndForgetInvoker, resolveMeetNowMeeting} = renderMeetNowModal();
 
@@ -305,6 +333,23 @@ describe('MeetNowModal', () => {
       await fireAndForgetInvoker.waitUntilAllSettled();
     });
 
+    expect(useMeetNowModal.getState().isOpen).toBe(true);
+  });
+
+  it('shows a title error and does not start the meeting when the title is too long', async () => {
+    const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
+    renderMeetNowModal({meetNowMeeting});
+
+    act(() => {
+      useMeetNowModal.getState().open();
+      useMeetNowModal.getState().setTitle('a'.repeat(MEETING_TITLE_MAX_LENGTH + 1));
+    });
+
+    expect(screen.getByText(meetingTitleErrorKeys.tooLong)).toBeInTheDocument();
+
+    await submitForm();
+
+    expect(meetNowMeeting).not.toHaveBeenCalled();
     expect(useMeetNowModal.getState().isOpen).toBe(true);
   });
 

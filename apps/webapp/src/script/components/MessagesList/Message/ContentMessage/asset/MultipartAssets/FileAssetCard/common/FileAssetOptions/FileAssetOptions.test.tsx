@@ -19,10 +19,15 @@
 
 import type {ComponentProps} from 'react';
 
-import {fireEvent, render, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-import {ConversationFileDownloadPermissionProvider} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  CellsSelfUserDriveRoleProvider,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -31,25 +36,25 @@ import {isFileEditable} from 'Util/fileTypeUtil';
 
 import {FileAssetOptions} from './FileAssetOptions';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    translate: key => {
-      return key;
-    },
-  }),
-);
-
 const renderFileAssetOptions = (
   properties: ComponentProps<typeof FileAssetOptions>,
-  isDownloadAllowed = true,
+  {isViewerPermissionFeatureEnabled = false, isViewer = false} = {},
 ) => {
+  const wrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      translate: key => key,
+      isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
+    }),
+  );
+  const role = isViewer ? CELLS_SELF_USER_DRIVE_ROLE.VIEWER : CELLS_SELF_USER_DRIVE_ROLE.EDITOR;
+
   return render(
-    withTheme(
-      <ConversationFileDownloadPermissionProvider isDownloadAllowed={isDownloadAllowed}>
+    withThemeAndRootContext(
+      <CellsSelfUserDriveRoleProvider selfUserDriveRole={role}>
         <FileAssetOptions {...properties} />
-      </ConversationFileDownloadPermissionProvider>,
+      </CellsSelfUserDriveRoleProvider>,
+      wrapper,
     ),
-    {wrapper: rootProviderWrapper},
   );
 };
 
@@ -73,21 +78,22 @@ describe('FileAssetOptions', () => {
     expect(button).toBeInTheDocument();
   });
 
-  it('shows download option when downloads are allowed', () => {
-    renderFileAssetOptions(defaultProps, true);
+  it('hides download for a conversation viewer when viewer permissions are enabled', async () => {
+    const user = userEvent.setup();
+    renderFileAssetOptions(defaultProps, {isViewer: true, isViewerPermissionFeatureEnabled: true});
 
-    fireEvent.keyDown(screen.getByLabelText('cells.options.label'), {key: 'Enter'});
-
-    expect(screen.getByText('cells.options.download')).toBeInTheDocument();
-  });
-
-  it('hides download option when downloads are not allowed', () => {
-    renderFileAssetOptions(defaultProps, false);
-
-    fireEvent.keyDown(screen.getByLabelText('cells.options.label'), {key: 'Enter'});
+    await user.click(screen.getByLabelText('cells.options.label'));
 
     expect(screen.queryByText('cells.options.download')).not.toBeInTheDocument();
-    expect(screen.getByText('cells.options.open')).toBeInTheDocument();
+  });
+
+  it('shows download when viewer permissions are disabled', async () => {
+    const user = userEvent.setup();
+    renderFileAssetOptions(defaultProps, {isViewer: true});
+
+    await user.click(screen.getByLabelText('cells.options.label'));
+
+    expect(screen.getByText('cells.options.download')).toBeInTheDocument();
   });
 
   describe('isFileEditable integration', () => {

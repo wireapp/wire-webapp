@@ -150,6 +150,13 @@ describe('MeetingNotificationHost', () => {
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.showAll'}));
 
     expect(screen.getAllByRole('listitem')).toHaveLength(5);
+    expect(screen.getAllByRole('listitem').map(item => item.getAttribute('data-uie-name'))).toEqual([
+      'meeting-notification-card-meeting-notification-4',
+      'meeting-notification-card-meeting-notification-3',
+      'meeting-notification-card-meeting-notification-2',
+      'meeting-notification-card-meeting-notification-1',
+      'meeting-notification-card-meeting-notification-0',
+    ]);
     expect(getList()).toHaveStyle({overflowY: 'auto'});
     fireEvent.click(screen.getAllByRole('button', {name: 'meetings.notifications.dismiss'})[0]);
     expect(screen.getAllByRole('listitem')).toHaveLength(4);

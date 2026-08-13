@@ -148,6 +148,22 @@ describe('ScheduleMeetingModal', () => {
     expect(useScheduleMeetingModal.getState().isOpen).toBe(false);
   });
 
+  it('stays open when the overlay is clicked', () => {
+    renderModal();
+
+    fireEvent.click(screen.getByRole('dialog'));
+
+    expect(useScheduleMeetingModal.getState().isOpen).toBe(true);
+  });
+
+  it('closes when the close button is clicked', () => {
+    renderModal();
+
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.scheduleModal.closeAriaLabel'}));
+
+    expect(useScheduleMeetingModal.getState().isOpen).toBe(false);
+  });
+
   it('stays open when Escape is pressed while submission is pending', async () => {
     const deferred = createDeferred<{failedToAdd: User[]}>();
     const scheduleMeeting = jest.fn().mockReturnValue(

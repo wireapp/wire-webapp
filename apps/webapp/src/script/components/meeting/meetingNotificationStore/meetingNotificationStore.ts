@@ -75,7 +75,6 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
   addNotification: input =>
     set(state => ({
       notifications: [
-        ...state.notifications,
         match(input)
           .with(
             {kind: MeetingNotificationKind.INVITE},
@@ -118,6 +117,7 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
             }),
           )
           .exhaustive(),
+        ...state.notifications,
       ],
     })),
   dismissNotification: id =>

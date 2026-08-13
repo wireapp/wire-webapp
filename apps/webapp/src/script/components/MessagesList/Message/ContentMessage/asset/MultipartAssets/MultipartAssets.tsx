@@ -23,7 +23,6 @@ import {container} from 'tsyringe';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {ConversationFileDownloadPermissionProvider} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
 import {useInView} from 'Hooks/useInView/useInView';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -49,7 +48,6 @@ interface MultipartAssetsProps {
   senderName: string;
   conversationId: string;
   timestamp: number;
-  isDownloadAllowed: boolean;
 }
 
 export const MultipartAssets = ({
@@ -58,24 +56,21 @@ export const MultipartAssets = ({
   cellsRepository = container.resolve(CellsRepository),
   senderName,
   timestamp,
-  isDownloadAllowed,
 }: MultipartAssetsProps): JSX.Element => {
   return (
-    <ConversationFileDownloadPermissionProvider isDownloadAllowed={isDownloadAllowed}>
-      <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
-        {assets.map(asset => (
-          <MultipartAsset
-            conversationId={conversationId}
-            key={asset.uuid}
-            cellsRepository={cellsRepository}
-            assetsCount={assets.length}
-            senderName={senderName}
-            timestamp={timestamp}
-            {...asset}
-          />
-        ))}
-      </ul>
-    </ConversationFileDownloadPermissionProvider>
+    <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
+      {assets.map(asset => (
+        <MultipartAsset
+          conversationId={conversationId}
+          key={asset.uuid}
+          cellsRepository={cellsRepository}
+          assetsCount={assets.length}
+          senderName={senderName}
+          timestamp={timestamp}
+          {...asset}
+        />
+      ))}
+    </ul>
   );
 };
 

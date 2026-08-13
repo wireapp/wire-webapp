@@ -24,10 +24,10 @@ import userEvent from '@testing-library/user-event';
 
 import en from 'I18n/en-US.json';
 import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {ConversationState} from 'src/script/repositories/conversation/ConversationState';
+import type {SearchRepository} from 'Repositories/search/searchRepository';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import type {TeamState} from 'Repositories/team/TeamState';
+import type {ConversationState} from 'src/script/repositories/conversation/ConversationState';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
@@ -37,11 +37,14 @@ import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {setStrings, translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
+import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
 import {MeetingParticipantsPicker} from './meetingParticipantsPicker';
-import {formatSelectedSummary} from './formatSelectedSummary';
 import {searchUsersByQuery} from './participantPickerUtils';
 
 setStrings({en});
+
+const SEARCH_PLACEHOLDER = 'Search by name';
+const PARTICIPANTS_LABEL = 'Participants';
 
 const createUser = (id: string, name: string, handle: string) => {
   const user = new User(id, 'example.com', translateForTest);
@@ -96,7 +99,7 @@ const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({
     fireAndForgetInvoker,
-    translate: translateForTest,
+    translate,
   }),
 );
 
@@ -104,60 +107,98 @@ const ControlledPicker = ({
   initialSelected = [],
   initialFilter = '',
   searchByName = searchRepositoryDouble.searchByName,
+  availableUsers = users,
+  label = PARTICIPANTS_LABEL,
 }: {
   initialSelected?: User[];
   initialFilter?: string;
   searchByName?: (query: string, teamId?: string) => Promise<User[]>;
+  availableUsers?: User[];
+  label?: string;
 }) => {
   const [selectedUsers, setSelectedUsers] = useState<User[]>(initialSelected);
   const [filter, setFilter] = useState(initialFilter);
+  const selfUser = availableUsers[0] ?? users[0];
 
   return (
     <MeetingParticipantsPicker
       id="meeting-participants-picker"
       dataUieName="meeting-participants-picker"
-      label="Participants"
-      users={users}
+      label={label}
+      users={availableUsers}
       selectedUsers={selectedUsers}
       onSelectedUsersChange={setSelectedUsers}
       filter={filter}
       onFilterChange={setFilter}
-      selfUser={users[0]}
-      searchRepository={{...searchRepositoryDouble, searchByName} as SearchRepository}
-      teamRepository={teamRepositoryDouble as TeamRepository}
-      conversationRepository={
-        {
-          conversationState: conversationStateDouble,
-        } as unknown as import('Repositories/conversation/ConversationRepository').ConversationRepository
-      }
-      conversationState={conversationStateDouble as ConversationState}
-      teamState={teamStateDouble as TeamState}
+      selfUser={selfUser}
+      searchRepository={{...searchRepositoryDouble, searchByName}}
+      teamRepository={teamRepositoryDouble}
+      conversationState={conversationStateDouble}
+      teamState={teamStateDouble}
     />
   );
 };
+
+const getSearchInput = (accessibleName = PARTICIPANTS_LABEL) => screen.getByRole('combobox', {name: accessibleName});
 
 describe('MeetingParticipantsPicker', () => {
   it('renders label and search input', () => {
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
 
-    expect(screen.getByText('Participants')).toBeInTheDocument();
-    expect(screen.getByLabelText('Enter a name')).toBeInTheDocument();
+    expect(screen.getByText(PARTICIPANTS_LABEL)).toBeInTheDocument();
+    expect(getSearchInput()).toBeInTheDocument();
+    expect(getSearchInput()).toHaveAttribute('placeholder', SEARCH_PLACEHOLDER);
   });
 
-  it('shows truncated selected summary', () => {
-    const selected = users.slice(0, 3);
+  it('shows selected count on the label', () => {
+    const selected = users.slice(0, 2);
 
     render(withThemeAndRootContext(<ControlledPicker initialSelected={selected} />, rootProviderWrapper));
 
-    expect(screen.getByTestId('meeting-participants-picker-summary')).toHaveTextContent(
-      formatSelectedSummary(selected, translateForTest),
+    expect(screen.getByText('Participants (2 selected)')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', {name: 'Participants (2 selected)'})).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', {name: SEARCH_PLACEHOLDER})).not.toBeInTheDocument();
+    expect(screen.queryByTestId('meeting-participants-picker-summary')).not.toBeInTheDocument();
+  });
+
+  it('keeps search available after selecting more than three participants', async () => {
+    const carol = createUser('4', 'Carol Chen', 'carol');
+    const availableUsers = [...users, carol];
+    const user = userEvent.setup();
+
+    render(
+      withThemeAndRootContext(
+        <ControlledPicker availableUsers={availableUsers} initialSelected={availableUsers.slice(0, 3)} />,
+        rootProviderWrapper,
+      ),
     );
+
+    const input = getSearchInput('Participants (3 selected)');
+
+    expect(input).toHaveValue('');
+    expect(input).toHaveAttribute('placeholder', SEARCH_PLACEHOLDER);
+    expect(input).toBeEnabled();
+    expect(screen.queryByText('Carol Chen')).not.toBeInTheDocument();
+
+    await user.click(input);
+    await user.type(input, 'carol');
+
+    expect(input).toHaveValue('carol');
+
+    await waitFor(() => {
+      expect(screen.getByText('Carol Chen')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText('Carol Chen'));
+
+    expect(screen.getByRole('combobox', {name: 'Participants (4 selected)'})).toBeInTheDocument();
+    expect(screen.getByRole('combobox', {name: 'Participants (4 selected)'})).toHaveValue('');
   });
 
   it('opens the menu and filters users locally', async () => {
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
 
-    fireEvent.change(screen.getByLabelText('Enter a name'), {target: {value: 'alice'}});
+    fireEvent.change(getSearchInput(), {target: {value: 'alice'}});
 
     await waitFor(() => {
       expect(screen.getByText('Alice Anderson')).toBeInTheDocument();
@@ -169,7 +210,7 @@ describe('MeetingParticipantsPicker', () => {
     const user = userEvent.setup();
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
 
-    await user.click(screen.getByLabelText('Enter a name'));
+    await user.click(getSearchInput());
 
     await waitFor(() => {
       expect(screen.getByText('Thomas Goodwin')).toBeInTheDocument();
@@ -184,33 +225,9 @@ describe('MeetingParticipantsPicker', () => {
     );
     const user = userEvent.setup();
 
-    render(
-      withThemeAndRootContext(
-        <MeetingParticipantsPicker
-          id="meeting-participants-picker"
-          dataUieName="meeting-participants-picker"
-          label="Participants"
-          users={manyUsers}
-          selectedUsers={[]}
-          onSelectedUsersChange={() => undefined}
-          filter=""
-          onFilterChange={() => undefined}
-          selfUser={manyUsers[0]}
-          searchRepository={searchRepositoryDouble as SearchRepository}
-          teamRepository={teamRepositoryDouble as TeamRepository}
-          conversationRepository={
-            {
-              conversationState: conversationStateDouble,
-            } as unknown as import('Repositories/conversation/ConversationRepository').ConversationRepository
-          }
-          conversationState={conversationStateDouble as ConversationState}
-          teamState={teamStateDouble as TeamState}
-        />,
-        rootProviderWrapper,
-      ),
-    );
+    render(withThemeAndRootContext(<ControlledPicker availableUsers={manyUsers} />, rootProviderWrapper));
 
-    await user.click(screen.getByLabelText('Enter a name'));
+    await user.click(getSearchInput());
 
     await waitFor(() => {
       expect(screen.getByText('User 0')).toBeInTheDocument();
@@ -222,7 +239,7 @@ describe('MeetingParticipantsPicker', () => {
     const user = userEvent.setup();
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
 
-    const input = screen.getByLabelText('Enter a name');
+    const input = getSearchInput();
     await user.click(input);
     await user.type(input, 'bob');
 
@@ -238,7 +255,7 @@ describe('MeetingParticipantsPicker', () => {
     const user = userEvent.setup();
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
 
-    const input = screen.getByLabelText('Enter a name');
+    const input = getSearchInput();
     await user.click(input);
 
     await waitFor(() => {
@@ -247,14 +264,17 @@ describe('MeetingParticipantsPicker', () => {
 
     await user.click(screen.getByText('Alice Anderson'));
 
-    expect(screen.getByTestId('meeting-participants-picker-summary')).toHaveTextContent('Alice Anderson');
+    expect(screen.getByText('Participants (1 selected)')).toBeInTheDocument();
+    expect(input).toHaveValue('');
+    expect(input).toHaveAttribute('placeholder', SEARCH_PLACEHOLDER);
+    expect(screen.queryByTestId('meeting-participants-picker-summary')).not.toBeInTheDocument();
   });
 
   it('clears the search filter after selecting a participant', async () => {
     const user = userEvent.setup();
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
 
-    const input = screen.getByLabelText('Enter a name');
+    const input = getSearchInput();
     await user.click(input);
     await user.type(input, 'alice');
 
@@ -267,7 +287,8 @@ describe('MeetingParticipantsPicker', () => {
     await user.click(screen.getByText('Alice Anderson'));
 
     expect(input).toHaveValue('');
-    expect(screen.getByTestId('meeting-participants-picker-summary')).toHaveTextContent('Alice Anderson');
+    expect(input).toHaveAttribute('placeholder', SEARCH_PLACEHOLDER);
+    expect(screen.getByText('Participants (1 selected)')).toBeInTheDocument();
   });
 
   it('includes remote team search results when filtering', async () => {
@@ -285,7 +306,7 @@ describe('MeetingParticipantsPicker', () => {
       ),
     );
 
-    fireEvent.change(screen.getByLabelText('Enter a name'), {target: {value: 'remote'}});
+    fireEvent.change(getSearchInput(), {target: {value: 'remote'}});
 
     await waitFor(() => {
       expect(screen.getByText('Remote Member')).toBeInTheDocument();
@@ -304,7 +325,7 @@ describe('MeetingParticipantsPicker', () => {
       ),
     );
 
-    const input = screen.getByLabelText('Enter a name');
+    const input = getSearchInput();
     await user.click(input);
 
     expect(screen.getByTestId('dropdown-meeting-participants-picker')).toBeInTheDocument();
@@ -328,7 +349,7 @@ describe('MeetingParticipantsPicker', () => {
       ),
     );
 
-    const input = screen.getByLabelText('Enter a name');
+    const input = getSearchInput();
     await user.click(input);
     await user.type(input, 'alice');
 
@@ -343,11 +364,13 @@ describe('MeetingParticipantsPicker', () => {
   });
 });
 
-describe('formatSelectedSummary', () => {
-  it('formats multiple selections with overflow count', () => {
-    const selected = users.concat(createUser('4', 'Carol Chen', 'carol'), createUser('5', 'David Davis', 'david'));
+describe('formatParticipantsFieldLabel', () => {
+  it('returns the base label when no participants are selected', () => {
+    expect(formatParticipantsFieldLabel('Participants', 0, translate)).toBe('Participants');
+  });
 
-    expect(formatSelectedSummary(selected, translate)).toBe('Thomas Goodwin, Alice Anderson, B... +3 more');
+  it('appends the selected count to the label', () => {
+    expect(formatParticipantsFieldLabel('Participants', 2, translate)).toBe('Participants (2 selected)');
   });
 });
 

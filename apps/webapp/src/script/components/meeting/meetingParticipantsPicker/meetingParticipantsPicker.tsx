@@ -33,7 +33,7 @@ import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import type {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {formatSelectedSummary} from './formatSelectedSummary';
+import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
 import {
   chevronButtonStyles,
   chevronIconStyles,
@@ -44,7 +44,6 @@ import {
   popoverStyles,
   searchIconStyles,
   searchInputStyles,
-  selectedSummaryStyles,
   valueContainerStyles,
   wrapperStyles,
 } from './meetingParticipantsPicker.styles';
@@ -58,11 +57,11 @@ export interface MeetingParticipantsPickerProps {
   filter: string;
   onFilterChange: (filter: string) => void;
   selfUser: User;
-  searchRepository: SearchRepository;
-  teamRepository: TeamRepository;
-  conversationRepository: ConversationRepository;
-  conversationState?: ConversationState;
-  teamState?: TeamState;
+  searchRepository: Pick<SearchRepository, 'normalizeQuery' | 'searchByName' | 'searchUserInSet'>;
+  teamRepository: Pick<TeamRepository, 'filterExternals' | 'filterRemoteDomainUsers' | 'isSelfConnectedTo'>;
+  conversationRepository?: ConversationRepository;
+  conversationState?: Pick<ConversationState, 'hasConversationWith'>;
+  teamState?: Pick<TeamState, 'isInTeam'>;
   label?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -87,7 +86,7 @@ export const MeetingParticipantsPicker = ({
   conversationState,
   teamState,
   label,
-  placeholder = 'Enter a name',
+  placeholder,
   disabled = false,
   markInvalid = false,
   required = false,
@@ -101,9 +100,11 @@ export const MeetingParticipantsPicker = ({
   const listboxId = useId();
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
 
-  const selectedSummary = formatSelectedSummary(selectedUsers, translate);
-  const hasSelection = selectedUsers.length > 0;
-  const showPlaceholder = !hasSelection && filter.length === 0;
+  const fieldLabel = isNonEmptyString(label)
+    ? formatParticipantsFieldLabel(label, selectedUsers.length, translate)
+    : undefined;
+  const searchPlaceholder = placeholder ?? translate('meetings.scheduleModal.participantsPlaceholder');
+  const showPlaceholder = filter.length === 0;
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -157,9 +158,9 @@ export const MeetingParticipantsPicker = ({
 
   return (
     <div css={wrapperStyles} data-uie-name={dataUieName}>
-      {isNonEmptyString(label) && (
+      {isNonEmptyString(fieldLabel) && (
         <InputLabel htmlFor={id} markInvalid={markInvalid} isRequired={required}>
-          {label}
+          {fieldLabel}
         </InputLabel>
       )}
 
@@ -174,11 +175,6 @@ export const MeetingParticipantsPicker = ({
       >
         <div css={valueContainerStyles}>
           <SearchIcon aria-hidden="true" css={searchIconStyles} />
-          {hasSelection && (
-            <span css={selectedSummaryStyles} data-uie-name={dataUieName ? `${dataUieName}-summary` : undefined}>
-              {selectedSummary}
-            </span>
-          )}
           <input
             id={id}
             css={searchInputStyles}
@@ -189,8 +185,8 @@ export const MeetingParticipantsPicker = ({
             aria-controls={isOpen ? listboxId : undefined}
             value={filter}
             disabled={disabled}
-            placeholder={showPlaceholder ? placeholder : ''}
-            aria-label={placeholder}
+            placeholder={showPlaceholder ? searchPlaceholder : ''}
+            aria-label={isNonEmptyString(fieldLabel) ? undefined : searchPlaceholder}
             data-uie-name={dataUieName ? `${dataUieName}-input` : undefined}
             onChange={event => {
               onFilterChange(event.target.value);
@@ -213,7 +209,7 @@ export const MeetingParticipantsPicker = ({
         <Button
           css={chevronButtonStyles}
           isDisabled={disabled}
-          aria-label={label ?? placeholder}
+          aria-label={fieldLabel ?? searchPlaceholder}
           data-uie-name={dataUieName ? `${dataUieName}-toggle` : undefined}
           onPress={() => handleOpenChange(!isOpen)}
         >
@@ -233,7 +229,7 @@ export const MeetingParticipantsPicker = ({
         offset={4}
         UNSTABLE_portalContainer={portalContainer}
       >
-        <div css={dialogStyles} aria-label={label ?? placeholder}>
+        <div css={dialogStyles} aria-label={fieldLabel ?? searchPlaceholder}>
           <div
             id={listboxId}
             css={listContainerStyles}

@@ -18,45 +18,48 @@
  */
 
 import {render, screen} from '@testing-library/react';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {ConversationFileDownloadPermissionProvider} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
 
 import {NoPreviewAvailable} from './NoPreviewAvailable';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
+const translate = (key: string) =>
+  ({
+    'fileFullscreenModal.noPreviewAvailable.title': 'No preview available',
+    'fileFullscreenModal.noPreviewAvailable.description': 'Download this file to view it.',
+    'fileFullscreenModal.noPreviewAvailable.callToAction': 'Download',
+  })[key] ?? key;
 
-const renderNoPreviewAvailable = (isDownloadAllowed: boolean) =>
-  render(
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      <ConversationFileDownloadPermissionProvider isDownloadAllowed={isDownloadAllowed}>
-        <NoPreviewAvailable
-          fileUrl="https://example.com/document.docx"
-          fileName="document"
-          fileExtension="docx"
-        />
-      </ConversationFileDownloadPermissionProvider>
-    </StyledApp>,
-    {wrapper: rootProviderWrapper},
-  );
+const defaultProps = {
+  fileExtension: 'zip',
+  fileName: 'archive',
+  fileUrl: 'https://example.com/archive.zip',
+};
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 describe('NoPreviewAvailable', () => {
-  it('shows download action when downloads are allowed', () => {
-    renderNoPreviewAvailable(true);
+  const renderPlaceholder = (isDownloadRestricted: boolean) =>
+    render(
+      withThemeAndRootContext(
+        <NoPreviewAvailable {...defaultProps} isDownloadRestricted={isDownloadRestricted} />,
+        rootProviderWrapper,
+      ),
+    );
 
-    expect(screen.getByText('fileFullscreenModal.noPreviewAvailable.callToAction')).toBeInTheDocument();
+  it('hides download action when download is restricted', () => {
+    renderPlaceholder(true);
+
+    expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
   });
 
-  it('hides download action when downloads are not allowed', () => {
-    renderNoPreviewAvailable(false);
+  it('shows download action when download is allowed', () => {
+    renderPlaceholder(false);
 
-    expect(screen.queryByText('fileFullscreenModal.noPreviewAvailable.callToAction')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
   });
 });

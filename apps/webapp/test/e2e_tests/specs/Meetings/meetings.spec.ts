@@ -22,6 +22,7 @@ import {createMeetingsTeam, loginMeetingsUsers} from 'test/e2e_tests/utils/meeti
 
 const MEETING_TITLE = 'Team sync';
 const UPDATED_MEETING_TITLE = 'Updated team sync';
+const LARGE_MEETING_TITLE = 'Large meeting';
 
 test.describe.configure({mode: 'serial'});
 
@@ -204,6 +205,24 @@ test.describe('Meetings CRUD', () => {
     await memberMeetings.waitForMeetingAbsentFromList(MEETING_TITLE);
     await memberMeetings.expectNoNotificationContaining(`Canceled: ${MEETING_TITLE}`);
     await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
+  });
+});
+
+test.describe('Meeting calls', () => {
+  test('starts a meeting call without the large-call confirmation', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 5);
+    const [ownerPage] = await loginMeetingsUsers(createPage, [owner, ...members]);
+    const ownerPages = PageManager.from(ownerPage).webapp.pages;
+    const ownerModals = PageManager.from(ownerPage).webapp.modals;
+    const meetings = ownerPages.meetings();
+
+    await meetings.startMeetNow(
+      LARGE_MEETING_TITLE,
+      members.map(member => member.fullName),
+    );
+
+    await expect(ownerModals.withoutTitle().modal).toBeHidden();
+    await expect(ownerPages.calling().callCell).toBeVisible();
   });
 });
 

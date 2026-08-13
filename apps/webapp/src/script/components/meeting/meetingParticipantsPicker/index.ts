@@ -18,5 +18,5 @@
  */
 
 export * from './meetingParticipantsPicker';
-export * from './formatSelectedSummary';
+export * from './formatParticipantsFieldLabel';
 export * from './participantPickerUtils';
