@@ -100,6 +100,11 @@ export class MeetingsPage {
       .toBeGreaterThan(0);
   }
 
+  async waitForMeetingAttending(title: string) {
+    await this.waitForMeetingInList(title);
+    await expect(this.meetingListItem(title)).toContainText('Attending');
+  }
+
   async waitForMeetingAbsentFromList(title: string) {
     await expect
       .poll(
@@ -111,6 +116,11 @@ export class MeetingsPage {
         {timeout: MEETINGS_LIST_TIMEOUT_MS},
       )
       .toBe(0);
+  }
+
+  async joinMeeting(title: string) {
+    await this.openMeetingsTab();
+    await this.meetingListItem(title).locator('[data-uie-name="join-meeting-call"]').click();
   }
 
   async assertNoSubmitErrorVisible() {
@@ -331,8 +341,21 @@ export class MeetingsPage {
 
   async waitForNotificationContaining(text: string) {
     await this.waitForNotificationHost();
-    await this.expandNotifications();
-    await expect(this.notificationCardContaining(text)).toBeVisible({timeout: MEETINGS_LIST_TIMEOUT_MS});
+
+    const expandButton = this.notificationHost.getByTestId('meeting-notification-expand');
+    const notification = this.notificationCardContaining(text);
+    await expect
+      .poll(
+        async () => {
+          if ((await expandButton.getAttribute('aria-expanded')) !== 'true') {
+            await expandButton.click();
+          }
+
+          return notification.isVisible();
+        },
+        {timeout: MEETINGS_LIST_TIMEOUT_MS},
+      )
+      .toBe(true);
   }
 
   async expectNoNotificationContaining(text: string) {

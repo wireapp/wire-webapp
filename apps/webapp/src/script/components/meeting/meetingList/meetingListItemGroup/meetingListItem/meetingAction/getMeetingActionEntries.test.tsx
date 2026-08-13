@@ -219,7 +219,7 @@ describe('getMeetingActionEntries', () => {
     expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
   });
 
-  it('omits Delete meeting for everyone when the instance has started', () => {
+  it('includes Delete meeting for everyone when the instance is ongoing', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
@@ -231,7 +231,7 @@ describe('getMeetingActionEntries', () => {
       onDeleteForMe: noop,
     });
 
-    expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
+    expect(getDeleteForAllEntryLabel(entries)).toBeDefined();
     expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
   });
 

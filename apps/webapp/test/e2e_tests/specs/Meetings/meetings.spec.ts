@@ -227,6 +227,48 @@ test.describe('Meeting calls', () => {
 });
 
 test.describe('Meeting notifications', () => {
+  test('participants receive cancellation notifications when the organizer deletes an ongoing meeting', async ({
+    createUser,
+    createTeam,
+    createPage,
+  }) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
+    const [firstMember, secondMember] = members;
+
+    const [ownerPage, firstMemberPage, secondMemberPage] = await loginMeetingsUsers(createPage, [
+      owner,
+      firstMember,
+      secondMember,
+    ]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const firstMemberMeetings = PageManager.from(firstMemberPage).webapp.pages.meetings();
+    const secondMemberMeetings = PageManager.from(secondMemberPage).webapp.pages.meetings();
+
+    await ownerMeetings.startMeetNow(MEETING_TITLE, [firstMember.fullName, secondMember.fullName]);
+
+    await Promise.all([
+      firstMemberMeetings.joinMeeting(MEETING_TITLE),
+      secondMemberMeetings.joinMeeting(MEETING_TITLE),
+    ]);
+
+    const firstMemberCalling = PageManager.from(firstMemberPage).webapp.pages.calling();
+    const secondMemberCalling = PageManager.from(secondMemberPage).webapp.pages.calling();
+    await Promise.all([firstMemberCalling.waitForCell(), secondMemberCalling.waitForCell()]);
+
+    await Promise.all([
+      ownerMeetings.waitForMeetingAttending(MEETING_TITLE),
+      firstMemberMeetings.waitForMeetingAttending(MEETING_TITLE),
+      secondMemberMeetings.waitForMeetingAttending(MEETING_TITLE),
+    ]);
+
+    await ownerMeetings.deleteMeetingForAll(MEETING_TITLE);
+
+    await Promise.all([
+      firstMemberMeetings.waitForNotificationContaining(`Canceled: ${MEETING_TITLE}`),
+      secondMemberMeetings.waitForNotificationContaining(`Canceled: ${MEETING_TITLE}`),
+    ]);
+  });
+
   test('two participants each receive exactly one invitation', async ({createUser, createTeam, createPage}) => {
     const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
     const [firstMember, secondMember] = members;
