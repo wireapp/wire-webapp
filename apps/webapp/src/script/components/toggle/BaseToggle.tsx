@@ -49,6 +49,13 @@ const BaseToggle = ({
   const uuid = useId();
   const labelUuid = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleToggleChange = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (inputRef.current) {
+      setIsChecked(inputRef.current.checked);
+    }
+  };
   return (
     <div className={cx(defaultToggleName, className)}>
       <div className="info-toggle__row">
@@ -74,7 +81,7 @@ const BaseToggle = ({
             className="button-label"
             aria-pressed={isChecked}
             type="button"
-            onClick={() => inputRef.current && setIsChecked(inputRef.current.checked)}
+            onClick={handleToggleChange}
             data-uie-name={`do-allow-${toggleId}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           >
