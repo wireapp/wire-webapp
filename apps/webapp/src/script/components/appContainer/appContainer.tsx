@@ -207,7 +207,6 @@ export const AppContainer = (properties: AppProps) => {
             <MeetingStoreRoot>
               <AppMain
                 app={app}
-                isFeatureToggleEnabled={isFeatureToggleEnabled}
                 selfUser={selfUser}
                 mainView={mainView}
                 locked={softLockEnabled}

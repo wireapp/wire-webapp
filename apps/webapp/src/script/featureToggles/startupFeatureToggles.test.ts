@@ -25,14 +25,12 @@ import {
 import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
-  meetingsFeatureToggleName,
   startupFeatureToggleNames,
   viewerPermissionFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
-  meetingsFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   viewerPermissionFeatureToggleName,
 ] as const;
@@ -70,6 +68,14 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
   });
 
+  it('does not treat meetings as a startup feature toggle', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=meetings`,
+    );
+
+    expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+  });
+
   it('keeps only whitelisted feature toggles when known and unknown values are mixed', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=unknown-feature,${applockRefactoredFeatureToggleName}`,
@@ -85,14 +91,6 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
-  });
-
-  it('enables the meetings feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(meetingsFeatureToggleName)).toBe(true);
   });
 
   it('enables the conversation list collapse feature toggle when present in the query parameter', () => {
@@ -150,7 +148,6 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       applockRefactoredFeatureToggleName,
-      meetingsFeatureToggleName,
       conversationListCollapseFeatureToggleName,
       viewerPermissionFeatureToggleName,
     ]);

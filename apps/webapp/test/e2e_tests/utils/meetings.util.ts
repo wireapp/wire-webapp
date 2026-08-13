@@ -20,17 +20,13 @@ import type {Page} from '@playwright/test';
 
 import type {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {expect, LOGIN_TIMEOUT, type Team} from 'test/e2e_tests/test.fixtures';
+import {LOGIN_TIMEOUT, type Team} from 'test/e2e_tests/test.fixtures';
 
 export const loginWithMeetingsEnabled = (user: Pick<User, 'email' | 'password'>) => async (page: Page) => {
   const pageManager = PageManager.from(page);
   const {pages, components} = pageManager.webapp;
   await pageManager.openLoginPage();
   await pages.login().login(user);
-  await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-  const clientUrl = new URL('/?enabled-features=meetings#/clients', page.url());
-  await page.goto(clientUrl.href, {waitUntil: 'domcontentloaded'});
-  await expect.poll(() => new URL(page.url()).searchParams.get('enabled-features')).toBe('meetings');
   await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
 };
 

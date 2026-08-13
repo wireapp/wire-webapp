@@ -67,8 +67,6 @@ import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
-import {meetingsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
@@ -85,7 +83,6 @@ export type RightSidebarParams = {
 type AppMainProps = {
   readonly app: App;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
-  readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly selfUser: User;
   readonly mainView: MainViewModel;
   readonly conversationState?: ConversationState;
@@ -99,7 +96,6 @@ export const AppMain = (properties: AppMainProps) => {
   const {
     app,
     fireAndForgetInvoker,
-    isFeatureToggleEnabled,
     mainView,
     selfUser,
     conversationState = container.resolve(ConversationState),
@@ -259,10 +255,7 @@ export const AppMain = (properties: AppMainProps) => {
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/meetings': () =>
-        teamState.isMeetingsEnabled() && isFeatureToggleEnabled(meetingsFeatureToggleName)
-          ? mainView.list.openMeetingsList()
-          : navigate('/'),
+      '/meetings': () => (teamState.isMeetingsEnabled() ? mainView.list.openMeetingsList() : navigate('/')),
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,
