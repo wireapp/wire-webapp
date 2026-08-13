@@ -28,7 +28,7 @@ describe('useMeetingNotificationStore', () => {
     useMeetingNotificationStore.getState().clearNotifications();
   });
 
-  it('stores every event independently in arrival order', () => {
+  it('stores every event independently with newest notifications first', () => {
     const {addNotification} = useMeetingNotificationStore.getState();
 
     addNotification({
@@ -81,8 +81,8 @@ describe('useMeetingNotificationStore', () => {
     ).toEqual([
       {kind: MeetingNotificationKind.CANCELLED, qualifiedId},
       {kind: MeetingNotificationKind.UPDATE, qualifiedId},
-      {kind: MeetingNotificationKind.INVITE, qualifiedId},
       {kind: MeetingNotificationKind.INVITE, qualifiedId: {id: 'another-meeting-id', domain: 'example.com'}},
+      {kind: MeetingNotificationKind.INVITE, qualifiedId},
       {kind: MeetingNotificationKind.UPDATE, qualifiedId},
       {kind: MeetingNotificationKind.CANCELLED, qualifiedId},
     ]);
@@ -144,18 +144,11 @@ describe('useMeetingNotificationStore', () => {
 
     expect(useMeetingNotificationStore.getState().notifications).toEqual([
       {
-        id: 'meeting-notification-0',
-        kind: MeetingNotificationKind.INVITE,
+        id: 'meeting-notification-3',
+        kind: MeetingNotificationKind.ONGOING,
         qualifiedId,
-        meetingTitle: 'Invite meeting',
+        meetingTitle: 'Ongoing meeting',
         qualifiedCreator,
-        meetingStartTime,
-      },
-      {
-        id: 'meeting-notification-1',
-        kind: MeetingNotificationKind.UPDATE,
-        qualifiedId,
-        meetingTitle: 'Updated meeting',
         meetingStartTime,
       },
       {
@@ -167,10 +160,17 @@ describe('useMeetingNotificationStore', () => {
         meetingStartTime,
       },
       {
-        id: 'meeting-notification-3',
-        kind: MeetingNotificationKind.ONGOING,
+        id: 'meeting-notification-1',
+        kind: MeetingNotificationKind.UPDATE,
         qualifiedId,
-        meetingTitle: 'Ongoing meeting',
+        meetingTitle: 'Updated meeting',
+        meetingStartTime,
+      },
+      {
+        id: 'meeting-notification-0',
+        kind: MeetingNotificationKind.INVITE,
+        qualifiedId,
+        meetingTitle: 'Invite meeting',
         qualifiedCreator,
         meetingStartTime,
       },
@@ -257,8 +257,8 @@ describe('useMeetingNotificationStore', () => {
 
     expect(useMeetingNotificationStore.getState().notifications.map(({kind, qualifiedId: id}) => ({kind, id}))).toEqual(
       [
-        {kind: MeetingNotificationKind.UPDATE, id: otherMeetingId},
         {kind: MeetingNotificationKind.CANCELLED, id: qualifiedId},
+        {kind: MeetingNotificationKind.UPDATE, id: otherMeetingId},
       ],
     );
   });
