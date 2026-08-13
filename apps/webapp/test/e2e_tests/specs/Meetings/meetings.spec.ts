@@ -252,7 +252,7 @@ test.describe('Meeting notifications', () => {
     await expect(secondMemberMeetings.notificationCards()).toHaveCount(1);
   });
 
-  test('adding a participant sends only one invitation to the newly added participant', async ({
+  test('adding a participant only sends an invitation to the newly added participant', async ({
     createUser,
     createTeam,
     createPage,
@@ -277,6 +277,7 @@ test.describe('Meeting notifications', () => {
 
     await expect(firstMemberMeetings.notificationCardContaining(`Invitation: ${MEETING_TITLE}`)).toHaveCount(1);
     await secondMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
+    await expect(secondMemberMeetings.notificationCardContaining(`Invitation: ${MEETING_TITLE}`)).toHaveCount(1);
   });
 
   test('removed participant sees cancellation notification and stale invitation is dismissed', async ({
