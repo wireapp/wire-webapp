@@ -86,7 +86,7 @@ export const MeetingParticipantsPicker = ({
   conversationState,
   teamState,
   label,
-  placeholder = 'Search by name',
+  placeholder,
   disabled = false,
   markInvalid = false,
   required = false,
@@ -103,6 +103,7 @@ export const MeetingParticipantsPicker = ({
   const fieldLabel = isNonEmptyString(label)
     ? formatParticipantsFieldLabel(label, selectedUsers.length, translate)
     : undefined;
+  const searchPlaceholder = placeholder ?? translate('meetings.scheduleModal.participantsPlaceholder');
   const showPlaceholder = filter.length === 0;
 
   const handleOpenChange = useCallback(
@@ -184,8 +185,8 @@ export const MeetingParticipantsPicker = ({
             aria-controls={isOpen ? listboxId : undefined}
             value={filter}
             disabled={disabled}
-            placeholder={showPlaceholder ? placeholder : ''}
-            aria-label={placeholder}
+            placeholder={showPlaceholder ? searchPlaceholder : ''}
+            aria-label={isNonEmptyString(fieldLabel) ? undefined : searchPlaceholder}
             data-uie-name={dataUieName ? `${dataUieName}-input` : undefined}
             onChange={event => {
               onFilterChange(event.target.value);
@@ -208,7 +209,7 @@ export const MeetingParticipantsPicker = ({
         <Button
           css={chevronButtonStyles}
           isDisabled={disabled}
-          aria-label={fieldLabel ?? placeholder}
+          aria-label={fieldLabel ?? searchPlaceholder}
           data-uie-name={dataUieName ? `${dataUieName}-toggle` : undefined}
           onPress={() => handleOpenChange(!isOpen)}
         >
@@ -228,7 +229,7 @@ export const MeetingParticipantsPicker = ({
         offset={4}
         UNSTABLE_portalContainer={portalContainer}
       >
-        <div css={dialogStyles} aria-label={fieldLabel ?? placeholder}>
+        <div css={dialogStyles} aria-label={fieldLabel ?? searchPlaceholder}>
           <div
             id={listboxId}
             css={listContainerStyles}
