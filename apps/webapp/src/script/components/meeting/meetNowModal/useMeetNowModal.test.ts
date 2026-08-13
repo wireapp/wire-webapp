@@ -18,6 +18,11 @@
  */
 
 import {
+  MEETING_TITLE_MAX_LENGTH,
+  meetingTitleErrorKeys,
+} from 'Components/meeting/shared/validation/meetingTitleValidation';
+
+import {
   getDefaultMeetNowFormState,
   getMeetNowFormErrors,
   hasMeetNowFormErrors,
@@ -40,7 +45,32 @@ describe('useMeetNowModal', () => {
   it('requires a title before submit', () => {
     const errors = getMeetNowFormErrors(getDefaultMeetNowFormState());
 
-    expect(errors.title).toBe('meetings.scheduleModal.error.titleRequired');
+    expect(errors.title).toBe(meetingTitleErrorKeys.required);
     expect(hasMeetNowFormErrors(errors)).toBe(true);
+  });
+
+  it('rejects a title longer than the maximum length', () => {
+    const errors = getMeetNowFormErrors({
+      ...getDefaultMeetNowFormState(),
+      title: 'a'.repeat(MEETING_TITLE_MAX_LENGTH + 1),
+    });
+
+    expect(errors.title).toBe(meetingTitleErrorKeys.tooLong);
+    expect(hasMeetNowFormErrors(errors)).toBe(true);
+  });
+
+  it('shows a titleTooLong error on the input while typing past the maximum length', () => {
+    useMeetNowModal.getState().open();
+    useMeetNowModal.getState().setTitle('a'.repeat(MEETING_TITLE_MAX_LENGTH + 1));
+
+    expect(useMeetNowModal.getState().errors.title).toBe(meetingTitleErrorKeys.tooLong);
+  });
+
+  it('clears the titleTooLong error when the title is shortened', () => {
+    useMeetNowModal.getState().open();
+    useMeetNowModal.getState().setTitle('a'.repeat(MEETING_TITLE_MAX_LENGTH + 1));
+    useMeetNowModal.getState().setTitle('a'.repeat(MEETING_TITLE_MAX_LENGTH));
+
+    expect(useMeetNowModal.getState().errors.title).toBeUndefined();
   });
 });

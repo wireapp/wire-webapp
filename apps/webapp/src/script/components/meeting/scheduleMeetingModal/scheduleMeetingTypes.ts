@@ -36,6 +36,7 @@ export interface ScheduleMeetingFormState {
 
 export type ScheduleMeetingFormErrorKey =
   | 'meetings.scheduleModal.error.titleRequired'
+  | 'meetings.scheduleModal.error.titleTooLong'
   | 'meetings.scheduleModal.error.missingTimes'
   | 'meetings.scheduleModal.error.endBeforeStart'
   | 'meetings.schedule.errors.startInPast'

@@ -1351,6 +1351,7 @@
   "meetings.scheduleModal.error.missingTimes": "Start and end times are required.",
   "meetings.scheduleModal.error.removeParticipantsFailed": "The meeting was updated, but some participants could not be removed. Please try again.",
   "meetings.scheduleModal.error.titleRequired": "Title is required",
+  "meetings.scheduleModal.error.titleTooLong": "Title must be 64 characters or fewer",
   "meetings.scheduleModal.error.updateFailed": "Something went wrong while updating the meeting. Please try again.",
   "meetings.scheduleModal.error.updateFailedTitle": "Could not update meeting",
   "meetings.scheduleModal.nextMonthAriaLabel": "Next month",

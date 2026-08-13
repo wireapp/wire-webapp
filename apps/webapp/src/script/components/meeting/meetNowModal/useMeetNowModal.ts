@@ -17,10 +17,13 @@
  *
  */
 
-import {isEmptyString} from '@sindresorhus/is';
 import {result, type Result} from 'true-myth';
 import {create} from 'zustand';
 
+import {
+  getMeetingTitleError,
+  getMeetingTitleInputError,
+} from 'Components/meeting/shared/validation/meetingTitleValidation';
 import type {User} from 'Repositories/entity/User';
 
 import {emptyMeetNowFormErrors, type MeetNowFormErrors, type MeetNowFormState} from './meetNowTypes';
@@ -54,7 +57,7 @@ const initialState = {
 };
 
 export const getMeetNowFormErrors = ({title}: MeetNowFormState): MeetNowFormErrors => ({
-  title: isEmptyString(title.trim()) ? 'meetings.scheduleModal.error.titleRequired' : undefined,
+  title: getMeetingTitleError(title),
 });
 
 export const hasMeetNowFormErrors = (errors: MeetNowFormErrors): boolean => errors.title !== undefined;
@@ -86,7 +89,7 @@ export const useMeetNowModal = create<MeetNowModalState>((set, get) => ({
   setTitle: title =>
     set(state => ({
       formState: {...state.formState, title},
-      errors: {...state.errors, title: undefined},
+      errors: {...state.errors, title: getMeetingTitleInputError(title)},
     })),
   setSelectedUsers: selectedUsers =>
     set(state => ({

@@ -28,6 +28,7 @@ import {
   resolveEndChange,
   resolveStartChange,
 } from 'Components/meeting/shared/defaults/meetingDateTimeDefaults';
+import {getMeetingTitleInputError} from 'Components/meeting/shared/validation/meetingTitleValidation';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 
@@ -153,7 +154,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
   setTitle: title =>
     set(state => ({
       formState: {...state.formState, title},
-      errors: {...state.errors, title: undefined},
+      errors: {...state.errors, title: getMeetingTitleInputError(title)},
     })),
   setStart: start =>
     set(state => {
