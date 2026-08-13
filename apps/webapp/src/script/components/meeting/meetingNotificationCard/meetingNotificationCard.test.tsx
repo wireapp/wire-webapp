@@ -20,13 +20,14 @@ import {fireEvent, render, screen} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
+import en from 'I18n/en-US.json';
 import {MeetingNotificationCard} from './meetingNotificationCard';
 import {
   type MeetingNotification,
   MeetingNotificationKind,
 } from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {formatLocale} from 'Util/timeUtil';
-import type {Translate} from 'Util/localizerUtil';
+import {setStrings, translate, type Translate} from 'Util/localizerUtil';
 import type {ReactElement} from 'react';
 import {
   createRootContextValueForTest,
@@ -189,5 +190,29 @@ describe('MeetingNotificationCard', () => {
     );
 
     expect(screen.getByRole('listitem')).toHaveTextContent(`creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
+  });
+
+  it('renders an apostrophe in the meeting title instead of an HTML entity', () => {
+    setStrings({en});
+    const productionTranslateWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
+
+    render(
+      <ThemeProvider>
+        <MeetingNotificationCard
+          id="notification-invite"
+          kind={MeetingNotificationKind.INVITE}
+          meetingTitle="Cleopatra's meeting"
+          qualifiedId={qualifiedId}
+          qualifiedCreator={qualifiedCreator}
+          meetingStartTime={meetingStartTime}
+          onDismiss={jest.fn()}
+        />
+      </ThemeProvider>,
+      {wrapper: productionTranslateWrapper},
+    );
+
+    const card = screen.getByRole('listitem');
+    expect(card).toHaveTextContent("Invitation: Cleopatra's meeting");
+    expect(card).not.toHaveTextContent('&#x27;');
   });
 });
