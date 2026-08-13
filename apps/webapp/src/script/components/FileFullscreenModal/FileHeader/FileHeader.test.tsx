@@ -20,12 +20,12 @@
 import {render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {ThemeProvider} from '@wireapp/react-ui-kit';
-
-import * as RelativeTimestamp from 'Hooks/useRelativeTimestamp';
-import * as FileHistoryModal from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import * as RootProvider from 'src/script/page/rootProvider';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FileHeader} from './FileHeader';
 
@@ -49,25 +49,19 @@ const defaultProps = {
   onFileContentRefresh: jest.fn(),
 };
 
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
+
 describe('FileHeader', () => {
   beforeEach(() => {
-    jest.spyOn(RootProvider, 'useApplicationContext').mockReturnValue({translate} as RootProvider.RootContextValue);
-    jest.spyOn(RelativeTimestamp, 'useRelativeTimestamp').mockReturnValue('now');
-    jest.spyOn(FileHistoryModal, 'useFileHistoryModal').mockReturnValue({showModal: jest.fn()});
     container.registerInstance(CellsRepository, {} as CellsRepository);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
     container.reset();
   });
 
   const renderHeader = (props: Partial<Parameters<typeof FileHeader>[0]> = {}) =>
-    render(
-      <ThemeProvider>
-        <FileHeader {...defaultProps} {...props} />
-      </ThemeProvider>,
-    );
+    render(withThemeAndRootContext(<FileHeader {...defaultProps} {...props} />, rootProviderWrapper));
 
   it('hides download action when download is restricted', () => {
     renderHeader({isDownloadRestricted: true});

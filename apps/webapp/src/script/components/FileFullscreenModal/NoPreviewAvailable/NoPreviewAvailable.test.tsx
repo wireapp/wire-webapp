@@ -19,9 +19,11 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {ThemeProvider} from '@wireapp/react-ui-kit';
-
-import * as RootProvider from 'src/script/page/rootProvider';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {NoPreviewAvailable} from './NoPreviewAvailable';
 
@@ -38,20 +40,15 @@ const defaultProps = {
   fileUrl: 'https://example.com/archive.zip',
 };
 
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
+
 describe('NoPreviewAvailable', () => {
-  beforeEach(() => {
-    jest.spyOn(RootProvider, 'useApplicationContext').mockReturnValue({translate} as RootProvider.RootContextValue);
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   const renderPlaceholder = (isDownloadRestricted: boolean) =>
     render(
-      <ThemeProvider>
-        <NoPreviewAvailable {...defaultProps} isDownloadRestricted={isDownloadRestricted} />
-      </ThemeProvider>,
+      withThemeAndRootContext(
+        <NoPreviewAvailable {...defaultProps} isDownloadRestricted={isDownloadRestricted} />,
+        rootProviderWrapper,
+      ),
     );
 
   it('hides download action when download is restricted', () => {
