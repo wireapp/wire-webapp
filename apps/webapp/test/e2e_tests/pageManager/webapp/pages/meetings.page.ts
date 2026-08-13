@@ -31,6 +31,7 @@ export class MeetingsPage {
   readonly scheduleMeetingButton: Locator;
   readonly createMeetingButton: Locator;
   readonly scheduleMeetingModal: Locator;
+  readonly meetNowModal: Locator;
   readonly notificationHost: Locator;
 
   constructor(page: Page) {
@@ -42,6 +43,7 @@ export class MeetingsPage {
     this.scheduleMeetingButton = page.locator('[data-uie-name="schedule-meeting"]');
     this.createMeetingButton = page.locator('[data-uie-name="create-meeting"]');
     this.scheduleMeetingModal = page.locator('[data-uie-name="schedule-meeting-modal"]');
+    this.meetNowModal = page.locator('#meet-now-modal');
     this.notificationHost = page.locator('[data-uie-name="meeting-notification-host"]');
   }
 
@@ -57,6 +59,34 @@ export class MeetingsPage {
 
     await this.createMeetingButton.click();
     await this.page.getByRole('menu').getByRole('button', {name: 'Schedule Meeting'}).click();
+  }
+
+  async openMeetNowModal() {
+    await this.openMeetingsTab();
+    await this.createMeetingButton.click();
+    await this.page.getByRole('menu').getByRole('button', {name: 'Meet now'}).click();
+    await expect(this.meetNowModal).toBeVisible();
+  }
+
+  async addMeetNowParticipant(fullName: string) {
+    const participantsInput = this.meetNowModal.locator('#meet-now-participants');
+    const participantOption = this.page.locator('[data-uie-name="item-user"]').filter({hasText: fullName});
+
+    await participantsInput.fill(fullName);
+    await expect(participantOption).toBeVisible();
+    await participantOption.click();
+  }
+
+  async startMeetNow(title: string, participantNames: string[]) {
+    await this.openMeetNowModal();
+    await this.meetNowModal.locator('#meet-now-title').fill(title);
+
+    for (const participantName of participantNames) {
+      await this.addMeetNowParticipant(participantName);
+    }
+
+    await this.meetNowModal.getByRole('button', {name: 'Start meeting'}).click();
+    await expect(this.meetNowModal).toBeHidden();
   }
 
   meetingListItem(title: string) {
