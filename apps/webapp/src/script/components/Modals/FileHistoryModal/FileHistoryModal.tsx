@@ -32,7 +32,7 @@ import {ModalComponent} from '../ModalComponent';
 
 export const FileHistoryModal = () => {
   const {translate} = useApplicationContext();
-  const {isOpen, hideModal, nodeUuid, onRestore} = useFileHistoryModal();
+  const {isOpen, hideModal, nodeUuid, onRestore, isDownloadAllowed} = useFileHistoryModal();
   const {
     fileVersions,
     isLoading,
@@ -76,6 +76,7 @@ export const FileHistoryModal = () => {
               fileVersions={fileVersions}
               handleDownload={handleDownload}
               handleRestore={setToBeRestoredVersionId}
+              isDownloadAllowed={isDownloadAllowed}
             />
           )}
         </>

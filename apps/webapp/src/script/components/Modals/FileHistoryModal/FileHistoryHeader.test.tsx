@@ -48,6 +48,7 @@ describe('FileHistoryHeader', () => {
       isOpen: true,
       nodeUuid: 'test-uuid',
       showModal: jest.fn(),
+      isDownloadAllowed: true,
     });
   });
 

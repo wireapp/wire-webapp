@@ -32,6 +32,7 @@ import {
   ShowIcon,
 } from '@wireapp/react-ui-kit';
 
+import {useConversationFileDownloadPermission} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {EditIcon} from 'Components/icon';
@@ -97,6 +98,7 @@ export const FileHeader = ({
   const isRecycleBin = isInRecycleBin();
   const cellsRepository = container.resolve(CellsRepository);
   const {showModal} = useFileHistoryModal();
+  const isDownloadAllowed = useConversationFileDownloadPermission();
 
   const handleFileDownload = async () => {
     if (fileUrl !== undefined && fileUrl.length > 0) {
@@ -152,7 +154,7 @@ export const FileHeader = ({
         </div>
       )}
       <div css={actionButtonsStyles}>
-        {!isRecycleBin && (
+        {!isRecycleBin && isDownloadAllowed && (
           <Button
             variant={ButtonVariant.TERTIARY}
             css={downloadButtonStyles}
@@ -175,7 +177,7 @@ export const FileHeader = ({
               </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
+              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh(), isDownloadAllowed)}>
                 {translate('cells.options.versionHistory')}
               </DropdownMenu.Item>
             </DropdownMenu.Content>

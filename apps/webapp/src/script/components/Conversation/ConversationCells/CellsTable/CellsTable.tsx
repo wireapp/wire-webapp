@@ -20,6 +20,7 @@
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {ConversationFileDownloadPermissionProvider} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -50,6 +51,7 @@ interface CellsTableProps {
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
+  isDownloadAllowed: boolean;
 }
 
 interface CellsTableHeaderCellProps {
@@ -85,6 +87,7 @@ export const CellsTable = ({
   getDirectionFor,
   isSortingEnabled,
   onToggleSort,
+  isDownloadAllowed,
 }: CellsTableProps) => {
   const {translate} = useApplicationContext();
   const labels = {
@@ -118,46 +121,48 @@ export const CellsTable = ({
   const tableWrapperStyles = rows.length > 0 ? [wrapperStyles, wrapperWithRowsStyles] : wrapperStyles;
 
   return (
-    <CellsFilePreviewModalProvider>
-      <div css={tableWrapperStyles}>
-        <table css={tableStyles}>
-          <thead>
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <CellsTableHeaderCell
-                    key={header.id}
-                    header={header}
-                    getDirectionFor={getDirectionFor}
-                    isSortingEnabled={isSortingEnabled}
-                  />
-                ))}
-              </tr>
-            ))}
-          </thead>
-          {rows.length > 0 && (
-            <tbody>
-              {rows.map(row => (
-                <tr key={row.id} css={tableCellRow}>
-                  {row.getVisibleCells().map(cell => (
-                    <td
-                      key={cell.id}
-                      css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={cellLabels[cell.column.id]}
-                      style={{
-                        width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
-                      }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
+    <ConversationFileDownloadPermissionProvider isDownloadAllowed={isDownloadAllowed}>
+      <CellsFilePreviewModalProvider>
+        <div css={tableWrapperStyles}>
+          <table css={tableStyles}>
+            <thead>
+              {table.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => (
+                    <CellsTableHeaderCell
+                      key={header.id}
+                      header={header}
+                      getDirectionFor={getDirectionFor}
+                      isSortingEnabled={isSortingEnabled}
+                    />
                   ))}
                 </tr>
               ))}
-            </tbody>
-          )}
-        </table>
-        <CellsFilePreviewModal />
-      </div>
-    </CellsFilePreviewModalProvider>
+            </thead>
+            {rows.length > 0 && (
+              <tbody>
+                {rows.map(row => (
+                  <tr key={row.id} css={tableCellRow}>
+                    {row.getVisibleCells().map(cell => (
+                      <td
+                        key={cell.id}
+                        css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
+                        data-cell={cellLabels[cell.column.id]}
+                        style={{
+                          width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                        }}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            )}
+          </table>
+          <CellsFilePreviewModal />
+        </div>
+      </CellsFilePreviewModalProvider>
+    </ConversationFileDownloadPermissionProvider>
   );
 };

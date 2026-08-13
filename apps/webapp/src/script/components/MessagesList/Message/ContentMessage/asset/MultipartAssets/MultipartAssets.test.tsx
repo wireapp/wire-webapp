@@ -104,6 +104,7 @@ describe('MultipartAssets', () => {
               cellsRepository={cellsRepository}
               senderName={senderName}
               timestamp={timestamp}
+              isDownloadAllowed
             />
           ),
         })}

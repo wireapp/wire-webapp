@@ -19,6 +19,7 @@
 
 import {Button} from '@wireapp/react-ui-kit';
 
+import {useConversationFileDownloadPermission} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
@@ -32,6 +33,7 @@ interface NoPreviewAvailableProps {
 
 export const NoPreviewAvailable = ({fileUrl, fileName, fileExtension}: NoPreviewAvailableProps) => {
   const {translate} = useApplicationContext();
+  const isDownloadAllowed = useConversationFileDownloadPermission();
   const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
 
   return (
@@ -39,12 +41,14 @@ export const NoPreviewAvailable = ({fileUrl, fileName, fileExtension}: NoPreview
       title={translate('fileFullscreenModal.noPreviewAvailable.title')}
       description={translate('fileFullscreenModal.noPreviewAvailable.description')}
       callToAction={
-        <Button
-          onClick={() => forcedDownloadFile({url: fileUrl ?? '', name: fileNameWithExtension})}
-          disabled={fileUrl === undefined || fileUrl.length === 0}
-        >
-          {translate('fileFullscreenModal.noPreviewAvailable.callToAction')}
-        </Button>
+        isDownloadAllowed ? (
+          <Button
+            onClick={() => forcedDownloadFile({url: fileUrl ?? '', name: fileNameWithExtension})}
+            disabled={fileUrl === undefined || fileUrl.length === 0}
+          >
+            {translate('fileFullscreenModal.noPreviewAvailable.callToAction')}
+          </Button>
+        ) : undefined
       }
     />
   );

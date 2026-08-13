@@ -24,6 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useAppNotification} from 'Components/appNotification/appNotification';
+import {useConversationFileDownloadPermission} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
 import {
   shouldRestrictCellsViewerActions,
   useCellsSelfUserDriveRole,
@@ -110,6 +111,7 @@ const CellsTableRowOptionsContent = ({
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
   const [isRenameNodeModalOpen, setIsRenameNodeModalOpen] = useState(false);
   const {showModal} = useFileHistoryModal();
+  const isDownloadAllowed = useConversationFileDownloadPermission();
 
   const url = node.url;
   const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
@@ -230,7 +232,7 @@ const CellsTableRowOptionsContent = ({
               {translate('cells.options.share')}
             </DropdownMenu.Item>
 
-            {url !== undefined && url.length > 0 && (
+            {isDownloadAllowed && url !== undefined && url.length > 0 && (
               <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
                 {translate('cells.options.download')}
               </DropdownMenu.Item>
@@ -249,7 +251,7 @@ const CellsTableRowOptionsContent = ({
                 <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>
                   {translate('cells.options.edit')}
                 </DropdownMenu.Item>
-                <DropdownMenu.Item onClick={() => showModal(node.id, onConfirmRestore)}>
+                <DropdownMenu.Item onClick={() => showModal(node.id, onConfirmRestore, isDownloadAllowed)}>
                   {translate('cells.options.versionHistory')}
                 </DropdownMenu.Item>
               </>

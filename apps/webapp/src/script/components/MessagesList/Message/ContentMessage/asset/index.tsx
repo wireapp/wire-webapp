@@ -57,6 +57,7 @@ interface ContentAssetProps {
   isMessageFocused: boolean;
   is1to1Conversation: boolean;
   isFileShareRestricted: boolean;
+  isConversationFileDownloadAllowed: boolean;
   onClickDetails: () => void;
 }
 
@@ -69,6 +70,7 @@ const ContentAsset = ({
   onClickButton,
   isMessageFocused,
   is1to1Conversation,
+  isConversationFileDownloadAllowed,
   onClickDetails,
 }: ContentAssetProps) => {
   const {isObfuscated, status, senderName, timestamp} = useKoSubscribableChildren(message, [
@@ -109,6 +111,7 @@ const ContentAsset = ({
             senderName={senderName}
             timestamp={timestamp}
             assets={filesMultipart}
+            isDownloadAllowed={isConversationFileDownloadAllowed}
           />
 
           {shouldRenderTextMultipart && (

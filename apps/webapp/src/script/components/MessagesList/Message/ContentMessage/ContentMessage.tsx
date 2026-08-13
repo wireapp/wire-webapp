@@ -72,6 +72,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   onClickReaction: (emoji: string) => void;
   is1to1?: boolean;
   isFileShareRestricted: boolean;
+  isConversationFileDownloadAllowed: boolean;
 }
 
 export const ContentMessageComponent = ({
@@ -95,6 +96,7 @@ export const ContentMessageComponent = ({
   onClickDetails,
   is1to1,
   isFileShareRestricted,
+  isConversationFileDownloadAllowed,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
   const {translate} = useApplicationContext();
@@ -258,6 +260,7 @@ export const ContentMessageComponent = ({
               isMessageFocused={msgFocusState}
               is1to1Conversation={conversation.is1to1()}
               isFileShareRestricted={isFileShareRestricted}
+              isConversationFileDownloadAllowed={isConversationFileDownloadAllowed}
               onClickDetails={() => onClickDetails(message)}
             />
           ))}

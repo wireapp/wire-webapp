@@ -25,6 +25,8 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {isConversationFileDownloadAllowed} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
+import {getSelfUserDriveRole} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
@@ -123,10 +125,15 @@ export const MessageWrapper = ({
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
   };
-  const {display_name: displayName, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
-    'display_name',
-    'hasGlobalMessageTimer',
-  ]);
+  const {
+    display_name: displayName,
+    hasGlobalMessageTimer,
+    selfUser,
+  } = useKoSubscribableChildren(conversation, ['display_name', 'hasGlobalMessageTimer', 'selfUser']);
+  const selfUserDriveRole = getSelfUserDriveRole({
+    conversationTeamId: conversation.teamId,
+    selfUserTeamId: selfUser?.teamId,
+  });
   const isFileShareRestricted = !teamState.isFileSharingReceivingEnabled();
 
   const isCellsConversation =
@@ -224,6 +231,7 @@ export const MessageWrapper = ({
         onClickReaction={handleReactionClick}
         is1to1={conversation.is1to1()}
         isFileShareRestricted={isFileShareRestricted}
+        isConversationFileDownloadAllowed={isConversationFileDownloadAllowed(selfUserDriveRole)}
       />
     );
   }

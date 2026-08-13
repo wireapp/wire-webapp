@@ -19,8 +19,9 @@
 
 import type {ComponentProps} from 'react';
 
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 
+import {ConversationFileDownloadPermissionProvider} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -38,8 +39,18 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   }),
 );
 
-const renderFileAssetOptions = (properties: ComponentProps<typeof FileAssetOptions>) => {
-  return render(withTheme(<FileAssetOptions {...properties} />), {wrapper: rootProviderWrapper});
+const renderFileAssetOptions = (
+  properties: ComponentProps<typeof FileAssetOptions>,
+  isDownloadAllowed = true,
+) => {
+  return render(
+    withTheme(
+      <ConversationFileDownloadPermissionProvider isDownloadAllowed={isDownloadAllowed}>
+        <FileAssetOptions {...properties} />
+      </ConversationFileDownloadPermissionProvider>,
+    ),
+    {wrapper: rootProviderWrapper},
+  );
 };
 
 describe('FileAssetOptions', () => {
@@ -60,6 +71,23 @@ describe('FileAssetOptions', () => {
     renderFileAssetOptions(defaultProps);
     const button = screen.getByLabelText('cells.options.label');
     expect(button).toBeInTheDocument();
+  });
+
+  it('shows download option when downloads are allowed', () => {
+    renderFileAssetOptions(defaultProps, true);
+
+    fireEvent.keyDown(screen.getByLabelText('cells.options.label'), {key: 'Enter'});
+
+    expect(screen.getByText('cells.options.download')).toBeInTheDocument();
+  });
+
+  it('hides download option when downloads are not allowed', () => {
+    renderFileAssetOptions(defaultProps, false);
+
+    fireEvent.keyDown(screen.getByLabelText('cells.options.label'), {key: 'Enter'});
+
+    expect(screen.queryByText('cells.options.download')).not.toBeInTheDocument();
+    expect(screen.getByText('cells.options.open')).toBeInTheDocument();
   });
 
   describe('isFileEditable integration', () => {

@@ -27,6 +27,7 @@ describe('useFileHistoryModal', () => {
 
     expect(result.current.isOpen).toBe(false);
     expect(result.current.nodeUuid).toBeUndefined();
+    expect(result.current.isDownloadAllowed).toBe(true);
   });
 
   it('should open modal with provided node UUID', () => {
@@ -39,6 +40,16 @@ describe('useFileHistoryModal', () => {
 
     expect(result.current.isOpen).toBe(true);
     expect(result.current.nodeUuid).toBe(testUuid);
+  });
+
+  it('should preserve a download restriction while the modal is open', () => {
+    const {result} = renderHook(() => useFileHistoryModal());
+
+    act(() => {
+      result.current.showModal('test-uuid-123', undefined, false);
+    });
+
+    expect(result.current.isDownloadAllowed).toBe(false);
   });
 
   it('should close modal and reset state', () => {
@@ -60,6 +71,7 @@ describe('useFileHistoryModal', () => {
 
     expect(result.current.isOpen).toBe(false);
     expect(result.current.nodeUuid).toBeUndefined();
+    expect(result.current.isDownloadAllowed).toBe(true);
   });
 
   it('should update node UUID when opening modal multiple times', () => {

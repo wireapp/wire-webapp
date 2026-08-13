@@ -23,6 +23,7 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
+import {isConversationFileDownloadAllowed} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -261,6 +262,7 @@ export const ConversationCells = memo(
               getDirectionFor={getDirectionFor}
               isSortingEnabled={!isInRecycleBin}
               onToggleSort={toggleSort}
+              isDownloadAllowed={isConversationFileDownloadAllowed(selfUserDriveRole)}
             />
           )}
           {isCellsStatePending && !isRefreshing && (

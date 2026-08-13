@@ -26,7 +26,8 @@ type FileHistoryModalState = {
   isOpen: boolean;
   nodeUuid?: string;
   onRestore?: () => void;
-  showModal: (nodeUuid: string, onRestore?: () => void) => void;
+  isDownloadAllowed: boolean;
+  showModal: (nodeUuid: string, onRestore?: () => void, isDownloadAllowed?: boolean) => void;
   hideModal: () => void;
 };
 
@@ -37,6 +38,7 @@ const initialState: Omit<FileHistoryModalState, 'showModal' | 'hideModal'> = {
   isOpen: false,
   nodeUuid: undefined,
   onRestore: undefined,
+  isDownloadAllowed: true,
 };
 
 /**
@@ -44,11 +46,12 @@ const initialState: Omit<FileHistoryModalState, 'showModal' | 'hideModal'> = {
  */
 export const useFileHistoryModal = create<FileHistoryModalState>(set => ({
   ...initialState,
-  showModal: (nodeUuid: string, onRestore?: () => void) =>
+  showModal: (nodeUuid: string, onRestore?: () => void, isDownloadAllowed = true) =>
     set({
       isOpen: true,
       nodeUuid,
       onRestore,
+      isDownloadAllowed,
     }),
   hideModal: () => set(() => ({...initialState})),
 }));

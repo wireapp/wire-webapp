@@ -19,6 +19,7 @@
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
+import {useConversationFileDownloadPermission} from 'Components/cells/ConversationFileDownloadPermission/ConversationFileDownloadPermission';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isFileEditable} from 'Util/fileTypeUtil';
@@ -39,6 +40,7 @@ export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOp
   const fileNameWithExtension = getFileNameWithExtension(name, extension);
   const isEditable = isFileEditable(extension);
   const {showModal} = useFileHistoryModal();
+  const isDownloadAllowed = useConversationFileDownloadPermission();
 
   return (
     <DropdownMenu>
@@ -52,12 +54,12 @@ export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOp
         {isEditable && (
           <>
             <DropdownMenu.Item onClick={() => onOpen(true)}>{translate('cells.options.edit')}</DropdownMenu.Item>
-            <DropdownMenu.Item onClick={() => showModal(id, () => onOpen(false))}>
+            <DropdownMenu.Item onClick={() => showModal(id, () => onOpen(false), isDownloadAllowed)}>
               {translate('cells.options.versionHistory')}
             </DropdownMenu.Item>
           </>
         )}
-        {src !== undefined && src !== '' && (
+        {isDownloadAllowed && src !== undefined && src !== '' && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url: src, name: fileNameWithExtension})}>
             {translate('cells.options.download')}
           </DropdownMenu.Item>

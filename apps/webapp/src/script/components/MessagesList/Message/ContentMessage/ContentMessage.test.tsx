@@ -75,6 +75,7 @@ describe('message', () => {
       selfId: {domain: '', id: createUuid()},
       isMsgElementsFocusable: true,
       isFileShareRestricted: false,
+      isConversationFileDownloadAllowed: true,
     };
   });
 
