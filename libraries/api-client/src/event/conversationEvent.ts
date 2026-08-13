@@ -55,6 +55,7 @@ export enum CONVERSATION_EVENT {
   MEMBER_JOIN = 'conversation.member-join',
   MEMBER_LEAVE = 'conversation.member-leave',
   MEMBER_UPDATE = 'conversation.member-update',
+  SYSTEM_MEMBER_UPDATE = 'conversation.system.member-update',
   MESSAGE_TIMER_UPDATE = 'conversation.message-timer-update',
   OTR_MESSAGE_ADD = 'conversation.otr-message-add',
   MLS_MESSAGE_ADD = 'conversation.mls-message-add',
@@ -179,9 +180,11 @@ export interface ConversationMemberLeaveEvent extends BaseConversationEvent {
   type: CONVERSATION_EVENT.MEMBER_LEAVE;
 }
 
-export interface ConversationMemberUpdateEvent extends BaseConversationEvent {
+export interface ConversationMemberUpdateEvent extends Omit<BaseConversationEvent, 'from'> {
   data: ConversationMemberUpdateData;
-  type: CONVERSATION_EVENT.MEMBER_UPDATE;
+  /** Not present for backend/system-initiated updates, e.g. `conversation.system.member-update`. */
+  from?: string;
+  type: CONVERSATION_EVENT.MEMBER_UPDATE | CONVERSATION_EVENT.SYSTEM_MEMBER_UPDATE;
 }
 
 export interface ConversationMessageTimerUpdateEvent extends BaseConversationEvent {

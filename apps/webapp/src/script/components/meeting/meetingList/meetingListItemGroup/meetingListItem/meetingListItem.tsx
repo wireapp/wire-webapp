@@ -82,12 +82,9 @@ const MeetingListItemComponent = ({
 
   const time = useMemo(() => {
     if (temporalStatus === MeetingTemporalStatuses.PAST) {
-      const dayOfWeek = formatLocale(start, 'EEEE');
-      const month = formatLocale(start, 'MMMM');
-      const day = formatLocale(start, 'd');
       const startedAtTime = formatLocale(start, 'h:mm a');
       const endedAtTime = formatLocale(end, 'h:mm a');
-      return `${dayOfWeek}, ${month} ${day} • ${translate('meetings.meetingStatus.startedAt', {time: startedAtTime})} • ${translate(
+      return `${translate('meetings.meetingStatus.startedAt', {time: startedAtTime})} • ${translate(
         'meetings.meetingStatus.endedAt',
         {time: endedAtTime},
       )}`;
