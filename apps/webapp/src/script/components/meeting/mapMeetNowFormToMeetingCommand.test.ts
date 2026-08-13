@@ -17,8 +17,13 @@
  *
  */
 
-import {mapMeetNowFormToMeetingCommand} from './mapMeetNowFormToMeetingCommand';
+import {
+  MEETING_TITLE_MAX_LENGTH,
+  meetingTitleErrorKeys,
+} from 'Components/meeting/shared/validation/meetingTitleValidation';
 import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+
+import {mapMeetNowFormToMeetingCommand} from './mapMeetNowFormToMeetingCommand';
 
 describe('mapMeetNowFormToMeetingCommand', () => {
   it('maps validated form state to a meeting command', () => {
@@ -44,7 +49,20 @@ describe('mapMeetNowFormToMeetingCommand', () => {
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toEqual({
-      title: 'meetings.scheduleModal.error.titleRequired',
+      title: meetingTitleErrorKeys.required,
+    });
+  });
+
+  it('returns title errors for a title that exceeds the maximum length', () => {
+    const result = mapMeetNowFormToMeetingCommand({
+      title: 'a'.repeat(MEETING_TITLE_MAX_LENGTH + 1),
+      selectedUsers: [],
+      participantsFilter: '',
+    });
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toEqual({
+      title: meetingTitleErrorKeys.tooLong,
     });
   });
 });
