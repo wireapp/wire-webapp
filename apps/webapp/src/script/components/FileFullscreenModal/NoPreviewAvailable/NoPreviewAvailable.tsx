@@ -28,9 +28,15 @@ interface NoPreviewAvailableProps {
   fileExtension: string;
   fileName: string;
   fileUrl?: string;
+  isDownloadRestricted?: boolean;
 }
 
-export const NoPreviewAvailable = ({fileUrl, fileName, fileExtension}: NoPreviewAvailableProps) => {
+export const NoPreviewAvailable = ({
+  fileUrl,
+  fileName,
+  fileExtension,
+  isDownloadRestricted = false,
+}: NoPreviewAvailableProps) => {
   const {translate} = useApplicationContext();
   const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
 
@@ -39,12 +45,14 @@ export const NoPreviewAvailable = ({fileUrl, fileName, fileExtension}: NoPreview
       title={translate('fileFullscreenModal.noPreviewAvailable.title')}
       description={translate('fileFullscreenModal.noPreviewAvailable.description')}
       callToAction={
-        <Button
-          onClick={() => forcedDownloadFile({url: fileUrl ?? '', name: fileNameWithExtension})}
-          disabled={fileUrl === undefined || fileUrl.length === 0}
-        >
-          {translate('fileFullscreenModal.noPreviewAvailable.callToAction')}
-        </Button>
+        !isDownloadRestricted && (
+          <Button
+            onClick={() => forcedDownloadFile({url: fileUrl ?? '', name: fileNameWithExtension})}
+            disabled={fileUrl === undefined || fileUrl.length === 0}
+          >
+            {translate('fileFullscreenModal.noPreviewAvailable.callToAction')}
+          </Button>
+        )
       }
     />
   );
