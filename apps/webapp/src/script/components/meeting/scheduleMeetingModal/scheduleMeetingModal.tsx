@@ -111,7 +111,6 @@ export const ScheduleMeetingModal = () => {
       wrapperCSS={modalWrapperStyles}
       isShown={isOpen}
       onClosed={handleClose}
-      onBgClick={handleClose}
       data-uie-name="schedule-meeting-modal"
       onKeyDown={event => handleEscDown(event, handleClose)}
     >

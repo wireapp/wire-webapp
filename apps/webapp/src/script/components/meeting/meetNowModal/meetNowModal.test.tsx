@@ -254,6 +254,30 @@ describe('MeetNowModal', () => {
     expect(useMeetNowModal.getState().isOpen).toBe(false);
   });
 
+  it('stays open when the overlay is clicked', () => {
+    renderMeetNowModal();
+
+    act(() => {
+      useMeetNowModal.getState().open();
+    });
+
+    fireEvent.click(getModalOverlay());
+
+    expect(useMeetNowModal.getState().isOpen).toBe(true);
+  });
+
+  it('closes when the close button is clicked', () => {
+    renderMeetNowModal();
+
+    act(() => {
+      useMeetNowModal.getState().open();
+    });
+
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
+
+    expect(useMeetNowModal.getState().isOpen).toBe(false);
+  });
+
   it('does not dismiss the modal while submission is pending', async () => {
     const {fireAndForgetInvoker, resolveMeetNowMeeting} = renderMeetNowModal();
 
