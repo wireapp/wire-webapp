@@ -18,13 +18,11 @@
  */
 
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
-export const meetingsFeatureToggleName = 'meetings';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
 export const viewerPermissionFeatureToggleName = 'viewer-permission';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
-  meetingsFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   viewerPermissionFeatureToggleName,
 ] as const;

@@ -103,7 +103,6 @@ const renderMeetingStoreRoot = ({
       translate: translateForTest,
       wallClock: createDeterministicWallClock(),
       mainViewModel,
-      isFeatureToggleEnabled: () => true,
     }),
   );
 
