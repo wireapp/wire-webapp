@@ -27,7 +27,7 @@ import {useDebouncedCallback} from 'use-debounce';
 import {UserList} from 'Components/userList';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
+import type {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -35,17 +35,17 @@ import {partition} from 'Util/arrayUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortByPriority} from 'Util/stringUtil';
 
-export type UserListProps = React.ComponentProps<typeof UserList> & {
-  conversationState?: ConversationState;
+export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'conversationState' | 'teamState'> & {
+  conversationState?: Pick<ConversationState, 'hasConversationWith'>;
   highlightedUsers?: User[];
   users: User[];
   filter?: string;
   selected?: User[];
   onUpdateSelectedUsers?: (updatedUsers: User[]) => void;
-  searchRepository: SearchRepository;
+  searchRepository: Pick<SearchRepository, 'normalizeQuery' | 'searchByName' | 'searchUserInSet'>;
   selfFirst?: boolean;
-  teamRepository: TeamRepository;
-  teamState?: TeamState;
+  teamRepository: Pick<TeamRepository, 'filterExternals' | 'filterRemoteDomainUsers' | 'isSelfConnectedTo'>;
+  teamState?: Pick<TeamState, 'isInTeam'>;
   truncate?: boolean;
   selfUser: User;
   dataUieName?: string;
@@ -75,8 +75,13 @@ export const UserSearchableList = ({
   ...props
 }: UserListProps) => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
-  const {searchRepository, teamRepository, selfFirst, ...userListProps} = props;
-  const {conversationState = container.resolve(ConversationState)} = props;
+  const {
+    searchRepository,
+    teamRepository,
+    selfFirst,
+    conversationState = container.resolve(ConversationState),
+    ...userListProps
+  } = props;
 
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [remoteTeamMembers, setRemoteTeamMembers] = useState<User[]>([]);

@@ -17,6 +17,15 @@
  *
  */
 
-export * from './meetingParticipantsPicker';
-export * from './formatParticipantsFieldLabel';
-export * from './participantPickerUtils';
+import type {Translate} from 'Util/localizerUtil';
+
+export function formatParticipantsFieldLabel(label: string, selectedCount: number, translate: Translate): string {
+  if (selectedCount === 0) {
+    return label;
+  }
+
+  return translate('meetings.scheduleModal.participantsLabelWithCount', {
+    label,
+    count: selectedCount,
+  });
+}

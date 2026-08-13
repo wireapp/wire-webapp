@@ -86,17 +86,6 @@ export const valueContainerStyles: CSSObject = {
   overflow: 'hidden',
 };
 
-export const selectedSummaryStyles: CSSObject = {
-  color: 'var(--main-color)',
-  flexShrink: 0,
-  fontSize: 'var(--font-size-medium)',
-  lineHeight: '20px',
-  maxWidth: '100%',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-};
-
 export const searchInputStyles: CSSObject = {
   background: 'transparent',
   border: 'none',
@@ -104,7 +93,7 @@ export const searchInputStyles: CSSObject = {
   flex: 1,
   fontSize: 'var(--font-size-medium)',
   lineHeight: '20px',
-  minWidth: '48px',
+  minWidth: 0,
   outline: 'none',
   padding: 0,
   width: '100%',
