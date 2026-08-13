@@ -143,7 +143,6 @@ export class MeetingsPage {
   }
 
   async removeParticipant(fullName: string) {
-    const participants = this.scheduleMeetingModal.locator('[data-uie-name="schedule-meeting-participants"]');
     const dropdown = await this.openParticipantsPicker();
     const selectedSectionToggle = dropdown.locator('[data-uie-name="do-toggle-selected-search-list"]');
     const selectedList = dropdown.locator('[data-uie-name="selected-search-list"]');
@@ -157,9 +156,7 @@ export class MeetingsPage {
 
     await expect(selectedParticipant).toBeVisible();
     await selectedParticipant.click();
-    await expect(participants.locator('[data-uie-name="schedule-meeting-participants-summary"]')).not.toContainText(
-      fullName,
-    );
+    await expect(selectedParticipant).toBeHidden();
     await this.closeParticipantsPicker();
   }
 

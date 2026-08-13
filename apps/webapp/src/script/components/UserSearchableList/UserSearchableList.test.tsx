@@ -25,11 +25,11 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {ConversationState} from 'src/script/repositories/conversation/ConversationState';
+import type {ConversationState} from 'src/script/repositories/conversation/ConversationState';
 import {User} from 'src/script/repositories/entity/User';
-import {SearchRepository} from 'src/script/repositories/search/searchRepository';
-import {TeamRepository} from 'src/script/repositories/team/TeamRepository';
-import {TeamState} from 'src/script/repositories/team/TeamState';
+import type {SearchRepository} from 'src/script/repositories/search/searchRepository';
+import type {TeamRepository} from 'src/script/repositories/team/TeamRepository';
+import type {TeamState} from 'src/script/repositories/team/TeamState';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {UserSearchableList, UserListProps} from './UserSearchableList';
@@ -127,13 +127,13 @@ describe('UserSearchableList', () => {
     );
     const properties: Omit<UserListProps, 'filter'> = {
       allowRemoteSearch: true,
-      conversationState: conversationStateDouble as ConversationState,
+      conversationState: conversationStateDouble,
       filterRemoteTeamUsers: true,
       isSelectable: true,
-      searchRepository: searchRepositoryDouble as SearchRepository,
+      searchRepository: searchRepositoryDouble,
       selfUser,
-      teamRepository: teamRepositoryDouble as TeamRepository,
-      teamState: teamStateDouble as TeamState,
+      teamRepository: teamRepositoryDouble,
+      teamState: teamStateDouble,
       users: candidateUsers,
     };
 
