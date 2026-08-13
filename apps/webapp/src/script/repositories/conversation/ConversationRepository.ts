@@ -3871,6 +3871,7 @@ export class ConversationRepository {
         return this.onMemberLeave(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.MEMBER_UPDATE:
+      case CONVERSATION_EVENT.SYSTEM_MEMBER_UPDATE:
         return this.onMemberUpdate(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.TYPING:
@@ -4378,7 +4379,8 @@ export class ConversationRepository {
     const conversationId = {domain: '', id: conversation ?? '' /* TODO(federation) add domain on the sender side */};
 
     if (eventData.conversation_role) {
-      await this.onConversationMemberRoleUpdated(conversationId, eventData, from);
+      // `from` is absent for backend/system-initiated role changes (e.g. `conversation.system.member-update`).
+      await this.onConversationMemberRoleUpdated(conversationId, eventData, from ?? '');
       return;
     }
 
