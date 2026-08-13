@@ -17,7 +17,10 @@
  *
  */
 
-import {applockRefactoredFeatureToggleName, conversationListCollapseFeatureToggleName} from './startupFeatureToggleNames';
+import {
+  applockRefactoredFeatureToggleName,
+  conversationListCollapseFeatureToggleName,
+} from './startupFeatureToggleNames';
 import {startupFeatureToggleQueryParameterName} from './startupFeatureToggles';
 import {updateLocationSearchForStartupFeatureToggle} from './startupFeatureToggleQueryParameters';
 
