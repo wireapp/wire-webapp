@@ -44,11 +44,11 @@ import {
   getMeetingTemporalStatusAt,
   isAttendingMeetingInstance,
   isMeetingListItemOngoing,
-  MeetingTemporalStatuses,
 } from 'Components/meeting/utils/meetingStatusUtil';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {formatLocale} from 'Util/timeUtil';
+
+import {formatMeetingTimeRange} from './formatMeetingTimeRange';
 
 interface MeetingListItemProps {
   meetingInstance: MeetingInstance;
@@ -80,30 +80,7 @@ const MeetingListItemComponent = ({
   const temporalStatus = useMemo(() => getMeetingTemporalStatusAt(now, start, end), [now, start, end]);
   const isCallActive = isAttendingMeetingInstance(isConversationCallActive, temporalStatus);
 
-  const time = useMemo(() => {
-    if (temporalStatus === MeetingTemporalStatuses.PAST) {
-      const startedAtTime = formatLocale(start, 'h:mm a');
-      const endedAtTime = formatLocale(end, 'h:mm a');
-      return `${translate('meetings.meetingStatus.startedAt', {time: startedAtTime})} • ${translate(
-        'meetings.meetingStatus.endedAt',
-        {time: endedAtTime},
-      )}`;
-    }
-
-    if (temporalStatus === MeetingTemporalStatuses.ON_GOING) {
-      const startedAtTime = formatLocale(start, 'h:mm a');
-      const endsAtTime = formatLocale(end, 'h:mm a');
-      return `${translate('meetings.meetingStatus.startedAt', {time: startedAtTime})} • ${translate(
-        'meetings.meetingStatus.endsAt',
-        {time: endsAtTime},
-      )}`;
-    }
-
-    const sameMeridiem = formatLocale(start, 'a') === formatLocale(end, 'a');
-    return sameMeridiem
-      ? `${formatLocale(start, 'h:mm')} – ${formatLocale(end, 'h:mm a')}`
-      : `${formatLocale(start, 'h:mm a')} – ${formatLocale(end, 'h:mm a')}`;
-  }, [end, start, temporalStatus, translate]);
+  const time = formatMeetingTimeRange(start, end);
 
   const isOngoing = isMeetingListItemOngoing(temporalStatus, isCallActive);
 
