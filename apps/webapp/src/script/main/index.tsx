@@ -90,7 +90,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }
 
-  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
+  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+    globalThis.location.search,
+    globalThis.localStorage,
+  );
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const applicationServices = createApplicationServices({
     createApplicationObservability() {
