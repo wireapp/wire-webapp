@@ -92,6 +92,18 @@ describe('FileHeader', () => {
     expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
   });
 
+  it('hides edit and version history actions for restricted viewers on editable files', () => {
+    renderHeader({
+      isViewerPermissionFeatureEnabled: true,
+      props: {
+        isEditable: true,
+      },
+    });
+
+    expect(screen.queryByRole('button', {name: 'Editing'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'More options'})).not.toBeInTheDocument();
+  });
+
   it('shows download action when download is allowed', () => {
     renderHeader({isViewerPermissionFeatureEnabled: false});
 
