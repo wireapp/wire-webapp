@@ -269,7 +269,7 @@ export class MeetingsPage {
 
   async editMeeting(
     title: string,
-    updates: {newTitle?: string; addParticipants?: string[]; removeParticipants?: string[]},
+    updates: {newTitle?: string; updateStartTime?: boolean; addParticipants?: string[]; removeParticipants?: string[]},
   ) {
     const menu = await this.openMeetingContextMenu(title);
     await menu.getByRole('button', {name: 'Edit meeting'}).click();
@@ -282,6 +282,11 @@ export class MeetingsPage {
 
     if (updates.newTitle !== undefined) {
       await this.fillMeetingTitle(updates.newTitle);
+    }
+
+    if (updates.updateStartTime) {
+      await this.selectLatestAvailableStartTime();
+      await this.fixStartTimeInPastValidationError();
     }
 
     for (const participantName of updates.addParticipants ?? []) {
@@ -333,6 +338,11 @@ export class MeetingsPage {
     await this.waitForNotificationHost();
     await this.expandNotifications();
     await expect(this.notificationCardContaining(text)).toBeVisible({timeout: MEETINGS_LIST_TIMEOUT_MS});
+  }
+
+  async dismissNotificationContaining(text: string) {
+    await this.waitForNotificationContaining(text);
+    await this.notificationCardContaining(text).getByRole('button', {name: 'Dismiss'}).click();
   }
 
   async expectNoNotificationContaining(text: string) {

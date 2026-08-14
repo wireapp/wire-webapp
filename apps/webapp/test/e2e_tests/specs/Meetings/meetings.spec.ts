@@ -119,9 +119,40 @@ test.describe('Meetings CRUD', () => {
     await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
     await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
 
+    await memberMeetings.openMeetingsTab();
+    await memberMeetings.waitForMeetingInList(MEETING_TITLE);
+    await memberMeetings.dismissNotificationContaining(`Invitation: ${MEETING_TITLE}`);
+
     await ownerMeetings.editMeeting(MEETING_TITLE, {newTitle: UPDATED_MEETING_TITLE});
 
     await memberMeetings.waitForNotificationContaining(`Update: ${UPDATED_MEETING_TITLE}`);
+    await expect(memberMeetings.notificationCardContaining(`Update: ${UPDATED_MEETING_TITLE}`)).toHaveCount(1);
+    await expect(memberMeetings.notificationCardContaining(`Invitation: ${UPDATED_MEETING_TITLE}`)).toHaveCount(0);
+    await expect(memberMeetings.notificationCards()).toHaveCount(1);
+  });
+
+  test('invitee sees update notification after meeting time edit', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+    const member = members[0];
+
+    const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+    await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
+
+    await memberMeetings.openMeetingsTab();
+    await memberMeetings.waitForMeetingInList(MEETING_TITLE);
+    await memberMeetings.dismissNotificationContaining(`Invitation: ${MEETING_TITLE}`);
+
+    await ownerMeetings.editMeeting(MEETING_TITLE, {updateStartTime: true});
+
+    await memberMeetings.waitForNotificationContaining(`Update: ${MEETING_TITLE}`);
+    await expect(memberMeetings.notificationCardContaining(`Update: ${MEETING_TITLE}`)).toHaveCount(1);
+    await expect(memberMeetings.notificationCardContaining(`Invitation: ${MEETING_TITLE}`)).toHaveCount(0);
+    await expect(memberMeetings.notificationCards()).toHaveCount(1);
   });
 
   test('host can add a participant', async ({createUser, createTeam, createPage}) => {

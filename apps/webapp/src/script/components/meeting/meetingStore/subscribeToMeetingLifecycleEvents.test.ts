@@ -47,6 +47,7 @@ describe('subscribeToMeetingLifecycleEvents', () => {
       dispatcher,
       getSelfUserQualifiedId: () => selfUserId,
       notifyMeetingChange: jest.fn(),
+      notifyUpdate: jest.fn(),
     });
     activeUnsubscribeCallbacks.push(unsubscribe);
 

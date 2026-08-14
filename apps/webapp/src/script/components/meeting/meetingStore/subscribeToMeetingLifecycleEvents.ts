@@ -31,6 +31,7 @@ export type SubscribeToMeetingLifecycleEventsDependencies = {
   dispatcher: MeetingLifecycleDispatcher;
   getSelfUserQualifiedId: () => QualifiedId;
   notifyMeetingChange: (meeting: MeetingSeries) => void;
+  notifyUpdate: (meeting: MeetingSeries) => void;
 };
 
 /**
@@ -41,13 +42,14 @@ export const subscribeToMeetingLifecycleEvents = ({
   dispatcher,
   getSelfUserQualifiedId,
   notifyMeetingChange,
+  notifyUpdate,
 }: SubscribeToMeetingLifecycleEventsDependencies): (() => void) => {
   const onMeetingCreated = (meetingId: QualifiedId) => {
     dispatcher.enqueueMeetingSync(meetingId);
   };
 
-  const enqueueMeetingSyncWithNotification = (meetingId: QualifiedId) => {
-    dispatcher.enqueueMeetingSync(meetingId, notifyMeetingChange);
+  const enqueueMeetingSyncWithNotification = (meetingId: QualifiedId, onSuccess: (meeting: MeetingSeries) => void) => {
+    dispatcher.enqueueMeetingSync(meetingId, onSuccess);
   };
 
   const onMeetingUpdated = (meetingId: QualifiedId, actorId: QualifiedId) => {
@@ -56,7 +58,7 @@ export const subscribeToMeetingLifecycleEvents = ({
       return;
     }
 
-    enqueueMeetingSyncWithNotification(meetingId);
+    enqueueMeetingSyncWithNotification(meetingId, notifyUpdate);
   };
 
   const onMeetingMemberAdded = (meetingId: QualifiedId, actorId: QualifiedId) => {
@@ -65,7 +67,7 @@ export const subscribeToMeetingLifecycleEvents = ({
       return;
     }
 
-    enqueueMeetingSyncWithNotification(meetingId);
+    enqueueMeetingSyncWithNotification(meetingId, notifyMeetingChange);
   };
 
   const onMeetingDeleted = (meetingId: QualifiedId) => {

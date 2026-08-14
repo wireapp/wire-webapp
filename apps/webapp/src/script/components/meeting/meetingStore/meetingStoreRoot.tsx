@@ -103,6 +103,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       dispatcher,
       getSelfUserQualifiedId,
       notifyMeetingChange: notificationHandlers.notifyMeetingChange,
+      notifyUpdate: notificationHandlers.notifyUpdate,
     });
     const unsubscribeFromMeetingConversationEvents = subscribeToMeetingConversationEvents({
       dispatcher,

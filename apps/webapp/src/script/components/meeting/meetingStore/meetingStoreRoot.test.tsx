@@ -169,7 +169,7 @@ describe('MeetingStoreRoot', () => {
     expect(getMeeting).toHaveBeenCalledWith(meetingId);
   });
 
-  it('creates invite notifications while the meetings view is not mounted', async () => {
+  it('creates update notifications for existing participants while the meetings view is not mounted', async () => {
     renderMeetingStoreRoot();
 
     await waitFor(() => {
@@ -183,7 +183,7 @@ describe('MeetingStoreRoot', () => {
     await waitFor(() => {
       expect(useMeetingNotificationStore.getState().notifications).toEqual([
         expect.objectContaining({
-          kind: MeetingNotificationKind.INVITE,
+          kind: MeetingNotificationKind.UPDATE,
           meetingTitle: 'Weekly sync (updated)',
           qualifiedId: meetingId,
         }),
@@ -337,7 +337,7 @@ describe('MeetingStoreRoot', () => {
     await waitFor(() => {
       expect(useMeetingNotificationStore.getState().notifications).toEqual([
         expect.objectContaining({
-          kind: MeetingNotificationKind.INVITE,
+          kind: MeetingNotificationKind.UPDATE,
           qualifiedId: meetingId,
         }),
       ]);
