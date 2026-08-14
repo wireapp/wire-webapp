@@ -265,9 +265,7 @@ const CellsTableRowOptionsContent = ({
               </DropdownMenu.Item>
             )}
             {isEditable && canViewVersionHistory && (
-              <DropdownMenu.Item
-                onClick={() => showModal(node.id, onConfirmRestore, canDownload)}
-              >
+              <DropdownMenu.Item onClick={() => showModal(node.id, onConfirmRestore)}>
                 {translate('cells.options.versionHistory')}
               </DropdownMenu.Item>
             )}

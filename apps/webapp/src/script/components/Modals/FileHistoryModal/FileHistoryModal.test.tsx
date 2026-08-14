@@ -66,7 +66,6 @@ describe('FileHistoryModal', () => {
     nodeUuid: undefined as string | undefined,
     showModal: jest.fn(),
     onRestore: undefined as (() => void) | undefined,
-    isDownloadAllowed: true,
   };
 
   const defaultFileVersionsState = {

@@ -181,11 +181,7 @@ export const FileHeader = ({
               </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-              <DropdownMenu.Item
-                onClick={() =>
-                  showModal(id, () => onFileContentRefresh(), canPerformCellsAction(CELLS_ACTION.DOWNLOAD))
-                }
-              >
+              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
                 {translate('cells.options.versionHistory')}
               </DropdownMenu.Item>
             </DropdownMenu.Content>

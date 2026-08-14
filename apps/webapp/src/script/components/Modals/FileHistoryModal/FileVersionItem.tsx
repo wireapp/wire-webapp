@@ -51,12 +51,11 @@ interface FileVersionItemProps {
   showTimelineConnector: boolean;
   onDownload: (downloadUrl: string) => void | Promise<void>;
   onRestore: (versionId: string) => void;
-  isDownloadAllowed: boolean;
 }
 
 export const FileVersionItem = (properties: FileVersionItemProps): ReactElement => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
-  const {version, isCurrentVersion, showTimelineConnector, onDownload, onRestore, isDownloadAllowed} = properties;
+  const {version, isCurrentVersion, showTimelineConnector, onDownload, onRestore} = properties;
   const versionDetailsTitle = `${version.ownerName} ${version.size}`.trim();
 
   function handleDownloadClick(): void {
@@ -79,16 +78,14 @@ export const FileVersionItem = (properties: FileVersionItemProps): ReactElement 
         </p>
       </div>
       <div css={versionActionsWrapperCss} data-version-actions="true">
-        {isDownloadAllowed && (
-          <Button
-            variant={ButtonVariant.SECONDARY}
-            css={versionButtonCss}
-            onClick={handleDownloadClick}
-            aria-label={translate('cells.versionHistory.downloadAriaLabel', {time: version.time})}
-          >
-            <DownloadIcon css={iconMarginRightCss} /> {translate('cells.versionHistory.download')}
-          </Button>
-        )}
+        <Button
+          variant={ButtonVariant.SECONDARY}
+          css={versionButtonCss}
+          onClick={handleDownloadClick}
+          aria-label={translate('cells.versionHistory.downloadAriaLabel', {time: version.time})}
+        >
+          <DownloadIcon css={iconMarginRightCss} /> {translate('cells.versionHistory.download')}
+        </Button>
         {!isCurrentVersion && (
           <Button
             css={versionButtonCss}

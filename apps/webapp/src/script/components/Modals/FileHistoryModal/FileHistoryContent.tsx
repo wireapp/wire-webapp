@@ -32,11 +32,10 @@ type FileHistoryContentProps = {
   readonly fileVersions: Record<string, FileVersion[]>;
   readonly handleDownload: (url: string) => Promise<void>;
   readonly handleRestore: (versionId: string) => void;
-  readonly isDownloadAllowed?: boolean;
 };
 
 export const FileHistoryContent: FunctionComponent<FileHistoryContentProps> = properties => {
-  const {fileVersions, handleDownload, handleRestore, isDownloadAllowed = true} = properties;
+  const {fileVersions, handleDownload, handleRestore} = properties;
 
   return (
     <div css={fileHistoryContentCss}>
@@ -53,7 +52,6 @@ export const FileHistoryContent: FunctionComponent<FileHistoryContentProps> = pr
                   showTimelineConnector={versionIndex < fileVersions[date].length - 1}
                   onDownload={handleDownload}
                   onRestore={handleRestore}
-                  isDownloadAllowed={isDownloadAllowed}
                 />
               ))}
             </div>

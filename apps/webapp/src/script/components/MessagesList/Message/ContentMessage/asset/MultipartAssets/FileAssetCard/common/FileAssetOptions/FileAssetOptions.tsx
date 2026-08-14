@@ -60,9 +60,7 @@ export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOp
           </>
         )}
         {isEditable && canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY) && (
-          <DropdownMenu.Item
-            onClick={() => showModal(id, () => onOpen(false), canPerformCellsAction(CELLS_ACTION.DOWNLOAD))}
-          >
+          <DropdownMenu.Item onClick={() => showModal(id, () => onOpen(false))}>
             {translate('cells.options.versionHistory')}
           </DropdownMenu.Item>
         )}

@@ -30,10 +30,7 @@ import {FileHistoryContent} from './FileHistoryContent';
 import {FileVersion} from './types';
 import {translateForTest} from 'Util/test/translateForTest';
 
-type RenderFileHistoryContent = (
-  fileVersions: Record<string, FileVersion[]>,
-  isDownloadAllowed?: boolean,
-) => ReturnType<typeof render>;
+type RenderFileHistoryContent = (fileVersions: Record<string, FileVersion[]>) => ReturnType<typeof render>;
 
 describe('FileHistoryContent', () => {
   const mockHandleDownload = jest.fn().mockResolvedValue(undefined);
@@ -74,7 +71,7 @@ describe('FileHistoryContent', () => {
     jest.clearAllMocks();
   });
 
-  const renderFileHistoryContent: RenderFileHistoryContent = (fileVersions, isDownloadAllowed = true) => {
+  const renderFileHistoryContent: RenderFileHistoryContent = fileVersions => {
     return render(
       <StyledApp themeId={THEME_ID.DEFAULT}>
         {rootProviderWrapper({
@@ -83,7 +80,6 @@ describe('FileHistoryContent', () => {
               fileVersions={fileVersions}
               handleDownload={mockHandleDownload}
               handleRestore={mockHandleRestore}
-              isDownloadAllowed={isDownloadAllowed}
             />
           ),
         })}
@@ -124,13 +120,6 @@ describe('FileHistoryContent', () => {
 
     const downloadButtons = screen.getAllByText('cells.versionHistory.download');
     expect(downloadButtons).toHaveLength(3);
-  });
-
-  it('should hide download buttons while keeping restore buttons when downloads are not allowed', () => {
-    renderFileHistoryContent(mockFileVersions, false);
-
-    expect(screen.queryByText('cells.versionHistory.download')).not.toBeInTheDocument();
-    expect(screen.getAllByText('cells.versionHistory.restore')).toHaveLength(2);
   });
 
   it('should render restore buttons for non-current versions', () => {
