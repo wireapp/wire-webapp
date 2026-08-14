@@ -69,8 +69,10 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
         </DropdownMenu.Item>
         <DropdownMenu.Item
           disabled={shouldDisableRestrictedActions}
-          onClick={() =>
-            showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker, translate})
+          onClick={
+            shouldDisableRestrictedActions
+              ? undefined
+              : () => showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker, translate})
           }
         >
           {translate('cells.options.share')}
@@ -78,11 +80,14 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
         {isNonEmptyString(url) && (
           <DropdownMenu.Item
             disabled={shouldDisableRestrictedActions}
-            onClick={() =>
-              forcedDownloadFile({
-                url,
-                name,
-              })
+            onClick={
+              shouldDisableRestrictedActions
+                ? undefined
+                : () =>
+                    forcedDownloadFile({
+                      url,
+                      name,
+                    })
             }
           >
             {translate('cells.options.download')}
