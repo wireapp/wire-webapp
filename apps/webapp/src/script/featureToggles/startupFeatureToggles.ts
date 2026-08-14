@@ -80,8 +80,12 @@ function readEnabledFeatureToggleNameListFromLocalStorage(
 
 export function persistEnabledFeatureToggleNamesInLocalStorage(
   enabledFeatureToggleNames: readonly StartupFeatureToggleName[],
-  localStorage: StartupFeatureToggleLocalStorage,
+  localStorage?: StartupFeatureToggleLocalStorage,
 ): void {
+  if (localStorage === undefined) {
+    return;
+  }
+
   if (enabledFeatureToggleNames.length === 0) {
     localStorage.removeItem(startupFeatureToggleLocalStorageKey);
     return;
@@ -120,9 +124,7 @@ export function createStartupFeatureTogglesFromLocationSearch(
 ): StartupFeatureToggles {
   const enabledFeatureToggleNames = readEnabledFeatureToggleNameList(locationSearch, localStorage);
 
-  if (localStorage !== undefined) {
-    persistEnabledFeatureToggleNamesInLocalStorage(enabledFeatureToggleNames, localStorage);
-  }
+  persistEnabledFeatureToggleNamesInLocalStorage(enabledFeatureToggleNames, localStorage);
 
   const enabledFeatureToggleNameSet = new Set<StartupFeatureToggleName>(enabledFeatureToggleNames);
 

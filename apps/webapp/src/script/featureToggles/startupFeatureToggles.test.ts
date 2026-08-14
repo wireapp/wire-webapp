@@ -167,10 +167,10 @@ describe('startupFeatureToggles', function () {
   });
 });
 
-type LocalStorageLike = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
+type LocalStorageStub = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 
-function createInMemoryLocalStorage(initialValue?: string): {
-  localStorage: LocalStorageLike;
+function createInMemoryLocalStorageStub(initialValue?: string): {
+  localStorage: LocalStorageStub;
   getStoredValue: () => string | null;
 } {
   let storedValue: string | null = initialValue ?? null;
@@ -195,7 +195,7 @@ function createInMemoryLocalStorage(initialValue?: string): {
 
 describe('startupFeatureToggles session persistence', () => {
   it('falls back to local storage when the query parameter is missing', () => {
-    const {localStorage} = createInMemoryLocalStorage(applockRefactoredFeatureToggleName);
+    const {localStorage} = createInMemoryLocalStorageStub(applockRefactoredFeatureToggleName);
 
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar', localStorage);
 
@@ -204,7 +204,7 @@ describe('startupFeatureToggles session persistence', () => {
   });
 
   it('prefers the query parameter over local storage', () => {
-    const {localStorage} = createInMemoryLocalStorage(applockRefactoredFeatureToggleName);
+    const {localStorage} = createInMemoryLocalStorageStub(applockRefactoredFeatureToggleName);
 
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${viewerPermissionFeatureToggleName}`,
@@ -216,7 +216,7 @@ describe('startupFeatureToggles session persistence', () => {
   });
 
   it('persists query parameter toggles to local storage', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorage();
+    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub();
 
     createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
@@ -227,7 +227,7 @@ describe('startupFeatureToggles session persistence', () => {
   });
 
   it('clears local storage when the query parameter is present but empty', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorage(applockRefactoredFeatureToggleName);
+    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub(applockRefactoredFeatureToggleName);
 
     createStartupFeatureTogglesFromLocationSearch(`?${startupFeatureToggleQueryParameterName}=`, localStorage);
 
@@ -241,7 +241,7 @@ describe('startupFeatureToggles session persistence', () => {
   });
 
   it('ignores unknown feature toggles from local storage', () => {
-    const {localStorage} = createInMemoryLocalStorage('unknown-feature');
+    const {localStorage} = createInMemoryLocalStorageStub('unknown-feature');
 
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar', localStorage);
 
@@ -249,7 +249,7 @@ describe('startupFeatureToggles session persistence', () => {
   });
 
   it('trims whitespace around feature toggle names from local storage', () => {
-    const {localStorage} = createInMemoryLocalStorage(` ${applockRefactoredFeatureToggleName} `);
+    const {localStorage} = createInMemoryLocalStorageStub(` ${applockRefactoredFeatureToggleName} `);
 
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar', localStorage);
 

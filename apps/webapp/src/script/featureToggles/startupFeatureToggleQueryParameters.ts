@@ -90,12 +90,10 @@ export function updateLocationSearchForStartupFeatureToggle(
     shouldEnableFeatureToggle,
   );
 
-  if (localStorage !== undefined) {
-    persistEnabledFeatureToggleNamesInLocalStorage(
-      toOrderedEnabledFeatureToggleNames(updatedEnabledFeatureToggleNameSet),
-      localStorage,
-    );
-  }
+  persistEnabledFeatureToggleNamesInLocalStorage(
+    toOrderedEnabledFeatureToggleNames(updatedEnabledFeatureToggleNameSet),
+    localStorage,
+  );
 
   const queryParameters = new URLSearchParams(locationSearch);
   const serializedEnabledFeatureToggleNames = serializeEnabledFeatureToggleNames(updatedEnabledFeatureToggleNameSet);
