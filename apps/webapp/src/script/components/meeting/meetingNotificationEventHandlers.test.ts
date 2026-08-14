@@ -75,6 +75,7 @@ describe('createMeetingNotificationEventHandlers', () => {
       },
       dismissNotificationsForMeeting: (meetingId, kinds) => {
         dismissedMeetings.push({meetingId, kinds});
+        dismissNotificationsFromList(notifications, meetingId, kinds);
       },
       logger: {
         warn: (message, context) => {
@@ -95,18 +96,6 @@ describe('createMeetingNotificationEventHandlers', () => {
     onMeetingCancelled(meetingId);
 
     expect(notifications).toEqual([
-      {
-        kind: MeetingNotificationKind.UPDATE,
-        meetingStartTime: meetingSeries.series_start_date,
-        meetingTitle: meetingSeries.title,
-        qualifiedId: meetingSeries.qualified_id,
-      },
-      {
-        kind: MeetingNotificationKind.UPDATE,
-        meetingStartTime: meetingSeries.series_start_date,
-        meetingTitle: meetingSeries.title,
-        qualifiedId: meetingSeries.qualified_id,
-      },
       {
         kind: MeetingNotificationKind.CANCELLED,
         meetingStartTime: meetingSeries.series_start_date,
@@ -180,6 +169,20 @@ describe('createMeetingNotificationEventHandlers', () => {
         meetingTitle: meetingSeries.title,
         qualifiedId: meetingSeries.qualified_id,
       },
+    ]);
+  });
+
+  it('creates a new invitation when the user is removed and added again', () => {
+    const notifications: AddNotificationInput[] = [];
+    const {notifyMeetingChange, onMeetingCancelled} = createHandlers({notifications});
+
+    notifyMeetingChange(meetingSeries);
+    onMeetingCancelled(meetingId);
+    notifyMeetingChange(meetingSeries);
+
+    expect(notifications.map(notification => notification.kind)).toEqual([
+      MeetingNotificationKind.CANCELLED,
+      MeetingNotificationKind.INVITE,
     ]);
   });
 
