@@ -119,9 +119,9 @@ test.describe('Meetings CRUD', () => {
     await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
     await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
 
+    await memberPage.reload();
     await memberMeetings.openMeetingsTab();
     await memberMeetings.waitForMeetingInList(MEETING_TITLE);
-    await memberMeetings.dismissNotificationContaining(`Invitation: ${MEETING_TITLE}`);
 
     await ownerMeetings.editMeeting(MEETING_TITLE, {newTitle: UPDATED_MEETING_TITLE});
 
@@ -143,9 +143,9 @@ test.describe('Meetings CRUD', () => {
     await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
     await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
 
+    await memberPage.reload();
     await memberMeetings.openMeetingsTab();
     await memberMeetings.waitForMeetingInList(MEETING_TITLE);
-    await memberMeetings.dismissNotificationContaining(`Invitation: ${MEETING_TITLE}`);
 
     await ownerMeetings.editMeeting(MEETING_TITLE, {updateStartTime: true});
 

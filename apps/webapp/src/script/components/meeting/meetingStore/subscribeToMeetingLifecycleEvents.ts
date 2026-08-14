@@ -48,17 +48,13 @@ export const subscribeToMeetingLifecycleEvents = ({
     dispatcher.enqueueMeetingSync(meetingId);
   };
 
-  const enqueueMeetingSyncWithNotification = (meetingId: QualifiedId, onSuccess: (meeting: MeetingSeries) => void) => {
-    dispatcher.enqueueMeetingSync(meetingId, onSuccess);
-  };
-
   const onMeetingUpdated = (meetingId: QualifiedId, actorId: QualifiedId) => {
     if (matchQualifiedIds(actorId, getSelfUserQualifiedId())) {
       dispatcher.enqueueMeetingSync(meetingId);
       return;
     }
 
-    enqueueMeetingSyncWithNotification(meetingId, notifyUpdate);
+    dispatcher.enqueueMeetingSync(meetingId, notifyUpdate);
   };
 
   const onMeetingMemberAdded = (meetingId: QualifiedId, actorId: QualifiedId) => {
@@ -67,7 +63,7 @@ export const subscribeToMeetingLifecycleEvents = ({
       return;
     }
 
-    enqueueMeetingSyncWithNotification(meetingId, notifyMeetingChange);
+    dispatcher.enqueueMeetingSync(meetingId, notifyMeetingChange);
   };
 
   const onMeetingDeleted = (meetingId: QualifiedId) => {

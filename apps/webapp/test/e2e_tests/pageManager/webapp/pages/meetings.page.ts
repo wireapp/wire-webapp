@@ -340,11 +340,6 @@ export class MeetingsPage {
     await expect(this.notificationCardContaining(text)).toBeVisible({timeout: MEETINGS_LIST_TIMEOUT_MS});
   }
 
-  async dismissNotificationContaining(text: string) {
-    await this.waitForNotificationContaining(text);
-    await this.notificationCardContaining(text).getByRole('button', {name: 'Dismiss'}).click();
-  }
-
   async expectNoNotificationContaining(text: string) {
     await expect(this.notificationCardContaining(text)).toHaveCount(0, {timeout: MEETINGS_LIST_TIMEOUT_MS});
   }

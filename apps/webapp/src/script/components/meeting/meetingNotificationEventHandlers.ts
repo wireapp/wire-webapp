@@ -118,6 +118,8 @@ export const createMeetingNotificationEventHandlers = ({
   const notifyMeetingCancellation = (meetingId: QualifiedId): void => {
     const meetingKey = toMeetingIdKey(meetingId);
 
+    notifiedMeetings.delete(meetingKey);
+
     if (cancelledMeetings.has(meetingKey)) {
       pending.delete(meetingKey);
       return;

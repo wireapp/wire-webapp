@@ -43,15 +43,17 @@ describe('subscribeToMeetingLifecycleEvents', () => {
   const activeUnsubscribeCallbacks: (() => void)[] = [];
 
   const subscribe = (dispatcher: MeetingLifecycleDispatcherDouble) => {
+    const notifyMeetingChange = jest.fn();
+    const notifyUpdate = jest.fn();
     const unsubscribe = subscribeToMeetingLifecycleEvents({
       dispatcher,
       getSelfUserQualifiedId: () => selfUserId,
-      notifyMeetingChange: jest.fn(),
-      notifyUpdate: jest.fn(),
+      notifyMeetingChange,
+      notifyUpdate,
     });
     activeUnsubscribeCallbacks.push(unsubscribe);
 
-    return unsubscribe;
+    return {notifyMeetingChange, notifyUpdate, unsubscribe};
   };
 
   afterEach(() => {
@@ -70,21 +72,21 @@ describe('subscribeToMeetingLifecycleEvents', () => {
 
   it('queues a meeting sync when a meeting updated event is published', () => {
     const dispatcher = createDispatcherDouble();
-    subscribe(dispatcher);
+    const {notifyUpdate} = subscribe(dispatcher);
 
     amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
 
-    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId, expect.any(Function));
+    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId, notifyUpdate);
     expect(dispatcher.enqueueMeetingRemoval).not.toHaveBeenCalled();
   });
 
   it('queues a meeting sync when a meeting member-added event is published', () => {
     const dispatcher = createDispatcherDouble();
-    subscribe(dispatcher);
+    const {notifyMeetingChange} = subscribe(dispatcher);
 
     amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, otherUserId);
 
-    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId, expect.any(Function));
+    expect(dispatcher.enqueueMeetingSync).toHaveBeenCalledWith(meetingId, notifyMeetingChange);
     expect(dispatcher.enqueueMeetingRemoval).not.toHaveBeenCalled();
   });
 
@@ -129,7 +131,7 @@ describe('subscribeToMeetingLifecycleEvents', () => {
 
   it('stops handling meeting lifecycle events after unsubscribing', () => {
     const dispatcher = createDispatcherDouble();
-    const unsubscribe = subscribe(dispatcher);
+    const {unsubscribe} = subscribe(dispatcher);
 
     unsubscribe();
 
