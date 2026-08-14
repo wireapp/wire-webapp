@@ -20,6 +20,10 @@
 import {render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  CellsSelfUserDriveRoleProvider,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
@@ -49,7 +53,13 @@ const defaultProps = {
   onFileContentRefresh: jest.fn(),
 };
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
+const createWrapper = (isViewerPermissionFeatureEnabled: boolean) =>
+  createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
+      translate,
+    }),
+  );
 
 describe('FileHeader', () => {
   beforeEach(() => {
@@ -60,17 +70,42 @@ describe('FileHeader', () => {
     container.reset();
   });
 
-  const renderHeader = (props: Partial<Parameters<typeof FileHeader>[0]> = {}) =>
-    render(withThemeAndRootContext(<FileHeader {...defaultProps} {...props} />, rootProviderWrapper));
+  const renderHeader = ({
+    isViewerPermissionFeatureEnabled = false,
+    props = {},
+  }: {
+    isViewerPermissionFeatureEnabled?: boolean;
+    props?: Partial<Parameters<typeof FileHeader>[0]>;
+  } = {}) =>
+    render(
+      withThemeAndRootContext(
+        <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
+          <FileHeader {...defaultProps} {...props} />
+        </CellsSelfUserDriveRoleProvider>,
+        createWrapper(isViewerPermissionFeatureEnabled),
+      ),
+    );
 
   it('hides download action when download is restricted', () => {
-    renderHeader({isDownloadRestricted: true});
+    renderHeader({isViewerPermissionFeatureEnabled: true});
 
     expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
   });
 
+  it('hides edit and version history actions for restricted viewers on editable files', () => {
+    renderHeader({
+      isViewerPermissionFeatureEnabled: true,
+      props: {
+        isEditable: true,
+      },
+    });
+
+    expect(screen.queryByRole('button', {name: 'Editing'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'More options'})).not.toBeInTheDocument();
+  });
+
   it('shows download action when download is allowed', () => {
-    renderHeader({isDownloadRestricted: false});
+    renderHeader({isViewerPermissionFeatureEnabled: false});
 
     expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
   });

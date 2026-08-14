@@ -24,11 +24,10 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
 import {
-  shouldRestrictCellsViewerActions,
-  useCellsSelfUserDriveRole,
+  CELLS_ACTION,
+  useCellsActionPermissions,
 } from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CellsNewFileModal} from './CellsNewFileModal/CellsNewFileModal';
@@ -46,15 +45,11 @@ interface CellsNewMenuProps {
 export type CellsNewFileType = 'document' | 'spreadsheet' | 'presentation';
 
 export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const selfUserDriveRole = useCellsSelfUserDriveRole();
+  const {translate} = useApplicationContext();
+  const canPerformCellsAction = useCellsActionPermissions();
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [isFileModalOpen, setIsFileModalOpen] = useState(false);
   const [fileType, setFileType] = useState<CellsNewFileType>('document');
-  const shouldHideRestrictedActions = shouldRestrictCellsViewerActions({
-    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
-    selfUserDriveRole,
-  });
 
   const openFolderModal = () => setIsFolderModalOpen(true);
 
@@ -71,7 +66,7 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
 
   return (
     <>
-      {!shouldHideRestrictedActions && (
+      {canPerformCellsAction(CELLS_ACTION.CREATE) && (
         <DropdownMenu>
           <DropdownMenu.Trigger asChild>
             <Button variant={ButtonVariant.TERTIARY} css={buttonStyles}>

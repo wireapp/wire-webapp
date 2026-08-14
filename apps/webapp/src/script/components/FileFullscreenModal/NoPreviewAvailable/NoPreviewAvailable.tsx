@@ -19,6 +19,10 @@
 
 import {Button} from '@wireapp/react-ui-kit';
 
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
@@ -28,16 +32,11 @@ interface NoPreviewAvailableProps {
   fileExtension: string;
   fileName: string;
   fileUrl?: string;
-  isDownloadRestricted?: boolean;
 }
 
-export const NoPreviewAvailable = ({
-  fileUrl,
-  fileName,
-  fileExtension,
-  isDownloadRestricted = false,
-}: NoPreviewAvailableProps) => {
+export const NoPreviewAvailable = ({fileUrl, fileName, fileExtension}: NoPreviewAvailableProps) => {
   const {translate} = useApplicationContext();
+  const canPerformCellsAction = useCellsActionPermissions();
   const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
 
   return (
@@ -45,7 +44,7 @@ export const NoPreviewAvailable = ({
       title={translate('fileFullscreenModal.noPreviewAvailable.title')}
       description={translate('fileFullscreenModal.noPreviewAvailable.description')}
       callToAction={
-        !isDownloadRestricted && (
+        canPerformCellsAction(CELLS_ACTION.DOWNLOAD) && (
           <Button
             onClick={() => forcedDownloadFile({url: fileUrl ?? '', name: fileNameWithExtension})}
             disabled={fileUrl === undefined || fileUrl.length === 0}

@@ -19,6 +19,9 @@
 
 import {createContext, type ReactNode, useContext} from 'react';
 
+import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+
 export const CELLS_SELF_USER_DRIVE_ROLE = {
   EDITOR: 'editor',
   VIEWER: 'viewer',
@@ -58,6 +61,53 @@ export const shouldRestrictCellsViewerActions = ({
   return isViewerPermissionFeatureEnabled && selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
 };
 
+export const CELLS_ACTION = {
+  CREATE: 'create',
+  DELETE: 'delete',
+  DOWNLOAD: 'download',
+  EDIT: 'edit',
+  MOVE: 'move',
+  RENAME: 'rename',
+  RESTORE: 'restore',
+  SHARE: 'share',
+  TAGS: 'tags',
+  VIEW_VERSION_HISTORY: 'viewVersionHistory',
+} as const;
+
+export type CellsAction = (typeof CELLS_ACTION)[keyof typeof CELLS_ACTION];
+
+const RESTRICTED_VIEWER_ACTIONS: readonly CellsAction[] = [
+  CELLS_ACTION.CREATE,
+  CELLS_ACTION.DELETE,
+  CELLS_ACTION.DOWNLOAD,
+  CELLS_ACTION.EDIT,
+  CELLS_ACTION.MOVE,
+  CELLS_ACTION.RENAME,
+  CELLS_ACTION.RESTORE,
+  CELLS_ACTION.SHARE,
+  CELLS_ACTION.TAGS,
+  CELLS_ACTION.VIEW_VERSION_HISTORY,
+];
+
+interface CanPerformCellsActionParams {
+  action: CellsAction;
+  isViewerPermissionFeatureEnabled: boolean;
+  selfUserDriveRole: CellsSelfUserDriveRole;
+}
+
+export const canPerformCellsAction = ({
+  action,
+  isViewerPermissionFeatureEnabled,
+  selfUserDriveRole,
+}: CanPerformCellsActionParams): boolean => {
+  if (!shouldRestrictCellsViewerActions({isViewerPermissionFeatureEnabled, selfUserDriveRole})) {
+    return true;
+  }
+
+  // Viewer restrictions are being rolled out incrementally, so actions stay allowed until explicitly restricted.
+  return !RESTRICTED_VIEWER_ACTIONS.includes(action);
+};
+
 const CellsSelfUserDriveRoleContext = createContext<CellsSelfUserDriveRole>(CELLS_SELF_USER_DRIVE_ROLE.EDITOR);
 
 interface CellsSelfUserDriveRoleProviderProps {
@@ -75,4 +125,17 @@ export const CellsSelfUserDriveRoleProvider = ({children, selfUserDriveRole}: Ce
 
 export const useCellsSelfUserDriveRole = (): CellsSelfUserDriveRole => {
   return useContext(CellsSelfUserDriveRoleContext);
+};
+
+export const useCellsActionPermissions = () => {
+  const {isFeatureToggleEnabled} = useApplicationContext();
+  const selfUserDriveRole = useCellsSelfUserDriveRole();
+  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
+
+  return (action: CellsAction) =>
+    canPerformCellsAction({
+      action,
+      isViewerPermissionFeatureEnabled,
+      selfUserDriveRole,
+    });
 };

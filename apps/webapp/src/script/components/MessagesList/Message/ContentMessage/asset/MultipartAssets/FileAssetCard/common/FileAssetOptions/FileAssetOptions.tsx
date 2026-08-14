@@ -20,11 +20,10 @@
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {
-  shouldRestrictCellsViewerActions,
-  useCellsSelfUserDriveRole,
+  CELLS_ACTION,
+  useCellsActionPermissions,
 } from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
@@ -40,15 +39,11 @@ interface FileAssetOptionsProps {
 }
 
 export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOptionsProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const selfUserDriveRole = useCellsSelfUserDriveRole();
+  const {translate} = useApplicationContext();
+  const canPerformCellsAction = useCellsActionPermissions();
   const fileNameWithExtension = getFileNameWithExtension(name, extension);
   const isEditable = isFileEditable(extension);
   const {showModal} = useFileHistoryModal();
-  const isDownloadRestricted = shouldRestrictCellsViewerActions({
-    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
-    selfUserDriveRole,
-  });
 
   return (
     <DropdownMenu>
@@ -59,15 +54,17 @@ export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOp
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <DropdownMenu.Item onClick={onOpen}>{translate('cells.options.open')}</DropdownMenu.Item>
-        {isEditable && (
+        {isEditable && canPerformCellsAction(CELLS_ACTION.EDIT) && (
           <>
             <DropdownMenu.Item onClick={() => onOpen(true)}>{translate('cells.options.edit')}</DropdownMenu.Item>
-            <DropdownMenu.Item onClick={() => showModal(id, () => onOpen(false))}>
-              {translate('cells.options.versionHistory')}
-            </DropdownMenu.Item>
           </>
         )}
-        {!isDownloadRestricted && src !== undefined && src !== '' && (
+        {isEditable && canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY) && (
+          <DropdownMenu.Item onClick={() => showModal(id, () => onOpen(false))}>
+            {translate('cells.options.versionHistory')}
+          </DropdownMenu.Item>
+        )}
+        {canPerformCellsAction(CELLS_ACTION.DOWNLOAD) && src !== undefined && src !== '' && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url: src, name: fileNameWithExtension})}>
             {translate('cells.options.download')}
           </DropdownMenu.Item>

@@ -17,7 +17,18 @@
  *
  */
 
+import type {ReactNode} from 'react';
+
 import {render, screen} from '@testing-library/react';
+
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  CellsSelfUserDriveRoleProvider,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FileFullscreenModal} from './FileFullscreenModal';
 
@@ -26,11 +37,7 @@ jest.mock('Components/fullscreenModal/fullscreenModal', () => ({
 }));
 
 jest.mock('./FileHeader/FileHeader', () => ({
-  FileHeader: ({isDownloadRestricted}: {isDownloadRestricted?: boolean}) => (
-    <div data-uie-name="file-header" data-download-restricted={String(isDownloadRestricted === true)}>
-      Header
-    </div>
-  ),
+  FileHeader: () => <div data-uie-name="file-header">Header</div>,
 }));
 
 jest.mock('./FileEditor/FileEditor', () => {
@@ -60,11 +67,7 @@ jest.mock('./ImageFileView/ImageFileView', () => ({
 }));
 
 jest.mock('./NoPreviewAvailable/NoPreviewAvailable', () => ({
-  NoPreviewAvailable: ({isDownloadRestricted}: {isDownloadRestricted?: boolean}) => (
-    <div data-uie-name="no-preview" data-download-restricted={String(isDownloadRestricted === true)}>
-      No preview available
-    </div>
-  ),
+  NoPreviewAvailable: () => <div data-uie-name="no-preview">No preview available</div>,
 }));
 
 jest.mock('./PdfViewer/PdfViewer', () => ({
@@ -72,6 +75,20 @@ jest.mock('./PdfViewer/PdfViewer', () => ({
 }));
 
 describe('FileFullscreenModal - File Version Restore', () => {
+  const RootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      isFeatureToggleEnabled: () => false,
+      translate: key => key,
+    }),
+  );
+  const wrapper = ({children}: {children: ReactNode}) => (
+    <RootProviderWrapper>
+      <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.EDITOR}>
+        {children}
+      </CellsSelfUserDriveRoleProvider>
+    </RootProviderWrapper>
+  );
+
   const defaultProps = {
     id: 'test-file-id',
     isOpen: true,
@@ -88,26 +105,26 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
   describe('Modal Rendering', () => {
     it('should render file header when modal is open', () => {
-      render(<FileFullscreenModal {...defaultProps} />);
+      render(<FileFullscreenModal {...defaultProps} />, {wrapper});
 
       expect(screen.getByTestId('file-header')).toBeInTheDocument();
     });
 
     it('should not render when modal is closed', () => {
-      render(<FileFullscreenModal {...defaultProps} isOpen={false} />);
+      render(<FileFullscreenModal {...defaultProps} isOpen={false} />, {wrapper});
 
       expect(screen.queryByTestId('file-header')).not.toBeInTheDocument();
     });
 
     it('should render editor in edit mode for editable files', () => {
-      render(<FileFullscreenModal {...defaultProps} isEditMode />);
+      render(<FileFullscreenModal {...defaultProps} isEditMode />, {wrapper});
 
       expect(screen.getByTestId('file-editor')).toBeInTheDocument();
       expect(screen.queryByTestId('no-preview')).not.toBeInTheDocument();
     });
 
     it('should render content in view mode', () => {
-      render(<FileFullscreenModal {...defaultProps} isEditMode={false} />);
+      render(<FileFullscreenModal {...defaultProps} isEditMode={false} />, {wrapper});
 
       expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
       expect(screen.getByTestId('no-preview')).toBeInTheDocument();
@@ -116,7 +133,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
   describe('Edit Mode Handling', () => {
     it('should switch from edit to view mode', () => {
-      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode />);
+      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode />, {wrapper});
 
       expect(screen.getByTestId('file-editor')).toBeInTheDocument();
 
@@ -127,14 +144,16 @@ describe('FileFullscreenModal - File Version Restore', () => {
     });
 
     it('should not show editor for non-editable files', () => {
-      render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.pdf" fileExtension="pdf" isEditMode />);
+      render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.pdf" fileExtension="pdf" isEditMode />, {
+        wrapper,
+      });
 
       expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
       expect(screen.getByTestId('pdf-viewer')).toBeInTheDocument();
     });
 
     it('should update edit mode when prop changes', () => {
-      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode={false} />);
+      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode={false} />, {wrapper});
 
       expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
 
@@ -146,46 +165,31 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
   describe('Content Rendering Based on File Type', () => {
     it('should render PDF viewer for PDF files', () => {
-      render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.pdf" fileExtension="pdf" />);
+      render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.pdf" fileExtension="pdf" />, {wrapper});
 
       expect(screen.getByTestId('pdf-viewer')).toBeInTheDocument();
-    });
-
-    it('keeps rendering PDF preview when download is restricted', () => {
-      render(
-        <FileFullscreenModal {...defaultProps} filePreviewUrl="file.pdf" fileExtension="pdf" isDownloadRestricted />,
-      );
-
-      expect(screen.getByTestId('pdf-viewer')).toBeInTheDocument();
-      expect(screen.getByTestId('file-header')).toHaveAttribute('data-download-restricted', 'true');
     });
 
     it('should render image viewer for image files', () => {
-      render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.png" fileExtension="png" />);
+      render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.png" fileExtension="png" />, {wrapper});
 
       expect(screen.getByTestId('image-view')).toBeInTheDocument();
     });
 
     it('should show loader when loading', () => {
-      render(<FileFullscreenModal {...defaultProps} status="loading" filePreviewUrl={undefined} />);
+      render(<FileFullscreenModal {...defaultProps} status="loading" filePreviewUrl={undefined} />, {wrapper});
 
       expect(screen.getByTestId('file-loader')).toBeInTheDocument();
     });
 
     it('should show no preview when unavailable', () => {
-      render(<FileFullscreenModal {...defaultProps} status="unavailable" />);
+      render(<FileFullscreenModal {...defaultProps} status="unavailable" />, {wrapper});
 
       expect(screen.getByTestId('no-preview')).toBeInTheDocument();
     });
 
-    it('restricts download when preview is unavailable', () => {
-      render(<FileFullscreenModal {...defaultProps} status="unavailable" isDownloadRestricted />);
-
-      expect(screen.getByTestId('no-preview')).toHaveAttribute('data-download-restricted', 'true');
-    });
-
     it('should show no preview when filePreviewUrl is missing', () => {
-      render(<FileFullscreenModal {...defaultProps} filePreviewUrl={undefined} status="success" />);
+      render(<FileFullscreenModal {...defaultProps} filePreviewUrl={undefined} status="success" />, {wrapper});
 
       expect(screen.getByTestId('no-preview')).toBeInTheDocument();
     });
@@ -193,7 +197,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
   describe('Modal Close Behavior', () => {
     it('should reset edit mode state when closing', () => {
-      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode />);
+      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode />, {wrapper});
 
       expect(screen.getByTestId('file-editor')).toBeInTheDocument();
 
@@ -215,6 +219,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
           fileExtension="jpg"
           fileUrl="https://example.com/original.jpg"
         />,
+        {wrapper},
       );
 
       expect(screen.getByTestId('image-view')).toHaveAttribute('data-src', 'https://example.com/original.jpg');
@@ -228,6 +233,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
           fileExtension="heic"
           fileUrl="https://example.com/original.heic"
         />,
+        {wrapper},
       );
 
       expect(screen.getByTestId('image-view')).toHaveAttribute('data-src', 'https://example.com/preview.jpg');
@@ -241,6 +247,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
           fileExtension="jpg"
           fileUrl={undefined}
         />,
+        {wrapper},
       );
 
       expect(screen.getByTestId('image-view')).toHaveAttribute('data-src', 'https://example.com/preview.jpg');
@@ -249,7 +256,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
   describe('Content Refresh After Version Restore', () => {
     it('should render fresh content when component remounts', () => {
-      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode />);
+      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode />, {wrapper});
 
       const firstRender = screen.getByTestId('file-editor');
       expect(firstRender).toBeInTheDocument();
@@ -265,6 +272,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
     it('should allow switching between different file types', () => {
       const {rerender} = render(
         <FileFullscreenModal {...defaultProps} filePreviewUrl="file.pdf" fileExtension="pdf" />,
+        {wrapper},
       );
 
       expect(screen.getByTestId('pdf-viewer')).toBeInTheDocument();
@@ -279,7 +287,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
   describe('Behavior for Recycled Files', () => {
     it('should not allow editing if file is in recycle bin', () => {
-      render(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => true} />);
+      render(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => true} />, {wrapper});
 
       expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
       expect(screen.getByTestId('no-preview')).toBeInTheDocument();
@@ -288,6 +296,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
     it('should keep view mode when edit mode prop changes while file is in recycle bin', () => {
       const {rerender} = render(
         <FileFullscreenModal {...defaultProps} isEditMode={false} checkIsInRecycleBin={() => true} />,
+        {wrapper},
       );
 
       expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
@@ -299,7 +308,12 @@ describe('FileFullscreenModal - File Version Restore', () => {
     });
 
     it('should be editable and previewable if file is not in recycle bin', () => {
-      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => false} />);
+      const {rerender} = render(
+        <FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => false} />,
+        {
+          wrapper,
+        },
+      );
 
       expect(screen.getByTestId('file-editor')).toBeInTheDocument();
       expect(screen.queryByTestId('no-preview')).not.toBeInTheDocument();

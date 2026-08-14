@@ -25,8 +25,8 @@ import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useAppNotification} from 'Components/appNotification/appNotification';
 import {
-  shouldRestrictCellsViewerActions,
-  useCellsSelfUserDriveRole,
+  CELLS_ACTION,
+  useCellsActionPermissions,
 } from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {
@@ -35,7 +35,6 @@ import {
 } from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/fileTypeUtil';
@@ -103,8 +102,8 @@ const CellsTableRowOptionsContent = ({
   onRefresh,
   onCloseSearchView,
 }: CellsTableRowOptionsProps) => {
-  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
-  const selfUserDriveRole = useCellsSelfUserDriveRole();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const canPerformCellsAction = useCellsActionPermissions();
   const {handleOpenFile} = useCellsFilePreviewModal();
   const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
@@ -140,12 +139,18 @@ const CellsTableRowOptionsContent = ({
 
   const isRootRecycleBin = isRootRecycleBinPath();
   const isNestedRecycleBin = isInRecycleBin();
-  const shouldHideRestrictedActions = shouldRestrictCellsViewerActions({
-    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
-    selfUserDriveRole,
-  });
-
   const isEditable = node.type === CellNodeType.FILE && isFileEditable(node.extension);
+  const canShare = canPerformCellsAction(CELLS_ACTION.SHARE);
+  const canDelete = canPerformCellsAction(CELLS_ACTION.DELETE);
+  const canDownload = canPerformCellsAction(CELLS_ACTION.DOWNLOAD);
+  const canEdit = canPerformCellsAction(CELLS_ACTION.EDIT);
+  const canMove = canPerformCellsAction(CELLS_ACTION.MOVE);
+  const canRename = canPerformCellsAction(CELLS_ACTION.RENAME);
+  const canRestore = canPerformCellsAction(CELLS_ACTION.RESTORE);
+  const canTag = canPerformCellsAction(CELLS_ACTION.TAGS);
+  const canViewVersionHistory = canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY);
+  const hasVisibleFileActions =
+    canShare || canDownload || canRename || canMove || canTag || canEdit || canViewVersionHistory || canDelete;
 
   const onConfirmRestore = useCallback(() => {
     onRefresh();
@@ -164,8 +169,8 @@ const CellsTableRowOptionsContent = ({
         >
           {translate('cells.options.open')}
         </DropdownMenu.Item>
-        {!shouldHideRestrictedActions && (
-          <>
+        <>
+          {canRestore && (
             <DropdownMenu.Item
               onClick={() =>
                 isRootRecycleBin
@@ -184,6 +189,8 @@ const CellsTableRowOptionsContent = ({
             >
               {translate('cells.options.restore')}
             </DropdownMenu.Item>
+          )}
+          {canDelete && (
             <DropdownMenu.Item
               onClick={() =>
                 showDeletePermanentlyModal({
@@ -195,8 +202,8 @@ const CellsTableRowOptionsContent = ({
             >
               {translate('cells.options.deletePermanently')}
             </DropdownMenu.Item>
-          </>
-        )}
+          )}
+        </>
       </DropdownMenu.Content>
     );
   }
@@ -213,58 +220,68 @@ const CellsTableRowOptionsContent = ({
         >
           {translate('cells.options.open')}
         </DropdownMenu.Item>
-        {!shouldHideRestrictedActions && (
+        {hasVisibleFileActions && (
           <>
-            <DropdownMenu.Item
-              onClick={() =>
-                showShareModal({
-                  type: node.type,
-                  uuid: node.id,
-                  conversationId: conversationQualifiedId.id,
-                  cellsRepository,
-                  fireAndForgetInvoker,
-                  translate,
-                })
-              }
-            >
-              {translate('cells.options.share')}
-            </DropdownMenu.Item>
+            {canShare && (
+              <DropdownMenu.Item
+                onClick={() =>
+                  showShareModal({
+                    type: node.type,
+                    uuid: node.id,
+                    conversationId: conversationQualifiedId.id,
+                    cellsRepository,
+                    fireAndForgetInvoker,
+                    translate,
+                  })
+                }
+              >
+                {translate('cells.options.share')}
+              </DropdownMenu.Item>
+            )}
 
-            {url !== undefined && url.length > 0 && (
+            {canDownload && url !== undefined && url.length > 0 && (
               <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
                 {translate('cells.options.download')}
               </DropdownMenu.Item>
             )}
-            <DropdownMenu.Item onClick={() => setIsRenameNodeModalOpen(true)}>
-              {translate('cells.options.rename')}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>
-              {translate('cells.options.move')}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>
-              {translate('cells.options.tags')}
-            </DropdownMenu.Item>
-            {isEditable && (
-              <>
-                <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>
-                  {translate('cells.options.edit')}
-                </DropdownMenu.Item>
-                <DropdownMenu.Item onClick={() => showModal(node.id, onConfirmRestore)}>
-                  {translate('cells.options.versionHistory')}
-                </DropdownMenu.Item>
-              </>
+            {canRename && (
+              <DropdownMenu.Item onClick={() => setIsRenameNodeModalOpen(true)}>
+                {translate('cells.options.rename')}
+              </DropdownMenu.Item>
             )}
-            <DropdownMenu.Item
-              onClick={() =>
-                showMoveToRecycleBinModal({
-                  node,
-                  onMoveToRecycleBin: () => deleteNode({uuid: node.id, permanently: false}),
-                  translate,
-                })
-              }
-            >
-              {translate('cells.options.delete')}
-            </DropdownMenu.Item>
+            {canMove && (
+              <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>
+                {translate('cells.options.move')}
+              </DropdownMenu.Item>
+            )}
+            {canTag && (
+              <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>
+                {translate('cells.options.tags')}
+              </DropdownMenu.Item>
+            )}
+            {isEditable && canEdit && (
+              <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>
+                {translate('cells.options.edit')}
+              </DropdownMenu.Item>
+            )}
+            {isEditable && canViewVersionHistory && (
+              <DropdownMenu.Item onClick={() => showModal(node.id, onConfirmRestore)}>
+                {translate('cells.options.versionHistory')}
+              </DropdownMenu.Item>
+            )}
+            {canDelete && (
+              <DropdownMenu.Item
+                onClick={() =>
+                  showMoveToRecycleBinModal({
+                    node,
+                    onMoveToRecycleBin: () => deleteNode({uuid: node.id, permanently: false}),
+                    translate,
+                  })
+                }
+              >
+                {translate('cells.options.delete')}
+              </DropdownMenu.Item>
+            )}
           </>
         )}
       </DropdownMenu.Content>
