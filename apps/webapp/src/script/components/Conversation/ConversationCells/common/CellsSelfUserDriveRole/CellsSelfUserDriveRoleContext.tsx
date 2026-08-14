@@ -104,6 +104,7 @@ export const canPerformCellsAction = ({
     return true;
   }
 
+  // Viewer restrictions are being rolled out incrementally, so actions stay allowed until explicitly restricted.
   return !RESTRICTED_VIEWER_ACTIONS.includes(action);
 };
 
