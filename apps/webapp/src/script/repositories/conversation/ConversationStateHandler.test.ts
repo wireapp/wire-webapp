@@ -30,7 +30,8 @@ import type {ConversationService} from './ConversationService';
 import {Conversation} from '../entity/Conversation';
 
 function buildHandler() {
-  const conversationService: jest.Mocked<Pick<ConversationService, 'putConversationAccess'>> = {
+  const conversationService: jest.Mocked<Pick<ConversationService, 'deleteConversationCode' | 'putConversationAccess'>> = {
+    deleteConversationCode: jest.fn(),
     putConversationAccess: jest.fn(),
   };
   const translate = jest.fn((key: Parameters<Translate>[0]) => `translated:${key}`) as Translate;
@@ -59,6 +60,35 @@ describe('ConversationStateHandler', () => {
   });
 
   describe('changeAccessState', () => {
+    it.each([
+      [ACCESS_STATE.TEAM.TEAM_ONLY, ACCESS_STATE.TEAM.SERVICES],
+      [ACCESS_STATE.TEAM.SERVICES, ACCESS_STATE.TEAM.TEAM_ONLY],
+    ])('does not revoke an access code when toggling apps from %s to %s', async (previousState, nextState) => {
+      const {conversationService, translate, handler} = buildHandler();
+      const conversation = buildConversation(true);
+      conversation.accessState(previousState);
+
+      await handler.changeAccessState(conversation, nextState);
+
+      expect(conversationService.deleteConversationCode).not.toHaveBeenCalled();
+      expect(conversationService.putConversationAccess).toHaveBeenCalled();
+      expect(translate).not.toHaveBeenCalledWith('modalConversationGuestOptionsRevokeCodeMessage');
+      expect(conversation.accessState()).toBe(nextState);
+    });
+
+    it('revokes the access code when disabling guest access', async () => {
+      const {conversationService, handler} = buildHandler();
+      const conversation = buildConversation(true);
+      conversation.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+      conversation.accessCode('access-code');
+
+      await handler.changeAccessState(conversation, ACCESS_STATE.TEAM.TEAM_ONLY);
+
+      expect(conversationService.deleteConversationCode).toHaveBeenCalledWith('conversation-id');
+      expect(conversation.accessCode()).toBe('');
+      expect(conversationService.putConversationAccess).toHaveBeenCalled();
+    });
+
     it('shows the app allow-failure modal with the app translation key when granting service access fails', async () => {
       const {conversationService, translate, handler} = buildHandler();
       conversationService.putConversationAccess.mockRejectedValue(new Error('Expected unit test error'));
