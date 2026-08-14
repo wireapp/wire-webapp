@@ -52,6 +52,10 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
     isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
     selfUserDriveRole: node.selfUserDriveRole,
   });
+  // DropdownMenu.Item disabled state is visual/ARIA only for native onClick handlers.
+  // Keep restricted actions without a handler so viewer access cannot activate them.
+  const restrictedActionClickHandler = <ClickHandler extends () => void>(clickHandler: ClickHandler) =>
+    shouldDisableRestrictedActions ? undefined : clickHandler;
 
   return (
     <DropdownMenu>
@@ -69,26 +73,21 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
         </DropdownMenu.Item>
         <DropdownMenu.Item
           disabled={shouldDisableRestrictedActions}
-          onClick={
-            shouldDisableRestrictedActions
-              ? undefined
-              : () => showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker, translate})
-          }
+          onClick={restrictedActionClickHandler(() =>
+            showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker, translate}),
+          )}
         >
           {translate('cells.options.share')}
         </DropdownMenu.Item>
         {isNonEmptyString(url) && (
           <DropdownMenu.Item
             disabled={shouldDisableRestrictedActions}
-            onClick={
-              shouldDisableRestrictedActions
-                ? undefined
-                : () =>
-                    forcedDownloadFile({
-                      url,
-                      name,
-                    })
-            }
+            onClick={restrictedActionClickHandler(() =>
+              forcedDownloadFile({
+                url,
+                name,
+              }),
+            )}
           >
             {translate('cells.options.download')}
           </DropdownMenu.Item>
