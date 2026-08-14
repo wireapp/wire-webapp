@@ -19,6 +19,10 @@
 
 import {render, screen} from '@testing-library/react';
 
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  CellsSelfUserDriveRoleProvider,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -40,14 +44,22 @@ const defaultProps = {
   fileUrl: 'https://example.com/archive.zip',
 };
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
+const createWrapper = (isViewerPermissionFeatureEnabled: boolean) =>
+  createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
+      translate,
+    }),
+  );
 
 describe('NoPreviewAvailable', () => {
-  const renderPlaceholder = (isDownloadRestricted: boolean) =>
+  const renderPlaceholder = (isViewerPermissionFeatureEnabled: boolean) =>
     render(
       withThemeAndRootContext(
-        <NoPreviewAvailable {...defaultProps} isDownloadRestricted={isDownloadRestricted} />,
-        rootProviderWrapper,
+        <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
+          <NoPreviewAvailable {...defaultProps} />
+        </CellsSelfUserDriveRoleProvider>,
+        createWrapper(isViewerPermissionFeatureEnabled),
       ),
     );
 

@@ -21,6 +21,10 @@ import {useEffect, useState} from 'react';
 
 import {Maybe} from 'true-myth';
 
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/fullscreenModal/fullscreenModal';
@@ -50,7 +54,6 @@ interface FileFullscreenModalProps {
   timestamp: number;
   badges?: string[];
   isEditMode?: boolean;
-  isDownloadRestricted?: boolean;
   checkIsInRecycleBin?: () => boolean;
 }
 
@@ -67,11 +70,13 @@ export const FileFullscreenModal = ({
   timestamp,
   badges,
   isEditMode = false,
-  isDownloadRestricted = false,
   checkIsInRecycleBin = isInRecycleBin,
 }: FileFullscreenModalProps) => {
   const notInRecycleBin = !checkIsInRecycleBin();
-  const [isEditableState, setIsEditableState] = useState(isEditMode && notInRecycleBin);
+  const canPerformCellsAction = useCellsActionPermissions();
+  const [isEditableState, setIsEditableState] = useState(
+    isEditMode && notInRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT),
+  );
   const [refreshKey, setRefreshKey] = useState(0);
   const isEditable = isFileEditable(fileExtension);
 
@@ -85,8 +90,8 @@ export const FileFullscreenModal = ({
   };
 
   useEffect(() => {
-    setIsEditableState(isEditMode && notInRecycleBin);
-  }, [isEditMode, notInRecycleBin]);
+    setIsEditableState(isEditMode && notInRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT));
+  }, [canPerformCellsAction, isEditMode, notInRecycleBin]);
 
   return (
     <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>
@@ -103,7 +108,6 @@ export const FileFullscreenModal = ({
         isEditable={isEditable}
         id={id}
         onFileContentRefresh={refreshModalContent}
-        isDownloadRestricted={isDownloadRestricted}
       />
       {isEditableState && isEditable ? (
         <FileEditor key={refreshKey} id={id} />
@@ -117,7 +121,6 @@ export const FileFullscreenModal = ({
           senderName={senderName}
           timestamp={timestamp}
           status={status}
-          isDownloadRestricted={isDownloadRestricted}
         />
       )}
     </FullscreenModal>
@@ -132,7 +135,6 @@ interface ModalContentProps {
   timestamp: number;
   filePreviewUrl?: string;
   fileUrl?: string;
-  isDownloadRestricted: boolean;
 }
 
 const ModalContent = ({
@@ -143,21 +145,13 @@ const ModalContent = ({
   senderName,
   timestamp,
   status,
-  isDownloadRestricted,
 }: ModalContentProps) => {
   if (status === 'loading' && (filePreviewUrl === undefined || filePreviewUrl.length === 0)) {
     return <FileLoader />;
   }
 
   if (status === 'unavailable' || filePreviewUrl === undefined || filePreviewUrl.length === 0) {
-    return (
-      <NoPreviewAvailable
-        fileUrl={fileUrl}
-        fileName={fileName}
-        fileExtension={fileExtension}
-        isDownloadRestricted={isDownloadRestricted}
-      />
-    );
+    return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
   }
 
   const extension = getFileExtensionFromUrl(filePreviewUrl);
@@ -177,12 +171,5 @@ const ModalContent = ({
     return <ImageFileView src={imageSrc} senderName={senderName} timestamp={timestamp} />;
   }
 
-  return (
-    <NoPreviewAvailable
-      fileUrl={fileUrl}
-      fileName={fileName}
-      fileExtension={fileExtension}
-      isDownloadRestricted={isDownloadRestricted}
-    />
-  );
+  return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
 };

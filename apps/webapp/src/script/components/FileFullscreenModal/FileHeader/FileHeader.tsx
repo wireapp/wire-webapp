@@ -33,6 +33,10 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {EditIcon} from 'Components/icon';
 import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/FileAssetCard/common/FileAssetOptions/FileAssetOptions.styles';
@@ -66,7 +70,6 @@ interface FileHeaderProps {
   fileUrl?: string;
   isEditable?: boolean;
   isInEditMode?: boolean;
-  isDownloadRestricted?: boolean;
   onEditModeChange: (isEditable: boolean) => void;
   onFileContentRefresh: () => void;
 }
@@ -82,11 +85,11 @@ export const FileHeader = ({
   badges,
   isEditable,
   isInEditMode,
-  isDownloadRestricted = false,
   onEditModeChange,
   onFileContentRefresh,
 }: FileHeaderProps) => {
   const {translate} = useApplicationContext();
+  const canPerformCellsAction = useCellsActionPermissions();
   const relativeTimestampFormatter = useMemo(() => {
     return createRelativeTimestampFormatter({
       justNow: translate('conversationJustNow'),
@@ -99,6 +102,7 @@ export const FileHeader = ({
   const isRecycleBin = isInRecycleBin();
   const cellsRepository = container.resolve(CellsRepository);
   const {showModal} = useFileHistoryModal();
+  const canViewVersionHistory = canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY);
 
   const handleFileDownload = async () => {
     if (fileUrl !== undefined && fileUrl.length > 0) {
@@ -140,7 +144,7 @@ export const FileHeader = ({
             <ShowIcon width={16} height={16} />
             Viewing
           </button>
-          {!isRecycleBin && (
+          {!isRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT) && (
             <button
               title="Editing"
               aria-label="Editing"
@@ -154,7 +158,7 @@ export const FileHeader = ({
         </div>
       )}
       <div css={actionButtonsStyles}>
-        {!isRecycleBin && !isDownloadRestricted && (
+        {!isRecycleBin && canPerformCellsAction(CELLS_ACTION.DOWNLOAD) && (
           <Button
             variant={ButtonVariant.TERTIARY}
             css={downloadButtonStyles}
@@ -165,7 +169,7 @@ export const FileHeader = ({
             <DownloadIcon />
           </Button>
         )}
-        {!isRecycleBin && isEditable === true && (
+        {!isRecycleBin && isEditable === true && canViewVersionHistory && (
           <DropdownMenu>
             <DropdownMenu.Trigger asChild>
               <Button
@@ -177,7 +181,11 @@ export const FileHeader = ({
               </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh(), !isDownloadRestricted)}>
+              <DropdownMenu.Item
+                onClick={() =>
+                  showModal(id, () => onFileContentRefresh(), canPerformCellsAction(CELLS_ACTION.DOWNLOAD))
+                }
+              >
                 {translate('cells.options.versionHistory')}
               </DropdownMenu.Item>
             </DropdownMenu.Content>

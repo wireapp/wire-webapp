@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  shouldRestrictCellsViewerActions,
-  useCellsSelfUserDriveRole,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface FilePreviewModalProps {
   id: string;
@@ -56,13 +50,6 @@ export const FilePreviewModal = ({
   isError,
   isEditMode,
 }: FilePreviewModalProps) => {
-  const {isFeatureToggleEnabled} = useApplicationContext();
-  const selfUserDriveRole = useCellsSelfUserDriveRole();
-  const isDownloadRestricted = shouldRestrictCellsViewerActions({
-    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
-    selfUserDriveRole,
-  });
-
   const getFileUrl = () => {
     if (fileExtension === 'pdf') {
       return fileUrl;
@@ -96,7 +83,6 @@ export const FilePreviewModal = ({
       onClose={onClose}
       status={getStatus()}
       isEditMode={isEditMode}
-      isDownloadRestricted={isDownloadRestricted}
     />
   );
 };

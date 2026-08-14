@@ -18,6 +18,8 @@
  */
 
 import {
+  canPerformCellsAction,
+  CELLS_ACTION,
   CELLS_SELF_USER_DRIVE_ROLE,
   getSelfUserDriveRole,
   shouldRestrictCellsViewerActions,
@@ -75,5 +77,37 @@ describe('shouldRestrictCellsViewerActions', () => {
         selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
       }),
     ).toBe(false);
+  });
+});
+
+describe('canPerformCellsAction', () => {
+  it('blocks version history for viewer access when the feature flag is enabled', () => {
+    expect(
+      canPerformCellsAction({
+        action: CELLS_ACTION.VIEW_VERSION_HISTORY,
+        isViewerPermissionFeatureEnabled: true,
+        selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      }),
+    ).toBe(false);
+  });
+
+  it('blocks restricted actions for viewer access when the feature flag is enabled', () => {
+    expect(
+      canPerformCellsAction({
+        action: CELLS_ACTION.RESTORE,
+        isViewerPermissionFeatureEnabled: true,
+        selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      }),
+    ).toBe(false);
+  });
+
+  it('allows restricted actions for viewer access when the feature flag is disabled', () => {
+    expect(
+      canPerformCellsAction({
+        action: CELLS_ACTION.DOWNLOAD,
+        isViewerPermissionFeatureEnabled: false,
+        selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      }),
+    ).toBe(true);
   });
 });
