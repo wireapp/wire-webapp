@@ -156,6 +156,12 @@ const syncParticipantsAfterMeetingUpdate = (
   }).mapRejected(mapSyncErrorToSubmitError);
 };
 
+const hasMeetingMetadataChanged = (command: UpdateMeetingCommand): boolean =>
+  command.title.trim() !== command.originalTitle.trim() ||
+  command.start.getTime() !== command.originalStart.getTime() ||
+  command.end.getTime() !== command.originalEnd.getTime() ||
+  command.recurrence !== command.originalRecurrence;
+
 /**
  * Updates meeting metadata, syncs conversation participants, then heals the
  * dedicated meeting conversation name when it differs from the meeting title.
@@ -165,6 +171,10 @@ export const updateMeeting = (
   deps: MeetingServiceDeps,
 ): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
   const {usersToAdd, userIdsToRemove} = computeParticipantDiff(command.originalSelectedUsers, command.selectedUsers);
+
+  if (!hasMeetingMetadataChanged(command)) {
+    return syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove);
+  }
 
   return deps.meetingsRepository
     .updateMeeting(command.meetingId, mapUpdateCommandToUpdateMeeting(command))

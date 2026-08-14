@@ -54,6 +54,9 @@ type SubmitMeetingParams = {
   mode: ScheduleMeetingMode;
   editingMeetingId: Maybe<QualifiedId>;
   qualifiedConversation: Maybe<QualifiedId>;
+  originalTitle: string;
+  originalStart: Maybe<Date>;
+  originalEnd: Maybe<Date>;
   originalRecurrence: ScheduleMeetingFormState['recurrence'];
   originalSelectedUsers: User[];
   wallClock: WallClock;
@@ -66,6 +69,9 @@ const submitMeeting = ({
   mode,
   editingMeetingId,
   qualifiedConversation,
+  originalTitle,
+  originalStart,
+  originalEnd,
   originalRecurrence,
   originalSelectedUsers,
   wallClock,
@@ -86,10 +92,17 @@ const submitMeeting = ({
     return task.reject(meetingSubmitErrors.editMeetingIdMissing);
   }
 
+  if (originalStart.isNothing || originalEnd.isNothing) {
+    return task.reject(meetingSubmitErrors.updateFailed);
+  }
+
   const commandResult = mapScheduleFormToUpdateMeetingCommand({
     formState,
     meetingId: editingMeetingId.value,
     qualifiedConversation,
+    originalTitle,
+    originalStart: originalStart.value,
+    originalEnd: originalEnd.value,
     originalRecurrence,
     originalSelectedUsers,
     wallClock,
@@ -113,6 +126,9 @@ export const useScheduleMeetingSubmit = () => {
   const mode = useScheduleMeetingModal(state => state.mode);
   const editingMeetingId = useScheduleMeetingModal(state => state.editingMeetingId);
   const qualifiedConversation = useScheduleMeetingModal(state => state.qualifiedConversation);
+  const originalTitle = useScheduleMeetingModal(state => state.originalTitle);
+  const originalStart = useScheduleMeetingModal(state => state.originalStart);
+  const originalEnd = useScheduleMeetingModal(state => state.originalEnd);
   const originalRecurrence = useScheduleMeetingModal(state => state.originalRecurrence);
   const originalSelectedUsers = useScheduleMeetingModal(state => state.originalSelectedUsers);
 
@@ -125,6 +141,9 @@ export const useScheduleMeetingSubmit = () => {
         mode,
         editingMeetingId,
         qualifiedConversation,
+        originalTitle,
+        originalStart,
+        originalEnd,
         originalRecurrence,
         originalSelectedUsers,
         wallClock,
@@ -175,6 +194,9 @@ export const useScheduleMeetingSubmit = () => {
       loadMeetings,
       mode,
       originalRecurrence,
+      originalTitle,
+      originalStart,
+      originalEnd,
       originalSelectedUsers,
       qualifiedConversation,
       scheduleMeeting,

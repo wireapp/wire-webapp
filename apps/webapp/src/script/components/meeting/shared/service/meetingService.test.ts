@@ -57,6 +57,9 @@ const updateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): UpdateMee
   start: futureStartDate,
   end: futureEndDate,
   recurrence: 'doesNotRepeat',
+  originalTitle: 'Weekly sync',
+  originalStart: futureStartDate,
+  originalEnd: futureEndDate,
   originalRecurrence: 'doesNotRepeat',
   selectedUsers: [],
   originalSelectedUsers: [],
@@ -396,6 +399,7 @@ describe('updateMeeting', () => {
 
     const result = await updateMeeting(
       updateCommand({
+        originalStart: new Date(futureStartDate.getTime() - 60_000),
         selectedUsers: [bob, charlie],
         originalSelectedUsers: [alice, bob],
       }),
@@ -413,7 +417,7 @@ describe('updateMeeting', () => {
     expect(safeAddUsers).toHaveBeenCalledWith(establishedConversation, [charlie]);
   });
 
-  it('does not sync participants when the selection is unchanged', async () => {
+  it('does not update or sync when metadata and participants are unchanged', async () => {
     const alice = createUser('1');
     const bob = createUser('2');
     const {deps, updateMeetingMock, safeAddUsers, safeRemoveMembers, renameConversation} = createDeps();
@@ -427,10 +431,64 @@ describe('updateMeeting', () => {
     );
 
     expect(result.isOk).toBe(true);
-    expect(updateMeetingMock).toHaveBeenCalled();
+    expect(updateMeetingMock).not.toHaveBeenCalled();
     expect(safeRemoveMembers).not.toHaveBeenCalled();
     expect(safeAddUsers).not.toHaveBeenCalled();
     expect(renameConversation).not.toHaveBeenCalled();
+  });
+
+  it('does not update when the title differs only by surrounding whitespace', async () => {
+    const {deps, updateMeetingMock} = createDeps();
+
+    const result = await updateMeeting(
+      updateCommand({
+        title: 'Weekly sync',
+        originalTitle: '  Weekly sync  ',
+      }),
+      deps,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(updateMeetingMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['title', {title: 'Changed title'}],
+    ['start', {start: new Date('2026-06-23T18:00:00.000Z')}],
+    ['end', {end: new Date('2026-06-23T19:00:00.000Z')}],
+    ['recurrence', {recurrence: 'weekly' as const}],
+  ])('detects %s metadata changes independently', async (_field, change) => {
+    const {deps, updateMeetingMock} = createDeps();
+
+    const result = await updateMeeting(updateCommand(change), deps);
+
+    expect(result.isOk).toBe(true);
+    expect(updateMeetingMock).toHaveBeenCalled();
+  });
+
+  it('compares recurring edit times with the original upcoming instance times', async () => {
+    const {deps, updateMeetingMock, safeAddUsers} = createDeps();
+    const recurringStart = new Date('2026-06-29T10:00:00.000Z');
+    const recurringEnd = new Date('2026-06-29T11:00:00.000Z');
+    const participant = createUser('1');
+
+    const result = await updateMeeting(
+      updateCommand({
+        start: recurringStart,
+        end: recurringEnd,
+        originalStart: recurringStart,
+        originalEnd: recurringEnd,
+        recurrence: 'weekly',
+        originalRecurrence: 'weekly',
+        selectedUsers: [participant],
+        originalSelectedUsers: [],
+      }),
+      deps,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(updateMeetingMock).not.toHaveBeenCalled();
+    expect(safeAddUsers).toHaveBeenCalledWith(expect.anything(), [participant]);
   });
 
   it('renames the dedicated meeting conversation when the live name differs from the title', async () => {
@@ -513,7 +571,7 @@ describe('updateMeeting', () => {
       updateMeetingMock: jest.fn().mockReturnValue(task.reject(new Error('network'))),
     });
 
-    const result = await updateMeeting(updateCommand(), deps);
+    const result = await updateMeeting(updateCommand({title: 'New title'}), deps);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.updateFailed);
@@ -524,7 +582,7 @@ describe('updateMeeting', () => {
       saveMeetingConversationFromBackend: jest.fn().mockReturnValue(task.reject(new Error('save failed'))),
     });
 
-    const result = await updateMeeting(updateCommand(), deps);
+    const result = await updateMeeting(updateCommand({title: 'New title'}), deps);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.conversationSetupFailed);
@@ -539,6 +597,7 @@ describe('updateMeeting', () => {
 
     const result = await updateMeeting(
       updateCommand({
+        title: 'New title',
         selectedUsers: [bob],
         originalSelectedUsers: [alice, bob],
       }),
@@ -577,6 +636,7 @@ describe('updateMeeting', () => {
 
     const result = await updateMeeting(
       updateCommand({
+        title: 'New title',
         selectedUsers: [bob],
         originalSelectedUsers: [alice],
         qualifiedConversation: maybe.nothing(),
@@ -588,5 +648,24 @@ describe('updateMeeting', () => {
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.addParticipantsFailed);
     expect(updateMeetingMock).toHaveBeenCalled();
     expect(safeGetConversationById).not.toHaveBeenCalled();
+  });
+
+  it('syncs participant-only additions and removals without updating meeting metadata', async () => {
+    const alice = createUser('1');
+    const bob = createUser('2');
+    const {deps, updateMeetingMock, safeAddUsers, safeRemoveMembers} = createDeps();
+
+    const result = await updateMeeting(
+      updateCommand({
+        selectedUsers: [bob],
+        originalSelectedUsers: [alice],
+      }),
+      deps,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(updateMeetingMock).not.toHaveBeenCalled();
+    expect(safeRemoveMembers).toHaveBeenCalled();
+    expect(safeAddUsers).toHaveBeenCalled();
   });
 });

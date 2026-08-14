@@ -34,6 +34,9 @@ export type MapScheduleFormToUpdateMeetingCommandParams = {
   formState: ScheduleMeetingFormState;
   meetingId: QualifiedId;
   qualifiedConversation: Maybe<QualifiedId>;
+  originalTitle: string;
+  originalStart: Date;
+  originalEnd: Date;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
   wallClock: WallClock;
@@ -43,6 +46,9 @@ export const mapScheduleFormToUpdateMeetingCommand = ({
   formState,
   meetingId,
   qualifiedConversation,
+  originalTitle,
+  originalStart,
+  originalEnd,
   originalRecurrence,
   originalSelectedUsers,
   wallClock,
@@ -61,6 +67,9 @@ export const mapScheduleFormToUpdateMeetingCommand = ({
     start,
     end,
     recurrence: formState.recurrence,
+    originalTitle,
+    originalStart,
+    originalEnd,
     originalRecurrence,
     selectedUsers: formState.selectedUsers,
     originalSelectedUsers,

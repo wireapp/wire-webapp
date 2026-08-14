@@ -73,6 +73,9 @@ type ScheduleMeetingModalState = {
   errors: ScheduleMeetingFormErrors;
   editingMeetingId: Maybe<QualifiedId>;
   qualifiedConversation: Maybe<QualifiedId>;
+  originalTitle: string;
+  originalStart: Maybe<Date>;
+  originalEnd: Maybe<Date>;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
   openCreate: (wallClock: WallClock) => void;
@@ -110,6 +113,9 @@ const initialState = {
   errors: emptyScheduleMeetingFormErrors(),
   editingMeetingId: Maybe.nothing<QualifiedId>(),
   qualifiedConversation: Maybe.nothing<QualifiedId>(),
+  originalTitle: '',
+  originalStart: Maybe.nothing<Date>(),
+  originalEnd: Maybe.nothing<Date>(),
   originalRecurrence: 'doesNotRepeat' as ScheduleMeetingRecurrenceOption,
   originalSelectedUsers: [] as User[],
 };
@@ -124,6 +130,9 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       errors: emptyScheduleMeetingFormErrors(),
       editingMeetingId: Maybe.nothing(),
       qualifiedConversation: Maybe.nothing(),
+      originalTitle: '',
+      originalStart: Maybe.nothing<Date>(),
+      originalEnd: Maybe.nothing<Date>(),
       originalRecurrence: 'doesNotRepeat',
       originalSelectedUsers: [],
     }),
@@ -140,6 +149,9 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       errors: emptyScheduleMeetingFormErrors(),
       editingMeetingId: maybe.just(meetingSeries.qualified_id),
       qualifiedConversation: maybe.just(qualifiedConversation),
+      originalTitle: formState.title,
+      originalStart: formState.start,
+      originalEnd: formState.end,
       originalRecurrence: formState.recurrence,
       originalSelectedUsers,
     }),
@@ -147,6 +159,9 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
     set({
       isOpen: false,
       qualifiedConversation: Maybe.nothing(),
+      originalTitle: '',
+      originalStart: Maybe.nothing<Date>(),
+      originalEnd: Maybe.nothing<Date>(),
       originalRecurrence: 'doesNotRepeat',
       originalSelectedUsers: [],
     }),
