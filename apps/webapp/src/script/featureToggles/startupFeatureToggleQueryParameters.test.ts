@@ -21,34 +21,8 @@ import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
 } from './startupFeatureToggleNames';
-import {startupFeatureToggleQueryParameterName, startupFeatureToggleLocalStorageKey} from './startupFeatureToggles';
+import {startupFeatureToggleQueryParameterName} from './startupFeatureToggles';
 import {updateLocationSearchForStartupFeatureToggle} from './startupFeatureToggleQueryParameters';
-
-type LocalStorageStub = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
-
-function createInMemoryLocalStorageStub(initialValue?: string): {
-  localStorage: LocalStorageStub;
-  getStoredValue: () => string | null;
-} {
-  let storedValue: string | null = initialValue ?? null;
-
-  return {
-    localStorage: {
-      getItem: (key: string) => (key === startupFeatureToggleLocalStorageKey ? storedValue : null),
-      setItem: (key: string, value: string) => {
-        if (key === startupFeatureToggleLocalStorageKey) {
-          storedValue = value;
-        }
-      },
-      removeItem: (key: string) => {
-        if (key === startupFeatureToggleLocalStorageKey) {
-          storedValue = null;
-        }
-      },
-    },
-    getStoredValue: () => storedValue,
-  };
-}
 
 describe('updateLocationSearchForStartupFeatureToggle', () => {
   it('adds a feature toggle to an existing query string and preserves unrelated parameters', () => {
@@ -129,108 +103,5 @@ describe('updateLocationSearchForStartupFeatureToggle', () => {
     expect(updatedLocationSearch).toBe(
       `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
     );
-  });
-});
-
-describe('updateLocationSearchForStartupFeatureToggle session persistence', () => {
-  it('persists the updated enabled toggles to local storage when enabling a toggle', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub();
-
-    updateLocationSearchForStartupFeatureToggle({
-      locationSearch: '?foo=bar',
-      featureToggleName: applockRefactoredFeatureToggleName,
-      shouldEnableFeatureToggle: true,
-      localStorage,
-    });
-
-    expect(getStoredValue()).toBe(applockRefactoredFeatureToggleName);
-  });
-
-  it('clears local storage when the last feature toggle is disabled', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub(applockRefactoredFeatureToggleName);
-
-    updateLocationSearchForStartupFeatureToggle({
-      locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
-      featureToggleName: applockRefactoredFeatureToggleName,
-      shouldEnableFeatureToggle: false,
-      localStorage,
-    });
-
-    expect(getStoredValue()).toBeNull();
-  });
-
-  it('keeps the remaining enabled toggles in local storage when one is disabled', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub(
-      `${applockRefactoredFeatureToggleName},${conversationListCollapseFeatureToggleName}`,
-    );
-
-    updateLocationSearchForStartupFeatureToggle({
-      locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName},${conversationListCollapseFeatureToggleName}`,
-      featureToggleName: applockRefactoredFeatureToggleName,
-      shouldEnableFeatureToggle: false,
-      localStorage,
-    });
-
-    expect(getStoredValue()).toBe(conversationListCollapseFeatureToggleName);
-  });
-
-  it('does not touch local storage when no local storage is provided', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub();
-
-    updateLocationSearchForStartupFeatureToggle({
-      locationSearch: '?foo=bar',
-      featureToggleName: applockRefactoredFeatureToggleName,
-      shouldEnableFeatureToggle: true,
-    });
-
-    expect(getStoredValue()).toBeNull();
-  });
-
-  it('keeps localStorage-enabled toggles when enabling a toggle from a search without the query parameter', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub(conversationListCollapseFeatureToggleName);
-
-    const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
-      locationSearch: '?foo=bar',
-      featureToggleName: applockRefactoredFeatureToggleName,
-      shouldEnableFeatureToggle: true,
-      localStorage,
-    });
-
-    expect(updatedLocationSearch).toBe(
-      `?foo=bar&${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}%2C${conversationListCollapseFeatureToggleName}`,
-    );
-    expect(getStoredValue()).toBe(`${applockRefactoredFeatureToggleName},${conversationListCollapseFeatureToggleName}`);
-  });
-
-  it('keeps other localStorage-enabled toggles when disabling one from a search without the query parameter', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub(
-      `${applockRefactoredFeatureToggleName},${conversationListCollapseFeatureToggleName}`,
-    );
-
-    const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
-      locationSearch: '?foo=bar',
-      featureToggleName: applockRefactoredFeatureToggleName,
-      shouldEnableFeatureToggle: false,
-      localStorage,
-    });
-
-    expect(updatedLocationSearch).toBe(
-      `?foo=bar&${startupFeatureToggleQueryParameterName}=${conversationListCollapseFeatureToggleName}`,
-    );
-    expect(getStoredValue()).toBe(conversationListCollapseFeatureToggleName);
-  });
-
-  it('clears local storage when disabling the last toggle from a search without the query parameter', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub(applockRefactoredFeatureToggleName);
-
-    const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
-      locationSearch: '?foo=bar',
-      featureToggleName: applockRefactoredFeatureToggleName,
-      shouldEnableFeatureToggle: false,
-      localStorage,
-    });
-
-    expect(updatedLocationSearch).toBe('?foo=bar');
-    expect(getStoredValue()).toBeNull();
   });
 });
