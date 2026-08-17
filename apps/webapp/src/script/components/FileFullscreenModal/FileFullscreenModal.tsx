@@ -74,7 +74,7 @@ export const FileFullscreenModal = ({
 }: FileFullscreenModalProps) => {
   const notInRecycleBin = !checkIsInRecycleBin();
   const canPerformCellsAction = useCellsActionPermissions();
-  const [isEditableState, setIsEditableState] = useState(
+  const [isInEditMode, setIsInEditMode] = useState(
     isEditMode && notInRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT),
   );
   const [refreshKey, setRefreshKey] = useState(0);
@@ -85,12 +85,12 @@ export const FileFullscreenModal = ({
   };
 
   const onCloseModal = () => {
-    setIsEditableState(false);
+    setIsInEditMode(false);
     onClose();
   };
 
   useEffect(() => {
-    setIsEditableState(isEditMode && notInRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT));
+    setIsInEditMode(isEditMode && notInRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT));
   }, [canPerformCellsAction, isEditMode, notInRecycleBin]);
 
   return (
@@ -103,13 +103,13 @@ export const FileFullscreenModal = ({
         senderName={senderName}
         timestamp={timestamp}
         badges={badges}
-        isInEditMode={isEditableState}
-        onEditModeChange={setIsEditableState}
+        isInEditMode={isInEditMode}
+        onEditModeChange={setIsInEditMode}
         isEditable={isEditable}
         id={id}
         onFileContentRefresh={refreshModalContent}
       />
-      {isEditableState && isEditable ? (
+      {isInEditMode && isEditable ? (
         <FileEditor key={refreshKey} id={id} />
       ) : (
         <ModalContent

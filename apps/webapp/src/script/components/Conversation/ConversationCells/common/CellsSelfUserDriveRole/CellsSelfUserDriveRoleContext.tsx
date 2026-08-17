@@ -17,7 +17,7 @@
  *
  */
 
-import {createContext, type ReactNode, useContext} from 'react';
+import {createContext, type ReactNode, useCallback, useContext} from 'react';
 
 import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -132,10 +132,13 @@ export const useCellsActionPermissions = () => {
   const selfUserDriveRole = useCellsSelfUserDriveRole();
   const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
 
-  return (action: CellsAction) =>
-    canPerformCellsAction({
-      action,
-      isViewerPermissionFeatureEnabled,
-      selfUserDriveRole,
-    });
+  return useCallback(
+    (action: CellsAction) =>
+      canPerformCellsAction({
+        action,
+        isViewerPermissionFeatureEnabled,
+        selfUserDriveRole,
+      }),
+    [isViewerPermissionFeatureEnabled, selfUserDriveRole],
+  );
 };
