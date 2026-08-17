@@ -37,14 +37,14 @@ export class MeetingsPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.meetingsTab = page.locator('[data-uie-name="go-meetings"]');
-    this.meetingsList = page.locator('[data-uie-name="meetings-list"]');
-    this.emptyMeetingsList = page.locator('[data-uie-name="empty-meetings-list"]');
-    this.scheduleMeetingButton = page.locator('[data-uie-name="schedule-meeting"]');
-    this.createMeetingButton = page.locator('[data-uie-name="create-meeting"]');
-    this.scheduleMeetingModal = page.locator('[data-uie-name="schedule-meeting-modal"]');
-    this.meetNowModal = page.locator('#meet-now-modal');
-    this.notificationHost = page.locator('[data-uie-name="meeting-notification-host"]');
+    this.meetingsTab = page.getByTestId('go-meetings');
+    this.meetingsList = page.getByTestId('meetings-list');
+    this.emptyMeetingsList = page.getByTestId('empty-meetings-list');
+    this.scheduleMeetingButton = page.getByTestId('schedule-meeting');
+    this.createMeetingButton = page.getByTestId('create-meeting');
+    this.scheduleMeetingModal = page.getByTestId('schedule-meeting-modal');
+    this.meetNowModal = page.getByTestId('meet-now-modal');
+    this.notificationHost = page.getByTestId('meeting-notification-host');
   }
 
   async openMeetingsTab() {
@@ -69,8 +69,8 @@ export class MeetingsPage {
   }
 
   async addMeetNowParticipant(fullName: string) {
-    const participantsInput = this.meetNowModal.locator('#meet-now-participants');
-    const participantOption = this.page.locator('[data-uie-name="item-user"]').filter({hasText: fullName});
+    const participantsInput = this.meetNowModal.getByTestId('meet-now-participants').locator('input');
+    const participantOption = this.page.getByTestId('item-user').filter({hasText: fullName});
 
     await participantsInput.fill(fullName);
     await expect(participantOption).toBeVisible();
@@ -79,7 +79,7 @@ export class MeetingsPage {
 
   async startMeetNow(title: string, participantNames: string[]) {
     await this.openMeetNowModal();
-    await this.meetNowModal.locator('#meet-now-title').fill(title);
+    await this.meetNowModal.getByTestId('meet-now-title').fill(title);
 
     for (const participantName of participantNames) {
       await this.addMeetNowParticipant(participantName);
@@ -104,7 +104,7 @@ export class MeetingsPage {
     await expect
       .poll(
         async () => {
-          await this.page.locator('[data-uie-name="go-people"]').click();
+          await this.page.getByTestId('go-people').click();
           await this.openMeetingsTab();
           return this.meetingListItem(title).count();
         },
@@ -120,7 +120,7 @@ export class MeetingsPage {
   }
 
   meetingTitleInput() {
-    return this.scheduleMeetingModal.locator('input[data-uie-name="schedule-meeting-title"]');
+    return this.scheduleMeetingModal.getByTestId('schedule-meeting-title');
   }
 
   async fillMeetingTitle(title: string) {
@@ -132,7 +132,7 @@ export class MeetingsPage {
   }
 
   async dismissBlockingModals() {
-    const acknowledgeModal = this.page.locator('[data-uie-name="modal-template-acknowledge"]');
+    const acknowledgeModal = this.page.getByTestId('modal-template-acknowledge');
     if (await acknowledgeModal.isVisible()) {
       await acknowledgeModal.getByTestId('do-action').click();
       await expect(acknowledgeModal).toBeHidden();
@@ -140,7 +140,7 @@ export class MeetingsPage {
   }
 
   async closeParticipantsPicker() {
-    const dropdown = this.page.locator('[data-uie-name="dropdown-schedule-meeting-participants"]');
+    const dropdown = this.page.getByTestId('dropdown-schedule-meeting-participants');
     if (!(await dropdown.isVisible())) {
       return;
     }
@@ -150,22 +150,22 @@ export class MeetingsPage {
   }
 
   async addParticipant(fullName: string) {
-    const participants = this.scheduleMeetingModal.locator('[data-uie-name="schedule-meeting-participants"]');
-    const dropdown = this.page.locator('[data-uie-name="dropdown-schedule-meeting-participants"]');
-    const participantOption = dropdown.locator('[data-uie-name="item-user"]').filter({hasText: fullName});
+    const participants = this.scheduleMeetingModal.getByTestId('schedule-meeting-participants');
+    const dropdown = this.page.getByTestId('dropdown-schedule-meeting-participants');
+    const participantOption = dropdown.getByTestId('item-user').filter({hasText: fullName});
 
-    await participants.locator('[data-uie-name="schedule-meeting-participants-input"]').fill(fullName);
+    await participants.getByTestId('schedule-meeting-participants-input').fill(fullName);
     await expect(participantOption).toBeVisible();
     await participantOption.click();
     await this.closeParticipantsPicker();
   }
 
   async openParticipantsPicker() {
-    const participants = this.scheduleMeetingModal.locator('[data-uie-name="schedule-meeting-participants"]');
-    const dropdown = this.page.locator('[data-uie-name="dropdown-schedule-meeting-participants"]');
+    const participants = this.scheduleMeetingModal.getByTestId('schedule-meeting-participants');
+    const dropdown = this.page.getByTestId('dropdown-schedule-meeting-participants');
 
     if (!(await dropdown.isVisible())) {
-      await participants.locator('[data-uie-name="schedule-meeting-participants-toggle"]').click();
+      await participants.getByTestId('schedule-meeting-participants-toggle').click();
     }
 
     await expect(dropdown).toBeVisible();
@@ -174,9 +174,9 @@ export class MeetingsPage {
 
   async removeParticipant(fullName: string) {
     const dropdown = await this.openParticipantsPicker();
-    const selectedSectionToggle = dropdown.locator('[data-uie-name="do-toggle-selected-search-list"]');
-    const selectedList = dropdown.locator('[data-uie-name="selected-search-list"]');
-    const selectedParticipant = selectedList.locator('[data-uie-name="item-user"]').filter({hasText: fullName});
+    const selectedSectionToggle = dropdown.getByTestId('do-toggle-selected-search-list');
+    const selectedList = dropdown.getByTestId('selected-search-list');
+    const selectedParticipant = selectedList.getByTestId('item-user').filter({hasText: fullName});
 
     if (await selectedSectionToggle.isVisible()) {
       if (!(await selectedParticipant.isVisible())) {
@@ -199,10 +199,14 @@ export class MeetingsPage {
   }
 
   async selectLatestAvailableStartTime() {
-    const startTimeCombobox = this.startTimeCombobox();
+    const startTimeCombobox = this.scheduleMeetingModal.locator(
+      '[data-uie-name="schedule-meeting-start-time"] > [data-uie-name="schedule-meeting-start-time"]',
+    );
     await startTimeCombobox.scrollIntoViewIfNeeded();
     await startTimeCombobox.click();
-    await this.page.getByRole('option').last().click();
+    const startTimeOptions = this.page.getByRole('option');
+    const optionCount = await startTimeOptions.count();
+    await startTimeOptions.nth(Math.min(1, optionCount - 1)).click();
   }
 
   async setMeetingStartDateToTomorrow() {
@@ -236,12 +240,12 @@ export class MeetingsPage {
   }
 
   async submitScheduleMeetingModal() {
-    await this.scheduleMeetingModal.locator('[data-uie-name="schedule-meeting-modal-submit"]').click();
+    await this.scheduleMeetingModal.getByTestId('schedule-meeting-modal-submit').click();
 
     const startInPastError = this.scheduleMeetingModal.getByText('Start time must be in the future');
     if (await startInPastError.isVisible()) {
       await this.fixStartTimeInPastValidationError();
-      await this.scheduleMeetingModal.locator('[data-uie-name="schedule-meeting-modal-submit"]').click();
+      await this.scheduleMeetingModal.getByTestId('schedule-meeting-modal-submit').click();
     }
 
     await expect(this.scheduleMeetingModal).toBeHidden({timeout: MEETINGS_LIST_TIMEOUT_MS});
@@ -274,7 +278,7 @@ export class MeetingsPage {
     const menu = await this.openMeetingContextMenu(title);
     await menu.getByRole('button', {name: 'Edit meeting'}).click();
     await expect(this.scheduleMeetingModal).toBeVisible();
-    await expect(this.scheduleMeetingModal.locator('[data-uie-name="schedule-meeting-form"]')).toHaveAttribute(
+    await expect(this.scheduleMeetingModal.getByTestId('schedule-meeting-form')).toHaveAttribute(
       'data-uie-mode',
       'edit',
     );
@@ -318,7 +322,10 @@ export class MeetingsPage {
   }
 
   async expandNotifications() {
-    await this.notificationHost.getByTestId('meeting-notification-expand').click();
+    const expandButton = this.notificationHost.getByTestId('meeting-notification-expand');
+    if ((await expandButton.getAttribute('aria-expanded')) !== 'true') {
+      await expandButton.click();
+    }
   }
 
   notificationCards() {
