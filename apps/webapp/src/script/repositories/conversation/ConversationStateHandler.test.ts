@@ -30,7 +30,9 @@ import type {ConversationService} from './ConversationService';
 import {Conversation} from '../entity/Conversation';
 
 function buildHandler() {
-  const conversationService: jest.Mocked<Pick<ConversationService, 'deleteConversationCode' | 'putConversationAccess'>> = {
+  const conversationService: jest.Mocked<
+    Pick<ConversationService, 'deleteConversationCode' | 'putConversationAccess'>
+  > = {
     deleteConversationCode: jest.fn(),
     putConversationAccess: jest.fn(),
   };
