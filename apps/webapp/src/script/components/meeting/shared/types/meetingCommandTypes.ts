@@ -42,6 +42,9 @@ export type UpdateMeetingCommand = {
   start: Date;
   end: Date;
   recurrence: ScheduleMeetingRecurrenceOption;
+  originalTitle: string;
+  originalStart: Date;
+  originalEnd: Date;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   selectedUsers: User[];
   originalSelectedUsers: User[];

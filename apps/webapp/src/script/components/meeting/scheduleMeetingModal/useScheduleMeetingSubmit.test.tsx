@@ -76,6 +76,9 @@ const updateCommand = {
   title: 'Weekly sync',
   start: futureStartDate,
   end: futureEndDate,
+  originalTitle: 'Weekly sync',
+  originalStart: futureStartDate,
+  originalEnd: futureEndDate,
   recurrence: 'doesNotRepeat' as const,
   originalRecurrence: 'doesNotRepeat' as const,
   selectedUsers: [],
@@ -235,15 +238,39 @@ describe('useScheduleMeetingSubmit', () => {
     expect(loadMeetings).not.toHaveBeenCalled();
   });
 
-  const openEditMeetingModal = () => {
+  it('fails closed when original edit times are missing', async () => {
+    const updateMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
+    const store = createMeetingStore({updateMeeting});
+
+    openEditMeetingModal();
+    useScheduleMeetingModal.setState({originalStart: maybe.nothing(), originalEnd: maybe.nothing()});
+
+    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.succeeded;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.submitFailed);
+    expect(updateMeeting).not.toHaveBeenCalled();
+  });
+
+  const openEditMeetingModal = ({
+    seriesStartDate = '2026-06-16T10:00:00.000Z',
+    seriesEndDate = '2026-06-16T11:00:00.000Z',
+  }: {
+    seriesStartDate?: string;
+    seriesEndDate?: string;
+  } = {}) => {
     useScheduleMeetingModal.getState().openEdit(
       {
         title: formState.title,
         qualified_id: {id: 'meeting-id', domain: 'example.com'},
         qualified_creator: {id: 'creator-id', domain: 'example.com'},
         qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
-        series_start_date: '2026-06-16T10:00:00.000Z',
-        series_end_date: '2026-06-16T11:00:00.000Z',
+        series_start_date: seriesStartDate,
+        series_end_date: seriesEndDate,
         duration_ms: 3_600_000,
         recurrence: 'doesNotRepeat',
         conversation_id: 'conversation-id',
@@ -253,6 +280,24 @@ describe('useScheduleMeetingSubmit', () => {
       [],
     );
   };
+
+  it('snapshots original edit times from the upcoming form instance', async () => {
+    const updateMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
+    const store = createMeetingStore({updateMeeting});
+
+    openEditMeetingModal({
+      seriesStartDate: '2026-06-16T09:00:00.000Z',
+      seriesEndDate: '2026-06-16T10:00:00.000Z',
+    });
+
+    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+
+    await act(async () => {
+      await result.current.submit(formState);
+    });
+
+    expect(updateMeeting).toHaveBeenCalledWith(updateCommand);
+  });
 
   it('shows rename retry modal and refreshes meetings when conversation rename fails after update', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);

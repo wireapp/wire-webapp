@@ -24,6 +24,7 @@ export const meetingSubmitErrors = {
   conversationSetupFailed: 'conversationSetupFailed',
   updateFailed: 'updateFailed',
   editMeetingIdMissing: 'editMeetingIdMissing',
+  originalMeetingTimesMissing: 'originalMeetingTimesMissing',
   addParticipantsFailed: 'addParticipantsFailed',
   removeParticipantsFailed: 'removeParticipantsFailed',
   conversationRenameFailed: 'conversationRenameFailed',
