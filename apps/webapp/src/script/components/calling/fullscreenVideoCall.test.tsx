@@ -83,6 +83,7 @@ describe('fullscreenVideoCall', () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
+    Element.prototype.scrollIntoView = jest.fn();
   });
 
   afterEach(() => jest.useRealTimers());

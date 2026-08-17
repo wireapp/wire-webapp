@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect, useRef} from 'react';
+
 import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {components, GroupBase, OptionProps, OptionsOrGroups} from 'react-select';
 
@@ -29,10 +31,20 @@ export const SelectOption = <IsMulti extends boolean = false, Group extends Grou
 ) => {
   function SelectOptionComponent(props: OptionProps<Option, IsMulti, Group>) {
     const {children, data, isMulti, isSelected, options} = props;
+    const selectedOptionRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      if (!isSelected) {
+        return;
+      }
+
+      selectedOptionRef.current?.scrollIntoView({block: 'center'});
+    }, [isSelected]);
 
     return (
       <components.Option {...props}>
         <div
+          ref={selectedOptionRef}
           css={{
             ...((isMulti === true || isGroup(options)) && {
               display: 'grid',
