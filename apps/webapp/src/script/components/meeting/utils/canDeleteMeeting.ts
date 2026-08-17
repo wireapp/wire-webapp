@@ -21,32 +21,9 @@ import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {User} from 'Repositories/entity/User';
 
 import {isMeetingHost} from './canEditMeeting';
-import {MeetingTemporalStatuses, getMeetingTemporalStatusAt} from './meetingStatusUtil';
 
-export const canDeleteMeeting = (meetingInstance: MeetingInstance, nowMilliseconds: number): boolean => {
-  const {start, end} = meetingInstance;
-  const temporalStatus = getMeetingTemporalStatusAt(new Date(nowMilliseconds), start, end);
+export const canDeleteMeetingForAll = (meetingInstance: MeetingInstance, selfUser: User): boolean =>
+  isMeetingHost(meetingInstance.meetingSeries, selfUser);
 
-  return temporalStatus !== MeetingTemporalStatuses.PAST;
-};
-
-export const canDeleteMeetingForAll = (
-  meetingInstance: MeetingInstance,
-  selfUser: User,
-  nowMilliseconds: number,
-): boolean => {
-  const instanceHasNotStarted = nowMilliseconds < meetingInstance.start.getTime();
-
-  return (
-    canDeleteMeeting(meetingInstance, nowMilliseconds) &&
-    isMeetingHost(meetingInstance.meetingSeries, selfUser) &&
-    instanceHasNotStarted
-  );
-};
-
-export const canDeleteMeetingForMe = (
-  meetingInstance: MeetingInstance,
-  selfUser: User,
-  nowMilliseconds: number,
-): boolean =>
-  canDeleteMeeting(meetingInstance, nowMilliseconds) && !isMeetingHost(meetingInstance.meetingSeries, selfUser);
+export const canDeleteMeetingForMe = (meetingInstance: MeetingInstance, selfUser: User): boolean =>
+  !isMeetingHost(meetingInstance.meetingSeries, selfUser);

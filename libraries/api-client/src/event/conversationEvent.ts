@@ -49,6 +49,7 @@ export enum CONVERSATION_EVENT {
   CREATE = 'conversation.create',
   CREATE_MEETING = 'conversation.create-meeting',
   DELETE = 'conversation.delete',
+  DELETE_MEETING = 'conversation.delete-meeting',
   SYSTEM_DELETE = 'conversation.system.delete',
   ADMINLESS_DELETE_REMINDER = 'conversation.adminless-reminder',
   SYSTEM_ADMINLESS_DELETE_REMINDER = 'conversation.system.adminless-reminder',
@@ -96,6 +97,7 @@ export type ConversationEvent =
   | ConversationCreateEvent
   | ConversationCreateMeetingEvent
   | ConversationDeleteEvent
+  | ConversationDeleteMeetingEvent
   | ConversationAdminlessDeleteReminderEvent
   | ConversationMemberJoinEvent
   | ConversationMemberLeaveEvent
@@ -161,6 +163,13 @@ export interface ConversationDeleteEvent extends Omit<BaseConversationEvent, 'fr
   /** Not present for backend/system-initiated deletions, e.g. `conversation.system.delete`. */
   from?: string;
   type: CONVERSATION_EVENT.DELETE | CONVERSATION_EVENT.SYSTEM_DELETE;
+}
+
+export interface ConversationDeleteMeetingEvent extends Omit<BaseConversationEvent, 'from'> {
+  data: null;
+  /** Not present for backend/system-initiated deletions. */
+  from?: string;
+  type: CONVERSATION_EVENT.DELETE_MEETING;
 }
 
 export interface ConversationAdminlessDeleteReminderEvent extends Omit<BaseConversationEvent, 'from'> {

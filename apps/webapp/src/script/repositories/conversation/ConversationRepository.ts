@@ -1249,7 +1249,12 @@ export class ConversationRepository {
       return;
     }
 
-    this.callingRepository.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
+    this.callingRepository.leaveCall(
+      conversationEntity.qualifiedId,
+      conversationEntity.isMeeting()
+        ? LEAVE_CALL_REASON.USER_IS_REMOVED_FROM_CONVERSATION
+        : LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION,
+    );
 
     if (this.conversationState.isActiveConversation(conversationEntity)) {
       const nextConversation = this.getNextConversation(conversationEntity);
@@ -3664,6 +3669,7 @@ export class ConversationRepository {
             CONVERSATION_EVENT.MEMBER_LEAVE,
             CONVERSATION_EVENT.MEMBER_JOIN,
             CONVERSATION_EVENT.DELETE,
+            CONVERSATION_EVENT.DELETE_MEETING,
             CONVERSATION_EVENT.SYSTEM_DELETE,
             CONVERSATION_EVENT.ADMINLESS_DELETE_REMINDER,
             CONVERSATION_EVENT.SYSTEM_ADMINLESS_DELETE_REMINDER,
@@ -3842,6 +3848,12 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.DELETE:
       case CONVERSATION_EVENT.SYSTEM_DELETE:
         return this.deleteConversationLocally({domain: conversationEntity.domain, id: eventJson.conversation}, false);
+
+      case CONVERSATION_EVENT.DELETE_MEETING:
+        if (!conversationEntity.isMeeting()) {
+          return;
+        }
+        return this.deleteConversationLocally({domain: conversationEntity.domain, id: eventJson.conversation}, true);
 
       case CONVERSATION_EVENT.MEMBER_JOIN:
         return this.onMemberJoin(conversationEntity, eventJson);

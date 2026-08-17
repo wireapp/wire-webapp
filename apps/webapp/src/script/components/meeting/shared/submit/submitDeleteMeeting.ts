@@ -17,7 +17,6 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Task} from 'true-myth';
 
@@ -49,7 +48,6 @@ export type SubmitDeleteMeetingParams = {
   meetingInstance: MeetingInstance;
   mode: DeleteMeetingModalMode;
   selfUser: User | undefined;
-  wallClock: WallClock;
   translate: Translate;
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   deleteMeetingForAll: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
@@ -95,11 +93,10 @@ const canDeleteMeetingWithMode = (
   meetingInstance: MeetingInstance,
   mode: DeleteMeetingModalMode,
   selfUser: User,
-  nowMilliseconds: number,
 ): boolean =>
   mode === 'forAll'
-    ? canDeleteMeetingForAll(meetingInstance, selfUser, nowMilliseconds)
-    : canDeleteMeetingForMe(meetingInstance, selfUser, nowMilliseconds);
+    ? canDeleteMeetingForAll(meetingInstance, selfUser)
+    : canDeleteMeetingForMe(meetingInstance, selfUser);
 
 export const resetInFlightDeleteMeetingsForTest = (): void => {
   inFlightDeleteMeetingIds.clear();
@@ -109,7 +106,6 @@ export const submitDeleteMeeting = async ({
   meetingInstance,
   mode,
   selfUser,
-  wallClock,
   translate,
   deleteMeetingForMe,
   deleteMeetingForAll,
@@ -121,9 +117,7 @@ export const submitDeleteMeeting = async ({
     return deleteMeetingSubmitResults.blocked;
   }
 
-  const nowMilliseconds = wallClock.currentTimestampInMilliseconds;
-
-  if (!canDeleteMeetingWithMode(meetingInstance, mode, selfUser, nowMilliseconds)) {
+  if (!canDeleteMeetingWithMode(meetingInstance, mode, selfUser)) {
     showDeleteNotAllowedModal(translate);
     return deleteMeetingSubmitResults.blocked;
   }

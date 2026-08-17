@@ -28,6 +28,7 @@ import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/meeting/meetingList/me
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
 import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
+import {getMeetingTemporalStatusAt, MeetingTemporalStatuses} from 'Components/meeting/utils/meetingStatusUtil';
 import type {User} from 'Repositories/entity/User';
 import type {ContextMenuEntry} from 'src/script/ui/contextMenu';
 import type {Translate} from 'Util/localizerUtil';
@@ -82,11 +83,17 @@ export const getMeetingActionEntries = ({
     click: onDeleteForAll,
   };
 
-  const showDeleteForAll = canDeleteMeetingForAll(meetingInstance, selfUser, nowMilliseconds);
-  const showDeleteForMe = canDeleteMeetingForMe(meetingInstance, selfUser, nowMilliseconds);
+  const showDeleteForAll = canDeleteMeetingForAll(meetingInstance, selfUser);
+  const showDeleteForMe = canDeleteMeetingForMe(meetingInstance, selfUser);
+  const temporalStatus = getMeetingTemporalStatusAt(
+    new Date(nowMilliseconds),
+    meetingInstance.start,
+    meetingInstance.end,
+  );
+  const showJoin = temporalStatus !== MeetingTemporalStatuses.PAST;
 
   return [
-    joinEntry,
+    ...(showJoin ? [joinEntry] : []),
     ...(canEditMeeting(meetingInstance, selfUser, nowMilliseconds) ? [editEntry] : []),
     ...(showDeleteForAll ? [deleteForAllEntry] : []),
     ...(showDeleteForMe ? [deleteForMeEntry] : []),
