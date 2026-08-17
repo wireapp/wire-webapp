@@ -33,7 +33,7 @@ import {ACCESS_STATE} from './AccessState';
 import {
   ACCESS_MODES,
   featureFromStateChange,
-  isGettingAccessToFeature,
+  hasAccessToFeature,
   updateAccessRights,
 } from './ConversationAccessPermission';
 import {ConversationMapper} from './ConversationMapper';
@@ -82,8 +82,10 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
         const {accessModes, accessRole} = updateAccessRights(accessState);
         if (accessModes !== undefined && accessRole !== undefined) {
           try {
-            const isGettingAccessCode = isGettingAccessToFeature(ACCESS_MODES.CODE, prevAccessState, accessState);
-            if (isGettingAccessCode === false) {
+            const isLosingAccessCode =
+              hasAccessToFeature(ACCESS_MODES.CODE, prevAccessState) &&
+              !hasAccessToFeature(ACCESS_MODES.CODE, accessState);
+            if (isLosingAccessCode) {
               conversationEntity.accessCode('');
               await this.revokeAccessCode(conversationEntity);
             }
