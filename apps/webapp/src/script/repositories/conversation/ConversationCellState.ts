@@ -334,6 +334,14 @@ const _getStateRemoved: ConversationCellStateDefinition = {
   match: (conversationEntity: Conversation) => conversationEntity.isSelfUserRemoved(),
 };
 
+const _getStateGhostGroup: ConversationCellStateDefinition = {
+  description: (conversationEntity: Conversation, translate: Translate) => {
+    return conversationEntity.isGhostGroup() ? translate('conversationsSecondaryLineGhostGroup') : '';
+  },
+  icon: () => ConversationStatusIcon.GHOST_GROUP,
+  match: (conversationEntity: Conversation) => conversationEntity.isGhostGroup(),
+};
+
 const _getStateUnreadMessage: ConversationCellStateDefinition = {
   description: (conversationEntity: Conversation, translate: Translate): string => {
     const unreadState = conversationEntity.unreadState();
@@ -430,6 +438,7 @@ export const generateCellState = (
 ): {description: string; icon: ConversationStatusIcon | void} => {
   const states = [
     _getStateRemoved,
+    _getStateGhostGroup,
     _getStateMuted,
     _getStateAlert,
     _getStateGroupActivity,

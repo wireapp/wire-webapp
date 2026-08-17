@@ -143,6 +143,19 @@ body.theme-dark {
   }
 }
 
+.conversation-list-cell-badge.conversation-ghosted {
+  padding: 0;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  svg > path {
+    fill: var(--red-500);
+  }
+}
+
 .conversation-list-cell-badge {
   font-size: var(--font-size-small);
 }

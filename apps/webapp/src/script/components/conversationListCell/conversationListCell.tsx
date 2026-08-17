@@ -90,6 +90,7 @@ export const ConversationListCell = ({
     isConversationWithBlockedUser,
     isChannel,
     isGroupOrChannel,
+    isGhostGroup,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
@@ -102,6 +103,7 @@ export const ConversationListCell = ({
     'isConversationWithBlockedUser',
     'isChannel',
     'isGroupOrChannel',
+    'isGhostGroup',
   ]);
 
   const guardCall = useNoInternetCallGuard({
@@ -287,6 +289,7 @@ export const ConversationListCell = ({
             isActive={isActive}
             isRequest={isRequest}
             unreadState={unreadState}
+            isGhostGroup={isGhostGroup}
           />
         </div>
       </div>

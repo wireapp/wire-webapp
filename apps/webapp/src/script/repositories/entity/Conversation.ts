@@ -118,6 +118,8 @@ export class Conversation {
   public cipherSuite: number = 1;
   // Initial protocol is a protocol that was known by a webapp before any protocol update happened. For newly created conversations it is the same as protocol.
   public initialProtocol: CONVERSATION_PROTOCOL;
+  /** Whether this group has no eligible admins and is scheduled for automatic deletion. */
+  public readonly isGhostGroup: ko.Observable<boolean>;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
@@ -378,6 +380,7 @@ export class Conversation {
     });
 
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
+    this.isGhostGroup = ko.observable(false);
 
     this.hasLegalHold = ko.computed(() => {
       const isInitialized = this.hasInitializedUsers();
@@ -673,6 +676,7 @@ export class Conversation {
       this.cleared_timestamp,
       this.messageTimer,
       this.isGuest,
+      this.isGhostGroup,
       this.last_event_timestamp,
       this.last_read_timestamp,
       this.last_server_timestamp,
@@ -1135,6 +1139,7 @@ export class Conversation {
       initial_protocol: this.initialProtocol,
       id: this.id,
       is_guest: this.isGuest(),
+      is_ghost_group: this.isGhostGroup(),
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),
