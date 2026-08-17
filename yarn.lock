@@ -11309,7 +11309,7 @@ __metadata:
     "@types/jsrsasign": "npm:10.5.15"
     "@types/node": "npm:^22.0.0"
     jest: "npm:^29.2.1"
-    jsrsasign: "npm:11.1.3"
+    jsrsasign: "npm:11.1.5"
     rimraf: "npm:6.1.3"
     ts-node: "npm:^10.9.1"
     typescript: "npm:^5.0.4"
@@ -21527,10 +21527,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsrsasign@npm:11.1.3":
-  version: 11.1.3
-  resolution: "jsrsasign@npm:11.1.3"
-  checksum: 10/fbe7ef29a8cd45fa78008a979a559367b87908e7fb79b3cd81f12b93754ed1c8c794fa8c6baf2d088767f77291cfd0e3da4188115c6492122801dc81a49dde01
+"jsrsasign@npm:11.1.5":
+  version: 11.1.5
+  resolution: "jsrsasign@npm:11.1.5"
+  checksum: 10/51694b5502b57f45eb2ecb89be225f5cc0b692e6cc75f1327bbdfc8ec2e14049dff72b60016b3b4380714884813d42d5ecbbe0626b9b3f781e390f2c6ab7332a
   languageName: node
   linkType: hard
 
