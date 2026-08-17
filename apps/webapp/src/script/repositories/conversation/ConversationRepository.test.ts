@@ -2385,7 +2385,9 @@ describe('ConversationRepository', () => {
 
         await conversationRepository['handleConversationEvent'](createDeleteMeetingEvent(conversation));
 
-        expect(conversationRepository['conversationState'].findConversation(conversation.qualifiedId)).toBe(conversation);
+        expect(conversationRepository['conversationState'].findConversation(conversation.qualifiedId)).toBe(
+          conversation,
+        );
       });
 
       it('does not throw when the conversation is unknown', async () => {
@@ -2421,7 +2423,9 @@ describe('ConversationRepository', () => {
         try {
           await conversationRepository['handleConversationEvent'](createDeleteEvent(conversation));
 
-          expect(conversationRepository['conversationState'].findConversation(conversation.qualifiedId)).toBeUndefined();
+          expect(
+            conversationRepository['conversationState'].findConversation(conversation.qualifiedId),
+          ).toBeUndefined();
           expect(publishSpy).toHaveBeenCalledWith(
             WebAppEvents.NOTIFICATION.NOTIFY,
             expect.objectContaining({system_message_type: SystemMessageType.CONVERSATION_DELETE}),

@@ -76,7 +76,12 @@ const renderAction = (
   render(
     <MeetingStoreProvider store={createMeetingStoreForTest()}>
       <ThemeProvider>
-        <MeetingAction meetingInstance={meetingInstance} selfUser={user} joinMeeting={() => undefined} isJoinDisabled={false} />
+        <MeetingAction
+          meetingInstance={meetingInstance}
+          selfUser={user}
+          joinMeeting={() => undefined}
+          isJoinDisabled={false}
+        />
       </ThemeProvider>
     </MeetingStoreProvider>,
     {
