@@ -25,6 +25,7 @@ import {
 import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
+  disableMessagePreprocessingFeatureToggleName,
   startupFeatureToggleNames,
   viewerPermissionFeatureToggleName,
 } from './startupFeatureToggleNames';
@@ -33,6 +34,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   viewerPermissionFeatureToggleName,
+  disableMessagePreprocessingFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -109,6 +111,14 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(viewerPermissionFeatureToggleName)).toBe(true);
   });
 
+  it('enables the disable message preprocessing feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${disableMessagePreprocessingFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(disableMessagePreprocessingFeatureToggleName)).toBe(true);
+  });
+
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${applockRefactoredFeatureToggleName} `,
@@ -150,6 +160,7 @@ describe('startupFeatureToggles', function () {
       applockRefactoredFeatureToggleName,
       conversationListCollapseFeatureToggleName,
       viewerPermissionFeatureToggleName,
+      disableMessagePreprocessingFeatureToggleName,
     ]);
   });
 

@@ -214,8 +214,7 @@ export const useMessageSend = ({
     const text = messageContent.text;
     const mentions = messageContent.mentions ?? [];
 
-    const messageTrimmedStart = text.trimStart();
-    const messageText = messageTrimmedStart.trimEnd();
+    const messageText = text.trimStart().trimEnd();
 
     const config = Config.getConfig();
 

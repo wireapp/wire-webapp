@@ -17,8 +17,17 @@
  *
  */
 
+import {$getRoot} from 'lexical';
+
 import {findAndTransformEmoji} from '../plugins/InlineEmojiReplacementPlugin';
 
 export const transformMessage = ({replaceEmojis, markdown}: {replaceEmojis: boolean; markdown: string}) => {
   return replaceEmojis ? findAndTransformEmoji(markdown) : markdown;
+};
+
+export const getRawMessageText = () => {
+  return $getRoot()
+    .getChildren()
+    .map(node => node.getTextContent())
+    .join('\n');
 };
