@@ -22,13 +22,17 @@ import {Maybe} from 'true-myth';
 import {StartupFeatureToggleName, startupFeatureToggleNames} from './startupFeatureToggleNames';
 import {
   createStartupFeatureTogglesFromLocationSearch,
+  persistEnabledFeatureToggleNamesInLocalStorage,
   startupFeatureToggleQueryParameterName,
 } from './startupFeatureToggles';
+
+type StartupFeatureToggleLocalStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 
 type UpdateStartupFeatureToggleLocationSearchInput = {
   readonly locationSearch: string;
   readonly featureToggleName: StartupFeatureToggleName;
   readonly shouldEnableFeatureToggle: boolean;
+  readonly localStorage?: StartupFeatureToggleLocalStorage;
 };
 
 function toOrderedEnabledFeatureToggleNames(
@@ -41,8 +45,9 @@ function toOrderedEnabledFeatureToggleNames(
 
 function readEnabledFeatureToggleNameSetFromLocationSearch(
   locationSearch: string,
+  localStorage?: StartupFeatureToggleLocalStorage,
 ): ReadonlySet<StartupFeatureToggleName> {
-  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
+  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch, localStorage);
   return new Set(startupFeatureToggles.enabledFeatureToggleNames);
 }
 
@@ -77,12 +82,17 @@ function serializeEnabledFeatureToggleNames(
 export function updateLocationSearchForStartupFeatureToggle(
   input: UpdateStartupFeatureToggleLocationSearchInput,
 ): string {
-  const {locationSearch, featureToggleName, shouldEnableFeatureToggle} = input;
-  const enabledFeatureToggleNameSet = readEnabledFeatureToggleNameSetFromLocationSearch(locationSearch);
+  const {locationSearch, featureToggleName, shouldEnableFeatureToggle, localStorage} = input;
+  const enabledFeatureToggleNameSet = readEnabledFeatureToggleNameSetFromLocationSearch(locationSearch, localStorage);
   const updatedEnabledFeatureToggleNameSet = toUpdatedEnabledFeatureToggleNameSet(
     enabledFeatureToggleNameSet,
     featureToggleName,
     shouldEnableFeatureToggle,
+  );
+
+  persistEnabledFeatureToggleNamesInLocalStorage(
+    toOrderedEnabledFeatureToggleNames(updatedEnabledFeatureToggleNameSet),
+    localStorage,
   );
 
   const queryParameters = new URLSearchParams(locationSearch);

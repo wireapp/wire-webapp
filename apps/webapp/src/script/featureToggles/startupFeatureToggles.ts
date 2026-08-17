@@ -24,7 +24,11 @@ export type {StartupFeatureToggleName} from './startupFeatureToggleNames';
 
 export const startupFeatureToggleQueryParameterName = 'enabled-features';
 
+export const startupFeatureToggleLocalStorageKey = 'startup-feature-toggles';
+
 export const allowedStartupFeatureToggleNames = startupFeatureToggleNames;
+
+type StartupFeatureToggleLocalStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 
 const allowedStartupFeatureToggleNameSet = new Set<StartupFeatureToggleName>(allowedStartupFeatureToggleNames);
 
@@ -62,10 +66,67 @@ function readEnabledFeatureToggleNameListFromLocationSearch(
   return Maybe.of(enabledFeatureTogglesParameterValue).map(toEnabledFeatureToggleNameList).unwrapOr([]);
 }
 
-export function createStartupFeatureTogglesFromLocationSearch(locationSearch: string): StartupFeatureToggles {
-  const enabledFeatureToggleNameSet = new Set<StartupFeatureToggleName>(
-    readEnabledFeatureToggleNameListFromLocationSearch(locationSearch),
-  );
+function hasStartupFeatureToggleQueryParameter(locationSearch: string): boolean {
+  return new URLSearchParams(locationSearch).has(startupFeatureToggleQueryParameterName);
+}
+
+function readEnabledFeatureToggleNameListFromLocalStorage(
+  localStorage: StartupFeatureToggleLocalStorage,
+): readonly StartupFeatureToggleName[] {
+  return Maybe.of(localStorage.getItem(startupFeatureToggleLocalStorageKey))
+    .map(toEnabledFeatureToggleNameList)
+    .unwrapOr([]);
+}
+
+export function persistEnabledFeatureToggleNamesInLocalStorage(
+  enabledFeatureToggleNames: readonly StartupFeatureToggleName[],
+  localStorage?: StartupFeatureToggleLocalStorage,
+): void {
+  if (localStorage === undefined) {
+    return;
+  }
+
+  if (enabledFeatureToggleNames.length === 0) {
+    localStorage.removeItem(startupFeatureToggleLocalStorageKey);
+    return;
+  }
+
+  localStorage.setItem(startupFeatureToggleLocalStorageKey, enabledFeatureToggleNames.join(','));
+}
+
+function readEnabledFeatureToggleNameList(
+  locationSearch: string,
+  localStorage: StartupFeatureToggleLocalStorage | undefined,
+): readonly StartupFeatureToggleName[] {
+  if (hasStartupFeatureToggleQueryParameter(locationSearch)) {
+    return readEnabledFeatureToggleNameListFromLocationSearch(locationSearch);
+  }
+
+  if (localStorage !== undefined) {
+    return readEnabledFeatureToggleNameListFromLocalStorage(localStorage);
+  }
+
+  return [];
+}
+
+/**
+ * Creates the startup feature toggles for the application boot.
+ *
+ * The URL query parameter is the source of truth whenever it is present:
+ * - If `enabled-features` is in the URL, its value is used and synced to local storage.
+ * - If the parameter is missing and local storage is provided, the previously persisted
+ *   toggles are used so they survive page reloads and in-app navigation.
+ * - If neither is available, all toggles are disabled.
+ */
+export function createStartupFeatureTogglesFromLocationSearch(
+  locationSearch: string,
+  localStorage?: StartupFeatureToggleLocalStorage,
+): StartupFeatureToggles {
+  const enabledFeatureToggleNames = readEnabledFeatureToggleNameList(locationSearch, localStorage);
+
+  persistEnabledFeatureToggleNamesInLocalStorage(enabledFeatureToggleNames, localStorage);
+
+  const enabledFeatureToggleNameSet = new Set<StartupFeatureToggleName>(enabledFeatureToggleNames);
 
   return {
     isFeatureToggleEnabled(featureToggleName) {
