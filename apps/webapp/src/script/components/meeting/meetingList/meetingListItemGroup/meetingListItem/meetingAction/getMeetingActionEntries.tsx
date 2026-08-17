@@ -82,8 +82,8 @@ export const getMeetingActionEntries = ({
     click: onDeleteForAll,
   };
 
-  const showDeleteForAll = canDeleteMeetingForAll(meetingInstance, selfUser, nowMilliseconds);
-  const showDeleteForMe = canDeleteMeetingForMe(meetingInstance, selfUser, nowMilliseconds);
+  const showDeleteForAll = canDeleteMeetingForAll(meetingInstance, selfUser);
+  const showDeleteForMe = canDeleteMeetingForMe(meetingInstance, selfUser);
 
   return [
     joinEntry,

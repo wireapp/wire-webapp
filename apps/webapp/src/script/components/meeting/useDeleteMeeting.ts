@@ -30,7 +30,7 @@ import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useDeleteMeeting = () => {
-  const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
+  const {translate, fireAndForgetInvoker} = useApplicationContext();
   const deleteMeetingForMe = useMeetingStore(state => state.deleteMeetingForMe);
   const deleteMeetingForAll = useMeetingStore(state => state.deleteMeetingForAll);
   const removeMeetingByQualifiedId = useMeetingStore(state => state.removeMeetingByQualifiedId);
@@ -43,7 +43,6 @@ export const useDeleteMeeting = () => {
           meetingInstance,
           mode,
           selfUser,
-          wallClock,
           translate,
           deleteMeetingForMe,
           deleteMeetingForAll,
@@ -59,7 +58,6 @@ export const useDeleteMeeting = () => {
       loadMeetings,
       removeMeetingByQualifiedId,
       translate,
-      wallClock,
     ],
   );
 

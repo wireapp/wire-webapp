@@ -219,7 +219,7 @@ describe('getMeetingActionEntries', () => {
     expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
   });
 
-  it('omits Delete meeting for everyone when the instance has started', () => {
+  it('includes Delete meeting for everyone when the instance has started', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
@@ -231,7 +231,7 @@ describe('getMeetingActionEntries', () => {
       onDeleteForMe: noop,
     });
 
-    expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
+    expect(getDeleteForAllEntryLabel(entries)).toBeDefined();
     expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
   });
 
@@ -267,7 +267,7 @@ describe('getMeetingActionEntries', () => {
     expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
   });
 
-  it('omits delete actions for past meetings', () => {
+  it('includes Delete meeting for everyone when the instance is in the past', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
@@ -279,8 +279,24 @@ describe('getMeetingActionEntries', () => {
       onDeleteForMe: noop,
     });
 
-    expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
+    expect(getDeleteForAllEntryLabel(entries)).toBeDefined();
     expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('includes Delete meeting for me for a participant when the instance is in the past', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser('invitee-id'),
+      nowMilliseconds: pastNowMilliseconds,
+      translate,
+      onJoin: noop,
+      onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    expect(getDeleteForMeEntryLabel(entries)).toBeDefined();
+    expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
   });
 
   it('keeps Join now visible but disables it while joining or in a call', () => {

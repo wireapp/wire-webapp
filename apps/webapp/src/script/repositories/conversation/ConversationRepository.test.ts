@@ -37,6 +37,8 @@ import {
   ConversationProtocolUpdateEvent,
   ConversationCreateEvent,
   ConversationCreateMeetingEvent,
+  ConversationDeleteEvent,
+  ConversationDeleteMeetingEvent,
   ConversationMemberJoinEvent,
   CONVERSATION_EVENT,
   ConversationMLSWelcomeEvent,
@@ -51,10 +53,16 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {buildMediaDevicesHandler, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState} from 'Repositories/calling/CallState';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
@@ -2289,6 +2297,190 @@ describe('ConversationRepository', () => {
           injectEventSpy.mockRestore();
           updateParticipatingUserEntitiesSpy.mockRestore();
           saveConversationSpy.mockRestore();
+        }
+      });
+    });
+
+    describe('conversation.delete-meeting', () => {
+      const createDeleteMeetingEvent = (conversation: Conversation): ConversationDeleteMeetingEvent => ({
+        conversation: conversation.id,
+        data: null,
+        from: createUuid(),
+        qualified_conversation: conversation.qualifiedId,
+        time: '2015-04-27T11:42:31.475Z',
+        type: CONVERSATION_EVENT.DELETE_MEETING,
+      });
+
+      const createDeleteEvent = (conversation: Conversation): ConversationDeleteEvent => ({
+        conversation: conversation.id,
+        data: null,
+        from: createUuid(),
+        qualified_conversation: conversation.qualifiedId,
+        time: '2015-04-27T11:42:31.475Z',
+        type: CONVERSATION_EVENT.DELETE,
+      });
+
+      const saveMeetingConversation = async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const meetingConversation = _generateConversation({
+          protocol: CONVERSATION_PROTOCOL.MLS,
+          overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+        });
+        await conversationRepository['saveConversation'](meetingConversation);
+        return meetingConversation;
+      };
+
+      let deleteFromDbSpy: jest.SpyInstance;
+      let wipeMeetingConversationSpy: jest.SpyInstance;
+
+      beforeEach(() => {
+        const conversationRepository = testFactory.conversation_repository!;
+        deleteFromDbSpy = jest
+          .spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb')
+          .mockResolvedValue(1);
+        wipeMeetingConversationSpy = jest
+          .spyOn(conversationRepository, 'wipeMLSCapableConversation')
+          .mockResolvedValue(undefined);
+      });
+
+      afterEach(() => {
+        deleteFromDbSpy.mockRestore();
+        wipeMeetingConversationSpy.mockRestore();
+      });
+
+      it('deletes a local meeting conversation without a delete notification', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const meetingConversation = await saveMeetingConversation();
+        const publishSpy = jest.spyOn(amplify, 'publish');
+
+        try {
+          await conversationRepository['handleConversationEvent'](createDeleteMeetingEvent(meetingConversation));
+
+          expect(
+            conversationRepository['conversationState'].findConversation(meetingConversation.qualifiedId),
+          ).toBeUndefined();
+          expect(publishSpy).not.toHaveBeenCalledWith(WebAppEvents.NOTIFICATION.NOTIFY, expect.anything());
+        } finally {
+          publishSpy.mockRestore();
+        }
+      });
+
+      it.each([
+        {
+          name: 'regular group',
+          params: {type: CONVERSATION_TYPE.REGULAR},
+        },
+        {
+          name: 'channel',
+          params: {overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.CHANNEL}},
+        },
+        {
+          name: '1:1',
+          params: {type: CONVERSATION_TYPE.ONE_TO_ONE},
+        },
+      ])('ignores conversation.delete-meeting for a $name', async ({params}) => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const conversation = _generateConversation(params);
+        await conversationRepository['saveConversation'](conversation);
+
+        await conversationRepository['handleConversationEvent'](createDeleteMeetingEvent(conversation));
+
+        expect(conversationRepository['conversationState'].findConversation(conversation.qualifiedId)).toBe(conversation);
+      });
+
+      it('does not throw when the conversation is unknown', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const getConversationByIdSpy = jest
+          .spyOn(conversationRepository, 'getConversationById')
+          .mockRejectedValue(
+            new ConversationError(
+              ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+              ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+            ),
+          );
+
+        const unknownConversation = _generateConversation({
+          overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
+        });
+
+        try {
+          await expect(
+            conversationRepository['handleConversationEvent'](createDeleteMeetingEvent(unknownConversation)),
+          ).resolves.toBeUndefined();
+        } finally {
+          getConversationByIdSpy.mockRestore();
+        }
+      });
+
+      it('still deletes a conversation.delete event and notifies', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const conversation = _generateConversation();
+        await conversationRepository['saveConversation'](conversation);
+        const publishSpy = jest.spyOn(amplify, 'publish');
+
+        try {
+          await conversationRepository['handleConversationEvent'](createDeleteEvent(conversation));
+
+          expect(conversationRepository['conversationState'].findConversation(conversation.qualifiedId)).toBeUndefined();
+          expect(publishSpy).toHaveBeenCalledWith(
+            WebAppEvents.NOTIFICATION.NOTIFY,
+            expect.objectContaining({system_message_type: SystemMessageType.CONVERSATION_DELETE}),
+          );
+        } finally {
+          publishSpy.mockRestore();
+        }
+      });
+
+      it('leaves an active call and clears calling state for a deleted meeting conversation', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const meetingConversation = await saveMeetingConversation();
+        const callState = container.resolve(CallState);
+        const call = new Call(
+          {domain: 'caller.com', id: 'caller-id'},
+          meetingConversation,
+          CONV_TYPE.CONFERENCE_MLS,
+          createSelfParticipant(),
+          CALL_TYPE.NORMAL,
+          buildMediaDevicesHandler(),
+        );
+        call.state(CALL_STATE.MEDIA_ESTAB);
+        callState.calls.push(call);
+
+        const leaveCallSpy = jest.spyOn(conversationRepository['callingRepository'], 'leaveCall');
+
+        try {
+          await conversationRepository['handleConversationEvent'](createDeleteMeetingEvent(meetingConversation));
+
+          expect(leaveCallSpy).toHaveBeenCalledWith(
+            meetingConversation.qualifiedId,
+            LEAVE_CALL_REASON.USER_IS_REMOVED_FROM_CONVERSATION,
+          );
+          expect(conversationRepository['callingRepository'].findCall(meetingConversation.qualifiedId)).toBeUndefined();
+          expect(callState.activeCalls()).toHaveLength(0);
+        } finally {
+          leaveCallSpy.mockRestore();
+          callState.calls.removeAll();
+        }
+      });
+
+      it('succeeds when there is no call for the meeting conversation', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const meetingConversation = await saveMeetingConversation();
+        const leaveCallSpy = jest.spyOn(conversationRepository['callingRepository'], 'leaveCall');
+
+        try {
+          await conversationRepository['handleConversationEvent'](createDeleteMeetingEvent(meetingConversation));
+
+          expect(
+            conversationRepository['conversationState'].findConversation(meetingConversation.qualifiedId),
+          ).toBeUndefined();
+          expect(leaveCallSpy).toHaveBeenCalledWith(
+            meetingConversation.qualifiedId,
+            LEAVE_CALL_REASON.USER_IS_REMOVED_FROM_CONVERSATION,
+          );
+          expect(conversationRepository['callingRepository'].findCall(meetingConversation.qualifiedId)).toBeUndefined();
+        } finally {
+          leaveCallSpy.mockRestore();
         }
       });
     });

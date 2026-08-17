@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent, useEffect} from 'react';
+import {MouseEvent} from 'react';
 
 import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
 
@@ -31,11 +31,10 @@ import {useDeleteMeeting} from 'Components/meeting/useDeleteMeeting';
 import {useEditMeeting} from 'Components/meeting/useEditMeeting';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
 import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
-import {getMeetingTemporalStatusAt, MeetingTemporalStatuses} from 'Components/meeting/utils/meetingStatusUtil';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {closeContextMenu, showContextMenu} from '../../../../../../ui/contextMenu';
+import {showContextMenu} from '../../../../../../ui/contextMenu';
 
 interface MeetingActionProps {
   meetingInstance: MeetingInstance;
@@ -48,22 +47,6 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
   const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const {openDeleteMeetingModal} = useDeleteMeeting();
-
-  const temporalStatus = getMeetingTemporalStatusAt(
-    new Date(wallClock.currentTimestampInMilliseconds),
-    meetingInstance.start,
-    meetingInstance.end,
-  );
-
-  useEffect(() => {
-    if (temporalStatus === MeetingTemporalStatuses.PAST) {
-      closeContextMenu();
-    }
-  }, [temporalStatus]);
-
-  if (temporalStatus === MeetingTemporalStatuses.PAST) {
-    return null;
-  }
 
   const handleActionButton = (event: MouseEvent<HTMLElement>) => {
     if (selfUser === undefined) {
@@ -87,12 +70,12 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
           }
         },
         onDeleteForAll: () => {
-          if (canDeleteMeetingForAll(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
+          if (canDeleteMeetingForAll(meetingInstance, selfUser)) {
             openDeleteMeetingModal(meetingInstance, 'forAll', selfUser);
           }
         },
         onDeleteForMe: () => {
-          if (canDeleteMeetingForMe(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
+          if (canDeleteMeetingForMe(meetingInstance, selfUser)) {
             openDeleteMeetingModal(meetingInstance, 'forMe', selfUser);
           }
         },

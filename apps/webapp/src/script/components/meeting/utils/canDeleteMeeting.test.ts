@@ -19,17 +19,9 @@
 
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {
-  canDeleteMeeting,
-  canDeleteMeetingForAll,
-  canDeleteMeetingForMe,
-} from 'Components/meeting/utils/canDeleteMeeting';
+import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
-
-const futureNowMilliseconds = Date.parse('2026-06-15T13:00:00.000Z');
-const ongoingNowMilliseconds = Date.parse('2026-06-15T14:30:00.000Z');
-const pastNowMilliseconds = Date.parse('2026-06-15T16:00:00.000Z');
 
 const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
   series_start_date: '2026-06-15T14:00:00.000Z',
@@ -60,51 +52,30 @@ const createSelfUser = (id = 'host-id') => {
   return user;
 };
 
-describe('canDeleteMeeting', () => {
-  it('allows delete for upcoming and ongoing meetings', () => {
-    const meetingInstance = createMeetingInstance();
-
-    expect(canDeleteMeeting(meetingInstance, futureNowMilliseconds)).toBe(true);
-    expect(canDeleteMeeting(meetingInstance, ongoingNowMilliseconds)).toBe(true);
-  });
-
-  it('disallows delete for past meetings', () => {
-    const meetingInstance = createMeetingInstance();
-
-    expect(canDeleteMeeting(meetingInstance, pastNowMilliseconds)).toBe(false);
-  });
-});
-
 describe('canDeleteMeetingForAll', () => {
-  it('allows host delete when the meeting has not started', () => {
+  it('allows host delete regardless of meeting time', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(canDeleteMeetingForAll(meetingInstance, createSelfUser(), futureNowMilliseconds)).toBe(true);
-  });
-
-  it('disallows host delete when the meeting has started', () => {
-    const meetingInstance = createMeetingInstance();
-
-    expect(canDeleteMeetingForAll(meetingInstance, createSelfUser(), ongoingNowMilliseconds)).toBe(false);
+    expect(canDeleteMeetingForAll(meetingInstance, createSelfUser())).toBe(true);
   });
 
   it('disallows delete for non-host users', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(canDeleteMeetingForAll(meetingInstance, createSelfUser('invitee-id'), futureNowMilliseconds)).toBe(false);
+    expect(canDeleteMeetingForAll(meetingInstance, createSelfUser('invitee-id'))).toBe(false);
   });
 });
 
 describe('canDeleteMeetingForMe', () => {
-  it('allows participant delete when the meeting is not past', () => {
+  it('allows participant delete regardless of meeting time', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(canDeleteMeetingForMe(meetingInstance, createSelfUser('invitee-id'), futureNowMilliseconds)).toBe(true);
+    expect(canDeleteMeetingForMe(meetingInstance, createSelfUser('invitee-id'))).toBe(true);
   });
 
   it('disallows delete for the host', () => {
     const meetingInstance = createMeetingInstance();
 
-    expect(canDeleteMeetingForMe(meetingInstance, createSelfUser(), futureNowMilliseconds)).toBe(false);
+    expect(canDeleteMeetingForMe(meetingInstance, createSelfUser())).toBe(false);
   });
 });
