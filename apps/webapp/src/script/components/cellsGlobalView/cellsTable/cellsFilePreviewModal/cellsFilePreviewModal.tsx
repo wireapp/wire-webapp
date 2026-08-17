@@ -19,6 +19,7 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
+import {CellsSelfUserDriveRoleProvider} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
@@ -57,19 +58,21 @@ export const CellsFilePreviewModal = () => {
   };
 
   return (
-    <FileFullscreenModal
-      id={selectedFile.id}
-      isOpen={selectedFile !== null}
-      onClose={handleCloseFile}
-      filePreviewUrl={getFileUrl()}
-      fileUrl={url}
-      fileName={name}
-      fileExtension={extension}
-      status={getFileUrl() === undefined ? 'unavailable' : 'success'}
-      senderName={owner}
-      timestamp={uploadedAtTimestamp}
-      badges={sortTagsAlphabetically(tags)}
-      isEditMode={isEditMode}
-    />
+    <CellsSelfUserDriveRoleProvider selfUserDriveRole={selectedFile.selfUserDriveRole}>
+      <FileFullscreenModal
+        id={selectedFile.id}
+        isOpen={selectedFile !== null}
+        onClose={handleCloseFile}
+        filePreviewUrl={getFileUrl()}
+        fileUrl={url}
+        fileName={name}
+        fileExtension={extension}
+        status={getFileUrl() === undefined ? 'unavailable' : 'success'}
+        senderName={owner}
+        timestamp={uploadedAtTimestamp}
+        badges={sortTagsAlphabetically(tags)}
+        isEditMode={isEditMode}
+      />
+    </CellsSelfUserDriveRoleProvider>
   );
 };
