@@ -525,7 +525,7 @@ jobs:
       - name: Setup Helm
         uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
         with:
-          version: '3.21.3'
+          version: '3.21.4'
 
       - name: Check whether this main delivery is current
         id: check_latest_main
