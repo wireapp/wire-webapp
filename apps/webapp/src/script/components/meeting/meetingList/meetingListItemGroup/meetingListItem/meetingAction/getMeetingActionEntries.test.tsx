@@ -97,8 +97,8 @@ describe('getMeetingActionEntries', () => {
     expect(getEntryLabels(entries)).not.toContain('meetings.action.startMeeting');
   });
 
-  it.each([futureNowMilliseconds, ongoingNowMilliseconds, pastNowMilliseconds])(
-    'always includes Join now regardless of meeting state',
+  it.each([futureNowMilliseconds, ongoingNowMilliseconds])(
+    'includes Join now for upcoming and ongoing meetings',
     nowMilliseconds => {
       const onJoin = jest.fn();
       const entries = getMeetingActionEntries({
@@ -281,6 +281,7 @@ describe('getMeetingActionEntries', () => {
 
     expect(getDeleteForAllEntryLabel(entries)).toBeDefined();
     expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
+    expect(getJoinEntry(entries)).toBeUndefined();
   });
 
   it('includes Delete meeting for me for a participant when the instance is in the past', () => {
@@ -297,6 +298,7 @@ describe('getMeetingActionEntries', () => {
 
     expect(getDeleteForMeEntryLabel(entries)).toBeDefined();
     expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
+    expect(getJoinEntry(entries)).toBeUndefined();
   });
 
   it('keeps Join now visible but disables it while joining or in a call', () => {
