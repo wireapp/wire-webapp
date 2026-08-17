@@ -353,7 +353,6 @@ export function ConfigToolbar() {
       locationSearch,
       featureToggleName,
       shouldEnableFeatureToggle,
-      localStorage: globalThis.localStorage,
     });
     const locationPathname = applicationNavigation.currentPathname;
     const locationHash = applicationNavigation.currentHash;

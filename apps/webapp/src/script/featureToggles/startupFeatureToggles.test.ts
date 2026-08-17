@@ -21,7 +21,6 @@ import {
   allowedStartupFeatureToggleNames,
   createStartupFeatureTogglesFromLocationSearch,
   startupFeatureToggleQueryParameterName,
-  startupFeatureToggleLocalStorageKey,
 } from './startupFeatureToggles';
 import {
   applockRefactoredFeatureToggleName,
@@ -164,95 +163,5 @@ describe('startupFeatureToggles', function () {
     );
 
     expect('enabledFeatureToggleNameSet' in startupFeatureToggles).toBe(false);
-  });
-});
-
-type LocalStorageStub = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
-
-function createInMemoryLocalStorageStub(initialValue?: string): {
-  localStorage: LocalStorageStub;
-  getStoredValue: () => string | null;
-} {
-  let storedValue: string | null = initialValue ?? null;
-
-  return {
-    localStorage: {
-      getItem: (key: string) => (key === startupFeatureToggleLocalStorageKey ? storedValue : null),
-      setItem: (key: string, value: string) => {
-        if (key === startupFeatureToggleLocalStorageKey) {
-          storedValue = value;
-        }
-      },
-      removeItem: (key: string) => {
-        if (key === startupFeatureToggleLocalStorageKey) {
-          storedValue = null;
-        }
-      },
-    },
-    getStoredValue: () => storedValue,
-  };
-}
-
-describe('startupFeatureToggles session persistence', () => {
-  it('falls back to local storage when the query parameter is missing', () => {
-    const {localStorage} = createInMemoryLocalStorageStub(applockRefactoredFeatureToggleName);
-
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar', localStorage);
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
-    expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([applockRefactoredFeatureToggleName]);
-  });
-
-  it('prefers the query parameter over local storage', () => {
-    const {localStorage} = createInMemoryLocalStorageStub(applockRefactoredFeatureToggleName);
-
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${viewerPermissionFeatureToggleName}`,
-      localStorage,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(false);
-    expect(startupFeatureToggles.isFeatureToggleEnabled(viewerPermissionFeatureToggleName)).toBe(true);
-  });
-
-  it('persists query parameter toggles to local storage', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub();
-
-    createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
-      localStorage,
-    );
-
-    expect(getStoredValue()).toBe(applockRefactoredFeatureToggleName);
-  });
-
-  it('clears local storage when the query parameter is present but empty', () => {
-    const {localStorage, getStoredValue} = createInMemoryLocalStorageStub(applockRefactoredFeatureToggleName);
-
-    createStartupFeatureTogglesFromLocationSearch(`?${startupFeatureToggleQueryParameterName}=`, localStorage);
-
-    expect(getStoredValue()).toBeNull();
-  });
-
-  it('does not read from local storage when no local storage is provided', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
-
-    expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
-  });
-
-  it('ignores unknown feature toggles from local storage', () => {
-    const {localStorage} = createInMemoryLocalStorageStub('unknown-feature');
-
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar', localStorage);
-
-    expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
-  });
-
-  it('trims whitespace around feature toggle names from local storage', () => {
-    const {localStorage} = createInMemoryLocalStorageStub(` ${applockRefactoredFeatureToggleName} `);
-
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar', localStorage);
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
   });
 });
