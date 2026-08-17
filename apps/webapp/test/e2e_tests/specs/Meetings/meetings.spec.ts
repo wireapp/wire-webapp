@@ -311,6 +311,33 @@ test.describe('Meeting notifications', () => {
     await expect(secondMemberMeetings.notificationCardContaining(`Invitation: ${MEETING_TITLE}`)).toHaveCount(1);
   });
 
+  test('re-adding a removed participant shows a new invitation', async ({createUser, createTeam, createPage}) => {
+    const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
+    const [firstMember, secondMember] = members;
+
+    const [ownerPage, firstMemberPage] = await loginMeetingsUsers(createPage, [owner, firstMember, secondMember]);
+    const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+    const firstMemberMeetings = PageManager.from(firstMemberPage).webapp.pages.meetings();
+
+    await ownerMeetings.openMeetingsTab();
+    await ownerMeetings.scheduleMeeting(MEETING_TITLE, [secondMember.fullName]);
+    await ownerMeetings.editMeeting(MEETING_TITLE, {addParticipants: [firstMember.fullName]});
+
+    await firstMemberMeetings.waitForMeetingInList(MEETING_TITLE);
+    await firstMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
+
+    await ownerMeetings.editMeeting(MEETING_TITLE, {removeParticipants: [firstMember.fullName]});
+
+    await firstMemberMeetings.waitForNotificationContaining(`Canceled: ${MEETING_TITLE}`);
+    await expect(firstMemberMeetings.notificationCardContaining(`Invitation: ${MEETING_TITLE}`)).toHaveCount(0);
+
+    await ownerMeetings.editMeeting(MEETING_TITLE, {addParticipants: [firstMember.fullName]});
+
+    await firstMemberMeetings.waitForMeetingInList(MEETING_TITLE);
+    await firstMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
+    await expect(firstMemberMeetings.notificationCardContaining(`Invitation: ${MEETING_TITLE}`)).toHaveCount(1);
+  });
+
   test('removed participant sees cancellation notification and stale invitation is dismissed', async ({
     createUser,
     createTeam,

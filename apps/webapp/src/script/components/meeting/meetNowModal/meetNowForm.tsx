@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef, type FormEvent} from 'react';
+import {type FormEvent, useEffect, useRef} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
@@ -80,6 +80,7 @@ export const MeetNowForm = ({
     <form id={MEET_NOW_FORM_ID} css={meetNowFormLayoutStyles} onSubmit={onSubmit} noValidate>
       <Input
         id="meet-now-title"
+        data-uie-name="meet-now-title"
         ref={titleInputRef}
         autoComplete="off"
         label={translate('meetings.scheduleModal.titleLabel')}
@@ -107,6 +108,7 @@ export const MeetNowForm = ({
       <div css={scheduleMeetingParticipantsSectionCss}>
         <MeetingParticipantsPicker
           id="meet-now-participants"
+          dataUieName="meet-now-participants"
           users={users}
           selectedUsers={formState.selectedUsers}
           onSelectedUsersChange={onSelectedUsersChange}

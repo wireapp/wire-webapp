@@ -100,6 +100,7 @@ export const MeetNowModal = () => {
   return (
     <ModalComponent
       id="meet-now-modal"
+      data-uie-name="meet-now-modal"
       wrapperCSS={{...modalWrapperStyles, ...meetNowModalWrapperStyles}}
       isShown={isOpen}
       onClosed={handleClose}
