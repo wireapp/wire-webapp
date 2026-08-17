@@ -36,15 +36,13 @@ export const MeetingCallingView = () => {
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {callingRepository} = callingViewModel;
 
-  const meetingCalls = activeCalls.filter(call => call.conversation.isMeeting());
-
-  if (meetingCalls.length === 0) {
+  if (activeCalls.length === 0) {
     return null;
   }
 
   return (
     <div css={meetingCallingViewStyles} data-uie-name="meeting-calling-view">
-      {meetingCalls.map(call => (
+      {activeCalls.map(call => (
         <CallingCell
           key={`${call.conversation.qualifiedId.id}-${call.conversation.qualifiedId.domain}`}
           classifiedDomains={classifiedDomains}
