@@ -93,7 +93,7 @@ const submitMeeting = ({
   }
 
   if (originalStart.isNothing || originalEnd.isNothing) {
-    return task.reject(meetingSubmitErrors.updateFailed);
+    return task.reject(meetingSubmitErrors.originalMeetingTimesMissing);
   }
 
   const commandResult = mapScheduleFormToUpdateMeetingCommand({

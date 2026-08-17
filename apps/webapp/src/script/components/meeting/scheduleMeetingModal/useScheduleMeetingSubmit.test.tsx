@@ -238,6 +238,24 @@ describe('useScheduleMeetingSubmit', () => {
     expect(loadMeetings).not.toHaveBeenCalled();
   });
 
+  it('fails closed when original edit times are missing', async () => {
+    const updateMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
+    const store = createMeetingStore({updateMeeting});
+
+    openEditMeetingModal();
+    useScheduleMeetingModal.setState({originalStart: maybe.nothing(), originalEnd: maybe.nothing()});
+
+    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.succeeded;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.submitFailed);
+    expect(updateMeeting).not.toHaveBeenCalled();
+  });
+
   const openEditMeetingModal = () => {
     useScheduleMeetingModal.getState().openEdit(
       {

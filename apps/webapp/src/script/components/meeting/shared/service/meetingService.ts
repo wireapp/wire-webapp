@@ -173,7 +173,16 @@ export const updateMeeting = (
   const {usersToAdd, userIdsToRemove} = computeParticipantDiff(command.originalSelectedUsers, command.selectedUsers);
 
   if (!hasMeetingMetadataChanged(command)) {
-    return syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove);
+    return syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove).andThen(submitSuccess => {
+      if ((isEmptyArray(usersToAdd) && isEmptyArray(userIdsToRemove)) || command.qualifiedConversation.isNothing) {
+        return task.resolve(submitSuccess);
+      }
+
+      return syncMeetingConversationName(deps.conversationRepository, {
+        qualifiedConversationId: command.qualifiedConversation.value,
+        title: command.title,
+      }).map(() => submitSuccess);
+    });
   }
 
   return deps.meetingsRepository

@@ -437,6 +437,27 @@ describe('updateMeeting', () => {
     expect(renameConversation).not.toHaveBeenCalled();
   });
 
+  it('heals a drifted conversation name when only participants change', async () => {
+    const conversation = createMeetingConversation({name: 'Stale call name'});
+    const participant = createUser('1');
+    const {deps, updateMeetingMock, safeAddUsers, renameConversation} = createDeps({
+      safeGetConversationById: jest.fn().mockReturnValue(task.resolve(conversation)),
+    });
+
+    const result = await updateMeeting(
+      updateCommand({
+        selectedUsers: [participant],
+        originalSelectedUsers: [],
+      }),
+      deps,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(updateMeetingMock).not.toHaveBeenCalled();
+    expect(safeAddUsers).toHaveBeenCalledWith(conversation, [participant]);
+    expect(renameConversation).toHaveBeenCalledWith(conversation, 'Weekly sync');
+  });
+
   it('does not update when the title differs only by surrounding whitespace', async () => {
     const {deps, updateMeetingMock} = createDeps();
 
