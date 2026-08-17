@@ -153,6 +153,7 @@ export const ScheduleMeetingModal = () => {
             css={submitButtonStyles}
             onClick={handleSubmit}
             disabled={isSubmitting}
+            showLoading={isSubmitting}
             data-uie-name="schedule-meeting-modal-submit"
           >
             <CalendarIcon aria-hidden="true" css={submitButtonIconStyles} />

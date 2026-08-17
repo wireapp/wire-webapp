@@ -139,6 +139,7 @@ export const MeetNowModal = () => {
             variant={ButtonVariant.PRIMARY}
             css={submitButtonStyles}
             disabled={isSubmitting}
+            showLoading={isSubmitting}
           >
             <CallIcon aria-hidden="true" css={submitButtonIconStyles} />
             {translate('meetings.meetNowModal.startMeeting')}
