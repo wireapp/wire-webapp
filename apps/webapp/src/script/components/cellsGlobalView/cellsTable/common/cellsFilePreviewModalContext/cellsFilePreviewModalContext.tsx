@@ -21,7 +21,7 @@ import {createContext, ReactNode, useContext, useId, useMemo, useState} from 're
 
 import {CellFile} from 'src/script/types/cellNode';
 
-interface CellsFilePreviewModalContextValue {
+export interface CellsFilePreviewModalContextValue {
   id: string;
   selectedFile: CellFile | null;
   isEditMode: boolean;
@@ -29,7 +29,7 @@ interface CellsFilePreviewModalContextValue {
   handleCloseFile: () => void;
 }
 
-const CellsFilePreviewModalContext = createContext<CellsFilePreviewModalContextValue | null>(null);
+export const CellsFilePreviewModalContext = createContext<CellsFilePreviewModalContextValue | null>(null);
 
 interface FilePreviewProviderProps {
   children: ReactNode;

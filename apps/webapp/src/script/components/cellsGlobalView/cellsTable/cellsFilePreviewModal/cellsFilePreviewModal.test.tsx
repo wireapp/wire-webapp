@@ -17,8 +17,9 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import {ReactNode} from 'react';
+
+import {act, render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
@@ -27,12 +28,16 @@ import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
+  createExecutingFireAndForgetInvokerForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellFile, CellNodeType} from 'src/script/types/cellNode';
 
 import {CellsFilePreviewModal} from './cellsFilePreviewModal';
-import {FilePreviewProvider, useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
+import {
+  CellsFilePreviewModalContext,
+  CellsFilePreviewModalContextValue,
+} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 const translate = (key: string) =>
   ({
@@ -40,16 +45,26 @@ const translate = (key: string) =>
     'cells.imageFullScreenModal.downloadButton': 'Download',
     'cells.options.label': 'More options',
     'cells.options.versionHistory': 'Version History',
+    'fileFullscreenModal.editor.iframeTitle': 'Collabora editor',
   })[key] ?? key;
 
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled: featureName => featureName === viewerPermissionFeatureToggleName,
-    translate,
-  }),
-);
+const createRootProviderWrapper = ({
+  fireAndForgetInvoker,
+  isViewerPermissionFeatureEnabled,
+}: {
+  fireAndForgetInvoker: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
+  isViewerPermissionFeatureEnabled: boolean;
+}) =>
+  createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      fireAndForgetInvoker,
+      isFeatureToggleEnabled: featureName =>
+        featureName === viewerPermissionFeatureToggleName && isViewerPermissionFeatureEnabled,
+      translate,
+    }),
+  );
 
-const viewerFile: CellFile = {
+const file: CellFile = {
   id: 'file-id',
   type: CellNodeType.FILE,
   url: 'https://example.com/document.docx',
@@ -68,41 +83,82 @@ const viewerFile: CellFile = {
   selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
 };
 
-const OpenPreviewButton = () => {
-  const {handleOpenFile} = useCellsFilePreviewModal();
+const FakeFilePreviewProvider = ({
+  children,
+  selfUserDriveRole,
+}: {
+  children: ReactNode;
+  selfUserDriveRole: CellFile['selfUserDriveRole'];
+}) => {
+  const value: CellsFilePreviewModalContextValue = {
+    id: 'preview-context-id',
+    selectedFile: {...file, selfUserDriveRole},
+    isEditMode: true,
+    handleOpenFile: jest.fn(),
+    handleCloseFile: jest.fn(),
+  };
 
-  return (
-    <button type="button" onClick={() => handleOpenFile(viewerFile, true)}>
-      Open preview
-    </button>
-  );
+  return <CellsFilePreviewModalContext.Provider value={value}>{children}</CellsFilePreviewModalContext.Provider>;
 };
 
 describe('CellsFilePreviewModal', () => {
   beforeEach(() => {
-    container.registerInstance(CellsRepository, {} as CellsRepository);
+    container.registerInstance(CellsRepository, {
+      getNode: jest.fn().mockResolvedValue({
+        EditorURLs: {
+          collabora: {
+            ExpiresAt: '1000',
+            Url: 'https://cells.example.com/editor?token=abc',
+          },
+        },
+        IsRecycled: false,
+      }),
+    } as unknown as CellsRepository);
   });
 
   afterEach(() => {
     container.reset();
   });
 
-  it('uses the global drive file role when rendering fullscreen actions', async () => {
+  const renderModal = ({
+    isViewerPermissionFeatureEnabled = true,
+    selfUserDriveRole,
+  }: {
+    isViewerPermissionFeatureEnabled?: boolean;
+    selfUserDriveRole: CellFile['selfUserDriveRole'];
+  }) => {
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+
     render(
       withThemeAndRootContext(
-        <FilePreviewProvider>
-          <OpenPreviewButton />
+        <FakeFilePreviewProvider selfUserDriveRole={selfUserDriveRole}>
           <CellsFilePreviewModal />
-        </FilePreviewProvider>,
-        rootProviderWrapper,
+        </FakeFilePreviewProvider>,
+        createRootProviderWrapper({fireAndForgetInvoker, isViewerPermissionFeatureEnabled}),
       ),
     );
 
-    await userEvent.click(screen.getByRole('button', {name: 'Open preview'}));
+    return {fireAndForgetInvoker};
+  };
+
+  it('uses the global drive file role when rendering fullscreen actions', async () => {
+    renderModal({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER});
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Editing'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'More options'})).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Collabora editor')).not.toBeInTheDocument();
+  });
+
+  it('keeps fullscreen modification actions available for editors', async () => {
+    const {fireAndForgetInvoker} = renderModal({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR});
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Editing'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'More options'})).toBeInTheDocument();
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    expect(screen.getByTitle('Collabora editor')).toBeInTheDocument();
   });
 });
