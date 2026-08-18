@@ -19,6 +19,7 @@
 
 import {render} from '@testing-library/react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {UserType} from '@wireapp/api-client/lib/user';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
@@ -65,5 +66,25 @@ describe('SharedDrive', () => {
     expect(getByTestId('shared-drive-viewer-icon')).toBeInTheDocument();
     expect(getByText('Editor user')).toBeInTheDocument();
     expect(getByText('Viewer user')).toBeInTheDocument();
+  });
+
+  it('does not show access roles for apps and services', () => {
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.teamId = 'conversation-team';
+
+    const app = createUser({id: 'app', name: 'App', teamId: 'conversation-team'});
+    app.type = UserType.APP;
+    const service = createUser({id: 'service', name: 'Service', teamId: 'conversation-team'});
+    service.isService = true;
+    service.type = UserType.BOT;
+    conversation.participating_user_ets([app, service]);
+
+    const {queryByText} = render(
+      <SharedDrive activeConversation={conversation} onBack={jest.fn()} onClose={jest.fn()} />,
+      {wrapper: rootProviderWrapper},
+    );
+
+    expect(queryByText('App')).not.toBeInTheDocument();
+    expect(queryByText('Service')).not.toBeInTheDocument();
   });
 });

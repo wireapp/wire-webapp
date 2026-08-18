@@ -19,6 +19,8 @@
 
 import {useMemo} from 'react';
 
+import {UserType} from '@wireapp/api-client/lib/user';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
@@ -32,7 +34,6 @@ import {ParticipantItemContent} from 'Components/participantItemContent';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {isServiceEntity} from 'src/script/guards/Service';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {capitalizeFirstChar, sortUsersByPriority} from 'Util/stringUtil';
@@ -73,7 +74,9 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
   } = useKoSubscribableChildren(activeConversation, ['isSelfUserRemoved', 'participating_user_ets', 'selfUser']);
 
   const participants = useMemo(() => {
-    const users = participatingUsers.filter((participant): participant is User => !isServiceEntity(participant));
+    const users = participatingUsers.filter(
+      (participant): participant is User => participant.type === UserType.REGULAR,
+    );
 
     if (!isSelfUserRemoved && selfUser) {
       return [...users, selfUser].toSorted(sortUsersByPriority);
