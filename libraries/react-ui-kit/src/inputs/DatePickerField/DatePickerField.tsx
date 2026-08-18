@@ -61,7 +61,7 @@ import {
   dateSegmentStyles,
 } from './DatePickerField.styles';
 
-import {CalendarIcon} from '../../dataDisplay/Icon';
+import {CalendarIcon} from '../../dataDisplay/icon';
 import {Theme} from '../../identity/Theme';
 import {getOverlayPortalContainer} from '../../utils/overlayPortal';
 import {InputLabel} from '../InputLabel';

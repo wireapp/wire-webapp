@@ -21,7 +21,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 
 import {Button, ButtonVariant} from './Button';
 
-import {PlaneIcon} from '../../dataDisplay/Icon';
+import {PlaneIcon} from '../../dataDisplay/icon';
 import {COLOR_V2} from '../../identity';
 
 const meta = {

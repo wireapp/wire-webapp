@@ -17,11 +17,11 @@
  *
  */
 
-export * from './Avatar';
-export * from './AvatarGrid';
-export * from './Badge';
-export * from './BadgesWithTooltip';
-export * from './Icon';
-export * from './Loading';
-export * from './Pill';
-export * from './Tooltip';
+export * from './avatar';
+export * from './avatarGrid';
+export * from './badge';
+export * from './badgesWithTooltip';
+export * from './icon';
+export * from './loading';
+export * from './pill';
+export * from './tooltip';

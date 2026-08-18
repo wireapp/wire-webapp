@@ -22,7 +22,7 @@ import {components, GroupBase, MenuListProps} from 'react-select';
 
 import {closeButtonStyles, headingContainerStyles} from './SelectMenuList.styles';
 
-import {CloseIcon} from '../../../dataDisplay/Icon';
+import {CloseIcon} from '../../../dataDisplay/icon';
 import {Theme} from '../../../identity/Theme';
 import {Option} from '../Select';
 

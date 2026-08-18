@@ -21,7 +21,7 @@ import {Meta, StoryObj} from '@storybook/react/*';
 
 import {DropdownMenu} from './DropdownMenu';
 
-import {PlusIcon} from '../../dataDisplay/Icon';
+import {PlusIcon} from '../../dataDisplay/icon';
 import {Button, ButtonVariant} from '../../inputs';
 import {IconButton, IconButtonVariant} from '../../inputs/IconButton';
 

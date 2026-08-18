@@ -21,7 +21,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 
 import {InputSubmitCombo} from './InputSubmitCombo';
 
-import {ArrowIcon, AttachmentIcon} from '../../dataDisplay/Icon';
+import {ArrowIcon, AttachmentIcon} from '../../dataDisplay/icon';
 import {Input} from '../Input';
 import {RoundIconButton} from '../RoundIconButton';
 

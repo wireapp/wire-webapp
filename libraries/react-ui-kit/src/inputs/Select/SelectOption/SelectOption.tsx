@@ -22,7 +22,7 @@ import {useEffect, useRef} from 'react';
 import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {components, GroupBase, OptionProps, OptionsOrGroups} from 'react-select';
 
-import {CheckIcon} from '../../../dataDisplay/Icon';
+import {CheckIcon} from '../../../dataDisplay/icon';
 import {Theme} from '../../../identity/Theme';
 import {Option} from '../Select';
 

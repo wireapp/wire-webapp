@@ -24,7 +24,7 @@ import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {Property} from 'csstype';
 
-import {ErrorIcon, HideIcon, ShowIcon} from '../../dataDisplay/Icon';
+import {ErrorIcon, HideIcon, ShowIcon} from '../../dataDisplay/icon';
 import {Theme} from '../../identity/Theme';
 import {TextProps} from '../../typography';
 import {filterProps} from '../../utils/util';

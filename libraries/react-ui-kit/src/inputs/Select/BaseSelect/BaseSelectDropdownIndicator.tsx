@@ -19,7 +19,7 @@
 
 import {components, DropdownIndicatorProps, GroupBase} from 'react-select';
 
-import {ArrowDown} from '../../../dataDisplay/Icon/ArrowDown';
+import {ArrowDown} from '../../../dataDisplay/icon/arrowDown';
 
 export const BaseSelectDropdownIndicator = <
   Option = unknown,

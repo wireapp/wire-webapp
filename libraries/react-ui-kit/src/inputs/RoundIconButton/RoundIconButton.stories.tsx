@@ -34,7 +34,7 @@ import {
   TeamIcon,
   TimedIcon,
   TrashIcon,
-} from '../../dataDisplay/Icon';
+} from '../../dataDisplay/icon';
 import {COLOR} from '../../identity';
 
 const meta = {

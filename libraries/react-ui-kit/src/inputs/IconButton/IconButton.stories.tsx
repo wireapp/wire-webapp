@@ -21,7 +21,7 @@ import {Meta, StoryObj} from '@storybook/react';
 
 import {IconButton, IconButtonVariant} from './IconButton';
 
-import {InfoIcon, PlusIcon, TrashIcon} from '../../dataDisplay/Icon';
+import {InfoIcon, PlusIcon, TrashIcon} from '../../dataDisplay/icon';
 import {COLOR} from '../../identity/colors/colors';
 
 const meta: Meta<typeof IconButton> = {

@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {SVGIcon, SVGIconProps} from '../../dataDisplay/Icon/SVGIcon';
+import {SVGIcon, SVGIconProps} from '../../dataDisplay/icon/svgIcon';
 import {COLOR} from '../colors';
 import {defaultTransition} from '../motions/motions';
 import {Theme} from '../Theme';

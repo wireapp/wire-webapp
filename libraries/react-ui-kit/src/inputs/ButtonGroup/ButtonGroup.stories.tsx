@@ -21,7 +21,7 @@ import {Meta, StoryObj} from '@storybook/react';
 
 import {ButtonGroup} from './ButtonGroup';
 
-import {PlusIcon} from '../../dataDisplay/Icon';
+import {PlusIcon} from '../../dataDisplay/icon';
 
 const meta: Meta<typeof ButtonGroup> = {
   component: ButtonGroup,

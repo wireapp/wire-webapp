@@ -19,7 +19,7 @@
 
 import {iconStyles} from './BreadcrumbLeaf.styles';
 
-import {ChevronUpIcon} from '../../../dataDisplay/Icon';
+import {ChevronUpIcon} from '../../../dataDisplay/icon';
 
 export const BreadcrumbLeaf = () => {
   return (

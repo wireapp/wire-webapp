@@ -21,7 +21,7 @@ import {Meta, StoryObj} from '@storybook/react/*';
 
 import {Breadcrumbs} from './Breadcrumbs';
 
-import {TrashIcon} from '../../dataDisplay/Icon';
+import {TrashIcon} from '../../dataDisplay/icon';
 
 const meta: Meta<typeof Breadcrumbs> = {
   component: Breadcrumbs,

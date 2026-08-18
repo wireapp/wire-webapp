@@ -594,3 +594,9 @@ ls:
   libraries/react-ui-kit/src/images:
     .dir: camelCase
     .tsx: camelCase
+  libraries/react-ui-kit/src/dataDisplay:
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+    .stories.tsx: camelCase
+    .test.tsx: camelCase

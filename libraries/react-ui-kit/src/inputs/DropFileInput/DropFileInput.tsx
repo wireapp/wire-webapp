@@ -23,7 +23,7 @@ import * as React from 'react';
 import {CSSObject} from '@emotion/react';
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {UploadIcon} from '../../dataDisplay/Icon';
+import {UploadIcon} from '../../dataDisplay/icon';
 import {COLOR} from '../../identity';
 import {Theme} from '../../identity/Theme';
 import {FlexBox} from '../../layout';
