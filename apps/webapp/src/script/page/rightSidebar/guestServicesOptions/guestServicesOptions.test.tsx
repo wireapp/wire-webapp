@@ -34,6 +34,7 @@ import {GuestServicesOptions} from './guestServicesOptions';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const testFactory = new TestFactory();
@@ -57,15 +58,17 @@ const getDefaultParams = (isGuest: boolean = true) => {
     teamState: {
       ...new TeamState(),
       isGuestLinkEnabled: ko.pureComputed(() => true),
+      isInTeam: () => true,
     } as TeamState,
   };
 };
 
 describe('GuestServicesOptions', () => {
-  it('renders guest options', async () => {
+  it('shows Shared Drive guest restrictions for a Cells conversation', async () => {
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
     conversation.accessCode('accessCode');
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
 
     const newConv = {
       ...conversation,
@@ -83,6 +86,17 @@ describe('GuestServicesOptions', () => {
     });
 
     expect(getByText('guestRoomToggleInfoHead')).not.toBeNull();
+    expect(getByText('guestRoomToggleCellsInfo')).toBeInTheDocument();
+  });
+
+  it('does not show Shared Drive guest restrictions for a non-Cells conversation', () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const defaultProps = getDefaultParams();
+    const {queryByText} = render(<GuestServicesOptions {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(queryByText('guestRoomToggleCellsInfo')).not.toBeInTheDocument();
   });
 
   it('renders services options', () => {
