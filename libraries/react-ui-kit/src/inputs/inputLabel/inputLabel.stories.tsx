@@ -19,51 +19,46 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {RangeInput} from './RangeInput';
+import {InputLabel} from './inputLabel';
+
+import {Input} from '../input';
 
 const meta = {
-  title: 'inputs/RangeInput',
-  component: RangeInput,
+  title: 'inputs/inputLabel',
+  component: InputLabel,
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof RangeInput>;
+} satisfies Meta<typeof InputLabel>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    defaultValue: 50,
-    min: 0,
-    max: 100,
+    children: 'Label Text',
   },
 };
 
-export const WithSteps: Story = {
+export const WithInput: Story = {
   args: {
-    defaultValue: 5,
-    min: 0,
-    max: 10,
-    step: 1,
+    children: 'Email address',
+    htmlFor: 'example-input',
   },
+  decorators: [
+    Story => (
+      <div>
+        <Story />
+        <Input id="example-input" type="email" placeholder="Enter email" />
+      </div>
+    ),
+  ],
 };
 
-export const Disabled: Story = {
+export const Invalid: Story = {
   args: {
-    defaultValue: 50,
-    min: 0,
-    max: 100,
-    disabled: true,
-  },
-};
-
-export const CustomRange: Story = {
-  args: {
-    defaultValue: 0,
-    min: -50,
-    max: 50,
-    step: 10,
+    children: 'Invalid Label',
+    markInvalid: true,
   },
 };

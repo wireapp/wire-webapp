@@ -27,11 +27,11 @@ import {
   getValueLabelStyles,
   rangeInputWrapperStyles,
   ValueLabelPosition,
-} from './RangeInput.styles';
+} from './rangeInput.styles';
 
 import {Theme} from '../../identity/theme';
 import {TextProps} from '../../typography';
-import {InputLabel} from '../InputLabel';
+import {InputLabel} from '../inputLabel';
 
 export interface RangeInputProps<T = HTMLInputElement> extends TextProps<T> {
   label?: string;

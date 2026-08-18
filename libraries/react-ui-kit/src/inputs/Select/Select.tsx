@@ -35,7 +35,7 @@ import {SelectValueContainer} from './SelectValueContainer/SelectValueContainer'
 
 import {Theme} from '../../identity/theme';
 import {TabIndex} from '../../utils/enums';
-import {InputLabel} from '../InputLabel';
+import {InputLabel} from '../inputLabel';
 
 export type Option = {
   value: string | number;

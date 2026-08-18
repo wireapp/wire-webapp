@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/react';
 
 import {COLOR} from '../../identity';
 import {INPUT_CLASSNAME, INPUT_GROUP} from '../input';
-import {INPUT_SUBMIT_COMBO_CLASSNAME} from '../InputSubmitCombo';
+import {INPUT_SUBMIT_COMBO_CLASSNAME} from '../inputSubmitCombo';
 
 export type InputBlockProps<T = HTMLDivElement> = React.HTMLProps<T>;
 

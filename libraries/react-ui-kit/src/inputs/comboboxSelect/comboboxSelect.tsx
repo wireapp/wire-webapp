@@ -34,7 +34,7 @@ import {
 
 import {CloseIcon} from '../../dataDisplay/icon';
 import {Theme} from '../../identity/theme';
-import {InputLabel} from '../InputLabel';
+import {InputLabel} from '../inputLabel';
 import {BaseSelectDropdownIndicator} from '../Select/BaseSelect/BaseSelectDropdownIndicator';
 
 export type ComboboxSelectOption = {

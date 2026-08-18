@@ -28,7 +28,7 @@ import {ErrorIcon, HideIcon, ShowIcon} from '../../dataDisplay/icon';
 import {Theme} from '../../identity/theme';
 import {TextProps} from '../../typography';
 import {filterProps} from '../../utils/util';
-import {InputLabel} from '../InputLabel';
+import {InputLabel} from '../inputLabel';
 
 export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   label?: string;

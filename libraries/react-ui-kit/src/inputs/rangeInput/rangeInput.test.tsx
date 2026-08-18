@@ -20,7 +20,7 @@
 import {matchers} from '@emotion/jest';
 import {fireEvent, render} from '@testing-library/react';
 
-import {RangeInput, RangeInputProps} from './RangeInput';
+import {RangeInput, RangeInputProps} from './rangeInput';
 
 import {THEME_ID} from '../../identity';
 import {StyledApp} from '../../layout';

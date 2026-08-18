@@ -17,4 +17,4 @@
  *
  */
 
-export * from './InputLabel';
+export * from './inputLabel';

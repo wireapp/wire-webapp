@@ -64,7 +64,7 @@ import {
 import {CalendarIcon} from '../../dataDisplay/icon';
 import {Theme} from '../../identity/theme';
 import {getOverlayPortalContainer} from '../../utils/overlayPortal';
-import {InputLabel} from '../InputLabel';
+import {InputLabel} from '../inputLabel';
 
 export interface DatePickerFieldLabels {
   openCalendarLabel: string;

@@ -23,7 +23,7 @@ import {InputBlock} from './inputBlock';
 
 import {ArrowIcon} from '../../dataDisplay/icon';
 import {Input} from '../input';
-import {InputSubmitCombo} from '../InputSubmitCombo';
+import {InputSubmitCombo} from '../inputSubmitCombo';
 import {RoundIconButton} from '../RoundIconButton';
 
 const meta = {

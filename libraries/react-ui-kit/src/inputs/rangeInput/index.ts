@@ -17,4 +17,4 @@
  *
  */
 
-export * from './RangeInput';
+export * from './rangeInput';
