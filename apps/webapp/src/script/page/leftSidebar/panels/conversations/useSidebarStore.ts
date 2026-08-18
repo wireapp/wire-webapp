@@ -105,6 +105,9 @@ export const CONVERSATION_LIST_TABS: readonly SidebarTabs[] = [
 
 export const isConversationListTab = (tab: SidebarTabs): boolean => CONVERSATION_LIST_TABS.includes(tab);
 
+export const getConversationListTab = (tab: SidebarTabs): SidebarTabs =>
+  isConversationListTab(tab) ? tab : SidebarTabs.RECENT;
+
 type ConversationListCollapseParams = {
   isFeatureEnabled: boolean;
   currentTab: SidebarTabs;

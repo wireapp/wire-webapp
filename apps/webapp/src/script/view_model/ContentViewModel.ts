@@ -43,7 +43,7 @@ import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import {Config} from '../Config';
 import {ConversationError} from '../error/conversationError';
 import '../page/leftSidebar';
-import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+import {getConversationListTab, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
 import '../page/mainContent';
 import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
@@ -315,10 +315,7 @@ export class ContentViewModel {
       throw error;
     } finally {
       const {currentTab, setCurrentTab} = useSidebarStore.getState();
-
-      if ([SidebarTabs.PREFERENCES, SidebarTabs.CONNECT].includes(currentTab)) {
-        setCurrentTab(SidebarTabs.RECENT);
-      }
+      setCurrentTab(getConversationListTab(currentTab));
     }
   };
 
