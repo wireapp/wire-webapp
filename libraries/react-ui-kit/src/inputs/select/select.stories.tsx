@@ -19,7 +19,7 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {Select} from './Select';
+import {Select} from './select';
 
 const options = [
   {value: '1', label: 'Option 1'},
@@ -28,7 +28,7 @@ const options = [
 ];
 
 const meta = {
-  title: 'inputs/Select',
+  title: 'inputs/select',
   component: Select,
   parameters: {
     layout: 'centered',

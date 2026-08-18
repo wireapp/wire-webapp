@@ -20,11 +20,11 @@
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {components, GroupBase, MenuListProps} from 'react-select';
 
-import {closeButtonStyles, headingContainerStyles} from './SelectMenuList.styles';
+import {closeButtonStyles, headingContainerStyles} from './selectMenuList.styles';
 
 import {CloseIcon} from '../../../dataDisplay/icon';
 import {Theme} from '../../../identity/theme';
-import {Option} from '../Select';
+import {Option} from '../select';
 
 export const SelectMenuList = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
   menuListHeading: string,

@@ -37,7 +37,7 @@ export * from './inputLabel';
 export * from './inputSubmitCombo';
 export * from './rangeInput';
 export * from './roundIconButton';
-export * from './Select';
+export * from './select';
 export * from './ShakeBox';
 export * from './Switch';
 export * from './TextArea';

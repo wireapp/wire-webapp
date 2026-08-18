@@ -34,7 +34,7 @@ import {combineDateAndTime, dateValueFromDate, isSameLocalCalendarDay} from './d
 import {Theme} from '../../identity/theme';
 import {DatePickerField, DatePickerFieldLabels} from '../datePickerField';
 import {InputLabel} from '../inputLabel';
-import {Option} from '../Select';
+import {Option} from '../select';
 import {TimePickerField} from '../TimePickerField';
 import {nearestTimeOptionFromDate} from '../TimePickerField/timePickerUtils';
 

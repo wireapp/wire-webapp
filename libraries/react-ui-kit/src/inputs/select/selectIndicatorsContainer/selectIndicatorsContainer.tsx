@@ -19,7 +19,7 @@
 
 import {components, GroupBase, IndicatorsContainerProps} from 'react-select';
 
-import {Option} from '../Select';
+import {Option} from '../select';
 
 export const SelectIndicatorsContainer = <
   IsMulti extends boolean = false,

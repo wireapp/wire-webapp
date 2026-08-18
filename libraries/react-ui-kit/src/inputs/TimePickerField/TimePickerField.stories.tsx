@@ -23,7 +23,7 @@ import {useState} from 'react';
 import {TimePickerField} from './TimePickerField';
 import {buildTimeOptions} from './timePickerUtils';
 
-import {Option} from '../Select';
+import {Option} from '../select';
 
 const timeOptions = buildTimeOptions();
 

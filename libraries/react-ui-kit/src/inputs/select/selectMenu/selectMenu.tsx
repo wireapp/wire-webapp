@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {components, GroupBase, MenuProps} from 'react-select';
 
-import {Option} from '../Select';
+import {Option} from '../select';
 
 export const SelectMenu = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
   dataUieName: string,

@@ -17,7 +17,7 @@
  *
  */
 
-import type {Option} from '../Select';
+import type {Option} from '../select';
 
 export const TIME_INTERVAL_MINUTES = 15;
 export const TIME_OPTIONS_COUNT = 96;

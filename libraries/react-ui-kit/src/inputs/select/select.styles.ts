@@ -29,9 +29,9 @@ import {
   baseMenuStyles,
   baseOptionStyles,
   baseSingleValueStyles,
-} from './BaseSelect/BaseSelect.styles';
-import {Option} from './Select';
-import {isGroup} from './SelectOption/SelectOption';
+} from './baseSelect/baseSelect.styles';
+import {Option} from './select';
+import {isGroup} from './selectOption/selectOption';
 
 import {Theme} from '../../identity/theme';
 

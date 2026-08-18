@@ -33,7 +33,7 @@ import {
   baseMenuStyles,
   baseOptionStyles,
   baseSingleValueStyles,
-} from '../Select/BaseSelect/BaseSelect.styles';
+} from '../select/baseSelect/baseSelect.styles';
 
 interface SelectStylesParams {
   theme: Theme;

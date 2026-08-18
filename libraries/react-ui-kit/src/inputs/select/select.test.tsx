@@ -19,7 +19,7 @@
 
 import * as React from 'react';
 
-import {Select} from './Select';
+import {Select} from './select';
 
 import {matchComponent} from '../../utils/testUtil';
 

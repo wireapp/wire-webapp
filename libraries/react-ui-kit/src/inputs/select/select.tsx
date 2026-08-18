@@ -24,14 +24,14 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import ReactSelect, {GroupBase, SelectComponentsConfig, StylesConfig} from 'react-select';
 import type {StateManagerProps} from 'react-select/dist/declarations/src/stateManager';
 
-import {BaseSelectDropdownIndicator} from './BaseSelect/BaseSelectDropdownIndicator';
-import {customStyles} from './Select.styles';
-import {SelectContainer} from './SelectContainer/SelectContainer';
-import {SelectIndicatorsContainer} from './SelectIndicatorsContainer/SelectIndicatorsContainer';
-import {SelectMenu} from './SelectMenu/SelectMenu';
-import {SelectMenuList} from './SelectMenuList/SelectMenuList';
-import {isGroup, SelectOption} from './SelectOption/SelectOption';
-import {SelectValueContainer} from './SelectValueContainer/SelectValueContainer';
+import {BaseSelectDropdownIndicator} from './baseSelect/baseSelectDropdownIndicator';
+import {customStyles} from './select.styles';
+import {SelectContainer} from './selectContainer/selectContainer';
+import {SelectIndicatorsContainer} from './selectIndicatorsContainer/selectIndicatorsContainer';
+import {SelectMenu} from './selectMenu/selectMenu';
+import {SelectMenuList} from './selectMenuList/selectMenuList';
+import {isGroup, SelectOption} from './selectOption/selectOption';
+import {SelectValueContainer} from './selectValueContainer/selectValueContainer';
 
 import {Theme} from '../../identity/theme';
 import {TabIndex} from '../../utils/enums';

@@ -34,7 +34,7 @@ import {buildTimeOptions, filterTimeOptionsAfter} from './timePickerUtils';
 
 import {Theme} from '../../identity/theme';
 import {InputLabel} from '../inputLabel';
-import {Option, Select} from '../Select';
+import {Option, Select} from '../select';
 
 export interface TimePickerFieldProps {
   /** Controlled time value using the shared Select `Option` type (15-minute intervals). */

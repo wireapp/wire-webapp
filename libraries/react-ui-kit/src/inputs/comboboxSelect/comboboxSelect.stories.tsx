@@ -23,7 +23,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 
 import {ComboboxSelect, type ComboboxSelectProps} from './comboboxSelect';
 
-import type {Option} from '../Select';
+import type {Option} from '../select';
 
 const initialOptions: Option[] = [
   {value: '1', label: 'Option 1'},
