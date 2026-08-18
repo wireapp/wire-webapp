@@ -43,7 +43,9 @@ const translateForNotificationTest: Translate = (key, substitutions) =>
     ? `${substitutions?.label} ${substitutions?.meetingTitle}`
     : key === 'meetings.notifications.by'
       ? `By ${substitutions?.organizer}`
-      : key;
+      : key === 'meetings.meetingStatus.startedAt'
+        ? `Started at ${substitutions?.time}`
+        : key;
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForNotificationTest}),
 );
@@ -120,8 +122,10 @@ describe('MeetingNotificationCard', () => {
 
     if (notification.kind === MeetingNotificationKind.ONGOING) {
       expect(card).toHaveTextContent('By creator-id');
-      expect(card).toHaveTextContent('meetings.meetingStatus.startedAt');
-      expect(screen.getByText('meetings.meetingStatus.startedAt')).toHaveStyle({color: 'var(--accent-color)'});
+      expect(card).toHaveTextContent(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`);
+      expect(screen.getByText(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`)).toHaveStyle({
+        color: 'var(--accent-color)',
+      });
     }
 
     if (notification.kind === MeetingNotificationKind.CANCELLED) {
@@ -144,7 +148,9 @@ describe('MeetingNotificationCard', () => {
         onDismiss={jest.fn()}
       />,
     );
-    expect(screen.getByText('meetings.meetingStatus.startedAt')).toHaveStyle({color: 'var(--accent-color)'});
+    expect(screen.getByText(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`)).toHaveStyle({
+      color: 'var(--accent-color)',
+    });
   });
 
   it('omits View for canceled cards and dismisses every variant', () => {
@@ -196,7 +202,9 @@ describe('MeetingNotificationCard', () => {
       />,
     );
 
-    expect(screen.getByRole('listitem')).toHaveTextContent(`By creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
+    expect(screen.getByRole('listitem')).toHaveTextContent(
+      `By creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`,
+    );
   });
 
   it('renders an apostrophe in the meeting title instead of an HTML entity', () => {

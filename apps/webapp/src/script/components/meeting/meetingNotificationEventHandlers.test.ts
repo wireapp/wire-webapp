@@ -18,6 +18,7 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
 import {
   type AddNotificationInput,
@@ -31,6 +32,9 @@ import {createMeetingNotificationEventHandlers} from './meetingNotificationEvent
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const creatorId: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const conversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
+const wallClock = createDeterministicWallClock({
+  initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T12:00:00.000Z'),
+});
 
 const meetingSeries: MeetingSeries = {
   conversation_id: '',
@@ -64,12 +68,14 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   const createHandlers = ({
     getMeetingSeries = () => [meetingSeries],
+    activeWallClock = wallClock,
     notifications = [] as AddNotificationInput[],
     dismissedMeetings = [] as Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}>,
     warnings = [] as Array<{message: string; context?: unknown}>,
   } = {}) =>
     createMeetingNotificationEventHandlers({
       getMeetingSeries,
+      wallClock: activeWallClock,
       addNotification: notification => {
         notifications.push(notification);
       },
@@ -173,6 +179,65 @@ describe('createMeetingNotificationEventHandlers', () => {
     ]);
   });
 
+  it('notifies with ONGOING when the first notification arrives during the meeting', () => {
+    const notifications: AddNotificationInput[] = [];
+    const activeMeetingWallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T10:30:00.000Z'),
+    });
+
+    const {notifyMeetingChange} = createHandlers({notifications, activeWallClock: activeMeetingWallClock});
+
+    notifyMeetingChange(meetingSeries);
+
+    expect(notifications).toEqual([
+      {
+        kind: MeetingNotificationKind.ONGOING,
+        meetingStartTime: meetingSeries.series_start_date,
+        meetingTitle: meetingSeries.title,
+        qualifiedCreator: meetingSeries.qualified_creator,
+        qualifiedId: meetingSeries.qualified_id,
+      },
+    ]);
+  });
+
+  it('keeps an active meeting ongoing on subsequent notifications', () => {
+    const notifications: AddNotificationInput[] = [];
+    const activeMeetingWallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T10:30:00.000Z'),
+    });
+
+    const {notifyMeetingChange} = createHandlers({notifications, activeWallClock: activeMeetingWallClock});
+
+    notifyMeetingChange(meetingSeries);
+    notifyMeetingChange(meetingSeries);
+
+    expect(notifications.map(notification => notification.kind)).toEqual([
+      MeetingNotificationKind.ONGOING,
+      MeetingNotificationKind.ONGOING,
+    ]);
+  });
+
+  it('logs invalid meeting dates and falls back to an invitation', () => {
+    const notifications: AddNotificationInput[] = [];
+    const warnings: Array<{message: string; context?: unknown}> = [];
+    const invalidMeeting = {...meetingSeries, series_start_date: 'invalid-start'};
+    const {notifyMeetingChange} = createHandlers({notifications, warnings});
+
+    notifyMeetingChange(invalidMeeting);
+
+    expect(notifications[0]?.kind).toBe(MeetingNotificationKind.INVITE);
+    expect(warnings).toEqual([
+      {
+        message: 'meeting notification received with invalid meeting dates',
+        context: {
+          meetingId: meetingSeries.qualified_id,
+          meetingStartTime: 'invalid-start',
+          meetingEndTime: meetingSeries.series_end_date,
+        },
+      },
+    ]);
+  });
+
   it('creates a new invitation when the user is removed and added again', () => {
     const notifications: AddNotificationInput[] = [];
     const {notifyMeetingChange, onMeetingCancelled} = createHandlers({notifications});
@@ -220,6 +285,7 @@ describe('createMeetingNotificationEventHandlers', () => {
     const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
     const {onMeetingCancelled} = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => [meetingSeries],
+      wallClock,
       addNotification: notification => {
         notifications.push(notification);
       },

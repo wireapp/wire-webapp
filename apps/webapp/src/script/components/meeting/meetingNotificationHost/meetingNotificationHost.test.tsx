@@ -75,15 +75,13 @@ describe('MeetingNotificationHost', () => {
       qualifiedCreator,
       meetingStartTime,
     });
-    useMeetingNotificationStore
-      .getState()
-      .addNotification({
-        kind: MeetingNotificationKind.UPDATE,
-        qualifiedId,
-        meetingTitle: 'Updated',
-        qualifiedCreator,
-        meetingStartTime,
-      });
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.UPDATE,
+      qualifiedId,
+      meetingTitle: 'Updated',
+      qualifiedCreator,
+      meetingStartTime,
+    });
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.ONGOING,
       qualifiedId,
