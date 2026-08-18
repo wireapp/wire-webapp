@@ -167,6 +167,7 @@ describe('createMeetingNotificationEventHandlers', () => {
         kind: MeetingNotificationKind.UPDATE,
         meetingStartTime: meetingSeries.series_start_date,
         meetingTitle: meetingSeries.title,
+        qualifiedCreator: meetingSeries.qualified_creator,
         qualifiedId: meetingSeries.qualified_id,
       },
     ]);

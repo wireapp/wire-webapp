@@ -18,7 +18,7 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {match} from 'ts-pattern';
+import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CalendarIcon} from '@wireapp/react-ui-kit';
@@ -62,6 +62,27 @@ const getOrganizer = (qualifiedCreator: QualifiedId) =>
 
 const getMeetingTime = (meetingStartTime: string) => formatLocale(meetingStartTime, 'PP, p');
 
+const MeetingNotificationOrganizerAndTimeMetadata = ({
+  qualifiedCreator,
+  meetingStartTime,
+  translate,
+}: {
+  qualifiedCreator: QualifiedId;
+  meetingStartTime: string;
+  translate: Translate;
+}) => {
+  const organizer = getOrganizer(qualifiedCreator);
+  const meetingTime = getMeetingTime(meetingStartTime);
+
+  return (
+    <>
+      {translate('meetings.notifications.by', {organizer})}
+      {organizer && meetingTime && <span aria-hidden="true"> • </span>}
+      {meetingTime}
+    </>
+  );
+};
+
 const MeetingNotificationMetadata = ({
   notification,
   translate,
@@ -70,40 +91,29 @@ const MeetingNotificationMetadata = ({
   translate: Translate;
 }) => {
   return match(notification)
-    .with({kind: MeetingNotificationKind.INVITE}, ({qualifiedCreator, meetingStartTime}) => {
-      const organizer = getOrganizer(qualifiedCreator);
-      const meetingTime = getMeetingTime(meetingStartTime);
-
-      return (
-        <>
-          {organizer}
-          {organizer && meetingTime && <span aria-hidden="true"> • </span>}
-          {meetingTime}
-        </>
-      );
-    })
-    .with({kind: MeetingNotificationKind.UPDATE}, ({meetingStartTime}) =>
-      translate('meetings.notifications.newTime', {time: getMeetingTime(meetingStartTime)}),
+    .with(
+      {
+        kind: P.union(
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.CANCELLED,
+        ),
+      },
+      ({qualifiedCreator, meetingStartTime}) => (
+        <MeetingNotificationOrganizerAndTimeMetadata
+          qualifiedCreator={qualifiedCreator}
+          meetingStartTime={meetingStartTime}
+          translate={translate}
+        />
+      ),
     )
-    .with({kind: MeetingNotificationKind.CANCELLED}, ({qualifiedCreator, meetingStartTime}) => {
-      const organizer = getOrganizer(qualifiedCreator);
-      const meetingTime = getMeetingTime(meetingStartTime);
-
-      return (
-        <>
-          {organizer}
-          {organizer && <span aria-hidden="true"> • </span>}
-          {meetingTime}
-        </>
-      );
-    })
     .with({kind: MeetingNotificationKind.ONGOING}, ({qualifiedCreator, meetingStartTime}) => {
       const organizer = getOrganizer(qualifiedCreator);
       const meetingTime = getMeetingTime(meetingStartTime);
 
       return (
         <>
-          {organizer}
+          {translate('meetings.notifications.by', {organizer})}
           {organizer && <span aria-hidden="true"> • </span>}
           <span css={meetingNotificationCardOngoingTimeStyles}>
             {translate('meetings.meetingStatus.startedAt', {time: meetingTime})}

@@ -18,7 +18,6 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {match} from 'ts-pattern';
 
 import {
   type AddNotificationInput,
@@ -75,23 +74,7 @@ export const createMeetingNotificationEventHandlers = ({
       qualifiedId: meeting.qualified_id,
     };
 
-    match(kind)
-      .with(MeetingNotificationKind.UPDATE, kind => {
-        addNotification({...notificationBase, kind});
-      })
-      .with(
-        MeetingNotificationKind.INVITE,
-        MeetingNotificationKind.CANCELLED,
-        MeetingNotificationKind.ONGOING,
-        kind => {
-          addNotification({
-            ...notificationBase,
-            kind,
-            qualifiedCreator: meeting.qualified_creator,
-          });
-        },
-      )
-      .exhaustive();
+    addNotification({...notificationBase, kind, qualifiedCreator: meeting.qualified_creator});
   };
 
   const dismissStaleNotificationsForMeeting = (meetingId: QualifiedId): void => {

@@ -77,7 +77,13 @@ describe('MeetingNotificationHost', () => {
     });
     useMeetingNotificationStore
       .getState()
-      .addNotification({kind: MeetingNotificationKind.UPDATE, qualifiedId, meetingTitle: 'Updated', meetingStartTime});
+      .addNotification({
+        kind: MeetingNotificationKind.UPDATE,
+        qualifiedId,
+        meetingTitle: 'Updated',
+        qualifiedCreator,
+        meetingStartTime,
+      });
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.ONGOING,
       qualifiedId,
@@ -144,7 +150,13 @@ describe('MeetingNotificationHost', () => {
       qualifiedCreator,
       meetingStartTime,
     });
-    addNotification({kind: MeetingNotificationKind.UPDATE, qualifiedId, meetingTitle: 'Updated', meetingStartTime});
+    addNotification({
+      kind: MeetingNotificationKind.UPDATE,
+      qualifiedId,
+      meetingTitle: 'Updated',
+      qualifiedCreator,
+      meetingStartTime,
+    });
 
     renderHost();
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.showAll'}));
