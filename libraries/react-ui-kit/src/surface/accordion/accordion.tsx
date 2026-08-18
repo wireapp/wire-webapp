@@ -21,8 +21,8 @@ import {ElementRef, forwardRef, ForwardRefExoticComponent, ReactNode, RefAttribu
 
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 
-import {AccordionItem} from './AccordionItem/AccordionItem';
-import {wrapperStyles} from './AccordionItem/AccordionItem.styles';
+import {AccordionItem} from './accordionItem/accordionItem';
+import {wrapperStyles} from './accordionItem/accordionItem.styles';
 
 interface AccordionSingleProps {
   type?: 'single';

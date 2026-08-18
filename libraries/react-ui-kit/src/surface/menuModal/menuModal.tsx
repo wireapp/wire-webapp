@@ -26,7 +26,7 @@ import {ANIMATION, DURATION, EASE} from '../../identity/motions/motions';
 import {Theme} from '../../identity/theme';
 import {QueryKeys, media} from '../../utils';
 import {noop} from '../../utils/util';
-import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyle} from '../Modal/Overlay';
+import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyle} from '../modal/overlay';
 
 const menuModalWrapperStyle: CSSObject = {
   ...overlayBackgroundStyle,

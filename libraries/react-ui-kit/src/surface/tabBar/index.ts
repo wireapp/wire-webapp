@@ -17,4 +17,4 @@
  *
  */
 
-export * from './MenuModal';
+export * from './tabBar';

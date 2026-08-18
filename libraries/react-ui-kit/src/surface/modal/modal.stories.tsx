@@ -21,7 +21,7 @@ import {ReactNode, useState} from 'react';
 
 import {Meta, StoryObj} from '@storybook/react';
 
-import {Modal} from './Modal';
+import {Modal} from './modal';
 
 import {Button} from '../../inputs';
 import {H1, H2, Paragraph, Text} from '../../typography';

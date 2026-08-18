@@ -17,8 +17,8 @@
  *
  */
 
-export * from './Accordion';
-export * from './DropdownMenu';
-export * from './MenuModal';
-export * from './Modal';
-export * from './TabBar';
+export * from './accordion';
+export * from './dropdownMenu';
+export * from './menuModal';
+export * from './modal';
+export * from './tabBar';

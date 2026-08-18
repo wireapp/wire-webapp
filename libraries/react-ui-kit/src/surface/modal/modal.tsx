@@ -23,7 +23,7 @@ import * as React from 'react';
 import {CSSObject} from '@emotion/react';
 import Color from 'color';
 
-import {OverlayBackgroundProps, OverlayWrapper, overlayBackgroundStyle} from './Overlay';
+import {OverlayBackgroundProps, OverlayWrapper, overlayBackgroundStyle} from './overlay';
 
 import {CloseIcon} from '../../dataDisplay/icon';
 import {SVGIconProps} from '../../dataDisplay/icon/svgIcon';

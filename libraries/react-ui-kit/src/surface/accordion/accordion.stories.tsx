@@ -19,7 +19,7 @@
 
 import {Meta, StoryObj} from '@storybook/react';
 
-import {Accordion} from './Accordion';
+import {Accordion} from './accordion';
 
 import {COLOR_V2} from '../../identity/colorsV2/colorsV2';
 import {Text} from '../../typography';

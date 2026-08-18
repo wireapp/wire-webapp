@@ -19,7 +19,7 @@
 
 import {Meta, StoryObj} from '@storybook/react/*';
 
-import {DropdownMenu} from './DropdownMenu';
+import {DropdownMenu} from './dropdownMenu';
 
 import {PlusIcon} from '../../dataDisplay/icon';
 import {Button, ButtonVariant} from '../../inputs';
@@ -27,7 +27,7 @@ import {IconButton, IconButtonVariant} from '../../inputs/iconButton';
 
 const meta: Meta<typeof DropdownMenu> = {
   component: DropdownMenu,
-  title: 'surface/DropdownMenu',
+  title: 'surface/dropdownMenu',
   parameters: {
     layout: 'centered',
   },

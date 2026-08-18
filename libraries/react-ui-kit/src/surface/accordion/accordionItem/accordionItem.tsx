@@ -28,7 +28,7 @@ import {
   itemStyles,
   triggerStyles,
   triggerTextStyles,
-} from './AccordionItem.styles';
+} from './accordionItem.styles';
 
 import {ChevronDownIcon} from '../../../dataDisplay/icon';
 

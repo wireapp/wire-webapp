@@ -613,6 +613,13 @@ ls:
     .styles.ts: camelCase
     .stories.tsx: camelCase
     .test.tsx: camelCase
+  libraries/react-ui-kit/src/surface:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+    .stories.tsx: camelCase
+    .test.tsx: camelCase
   libraries/react-ui-kit/src/inputs/{button,buttonGroup,buttonLink,buttonsGroup,checkbox,codeInput,comboboxSelect,datePickerField,dateTimePickerField,dropFileInput,errorMessage,form,iconButton,indicatorRangeInput,input,inputBlock,inputLabel,inputSubmitCombo,rangeInput,roundIconButton,secondaryButton,select,shakeBox,switch,textArea,timePickerField}:
     .ts: camelCase
     .tsx: camelCase

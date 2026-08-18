@@ -29,7 +29,7 @@ import {
   subTriggerStyle,
   textStyles,
   triggerStyles,
-} from './DropdownMenu.styles';
+} from './dropdownMenu.styles';
 
 /**
  * A dropdown menu component that provides a customizable and accessible dropdown interface.

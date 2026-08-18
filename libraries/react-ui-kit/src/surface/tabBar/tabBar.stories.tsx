@@ -21,7 +21,7 @@ import {useState} from 'react';
 
 import {Meta, StoryObj} from '@storybook/react';
 
-import {TabBar, TabBarItem} from './TabBar';
+import {TabBar, TabBarItem} from './tabBar';
 
 const meta: Meta<typeof TabBar> = {
   component: TabBar,
