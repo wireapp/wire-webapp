@@ -591,3 +591,6 @@ ls:
   libraries/core/src/messagingProtocols/mls/e2eIdentityService/steps/dpopChallenge:
     .ts: camelCase
     .types.ts: camelCase
+  libraries/react-ui-kit/src/images:
+    .dir: camelCase
+    .tsx: camelCase
