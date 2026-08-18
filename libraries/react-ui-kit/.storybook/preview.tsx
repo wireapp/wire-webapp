@@ -1,7 +1,7 @@
 import type {Preview} from '@storybook/react';
 
 import {withThemeFromJSXProvider} from '@storybook/addon-themes';
-import {THEME_ID, ThemeProvider, themes, GlobalStyle} from '../src/Identity';
+import {THEME_ID, ThemeProvider, themes, GlobalStyle} from '../src/identity';
 
 const availableThemes = {
   light: themes[THEME_ID.LIGHT],

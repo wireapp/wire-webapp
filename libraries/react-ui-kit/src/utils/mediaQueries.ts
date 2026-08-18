@@ -17,7 +17,7 @@
  *
  */
 
-import {WIDTH} from '../Layout/sizes';
+import {WIDTH} from '../layout/sizes';
 
 export enum QueryKeys {
   DESKTOP = 'desktop',

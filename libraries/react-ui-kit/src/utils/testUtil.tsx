@@ -21,8 +21,8 @@ import {ReactElement} from 'react';
 
 import {create} from 'react-test-renderer';
 
-import {THEME_ID} from '../Identity';
-import {StyledApp} from '../Layout';
+import {THEME_ID} from '../identity';
+import {StyledApp} from '../layout';
 
 export const matchComponent = (component: ReactElement, themeId = THEME_ID.LIGHT) =>
   expect(create(<StyledApp themeId={themeId}>{component}</StyledApp>).toJSON()).toMatchSnapshot();

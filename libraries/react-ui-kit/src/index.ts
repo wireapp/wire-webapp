@@ -19,11 +19,11 @@
 
 /// <reference types="@emotion/react/types/css-prop" />
 
-export * from './DataDisplay';
-export * from './Identity';
-export * from './Inputs';
-export * from './Layout';
-export * from './Navigation';
-export * from './Surface';
-export * from './Typography';
+export * from './dataDisplay';
+export * from './identity';
+export * from './inputs';
+export * from './layout';
+export * from './navigation';
+export * from './surface';
+export * from './typography';
 export * from './utils';

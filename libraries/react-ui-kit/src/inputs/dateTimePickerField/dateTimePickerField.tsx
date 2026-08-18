@@ -1,0 +1,167 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {useCallback, useMemo} from 'react';
+
+import {DateValue} from '@internationalized/date';
+import {isNonEmptyString} from '@sindresorhus/is';
+
+import {
+  dateTimePickerContentStyles,
+  dateTimePickerDateFieldWrapperStyles,
+  dateTimePickerErrorTextStyles,
+  dateTimePickerFieldsRowStyles,
+  dateTimePickerTimeFieldWrapperStyles,
+} from './dateTimePickerField.styles';
+import {combineDateAndTime, dateValueFromDate, isSameLocalCalendarDay} from './dateTimeUtils';
+
+import {Theme} from '../../identity/theme';
+import {DatePickerField, DatePickerFieldLabels} from '../datePickerField';
+import {InputLabel} from '../inputLabel';
+import {Option} from '../select';
+import {TimePickerField} from '../timePickerField';
+import {nearestTimeOptionFromDate} from '../timePickerField/timePickerUtils';
+
+export interface DateTimePickerFieldLabels extends DatePickerFieldLabels {
+  dateAriaLabel: string;
+  timeAriaLabel: string;
+}
+
+export interface DateTimePickerFieldProps {
+  /** Controlled combined date-time value exposed as a native `Date`. */
+  value: Date | null;
+  onChange: (value: Date | null) => void;
+  dataUieName: string;
+  dateFieldId?: string;
+  timeFieldId?: string;
+  label?: string;
+  labels: DateTimePickerFieldLabels;
+  locale?: string;
+  markInvalid?: boolean;
+  disabled?: boolean;
+  dateDisabled?: boolean;
+  timeDisabled?: boolean;
+  menuPortalTarget?: HTMLElement;
+  popoverPortalContainer?: HTMLElement;
+  errorText?: string;
+  minValue?: DateValue;
+  /** When set, only time options strictly after this time of day are shown. */
+  minTime?: Date | null;
+  /** When the selected date matches this date, hide past time options. */
+  minTimeForToday?: Date | null;
+}
+
+export const DateTimePickerField = ({
+  value,
+  onChange,
+  dataUieName,
+  dateFieldId = `${dataUieName}-date`,
+  timeFieldId = `${dataUieName}-time`,
+  label,
+  labels,
+  locale = 'de-DE',
+  markInvalid = false,
+  disabled = false,
+  dateDisabled,
+  timeDisabled,
+  menuPortalTarget,
+  popoverPortalContainer,
+  errorText,
+  minValue,
+  minTime = null,
+  minTimeForToday = null,
+}: DateTimePickerFieldProps) => {
+  const labelId = `${dataUieName}-label`;
+  const selectedDate = useMemo(() => (value !== null ? dateValueFromDate(value) : null), [value]);
+  const selectedTime = useMemo(() => (value !== null ? nearestTimeOptionFromDate(value) : null), [value]);
+  const isDateDisabled = dateDisabled ?? disabled;
+  const isTimeDisabled = timeDisabled ?? disabled;
+  const effectiveMinTime = useMemo(() => {
+    if (minTime !== null) {
+      return minTime;
+    }
+
+    if (minTimeForToday === null || value === null) {
+      return null;
+    }
+
+    return isSameLocalCalendarDay(value, minTimeForToday) ? minTimeForToday : null;
+  }, [minTime, minTimeForToday, value]);
+
+  const handleDateChange = useCallback(
+    (nextDate: DateValue | null) => {
+      onChange(combineDateAndTime(nextDate, selectedTime));
+    },
+    [onChange, selectedTime],
+  );
+
+  const handleTimeChange = useCallback(
+    (nextTime: Option | null) => {
+      onChange(combineDateAndTime(selectedDate, nextTime));
+    },
+    [onChange, selectedDate],
+  );
+
+  return (
+    <div css={dateTimePickerContentStyles} data-uie-name={dataUieName}>
+      {isNonEmptyString(label) && (
+        <InputLabel markInvalid={markInvalid} id={labelId}>
+          {label}
+        </InputLabel>
+      )}
+
+      <div
+        css={dateTimePickerFieldsRowStyles}
+        role="group"
+        aria-labelledby={isNonEmptyString(label) ? labelId : undefined}
+      >
+        <DatePickerField
+          id={dateFieldId}
+          dataUieName={`${dataUieName}-date`}
+          value={selectedDate}
+          onChange={handleDateChange}
+          ariaLabel={labels.dateAriaLabel}
+          labels={labels}
+          locale={locale}
+          markInvalid={markInvalid}
+          disabled={isDateDisabled}
+          popoverPortalContainer={popoverPortalContainer}
+          minValue={minValue}
+          wrapperCSS={dateTimePickerDateFieldWrapperStyles}
+        />
+        <TimePickerField
+          id={timeFieldId}
+          dataUieName={`${dataUieName}-time`}
+          value={selectedTime}
+          onChange={handleTimeChange}
+          ariaLabel={labels.timeAriaLabel}
+          markInvalid={markInvalid}
+          disabled={isTimeDisabled}
+          minTime={effectiveMinTime}
+          menuPortalTarget={menuPortalTarget}
+          wrapperCSS={dateTimePickerTimeFieldWrapperStyles}
+        />
+      </div>
+
+      {markInvalid && isNonEmptyString(errorText) && (
+        <p css={(theme: Theme) => dateTimePickerErrorTextStyles(theme)}>{errorText}</p>
+      )}
+    </div>
+  );
+};
