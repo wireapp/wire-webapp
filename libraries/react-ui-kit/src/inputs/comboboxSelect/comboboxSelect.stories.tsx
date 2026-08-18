@@ -21,7 +21,7 @@ import {useState} from 'react';
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {ComboboxSelect, type ComboboxSelectProps} from './ComboboxSelect';
+import {ComboboxSelect, type ComboboxSelectProps} from './comboboxSelect';
 
 import type {Option} from '../Select';
 
@@ -32,7 +32,7 @@ const initialOptions: Option[] = [
 ];
 
 const meta = {
-  title: 'inputs/ComboboxSelect',
+  title: 'inputs/comboboxSelect',
   component: ComboboxSelect,
   parameters: {
     layout: 'centered',

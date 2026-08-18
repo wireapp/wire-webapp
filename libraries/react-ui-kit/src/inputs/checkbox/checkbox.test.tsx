@@ -20,7 +20,7 @@
 import '@testing-library/jest-dom/jest-globals';
 import {fireEvent, render} from '@testing-library/react';
 
-import {Checkbox, CheckboxLabel} from './Checkbox';
+import {Checkbox, CheckboxLabel} from './checkbox';
 
 import {THEME_ID} from '../../identity';
 import {StyledApp} from '../../layout';

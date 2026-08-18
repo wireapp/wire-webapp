@@ -30,7 +30,7 @@ import {
   wrapperStyles,
   loadingMessageStyles,
   labelCSS,
-} from './ComboboxSelect.styles';
+} from './comboboxSelect.styles';
 
 import {CloseIcon} from '../../dataDisplay/icon';
 import {Theme} from '../../identity/theme';

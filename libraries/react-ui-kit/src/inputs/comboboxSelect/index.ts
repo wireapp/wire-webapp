@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Checkbox';
+export * from './comboboxSelect';

@@ -19,48 +19,36 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {Checkbox, CheckboxLabel} from './Checkbox';
-
-import {Link} from '../../typography';
+import {CodeInput} from './codeInput';
 
 const meta = {
-  title: 'inputs/Checkbox',
-  component: Checkbox,
+  title: 'inputs/codeInput',
+  component: CodeInput,
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof Checkbox>;
+} satisfies Meta<typeof CodeInput>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    children: <CheckboxLabel>Default Checkbox</CheckboxLabel>,
+    onCodeComplete: code => console.log('Code entered:', code),
   },
-};
-
-export const WithLink: Story = {
-  render: () => (
-    <Checkbox>
-      <CheckboxLabel>
-        I accept the <Link href="#">Terms and Conditions</Link>
-      </CheckboxLabel>
-    </Checkbox>
-  ),
 };
 
 export const Invalid: Story = {
   args: {
-    children: <CheckboxLabel>Invalid Checkbox</CheckboxLabel>,
     markInvalid: true,
+    onCodeComplete: code => console.log('Code entered:', code),
   },
 };
 
-export const Disabled: Story = {
+export const CustomLength: Story = {
   args: {
-    children: <CheckboxLabel>Disabled Checkbox</CheckboxLabel>,
-    disabled: true,
+    digits: 4,
+    onCodeComplete: code => console.log('Code entered:', code),
   },
 };
