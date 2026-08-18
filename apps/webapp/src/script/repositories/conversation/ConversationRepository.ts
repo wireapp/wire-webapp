@@ -3945,9 +3945,11 @@ export class ConversationRepository {
         }
         return this.addEventToConversation(conversationEntity, eventJson);
 
-      case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case CONVERSATION_EVENT.ADMINLESS_DELETE_REMINDER:
       case CONVERSATION_EVENT.SYSTEM_ADMINLESS_DELETE_REMINDER:
+        return this.onAdminlessDeleteReminder(conversationEntity, eventJson);
+
+      case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
       case ClientEvent.CONVERSATION.MEMBER_ROLE_UPDATE:
       case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
@@ -4895,6 +4897,15 @@ export class ConversationRepository {
     );
     await this.ephemeralHandler.validateMessage(replacedMessageEntity);
     return replacedMessageEntity;
+  }
+
+  /**
+   * A group has no eligible admins and will be automatically deleted by the backend.
+   * Marks the conversation as a "ghost group" so the conversation list can warn about the upcoming deletion.
+   */
+  private async onAdminlessDeleteReminder(conversationEntity: Conversation, eventJson: IncomingEvent) {
+    conversationEntity.isGhostGroup(true);
+    return this.addEventToConversation(conversationEntity, eventJson);
   }
 
   /**

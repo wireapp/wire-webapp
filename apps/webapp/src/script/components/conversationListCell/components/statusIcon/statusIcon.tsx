@@ -32,15 +32,16 @@ interface Props {
 
 export const StatusIcon = ({conversation}: Props) => {
   const {translate} = useApplicationContext();
-  const {unreadState, mutedState, isRequest} = useKoSubscribableChildren(conversation, [
+  const {unreadState, mutedState, isRequest, isGhostGroup} = useKoSubscribableChildren(conversation, [
     'unreadState',
     'mutedState',
     'isRequest',
+    'isGhostGroup',
   ]);
 
   const cellState = useMemo(
     () => generateCellState(conversation, translate),
-    [conversation, isRequest, mutedState, translate, unreadState],
+    [conversation, isRequest, mutedState, isGhostGroup, translate, unreadState],
   );
 
   return (
@@ -114,6 +115,17 @@ export const StatusIcon = ({conversation}: Props) => {
           title={translate('accessibility.conversationStatusUnread')}
         >
           {unreadState.allMessages.length}
+        </span>
+      )}
+
+      {cellState.icon === ConversationStatusIcon.GHOST_GROUP && (
+        <span
+          className="conversation-list-cell-badge cell-badge-light conversation-ghosted"
+          data-uie-name="status-ghost-group"
+          title={translate('accessibility.conversationStatusGhosted')}
+          aria-hidden="true"
+        >
+          <Icon.InfoIcon className="svg-icon" />
         </span>
       )}
     </>

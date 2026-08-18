@@ -515,6 +515,10 @@ export class ConversationMapper {
       conversationEntity.isGuest(conversationData.is_guest);
     }
 
+    if (!isUndefined(conversationData.is_ghost_group)) {
+      conversationEntity.isGhostGroup(conversationData.is_ghost_group);
+    }
+
     // Access related data
     const accessModes = conversationData.accessModes ?? conversationData.access;
     const accessRole = conversationData.accessRole ?? conversationData.access_role;

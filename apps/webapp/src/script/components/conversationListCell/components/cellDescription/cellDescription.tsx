@@ -34,6 +34,7 @@ interface Props {
   isActive: boolean;
   isRequest: boolean;
   unreadState: UnreadState;
+  isGhostGroup: boolean;
 }
 
 export const CellDescription = ({conversation, isActive}: Props) => {
