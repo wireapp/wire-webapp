@@ -25,8 +25,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {useRefreshConversationParticipants} from './useRefreshConversationParticipants';
 
-const createConversation = (id: string) =>
-  new Conversation(id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+const createConversation = (id: string) => new Conversation(id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
 const createDeferredPromise = () => {
   let resolvePromise!: () => void;
