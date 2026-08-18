@@ -1,0 +1,105 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {useEffect, useRef} from 'react';
+
+import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
+import {components, GroupBase, OptionProps, OptionsOrGroups} from 'react-select';
+
+import {CheckIcon} from '../../../dataDisplay/Icon';
+import {Theme} from '../../../identity/Theme';
+import {Option} from '../Select';
+
+export const SelectOption = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
+  dataUieName: string,
+) => {
+  function SelectOptionComponent(props: OptionProps<Option, IsMulti, Group>) {
+    const {children, data, isMulti, isSelected, options} = props;
+    const selectedOptionRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      if (!isSelected) {
+        return;
+      }
+
+      if (typeof selectedOptionRef.current?.scrollIntoView === 'function') {
+        selectedOptionRef.current?.scrollIntoView({block: 'center'});
+      }
+    }, [isSelected]);
+
+    return (
+      <components.Option {...props}>
+        <div
+          ref={selectedOptionRef}
+          css={{
+            ...((isMulti === true || isGroup(options)) && {
+              display: 'grid',
+              gridTemplateAreas: `"checkbox label"
+                                ". description"`,
+              gridTemplateColumns: '22px 1fr',
+              columnGap: isGroup(options) ? '5px' : '10px',
+            }),
+          }}
+          {...(isNonEmptyString(dataUieName) && {
+            'data-uie-name': `option-${dataUieName}`,
+            'data-uie-value': (options as Option[]).find(option => option.label === children)?.value,
+            'data-uie-selected': isSelected,
+          })}
+        >
+          {isMulti === true && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => null}
+              css={{gridArea: 'checkbox', width: 22, height: 22, cursor: 'pointer', placeSelf: 'center'}}
+            />
+          )}
+
+          {isGroup(options) && (
+            //includes a checkmark character if it is selected and a group
+            <div css={{width: 22, height: 22, cursor: 'pointer', placeSelf: 'center'}}>
+              {isSelected ? <CheckIcon /> : null}
+            </div>
+          )}
+
+          <div css={{gridArea: 'label', overflowWrap: 'break-word', overflow: 'hidden'}}>{children}</div>
+
+          {isNonEmptyString(data.description) && (
+            <p
+              css={(theme: Theme) => ({
+                marginBottom: 0,
+                fontSize: theme.fontSizes.medium,
+                color: isSelected ? theme.Select.focusedDescriptionColor : theme.Input.labelColor,
+                gridArea: 'description',
+              })}
+            >
+              {data.description}
+            </p>
+          )}
+        </div>
+      </components.Option>
+    );
+  }
+  SelectOptionComponent.displayName = 'SelectOption';
+  return SelectOptionComponent;
+};
+
+export const isGroup = (options: OptionsOrGroups<Option, GroupBase<Option>>): options is GroupBase<Option>[] => {
+  return isNonEmptyArray(options) && 'options' in options[0];
+};

@@ -27,13 +27,13 @@ When creating a new component, follow these guidelines:
 1. **Choose the Right Category**
 
    - Place your component in the appropriate category folder under `src/`:
-     - `DataDisplay/`: For data visualization components (tables, lists)
-     - `Identity/`: Design system, theme, colors, etc.
-     - `Inputs/`: For form controls and input elements
-     - `Layout/`: For structural components
-     - `Navigation/`: For navigation-related components
-     - `Surface/`: For containers, cards, modals, and overlays
-     - `Typography/`: For text-related components
+     - `dataDisplay/`: For data visualization components (tables, lists)
+     - `identity/`: Design system, theme, colors, etc.
+     - `inputs/`: For form controls and input elements
+     - `layout/`: For structural components
+     - `navigation/`: For navigation-related components
+     - `surface/`: For containers, cards, modals, and overlays
+     - `typography/`: For text-related components
      - `utils/`: For utility components
 
 2. **Component Structure** Create a new folder for your component with the following files:
@@ -79,7 +79,7 @@ export const Button = ({variant, ...props}: ButtonProps) => {
 
 // Button.stories.tsx
 export default {
-  title: 'Inputs/Button',
+  title: 'inputs/Button',
   component: Button,
   // ... story configuration
 };
