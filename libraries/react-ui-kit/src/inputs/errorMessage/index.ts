@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,4 @@
  *
  */
 
-import {ErrorMessage} from './ErrorMessage';
-
-import {matchComponent} from '../../utils/testUtil';
-
-describe('"ErrorMessage"', () => {
-  it('renders', () => matchComponent(<ErrorMessage>ErrorMessage</ErrorMessage>));
-});
+export * from './errorMessage';

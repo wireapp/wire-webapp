@@ -19,32 +19,32 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {ErrorMessage} from './ErrorMessage';
-
-import {Link} from '../../typography';
+import {Button} from '../button';
+import {Form} from '../form';
+import {Input} from '../Input';
 
 const meta = {
-  title: 'inputs/ErrorMessage',
-  component: ErrorMessage,
+  title: 'inputs/form',
+  component: Form,
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof ErrorMessage>;
+} satisfies Meta<typeof Form>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {
-    children: 'This is an error message',
-  },
-};
-
-export const WithLink: Story = {
   render: () => (
-    <ErrorMessage>
-      This is an error message with a <Link href="#">link</Link>
-    </ErrorMessage>
+    <Form
+      onSubmit={event => {
+        event.preventDefault();
+        console.log('Form submitted');
+      }}
+    >
+      <Input placeholder="Email" type="email" required />
+      <Button type="submit">Submit</Button>
+    </Form>
   ),
 };

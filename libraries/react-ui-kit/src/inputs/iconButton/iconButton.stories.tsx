@@ -19,14 +19,14 @@
 
 import {Meta, StoryObj} from '@storybook/react';
 
-import {IconButton, IconButtonVariant} from './IconButton';
+import {IconButton, IconButtonVariant} from './iconButton';
 
 import {InfoIcon, PlusIcon, TrashIcon} from '../../dataDisplay/icon';
 import {COLOR} from '../../identity/colors/colors';
 
 const meta: Meta<typeof IconButton> = {
   component: IconButton,
-  title: 'inputs/IconButton',
+  title: 'inputs/iconButton',
   decorators: [
     Story => (
       <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>

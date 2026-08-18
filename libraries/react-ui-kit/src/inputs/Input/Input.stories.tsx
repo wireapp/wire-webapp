@@ -21,7 +21,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 
 import {Input} from './Input';
 
-import {ErrorMessage} from '../ErrorMessage';
+import {ErrorMessage} from '../errorMessage';
 
 const meta = {
   title: 'inputs/Input',

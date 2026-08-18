@@ -17,34 +17,4 @@
  *
  */
 
-import type {Meta, StoryObj} from '@storybook/react';
-
-import {Button} from '../button';
-import {Form} from '../Form';
-import {Input} from '../Input';
-
-const meta = {
-  title: 'inputs/Form',
-  component: Form,
-  parameters: {
-    layout: 'centered',
-  },
-  tags: ['autodocs'],
-} satisfies Meta<typeof Form>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Default: Story = {
-  render: () => (
-    <Form
-      onSubmit={event => {
-        event.preventDefault();
-        console.log('Form submitted');
-      }}
-    >
-      <Input placeholder="Email" type="email" required />
-      <Button type="submit">Submit</Button>
-    </Form>
-  ),
-};
+export * from './iconButton';

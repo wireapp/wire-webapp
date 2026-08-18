@@ -17,4 +17,34 @@
  *
  */
 
-export * from './ErrorMessage';
+import type {Meta, StoryObj} from '@storybook/react';
+
+import {ErrorMessage} from './errorMessage';
+
+import {Link} from '../../typography';
+
+const meta = {
+  title: 'inputs/errorMessage',
+  component: ErrorMessage,
+  parameters: {
+    layout: 'centered',
+  },
+  tags: ['autodocs'],
+} satisfies Meta<typeof ErrorMessage>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  args: {
+    children: 'This is an error message',
+  },
+};
+
+export const WithLink: Story = {
+  render: () => (
+    <ErrorMessage>
+      This is an error message with a <Link href="#">link</Link>
+    </ErrorMessage>
+  ),
+};

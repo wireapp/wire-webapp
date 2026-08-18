@@ -23,7 +23,7 @@ import {DropdownMenu} from './DropdownMenu';
 
 import {PlusIcon} from '../../dataDisplay/icon';
 import {Button, ButtonVariant} from '../../inputs';
-import {IconButton, IconButtonVariant} from '../../inputs/IconButton';
+import {IconButton, IconButtonVariant} from '../../inputs/iconButton';
 
 const meta: Meta<typeof DropdownMenu> = {
   component: DropdownMenu,
