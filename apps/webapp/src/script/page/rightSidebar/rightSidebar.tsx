@@ -47,7 +47,6 @@ import {Notifications} from './notifications';
 import {ParticipantDevices} from './participantDevices';
 import {SharedDrive} from './sharedDrive';
 import {TimedMessages} from './timedMessages';
-import {useRefreshConversationParticipants} from './useRefreshConversationParticipants';
 
 import {isReadableMessage} from '../../guards/Message';
 import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
@@ -126,16 +125,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const {rightSidebar} = useAppMainState.getState();
   const lastItem = rightSidebar.history.length - 1;
   const currentState = rightSidebar.history[lastItem];
-  const refreshUnavailableParticipants = useCallback(
-    (conversation: Conversation) => conversationRepository.refreshUnavailableParticipants(conversation),
-    [conversationRepository],
-  );
-  const shouldRefreshConversationParticipants =
-    currentState === PanelState.CONVERSATION_DETAILS || currentState === PanelState.SHARED_DRIVE;
-  useRefreshConversationParticipants({
-    conversation: shouldRefreshConversationParticipants ? activeConversation : undefined,
-    refreshUnavailableParticipants,
-  });
 
   const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
   const userServiceEntity = currentEntity && isUserAppOrServiceEntity(currentEntity) ? currentEntity : null;

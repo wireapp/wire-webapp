@@ -248,6 +248,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const isServiceMode = isSingleUserMode && firstParticipant!.isService;
 
     useEffect(() => {
+      void conversationRepository.refreshUnavailableParticipants(activeConversation);
+    }, [activeConversation, conversationRepository]);
+
+    useEffect(() => {
       if (team.id && isSingleUserMode) {
         void teamRepository.updateTeamMembersByIds(team.id, [firstParticipant!.id], true);
       }
