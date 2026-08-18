@@ -286,16 +286,18 @@ describe('MeetNowModal', () => {
     const {fireAndForgetInvoker, resolveMeetNowMeeting} = renderMeetNowModal();
 
     await openModalWithTitle('Standup');
-    await submitForm();
+    const submitButton = screen.getByRole('button', {name: 'meetings.meetNowModal.startMeeting'});
+    const closeButton = screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'});
+    await userEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', {name: 'meetings.meetNowModal.startMeeting'})).toBeDisabled();
-      expect(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'})).toBeDisabled();
+      expect(submitButton).toBeDisabled();
+      expect(closeButton).toBeDisabled();
     });
 
     await userEvent.click(getModalOverlay());
     fireEvent.keyDown(getModalContent(), {key: KEY.ESC});
-    await userEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
+    await userEvent.click(closeButton);
 
     expect(useMeetNowModal.getState().isOpen).toBe(true);
 

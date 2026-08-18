@@ -38,7 +38,9 @@ export const SelectOption = <IsMulti extends boolean = false, Group extends Grou
         return;
       }
 
-      selectedOptionRef.current?.scrollIntoView({block: 'center'});
+      if (typeof selectedOptionRef.current?.scrollIntoView === 'function') {
+        selectedOptionRef.current?.scrollIntoView({block: 'center'});
+      }
     }, [isSelected]);
 
     return (
