@@ -19,7 +19,7 @@
 
 import {forwardRef} from 'react';
 
-import {buttonStyle} from './Button.styles';
+import {buttonStyle} from './button.styles';
 
 import {Loading} from '../../dataDisplay';
 import {COLOR, Theme} from '../../identity';

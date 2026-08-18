@@ -19,13 +19,13 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {Button, ButtonVariant} from './Button';
+import {Button, ButtonVariant} from './button';
 
 import {PlaneIcon} from '../../dataDisplay/icon';
 import {COLOR_V2} from '../../identity';
 
 const meta = {
-  title: 'inputs/Button',
+  title: 'inputs/button',
   component: Button,
   parameters: {
     layout: 'centered',

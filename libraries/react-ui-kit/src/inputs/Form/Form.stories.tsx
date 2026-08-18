@@ -19,7 +19,7 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {Button} from '../Button';
+import {Button} from '../button';
 import {Form} from '../Form';
 import {Input} from '../Input';
 

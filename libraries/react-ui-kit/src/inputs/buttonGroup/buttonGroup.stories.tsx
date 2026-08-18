@@ -19,13 +19,13 @@
 
 import {Meta, StoryObj} from '@storybook/react';
 
-import {ButtonGroup} from './ButtonGroup';
+import {ButtonGroup} from './buttonGroup';
 
 import {PlusIcon} from '../../dataDisplay/icon';
 
 const meta: Meta<typeof ButtonGroup> = {
   component: ButtonGroup,
-  title: 'inputs/ButtonGroup',
+  title: 'inputs/buttonGroup',
   decorators: [
     Story => (
       <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>

@@ -19,12 +19,12 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {ButtonLink} from './ButtonLink';
+import {ButtonLink} from './buttonLink';
 
 import {COLOR} from '../../identity';
 
 const meta = {
-  title: 'inputs/ButtonLink',
+  title: 'inputs/buttonLink',
   component: ButtonLink,
   parameters: {
     layout: 'centered',

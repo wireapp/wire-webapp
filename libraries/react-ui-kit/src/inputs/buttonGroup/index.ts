@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ButtonLink';
+export * from './buttonGroup';

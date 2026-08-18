@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,4 @@
  *
  */
 
-import {ButtonLink} from './ButtonLink';
-
-import {THEME_ID} from '../../identity';
-import {matchComponent} from '../../utils/testUtil';
-
-describe('"ButtonLink"', () => {
-  it('renders', () => matchComponent(<ButtonLink>Submit</ButtonLink>));
-  it('renders (dark theme)', () => matchComponent(<ButtonLink>ButtonLink</ButtonLink>, THEME_ID.DARK));
-  it('renders in loading state', () => matchComponent(<ButtonLink showLoading>Submit</ButtonLink>));
-});
+export * from './button';

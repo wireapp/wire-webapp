@@ -25,8 +25,8 @@ import {SVGIconProps} from '../../dataDisplay/icon/svgIcon';
 import {COLOR} from '../../identity';
 import {Theme} from '../../identity/theme';
 import {childrenWithDefaultProps} from '../../utils';
-import {ButtonProps, filterButtonProps} from '../Button';
-import {buttonStyle} from '../Button/Button.styles';
+import {ButtonProps, filterButtonProps} from '../button';
+import {buttonStyle} from '../button/button.styles';
 
 export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps<T> {}
 

@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/react';
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 
-import {ButtonProps, ButtonVariant} from './Button';
+import {ButtonProps, ButtonVariant} from './button';
 
 import {COLOR, COLOR_V2, Theme} from '../../identity';
 import {defaultTransition} from '../../identity/motions';

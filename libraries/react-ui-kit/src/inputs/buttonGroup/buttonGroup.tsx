@@ -23,8 +23,8 @@ import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {Theme} from '../../identity/theme';
-import {Button, ButtonProps, ButtonVariant} from '../Button';
-import {buttonStyle} from '../Button/Button.styles';
+import {Button, ButtonProps, ButtonVariant} from '../button';
+import {buttonStyle} from '../button/button.styles';
 
 const buttonGroupStyle: (theme: Theme) => CSSObject = () => ({
   display: 'flex',

@@ -21,7 +21,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 
 import {Tooltip} from './tooltip';
 
-import {Button} from '../../inputs/Button/Button';
+import {Button} from '../../inputs/button/button';
 import {Input} from '../../inputs/Input/Input';
 
 const meta = {

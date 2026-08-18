@@ -17,16 +17,13 @@
  *
  */
 
-import {Button} from './Button';
+import {ButtonLink} from './buttonLink';
 
 import {THEME_ID} from '../../identity';
 import {matchComponent} from '../../utils/testUtil';
 
-describe('"Button"', () => {
-  it('renders', () => matchComponent(<Button>Submit</Button>));
-  it('renders (dark theme)', () => matchComponent(<Button>Button</Button>, THEME_ID.DARK));
-  it('renders when disabled', () => matchComponent(<Button disabled>Submit</Button>));
-  it('renders as block', () => matchComponent(<Button block>Submit</Button>));
-  it('renders in loading state', () => matchComponent(<Button showLoading>Submit</Button>));
-  it('renders in active state', () => matchComponent(<Button isActive>Submit</Button>));
+describe('"ButtonLink"', () => {
+  it('renders', () => matchComponent(<ButtonLink>Submit</ButtonLink>));
+  it('renders (dark theme)', () => matchComponent(<ButtonLink>ButtonLink</ButtonLink>, THEME_ID.DARK));
+  it('renders in loading state', () => matchComponent(<ButtonLink showLoading>Submit</ButtonLink>));
 });

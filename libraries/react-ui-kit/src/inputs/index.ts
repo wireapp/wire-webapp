@@ -17,10 +17,10 @@
  *
  */
 
-export * from './Button';
-export * from './ButtonGroup';
-export * from './ButtonLink';
-export * from './ButtonsGroup';
+export * from './button';
+export * from './buttonGroup';
+export * from './buttonLink';
+export * from './buttonsGroup';
 export * from './Checkbox';
 export * from './CodeInput';
 export * from './ComboboxSelect';

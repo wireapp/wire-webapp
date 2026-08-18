@@ -21,7 +21,7 @@ import {useRef} from 'react';
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {Button} from '../Button';
+import {Button} from '../button';
 import {Input} from '../Input';
 import {ShakeBox, ShakeBoxRef} from '../ShakeBox';
 

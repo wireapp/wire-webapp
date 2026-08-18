@@ -19,9 +19,9 @@
 
 import {ReactNode} from 'react';
 
-import {wrapperStyles} from './ButtonsGroup.styles';
+import {wrapperStyles} from './buttonsGroup.styles';
 
-import {Button as ButtonComponent, ButtonProps, ButtonVariant} from '../Button';
+import {Button as ButtonComponent, ButtonProps, ButtonVariant} from '../button';
 import {IconButton as IconButtonComponent, IconButtonProps, IconButtonVariant} from '../IconButton';
 
 interface ButtonsGroupProps {

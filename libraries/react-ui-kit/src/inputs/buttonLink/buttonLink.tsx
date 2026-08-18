@@ -24,8 +24,8 @@ import {COLOR} from '../../identity';
 import {Theme} from '../../identity/theme';
 import {filterTextProps} from '../../typography';
 import {filterProps} from '../../utils/util';
-import {ButtonProps} from '../Button';
-import {buttonStyle} from '../Button/Button.styles';
+import {ButtonProps} from '../button';
+import {buttonStyle} from '../button/button.styles';
 
 export const buttonLinkStyle: (theme: Theme, props: ButtonProps<HTMLAnchorElement>) => CSSObject = (theme, props) => ({
   ...buttonStyle(theme, props),
