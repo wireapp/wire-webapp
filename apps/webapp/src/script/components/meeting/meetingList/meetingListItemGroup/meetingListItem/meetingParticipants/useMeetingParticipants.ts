@@ -19,6 +19,7 @@
 
 import {useMemo} from 'react';
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -28,9 +29,12 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {getMeetingParticipantsForDisplay} from './getMeetingParticipantsForDisplay';
 
-export const useMeetingParticipants = (conversation: Conversation): User[] => {
+export const useMeetingParticipants = (conversation: Conversation, qualifiedCreator: QualifiedId): User[] => {
   const selfUser = container.resolve(UserState).self();
   const {participating_user_ets: participants} = useKoSubscribableChildren(conversation, ['participating_user_ets']);
 
-  return useMemo(() => getMeetingParticipantsForDisplay(participants, selfUser), [participants, selfUser]);
+  return useMemo(
+    () => getMeetingParticipantsForDisplay(participants, selfUser, qualifiedCreator),
+    [participants, selfUser, qualifiedCreator],
+  );
 };

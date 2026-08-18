@@ -34,12 +34,14 @@ const createUser = (id: string, name: string) => {
   return user;
 };
 
-const renderStackedAvatars = (participants: User[]) => {
+const renderStackedAvatars = (participants: User[], organizer?: User) => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );
 
-  return render(<StackedAvatars participants={participants} />, {wrapper: rootProviderWrapper});
+  return render(<StackedAvatars participants={participants} organizer={organizer?.qualifiedId} />, {
+    wrapper: rootProviderWrapper,
+  });
 };
 
 describe('StackedAvatars', () => {
@@ -71,5 +73,17 @@ describe('StackedAvatars', () => {
     renderStackedAvatars(participants);
 
     expect(screen.getByText('+1')).toBeInTheDocument();
+  });
+
+  it('labels visible participant avatars and marks the organizer', () => {
+    const organizer = createUser('1', 'Alice Anderson');
+    const participant = createUser('2', 'Bob Baker');
+
+    renderStackedAvatars([organizer, participant], organizer);
+
+    expect(
+      screen.getByLabelText(`Alice Anderson (${translateForTest('meetings.participant.organizer')})`),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Bob Baker')).toBeInTheDocument();
   });
 });

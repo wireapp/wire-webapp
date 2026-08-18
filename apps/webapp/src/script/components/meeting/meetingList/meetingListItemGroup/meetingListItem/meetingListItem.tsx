@@ -113,7 +113,11 @@ const MeetingListItemComponent = ({
         </div>
       </div>
       <div css={rightStyles}>
-        <MeetingParticipants qualifiedConversation={meetingSeries.qualified_conversation} isOngoing={isOngoing} />
+        <MeetingParticipants
+          qualifiedConversation={meetingSeries.qualified_conversation}
+          qualifiedCreator={meetingSeries.qualified_creator}
+          isOngoing={isOngoing}
+        />
         <MeetingStatus
           temporalStatus={temporalStatus}
           joinMeeting={joinMeeting}

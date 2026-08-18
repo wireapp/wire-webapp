@@ -17,13 +17,26 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import type {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-export const getMeetingParticipantsForDisplay = (participants: User[], selfUser: User): User[] => {
+export const getMeetingParticipantsForDisplay = (
+  participants: User[],
+  selfUser: User,
+  qualifiedCreator: QualifiedId,
+): User[] => {
+  const organizer = participants.find(participant => matchQualifiedIds(participant.qualifiedId, qualifiedCreator));
   const otherParticipants = participants.filter(
-    participant => !matchQualifiedIds(participant.qualifiedId, selfUser.qualifiedId),
+    participant =>
+      !matchQualifiedIds(participant.qualifiedId, selfUser.qualifiedId) &&
+      !matchQualifiedIds(participant.qualifiedId, qualifiedCreator),
   );
 
-  return [selfUser, ...otherParticipants];
+  return [
+    ...(organizer ? [organizer] : []),
+    ...(!organizer || !matchQualifiedIds(selfUser.qualifiedId, qualifiedCreator) ? [selfUser] : []),
+    ...otherParticipants,
+  ];
 };
