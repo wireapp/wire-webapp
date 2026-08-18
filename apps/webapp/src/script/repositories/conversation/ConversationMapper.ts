@@ -515,7 +515,7 @@ export class ConversationMapper {
       conversationEntity.isGuest(conversationData.is_guest);
     }
 
-    if (conversationData.is_ghost_group !== undefined) {
+    if (!isUndefined(conversationData.is_ghost_group)) {
       conversationEntity.isGhostGroup(conversationData.is_ghost_group);
     }
 
